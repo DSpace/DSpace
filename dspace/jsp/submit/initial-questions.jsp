@@ -43,12 +43,14 @@
   -
   - Attributes to pass in:
   -    submission.info    - the SubmissionInfo object
+  -    submission.inputs  - the DCInputSet object
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.DCInputSet" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -56,6 +58,8 @@
 <%
     SubmissionInfo si =
         (SubmissionInfo) request.getAttribute("submission.info");
+    DCInputSet inputSet =
+        (DCInputSet) request.getAttribute("submission.inputs");
 %>
 
 <dspace:layout locbar="off" navbar="off" title="Describe Your Item" nocache="true">
@@ -65,6 +69,7 @@
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.INITIAL_QUESTIONS %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
+            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
         <H1>Submit: Describe Your Item</H1>
@@ -75,6 +80,11 @@
 
         <center>
             <table class="miscTable">
+<%
+	// Don't display MultipleTitles if no such form box defined
+    if (inputSet.isDefinedMultTitles())
+    {
+%>
                 <tr class="oddRowOddCol">
                     <td class="oddRowOddCol" align="left">
                         <table border=0>
@@ -85,6 +95,12 @@
                         </table>
                     </td>
                 </tr>
+<%
+    }
+    // Don't display PublishedBefore if no form boxes defined
+    if (inputSet.isDefinedPubBefore())
+    {
+%>
                 <tr class="evenRowOddCol">
                     <td class="evenRowOddCol" align="left">
                         <table border=0>
@@ -96,6 +112,7 @@
                     </td>
                 </tr>
 <%
+    }
     // Don't display file or thesis questions in workflow mode
     if (!SubmitServlet.isWorkflow(si))
     {
