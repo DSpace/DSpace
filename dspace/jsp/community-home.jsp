@@ -229,10 +229,15 @@
 		          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COMMUNITY%>">
                   <input type="submit" value="Edit...">
                 </form>
-			    <form method=POST action="<%=request.getContextPath()%>/dspace-admin/collection-wizard">
-			      <input type="hidden" name="community_id" value="<%= community.getID() %>">
-                  <input type="submit" value="Create collection">
+		<form method=POST action="<%=request.getContextPath()%>/dspace-admin/collection-wizard">
+		     <input type="hidden" name="community_id" value="<%= community.getID() %>">
+                     <input type="submit" value="Create collection">
                 </form>
+                <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+                    <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
+                    <input type="hidden" name="parent_community_id" value="<%= community.getID() %>">
+                    <input type="submit" name="submit" value="Create Sub-community">
+                 </form>
               </td>
             </tr>
             <tr>
