@@ -118,7 +118,7 @@
                     </select>
                 </td>
                 <td class="<%= row %>RowEvenCol" align="center">
-                    <input type="checkbox" name="internal" value="trye"<%= formats[i].isInternal() ? " CHECKED" : "" %>>
+                    <input type="checkbox" name="internal" value="true"<%= formats[i].isInternal() ? " CHECKED" : "" %>>
                 </td>
                 <td class="<%= row %>RowOddCol">
                     <input type="text" name="extensions" value="<%= extValue %>" size="10">
