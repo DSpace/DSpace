@@ -67,14 +67,13 @@
     {
         scopeName = collection.getMetadata("name");
         linkText = collection.getMetadata("name");
-        linkBack = "/communities/" + community.getID() + "/collections/" +
-            collection.getID() + "/";
+        linkBack = "/handle/" + collection.getHandle();
     }
     else if(community != null)
     {
         scopeName = community.getMetadata("name");
         linkText = community.getMetadata("name");
-        linkBack = "/communities/" + community.getID() + "/";
+        linkBack = "/handle/" + community.getHandle();
     }
 %>
 
