@@ -600,6 +600,15 @@ public class Item
     public void setSubmitter(EPerson sub)
     {
         submitter = sub;
+
+        if (submitter != null)
+        {
+            itemRow.setColumn("submitter_id", submitter.getID());
+        }
+        else
+        {
+            itemRow.setColumnNull("submitter_id");
+        }
     }
 
 
