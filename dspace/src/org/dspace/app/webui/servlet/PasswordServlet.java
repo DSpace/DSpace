@@ -90,7 +90,7 @@ public class PasswordServlet extends DSpaceServlet
         String password = request.getParameter("login_password");
         
         // Locate the eperson
-        EPerson eperson = EPerson.findByEmail(context, email);
+        EPerson eperson = EPerson.findByEmail(context, email.toLowerCase());
         boolean loggedIn = false;
 
         // Verify the password
