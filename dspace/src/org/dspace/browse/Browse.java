@@ -1306,7 +1306,7 @@ class NormalizedTitle
     }
 
     /**
-     * Return the index of the first non-whitespace character in
+     * Return the index of the first letter or number in
      * the character array, starting at position STARTAT.
      */
     private static int firstWhitespace(char[] title, int startAt)
@@ -1315,7 +1315,9 @@ class NormalizedTitle
 
         for (int j = startAt; j < title.length; j++)
         {
-            if (Character.isWhitespace(title[j]))
+            //if (Character.isWhitespace(title[j]))
+        	// Actually, let's skip anything that's not a letter or number
+        	if (!Character.isLetterOrDigit(title[j]))
             {
                 first = j + 1;
                 continue;
