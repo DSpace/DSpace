@@ -53,6 +53,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 import java.util.StringTokenizer;
+import java.sql.SQLException;
+
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace.
@@ -80,68 +82,103 @@ import java.util.StringTokenizer;
 
 public class AuthorizeManager
 {
-    public static void authorizeAction(Context c,Object o, int a)
-        throws java.sql.SQLException, AuthorizeException
+    /**
+     * primary authorization interface, assumes user is the context's
+     *  currentuser, and throws an exception
+     *
+     * @param c Context object
+     * @param o DSpace object
+     * @param a action from org.dspace.core.Constants
+     * 
+     * @throws AuthorizeException if permission denied or object type unknown
+     */
+    public static void authorizeAction(Context c,Object myobject, int myaction)
+        throws SQLException, AuthorizeException
     {
-        // initialize so that -1s get passed on unknown objects
-        int otype	= -1;
-        int oid 	= -1;
-
+        int otype;
+        int oid;
+        int userid = -1;  // -1 is anonymous
+        
         // now figure out the type and object id
-        if( o instanceof Item )
+        if( myobject instanceof Item )
         {
             otype = Constants.ITEM;
-            oid   = ((Item) o).getID();
+            oid   = ((Item) myobject).getID();
         }
-        else if( o instanceof Bitstream )
+        else if( myobject instanceof Bitstream )
         {
             otype = Constants.BITSTREAM;
-            oid   = ((Bitstream) o).getID();
+            oid   = ((Bitstream) myobject).getID();
         }		
-        else if( o instanceof Collection )
+        else if( myobject instanceof Collection )
         {
             otype = Constants.COLLECTION;
-            oid   = ((Collection) o).getID();
+            oid   = ((Collection) myobject).getID();
         }		
-        else if( o instanceof Bundle )
+        else if( myobject instanceof Bundle )
         {
             otype = Constants.BUNDLE;
-            oid   = ((Bundle) o).getID();
+            oid   = ((Bundle) myobject).getID();
         }
         else
         {
-            throw new AuthorizeException("Unknown object type");
+            throw new IllegalArgumentException("Unknown object type");
         }
 		
-        authorizeAction( c,otype,oid,a);
+        // now set the userid if context contains an eperson
+        EPerson e = c.getCurrentUser();
+        
+        if( e != null ) userid = e.getID();
+        
+        if (!authorize(c,otype,oid,myaction, userid))
+            throw new AuthorizeException("Authorization denied for action " + myaction + " by user " + userid);
     }
 
-    /**
-     * authorizeAction()is the authorize method that throws an AuthorizeException
-	 *
-     * @param resourcetype	constant from core.Constants (collection, item, etc.)
-     * @param resorceidID	of resource you're trying to do an authorize on
-     * @param actionid		action to perform (read, write, etc) DSpaceActions
-     * @param userid		who wants to perform the action?
-     * @throws AuthorizeException
-     */
-    public static void authorizeAction(Context c,int resourcetype, int resourceid, int actionid)
-        throws java.sql.SQLException, AuthorizeException
-    {
-        if (!authorize(c,resourcetype, resourceid, actionid))
-            throw new AuthorizeException("Authorization denied for action " + actionid + " by user " + c.getCurrentUser().getID());
 
+    /**
+     * same authorize, returns boolean for those who don't want to bother
+     *  catching exceptions.
+     */
+    public static boolean authorize(Context c, Object o, int a)
+        throws SQLException
+    {
+        boolean isauthorized = true;
+        
+        try
+        {
+            authorizeAction(c,o,a);
+        }
+        catch( AuthorizeException e )
+        {
+            isauthorized = false;
+        }
+        
+        return isauthorized;
     }
 
     /**
      * check to see if the current user is an admin
      */
-
     public static boolean isAdmin(Context c)
-        throws java.sql.SQLException
+        throws SQLException
+    {
+        EPerson e = c.getCurrentUser();
+        
+        if( e == null ) return false; // anonymous users can't be admins....
+        
+        else
+            return isAdmin(c,e.getID());
+    }
+
+
+    /**
+     * check to see if the a given userid is an admin
+     */
+    public static boolean isAdmin(Context c,int userid)
+        throws SQLException
     {
         // group is hardcoded as 'admin', and admins can do everything
-        if (Group.isMember(c,-1,c.getCurrentUser().getID()))
+        if( Group.isMember(c,-1,userid) )
             return true;
         else
             return false;
@@ -155,13 +192,11 @@ public class AuthorizeManager
      * @param resorceidID of resource you're trying to do an authorize on
      * @param actionid - action to perform (read, write, etc)
      */
-    public static boolean authorize(Context c,int resourcetype, int resourceid, int actionid)
-        throws java.sql.SQLException
+    public static boolean authorize(Context c,int resourcetype, int resourceid, int actionid, int userid)
+        throws SQLException
     {
-        int userid = c.getCurrentUser().getID();
-        
         // admins can do everything
-        if( isAdmin(c) ) return true;
+        if( isAdmin(c,userid) ) return true;
    
         TableRowIterator i = policyLookup(c,resourcetype, resourceid, actionid);
 
@@ -236,9 +271,8 @@ public class AuthorizeManager
      * policies once a specific policy is found.
      * 
 	 */
-	 
-    static TableRowIterator policyLookup(Context c, int resource_type, int resource_id, int action_id)
-        throws java.sql.SQLException
+    private static TableRowIterator policyLookup(Context c, int resource_type, int resource_id, int action_id)
+        throws SQLException
     {
         String myquery = "";
         
