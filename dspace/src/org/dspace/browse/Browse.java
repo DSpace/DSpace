@@ -64,8 +64,8 @@ import org.dspace.core.Context;
 
 
 /**
- * API for Browsing
- * NOTE: Browses _only_ return Items which have the in_archive flag set!
+ * API for Browsing Items in DSpace by title, author, or date.
+ * Browses only return archived Items.
  *
  * @author  Peter Breton
  * @version $Revision$
