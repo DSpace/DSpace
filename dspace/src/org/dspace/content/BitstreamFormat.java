@@ -176,25 +176,24 @@ public class BitstreamFormat
 
     
     /**
-     * Get the generic "unknown" bitstream format.
+     * Find a bitstream format by its (unique) short description
      *
      * @param  context  DSpace context object
+     * @param  desc     the short description
      *   
-     * @return  the "unknown" bitstream format.
-     *
-     * @throws IllegalStateException  
-     *               if the "unknown" bitstream format couldn't be found
+     * @return  the corresponding bitstream format, or <code>null</code> if
+     *          there's no bitstream format with the given short description
      */
-    public static BitstreamFormat findUnknown(Context context)
+    public static BitstreamFormat findByShortDescription(Context context,
+        String desc)
         throws SQLException
     {
         TableRow formatRow = DatabaseManager.findByUnique(context,
-            "bitstreamformatregistry", "short_description", "Unknown");
+            "bitstreamformatregistry", "short_description", desc);
 
         if (formatRow == null)
         {
-            throw new IllegalStateException(
-                "No `Unknown' bitstream format in registry");
+            return null;
         }
         else
         {
@@ -218,6 +217,33 @@ public class BitstreamFormat
             
 
             return new BitstreamFormat(context, formatRow);
+        }
+    }
+
+
+    /**
+     * Get the generic "unknown" bitstream format.
+     *
+     * @param  context  DSpace context object
+     *   
+     * @return  the "unknown" bitstream format.
+     *
+     * @throws IllegalStateException  
+     *               if the "unknown" bitstream format couldn't be found
+     */
+    public static BitstreamFormat findUnknown(Context context)
+        throws SQLException
+    {
+        BitstreamFormat bf = findByShortDescription(context, "Unknown");
+
+        if (bf == null)
+        {
+            throw new IllegalStateException(
+                "No `Unknown' bitstream format in registry");
+        }
+        else
+        {
+            return bf;
         }
     }
         
