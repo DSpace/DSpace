@@ -1,5 +1,9 @@
 1.3 branch (unreleased)
 =======================
+
+(Richard Jones)
+- "View Licence" link and copyright warning added to item display pages
+
 (Richard Jones)
 - SF patch #1149684 Group and Collection Admin bug fix. Can now change submitter
 and collection admin group names (COLLECTION_XXX_SUBMITTER, COLLECTION_XXX_ADMIN)
