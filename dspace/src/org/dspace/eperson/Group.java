@@ -1,9 +1,7 @@
 /*
  * Group.java
  *
- * Version: $Revision$
- *
- * Date: $Date$
+ * $Id$
  *
  * Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -76,13 +74,14 @@ public class Group
     /** epeople list needs to be written out again */
     private boolean epeoplechanged = false;
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(Group.class);
-
     // findAll sortby types
     public static final int ID   = 0;   // sort by ID
     public static final int NAME = 1;   // sort by NAME (default)
     
+
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(Group.class);
+
 
     /**
      * Construct a Group from a given context and tablerow
@@ -224,6 +223,9 @@ public class Group
      */
     public boolean isMember(EPerson e)
     {
+        // special, group 0 is anonymous
+        if( getID() == 0 ) return true;
+        
         return epeople.contains(e);
     }
 
@@ -241,6 +243,9 @@ public class Group
     public static boolean isMember(Context c, int groupid, int userid)
         throws SQLException
     {
+        // special, everyone is member of group 0 (anonymous)
+        if( groupid == 0 ) return true;
+    
         TableRowIterator tri = DatabaseManager.query(c,
             "eperson",
             "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
