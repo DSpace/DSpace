@@ -40,6 +40,7 @@
 
 package org.dspace.workflow;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -267,18 +268,18 @@ public class WorkflowItem implements InProgressSubmission
     }
 
     /**
-     * Delete workflow
+     * Delete workflow only, not the item
      *
      * @param context Context object
      */
-    public void delete(Context context)
-        throws SQLException
+    public void delete()
+        throws SQLException, IOException, AuthorizeException
     {
         // Remove from cache
         ourContext.removeCached(this, getID());
 
         // FIXME - auth?
-        DatabaseManager.delete(context, wfRow);
+        DatabaseManager.delete(ourContext, wfRow);
     }
 
 
