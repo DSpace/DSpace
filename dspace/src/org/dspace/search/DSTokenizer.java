@@ -1,7 +1,9 @@
 /*
- * DSAnalyzer.java
+ * DSTokenizer.java
  *
- * $Id$
+ * Version: $Revision$
+ *
+ * Date: $Date$
  *
  * Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -38,61 +40,24 @@
 
 package org.dspace.search;
 
-import java.util.Hashtable;
 import java.io.Reader;
-
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.standard.*;
 
-
-public class DSAnalyzer extends Analyzer
-{
-    /*
-     * An array containing some common words that
-     * are not usually useful for searching.
-     */
-    private static final String[] STOP_WORDS =
-    {
-
-            // new stopwords (per Margret)
-            "a", "am", "and", "are", "as",
-            "at", "be", "but", "by",
-            "for", "if", "in", "into",
-            "is", "it", "no", "not",
-            "of", "on", "or", "the",
-            "to", "was"
-
-            // old stopwords (Lucene default)
-            /*		"a",	"and",	"are",	"as",
-             "at",	"be",	"but",	"by",
-             "for",	"if",	"in",	"into",
-             "is",	"it",	"no",	"not",
-             "of",	"on",	"or",	"s",
-             "such",	"t",	"that",	"the",
-             "their","then", "there","these",
-             "they",	"this", "to",	"was",
-             "will",	"with"
-             */
-    };
-
-    /*
-     * Stop table
-     */
-    final static private Hashtable stopTable =
-            StopFilter.makeStopTable(STOP_WORDS);
-
-    /*
-     * Create a token stream for this analyzer.
-     */
-    public final TokenStream tokenStream(String fieldName, final Reader reader)
-    {
-        TokenStream result = new DSTokenizer(reader);
-
-        result = new StandardFilter  (result);
-        result = new LowerCaseFilter (result);
-        result = new StopFilter      (result, stopTable);
-        result = new PorterStemFilter(result);
-
-        return result;
-    }
+public final class DSTokenizer extends CharTokenizer {
+	/** Construct a new LowerCaseTokenizer. */
+	public DSTokenizer(Reader in) {
+		super(in);
+	}
+	/** Collects only characters which satisfy
+	* {@link Character#isLetter(char)}.*/
+	protected char normalize(char c) {
+		return Character.toLowerCase(c);
+	}
+	/** Collects only characters which do not satisfy
+	* {@link Character#isWhitespace(char)}.*/
+	protected boolean isTokenChar(char c) {
+		return Character.isLetterOrDigit(c);
+	}
 }
+
