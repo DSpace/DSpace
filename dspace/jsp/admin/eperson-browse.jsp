@@ -103,9 +103,9 @@
 
     <table class="miscTable" align="center">
         <tr>
-            <th class="oddRowOddCol"><strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?sortby=id">ID</A></strong></th>
-            <th class="oddRowEvenCol"><strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?sortby=email">E-mail Address</A></strong></th>
-            <th class="oddRowOddCol"><strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?sortby=lastname">Last Name</A></strong></th>
+            <th class="oddRowOddCol"><strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?submit_browse&sortby=id">ID</A></strong></th>
+            <th class="oddRowEvenCol"><strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?submit_browse&sortby=email">E-mail Address</A></strong></th>
+            <th class="oddRowOddCol"><strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?submit_browse&sortby=lastname">Last Name</A></strong></th>
             <th class="oddRowEvenCol"><strong>First Name</strong></th>
             <th class="oddRowOddCol"><strong>Can Log In?</strong></th>
             <th class="oddRowEvenCol"><strong>Must Use Cert?</strong></th>
