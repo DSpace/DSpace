@@ -49,6 +49,7 @@ import net.handle.util.StreamTable;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 
@@ -295,32 +296,28 @@ public class HandlePlugin implements HandleStorage
         if (log.isInfoEnabled())
             log.info("Called haveNA");
 
-        Context context = null;
+        /*
+         * Naming authority Handles are in the form: 0.NA/1721.1234
+         *
+         * 0.NA is basically the naming authority for naming authorities.
+         * For this simple implementation, we will just check that the prefix
+         * configured in dspace.cfg is the one in the request, returning true
+         * if this is the case, false otherwise.
+         *
+         * FIXME: For more complex Handle situations, this will need enhancing.
+         */
 
-        try
-        {
-            context = new Context();
-            return HandleManager.resolveToURL
-                (context,
-                 Util.decodeString(theHandle)) != null;
-        }
-        catch (Exception e)
-        {
-            if (log.isDebugEnabled())
-                log.debug("Exception in haveNA", e);
+        // First, construct a string representating the naming authority Handle
+        // we'd expect.
+        String expected = "0.NA/" + ConfigurationManager.getProperty("handle.prefix");
 
-            throw new HandleException(HandleException.INTERNAL_ERROR);
-        }
-        finally
-        {
-            if (context != null)
-                try
-                {
-                    context.complete();
-                }
-                catch (SQLException sqle) {}
-        }
+        // Which authority does the request pertain to?
+        String received = Util.decodeString(theHandle);
+
+        // Return true if they match
+        return expected.equals(received);
     }
+
 
     /**
      * Return all handles in local storage which start with the naming
