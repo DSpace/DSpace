@@ -513,8 +513,17 @@ public class ItemTag extends TagSupport
 			    out.print(bitstreams[k].getFormatDescription());
 			    out.print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
 			    out.print(request.getContextPath());
-			    out.print("/retrieve/");
-			    out.print(bitstreams[k].getID() + "/");
+			    if (bitstreams[k].getSequenceID() > 0)
+			    {
+				out.print("/bitstream/");
+				out.print(item.getHandle() + "/");
+				out.print(bitstreams[k].getSequenceID() + "/");
+			    }
+			    else
+			    {
+				out.print("/retrieve/");
+				out.print(bitstreams[k].getID() + "/");
+			    }
 			    out.print(URLEncoder.encode(bitstreams[k].getName()));
 			    out.print("\">");
                             

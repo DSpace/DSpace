@@ -1,5 +1,5 @@
 /*
- * HTMLServlet.java
+ * BitstreamServlet.java
  *
  * Version: $Revision$
  *
@@ -42,7 +42,6 @@ package org.dspace.app.webui.servlet;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -63,18 +62,19 @@ import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 
+
 /**
- * Servlet for HTML bitstream support.
+ * Servlet for retrieving bitstreams.  The bits are simply piped to the user.
  * <P>
- * <code>/html/handle/filename</code>
+ * <code>/bitstream/handle/sequence_id/filename</code>
  *
  * @author  Robert Tansley
  * @version $Revision$
  */
-public class HTMLServlet extends DSpaceServlet
+public class BitstreamServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(HTMLServlet.class);
+    private static Logger log = Logger.getLogger(RetrieveServlet.class);
     
     
     protected void doDSGet(Context context,
@@ -86,45 +86,40 @@ public class HTMLServlet extends DSpaceServlet
     
         // Get the ID from the URL
         String idString = request.getPathInfo();
-	String filename = "";
 	String handle = "";
+	String sequence = "";
 
         if (idString != null)
         {
-
             // Remove leading slash
             if (idString.startsWith("/"))
             {
                 idString = idString.substring(1);
             }
 
-            // Get filename
+	    // Remove last slash and filename after it
             int slashIndex = idString.lastIndexOf('/');
             if (slashIndex != -1)
             {
-		filename = idString.substring(slashIndex + 1);
-		filename = URLDecoder.decode(filename);
-                handle = idString.substring(0, slashIndex);
+                idString = idString.substring(0, slashIndex);
             }
 
-            // If there's still a second slash, remove it and anything after it,
-            // it might be a relative directory name
-            slashIndex = handle.indexOf('/');
-	    slashIndex = handle.indexOf('/', slashIndex + 1);
-            if (slashIndex != -1)
+	    // Get bitstream sequence ID
+	    slashIndex = idString.lastIndexOf('/');
+	    if (slashIndex != -1)
 	    {
-		handle = handle.substring(0, slashIndex);
+		sequence = idString.substring(slashIndex + 1);
+		handle = idString.substring(0, slashIndex);
 	    }
 
-
+        
             // Find the corresponding bitstream
             try
             {
-		boolean found = false;
 
-		Item item = (Item) HandleManager.resolveToObject(context, handle);
+                Item item = (Item) HandleManager.resolveToObject(context, handle);
 
-		if (item == null)
+                if (item == null)
 		{
 		    log.info(LogManager.getHeader(context,
 						  "invalid_id",
@@ -133,41 +128,42 @@ public class HTMLServlet extends DSpaceServlet
 		    return;
 		}
 
-		Bundle[] bundles = item.getBundles();
-		for (int i = 0; i < bundles.length; i++) {
-		    Bitstream[] bitstreams = bundles[i].getBitstreams();
-		    if (!found) {
-			for (int k = 0; k < bitstreams.length; k++) {
-			    if (filename.equals(bitstreams[k].getName())) {
-				bitstream = bitstreams[k];
-				found = true;
-			    }
+		int sid = Integer.parseInt(sequence);
+		boolean found = false;
+
+                Bundle[] bundles = item.getBundles();
+                for (int i = 0; i < bundles.length && !found; i++)
+		{
+                    Bitstream[] bitstreams = bundles[i].getBitstreams();
+		    for (int k = 0; k < bitstreams.length && !found; k++)
+		    {
+			if (sid == bitstreams[k].getSequenceID())
+			{
+			    bitstream = bitstreams[k];
+			    found = true;
 			}
 		    }
-		}
-
+                }
             }
             catch (NumberFormatException nfe)
             {
                 // Invalid ID - this will be dealt with below
             }
-
-	}
-
+        }
+        
         // Did we get a bitstream?
         if (bitstream != null)
         {
-	    	  
             log.info(LogManager.getHeader(context,
                 "view_bitstream",
                 "bitstream_id=" + bitstream.getID()));
-
+            
             // Set the response MIME type
             response.setContentType(bitstream.getFormat().getMIMEType());
             
             // Response length
             response.setHeader("Content-Length",
-	      String.valueOf(bitstream.getSize()));
+                String.valueOf(bitstream.getSize()));
             
             // Pipe the bits
             InputStream is = bitstream.retrieve();
@@ -175,11 +171,9 @@ public class HTMLServlet extends DSpaceServlet
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();
             response.getOutputStream().flush();
-
         }
         else
         {
-
             // No bitstream - we got an invalid ID
             log.info(LogManager.getHeader(context,
                 "view_bitstream",
@@ -189,7 +183,6 @@ public class HTMLServlet extends DSpaceServlet
                 response,
                 idString,
                 Constants.BITSTREAM);
-
         }
     }
 }

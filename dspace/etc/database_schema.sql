@@ -149,7 +149,8 @@ CREATE TABLE Bitstream
    source                  VARCHAR(256),
    internal_id             VARCHAR(256),
    deleted                 BOOL,
-   store_number            INTEGER
+   store_number            INTEGER,
+   sequence_id             INTEGER
 );
 
 -------------------------------------------------------

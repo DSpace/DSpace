@@ -215,6 +215,28 @@ public class Bitstream extends DSpaceObject
 
 
     /**
+     * Get the sequence ID of this bitstream
+     *
+     * @return the sequence ID
+     */
+    public int getSequenceID()
+    {
+	return bRow.getIntColumn("sequence_id");
+    }
+
+
+    /**
+     * Set the sequence ID of this bitstream
+     *
+     * @param  sid  the ID
+     */
+    public void setSequenceID(int sid)
+    {
+	bRow.setColumn("sequence_id", sid);
+    }
+
+
+    /**
      * Get the name of this bitstream - typically the filename, without
      * any path information
      *

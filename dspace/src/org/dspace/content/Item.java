@@ -1107,6 +1107,39 @@ public class Item extends DSpaceObject
         // Set the last modified date
         itemRow.setColumn("last_modified", new Date());
         
+	// Set sequence IDs for bitstreams in item
+	int sequence = 0;
+	Bundle[] bunds = getBundles();
+
+	// find the highest current sequence number
+	for (int i = 0; i < bunds.length; i++)
+	{
+	    Bitstream[] streams = bunds[i].getBitstreams();
+	    for (int k = 0; k < streams.length; k++)
+	    {
+		if (streams[k].getSequenceID() > sequence)
+		{
+		    sequence = streams[k].getSequenceID();
+		}
+	    }
+	}
+
+	// start sequencing bitstreams without sequence IDs
+	sequence++;
+	for (int i = 0; i < bunds.length; i++)
+	{
+	    Bitstream[] streams = bunds[i].getBitstreams();
+	    for (int k = 0; k < streams.length; k++)
+	    {
+		if (streams[k].getSequenceID() < 0)
+		{
+		    streams[k].setSequenceID(sequence);
+		    sequence++;
+		    streams[k].update();
+		}
+	    }
+	}
+
         // Make sure that withdrawn and in_archive are non-null
         if (itemRow.isColumnNull("in_archive"))
         {

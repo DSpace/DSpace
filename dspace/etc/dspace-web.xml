@@ -131,6 +131,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>bitstream</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BitstreamServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>browse-author</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
     <init-param>
@@ -217,6 +222,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>html</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.HTMLServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>internal-error</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.InternalErrorServlet</servlet-class>
   </servlet>
@@ -261,11 +271,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>html</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.HTMLServlet</servlet-class>
-  </servlet>
-
-  <servlet>
     <servlet-name>retrieve</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
   </servlet>
@@ -301,6 +306,11 @@
   <servlet-mapping>
     <servlet-name>advanced-search</servlet-name>
     <url-pattern>/advanced-search</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>bitstream</servlet-name>
+    <url-pattern>/bitstream/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -374,6 +384,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>html</servlet-name>
+    <url-pattern>/html/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>internal-error</servlet-name>
     <url-pattern>/internal-error</url-pattern>
   </servlet-mapping>
@@ -411,11 +426,6 @@
   <servlet-mapping>
     <servlet-name>register</servlet-name>
     <url-pattern>/register</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>html</servlet-name>
-    <url-pattern>/html/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
