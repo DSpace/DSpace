@@ -44,27 +44,25 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.Item;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
@@ -75,38 +73,46 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 public class DSIndexer
 {
-    /** IndexItem() adds a single item to the index
+   private static final Logger log = Logger.getLogger(DSIndexer.class);
+   
+    /**
+     * IndexItem() adds a single item to the index
      */
-    public static void indexContent(Context c, DSpaceObject dso)
-        throws SQLException, IOException
-    {
-        IndexWriter writer = openIndex(c, false);
+   public static void indexContent(Context c, DSpaceObject dso)
+         throws SQLException, IOException
+   {
+      IndexWriter writer = openIndex(c, false);
+      try
+      {
+         switch (dso.getType())
+         {
+         case Constants.ITEM:
+            writeItemIndex(c, writer, (Item) dso);
+            break;
 
-        switch( dso.getType() )
-        {
-            case Constants.ITEM:
-                writeItemIndex(c, writer, (Item)dso);
-                break;
+         case Constants.COLLECTION:
+            writeCollectionIndex(c, writer, (Collection) dso);
+            break;
 
-            case Constants.COLLECTION:
-                writeCollectionIndex(c, writer, (Collection)dso);
-                break;
-
-            case Constants.COMMUNITY:
-                writeCommunityIndex(c, writer, (Community)dso);
-                break;
-            // FIXME: should probably default unknown type exception
-        }
-
-        closeIndex(c, writer);
-    }
+         case Constants.COMMUNITY:
+            writeCommunityIndex(c, writer, (Community) dso);
+            break;
+         // FIXME: should probably default unknown type exception
+         }
+      }
+      finally
+      {
+         closeIndex(c, writer);
+      }
+   }
 
 
-    /** unIndex removes an Item, Collection, or Community
-     *  only works if the DSpaceObject has a handle
-     *  (uses the handle for its unique ID)
-     *
-     * @param dso DSpace Object, can be Community, Item, or Collection
+    /**
+     * unIndex removes an Item, Collection, or Community only works if the
+     * DSpaceObject has a handle (uses the handle for its unique ID)
+     * 
+     * @param dso
+     *           DSpace Object, can be Community, Item, or Collection
      */
     public static void unIndexContent(Context c, DSpaceObject dso)
         throws SQLException, IOException
@@ -126,11 +132,16 @@ public class DSIndexer
         {
             // we have a handle (our unique ID, so remove)
             Term t = new Term("handle", myhandle);
-            ir.delete(t);
-            ir.close();
+            try {
+              ir.delete(t);
+            }
+            finally {
+              ir.close();
+            }
         }
         else
         {
+           log.warn("unindex of content with null handle attempted");
             // FIXME: no handle, fail quietly - should log failure
             //System.out.println("Error in unIndexContent: Object had no handle!");            
         }
@@ -151,29 +162,35 @@ public class DSIndexer
 
     /**
      * create full index - wiping old index
+     * 
      * @param context
      */
-    public static void createIndex(Context c)
-        throws SQLException, IOException
-    {
-        IndexWriter writer = openIndex(c, true);
+   public static void createIndex(Context c) throws SQLException, IOException
+   {
+      IndexWriter writer = openIndex(c, true);
+      try
+      {
+         indexAllCommunities(c, writer);
+         indexAllCollections(c, writer);
+         indexAllItems(c, writer);
 
-        indexAllCommunities(c, writer);
-        indexAllCollections(c, writer);
-        indexAllItems(c, writer);
-
-	// optimize the index - important to do regularly to reduce filehandle usage
-	// and keep performance fast!
-	writer.optimize();
-	
-        closeIndex(c, writer);
-    }
+         // optimize the index - important to do regularly to reduce filehandle
+         // usage
+         // and keep performance fast!
+         writer.optimize();
+      }
+      finally
+      {
+         closeIndex(c, writer);
+      }
+   }
 
 
     /**
      * When invoked as a command-line tool, (re)-builds the whole index
-     *
-     * @param args   the command-line arguments, none used
+     * 
+     * @param args
+     *           the command-line arguments, none used
      */
     public static void main(String[] args) throws Exception
     {
@@ -210,7 +227,8 @@ public class DSIndexer
         String index_directory = ConfigurationManager.getProperty("search.dir");
 
         writer = new IndexWriter(index_directory, new DSAnalyzer(), wipe_existing);
-
+        // Potential improvement for large indices to avoid TooManyFiles exception.
+        //writer.setUseCompoundFile(true);
         return writer;
     }
 
