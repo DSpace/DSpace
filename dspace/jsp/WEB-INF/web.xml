@@ -42,12 +42,13 @@
 -->
 
 <!--
-  - The is the servlet deployment descriptor for Tomcat 4.0
+  - The is the servlet deployment descriptor for Tomcat 4.0 for the DSpace
+  - Web user interface
   -->
 
 <web-app>
 
-  <display-name>DSpace</display-name>
+  <display-name>DSpace Web UI</display-name>
 
 
   <!-- Filters -->
