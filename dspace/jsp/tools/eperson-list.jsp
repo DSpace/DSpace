@@ -47,6 +47,7 @@
   -   epeople    - EPerson[] - all epeople to browse
   -   sortby     - Integer - field to sort by (constant from EPerson.java)
   -   first      - Integer - index of first eperson to display
+  -   multiple   - if non-null, this is for selecting multiple epeople
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -62,6 +63,7 @@
         (EPerson[]) request.getAttribute("epeople");
     int sortBy = ((Integer)request.getAttribute("sortby" )).intValue();
     int first = ((Integer)request.getAttribute("first")).intValue();
+	boolean multiple = (request.getAttribute("multiple") != null);
 
 	// Make sure we won't run over end of list
 	int last = first + PAGESIZE;
@@ -87,9 +89,9 @@
 	String sortByParam = "lastname";
 	if (sortBy == EPerson.EMAIL) sortByParam = "email";
 	if (sortBy == EPerson.ID) sortByParam = "id";
-	
-	String jumpLink = request.getContextPath() + "/dspace-admin/eperson-list?sortby=" + sortByParam + "&first=";
-	String sortLink = request.getContextPath() + "/dspace-admin/eperson-list?first=" + first + "&sortby=";
+
+	String jumpLink = request.getContextPath() + "/dspace-admin/eperson-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first=";
+	String sortLink = request.getContextPath() + "/dspace-admin/eperson-list?multiple=" + multiple + "&first=" + first + "&sortby=";
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
@@ -108,6 +110,17 @@ function addEPerson(id, email, name)
 {
 	self.opener.addEPerson(id, email, name);
 }
+
+// Clear selected items from main e-people list
+function clearEPeople()
+{
+	var list = self.opener.document.forms[0].eperson_id;
+	while (list.options.length > 0)
+	{
+		list.options[0] = null;
+	}
+}
+
 // End -->
 </script>
 	</head>
@@ -140,6 +153,15 @@ function addEPerson(id, email, name)
 
 <%
     String row = "even";
+
+	String buttonText = (multiple ? "Add" : "Select");
+	// If this is a dialogue to select a *single* e-person, we want
+	// to clear any existing entry in the e-person list, and
+	// to close this window when a 'select' button is clicked
+	String clearList = (multiple ? "" : "clearEPeople();");
+	String closeWindow = (multiple ? "" : "window.close();");
+
+
     for (int i = first; i <= last; i++)
     {
         EPerson e = epeople[i];
@@ -147,7 +169,7 @@ function addEPerson(id, email, name)
         String fullname = e.getFullName().replace('\'', ' ');
 %>
         <tr>
-			<td class="<%= row %>RowOddCol"><input type=button value="Add" onClick="javascript:addEPerson(<%= e.getID() %>, '<%= e.getEmail() %>', '<%= fullname %>');"></td>
+			<td class="<%= row %>RowOddCol"><input type=button value="<%= buttonText %>" onClick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= e.getEmail() %>', '<%= fullname %>');<%= closeWindow %>"></td>
 			<td class="<%= row %>RowEvenCol"><%= e.getID() %></td>
 			<td class="<%= row %>RowOddCol"><%= e.getEmail() %></td>
             <td class="<%= row %>RowEvenCol">

@@ -66,18 +66,26 @@
     <form method=POST>    
 
     <center>
-        <table width="70%">
+        <table width="90%">
             <tr>
-                <td>
+                <td colspan=3 align=center>
                     <input type="submit" name="submit_add" value="Add EPerson...">
                 </td>
             </tr>
             <tr>
+            	<td colspan=3><strong>OR</strong></td>
+            </tr>
+            <tr>
                 <td>
-                    <input type="submit" name="submit_browse" value="Browse EPeople...">
+                    <dspace:selecteperson multiple="false" />
+                </td>
+                <td>
+                	then&nbsp;<input type="submit" name="submit_edit" value="Edit..." onclick="javascript:finishEPerson();">
+                </td>
+                <td>
+                	<input type="submit" name="submit_delete" value="Delete..." onclick="javascript:finishEPerson();">
                 </td>
             </tr>
-
         </table>
     </center>        
 

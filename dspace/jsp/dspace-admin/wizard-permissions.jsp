@@ -146,21 +146,13 @@ incoming submissions, but will not be able to reject them.</P>
 				<tr>
 					<td width="40%"></td>
 					<td class="submitFormHelp">
-						Click on the 'Choose E-people' button to choose e-people to add to the list.</td>
+						Click on the 'Select E-people' button to choose e-people to add to the list.</td>
 					<td width="40%"></td>
 				</tr>
 				<tr>
 					<td></td>
-					<td align=center class="submitFormLabel">
-						<select size=10 name="epersonList" multiple>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td></td>
 					<td align=center>
-						<input type=button value="Choose E-people" onclick="javascript:eperson_window();">
-						<input type=button value="Remove Selected" onclick="javascript:removeSelected(epersonList);">
+						<dspace:selecteperson multiple="yes" />
 					</td>
 				</tr>
 			</table>
@@ -178,7 +170,7 @@ incoming submissions, but will not be able to reject them.</P>
                         &nbsp;
                     </td>
                     <td>
-                        <input type=submit name="submit_next" value="Next &gt;" onclick="javascript:selectList(epersonList);">
+                        <input type=submit name="submit_next" value="Next &gt;" onclick="javascript:finishEPerson();">
                     </td>
                 </tr>
             </table>

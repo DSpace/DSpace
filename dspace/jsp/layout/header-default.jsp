@@ -63,63 +63,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp">
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon">
-<SCRIPT LANGUAGE="JavaScript">
-
-<!-- Begin
-// Open eperson popup window
-function eperson_window()
-{
-	var newWindow;
-	var props = 'scrollBars=yes,resizable=yes,toolbar=no,menubar=no,location=no,directories=no,width=640,height=480';
-	newWindow = window.open("<%= request.getContextPath() %>/dspace-admin/eperson-list", "dspace_epeople", props);
-}
-
-// Add to list of e-people on this page -- invoked by eperson popup window
-function addEPerson(id, email, name)
-{
-	var newplace = window.document.forms[0].epersonList.options.length;
-
-	// First we check to see if e-person is already there
-	for (var i = 0; i < window.document.forms[0].epersonList.options.length; i++)
-	{
-		if (window.document.forms[0].epersonList.options[i].value == id)
-		{
-			newplace = -1;
-		}
-	}
-
-	if (newplace > -1)
-	{
-		window.document.forms[0].epersonList.options[newplace] = new Option(name + " (" + email + ")", id);
-	}
-}
-
-// Marks all the epeople as selected for the submit button.
-function selectList()
-{
-	sourceList = window.document.forms[0].epersonList;
-	for(var i = 0; i < sourceList.options.length; i++)
-	{
-		if (sourceList.options[i] != null)
-			sourceList.options[i].selected = true;
-	}
-	return true;
-}
-
-// Deletes the selected items of supplied list.
-function removeSelected(sourceList)
-{
-	var maxCnt = sourceList.options.length;
-	for(var i = maxCnt - 1; i >= 0; i--)
-	{
-		if ((sourceList.options[i] != null) && (sourceList.options[i].selected == true))
-		{
-			sourceList.options[i] = null;
-      	}
-   	}
-}
-//  End -->
-</script>
+<SCRIPT LANGUAGE="JavaScript" src="<%= request.getContextPath() %>/utils.js"></script>
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>

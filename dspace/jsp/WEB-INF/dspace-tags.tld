@@ -71,7 +71,7 @@
     -                 nolink - show a location bar with no links
     -                 auto   - show community/collection from request (default)
     - parenttitle  - title of "parent" page, that is, the page one up in the
-    -                site hierarchy.  
+    -                site hierarchy.
     - parentlink - path to parent page - must be specified if "parent" specified
     - style   - page layout style.  Default is "default".  Page is loaded
     -            from layout/header-XXX.jsp and layout/footer-XXX.jsp.
@@ -251,10 +251,10 @@
       a popup link is pressed.  If Javascript is not available, a simple
       HTML link is used as a fallback.  The contents of the tag are used as
       the text of the link.
-      
+
       Additionally, this will link to the "local" version of the URL, if a
       locally modified version exists.
-      
+
       FIXME: Currently supports a single popup window at a hardcoded size;
       extra attributes could be added at a later date (e.g. name, width, height)
     </info>
@@ -264,7 +264,36 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
-    
+
+  <tag>
+    <name>selecteperson</name>
+    <tagclass>org.dspace.app.webui.jsptag.SelectEPersonTag</tagclass>
+    <info>
+      Tag for producing an e-person select widget in a form.  Somewhat
+      analogous to the HTML SELECT element.  An input
+      field is produced with a button which pops up a window from which
+      e-people can be selected.  Selected e-epeople are added to the field
+      in the form.  If the selector is for multiple e-people, a 'remove
+      selected from list' button is also added.
+
+      On any form that has a selecteperson tag (only one allowed per page),
+      you need to include the following Javascript code on all of the submit
+      buttons, to ensure that the e-people IDs are posted and that the popup
+      window is close:
+
+      onclick="javascript:finishEPerson();"
+    </info>
+    <attribute>
+      <name>multiple</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>selected</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
 
   <tag>
     <name>sfxlink</name>

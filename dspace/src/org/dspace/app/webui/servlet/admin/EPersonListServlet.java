@@ -66,6 +66,9 @@ public class EPersonListServlet extends DSpaceServlet
 			HttpServletResponse response)
 	throws ServletException, IOException, SQLException, AuthorizeException
 	{
+		// Are we for selecting a single or multiple epeople?
+		boolean multiple = UIUtil.getBoolParameter(request, "multiple");
+		
 		// What are we sorting by.  Lastname is default
 		int sortBy = EPerson.LASTNAME;
 		
@@ -95,7 +98,11 @@ public class EPersonListServlet extends DSpaceServlet
 		request.setAttribute("sortby", new Integer(sortBy));
 		request.setAttribute("first", new Integer(first));
 		request.setAttribute("epeople", epeople);
+		if (multiple)
+		{
+			request.setAttribute("multiple", new Boolean(true));
+		}
 		
-		JSPManager.showJSP(request, response, "/dspace-admin/eperson-list.jsp");
+		JSPManager.showJSP(request, response, "/tools/eperson-list.jsp");
 	}
 }

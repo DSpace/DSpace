@@ -343,7 +343,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 		}
 
 		// Add people from the form to the group
-		int[] ids = UIUtil.getIntParameters(request, "epersonList");
+		int[] ids = UIUtil.getIntParameters(request, "eperson_id");
 		
 		if (ids != null)
 		{	

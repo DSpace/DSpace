@@ -375,7 +375,7 @@
 
   <servlet-mapping>
     <servlet-name>eperson-list</servlet-name>
-    <url-pattern>/dspace-admin/eperson-list</url-pattern>
+    <url-pattern>/tools/eperson-list</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

@@ -45,7 +45,6 @@ package org.dspace.app.webui.servlet.admin;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,7 +55,6 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -75,10 +73,7 @@ public class EPersonAdminServlet extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        doDSPost(context, request, response);
-
-        // GET just displays the list of e-people
-        //showMain(context, request, response);
+    	showMain(context, request, response);
     }
     
     
@@ -97,8 +92,6 @@ public class EPersonAdminServlet extends DSpaceServlet
             // create clever name and do update before continuing            
             e.setEmail("newuser"+e.getID());
             e.update();
-            
-            //showEPeople(context, request, response);
 
             request.setAttribute("eperson", e);
 
@@ -229,58 +222,6 @@ public class EPersonAdminServlet extends DSpaceServlet
             showMain(context, request, response);
             context.complete();
         }
-        else if (button.equals("submit_browse"))
-        {
-            // user wants to browse
-            
-            String pageRequest = request.getParameter("page_request");
-            int pageIndex = UIUtil.getIntParameter(request, "page_index");
-            String sortby = request.getParameter("sortby");
-            int sortField = EPerson.EMAIL; // default
-            int pageSize = 50;
-
-            if (sortby == null)
-            {
-            }
-            else if (sortby.equals("lastname"))
-            {
-                sortField = EPerson.LASTNAME;
-            }
-            else if (sortby.equals("id"))
-            {
-                sortField = EPerson.ID;
-            }
-
-            if (pageIndex == -1)
-            {
-                pageIndex = 0;  // default page is 0
-            }
-
-            // get back "next" and "previous" messages
-            //  can also insert numbers here
-            if (pageRequest != null)
-            {
-                if (pageRequest.equals("next"))
-                {
-                    pageIndex++;
-                }
-                else
-                {
-                    pageIndex--;
-                }
-            }
-
-            EPerson[] epeople = EPerson.findAll(context, sortField);
-            
-            int pageCount = ((epeople.length-1)/pageSize)+1;
-                        
-            request.setAttribute("epeople",    epeople  );
-            request.setAttribute("page_size",  new Integer(pageSize ));
-            request.setAttribute("page_count", new Integer(pageCount));
-            request.setAttribute("page_index", new Integer(pageIndex));
-            
-            JSPManager.showJSP(request, response, "/dspace-admin/eperson-browse.jsp");            
-        }
         else
         {
             // Cancel etc. pressed - show list again
@@ -288,38 +229,6 @@ public class EPersonAdminServlet extends DSpaceServlet
         }
     }
 
-
-    /**
-     * Show list of E-people
-     *
-     * @param context   Current DSpace context
-     * @param request   Current HTTP request
-     * @param response  Current HTTP response
-     */
-    private void showEPeople(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
-    {
-        // First get the sort field
-        String sortFieldParam = request.getParameter("sortby");
-        int sortField = EPerson.LASTNAME;
-        
-        if (sortFieldParam != null && sortFieldParam.equals("email"))
-        {
-            sortField = EPerson.EMAIL;
-        }
-        else if (sortFieldParam != null && sortFieldParam.equals("id"))
-        {
-            sortField = EPerson.ID;
-        }
-
-        EPerson[] epeople = EPerson.findAll(context, sortField);
-        
-        request.setAttribute("epeople", epeople);
-        JSPManager.showJSP(request, response, "/dspace-admin/list-epeople.jsp");
-    }
-    
     
     private void showMain(Context c,
                     HttpServletRequest request, HttpServletResponse response )
