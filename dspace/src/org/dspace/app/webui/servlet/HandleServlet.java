@@ -452,15 +452,6 @@ public class HandleServlet extends DSpaceServlet
                     // what group is the submitter?
                     Group group = collection.getSubmitters();
 
-                    /*if( group==null )
-                    {
-                        // see if there are any 'non standard' submitter groups
-                        Group [] groups = AuthorizeManager.getAuthorizedGroups(context, collection, Constants.ADD);
-                        
-                        // hack, take the first group
-                        if(groups.length>0) group = groups[0];
-                    }*/
-                    
                     if( group != null )
                     {
                         request.setAttribute("submitters", group);

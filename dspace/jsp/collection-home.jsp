@@ -225,8 +225,8 @@
 			<tr>
 				<td class="standard" align="center">
 				  <form method=GET action="<%=request.getContextPath()%>/tools/group-edit">
-				    <input type=hidden name="group" value="<%=submitters.getID()%>">
-				    <input type="submit" value="Edit Submitters">
+				    <input type=hidden name="group_id" value="<%=submitters.getID()%>">
+				    <input type="submit" name="submit_edit" value="Edit Submitters">
 				  </form>
 				</td>
 			</tr>

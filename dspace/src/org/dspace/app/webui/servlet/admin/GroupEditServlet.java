@@ -73,7 +73,7 @@ public class GroupEditServlet extends DSpaceServlet
                     HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        showMainPage(c, request, response);
+        doDSPost(c, request, response);
     }
     
     protected void doDSPost(Context c,
@@ -182,15 +182,11 @@ public class GroupEditServlet extends DSpaceServlet
             }
             else
             {
-                // unknown action, show main page
-                showMainPage(c, request, response);
+                // unknown action, show edit page
+                request.setAttribute("group", group);
+                request.setAttribute("members", group.getMembers());
+                JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
             }
-
-            // Show edit page for group
-            //#request.setAttribute("group", group);
-            //request.setAttribute("members", group.getMembers());
-           // 
-            //JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
         }
         else  // no group set
         {
