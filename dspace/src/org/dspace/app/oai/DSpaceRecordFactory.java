@@ -90,7 +90,7 @@ public class DSpaceRecordFactory extends RecordFactory
 
     protected String getOAIIdentifier(Object nativeItem)
     {
-        String h = DSpaceOAICatalog.oaiIDPrefix +
+        String h = DSpaceOAICatalog.OAI_ID_PREFIX +
             ((HarvestedItemInfo) nativeItem).handle;
         return h;
     }

@@ -96,7 +96,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
     private final int MAX_RECORDS = 100;
 
     /** Prefix that all our OAI identifiers have */
-    public final static String oaiIDPrefix = "oai:" +
+    public final static String OAI_ID_PREFIX = "oai:" +
         ConfigurationManager.getProperty("dspace.hostname") + ":";
     
     
@@ -135,10 +135,10 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
             // Valid identifiers all have prefix "oai:hostname:"
             
-            if (identifier.startsWith(oaiIDPrefix))
+            if (identifier.startsWith(OAI_ID_PREFIX))
             {
                 itemInfo = Harvest.getSingle(context,
-                    identifier.substring(oaiIDPrefix.length()), // Strip prefix to get raw handle
+                    identifier.substring(OAI_ID_PREFIX.length()), // Strip prefix to get raw handle
                     false);
             }
         }
@@ -322,12 +322,12 @@ public class DSpaceOAICatalog extends AbstractCatalog
         try
         {
             // Valid IDs start with oai:hostname:
-            if (identifier.startsWith(oaiIDPrefix))
+            if (identifier.startsWith(OAI_ID_PREFIX))
             {
                 context = new Context();
 
                 itemInfo = Harvest.getSingle(context,
-                    identifier.substring(oaiIDPrefix.length()), // Strip prefix to get raw handle
+                    identifier.substring(OAI_ID_PREFIX.length()), // Strip prefix to get raw handle
                     true);
             }
         }
