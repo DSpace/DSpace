@@ -33,6 +33,8 @@ if [ "$mit" == "0" ] ; then
         rm -f dspace/lib/activation.jar
         rm -f dspace/lib/mail.jar
         rm -f dspace/lib/servlet.jar
+        rm -f dspace/lib/sunjce*.jar
+        rm -f dspace/lib/*.policy
 fi
 
 echo "Checking out documentation"
