@@ -86,3 +86,4 @@ SELECT setval('itemsbyauthor_seq', max(items_by_author_id)) FROM itemsbyauthor;
 SELECT setval('itemsbytitle_seq', max(items_by_title_id)) FROM itemsbytitle;
 SELECT setval('itemsbydate_seq', max(items_by_date_id)) FROM itemsbydate;
 SELECT setval('itemsbydateaccessioned_seq', max(items_by_date_accessioned_id)) FROM itemsbydateaccessioned;
+SELECT setval('epersongroup2workspaceitem_seq', max(id)) FROM epersongroup2workspaceitem_seq;
