@@ -360,7 +360,6 @@ public class DSIndexer
     private static void writeItemIndex(Context c, IndexWriter writer, Item myitem )
         throws SQLException, IOException
     {
-
         // get the location string (for searching by collection & community)
         String location_text = buildItemLocationString(c, myitem);
 
@@ -407,10 +406,7 @@ public class DSIndexer
         textvalues.put("keyword",   keyword_text );
         textvalues.put("location",  location_text);
         textvalues.put("handletext",itemhandle   );
-        
-//      delayed until we can assign relative weights
-//        textvalues.put("abstract",  abstract_text);
-
+        textvalues.put("abstract",  abstract_text);
 
         // write out the metatdata (for scalability, using hash instead of individual strings)
         writeIndexRecord(writer, Constants.ITEM, myitem.getID(), itemhandle, textvalues);
