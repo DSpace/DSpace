@@ -171,14 +171,16 @@ public class BrowseRun
                                    String qualifier,
                                    String lang)
     {
-        System.out.println("Item " + item.getID());
         DCValue[] values = item.getDC(element, qualifier, lang);
 
         for (int i = 0; i < values.length; i++)
         {
             DCValue value = values[i];
 
-            System.out.println("  " + value.value);
+            System.out.println("  " +
+                               value.value +
+                               "  (item " +
+                               item.getID() + ")");
         }
     }
 }
