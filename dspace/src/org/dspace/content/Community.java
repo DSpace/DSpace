@@ -189,7 +189,7 @@ public class Community extends DSpaceObject
 
         TableRow row = DatabaseManager.create(context, "community");
         Community c = new Community(context, row);
-        String newHandle = HandleManager.createHandle(context, c);
+        c.handle = HandleManager.createHandle(context, c);
 
 
         // create the default authorization policy for communities
@@ -212,7 +212,7 @@ public class Community extends DSpaceObject
         log.info(LogManager.getHeader(context,
             "create_community",
             "community_id=" + row.getIntColumn("community_id")) +
-            ",handle=" + newHandle);
+            ",handle=" + c.handle);
 
         return c;
     }
