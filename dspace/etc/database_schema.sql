@@ -42,7 +42,8 @@
 --
 --   DSpace SQL schema
 --
---   Authors:   Peter Breton, Robert Tansley, David Stuve, Daniel Chudnov
+--   Authors:   Peter Breton, Robert Tansley, David Stuve, Daniel Chudnov,
+--              Richard Jones
 --
 --   This file is used as-is to initialize a database. Therefore,
 --   table and view definitions must be ordered correctly.
@@ -57,8 +58,6 @@
 --   an SQL function 'getnextid', which takes a table name as an
 --   argument, will return a safe new ID to use to create a new
 --   row in that table.
-
-
 
 -------------------------------------------------------
 -- Function for obtaining new IDs.
@@ -109,7 +108,7 @@ CREATE SEQUENCE itemsbyauthor_seq;
 CREATE SEQUENCE itemsbytitle_seq;
 CREATE SEQUENCE itemsbydate_seq;
 CREATE SEQUENCE itemsbydateaccessioned_seq;
-
+CREATE SEQUENCE epersongroup2workspaceitem_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -470,6 +469,19 @@ CREATE TABLE HistoryState
   history_state_id           INTEGER PRIMARY KEY,
   object_id                  VARCHAR(64)
 );
+
+-------------------------------------------------------------------------------
+-- EPersonGroup2WorkspaceItem table
+-------------------------------------------------------------------------------
+
+CREATE TABLE epersongroup2workspaceitem 
+(
+  id integer DEFAULT nextval('epersongroup2workspaceitem_seq'),
+  eperson_group_id integer,
+  workspace_item_id integer,
+  CONSTRAINT epersongroup2item_pkey PRIMARY KEY (id)
+);
+
 
 ------------------------------------------------------------
 -- Browse subsystem tables and views
