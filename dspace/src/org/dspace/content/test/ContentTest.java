@@ -113,6 +113,11 @@ public class ContentTest extends TestCase
             Community c1 = createCommunity(context);
             int id = c1.getID();
 
+            // FIXME: Start a new transaction - this is a workaround for
+            // a PostgreSQL 7.1 bug.
+            context.complete();
+            context = new Context();
+
             // Check we can get it
             Community c2 = Community.find (context, c1.getID());
             assertNotNull("Found community", c2);
@@ -121,11 +126,6 @@ public class ContentTest extends TestCase
             assertTrue("Found community in getAllCommunities array",
                        contains(Community.getAllCommunities(context), c1));
 
-            // FIXME: Start a new transaction - this is a workaround for
-            // a PostgreSQL 7.1 bug.
-
-            context.complete();
-            context = new Context();
 
             c1 = Community.find(context, id);
             assertNotNull("Found community", c1);
@@ -166,16 +166,22 @@ public class ContentTest extends TestCase
             context = new Context();
             Community c1 = createCommunity(context);
             Collection collection = c1.createCollection();
-            int cid = collection.getID();
-            c1.addCollection(collection);
+
+            int community1ID = c1.getID();
+            int collectionID = collection.getID();
+
+
             assertNotNull("Found new collection",
-                          Collection.find(context, cid));
+                          Collection.find(context, collectionID));
             assertTrue("Community includes this collection",
                        contains(collection.getCommunities(), c1));
             assertTrue("Collection is present in getAllCollections ",
                        contains(Collection.getAllCollections(context),
                                 collection));
             Community c2 = Community.create(context);
+
+            int community2ID = c2.getID();
+
             c2.setMetadata("name", TEST_NAME_2);
             c2.update();
             c2.addCollection(collection);
@@ -183,13 +189,23 @@ public class ContentTest extends TestCase
                        contains(collection.getCommunities(), c1));
             assertTrue("Community includes this collection",
                        contains(collection.getCommunities(), c2));
+
+            // FIXME: Start a new transaction - this is a workaround for
+            // a PostgreSQL 7.1 bug.
+            context.complete();
+            context = new Context();
+
+            c1 = Community.find(context, community1ID);
+            c2 = Community.find(context, community2ID);
+            collection = Collection.find(context, collectionID);
+
             c2.delete();
             assertNotNull("Collection still exists after one containing community is deleted",
-                          Collection.find(context, cid));
+                          Collection.find(context, collectionID));
 
              c1.deleteWithContents();
              assertNull("Collection does not exist after all containing communities are deleted",
-                         Collection.find(context, cid));
+                         Collection.find(context, collectionID));
             context.complete();
         }
         // Clean up context or the test hangs
@@ -223,15 +239,29 @@ public class ContentTest extends TestCase
             Collection c1 = community.createCollection();
             c1.setMetadata("name", TEST_NAME_1);
             c1.update();
-            Collection c2 = Collection.find (context, c1.getID());
+
+            int commID = community.getID();
+            int collID = c1.getID();
+
+            // FIXME: Start a new transaction - this is a workaround for
+            // a PostgreSQL 7.1 bug.
+            context.complete();
+            context = new Context();
+
+            Collection c2 = Collection.find (context, collID);
+
             assertNotNull("Found collection", c2);
             assertEquals("Found collection has correct name",
                          c2.getMetadata("name"), TEST_NAME_1);
             assertTrue("Found collection in getAllCollections array",
-                       contains(Collection.getAllCollections(context), c1));
-            c1.delete();
-            Collection c3 = Collection.find (context, c1.getID());
+                       contains(Collection.getAllCollections(context), c2));
+            c2.delete();
+            Collection c3 = Collection.find (context, collID);
             assertNull("Did not find deleted collection", c3);
+
+            // Clean up community - delete tested elsewhere, so should work
+            Community.find(context, commID).delete();
+            
             context.complete();
         }
         // Clean up context or the test hangs
@@ -284,6 +314,7 @@ public class ContentTest extends TestCase
 
             WorkspaceItem wi = WorkspaceItem.create(context, collection, null);
 
+            int w_id = wi.getID();
             Item item = wi.getItem();
             int id = item.getID();
 
@@ -297,12 +328,20 @@ public class ContentTest extends TestCase
             item.addDC("date","accessioned", null, now);
             item.update();
 
+            // FIXME: Start a new transaction - this is a workaround for
+            // a PostgreSQL 7.1 bug.
+            context.complete();
+            context = new Context();
+
+            item = Item.find(context, id);
+
             // Retrieve titles
             String[] titles = item.getDC("title", null, LANG);
             assertNotNull("Retrieved titles", titles);
             assertEquals("Got correct number of titles",
                          titles.length,
                          TITLES.size() + 1);
+
             assertTrue("Got correct titles",
                        containsAll(titles, TITLES));
 
@@ -343,7 +382,9 @@ public class ContentTest extends TestCase
             assertEquals("Got correct number of titles",
                          alt.length, 0);
 
-            item.deleteWithContents();
+            wi = WorkspaceItem.find(context, w_id);
+            wi.delete();
+
             assertNull("Item cannot be found after deletion",
                        Item.find(context, id));
             context.abort();
