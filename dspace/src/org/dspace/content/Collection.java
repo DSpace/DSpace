@@ -61,7 +61,15 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
- * Class representing a collection
+ * Class representing a collection.
+ * <P>
+ * The collection's metadata (name, introductory text etc), workflow groups,
+ * and default group of submitters are loaded into memory.  Changes to metadata
+ * are not written to the database until <code>update</code> is called.
+ * If you create or remove a workflow group, the change is only reflected in
+ * the database after calling <code>update</code>.  The default group of
+ * submitters is slightly different - creating or removing this has instant
+ * effect.
  *
  * @author   Robert Tansley
  * @version  $Revision$

@@ -60,6 +60,10 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Class representing a community
+ * <P>
+ * The community's metadata (name, introductory text etc.) is loaded into'
+ * memory.  Changes to this metadata are only reflected in the database after
+ * <code>update</code> is called.
  *
  * @author   Robert Tansley
  * @version  $Revision$

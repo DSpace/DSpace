@@ -59,7 +59,11 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
- * Class representing bitstreams stored in the DSpace system
+ * Class representing bitstreams stored in the DSpace system.
+ * <P>
+ * When modifying the bitstream metadata, changes are not reflected in the
+ * database until <code>update</code> is called.  Note that you cannot alter
+ * the contents of a bitstream; you need to create a new bitstream.
  *
  * @author   Robert Tansley
  * @version  $Revision$
@@ -419,7 +423,7 @@ public class Bitstream
 
 
     /**
-     * Delete the bitstream.
+     * Delete the bitstream, including any mappings to bundles
      */
     public void delete()
         throws SQLException, IOException, AuthorizeException
@@ -431,6 +435,11 @@ public class Bitstream
             "delete_bitstream",
             "bitstream_id=" + getID()));
 
+        // Remove mappings
+        DatabaseManager.updateQuery(bContext,
+            "DELETE FROM bundle2bitstream WHERE bitstream_id=" + getID() + ";");
+
+        // Remove bitstream itself
         BitstreamStorageManager.delete(bContext,
             bRow.getIntColumn("bitstream_id"));
     }

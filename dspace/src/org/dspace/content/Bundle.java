@@ -62,6 +62,11 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Class representing bundles of bitstreams stored in the DSpace system
+ * <P>
+ * The corresponding Bitstream objects are loaded into memory.  At present,
+ * there is no metadata associated with bundles - they are simple containers.
+ * Thus, the <code>update</code> method doesn't do much yet.  Creating, adding
+ * or removing bitstreams has instant effect in the database.
  *
  * @author   Robert Tansley
  * @version  $Revision$
@@ -80,12 +85,6 @@ public class Bundle
     /** The bitstreams in this bundle */
     private List bitstreams;
 
-    /**
-     * True if the bitstreams have changed since reading from the DB
-     * or the last update()
-     */
-    private boolean bitstreamsChanged;
-
 
     /**
      * Construct a bundle object with the given table row
@@ -98,7 +97,6 @@ public class Bundle
     {
         ourContext = context;
         bundleRow = row;
-        bitstreamsChanged = false;
         bitstreams = new ArrayList();
         
         // Get bitstreams
@@ -221,7 +219,7 @@ public class Bundle
         // Get items
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "item",
-            "select item.* from item, item2bundle where " +
+            "SELECT item.* FROM item, item2bundle WHERE " +
                 "item2bundle.item_id=item.item_id AND " +
                 "item2bundle.bundle_id=" +
                 bundleRow.getIntColumn("bundle_id") + ";");
@@ -240,9 +238,7 @@ public class Bundle
     
 
     /**
-     * Create a new bitstream in this bundle.  The bitstream is added to the
-     * database immediately, but the bundle-bitstream mapping isn't added
-     * until <code>update</code> is called.
+     * Create a new bitstream in this bundle.
      *
      * @param is   the stream to read the new bitstream from
      *
@@ -286,9 +282,15 @@ public class Bundle
             }
         }
         
-        // Add the bitstream
+        // Add the bitstream object
         bitstreams.add(b);
-        bitstreamsChanged = true;
+
+        // Add the mapping row to the database
+        TableRow mappingRow = DatabaseManager.create(ourContext,
+            "bundle2bitstream");
+        mappingRow.setColumn("bundle_id", getID());
+        mappingRow.setColumn("bitstream_id", b.getID());
+        DatabaseManager.update(ourContext, mappingRow);
     }
     
 
@@ -317,14 +319,19 @@ public class Bundle
             {
                 // We've found the bitstream to remove
                 li.remove();               
-                bitstreamsChanged = true;
+
+                // Delete the mapping row
+                DatabaseManager.updateQuery(ourContext,
+                    "DELETE FROM bundle2bitstream WHERE bundle_id=" + getID() +
+                        " AND bitstream_id=" + b.getID());
+
             }
         }
     }
 
 
     /**
-     * Update the bundle item, including any changes to bitstreams.
+     * Update the bundle metadata
      */
     public void update()
         throws SQLException, AuthorizeException
@@ -337,30 +344,6 @@ public class Bundle
             "bundle_id=" + getID()));
 
         DatabaseManager.update(ourContext, bundleRow);
-        
-        // Redo bitstream mappings if they've changed
-        if (bitstreamsChanged)
-        {
-            // Remove any existing mappings
-            DatabaseManager.updateQuery(ourContext,
-                "delete from bundle2bitstream where bundle_id=" + getID());
-
-            // Add new mappings
-            Iterator i = bitstreams.iterator();
-
-            while (i.hasNext())
-            {
-                Bitstream b = (Bitstream) i.next();
-
-                TableRow mappingRow = DatabaseManager.create(ourContext,
-                    "bundle2bitstream");
-                mappingRow.setColumn("bundle_id", getID());
-                mappingRow.setColumn("bitstream_id", b.getID());
-                DatabaseManager.update(ourContext, mappingRow);
-            }
-
-            bitstreamsChanged = false;
-        }
     }
 
 
@@ -419,7 +402,7 @@ public class Bundle
                 "select * from bundle2bitstream where bitstream_id=" +
                     b.getID());
             
-            if (tri.toList().size() == 0)
+            if (!tri.hasNext())
             {
                 // The bitstream is not in any other bundle, so delete it
                 b.delete();

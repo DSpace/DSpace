@@ -55,6 +55,7 @@ import org.apache.log4j.Logger;
 import org.dspace.administer.DCType;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.browse.Browse;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -65,7 +66,14 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
- * Class representing an item in DSpace
+ * Class representing an item in DSpace.
+ * <P>
+ * This class holds in memory the item Dublin Core metadata, the bundles in
+ * the item, and the bitstreams in those bundles.  When modifying the item,
+ * if you modify the Dublin Core or the "in archive" flag, you must call
+ * <code>update</code> for the changes to be written to the database.  Creating,
+ * adding or removing bundles or bitstreams has immediate effect in the
+ * database.
  *
  * @author   Robert Tansley
  * @version  $Revision$
@@ -89,14 +97,8 @@ public class Item
     /** The e-person who submitted this item */
     private EPerson submitter;
 
-    /** The bundles in this item */
+    /** The bundles in this item - kept in sync with DB */
     private List bundles;
-
-    /**
-     * True if the bundles have changed since reading from the DB
-     * or the last update()
-     */
-    private boolean bundlesChanged;
 
     /**
      * The Dublin Core metadata - a list of DCValue objects.
@@ -123,11 +125,15 @@ public class Item
         itemRow = row;
         dublinCoreChanged = false;
         dublinCore = new ArrayList();
-        bundlesChanged = false;
         bundles = new ArrayList();
 
-        // FIXME
+        // Get the submitter
         submitter = null;
+        if (!itemRow.isColumnNull("submitter_id"))
+        {
+            submitter = EPerson.find(ourContext,
+                itemRow.getIntColumn("submitter_id"));
+        }
 
         // Get bitstreams
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -146,7 +152,8 @@ public class Item
         // Get Dublin Core metadata
         tri = DatabaseManager.query(ourContext, "dcvalue",
             "SELECT * FROM dcvalue WHERE item_id=" +
-                itemRow.getIntColumn("item_id") + " ORDER BY place;");
+                itemRow.getIntColumn("item_id") +
+                " ORDER BY dc_type_id, place;");
 
         while (tri.hasNext())
         {
@@ -305,8 +312,15 @@ public class Item
      *   Return all US English values of the "title" element, with any qualifier
      *   (including unqualified):<P>
      *      <code>item.getDC( "title", Item.ANY, "en_US" );</code>
+     * <P>
+     * The ordering of values of a particular element/qualifier/language
+     * combination is significant.  When retrieving with wildcards, values of
+     * a particular element/qualifier/language combinations will be adjacent,
+     * but the overall ordering of the combinations is indeterminate.
      *
-     * @param  element    the Dublin Core element.  Must be specified.
+     * @param  element    the Dublin Core element.  <code>Item.ANY</code>
+     *                    matches any element.  <code>null</code> doesn't
+     *                    really make sense as all DC must have an element.
      * @param  qualifier  the qualifier.  <code>null</code> means unqualified,
      *                    and <code>Item.ANY</code> means any qualifier
      *                    (including unqualified.)
@@ -316,7 +330,7 @@ public class Item
      *                    are returned, and <code>Item.ANY</code> means values
      *                    with any country code or no country code are returned.
      *
-     * @return  values of the Dublin Core fields that match the parameters.
+     * @return  Dublin Core fields that match the parameters
      */
     public DCValue[] getDC(String element, String qualifier, String lang)
     {
@@ -351,7 +365,8 @@ public class Item
 
     /**
      * Add Dublin Core metadata fields.  These are appended to existing values.
-     * Use <code>clearDC</code> to remove values.
+     * Use <code>clearDC</code> to remove values.  The ordering of values
+     * passed in is maintained.
      *
      * @param  element    the Dublin Core element
      * @param  qualifier  the Dublin Core qualifer, or <code>null</code> for
@@ -536,6 +551,7 @@ public class Item
     /**
      * Set the e-person that originally submitted this item.  This is not a
      * public method since it is handled by the WorkspaceItem class.
+     * <code>update</code> must be called to write the change to the database.
      *
      * @param  sub  the submitter
      */
@@ -546,7 +562,7 @@ public class Item
 
 
     /**
-     * Get the collections this item is in.
+     * Get the collections this item is in.  The order is indeterminate.
      *
      * @return the collections this item is in, if any.
      */
@@ -577,7 +593,8 @@ public class Item
 
 
     /**
-     * Get the communities this item is in.  Provided for convenience.
+     * Get the communities this item is in.  Returns an unordered array of
+     * the communities that house the collections this item is in.
      *
      * @return  the communities this item is in.
      */
@@ -608,9 +625,9 @@ public class Item
 
 
     /**
-     * Get the bundles in this item
+     * Get the bundles in this item.
      *
-     * @return the bundles
+     * @return the bundles in an unordered array
      */
     public Bundle[] getBundles()
     {
@@ -622,7 +639,7 @@ public class Item
 
 
     /**
-     * Create a bundle in this item
+     * Create a bundle in this item, with immediate effect
      *
      * @return  the newly created bundle
      */
@@ -639,7 +656,7 @@ public class Item
 
 
     /**
-     * Add an existing bundle to this item
+     * Add an existing bundle to this item.  This has immediate effect.
      *
      * @param b  the bundle to add
      */
@@ -665,9 +682,14 @@ public class Item
             }
         }
 
-        // Add the bundle
+        // Add the bundle to in-memory list
         bundles.add(b);
-        bundlesChanged = true;
+
+        // Insert the mapping
+        TableRow mappingRow = DatabaseManager.create(ourContext, "item2bundle");
+        mappingRow.setColumn("item_id", getID());
+        mappingRow.setColumn("bundle_id", b.getID());
+        DatabaseManager.update(ourContext, mappingRow);
     }
 
 
@@ -698,17 +720,19 @@ public class Item
             {
                 // We've found the bundle to remove
                 li.remove();
-                bundlesChanged = true;
             }
         }
+
+        // Remove mappings from DB
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM item2bundle WHERE item_id=" + getID() +
+                " AND bundle_id=" + b.getID());
     }
 
 
     /**
-     * Create a single bitstream in a new bundle.  A bundle is created, and the
-     * bundle-bitstream mapping are added to the database immediately, but
-     * the item-bundle mapping won't be written until <code>update</code> is
-     * called.
+     * Create a single bitstream in a new bundle.  Provided as a convenience
+     * method for the most common use.
      *
      * @param is   the stream to create the new bitstream from
      */
@@ -730,7 +754,7 @@ public class Item
     /**
      * Get all non-internal bitstreams in the item.  This is mainly used
      * for auditing for provenance messages and adding format.* DC values,
-     * and is hence not public.
+     * and is hence not public.  The order is indeterminate.
      *
      * @return  non-internal bitstreams.
      */
@@ -763,9 +787,8 @@ public class Item
 
 
     /**
-     * Update the item, including Dublin Core metadata, and the bundle
-     * and bitstream metadata, in the database.  Inserts if this is a new
-     * item.
+     * Update the item "in archive" flag and Dublin Core metadata in the
+     * database
      */
     public void update()
         throws SQLException, AuthorizeException
@@ -785,30 +808,6 @@ public class Item
 
         DatabaseManager.update(ourContext, itemRow);
 
-        // Redo bundle mappings if they've changed
-        if (bundlesChanged)
-        {
-            // Remove any existing mappings
-            DatabaseManager.updateQuery(ourContext,
-                "delete from item2bundle where item_id=" + getID());
-
-            // Add new mappings
-            Iterator i = bundles.iterator();
-
-            while (i.hasNext())
-            {
-                Bundle b = (Bundle) i.next();
-
-                TableRow mappingRow = DatabaseManager.create(ourContext,
-                    "item2bundle");
-                mappingRow.setColumn("bundle_id", b.getID());
-                mappingRow.setColumn("item_id", getID());
-                DatabaseManager.update(ourContext, mappingRow);
-            }
-
-            bundlesChanged = false;
-        }
-
         // Redo Dublin Core if it's changed
         if (dublinCoreChanged)
         {
@@ -821,7 +820,6 @@ public class Item
             while (i.hasNext())
             {
                 DCValue dcv = (DCValue) i.next();
-
 
                 // Get the DC Type
                 DCType dcType = DCType.findByElement(ourContext,
@@ -877,6 +875,14 @@ public class Item
             dublinCoreChanged = false;
         }
 
+        // Update indices if appropriate
+        if (isArchived())
+        {
+            // Update browse indices
+            Browse.itemChanged(ourContext, this);
+            
+            // FIXME: Update search index
+        }
     }
 
 
@@ -894,6 +900,15 @@ public class Item
         log.info(LogManager.getHeader(ourContext,
             "update_item",
             "item_id=" + getID()));
+
+        // Remove from indices, if appropriate
+        if (isArchived())
+        {
+            // Remove from Browse indices
+            Browse.itemRemoved(ourContext, getID());
+            
+            // FIXME: Remove from search index
+        }
 
         // Delete the Dublin Core
         removeDCFromDatabase();
@@ -928,6 +943,7 @@ public class Item
         DatabaseManager.delete(ourContext, itemRow);
     }
 
+
     /**
      * Return <code>true</code> if <code>other</code> is the same Item as
      * this object, <code>false</code> otherwise
@@ -946,6 +962,7 @@ public class Item
 
         return (getID() == ((Item) other).getID());
     }
+
 
     /**
      * Utility method to remove all Dublin Core associated with the item

@@ -57,7 +57,10 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
- * Class representing a particular bitstream format
+ * Class representing a particular bitstream format.
+ * <P>
+ * Changes to the bitstream format metadata are only written to the database
+ * when <code>update</code> is called.
  *
  * @author   Robert Tansley
  * @version  $Revision$

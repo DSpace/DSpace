@@ -81,6 +81,10 @@ reading or manipulating is done, the Context may either be <em>aborted</em>, in
 which case any changes made are discarded, or <em>completed</em>, in which case
 any changes made are committed to main DSpace storage.
 <P>
+If any error occurs if you are making changes, you should <em>abort</em> the
+current context, since the in-memory snapshots might be in an inconsistent
+state.
+<P>
 Typically, when changing a particular object in the system, the changes will
 not be written to main DSpace storage unless <code>update</code> is called on
 the object prior to Context completion.  Where this is not the case, it is
