@@ -646,7 +646,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             temp));
         Bitstream logoBS;
 
-        if (community != null)
+        if (collection == null)
         {
             logoBS = community.setLogo(is);
         }
@@ -677,7 +677,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         logoBS.setFormat(bf);
         logoBS.update();
 
-        if (community != null)
+ 
+        if (collection == null)
         {
             community.update();
 
@@ -689,7 +690,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
         {
             collection.update();
             // Show collection edit page
+            
             request.setAttribute("collection", collection);
+            request.setAttribute("community", community);
             JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
         }
 
