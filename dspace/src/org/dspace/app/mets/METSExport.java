@@ -52,6 +52,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
@@ -244,12 +245,10 @@ public class METSExport
             throw new IOException("Couldn't create " + aipDir.toString());
         }
 
-        Mets mets = createMETS(context, item);
-        
         // Write the METS file
         FileOutputStream out = new FileOutputStream(
                 aipDir.toString() + java.io.File.separator + "mets.xml");
-        mets.write(new MetsWriter(out));
+        writeMETS(context, item, out);
         out.close();
         
         // Write bitstreams
@@ -274,181 +273,192 @@ public class METSExport
         }
     }
     
-    
+
     /**
-     * 
+     * Write METS metadata corresponding to the metadata for an item
+     *  
      * @param context  DSpace context
      * @param item     DSpace item to create METS object for
      * @return  METS object for DSpace item
      */
-    public static Mets createMETS(Context context, Item item)
-        throws SQLException, IOException, AuthorizeException, MetsException
+    public static void writeMETS(Context context, Item item, OutputStream os)
+        throws SQLException, IOException, AuthorizeException
     {
-        init(context);
-
-        // Create the METS file
-        Mets mets = new Mets();
-        
-        // Top-level stuff
-        mets.setOBJID("hdl:" + item.getHandle());
-        mets.setLABEL("DSpace Item");
-        mets.setSchema("mods", "http://www.loc.gov/mods/v3",
-                "http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
-        
-        // MetsHdr
-        MetsHdr metsHdr = new MetsHdr();
-        metsHdr.setCREATEDATE(new Date()); // FIXME: CREATEDATE is now:  maybe should be item create date?
-        
-        // Agent
-        Agent agent = new Agent();
-        agent.setROLE(Role.CUSTODIAN);
-        agent.setTYPE(Type.ORGANIZATION);
-        
-        Name name = new Name();
-        name.getContent().add(new PCData(ConfigurationManager.getProperty("dspace.name")));
-        agent.getContent().add(name);
-
-        metsHdr.getContent().add(agent);
-        
-        mets.getContent().add(metsHdr);
-        
-        DmdSec dmdSec = new DmdSec();
-        dmdSec.setID("DMD_hdl_" + item.getHandle());
-        
-        MdWrap mdWrap = new MdWrap();
-        mdWrap.setMDTYPE(Mdtype.MODS);
-        
-        XmlData xmlData = new XmlData();
-        createMODS(item, xmlData);
-
-        mdWrap.getContent().add(xmlData);
-        dmdSec.getContent().add(mdWrap);
-        mets.getContent().add(dmdSec);
-      
-        // amdSec
-        AmdSec amdSec = new AmdSec();
-        amdSec.setID("TMD_hdl_" + item.getHandle());
-        
-        // FIXME: techMD here
-     
-        // License as <rightsMD><mdWrap><binData>base64encoded</binData>...
-        InputStream licenseStream = findLicense(context, item);
-        
-        if (licenseStream != null)
+    	try
         {
-            RightsMD rightsMD = new RightsMD();
-            MdWrap rightsMDWrap = new MdWrap();
-            rightsMDWrap.setMIMETYPE("text/plain");
-            rightsMDWrap.setMDTYPE(Mdtype.OTHER);
-            rightsMDWrap.setOTHERMDTYPE("TEXT");
+            init(context);
     
-            BinData binData = new BinData();
-            Base64 base64 = new Base64(licenseStream);
+            // Create the METS file
+            Mets mets = new Mets();
+            
+            // Top-level stuff
+            mets.setOBJID("hdl:" + item.getHandle());
+            mets.setLABEL("DSpace Item");
+            mets.setSchema("mods", "http://www.loc.gov/mods/v3",
+                    "http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
+            
+            // MetsHdr
+            MetsHdr metsHdr = new MetsHdr();
+            metsHdr.setCREATEDATE(new Date()); // FIXME: CREATEDATE is now:  maybe should be item create date?
+            
+            // Agent
+            Agent agent = new Agent();
+            agent.setROLE(Role.CUSTODIAN);
+            agent.setTYPE(Type.ORGANIZATION);
+            
+            Name name = new Name();
+            name.getContent().add(new PCData(ConfigurationManager.getProperty("dspace.name")));
+            agent.getContent().add(name);
     
-            binData.getContent().add(base64);
-            rightsMDWrap.getContent().add(binData);
-            rightsMD.getContent().add(rightsMDWrap);
-            amdSec.getContent().add(rightsMD);
-        }
+            metsHdr.getContent().add(agent);
             
-        // FIXME: History data???? Nooooo!!!! 
-        
-        mets.getContent().add(amdSec);
-        
-        // fileSec
-        FileSec fileSec = new FileSec();
-        
-        Bundle[] bundles = item.getBundles();
-        
-        
-        for (int i = 0; i < bundles.length; i++)
-        {
-            Bitstream[] bitstreams = bundles[i].getBitstreams();
+            mets.getContent().add(metsHdr);
             
-            // First: we skip the license bundle, since it's included elsewhere
-            if (bitstreams[0].getFormat().getID() == licenseFormat)
-                continue;
+            DmdSec dmdSec = new DmdSec();
+            dmdSec.setID("DMD_hdl_" + item.getHandle());
             
-            // Create a fileGrp
-            FileGrp fileGrp = new FileGrp();            
-            // Bundle name for USE attribute
-            if (bundles[i].getName() != null && !bundles[i].getName().equals(""))
+            MdWrap mdWrap = new MdWrap();
+            mdWrap.setMDTYPE(Mdtype.MODS);
+            
+            XmlData xmlData = new XmlData();
+            createMODS(item, xmlData);
+    
+            mdWrap.getContent().add(xmlData);
+            dmdSec.getContent().add(mdWrap);
+            mets.getContent().add(dmdSec);
+          
+            // amdSec
+            AmdSec amdSec = new AmdSec();
+            amdSec.setID("TMD_hdl_" + item.getHandle());
+            
+            // FIXME: techMD here
+         
+            // License as <rightsMD><mdWrap><binData>base64encoded</binData>...
+            InputStream licenseStream = findLicense(context, item);
+            
+            if (licenseStream != null)
             {
-                fileGrp.setUSE(bundles[i].getName());
+                RightsMD rightsMD = new RightsMD();
+                MdWrap rightsMDWrap = new MdWrap();
+                rightsMDWrap.setMIMETYPE("text/plain");
+                rightsMDWrap.setMDTYPE(Mdtype.OTHER);
+                rightsMDWrap.setOTHERMDTYPE("TEXT");
+        
+                BinData binData = new BinData();
+                Base64 base64 = new Base64(licenseStream);
+        
+                binData.getContent().add(base64);
+                rightsMDWrap.getContent().add(binData);
+                rightsMD.getContent().add(rightsMDWrap);
+                amdSec.getContent().add(rightsMD);
             }
+                
+            // FIXME: History data???? Nooooo!!!! 
             
-            for (int bits = 0; bits < bitstreams.length; bits++)
+            mets.getContent().add(amdSec);
+            
+            // fileSec
+            FileSec fileSec = new FileSec();
+            
+            Bundle[] bundles = item.getBundles();
+            
+            
+            for (int i = 0; i < bundles.length; i++)
             {
-                // What's the persistent(-ish) ID?
-                String bitstreamPID = ConfigurationManager.getProperty("dspace.url") +
-                "/bitstream/" + item.getHandle() + "/" +
-                bitstreams[bits].getSequenceID() + "/" +
-                URLEncoder.encode(bitstreams[bits].getName(), "UTF-8");
+                Bitstream[] bitstreams = bundles[i].getBitstreams();
                 
-                edu.harvard.hul.ois.mets.File file =
-                    new edu.harvard.hul.ois.mets.File();
+                // First: we skip the license bundle, since it's included elsewhere
+                if (bitstreams[0].getFormat().getID() == licenseFormat)
+                    continue;
                 
-                /* ID: we use the unique part of the persistent ID, i.e. the
-                 * Handle + sequence number, but with _'s instead of /'s
-                 * so it's a legal xsd:ID. */
-                String xmlIDstart = item.getHandle().replaceAll("/", "_") + "_";
-
-                file.setID(xmlIDstart + bitstreams[bits].getSequenceID());
-
-                String groupID = "GROUP_" + xmlIDstart +
-                    bitstreams[bits].getSequenceID();
-                
-                /* If we're in THUMBNAIL or TEXT bundles, the bitstream is
-                 * extracted text or a thumbnail, so we use the name to work
-                 * out which bitstream to be in the same group as
-                 */
-                if (bundles[i].getName() != null &&
-                    (bundles[i].getName().equals("THUMBNAIL")
-                  || bundles[i].getName().equals("TEXT")))
+                // Create a fileGrp
+                FileGrp fileGrp = new FileGrp();            
+                // Bundle name for USE attribute
+                if (bundles[i].getName() != null && !bundles[i].getName().equals(""))
                 {
-                    // Try and find the original bitstream, and chuck the derived
-                    // bitstream in the same group
-                    Bitstream original = findOriginalBitstream(item,
-                            bitstreams[bits]);
-                    
-                    if (original != null)
-                    {
-                        groupID = "GROUP_" + xmlIDstart +
-                            original.getSequenceID();
-                    }
+                    fileGrp.setUSE(bundles[i].getName());
                 }
                 
-                file.setGROUPID(groupID);
-                file.setOWNERID(bitstreamPID);
-                // FIXME: ADMID should point to appropriate TechMD section above
-                file.setMIMETYPE(bitstreams[bits].getFormat().getMIMEType());
-                // FIXME: CREATED: no date
-                file.setSIZE(bitstreams[bits].getSize());
-                file.setCHECKSUM(bitstreams[bits].getChecksum());
-                file.setCHECKSUMTYPE(Checksumtype.MD5);
+                for (int bits = 0; bits < bitstreams.length; bits++)
+                {
+                    // What's the persistent(-ish) ID?
+                    String bitstreamPID = ConfigurationManager.getProperty("dspace.url") +
+                    "/bitstream/" + item.getHandle() + "/" +
+                    bitstreams[bits].getSequenceID() + "/" +
+                    URLEncoder.encode(bitstreams[bits].getName(), "UTF-8");
+                    
+                    edu.harvard.hul.ois.mets.File file =
+                        new edu.harvard.hul.ois.mets.File();
+                    
+                    /* ID: we use the unique part of the persistent ID, i.e. the
+                     * Handle + sequence number, but with _'s instead of /'s
+                     * so it's a legal xsd:ID. */
+                    String xmlIDstart = item.getHandle().replaceAll("/", "_") + "_";
+    
+                    file.setID(xmlIDstart + bitstreams[bits].getSequenceID());
+    
+                    String groupID = "GROUP_" + xmlIDstart +
+                        bitstreams[bits].getSequenceID();
+                    
+                    /* If we're in THUMBNAIL or TEXT bundles, the bitstream is
+                     * extracted text or a thumbnail, so we use the name to work
+                     * out which bitstream to be in the same group as
+                     */
+                    if (bundles[i].getName() != null &&
+                        (bundles[i].getName().equals("THUMBNAIL")
+                      || bundles[i].getName().equals("TEXT")))
+                    {
+                        // Try and find the original bitstream, and chuck the derived
+                        // bitstream in the same group
+                        Bitstream original = findOriginalBitstream(item,
+                                bitstreams[bits]);
+                        
+                        if (original != null)
+                        {
+                            groupID = "GROUP_" + xmlIDstart +
+                                original.getSequenceID();
+                        }
+                    }
+                    
+                    file.setGROUPID(groupID);
+                    file.setOWNERID(bitstreamPID);
+                    // FIXME: ADMID should point to appropriate TechMD section above
+                    file.setMIMETYPE(bitstreams[bits].getFormat().getMIMEType());
+                    // FIXME: CREATED: no date
+                    file.setSIZE(bitstreams[bits].getSize());
+                    file.setCHECKSUM(bitstreams[bits].getChecksum());
+                    file.setCHECKSUMTYPE(Checksumtype.MD5);
+                    
+                    // FLocat: filename is MD5 checksum
+                    FLocat flocat = new FLocat();
+                    flocat.setLOCTYPE(Loctype.URL);
+                    flocat.setXlinkHref(bitstreams[bits].getChecksum());
+                    
+                    // Add FLocat to File, and File to FileGrp
+                    file.getContent().add(flocat);
+                    fileGrp.getContent().add(file);
+                }
                 
-                // FLocat: filename is MD5 checksum
-                FLocat flocat = new FLocat();
-                flocat.setLOCTYPE(Loctype.URL);
-                flocat.setXlinkHref(bitstreams[bits].getChecksum());
-                
-                // Add FLocat to File, and File to FileGrp
-                file.getContent().add(flocat);
-                fileGrp.getContent().add(file);
+                // Add fileGrp to fileSec
+                fileSec.getContent().add(fileGrp);
             }
             
-            // Add fileGrp to fileSec
-            fileSec.getContent().add(fileGrp);
+            // Add fileSec to document
+            mets.getContent().add(fileSec);
+            
+            // FIXME: Structmap
+            
+            mets.validate(new MetsValidator());
+
+            mets.write(new MetsWriter(os));
         }
-        
-        // Add fileSec to document
-        mets.getContent().add(fileSec);
-        
-        // FIXME: Structmap
-        
-        mets.validate(new MetsValidator());
-        
-        return mets;
+        catch (MetsException e)
+        {
+        	// We don't pass up a MetsException, so callers don't need to
+            // know the details of the METS toolkit
+            e.printStackTrace();
+            throw new IOException (e.getMessage());
+        }
     }
     
     
