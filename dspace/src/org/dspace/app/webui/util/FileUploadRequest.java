@@ -79,15 +79,12 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     {
         super(req);
 
-        // set all incoming encoding to UTF-8
-        req.setCharacterEncoding("UTF-8");
-
         original = req;
         
         String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
         int maxSize = ConfigurationManager.getIntProperty("upload.max");
         
-        mreq = new MultipartRequest(req, tempDir, maxSize);
+        mreq = new MultipartRequest(req, tempDir, maxSize, "UTF-8");
     }
 
     // Methods to replace HSR methods
