@@ -54,6 +54,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -599,12 +600,16 @@ public class MyDSpaceServlet extends DSpaceServlet
         WorkspaceItem[] workspaceItems = WorkspaceItem.findByEPerson(context,
                 context.getCurrentUser());
 
+        SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(context, 
+                context.getCurrentUser());
+        
         // Set attributes
         request.setAttribute("mydspace.user", context.getCurrentUser());
         request.setAttribute("workspace.items", workspaceItems);
         request.setAttribute("workflow.items", workflowItems);
         request.setAttribute("workflow.owned", owned);
         request.setAttribute("workflow.pooled", pooled);
+        request.setAttribute("supervised.items", supervisedItems);
 
         // Forward to main mydspace page
         JSPManager.showJSP(request, response, "/mydspace/main.jsp");

@@ -60,6 +60,7 @@
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.content.SupervisedItem" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
@@ -80,6 +81,9 @@
 
     WorkflowItem[] pooled =
         (WorkflowItem[]) request.getAttribute("workflow.pooled");
+
+    SupervisedItem[] supervisedItems =
+        (SupervisedItem[]) request.getAttribute("supervised.items");
 %>
 
 <dspace:layout title="My DSpace" nocache="true">
@@ -246,45 +250,111 @@
     <P align="center"><A HREF="<%= request.getContextPath() %>/subscribe">See Your Subscriptions</A></P>
 
 <%
-    // Display workspace items, if any
-    if (workspaceItems.length > 0)
+    // Display workspace items (authoring or supervised), if any
+    if (workspaceItems.length > 0 || supervisedItems.length > 0)
     {
         // even or odd row:  Starts even since header row is odd (1)
         String row = "even";
 %>
-    <H2>Unfinished Submissions</H2>
+    <H2>WorkSpace</H2>
+
+    <p>This section is for use in the continued authoring of your document.</p>
 
     <table class=miscTable align=center>
         <tr>
+            <th class=oddRowOddCol>&nbsp;</th>
+            <th class=oddRowEvenCol>Submitted by</th>
             <th class=oddRowOddCol>Title</th>
             <th class=oddRowEvenCol>Submitted to</th>
             <th class=oddRowOddCol>&nbsp;</th>
-            <th class=oddRowEvenCol>&nbsp;</th>
         </tr>
 <%
+        if (supervisedItems.length > 0 && workspaceItems.length > 0) 
+        {
+%>
+        <tr>
+            <th colspan="5">
+                Authoring
+            </th>
+        </tr>
+<%
+        }
+
         for (int i = 0; i < workspaceItems.length; i++)
         {
             DCValue[] titleArray =
                 workspaceItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                                                   : "Untitled");
+            EPerson submitter = workspaceItems[i].getItem().getSubmitter();
 %>
-        <form action="<%= request.getContextPath() %>/mydspace" method=post>
-            <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>">
-            <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>">
-            <tr>
-                <td class="<%= row %>RowOddCol"><%= Utils.addEntities(title) %></td>
-                <td class="<%= row %>RowEvenCol">
-                    <%= workspaceItems[i].getCollection().getMetadata("name") %>
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <input type="submit" name="submit_resume" value="Resume">
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="submit" name="submit_delete" value="Remove...">
-                </td>
-            </tr>
-        </form>
+        <tr>
+            <form action="<%= request.getContextPath() %>/workspace" method="post">
+            <td class="<%= row %>RowOddCol">
+                <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>"/>
+                <input type="submit" name="submit_open" value="Open"/>
+            </td>
+            </form>
+            <td class="<%= row %>RowEvenCol">
+                <A HREF="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></A>
+            </td>
+            <td class="<%= row %>RowOddCol"><%= Utils.addEntities(title) %></td>
+            <td class="<%= row %>RowEvenCol"><%= workspaceItems[i].getCollection().getMetadata("name") %></td>
+            <form action="<%= request.getContextPath() %>/mydspace" method="post">
+            <td class="<%= row %>RowOddCol">
+                <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
+                <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>"/>
+                <input type="submit" name="submit_delete" value="Remove"/>
+            </td>
+            </form>
+        </tr>
+<%
+            row = (row.equals("even") ? "odd" : "even" );
+        }
+%>
+
+<%-- Start of the Supervisors workspace list --%>
+<%
+        if (supervisedItems.length > 0) 
+        {
+%>
+        <tr>
+            <th colspan="5">
+                Supervising
+            </th>
+        </tr>
+<%
+        }
+
+        for (int i = 0; i < supervisedItems.length; i++)
+        {
+            DCValue[] titleArray =
+                supervisedItems[i].getItem().getDC("title", null, Item.ANY);
+            String title = (titleArray.length > 0 ? titleArray[0].value
+                                                  : "Untitled");
+            EPerson submitter = supervisedItems[i].getItem().getSubmitter();
+%>
+        <tr>
+            <form action="<%= request.getContextPath() %>/workspace" method="post">
+            <td class="<%= row %>RowOddCol">
+                <input type="hidden" name="workspace_id" value="<%= supervisedItems[i].getID() %>"/>
+                <input type="submit" name="submit_open" value="Open"/>
+            </td>
+            </form>
+            <td class="<%= row %>RowEvenCol">
+                <A HREF="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></A>
+            </td>
+            <td class="<%= row %>RowOddCol"><%= Utils.addEntities(title) %></td>
+            <td class="<%= row %>RowEvenCol"><%= supervisedItems[i].getCollection().getMetadata("name") %><
+/td>
+            <form action="<%= request.getContextPath() %>/mydspace" method="post">
+            <td class="<%= row %>RowOddCol">
+                <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
+                <input type="hidden" name="workspace_id" value="<%= supervisedItems[i].getID() %>"/>
+                <input type="submit" name="submit_delete" value="Remove"/>
+            </td>
+            </form>
+        </tr>
 <%
             row = (row.equals("even") ? "odd" : "even" );
         }
@@ -292,7 +362,9 @@
     </table>
 <%
     }
+%>
 
+<%
     // Display workflow items, if any
     if (workflowItems.length > 0)
     {
