@@ -98,7 +98,7 @@ Common usage:
 
   
   <!-- ============================================================= -->
-  <!-- Compile the source code and build WARs                        -->
+  <!-- Compile the source code                                       -->
   <!-- ============================================================= -->
 
   <target name="compile"
@@ -128,7 +128,7 @@ Common usage:
              token="@@dspace.dir@@"
              value="${dspace.dir}" />
     <!-- Make sure jsp/local exists -->
-   <mkdir dir="jsp/local" />
+    <mkdir dir="jsp/local" />
     <!-- Copy original JSPs, then copy localised versions on top -->
     <mkdir dir="build/jsp" />
     <copy todir="build/jsp" preservelastmodified="true">
@@ -193,7 +193,7 @@ Common usage:
 
 
   <!-- ============================================================= -->
-  <!-- Install or update DSpace code (except database)               -->
+  <!-- Install or update DSpace code                                 -->
   <!-- ============================================================= -->
 
   <target name="install_code"
@@ -210,11 +210,7 @@ Common usage:
     <copy todir="${dspace.dir}/bin" preservelastmodified="true">
       <fileset dir="bin"/>
     </copy>
-    <exec executable="chmod">
-      <arg value="-R" />
-      <arg value="u+x" />
-      <arg value="${dspace.dir}/bin" />
-    </exec>
+    <chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
     <copy todir="${dspace.dir}/lib" preservelastmodified="true">
       <fileset dir="lib" />
     </copy>
