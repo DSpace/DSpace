@@ -55,6 +55,9 @@ import org.apache.lucene.analysis.*;
 
 import org.apache.log4j.Logger;
 
+//Jakarta-ORO classes (regular expressions)
+import org.apache.oro.text.perl.Perl5Util;
+
 // dspace classes
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -90,6 +93,14 @@ public class DSQuery
         throws IOException
     {
         querystring = checkEmptyQuery( querystring );
+        
+        // play with regular expressions to work around lucene bug
+        Perl5Util util = new Perl5Util();
+        
+        querystring = util.substitute("s/ AND / && /g", querystring);
+        querystring = util.substitute("s/ OR / || /g", querystring);
+        querystring = util.substitute("s/ NOT / ! /g", querystring);
+        
         querystring = querystring.toLowerCase();
                         
         ArrayList resultlist= new ArrayList();
