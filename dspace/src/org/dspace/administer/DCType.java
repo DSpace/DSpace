@@ -88,7 +88,7 @@ public class DCType
      *
      * @param  context  DSpace context object
      * @param  id       ID of the bitstream format
-     *   
+     *
      * @return  the bitstream format, or null if the ID is invalid.
      */
     public static DCType find(Context context, int id)
@@ -108,7 +108,7 @@ public class DCType
         }
     }
 
-    
+
     /**
      * Find a given Dublin Core type.  Returns <code>null</code> if the
      * Dublin Core type doesn't exist.
@@ -127,10 +127,10 @@ public class DCType
     {
         String sql = "SELECT * FROM dctyperegistry WHERE element LIKE '" +
             element + "' AND qualifier";
-        
+
         if (qualifier == null)
         {
-            sql = sql + "=null;";
+            sql = sql + " is null;";
         }
         else
         {
@@ -169,7 +169,7 @@ public class DCType
         TableRowIterator tri = DatabaseManager.query(context,
             "dctyperegistry",
             "SELECT * FROM dctyperegistry ORDER BY element, qualifier;");
-        
+
         // Make into DC Type objects
         while (tri.hasNext())
         {
@@ -179,7 +179,7 @@ public class DCType
         // Convert list into an array
         DCType[] typeArray = new DCType[dcTypes.size()];
         typeArray = (DCType[]) dcTypes.toArray(typeArray);
-        
+
         // Return the array
         return typeArray;
     }
@@ -200,7 +200,7 @@ public class DCType
             throw new AuthorizeException(
                 "Only administrators may modiffy the Dublin Core registry");
         }
-        
+
         // Create a table row
         TableRow row = DatabaseManager.create(context, "dctyperegistry");
         return new DCType(context, row);
