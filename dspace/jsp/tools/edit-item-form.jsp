@@ -57,6 +57,7 @@
 <%@ page import="java.util.Map" %>
 
 <%@ page import="org.dspace.administer.DCType" %>
+<%@ page import="org.dspace.app.webui.servlet.admin.AuthorizeAdminServlet" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
@@ -151,6 +152,20 @@
 <%  } %>
                 </td>
             </tr>
+<%-- ===========================================================
+     Edit item's policies
+     =========================================================== --%>
+            <tr>
+                <td class="submitFormLabel">Item's Authorizations:</td>
+                <td>
+                    <form method=POST action="<%= request.getContextPath() %>/dspace-admin/authorize">
+                        <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>">
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>">
+                        <input type="submit" name="submit_item_select" value="Edit...">
+                    </form>
+                </td>
+            </tr>
+
         </table>
     </center>
 
