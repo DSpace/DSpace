@@ -109,6 +109,15 @@
     <url-pattern>/subscribe</url-pattern>
   </filter-mapping>
 
+  <filter-mapping>
+    <filter-name>registered-only</filter-name>
+    <url-pattern>/workspace</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>registered-only</filter-name>
+    <url-pattern>/view-workspaceitem</url-pattern>
+  </filter-mapping>
 
   <!-- Servlets -->
 
@@ -316,10 +325,19 @@
   </servlet>
 
   <servlet>
+    <servlet-name>view-workspaceitem</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.ViewWorkspaceItemServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>workflow</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.WorkflowAbortServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>workspace</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.WorkspaceServlet</servlet-class>
+  </servlet>
 
   <!-- Servlet Mappings -->
 
@@ -506,10 +524,19 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>view-workspaceitem</servlet-name>
+    <url-pattern>/view-workspaceitem</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>workflow</servlet-name>
     <url-pattern>/dspace-admin/workflow</url-pattern>
   </servlet-mapping>
 
+  <servlet-mapping>
+    <servlet-name>workspace</servlet-name>
+    <url-pattern>/workspace</url-pattern>
+  </servlet-mapping>
 
 
   <!-- Icon MIME type -->
