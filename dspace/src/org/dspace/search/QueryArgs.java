@@ -1,6 +1,7 @@
 package org.dspace.search;
 
 import javax.servlet.http.HttpServletRequest;
+import org.apache.oro.text.perl.Perl5Util;
 
 public class QueryArgs
 {
@@ -67,22 +68,14 @@ public class QueryArgs
     	String conjunction2 	= request.getParameter("conjunction2");
     	
     	if (query1.length() > 0)
-    	{
-    		if (!field1.equals("ANY")) {
-    			newquery = newquery + field1 + ":";
-    		}
-    		
-    		newquery = newquery + '"' + query1 + '"';
+    	{    		
+    		newquery = newquery + buildQueryPart(query1, field1); 
     	}
     	
     	if (query2.length() > 0)
     	{
     		newquery = newquery + " " + conjunction1 + " ";
-    		if (!field2.equals("ANY")) {
-    			newquery = newquery + field2 + ":";
-    		}
-    		
-    		newquery = newquery + '"' + query2 + '"';
+    		newquery = newquery + buildQueryPart(query2, field2); 
     	}
     	
     	newquery = newquery + ")";
@@ -90,13 +83,28 @@ public class QueryArgs
     	if (query3.length() > 0)
     	{
 			newquery = newquery + " " + conjunction2 + " ";
-    		if (!field3.equals("ANY")) {
-    			newquery = newquery + field3 + ":";
-    		}
-    		
-    		newquery = newquery + "\"" + query3 + "\"";
+    		newquery = newquery + buildQueryPart(query3, field3); 
     	}
 
+    	return (newquery);
+    }
+    
+    private String buildQueryPart (String myquery, String myfield)
+    {	
+    	Perl5Util util  = new Perl5Util();
+    	String newquery = "(";
+    	String pattern = "";
+    	 
+    	if (!myfield.equals("ANY")) {
+    		newquery = newquery + myfield + ":";
+    		myquery = util.substitute("s/\'(.*)\'/\"$1\"/g", myquery);
+    		if (!util.match("/\".*\"/", myquery))
+    		{
+    			myquery = util.substitute("s/ / " + myfield + ":/g", myquery);
+    		}
+    	}
+
+    	newquery = newquery +  myquery + ")";
     	return (newquery);
     }
 }
