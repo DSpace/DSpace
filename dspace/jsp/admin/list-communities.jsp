@@ -113,22 +113,22 @@
 %>
         <tr class="oddRowOddCol">
             <td>
-                &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>"><%= collections[j].getMetadata("name") %></A>
-                <small><%= collections[i].getHandle() %> (DB ID: <%= collections[i].getID()%>)</small>
+                &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="<%= request.getContextPath() %>/handle/<%= collections[j].getHandle() %>"><%= collections[j].getMetadata("name") %></A>
+                <small><%= collections[j].getHandle() %> (DB ID: <%= collections[j].getID()%>)</small>
             </td>
             <form method=POST>
                 <td>
-                    <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
+                    <input type="hidden" name="action"        value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
                     <input type="hidden" name="collection_id" value="<%= collections[j].getID() %>">
-                    <input type="submit" name="submit" value="Edit...">
+                    <input type="submit" name="submit"        value="Edit...">
                 </td>
             </form>
             <form method=POST>
                 <td>
-                    <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>">
+                    <input type="hidden" name="action"        value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>">
                     <input type="hidden" name="collection_id" value="<%= collections[j].getID() %>">
-                    <input type="hidden" name="community_id" value="<%= communities[i].getID() %>">
-                    <input type="submit" name="submit" value="Delete...">
+                    <input type="hidden" name="community_id"  value="<%= communities[i].getID() %>">
+                    <input type="submit" name="submit"        value="Delete...">
                 </td>
             </form>
         </tr>
