@@ -90,8 +90,8 @@
 	if (sortBy == EPerson.EMAIL) sortByParam = "email";
 	if (sortBy == EPerson.ID) sortByParam = "id";
 
-	String jumpLink = request.getContextPath() + "/dspace-admin/eperson-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first=";
-	String sortLink = request.getContextPath() + "/dspace-admin/eperson-list?multiple=" + multiple + "&first=" + first + "&sortby=";
+	String jumpLink = request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first=";
+	String sortLink = request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&first=" + first + "&sortby=";
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
