@@ -4,10 +4,10 @@ activation.jar:      The Java Activation Framework, used by JavaMail
 handle.jar:          CNRI Handle Server (version 5.2.0)
 jena.jar:            The Jena RDF framework (version 1.4.0)
 junit.jar:           JUnit Test Framework, for automatic system tests
-log4j-1.2.1.jar:     Log4j, for system logging (version 1.2.1)
-lucene-1.2-RC5.jar:  Lucene search engine (version 1.2RC5)
+log4j.jar:           Log4j, for system logging (version 1.2.1)
+lucene.jar:          Lucene search engine (version 1.2)
 mail.jar:            JavaMail, used for sending e-mail
 postgresql.jar:      JDBC driver for PostgreSQL (corresponds to Postgres 7.2)
-servlet-2.3.jar      Servlet interfaces (version 2.3)
+servlet.jar          Servlet interfaces (version 2.3)
 xalan.jar:           XSLT processor - used for XPath functionality
 xerces.jar:          XML processor - used for parsing XML files
