@@ -584,7 +584,7 @@ public class ItemImport
         System.out.println("\tElement: " + element + " Qualifier: " + qualifier +
         " Value: " + value );
 
-        if( qualifier.equals("none") ) qualifier = null;
+        if( qualifier.equals("none") || "".equals(qualifier) ) qualifier = null;
 
         // if language isn't set, use the system's default value
         if( language.equals("") )
@@ -668,6 +668,8 @@ public class ItemImport
         BufferedReader is = new BufferedReader( new FileReader( contentspath ) );
         while( ( line = is.readLine() ) != null )
         {
+        	if("".equals(line.trim())) continue;
+        	
             // look for a bundle name
             String bundleMarker = "\tbundle:";
             
