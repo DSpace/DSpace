@@ -166,7 +166,6 @@ public class DSpaceServlet extends HttpServlet
             UIUtil.sendAlert(request, se);
 
             JSPManager.showInternalError(request, response);
-
         }
         catch (AuthorizeException ae)
         {
@@ -192,11 +191,28 @@ public class DSpaceServlet extends HttpServlet
                 JSPManager.showAuthorizeError(request, response, ae);
             }
         }
-        
-        // Abort the context if it's still valid
-        if (context != null && context.isValid())
+        catch (RuntimeException e)
         {
-            context.abort();
+            // Catch and re-throw to ensure context aborted (via "finally")
+            throw e;
+        }
+        catch (IOException ioe)
+        {
+            // Catch and re-throw to ensure context aborted (via "finally")
+            throw ioe;
+        }
+        catch (ServletException sve)
+        {
+            // Catch and re-throw to ensure context aborted (via "finally")
+            throw sve;
+        }
+        finally
+        {
+            // Abort the context if it's still valid
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
         }
     }
     
