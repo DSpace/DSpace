@@ -154,7 +154,8 @@ public class UIUtil
 
         if (orig == null)
         {
-            String fullURL = request.getServletPath();
+            String fullURL = request.getContextPath() +
+                request.getServletPath();
 
             if (request.getQueryString() != null)
             {
