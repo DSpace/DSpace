@@ -292,12 +292,12 @@ public class DSIndexer
 
         // and populate it
         String name        = target.getMetadata("name");
-        String description = target.getMetadata("short_description");
-        String intro_text  = target.getMetadata("introductory_text");
+//        String description = target.getMetadata("short_description");
+//        String intro_text  = target.getMetadata("introductory_text");
 
         textvalues.put("name",        name       );
-        textvalues.put("description", description);
-        textvalues.put("intro_text",  intro_text );
+//        textvalues.put("description", description);
+//        textvalues.put("intro_text",  intro_text );
 
         // get the handle
         String myhandle = HandleManager.findHandle(c, target);
@@ -319,12 +319,12 @@ public class DSIndexer
 
         // and populate it
         String name        = target.getMetadata("name");
-        String description = target.getMetadata("short_description");
-        String intro_text  = target.getMetadata("introductory_text");
+//        String description = target.getMetadata("short_description");
+//        String intro_text  = target.getMetadata("introductory_text");
 
         textvalues.put("name",       name         );
-        textvalues.put("description",description  );
-        textvalues.put("intro_text", intro_text   );
+//        textvalues.put("description",description  );
+//        textvalues.put("intro_text", intro_text   );
         textvalues.put("location",   location_text);
 
         // get the handle
