@@ -86,7 +86,7 @@
 %>
 		</select>
 		</p>
-         <table cellspacing=2 border=1 width="80%">
+         <table cellspacing=2 border=0 width="80%">
 		  <tr>
                 <td class="evenRowEvenCol">
                     <table border=0>
@@ -99,7 +99,7 @@
                     <option value="ANY" <%= field1.equals("ANY") ? "selected" : "" %>>Keyword</option>
                     <option value="author" <%= field1.equals("author") ? "selected" : "" %>>Author</option>
                     <option value="title" <%= field1.equals("title") ? "selected" : "" %>>Title</option>
-                    <option value="subject" <%= field1.equals("subject") ? "selected" : "" %>>Subject</option>
+                    <option value="keyword" <%= field1.equals("keyword") ? "selected" : "" %>>Subject</option>
                     <option value="abstract" <%= field1.equals("abstract") ? "selected" : "" %>>Abstract</option>
                     <option value="series" <%= field1.equals("series") ? "selected" : "" %>>Series</option>
                     <option value="sponsor" <%= field1.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
@@ -128,7 +128,7 @@
                     <option value="ANY" <%= field2.equals("ANY") ? "selected" : "" %>>Keyword</option>
                     <option value="author" <%= field2.equals("author") ? "selected" : "" %>>Author</option>
                     <option value="title" <%= field2.equals("title") ? "selected" : "" %>>Title</option>
-                    <option value="subject" <%= field2.equals("subject") ? "selected" : "" %>>Subject</option>
+                    <option value="keyword" <%= field2.equals("keyword") ? "selected" : "" %>>Subject</option>
                     <option value="abstract" <%= field2.equals("abstract") ? "selected" : "" %>>Abstract</option>
                     <option value="series" <%= field2.equals("series") ? "selected" : "" %>>Series</option>
                     <option value="sponsor" <%= field2.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
@@ -153,7 +153,7 @@
                     <option value="ANY" <%= field3.equals("ANY") ? "selected" : "" %>>Keyword</option>
                     <option value="author" <%= field3.equals("author") ? "selected" : "" %>>Author</option>
                     <option value="title" <%= field3.equals("title") ? "selected" : "" %>>Title</option>
-                    <option value="subject" <%= field3.equals("subject") ? "selected" : "" %>>Subject</option>
+                    <option value="keyword" <%= field3.equals("keyword") ? "selected" : "" %>>Subject</option>
                     <option value="abstract" <%= field3.equals("abstract") ? "selected" : "" %>>Abstract</option>
                     <option value="series" <%= field3.equals("series") ? "selected" : "" %>>Series</option>
                     <option value="sponsor" <%= field3.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
