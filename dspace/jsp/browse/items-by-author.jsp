@@ -64,6 +64,7 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     Collection collection = (Collection) request.getAttribute("collection");
@@ -89,7 +90,7 @@
 
 <dspace:layout title="<%= pageTitle %>">
 
-    <H2>Items for Author <%= author %> in <%= scopeName %></H2>
+    <H2>Items for Author <%= Utils.addEntities(author) %> in <%= scopeName %></H2>
 
     <%-- Sorting controls --%>
     <table border=0 cellpadding=10 align=center>
