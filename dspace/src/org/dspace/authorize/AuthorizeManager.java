@@ -435,5 +435,19 @@ public class AuthorizeManager
             "DELETE FROM resourcepolicy WHERE " +
             "resource_type_id=" + o.getType()   + " AND " +
             "resource_id="      + o.getID()   );
+    }
+    
+    
+    /**
+     * removes all policies relating to a group
+     * @param context
+     * @param groupID
+     */
+    public static void removeGroupPolicies(Context c, int groupID )
+        throws SQLException
+    {
+        DatabaseManager.updateQuery(c,
+            "DELETE FROM resourcepolicy WHERE " +
+            "epersongroup_id=" + groupID );
     }    
 }
