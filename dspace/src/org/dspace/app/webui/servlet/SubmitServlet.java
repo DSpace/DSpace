@@ -771,8 +771,15 @@ public class SubmitServlet extends DSpaceServlet
         }
 
         readSeriesNumbers(request, item, "relation", "ispartofseries", true);
-        readText(request, item, "type", null, false, "en");
 
+        // Type
+        item.clearDC("type", null, Item.ANY);
+        String[] types = request.getParameterValues("type");
+        for (int i = 0; i < types.length; i++)
+        {
+            item.addDC("type", null, "en", types[i]);
+        }
+        
         // FIXME: Maybe should do integrity check using language object
         readText(request, item, "language", "iso", false, null);
 

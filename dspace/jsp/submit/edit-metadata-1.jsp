@@ -623,30 +623,56 @@
 <%-- ================================================ --%>
                 <tr>
                     <td colspan=4 class="submitFormHelp">
-                        Select the type of content you are submitting.
+                        Select the type(s) of content you are submitting.  To
+                        select more than one value in the list, you may have to
+                        hold down the "CTRL" or "Shift" key.
                     </td>
                 </tr>
 <%
-    String[] allTypes = {"Miscellaneous", "Dataset", "Preprint", "Reprint"};
+    String[] allTypes = {
+                "Animation",
+                "Article",
+                "Book",
+                "Book chapter",
+                "Dataset",
+                "Learning Object",
+                "Image",
+                "Image,3-D",
+                "Map",
+                "Musical Score",
+                "Plan or blueprint",
+                "Preprint",
+                "Presentation",
+                "Recording,acoustical",
+                "Recording,musical",
+                "Recording,oral",
+                "Software",
+                "Technical Report",
+                "Thesis",
+                "Video",
+                "Working Paper",
+                "Other"};
+
     DCValue[] typeArray = item.getDC("type", null, Item.ANY);
-    String type = (typeArray.length > 0 ? typeArray[0].value : "");
+    // Make into a HashMap for easy access
+    HashMap typeMap = new HashMap();
+    for (int i = 0; i < typeArray.length; i++)
+    {
+        typeMap.put(typeArray[i].value, new Boolean(true));
+    }
 %>
                 <tr>
                     <td class="submitFormLabel">Type</td>
                     <td colspan=2>
-                        <select name="type">
+                        <select name="type" size=6 multiple>
 <%
-    if (type.equals(""))
-    {
-%>
-                            <option selected value="">Select...</option>
-<%
-    }
-
     for (int i = 0; i < allTypes.length; i++)
     {
 %>
-                            <option value="<%= allTypes[i] %>"<%= (type.equals(allTypes[i]) ? " SELECTED" : "" ) %>><%= allTypes[i] %></option>
+                            <option<%
+        // option should be selected if it's in the DC
+        if (typeMap.get(allTypes[i]) != null)
+        { %> selected <% } %>><%= allTypes[i] %></option>
 <%
     }
 %>
