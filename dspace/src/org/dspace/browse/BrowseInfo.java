@@ -45,13 +45,12 @@ import java.util.*;
 
 
 /**
- * Results of DSpace Browse.
+ * Results of a Browse method call.
  *
  * The List RESULTS are the objects returned from the browse; either
  * Strings (for getAuthors()) or org.dspace.content.Items (for all
- * the getItems.... methods). The list is guaranteed to be non-null.
- * You can use the usual list methods to access objects, determine
- * how many objects have been returned, and so forth.
+ * the getItems.... methods). The list is readonly, and is guaranteed
+ * to be non-null.
  *
  * overallPosition is the position of the first element of results
  * within the Browse index. Positions begin with 0.
@@ -70,7 +69,7 @@ public class BrowseInfo
     /**
      * The results of the browse
      */
-    private java.util.List results;
+    private List results;
 
     /**
      * The position of the first element of results
@@ -103,33 +102,8 @@ public class BrowseInfo
         int offset
     )
     {
-        this(results, null, null, overallPosition, total, offset);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param results - A List of Browse results
-     * @param element - Results are sorted by dublin core ELEMENT and QUALIFIER
-     * @param qualifier - Results are sorted by dublin core ELEMENT and QUALIFIER
-     * @param overallPosition - The position of the first returned item in the overall index
-     * @param total - The total number of items in the index
-     * @param offset - The position of the requested item in the set of results
-     */
-    public BrowseInfo (List results,
-        String element,
-        String qualifier,
-        int overallPosition,
-        int total,
-        int offset
-    )
-    {
         if (results == null)
             throw new IllegalArgumentException("Null result list not allowed");
-
-            // Sort the results as requested
-//         if (element != null)
-//             Collections.sort(results, new ItemComparator(type));
 
         this.results = Collections.unmodifiableList(results);
         this.overallPosition = overallPosition;
@@ -137,13 +111,9 @@ public class BrowseInfo
         this.offset = offset;
     }
 
-    ////////////////////////////////////////
-    // Accessor methods
-    ////////////////////////////////////////
-
     /**
      * The results of the Browse.
-     * This can be either Strings (for the authors browse)
+     * The results can contain either Strings (for the authors browse)
      * or org.dspace.content.Items (for the other browses).
      *
      * @return - Result list. This list cannot be modified.
@@ -155,8 +125,10 @@ public class BrowseInfo
 
     /**
      * Return the number of results.
+     *
+     * @return - the number of results.
      */
-    public int getResultSize()
+    public int getResultCount()
     {
         return results.size();
     }
@@ -165,7 +137,7 @@ public class BrowseInfo
      * Return the position of the results in index being browsed.
      * This is 0 for the start of the index.
      *
-     * @return - The value of overallPosition
+     * @return - the position of the results in index being browsed.
      */
     public int getOverallPosition()
     {
@@ -173,9 +145,9 @@ public class BrowseInfo
     }
 
     /**
-     * The total number of items in the index.
+     * Return the total number of items in the index.
      *
-     * @return - The value of total
+     * @return - The total number of items in the index.
      */
     public int getTotal()
     {
@@ -183,21 +155,19 @@ public class BrowseInfo
     }
 
     /**
-     * The position of the requested item in the set of results
+     * Return the position of the requested item or value in the set of results
      *
-     * @return - The value of offset
+     * @return - the position of the requested item or value in the set of results
      */
     public int getOffset()
     {
         return offset;
     }
 
-    ////////////////////////////////////////
-    //
-    ////////////////////////////////////////
-
     /**
-     * True if these are no previous results from the browse
+     * True if there are no previous results from the browse
+     *
+     * @return - True if there are no previous results from the browse
      */
     public boolean isFirst()
     {
@@ -206,6 +176,8 @@ public class BrowseInfo
 
     /**
      * True if these are the last results from the browse
+     *
+     * @return - True if these are the last results from the browse
      */
     public boolean isLast()
     {
