@@ -180,6 +180,9 @@ Common usage:
     </java>
   </target>
     
+
+  <!-- FIXME:  This is temporary, and will be replaced by a script to be
+    -  run from the DSpace installation rather than the source tree -->
   <target name="setup_browse"
           description="Create the browse index, removing the old one">
     <java classname="org.dspace.browse.InitializeBrowse"
@@ -259,6 +262,7 @@ Common usage:
              classpathref="build.class.path">
       <package name="org.dspace.administer"/>
       <package name="org.dspace.authorize"/>
+      <package name="org.dspace.browse"/>
       <package name="org.dspace.content"/>
       <package name="org.dspace.core"/>
       <package name="org.dspace.eperson"/>
