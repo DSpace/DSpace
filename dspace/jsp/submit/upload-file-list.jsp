@@ -135,6 +135,8 @@
             supportLevel = "unsupported";
         }
 
+        // Full param to dspace:popup must be single variable
+        String supportLevelLink = "/help/formats.html#" + supportLevel;
 %>
             <tr>
                 <td class="<%= row %>RowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= java.net.URLEncoder.encode(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A></td>
@@ -146,7 +148,7 @@
                     <input type=submit name="submit_describe_<%= bitstreams[i].getID() %>" value="Change">
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= description %> <dspace:popup page="/help/formats.html#<%= supportLevel %>">(<%= supportLevel %>)</dspace:popup>
+                    <%= description %> <dspace:popup page="<%= supportLevelLink %>">(<%= supportLevel %>)</dspace:popup>
                     <input type=submit name="submit_format_<%= bitstreams[i].getID() %>" value="Change">
                 </td>
 <%
