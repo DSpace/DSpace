@@ -39,6 +39,8 @@
  */
 package org.dspace.app.webui.util;
 
+import java.util.List;
+
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
@@ -63,12 +65,16 @@ public class SubmissionInfo
     /** The element or element_qualifier to scroll to initially using anchor */
     public String jumpToField;
 
-    /** If true, something on the form is missing */
-    public boolean missing;
+    /** If non-empty, form-relative indices of missing fields */
+    public List missingFields;
 
     /** Specific bundle we're dealing with */
     public Bundle bundle;
 
     /** Specific bitstream we're dealing with */
     public Bitstream bitstream;
+    
+    /** The number of metadata entry/edit pages */
+    public int numMetadataPages;
 }
+
