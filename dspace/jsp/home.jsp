@@ -49,20 +49,25 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="java.io.File" %>
+
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.core.Constants" %>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
+    
+    String topNews = ConfigurationManager.readNewsFile(Constants.NEWS_TOP);
+    String sideNews = ConfigurationManager.readNewsFile(Constants.NEWS_SIDE);
+
 %>
 
 <dspace:layout locbar="nolink" title="Home">
 
     <table class="miscTable" width="95%" align="center">
         <tr>
-            <td class="oddRowEvenCol">
-                <dspace:include page="/components/news-top.html" />
-            </td>
+            <td class="oddRowEvenCol"><%= topNews %></td>
         </tr>
     </table>
   
@@ -102,7 +107,5 @@
         </tr>
     </table>
 
-  <dspace:sidebar>
-    <dspace:include page="/components/news-side.html" />
-  </dspace:sidebar>
+  <dspace:sidebar><%= sideNews %></dspace:sidebar>
 </dspace:layout>
