@@ -45,7 +45,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="Submission Saved">
+<dspace:layout locbar="nolink" navbar="off" parenttitle="Submit"
+title="Submission Saved">
 
     <H1>Submission Saved</H1>
 

@@ -3,7 +3,7 @@
     String navbar = (String) request.getAttribute("dspace.layout.navbar");
     int overallColSpan = 1;
 
-    if (sidebar == null)
+    if (sidebar != null)
     {
         overallColSpan++;
     }
