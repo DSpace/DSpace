@@ -188,6 +188,13 @@ public class CombineBundles
                             myItem.removeBundle(myBundles[i]);  // remove this bundle
                             
                             System.out.println("Bitstream from bundle " + i + " moved to primary bundle");
+
+			    // flag if HTML bitstream
+			    if (bitstreams[0].getFormat().getMIMEType().equals("text/html"))
+			    {
+				System.out.println("Set primary bitstream to HTML file in item #" + myItem.getID() +
+						   " for HTML support.");
+			    }
                         }
                     }
                 }            
