@@ -196,7 +196,7 @@ public class BrowseScope implements Cloneable
      */
     public void setFocus(String value)
     {
-        focus = value;
+        focus = value.toLowerCase();
     }
 
     /**

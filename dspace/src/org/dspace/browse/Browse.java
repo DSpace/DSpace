@@ -1,6 +1,8 @@
 /*
  * Browse.java
  *
+ * $Id$
+ *
  * Version: $Revision$
  *
  * Date: $Date$
@@ -71,10 +73,10 @@ import org.dspace.core.Context;
 public class Browse
 {
     // Browse types
-    static final int AUTHORS_BROWSE = 0;
-    static final int ITEMS_BY_TITLE_BROWSE = 1;
+    static final int AUTHORS_BROWSE         = 0;
+    static final int ITEMS_BY_TITLE_BROWSE  = 1;
     static final int ITEMS_BY_AUTHOR_BROWSE = 2;
-    static final int ITEMS_BY_DATE_BROWSE = 3;
+    static final int ITEMS_BY_DATE_BROWSE   = 3;
 
     /** Log4j log */
     private static Logger log = Logger.getLogger(Browse.class);
@@ -101,7 +103,7 @@ public class Browse
         throws SQLException
     {
         scope.setBrowseType(AUTHORS_BROWSE);
-        scope.setAscending(true);
+        scope.setAscending (true);
         scope.setSortByTitle(null);
 
         return doBrowse(scope);
@@ -378,12 +380,17 @@ public class Browse
                 else if ("ItemsByDate".equals(table))
                     row.setColumn("date_issued", value);
                 else if ("ItemsByAuthor".equals(table))
+                {
+                    // author name, and normalized sorting name
+                    // (which for now is simple lower-case)
                     row.setColumn("author", value);
+                    row.setColumn("sort_author", value.toLowerCase() );
+                }
                 else if ("ItemsByTitle".equals(table))
                 {
                     String title = NormalizedTitle.normalize(value, dc[i].language);
                     row.setColumn("title", value);
-                    row.setColumn("sort_title", title);
+                    row.setColumn("sort_title", title.toLowerCase() );
                 }
 
                 DatabaseManager.update(context, row);
@@ -665,7 +672,8 @@ public class Browse
 
             StringBuffer buffer = new StringBuffer()
                 .append("select count(")
-                .append(getTargetColumns(scope))
+		.append((getTargetColumns(scope) == "*") ? "*" : "distinct sort_author")
+               // .append(getTargetColumns(scope))
                 .append(") from ")
                 .append(table);
 
@@ -673,7 +681,7 @@ public class Browse
             if (browseType == ITEMS_BY_AUTHOR_BROWSE)
             {
                 hasWhere = true;
-                buffer.append(" where author = ?");
+                buffer.append(" where sort_author = ?");
             }
 
             String connector = hasWhere ? "and" : "where";
@@ -775,7 +783,7 @@ public class Browse
         {
             TableRow row = (TableRow) iterator.next();
             Object theValue = (isAuthorsBrowse) ?
-                (Object) row.getStringColumn("author") :
+                (Object) row.getStringColumn("sort_author") :
                 (Object) new Integer(row.getIntColumn("item_id"));
 
             // Should not happen
@@ -849,7 +857,7 @@ public class Browse
         StringBuffer sqlb = new StringBuffer()
             .append("select ")
             .append(isCount ? "count(" : "")
-            .append(getTargetColumns(scope))
+            .append((getTargetColumns(scope) == "*") ? "*" : "distinct sort_author")
             .append(isCount ? ")" : "")
             .append(" from ")
             .append(tablename);
@@ -1013,7 +1021,7 @@ public class Browse
     private static String getTargetColumns(BrowseScope scope)
     {
         int browseType = scope.getBrowseType();
-        return (browseType == AUTHORS_BROWSE) ? "distinct author" : "*";
+        return (browseType == AUTHORS_BROWSE) ? "distinct sort_author, author" : "*";
     }
 
     /**
@@ -1195,13 +1203,16 @@ class NormalizedTitle
      * This simple strategy is only expected to be used for
      * English words.
      */
-    public static String normalizeEnglish(String title)
+    public static String normalizeEnglish(String oldtitle)
     {
         // Corner cases
-        if (title == null)
+        if (oldtitle == null)
             return null;
-        if (title.length() == 0)
-            return title;
+        if (oldtitle.length() == 0)
+            return oldtitle;
+
+        // lower case, stupid! (sorry, just a rant about bad contractors)
+        String title = oldtitle.toLowerCase();
 
         // State variables
         // First find leading whitespace, if any
@@ -1650,9 +1661,9 @@ class BrowseTables
         int browseType = scope.getBrowseType();
 
         if (browseType == Browse.AUTHORS_BROWSE)
-            return "author";
+            return "sort_author";
         if (browseType == Browse.ITEMS_BY_AUTHOR_BROWSE)
-            return "author";
+            return "sort_author";
         if (browseType == Browse.ITEMS_BY_DATE_BROWSE)
             return "date_issued";
         // Note that we use the normalized form of the title
