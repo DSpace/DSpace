@@ -1489,6 +1489,8 @@ public class SubmitServlet extends DSpaceServlet
 
             // FIXME: pass in more information about what happens next?
             JSPManager.showJSP(request, response, "/submit/complete.jsp");
+
+            context.complete();
         }
         else if (request.getParameter("submit_reject") != null)
         {
