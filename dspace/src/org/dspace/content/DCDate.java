@@ -40,7 +40,7 @@
 
 package org.dspace.content;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -70,7 +70,7 @@ import java.util.TimeZone;
 public class DCDate
 {
     /** Logger */
-    private static Category cat = Category.getInstance(DCDate.class);
+    private static Logger cat = Logger.getLogger(DCDate.class);
 
     /** The year, or -1 if none */
     private int year;

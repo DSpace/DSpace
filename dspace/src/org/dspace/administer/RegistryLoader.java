@@ -49,7 +49,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -82,12 +82,11 @@ import org.dspace.core.LogManager;
 public class RegistryLoader
 {
     /** log4j category */
-    private static Category log = Category.getInstance(RegistryLoader.class);
-
+    private static Logger log = Logger.getLogger(RegistryLoader.class);
 
     /**
      * For invoking via the command line
-     * 
+     *
      * @param argv  command-line arguments
      */
     public static void main(String argv[])
@@ -101,7 +100,7 @@ public class RegistryLoader
         try
         {
             context = new Context();
-           
+
             // Can't update registries anonymously, so we need to turn off
             // authorisation
             context.setIgnoreAuthorization(true);
@@ -148,8 +147,8 @@ public class RegistryLoader
             System.exit(1);
         }
     }
-    
-    
+
+
     /**
      * Load Bitstream Format metadata
      *
@@ -176,7 +175,7 @@ public class RegistryLoader
         log.info(LogManager.getHeader(context, "load_bitstream_formats",
             "number_loaded=" + typeNodes.getLength()));
     }
-    
+
 
     /**
      * Process a node in the bitstream format registry XML file.  The node
@@ -196,7 +195,7 @@ public class RegistryLoader
 
         String supportLevelString = getElementData(node, "support_level");
         int supportLevel = Integer.parseInt(supportLevelString);
-        
+
         String internalString = getElementData(node, "internal");
         boolean internal = new Boolean(internalString).booleanValue();
 
@@ -241,7 +240,7 @@ public class RegistryLoader
         log.info(LogManager.getHeader(context, "load_dublin_core_types",
             "number_loaded=" + typeNodes.getLength()));
     }
-    
+
 
     /**
      * Process a node in the bitstream format registry XML file.  The node
@@ -280,7 +279,7 @@ public class RegistryLoader
     private static Document loadXML(String filename)
         throws IOException, ParserConfigurationException, SAXException
     {
-        DocumentBuilder builder = 
+        DocumentBuilder builder =
             DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
         return builder.parse(new File(filename));
@@ -319,16 +318,16 @@ public class RegistryLoader
 
         // Get the #text
         Node dataNode = childNode.getFirstChild();
-        
+
         if (dataNode==null)
         {
             return null;
         }
-        
-        
+
+
         // Get the data
         String value = dataNode.getNodeValue().trim();
-        
+
         return value;
     }
 }
