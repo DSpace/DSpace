@@ -42,8 +42,12 @@
 package org.dspace.storage.rdbms;
 
 
-import java.sql.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.dspace.core.ConfigurationManager;
 
 
 /**
@@ -232,12 +236,24 @@ public class TableRow
 
         Object value = data.get(name);
 
+        // make sure that we tolerate integers or booleans
         if (value == null)
             throw new IllegalArgumentException("Column " + column + " not present");
-        if (!(value instanceof Boolean))
-            throw new IllegalArgumentException("Value is not a boolean");
 
-        return ((Boolean) value).booleanValue();
+        if ((value instanceof Boolean))
+        {
+            return((Boolean)value).booleanValue();
+        }
+        else if( (value instanceof Integer) )
+        {
+            int i = ((Integer)value).intValue();
+            
+            if( i == 0 ) return false;  // 0 is false
+            
+            return true;           // nonzero is true
+        }
+        else
+            throw new IllegalArgumentException("Value is not a boolean or an integer");
     }
 
     /**
@@ -298,7 +314,16 @@ public class TableRow
         if (! hasColumn(column))
             throw new IllegalArgumentException("No such column " + column);
 
-        data.put(canonicalize(column), b ? Boolean.TRUE : Boolean.FALSE);
+        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        {
+            // if oracle, use 1 or 0 for true/false
+            data.put(canonicalize(column), b ? new Integer(1) : new Integer(0));
+        }
+        else
+        {
+            // default to postgres true/false
+            data.put(canonicalize(column), b ? Boolean.TRUE : Boolean.FALSE);
+        }
     }
 
     /**
@@ -380,6 +405,7 @@ public class TableRow
 
     /**
      * Return a String representation of this object.
+     * @return String representaton
      */
     public String toString()
     {
@@ -403,6 +429,7 @@ public class TableRow
 
     /**
      * Return a hash code for this object.
+     * @return int hash of object
      */
     public int hashCode()
     {
@@ -411,6 +438,8 @@ public class TableRow
 
     /**
      * Return true if this object equals obj, false otherwise.
+     * @param obj
+     * @return true if TableRow objects are equal
      */
     public boolean equals(Object obj)
     {
@@ -428,6 +457,13 @@ public class TableRow
      */
     static String canonicalize(String column)
     {
+        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        {
+            // oracle requires uppercase
+            return column.toUpperCase();
+        }
+
+        // postgres default lowercase
         return column.toLowerCase();
     }
 
@@ -448,6 +484,7 @@ public class TableRow
     /**
      * Internal method to set column to null.
      * The public method ensures that column actually exists.
+     * @param column
      */
     private void setColumnNullInternal(String column)
     {
