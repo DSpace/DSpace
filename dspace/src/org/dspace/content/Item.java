@@ -85,7 +85,7 @@ public class Item
 
     /** The table row corresponding to this item */
     private TableRow itemRow;
-    
+
     /** The e-person who submitted this item */
     private EPerson submitter;
 
@@ -128,7 +128,7 @@ public class Item
 
         // FIXME
         submitter = null;
-        
+
         // Get bitstreams
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "bundle",
@@ -176,7 +176,7 @@ public class Item
      *
      * @param  context  DSpace context object
      * @param  id       Internal ID of the item
-     *   
+     *
      * @return  the item, or null if the internal ID is invalid.
      */
     public static Item find(Context context, int id)
@@ -287,7 +287,7 @@ public class Item
     {
         itemRow.setColumn("is_archived", isArchived);
     }
-    
+
 
     /**
      * Get Dublin Core metadata for the item.  Passing in a <code>null</code>
@@ -323,11 +323,11 @@ public class Item
         // Build up list of matching values
         List values = new ArrayList();
         Iterator i = dublinCore.iterator();
-        
+
         while (i.hasNext())
         {
             DCValue dcv = (DCValue) i.next();
-            
+
             if (match(element, qualifier, lang, dcv))
             {
                 // We will return a copy of the object in case it is altered
@@ -347,8 +347,8 @@ public class Item
 
         return valueArray;
     }
-    
-    
+
+
     /**
      * Add Dublin Core metadata fields.  These are appended to existing values.
      * Use <code>clearDC</code> to remove values.
@@ -408,7 +408,7 @@ public class Item
     {
         String[] valArray = new String[1];
         valArray[0] = value;
-        
+
         addDC(element, qualifier, lang, valArray);
     }
 
@@ -438,11 +438,11 @@ public class Item
         // We will build a list of values NOT matching the values to clear
         List values = new ArrayList();
         Iterator i = dublinCore.iterator();
-        
+
         while (i.hasNext())
         {
             DCValue dcv = (DCValue) i.next();
-            
+
             if (!match(element, qualifier, lang, dcv))
             {
                 values.add(dcv);
@@ -452,7 +452,7 @@ public class Item
         // Now swap the old list of values for the new, unremoved values
         dublinCore = values;
     }
-    
+
 
     /**
      * Utility method for pattern-matching Dublin Core.  This method will
@@ -478,7 +478,7 @@ public class Item
             // Elements do not match, no wildcard
             return false;
         }
-        
+
 
         if (qualifier == null)
         {
@@ -568,13 +568,13 @@ public class Item
             TableRow r = (TableRow) tri.next();
             collections.add(new Item(ourContext, r));
         }
-        
+
         Collection[] collectionArray = new Collection[collections.size()];
         collectionArray = (Collection[]) collections.toArray(collectionArray);
-        
+
         return collectionArray;
     }
-    
+
 
     /**
      * Get the communities this item is in.  Provided for convenience.
@@ -599,12 +599,12 @@ public class Item
             TableRow r = (TableRow) tri.next();
             communities.add(new Item(ourContext, r));
         }
-        
+
         Community[] communityArray = new Community[communities.size()];
         communityArray = (Community[]) communities.toArray(communityArray);
-        
+
         return communityArray;
-    }        
+    }
 
 
     /**
@@ -616,10 +616,10 @@ public class Item
     {
         Bundle[] bundleArray = new Bundle[bundles.size()];
         bundleArray = (Bundle[]) bundles.toArray(bundleArray);
-        
+
         return bundleArray;
     }
-    
+
 
     /**
      * Create a bundle in this item
@@ -631,7 +631,7 @@ public class Item
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
-        
+
         Bundle b = Bundle.create(ourContext);
         addBundle(b);
         return b;
@@ -664,13 +664,13 @@ public class Item
                 return;
             }
         }
-        
+
         // Add the bundle
         bundles.add(b);
         bundlesChanged = true;
     }
 
-    
+
     /**
      * Remove a bundle.  Only the mapping between the item and the bundle is
      * removed.  The bundle itself is not deleted from the database.
@@ -697,12 +697,12 @@ public class Item
             if (b.getID() == existing.getID())
             {
                 // We've found the bundle to remove
-                li.remove();               
+                li.remove();
                 bundlesChanged = true;
             }
         }
     }
-    
+
 
     /**
      * Create a single bitstream in a new bundle.  A bundle is created, and the
@@ -760,7 +760,7 @@ public class Item
 
         return bsArray;
     }
-    
+
 
     /**
      * Update the item, including Dublin Core metadata, and the bundle
@@ -772,7 +772,7 @@ public class Item
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
-        
+
         log.info(LogManager.getHeader(ourContext,
             "update_item",
             "item_id=" + getID()));
@@ -784,7 +784,7 @@ public class Item
         Map elementCount = new HashMap();
 
         DatabaseManager.update(ourContext, itemRow);
-        
+
         // Redo bundle mappings if they've changed
         if (bundlesChanged)
         {
@@ -817,11 +817,11 @@ public class Item
 
             // Add in-memory DC
             Iterator i = dublinCore.iterator();
-            
+
             while (i.hasNext())
             {
                 DCValue dcv = (DCValue) i.next();
-                
+
 
                 // Get the DC Type
                 DCType dcType = DCType.findByElement(ourContext,
@@ -836,9 +836,9 @@ public class Item
                         "bad_dc",
                         "Bad DC field.  element: \"" +
                             (dcv.element == null ? "null" : dcv.element) +
-                            "\" qualifier: \"" + 
+                            "\" qualifier: \"" +
                             (dcv.qualifier == null ? "null" : dcv.qualifier) +
-                            "\" value: \"" + 
+                            "\" value: \"" +
                             (dcv.value == null ? "null" : dcv.value) + "\""));
                 }
                 else
@@ -856,7 +856,7 @@ public class Item
                     {
                         current = currentInteger.intValue();
                     }
-                    
+
                     current++;
                     elementCount.put(key, new Integer(current));
 
@@ -873,12 +873,12 @@ public class Item
                     DatabaseManager.update(ourContext, valueRow);
                 }
             }
-            
+
             dublinCoreChanged = false;
         }
-                            
+
     }
-    
+
 
     /**
      * Delete the item.  Bundles and bitstreams are also deleted if they are
@@ -897,22 +897,22 @@ public class Item
 
         // Delete the Dublin Core
         removeDCFromDatabase();
-        
+
         // Remove all item -> bundle mappings
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM item2bundle WHERE item_id=" + getID() + ";");
-        
+
         // Work out which Bundles are "orphans"
         Iterator i = bundles.iterator();
 
         while (i.hasNext())
         {
             Bundle b = (Bundle) i.next();
-            
+
             TableRowIterator mappings = DatabaseManager.query(ourContext,
                 "item2bundle",
                 "SELECT * FROM item2bundle WHERE bundle_id=" + b.getID() + ";");
-            
+
             if (!mappings.hasNext())
             {
                 // No mapping between bundle b and another item; remove it
@@ -923,11 +923,29 @@ public class Item
         // Remove collection -> item mappings
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM collection2item WHERE item_id=" + getID() + ";");
-        
+
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
     }
 
+    /**
+     * Return <code>true</code> if <code>other</code> is the same Item as
+     * this object, <code>false</code> otherwise
+     *
+     * @param other   object to compare to
+     *
+     * @return  <code>true</code> if object passed in represents the same
+     *          item as this object
+     */
+    public boolean equals(Object other)
+    {
+        if (!(other instanceof Item))
+        {
+            return false;
+        }
+
+        return (getID() == ((Item) other).getID());
+    }
 
     /**
      * Utility method to remove all Dublin Core associated with the item
@@ -938,5 +956,5 @@ public class Item
     {
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM dcvalue WHERE item_id=" + getID() + ";");
-    }    
+    }
 }
