@@ -67,6 +67,11 @@
     <P>Note that presently you can only update one line at a time - make
     changes to a single e-person and click the relevant "update" button.</P>
     
+    <P align="center">
+        <form method=POST>
+            <input type="submit" name="submit_add" value="Add New">
+        </form>
+    </p>
 
     <table class="miscTable" align="center">
         <tr>
@@ -90,10 +95,10 @@
             <tr>
                 <td class="<%= row %>RowOddCol"><%= epeople[i].getID() %></td>
                 <td class="<%= row %>RowEvenCol">
-                    <input type="text" name="email" value="<%= epeople[i].getEmail() %>" size=12>
+                    <input type="text" name="email" value="<%= (epeople[i].getEmail() == null ? "" : epeople[i].getEmail()) %>" size=12>
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    <input type="text" name="lastname" value="<%= epeople[i].getLastName() %>" size=12>
+                    <input type="text" name="lastname" value="<%= (epeople[i].getLastName() == null ? "" : epeople[i].getLastName()) %>" size=12>
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <input type="text" name="firstname" value="<%= (epeople[i].getFirstName() == null ? "" : epeople[i].getFirstName()) %>" size=12>
@@ -124,10 +129,5 @@
     }
 %>
     </table>
-        
-    <P align="center">
-        <form method=POST>
-            <input type="submit" name="submit_add" value="Add New">
-        </form>
-    </p>
+
 </dspace:layout>
