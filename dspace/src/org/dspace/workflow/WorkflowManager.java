@@ -414,7 +414,7 @@ public class WorkflowManager
 
                 // get reviewers (group 1 )
                 mygroup = mycollection.getWorkflowGroup( 1 );
-                if (mygroup != null )
+                if( (mygroup != null) && !(mygroup.isEmpty()) )
                 {
                     // there were reviewers, change the state
                     //  and add them to the list
@@ -447,7 +447,7 @@ public class WorkflowManager
 
             // get approvers (group 2)
             mygroup = mycollection.getWorkflowGroup( 2 );
-            if( mygroup != null )
+            if( (mygroup != null) && !(mygroup.isEmpty()))
             {
                 // there were approvers, change the state
                 //  timestamp, and add them to the list
@@ -477,7 +477,7 @@ public class WorkflowManager
 
             mygroup = mycollection.getWorkflowGroup( 3 );
             
-            if( mygroup != null )
+            if( (mygroup != null) && !(mygroup.isEmpty()))
             {
                 // there were editors, change the state
                 //  timestamp, and add them to the list
