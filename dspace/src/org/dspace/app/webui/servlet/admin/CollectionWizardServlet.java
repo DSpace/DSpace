@@ -681,6 +681,13 @@ public class CollectionWizardServlet extends DSpaceServlet
                 {
                     Community[] communities = collection.getCommunities();
                     request.setAttribute("community", communities[0]);
+
+
+                    if (AuthorizeManager.isAdmin(context))
+                    {
+                        // set a variable to show all buttons
+                        request.setAttribute("admin_button", new Boolean(true));
+                    }
                 }
 
                 JSPManager.showJSP(request, response,
