@@ -52,6 +52,19 @@
     <form method=POST>
 
     <table class="miscTable" align="center">
+        <tr>     
+            <td>Group:</td>
+            <td>
+                <select size="5" name="group_id">
+                    <%  for(int i = 0; i < groups.length; i++ ) { %>
+                            <option value="<%= groups[i].getID() %>" <%= (groups[i].getID() == policy.getGroupID() ? "selected" : "" ) %> >
+                            <%= groups[i].getName()%>
+                            </option>
+                        <%  } %>
+                </select>
+            </td>
+        </tr>
+
         <tr><td>Action:</td>
             <td><input type="hidden" name="<%=id_name%>" value="<%=id%>">
                 <input type="hidden" name="policy_id" value="<%=policy.getID()%>" >
@@ -65,22 +78,8 @@
                 </select>
             </td>
         </tr>
-        
-        <tr>     
-            <td>Group:</td>
-            <td>
-                <select size="5" name="group_id">
-                    <%  for(int i = 0; i < groups.length; i++ ) { %>
-                            <option value="<%= groups[i].getID() %>" <%= (groups[i].getID() == policy.getGroupID() ? "selected" : "" ) %> >
-                            <%= groups[i].getName()%>
-                            </option>
-                        <%  } %>
-                </select>
-            </td>
-        </tr>
     </table>
     
-
     <center>
         <table width="70%">
             <tr>
