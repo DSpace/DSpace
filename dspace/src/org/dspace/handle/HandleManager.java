@@ -157,6 +157,34 @@ public class HandleManager
         return handleId;
     }
 
+
+    /**
+     * Creates a handle entry, but with a handle supplied by the caller
+     *
+     * @param context DSpace context
+     * @param dso DSpaceObject
+     * @param supppliedHandle
+     */
+    public static String createHandle(Context context, DSpaceObject dso, String
+                suppliedHandle)
+        throws SQLException
+    {
+        TableRow handle = DatabaseManager.create(context, "Handle");
+        String handleId = suppliedHandle;
+
+        handle.setColumn("handle",           handleId     );
+        handle.setColumn("resource_type_id", dso.getType());
+        handle.setColumn("resource_id",      dso.getID()  );
+        DatabaseManager.update(context, handle);
+
+        if (log.isDebugEnabled())
+            log.debug("Created new handle for " + Constants.typeText[dso.getType()] + " "
+             + handleId);
+
+        return handleId;
+    }
+    
+
     /**
      * Return the object which handle maps to, or null.
      * This is the object itself, not a URL which points to it.
