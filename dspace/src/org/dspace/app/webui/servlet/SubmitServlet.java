@@ -514,7 +514,8 @@ public class SubmitServlet extends DSpaceServlet
         boolean multipleFiles =
             UIUtil.getBoolParameter(request, "multiple_files");
         boolean isThesis =
-            UIUtil.getBoolParameter(request, "is_thesis");
+            ConfigurationManager.getBooleanProperty("webui.submit.blocktheses")
+            && UIUtil.getBoolParameter(request, "is_thesis");
 
         if (isWorkflow(subInfo))
         {
@@ -526,7 +527,6 @@ public class SubmitServlet extends DSpaceServlet
         }
 
         // First and foremost - if it's a thesis, reject the submission
-        // FIXME: MIT-SPECIFIC
         if (isThesis)
         {
             WorkspaceItem wi = (WorkspaceItem) subInfo.submission;

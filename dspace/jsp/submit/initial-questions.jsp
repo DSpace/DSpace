@@ -47,6 +47,7 @@
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -107,7 +108,10 @@
                         </table>
                     </td>
                 </tr>
-<%-- FIXME: MIT-SPECIFIC: Is this a thesis question --%>
+<%
+        if (ConfigurationManager.getBooleanProperty("webui.submit.blocktheses"))
+        {
+%>
                 <tr class="evenRowOddCol">
                     <td class="evenRowOddCol" align="left">
                         <table border=0>
@@ -119,6 +123,7 @@
                     </td>
                 </tr>
 <%
+        }
     }
 %>
             </table>
