@@ -100,7 +100,7 @@ public class DCDate
     /**
      * The month names
      */
-    private final static String[] monthNames =
+    private final static String[] MONTHNAMES =
         {
             "January",
             "February",
@@ -142,7 +142,9 @@ public class DCDate
 
         // An empty date is OK
         if (fromDC == null || fromDC.equals(""))
+        {
             return;
+        }
 
         try
         {
@@ -228,11 +230,30 @@ public class DCDate
     {
         StringBuffer sb = new StringBuffer();
 
-        if (year > 0) sb.append(year);
-        if (month > 0) sb.append('-').append(fleshOut(month));
-        if (day > 0) sb.append('-').append(fleshOut(day));
+        if (year > 0)
+        {
+            sb.append(year);
+        }
+
+        if (month > 0)
+        {
+            sb.append('-').append(fleshOut(month));
+        }
+        
+        if (day > 0)
+        {
+            sb.append('-').append(fleshOut(day));
+        }
+
         if (hours > 0)
-            sb.append("T").append(fleshOut(hours)).append(':').append(fleshOut(minutes)).append(':').append(fleshOut(seconds));
+        {
+            sb.append("T")
+                .append(fleshOut(hours))
+                .append(':')
+                .append(fleshOut(minutes))
+                .append(':')
+                .append(fleshOut(seconds));
+        }
 
         return (sb.toString());
     }
@@ -248,7 +269,7 @@ public class DCDate
      * @param dd     the day
      * @param hh     the hours
      * @param mn     the minutes
-     * @param dd     the days
+     * @param ss     the seconds
      */
     public void setDateLocal(int yyyy,
         int mm,
@@ -259,13 +280,37 @@ public class DCDate
     {
         year = month = day = hours = minutes = seconds = -1;
 
-        if (yyyy > 0) year = yyyy;
-        else return;
-        if (mm > 0) month = mm;
-        else return;
-        if (dd > 0) day = dd;
-        else return;
-        if (hh == -1) return;
+        if (yyyy > 0)
+        {
+            year = yyyy;
+        }
+        else
+        {
+            return;
+        }
+
+        if (mm > 0)
+        {
+            month = mm;
+        }
+        else
+        {
+            return;
+        }
+
+        if (dd > 0)
+        {
+            day = dd;
+        }
+        else
+        {
+            return;
+        }
+
+        if (hh == -1)
+        {
+            return;
+        }
 
         // We have a time, so we need to do a timezone adjustment
         localGC = new GregorianCalendar(year,
@@ -302,8 +347,9 @@ public class DCDate
     {
         // Handle simple date cases first - no timezone adjustment
         if (hours == -1)
-            return (new int[]{ year, month, day, -1, -1, -1 }
-                );
+        {
+            return new int[]{ year, month, day, -1, -1, -1 };
+        }
 
         // We have a full time, adjust to current timezone
         if (localGC == null)
@@ -316,14 +362,13 @@ public class DCDate
             localGC.setTime(utcGC.getTime());
         }
 
-        return (new int[]{
+        return new int[]{
                     localGC.get(Calendar.YEAR),
                     localGC.get(Calendar.MONTH) + 1,
                     localGC.get(Calendar.DAY_OF_MONTH),
                     localGC.get(Calendar.HOUR_OF_DAY),
                     localGC.get(Calendar.MINUTE),
-                    localGC.get(Calendar.SECOND) }
-            );
+                    localGC.get(Calendar.SECOND) };
     }
 
 
@@ -334,7 +379,7 @@ public class DCDate
      */
     public int getYear()
     {
-        return ((getDateLocal())[0]);
+        return (getDateLocal())[0];
     }
 
 
@@ -345,7 +390,7 @@ public class DCDate
      */
     public int getMonth()
     {
-        return ((getDateLocal())[1]);
+        return (getDateLocal())[1];
     }
 
 
@@ -356,7 +401,7 @@ public class DCDate
      */
     public int getDay()
     {
-        return ((getDateLocal())[2]);
+        return (getDateLocal())[2];
     }
 
 
@@ -367,7 +412,7 @@ public class DCDate
      */
     public int getHour()
     {
-        return ((getDateLocal())[3]);
+        return (getDateLocal())[3];
     }
 
 
@@ -378,7 +423,7 @@ public class DCDate
      */
     public int getMinute()
     {
-        return ((getDateLocal())[4]);
+        return (getDateLocal())[4];
     }
 
 
@@ -389,7 +434,7 @@ public class DCDate
      */
     public int getSecond()
     {
-        return ((getDateLocal())[5]);
+        return (getDateLocal())[5];
     }
 
 
@@ -402,8 +447,7 @@ public class DCDate
      */
     private int[] getDateGMT()
     {
-        return (new int[]{ year, month, day, hours, minutes, seconds }
-            );
+        return new int[]{ year, month, day, hours, minutes, seconds };
     }
 
 
@@ -414,7 +458,7 @@ public class DCDate
      */
     public int getYearGMT()
     {
-        return ((getDateGMT())[0]);
+        return (getDateGMT())[0];
     }
 
 
@@ -425,7 +469,7 @@ public class DCDate
      */
     public int getMonthGMT()
     {
-        return ((getDateGMT())[1]);
+        return (getDateGMT())[1];
     }
 
 
@@ -436,7 +480,7 @@ public class DCDate
      */
     public int getDayGMT()
     {
-        return ((getDateGMT())[2]);
+        return (getDateGMT())[2];
     }
 
 
@@ -447,7 +491,7 @@ public class DCDate
      */
     public int getHourGMT()
     {
-        return ((getDateGMT())[3]);
+        return (getDateGMT())[3];
     }
 
 
@@ -458,7 +502,7 @@ public class DCDate
      */
     public int getMinuteGMT()
     {
-        return ((getDateGMT())[4]);
+        return (getDateGMT())[4];
     }
 
 
@@ -469,7 +513,7 @@ public class DCDate
      */
     public int getSecondGMT()
     {
-        return ((getDateGMT())[5]);
+        return (getDateGMT())[5];
     }
 
 
@@ -482,9 +526,13 @@ public class DCDate
     private String fleshOut(int n)
     {
         if (n < 10)
-            return ("0" + n);
+        {
+            return "0" + n;
+        }
         else
-            return (String.valueOf(n));
+        {
+            return String.valueOf(n);
+        }
     }
 
 
@@ -500,11 +548,11 @@ public class DCDate
     {
         if (m > 0 && m < 13)
         {
-            return (monthNames[m - 1]);
+            return MONTHNAMES[m - 1];
         }
         else
         {
-            return ("Unspecified");
+            return "Unspecified";
         }
     }
 }

@@ -50,11 +50,19 @@ package org.dspace.authorize;
  */
 public class AuthorizeException extends Exception
 {
+    /**
+     * Create an empty authorize exception
+     */
     public AuthorizeException()
     {
         super();
     }
 
+    /**
+     * Create an authorize exception with a message
+     *
+     * @param message  the message
+     */
     public AuthorizeException(String message)
     {
         super(message);

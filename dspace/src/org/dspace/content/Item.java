@@ -134,7 +134,7 @@ public class Item
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            bundles.add(new Bundle(ourContext,r));
+            bundles.add(new Bundle(ourContext, r));
         }
 
         // Get Dublin Core metadata
@@ -180,7 +180,7 @@ public class Item
             "item",
             id);
 
-        if (row==null )
+        if (row == null)
         {
             return null;
         }
@@ -295,7 +295,7 @@ public class Item
         List values = new ArrayList();
         Iterator i = dublinCore.iterator();
         
-        while(i.hasNext())
+        while (i.hasNext())
         {
             DCValue dcv = (DCValue) i.next();
             
@@ -329,12 +329,12 @@ public class Item
     public void addDC(String element,
                       String qualifier,
                       String lang,
-                      String[] values )
+                      String[] values)
         throws AuthorizeException
     {
         // We will not verify that they are valid entries in the registry
         // until update() is called.
-        for (int i=0; i<values.length; i++)
+        for (int i = 0; i < values.length; i++)
         {
             DCValue dcv = new DCValue();
             dcv.element = element;
@@ -361,7 +361,7 @@ public class Item
     public void addDC(String element,
                       String qualifier,
                       String lang,
-                      String value )
+                      String value)
         throws AuthorizeException
     {
         String[] valArray = new String[1];
@@ -397,7 +397,7 @@ public class Item
         List values = new ArrayList();
         Iterator i = dublinCore.iterator();
         
-        while(i.hasNext())
+        while (i.hasNext())
         {
             DCValue dcv = (DCValue) i.next();
             
@@ -438,7 +438,7 @@ public class Item
         }
         
 
-        if (qualifier==null)
+        if (qualifier == null)
         {
             // Value must be unqualified
             if (dcv.qualifier != null)
@@ -457,7 +457,7 @@ public class Item
         }
 
 
-        if (language==null)
+        if (language == null)
         {
             // Value must be null language to match
             if (dcv.language != null)
@@ -537,7 +537,7 @@ public class Item
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            collections.add(new Item(ourContext,r));
+            collections.add(new Item(ourContext, r));
         }
         
         Collection[] collectionArray = new Collection[collections.size()];
@@ -571,11 +571,11 @@ public class Item
     {
         // FIXME: Check auth
 
-        // Check it's not alread there
-        for (int i=0; i<bundles.size(); i++)
+        // Check it's not already there
+        for (int i = 0; i < bundles.size(); i++)
         {
             Bundle existing = (Bundle) bundles.get(i);
-            if (b.getID()==existing.getID())
+            if (b.getID() == existing.getID())
             {
                 // Bundle is already there; no change
                 return;
@@ -605,7 +605,7 @@ public class Item
         {
             Bundle existing = (Bundle) li.next();
 
-            if (b.getID()==existing.getID())
+            if (b.getID() == existing.getID())
             {
                 // We've found the bundle to remove
                 li.remove();               
@@ -649,11 +649,11 @@ public class Item
         // Go through the bundles and bitstreams picking out ones which aren't
         // of internal formats
         Bundle[] bundles = getBundles();
-        for (int i=0; i<bundles.length; i++)
+        for (int i = 0; i < bundles.length; i++)
         {
             Bitstream[] bitstreams = bundles[i].getBitstreams();
 
-            for (int j=0; j<bundles.length; j++)
+            for (int j = 0; j < bundles.length; j++)
             {
                 if (!bitstreams[j].getFormat().isInternal())
                 {
@@ -700,7 +700,7 @@ public class Item
                     "item2bundle");
                 mappingRow.setColumn("bundle_id", b.getID());
                 mappingRow.setColumn("item_id", getID());
-                DatabaseManager.update(ourContext,mappingRow);
+                DatabaseManager.update(ourContext, mappingRow);
             }
 
             bundlesChanged = false;
@@ -723,26 +723,27 @@ public class Item
                 // FIXME: Maybe should use RegistryManager?
                 String query = "select * from dctyperegistry where element " +
                     "LIKE \"" + dcv.element + "\" AND qualifier" +
-                    (dcv.qualifier==null ? "=null"
-                                         : " LIKE \"" + dcv.qualifier + "\"") +
+                    (dcv.qualifier == null
+                        ? "=null"
+                        : " LIKE \"" + dcv.qualifier + "\"") +
                     ";";
 
                 TableRow dcTypeRow = DatabaseManager.querySingle(ourContext,
                     "dctyperegistry",
                     query);
 
-                if (dcTypeRow==null)
+                if (dcTypeRow == null)
                 {
                     // Bad DC field
                     // FIXME: An error?
                     log.warn(LogManager.getHeader(ourContext,
                         "bad_dc",
                         "Bad DC field.  element: \"" +
-                            (dcv.element==null ? "null" : dcv.element) +
+                            (dcv.element == null ? "null" : dcv.element) +
                             "\" qualifier: \"" + 
-                            (dcv.qualifier==null ? "null" : dcv.qualifier) +
+                            (dcv.qualifier == null ? "null" : dcv.qualifier) +
                             "\" value: \"" + 
-                            (dcv.value==null ? "null" : dcv.value) + "\""));
+                            (dcv.value == null ? "null" : dcv.value) + "\""));
                 }
                 else
                 {
@@ -839,7 +840,7 @@ public class Item
             "dcvalue",
             "SELECT dcvalue.* FROM dcvalue, item2dcvalue WHERE " +
                 "dcvalue.dc_value_id=item2dcvalue.dc_value_id AND " +
-                "item2dcvalue.item_id=" + getID() + ";" );
+                "item2dcvalue.item_id=" + getID() + ";");
 
         // Now delete the mappings
         DatabaseManager.updateQuery(ourContext,

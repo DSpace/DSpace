@@ -110,7 +110,7 @@ public class BitstreamFormat
             "bitstreamtyperegistry",
             id);
 
-        if (row==null )
+        if (row == null)
         {
             return null;
         }
@@ -125,6 +125,7 @@ public class BitstreamFormat
      * Create a new bitstream format
      *
      * @param  context  DSpace context object
+     * @return  the newly created BitstreamFormat
      */
     public static BitstreamFormat create(Context context)
         throws SQLException, AuthorizeException
@@ -132,7 +133,7 @@ public class BitstreamFormat
         // FIXME: Check authorisation 
         
         // Create a table row
-        TableRow row = DatabaseManager.create(context, "bitstreamtyperegistry");        
+        TableRow row = DatabaseManager.create(context, "bitstreamtyperegistry");
         return new BitstreamFormat(context, row);
     }
 
@@ -237,7 +238,7 @@ public class BitstreamFormat
     public void setSupportLevel(int sl)
     {
         // Sanity check
-        if (sl < 0 || sl > 2 )
+        if (sl < 0 || sl > 2)
         {
             throw new IllegalArgumentException("Invalid support level");
         }

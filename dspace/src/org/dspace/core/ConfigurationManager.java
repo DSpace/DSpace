@@ -148,7 +148,7 @@ public class ConfigurationManager
      */
     public static boolean getBooleanProperty(String property)
     {
-        if (properties==null)
+        if (properties == null)
         {
             loadProperties();
         }
@@ -181,7 +181,7 @@ public class ConfigurationManager
      * @return  the template for that email, or null if that template doesn't
      *          exist.
      */
-    public static String getEmail(String name)
+    public static String getEmail(String template)
     {
         // FIXME: Read in template
         return "";
@@ -195,7 +195,7 @@ public class ConfigurationManager
      */
     public static String getDefaultSubmissionLicense()
     {
-        if (properties==null)
+        if (properties == null)
         {
             loadProperties();
         }
@@ -211,7 +211,10 @@ public class ConfigurationManager
     {
         InputStream is;
 
-        if (properties != null) return;
+        if (properties != null)
+        {
+            return;
+        }
     
         try
         {
@@ -230,7 +233,7 @@ public class ConfigurationManager
                     "/dspace.cfg");
             }
 
-            if (is==null)
+            if (is == null)
             {
                 log.fatal("Cannot find dspace.cfg");
                 System.exit(1);

@@ -76,8 +76,8 @@ public class Context
      * Construct a new context object.  A database connection is opened.
      * No user is authenticated.
      *
-     * @exception java.sql.SQLException
-     *      if there was an error obtaining a database connection
+     * @exception SQLException
+     *         if there was an error obtaining a database connection
      */
     public Context()
         throws SQLException
@@ -154,7 +154,7 @@ public class Context
      * context have completed succesfully.  Any transaction with the database
      * is committed.
      *
-     * @exception java.sql.SQLException
+     * @exception SQLException
      *     if there was an error completing the database transaction or closing
      *     the connection
      */
@@ -185,7 +185,7 @@ public class Context
         {
             connection.rollback();
         }
-        catch(SQLException se)
+        catch (SQLException se)
         {
             // Do nothing; we may be here when a database error has already
             // occurred.  In any case, nothing will be written.

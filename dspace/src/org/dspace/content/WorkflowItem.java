@@ -41,7 +41,6 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import org.apache.log4j.Category;
 
@@ -111,7 +110,7 @@ public class WorkflowItem implements InProgressSubmission
             "workflowitem",
             id);
 
-        if (row==null )
+        if (row == null)
         {
             return null;
         }
@@ -192,7 +191,7 @@ public class WorkflowItem implements InProgressSubmission
         // Add format.mimetype and format.extent DC values
         Bitstream[] bitstreams = item.getNonInternalBitstreams();
         
-        for (int i=0; i < bitstreams.length; i++)
+        for (int i = 0; i < bitstreams.length; i++)
         {
             BitstreamFormat bf = bitstreams[i].getFormat();
             item.addDC("format",

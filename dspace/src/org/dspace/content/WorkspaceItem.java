@@ -113,7 +113,7 @@ public class WorkspaceItem implements InProgressSubmission
             "personalworkspace",
             id);
 
-        if (row==null )
+        if (row == null)
         {
             return null;
         }
@@ -136,7 +136,7 @@ public class WorkspaceItem implements InProgressSubmission
      */
     public static WorkspaceItem create(Context context,
                                        Collection coll,
-                                       EPerson sub )
+                                       EPerson sub)
         throws AuthorizeException, SQLException
     {
         // FIXME Check authorisation
@@ -160,6 +160,8 @@ public class WorkspaceItem implements InProgressSubmission
      *
      * @param context   the context object
      * @param ep        the eperson
+     *
+     * @return  the corresponding workspace items
      */
     public static WorkspaceItem[] findByEPerson(Context context, EPerson ep)
         throws SQLException
@@ -172,7 +174,7 @@ public class WorkspaceItem implements InProgressSubmission
                 "personalworkspace.item_id=item.item_id AND " +
                 "item.submitter_id=" + ep.getID() + ";");
 
-        while(tri.hasNext())
+        while (tri.hasNext())
         {
             TableRow row = tri.next();
             WorkspaceItem wi = new WorkspaceItem(context, row);
@@ -211,18 +213,19 @@ public class WorkspaceItem implements InProgressSubmission
         Bitstream[] bitstreams = item.getNonInternalBitstreams();
 
         // Create provenance description
-        String provMessage = "Submitted by" + item.getSubmitter().getFullName() +
-            " (" + item.getSubmitter().getEmail() +
-            ").  DSpace accession date:" + d.toString() +
-            "\n Submission has " + bitstreams.length + " bitstreams:\n";
+        String provMessage = "Submitted by" + 
+            item.getSubmitter().getFullName() + " (" +
+            item.getSubmitter().getEmail() + ").  DSpace accession date:" +
+            d.toString() + "\n Submission has " + bitstreams.length +
+            " bitstreams:\n";
 
         // Add sizes and checksums of bitstreams
-        for (int j=0; j < bitstreams.length; j++)
+        for (int j = 0; j < bitstreams.length; j++)
         {
             provMessage = provMessage + bitstreams[j].getName() + ": " +
                 bitstreams[j].getSize() + " bytes, checksum: " +
                 bitstreams[j].getChecksum() + " (" + 
-                bitstreams[j].getChecksumAlgorithm()+ ")\n";
+                bitstreams[j].getChecksumAlgorithm() + ")\n";
         }
                     
         // Add message to the DC

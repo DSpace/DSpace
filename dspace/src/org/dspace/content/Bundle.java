@@ -103,7 +103,7 @@ public class Bundle
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            bitstreams.add(new Bitstream(ourContext,r));
+            bitstreams.add(new Bitstream(ourContext, r));
         }
     }
 
@@ -124,7 +124,7 @@ public class Bundle
             "bundle",
             id);
 
-        if (row==null )
+        if (row == null)
         {
             return null;
         }
@@ -200,7 +200,7 @@ public class Bundle
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            items.add(new Item(ourContext,r));
+            items.add(new Item(ourContext, r));
         }
         
         Item[] itemArray = new Item[items.size()];
@@ -221,10 +221,10 @@ public class Bundle
         // FIXME Check authorisation
 
         // First check that the bitstream isn't already in the list
-        for (int i=0; i<bitstreams.size(); i++)
+        for (int i = 0; i < bitstreams.size(); i++)
         {
             Bitstream existing = (Bitstream) bitstreams.get(i);
-            if (b.getID()==existing.getID())
+            if (b.getID() == existing.getID())
             {
                 // Bitstream is already there; no change
                 return;
@@ -253,7 +253,7 @@ public class Bundle
         {
             Bitstream existing = (Bitstream) li.next();
 
-            if (b.getID()==existing.getID())
+            if (b.getID() == existing.getID())
             {
                 // We've found the bitstream to remove
                 li.remove();               
@@ -291,7 +291,7 @@ public class Bundle
                     "bundle2bitstream");
                 mappingRow.setColumn("bundle_id", getID());
                 mappingRow.setColumn("bitstream_id", b.getID());
-                DatabaseManager.update(ourContext,mappingRow);
+                DatabaseManager.update(ourContext, mappingRow);
             }
 
             bitstreamsChanged = false;
@@ -311,11 +311,11 @@ public class Bundle
 
         // Remove item-bundle mappings
         DatabaseManager.updateQuery(ourContext,
-            "delete from item2bundle where bundle_id="+getID());
+            "delete from item2bundle where bundle_id=" + getID());
 
         // Remove bundle-bitstream mappings
         DatabaseManager.updateQuery(ourContext,
-            "delete from bundle2bitstream where bitstream_id="+getID());
+            "delete from bundle2bitstream where bitstream_id=" + getID());
 
         // Remove ourself
         DatabaseManager.delete(ourContext, bundleRow);
@@ -348,7 +348,7 @@ public class Bundle
                 "select * from bundle2bitstream where bitstream_id=" +
                     b.getID());
             
-            if (tri.toList().size()==0)
+            if (tri.toList().size() == 0)
             {
                 // The bitstream is not in any other bundle, so delete it
                 b.delete();

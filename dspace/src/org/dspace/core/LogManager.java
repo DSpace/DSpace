@@ -42,6 +42,13 @@ package org.dspace.core;
 
 import org.dspace.eperson.EPerson;
 
+/**
+ * Class for generating standard log header
+ *
+ * @author David Stuve
+ * @author Robert Tansley
+ * @version $Revision$
+ */
 public class LogManager
 {
     /**
@@ -50,22 +57,23 @@ public class LogManager
      * @param context    the current Context
      * @param action     string describing the action
      * @param extrainfo  string with extra information, like parameters
+     *
+     * @return  the filled out log header
      */
-
     public static String getHeader(Context context, String action,
-        String extrainfo )
+        String extrainfo)
     {
         String email = "anonymous";
 
         EPerson e = context.getCurrentUser();
 
-        if (e != null )
+        if (e != null)
         {
             email = e.getEmail();
         }
 
-        String result = new String( email + ":" + context.getExtraLogInfo() +
-            ":" + action + ":" + extrainfo );
+        String result = new String(email + ":" + context.getExtraLogInfo() +
+            ":" + action + ":" + extrainfo);
 
         return result;
     }

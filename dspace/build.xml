@@ -89,8 +89,8 @@
     <javac srcdir="${basedir}/src"
            destdir="${basedir}/build/classes"
            debug="on">
-       <include name="**/*.java"/>
-       <classpath refid="build.class.path"/>
+      <include name="**/*.java"/>
+      <classpath refid="build.class.path"/>
     </javac>
   </target>
   
@@ -249,5 +249,23 @@
     </exec>
   </target>
 
+
+
+  <!-- ============================================================= -->
+  <!-- Check the style                                               -->
+  <!-- ============================================================= -->
+
+  <!-- checkstyle-all-2.2.jar (or later) must be on CLASSPATH -->
+
+  <target name="checkstyle"
+          description="Check source code follows conventions (need checkstyle 2.2+)">
+    <taskdef resource="checkstyletask.properties"/>
+    <checkstyle lcurlyType="nl"
+                lcurlyMethod="nl"
+                lcurlyOther="nl"
+                rcurly="alone">
+      <fileset dir="${basedir}/src" includes="**/*.java"/>
+    </checkstyle>
+  </target>
 
 </project>

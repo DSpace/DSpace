@@ -40,7 +40,6 @@
 
 package org.dspace.content;
 
-import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -120,7 +119,7 @@ public class Community
             "community",
             id);
 
-        if (row==null )
+        if (row == null)
         {
             return null;
         }
@@ -252,7 +251,7 @@ public class Community
             logo.delete();
         }
 
-        if (newLogo==null)
+        if (newLogo == null)
         {
             communityRow.setColumnNull("logo_bitstream_id");
         }
@@ -292,8 +291,8 @@ public class Community
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "collection",
             "SELECT collection.* FROM collection, community2collection WHERE " +
-                "community2collection.collection_id=collection.collection_id AND " +
-                "community2collection.community_id=" + getID() + ";");
+                "community2collection.collection_id=collection.collection_id " +
+                "AND community2collection.community_id=" + getID() + ";");
 
         // Make Collection objects
         while (tri.hasNext())
@@ -397,7 +396,7 @@ public class Community
         delete();
 
         // Delete collections if they aren't contained in other collections
-        for (int i=0; i<collections.length; i++)
+        for (int i = 0; i < collections.length; i++)
         {
             Community[] communities = collections[i].getCommunities();
             
@@ -417,7 +416,7 @@ public class Community
      *
      * @return  a list of the most recent additions.
      */
-    public List getRecentAdditions( int n )
+    public List getRecentAdditions(int n)
         throws SQLException
     {
         return null;

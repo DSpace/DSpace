@@ -89,15 +89,17 @@ public class Bitstream
         TableRow formatRow = DatabaseManager.find(context,
             "bitstreamtyperegistry", bfID);
         
-        if (formatRow==null)
+        if (formatRow == null)
         {
             // No format: use "Unknown"
             formatRow = DatabaseManager.findByUnique(context,
                 "bitstreamtyperegistry", "short_description", "Unknown");
 
             // Panic if we can't find it
-            if (formatRow==null)
+            if (formatRow == null)
+            {
                 throw new IllegalStateException("No Unknown bitsream format");
+            }
         }
 
         bitstreamFormat = new BitstreamFormat(context, formatRow);
@@ -120,7 +122,7 @@ public class Bitstream
             "bitstream",
             id);
 
-        if (row==null )
+        if (row == null)
         {
             return null;
         }
@@ -334,7 +336,7 @@ public class Bitstream
     {
         // FIXME: Would be better if this didn't throw an SQLException,
         // but we need to find the unknown format!
-        if (f==null)
+        if (f == null)
         {
             // Use "Unknown" format
             TableRow formatRow = DatabaseManager.findByUnique(bContext,
@@ -420,7 +422,7 @@ public class Bitstream
             "SELECT bundle.* FROM bundle, bundle2bitstream WHERE " +
                 "bundle.bundle_id=bundle2bitstream.bundle_id AND " +
                 "bundle2bitstream.bitstream_id=" +
-                bRow.getIntColumn("bitstream_id") + ";" );
+                bRow.getIntColumn("bitstream_id") + ";");
 
         // Build a list of Bundle objects
         List bundles = new ArrayList();

@@ -40,7 +40,6 @@
 
 package org.dspace.content;
 
-import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -51,7 +50,6 @@ import org.apache.log4j.Category;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -148,7 +146,7 @@ public class Collection
             "collection",
             id);
 
-        if (row==null )
+        if (row == null)
         {
             return null;
         }
@@ -280,7 +278,7 @@ public class Collection
             logo.delete();
         }
 
-        if (newLogo==null)
+        if (newLogo == null)
         {
             collectionRow.setColumnNull("logo_bitstream_id");
         }
@@ -307,7 +305,7 @@ public class Collection
     /**
      * Get the workflow reviewers.
      *
-     * @param   g  Get the group of reviewers
+     * @return  the group of reviewers
      */
     public Group getReviewers()
     {
@@ -329,7 +327,7 @@ public class Collection
     /**
      * Get the workflow administrators.
      *
-     * @param   g  Get the group of workflow administrators
+     * @return the group of workflow administrators
      */
     public Group getWorkflowAdministrators()
     {
@@ -351,7 +349,7 @@ public class Collection
     /**
      * Get the workflow editors.
      *
-     * @param   g  Get the group of workflow editors
+     * @return  the group of workflow editors
      */
     public Group getEditors()
     {
@@ -367,7 +365,7 @@ public class Collection
      * The default group of submitters for collection 100 is the one called
      * <code>collection_100_submit</code>.
      *
-     * @param   g  Get the default group of submitters.
+     * @return  the default group of submitters.
      */
     public Group getSubmitters()
     {
@@ -404,7 +402,7 @@ public class Collection
      */
     public void setLicense(String license)
     {
-        if (license==null)
+        if (license == null)
         {
             collectionRow.setColumnNull("license");
         }
@@ -441,7 +439,7 @@ public class Collection
     {
         // FIXME: Check auth
 
-        if (template==null)
+        if (template == null)
         {
             template = Item.create(ourContext);
         }
@@ -463,7 +461,7 @@ public class Collection
         collectionRow.setColumnNull("template_item_id");
         DatabaseManager.update(ourContext, collectionRow);
         
-        if (template!=null)
+        if (template != null)
         {
             template.deleteWithContents();
             template = null;
@@ -625,9 +623,9 @@ public class Collection
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "community",
             "SELECT community.* FROM community, community2collection WHERE " +
-                "community.community_id=community2collection.community_id AND " +
-                "community2collection.collection_id=" +
-                getID() + ";" );
+                "community.community_id=community2collection.community_id " +
+                "AND community2collection.collection_id=" +
+                getID() + ";");
 
         // Build a list of Community objects
         List communities = new ArrayList();

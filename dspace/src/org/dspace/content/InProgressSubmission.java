@@ -40,7 +40,6 @@
 
 package org.dspace.content;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
 
 
@@ -58,7 +57,7 @@ public interface InProgressSubmission
      *
      * @return  the item
      */
-    public Item getItem();
+    Item getItem();
     
 
     /**
@@ -66,7 +65,7 @@ public interface InProgressSubmission
      *
      * @return the collection
      */
-    public Collection getCollection();
+    Collection getCollection();
 
     
     /**
@@ -74,7 +73,7 @@ public interface InProgressSubmission
      *
      * @return  the submitting e-person
      */
-    public EPerson getSubmitter();
+    EPerson getSubmitter();
     
 
     /**
@@ -83,7 +82,7 @@ public interface InProgressSubmission
      *
      * @return  <code>true</code> if there is to be more than one file.
      */
-    public boolean hasMultipleFiles();
+    boolean hasMultipleFiles();
 
     
     /**
@@ -92,7 +91,7 @@ public interface InProgressSubmission
      *
      * @param b  if <code>true</code>, submission may have more than one file.
      */
-    public void setMultipleFiles(boolean b);
+    void setMultipleFiles(boolean b);
     
 
     /**
@@ -101,7 +100,7 @@ public interface InProgressSubmission
      *
      * @return  <code>true</code> if there is to be more than one file.
      */
-    public boolean hasMultipleTitles();
+    boolean hasMultipleTitles();
     
     /**
      * Indicate whether the submission is intended to have more than one
@@ -109,7 +108,7 @@ public interface InProgressSubmission
      *
      * @param b  if <code>true</code>, submission may have more than one title.
      */
-    public void setMultipleTitles(boolean b);
+    void setMultipleTitles(boolean b);
 
 
     /**
@@ -118,7 +117,7 @@ public interface InProgressSubmission
      *
      * @return  <code>true</code> if it has been published before
      */
-    public boolean isPublishedBefore();
+    boolean isPublishedBefore();
 
     
     /**
@@ -127,5 +126,5 @@ public interface InProgressSubmission
      *
      * @param  b  <code>true</code> if it has been published before
      */
-    public void setPublishedBefore(boolean b);
+    void setPublishedBefore(boolean b);
 }
