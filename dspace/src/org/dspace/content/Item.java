@@ -193,6 +193,9 @@ public class Item extends DSpaceObject
             dublinCore.add(dcv);
         }
 
+        // Set the last modified date
+        itemRow.setColumn("last_modified", new Date());
+
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
 
