@@ -45,6 +45,8 @@
   -    item - the item the bitstream will be added to
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page import="org.dspace.content.Item" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>

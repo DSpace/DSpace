@@ -43,6 +43,8 @@
   - clicked "cancel/save" during a submission and elected to remove the item.
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout locbar="off" title="Submission Cancelled">

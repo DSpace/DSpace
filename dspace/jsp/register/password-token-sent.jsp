@@ -42,6 +42,8 @@
   - Forgot password token sent message.
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout title="New Password E-mail Sent">

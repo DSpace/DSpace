@@ -42,6 +42,8 @@
   - Display message indicating no valid certificate was found
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout navbar="off" locbar="nolink" title="Log In">

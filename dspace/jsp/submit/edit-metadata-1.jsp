@@ -45,6 +45,8 @@
   -    submission.info  - the SubmissionInfo object
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Map" %>

@@ -45,6 +45,8 @@
   -    type   - DCType we may delete
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page import="org.dspace.administer.DCType" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>

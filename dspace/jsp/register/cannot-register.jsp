@@ -42,6 +42,8 @@
   - Message informing user they are not allowed to self-register.
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout title="Cannot Register">

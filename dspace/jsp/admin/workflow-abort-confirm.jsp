@@ -1,5 +1,5 @@
 <%--
-  - confirm-delete-collection.jsp
+  - workflow-abort-confirm.jsp
   -
   - Version: $Revision$
   -
@@ -44,6 +44,8 @@
   - Attributes:
   -    workflow   - WorkflowItem representing the workflow in question
   --%>
+
+<%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.WorkflowAbortServlet" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>

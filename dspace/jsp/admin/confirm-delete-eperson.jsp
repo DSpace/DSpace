@@ -45,6 +45,8 @@
   -    eperson   - eperson we may delete
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page import="org.dspace.eperson.EPerson" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>

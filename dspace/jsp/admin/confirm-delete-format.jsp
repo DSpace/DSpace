@@ -45,6 +45,8 @@
   -    format   - bitstream format we may delete
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>

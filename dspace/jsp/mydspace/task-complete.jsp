@@ -42,6 +42,8 @@
   - Task complete message page
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Task Completed">

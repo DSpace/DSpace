@@ -47,6 +47,8 @@
   -               is was!) from org.dspace.core.Constants.
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page isErrorPage="true" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 

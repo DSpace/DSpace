@@ -45,6 +45,8 @@
   -    collections - Array of collection objects to show in the drop-down.
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 

@@ -42,6 +42,8 @@
   - Display message indicating password is incorrect, and allow a retry
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout navbar="off" locbar="nolink" title="Log In">

@@ -42,6 +42,8 @@
   - Display a tombstone indicating that an item has been withdrawn.
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 

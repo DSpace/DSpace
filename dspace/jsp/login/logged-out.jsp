@@ -42,6 +42,8 @@
   - Displays a message indicating the user has logged out
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout locbar="nolink" title="Logged Out">

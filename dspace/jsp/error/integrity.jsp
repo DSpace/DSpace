@@ -43,6 +43,8 @@
   - data received from the browser
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page isErrorPage="true" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>

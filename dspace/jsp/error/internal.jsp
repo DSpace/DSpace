@@ -42,6 +42,8 @@
   - Page representing an internal server error
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page isErrorPage="true" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>

@@ -39,11 +39,14 @@
   --%>
 
 <%--
-  - Get a reason for rejecting a submission
+  - Get a reason for rejecting a submission (or just reject reason itself -
+  -  this is JSP programming after all!)
   -
   - Attributes:
   -    workflow.item: The workflow item being rejected
   --%>
+
+<%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 

@@ -42,6 +42,8 @@
   - Page that displays the email/password login form
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout navbar="off" locbar="off" title="Log In">
