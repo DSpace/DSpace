@@ -528,6 +528,13 @@ public class Browse
         }
     }
 
+    /**
+     * Run a database query and return results before the focus.
+     *
+     * @param params The Browse Scope
+     * @param itemValue If the focus is an Item, this is its value
+     * in the index (its title, author, etc).
+     */
     protected static List getResultsBeforeFocus(BrowseScope params,
                                                 String itemValue)
         throws SQLException
@@ -537,6 +544,11 @@ public class Browse
             return Collections.EMPTY_LIST;
         // No previous results desired
         if (params.getNumberBefore() == 0)
+            return Collections.EMPTY_LIST;
+        // ItemsByAuthor. Since this is an exact match, it
+        // does not make sense to return values before the
+        // query.
+        if (params.getBrowseType() == ITEMS_BY_AUTHOR_BROWSE)
             return Collections.EMPTY_LIST;
 
         PreparedStatement statement = createSql(params, itemValue, false, false);
@@ -550,6 +562,13 @@ public class Browse
         return results;
     }
 
+    /**
+     * Run a database query and return results after the focus.
+     *
+     * @param params The Browse Scope
+     * @param itemValue If the focus is an Item, this is its value
+     * in the index (its title, author, etc).
+     */
     protected static List getResultsAfterFocus(BrowseScope params,
                                                String itemValue,
                                                int count)
@@ -574,19 +593,21 @@ public class Browse
 
     /*
      * Return the total number of values in an index.
-     * Although this may look a bit dizzying, the basic idea is
-     * straightforward:
      *
+     * <p>
      * We total Authors with SQL like:
      *    select count(distinct author) from ItemsByAuthor;
      * ItemsByAuthor with:
      *    select count(*) from ItemsByAuthor where author = ?;
      * and every other index with:
      *    select count(*) from ItemsByTitle;
+     * </p>
      *
+     * <p>
      * If limiting to a community or collection, we add a clause like:
      *    community_id = 7
      *    collection_id = 201
+     * </p>
      */
     protected static int countTotalInIndex(BrowseScope params,
                                            int numberOfResults)
