@@ -40,7 +40,7 @@
 
 package org.dspace.history;
 
-
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -83,87 +83,100 @@ public class HistorySubmission
                                           EPerson user,
                                           String tool)
     {
-//         HistoryManager.saveHistory
-//         (item,
-//          HistoryManager.CREATE,
-//          user,
-//          tool);
+        HistoryManager.saveHistory
+        (context,
+         item,
+         HistoryManager.MODIFY,
+         user,
+         tool);
     }
 
     /**
      * Record the fact that reviewer approved the submission of
      * WorkflowItem using tool.
      *
+     * @param context Current DSpace context
      * @param item The WorkspaceItem
      * @param reviewer The reviewer who accepted the submission
      * @param tool The tool used to accept the submission
      */
-    public static void reviewerAccepts(WorkflowItem item,
-        EPerson reviewer,
-        String tool)
+    public static void reviewerAccepts(Context context,
+                                       WorkflowItem item,
+                                       EPerson reviewer,
+                                       String tool)
     {
-//         HistoryManager.saveHistory
-//         (item,
-//             HistoryManager.MODIFY,
-//             reviewer,
-//             tool);
+        HistoryManager.saveHistory
+        (context,
+         item,
+         HistoryManager.MODIFY,
+         reviewer,
+         tool);
     }
 
     /**
-     * Record the fact that reviewer rejected the submission of WorkflowItem
-     * using tool.
+     * Record the fact that reviewer rejected the submission of
+     * WorkflowItem using tool.
      *
+     * @param context Current DSpace context
      * @param item The WorkspaceItem
      * @param reviewer The reviewer who rejected the submission
      * @param tool The tool used to reject the submission
      */
-    public static void reviewerRejects(WorkflowItem item,
-        EPerson reviewer,
-        String tool)
+    public static void reviewerRejects(Context context,
+                                       WorkflowItem item,
+                                       EPerson reviewer,
+                                       String tool)
     {
-//         HistoryManager.saveHistory
-//         (item,
-//             HistoryManager.REMOVE,
-//             reviewer,
-//             tool);
+        HistoryManager.saveHistory
+        (context,
+         item,
+         HistoryManager.REMOVE,
+         reviewer,
+         tool);
     }
 
     /**
-     * Record the fact that admin accepted the submission of WorkflowItem
-     * using tool.
+     * Record the fact that admin accepted the submission of
+     * WorkflowItem using tool.
      *
+     * @param context Current DSpace context
      * @param item The WorkspaceItem
      * @param admin The admin who accepted the submission
      * @param tool The tool used to accept the submission
      */
-    public static void adminAccepts(WorkflowItem item,
-        EPerson admin,
-        String tool)
+    public static void adminAccepts(Context context,
+                                    WorkflowItem item,
+                                    EPerson admin,
+                                    String tool)
     {
-//         HistoryManager.saveHistory
-//         (item,
-//             HistoryManager.MODIFY,
-//             approver,
-//             tool);
+        HistoryManager.saveHistory
+        (context,
+         item,
+         HistoryManager.MODIFY,
+         admin,
+         tool);
     }
 
     /**
-     * Record the fact that admin rejected the submission of WorkflowItem
-     * using tool.
+     * Record the fact that admin rejected the submission of
+     * WorkflowItem using tool.
      *
+     * @param context Current DSpace context
      * @param item The WorkspaceItem
      * @param admin The admin who rejected the submission
      * @param tool The tool used to reject the submission
      */
-    public static void adminRejects(WorkflowItem item,
-        EPerson admin,
-        String tool)
+    public static void adminRejects(Context context,
+                                    WorkflowItem item,
+                                    EPerson admin,
+                                    String tool)
     {
-//         HistoryManager.saveHistory
-//         (item,
-//             HistoryManager.REMOVE,
-//             approver,
-//             tool);
+        HistoryManager.saveHistory
+        (context,
+         item,
+         HistoryManager.REMOVE,
+         admin,
+         tool);
     }
 
     /**
@@ -180,11 +193,12 @@ public class HistorySubmission
                                      EPerson editor,
                                      String tool)
     {
-//         HistoryManager.saveHistory
-//         (item,
-//          HistoryManager.MODIFY,
-//          approver,
-//          tool);
+        HistoryManager.saveHistory
+        (context,
+         item,
+         HistoryManager.MODIFY,
+         editor,
+         tool);
     }
 
     /**
@@ -203,22 +217,33 @@ public class HistorySubmission
                                      EPerson installer,
                                      String tool)
     {
-//         HistoryManager.saveHistory
-//         (item,
-//             HistoryManager.MODIFY,
-//             installer,
-//             tool);
-//
-//         // Installing an item changes not only the item, but also the collection
-//         Collection[] collections = Item.getCollections();
-//
-//         for (int i = 0; i < collections.length; i++ )
-//         {
-//             HistoryManager.saveHistory
-//                 (collections[i],
-//                  HistoryManager.MODIFY,
-//                  installer,
-//                  tool);
-//         }
+        HistoryManager.saveHistory
+        (context,
+         item,
+         HistoryManager.MODIFY,
+         installer,
+         tool);
+
+        // Installing an item changes not only the item, but also the
+        // collection
+        try
+        {
+            Collection[] collections = item.getCollections();
+
+            for (int i = 0; i < collections.length; i++ )
+            {
+                HistoryManager.saveHistory
+                    (context,
+                     collections[i],
+                     HistoryManager.MODIFY,
+                     installer,
+                     tool);
+            }
+        }
+        catch (SQLException sqle)
+        {
+            if (log.isDebugEnabled())
+                log.debug("Caught SQLException " + sqle, sqle);
+        }
     }
 }
