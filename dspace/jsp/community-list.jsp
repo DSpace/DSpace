@@ -48,6 +48,7 @@
   -                      the value is the array of collections in that community
   -    subcommunities.map  - Map where a keys is a community IDs (Integers) and 
   -                      the value is the array of subcommunities in that community
+  -    admin_button - Boolean, show admin 'Create Top-Level Community' button
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -55,6 +56,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -62,6 +64,8 @@
     Community[] communities = (Community[]) request.getAttribute("communities");
     Map collectionMap = (Map) request.getAttribute("collections.map");
     Map subcommunityMap = (Map) request.getAttribute("subcommunities.map");
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
 %>
 
 <dspace:layout title="Communities and Collections">
@@ -79,7 +83,6 @@
         <LI class="communityLink">
             <%-- HACK: <strong> tags here for broken Netscape 4.x CSS support --%>
             <strong><A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></A></strong>
-            <P class="communityDescription"><%= communities[i].getMetadata("short_description") %></P>
 	    <UL>
 <%
         // Get the collections in this community from the map
@@ -89,12 +92,12 @@
         for (int j = 0; j < cols.length; j++)
         {
 %>
-                <LI class="collectionListItem"><A HREF="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></A></LI>
+            <LI class="collectionListItem">
+                <A HREF="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></A></LI>
 <%
         }
 %>
             </UL>
-            <P>&nbsp;</P>
 	    <UL>
 <%
         // Get the sub-communities in this community from the map
@@ -104,7 +107,8 @@
         for (int k = 0; k < comms.length; k++)
         {
 %>
-                <LI class="communityLink"><A HREF="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></A></LI>
+                <LI class="communityLink">
+                    <A HREF="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></A></LI>
 <%
         }
 %>
@@ -115,5 +119,35 @@
     }
 %>
     </UL>
+<%
+    if(admin_button)
+    {
+%>
+      <dspace:sidebar>
+        <table class=miscTable align=center>
+	    <tr>
+	        <td class="evenRowEvenCol" colspan=2>
+	            <table>
+                        <tr>
+                            <th class="standard">
+                                <strong>Admin Tools</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td class="standard" align="center">
+	                        <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+		                    <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
+                                    <input type="submit" name="submit" value="Create Top-Level Community...">
+                                </form>
+                            </td>
+                        </tr>
+	 	    </table>
+	 	</td>
+            </tr>
+        </table>
+      </dspace:sidebar>
+<%
+    }
+%>
  
 </dspace:layout>
