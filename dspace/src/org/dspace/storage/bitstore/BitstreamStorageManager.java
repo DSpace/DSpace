@@ -251,7 +251,7 @@ public class BitstreamStorageManager
                 // Make sure entries which do not exist are removed
                 if (file == null)
                 {
-                    doDatabaseDelete(context, bid);
+                    DatabaseManager.delete (context, "Bitstream", bid);
                     continue;
                 }
 
@@ -260,15 +260,15 @@ public class BitstreamStorageManager
                  if (isRecent(file))
                      continue;
 
-                doDatabaseDelete(context, bid);
-                boolean success = file.delete();
+                 DatabaseManager.delete (context, "Bitstream", bid);
+                 boolean success = file.delete();
 
-                if (log.isDebugEnabled())
-                    log.debug("Deleted bitstream " + bid +
-                              " (file " + file.getAbsolutePath() +
-                              ") with result " + success);
+                 if (log.isDebugEnabled())
+                     log.debug("Deleted bitstream " + bid +
+                               " (file " + file.getAbsolutePath() +
+                               ") with result " + success);
 
-                deleteParents(file);
+                 deleteParents(file);
             }
 
             context.complete();
@@ -424,20 +424,13 @@ public class BitstreamStorageManager
     protected static File forId(Context context, int id, boolean includeDeleted)
         throws IOException, SQLException
     {
-        // Assumes that every bitstream is in 1 and only 1 storage location
         String sql = new StringBuffer()
-            .append("select Storage.* from Bitstream, Storage, Bitstream2Storage")
-            .append(" where ")
-            .append(" Bitstream2Storage.bitstream_id = Bitstream.bitstream_id")
-            .append(" and ")
-            .append(" Bitstream2Storage.storage_id = Storage.storage_id")
-            .append(" and ")
-            .append(" Bitstream.bitstream_id = ")
+            .append("select * from Bitstream where Bitstream.bitstream_id = ")
             .append(id)
             .append(includeDeleted  ? "" : " and deleted = 'f'")
             .toString();
 
-        TableRow row = DatabaseManager.querySingle (context, "Storage", sql);
+        TableRow row = DatabaseManager.querySingle (context, "Bitstream", sql);
 
         return row == null ? null :
             forId(row.getStringColumn("internal_id"), false);
@@ -523,71 +516,20 @@ public class BitstreamStorageManager
     ////////////////////////////////////////
 
     /**
-     * Delete bitstream from the RDBMS
-     *
-     * @param context - the current context
-     * @param id - the internal storage ID
-     * @exception SQLException - If a problem occurs accessing the RDBMS
-     */
-    private static void doDatabaseDelete(Context context, int id)
-        throws SQLException
-    {
-        // Note that this has to be done in order.
-        // First, we have to read in the storage locations,
-        // because we clear them in the very next step.
-        //
-        // Next, we clear the Bitstream2Storage link table; its
-        // foreign keys reference the Storage and Bitstream tables,
-        // so we can't delete them til the tables are cleared.
-        //
-        // Finally, we delete the Storage and Bitstream locations
-        // (this can be done either way)
-
-        List storage = DatabaseManager.query
-            (context,
-             "Bitstream2Storage",
-             "select * from Bitstream2Storage where bitstream_id = " + id)
-            .toList();
-
-        DatabaseManager.deleteByValue
-            (context, "Bitstream2Storage", "bitstream_id", Integer.toString(id));
-
-        DatabaseManager.delete (context, "Bitstream", id);
-
-        for (Iterator iterator = storage.iterator(); iterator.hasNext(); )
-        {
-            TableRow b2s = (TableRow) iterator.next();
-            DatabaseManager.deleteByValue
-                (context,
-                 "Storage",
-                 "storage_id",
-                 Integer.toString(b2s.getIntColumn("storage_id")));
-        }
-    }
-
-    /**
      * Create and return a bitstream with ID which is marked deleted.
      */
     private static TableRow createDeletedBitstream(String id)
         throws SQLException, IOException
     {
         Context context = new Context();
-        TableRow bitstream = DatabaseManager.create(context,
-                                                    "Bitstream");
-        TableRow storage   = DatabaseManager.create(context,
-                                                    "Storage");
-        TableRow b2s        = DatabaseManager.create(context,
-                                                    "Bitstream2Storage");
+
+        TableRow bitstream = DatabaseManager.create(context, "Bitstream");
         bitstream.setColumn("deleted", true);
+        bitstream.setColumn("internal_id", id);
         DatabaseManager.update(context, bitstream);
 
-        storage.setColumn("internal_id", id);
-        DatabaseManager.update(context, storage);
-
-        b2s.setColumn("bitstream_id",  bitstream.getIntColumn("bitstream_id"));
-        b2s.setColumn("storage_id",    storage.getIntColumn("storage_id"));
-        DatabaseManager.update(context, b2s);
         context.complete();
+
         return bitstream;
     }
 
@@ -598,15 +540,9 @@ public class BitstreamStorageManager
     private static String getInternalId(Context context, int id)
         throws SQLException
     {
-        String sql = new StringBuffer()
-            .append("select Storage.* from Bitstream2Storage, Storage ")
-            .append(" where bitstream_id = ")
-            .append(id)
-            .append(" and Bitstream2Storage.storage_id = Storage.storage_id")
-            .toString();
-
         TableRow row = DatabaseManager.querySingle
-            (context, "Storage", sql);
+            (context, "Bitstream",
+             "select * from Bitstream where bitstream_id = " + id);
 
         return row == null ? null : row.getStringColumn("internal_id");
     }
