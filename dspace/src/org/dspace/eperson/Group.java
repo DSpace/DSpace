@@ -46,7 +46,6 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 
-import java.util.ListIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -156,14 +155,11 @@ public class Group
      */
     public void addMember(EPerson e)
     {
-        // flag epeople list as changed
-        epeoplechanged = true;
+        if (epeople.contains(e))
+            return;
 
-        // ensure only a single entry
-        removeMember( e );
-
-        // now do the add
         epeople.add(e);
+        epeoplechanged = true;
     }
 
 
