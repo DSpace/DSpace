@@ -249,9 +249,6 @@ public class WorkspaceItem implements InProgressSubmission
         }
         else
         {
-            // Just set default language
-            i.addDC("language", "iso", null, 
-                ConfigurationManager.getProperty("default.language"));
         }
 
         i.update();

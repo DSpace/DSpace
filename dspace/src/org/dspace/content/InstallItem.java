@@ -49,6 +49,7 @@ import java.util.List;
 import org.dspace.browse.Browse;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -103,6 +104,17 @@ public class InstallItem
     {
         Item item = is.getItem();
         String handle;
+
+        // set the language to default if it's not set already
+        DCValue[] dc = item.getDC("language", "iso", Item.ANY);
+            
+        if( dc.length < 1 )
+        {
+            // Just set default language
+            item.addDC("language", "iso", null, 
+                ConfigurationManager.getProperty("default.language"));
+        }
+
         
         // create accession date
         DCDate now = DCDate.getCurrent();

@@ -76,6 +76,7 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -212,7 +213,7 @@ public class ItemImport
 
         for( int i = 0; i < dircontents.length; i++ )
         {
-            addItem( c, mycollection, sourceDir, dircontents[ i ], mapOut );
+            addItem( c, mycollection, sourceDir, dircontents[ i ], null, mapOut );
             System.out.println( i + " " + dircontents[ i ] );
         }
         
@@ -241,8 +242,9 @@ public class ItemImport
 
             // add new item, locate old one
             Item oldItem = (Item)HandleManager.resolveToObject(c, oldHandle);
-            Item newItem = addItem(c, mycollection, sourceDir, newItemName, null);
+            Item newItem = addItem(c, mycollection, sourceDir, newItemName, oldHandle, null);
 
+/*   obsolete - but undeleted just to be safe....
             String newHandle = HandleManager.findHandle(c, newItem);
 
             // discard the new handle - FIXME: database hack
@@ -251,12 +253,12 @@ public class ItemImport
                 Constants.ITEM + " AND resource_id=" + newItem.getID();
             DatabaseManager.updateQuery(c, myquery );
 
-            // re-assign the old handle one to the new item
+            // re-assign the old handle to the new item
             myquery = "UPDATE handle set resource_id=" +
                         newItem.getID() +
                         " WHERE handle.handle LIKE '" + oldHandle + "'";
             DatabaseManager.updateQuery(c, myquery );
-
+*/
             // schedule item for demolition
             itemsToDelete.add( oldItem );
               
@@ -294,13 +296,20 @@ public class ItemImport
 
 
 
-    // item?  try and add it to the archive
-    private Item addItem( Context c, Collection mycollection, String path, String itemname, PrintWriter mapOut )
+    /** item?  try and add it to the archive
+     *   c
+     *   mycollection
+     *   path
+     *   itemname 
+     *   handle - non-null means we have a pre-defined handle already
+     *   mapOut - mapfile we're writing
+     */   
+    private Item addItem( Context c, Collection mycollection, String path, String itemname, String handle, PrintWriter mapOut )
         throws Exception
     {
         Item myitem = null;
 
-        System.out.println("Adding item from directory" + itemname );
+        System.out.println("Adding item from directory " + itemname );
 
         // create workspace item
         WorkspaceItem wi = WorkspaceItem.create(c, mycollection, false);
@@ -419,15 +428,26 @@ public class ItemImport
         throws TransformerException
     {
         String value     = getStringValue(n); //n.getNodeValue(); //getElementData(n, "element");
-        String element   = getAttributeValue(n, "element");
+        String element   = getAttributeValue(n, "element"  );
         String qualifier = getAttributeValue(n, "qualifier"); //NodeValue(); //getElementData(n, "qualifier");
+        String language  = getAttributeValue(n, "language" );
 
         System.out.println("\tElement: " + element + " Qualifier: " + qualifier +
         " Value: " + value );
 
         if( qualifier.equals("none") ) qualifier = null;
 
-        i.addDC(element, qualifier, "en", value);
+        // if language isn't set, use the system's default value
+        if( language.equals("") )
+        {
+            language = ConfigurationManager.getProperty("default.language");
+        }
+
+        // a goofy default, but there it is
+        if( language == null ) { language = "en"; }
+
+
+        i.addDC(element, qualifier, language, value);
     }
 
 

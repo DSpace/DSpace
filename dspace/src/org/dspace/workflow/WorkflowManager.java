@@ -698,7 +698,7 @@ public class WorkflowManager
             + " on " + now + " (GMT) ";
             
         // Add to item as a DC field
-        myitem.addDC("description", "provenance", null, provDescription);
+        myitem.addDC("description", "provenance", "en", provDescription);
         myitem.update();
 
         // convert into personal workspace
@@ -950,7 +950,7 @@ public class WorkflowManager
         provDescription += InstallItem.getBitstreamProvenanceMessage(item);    
 
         // Add to item as a DC field
-        item.addDC("description", "provenance", null, provDescription);
+        item.addDC("description", "provenance", "en", provDescription);
         item.update();
     }
 
