@@ -66,6 +66,7 @@ DROP VIEW CollectionItemsByAuthor;
 DROP VIEW Community2Item;
 
 -- Then the tables
+DROP TABLE Communities2Item;
 DROP TABLE ItemsByDateAccessioned;
 DROP TABLE ItemsByDate;
 DROP TABLE ItemsByTitle;
@@ -124,6 +125,7 @@ DROP SEQUENCE registrationdata_seq;
 DROP SEQUENCE subscription_seq;
 DROP SEQUENCE history_seq;
 DROP SEQUENCE historystate_seq;
+DROP SEQUENCE communities2item_seq;
 DROP SEQUENCE itemsbyauthor_seq;
 DROP SEQUENCE itemsbytitle_seq;
 DROP SEQUENCE itemsbydate_seq;
