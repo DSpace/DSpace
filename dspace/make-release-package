@@ -1,11 +1,18 @@
 #!/bin/sh
 
-USAGE="$0 cvs-tag target"
+USAGE="$0 [-mit] cvs-tag target"
+
+mit=0
 
 # Check we have command-line arguments
+if [ "$#" == "3" ]; then
+   mit=1
+   shift
+fi
+
 if [ "$#" != "2" ]; then
-    echo $USAGE
-    exit 1
+        echo $USAGE
+        exit 1
 fi
 
 mkdir tmp
@@ -17,6 +24,35 @@ cvs -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 dspace
 # Don't need to include this script!
 rm -f dspace/make-release-package
 
+# Or silly cvsignore file
+rm -f dspace/.cvsignore
+
+
+# Remove Sun JARs due to licensing issues
+if [ "$mit" == "0" ] ; then
+        rm -f dspace/lib/activation.jar
+        rm -f dspace/lib/mail.jar
+        rm -f dspace/lib/servlet.jar
+fi
+
+echo "Checking out documentation"
+cvs -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 docs
+
+# Copy appropriate docs over
+
+mkdir dspace/docs
+cp -r docs/system/*.html docs/system/*.css docs/system/image dspace/docs
+
+
+if [ "$mit" == "1" ] ; then
+        echo "Checking out MIT-specific code..."
+        cvs -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 mit
+
+        echo "Overlaying MIT-specifics..."
+        cp -r mit/* dspace
+fi
+
+
 echo "Creating tarball..."
 mv dspace $2
 
@@ -25,7 +61,7 @@ tar -cf - $2 | gzip -c > $2.tar.gz
 echo "Cleaning up..."
 
 cd ..
-mv tmp/$1.tar.gz .
+mv tmp/$2.tar.gz .
 rm -r tmp
 
 echo "Package created as $2.tar.gz"
