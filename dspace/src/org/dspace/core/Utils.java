@@ -175,10 +175,10 @@ public class Utils
 
     /**
      * Copy stream-data from source to destination, with buffering.
-     * This is equivalent to passing {@link #copy} a {@link
-     * java.io.BufferedInputStream} and {@link java.io.BufferedOuputStream} to
-     * {@link #copy}, and flushing the output stream afterwards. The streams
-     * are not closed after the copy.
+     * This is equivalent to passing {@link #copy} a
+     * <code>java.io.BufferedInputStream</code> and
+     * <code>java.io.BufferedOuputStream</code> to {@link #copy}, and flushing
+     * the output stream afterwards. The streams are not closed after the copy.
      */
     public static void bufferedCopy( final InputStream source, final OutputStream destination )
         throws IOException
