@@ -44,7 +44,8 @@ import org.dspace.core.Context;
 import org.dspace.content.*;
 
 /**
- * Scope object for browse. A scope object contains the following:
+ * Object which describes the desired parameters for a browse.
+ * A scope object contains the following:
  *
  *  <dl>
  *  <dt>scope</dt>
@@ -56,12 +57,12 @@ import org.dspace.content.*;
  *  <dt>focus</dt>
  *      <dd>The point at which a Browse begins. This can be a String,
  *      an {@link org.dspace.content.Item} (given by either the Item
- *      object or its id), or null. <br>.
+ *      object or its id), or null.<br>
  *      If a String, Browses begin with values lexicographically greater
  *      than or equal to the String.<br>
  *      If an Item, Browses begin with the value of the Item in the
  *      corresponding browse index. If the item has multiple values
- *      in the index, the behavior is undefined.<br>.
+ *      in the index, the behavior is undefined.<br>
  *      If null, Browses begin at the start of the index.
  *      </dd>
  *
