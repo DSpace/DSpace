@@ -53,13 +53,9 @@
     <H1>Invalid Token</H1>
 
     <P>The registration or forgotten password "token" in the URL is invalid.
-    This may be because of one of the following reasons:</P>
+    This may be because of one of the following reason:</P>
 
     <UL>
-        <LI>A token is only valid for around two weeks after we mail it to you.
-        If it's been a while since you selected "Register" or "I forgot my
-        password", you should try again.</LI>
-
         <LI>The token might be incorrectly copied into the URL.  Some e-mail
         programs will "wrap" long lines of text in an email, so maybe it split
         your special URL up into two lines, like this:
