@@ -52,14 +52,13 @@ import org.dspace.core.ConfigurationManager;
 
 import com.oreilly.servlet.MultipartRequest;
 
-
 /**
- * Based on the com.oreilly.servlet.MultipartWrapper object, this is an
- * HTTP request wrapper for multi-part (MIME) POSTs.  It uses DSpace
- * configuration properties to determine the temporary directory to use and
- * the maximum allowable upload size.
- *
- * @author  Robert Tansley
+ * Based on the com.oreilly.servlet.MultipartWrapper object, this is an HTTP
+ * request wrapper for multi-part (MIME) POSTs. It uses DSpace configuration
+ * properties to determine the temporary directory to use and the maximum
+ * allowable upload size.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class FileUploadRequest extends HttpServletRequestWrapper
@@ -72,8 +71,9 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
     /**
      * Wraps a multipart request and extracts the files
-     *
-     * @param req   the original request
+     * 
+     * @param req
+     *            the original request
      */
     public FileUploadRequest(HttpServletRequest req) throws IOException
     {
@@ -140,7 +140,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
     /**
      * Get back the original HTTP request object
-     *
+     * 
      * @return the original HTTP request
      */
     public HttpServletRequest getOriginalRequest()

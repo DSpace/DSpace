@@ -47,16 +47,15 @@ import java.util.Set;
 
 import org.dspace.browse.Browse;
 
-
 /**
  * Compare two Items by their DCValues.
- *
- * The DCValues to be compared are specified by the element, qualifier
- * and language parameters to the constructor. If the Item has more
- * than one matching DCValue, then the max parameter to the constructor
- * specifies whether the maximum or minimum lexicographic value will be used.
- *
- * @author  Peter Breton
+ * 
+ * The DCValues to be compared are specified by the element, qualifier and
+ * language parameters to the constructor. If the Item has more than one
+ * matching DCValue, then the max parameter to the constructor specifies whether
+ * the maximum or minimum lexicographic value will be used.
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class ItemComparator implements Comparator
@@ -75,16 +74,20 @@ public class ItemComparator implements Comparator
 
     /**
      * Constructor.
-     *
-     * @param element The Dublin Core element
-     * @param qualifier The Dublin Core qualifier
-     * @param language The language for the DCValues
-     * @param max If true, and there is more than one DCValue for
-     * element, qualifier and language, then use the maximum value
-     * lexicographically; otherwise use the minimum value.
+     * 
+     * @param element
+     *            The Dublin Core element
+     * @param qualifier
+     *            The Dublin Core qualifier
+     * @param language
+     *            The language for the DCValues
+     * @param max
+     *            If true, and there is more than one DCValue for element,
+     *            qualifier and language, then use the maximum value
+     *            lexicographically; otherwise use the minimum value.
      */
     public ItemComparator(String element, String qualifier, String language,
-                          boolean max)
+            boolean max)
     {
         this.element = element;
         this.qualifier = qualifier;
@@ -93,22 +96,24 @@ public class ItemComparator implements Comparator
     }
 
     /**
-     * Compare two Items by checking their DCValues for element,
-     * qualifier, and language.
-     *
+     * Compare two Items by checking their DCValues for element, qualifier, and
+     * language.
+     * 
      * <p>
-     * Return >= 1 if the first is lexicographically greater than
-     * the second; <= -1 if the second is lexicographically greater
-     * than the first, and 0 otherwise.
+     * Return >= 1 if the first is lexicographically greater than the second; <=
+     * -1 if the second is lexicographically greater than the first, and 0
+     * otherwise.
      * </p>
-     *
-     * @param first The first object to compare. Must be an object of
-     * type org.dspace.content.Item.
-     * @param second The second object to compare. Must be an object of
-     * type org.dspace.content.Item.
-     * @return >= 1 if the first is lexicographically greater than
-     * the second; <= -1 if the second is lexicographically greater
-     * than the first, and 0 otherwise.
+     * 
+     * @param first
+     *            The first object to compare. Must be an object of type
+     *            org.dspace.content.Item.
+     * @param second
+     *            The second object to compare. Must be an object of type
+     *            org.dspace.content.Item.
+     * @return >= 1 if the first is lexicographically greater than the second; <=
+     *         -1 if the second is lexicographically greater than the first, and
+     *         0 otherwise.
      */
     public int compare(Object first, Object second)
     {
@@ -142,12 +147,12 @@ public class ItemComparator implements Comparator
     }
 
     /**
-     * Return true if the object is equal to this one, false
-     * otherwise. Another object is equal to this one if it is also
-     * an ItemComparator, and has the same values for element,
-     * qualifier, language, and max.
-     *
-     * @param obj The object to compare to.
+     * Return true if the object is equal to this one, false otherwise. Another
+     * object is equal to this one if it is also an ItemComparator, and has the
+     * same values for element, qualifier, language, and max.
+     * 
+     * @param obj
+     *            The object to compare to.
      * @return True if the other object is equal to this one, false otherwise.
      */
     public boolean equals(Object obj)
@@ -159,14 +164,14 @@ public class ItemComparator implements Comparator
 
         ItemComparator other = (ItemComparator) obj;
 
-        return _equals(element, other.element) &&
-               _equals(qualifier, other.qualifier) &&
-               _equals(language, other.language) && (max == other.max);
+        return _equals(element, other.element)
+                && _equals(qualifier, other.qualifier)
+                && _equals(language, other.language) && (max == other.max);
     }
 
     /**
-     * Return true if the first string is equal to the second.
-     * Either or both may be null.
+     * Return true if the first string is equal to the second. Either or both
+     * may be null.
      */
     private boolean _equals(String first, String second)
     {
@@ -189,13 +194,13 @@ public class ItemComparator implements Comparator
     }
 
     /**
-     * Choose the canonical value from an item for comparison.
-     * If there are no values, null is returned.
-     * If there is exactly one value, then it is returned.
-     * Otherwise, either the maximum or minimum lexicographical
-     * value is returned; the parameter to the constructor says which.
-     *
-     * @param item The item to check
+     * Choose the canonical value from an item for comparison. If there are no
+     * values, null is returned. If there is exactly one value, then it is
+     * returned. Otherwise, either the maximum or minimum lexicographical value
+     * is returned; the parameter to the constructor says which.
+     * 
+     * @param item
+     *            The item to check
      * @return The chosen value, or null
      */
     private String getValue(Item item)
@@ -234,7 +239,7 @@ public class ItemComparator implements Comparator
 
         Set valueSet = values.keySet();
         String chosen = max ? (String) Collections.max(valueSet)
-                            : (String) Collections.min(valueSet);
+                : (String) Collections.min(valueSet);
 
         int index = ((Integer) values.get(chosen)).intValue();
 

@@ -53,10 +53,9 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
  * Class representing a group of e-people.
- *
+ * 
  * @author David Stuve
  * @version $Revision$
  */
@@ -64,6 +63,7 @@ public class Group extends DSpaceObject
 {
     // findAll sortby types
     public static final int ID = 0; // sort by ID
+
     public static final int NAME = 1; // sort by NAME (default)
 
     /** log4j logger */
@@ -83,6 +83,7 @@ public class Group extends DSpaceObject
 
     /**
      * Construct a Group from a given context and tablerow
+     * 
      * @param context
      * @param row
      */
@@ -92,24 +93,28 @@ public class Group extends DSpaceObject
         myRow = row;
 
         // get epeople objects
-        TableRowIterator tri = DatabaseManager.query(myContext, "eperson",
-                                                     "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
-                                                     "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
-                                                     "epersongroup2eperson.eperson_group_id=" +
-                                                     myRow.getIntColumn("eperson_group_id"));
+        TableRowIterator tri = DatabaseManager
+                .query(
+                        myContext,
+                        "eperson",
+                        "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE "
+                                + "epersongroup2eperson.eperson_id=eperson.eperson_id AND "
+                                + "epersongroup2eperson.eperson_group_id="
+                                + myRow.getIntColumn("eperson_group_id"));
 
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
 
             // First check the cache
-            EPerson fromCache = (EPerson) myContext.fromCache(EPerson.class,
-                                                              r.getIntColumn("eperson_id"));
+            EPerson fromCache = (EPerson) myContext.fromCache(EPerson.class, r
+                    .getIntColumn("eperson_id"));
 
             if (fromCache != null)
             {
                 epeople.add(fromCache);
-            } else
+            }
+            else
             {
                 epeople.add(new EPerson(myContext, r));
             }
@@ -121,16 +126,18 @@ public class Group extends DSpaceObject
 
     /**
      * Create a new group
-     *
-     * @param  context  DSpace context object
+     * 
+     * @param context
+     *            DSpace context object
      */
-    public static Group create(Context context)
-                        throws SQLException, AuthorizeException
+    public static Group create(Context context) throws SQLException,
+            AuthorizeException
     {
         // FIXME - authorization?
         if (!AuthorizeManager.isAdmin(context))
         {
-            throw new AuthorizeException("You must be an admin to create an EPerson Group");
+            throw new AuthorizeException(
+                    "You must be an admin to create an EPerson Group");
         }
 
         // Create a table row
@@ -138,37 +145,38 @@ public class Group extends DSpaceObject
 
         Group g = new Group(context, row);
 
-        log.info(LogManager.getHeader(context, "create_group",
-                                      "group_id=" + g.getID()));
+        log.info(LogManager.getHeader(context, "create_group", "group_id="
+                + g.getID()));
 
         return g;
     }
 
     /**
-    * get the ID of the group object
-    *
-    * @return id
-    */
+     * get the ID of the group object
+     * 
+     * @return id
+     */
     public int getID()
     {
         return myRow.getIntColumn("eperson_group_id");
     }
 
     /**
-    * get name of group
-    *
-    * @return name
-    */
+     * get name of group
+     * 
+     * @return name
+     */
     public String getName()
     {
         return myRow.getStringColumn("name");
     }
 
     /**
-    * set name of group
-    *
-    * @param name new group name
-    */
+     * set name of group
+     * 
+     * @param name
+     *            new group name
+     */
     public void setName(String name)
     {
         myRow.setColumn("name", name);
@@ -176,8 +184,9 @@ public class Group extends DSpaceObject
 
     /**
      * add an eperson member
-     *
-     * @param e eperson
+     * 
+     * @param e
+     *            eperson
      */
     public void addMember(EPerson e)
     {
@@ -192,8 +201,9 @@ public class Group extends DSpaceObject
 
     /**
      * remove an eperson from a group
-     *
-     * @param e eperson
+     * 
+     * @param e
+     *            eperson
      */
     public void removeMember(EPerson e)
     {
@@ -205,8 +215,9 @@ public class Group extends DSpaceObject
 
     /**
      * check to see if an eperson is a member
-     *
-     * @param e eperson to check membership
+     * 
+     * @param e
+     *            eperson to check membership
      */
     public boolean isMember(EPerson e)
     {
@@ -220,16 +231,16 @@ public class Group extends DSpaceObject
     }
 
     /**
-     * fast check to see if an eperson is a member
-     *  called with eperson id, does database lookup
-     *  without instantiating all of the epeople objects
-     *  and is thus a static method
-     *
-     * @param c context
-     * @param groupid group ID to check
+     * fast check to see if an eperson is a member called with eperson id, does
+     * database lookup without instantiating all of the epeople objects and is
+     * thus a static method
+     * 
+     * @param c
+     *            context
+     * @param groupid
+     *            group ID to check
      */
-    public static boolean isMember(Context c, int groupid)
-                            throws SQLException
+    public static boolean isMember(Context c, int groupid) throws SQLException
     {
         // special, everyone is member of group 0 (anonymous)
         if (groupid == 0)
@@ -252,13 +263,15 @@ public class Group extends DSpaceObject
             // not in special groups, try database
             int userid = currentuser.getID();
 
-            TableRowIterator tri = DatabaseManager.query(c, "eperson",
-                                                         "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
-                                                         "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
-                                                         "epersongroup2eperson.eperson_group_id=" +
-                                                         groupid +
-                                                         " AND eperson.eperson_id=" +
-                                                         userid);
+            TableRowIterator tri = DatabaseManager
+                    .query(
+                            c,
+                            "eperson",
+                            "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE "
+                                    + "epersongroup2eperson.eperson_id=eperson.eperson_id AND "
+                                    + "epersongroup2eperson.eperson_group_id="
+                                    + groupid + " AND eperson.eperson_id="
+                                    + userid);
 
             if (tri.hasNext())
             {
@@ -271,7 +284,7 @@ public class Group extends DSpaceObject
 
     /**
      * find the group by its ID
-     *
+     * 
      * @param context
      * @param id
      */
@@ -290,7 +303,8 @@ public class Group extends DSpaceObject
         if (row == null)
         {
             return null;
-        } else
+        }
+        else
         {
             return new Group(context, row);
         }
@@ -298,31 +312,33 @@ public class Group extends DSpaceObject
 
     /**
      * Find the group by its name - assumes name is unique
-     *
+     * 
      * @param context
      * @param name
-     *
+     * 
      * @return Group
      */
     public static Group findByName(Context context, String name)
-                            throws SQLException
+            throws SQLException
     {
         TableRow row = DatabaseManager.findByUnique(context, "epersongroup",
-                                                    "name", name);
+                "name", name);
 
         if (row == null)
         {
             return null;
-        } else
+        }
+        else
         {
             // First check the cache
-            Group fromCache = (Group) context.fromCache(Group.class,
-                                                        row.getIntColumn("eperson_group_id"));
+            Group fromCache = (Group) context.fromCache(Group.class, row
+                    .getIntColumn("eperson_group_id"));
 
             if (fromCache != null)
             {
                 return fromCache;
-            } else
+            }
+            else
             {
                 return new Group(context, row);
             }
@@ -331,35 +347,36 @@ public class Group extends DSpaceObject
 
     /**
      * finds all groups in the site
+     * 
      * @param context
-     * @param sortField, Group.ID or Group.NAME (default)
-     *
+     * @param sortField,
+     *            Group.ID or Group.NAME (default)
+     * 
      * @return Group []
      */
     public static Group[] findAll(Context context, int sortField)
-                           throws SQLException
+            throws SQLException
     {
         String s;
 
         switch (sortField)
         {
-            case ID:
-                s = "eperson_group_id";
+        case ID:
+            s = "eperson_group_id";
 
-                break;
+            break;
 
-            case NAME:
-                s = "name";
+        case NAME:
+            s = "name";
 
-                break;
+            break;
 
-            default:
-                s = "name";
+        default:
+            s = "name";
         }
 
         TableRowIterator rows = DatabaseManager.query(context, "epersongroup",
-                                                      "SELECT * FROM epersongroup ORDER BY " +
-                                                      s);
+                "SELECT * FROM epersongroup ORDER BY " + s);
 
         List gRows = rows.toList();
 
@@ -370,13 +387,14 @@ public class Group extends DSpaceObject
             TableRow row = (TableRow) gRows.get(i);
 
             // First check the cache
-            Group fromCache = (Group) context.fromCache(Group.class,
-                                                        row.getIntColumn("eperson_group_id"));
+            Group fromCache = (Group) context.fromCache(Group.class, row
+                    .getIntColumn("eperson_group_id"));
 
             if (fromCache != null)
             {
                 groups[i] = fromCache;
-            } else
+            }
+            else
             {
                 groups[i] = new Group(context, row);
             }
@@ -387,7 +405,7 @@ public class Group extends DSpaceObject
 
     /**
      * Delete a group
-     *
+     *  
      */
     public void delete() throws SQLException
     {
@@ -400,16 +418,16 @@ public class Group extends DSpaceObject
 
         // Remove any group memberships first
         DatabaseManager.updateQuery(myContext,
-                                    "DELETE FROM EPersonGroup2EPerson WHERE eperson_group_id=" +
-                                    getID());
+                "DELETE FROM EPersonGroup2EPerson WHERE eperson_group_id="
+                        + getID());
 
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
 
         epeople.clear();
 
-        log.info(LogManager.getHeader(myContext, "delete_group",
-                                      "group_id=" + getID()));
+        log.info(LogManager.getHeader(myContext, "delete_group", "group_id="
+                + getID()));
     }
 
     /**
@@ -431,15 +449,15 @@ public class Group extends DSpaceObject
         if (epeople.size() == 0)
         {
             return true;
-        } else
+        }
+        else
         {
             return false;
         }
     }
 
     /**
-     * Update the group - writing out group object
-     *  and EPerson list if necessary
+     * Update the group - writing out group object and EPerson list if necessary
      */
     public void update() throws SQLException, AuthorizeException
     {
@@ -451,8 +469,8 @@ public class Group extends DSpaceObject
         {
             // Remove any existing mappings
             DatabaseManager.updateQuery(myContext,
-                                        "delete from epersongroup2eperson where eperson_group_id=" +
-                                        getID());
+                    "delete from epersongroup2eperson where eperson_group_id="
+                            + getID());
 
             // Add new mappings
             Iterator i = epeople.iterator();
@@ -462,7 +480,7 @@ public class Group extends DSpaceObject
                 EPerson e = (EPerson) i.next();
 
                 TableRow mappingRow = DatabaseManager.create(myContext,
-                                                             "epersongroup2eperson");
+                        "epersongroup2eperson");
                 mappingRow.setColumn("eperson_id", e.getID());
                 mappingRow.setColumn("eperson_group_id", getID());
                 DatabaseManager.update(myContext, mappingRow);
@@ -471,18 +489,19 @@ public class Group extends DSpaceObject
             epeoplechanged = false;
         }
 
-        log.info(LogManager.getHeader(myContext, "update_group",
-                                      "group_id=" + getID()));
+        log.info(LogManager.getHeader(myContext, "update_group", "group_id="
+                + getID()));
     }
 
     /**
      * Return <code>true</code> if <code>other</code> is the same Group as
      * this object, <code>false</code> otherwise
-     *
-     * @param other   object to compare to
-     *
-     * @return  <code>true</code> if object passed in represents the same
-     *          group as this object
+     * 
+     * @param other
+     *            object to compare to
+     * 
+     * @return <code>true</code> if object passed in represents the same group
+     *         as this object
      */
     public boolean equals(Object other)
     {

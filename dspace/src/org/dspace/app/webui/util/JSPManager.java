@@ -50,19 +50,18 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
-
 /**
  * Methods for displaying UI pages to the user.
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class JSPManager
 {
     /*
      * All displaying of UI pages should be performed using this manager for
-     * future-proofing, since any future localisation effort will probably
-     * use this manager.
+     * future-proofing, since any future localisation effort will probably use
+     * this manager.
      */
 
     /** log4j logger */
@@ -70,20 +69,22 @@ public class JSPManager
 
     /**
      * Forwards control of the request to the display JSP passed in.
-     *
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param jsp       the JSP page to display, relative to the webapps
-     *                  directory
+     * 
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param jsp
+     *            the JSP page to display, relative to the webapps directory
      */
     public static void showJSP(HttpServletRequest request,
-                               HttpServletResponse response, String jsp)
-                        throws ServletException, IOException
+            HttpServletResponse response, String jsp) throws ServletException,
+            IOException
     {
         if (log.isDebugEnabled())
         {
-            log.debug(LogManager.getHeader((Context) request.getAttribute("dspace.context"),
-                                           "view_jsp", jsp));
+            log.debug(LogManager.getHeader((Context) request
+                    .getAttribute("dspace.context"), "view_jsp", jsp));
         }
 
         // For the moment, a simple forward
@@ -91,67 +92,73 @@ public class JSPManager
     }
 
     /**
-     * Display an internal server error message - for example, a database
-     * error
-     *
-     * @param request   the HTTP request
-     * @param response  the HTTP response
+     * Display an internal server error message - for example, a database error
+     * 
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the HTTP response
      */
     public static void showInternalError(HttpServletRequest request,
-                                         HttpServletResponse response)
-                                  throws ServletException, IOException
+            HttpServletResponse response) throws ServletException, IOException
     {
         showJSP(request, response, "/error/internal.jsp");
     }
 
     /**
-     * Display an integrity error message.  Use when the POSTed data from a
+     * Display an integrity error message. Use when the POSTed data from a
      * request doesn't make sense.
-     *
-     * @param request   the HTTP request
-     * @param response  the HTTP response
+     * 
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the HTTP response
      */
     public static void showIntegrityError(HttpServletRequest request,
-                                          HttpServletResponse response)
-                                   throws ServletException, IOException
+            HttpServletResponse response) throws ServletException, IOException
     {
         showJSP(request, response, "/error/integrity.jsp");
     }
 
     /**
-     * Display an authorization failed error message.  The exception should be
+     * Display an authorization failed error message. The exception should be
      * passed in if possible so that the error message can be descriptive.
-     *
-     * @param request    the HTTP request
-     * @param response   the HTTP response
-     * @param exception  the AuthorizeException leading to this error, passing
-     *                   in <code>null</code> will display default error message
+     * 
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the HTTP response
+     * @param exception
+     *            the AuthorizeException leading to this error, passing in
+     *            <code>null</code> will display default error message
      */
     public static void showAuthorizeError(HttpServletRequest request,
-                                          HttpServletResponse response,
-                                          AuthorizeException exception)
-                                   throws ServletException, IOException
+            HttpServletResponse response, AuthorizeException exception)
+            throws ServletException, IOException
     {
         // FIXME: Need to work out which error message to display?
         showJSP(request, response, "/error/authorize.jsp");
     }
 
     /**
-     * Display an "invalid ID" error message.  Passing in information about the
-     * bad ID and what the ID was supposed to represent (collection etc.)
-     * should result in a more descriptive and helpful error message.
-     *
-     * @param request    the HTTP request
-     * @param response   the HTTP response
-     * @param badID      the bad identifier, or <code>null</code>
-     * @param type       the type of object, from
-     *                   <code>org.dspace.core.Constants</code>, or
-     *                   <code>-1</code> for a default message
+     * Display an "invalid ID" error message. Passing in information about the
+     * bad ID and what the ID was supposed to represent (collection etc.) should
+     * result in a more descriptive and helpful error message.
+     * 
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the HTTP response
+     * @param badID
+     *            the bad identifier, or <code>null</code>
+     * @param type
+     *            the type of object, from
+     *            <code>org.dspace.core.Constants</code>, or <code>-1</code>
+     *            for a default message
      */
     public static void showInvalidIDError(HttpServletRequest request,
-                                          HttpServletResponse response,
-                                          String badID, int type)
-                                   throws ServletException, IOException
+            HttpServletResponse response, String badID, int type)
+            throws ServletException, IOException
     {
         request.setAttribute("bad.id", badID);
 

@@ -49,16 +49,19 @@ import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+
 /**
  * Utility functions for DSpace.
- *
- * @author  Peter Breton
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class Utils
 {
     private static int counter = 0;
+
     private static Random random = new Random();
+
     private static VMID vmid = new VMID();
 
     /** Private Constructor */
@@ -68,8 +71,9 @@ public class Utils
 
     /**
      * Return an MD5 checksum for data in hex format.
-     *
-     * @param data The data to checksum.
+     * 
+     * @param data
+     *            The data to checksum.
      * @return MD5 checksum for the data in hex format.
      */
     public static String getMD5(String data)
@@ -79,8 +83,9 @@ public class Utils
 
     /**
      * Return an MD5 checksum for data in hex format.
-     *
-     * @param data The data to checksum.
+     * 
+     * @param data
+     *            The data to checksum.
      * @return MD5 checksum for the data in hex format.
      */
     public static String getMD5(byte[] data)
@@ -90,8 +95,9 @@ public class Utils
 
     /**
      * Return an MD5 checksum for data as a byte array.
-     *
-     * @param data The data to checksum.
+     * 
+     * @param data
+     *            The data to checksum.
      * @return MD5 checksum for the data as a byte array.
      */
     public static byte[] getMD5Bytes(byte[] data)
@@ -101,7 +107,8 @@ public class Utils
             MessageDigest digest = MessageDigest.getInstance("MD5");
 
             return digest.digest(data);
-        } catch (NoSuchAlgorithmException nsae)
+        }
+        catch (NoSuchAlgorithmException nsae)
         {
         }
 
@@ -111,8 +118,9 @@ public class Utils
 
     /**
      * Return a hex representation of the byte array
-     *
-     * @param data The data to transform.
+     * 
+     * @param data
+     *            The data to transform.
      * @return A hex representation of the data.
      */
     public static String toHex(byte[] data)
@@ -138,9 +146,9 @@ public class Utils
     }
 
     /**
-     * Generate a unique key.
-     * The key is a long (length 38 to 40) sequence of digits.
-     *
+     * Generate a unique key. The key is a long (length 38 to 40) sequence of
+     * digits.
+     * 
      * @return A unique key as a long sequence of base-10 digits.
      */
     public static String generateKey()
@@ -149,9 +157,9 @@ public class Utils
     }
 
     /**
-     * Generate a unique key.
-     * The key is a 32-character long sequence of hex digits.
-     *
+     * Generate a unique key. The key is a 32-character long sequence of hex
+     * digits.
+     * 
      * @return A unique key as a long sequence of hex digits.
      */
     public static String generateHexKey()
@@ -161,7 +169,7 @@ public class Utils
 
     /**
      * Generate a unique key as a byte array.
-     *
+     * 
      * @return A unique key as a byte array.
      */
     public static synchronized byte[] generateBytesKey()
@@ -170,10 +178,8 @@ public class Utils
 
         random.nextBytes(junk);
 
-        String input = new StringBuffer().append(vmid)
-                                         .append(new java.util.Date())
-                                         .append(junk).append(counter++)
-                                         .toString();
+        String input = new StringBuffer().append(vmid).append(
+                new java.util.Date()).append(junk).append(counter++).toString();
 
         return getMD5Bytes(input.getBytes());
     }
@@ -181,16 +187,18 @@ public class Utils
     // The following two methods are taken from the Jakarta IOUtil class.
 
     /**
-     * Copy stream-data from source to destination. This method does not
-     * buffer, flush or close the streams, as to do so would require making
-     * non-portable assumptions about the streams' origin and further use. If
-     * you wish to perform a buffered copy, use {@link #bufferedCopy}.
-     *
-     * @param input The InputStream to obtain data from.
-     * @param output The OutputStream to copy data to.
+     * Copy stream-data from source to destination. This method does not buffer,
+     * flush or close the streams, as to do so would require making non-portable
+     * assumptions about the streams' origin and further use. If you wish to
+     * perform a buffered copy, use {@link #bufferedCopy}.
+     * 
+     * @param input
+     *            The InputStream to obtain data from.
+     * @param output
+     *            The OutputStream to copy data to.
      */
     public static void copy(final InputStream input, final OutputStream output)
-                     throws IOException
+            throws IOException
     {
         final int BUFFER_SIZE = 1024 * 4;
         final byte[] buffer = new byte[BUFFER_SIZE];
@@ -213,37 +221,41 @@ public class Utils
     }
 
     /**
-     * Copy stream-data from source to destination, with buffering.
-     * This is equivalent to passing {@link #copy} a
+     * Copy stream-data from source to destination, with buffering. This is
+     * equivalent to passing {@link #copy}a
      * <code>java.io.BufferedInputStream</code> and
-     * <code>java.io.BufferedOuputStream</code> to {@link #copy}, and flushing
-     * the output stream afterwards. The streams are not closed after the copy.
-     *
-     * @param source The InputStream to obtain data from.
-     * @param destination The OutputStream to copy data to.
+     * <code>java.io.BufferedOuputStream</code> to {@link #copy}, and
+     * flushing the output stream afterwards. The streams are not closed after
+     * the copy.
+     * 
+     * @param source
+     *            The InputStream to obtain data from.
+     * @param destination
+     *            The OutputStream to copy data to.
      */
     public static void bufferedCopy(final InputStream source,
-                                    final OutputStream destination)
-                             throws IOException
+            final OutputStream destination) throws IOException
     {
         final BufferedInputStream input = new BufferedInputStream(source);
-        final BufferedOutputStream output = new BufferedOutputStream(destination);
+        final BufferedOutputStream output = new BufferedOutputStream(
+                destination);
         copy(input, output);
         output.flush();
     }
 
     /**
-    * Replace characters that could be interpreted as HTML codes with symbolic
-    * references (entities). This function should be called before displaying any metadata
-    * fields that could contain the characters "<", ">", "&", "'", and
-    * double quotation marks.
-    * This will effectively disable HTML links in metadata.
-    *
-    * @param value     the metadata value to be scrubbed for display
-    *
-    * @return      the passed-in string, with html special characters replaced
-    * with entities.
-    */
+     * Replace characters that could be interpreted as HTML codes with symbolic
+     * references (entities). This function should be called before displaying
+     * any metadata fields that could contain the characters " <", ">", "&",
+     * "'", and double quotation marks. This will effectively disable HTML links
+     * in metadata.
+     * 
+     * @param value
+     *            the metadata value to be scrubbed for display
+     * 
+     * @return the passed-in string, with html special characters replaced with
+     *         entities.
+     */
     public static String addEntities(String value)
     {
         value = value.replaceAll("&", "&amp;");

@@ -52,10 +52,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
 
-
 /**
  * Servlet for constructing the advanced search form
- *
+ * 
  * @author gam
  * @version $Revision$
  */
@@ -65,9 +64,8 @@ public class AdvancedSearchServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(SubscribeServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // just build a list of top-level communities and pass along to the jsp
         Community[] communities = Community.findAllTop(context);

@@ -55,11 +55,10 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscribe;
 
-
 /**
  * Servlet for constructing the components of the "My DSpace" page
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class SubscribeServlet extends DSpaceServlet
@@ -68,24 +67,21 @@ public class SubscribeServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(SubscribeServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Simply show list of subscriptions
         showSubscriptions(context, request, response, false);
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         /*
-         * Parameters:
-         *  submit_unsubscribe - unsubscribe from a collection
-         *  submit_clear - clear all subscriptions
-         *  submit_cancel - cancel update - go to My DSpace.
+         * Parameters: submit_unsubscribe - unsubscribe from a collection
+         * submit_clear - clear all subscriptions submit_cancel - cancel update -
+         * go to My DSpace.
          */
         String submit = UIUtil.getSubmitButton(request, "submit");
         EPerson e = context.getCurrentUser();
@@ -99,7 +95,8 @@ public class SubscribeServlet extends DSpaceServlet
             showSubscriptions(context, request, response, true);
 
             context.complete();
-        } else if (submit.equals("submit_unsubscribe"))
+        }
+        else if (submit.equals("submit_unsubscribe"))
         {
             int collID = UIUtil.getIntParameter(request, "collection");
             Collection c = Collection.find(context, collID);
@@ -114,30 +111,36 @@ public class SubscribeServlet extends DSpaceServlet
             showSubscriptions(context, request, response, true);
 
             context.complete();
-        } else
+        }
+        else
         {
             // Back to "My DSpace"
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/mydspace"));
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/mydspace"));
         }
     }
 
     /**
      * Show the list of subscriptions
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request
-     * @param response  HTTP response
-     * @param updated   if <code>true</code>, write a message indicating that
-     *                  updated subscriptions have been stored
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request
+     * @param response
+     *            HTTP response
+     * @param updated
+     *            if <code>true</code>, write a message indicating that
+     *            updated subscriptions have been stored
      */
     private void showSubscriptions(Context context, HttpServletRequest request,
-                                   HttpServletResponse response, boolean updated)
-                            throws ServletException, IOException, SQLException
+            HttpServletResponse response, boolean updated)
+            throws ServletException, IOException, SQLException
     {
         // Subscribed collections
-        Collection[] subs = Subscribe.getSubscriptions(context,
-                                                       context.getCurrentUser());
+        Collection[] subs = Subscribe.getSubscriptions(context, context
+                .getCurrentUser());
 
         request.setAttribute("subscriptions", subs);
         request.setAttribute("updated", new Boolean(updated));

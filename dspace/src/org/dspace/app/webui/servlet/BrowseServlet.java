@@ -62,22 +62,21 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 
-
 /**
- * Servlet for browsing through indices.  This can be used to browse authors,
- * items by date, or items by title.  In the deployment description, the
- * initial parameter "browse" should be set to one of these values:
+ * Servlet for browsing through indices. This can be used to browse authors,
+ * items by date, or items by title. In the deployment description, the initial
+ * parameter "browse" should be set to one of these values:
  * <P>
  * <UL>
- * <LI><code>titles</code> - for browsing items by title (the default)</LI>
- * <LI><code>authors</code> - for browsing authors</LI>
- * <LI><code>dates</code> - for browsing items by date</LI>
+ * <LI><code>titles</code>- for browsing items by title (the default)</LI>
+ * <LI><code>authors</code>- for browsing authors</LI>
+ * <LI><code>dates</code>- for browsing items by date</LI>
  * </UL>
  * <P>
  * Hence there should be three instances of this servlet, one for each type of
  * browse.
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class BrowseServlet extends DSpaceServlet
@@ -99,17 +98,16 @@ public class BrowseServlet extends DSpaceServlet
         // Sort out what we're browsing - default is titles
         String browseWhat = getInitParameter("browse");
 
-        browseAuthors = ((browseWhat != null) &&
-                        browseWhat.equalsIgnoreCase("authors"));
-        browseDates = ((browseWhat != null) &&
-                      browseWhat.equalsIgnoreCase("dates"));
+        browseAuthors = ((browseWhat != null) && browseWhat
+                .equalsIgnoreCase("authors"));
+        browseDates = ((browseWhat != null) && browseWhat
+                .equalsIgnoreCase("dates"));
         browseTitles = (!browseAuthors && !browseDates);
     }
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // We will resolve the HTTP request parameters into a scope
         BrowseScope scope = new BrowseScope(context);
@@ -144,12 +142,12 @@ public class BrowseServlet extends DSpaceServlet
             oldestFirst = true;
         }
 
-        if (browseDates && (year != null) && !year.equals("") &&
-                ((startsWith == null) || startsWith.equals("")))
+        if (browseDates && (year != null) && !year.equals("")
+                && ((startsWith == null) || startsWith.equals("")))
         {
             // We're browsing items by date, the user hasn't typed anything
             // into the "year" text box, and they've selected a year from
-            // the drop-down list.  From this we work out where to start
+            // the drop-down list. From this we work out where to start
             // the browse.
             startsWith = year;
 
@@ -176,16 +174,18 @@ public class BrowseServlet extends DSpaceServlet
             {
                 // For browsing authors, focus is just a text value
                 scope.setFocus(focus);
-            } else
+            }
+            else
             {
                 // For browsing items by title or date, focus is a Handle
-                Item item = (Item) HandleManager.resolveToObject(context, focus);
+                Item item = (Item) HandleManager
+                        .resolveToObject(context, focus);
 
                 if (item == null)
                 {
-                    // Handle is invalid one.  Show an error.
+                    // Handle is invalid one. Show an error.
                     JSPManager.showInvalidIDError(request, response, focus,
-                                                  Constants.ITEM);
+                            Constants.ITEM);
 
                     return;
                 }
@@ -201,9 +201,12 @@ public class BrowseServlet extends DSpaceServlet
             if (browseDates)
             {
                 // if the date order is flipped, we'll keep the same focus
-                flipOrderingQuery = "focus=" + URLEncoder.encode(focus, Constants.DEFAULT_ENCODING) + "&";
+                flipOrderingQuery = "focus="
+                        + URLEncoder.encode(focus, Constants.DEFAULT_ENCODING)
+                        + "&";
             }
-        } else if (startsWith != null)
+        }
+        else if (startsWith != null)
         {
             // ----------------------------------------------
             // Start the browse using user-specified text
@@ -211,35 +214,31 @@ public class BrowseServlet extends DSpaceServlet
             if (browseDates)
             {
                 // if the date order is flipped, we'll keep the same focus
-                flipOrderingQuery = "starts_with=" +
-                                    URLEncoder.encode(startsWith, Constants.DEFAULT_ENCODING) + "&";
+                flipOrderingQuery = "starts_with="
+                        + URLEncoder.encode(startsWith,
+                                Constants.DEFAULT_ENCODING) + "&";
 
                 /*
                  * When the user is browsing with the most recent items first,
                  * the browse code algorithm doesn't quite do what some people
-                 * might expect.  For example, if in the index there are
-                 * entries:
-                 *
-                 * Mar-2000
-                 * 15-Feb-2000
-                 * 6-Feb-2000
-                 * 15-Jan-2000
-                 *
+                 * might expect. For example, if in the index there are entries:
+                 * 
+                 * Mar-2000 15-Feb-2000 6-Feb-2000 15-Jan-2000
+                 * 
                  * and the user has selected "Feb 2000" as the start point for
                  * the browse, the browse algorithm will start at the first
-                 * point in that index *after* "Feb 2000".  "Feb 2000" would
+                 * point in that index *after* "Feb 2000". "Feb 2000" would
                  * appear in the index above between 6-Feb-2000 and 15-Jan-2000.
                  * So, the browse code in this case will start the browse at
-                 * "15-Jan-2000".  This isn't really what users are likely to
-                 * want:  They're more likely to want the browse to start at
-                 * the first Feb 2000 date, i.e. 15-Feb-2000.  A similar
-                 * scenario occurs when the user enters just a year.
-                 * Our quick hack to produce this behaviour is to add "-32" to
-                 * the startsWith variable, when sorting with most recent items
-                 * first.  This means the browse code starts at the topmost
-                 * item in the index that matches the user's input, rather
-                 * than the point in the index where the user's input would
-                 * appear.
+                 * "15-Jan-2000". This isn't really what users are likely to
+                 * want: They're more likely to want the browse to start at the
+                 * first Feb 2000 date, i.e. 15-Feb-2000. A similar scenario
+                 * occurs when the user enters just a year. Our quick hack to
+                 * produce this behaviour is to add "-32" to the startsWith
+                 * variable, when sorting with most recent items first. This
+                 * means the browse code starts at the topmost item in the index
+                 * that matches the user's input, rather than the point in the
+                 * index where the user's input would appear.
                  */
                 if (!oldestFirst)
                 {
@@ -250,7 +249,8 @@ public class BrowseServlet extends DSpaceServlet
             scope.setFocus(startsWith);
             highlight = true;
             logInfo = "starts_with=" + startsWith + ",";
-        } else if ((top != null) || (bottom != null))
+        }
+        else if ((top != null) || (bottom != null))
         {
             // ----------------------------------------------
             // Paginating: put specified entry at top or bottom
@@ -269,16 +269,17 @@ public class BrowseServlet extends DSpaceServlet
             {
                 // Value will be a text value for author browse
                 scope.setFocus(val);
-            } else
+            }
+            else
             {
                 // Value is Handle if we're browsing items by title or date
                 Item item = (Item) HandleManager.resolveToObject(context, val);
 
                 if (item == null)
                 {
-                    // Handle is invalid one.  Show an error.
+                    // Handle is invalid one. Show an error.
                     JSPManager.showInvalidIDError(request, response, focus,
-                                                  Constants.ITEM);
+                            Constants.ITEM);
 
                     return;
                 }
@@ -299,12 +300,16 @@ public class BrowseServlet extends DSpaceServlet
                 // the top.
                 if (top != null)
                 {
-                    flipOrderingQuery = "bottom=" + URLEncoder.encode(top, Constants.DEFAULT_ENCODING) +
-                                        "&";
-                } else
+                    flipOrderingQuery = "bottom="
+                            + URLEncoder
+                                    .encode(top, Constants.DEFAULT_ENCODING)
+                            + "&";
+                }
+                else
                 {
-                    flipOrderingQuery = "top=" + URLEncoder.encode(bottom, Constants.DEFAULT_ENCODING) +
-                                        "&";
+                    flipOrderingQuery = "top="
+                            + URLEncoder.encode(bottom,
+                                    Constants.DEFAULT_ENCODING) + "&";
                 }
             }
         }
@@ -321,7 +326,8 @@ public class BrowseServlet extends DSpaceServlet
         {
             logInfo = logInfo + ",collection_id=" + collection.getID() + ",";
             scope.setScope(collection);
-        } else if (community != null)
+        }
+        else if (community != null)
         {
             logInfo = logInfo + ",community_id=" + community.getID() + ",";
             scope.setScope(community);
@@ -333,10 +339,12 @@ public class BrowseServlet extends DSpaceServlet
         if (browseAuthors)
         {
             browseInfo = Browse.getAuthors(scope);
-        } else if (browseDates)
+        }
+        else if (browseDates)
         {
             browseInfo = Browse.getItemsByDate(scope, oldestFirst);
-        } else
+        }
+        else
         {
             browseInfo = Browse.getItemsByTitle(scope);
         }
@@ -347,14 +355,14 @@ public class BrowseServlet extends DSpaceServlet
         if (browseAuthors)
         {
             what = "author";
-        } else if (browseDates)
+        }
+        else if (browseDates)
         {
             what = "date";
         }
 
-        log.info(LogManager.getHeader(context, "browse_" + what,
-                                      logInfo + "results=" +
-                                      browseInfo.getResultCount()));
+        log.info(LogManager.getHeader(context, "browse_" + what, logInfo
+                + "results=" + browseInfo.getResultCount()));
 
         if (browseInfo.getResultCount() == 0)
         {
@@ -363,7 +371,8 @@ public class BrowseServlet extends DSpaceServlet
             request.setAttribute("collection", collection);
 
             JSPManager.showJSP(request, response, "/browse/no-results.jsp");
-        } else
+        }
+        else
         {
             // Work out what the query strings will be for the previous
             // and next pages
@@ -377,7 +386,8 @@ public class BrowseServlet extends DSpaceServlet
                 if (browseAuthors)
                 {
                     s = (browseInfo.getStringResults())[0];
-                } else
+                }
+                else
                 {
                     Item firstItem = (browseInfo.getItemResults())[0];
                     s = firstItem.getHandle();
@@ -388,12 +398,14 @@ public class BrowseServlet extends DSpaceServlet
                     // For browsing by date, oldest first, we need
                     // to add the ordering parameter
                     request.setAttribute("previous.query",
-                                         "order=oldestfirst&bottom=" +
-                                         URLEncoder.encode(s, Constants.DEFAULT_ENCODING));
-                } else
+                            "order=oldestfirst&bottom="
+                                    + URLEncoder.encode(s,
+                                            Constants.DEFAULT_ENCODING));
+                }
+                else
                 {
-                    request.setAttribute("previous.query",
-                                         "bottom=" + URLEncoder.encode(s, Constants.DEFAULT_ENCODING));
+                    request.setAttribute("previous.query", "bottom="
+                            + URLEncoder.encode(s, Constants.DEFAULT_ENCODING));
                 }
             }
 
@@ -408,7 +420,8 @@ public class BrowseServlet extends DSpaceServlet
                 {
                     String[] authors = browseInfo.getStringResults();
                     s = authors[authors.length - 1];
-                } else
+                }
+                else
                 {
                     Item[] items = browseInfo.getItemResults();
                     Item lastItem = items[items.length - 1];
@@ -419,13 +432,13 @@ public class BrowseServlet extends DSpaceServlet
                 {
                     // For browsing by date, oldest first, we need
                     // to add the ordering parameter
-                    request.setAttribute("next.query",
-                                         "order=oldestfirst&top=" +
-                                         URLEncoder.encode(s, Constants.DEFAULT_ENCODING));
-                } else
+                    request.setAttribute("next.query", "order=oldestfirst&top="
+                            + URLEncoder.encode(s, Constants.DEFAULT_ENCODING));
+                }
+                else
                 {
-                    request.setAttribute("next.query",
-                                         "top=" + URLEncoder.encode(s, Constants.DEFAULT_ENCODING));
+                    request.setAttribute("next.query", "top="
+                            + URLEncoder.encode(s, Constants.DEFAULT_ENCODING));
                 }
             }
 
@@ -438,16 +451,18 @@ public class BrowseServlet extends DSpaceServlet
             if (browseAuthors)
             {
                 JSPManager.showJSP(request, response, "/browse/authors.jsp");
-            } else if (browseDates)
+            }
+            else if (browseDates)
             {
                 request.setAttribute("oldest.first", new Boolean(oldestFirst));
                 request.setAttribute("flip.ordering.query", flipOrderingQuery);
                 JSPManager.showJSP(request, response,
-                                   "/browse/items-by-date.jsp");
-            } else
+                        "/browse/items-by-date.jsp");
+            }
+            else
             {
                 JSPManager.showJSP(request, response,
-                                   "/browse/items-by-title.jsp");
+                        "/browse/items-by-title.jsp");
             }
         }
     }

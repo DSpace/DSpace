@@ -48,24 +48,24 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
-
 /**
- * A command-line tool for creating an initial administrator for setting up
- * a DSpace site.  Prompts for an e-mail address, last name, first name and
- * password from standard input.  An administrator group is then created and
- * the data passed in used to create an e-person in that group.
+ * A command-line tool for creating an initial administrator for setting up a
+ * DSpace site. Prompts for an e-mail address, last name, first name and
+ * password from standard input. An administrator group is then created and the
+ * data passed in used to create an e-person in that group.
  * <P>
  * Takes no arguments.
- *
- * @author   Robert Tansley
- * @version  $Revision$
+ * 
+ * @author Robert Tansley
+ * @version $Revision$
  */
 public class CreateAdministrator
 {
     /**
      * For invoking via the command line
-     *
-     * @param argv  command-line arguments
+     * 
+     * @param argv
+     *            command-line arguments
      */
     public static void main(String[] argv)
     {
@@ -133,7 +133,8 @@ public class CreateAdministrator
                     {
                         dataOK = true;
                     }
-                } else
+                }
+                else
                 {
                     System.out.println("Passwords don't match");
                 }
@@ -168,7 +169,8 @@ public class CreateAdministrator
             System.out.println("Administrator account created");
 
             System.exit(0);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             System.err.println("Exception occurred:" + e);
             e.printStackTrace();

@@ -49,25 +49,24 @@ import javax.servlet.http.HttpServletResponse;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
-
 /**
  * Interface allowing DSpace instances to provide custom authentication
- * procedures.  Each site can either use the default implementation to allow
+ * procedures. Each site can either use the default implementation to allow
  * simple password authentication, or provide a custom implementation,
  * specifying the class name of that implementation in <code>dspace.cfg</code>.
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Id$
  */
 public interface SiteAuthenticator
 {
     /**
-     * Start the authentication process.  <code>request</code> is the original
-     * request that led to the authentication process being invoked.  The
-     * data in the request has already been stored in the session when this
-     * is invoked, so this method can either redirect the user to a login
-     * screen, or if some other form of authentication is used, the user in
-     * the context can be set, and
+     * Start the authentication process. <code>request</code> is the original
+     * request that led to the authentication process being invoked. The data in
+     * the request has already been stored in the session when this is invoked,
+     * so this method can either redirect the user to a login screen, or if some
+     * other form of authentication is used, the user in the context can be set,
+     * and
      * <code>org.dspace.app.webui.util.UIUtil.resumeOriginalRequest<code> can
      * be invoked to continue the original operation.
      *
@@ -76,55 +75,62 @@ public interface SiteAuthenticator
      * @param response  the associated HTTP response
      */
     public void startAuthentication(Context context,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response)
-                             throws ServletException, IOException;
+            HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException;
 
     /**
-     * Indicate whether or not a particular user can self-register, based
-     * on e-mail address.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request, in case anything in that is used to
-     *                  decide
-     * @param email     e-mail address of user attempting to register
+     * Indicate whether or not a particular user can self-register, based on
+     * e-mail address.
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request, in case anything in that is used to decide
+     * @param email
+     *            e-mail address of user attempting to register
      */
     public boolean canSelfRegister(Context context, HttpServletRequest request,
-                                   String email) throws SQLException;
+            String email) throws SQLException;
 
     /**
      * Indicate whether or not a particular self-registering user can set
      * themselves a password in the profile info form.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request, in case anything in that is used to
-     *                  decide
-     * @param email     e-mail address of user attempting to register
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request, in case anything in that is used to decide
+     * @param email
+     *            e-mail address of user attempting to register
      */
     public boolean allowSetPassword(Context context,
-                                    HttpServletRequest request, String email)
-                             throws SQLException;
+            HttpServletRequest request, String email) throws SQLException;
 
     /**
      * Initialise a new e-person record for a self-registered new user.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request, in case it's needed
-     * @param eperson   newly created EPerson record - email + information
-     *                  from the registration form will have been filled out.
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request, in case it's needed
+     * @param eperson
+     *            newly created EPerson record - email + information from the
+     *            registration form will have been filled out.
      */
     public void initEPerson(Context context, HttpServletRequest request,
-                            EPerson eperson) throws SQLException;
+            EPerson eperson) throws SQLException;
 
     /**
-     * Work out if the current user is implicitly a member of any groups.
-     * This may include checking an IP address etc.
-     *
-     * @param context   current DSpace context object
-     * @param request   the request leading up to authentication being required
-     *
-     * @return  the IDs of groups the user is implicitly in
+     * Work out if the current user is implicitly a member of any groups. This
+     * may include checking an IP address etc.
+     * 
+     * @param context
+     *            current DSpace context object
+     * @param request
+     *            the request leading up to authentication being required
+     * 
+     * @return the IDs of groups the user is implicitly in
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
-                           throws SQLException;
+            throws SQLException;
 }

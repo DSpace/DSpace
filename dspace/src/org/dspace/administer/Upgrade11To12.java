@@ -47,17 +47,17 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 
-
 /**
  * Command-line tool for making changes to DSpace database when updating from
  * version 1.1/1.1.1 to 1.2.
  * <P>
  * The changes are:
- * <UL><LI>Setting owning collection field for items
- * <LI>Reorganising content bitstreams into one bundle named ORIGINAL,
- * license bitstreams into a bundle named LICENSE
- * <LI>Setting the sequence_id numbers in the bitstream table.  This happens
- * as item.update() is called on every item.
+ * <UL>
+ * <LI>Setting owning collection field for items
+ * <LI>Reorganising content bitstreams into one bundle named ORIGINAL, license
+ * bitstreams into a bundle named LICENSE
+ * <LI>Setting the sequence_id numbers in the bitstream table. This happens as
+ * item.update() is called on every item.
  * <LI>If a (newly-reorganised) 'ORIGINAL' bundle contains a text/html
  * bitstream, that bitstream is set to the primary bitstream for HTML support.
  * </UL>
@@ -91,9 +91,8 @@ public class Upgrade11To12
                 {
                     myItem.setOwningCollection(collections[q]);
                     myItem.update();
-                    System.out.println("Set owner of item " + myItem.getID() +
-                                       " to collection " +
-                                       collections[q].getID());
+                    System.out.println("Set owner of item " + myItem.getID()
+                            + " to collection " + collections[q].getID());
                 }
             }
         }
@@ -101,7 +100,7 @@ public class Upgrade11To12
         // commit pending transactions before continuing
         c.commit();
 
-        // now combine some bundles        
+        // now combine some bundles
         ii = Item.findAll(c);
 
         while (ii.hasNext())
@@ -109,8 +108,10 @@ public class Upgrade11To12
             boolean skipItem = false;
             Item myItem = ii.next();
 
-            int licenseBundleIndex = -1; // array index of license bundle (we'll skip this one often)
-            int primaryBundleIndex = -1; // array index of our primary bundle (all bitstreams assemble here)
+            int licenseBundleIndex = -1; // array index of license bundle (we'll
+                                         // skip this one often)
+            int primaryBundleIndex = -1; // array index of our primary bundle
+                                         // (all bitstreams assemble here)
 
             System.out.println("Processing item #: " + myItem.getID());
 
@@ -123,7 +124,8 @@ public class Upgrade11To12
                 // skip if bundle is already named
                 if (myBundles[i].getName() != null)
                 {
-                    System.out.println("Skipping this item - named bundles already found");
+                    System.out
+                            .println("Skipping this item - named bundles already found");
                     skipItem = true;
 
                     break;
@@ -131,10 +133,12 @@ public class Upgrade11To12
 
                 Bitstream[] bitstreams = myBundles[i].getBitstreams();
 
-                // skip this item if we already have bundles combined in this item
+                // skip this item if we already have bundles combined in this
+                // item
                 if (bitstreams.length > 1)
                 {
-                    System.out.println("Skipping this item - compound bundles already found");
+                    System.out
+                            .println("Skipping this item - compound bundles already found");
                     skipItem = true;
 
                     break;
@@ -151,14 +155,17 @@ public class Upgrade11To12
                     {
                         licenseBundleIndex = i;
                         System.out.println("License bundle set to: " + i);
-                    } else
+                    }
+                    else
                     {
-                        System.out.println("ERROR - multiple license bundles in item - skipping");
+                        System.out
+                                .println("ERROR - multiple license bundles in item - skipping");
                         skipItem = true;
 
                         break;
                     }
-                } else
+                }
+                else
                 {
                     // not a license, if primary isn't set yet, set it
                     if (primaryBundleIndex == -1)
@@ -188,26 +195,33 @@ public class Upgrade11To12
                 {
                     Bitstream[] bitstreams = myBundles[i].getBitstreams();
 
-                    // now we can safely assume no bundles with multiple bitstreams
+                    // now we can safely assume no bundles with multiple
+                    // bitstreams
                     if (bitstreams.length > 0)
                     {
-                        if ((i != primaryBundleIndex) &&
-                                (i != licenseBundleIndex))
+                        if ((i != primaryBundleIndex)
+                                && (i != licenseBundleIndex))
                         {
-                            // only option left is a bitstream to be combined with primary bundle
+                            // only option left is a bitstream to be combined
+                            // with primary bundle
                             // and remove now-redundant bundle
-                            myBundles[primaryBundleIndex].addBitstream(bitstreams[0]); // add to primary
-                            myItem.removeBundle(myBundles[i]); // remove this bundle
+                            myBundles[primaryBundleIndex]
+                                    .addBitstream(bitstreams[0]); // add to
+                                                                  // primary
+                            myItem.removeBundle(myBundles[i]); // remove this
+                                                               // bundle
 
-                            System.out.println("Bitstream from bundle " + i +
-                                               " moved to primary bundle");
+                            System.out.println("Bitstream from bundle " + i
+                                    + " moved to primary bundle");
 
                             // flag if HTML bitstream
-                            if (bitstreams[0].getFormat().getMIMEType().equals("text/html"))
+                            if (bitstreams[0].getFormat().getMIMEType().equals(
+                                    "text/html"))
                             {
-                                System.out.println("Set primary bitstream to HTML file in item #" +
-                                                   myItem.getID() +
-                                                   " for HTML support.");
+                                System.out
+                                        .println("Set primary bitstream to HTML file in item #"
+                                                + myItem.getID()
+                                                + " for HTML support.");
                             }
                         }
                     }

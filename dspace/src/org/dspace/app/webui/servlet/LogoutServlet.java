@@ -53,11 +53,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
-
 /**
  * Servlet that logs out any current user if invoked.
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class LogoutServlet extends DSpaceServlet
@@ -66,9 +65,8 @@ public class LogoutServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(LogoutServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         log.info(LogManager.getHeader(context, "logout", ""));
 

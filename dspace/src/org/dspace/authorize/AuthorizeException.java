@@ -41,17 +41,17 @@ package org.dspace.authorize;
 
 import org.dspace.content.DSpaceObject;
 
-
 /**
- * Exception indicating the current user of the context does not have
- * permission to perform a particular action.
- *
- * @author   David Stuve
- * @version  $Revision$
+ * Exception indicating the current user of the context does not have permission
+ * to perform a particular action.
+ * 
+ * @author David Stuve
+ * @version $Revision$
  */
 public class AuthorizeException extends Exception
 {
     private int myaction; // action attempted, or -1
+
     private DSpaceObject myobject; // object action attempted on or null
 
     /**
@@ -67,6 +67,7 @@ public class AuthorizeException extends Exception
 
     /**
      * create an exception with only a message
+     * 
      * @param message
      */
     public AuthorizeException(String message)
@@ -79,8 +80,9 @@ public class AuthorizeException extends Exception
 
     /**
      * Create an authorize exception with a message
-     *
-     * @param message  the message
+     * 
+     * @param message
+     *            the message
      */
     public AuthorizeException(String message, DSpaceObject o, int a)
     {

@@ -50,9 +50,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
-
 /**
  * Servlet for editing the front page news
+ * 
  * @author gcarpent
  */
 public class NewsEditServlet extends DSpaceServlet
@@ -60,18 +60,16 @@ public class NewsEditServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(NewsEditServlet.class);
 
     protected void doDSGet(Context c, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         //always go first to news-main.jsp
         JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
     }
 
     protected void doDSPost(Context c, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         //Get submit button
         String button = UIUtil.getSubmitButton(request, "submit");
@@ -93,8 +91,10 @@ public class NewsEditServlet extends DSpaceServlet
             request.setAttribute("news", news);
 
             //show news edit page
-            JSPManager.showJSP(request, response, "/dspace-admin/news-edit.jsp");
-        } else if (button.equals("submit_save"))
+            JSPManager
+                    .showJSP(request, response, "/dspace-admin/news-edit.jsp");
+        }
+        else if (button.equals("submit_save"))
         {
             //get text string from form
             news = (String) request.getParameter("news");
@@ -102,11 +102,14 @@ public class NewsEditServlet extends DSpaceServlet
             //write the string out to file
             ConfigurationManager.writeNewsFile(position, news);
 
-            JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
-        } else
+            JSPManager
+                    .showJSP(request, response, "/dspace-admin/news-main.jsp");
+        }
+        else
         {
             //the user hit cancel, so return to the main news edit page
-            JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
+            JSPManager
+                    .showJSP(request, response, "/dspace-admin/news-main.jsp");
         }
 
         c.complete();

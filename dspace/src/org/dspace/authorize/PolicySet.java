@@ -49,54 +49,47 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
-
 /**
- * Was Hack/Tool to set policies for items, bundles, and bitstreams.
- *  Now has helpful method, setPolicies();
- *
- * @author   dstuve
- * @version  $Revision$
+ * Was Hack/Tool to set policies for items, bundles, and bitstreams. Now has
+ * helpful method, setPolicies();
+ * 
+ * @author dstuve
+ * @version $Revision$
  */
 public class PolicySet
 {
     /**
-     *  Old code, kept around in case there's a need to bring a collection's
-     *   contents' policies in line with the collections'
+     * Old code, kept around in case there's a need to bring a collection's
+     * contents' policies in line with the collections'
+     * 
      * @param context
      * @param collection
      */
     public static void syncCollection_obsolete(Context c, Collection collection)
-                                        throws SQLException, AuthorizeException
+            throws SQLException, AuthorizeException
     {
-        /*        // find all items in a collection, and clone the collection's read policy
-                ItemIterator items = collection.getItems();
-
-                int mycount = 0;
-
-                List policies = AuthorizeManager.getPoliciesActionFilter(
-                    c, collection, Constants.READ);
-
-                if( policies.isEmpty() )
-                {
-                    System.out.println( "Error: collection has no READ policies" );
-                    return;
-                }
-
-                while( items.hasNext() )
-                {
-                    mycount++;
-
-                    Item i = items.next();
-                        System.out.println(mycount + ": Replacing policies for item " + i.getID() );
-
-                    i.replaceAllPolicies(policies);
-                }
-
-                // now do the logo bitstream also (great variable name :-)
-                Bitstream bs = collection.getLogo();
-                AuthorizeManager.removeAllPolicies(c, bs);
-                AuthorizeManager.addPolicies(c, policies, bs);
-        */
+        /*
+         * // find all items in a collection, and clone the collection's read
+         * policy ItemIterator items = collection.getItems();
+         * 
+         * int mycount = 0;
+         * 
+         * List policies = AuthorizeManager.getPoliciesActionFilter( c,
+         * collection, Constants.READ);
+         * 
+         * if( policies.isEmpty() ) { System.out.println( "Error: collection has
+         * no READ policies" ); return; }
+         * 
+         * while( items.hasNext() ) { mycount++;
+         * 
+         * Item i = items.next(); System.out.println(mycount + ": Replacing
+         * policies for item " + i.getID() );
+         * 
+         * i.replaceAllPolicies(policies); }
+         *  // now do the logo bitstream also (great variable name :-) Bitstream
+         * bs = collection.getLogo(); AuthorizeManager.removeAllPolicies(c, bs);
+         * AuthorizeManager.addPolicies(c, policies, bs);
+         */
     }
 
     /**
@@ -106,7 +99,8 @@ public class PolicySet
     {
         if (argv.length < 6)
         {
-            System.out.println("Args: containerType containerID contentType actionID groupID command");
+            System.out
+                    .println("Args: containerType containerID contentType actionID groupID command");
             System.out.println("container=COLLECTION command = ADD|REPLACE");
 
             return;
@@ -135,26 +129,31 @@ public class PolicySet
         // carnage begins here
         //////////////////////
         setPolicies(c, containertype, containerID, contenttype, actionID,
-                    groupID, isReplace, false);
+                groupID, isReplace, false);
 
         c.complete();
     }
 
     /**
-     * Useful policy wildcard tool.  Can set entire collections' contents'
-     *  policies
+     * Useful policy wildcard tool. Can set entire collections' contents'
+     * policies
+     * 
      * @param context
-     * @param container type, Constants.ITEM or Constants.COLLECTION
-     * @param container ID
-     * @param content type (BUNDLE, ITEM, or BITSTREAM)
-     * @param replace, removing old policies, or just add to existing policies
-     * @param just delete all policies for matching objects
+     * @param container
+     *            type, Constants.ITEM or Constants.COLLECTION
+     * @param container
+     *            ID
+     * @param content
+     *            type (BUNDLE, ITEM, or BITSTREAM)
+     * @param replace,
+     *            removing old policies, or just add to existing policies
+     * @param just
+     *            delete all policies for matching objects
      */
     public static void setPolicies(Context c, int containerType,
-                                   int containerID, int contentType,
-                                   int actionID, int groupID,
-                                   boolean isReplace, boolean clearOnly)
-                            throws SQLException, AuthorizeException
+            int containerID, int contentType, int actionID, int groupID,
+            boolean isReplace, boolean clearOnly) throws SQLException,
+            AuthorizeException
     {
         if (containerType == Constants.COLLECTION)
         {
@@ -188,7 +187,8 @@ public class PolicySet
                         rp.update();
                     }
                 }
-            } else if (contentType == Constants.BUNDLE)
+            }
+            else if (contentType == Constants.BUNDLE)
             {
                 // build list of all items in a collection
                 // build list of all bundles in those items
@@ -221,7 +221,8 @@ public class PolicySet
                         }
                     }
                 }
-            } else if (contentType == Constants.BITSTREAM)
+            }
+            else if (contentType == Constants.BITSTREAM)
             {
                 // build list of all bitstreams in a collection
                 // iterate over items, bundles, get bitstreams

@@ -60,13 +60,12 @@ import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 
-
 /**
  * Servlet for HTML bitstream support.
  * <P>
  * <code>/html/handle/filename</code>
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class HTMLServlet extends DSpaceServlet
@@ -75,9 +74,8 @@ public class HTMLServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(HTMLServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         Bitstream bitstream = null;
 
@@ -100,7 +98,8 @@ public class HTMLServlet extends DSpaceServlet
             if (slashIndex != -1)
             {
                 filename = idString.substring(slashIndex + 1);
-                filename = URLDecoder.decode(filename, Constants.DEFAULT_ENCODING);
+                filename = URLDecoder.decode(filename,
+                        Constants.DEFAULT_ENCODING);
                 handle = idString.substring(0, slashIndex);
             }
 
@@ -121,26 +120,31 @@ public class HTMLServlet extends DSpaceServlet
 
                 Item item = null;
 
-                /* If the original item doesn't have a Handle yet (because it's in
-                 * the workflow) what we actually have is a fake Handle in the form:
-                 * db-id/1234 where 1234 is the database ID of the item.
+                /*
+                 * If the original item doesn't have a Handle yet (because it's
+                 * in the workflow) what we actually have is a fake Handle in
+                 * the form: db-id/1234 where 1234 is the database ID of the
+                 * item.
                  */
                 if (handle.startsWith("db-id"))
                 {
-                    String dbIDString = handle.substring(handle.indexOf('/') +
-                                                         1);
+                    String dbIDString = handle
+                            .substring(handle.indexOf('/') + 1);
                     int dbID = Integer.parseInt(dbIDString);
                     item = Item.find(context, dbID);
-                } else
+                }
+                else
                 {
-                    item = (Item) HandleManager.resolveToObject(context, handle);
+                    item = (Item) HandleManager
+                            .resolveToObject(context, handle);
                 }
 
                 if (item == null)
                 {
                     log.info(LogManager.getHeader(context, "invalid_id",
-                                                  "path=" + handle));
-                    JSPManager.showInvalidIDError(request, response, handle, -1);
+                            "path=" + handle));
+                    JSPManager
+                            .showInvalidIDError(request, response, handle, -1);
 
                     return;
                 }
@@ -163,7 +167,8 @@ public class HTMLServlet extends DSpaceServlet
                         }
                     }
                 }
-            } catch (NumberFormatException nfe)
+            }
+            catch (NumberFormatException nfe)
             {
                 // Invalid ID - this will be dealt with below
             }
@@ -173,14 +178,14 @@ public class HTMLServlet extends DSpaceServlet
         if (bitstream != null)
         {
             log.info(LogManager.getHeader(context, "view_bitstream",
-                                          "bitstream_id=" + bitstream.getID()));
+                    "bitstream_id=" + bitstream.getID()));
 
             // Set the response MIME type
             response.setContentType(bitstream.getFormat().getMIMEType());
 
             // Response length
-            response.setHeader("Content-Length",
-                               String.valueOf(bitstream.getSize()));
+            response.setHeader("Content-Length", String.valueOf(bitstream
+                    .getSize()));
 
             // Pipe the bits
             InputStream is = bitstream.retrieve();
@@ -188,14 +193,15 @@ public class HTMLServlet extends DSpaceServlet
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();
             response.getOutputStream().flush();
-        } else
+        }
+        else
         {
             // No bitstream - we got an invalid ID
             log.info(LogManager.getHeader(context, "view_bitstream",
-                                          "invalid_bitstream_id=" + idString));
+                    "invalid_bitstream_id=" + idString));
 
             JSPManager.showInvalidIDError(request, response, idString,
-                                          Constants.BITSTREAM);
+                    Constants.BITSTREAM);
         }
     }
 }

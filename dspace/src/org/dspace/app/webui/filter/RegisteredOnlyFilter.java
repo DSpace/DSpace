@@ -58,12 +58,11 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
-
 /**
  * DSpace filter that only allows requests from individual authenticated users
- * to proceed.  Other requests prompt the authentication procedure.
- *
- * @author  Robert Tansley
+ * to proceed. Other requests prompt the authentication procedure.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class RegisteredOnlyFilter implements Filter
@@ -77,8 +76,7 @@ public class RegisteredOnlyFilter implements Filter
     }
 
     public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain)
-                  throws ServletException, IOException
+            FilterChain chain) throws ServletException, IOException
     {
         Context context = null;
 
@@ -95,15 +93,17 @@ public class RegisteredOnlyFilter implements Filter
             if (context.getCurrentUser() == null)
             {
                 Authenticate.startAuthentication(context, hrequest, hresponse);
-            } else
+            }
+            else
             {
                 // Allow request to proceed
                 chain.doFilter(hrequest, hresponse);
             }
-        } catch (SQLException se)
+        }
+        catch (SQLException se)
         {
-            log.warn(LogManager.getHeader(context, "database_error",
-                                          se.toString()), se);
+            log.warn(LogManager.getHeader(context, "database_error", se
+                    .toString()), se);
             JSPManager.showInternalError(hrequest, hresponse);
         }
 

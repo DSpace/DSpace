@@ -46,25 +46,24 @@ import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
-
 // FIXME: No tests
 // FIXME: Not very robust - assumes dates will always be valid
 
 /**
  * Dublin Core date utility class
  * <P>
- *  Dates in the DSpace database are held in the ISO 8601 format.  They are
- *  always stored in UTC, converting to and from the current time zone.
+ * Dates in the DSpace database are held in the ISO 8601 format. They are always
+ * stored in UTC, converting to and from the current time zone.
  * <P>
- *  <code>YYYY-MM-DDThh:mm:ss</code>
+ * <code>YYYY-MM-DDThh:mm:ss</code>
  * <P>
- *  There are four levels of granularity, depending on how much date information
- *  is available.
+ * There are four levels of granularity, depending on how much date information
+ * is available.
  * <P>
- *  Examples: <code>1994-05-03T15:30:24</code>, <code>1995-10-04</code>,
- *            <code>2001-10</code>, <code>1975</code>
- *
- * @author  Robert Tansley
+ * Examples: <code>1994-05-03T15:30:24</code>,<code>1995-10-04</code>,
+ * <code>2001-10</code>,<code>1975</code>
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class DCDate
@@ -75,14 +74,9 @@ public class DCDate
     /**
      * The month names
      */
-    private final static String[] MONTHNAMES = 
-                                               {
-                                                   "January", "February",
-                                                   "March", "April", "May",
-                                                   "June", "July", "August",
-                                                   "September", "October",
-                                                   "November", "December"
-                                               };
+    private final static String[] MONTHNAMES = { "January", "February",
+            "March", "April", "May", "June", "July", "August", "September",
+            "October", "November", "December" };
 
     /** The year, or -1 if none */
     private int year;
@@ -103,8 +97,8 @@ public class DCDate
     private int seconds;
 
     /**
-     * Calendar object for timezone conversion.  Only used if the date
-     * has a time component.
+     * Calendar object for timezone conversion. Only used if the date has a time
+     * component.
      */
     private GregorianCalendar localGC;
 
@@ -120,9 +114,9 @@ public class DCDate
 
     /**
      * Construct a date from a Dublin Core value
-     *
-     * @param fromDC  the date string, in ISO 8601 (no timezone,
-     *                always use UTC/GMT)
+     * 
+     * @param fromDC
+     *            the date string, in ISO 8601 (no timezone, always use UTC/GMT)
      */
     public DCDate(String fromDC)
     {
@@ -140,29 +134,30 @@ public class DCDate
         {
             switch (fromDC.length())
             {
-                case 20:
+            case 20:
 
-                    // Full date and time
-                    hours = Integer.parseInt(fromDC.substring(11, 13));
-                    minutes = Integer.parseInt(fromDC.substring(14, 16));
-                    seconds = Integer.parseInt(fromDC.substring(17, 19));
+                // Full date and time
+                hours = Integer.parseInt(fromDC.substring(11, 13));
+                minutes = Integer.parseInt(fromDC.substring(14, 16));
+                seconds = Integer.parseInt(fromDC.substring(17, 19));
 
-                case 10:
+            case 10:
 
-                    // Just full date
-                    day = Integer.parseInt(fromDC.substring(8, 10));
+                // Just full date
+                day = Integer.parseInt(fromDC.substring(8, 10));
 
-                case 7:
+            case 7:
 
-                    // Just year and month
-                    month = Integer.parseInt(fromDC.substring(5, 7));
+                // Just year and month
+                month = Integer.parseInt(fromDC.substring(5, 7));
 
-                case 4:
+            case 4:
 
-                    // Just the year
-                    year = Integer.parseInt(fromDC.substring(0, 4));
+                // Just the year
+                year = Integer.parseInt(fromDC.substring(0, 4));
             }
-        } catch (NumberFormatException e)
+        }
+        catch (NumberFormatException e)
         {
             // Mangled date
             cat.warn("Mangled date: " + fromDC + "  Exception: " + e);
@@ -172,8 +167,9 @@ public class DCDate
 
     /**
      * Construct a date object from a Java <code>Date</code> object.
-     *
-     * @param date   the Java <code>Date</code> object.
+     * 
+     * @param date
+     *            the Java <code>Date</code> object.
      */
     public DCDate(Date date)
     {
@@ -183,19 +179,19 @@ public class DCDate
 
         // Set all fields
         setDateLocal(calendar.get(Calendar.YEAR),
-                     
+
         // Uses 1 to 12 implementation below instead of Java's
-        // 0 to 11 convention
-        calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
-                     calendar.get(Calendar.HOUR_OF_DAY),
-                     calendar.get(Calendar.MINUTE),
-                     calendar.get(Calendar.SECOND));
+                // 0 to 11 convention
+                calendar.get(Calendar.MONTH) + 1, calendar
+                        .get(Calendar.DAY_OF_MONTH), calendar
+                        .get(Calendar.HOUR_OF_DAY), calendar
+                        .get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
     }
 
     /**
      * Get a date representing the current instant in time.
-     *
-     * @return  a DSpaceDate object representing the current instant.
+     * 
+     * @return a DSpaceDate object representing the current instant.
      */
     public static DCDate getCurrent()
     {
@@ -204,8 +200,8 @@ public class DCDate
 
     /**
      * Get the date as a string to put back in the Dublin Core
-     *
-     * @return  The date as a string.
+     * 
+     * @return The date as a string.
      */
     public String toString()
     {
@@ -228,9 +224,9 @@ public class DCDate
 
         if (hours > 0)
         {
-            sb.append("T").append(fleshOut(hours)).append(':')
-              .append(fleshOut(minutes)).append(':').append(fleshOut(seconds))
-              .append("Z");
+            sb.append("T").append(fleshOut(hours)).append(':').append(
+                    fleshOut(minutes)).append(':').append(fleshOut(seconds))
+                    .append("Z");
         }
 
         return (sb.toString());
@@ -238,12 +234,13 @@ public class DCDate
 
     /**
      * Get the date as a Java Date object
-     *
+     * 
      * @return a Date object
      */
     public Date toDate()
     {
-        GregorianCalendar utcGC = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        GregorianCalendar utcGC = new GregorianCalendar(TimeZone
+                .getTimeZone("UTC"));
 
         utcGC.set(year, month - 1, day, hours, minutes, seconds);
 
@@ -251,16 +248,22 @@ public class DCDate
     }
 
     /**
-     * Set the date.  The date passed in is assumed to be in the current
-     * time zone, and is adjusting to fit the current time zone.
-     * Unknown values should be given as -1.
-     *
-     * @param yyyy   the year
-     * @param mm     the month
-     * @param dd     the day
-     * @param hh     the hours
-     * @param mn     the minutes
-     * @param ss     the seconds
+     * Set the date. The date passed in is assumed to be in the current time
+     * zone, and is adjusting to fit the current time zone. Unknown values
+     * should be given as -1.
+     * 
+     * @param yyyy
+     *            the year
+     * @param mm
+     *            the month
+     * @param dd
+     *            the day
+     * @param hh
+     *            the hours
+     * @param mn
+     *            the minutes
+     * @param ss
+     *            the seconds
      */
     public void setDateLocal(int yyyy, int mm, int dd, int hh, int mn, int ss)
     {
@@ -269,7 +272,8 @@ public class DCDate
         if (yyyy > 0)
         {
             year = yyyy;
-        } else
+        }
+        else
         {
             return;
         }
@@ -277,7 +281,8 @@ public class DCDate
         if (mm > 0)
         {
             month = mm;
-        } else
+        }
+        else
         {
             return;
         }
@@ -285,7 +290,8 @@ public class DCDate
         if (dd > 0)
         {
             day = dd;
-        } else
+        }
+        else
         {
             return;
         }
@@ -299,7 +305,8 @@ public class DCDate
         localGC = new GregorianCalendar(year, month - 1, day, hh, mn, ss);
 
         // Adjust to UTC
-        GregorianCalendar utcGC = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        GregorianCalendar utcGC = new GregorianCalendar(TimeZone
+                .getTimeZone("UTC"));
 
         utcGC.setTime(localGC.getTime());
 
@@ -315,10 +322,9 @@ public class DCDate
 
     /**
      * Get the date as an array of ints, adjusted for the current timezone
-     *
-     * @return the date an an array:
-     *         ( year, month, day, hour, minute, seconds) - unset
-     *         fields are given a value of -1.
+     * 
+     * @return the date an an array: ( year, month, day, hour, minute, seconds) -
+     *         unset fields are given a value of -1.
      */
     private int[] getDateLocal()
     {
@@ -331,26 +337,25 @@ public class DCDate
         // We have a full time, adjust to current timezone
         if (localGC == null)
         {
-            GregorianCalendar utcGC = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+            GregorianCalendar utcGC = new GregorianCalendar(TimeZone
+                    .getTimeZone("UTC"));
 
             utcGC.set(year, month - 1, day, hours, minutes, seconds);
             localGC = new GregorianCalendar();
             localGC.setTime(utcGC.getTime());
         }
 
-        return new int[]
-               {
-                   localGC.get(Calendar.YEAR), localGC.get(Calendar.MONTH) + 1,
-                   localGC.get(Calendar.DAY_OF_MONTH),
-                   localGC.get(Calendar.HOUR_OF_DAY),
-                   localGC.get(Calendar.MINUTE), localGC.get(Calendar.SECOND)
-               };
+        return new int[] { localGC.get(Calendar.YEAR),
+                localGC.get(Calendar.MONTH) + 1,
+                localGC.get(Calendar.DAY_OF_MONTH),
+                localGC.get(Calendar.HOUR_OF_DAY),
+                localGC.get(Calendar.MINUTE), localGC.get(Calendar.SECOND) };
     }
 
     /**
      * Get the year, adjusting for current time zone.
-     *
-     * @return  the year
+     * 
+     * @return the year
      */
     public int getYear()
     {
@@ -359,8 +364,8 @@ public class DCDate
 
     /**
      * Get the month, adjusting for current time zone.
-     *
-     * @return  the month
+     * 
+     * @return the month
      */
     public int getMonth()
     {
@@ -369,8 +374,8 @@ public class DCDate
 
     /**
      * Get the day, adjusting for current time zone.
-     *
-     * @return  the day
+     * 
+     * @return the day
      */
     public int getDay()
     {
@@ -379,8 +384,8 @@ public class DCDate
 
     /**
      * Get the hour, adjusting for current time zone.
-     *
-     * @return  the hour
+     * 
+     * @return the hour
      */
     public int getHour()
     {
@@ -389,8 +394,8 @@ public class DCDate
 
     /**
      * Get the minute, adjusting for current time zone.
-     *
-     * @return  the minute
+     * 
+     * @return the minute
      */
     public int getMinute()
     {
@@ -399,8 +404,8 @@ public class DCDate
 
     /**
      * Get the second, adjusting for current time zone.
-     *
-     * @return  the second
+     * 
+     * @return the second
      */
     public int getSecond()
     {
@@ -409,10 +414,9 @@ public class DCDate
 
     /**
      * Get the date as an array of ints in GMT
-     *
-     * @return the date an an array:
-     *         ( year, month, day, hour, minute, seconds) - unset
-     *         fields are given a value of -1.
+     * 
+     * @return the date an an array: ( year, month, day, hour, minute, seconds) -
+     *         unset fields are given a value of -1.
      */
     private int[] getDateGMT()
     {
@@ -421,8 +425,8 @@ public class DCDate
 
     /**
      * Get the year in GMT.
-     *
-     * @return  the year
+     * 
+     * @return the year
      */
     public int getYearGMT()
     {
@@ -431,8 +435,8 @@ public class DCDate
 
     /**
      * Get the month in GMT.
-     *
-     * @return  the month
+     * 
+     * @return the month
      */
     public int getMonthGMT()
     {
@@ -441,8 +445,8 @@ public class DCDate
 
     /**
      * Get the day in GMT.
-     *
-     * @return  the day
+     * 
+     * @return the day
      */
     public int getDayGMT()
     {
@@ -451,8 +455,8 @@ public class DCDate
 
     /**
      * Get the hour in GMT.
-     *
-     * @return  the hour
+     * 
+     * @return the hour
      */
     public int getHourGMT()
     {
@@ -461,8 +465,8 @@ public class DCDate
 
     /**
      * Get the minute in GMT.
-     *
-     * @return  the minute
+     * 
+     * @return the minute
      */
     public int getMinuteGMT()
     {
@@ -471,8 +475,8 @@ public class DCDate
 
     /**
      * Get the second in GMT.
-     *
-     * @return  the second
+     * 
+     * @return the second
      */
     public int getSecondGMT()
     {
@@ -481,27 +485,30 @@ public class DCDate
 
     /**
      * Flesh out a number to two digits
-     *
-     * @param  n   the number
-     * @return   the number as a two-digit string
+     * 
+     * @param n
+     *            the number
+     * @return the number as a two-digit string
      */
     private String fleshOut(int n)
     {
         if (n < 10)
         {
             return "0" + n;
-        } else
+        }
+        else
         {
             return String.valueOf(n);
         }
     }
 
     /**
-     * Get a month's name for a month between 1 and 12.  Any invalid
-     * month value (e.g. 0 or -1) will return a value of "Unspecified".
-     *
-     * @param m  the month number
-     *
+     * Get a month's name for a month between 1 and 12. Any invalid month value
+     * (e.g. 0 or -1) will return a value of "Unspecified".
+     * 
+     * @param m
+     *            the month number
+     * 
      * @return the month name.
      */
     public static String getMonthName(int m)
@@ -509,7 +516,8 @@ public class DCDate
         if ((m > 0) && (m < 13))
         {
             return MONTHNAMES[m - 1];
-        } else
+        }
+        else
         {
             return "Unspecified";
         }

@@ -39,7 +39,6 @@
  */
 package org.dspace.authorize;
 
-
 //import org.dspace.browse.Browse;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -52,14 +51,13 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
-
 /**
  * Command line tool to locate collections without default item and bitstream
- *  read policies, and assign them some.  (They must be there for submitted
- *  items to inherit.)
- *
- * @author   dstuve
- * @version  $Revision$
+ * read policies, and assign them some. (They must be there for submitted items
+ * to inherit.)
+ * 
+ * @author dstuve
+ * @version $Revision$
  */
 public class FixDefaultPolicies
 {
@@ -88,7 +86,8 @@ public class FixDefaultPolicies
             if (checkForPolicy(c, t, Constants.READ))
             {
                 System.out.println("\tFound READ policies!");
-            } else
+            }
+            else
             {
                 System.out.println("\tNo READ policy found, adding anonymous.");
                 addAnonymousPolicy(c, t, Constants.READ);
@@ -97,18 +96,22 @@ public class FixDefaultPolicies
             if (checkForPolicy(c, t, Constants.DEFAULT_ITEM_READ))
             {
                 System.out.println("\tFound DEFAULT_ITEM_READ policies!");
-            } else
+            }
+            else
             {
-                System.out.println("\tNo DEFAULT_ITEM_READ policy found, adding anonymous.");
+                System.out
+                        .println("\tNo DEFAULT_ITEM_READ policy found, adding anonymous.");
                 addAnonymousPolicy(c, t, Constants.DEFAULT_ITEM_READ);
             }
 
             if (checkForPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ))
             {
                 System.out.println("\tFound DEFAULT_BITSTREAM_READ policies!");
-            } else
+            }
+            else
             {
-                System.out.println("\tNo DEFAULT_BITSTREAM_READ policy found, adding anonymous.");
+                System.out
+                        .println("\tNo DEFAULT_BITSTREAM_READ policy found, adding anonymous.");
                 addAnonymousPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ);
             }
         }
@@ -126,7 +129,8 @@ public class FixDefaultPolicies
             if (checkForPolicy(c, t, Constants.READ))
             {
                 System.out.println("\tFound READ policies!");
-            } else
+            }
+            else
             {
                 System.out.println("\tNo READ policy found, adding anonymous.");
                 addAnonymousPolicy(c, t, Constants.READ);
@@ -140,22 +144,22 @@ public class FixDefaultPolicies
      * check to see if a collection has any policies for a given action
      */
     private static boolean checkForPolicy(Context c, DSpaceObject t,
-                                          int myaction)
-                                   throws SQLException
+            int myaction) throws SQLException
     {
         // check to see if any policies exist for this action
-        List policies = AuthorizeManager.getPoliciesActionFilter(c, t, myaction);
+        List policies = AuthorizeManager
+                .getPoliciesActionFilter(c, t, myaction);
         Iterator i = policies.iterator();
 
         return i.hasNext();
     }
 
     /**
-     * add an anonymous group permission policy to the collection for this action
+     * add an anonymous group permission policy to the collection for this
+     * action
      */
     private static void addAnonymousPolicy(Context c, DSpaceObject t,
-                                           int myaction)
-                                    throws SQLException, AuthorizeException
+            int myaction) throws SQLException, AuthorizeException
     {
         // group 0 is the anonymous group!
         Group anonymousGroup = Group.find(c, 0);

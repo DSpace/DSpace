@@ -39,20 +39,19 @@
  */
 package org.dspace.content;
 
-
 /**
- * Simple data structure-like class representing a Dublin Core value.
- * It had an element, qualifier, value and language.
- *
- * @author   Robert Tansley
- * @version  $Revision$
+ * Simple data structure-like class representing a Dublin Core value. It had an
+ * element, qualifier, value and language.
+ * 
+ * @author Robert Tansley
+ * @version $Revision$
  */
 public class DCValue
 {
     /** The DC element */
     public String element;
 
-    /** The DC qualifier, or <code>null</code> if unqualified*/
+    /** The DC qualifier, or <code>null</code> if unqualified */
     public String qualifier;
 
     /** The value of the field */

@@ -48,19 +48,19 @@ import org.dspace.search.HarvestedItemInfo;
 import ORG.oclc.oai.server.crosswalk.Crosswalk;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 
-
 /**
- * An OAICat Crosswalk implementation that extracts unqualified Dublin Core
- * from DSpace items into the oai_dc format.
- *
- * @author  Robert Tansley
+ * An OAICat Crosswalk implementation that extracts unqualified Dublin Core from
+ * DSpace items into the oai_dc format.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class OAIDCCrosswalk extends Crosswalk
 {
     public OAIDCCrosswalk(Properties properties)
     {
-        super("http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
+        super(
+                "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
     }
 
     public boolean isAvailableFor(Object nativeItem)
@@ -70,7 +70,7 @@ public class OAIDCCrosswalk extends Crosswalk
     }
 
     public String createMetadata(Object nativeItem)
-                          throws CannotDisseminateFormatException
+            throws CannotDisseminateFormatException
     {
         Item item = ((HarvestedItemInfo) nativeItem).item;
 
@@ -79,26 +79,30 @@ public class OAIDCCrosswalk extends Crosswalk
 
         StringBuffer metadata = new StringBuffer();
 
-        metadata.append("<oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" ")
+        metadata
+                .append(
+                        "<oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" ")
                 .append("xmlns:dc=\"http://purl.org/dc/elements/1.1/\" ")
-                .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
-                .append("xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">");
+                .append(
+                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
+                .append(
+                        "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">");
 
         for (int i = 0; i < allDC.length; i++)
         {
             // Do not include description.provenance
             boolean description = allDC[i].element.equals("description");
-            boolean provenance = (allDC[i].qualifier != null) &&
-                                 allDC[i].qualifier.equals("provenance");
+            boolean provenance = (allDC[i].qualifier != null)
+                    && allDC[i].qualifier.equals("provenance");
 
             if (!(description && provenance))
             {
                 String element = allDC[i].element;
 
                 // contributor.author exposed as 'creator'
-                if (allDC[i].element.equals("contributor") &&
-                        (allDC[i].qualifier != null) &&
-                        allDC[i].qualifier.equals("author"))
+                if (allDC[i].element.equals("contributor")
+                        && (allDC[i].qualifier != null)
+                        && allDC[i].qualifier.equals("author"))
                 {
                     element = "creator";
                 }
@@ -112,24 +116,24 @@ public class OAIDCCrosswalk extends Crosswalk
 
                 while ((c = value.indexOf("&", c + 1)) > -1)
                 {
-                    value = value.substring(0, c) + "&amp;" +
-                            value.substring(c + 1);
+                    value = value.substring(0, c) + "&amp;"
+                            + value.substring(c + 1);
                 }
 
                 while ((c = value.indexOf("<")) > -1)
                 {
-                    value = value.substring(0, c) + "&lt;" +
-                            value.substring(c + 1);
+                    value = value.substring(0, c) + "&lt;"
+                            + value.substring(c + 1);
                 }
 
                 while ((c = value.indexOf(">")) > -1)
                 {
-                    value = value.substring(0, c) + "&gt;" +
-                            value.substring(c + 1);
+                    value = value.substring(0, c) + "&gt;"
+                            + value.substring(c + 1);
                 }
 
-                metadata.append("<dc:").append(element).append(">").append(value)
-                        .append("</dc:").append(element).append(">");
+                metadata.append("<dc:").append(element).append(">").append(
+                        value).append("</dc:").append(element).append(">");
             }
         }
 

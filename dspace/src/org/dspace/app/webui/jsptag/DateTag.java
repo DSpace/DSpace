@@ -47,13 +47,11 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.DCDate;
 
-
 /**
- * Date rendering tag for DCDates.  Takes two parameter - "date", a DCDate,
- * and "notime", which, if present, means the date is rendered without the
- * time
- *
- * @author  Robert Tansley
+ * Date rendering tag for DCDates. Takes two parameter - "date", a DCDate, and
+ * "notime", which, if present, means the date is rendered without the time
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class DateTag extends TagSupport
@@ -66,8 +64,8 @@ public class DateTag extends TagSupport
 
     /**
      * Get the date
-     *
-     * @return  the date to display
+     * 
+     * @return the date to display
      */
     public DCDate getDate()
     {
@@ -76,8 +74,9 @@ public class DateTag extends TagSupport
 
     /**
      * Set the date
-     *
-     * @param s  the date to display
+     * 
+     * @param s
+     *            the date to display
      */
     public void setDate(DCDate d)
     {
@@ -86,8 +85,8 @@ public class DateTag extends TagSupport
 
     /**
      * Get the "don't display the time" flag
-     *
-     * @return  the date to display
+     * 
+     * @return the date to display
      */
     public String getNotime()
     {
@@ -97,8 +96,9 @@ public class DateTag extends TagSupport
 
     /**
      * Set the "don't display the time" flag
-     *
-     * @param dummy   can be anything - always sets the flag if present
+     * 
+     * @param dummy
+     *            can be anything - always sets the flag if present
      */
     public void setNotime(String dummy)
     {
@@ -112,7 +112,8 @@ public class DateTag extends TagSupport
         try
         {
             pageContext.getOut().print(toDisplay);
-        } catch (IOException ie)
+        }
+        catch (IOException ie)
         {
             throw new JspException(ie);
         }

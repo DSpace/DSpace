@@ -57,12 +57,11 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
  * Class representing an item going through the workflow process in DSpace
- *
- * @author   Robert Tansley
- * @version  $Revision$
+ * 
+ * @author Robert Tansley
+ * @version $Revision$
  */
 public class WorkflowItem implements InProgressSubmission
 {
@@ -86,9 +85,11 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * Construct a workspace item corresponding to the given database row
-     *
-     * @param context  the context this object exists in
-     * @param row      the database row
+     * 
+     * @param context
+     *            the context this object exists in
+     * @param row
+     *            the database row
      */
     WorkflowItem(Context context, TableRow row) throws SQLException
     {
@@ -96,13 +97,14 @@ public class WorkflowItem implements InProgressSubmission
         wfRow = row;
 
         item = Item.find(context, wfRow.getIntColumn("item_id"));
-        collection = Collection.find(context,
-                                     wfRow.getIntColumn("collection_id"));
+        collection = Collection.find(context, wfRow
+                .getIntColumn("collection_id"));
 
         if (wfRow.isColumnNull("owner"))
         {
             owner = null;
-        } else
+        }
+        else
         {
             owner = EPerson.find(context, wfRow.getIntColumn("owner"));
         }
@@ -112,20 +114,22 @@ public class WorkflowItem implements InProgressSubmission
     }
 
     /**
-     * Get a workflow item from the database.  The item, collection and
-     * submitter are loaded into memory.
-     *
-     * @param  context  DSpace context object
-     * @param  id       ID of the workspace item
-     *
-     * @return  the workflow item, or null if the ID is invalid.
+     * Get a workflow item from the database. The item, collection and submitter
+     * are loaded into memory.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param id
+     *            ID of the workspace item
+     * 
+     * @return the workflow item, or null if the ID is invalid.
      */
     public static WorkflowItem find(Context context, int id)
-                             throws SQLException
+            throws SQLException
     {
         // First check the cache
-        WorkflowItem fromCache = (WorkflowItem) context.fromCache(WorkflowItem.class,
-                                                                  id);
+        WorkflowItem fromCache = (WorkflowItem) context.fromCache(
+                WorkflowItem.class, id);
 
         if (fromCache != null)
         {
@@ -139,16 +143,17 @@ public class WorkflowItem implements InProgressSubmission
             if (log.isDebugEnabled())
             {
                 log.debug(LogManager.getHeader(context, "find_workflow_item",
-                                               "not_found,workflow_id=" + id));
+                        "not_found,workflow_id=" + id));
             }
 
             return null;
-        } else
+        }
+        else
         {
             if (log.isDebugEnabled())
             {
                 log.debug(LogManager.getHeader(context, "find_workflow_item",
-                                               "workflow_id=" + id));
+                        "workflow_id=" + id));
             }
 
             return new WorkflowItem(context, row);
@@ -157,6 +162,7 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * return all workflowitems
+     * 
      * @param context
      * @return WorkflowItem [] of all workflows in system
      */
@@ -164,7 +170,7 @@ public class WorkflowItem implements InProgressSubmission
     {
         List wfItems = new ArrayList();
         TableRowIterator tri = DatabaseManager.query(c, "workflowitem",
-                                                     "SELECT * FROM workflowitem");
+                "SELECT * FROM workflowitem");
 
         // make a list of workflow items
         while (tri.hasNext())
@@ -182,33 +188,34 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * Get all workflow items that were original submissions by a particular
-     * e-person.  These are ordered by workflow ID, since this should likely
-     * keep them in the order in which they were created.
-     *
-     * @param context   the context object
-     * @param ep        the eperson
-     *
-     * @return  the corresponding workflow items
+     * e-person. These are ordered by workflow ID, since this should likely keep
+     * them in the order in which they were created.
+     * 
+     * @param context
+     *            the context object
+     * @param ep
+     *            the eperson
+     * 
+     * @return the corresponding workflow items
      */
     public static WorkflowItem[] findByEPerson(Context context, EPerson ep)
-                                        throws SQLException
+            throws SQLException
     {
         List wfItems = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context, "workflowitem",
-                                                     "SELECT workflowitem.* FROM workflowitem, item WHERE " +
-                                                     "workflowitem.item_id=item.item_id AND " +
-                                                     "item.submitter_id=" +
-                                                     ep.getID() +
-                                                     " ORDER BY workflowitem.workflow_id");
+                "SELECT workflowitem.* FROM workflowitem, item WHERE "
+                        + "workflowitem.item_id=item.item_id AND "
+                        + "item.submitter_id=" + ep.getID()
+                        + " ORDER BY workflowitem.workflow_id");
 
         while (tri.hasNext())
         {
             TableRow row = tri.next();
 
             // Check the cache
-            WorkflowItem wi = (WorkflowItem) context.fromCache(WorkflowItem.class,
-                                                               row.getIntColumn("workflow_id"));
+            WorkflowItem wi = (WorkflowItem) context.fromCache(
+                    WorkflowItem.class, row.getIntColumn("workflow_id"));
 
             if (wi == null)
             {
@@ -226,31 +233,32 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * Get all workflow items for a particular collection.
-     *
-     * @param context   the context object
-     * @param c         the collection
-     *
-     * @return  array of the corresponding workflow items
+     * 
+     * @param context
+     *            the context object
+     * @param c
+     *            the collection
+     * 
+     * @return array of the corresponding workflow items
      */
     public static WorkflowItem[] findByCollection(Context context, Collection c)
-                                           throws SQLException
+            throws SQLException
     {
         List wsItems = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context, "workflowitem",
-                                                     "SELECT workflowitem.* FROM workflowitem WHERE " +
-                                                     "workflowitem.collection_id=" +
-                                                     c.getID());
+                "SELECT workflowitem.* FROM workflowitem WHERE "
+                        + "workflowitem.collection_id=" + c.getID());
 
         while (tri.hasNext())
         {
             TableRow row = tri.next();
 
             // Check the cache
-            WorkflowItem wi = (WorkflowItem) context.fromCache(WorkflowItem.class,
-                                                               row.getIntColumn("workflow_id"));
+            WorkflowItem wi = (WorkflowItem) context.fromCache(
+                    WorkflowItem.class, row.getIntColumn("workflow_id"));
 
-            // not in cache?  turn row into workflowitem
+            // not in cache? turn row into workflowitem
             if (wi == null)
             {
                 wi = new WorkflowItem(context, row);
@@ -267,7 +275,7 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * Get the internal ID of this workflow item
-     *
+     * 
      * @return the internal identifier
      */
     public int getID()
@@ -277,6 +285,7 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * get owner of WorkflowItem
+     * 
      * @return EPerson owner
      */
     public EPerson getOwner()
@@ -286,7 +295,9 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * set owner of WorkflowItem
-     * @param EPerson owner
+     * 
+     * @param EPerson
+     *            owner
      */
     public void setOwner(EPerson ep)
     {
@@ -295,7 +306,8 @@ public class WorkflowItem implements InProgressSubmission
         if (ep == null)
         {
             wfRow.setColumnNull("owner");
-        } else
+        }
+        else
         {
             wfRow.setColumn("owner", ep.getID());
         }
@@ -303,6 +315,7 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * Get state of WorkflowItem
+     * 
      * @return state
      */
     public int getState()
@@ -312,7 +325,9 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * Set state of WorkflowItem
-     * @param new state
+     * 
+     * @param new
+     *            state
      */
     public void setState(int newstate)
     {
@@ -326,7 +341,7 @@ public class WorkflowItem implements InProgressSubmission
     {
         // FIXME check auth
         log.info(LogManager.getHeader(ourContext, "update_workflow_item",
-                                      "workflow_item_id=" + getID()));
+                "workflow_item_id=" + getID()));
 
         // Update the item
         item.update();
@@ -335,22 +350,20 @@ public class WorkflowItem implements InProgressSubmission
         DatabaseManager.update(ourContext, wfRow);
 
         HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY,
-                                   ourContext.getCurrentUser(),
-                                   ourContext.getExtraLogInfo());
+                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
     }
 
     /**
      * delete the WorkflowItem, retaining the Item
      */
-    public void deleteWrapper()
-                       throws SQLException, IOException, AuthorizeException
+    public void deleteWrapper() throws SQLException, IOException,
+            AuthorizeException
     {
         // Remove from cache
         ourContext.removeCached(this, getID());
 
         HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
-                                   ourContext.getCurrentUser(),
-                                   ourContext.getExtraLogInfo());
+                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
 
         // delete any pending tasks
         WorkflowManager.deleteTasks(ourContext, this);

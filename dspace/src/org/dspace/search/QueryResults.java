@@ -43,18 +43,24 @@ package org.dspace.search;
 
 import java.util.List;
 
-
 /**
- * Contains the results of a query.  Use access methods to examine
- *  and retrieve the results.
+ * Contains the results of a query. Use access methods to examine and retrieve
+ * the results.
  */
 public class QueryResults
 {
     private int hitCount; // total hits returned by search engine
+
     private int start; // offset of query 'page'
+
     private int pageSize; // max number of hits returned
-    private List hitHandles; // handles of content (items, collections, communities)
-    private List hitTypes; // Integers from Constants defng types of corresponding handles 
+
+    private List hitHandles; // handles of content (items, collections,
+                             // communities)
+
+    private List hitTypes; // Integers from Constants defng types of
+                           // corresponding handles
+
     private String errorMsg; //error string, if there is one
 
     /** set total number of hits found by search engine, not number in hitHandles */
@@ -63,7 +69,10 @@ public class QueryResults
         hitCount = newCount;
     }
 
-    /** get total number of hits found by search engine, not just number of returned results */
+    /**
+     * get total number of hits found by search engine, not just number of
+     * returned results
+     */
     public int getHitCount()
     {
         return hitCount;

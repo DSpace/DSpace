@@ -48,11 +48,10 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.dspace.content.Community;
 
-
 /**
  * Tag for display a list of communities
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class CommunityListTag extends TagSupport
@@ -74,8 +73,8 @@ public class CommunityListTag extends TagSupport
             out.println("<table align=center class=\"miscTable\">");
 
             // Write column headings
-            out.print("<tr><th class=\"oddRowOddCol\">" + "Community Name" +
-                      "</th></tr>");
+            out.print("<tr><th class=\"oddRowOddCol\">" + "Community Name"
+                    + "</th></tr>");
 
             // Row: toggles between Odd and Even
             String row = "even";
@@ -89,7 +88,8 @@ public class CommunityListTag extends TagSupport
                 out.print("</td><td class=\"" + row + "RowEvenCol\">");
                 out.print("<A HREF=\"");
 
-                HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
+                HttpServletRequest hrq = (HttpServletRequest) pageContext
+                        .getRequest();
                 out.print(hrq.getContextPath() + "/handle/");
                 out.print(communities[i].getHandle());
                 out.print("\">");
@@ -102,7 +102,8 @@ public class CommunityListTag extends TagSupport
             }
 
             out.println("</table>");
-        } catch (IOException ie)
+        }
+        catch (IOException ie)
         {
             throw new JspException(ie);
         }
@@ -112,7 +113,7 @@ public class CommunityListTag extends TagSupport
 
     /**
      * Get the communities to list
-     *
+     * 
      * @return the communities
      */
     public Community[] getCommunities()
@@ -122,8 +123,9 @@ public class CommunityListTag extends TagSupport
 
     /**
      * Set the communities to list
-     *
-     * @param  communitiesIn  the communities
+     * 
+     * @param communitiesIn
+     *            the communities
      */
     public void setCommunities(Community[] communitiesIn)
     {

@@ -133,7 +133,8 @@ public class ConfigurationManager
             try
             {
                 intValue = Integer.parseInt(stringValue);
-            } catch (NumberFormatException e)
+            }
+            catch (NumberFormatException e)
             {
                 getLog()
                         .warn(
@@ -183,7 +184,8 @@ public class ConfigurationManager
             if (stringValue.equalsIgnoreCase("true"))
             {
                 boolValue = true;
-            } else if (stringValue.equalsIgnoreCase("yes"))
+            }
+            else if (stringValue.equalsIgnoreCase("yes"))
             {
                 boolValue = true;
             }
@@ -230,19 +232,22 @@ public class ConfigurationManager
                 if (line == null)
                 {
                     more = false;
-                } else if (line.toLowerCase().startsWith("subject:"))
+                }
+                else if (line.toLowerCase().startsWith("subject:"))
                 {
                     // Extract the first subject line - everything to the right
                     // of the colon, trimmed of whitespace
                     subject = line.substring(8).trim();
-                } else if (!line.startsWith("#"))
+                }
+                else if (!line.startsWith("#"))
                 {
                     // Add non-comment lines to the content
                     contentBuffer.append(line);
                     contentBuffer.append("\n");
                 }
             }
-        } finally
+        }
+        finally
         {
             if (reader != null)
             {
@@ -298,7 +303,8 @@ public class ConfigurationManager
         if (position == Constants.NEWS_TOP)
         {
             fileName += "news-top.html";
-        } else
+        }
+        else
         {
             fileName += "news-side.html";
         }
@@ -320,7 +326,8 @@ public class ConfigurationManager
             }
 
             br.close();
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             getLog().warn("news_read: " + e.getLocalizedMessage());
         }
@@ -345,7 +352,8 @@ public class ConfigurationManager
         if (position == Constants.NEWS_TOP)
         {
             fileName += "news-top.html";
-        } else
+        }
+        else
         {
             fileName += "news-side.html";
         }
@@ -360,7 +368,8 @@ public class ConfigurationManager
             PrintWriter out = new PrintWriter(osr);
             out.print(news);
             out.close();
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             getLog().warn("news_write: " + e.getLocalizedMessage());
         }
@@ -399,7 +408,8 @@ public class ConfigurationManager
             {
                 // Load the overriding configuration
                 is = new FileInputStream(configProperty);
-            } else
+            }
+            else
             {
                 // Load configuration from default location
                 is = ConfigurationManager.class
@@ -410,7 +420,8 @@ public class ConfigurationManager
             {
                 getLog().fatal("Cannot find dspace.cfg");
                 System.exit(1);
-            } else
+            }
+            else
             {
                 properties = new Properties();
                 properties.load(is);
@@ -430,7 +441,8 @@ public class ConfigurationManager
             }
 
             is.close();
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             getLog().fatal("Can't load configuration", e);
 
@@ -563,7 +575,8 @@ public class ConfigurationManager
                         // Fill in the value
                         line = line.substring(0, first) + propValue
                                 + line.substring(second + 2);
-                    } else
+                    }
+                    else
                     {
                         // There's a "@@" with no second one... just leave as-is
                         getLog().warn(
@@ -571,7 +584,8 @@ public class ConfigurationManager
                                         + ": Single @@ - leaving as-is");
                         moreValues = false;
                     }
-                } else
+                }
+                else
                 {
                     // No more @@'s
                     moreValues = false;
@@ -609,24 +623,28 @@ public class ConfigurationManager
                 getLog().info("Installing configuration files for other tools");
                 installConfigurations();
                 System.exit(0);
-            } catch (IOException ie)
+            }
+            catch (IOException ie)
             {
                 getLog().warn("Error installing configuration files", ie);
             }
-        } else if ((argv.length == 2) && argv[0].equals("-property"))
+        }
+        else if ((argv.length == 2) && argv[0].equals("-property"))
         {
             String val = getProperty(argv[1]);
 
             if (val != null)
             {
                 System.out.println(val);
-            } else
+            }
+            else
             {
                 System.out.println("");
             }
 
             System.exit(0);
-        } else
+        }
+        else
         {
             System.err
                     .println("Usage: ConfigurationManager OPTION\n  -installTemplates    install config files for external tools\n  -property prop.name  get value of prop.name from dspace.cfg");

@@ -44,25 +44,31 @@ import java.util.List;
 
 import org.dspace.content.Item;
 
-
 /**
  * The results of a Browse method call.
- *
- * <p>Results are a List of objects returned from the browse; each
- * returned object is either a String (for getAuthors()) or
- * an {@link org.dspace.content.Item} (for all
- * the getItems.... methods). The list is readonly, and is guaranteed
- * to be non-null.</p>
- *
- * <p>overallPosition is the position of the first element of results
- * within the Browse index. Positions begin with 0.</p>
- *
- * <p>total is the number of objects in the index. Note that this is a
- * snapshot, which is only guaranteed to be correct at the time the
- * browse method was called.</p>
- *
- * <p>offset is the position of the requested object within the results.
- * This position is also 0-based.</p>
+ * 
+ * <p>
+ * Results are a List of objects returned from the browse; each returned object
+ * is either a String (for getAuthors()) or an {@link org.dspace.content.Item}
+ * (for all the getItems.... methods). The list is readonly, and is guaranteed
+ * to be non-null.
+ * </p>
+ * 
+ * <p>
+ * overallPosition is the position of the first element of results within the
+ * Browse index. Positions begin with 0.
+ * </p>
+ * 
+ * <p>
+ * total is the number of objects in the index. Note that this is a snapshot,
+ * which is only guaranteed to be correct at the time the browse method was
+ * called.
+ * </p>
+ * 
+ * <p>
+ * offset is the position of the requested object within the results. This
+ * position is also 0-based.
+ * </p>
  */
 public class BrowseInfo
 {
@@ -72,14 +78,14 @@ public class BrowseInfo
     private List results;
 
     /**
-     * The position of the first element of results
-     * within the Browse index. Positions begin with 0.
+     * The position of the first element of results within the Browse index.
+     * Positions begin with 0.
      */
     private int overallPosition;
 
     /**
-     * The position of the requested object within the results.
-     * Offsets begin with 0.
+     * The position of the requested object within the results. Offsets begin
+     * with 0.
      */
     private int offset;
 
@@ -95,13 +101,15 @@ public class BrowseInfo
 
     /**
      * Constructor
-     *
-     * @param results A List of Browse results
-     * @param overallPosition The position of the first returned item
-     * in the overall index
-     * @param total The total number of items in the index
-     * @param offset The position of the requested item in the set of
-     * results
+     * 
+     * @param results
+     *            A List of Browse results
+     * @param overallPosition
+     *            The position of the first returned item in the overall index
+     * @param total
+     *            The total number of items in the index
+     * @param offset
+     *            The position of the requested item in the set of results
      */
     public BrowseInfo(List results, int overallPosition, int total, int offset)
     {
@@ -117,10 +125,10 @@ public class BrowseInfo
     }
 
     /**
-     * The results of the Browse.
-     * Each member of the list is either a String (for the authors browse)
-     * or an {@link org.dspace.content.Item} (for the other browses).
-     *
+     * The results of the Browse. Each member of the list is either a String
+     * (for the authors browse) or an {@link org.dspace.content.Item}(for the
+     * other browses).
+     * 
      * @return Result list. This list cannot be modified.
      */
     public List getResults()
@@ -130,7 +138,7 @@ public class BrowseInfo
 
     /**
      * Return the results of the Browse as a String array.
-     *
+     * 
      * @return The results of the Browse as a String array.
      */
     public String[] getStringResults()
@@ -140,7 +148,7 @@ public class BrowseInfo
 
     /**
      * Return the results of the Browse as an Item array.
-     *
+     * 
      * @return The results of the Browse as an Item array.
      */
     public Item[] getItemResults()
@@ -150,7 +158,7 @@ public class BrowseInfo
 
     /**
      * Return the number of results.
-     *
+     * 
      * @return The number of results.
      */
     public int getResultCount()
@@ -159,9 +167,9 @@ public class BrowseInfo
     }
 
     /**
-     * Return the position of the results in index being browsed.
-     * This is 0 for the start of the index.
-     *
+     * Return the position of the results in index being browsed. This is 0 for
+     * the start of the index.
+     * 
      * @return The position of the results in index being browsed.
      */
     public int getOverallPosition()
@@ -171,7 +179,7 @@ public class BrowseInfo
 
     /**
      * Return the total number of items in the index.
-     *
+     * 
      * @return The total number of items in the index.
      */
     public int getTotal()
@@ -180,11 +188,9 @@ public class BrowseInfo
     }
 
     /**
-     * Return the position of the requested item or value in the set of
-     * results.
-     *
-     * @return The position of the requested item or value in the set
-     * of results
+     * Return the position of the requested item or value in the set of results.
+     * 
+     * @return The position of the requested item or value in the set of results
      */
     public int getOffset()
     {
@@ -193,7 +199,7 @@ public class BrowseInfo
 
     /**
      * True if there are no previous results from the browse.
-     *
+     * 
      * @return True if there are no previous results from the browse
      */
     public boolean isFirst()
@@ -203,7 +209,7 @@ public class BrowseInfo
 
     /**
      * True if these are the last results from the browse.
-     *
+     * 
      * @return True if these are the last results from the browse
      */
     public boolean isLast()

@@ -50,11 +50,10 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 
-
 /**
  * Servlet for handling an internal server error
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class InternalErrorServlet extends HttpServlet
@@ -68,18 +67,18 @@ public class InternalErrorServlet extends HttpServlet
     private static Logger log = Logger.getLogger(InternalErrorServlet.class);
 
     protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
-                  throws ServletException, IOException
+            HttpServletResponse response) throws ServletException, IOException
     {
         // Get the exception that occurred, if any
-        Throwable t = (Throwable) request.getAttribute("javax.servlet.error.exception");
+        Throwable t = (Throwable) request
+                .getAttribute("javax.servlet.error.exception");
 
         String logInfo = UIUtil.getRequestLogInfo(request);
 
-        // Log the error.  Since we don't have a context, we need to
+        // Log the error. Since we don't have a context, we need to
         // build the info "by hand"
-        String logMessage = ":session_id=" + request.getSession().getId() +
-                            ":internal_error:" + logInfo;
+        String logMessage = ":session_id=" + request.getSession().getId()
+                + ":internal_error:" + logInfo;
 
         log.warn(logMessage, t);
 
@@ -90,8 +89,7 @@ public class InternalErrorServlet extends HttpServlet
     }
 
     protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response)
-                   throws ServletException, IOException
+            HttpServletResponse response) throws ServletException, IOException
     {
         doGet(request, response);
     }

@@ -71,11 +71,10 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
-
 /**
  * Collection creation wizard UI
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class CollectionWizardServlet extends DSpaceServlet
@@ -117,40 +116,37 @@ public class CollectionWizardServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(CollectionWizardServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         /*
-         * For GET, all we should really get is a community_id parameter
-         * (DB ID of community to add collection to).  doDSPost handles this
+         * For GET, all we should really get is a community_id parameter (DB ID
+         * of community to add collection to). doDSPost handles this
          */
         doDSPost(context, request, response);
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         /*
          * For POST, we expect from the form:
-         *
-         * community_id   DB ID if it was a 'create a new collection'
-         *                button press
-         *
+         * 
+         * community_id DB ID if it was a 'create a new collection' button press
+         * 
          * OR
-         *
-         * collection_id   DB ID of collection we're dealing with
-         * stage           Stage we're at (from constants above)
+         * 
+         * collection_id DB ID of collection we're dealing with stage Stage
+         * we're at (from constants above)
          */
 
         // First, see if we have a multipart request
         // (the 'basic info' page which might include uploading a logo)
         String contentType = request.getContentType();
 
-        if ((contentType != null) &&
-                (contentType.indexOf("multipart/form-data") != -1))
+        if ((contentType != null)
+                && (contentType.indexOf("multipart/form-data") != -1))
         {
             // This is a multipart request, so it's a file upload
             processBasicInfo(context, request, response);
@@ -168,7 +164,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             if (c == null)
             {
                 log.warn(LogManager.getHeader(context, "integrity_error",
-                                              UIUtil.getRequestLogInfo(request)));
+                        UIUtil.getRequestLogInfo(request)));
                 JSPManager.showIntegrityError(request, response);
 
                 return;
@@ -178,9 +174,10 @@ public class CollectionWizardServlet extends DSpaceServlet
             Collection newCollection = c.createCollection();
             request.setAttribute("collection", newCollection);
             JSPManager.showJSP(request, response,
-                               "/dspace-admin/wizard-questions.jsp");
+                    "/dspace-admin/wizard-questions.jsp");
             context.complete();
-        } else
+        }
+        else
         {
             // Collection already created, dealing with one of the wizard pages
             int collectionID = UIUtil.getIntParameter(request, "collection_id");
@@ -195,68 +192,69 @@ public class CollectionWizardServlet extends DSpaceServlet
             if (collection == null)
             {
                 log.warn(LogManager.getHeader(context, "integrity_error",
-                                              UIUtil.getRequestLogInfo(request)));
+                        UIUtil.getRequestLogInfo(request)));
                 JSPManager.showIntegrityError(request, response);
 
                 return;
             }
 
             // All pages will need this attribute
-            request.setAttribute("collection.id",
-                                 String.valueOf(collection.getID()));
+            request.setAttribute("collection.id", String.valueOf(collection
+                    .getID()));
 
             switch (stage)
             {
-                case INITIAL_QUESTIONS:
-                    processInitialQuestions(context, request, response,
-                                            collection);
+            case INITIAL_QUESTIONS:
+                processInitialQuestions(context, request, response, collection);
 
-                    break;
+                break;
 
-                case PERMISSIONS:
-                    processPermissions(context, request, response, collection);
+            case PERMISSIONS:
+                processPermissions(context, request, response, collection);
 
-                    break;
+                break;
 
-                case DEFAULT_ITEM:
-                    processDefaultItem(context, request, response, collection);
+            case DEFAULT_ITEM:
+                processDefaultItem(context, request, response, collection);
 
-                    break;
+                break;
 
-                default:
-                    log.warn(LogManager.getHeader(context, "integrity_error",
-                                                  UIUtil.getRequestLogInfo(request)));
-                    JSPManager.showIntegrityError(request, response);
+            default:
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                        UIUtil.getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
             }
         }
     }
 
     /**
      * Process input from initial questions page
-     *
-     * @param context     DSpace context
-     * @param request     HTTP request
-     * @param response    HTTP response
-     * @param collection  Collection we're editing
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request
+     * @param response
+     *            HTTP response
+     * @param collection
+     *            Collection we're editing
      */
     private void processInitialQuestions(Context context,
-                                         HttpServletRequest request,
-                                         HttpServletResponse response,
-                                         Collection collection)
-                                  throws SQLException, ServletException, 
-                                         IOException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            Collection collection) throws SQLException, ServletException,
+            IOException, AuthorizeException
     {
         Group anonymousGroup = Group.find(context, 0);
 
-        // "Public read" checkbox.  Only need to do anything
+        // "Public read" checkbox. Only need to do anything
         // if it's not checked.
         if (!UIUtil.getBoolParameter(request, "public_read"))
         {
             // Remove anonymous default policies for new items
             AuthorizeManager.removePoliciesActionFilter(context, collection,
-                                                        Constants.DEFAULT_ITEM_READ);
+                    Constants.DEFAULT_ITEM_READ);
             AuthorizeManager.removePoliciesActionFilter(context, collection,
-                                                        Constants.DEFAULT_BITSTREAM_READ);
+                    Constants.DEFAULT_BITSTREAM_READ);
         }
 
         // Some people authorised to submit
@@ -295,24 +293,26 @@ public class CollectionWizardServlet extends DSpaceServlet
 
         // Now display "basic info" screen
         JSPManager.showJSP(request, response,
-                           "/dspace-admin/wizard-basicinfo.jsp");
+                "/dspace-admin/wizard-basicinfo.jsp");
         context.complete();
     }
 
     /**
      * Process input from one of the permissions pages
-     *
-     * @param context     DSpace context
-     * @param request     HTTP request
-     * @param response    HTTP response
-     * @param collection  Collection we're editing
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request
+     * @param response
+     *            HTTP response
+     * @param collection
+     *            Collection we're editing
      */
     private void processPermissions(Context context,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    Collection collection)
-                             throws SQLException, ServletException, IOException, 
-                                    AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            Collection collection) throws SQLException, ServletException,
+            IOException, AuthorizeException
     {
         // Which permission are we dealing with?
         int permission = UIUtil.getIntParameter(request, "permission");
@@ -327,15 +327,15 @@ public class CollectionWizardServlet extends DSpaceServlet
             {
                 // assign default item and bitstream read to mitGroup
                 AuthorizeManager.addPolicy(context, collection,
-                                           Constants.DEFAULT_ITEM_READ, mitGroup);
+                        Constants.DEFAULT_ITEM_READ, mitGroup);
                 AuthorizeManager.addPolicy(context, collection,
-                                           Constants.DEFAULT_BITSTREAM_READ,
-                                           mitGroup);
-            } else
+                        Constants.DEFAULT_BITSTREAM_READ, mitGroup);
+            }
+            else
             {
                 // Must be submit
                 AuthorizeManager.addPolicy(context, collection, Constants.ADD,
-                                           mitGroup);
+                        mitGroup);
             }
         }
 
@@ -345,47 +345,48 @@ public class CollectionWizardServlet extends DSpaceServlet
 
         switch (permission)
         {
-            case PERM_READ:
+        case PERM_READ:
 
-                // Actually need to create a group for this.
-                g = Group.create(context);
+            // Actually need to create a group for this.
+            g = Group.create(context);
 
-                // Name it according to our conventions
-                g.setName("COLLECTION_" + collection.getID() +
-                          "_DEFAULT_ITEM_READ");
+            // Name it according to our conventions
+            g
+                    .setName("COLLECTION_" + collection.getID()
+                            + "_DEFAULT_ITEM_READ");
 
-                // Give it the needed permission
-                AuthorizeManager.addPolicy(context, collection,
-                                           Constants.DEFAULT_ITEM_READ, g);
-                AuthorizeManager.addPolicy(context, collection,
-                                           Constants.DEFAULT_BITSTREAM_READ, g);
+            // Give it the needed permission
+            AuthorizeManager.addPolicy(context, collection,
+                    Constants.DEFAULT_ITEM_READ, g);
+            AuthorizeManager.addPolicy(context, collection,
+                    Constants.DEFAULT_BITSTREAM_READ, g);
 
-                break;
+            break;
 
-            case PERM_SUBMIT:
-                g = collection.getSubmitters();
+        case PERM_SUBMIT:
+            g = collection.getSubmitters();
 
-                break;
+            break;
 
-            case PERM_WF1:
-                g = collection.getWorkflowGroup(1);
+        case PERM_WF1:
+            g = collection.getWorkflowGroup(1);
 
-                break;
+            break;
 
-            case PERM_WF2:
-                g = collection.getWorkflowGroup(2);
+        case PERM_WF2:
+            g = collection.getWorkflowGroup(2);
 
-                break;
+            break;
 
-            case PERM_WF3:
-                g = collection.getWorkflowGroup(3);
+        case PERM_WF3:
+            g = collection.getWorkflowGroup(3);
 
-                break;
+            break;
 
-            case PERM_ADMIN:
-                g = collection.getAdministrators();
+        case PERM_ADMIN:
+            g = collection.getAdministrators();
 
-                break;
+            break;
         }
 
         // Add people from the form to the group
@@ -414,7 +415,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 
     /**
      * process input from basic info page
-     *
+     * 
      * @param context
      * @param request
      * @param response
@@ -425,21 +426,19 @@ public class CollectionWizardServlet extends DSpaceServlet
      * @throws AuthorizeException
      */
     private void processBasicInfo(Context context, HttpServletRequest request,
-                                  HttpServletResponse response)
-                           throws SQLException, ServletException, IOException, 
-                                  AuthorizeException
+            HttpServletResponse response) throws SQLException,
+            ServletException, IOException, AuthorizeException
     {
         // Wrap multipart request to get the submission info
         FileUploadRequest wrapper = new FileUploadRequest(request);
 
-        Collection collection = Collection.find(context,
-                                                UIUtil.getIntParameter(wrapper,
-                                                                       "collection_id"));
+        Collection collection = Collection.find(context, UIUtil
+                .getIntParameter(wrapper, "collection_id"));
 
         if (collection == null)
         {
-            log.warn(LogManager.getHeader(context, "integrity_error",
-                                          UIUtil.getRequestLogInfo(wrapper)));
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(wrapper)));
             JSPManager.showIntegrityError(request, response);
 
             return;
@@ -447,16 +446,16 @@ public class CollectionWizardServlet extends DSpaceServlet
 
         // Get metadata
         collection.setMetadata("name", wrapper.getParameter("name"));
-        collection.setMetadata("short_description",
-                               wrapper.getParameter("short_description"));
-        collection.setMetadata("introductory_text",
-                               wrapper.getParameter("introductory_text"));
-        collection.setMetadata("copyright_text",
-                               wrapper.getParameter("copyright_text"));
-        collection.setMetadata("side_bar_text",
-                               wrapper.getParameter("side_bar_text"));
-        collection.setMetadata("provenance_description",
-                               wrapper.getParameter("provenance_description"));
+        collection.setMetadata("short_description", wrapper
+                .getParameter("short_description"));
+        collection.setMetadata("introductory_text", wrapper
+                .getParameter("introductory_text"));
+        collection.setMetadata("copyright_text", wrapper
+                .getParameter("copyright_text"));
+        collection.setMetadata("side_bar_text", wrapper
+                .getParameter("side_bar_text"));
+        collection.setMetadata("provenance_description", wrapper
+                .getParameter("provenance_description"));
 
         // Need to be more careful about license -- make sure it's null if
         // nothing was entered
@@ -475,7 +474,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             InputStream is = new BufferedInputStream(new FileInputStream(temp));
             Bitstream logoBS = collection.setLogo(is);
 
-            // Strip all but the last filename.  It would be nice
+            // Strip all but the last filename. It would be nice
             // to know which OS the file came from.
             String noPath = wrapper.getFilesystemName("file");
 
@@ -511,18 +510,20 @@ public class CollectionWizardServlet extends DSpaceServlet
 
     /**
      * Process input from default item page
-     *
-     * @param context     DSpace context
-     * @param request     HTTP request
-     * @param response    HTTP response
-     * @param collection  Collection we're editing
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request
+     * @param response
+     *            HTTP response
+     * @param collection
+     *            Collection we're editing
      */
     private void processDefaultItem(Context context,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    Collection collection)
-                             throws SQLException, ServletException, IOException, 
-                                    AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            Collection collection) throws SQLException, ServletException,
+            IOException, AuthorizeException
     {
         Item item = collection.getTemplateItem();
 
@@ -549,23 +550,23 @@ public class CollectionWizardServlet extends DSpaceServlet
 
     /**
      * Work out which page to show next, and show it
-     *
+     * 
      * @param context
      * @param request
      * @param response
      * @param collection
-     * @param stage  the stage the user just finished, or if PERMISSIONS, the
-     *               particular permissions page
+     * @param stage
+     *            the stage the user just finished, or if PERMISSIONS, the
+     *            particular permissions page
      * @throws SQLException
      * @throws ServletException
      * @throws IOException
      * @throws AuthorizeException
      */
     private void showNextPage(Context context, HttpServletRequest request,
-                              HttpServletResponse response,
-                              Collection collection, int stage)
-                       throws SQLException, ServletException, IOException, 
-                              AuthorizeException
+            HttpServletResponse response, Collection collection, int stage)
+            throws SQLException, ServletException, IOException,
+            AuthorizeException
     {
         // Put collection in request attributes, as most JSPs will need it
         request.setAttribute("collection", collection);
@@ -580,120 +581,123 @@ public class CollectionWizardServlet extends DSpaceServlet
 
         switch (stage)
         {
-            case BASIC_INFO:
+        case BASIC_INFO:
 
-                // Next page is 'permission to read' page iff ITEM_DEFAULT_READ
-                // for anonymous group is NOT there
-                List anonReadPols = AuthorizeManager.getPoliciesActionFilter(context,
-                                                                             collection,
-                                                                             Constants.DEFAULT_ITEM_READ);
+            // Next page is 'permission to read' page iff ITEM_DEFAULT_READ
+            // for anonymous group is NOT there
+            List anonReadPols = AuthorizeManager.getPoliciesActionFilter(
+                    context, collection, Constants.DEFAULT_ITEM_READ);
 
-                // At this stage, if there's any ITEM_DEFAULT_READ, it can only
-                // be an anonymous one.
-                if (anonReadPols.size() == 0)
-                {
-                    request.setAttribute("permission", new Integer(PERM_READ));
-                    JSPManager.showJSP(request, response,
-                                       "/dspace-admin/wizard-permissions.jsp");
-
-                    break;
-                }
-
-            case PERM_READ:
-
-                // Next page is 'permission to submit' iff there's a submit group defined
-                if (collection.getSubmitters() != null)
-                {
-                    request.setAttribute("permission", new Integer(PERM_SUBMIT));
-                    JSPManager.showJSP(request, response,
-                                       "/dspace-admin/wizard-permissions.jsp");
-
-                    break;
-                }
-
-            case PERM_SUBMIT:
-
-                // Next page is 'workflow step 1' iff there's a wf step 1 group defined
-                if (collection.getWorkflowGroup(1) != null)
-                {
-                    request.setAttribute("permission", new Integer(PERM_WF1));
-                    JSPManager.showJSP(request, response,
-                                       "/dspace-admin/wizard-permissions.jsp");
-
-                    break;
-                }
-
-            case PERM_WF1:
-
-                // Next page is 'workflow step 2' iff there's a wf step 2 group defined
-                if (collection.getWorkflowGroup(2) != null)
-                {
-                    request.setAttribute("permission", new Integer(PERM_WF2));
-                    JSPManager.showJSP(request, response,
-                                       "/dspace-admin/wizard-permissions.jsp");
-
-                    break;
-                }
-
-            case PERM_WF2:
-
-                // Next page is 'workflow step 3' iff there's a wf step 2 group defined
-                if (collection.getWorkflowGroup(3) != null)
-                {
-                    request.setAttribute("permission", new Integer(PERM_WF3));
-                    JSPManager.showJSP(request, response,
-                                       "/dspace-admin/wizard-permissions.jsp");
-
-                    break;
-                }
-
-            case PERM_WF3:
-
-                // Next page is 'collection administrator' iff there's a collection administrator group
-                if (collection.getAdministrators() != null)
-                {
-                    request.setAttribute("permission", new Integer(PERM_ADMIN));
-                    JSPManager.showJSP(request, response,
-                                       "/dspace-admin/wizard-permissions.jsp");
-
-                    break;
-                }
-
-            case PERM_ADMIN:
-
-                // Next page is 'default item' iff there's a default item
-                if (collection.getTemplateItem() != null)
-                {
-                    DCType[] types = DCType.findAll(context);
-                    request.setAttribute("dctypes", types);
-                    JSPManager.showJSP(request, response,
-                                       "/dspace-admin/wizard-default-item.jsp");
-
-                    break;
-                }
-
-            case DEFAULT_ITEM:
-
-                // Next page is 'summary page (the last page)
-                // sort of a hack to pass the community ID to the edit collection page,
-                // which needs it in other contexts
-                if (collection != null)
-                {
-                    Community[] communities = collection.getCommunities();
-                    request.setAttribute("community", communities[0]);
-
-
-                    if (AuthorizeManager.isAdmin(context))
-                    {
-                        // set a variable to show all buttons
-                        request.setAttribute("admin_button", new Boolean(true));
-                    }
-                }
-
+            // At this stage, if there's any ITEM_DEFAULT_READ, it can only
+            // be an anonymous one.
+            if (anonReadPols.size() == 0)
+            {
+                request.setAttribute("permission", new Integer(PERM_READ));
                 JSPManager.showJSP(request, response,
-                                   "/tools/edit-collection.jsp");
+                        "/dspace-admin/wizard-permissions.jsp");
 
                 break;
+            }
+
+        case PERM_READ:
+
+            // Next page is 'permission to submit' iff there's a submit group
+            // defined
+            if (collection.getSubmitters() != null)
+            {
+                request.setAttribute("permission", new Integer(PERM_SUBMIT));
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/wizard-permissions.jsp");
+
+                break;
+            }
+
+        case PERM_SUBMIT:
+
+            // Next page is 'workflow step 1' iff there's a wf step 1 group
+            // defined
+            if (collection.getWorkflowGroup(1) != null)
+            {
+                request.setAttribute("permission", new Integer(PERM_WF1));
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/wizard-permissions.jsp");
+
+                break;
+            }
+
+        case PERM_WF1:
+
+            // Next page is 'workflow step 2' iff there's a wf step 2 group
+            // defined
+            if (collection.getWorkflowGroup(2) != null)
+            {
+                request.setAttribute("permission", new Integer(PERM_WF2));
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/wizard-permissions.jsp");
+
+                break;
+            }
+
+        case PERM_WF2:
+
+            // Next page is 'workflow step 3' iff there's a wf step 2 group
+            // defined
+            if (collection.getWorkflowGroup(3) != null)
+            {
+                request.setAttribute("permission", new Integer(PERM_WF3));
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/wizard-permissions.jsp");
+
+                break;
+            }
+
+        case PERM_WF3:
+
+            // Next page is 'collection administrator' iff there's a collection
+            // administrator group
+            if (collection.getAdministrators() != null)
+            {
+                request.setAttribute("permission", new Integer(PERM_ADMIN));
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/wizard-permissions.jsp");
+
+                break;
+            }
+
+        case PERM_ADMIN:
+
+            // Next page is 'default item' iff there's a default item
+            if (collection.getTemplateItem() != null)
+            {
+                DCType[] types = DCType.findAll(context);
+                request.setAttribute("dctypes", types);
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/wizard-default-item.jsp");
+
+                break;
+            }
+
+        case DEFAULT_ITEM:
+
+            // Next page is 'summary page (the last page)
+            // sort of a hack to pass the community ID to the edit collection
+            // page,
+            // which needs it in other contexts
+            if (collection != null)
+            {
+                Community[] communities = collection.getCommunities();
+                request.setAttribute("community", communities[0]);
+
+                if (AuthorizeManager.isAdmin(context))
+                {
+                    // set a variable to show all buttons
+                    request.setAttribute("admin_button", new Boolean(true));
+                }
+            }
+
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
+
+            break;
         }
     }
 }

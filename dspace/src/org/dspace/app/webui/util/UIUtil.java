@@ -57,11 +57,10 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.eperson.EPerson;
 
-
 /**
  * Miscellaneous UI utility methods
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class UIUtil
@@ -70,17 +69,18 @@ public class UIUtil
     private static Logger log = Logger.getLogger(UIUtil.class);
 
     /**
-     * Obtain a new context object.  If a context object has already been
-     * created for this HTTP request, it is re-used, otherwise it is created.
-     * If a user has authenticated with the system, the current user of the
-     * context is set appropriately.
-     *
-     * @param  request   the HTTP request
-     *
+     * Obtain a new context object. If a context object has already been created
+     * for this HTTP request, it is re-used, otherwise it is created. If a user
+     * has authenticated with the system, the current user of the context is set
+     * appropriately.
+     * 
+     * @param request
+     *            the HTTP request
+     * 
      * @return a context object
      */
     public static Context obtainContext(HttpServletRequest request)
-                                 throws SQLException
+            throws SQLException
     {
         Context c = (Context) request.getAttribute("dspace.context");
 
@@ -90,7 +90,8 @@ public class UIUtil
             c = new Context();
 
             // See if a user has authentication
-            Integer userID = (Integer) request.getSession().getAttribute("dspace.current.user.id");
+            Integer userID = (Integer) request.getSession().getAttribute(
+                    "dspace.current.user.id");
 
             if (userID != null)
             {
@@ -119,13 +120,14 @@ public class UIUtil
     }
 
     /**
-     * Get the current community location, that is, where the user "is".
-     * This returns <code>null</code> if there is no location, i.e. "all of
-     * DSpace" is the location.
-     *
-     * @param request   current HTTP request
-     *
-     * @return  the current community location, or null
+     * Get the current community location, that is, where the user "is". This
+     * returns <code>null</code> if there is no location, i.e. "all of DSpace"
+     * is the location.
+     * 
+     * @param request
+     *            current HTTP request
+     * 
+     * @return the current community location, or null
      */
     public static Community getCommunityLocation(HttpServletRequest request)
     {
@@ -133,13 +135,14 @@ public class UIUtil
     }
 
     /**
-     * Get the current collection location, that is, where the user "is".
-     * This returns null if there is no collection location, i.e. the
-     * location is "all of DSpace" or a community.
-     *
-     * @param request   current HTTP request
-     *
-     * @return  the current collection location, or null
+     * Get the current collection location, that is, where the user "is". This
+     * returns null if there is no collection location, i.e. the location is
+     * "all of DSpace" or a community.
+     * 
+     * @param request
+     *            current HTTP request
+     * 
+     * @return the current collection location, or null
      */
     public static Collection getCollectionLocation(HttpServletRequest request)
     {
@@ -147,12 +150,13 @@ public class UIUtil
     }
 
     /**
-     * Put the original request URL into the request object as an attribute
-     * for later use.  This is necessary because forwarding a request removes
-     * this information.  The attribute is only written if it hasn't been
-     * before; thus it can be called after a forward safely.
-     *
-     * @param request   the HTTP request
+     * Put the original request URL into the request object as an attribute for
+     * later use. This is necessary because forwarding a request removes this
+     * information. The attribute is only written if it hasn't been before; thus
+     * it can be called after a forward safely.
+     * 
+     * @param request
+     *            the HTTP request
      */
     public static void storeOriginalURL(HttpServletRequest request)
     {
@@ -173,10 +177,11 @@ public class UIUtil
 
     /**
      * Get the original request URL.
-     *
-     * @param request   the HTTP request
-     *
-     * @return  the original request URL
+     * 
+     * @param request
+     *            the HTTP request
+     * 
+     * @return the original request URL
      */
     public static String getOriginalURL(HttpServletRequest request)
     {
@@ -189,10 +194,11 @@ public class UIUtil
     /**
      * Utility method to convert spaces in a string to HTML non-break space
      * elements.
-     *
-     * @param s    string to change spaces in
-     * @return   the string passed in with spaces converted to HTML non-break
-     *           spaces
+     * 
+     * @param s
+     *            string to change spaces in
+     * @return the string passed in with spaces converted to HTML non-break
+     *         spaces
      */
     public static String nonBreakSpace(String s)
     {
@@ -205,7 +211,8 @@ public class UIUtil
             if (ch == ' ')
             {
                 newString.append("&nbsp;");
-            } else
+            }
+            else
             {
                 newString.append(ch);
             }
@@ -216,12 +223,15 @@ public class UIUtil
 
     /**
      * Write a human-readable version of a DCDate.
-     *
-     * @param  d  the date
-     * @param time  if true, display the time with the date
-     * @param localTime  if true, adjust for local timezone, otherwise GMT
-     *
-     * @return  the date in a human-readable form.
+     * 
+     * @param d
+     *            the date
+     * @param time
+     *            if true, display the time with the date
+     * @param localTime
+     *            if true, adjust for local timezone, otherwise GMT
+     * 
+     * @return the date in a human-readable form.
      */
     public static String displayDate(DCDate d, boolean time, boolean localTime)
     {
@@ -244,7 +254,8 @@ public class UIUtil
                 hour = d.getHour();
                 minute = d.getMinute();
                 second = d.getSecond();
-            } else
+            }
+            else
             {
                 year = d.getYearGMT();
                 month = d.getMonthGMT();
@@ -294,7 +305,8 @@ public class UIUtil
 
                 sb.append(hr + ":" + mn + ":" + sc + " ");
             }
-        } else
+        }
+        else
         {
             sb.append("Unset");
         }
@@ -305,10 +317,10 @@ public class UIUtil
     /**
      * Return a string for logging, containing useful information about the
      * current request - the URL, the method and parameters.
-     *
-     * @param request   the request object.
-     * @return  a multi-line string containing information about
-     *          the request.
+     * 
+     * @param request
+     *            the request object.
+     * @return a multi-line string containing information about the request.
      */
     public static String getRequestLogInfo(HttpServletRequest request)
     {
@@ -331,10 +343,11 @@ public class UIUtil
                 // We don't want to write a clear text password
                 // to the log, even if it's wrong!
                 report = report + "-- " + name + ": *not logged*\n";
-            } else
+            }
+            else
             {
-                report = report + "-- " + name + ": \"" +
-                         request.getParameter(name) + "\"\n";
+                report = report + "-- " + name + ": \""
+                        + request.getParameter(name) + "\"\n";
             }
         }
 
@@ -342,13 +355,15 @@ public class UIUtil
     }
 
     /**
-     * Obtain a parameter from the given request as an int.  <code>-1</code>
-     * is returned if the parameter is garbled or does not exist.
-     *
-     * @param request   the HTTP request
-     * @param param     the name of the parameter
-     *
-     * @return  the integer value of the parameter, or -1
+     * Obtain a parameter from the given request as an int. <code>-1</code> is
+     * returned if the parameter is garbled or does not exist.
+     * 
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     * 
+     * @return the integer value of the parameter, or -1
      */
     public static int getIntParameter(HttpServletRequest request, String param)
     {
@@ -357,7 +372,8 @@ public class UIUtil
         try
         {
             return Integer.parseInt(val);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             // Problem with parameter
             return -1;
@@ -365,17 +381,19 @@ public class UIUtil
     }
 
     /**
-     * Obtain an array of int parameters from the given request as an int.
-     * null is returned if parameter doesn't exist. <code>-1</code>
-     * is returned in array locations if that particular value is garbled.
-     *
-     * @param request   the HTTP request
-     * @param param     the name of the parameter
-     *
-     * @return  array of integers or null
+     * Obtain an array of int parameters from the given request as an int. null
+     * is returned if parameter doesn't exist. <code>-1</code> is returned in
+     * array locations if that particular value is garbled.
+     * 
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     * 
+     * @return array of integers or null
      */
     public static int[] getIntParameters(HttpServletRequest request,
-                                         String param)
+            String param)
     {
         String[] request_values = request.getParameterValues(param);
 
@@ -391,7 +409,8 @@ public class UIUtil
             try
             {
                 return_values[x] = Integer.parseInt(request_values[x]);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 // Problem with parameter, stuff -1 in this slot
                 return_values[x] = -1;
@@ -405,29 +424,33 @@ public class UIUtil
      * Obtain a parameter from the given request as a boolean.
      * <code>false</code> is returned if the parameter is garbled or does not
      * exist.
-     *
-     * @param request   the HTTP request
-     * @param param     the name of the parameter
-     *
-     * @return  the integer value of the parameter, or -1
+     * 
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     * 
+     * @return the integer value of the parameter, or -1
      */
     public static boolean getBoolParameter(HttpServletRequest request,
-                                           String param)
+            String param)
     {
-        return ((request.getParameter(param) != null) &&
-               request.getParameter(param).equals("true"));
+        return ((request.getParameter(param) != null) && request.getParameter(
+                param).equals("true"));
     }
 
     /**
-     * Get the button the user pressed on a submitted form.  All buttons
-     * should start with the text <code>submit</code> for this to work.
-     * A default should be supplied, since often the browser will submit a form
-     * with no submit button pressed if the user presses enter.
-     *
-     * @param request   the HTTP request
-     * @param def       the default button
-     *
-     * @return  the button pressed
+     * Get the button the user pressed on a submitted form. All buttons should
+     * start with the text <code>submit</code> for this to work. A default
+     * should be supplied, since often the browser will submit a form with no
+     * submit button pressed if the user presses enter.
+     * 
+     * @param request
+     *            the HTTP request
+     * @param def
+     *            the default button
+     * 
+     * @return the button pressed
      */
     public static String getSubmitButton(HttpServletRequest request, String def)
     {
@@ -448,19 +471,21 @@ public class UIUtil
 
     /**
      * Send an alert to the designated "alert recipient" - that is, when a
-     * database error or internal error occurs, this person is sent an
-     * e-mail with details.
+     * database error or internal error occurs, this person is sent an e-mail
+     * with details.
      * <P>
      * The recipient is configured via the "alert.recipient" property in
-     * <code>dspace.cfg</code>.  If this property is omitted, no alerts
-     * are sent.
+     * <code>dspace.cfg</code>. If this property is omitted, no alerts are
+     * sent.
      * <P>
-     * This method "swallows" any exception that might occur - it will just
-     * be logged.  This is because this method will usually be invoked as
-     * part of an error handling routine anyway.
-     *
-     * @param  request    the HTTP request leading to the error
-     * @param  exception  the exception causing the error, or null
+     * This method "swallows" any exception that might occur - it will just be
+     * logged. This is because this method will usually be invoked as part of an
+     * error handling routine anyway.
+     * 
+     * @param request
+     *            the HTTP request leading to the error
+     * @param exception
+     *            the exception causing the error, or null
      */
     public static void sendAlert(HttpServletRequest request, Exception exception)
     {
@@ -468,14 +493,16 @@ public class UIUtil
 
         try
         {
-            String recipient = ConfigurationManager.getProperty("alert.recipient");
+            String recipient = ConfigurationManager
+                    .getProperty("alert.recipient");
 
             if (recipient != null)
             {
                 Email email = ConfigurationManager.getEmail("internal_error");
 
                 email.addRecipient(recipient);
-                email.addArgument(ConfigurationManager.getProperty("dspace.url"));
+                email.addArgument(ConfigurationManager
+                        .getProperty("dspace.url"));
                 email.addArgument(new Date());
                 email.addArgument(request.getSession().getId());
                 email.addArgument(logInfo);
@@ -489,7 +516,8 @@ public class UIUtil
                     exception.printStackTrace(pw);
                     pw.flush();
                     stackTrace = sw.toString();
-                } else
+                }
+                else
                 {
                     stackTrace = "No exception";
                 }
@@ -497,7 +525,8 @@ public class UIUtil
                 email.addArgument(stackTrace);
                 email.send();
             }
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             // Not much we can do here!
             log.warn("Unable to send email alert", e);

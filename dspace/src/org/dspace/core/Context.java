@@ -50,8 +50,6 @@ import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 
-
-
 /**
  * Class representing the context of a particular DSpace operation. This stores
  * information such as the current authenticated user and the database
@@ -65,8 +63,8 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * changes and free up the resources.
  * <P>
  * The context object is also used as a cache for CM API objects.
- *
- *
+ * 
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -95,9 +93,9 @@ public class Context
     /**
      * Construct a new context object. A database connection is opened. No user
      * is authenticated.
-     *
+     * 
      * @exception SQLException
-     *               if there was an error obtaining a database connection
+     *                if there was an error obtaining a database connection
      */
     public Context() throws SQLException
     {
@@ -115,7 +113,7 @@ public class Context
 
     /**
      * Get the database connection associated with the context
-     *
+     * 
      * @return the database connection
      */
     public Connection getDBConnection()
@@ -126,10 +124,10 @@ public class Context
     /**
      * Set the current user. Authentication must have been performed by the
      * caller - this call does not attempt any authentication.
-     *
+     * 
      * @param user
-     *           the new current user, or <code>null</code> if no user is
-     *           authenticated
+     *            the new current user, or <code>null</code> if no user is
+     *            authenticated
      */
     public void setCurrentUser(EPerson user)
     {
@@ -138,7 +136,7 @@ public class Context
 
     /**
      * Get the current (authenticated) user
-     *
+     * 
      * @return the current user, or <code>null</code> if no user is
      *         authenticated
      */
@@ -149,7 +147,7 @@ public class Context
 
     /**
      * Find out if the authorisation system should be ignored for this context.
-     *
+     * 
      * @return <code>true</code> if authorisation should be ignored for this
      *         session.
      */
@@ -161,10 +159,10 @@ public class Context
     /**
      * Specify whether the authorisation system should be ignored for this
      * context. This should be used sparingly.
-     *
+     * 
      * @param b
-     *           if <code>true</code>, authorisation should be ignored for
-     *           this session.
+     *            if <code>true</code>, authorisation should be ignored for
+     *            this session.
      */
     public void setIgnoreAuthorization(boolean b)
     {
@@ -177,9 +175,9 @@ public class Context
      * current Web user's session:
      * <P>
      * <code>setExtraLogInfo("session_id="+request.getSession().getId());</code>
-     *
+     * 
      * @param info
-     *           the extra information to log
+     *            the extra information to log
      */
     public void setExtraLogInfo(String info)
     {
@@ -189,7 +187,7 @@ public class Context
     /**
      * Get extra information to be logged with message logged in the scope of
      * this context.
-     *
+     * 
      * @return the extra log info - guaranteed non- <code>null</code>
      */
     public String getExtraLogInfo()
@@ -201,10 +199,10 @@ public class Context
      * Close the context object after all of the operations performed in the
      * context have completed succesfully. Any transaction with the database is
      * committed.
-     *
+     * 
      * @exception SQLException
-     *               if there was an error completing the database transaction or
-     *               closing the connection
+     *                if there was an error completing the database transaction
+     *                or closing the connection
      */
     public void complete() throws SQLException
     {
@@ -214,7 +212,8 @@ public class Context
         {
             // Commit any changes made as part of the transaction
             connection.commit();
-        } finally
+        }
+        finally
         {
             // Free the connection
             DatabaseManager.freeConnection(connection);
@@ -223,12 +222,12 @@ public class Context
     }
 
     /**
-     * Commit any transaction that is currently in progress, but do not close the
-     * context.
-     *
+     * Commit any transaction that is currently in progress, but do not close
+     * the context.
+     * 
      * @exception SQLException
-     *               if there was an error completing the database transaction or
-     *               closing the connection
+     *                if there was an error completing the database transaction
+     *                or closing the connection
      */
     public void commit() throws SQLException
     {
@@ -248,11 +247,13 @@ public class Context
         try
         {
             connection.rollback();
-        } catch (SQLException se)
+        }
+        catch (SQLException se)
         {
             log.error(se.getMessage());
             se.printStackTrace();
-        } finally
+        }
+        finally
         {
             DatabaseManager.freeConnection(connection);
             connection = null;
@@ -262,7 +263,7 @@ public class Context
     /**
      * Find out if this context is valid. Returns <code>false</code> if this
      * context has been aborted or completed.
-     *
+     * 
      * @return <code>true</code> if the context is still valid, otherwise
      *         <code>false</code>
      */
@@ -274,12 +275,12 @@ public class Context
 
     /**
      * Store an object in the object cache.
-     *
+     * 
      * @param type
-     *           type of object to check for in cache
+     *            type of object to check for in cache
      * @param id
-     *           ID of object in cache
-     *
+     *            ID of object in cache
+     * 
      * @return the object from the cache, or <code>null</code> if it's not
      *         cached.
      */
@@ -292,11 +293,11 @@ public class Context
 
     /**
      * Store an object in the object cache.
-     *
+     * 
      * @param o
-     *           the object to store
+     *            the object to store
      * @param id
-     *           the object's ID
+     *            the object's ID
      */
     public void cache(Object o, int id)
     {
@@ -306,11 +307,11 @@ public class Context
 
     /**
      * Remove an object from the object cache.
-     *
+     * 
      * @param o
-     *           the object to remove
+     *            the object to remove
      * @param id
-     *           the object's ID
+     *            the object's ID
      */
     public void removeCached(Object o, int id)
     {
@@ -320,7 +321,7 @@ public class Context
 
     /**
      * set membership in a special group
-     *
+     * 
      * @param groupid
      */
     public void setSpecialGroup(int groupID)
@@ -332,9 +333,9 @@ public class Context
 
     /**
      * test if member of special group
-     *
+     * 
      * @param groupid
-     *           to test
+     *            to test
      * @return true if member
      */
     public boolean inSpecialGroup(int groupID)

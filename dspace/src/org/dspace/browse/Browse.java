@@ -68,21 +68,22 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
-
-
 /**
- * API for Browsing Items in DSpace by title, author, or date.
- * Browses only return archived Items.
- *
- * @author  Peter Breton
+ * API for Browsing Items in DSpace by title, author, or date. Browses only
+ * return archived Items.
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class Browse
 {
     // Browse types
     static final int AUTHORS_BROWSE = 0;
+
     static final int ITEMS_BY_TITLE_BROWSE = 1;
+
     static final int ITEMS_BY_AUTHOR_BROWSE = 2;
+
     static final int ITEMS_BY_DATE_BROWSE = 3;
 
     /** Log4j log */
@@ -96,20 +97,21 @@ public class Browse
     }
 
     /**
-     * Return distinct Authors in the given scope.
-     * Author refers to a Dublin Core field with element
-     * <em>contributor</em> and qualifier <em>author</em>.
-     *
+     * Return distinct Authors in the given scope. Author refers to a Dublin
+     * Core field with element <em>contributor</em> and qualifier
+     * <em>author</em>.
+     * 
      * <p>
      * Results are returned in alphabetical order.
      * </p>
-     *
-     * @param scope The BrowseScope
+     * 
+     * @param scope
+     *            The BrowseScope
      * @return A BrowseInfo object, the results of the browse
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
-    public static BrowseInfo getAuthors(BrowseScope scope)
-                                 throws SQLException
+    public static BrowseInfo getAuthors(BrowseScope scope) throws SQLException
     {
         scope.setBrowseType(AUTHORS_BROWSE);
         scope.setAscending(true);
@@ -119,22 +121,22 @@ public class Browse
     }
 
     /**
-     * Return Items indexed by title in the given scope.
-     * Title refers to a Dublin Core field with element <em>title</em>
-     * and no qualifier.
-     *
+     * Return Items indexed by title in the given scope. Title refers to a
+     * Dublin Core field with element <em>title</em> and no qualifier.
+     * 
      * <p>
-     * Results are returned in alphabetical order; that is,
-     * the Item with the title which is first in alphabetical
-     * order will be returned first.
+     * Results are returned in alphabetical order; that is, the Item with the
+     * title which is first in alphabetical order will be returned first.
      * </p>
-     *
-     * @param scope The BrowseScope
+     * 
+     * @param scope
+     *            The BrowseScope
      * @return A BrowseInfo object, the results of the browse
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static BrowseInfo getItemsByTitle(BrowseScope scope)
-                                      throws SQLException
+            throws SQLException
     {
         scope.setBrowseType(ITEMS_BY_TITLE_BROWSE);
         scope.setAscending(true);
@@ -144,41 +146,41 @@ public class Browse
     }
 
     /**
-     * Return Items indexed by date in the given scope.
-     * Date refers to a Dublin Core field with element
-     * <em>date</em> and qualifier <em>issued</em>.
-     *
+     * Return Items indexed by date in the given scope. Date refers to a Dublin
+     * Core field with element <em>date</em> and qualifier <em>issued</em>.
+     * 
      * <p>
-     * If oldestfirst is true, the dates returned are the ones
-     * after the focus, ordered from earliest to latest. Otherwise the
-     * dates are the ones before the focus, and ordered from latest to
-     * earliest. For example:
+     * If oldestfirst is true, the dates returned are the ones after the focus,
+     * ordered from earliest to latest. Otherwise the dates are the ones before
+     * the focus, and ordered from latest to earliest. For example:
      * </p>
-     *
+     * 
      * <p>
-     * For example, if the focus is <em>1995</em>, and oldestfirst is true, the
-     * results might look like this:
+     * For example, if the focus is <em>1995</em>, and oldestfirst is true,
+     * the results might look like this:
      * </p>
-     *
+     * 
      * <code>1993, 1994, 1995 (the focus), 1996, 1997.....</code>
-     *
+     * 
      * <p>
      * While if the focus is <em>1995</em>, and oldestfirst is false, the
      * results would be:
      * </p>
-     *
+     * 
      * <code>1997, 1996, 1995 (the focus), 1994, 1993 .....</code>
-     *
-     * @param scope The BrowseScope
-     * @param oldestfirst If true, the dates returned are the ones
-     * after focus, ordered from earliest to latest; otherwise the dates
-     * are the ones before focus, ordered from latest to earliest.
+     * 
+     * @param scope
+     *            The BrowseScope
+     * @param oldestfirst
+     *            If true, the dates returned are the ones after focus, ordered
+     *            from earliest to latest; otherwise the dates are the ones
+     *            before focus, ordered from latest to earliest.
      * @return A BrowseInfo object, the results of the browse
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static BrowseInfo getItemsByDate(BrowseScope scope,
-                                            boolean oldestfirst)
-                                     throws SQLException
+            boolean oldestfirst) throws SQLException
     {
         scope.setBrowseType(ITEMS_BY_DATE_BROWSE);
         scope.setAscending(oldestfirst);
@@ -189,35 +191,38 @@ public class Browse
 
     /**
      * <p>
-     * Return Items in the given scope by the author (exact match).
-     * The focus of the BrowseScope is the author to use; using a
-     * BrowseScope without a focus causes an IllegalArgumentException
-     * to be thrown.
+     * Return Items in the given scope by the author (exact match). The focus of
+     * the BrowseScope is the author to use; using a BrowseScope without a focus
+     * causes an IllegalArgumentException to be thrown.
      * </p>
-     *
+     * 
      * <p>
-     * Author refers to a Dublin Core field with element
-     * <em>contributor</em> and qualifier <em>author</em>.
+     * Author refers to a Dublin Core field with element <em>contributor</em>
+     * and qualifier <em>author</em>.
      * </p>
-     *
-     * @param scope The BrowseScope
-     * @param sortByTitle If true, the returned items are sorted by title;
-     * otherwise they are sorted by date issued.
+     * 
+     * @param scope
+     *            The BrowseScope
+     * @param sortByTitle
+     *            If true, the returned items are sorted by title; otherwise
+     *            they are sorted by date issued.
      * @return A BrowseInfo object, the results of the browse
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static BrowseInfo getItemsByAuthor(BrowseScope scope,
-                                              boolean sortByTitle)
-                                       throws SQLException
+            boolean sortByTitle) throws SQLException
     {
         if (!scope.hasFocus())
         {
-            throw new IllegalArgumentException("Must specify an author for getItemsByAuthor");
+            throw new IllegalArgumentException(
+                    "Must specify an author for getItemsByAuthor");
         }
 
         if (!(scope.getFocus() instanceof String))
         {
-            throw new IllegalArgumentException("The focus for getItemsByAuthor must be a String");
+            throw new IllegalArgumentException(
+                    "The focus for getItemsByAuthor must be a String");
         }
 
         scope.setBrowseType(ITEMS_BY_AUTHOR_BROWSE);
@@ -230,13 +235,14 @@ public class Browse
 
     /**
      * Returns the last items submitted to DSpace in the given scope.
-     *
-     * @param scope The Browse Scope
+     * 
+     * @param scope
+     *            The Browse Scope
      * @return A List of Items submitted
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
-    public static List getLastSubmitted(BrowseScope scope)
-                                 throws SQLException
+    public static List getLastSubmitted(BrowseScope scope) throws SQLException
     {
         Context context = scope.getContext();
         String sql = getLastSubmittedQuery(scope);
@@ -252,8 +258,8 @@ public class Browse
     }
 
     /**
-     * Return the SQL used to determine the last submitted Items
-     * for scope.
+     * Return the SQL used to determine the last submitted Items for scope.
+     * 
      * @param scope
      * @return String query string
      */
@@ -261,18 +267,20 @@ public class Browse
     {
         String table = getLastSubmittedTable(scope);
 
-        String query = "SELECT * FROM " + table +
-                       getScopeClause(scope, "where") +
-                       " ORDER BY date_accessioned DESC";
+        String query = "SELECT * FROM " + table
+                + getScopeClause(scope, "where")
+                + " ORDER BY date_accessioned DESC";
 
         if (!scope.hasNoLimit())
         {
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
-                // Oracle version of LIMIT...OFFSET - must use a sub-query and ROWNUM
-                query = "SELECT * FROM (" + query + ") WHERE ROWNUM <=" +
-                        scope.getTotal();
-            } else
+                // Oracle version of LIMIT...OFFSET - must use a sub-query and
+                // ROWNUM
+                query = "SELECT * FROM (" + query + ") WHERE ROWNUM <="
+                        + scope.getTotal();
+            }
+            else
             {
                 // postgres, use LIMIT
                 query = query + " LIMIT " + scope.getTotal();
@@ -283,8 +291,9 @@ public class Browse
     }
 
     /**
-     * Return the name of the Browse index table to query for
-     * last submitted items in the given scope.
+     * Return the name of the Browse index table to query for last submitted
+     * items in the given scope.
+     * 
      * @param scope
      * @return name of table
      */
@@ -293,7 +302,8 @@ public class Browse
         if (scope.isCommunityScope())
         {
             return "CommunityItemsByDateAccession";
-        } else if (scope.isCollectionScope())
+        }
+        else if (scope.isCollectionScope())
         {
             return "CollectionItemsByDateAccession";
         }
@@ -303,13 +313,14 @@ public class Browse
 
     /**
      * Transform the query results into a List of Items.
+     * 
      * @param context
      * @param results
      * @return list of items
      * @throws SQLException
      */
     private static List getLastSubmittedResults(Context context, List results)
-                                         throws SQLException
+            throws SQLException
     {
         if ((results == null) || (results.isEmpty()))
         {
@@ -336,13 +347,15 @@ public class Browse
 
     /**
      * This method should be called whenever an item is removed.
-     *
-     * @param context The current DSpace context
-     * @param id The id of the item which has been removed
-     * @exception SQLException If a database error occurs
+     * 
+     * @param context
+     *            The current DSpace context
+     * @param id
+     *            The id of the item which has been removed
+     * @exception SQLException
+     *                If a database error occurs
      */
-    public static void itemRemoved(Context context, int id)
-                            throws SQLException
+    public static void itemRemoved(Context context, int id) throws SQLException
     {
         String sql = "delete from {0} where item_id = " + id;
 
@@ -351,26 +364,29 @@ public class Browse
         for (int i = 0; i < browseTables.length; i++)
         {
             String query = MessageFormat.format(sql,
-                                                new String[] { browseTables[i] });
+                    new String[] { browseTables[i] });
             DatabaseManager.updateQuery(context, query);
         }
     }
 
     /**
-     * This method should be called whenever an item has changed.
-     * Changes include:
-     *
-     *   <ul>
-     *    <li>DC values are added, removed, or modified
-     *    <li>the value of the in_archive flag changes
-     *   </ul>
-     *
-     * @param context - The database context
-     * @param item - The item which has been added
-     * @exception SQLException - If a database error occurs
+     * This method should be called whenever an item has changed. Changes
+     * include:
+     * 
+     * <ul>
+     * <li>DC values are added, removed, or modified
+     * <li>the value of the in_archive flag changes
+     * </ul>
+     * 
+     * @param context -
+     *            The database context
+     * @param item -
+     *            The item which has been added
+     * @exception SQLException -
+     *                If a database error occurs
      */
     public static void itemChanged(Context context, Item item)
-                            throws SQLException
+            throws SQLException
     {
         // This is a bit heavy-weight, but without knowing what
         // changed, it's easiest just to replace the values
@@ -387,13 +403,16 @@ public class Browse
 
     /**
      * This method should be called whenever an item is added.
-     *
-     * @param context The current DSpace context
-     * @param item The item which has been added
-     * @exception SQLException If a database error occurs
+     * 
+     * @param context
+     *            The current DSpace context
+     * @param item
+     *            The item which has been added
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static void itemAdded(Context context, Item item)
-                          throws SQLException
+            throws SQLException
     {
         // add all parent communities to communities2item table
         Community[] parents = item.getCommunities();
@@ -408,14 +427,14 @@ public class Browse
 
         Map table2dc = new HashMap();
         table2dc.put("ItemsByTitle", item.getDC("title", null, Item.ANY));
-        table2dc.put("ItemsByAuthor",
-                     item.getDC("contributor", Item.ANY, Item.ANY));
+        table2dc.put("ItemsByAuthor", item.getDC("contributor", Item.ANY,
+                Item.ANY));
         table2dc.put("ItemsByDate", item.getDC("date", "issued", Item.ANY));
-        table2dc.put("ItemsByDateAccessioned",
-                     item.getDC("date", "accessioned", Item.ANY));
+        table2dc.put("ItemsByDateAccessioned", item.getDC("date",
+                "accessioned", Item.ANY));
 
-        for (Iterator iterator = table2dc.keySet().iterator();
-                 iterator.hasNext();)
+        for (Iterator iterator = table2dc.keySet().iterator(); iterator
+                .hasNext();)
         {
             String table = (String) iterator.next();
             DCValue[] dc = (DCValue[]) table2dc.get(table);
@@ -430,19 +449,22 @@ public class Browse
                 if ("ItemsByDateAccessioned".equals(table))
                 {
                     row.setColumn("date_accessioned", value);
-                } else if ("ItemsByDate".equals(table))
+                }
+                else if ("ItemsByDate".equals(table))
                 {
                     row.setColumn("date_issued", value);
-                } else if ("ItemsByAuthor".equals(table))
+                }
+                else if ("ItemsByAuthor".equals(table))
                 {
                     // author name, and normalized sorting name
                     // (which for now is simple lower-case)
                     row.setColumn("author", value);
                     row.setColumn("sort_author", value.toLowerCase());
-                } else if ("ItemsByTitle".equals(table))
+                }
+                else if ("ItemsByTitle".equals(table))
                 {
                     String title = NormalizedTitle.normalize(value,
-                                                             dc[i].language);
+                            dc[i].language);
                     row.setColumn("title", value);
                     row.setColumn("sort_title", title.toLowerCase());
                 }
@@ -454,10 +476,12 @@ public class Browse
 
     /**
      * Index all items in DSpace. This method may be resource-intensive.
-     *
-     * @param context Current DSpace context
+     * 
+     * @param context
+     *            Current DSpace context
      * @return The number of items indexed.
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static int indexAll(Context context) throws SQLException
     {
@@ -477,10 +501,12 @@ public class Browse
 
     /**
      * Remove all items in DSpace from the Browse index.
-     *
-     * @param context Current DSpace context
+     * 
+     * @param context
+     *            Current DSpace context
      * @return The number of items removed.
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static int indexRemoveAll(Context context) throws SQLException
     {
@@ -503,6 +529,7 @@ public class Browse
 
     /**
      * Return the normalized form of title.
+     * 
      * @param title
      * @param lang
      * @return title
@@ -518,12 +545,12 @@ public class Browse
 
     /**
      * Workhorse method for browse functionality.
+     * 
      * @param scope
      * @return BrowseInfo
      * @throws SQLException
      */
-    private static BrowseInfo doBrowse(BrowseScope scope)
-                                throws SQLException
+    private static BrowseInfo doBrowse(BrowseScope scope) throws SQLException
     {
         // Check for a cached browse
         BrowseInfo cachedInfo = BrowseCache.get(scope);
@@ -561,37 +588,37 @@ public class Browse
             sortResults(scope, results);
 
             BrowseInfo info = new BrowseInfo(results, position, total,
-                                             beforeFocus);
+                    beforeFocus);
 
             logInfo(info);
 
             BrowseCache.add(scope, info);
 
             return info;
-        } finally
+        }
+        finally
         {
             restoreTransactionIsolation(scope, transactionIsolation);
         }
     }
 
     /**
-     * If focus refers to an Item, return a value for the item (its
-     * title, author, accession date, etc). Otherwise return null.
-     *
-     * In general, the queries for these values look like this:
-     *   select max(date_issued) from ItemsByDate where item_id = 7;
-     *
+     * If focus refers to an Item, return a value for the item (its title,
+     * author, accession date, etc). Otherwise return null.
+     * 
+     * In general, the queries for these values look like this: select
+     * max(date_issued) from ItemsByDate where item_id = 7;
+     * 
      * The max operator ensures that only one value is returned.
-     *
+     * 
      * If limiting to a community or collection, we add a clause like:
-     *    community_id = 7
-     *    collection_id = 201
+     * community_id = 7 collection_id = 201
+     * 
      * @param scope
      * @return desired value for the item
      * @throws SQLException
      */
-    protected static String getItemValue(BrowseScope scope)
-                                  throws SQLException
+    protected static String getItemValue(BrowseScope scope) throws SQLException
     {
         if (!scope.focusIsItem())
         {
@@ -607,16 +634,10 @@ public class Browse
             String column = BrowseTables.getValueColumn(scope);
 
             String itemValueQuery = new StringBuffer().append("select ")
-                                                      .append("max(")
-                                                      .append(column)
-                                                      .append(") from ")
-                                                      .append(tablename)
-                                                      .append(" where ")
-                                                      .append(" item_id = ")
-                                                      .append(scope.getFocusItemId())
-                                                      .append(getScopeClause(scope,
-                                                                             "and"))
-                                                      .toString();
+                    .append("max(").append(column).append(") from ").append(
+                            tablename).append(" where ").append(" item_id = ")
+                    .append(scope.getFocusItemId()).append(
+                            getScopeClause(scope, "and")).toString();
 
             statement = createStatement(scope, itemValueQuery);
             results = statement.executeQuery();
@@ -629,7 +650,8 @@ public class Browse
             }
 
             return itemValue;
-        } finally
+        }
+        finally
         {
             if (statement != null)
             {
@@ -645,16 +667,17 @@ public class Browse
 
     /**
      * Run a database query and return results before the focus.
-     *
-     * @param scope The Browse Scope
-     * @param itemValue If the focus is an Item, this is its value
-     * in the index (its title, author, etc).
+     * 
+     * @param scope
+     *            The Browse Scope
+     * @param itemValue
+     *            If the focus is an Item, this is its value in the index (its
+     *            title, author, etc).
      * @return list of Item results
      * @throws SQLException
      */
     protected static List getResultsBeforeFocus(BrowseScope scope,
-                                                String itemValue)
-                                         throws SQLException
+            String itemValue) throws SQLException
     {
         // Starting from beginning of index
         if (!scope.hasFocus())
@@ -692,17 +715,18 @@ public class Browse
 
     /**
      * Run a database query and return results after the focus.
-     *
-     * @param scope The Browse Scope
-     * @param itemValue If the focus is an Item, this is its value
-     * in the index (its title, author, etc).
+     * 
+     * @param scope
+     *            The Browse Scope
+     * @param itemValue
+     *            If the focus is an Item, this is its value in the index (its
+     *            title, author, etc).
      * @param count
      * @return list of results after the focus
      * @throws SQLException
      */
     protected static List getResultsAfterFocus(BrowseScope scope,
-                                               String itemValue, int count)
-                                        throws SQLException
+            String itemValue, int count) throws SQLException
     {
         // No results desired
         if (scope.getTotal() == 0)
@@ -728,25 +752,17 @@ public class Browse
 
     /*
      * Return the total number of values in an index.
-     *
-     * <p>
-     * We total Authors with SQL like:
-     *    select count(distinct author) from ItemsByAuthor;
-     * ItemsByAuthor with:
-     *    select count(*) from ItemsByAuthor where author = ?;
-     * and every other index with:
-     *    select count(*) from ItemsByTitle;
-     * </p>
-     *
-     * <p>
-     * If limiting to a community or collection, we add a clause like:
-     *    community_id = 7
-     *    collection_id = 201
-     * </p>
+     * 
+     * <p> We total Authors with SQL like: select count(distinct author) from
+     * ItemsByAuthor; ItemsByAuthor with: select count(*) from ItemsByAuthor
+     * where author = ?; and every other index with: select count(*) from
+     * ItemsByTitle; </p>
+     * 
+     * <p> If limiting to a community or collection, we add a clause like:
+     * community_id = 7 collection_id = 201 </p>
      */
     protected static int countTotalInIndex(BrowseScope scope,
-                                           int numberOfResults)
-                                    throws SQLException
+            int numberOfResults) throws SQLException
     {
         int browseType = scope.getBrowseType();
 
@@ -754,8 +770,8 @@ public class Browse
         // we find every single Item (eg, the Author only published
         // 2 works, and we asked for 15), and so can skip the
         // query.
-        if ((browseType == ITEMS_BY_AUTHOR_BROWSE) &&
-                (scope.hasNoLimit() || (scope.getTotal() > numberOfResults)))
+        if ((browseType == ITEMS_BY_AUTHOR_BROWSE)
+                && (scope.hasNoLimit() || (scope.getTotal() > numberOfResults)))
         {
             return numberOfResults;
         }
@@ -768,8 +784,8 @@ public class Browse
             String table = BrowseTables.getTable(scope);
 
             StringBuffer buffer = new StringBuffer().append("select count(")
-                                                    .append(getTargetColumns(scope))
-                                                    .append(") from ").append(table);
+                    .append(getTargetColumns(scope)).append(") from ").append(
+                            table);
 
             boolean hasWhere = false;
 
@@ -781,7 +797,7 @@ public class Browse
 
             String connector = hasWhere ? "and" : "where";
             String sql = buffer.append(getScopeClause(scope, connector))
-                               .toString();
+                    .toString();
 
             if (log.isDebugEnabled())
             {
@@ -796,7 +812,8 @@ public class Browse
             }
 
             return getIntValue(statement);
-        } finally
+        }
+        finally
         {
             if (statement != null)
             {
@@ -807,16 +824,19 @@ public class Browse
 
     /**
      * Return the number of matches for the browse scope.
+     * 
      * @param scope
-     * @param itemValue item value we're looking for
-     * @param totalInIndex FIXME ??
-     * @param numberOfResults FIXME ??
+     * @param itemValue
+     *            item value we're looking for
+     * @param totalInIndex
+     *            FIXME ??
+     * @param numberOfResults
+     *            FIXME ??
      * @return number of matches
      * @throws SQLException
      */
     protected static int countMatches(BrowseScope scope, String itemValue,
-                                      int totalInIndex, int numberOfResults)
-                               throws SQLException
+            int totalInIndex, int numberOfResults) throws SQLException
     {
         // Matched everything
         if (numberOfResults == totalInIndex)
@@ -850,8 +870,9 @@ public class Browse
     }
 
     /**
-     * Sort the results returned from the browse if necessary.
-     * The list of results is sorted in-place.
+     * Sort the results returned from the browse if necessary. The list of
+     * results is sorted in-place.
+     * 
      * @param scope
      * @param results
      */
@@ -863,27 +884,28 @@ public class Browse
             return;
         }
 
-        ItemComparator ic = scope.getSortByTitle().booleanValue()
-                            ? new ItemComparator("title", null, Item.ANY, true)
-                            : new ItemComparator("date", "issued", Item.ANY,
-                                                 true);
+        ItemComparator ic = scope.getSortByTitle().booleanValue() ? new ItemComparator(
+                "title", null, Item.ANY, true)
+                : new ItemComparator("date", "issued", Item.ANY, true);
 
         Collections.sort(results, ic);
     }
 
     /**
-     * Transform the results of the query (TableRow objects_
-     * into a List of Strings (for getAuthors()) or
-     * Items (for all the other browses).
-     *
-     * @param scope The Browse Scope
-     * @param results The results of the query
-     * @param max The maximum number of results to return
+     * Transform the results of the query (TableRow objects_ into a List of
+     * Strings (for getAuthors()) or Items (for all the other browses).
+     * 
+     * @param scope
+     *            The Browse Scope
+     * @param results
+     *            The results of the query
+     * @param max
+     *            The maximum number of results to return
      * @return FIXME ??
      * @throws SQLException
      */
     private static List getResults(BrowseScope scope, List results, int max)
-                            throws SQLException
+            throws SQLException
     {
         if (results == null)
         {
@@ -897,9 +919,9 @@ public class Browse
         for (Iterator iterator = results.iterator(); iterator.hasNext();)
         {
             TableRow row = (TableRow) iterator.next();
-            Object theValue = (isAuthorsBrowse)
-                              ? (Object) row.getStringColumn("author")
-                              : (Object) new Integer(row.getIntColumn("item_id"));
+            Object theValue = (isAuthorsBrowse) ? (Object) row
+                    .getStringColumn("author") : (Object) new Integer(row
+                    .getIntColumn("item_id"));
 
             // Should not happen
             if (theValue == null)
@@ -921,27 +943,30 @@ public class Browse
             }
         }
 
-        return isAuthorsBrowse ? theResults
-                               : toItems(scope.getContext(), theResults);
+        return isAuthorsBrowse ? theResults : toItems(scope.getContext(),
+                theResults);
     }
 
     /**
      * Create a PreparedStatement to run the correct query for scope.
-     *
-     * @param scope The Browse scope
-     * @param subqueryValue If the focus is an item, this is its value
-     * in the browse index (its title, author, date, etc). Otherwise null.
-     * @param after If true, create SQL to find the items after the focus.
-     * Otherwise create SQL to find the items before the focus.
-     * @param isCount If true, create SQL to count the number of matches
-     * for the query. Otherwise just the query.
+     * 
+     * @param scope
+     *            The Browse scope
+     * @param subqueryValue
+     *            If the focus is an item, this is its value in the browse index
+     *            (its title, author, date, etc). Otherwise null.
+     * @param after
+     *            If true, create SQL to find the items after the focus.
+     *            Otherwise create SQL to find the items before the focus.
+     * @param isCount
+     *            If true, create SQL to count the number of matches for the
+     *            query. Otherwise just the query.
      * @return a prepared statement
      * @throws SQLException
      */
     private static PreparedStatement createSql(BrowseScope scope,
-                                               String subqueryValue,
-                                               boolean after, boolean isCount)
-                                        throws SQLException
+            String subqueryValue, boolean after, boolean isCount)
+            throws SQLException
     {
         String sqli = createSqlInternal(scope, subqueryValue, isCount);
         String sql = formatSql(scope, sqli, subqueryValue, after);
@@ -951,7 +976,7 @@ public class Browse
         if (scope.hasFocus())
         {
             String value = (subqueryValue != null) ? subqueryValue
-                                                   : (String) scope.getFocus();
+                    : (String) scope.getFocus();
 
             statement.setString(1, value);
 
@@ -972,13 +997,15 @@ public class Browse
 
     /**
      * Create a SQL string to run the correct query.
+     * 
      * @param scope
-     * @param itemValue FIXME ??
+     * @param itemValue
+     *            FIXME ??
      * @param isCount
      * @return
      */
     private static String createSqlInternal(BrowseScope scope,
-                                            String itemValue, boolean isCount)
+            String itemValue, boolean isCount)
     {
         String tablename = BrowseTables.getTable(scope);
         String column = BrowseTables.getValueColumn(scope);
@@ -992,9 +1019,9 @@ public class Browse
         sqlb.append(isCount ? ")" : "");
 
         /**
-                * This next bit adds another column to the query, so
-                * authors don't show up lower-case
-                **/
+         * This next bit adds another column to the query, so authors don't show
+         * up lower-case
+         */
         if ((browseType == AUTHORS_BROWSE) && !isCount)
         {
             sqlb.append(",author");
@@ -1018,9 +1045,8 @@ public class Browse
             if (scope.focusIsItem())
             {
                 subquery = new StringBuffer().append(" or ( ").append(column)
-                                             .append(" = ? and item_id {0}  ")
-                                             .append(scope.getFocusItemId())
-                                             .append(")").toString();
+                        .append(" = ? and item_id {0}  ").append(
+                                scope.getFocusItemId()).append(")").toString();
             }
 
             if (log.isDebugEnabled())
@@ -1029,7 +1055,8 @@ public class Browse
             }
 
             sqlb.append(" where ").append("(").append(column).append(" {1} ")
-                .append("?").append(scope.focusIsItem() ? subquery : "").append(")");
+                    .append("?").append(scope.focusIsItem() ? subquery : "")
+                    .append(")");
 
             addedWhereClause = true;
         }
@@ -1044,11 +1071,14 @@ public class Browse
         }
 
         // Add an order by clause -- a parameter
-        sqlb.append(" order by ").append(column).append("{2}").append(((scope.focusIsString() &&
-                                                                      (scope.getBrowseType() != ITEMS_BY_DATE_BROWSE)) ||
-                                                                      (scope.getBrowseType() == AUTHORS_BROWSE))
-                                                                      ? ""
-                                                                      : ", item_id{2}");
+        sqlb
+                .append(" order by ")
+                .append(column)
+                .append("{2}")
+                .append(
+                        ((scope.focusIsString() && (scope.getBrowseType() != ITEMS_BY_DATE_BROWSE)) || (scope
+                                .getBrowseType() == AUTHORS_BROWSE)) ? ""
+                                : ", item_id{2}");
 
         String myquery = sqlb.toString();
 
@@ -1057,9 +1087,10 @@ public class Browse
         {
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
-                myquery = "SELECT * FROM (" + myquery +
-                          ") WHERE ROWNUM <= {3} ";
-            } else
+                myquery = "SELECT * FROM (" + myquery
+                        + ") WHERE ROWNUM <= {3} ";
+            }
+            else
             {
                 // postgres uses LIMIT
                 myquery = myquery + " LIMIT {3} ";
@@ -1071,16 +1102,18 @@ public class Browse
 
     /**
      * Format SQL according to the browse type.
+     * 
      * @param scope
      * @param sql
-     * @param subqueryValue FIXME ??
+     * @param subqueryValue
+     *            FIXME ??
      * @param after
      * @return
-     *
-     *
+     * 
+     *  
      */
     private static String formatSql(BrowseScope scope, String sql,
-                                    String subqueryValue, boolean after)
+            String subqueryValue, boolean after)
     {
         boolean before = !after;
         int browseType = scope.getBrowseType();
@@ -1118,7 +1151,8 @@ public class Browse
             {
                 beforeOperator = ">";
                 afterOperator = "<";
-            } else
+            }
+            else
             {
                 beforeOperator = "<";
                 afterOperator = ">";
@@ -1162,6 +1196,7 @@ public class Browse
 
     /**
      * Log a message about the results of a browse.
+     * 
      * @param info
      */
     private static void logInfo(BrowseInfo info)
@@ -1171,27 +1206,28 @@ public class Browse
             return;
         }
 
-        log.debug("Number of Results: " + info.getResultCount() +
-                  " Overall position: " + info.getOverallPosition() +
-                  " Total " + info.getTotal() + " Offset " + info.getOffset());
+        log.debug("Number of Results: " + info.getResultCount()
+                + " Overall position: " + info.getOverallPosition() + " Total "
+                + info.getTotal() + " Offset " + info.getOffset());
 
         int lastIndex = (info.getOverallPosition() + info.getResultCount());
-        boolean noresults = (info.getTotal() == 0) ||
-                            (info.getResultCount() == 0);
+        boolean noresults = (info.getTotal() == 0)
+                || (info.getResultCount() == 0);
 
         if (noresults)
         {
             log.debug("Got no results");
         }
 
-        log.debug("Got results: " + info.getOverallPosition() + " to " +
-                  lastIndex + " out of " + info.getTotal());
+        log.debug("Got results: " + info.getOverallPosition() + " to "
+                + lastIndex + " out of " + info.getTotal());
     }
 
     /**
      * Return the name or names of the column(s) to query for a browse.
-     *
-     * @param scope The current browse scope
+     * 
+     * @param scope
+     *            The current browse scope
      * @return The name or names of the columns to query
      */
     private static String getTargetColumns(BrowseScope scope)
@@ -1205,23 +1241,24 @@ public class Browse
      * <p>
      * Return a scoping clause.
      * </p>
-     *
+     * 
      * <p>
      * If scope is ALLDSPACE_SCOPE, return the empty string.
      * </p>
-     *
+     * 
      * <p>
      * Otherwise, the SQL clause which is generated looks like:
      * </p>
-     *    CONNECTOR community_id = 7
-     *    CONNECTOR collection_id = 203
-     *
+     * CONNECTOR community_id = 7 CONNECTOR collection_id = 203
+     * 
      * <p>
      * CONNECTOR may be empty, or it may be a SQL keyword like <em>where</em>,
      * <em>and</em>, and so forth.
      * </p>
+     * 
      * @param scope
-     * @param connector FIXME ??
+     * @param connector
+     *            FIXME ??
      * @return
      */
     static String getScopeClause(BrowseScope scope, String connector)
@@ -1234,27 +1271,28 @@ public class Browse
         boolean isCommunity = scope.isCommunityScope();
         Object obj = scope.getScope();
 
-        int id = (isCommunity) ? ((Community) obj).getID()
-                               : ((Collection) obj).getID();
+        int id = (isCommunity) ? ((Community) obj).getID() : ((Collection) obj)
+                .getID();
 
         String column = (isCommunity) ? "community_id" : "collection_id";
 
         return new StringBuffer().append(" ").append(connector).append(" ")
-                                 .append(column).append(" = ").append(id)
-                                 .toString();
+                .append(column).append(" = ").append(id).toString();
     }
 
     /**
      * Create a PreparedStatement with the given sql.
-     *
-     * @param scope The current Browse scope
-     * @param sql SQL query
+     * 
+     * @param scope
+     *            The current Browse scope
+     * @param sql
+     *            SQL query
      * @return A PreparedStatement with the given SQL
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     private static PreparedStatement createStatement(BrowseScope scope,
-                                                     String sql)
-                                              throws SQLException
+            String sql) throws SQLException
     {
         Connection connection = scope.getContext().getDBConnection();
 
@@ -1262,27 +1300,27 @@ public class Browse
     }
 
     /**
-     * Set the JDBC transaction isolation level.
-     * Multiple SQL statements can be made transactionally
-     * safe by setting the transaction level appropriately.
-     * Essentially, the database guarantees that the application's
-     * view of the database is isolated from changes by anyone else.
-     * In our case, we are only doing multiple queries, so there are
-     * no updating issues.
-     *
-     * @param scope The current Browse scope
+     * Set the JDBC transaction isolation level. Multiple SQL statements can be
+     * made transactionally safe by setting the transaction level appropriately.
+     * Essentially, the database guarantees that the application's view of the
+     * database is isolated from changes by anyone else. In our case, we are
+     * only doing multiple queries, so there are no updating issues.
+     * 
+     * @param scope
+     *            The current Browse scope
      * @return The transaction isolation level of the database
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     private static int setTransactionIsolation(BrowseScope scope)
-                                        throws SQLException
+            throws SQLException
     {
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             return 1;
         }
 
-        // postgres    
+        // postgres
         Connection connection = scope.getContext().getDBConnection();
         int level = connection.getTransactionIsolation();
         connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
@@ -1292,17 +1330,21 @@ public class Browse
 
     /**
      * Restore the Database's transaction isolation level.
-     *
-     * @param scope The current Browse scope
-     * @param level The transaction isolation level to set
-     * @exception SQLException If a database error occurs
+     * 
+     * @param scope
+     *            The current Browse scope
+     * @param level
+     *            The transaction isolation level to set
+     * @exception SQLException
+     *                If a database error occurs
      */
     private static void restoreTransactionIsolation(BrowseScope scope, int level)
-                                             throws SQLException
+            throws SQLException
     {
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
-        } else
+        }
+        else
         {
             // postgres
             Connection connection = scope.getContext().getDBConnection();
@@ -1312,14 +1354,16 @@ public class Browse
 
     /**
      * Return a single int value from the PreparedStatement.
-     *
-     * @param statement A PreparedStatement for a query which returns
-     * a single value of INTEGER type.
+     * 
+     * @param statement
+     *            A PreparedStatement for a query which returns a single value
+     *            of INTEGER type.
      * @return The integer value from the query.
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     private static int getIntValue(PreparedStatement statement)
-                            throws SQLException
+            throws SQLException
     {
         ResultSet results = null;
 
@@ -1328,7 +1372,8 @@ public class Browse
             results = statement.executeQuery();
 
             return results.next() ? results.getInt(1) : (-1);
-        } finally
+        }
+        finally
         {
             if (results != null)
             {
@@ -1339,14 +1384,16 @@ public class Browse
 
     /**
      * Convert a list of item ids to full Items.
-     *
-     * @param context The current DSpace context
-     * @param ids A list of item ids. Each member of the list is an Integer.
+     * 
+     * @param context
+     *            The current DSpace context
+     * @param ids
+     *            A list of item ids. Each member of the list is an Integer.
      * @return A list of Items with the given ids.
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
-    private static List toItems(Context context, List ids)
-                         throws SQLException
+    private static List toItems(Context context, List ids) throws SQLException
     {
         //  FIXME Again, this is probably a more general need
         List results = new ArrayList();
@@ -1366,13 +1413,13 @@ public class Browse
     }
 }
 
-
 class NormalizedTitle
 {
     private static String[] STOP_WORDS = new String[] { "A", "An", "The" };
 
     /**
      * Returns a normalized String corresponding to TITLE.
+     * 
      * @param title
      * @param lang
      * @return
@@ -1388,16 +1435,14 @@ class NormalizedTitle
     }
 
     /**
-     * Returns a normalized String corresponding to TITLE.
-     * The normalization is effected by:
-     *
-     *   + first removing leading spaces, if any
-     *   + then removing the first leading occurences of "a", "an"
-     *     and "the" (in any case).
-     *   + removing any whitespace following an occurence of a stop word
-     *
-     * This simple strategy is only expected to be used for
-     * English words.
+     * Returns a normalized String corresponding to TITLE. The normalization is
+     * effected by:
+     *  + first removing leading spaces, if any + then removing the first
+     * leading occurences of "a", "an" and "the" (in any case). + removing any
+     * whitespace following an occurence of a stop word
+     * 
+     * This simple strategy is only expected to be used for English words.
+     * 
      * @param oldtitle
      * @return
      */
@@ -1434,11 +1479,12 @@ class NormalizedTitle
             //   The title must start with the stop word (skipping white space
             //     and ignoring case).
             boolean found = title.toLowerCase().startsWith(stop.toLowerCase(),
-                                                           startAt) &&
-                            ( //   The title must be longer than whitespace plus the stop word
-            title.length() >= (startAt + stoplen + 1)) &&
-                            //   The stop word must be followed by white space
-            Character.isWhitespace(title.charAt(startAt + stoplen));
+                    startAt)
+                    && ( //   The title must be longer than whitespace plus the
+                         // stop word
+                    title.length() >= (startAt + stoplen + 1)) &&
+                    //   The stop word must be followed by white space
+                    Character.isWhitespace(title.charAt(startAt + stoplen));
 
             if (found)
             {
@@ -1473,12 +1519,13 @@ class NormalizedTitle
         }
 
         // Otherwise, return the substring with the stop word appended
-        return new StringBuffer(title.substring(startAt)).append(", ")
-                                                         .append(stop).toString();
+        return new StringBuffer(title.substring(startAt)).append(", ").append(
+                stop).toString();
     }
 
     /**
      * Return the index of the first non-whitespace character in the String.
+     * 
      * @param title
      * @return
      */
@@ -1488,8 +1535,9 @@ class NormalizedTitle
     }
 
     /**
-     * Return the index of the first non-whitespace character
-     * in the character array.
+     * Return the index of the first non-whitespace character in the character
+     * array.
+     * 
      * @param title
      * @return
      */
@@ -1499,8 +1547,9 @@ class NormalizedTitle
     }
 
     /**
-     * Return the index of the first non-whitespace character in
-     * the String, starting at position STARTAT.
+     * Return the index of the first non-whitespace character in the String,
+     * starting at position STARTAT.
+     * 
      * @param title
      * @param startAt
      * @return
@@ -1511,8 +1560,9 @@ class NormalizedTitle
     }
 
     /**
-     * Return the index of the first letter or number in
-     * the character array, starting at position STARTAT.
+     * Return the index of the first letter or number in the character array,
+     * starting at position STARTAT.
+     * 
      * @param title
      * @param startAt
      * @return
@@ -1539,14 +1589,15 @@ class NormalizedTitle
     }
 }
 
-
 class BrowseCache
 {
     private static Map tableMax = new HashMap();
+
     private static Map tableSize = new HashMap();
 
     /** log4j object */
     private static Logger log = Logger.getLogger(BrowseCache.class);
+
     private static Map cache = new WeakHashMap();
 
     // Everything in the cache is held via Weak References, and is
@@ -1554,10 +1605,12 @@ class BrowseCache
     // The dateCache holds normal references, so anything in it
     // will stay around.
     private static SortedMap dateCache = new TreeMap();
+
     private static final int CACHE_MAXIMUM = 30;
 
     /**
      * Look for cached Browse data corresponding to KEY.
+     * 
      * @param key
      * @return
      */
@@ -1565,8 +1618,9 @@ class BrowseCache
     {
         if (log.isDebugEnabled())
         {
-            log.debug("Checking browse cache with " + cache.size() +
-                      " objects");
+            log
+                    .debug("Checking browse cache with " + cache.size()
+                            + " objects");
         }
 
         BrowseInfo cachedInfo = (BrowseInfo) cache.get(key);
@@ -1607,7 +1661,8 @@ class BrowseCache
 
                 return null;
             }
-        } catch (SQLException sqle)
+        }
+        catch (SQLException sqle)
         {
             if (log.isDebugEnabled())
             {
@@ -1630,12 +1685,12 @@ class BrowseCache
 
     /**
      * Return true if an index has changed
+     * 
      * @param key
      * @return
      * @throws SQLException
      */
-    public static boolean indexHasChanged(BrowseScope key)
-                                   throws SQLException
+    public static boolean indexHasChanged(BrowseScope key) throws SQLException
     {
         Context context = null;
 
@@ -1667,7 +1722,8 @@ class BrowseCache
 
             // The index has in fact changed
             return true;
-        } catch (SQLException sqle)
+        }
+        catch (SQLException sqle)
         {
             if (context != null)
             {
@@ -1679,8 +1735,9 @@ class BrowseCache
     }
 
     /**
-     * Compute and save the values for the number of values in the
-     * index, and the maximum such value.
+     * Compute and save the values for the number of values in the index, and
+     * the maximum such value.
+     * 
      * @param key
      */
     public static void updateIndexData(BrowseScope key)
@@ -1705,7 +1762,8 @@ class BrowseCache
 
             setMaximum(key, max);
             setCount(key, count);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             if (context != null)
             {
@@ -1718,24 +1776,24 @@ class BrowseCache
 
     /**
      * Retrieve the values for count and max
+     * 
      * @param context
      * @param scope
      * @return
      * @throws SQLException
      */
     public static TableRow countAndMax(Context context, BrowseScope scope)
-                                throws SQLException
+            throws SQLException
     {
         // The basic idea here is that we'll check an indexes
         // maximum id and its count: if the maximum id has changed,
         // then there are new values, and if the count has changed,
         // then some items may have been removed. We assume that
         // values never change.
-        String sql = new StringBuffer().append("select count({0}) as count, max({0}) as max from ")
-                                       .append(BrowseTables.getTable(scope))
-                                       .append(Browse.getScopeClause(scope,
-                                                                     "where"))
-                                       .toString();
+        String sql = new StringBuffer().append(
+                "select count({0}) as count, max({0}) as max from ").append(
+                BrowseTables.getTable(scope)).append(
+                Browse.getScopeClause(scope, "where")).toString();
 
         // Format it to use the correct columns
         String countColumn = BrowseTables.getIndexColumn(scope);
@@ -1745,8 +1803,8 @@ class BrowseCache
         // Run the query
         if (log.isDebugEnabled())
         {
-            log.debug("Running SQL to check whether index has changed: \"" +
-                      SQL + "\"");
+            log.debug("Running SQL to check whether index has changed: \""
+                    + SQL + "\"");
         }
 
         return DatabaseManager.querySingle(context, null, SQL);
@@ -1754,6 +1812,7 @@ class BrowseCache
 
     /**
      * Add info to cache, using key.
+     * 
      * @param key
      * @param info
      */
@@ -1798,6 +1857,7 @@ class BrowseCache
 
     /**
      * Return the maximum value
+     * 
      * @param scope
      * @return
      */
@@ -1830,27 +1890,23 @@ class BrowseCache
     }
 }
 
-
 // Encapsulates browse table info:
 //   * Each scope and browsetype has a corresponding table or view
 //   * Each browse table or view has a value column
 //   * Some of the browse tables are true tables, others are views.
 //     The index maintenance code needs to know the true tables.
 //     The true tables have index columns, which can be used for caching
+
 class BrowseTables
 {
-    private static final String[] BROWSE_TABLES = new String[]
-                                                  {
-                                                      "Communities2Item",
-                                                      "ItemsByAuthor",
-                                                      "ItemsByDate",
-                                                      "ItemsByDateAccessioned",
-                                                      "ItemsByTitle",
-                                                  };
+    private static final String[] BROWSE_TABLES = new String[] {
+            "Communities2Item", "ItemsByAuthor", "ItemsByDate",
+            "ItemsByDateAccessioned", "ItemsByTitle", };
 
     /**
-     * Return the browse tables. This only returns true tables,
-     * views are ignored.
+     * Return the browse tables. This only returns true tables, views are
+     * ignored.
+     * 
      * @return
      */
     public static String[] tables()
@@ -1860,6 +1916,7 @@ class BrowseTables
 
     /**
      * Return the browse table or view for scope.
+     * 
      * @param scope
      * @return
      */
@@ -1869,8 +1926,8 @@ class BrowseTables
         boolean isCommunity = scope.isCommunityScope();
         boolean isCollection = scope.isCollectionScope();
 
-        if ((browseType == Browse.AUTHORS_BROWSE) ||
-                (browseType == Browse.ITEMS_BY_AUTHOR_BROWSE))
+        if ((browseType == Browse.AUTHORS_BROWSE)
+                || (browseType == Browse.ITEMS_BY_AUTHOR_BROWSE))
         {
             if (isCommunity)
             {
@@ -1915,11 +1972,13 @@ class BrowseTables
             return "ItemsByDate";
         }
 
-        throw new IllegalArgumentException("No table for browse and scope combination");
+        throw new IllegalArgumentException(
+                "No table for browse and scope combination");
     }
 
     /**
      * Return the name of the column that holds the index.
+     * 
      * @param scope
      * @return
      */
@@ -1947,13 +2006,13 @@ class BrowseTables
             return "items_by_title_id";
         }
 
-        throw new IllegalArgumentException("Unknown browse type: " +
-                                           browseType);
+        throw new IllegalArgumentException("Unknown browse type: " + browseType);
     }
 
     /**
-     * Return the name of the column that holds the Browse value
-     * (the title, author, date, etc).
+     * Return the name of the column that holds the Browse value (the title,
+     * author, date, etc).
+     * 
      * @param scope
      * @return
      */
@@ -1982,7 +2041,6 @@ class BrowseTables
             return "sort_title";
         }
 
-        throw new IllegalArgumentException("Unknown browse type: " +
-                                           browseType);
+        throw new IllegalArgumentException("Unknown browse type: " + browseType);
     }
 }

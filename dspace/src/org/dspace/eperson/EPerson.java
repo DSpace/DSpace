@@ -56,10 +56,9 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
  * Class representing an e-person.
- *
+ * 
  * @author David Stuve
  * @version $Revision$
  */
@@ -85,8 +84,11 @@ public class EPerson extends DSpaceObject
 
     /**
      * Construct an EPerson
-     * @param context  the context this object exists in
-     * @param row      the corresponding row in the table
+     * 
+     * @param context
+     *            the context this object exists in
+     * @param row
+     *            the corresponding row in the table
      */
     EPerson(Context context, TableRow row)
     {
@@ -99,14 +101,15 @@ public class EPerson extends DSpaceObject
 
     /**
      * Get an EPerson from the database.
-     *
-     * @param  context  DSpace context object
-     * @param  id       ID of the EPerson
-     *
-     * @return  the EPerson format, or null if the ID is invalid.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param id
+     *            ID of the EPerson
+     * 
+     * @return the EPerson format, or null if the ID is invalid.
      */
-    public static EPerson find(Context context, int id)
-                        throws SQLException
+    public static EPerson find(Context context, int id) throws SQLException
     {
         // First check the cache
         EPerson fromCache = (EPerson) context.fromCache(EPerson.class, id);
@@ -121,7 +124,8 @@ public class EPerson extends DSpaceObject
         if (row == null)
         {
             return null;
-        } else
+        }
+        else
         {
             return new EPerson(context, row);
         }
@@ -129,28 +133,30 @@ public class EPerson extends DSpaceObject
 
     /**
      * Find the eperson by their email address
-     *
+     * 
      * @return EPerson
      */
     public static EPerson findByEmail(Context context, String email)
-                               throws SQLException, AuthorizeException
+            throws SQLException, AuthorizeException
     {
         TableRow row = DatabaseManager.findByUnique(context, "eperson",
-                                                    "email", email);
+                "email", email);
 
         if (row == null)
         {
             return null;
-        } else
+        }
+        else
         {
             // First check the cache
-            EPerson fromCache = (EPerson) context.fromCache(EPerson.class,
-                                                            row.getIntColumn("eperson_id"));
+            EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+                    .getIntColumn("eperson_id"));
 
             if (fromCache != null)
             {
                 return fromCache;
-            } else
+            }
+            else
             {
                 return new EPerson(context, row);
             }
@@ -158,8 +164,8 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Retrieve all e-person records from the database, sorted by a
-     * particular field.  Fields are:
+     * Retrieve all e-person records from the database, sorted by a particular
+     * field. Fields are:
      * <UL>
      * <LI><code>ID</code></LI>
      * <LI><code>LASTNAME</code></LI>
@@ -167,29 +173,28 @@ public class EPerson extends DSpaceObject
      * </UL>
      */
     public static EPerson[] findAll(Context context, int sortField)
-                             throws SQLException
+            throws SQLException
     {
         String s;
 
         switch (sortField)
         {
-            case ID:
-                s = "eperson_id";
+        case ID:
+            s = "eperson_id";
 
-                break;
+            break;
 
-            case EMAIL:
-                s = "email";
+        case EMAIL:
+            s = "email";
 
-                break;
+            break;
 
-            default:
-                s = "lastname";
+        default:
+            s = "lastname";
         }
 
         TableRowIterator rows = DatabaseManager.query(context,
-                                                      "SELECT * FROM eperson ORDER BY " +
-                                                      s);
+                "SELECT * FROM eperson ORDER BY " + s);
 
         List epeopleRows = rows.toList();
 
@@ -200,13 +205,14 @@ public class EPerson extends DSpaceObject
             TableRow row = (TableRow) epeopleRows.get(i);
 
             // First check the cache
-            EPerson fromCache = (EPerson) context.fromCache(EPerson.class,
-                                                            row.getIntColumn("eperson_id"));
+            EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+                    .getIntColumn("eperson_id"));
 
             if (fromCache != null)
             {
                 epeople[i] = fromCache;
-            } else
+            }
+            else
             {
                 epeople[i] = new EPerson(context, row);
             }
@@ -217,16 +223,18 @@ public class EPerson extends DSpaceObject
 
     /**
      * Create a new eperson
-     *
-     * @param  context  DSpace context object
+     * 
+     * @param context
+     *            DSpace context object
      */
-    public static EPerson create(Context context)
-                          throws SQLException, AuthorizeException
+    public static EPerson create(Context context) throws SQLException,
+            AuthorizeException
     {
         // authorized?
         if (!AuthorizeManager.isAdmin(context))
         {
-            throw new AuthorizeException("You must be an admin to create an EPerson");
+            throw new AuthorizeException(
+                    "You must be an admin to create an EPerson");
         }
 
         // Create a table row
@@ -234,33 +242,31 @@ public class EPerson extends DSpaceObject
 
         EPerson e = new EPerson(context, row);
 
-        log.info(LogManager.getHeader(context, "create_eperson",
-                                      "eperson_id=" + e.getID()));
+        log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
+                + e.getID()));
 
-        HistoryManager.saveHistory(context, e, HistoryManager.REMOVE,
-                                   context.getCurrentUser(),
-                                   context.getExtraLogInfo());
+        HistoryManager.saveHistory(context, e, HistoryManager.REMOVE, context
+                .getCurrentUser(), context.getExtraLogInfo());
 
         return e;
     }
 
     /**
      * Delete an eperson
-     *
+     *  
      */
-    public void delete()
-                throws SQLException, AuthorizeException, 
-                       EPersonDeletionException
+    public void delete() throws SQLException, AuthorizeException,
+            EPersonDeletionException
     {
         // authorized?
         if (!AuthorizeManager.isAdmin(myContext))
         {
-            throw new AuthorizeException("You must be an admin to delete an EPerson");
+            throw new AuthorizeException(
+                    "You must be an admin to delete an EPerson");
         }
 
         HistoryManager.saveHistory(myContext, this, HistoryManager.REMOVE,
-                                   myContext.getCurrentUser(),
-                                   myContext.getExtraLogInfo());
+                myContext.getCurrentUser(), myContext.getExtraLogInfo());
 
         //check for presence of eperson in tables that
         //have constraints on eperson_id
@@ -278,24 +284,22 @@ public class EPerson extends DSpaceObject
 
         // Remove any group memberships first
         DatabaseManager.updateQuery(myContext,
-                                    "DELETE FROM EPersonGroup2EPerson WHERE eperson_id=" +
-                                    getID());
+                "DELETE FROM EPersonGroup2EPerson WHERE eperson_id=" + getID());
 
         // Remove any subscriptions
         DatabaseManager.updateQuery(myContext,
-                                    "DELETE FROM subscription WHERE eperson_id=" +
-                                    getID());
+                "DELETE FROM subscription WHERE eperson_id=" + getID());
 
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
 
         log.info(LogManager.getHeader(myContext, "delete_eperson",
-                                      "eperson_id=" + getID()));
+                "eperson_id=" + getID()));
     }
 
     /**
      * Get the e-person's internal identifier
-     *
+     * 
      * @return the internal identifier
      */
     public int getID()
@@ -311,8 +315,8 @@ public class EPerson extends DSpaceObject
 
     /**
      * Get the e-person's email address
-     *
-     * @return  their email address
+     * 
+     * @return their email address
      */
     public String getEmail()
     {
@@ -321,8 +325,9 @@ public class EPerson extends DSpaceObject
 
     /**
      * Set the EPerson's email
-     *
-     * @param  s   the new email
+     * 
+     * @param s
+     *            the new email
      */
     public void setEmail(String s)
     {
@@ -335,10 +340,10 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Get the e-person's full name, combining first and last name
-     * in a displayable string.
-     *
-     * @return  their full name
+     * Get the e-person's full name, combining first and last name in a
+     * displayable string.
+     * 
+     * @return their full name
      */
     public String getFullName()
     {
@@ -348,10 +353,12 @@ public class EPerson extends DSpaceObject
         if ((l == null) && (f == null))
         {
             return getEmail();
-        } else if (f == null)
+        }
+        else if (f == null)
         {
             return l;
-        } else
+        }
+        else
         {
             return (f + " " + l);
         }
@@ -359,7 +366,7 @@ public class EPerson extends DSpaceObject
 
     /**
      * Get the eperson's first name.
-     *
+     * 
      * @return their first name
      */
     public String getFirstName()
@@ -369,8 +376,9 @@ public class EPerson extends DSpaceObject
 
     /**
      * Set the eperson's first name
-     *
-     * @param firstname the person's first name
+     * 
+     * @param firstname
+     *            the person's first name
      */
     public void setFirstName(String firstname)
     {
@@ -379,7 +387,7 @@ public class EPerson extends DSpaceObject
 
     /**
      * Get the eperson's last name.
-     *
+     * 
      * @return their last name
      */
     public String getLastName()
@@ -389,8 +397,9 @@ public class EPerson extends DSpaceObject
 
     /**
      * Set the eperson's last name
-     *
-     * @param lastname the person's last name
+     * 
+     * @param lastname
+     *            the person's last name
      */
     public void setLastName(String lastname)
     {
@@ -399,8 +408,9 @@ public class EPerson extends DSpaceObject
 
     /**
      * Indicate whether the user can log in
-     *
-     * @param login boolean yes/no
+     * 
+     * @param login
+     *            boolean yes/no
      */
     public void setCanLogIn(boolean login)
     {
@@ -409,7 +419,7 @@ public class EPerson extends DSpaceObject
 
     /**
      * Can the user log in?
-     *
+     * 
      * @return boolean, yes/no
      */
     public boolean canLogIn()
@@ -419,8 +429,9 @@ public class EPerson extends DSpaceObject
 
     /**
      * Set require cert yes/no
-     *
-     * @param isrequired boolean yes/no
+     * 
+     * @param isrequired
+     *            boolean yes/no
      */
     public void setRequireCertificate(boolean isrequired)
     {
@@ -429,7 +440,7 @@ public class EPerson extends DSpaceObject
 
     /**
      * Get require certificate or not
-     *
+     * 
      * @return boolean, yes/no
      */
     public boolean getRequireCertificate()
@@ -439,8 +450,9 @@ public class EPerson extends DSpaceObject
 
     /**
      * Indicate whether the user self-registered
-     *
-     * @param sr boolean yes/no
+     * 
+     * @param sr
+     *            boolean yes/no
      */
     public void setSelfRegistered(boolean sr)
     {
@@ -449,7 +461,7 @@ public class EPerson extends DSpaceObject
 
     /**
      * Can the user log in?
-     *
+     * 
      * @return boolean, yes/no
      */
     public boolean getSelfRegistered()
@@ -459,13 +471,14 @@ public class EPerson extends DSpaceObject
 
     /**
      * Get the value of a metadata field
-     *
-     * @param  field   the name of the metadata field to get
-     *
-     * @return  the value of the metadata field
-     *
-     * @exception IllegalArgumentException   if the requested metadata
-     *            field doesn't exist
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * 
+     * @return the value of the metadata field
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
      */
     public String getMetadata(String field)
     {
@@ -474,12 +487,14 @@ public class EPerson extends DSpaceObject
 
     /**
      * Set a metadata value
-     *
-     * @param  field   the name of the metadata field to get
-     * @param  value   value to set the field to
-     *
-     * @exception IllegalArgumentException   if the requested metadata
-     *            field doesn't exist
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * @param value
+     *            value to set the field to
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
      */
     public void setMetadata(String field, String value)
     {
@@ -488,12 +503,13 @@ public class EPerson extends DSpaceObject
 
     /**
      * Set the EPerson's password
-     *
-     * @param  s   the new email
+     * 
+     * @param s
+     *            the new email
      */
     public void setPassword(String s)
     {
-        // FIXME:  encoding
+        // FIXME: encoding
         String encoded = Utils.getMD5(s);
 
         myRow.setColumn("password", encoded);
@@ -501,8 +517,9 @@ public class EPerson extends DSpaceObject
 
     /**
      * Check EPerson's password
-     *
-     * @param attempt the password attempt
+     * 
+     * @param attempt
+     *            the password attempt
      * @return boolean successful/unsuccessful
      */
     public boolean checkPassword(String attempt)
@@ -519,9 +536,9 @@ public class EPerson extends DSpaceObject
     {
         // Check authorisation - if you're not the eperson
         // see if the authorization system says you can
-        if (!myContext.ignoreAuthorization() &&
-                ((myContext.getCurrentUser() == null) ||
-                (getID() != myContext.getCurrentUser().getID())))
+        if (!myContext.ignoreAuthorization()
+                && ((myContext.getCurrentUser() == null) || (getID() != myContext
+                        .getCurrentUser().getID())))
         {
             AuthorizeManager.authorizeAction(myContext, this, Constants.WRITE);
         }
@@ -529,21 +546,21 @@ public class EPerson extends DSpaceObject
         DatabaseManager.update(myContext, myRow);
 
         log.info(LogManager.getHeader(myContext, "update_eperson",
-                                      "eperson_id=" + getID()));
+                "eperson_id=" + getID()));
 
         HistoryManager.saveHistory(myContext, this, HistoryManager.MODIFY,
-                                   myContext.getCurrentUser(),
-                                   myContext.getExtraLogInfo());
+                myContext.getCurrentUser(), myContext.getExtraLogInfo());
     }
 
     /**
      * Return <code>true</code> if <code>other</code> is the same EPerson as
      * this object, <code>false</code> otherwise
-     *
-     * @param other   object to compare to
-     *
-     * @return  <code>true</code> if object passed in represents the same
-     *          eperson as this object
+     * 
+     * @param other
+     *            object to compare to
+     * 
+     * @return <code>true</code> if object passed in represents the same
+     *         eperson as this object
      */
     public boolean obsolete_equals(Object other)
     {
@@ -564,15 +581,14 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Check for presence of EPerson in tables that have constraints
-     * on EPersons. Called by delete() to determine whether the
-     * eperson can actually be deleted.
-     *
-     * An EPerson cannot be deleted if it exists in the item,
-     * workflowitem, or tasklistitem tables.
-     *
-     * @return  Vector of tables that contain a reference to the
-     * eperson.
+     * Check for presence of EPerson in tables that have constraints on
+     * EPersons. Called by delete() to determine whether the eperson can
+     * actually be deleted.
+     * 
+     * An EPerson cannot be deleted if it exists in the item, workflowitem, or
+     * tasklistitem tables.
+     * 
+     * @return Vector of tables that contain a reference to the eperson.
      */
     public Vector getDeleteConstraints() throws SQLException
     {
@@ -580,8 +596,7 @@ public class EPerson extends DSpaceObject
 
         //check for eperson in item table
         TableRowIterator tri = DatabaseManager.query(myContext,
-                                                     "SELECT * from item where submitter_id=" +
-                                                     getID());
+                "SELECT * from item where submitter_id=" + getID());
 
         if (tri.hasNext())
         {
@@ -590,18 +605,16 @@ public class EPerson extends DSpaceObject
 
         //check for eperson in workflowitem table
         tri = DatabaseManager.query(myContext,
-                                    "SELECT * from workflowitem where owner=" +
-                                    getID());
+                "SELECT * from workflowitem where owner=" + getID());
 
         if (tri.hasNext())
         {
             tableList.add("workflowitem");
         }
 
-        //check for eperson in tasklistitem table      
+        //check for eperson in tasklistitem table
         tri = DatabaseManager.query(myContext,
-                                    "SELECT * from tasklistitem where eperson_id=" +
-                                    getID());
+                "SELECT * from tasklistitem where eperson_id=" + getID());
 
         if (tri.hasNext())
         {

@@ -45,11 +45,10 @@ import javax.servlet.ServletException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
-
 /**
  * Simple include tag that can include locally-modified JSPs
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class IncludeTag extends TagSupport
@@ -59,8 +58,8 @@ public class IncludeTag extends TagSupport
 
     /**
      * Get the JSP to display (default version)
-     *
-     * @return  the page to display
+     * 
+     * @return the page to display
      */
     public String getPage()
     {
@@ -69,8 +68,9 @@ public class IncludeTag extends TagSupport
 
     /**
      * Set the JSP to display (default version)
-     *
-     * @param s  the page to display
+     * 
+     * @param s
+     *            the page to display
      */
     public void setPage(String s)
     {
@@ -82,10 +82,12 @@ public class IncludeTag extends TagSupport
         try
         {
             pageContext.include(page);
-        } catch (IOException ie)
+        }
+        catch (IOException ie)
         {
             throw new JspException(ie);
-        } catch (ServletException se)
+        }
+        catch (ServletException se)
         {
             throw new JspException(se);
         }

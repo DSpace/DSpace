@@ -70,19 +70,18 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
  * Class representing an item in DSpace.
  * <P>
- * This class holds in memory the item Dublin Core metadata, the bundles in
- * the item, and the bitstreams in those bundles.  When modifying the item,
- * if you modify the Dublin Core or the "in archive" flag, you must call
- * <code>update</code> for the changes to be written to the database.  Creating,
- * adding or removing bundles or bitstreams has immediate effect in the
- * database.
- *
- * @author   Robert Tansley
- * @version  $Revision$
+ * This class holds in memory the item Dublin Core metadata, the bundles in the
+ * item, and the bitstreams in those bundles. When modifying the item, if you
+ * modify the Dublin Core or the "in archive" flag, you must call
+ * <code>update</code> for the changes to be written to the database.
+ * Creating, adding or removing bundles or bitstreams has immediate effect in
+ * the database.
+ * 
+ * @author Robert Tansley
+ * @version $Revision$
  */
 public class Item extends DSpaceObject
 {
@@ -113,16 +112,18 @@ public class Item extends DSpaceObject
     private String handle;
 
     /**
-     * True if the Dublin Core has changed since reading from the DB
-     * or the last update()
+     * True if the Dublin Core has changed since reading from the DB or the last
+     * update()
      */
     private boolean dublinCoreChanged;
 
     /**
      * Construct an item with the given table row
-     *
-     * @param context  the context this object exists in
-     * @param row      the corresponding row in the table
+     * 
+     * @param context
+     *            the context this object exists in
+     * @param row
+     *            the corresponding row in the table
      * @throws SQLException
      */
     Item(Context context, TableRow row) throws SQLException
@@ -138,29 +139,30 @@ public class Item extends DSpaceObject
 
         if (!itemRow.isColumnNull("submitter_id"))
         {
-            submitter = EPerson.find(ourContext,
-                                     itemRow.getIntColumn("submitter_id"));
+            submitter = EPerson.find(ourContext, itemRow
+                    .getIntColumn("submitter_id"));
         }
 
         // Get bundles
         TableRowIterator tri = DatabaseManager.query(ourContext, "bundle",
-                                                     "SELECT bundle.* FROM bundle, item2bundle WHERE " +
-                                                     "item2bundle.bundle_id=bundle.bundle_id AND " +
-                                                     "item2bundle.item_id=" +
-                                                     itemRow.getIntColumn("item_id"));
+                "SELECT bundle.* FROM bundle, item2bundle WHERE "
+                        + "item2bundle.bundle_id=bundle.bundle_id AND "
+                        + "item2bundle.item_id="
+                        + itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
         {
             TableRow r = tri.next();
 
             // First check the cache
-            Bundle fromCache = (Bundle) context.fromCache(Bundle.class,
-                                                          r.getIntColumn("bundle_id"));
+            Bundle fromCache = (Bundle) context.fromCache(Bundle.class, r
+                    .getIntColumn("bundle_id"));
 
             if (fromCache != null)
             {
                 bundles.add(fromCache);
-            } else
+            }
+            else
             {
                 bundles.add(new Bundle(ourContext, r));
             }
@@ -168,17 +170,17 @@ public class Item extends DSpaceObject
 
         // Get Dublin Core metadata
         tri = DatabaseManager.query(ourContext, "dcvalue",
-                                    "SELECT * FROM dcvalue WHERE item_id=" +
-                                    itemRow.getIntColumn("item_id") +
-                                    " ORDER BY dc_type_id, place");
+                "SELECT * FROM dcvalue WHERE item_id="
+                        + itemRow.getIntColumn("item_id")
+                        + " ORDER BY dc_type_id, place");
 
         while (tri.hasNext())
         {
             TableRow resultRow = tri.next();
 
             // Get the Dublin Core type
-            String[] dcType = DCType.quickFind(context,
-                                               resultRow.getIntColumn("dc_type_id"));
+            String[] dcType = DCType.quickFind(context, resultRow
+                    .getIntColumn("dc_type_id"));
 
             // Make a DCValue object
             DCValue dcv = new DCValue();
@@ -191,7 +193,8 @@ public class Item extends DSpaceObject
             dublinCore.add(dcv);
         }
 
-        // commented out - this belongs in the create() method, not the constructor
+        // commented out - this belongs in the create() method, not the
+        // constructor
         // Set the last modified date
         //itemRow.setColumn("last_modified", new Date());
         // Get our Handle if any
@@ -202,13 +205,15 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Get an item from the database.  The item, its Dublin Core metadata,
-     * and the bundle and bitstream metadata are all loaded into memory.
-     *
-     * @param  context  DSpace context object
-     * @param  id       Internal ID of the item
-     *
-     * @return  the item, or null if the internal ID is invalid.
+     * Get an item from the database. The item, its Dublin Core metadata, and
+     * the bundle and bitstream metadata are all loaded into memory.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param id
+     *            Internal ID of the item
+     * 
+     * @return the item, or null if the internal ID is invalid.
      * @throws SQLException
      */
     public static Item find(Context context, int id) throws SQLException
@@ -228,7 +233,7 @@ public class Item extends DSpaceObject
             if (log.isDebugEnabled())
             {
                 log.debug(LogManager.getHeader(context, "find_item",
-                                               "not_found,item_id=" + id));
+                        "not_found,item_id=" + id));
             }
 
             return null;
@@ -237,21 +242,22 @@ public class Item extends DSpaceObject
         // not null, return item
         if (log.isDebugEnabled())
         {
-            log.debug(LogManager.getHeader(context, "find_item", "item_id=" +
-                                           id));
+            log.debug(LogManager.getHeader(context, "find_item", "item_id="
+                    + id));
         }
 
         return new Item(context, row);
     }
 
     /**
-     * Create a new item, with a new internal ID.  This method is not public,
-     * since items need to be created as workspace items.  Authorisation is
-     * the responsibility of the caller.
-     *
-     * @param  context  DSpace context object
-     *
-     * @return  the newly created item
+     * Create a new item, with a new internal ID. This method is not public,
+     * since items need to be created as workspace items. Authorisation is the
+     * responsibility of the caller.
+     * 
+     * @param context
+     *            DSpace context object
+     * 
+     * @return the newly created item
      * @throws SQLException
      * @throws AuthorizeException
      */
@@ -260,40 +266,40 @@ public class Item extends DSpaceObject
         TableRow row = DatabaseManager.create(context, "item");
         Item i = new Item(context, row);
 
-        // Call update to give the item a last modified date.  OK this isn't
+        // Call update to give the item a last modified date. OK this isn't
         // amazingly efficient but creates don't happen that often.
         context.setIgnoreAuthorization(true);
         i.update();
         context.setIgnoreAuthorization(false);
 
-        HistoryManager.saveHistory(context, i, HistoryManager.CREATE,
-                                   context.getCurrentUser(),
-                                   context.getExtraLogInfo());
+        HistoryManager.saveHistory(context, i, HistoryManager.CREATE, context
+                .getCurrentUser(), context.getExtraLogInfo());
 
-        log.info(LogManager.getHeader(context, "create_item",
-                                      "item_id=" + row.getIntColumn("item_id")));
+        log.info(LogManager.getHeader(context, "create_item", "item_id="
+                + row.getIntColumn("item_id")));
 
         return i;
     }
 
     /**
-     * Get all the items in the archive.  Only items with the "in archive"
-     * flag set are included.  The order of the list is indeterminate.
-     *
-     * @param  context  DSpace context object
-     *
-     * @return  an iterator over the items in the archive.
+     * Get all the items in the archive. Only items with the "in archive" flag
+     * set are included. The order of the list is indeterminate.
+     * 
+     * @param context
+     *            DSpace context object
+     * 
+     * @return an iterator over the items in the archive.
      * @throws SQLException
      */
-    public static ItemIterator findAll(Context context)
-                                throws SQLException
+    public static ItemIterator findAll(Context context) throws SQLException
     {
         String myQuery = null;
 
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             myQuery = "SELECT * FROM item WHERE in_archive=1";
-        } else
+        }
+        else
         {
             // default postgres
             myQuery = "SELECT * FROM item WHERE in_archive=true";
@@ -305,29 +311,32 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Find all the items in the archive by a given submitter.  The order is
-     * indeterminate.  Only items with the "in archive" flag set are included.
-     *
-     * @param  context  DSpace context object
-     * @param  eperson  the submitter
-     *
+     * Find all the items in the archive by a given submitter. The order is
+     * indeterminate. Only items with the "in archive" flag set are included.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param eperson
+     *            the submitter
+     * 
      * @return an iterator over the items submitted by eperson
      * @throws SQLException
      */
     public static ItemIterator findBySubmitter(Context context, EPerson eperson)
-                                        throws SQLException
+            throws SQLException
     {
         String myQuery = null;
 
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
-            myQuery = "SELECT * FROM item WHERE in_archive=1 AND submitter_id=" +
-                      eperson.getID();
-        } else
+            myQuery = "SELECT * FROM item WHERE in_archive=1 AND submitter_id="
+                    + eperson.getID();
+        }
+        else
         {
             // default postgres
-            myQuery = "SELECT * FROM item WHERE in_archive=true AND submitter_id=" +
-                      eperson.getID();
+            myQuery = "SELECT * FROM item WHERE in_archive=true AND submitter_id="
+                    + eperson.getID();
         }
 
         TableRowIterator rows = DatabaseManager.query(context, "item", myQuery);
@@ -336,9 +345,9 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Get the internal ID of this item.  In general, this shouldn't be
-     * exposed to users
-     *
+     * Get the internal ID of this item. In general, this shouldn't be exposed
+     * to users
+     * 
      * @return the internal identifier
      */
     public int getID()
@@ -353,8 +362,8 @@ public class Item extends DSpaceObject
 
     /**
      * Find out if the item is part of the main archive
-     *
-     * @return  true if the item is in the main archive
+     * 
+     * @return true if the item is in the main archive
      */
     public boolean isArchived()
     {
@@ -363,8 +372,8 @@ public class Item extends DSpaceObject
 
     /**
      * Find out if the item has been withdrawn
-     *
-     * @return  true if the item has been withdrawn
+     * 
+     * @return true if the item has been withdrawn
      */
     public boolean isWithdrawn()
     {
@@ -372,11 +381,11 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Get the date the item was last modified, or the current date
-     *  if last_modified is null
-     *
-     * @return the date the item was last modified, or the current date
-     *   if the column is null.
+     * Get the date the item was last modified, or the current date if
+     * last_modified is null
+     * 
+     * @return the date the item was last modified, or the current date if the
+     *         column is null.
      */
     public Date getLastModified()
     {
@@ -391,10 +400,11 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Set the "is_archived" flag.  This is public and only
+     * Set the "is_archived" flag. This is public and only
      * <code>WorkflowItem.archive()</code> should set this.
-     *
-     * @param isArchived  new value for the flag
+     * 
+     * @param isArchived
+     *            new value for the flag
      */
     public void setArchived(boolean isArchived)
     {
@@ -403,8 +413,9 @@ public class Item extends DSpaceObject
 
     /**
      * Set the owning Collection for the item
-     *
-     * @param c Collection
+     * 
+     * @param c
+     *            Collection
      */
     public void setOwningCollection(Collection c)
     {
@@ -413,6 +424,7 @@ public class Item extends DSpaceObject
 
     /**
      * Get the owning Collection for the item
+     * 
      * @return Collection that is the owner of the item
      * @throws SQLException
      */
@@ -429,40 +441,45 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Get Dublin Core metadata for the item.  Passing in a <code>null</code>
+     * Get Dublin Core metadata for the item. Passing in a <code>null</code>
      * value only matches Dublin Core fields where that qualifier or languages
-     * is actually <code>null</code>.  Passing in <code>Item.ANY</code>
+     * is actually <code>null</code>. Passing in <code>Item.ANY</code>
      * retrieves all metadata fields with any value for the qualifier or
      * language, including <code>null</code>
      * <P>
      * Examples:
      * <P>
-     *   Return values of the unqualified "title" field, in any language.
-     *   Qualified title fields (e.g. "title.uniform") are NOT returned:<P>
-     *      <code>item.getDC( "title", null, Item.ANY );</code>
+     * Return values of the unqualified "title" field, in any language.
+     * Qualified title fields (e.g. "title.uniform") are NOT returned:
      * <P>
-     *   Return all US English values of the "title" element, with any qualifier
-     *   (including unqualified):<P>
-     *      <code>item.getDC( "title", Item.ANY, "en_US" );</code>
+     * <code>item.getDC( "title", null, Item.ANY );</code>
+     * <P>
+     * Return all US English values of the "title" element, with any qualifier
+     * (including unqualified):
+     * <P>
+     * <code>item.getDC( "title", Item.ANY, "en_US" );</code>
      * <P>
      * The ordering of values of a particular element/qualifier/language
-     * combination is significant.  When retrieving with wildcards, values of
-     * a particular element/qualifier/language combinations will be adjacent,
-     * but the overall ordering of the combinations is indeterminate.
-     *
-     * @param  element    the Dublin Core element.  <code>Item.ANY</code>
-     *                    matches any element.  <code>null</code> doesn't
-     *                    really make sense as all DC must have an element.
-     * @param  qualifier  the qualifier.  <code>null</code> means unqualified,
-     *                    and <code>Item.ANY</code> means any qualifier
-     *                    (including unqualified.)
-     * @param  lang       the ISO639 language code, optionally followed by
-     *                    an underscore and the ISO3166 country code.
-     *                    <code>null</code> means only values with no language
-     *                    are returned, and <code>Item.ANY</code> means values
-     *                    with any country code or no country code are returned.
-     *
-     * @return  Dublin Core fields that match the parameters
+     * combination is significant. When retrieving with wildcards, values of a
+     * particular element/qualifier/language combinations will be adjacent, but
+     * the overall ordering of the combinations is indeterminate.
+     * 
+     * @param element
+     *            the Dublin Core element. <code>Item.ANY</code> matches any
+     *            element. <code>null</code> doesn't really make sense as all
+     *            DC must have an element.
+     * @param qualifier
+     *            the qualifier. <code>null</code> means unqualified, and
+     *            <code>Item.ANY</code> means any qualifier (including
+     *            unqualified.)
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means only
+     *            values with no language are returned, and
+     *            <code>Item.ANY</code> means values with any country code or
+     *            no country code are returned.
+     * 
+     * @return Dublin Core fields that match the parameters
      */
     public DCValue[] getDC(String element, String qualifier, String lang)
     {
@@ -495,21 +512,24 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Add Dublin Core metadata fields.  These are appended to existing values.
-     * Use <code>clearDC</code> to remove values.  The ordering of values
+     * Add Dublin Core metadata fields. These are appended to existing values.
+     * Use <code>clearDC</code> to remove values. The ordering of values
      * passed in is maintained.
-     *
-     * @param  element    the Dublin Core element
-     * @param  qualifier  the Dublin Core qualifer, or <code>null</code> for
-     *                    unqualified
-     * @param  lang       the ISO639 language code, optionally followed by
-     *                    an underscore and the ISO3166 country code.
-     *                    <code>null</code> means the value has no language
-     *                    (for example, a date).
-     * @param  values     the values to add.
+     * 
+     * @param element
+     *            the Dublin Core element
+     * @param qualifier
+     *            the Dublin Core qualifer, or <code>null</code> for
+     *            unqualified
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means the
+     *            value has no language (for example, a date).
+     * @param values
+     *            the values to add.
      */
     public void addDC(String element, String qualifier, String lang,
-                      String[] values)
+            String[] values)
     {
         // We will not verify that they are valid entries in the registry
         // until update() is called.
@@ -530,20 +550,23 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Add a single Dublin Core metadata field.  This is appended to existing
-     * values.  Use <code>clearDC</code> to remove values.
-     *
-     * @param  element    the Dublin Core element
-     * @param  qualifier  the Dublin Core qualifer, or <code>null</code> for
-     *                    unqualified
-     * @param  lang       the ISO639 language code, optionally followed by
-     *                    an underscore and the ISO3166 country code.
-     *                    <code>null</code> means the value has no language
-     *                    (for example, a date).
-     * @param  value      the value to add.
+     * Add a single Dublin Core metadata field. This is appended to existing
+     * values. Use <code>clearDC</code> to remove values.
+     * 
+     * @param element
+     *            the Dublin Core element
+     * @param qualifier
+     *            the Dublin Core qualifer, or <code>null</code> for
+     *            unqualified
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means the
+     *            value has no language (for example, a date).
+     * @param value
+     *            the value to add.
      */
     public void addDC(String element, String qualifier, String lang,
-                      String value)
+            String value)
     {
         String[] valArray = new String[1];
         valArray[0] = value;
@@ -552,23 +575,25 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Clear Dublin Core metadata values.  As with <code>addDC</code> above,
+     * Clear Dublin Core metadata values. As with <code>addDC</code> above,
      * passing in <code>null</code> only matches fields where the qualifier or
-     * language is actually <code>null</code>.  <code>Item.ANY</code> will
+     * language is actually <code>null</code>.<code>Item.ANY</code> will
      * match any element, qualifier or language, including <code>null</code>.
-     * Thus, <code>item.clearDC(Item.ANY, Item.ANY, Item.ANY)</code>
-     * will remove all Dublin Core metadata associated with an item.
-     *
-     * @param element     the Dublin Core element to remove, or
-     *                    <code>Item.ANY</code>
-     * @param qualifier   the qualifier.  <code>null</code> means unqualified,
-     *                    and <code>Item.ANY</code> means any qualifier
-     *                    (including unqualified.)
-     * @param  lang       the ISO639 language code, optionally followed by
-     *                    an underscore and the ISO3166 country code.
-     *                    <code>null</code> means only values with no language
-     *                    are removed, and <code>Item.ANY</code> means values
-     *                    with any country code or no country code are removed.
+     * Thus, <code>item.clearDC(Item.ANY, Item.ANY, Item.ANY)</code> will
+     * remove all Dublin Core metadata associated with an item.
+     * 
+     * @param element
+     *            the Dublin Core element to remove, or <code>Item.ANY</code>
+     * @param qualifier
+     *            the qualifier. <code>null</code> means unqualified, and
+     *            <code>Item.ANY</code> means any qualifier (including
+     *            unqualified.)
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means only
+     *            values with no language are removed, and <code>Item.ANY</code>
+     *            means values with any country code or no country code are
+     *            removed.
      */
     public void clearDC(String element, String qualifier, String lang)
     {
@@ -592,21 +617,25 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Utility method for pattern-matching Dublin Core.  This method will
-     * return <code>true</code> if the element, qualifier and language passed
-     * in match the element, qualifier and language of the Dublin Core value
-     * passed in.  Any or all of the elemenent, qualifier and language passed
-     * in can be the <code>Item.ANY</code> wildcard.
-     *
-     * @param element    the element to match, or <code>Item.ANY</code>
-     * @param qualifier  the qualifier to match, or <code>Item.ANY</code>
-     * @param language   the language to match, or <code>Item.ANY</code>
-     * @param dcv        the Dublin Core value
-     *
-     * @return  <code>true</code> if there is a match
+     * Utility method for pattern-matching Dublin Core. This method will return
+     * <code>true</code> if the element, qualifier and language passed in
+     * match the element, qualifier and language of the Dublin Core value passed
+     * in. Any or all of the elemenent, qualifier and language passed in can be
+     * the <code>Item.ANY</code> wildcard.
+     * 
+     * @param element
+     *            the element to match, or <code>Item.ANY</code>
+     * @param qualifier
+     *            the qualifier to match, or <code>Item.ANY</code>
+     * @param language
+     *            the language to match, or <code>Item.ANY</code>
+     * @param dcv
+     *            the Dublin Core value
+     * 
+     * @return <code>true</code> if there is a match
      */
     private boolean match(String element, String qualifier, String language,
-                          DCValue dcv)
+            DCValue dcv)
     {
         // We will attempt to disprove a match - if we can't we have a match
         if (!element.equals(Item.ANY) && !element.equals(dcv.element))
@@ -623,7 +652,8 @@ public class Item extends DSpaceObject
                 // Value is qualified, so no match
                 return false;
             }
-        } else if (!qualifier.equals(Item.ANY))
+        }
+        else if (!qualifier.equals(Item.ANY))
         {
             // Not a wildcard, so qualifier must match exactly
             if (!qualifier.equals(dcv.qualifier))
@@ -640,7 +670,8 @@ public class Item extends DSpaceObject
                 // Value is qualified, so no match
                 return false;
             }
-        } else if (!language.equals(Item.ANY))
+        }
+        else if (!language.equals(Item.ANY))
         {
             // Not a wildcard, so language must match exactly
             if (!language.equals(dcv.language))
@@ -655,8 +686,8 @@ public class Item extends DSpaceObject
 
     /**
      * Get the e-person that originally submitted this item
-     *
-     * @return  the submitter
+     * 
+     * @return the submitter
      */
     public EPerson getSubmitter()
     {
@@ -664,12 +695,13 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Set the e-person that originally submitted this item.  This is a
-     * public method since it is handled by the WorkspaceItem class in the
-     * ingest package.
-     * <code>update</code> must be called to write the change to the database.
-     *
-     * @param  sub  the submitter
+     * Set the e-person that originally submitted this item. This is a public
+     * method since it is handled by the WorkspaceItem class in the ingest
+     * package. <code>update</code> must be called to write the change to the
+     * database.
+     * 
+     * @param sub
+     *            the submitter
      */
     public void setSubmitter(EPerson sub)
     {
@@ -678,15 +710,16 @@ public class Item extends DSpaceObject
         if (submitter != null)
         {
             itemRow.setColumn("submitter_id", submitter.getID());
-        } else
+        }
+        else
         {
             itemRow.setColumnNull("submitter_id");
         }
     }
 
     /**
-     * Get the collections this item is in.  The order is indeterminate.
-     *
+     * Get the collections this item is in. The order is indeterminate.
+     * 
      * @return the collections this item is in, if any.
      * @throws SQLException
      */
@@ -695,24 +728,28 @@ public class Item extends DSpaceObject
         List collections = new ArrayList();
 
         // Get collection table rows
-        TableRowIterator tri = DatabaseManager.query(ourContext, "collection",
-                                                     "SELECT collection.* FROM collection, collection2item WHERE " +
-                                                     "collection2item.collection_id=collection.collection_id AND " +
-                                                     "collection2item.item_id=" +
-                                                     itemRow.getIntColumn("item_id"));
+        TableRowIterator tri = DatabaseManager
+                .query(
+                        ourContext,
+                        "collection",
+                        "SELECT collection.* FROM collection, collection2item WHERE "
+                                + "collection2item.collection_id=collection.collection_id AND "
+                                + "collection2item.item_id="
+                                + itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
         {
             TableRow row = tri.next();
 
             // First check the cache
-            Collection fromCache = (Collection) ourContext.fromCache(Collection.class,
-                                                                     row.getIntColumn("collection_id"));
+            Collection fromCache = (Collection) ourContext.fromCache(
+                    Collection.class, row.getIntColumn("collection_id"));
 
             if (fromCache != null)
             {
                 collections.add(fromCache);
-            } else
+            }
+            else
             {
                 collections.add(new Collection(ourContext, row));
             }
@@ -725,11 +762,11 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Get the communities this item is in.  Returns an unordered array of
-     * the communities that house the collections this item is in, including
-     * parent communities of the owning collections.
-     *
-     * @return  the communities this item is in.
+     * Get the communities this item is in. Returns an unordered array of the
+     * communities that house the collections this item is in, including parent
+     * communities of the owning collections.
+     * 
+     * @return the communities this item is in.
      * @throws SQLException
      */
     public Community[] getCommunities() throws SQLException
@@ -737,11 +774,14 @@ public class Item extends DSpaceObject
         List communities = new ArrayList();
 
         // Get community table rows
-        TableRowIterator tri = DatabaseManager.query(ourContext, "community",
-                                                     "SELECT community.* FROM community, community2item " +
-                                                     "WHERE community2item.community_id=community.community_id " +
-                                                     "AND community2item.item_id=" +
-                                                     itemRow.getIntColumn("item_id"));
+        TableRowIterator tri = DatabaseManager
+                .query(
+                        ourContext,
+                        "community",
+                        "SELECT community.* FROM community, community2item "
+                                + "WHERE community2item.community_id=community.community_id "
+                                + "AND community2item.item_id="
+                                + itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
         {
@@ -749,7 +789,7 @@ public class Item extends DSpaceObject
 
             // First check the cache
             Community owner = (Community) ourContext.fromCache(Community.class,
-                                                               row.getIntColumn("community_id"));
+                    row.getIntColumn("community_id"));
 
             if (owner == null)
             {
@@ -775,7 +815,7 @@ public class Item extends DSpaceObject
 
     /**
      * Get the bundles in this item.
-     *
+     * 
      * @return the bundles in an unordered array
      */
     public Bundle[] getBundles()
@@ -787,12 +827,12 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Get the bundles matching a bundle name
-     *  (name corresponds roughly to type)
-     *
-     * @param name name of bundle (ORIGINAL/TEXT/THUMBNAIL)
+     * Get the bundles matching a bundle name (name corresponds roughly to type)
+     * 
+     * @param name
+     *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
      * @return Bundle []
-     *
+     * 
      * @returns the bundles in an unordered array
      */
     public Bundle[] getBundles(String name)
@@ -820,15 +860,16 @@ public class Item extends DSpaceObject
 
     /**
      * Create a bundle in this item, with immediate effect
-     *
-     * @param name bundle name (ORIGINAL/TEXT/THUMBNAIL)
-     *
-     * @return  the newly created bundle
+     * 
+     * @param name
+     *            bundle name (ORIGINAL/TEXT/THUMBNAIL)
+     * 
+     * @return the newly created bundle
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public Bundle createBundle(String name)
-                        throws SQLException, AuthorizeException
+    public Bundle createBundle(String name) throws SQLException,
+            AuthorizeException
     {
         if ((name == null) || "".equals(name))
         {
@@ -848,9 +889,10 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Add an existing bundle to this item.  This has immediate effect.
-     *
-     * @param b  the bundle to add
+     * Add an existing bundle to this item. This has immediate effect.
+     * 
+     * @param b
+     *            the bundle to add
      * @throws SQLException
      * @throws AuthorizeException
      */
@@ -859,9 +901,8 @@ public class Item extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
-        log.info(LogManager.getHeader(ourContext, "add_bundle",
-                                      "item_id=" + getID() + ",bundle_id=" +
-                                      b.getID()));
+        log.info(LogManager.getHeader(ourContext, "add_bundle", "item_id="
+                + getID() + ",bundle_id=" + b.getID()));
 
         // Check it's not already there
         for (int i = 0; i < bundles.size(); i++)
@@ -890,22 +931,22 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Remove a bundle.  This may result in the bundle being deleted, if the
+     * Remove a bundle. This may result in the bundle being deleted, if the
      * bundle is orphaned.
-     *
-     * @param b  the bundle to remove
+     * 
+     * @param b
+     *            the bundle to remove
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void removeBundle(Bundle b)
-                      throws SQLException, AuthorizeException, IOException
+    public void removeBundle(Bundle b) throws SQLException, AuthorizeException,
+            IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        log.info(LogManager.getHeader(ourContext, "remove_bundle",
-                                      "item_id=" + getID() + ",bundle_id=" +
-                                      b.getID()));
+        log.info(LogManager.getHeader(ourContext, "remove_bundle", "item_id="
+                + getID() + ",bundle_id=" + b.getID()));
 
         // Remove from internal list of bundles
         ListIterator li = bundles.listIterator();
@@ -923,24 +964,26 @@ public class Item extends DSpaceObject
 
         // Remove mapping from DB
         DatabaseManager.updateQuery(ourContext,
-                                    "DELETE FROM item2bundle WHERE item_id=" +
-                                    getID() + " AND bundle_id=" + b.getID());
+                "DELETE FROM item2bundle WHERE item_id=" + getID()
+                        + " AND bundle_id=" + b.getID());
 
         // If the bundle is orphaned, it's removed
         TableRowIterator tri = DatabaseManager.query(ourContext,
-                                                     "SELECT * FROM item2bundle WHERE bundle_id=" +
-                                                     b.getID());
+                "SELECT * FROM item2bundle WHERE bundle_id=" + b.getID());
 
         if (!tri.hasNext())
         {
-            //make the right to remove the bundle explicit because the implicit relation
-            //has been removed. This only has to concern the currentUser because
+            //make the right to remove the bundle explicit because the implicit
+            // relation
+            //has been removed. This only has to concern the currentUser
+            // because
             //he started the removal process and he will end it too.
-            //also add right to remove from the bundle to remove it's bitstreams.
+            //also add right to remove from the bundle to remove it's
+            // bitstreams.
             AuthorizeManager.addPolicy(ourContext, b, Constants.DELETE,
-                                       ourContext.getCurrentUser());
+                    ourContext.getCurrentUser());
             AuthorizeManager.addPolicy(ourContext, b, Constants.REMOVE,
-                                       ourContext.getCurrentUser());
+                    ourContext.getCurrentUser());
 
             // The bundle is an orphan, delete it
             b.delete();
@@ -948,19 +991,20 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Create a single bitstream in a new bundle.  Provided as a convenience
+     * Create a single bitstream in a new bundle. Provided as a convenience
      * method for the most common use.
-     *
-     * @param is   the stream to create the new bitstream from
-     * @param name is the name of the bundle (ORIGINAL, TEXT, THUMBNAIL)
+     * 
+     * @param is
+     *            the stream to create the new bitstream from
+     * @param name
+     *            is the name of the bundle (ORIGINAL, TEXT, THUMBNAIL)
      * @return Bitstream that is created
      * @throws AuthorizeException
      * @throws IOException
      * @throws SQLException
      */
     public Bitstream createSingleBitstream(InputStream is, String name)
-                                    throws AuthorizeException, IOException, 
-                                           SQLException
+            throws AuthorizeException, IOException, SQLException
     {
         // Authorisation is checked by methods below
         // Create a bundle
@@ -973,27 +1017,27 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Convenience method, calls createSingleBitstream() with
-     * name "ORIGINAL"
-     * @param is InputStream
+     * Convenience method, calls createSingleBitstream() with name "ORIGINAL"
+     * 
+     * @param is
+     *            InputStream
      * @return created bitstream
      * @throws AuthorizeException
      * @throws IOException
      * @throws SQLException
      */
     public Bitstream createSingleBitstream(InputStream is)
-                                    throws AuthorizeException, IOException, 
-                                           SQLException
+            throws AuthorizeException, IOException, SQLException
     {
         return createSingleBitstream(is, "ORIGINAL");
     }
 
     /**
-     * Get all non-internal bitstreams in the item.  This is mainly used
-     * for auditing for provenance messages and adding format.* DC values.
-     * The order is indeterminate.
-     *
-     * @return  non-internal bitstreams.
+     * Get all non-internal bitstreams in the item. This is mainly used for
+     * auditing for provenance messages and adding format.* DC values. The order
+     * is indeterminate.
+     * 
+     * @return non-internal bitstreams.
      */
     public Bitstream[] getNonInternalBitstreams()
     {
@@ -1025,21 +1069,22 @@ public class Item extends DSpaceObject
 
     /**
      * Store a copy of the license a user granted in this item.
-     *
-     * @param license   the license the user granted
-     * @param eperson   the eperson who granted the license
+     * 
+     * @param license
+     *            the license the user granted
+     * @param eperson
+     *            the eperson who granted the license
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
      */
     public void licenseGranted(String license, EPerson eperson)
-                        throws SQLException, IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         // Put together text to store
-        String licenseText = "License granted by " + eperson.getFullName() +
-                             " (" + eperson.getEmail() + ") on " +
-                             DCDate.getCurrent().toString() + " (GMT):\n\n" +
-                             license;
+        String licenseText = "License granted by " + eperson.getFullName()
+                + " (" + eperson.getEmail() + ") on "
+                + DCDate.getCurrent().toString() + " (GMT):\n\n" + license;
 
         // Store text as a bitstream
         byte[] licenseBytes = licenseText.getBytes();
@@ -1052,7 +1097,7 @@ public class Item extends DSpaceObject
 
         // Find the License format
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(ourContext,
-                                                                    "License");
+                "License");
         b.setFormat(bf);
 
         b.update();
@@ -1060,15 +1105,16 @@ public class Item extends DSpaceObject
 
     /**
      * Remove all licenses from an item - it was rejected
+     * 
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void removeLicenses()
-                        throws SQLException, AuthorizeException, IOException
+    public void removeLicenses() throws SQLException, AuthorizeException,
+            IOException
     {
         // Find the License format
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(ourContext,
-                                                                    "License");
+                "License");
         int licensetype = bf.getID();
 
         // search through bundles, looking for bitstream type license
@@ -1091,7 +1137,7 @@ public class Item extends DSpaceObject
             }
 
             // probably serious troubles with Authorizations
-            // fix by telling system not to check authorization?            
+            // fix by telling system not to check authorization?
             if (removethisbundle)
             {
                 removeBundle(buns[i]);
@@ -1102,6 +1148,7 @@ public class Item extends DSpaceObject
     /**
      * Update the item "in archive" flag and Dublin Core metadata in the
      * database
+     * 
      * @throws SQLException
      * @throws AuthorizeException
      */
@@ -1115,11 +1162,10 @@ public class Item extends DSpaceObject
         }
 
         HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY,
-                                   ourContext.getCurrentUser(),
-                                   ourContext.getExtraLogInfo());
+                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
 
-        log.info(LogManager.getHeader(ourContext, "update_item",
-                                      "item_id=" + getID()));
+        log.info(LogManager.getHeader(ourContext, "update_item", "item_id="
+                + getID()));
 
         // Set the last modified date
         itemRow.setColumn("last_modified", new Date());
@@ -1194,34 +1240,33 @@ public class Item extends DSpaceObject
 
                 // Get the DC Type
                 DCType dcType = DCType.findByElement(ourContext, dcv.element,
-                                                     dcv.qualifier);
+                        dcv.qualifier);
 
                 if (dcType == null)
                 {
                     // Bad DC field, log and throw exception
-                    log.warn(LogManager.getHeader(ourContext, "bad_dc",
-                                                  "Bad DC field.  element: \"" +
-                                                  ((dcv.element == null)
-                                                   ? "null" : dcv.element) +
-                                                  "\" qualifier: \"" +
-                                                  ((dcv.qualifier == null)
-                                                   ? "null" : dcv.qualifier) +
-                                                  "\" value: \"" +
-                                                  ((dcv.value == null) ? "null"
-                                                                       : dcv.value) +
-                                                  "\""));
+                    log.warn(LogManager
+                            .getHeader(ourContext, "bad_dc",
+                                    "Bad DC field.  element: \""
+                                            + ((dcv.element == null) ? "null"
+                                                    : dcv.element)
+                                            + "\" qualifier: \""
+                                            + ((dcv.qualifier == null) ? "null"
+                                                    : dcv.qualifier)
+                                            + "\" value: \""
+                                            + ((dcv.value == null) ? "null"
+                                                    : dcv.value) + "\""));
 
-                    throw new SQLException("bad_dublin_core " + dcv.element +
-                                           " " + dcv.qualifier);
+                    throw new SQLException("bad_dublin_core " + dcv.element
+                            + " " + dcv.qualifier);
                 }
 
                 // Work out the place number for ordering
                 int current = 0;
 
                 // Key into map is "element" or "element.qualifier"
-                String key = dcv.element +
-                             ((dcv.qualifier == null) ? "" : ("." +
-                                                      dcv.qualifier));
+                String key = dcv.element
+                        + ((dcv.qualifier == null) ? "" : ("." + dcv.qualifier));
 
                 Integer currentInteger = (Integer) elementCount.get(key);
 
@@ -1234,7 +1279,8 @@ public class Item extends DSpaceObject
                 elementCount.put(key, new Integer(current));
 
                 // Write DCValue
-                TableRow valueRow = DatabaseManager.create(ourContext, "dcvalue");
+                TableRow valueRow = DatabaseManager.create(ourContext,
+                        "dcvalue");
 
                 valueRow.setColumn("item_id", getID());
                 valueRow.setColumn("dc_type_id", dcType.getID());
@@ -1253,9 +1299,9 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Withdraw the item from the archive.  It is kept in place, and the
-     * content and metadata are not deleted, but it is not publicly
-     * accessible.
+     * Withdraw the item from the archive. It is kept in place, and the content
+     * and metadata are not deleted, but it is not publicly accessible.
+     * 
      * @throws SQLException
      * @throws AuthorizeException
      * @throws IOException
@@ -1270,23 +1316,23 @@ public class Item extends DSpaceObject
 
         for (int i = 0; i < colls.length; i++)
         {
-            collectionProv = collectionProv + colls[i].getMetadata("name") +
-                             " (ID: " + colls[i].getID() + ")\n";
+            collectionProv = collectionProv + colls[i].getMetadata("name")
+                    + " (ID: " + colls[i].getID() + ")\n";
         }
 
-        // Check permission.  User either has to have REMOVE on owning collection
+        // Check permission. User either has to have REMOVE on owning collection
         // or be COLLECTION_EDITOR of owning collection
         if (AuthorizeManager.authorizeActionBoolean(ourContext,
-                                                        getOwningCollection(),
-                                                        Constants.COLLECTION_ADMIN) ||
-                AuthorizeManager.authorizeActionBoolean(ourContext,
-                                                            getOwningCollection(),
-                                                            Constants.REMOVE))
+                getOwningCollection(), Constants.COLLECTION_ADMIN)
+                || AuthorizeManager.authorizeActionBoolean(ourContext,
+                        getOwningCollection(), Constants.REMOVE))
         {
             // authorized
-        } else
+        }
+        else
         {
-            throw new AuthorizeException("To withdraw item must be COLLECTION_ADMIN or have REMOVE authorization on owning Collection");
+            throw new AuthorizeException(
+                    "To withdraw item must be COLLECTION_ADMIN or have REMOVE authorization on owning Collection");
         }
 
         // Set withdrawn flag. timestamp will be set; last_modified in update()
@@ -1298,10 +1344,10 @@ public class Item extends DSpaceObject
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
         EPerson e = ourContext.getCurrentUser();
-        String prov = "Item withdrawn by " + e.getFullName() + " (" +
-                      e.getEmail() + ") on " + timestamp + "\n" +
-                      "Item was in collections:\n" + collectionProv +
-                      InstallItem.getBitstreamProvenanceMessage(this);
+        String prov = "Item withdrawn by " + e.getFullName() + " ("
+                + e.getEmail() + ") on " + timestamp + "\n"
+                + "Item was in collections:\n" + collectionProv
+                + InstallItem.getBitstreamProvenanceMessage(this);
 
         addDC("description", "provenance", "en", prov);
 
@@ -1310,7 +1356,7 @@ public class Item extends DSpaceObject
 
         // Invoke History system
         HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY, e,
-                                   ourContext.getExtraLogInfo());
+                ourContext.getExtraLogInfo());
 
         // Remove from indicies
         Browse.itemRemoved(ourContext, getID());
@@ -1321,32 +1367,33 @@ public class Item extends DSpaceObject
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
         // Write log
-        log.info(LogManager.getHeader(ourContext, "withdraw_item",
-                                      "user=" + e.getEmail() + ",item_id=" +
-                                      getID()));
+        log.info(LogManager.getHeader(ourContext, "withdraw_item", "user="
+                + e.getEmail() + ",item_id=" + getID()));
     }
 
     /**
      * Reinstate a withdrawn item
+     * 
      * @throws SQLException
      * @throws AuthorizeException
      * @throws IOException
      */
-    public void reinstate()
-                   throws SQLException, AuthorizeException, IOException
+    public void reinstate() throws SQLException, AuthorizeException,
+            IOException
     {
         String timestamp = DCDate.getCurrent().toString();
 
-        // Check permission.  User must have ADD on all collections.
+        // Check permission. User must have ADD on all collections.
         // Build some provenance data while we're at it.
         String collectionProv = "";
         Collection[] colls = getCollections();
 
         for (int i = 0; i < colls.length; i++)
         {
-            collectionProv = collectionProv + colls[i].getMetadata("name") +
-                             " (ID: " + colls[i].getID() + ")\n";
-            AuthorizeManager.authorizeAction(ourContext, colls[i], Constants.ADD);
+            collectionProv = collectionProv + colls[i].getMetadata("name")
+                    + " (ID: " + colls[i].getID() + ")\n";
+            AuthorizeManager.authorizeAction(ourContext, colls[i],
+                    Constants.ADD);
         }
 
         // Clear withdrawn flag
@@ -1358,10 +1405,10 @@ public class Item extends DSpaceObject
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
         EPerson e = ourContext.getCurrentUser();
-        String prov = "Item reinstated by " + e.getFullName() + " (" +
-                      e.getEmail() + ") on " + timestamp + "\n" +
-                      "Item was in collections:\n" + collectionProv +
-                      InstallItem.getBitstreamProvenanceMessage(this);
+        String prov = "Item reinstated by " + e.getFullName() + " ("
+                + e.getEmail() + ") on " + timestamp + "\n"
+                + "Item was in collections:\n" + collectionProv
+                + InstallItem.getBitstreamProvenanceMessage(this);
 
         addDC("description", "provenance", "en", prov);
 
@@ -1370,7 +1417,7 @@ public class Item extends DSpaceObject
 
         // Invoke History system
         HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY, e,
-                                   ourContext.getExtraLogInfo());
+                ourContext.getExtraLogInfo());
 
         // Add to indicies
         // Remove - update() already performs this
@@ -1388,15 +1435,15 @@ public class Item extends DSpaceObject
         }
 
         // Write log
-        log.info(LogManager.getHeader(ourContext, "reinstate_item",
-                                      "user=" + e.getEmail() + ",item_id=" +
-                                      getID()));
+        log.info(LogManager.getHeader(ourContext, "reinstate_item", "user="
+                + e.getEmail() + ",item_id=" + getID()));
     }
 
     /**
-     * Delete (expunge) the item.  Bundles and bitstreams are also deleted if
-     * they are not also included in another item.  The Dublin Core metadata is
+     * Delete (expunge) the item. Bundles and bitstreams are also deleted if
+     * they are not also included in another item. The Dublin Core metadata is
      * deleted.
+     * 
      * @throws SQLException
      * @throws AuthorizeException
      * @throws IOException
@@ -1404,11 +1451,10 @@ public class Item extends DSpaceObject
     void delete() throws SQLException, AuthorizeException, IOException
     {
         HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
-                                   ourContext.getCurrentUser(),
-                                   ourContext.getExtraLogInfo());
+                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
 
-        log.info(LogManager.getHeader(ourContext, "delete_item",
-                                      "item_id=" + getID()));
+        log.info(LogManager.getHeader(ourContext, "delete_item", "item_id="
+                + getID()));
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -1437,12 +1483,11 @@ public class Item extends DSpaceObject
 
         // Remove any Handle
         // FIXME: This is sort of a "tentacle" - HandleManager should provide
-        // a way of doing this.  Plus, deleting a Handle may have ramifications
+        // a way of doing this. Plus, deleting a Handle may have ramifications
         // that need considering.
         DatabaseManager.updateQuery(ourContext,
-                                    "DELETE FROM handle WHERE resource_type_id=" +
-                                    Constants.ITEM + " AND resource_id=" +
-                                    getID());
+                "DELETE FROM handle WHERE resource_type_id=" + Constants.ITEM
+                        + " AND resource_id=" + getID());
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
@@ -1451,11 +1496,12 @@ public class Item extends DSpaceObject
     /**
      * Return <code>true</code> if <code>other</code> is the same Item as
      * this object, <code>false</code> otherwise
-     *
-     * @param other   object to compare to
-     *
-     * @return  <code>true</code> if object passed in represents the same
-     *          item as this object
+     * 
+     * @param other
+     *            object to compare to
+     * 
+     * @return <code>true</code> if object passed in represents the same item
+     *         as this object
      */
     public boolean equals(DSpaceObject other)
     {
@@ -1472,11 +1518,12 @@ public class Item extends DSpaceObject
 
     /**
      * Return true if this Collection 'owns' this item
-     *
-     * @param c Collection
-     *
+     * 
+     * @param c
+     *            Collection
+     * 
      * @return true if this Collection owns this item
-     *
+     *  
      */
     public boolean isOwningCollection(Collection c)
     {
@@ -1492,19 +1539,20 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Utility method to remove all Dublin Core associated with the item
-     * from the database (regardless of in-memory version)
+     * Utility method to remove all Dublin Core associated with the item from
+     * the database (regardless of in-memory version)
+     * 
      * @throws SQLException
      */
     private void removeDCFromDatabase() throws SQLException
     {
         DatabaseManager.updateQuery(ourContext,
-                                    "DELETE FROM dcvalue WHERE item_id=" +
-                                    getID());
+                "DELETE FROM dcvalue WHERE item_id=" + getID());
     }
 
     /**
      * return type found in Constants
+     * 
      * @return int Constants.ITEM
      */
     public int getType()
@@ -1513,15 +1561,16 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * remove all of the policies for item and replace them
-     *  with a new list of policies
-     *
-     * @param newpolicies - this will be all of the new policies for
-     *   the item and its contents
+     * remove all of the policies for item and replace them with a new list of
+     * policies
+     * 
+     * @param newpolicies -
+     *            this will be all of the new policies for the item and its
+     *            contents
      * @throws SQLException
      */
-    public void replaceAllItemPolicies(List newpolicies)
-                                throws SQLException, AuthorizeException
+    public void replaceAllItemPolicies(List newpolicies) throws SQLException,
+            AuthorizeException
     {
         // remove all our policies, add new ones
         AuthorizeManager.removeAllPolicies(ourContext, this);
@@ -1529,15 +1578,16 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * remove all of the policies for item's bitstreams and bundles
-     *  and replace them with a new list of policies
-     *
-     * @param newpolicies - this will be all of the new policies for
-     *   the bundle and bitstream contents
+     * remove all of the policies for item's bitstreams and bundles and replace
+     * them with a new list of policies
+     * 
+     * @param newpolicies -
+     *            this will be all of the new policies for the bundle and
+     *            bitstream contents
      * @throws SQLException
      */
     public void replaceAllBitstreamPolicies(List newpolicies)
-                                     throws SQLException, AuthorizeException
+            throws SQLException, AuthorizeException
     {
         // remove all policies from bundles, add new ones
         // Remove bundles
@@ -1553,22 +1603,23 @@ public class Item extends DSpaceObject
             {
                 Bitstream mybitstream = bs[j];
 
-                // change bitstream policies                
+                // change bitstream policies
                 AuthorizeManager.removeAllPolicies(ourContext, bs[j]);
                 AuthorizeManager.addPolicies(ourContext, newpolicies, bs[j]);
             }
 
-            // change bundle policies            
+            // change bundle policies
             AuthorizeManager.removeAllPolicies(ourContext, mybundle);
             AuthorizeManager.addPolicies(ourContext, newpolicies, mybundle);
         }
     }
 
     /**
-     * remove all of the policies for item's bitstreams and bundles
-     *    that belong to a given Group
-     *
-     * @param g Group referenced by policies that needs to be removed
+     * remove all of the policies for item's bitstreams and bundles that belong
+     * to a given Group
+     * 
+     * @param g
+     *            Group referenced by policies that needs to be removed
      * @throws SQLException
      */
     public void removeGroupPolicies(Group g) throws SQLException
@@ -1589,33 +1640,34 @@ public class Item extends DSpaceObject
             {
                 Bitstream mybitstream = bs[j];
 
-                // remove bitstream policies                
+                // remove bitstream policies
                 AuthorizeManager.removeGroupPolicies(ourContext, bs[j], g);
             }
 
-            // change bundle policies            
+            // change bundle policies
             AuthorizeManager.removeGroupPolicies(ourContext, mybundle, g);
         }
     }
 
     /**
-     * remove all policies on an item and its contents, and
-     *  replace them with the DEFAULT_ITEM_READ and DEFAULT_BITSTREAM_READ
-     *  policies belonging to the collection.
-     *
-     * @param c Collection
-     *
-     * @throws java.sql.SQLException if an SQL error or if no default policies found.
-     *   It's a bit draconian, but default policies must be enforced.
+     * remove all policies on an item and its contents, and replace them with
+     * the DEFAULT_ITEM_READ and DEFAULT_BITSTREAM_READ policies belonging to
+     * the collection.
+     * 
+     * @param c
+     *            Collection
+     * 
+     * @throws java.sql.SQLException
+     *             if an SQL error or if no default policies found. It's a bit
+     *             draconian, but default policies must be enforced.
      */
     public void inheritCollectionDefaultPolicies(Collection c)
-                                          throws java.sql.SQLException, 
-                                                 AuthorizeException
+            throws java.sql.SQLException, AuthorizeException
     {
         // remove the submit authorization policies
         // and replace them with the collection's default READ policies
         List policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                                                                 Constants.DEFAULT_ITEM_READ);
+                Constants.DEFAULT_ITEM_READ);
 
         // change the action to just READ
         // just don't call update on the resourcepolicies!!!
@@ -1624,8 +1676,8 @@ public class Item extends DSpaceObject
         // MUST have default policies
         if (!i.hasNext())
         {
-            throw new java.sql.SQLException("Collection " + c.getID() +
-                                            " has no default item READ policies");
+            throw new java.sql.SQLException("Collection " + c.getID()
+                    + " has no default item READ policies");
         }
 
         while (i.hasNext())
@@ -1637,7 +1689,7 @@ public class Item extends DSpaceObject
         replaceAllItemPolicies(policies);
 
         policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                                                            Constants.DEFAULT_BITSTREAM_READ);
+                Constants.DEFAULT_BITSTREAM_READ);
 
         // change the action to just READ
         // just don't call update on the resourcepolicies!!!
@@ -1645,8 +1697,8 @@ public class Item extends DSpaceObject
 
         if (!i.hasNext())
         {
-            throw new java.sql.SQLException("Collection " + c.getID() +
-                                            " has no default bitstream READ policies");
+            throw new java.sql.SQLException("Collection " + c.getID()
+                    + " has no default bitstream READ policies");
         }
 
         while (i.hasNext())
@@ -1660,7 +1712,7 @@ public class Item extends DSpaceObject
 
     /**
      * return TRUE if context's user can edit item, false otherwise
-     *
+     * 
      * @return boolean true = current user can edit item
      * @throws SQLException
      */
@@ -1668,7 +1720,7 @@ public class Item extends DSpaceObject
     {
         // can this person write to the item?
         if (AuthorizeManager.authorizeActionBoolean(ourContext, this,
-                                                        Constants.WRITE))
+                Constants.WRITE))
         {
             return true;
         }
@@ -1681,8 +1733,7 @@ public class Item extends DSpaceObject
 
         // is this person an COLLECTION_EDITOR for the owning collection?
         if (AuthorizeManager.authorizeActionBoolean(ourContext,
-                                                        getOwningCollection(),
-                                                        Constants.COLLECTION_ADMIN))
+                getOwningCollection(), Constants.COLLECTION_ADMIN))
         {
             return true;
         }

@@ -79,49 +79,48 @@ import org.dspace.license.CreativeCommons;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
-
 /**
- * Submission servlet for DSpace.  Handles the initial submission of items, as
+ * Submission servlet for DSpace. Handles the initial submission of items, as
  * well as the editing of items further down the line.
  * <P>
- * Whenever the submit servlet receives a GET request, this is taken to
- * indicate the start of a fresh new submission, where no collection has been
- * selected, and the submission process is started from scratch.
+ * Whenever the submit servlet receives a GET request, this is taken to indicate
+ * the start of a fresh new submission, where no collection has been selected,
+ * and the submission process is started from scratch.
  * <P>
- * All other interactions happen via POSTs.  Part of the post will normally be
- * a (hidden) "step" parameter, which will correspond to the form that the
- * user has just filled out.  If this is absent, step 0 (select collection)
- * is assumed, meaning that it's simple to place "Submit to this collection"
+ * All other interactions happen via POSTs. Part of the post will normally be a
+ * (hidden) "step" parameter, which will correspond to the form that the user
+ * has just filled out. If this is absent, step 0 (select collection) is
+ * assumed, meaning that it's simple to place "Submit to this collection"
  * buttons on collection home pages.
  * <P>
- * According to the step number of the incoming form, the values posted from
- * the form are processed (using the process* methods), and the item updated
- * as appropriate.  The servlet then forwards control of the request to the
- * appropriate JSP (from jsp/submit) to render the next stage
- * of the process or an error if appropriate.  Each of these JSPs may
- * require that attributes be passed in.  Check the comments at the top of a
- * JSP to see which attributes are needed.  All submit-related forms require a
- * properly initialised SubmissionInfo object to be present in the the
- * "submission.info" attribute.  This holds the core information relevant to
- * the submission, e.g. the item, personal workspace or workflow item, the
- * submitting "e-person", and the target collection.
+ * According to the step number of the incoming form, the values posted from the
+ * form are processed (using the process* methods), and the item updated as
+ * appropriate. The servlet then forwards control of the request to the
+ * appropriate JSP (from jsp/submit) to render the next stage of the process or
+ * an error if appropriate. Each of these JSPs may require that attributes be
+ * passed in. Check the comments at the top of a JSP to see which attributes are
+ * needed. All submit-related forms require a properly initialised
+ * SubmissionInfo object to be present in the the "submission.info" attribute.
+ * This holds the core information relevant to the submission, e.g. the item,
+ * personal workspace or workflow item, the submitting "e-person", and the
+ * target collection.
  * <P>
  * When control of the request reaches a JSP, it is assumed that all checks,
  * interactions with the database and so on have been performed and that all
- * necessary information to render the form is in memory.  e.g. The
- * SubmitFormInfo object passed in must be correctly filled out.  Thus the
- * JSPs do no error or integrity checking; it is the servlet's responsibility
- * to ensure that everything is prepared.  The servlet is fairly diligent
- * about ensuring integrity at each step.
+ * necessary information to render the form is in memory. e.g. The
+ * SubmitFormInfo object passed in must be correctly filled out. Thus the JSPs
+ * do no error or integrity checking; it is the servlet's responsibility to
+ * ensure that everything is prepared. The servlet is fairly diligent about
+ * ensuring integrity at each step.
  * <P>
- * Each step has an integer constant defined below.  The main sequence of the
+ * Each step has an integer constant defined below. The main sequence of the
  * submission procedure always runs from 0 upwards, until SUBMISSION_COMPLETE.
  * Other, not-in-sequence steps (such as the cancellation screen and the
  * "previous version ID verification" screen) have numbers much higher than
- * SUBMISSION_COMPLETE.  These conventions allow the progress bar component
- * of the submission forms to render the user's progress through the process.
- *
- * @author  Robert Tansley
+ * SUBMISSION_COMPLETE. These conventions allow the progress bar component of
+ * the submission forms to render the user's progress through the process.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class SubmitServlet extends DSpaceServlet
@@ -141,10 +140,9 @@ public class SubmitServlet extends DSpaceServlet
     public static final int EDIT_METADATA_2 = 3;
 
     /**
-     * Upload files step.  Note this doesn't correspond to an actual
-     * page, since the upload file step consists of a number of
-     * pages with no definite order.  This is just used for the progress
-     * bar.
+     * Upload files step. Note this doesn't correspond to an actual page, since
+     * the upload file step consists of a number of pages with no definite
+     * order. This is just used for the progress bar.
      */
     public static final int UPLOAD_FILES = 4;
 
@@ -161,7 +159,7 @@ public class SubmitServlet extends DSpaceServlet
     public static final int SUBMISSION_COMPLETE = 8;
 
     // Steps which aren't part of the main sequence, but rather
-    // short "diversions" are given high step numbers.  The main sequence
+    // short "diversions" are given high step numbers. The main sequence
     // is defined as being steps 0 to SUBMISSION_COMPLETE.
 
     /** Cancellation of a submission */
@@ -183,8 +181,8 @@ public class SubmitServlet extends DSpaceServlet
     public static final int CHANGE_FILE_DESCRIPTION = 106;
 
     /**
-     * Verify pruning of extra files, titles, dates as a result of
-     * changing an answer to one of the initial questions
+     * Verify pruning of extra files, titles, dates as a result of changing an
+     * answer to one of the initial questions
      */
     public static final int VERIFY_PRUNE = 107;
 
@@ -192,26 +190,25 @@ public class SubmitServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(SubmitServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         /*
          * Possible GET parameters:
-         *
-         *   resume=<workspace_item_id>
-         *         - Resumes submitting the given workspace item
-         *
-         *   workflow=<workflow_id>
-         *         - Starts editing the given workflow item in workflow mode
-         *
-         * With no parameters, A GET starts a new submission.  What happens
-         * depends on the context of the user (where they are.)  If they're not
-         * in a community or collection, they can choose any collection
-         * from the list of all collections.  If they're in a community,
-         * the list of collections they can choose from will be limited to
-         * those within the current community.  If the user has selected
-         * a collection, a new submission will be started in that collection.
+         * 
+         * resume= <workspace_item_id> - Resumes submitting the given workspace
+         * item
+         * 
+         * workflow= <workflow_id> - Starts editing the given workflow item in
+         * workflow mode
+         * 
+         * With no parameters, A GET starts a new submission. What happens
+         * depends on the context of the user (where they are.) If they're not
+         * in a community or collection, they can choose any collection from the
+         * list of all collections. If they're in a community, the list of
+         * collections they can choose from will be limited to those within the
+         * current community. If the user has selected a collection, a new
+         * submission will be started in that collection.
          */
         String workspaceID = request.getParameter("resume");
 
@@ -219,17 +216,19 @@ public class SubmitServlet extends DSpaceServlet
         {
             try
             {
-                WorkspaceItem wi = WorkspaceItem.find(context,
-                                                      Integer.parseInt(workspaceID));
+                WorkspaceItem wi = WorkspaceItem.find(context, Integer
+                        .parseInt(workspaceID));
 
                 SubmissionInfo si = new SubmissionInfo();
                 si.submission = wi;
                 doStep(context, request, response, si, INITIAL_QUESTIONS);
-            } catch (NumberFormatException nfe)
+            }
+            catch (NumberFormatException nfe)
             {
                 log.warn(LogManager.getHeader(context, "bad_workspace_id",
-                                              "bad_id=" + workspaceID));
-                JSPManager.showInvalidIDError(request, response, workspaceID, -1);
+                        "bad_id=" + workspaceID));
+                JSPManager.showInvalidIDError(request, response, workspaceID,
+                        -1);
             }
 
             return;
@@ -241,17 +240,19 @@ public class SubmitServlet extends DSpaceServlet
         {
             try
             {
-                WorkflowItem wi = WorkflowItem.find(context,
-                                                    Integer.parseInt(workflowID));
+                WorkflowItem wi = WorkflowItem.find(context, Integer
+                        .parseInt(workflowID));
 
                 SubmissionInfo si = new SubmissionInfo();
                 si.submission = wi;
                 doStep(context, request, response, si, INITIAL_QUESTIONS);
-            } catch (NumberFormatException nfe)
+            }
+            catch (NumberFormatException nfe)
             {
                 log.warn(LogManager.getHeader(context, "bad_workflow_id",
-                                              "bad_id=" + workflowID));
-                JSPManager.showInvalidIDError(request, response, workflowID, -1);
+                        "bad_id=" + workflowID));
+                JSPManager
+                        .showInvalidIDError(request, response, workflowID, -1);
             }
 
             return;
@@ -271,41 +272,42 @@ public class SubmitServlet extends DSpaceServlet
             si.submission = wi;
             doStep(context, request, response, si, INITIAL_QUESTIONS);
             context.complete();
-        } else
+        }
+        else
         {
             Collection[] collections;
 
             if (com != null)
             {
-                // In a community.  Show collections in that community only.
+                // In a community. Show collections in that community only.
                 collections = Collection.findAuthorized(context, com,
-                                                        Constants.ADD);
-            } else
+                        Constants.ADD);
+            }
+            else
             {
                 // Show all collections
                 collections = Collection.findAuthorized(context, null,
-                                                        Constants.ADD);
+                        Constants.ADD);
             }
 
             log.info(LogManager.getHeader(context, "select_collection", ""));
 
             request.setAttribute("collections", collections);
             JSPManager.showJSP(request, response,
-                               "/submit/select-collection.jsp");
+                    "/submit/select-collection.jsp");
         }
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // First of all, we need to work out if this is a multipart request
         // The file upload page uses those
         String contentType = request.getContentType();
 
-        if ((contentType != null) &&
-                (contentType.indexOf("multipart/form-data") != -1))
+        if ((contentType != null)
+                && (contentType.indexOf("multipart/form-data") != -1))
         {
             // This is a multipart request, so it's a file upload
             processChooseFile(context, request, response);
@@ -332,21 +334,21 @@ public class SubmitServlet extends DSpaceServlet
         if (subInfo == null)
         {
             /*
-             * Work around for problem where people select "is a thesis",
-             * see the error page, and then use their "back" button thinking
-             * they can start another submission - it's been removed so the ID
-             * in the form is invalid.  If we detect the "removed_thesis"
-             * attribute we display a friendly message instead of an integrity
-             * error.
+             * Work around for problem where people select "is a thesis", see
+             * the error page, and then use their "back" button thinking they
+             * can start another submission - it's been removed so the ID in the
+             * form is invalid. If we detect the "removed_thesis" attribute we
+             * display a friendly message instead of an integrity error.
              */
             if (request.getSession().getAttribute("removed_thesis") != null)
             {
                 request.getSession().removeAttribute("removed_thesis");
                 JSPManager.showJSP(request, response,
-                                   "/submit/thesis-removed-workaround.jsp");
+                        "/submit/thesis-removed-workaround.jsp");
 
                 return;
-            } else
+            }
+            else
             {
                 /*
                  * If the submission info was invalid, set the step to an
@@ -358,70 +360,70 @@ public class SubmitServlet extends DSpaceServlet
 
         switch (step)
         {
-            case INITIAL_QUESTIONS:
-                processInitialQuestions(context, request, response, subInfo);
+        case INITIAL_QUESTIONS:
+            processInitialQuestions(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case EDIT_METADATA_1:
-                processEditMetadataOne(context, request, response, subInfo);
+        case EDIT_METADATA_1:
+            processEditMetadataOne(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case EDIT_METADATA_2:
-                processEditMetadataTwo(context, request, response, subInfo);
+        case EDIT_METADATA_2:
+            processEditMetadataTwo(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case GET_FILE_FORMAT:
-                processGetFileFormat(context, request, response, subInfo);
+        case GET_FILE_FORMAT:
+            processGetFileFormat(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case FILE_LIST:
-                processFileList(context, request, response, subInfo);
+        case FILE_LIST:
+            processFileList(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case UPLOAD_ERROR:
-                processUploadError(context, request, response, subInfo);
+        case UPLOAD_ERROR:
+            processUploadError(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case CHANGE_FILE_DESCRIPTION:
-                processChangeFileDescription(context, request, response, subInfo);
+        case CHANGE_FILE_DESCRIPTION:
+            processChangeFileDescription(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case REVIEW_SUBMISSION:
-                processReview(context, request, response, subInfo);
+        case REVIEW_SUBMISSION:
+            processReview(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case CC_LICENSE:
-                processCC(context, request, response, subInfo);
+        case CC_LICENSE:
+            processCC(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case GRANT_LICENSE:
-                processLicense(context, request, response, subInfo);
+        case GRANT_LICENSE:
+            processLicense(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case SUBMISSION_CANCELLED:
-                processCancellation(context, request, response, subInfo);
+        case SUBMISSION_CANCELLED:
+            processCancellation(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case VERIFY_PRUNE:
-                processVerifyPrune(context, request, response, subInfo);
+        case VERIFY_PRUNE:
+            processVerifyPrune(context, request, response, subInfo);
 
-                break;
+            break;
 
-            default:
-                log.warn(LogManager.getHeader(context, "integrity_error",
-                                              UIUtil.getRequestLogInfo(request)));
-                JSPManager.showIntegrityError(request, response);
+        default:
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(request)));
+            JSPManager.showIntegrityError(request, response);
         }
     }
 
@@ -432,27 +434,30 @@ public class SubmitServlet extends DSpaceServlet
     //****************************************************************
 
     /**
-     * Process the selection collection stage, or the clicking of a
-     * "submit to this collection" button on a collection home page.
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
+     * Process the selection collection stage, or the clicking of a "submit to
+     * this collection" button on a collection home page.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
      */
     private void processSelectCollection(Context context,
-                                         HttpServletRequest request,
-                                         HttpServletResponse response)
-                                  throws ServletException, IOException, 
-                                         SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
-        // The user might have clicked cancel.  We don't do a
+        // The user might have clicked cancel. We don't do a
         // standard cancellation at this stage, since we don't
         // actually have an item to keep or remove yet.
         if (request.getParameter("submit_cancel") != null)
         {
             // Just send them to their "My DSpace" for now.
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/mydspace"));
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/mydspace"));
 
             return;
         }
@@ -464,10 +469,10 @@ public class SubmitServlet extends DSpaceServlet
         // Show an error if we don't have a collection
         if (col == null)
         {
-            JSPManager.showInvalidIDError(request, response,
-                                          request.getParameter("collection"),
-                                          Constants.COLLECTION);
-        } else
+            JSPManager.showInvalidIDError(request, response, request
+                    .getParameter("collection"), Constants.COLLECTION);
+        }
+        else
         {
             WorkspaceItem wi = WorkspaceItem.create(context, col, true);
 
@@ -482,18 +487,20 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * process input from initial-questions.jsp
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processInitialQuestions(Context context,
-                                         HttpServletRequest request,
-                                         HttpServletResponse response,
-                                         SubmissionInfo subInfo)
-                                  throws ServletException, IOException, 
-                                         SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
 
@@ -501,20 +508,21 @@ public class SubmitServlet extends DSpaceServlet
         if (buttonPressed.equals("submit_cancel"))
         {
             doCancellation(request, response, subInfo, INITIAL_QUESTIONS,
-                           INITIAL_QUESTIONS);
+                    INITIAL_QUESTIONS);
 
             return;
         }
 
         // Get the values from the form
         boolean multipleTitles = UIUtil.getBoolParameter(request,
-                                                         "multiple_titles");
+                "multiple_titles");
         boolean publishedBefore = UIUtil.getBoolParameter(request,
-                                                          "published_before");
+                "published_before");
         boolean multipleFiles = UIUtil.getBoolParameter(request,
-                                                        "multiple_files");
-        boolean isThesis = ConfigurationManager.getBooleanProperty("webui.submit.blocktheses") &&
-                           UIUtil.getBoolParameter(request, "is_thesis");
+                "multiple_files");
+        boolean isThesis = ConfigurationManager
+                .getBooleanProperty("webui.submit.blocktheses")
+                && UIUtil.getBoolParameter(request, "is_thesis");
 
         if (isWorkflow(subInfo))
         {
@@ -534,7 +542,7 @@ public class SubmitServlet extends DSpaceServlet
 
             // Remember that we've removed a thesis in the session
             request.getSession().setAttribute("removed_thesis",
-                                              new Boolean(true));
+                    new Boolean(true));
 
             // Display appropriate message
             JSPManager.showJSP(request, response, "/submit/no-theses.jsp");
@@ -553,8 +561,7 @@ public class SubmitServlet extends DSpaceServlet
         if (multipleTitles == false)
         {
             DCValue[] altTitles = subInfo.submission.getItem().getDC("title",
-                                                                     "alternative",
-                                                                     Item.ANY);
+                    "alternative", Item.ANY);
 
             willRemoveTitles = altTitles.length > 0;
         }
@@ -562,24 +569,22 @@ public class SubmitServlet extends DSpaceServlet
         if (publishedBefore == false)
         {
             DCValue[] dateIssued = subInfo.submission.getItem().getDC("date",
-                                                                      "issued",
-                                                                      Item.ANY);
-            DCValue[] citation = subInfo.submission.getItem().getDC("identifier",
-                                                                    "citation",
-                                                                    Item.ANY);
-            DCValue[] publisher = subInfo.submission.getItem().getDC("publisher",
-                                                                     null,
-                                                                     Item.ANY);
+                    "issued", Item.ANY);
+            DCValue[] citation = subInfo.submission.getItem().getDC(
+                    "identifier", "citation", Item.ANY);
+            DCValue[] publisher = subInfo.submission.getItem().getDC(
+                    "publisher", null, Item.ANY);
 
-            willRemoveDate = (dateIssued.length > 0) || (citation.length > 0) ||
-                             (publisher.length > 0);
+            willRemoveDate = (dateIssued.length > 0) || (citation.length > 0)
+                    || (publisher.length > 0);
         }
 
         if (multipleFiles == false)
         {
             // see if number of bitstreams in "ORIGINAL" bundle > 1
             // FIXME: Assumes multiple bundles, clean up someday...
-            Bundle[] bundles = subInfo.submission.getItem().getBundles("ORIGINAL");
+            Bundle[] bundles = subInfo.submission.getItem().getBundles(
+                    "ORIGINAL");
 
             if (bundles.length > 0)
             {
@@ -596,20 +601,24 @@ public class SubmitServlet extends DSpaceServlet
         {
             // Verify pruning of extra bits
             request.setAttribute("submission.info", subInfo);
-            request.setAttribute("multiple.titles", new Boolean(multipleTitles));
-            request.setAttribute("published.before",
-                                 new Boolean(publishedBefore));
+            request
+                    .setAttribute("multiple.titles",
+                            new Boolean(multipleTitles));
+            request.setAttribute("published.before", new Boolean(
+                    publishedBefore));
             request.setAttribute("multiple.files", new Boolean(multipleFiles));
-            request.setAttribute("will.remove.titles",
-                                 new Boolean(willRemoveTitles));
-            request.setAttribute("will.remove.date", new Boolean(willRemoveDate));
-            request.setAttribute("will.remove.files",
-                                 new Boolean(willRemoveFiles));
-            request.setAttribute("button.pressed",
-                                 UIUtil.getSubmitButton(request, "submit_next"));
+            request.setAttribute("will.remove.titles", new Boolean(
+                    willRemoveTitles));
+            request.setAttribute("will.remove.date",
+                    new Boolean(willRemoveDate));
+            request.setAttribute("will.remove.files", new Boolean(
+                    willRemoveFiles));
+            request.setAttribute("button.pressed", UIUtil.getSubmitButton(
+                    request, "submit_next"));
 
             JSPManager.showJSP(request, response, "/submit/verify-prune.jsp");
-        } else
+        }
+        else
         {
             // Nothing needs removing, so just make the changes
             subInfo.submission.setMultipleTitles(multipleTitles);
@@ -631,7 +640,8 @@ public class SubmitServlet extends DSpaceServlet
 
                 // User has clicked "Next"
                 doStep(context, request, response, subInfo, EDIT_METADATA_1);
-            } else
+            }
+            else
             {
                 // Progress bar button clicked
                 doStepJump(context, request, response, subInfo);
@@ -643,18 +653,20 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Process input from "verify prune" step
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processVerifyPrune(Context context,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    SubmissionInfo subInfo)
-                             throws ServletException, IOException, SQLException, 
-                                    AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         if (request.getParameter("do_not_proceed") != null)
         {
@@ -667,16 +679,15 @@ public class SubmitServlet extends DSpaceServlet
         // User elected to proceed - do the pruning
         // Get the values from the form
         boolean multipleTitles = UIUtil.getBoolParameter(request,
-                                                         "multiple_titles");
+                "multiple_titles");
         boolean publishedBefore = UIUtil.getBoolParameter(request,
-                                                          "published_before");
+                "published_before");
 
         // Multiple files question does not appear in workflow mode.
         // Since the submission will have a license, the answer to
         // this question will always be "yes"
-        boolean multipleFiles = (isWorkflow(subInfo) ||
-                                UIUtil.getBoolParameter(request,
-                                                        "multiple_files"));
+        boolean multipleFiles = (isWorkflow(subInfo) || UIUtil
+                .getBoolParameter(request, "multiple_files"));
 
         Item item = subInfo.submission.getItem();
 
@@ -734,7 +745,8 @@ public class SubmitServlet extends DSpaceServlet
             doStep(context, request, response, subInfo, EDIT_METADATA_1);
 
             context.complete();
-        } else
+        }
+        else
         {
             // Progress bar button clicked
             doStepJump(context, request, response, subInfo);
@@ -745,18 +757,20 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * process input from edit-metadata-1.jsp
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processEditMetadataOne(Context context,
-                                        HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        SubmissionInfo subInfo)
-                                 throws ServletException, IOException, 
-                                        SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
 
@@ -764,7 +778,7 @@ public class SubmitServlet extends DSpaceServlet
         if (buttonPressed.equals("submit_cancel"))
         {
             doCancellation(request, response, subInfo, EDIT_METADATA_1,
-                           EDIT_METADATA_1);
+                    EDIT_METADATA_1);
 
             return;
         }
@@ -816,8 +830,8 @@ public class SubmitServlet extends DSpaceServlet
             String thisQual = (String) quals.get(i);
             String thisVal = (String) vals.get(i);
 
-            if (!buttonPressed.equals("submit_identifier_remove_" + i) &&
-                    !thisVal.equals(""))
+            if (!buttonPressed.equals("submit_identifier_remove_" + i)
+                    && !thisVal.equals(""))
             {
                 item.addDC("identifier", thisQual, null, thisVal);
             }
@@ -831,8 +845,8 @@ public class SubmitServlet extends DSpaceServlet
 
             // check that at least year has been entered - flag if not
             DCValue[] dateArray = item.getDC("date", "issued", Item.ANY);
-            DCDate dateIssued = new DCDate(((dateArray.length > 0)
-                                            ? dateArray[0].value : ""));
+            DCDate dateIssued = new DCDate(
+                    ((dateArray.length > 0) ? dateArray[0].value : ""));
 
             if (dateIssued.getYear() <= 0)
             {
@@ -854,42 +868,50 @@ public class SubmitServlet extends DSpaceServlet
             subInfo.moreBoxesFor = "contributor_author";
             subInfo.jumpToField = "contributor_author";
             nextStep = EDIT_METADATA_1;
-        } else if (subInfo.submission.hasMultipleTitles() &&
-                       buttonPressed.equals("submit_title_alternative_more"))
+        }
+        else if (subInfo.submission.hasMultipleTitles()
+                && buttonPressed.equals("submit_title_alternative_more"))
         {
             // "Add more" clicked for alternative titles
             subInfo.moreBoxesFor = "title_alternative";
             subInfo.jumpToField = "title_alternative";
             nextStep = EDIT_METADATA_1;
-        } else if (buttonPressed.equals("submit_relation_ispartofseries_more"))
+        }
+        else if (buttonPressed.equals("submit_relation_ispartofseries_more"))
         {
             // "Add more" clicked for series/number
             subInfo.moreBoxesFor = "relation_ispartofseries";
             subInfo.jumpToField = "relation_ispartofseries";
             nextStep = EDIT_METADATA_1;
-        } else if (buttonPressed.equals("submit_identifier_more"))
+        }
+        else if (buttonPressed.equals("submit_identifier_more"))
         {
             // "Add more" clicked for identifier
             subInfo.moreBoxesFor = "identifier";
             subInfo.jumpToField = "identifier";
             nextStep = EDIT_METADATA_1;
-        } else if (buttonPressed.equals("submit_prev"))
+        }
+        else if (buttonPressed.equals("submit_prev"))
         {
             nextStep = INITIAL_QUESTIONS;
-        } else if (buttonPressed.equals("submit_next"))
+        }
+        else if (buttonPressed.equals("submit_next"))
         {
             // return to edit metadata 1 if title or issue date missing
             if (titleMissing || issueDateMissing)
             {
                 subInfo.missing = true;
-                subInfo.jumpToField = (titleMissing ? "title" : "date_issued_year");
+                subInfo.jumpToField = (titleMissing ? "title"
+                        : "date_issued_year");
                 nextStep = EDIT_METADATA_1;
-            } else
+            }
+            else
             {
                 userHasReached(subInfo, EDIT_METADATA_2);
                 nextStep = EDIT_METADATA_2;
             }
-        } else if (buttonPressed.indexOf("remove") > -1)
+        }
+        else if (buttonPressed.indexOf("remove") > -1)
         {
             // Remove button pressed - stay with same form
             nextStep = EDIT_METADATA_1;
@@ -901,7 +923,8 @@ public class SubmitServlet extends DSpaceServlet
         if (nextStep != -1)
         {
             doStep(context, request, response, subInfo, nextStep);
-        } else
+        }
+        else
         {
             doStepJump(context, request, response, subInfo);
         }
@@ -911,18 +934,20 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * process input from edit-metadata-2.jsp
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processEditMetadataTwo(Context context,
-                                        HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        SubmissionInfo subInfo)
-                                 throws ServletException, IOException, 
-                                        SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
 
@@ -930,7 +955,7 @@ public class SubmitServlet extends DSpaceServlet
         if (buttonPressed.equals("submit_cancel"))
         {
             doCancellation(request, response, subInfo, EDIT_METADATA_2,
-                           EDIT_METADATA_2);
+                    EDIT_METADATA_2);
 
             return;
         }
@@ -952,14 +977,17 @@ public class SubmitServlet extends DSpaceServlet
             subInfo.moreBoxesFor = "subject";
             subInfo.jumpToField = "subject";
             nextStep = EDIT_METADATA_2;
-        } else if (buttonPressed.equals("submit_prev"))
+        }
+        else if (buttonPressed.equals("submit_prev"))
         {
             nextStep = EDIT_METADATA_1;
-        } else if (buttonPressed.equals("submit_next"))
+        }
+        else if (buttonPressed.equals("submit_next"))
         {
             userHasReached(subInfo, UPLOAD_FILES);
             nextStep = UPLOAD_FILES;
-        } else if (buttonPressed.indexOf("remove") > -1)
+        }
+        else if (buttonPressed.indexOf("remove") > -1)
         {
             // Remove button pressed - stay with same form
             nextStep = EDIT_METADATA_2;
@@ -971,7 +999,8 @@ public class SubmitServlet extends DSpaceServlet
         if (nextStep != -1)
         {
             doStep(context, request, response, subInfo, nextStep);
-        } else
+        }
+        else
         {
             doStepJump(context, request, response, subInfo);
         }
@@ -981,15 +1010,17 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Process the input from the choose file page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
      */
     private void processChooseFile(Context context, HttpServletRequest request,
-                                   HttpServletResponse response)
-                            throws ServletException, IOException, SQLException, 
-                                   AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         File temp = null;
         FileUploadRequest wrapper = null;
@@ -1022,22 +1053,24 @@ public class SubmitServlet extends DSpaceServlet
                 if (temp != null)
                 {
                     // Read the temp file into a bitstream
-                    InputStream is = new BufferedInputStream(new FileInputStream(temp));
+                    InputStream is = new BufferedInputStream(
+                            new FileInputStream(temp));
 
-                    // do we already have a bundle?    
+                    // do we already have a bundle?
                     Bundle[] bundles = item.getBundles("ORIGINAL");
 
                     if (bundles.length < 1)
                     {
-                        // set bundle's name to ORIGINAL    
+                        // set bundle's name to ORIGINAL
                         b = item.createSingleBitstream(is, "ORIGINAL");
-                    } else
+                    }
+                    else
                     {
                         // we have a bundle already, just add bitstream
                         b = bundles[0].createBitstream(is);
                     }
 
-                    // Strip all but the last filename.  It would be nice
+                    // Strip all but the last filename. It would be nice
                     // to know which OS the file came from.
                     String noPath = wrapper.getFilesystemName("file");
 
@@ -1066,7 +1099,8 @@ public class SubmitServlet extends DSpaceServlet
                     ok = true;
                 }
             }
-        } catch (IOException ie)
+        }
+        catch (IOException ie)
         {
             // Problem with uploading
             log.warn(LogManager.getHeader(context, "upload_error", ""), ie);
@@ -1076,29 +1110,33 @@ public class SubmitServlet extends DSpaceServlet
         {
             // In any event, if we don't have the submission info, the request
             // was malformed
-            log.warn(LogManager.getHeader(context, "integrity_error",
-                                          UIUtil.getRequestLogInfo(request)));
-        } else if (buttonPressed.equals("submit_cancel"))
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(request)));
+        }
+        else if (buttonPressed.equals("submit_cancel"))
         {
             doCancellation(request, response, subInfo,
-                           SubmitServlet.CHOOSE_FILE, SubmitServlet.UPLOAD_FILES);
-        } else if (buttonPressed.equals("submit_prev"))
+                    SubmitServlet.CHOOSE_FILE, SubmitServlet.UPLOAD_FILES);
+        }
+        else if (buttonPressed.equals("submit_prev"))
         {
             // Slightly tricky; if the user clicks on "previous,"
             // and they haven't uploaded any files yet, the previous
-            // screen is the edit metadata 2 page.  If there are
+            // screen is the edit metadata 2 page. If there are
             // upload files, we go back to the file list page,
             // without uploading the file they've specified.
             if (subInfo.submission.getItem().getBundles("ORIGINAL").length > 0)
             {
                 // Have files, go to list
                 showUploadFileList(request, response, subInfo, false, false);
-            } else
+            }
+            else
             {
                 // No files, go back to edit metadata 2
                 doStep(context, request, response, subInfo, EDIT_METADATA_2);
             }
-        } else if (buttonPressed.equals("submit_next"))
+        }
+        else if (buttonPressed.equals("submit_next"))
         {
             // "Next" pressed - the actual upload was handled above.
             if (ok)
@@ -1108,21 +1146,25 @@ public class SubmitServlet extends DSpaceServlet
                 {
                     // Format was identified
                     showUploadFileList(request, response, subInfo, true, false);
-                } else
+                }
+                else
                 {
                     // Format couldn't be identified
                     showGetFileFormat(context, request, response, subInfo, b);
                 }
 
                 context.complete();
-            } else
+            }
+            else
             {
                 // If we get here, there was a problem uploading, but we
                 // still know which submission we're dealing with
                 request.setAttribute("submission.info", subInfo);
-                JSPManager.showJSP(request, response, "/submit/upload-error.jsp");
+                JSPManager.showJSP(request, response,
+                        "/submit/upload-error.jsp");
             }
-        } else
+        }
+        else
         {
             doStepJump(context, wrapper, response, subInfo);
         }
@@ -1136,18 +1178,20 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Process input from get file type page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processGetFileFormat(Context context,
-                                      HttpServletRequest request,
-                                      HttpServletResponse response,
-                                      SubmissionInfo subInfo)
-                               throws ServletException, IOException, 
-                                      SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit");
 
@@ -1161,7 +1205,8 @@ public class SubmitServlet extends DSpaceServlet
             if (format != null)
             {
                 subInfo.bitstream.setFormat(format);
-            } else
+            }
+            else
             {
                 String userDesc = request.getParameter("format_description");
                 subInfo.bitstream.setUserFormatDescription(userDesc);
@@ -1172,33 +1217,38 @@ public class SubmitServlet extends DSpaceServlet
             if (buttonPressed.equals("submit"))
             {
                 showUploadFileList(request, response, subInfo, true, false);
-            } else
+            }
+            else
             {
                 doStepJump(context, request, response, subInfo);
             }
 
             context.complete();
-        } else
+        }
+        else
         {
-            log.warn(LogManager.getHeader(context, "integrity_error",
-                                          UIUtil.getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
         }
     }
 
     /**
      * Process input from file list page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processFileList(Context context, HttpServletRequest request,
-                                 HttpServletResponse response,
-                                 SubmissionInfo subInfo)
-                          throws ServletException, IOException, SQLException, 
-                                 AuthorizeException
+            HttpServletResponse response, SubmissionInfo subInfo)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
         Item item = subInfo.submission.getItem();
@@ -1206,14 +1256,16 @@ public class SubmitServlet extends DSpaceServlet
         if (buttonPressed.equals("submit_cancel"))
         {
             doCancellation(request, response, subInfo, SubmitServlet.FILE_LIST,
-                           SubmitServlet.UPLOAD_FILES);
-        } else if (buttonPressed.equals("submit_prev"))
+                    SubmitServlet.UPLOAD_FILES);
+        }
+        else if (buttonPressed.equals("submit_prev"))
         {
             // In some cases, this might be expected to go back
             // to the "choose file" page, but that doesn't make
             // a great deal of sense, so go back to edit metadata 2.
             doStep(context, request, response, subInfo, EDIT_METADATA_2);
-        } else if (buttonPressed.equals("submit_next"))
+        }
+        else if (buttonPressed.equals("submit_next"))
         {
             // Finished the uploading of files
             // FIXME Validation check here
@@ -1221,20 +1273,23 @@ public class SubmitServlet extends DSpaceServlet
             if (request.getParameter("primary_bitstream_id") != null)
             {
                 Bundle[] bundles = item.getBundles("ORIGINAL");
-                bundles[0].setPrimaryBitstreamID(new Integer(request.getParameter("primary_bitstream_id")).intValue());
+                bundles[0].setPrimaryBitstreamID(new Integer(request
+                        .getParameter("primary_bitstream_id")).intValue());
                 bundles[0].update();
             }
 
             userHasReached(subInfo, REVIEW_SUBMISSION);
             doStep(context, request, response, subInfo, REVIEW_SUBMISSION);
             context.complete();
-        } else if (buttonPressed.equals("submit_more"))
+        }
+        else if (buttonPressed.equals("submit_more"))
         {
             // set primary bitstream
             if (request.getParameter("primary_bitstream_id") != null)
             {
                 Bundle[] bundles = item.getBundles("ORIGINAL");
-                bundles[0].setPrimaryBitstreamID(new Integer(request.getParameter("primary_bitstream_id")).intValue());
+                bundles[0].setPrimaryBitstreamID(new Integer(request
+                        .getParameter("primary_bitstream_id")).intValue());
                 bundles[0].update();
                 context.commit();
             }
@@ -1242,11 +1297,13 @@ public class SubmitServlet extends DSpaceServlet
             // Upload another file
             request.setAttribute("submission.info", subInfo);
             JSPManager.showJSP(request, response, "/submit/choose-file.jsp");
-        } else if (buttonPressed.equals("submit_show_checksums"))
+        }
+        else if (buttonPressed.equals("submit_show_checksums"))
         {
             // Show the checksums
             showUploadFileList(request, response, subInfo, false, true);
-        } else if (buttonPressed.startsWith("submit_describe_"))
+        }
+        else if (buttonPressed.startsWith("submit_describe_"))
         {
             // Change the description of a bitstream
             Bitstream bitstream;
@@ -1256,7 +1313,8 @@ public class SubmitServlet extends DSpaceServlet
             {
                 int id = Integer.parseInt(buttonPressed.substring(16));
                 bitstream = Bitstream.find(context, id);
-            } catch (NumberFormatException nfe)
+            }
+            catch (NumberFormatException nfe)
             {
                 bitstream = null;
             }
@@ -1265,7 +1323,7 @@ public class SubmitServlet extends DSpaceServlet
             {
                 // Invalid or mangled bitstream ID
                 log.warn(LogManager.getHeader(context, "integrity_error",
-                                              UIUtil.getRequestLogInfo(request)));
+                        UIUtil.getRequestLogInfo(request)));
                 JSPManager.showIntegrityError(request, response);
 
                 return;
@@ -1275,8 +1333,9 @@ public class SubmitServlet extends DSpaceServlet
             subInfo.bitstream = bitstream;
             request.setAttribute("submission.info", subInfo);
             JSPManager.showJSP(request, response,
-                               "/submit/change-file-description.jsp");
-        } else if (buttonPressed.startsWith("submit_remove_"))
+                    "/submit/change-file-description.jsp");
+        }
+        else if (buttonPressed.startsWith("submit_remove_"))
         {
             // A "remove" button must have been pressed
             Bitstream bitstream;
@@ -1286,7 +1345,8 @@ public class SubmitServlet extends DSpaceServlet
             {
                 int id = Integer.parseInt(buttonPressed.substring(14));
                 bitstream = Bitstream.find(context, id);
-            } catch (NumberFormatException nfe)
+            }
+            catch (NumberFormatException nfe)
             {
                 bitstream = null;
             }
@@ -1295,7 +1355,7 @@ public class SubmitServlet extends DSpaceServlet
             {
                 // Invalid or mangled bitstream ID
                 log.warn(LogManager.getHeader(context, "integrity_error",
-                                              UIUtil.getRequestLogInfo(request)));
+                        UIUtil.getRequestLogInfo(request)));
                 JSPManager.showIntegrityError(request, response);
 
                 return;
@@ -1318,7 +1378,8 @@ public class SubmitServlet extends DSpaceServlet
 
             showFirstUploadPage(context, request, response, subInfo);
             context.complete();
-        } else if (buttonPressed.startsWith("submit_format_"))
+        }
+        else if (buttonPressed.startsWith("submit_format_"))
         {
             // A "format is wrong" button must have been pressed
             Bitstream bitstream;
@@ -1328,7 +1389,8 @@ public class SubmitServlet extends DSpaceServlet
             {
                 int id = Integer.parseInt(buttonPressed.substring(14));
                 bitstream = Bitstream.find(context, id);
-            } catch (NumberFormatException nfe)
+            }
+            catch (NumberFormatException nfe)
             {
                 bitstream = null;
             }
@@ -1337,7 +1399,7 @@ public class SubmitServlet extends DSpaceServlet
             {
                 // Invalid or mangled bitstream ID
                 log.warn(LogManager.getHeader(context, "integrity_error",
-                                              UIUtil.getRequestLogInfo(request)));
+                        UIUtil.getRequestLogInfo(request)));
                 JSPManager.showIntegrityError(request, response);
 
                 return;
@@ -1345,7 +1407,8 @@ public class SubmitServlet extends DSpaceServlet
 
             subInfo.bitstream = bitstream;
             showGetFileFormat(context, request, response, subInfo, bitstream);
-        } else
+        }
+        else
         {
             doStepJump(context, request, response, subInfo);
         }
@@ -1353,18 +1416,20 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Process input from the upload error page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processUploadError(Context context,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    SubmissionInfo subInfo)
-                             throws ServletException, IOException, SQLException, 
-                                    AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
 
@@ -1373,7 +1438,8 @@ public class SubmitServlet extends DSpaceServlet
         {
             request.setAttribute("submission.info", subInfo);
             JSPManager.showJSP(request, response, "/submit/choose-file.jsp");
-        } else
+        }
+        else
         {
             doStepJump(context, request, response, subInfo);
         }
@@ -1381,55 +1447,62 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Process input from the "change file description" page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processChangeFileDescription(Context context,
-                                              HttpServletRequest request,
-                                              HttpServletResponse response,
-                                              SubmissionInfo subInfo)
-                                       throws ServletException, IOException, 
-                                              SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         if (subInfo.bitstream != null)
         {
-            subInfo.bitstream.setDescription(request.getParameter("description"));
+            subInfo.bitstream.setDescription(request
+                    .getParameter("description"));
             subInfo.bitstream.update();
 
             if (request.getParameter("submit") != null)
             {
                 showUploadFileList(request, response, subInfo, false, false);
-            } else
+            }
+            else
             {
                 doStepJump(context, request, response, subInfo);
             }
 
             context.complete();
-        } else
+        }
+        else
         {
-            log.warn(LogManager.getHeader(context, "integrity_error",
-                                          UIUtil.getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
         }
     }
 
     /**
      * Process information from "submission cancelled" page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processCancellation(Context context,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     SubmissionInfo subInfo)
-                              throws ServletException, IOException, 
-                                     SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_back");
 
@@ -1439,7 +1512,8 @@ public class SubmitServlet extends DSpaceServlet
             int previous = UIUtil.getIntParameter(request, "previous_step");
 
             doStep(context, request, response, subInfo, previous);
-        } else if (buttonPressed.equals("submit_remove"))
+        }
+        else if (buttonPressed.equals("submit_remove"))
         {
             // User wants to cancel and remove
             // Cancellation page only applies to workspace items
@@ -1448,14 +1522,16 @@ public class SubmitServlet extends DSpaceServlet
             wi.deleteAll();
 
             JSPManager.showJSP(request, response,
-                               "/submit/cancelled-removed.jsp");
+                    "/submit/cancelled-removed.jsp");
 
             context.complete();
-        } else if (buttonPressed.equals("submit_keep"))
+        }
+        else if (buttonPressed.equals("submit_keep"))
         {
             // Save submission for later - just show message
             JSPManager.showJSP(request, response, "/submit/saved.jsp");
-        } else
+        }
+        else
         {
             doStepJump(context, request, response, subInfo);
         }
@@ -1463,25 +1539,29 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Process button click on "review submission" page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processReview(Context context, HttpServletRequest request,
-                               HttpServletResponse response,
-                               SubmissionInfo subInfo)
-                        throws ServletException, IOException, SQLException, 
-                               AuthorizeException
+            HttpServletResponse response, SubmissionInfo subInfo)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_cancel");
 
         if (buttonPressed.equals("submit_cancel"))
         {
             doCancellation(request, response, subInfo, REVIEW_SUBMISSION,
-                           REVIEW_SUBMISSION);
-        } else if (buttonPressed.equals("submit_next"))
+                    REVIEW_SUBMISSION);
+        }
+        else if (buttonPressed.equals("submit_next"))
         {
             // If the user is performing the initial submission
             // of an item, we go to the grant license stage
@@ -1489,24 +1569,27 @@ public class SubmitServlet extends DSpaceServlet
             {
                 // proceed to next step conditional on CC
                 int nextStep = CreativeCommons.isEnabled() ? CC_LICENSE
-                                                           : GRANT_LICENSE;
+                        : GRANT_LICENSE;
                 userHasReached(subInfo, nextStep);
                 doStep(context, request, response, subInfo, nextStep);
                 context.complete();
-            } else
+            }
+            else
             {
                 // The user is performing an edit as part
                 // of a workflow task, so we take them
                 // back to the relevant perform task page
                 request.setAttribute("workflow.item", subInfo.submission);
                 JSPManager.showJSP(request, response,
-                                   "/mydspace/perform-task.jsp");
+                        "/mydspace/perform-task.jsp");
             }
-        } else if (buttonPressed.equals("submit_prev"))
+        }
+        else if (buttonPressed.equals("submit_prev"))
         {
             // Back to file upload
             doStep(context, request, response, subInfo, UPLOAD_FILES);
-        } else
+        }
+        else
         {
             doStepJump(context, request, response, subInfo);
         }
@@ -1514,17 +1597,20 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Process the input from the license page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processLicense(Context context, HttpServletRequest request,
-                                HttpServletResponse response,
-                                SubmissionInfo subInfo)
-                         throws ServletException, IOException, SQLException, 
-                                AuthorizeException
+            HttpServletResponse response, SubmissionInfo subInfo)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_cancel");
 
@@ -1532,7 +1618,7 @@ public class SubmitServlet extends DSpaceServlet
         {
             // License granted
             log.info(LogManager.getHeader(context, "accept_license",
-                                          getSubmissionLogInfo(subInfo)));
+                    getSubmissionLogInfo(subInfo)));
 
             // Add the license to the item
             Item item = subInfo.submission.getItem();
@@ -1550,15 +1636,18 @@ public class SubmitServlet extends DSpaceServlet
             JSPManager.showJSP(request, response, "/submit/complete.jsp");
 
             context.complete();
-        } else if (request.getParameter("submit_reject") != null)
+        }
+        else if (request.getParameter("submit_reject") != null)
         {
             // User has rejected license.
             log.info(LogManager.getHeader(context, "reject_license",
-                                          getSubmissionLogInfo(subInfo)));
+                    getSubmissionLogInfo(subInfo)));
 
             // Show information page.
-            JSPManager.showJSP(request, response, "/submit/license-rejected.jsp");
-        } else
+            JSPManager.showJSP(request, response,
+                    "/submit/license-rejected.jsp");
+        }
+        else
         {
             doStepJump(context, request, response, subInfo);
         }
@@ -1566,16 +1655,20 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Process the input from the CC license page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
-     * @param subInfo   submission info object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
      */
     private void processCC(Context context, HttpServletRequest request,
-                           HttpServletResponse response, SubmissionInfo subInfo)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response, SubmissionInfo subInfo)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
 
@@ -1583,11 +1676,13 @@ public class SubmitServlet extends DSpaceServlet
         if (buttonPressed.equals("submit_cancel"))
         {
             doCancellation(request, response, subInfo, CC_LICENSE, CC_LICENSE);
-        } else if (buttonPressed.equals("submit_prev"))
+        }
+        else if (buttonPressed.equals("submit_prev"))
         {
             // Back to review submission
             doStep(context, request, response, subInfo, REVIEW_SUBMISSION);
-        } else if (buttonPressed.equals("submit_next"))
+        }
+        else if (buttonPressed.equals("submit_next"))
         {
             // Update user's progress
             userHasReached(subInfo, GRANT_LICENSE);
@@ -1595,16 +1690,20 @@ public class SubmitServlet extends DSpaceServlet
             // User has clicked "Next"
             doStep(context, request, response, subInfo, GRANT_LICENSE);
             context.complete();
-        } else if (buttonPressed.equals("submit_no_cc"))
+        }
+        else if (buttonPressed.equals("submit_no_cc"))
         {
             // Skipping the CC license - remove any existing license selection
-            CreativeCommons.removeLicense(context, subInfo.submission.getItem());
+            CreativeCommons
+                    .removeLicense(context, subInfo.submission.getItem());
             userHasReached(subInfo, GRANT_LICENSE);
             doStep(context, request, response, subInfo, GRANT_LICENSE);
             context.complete();
-        } else
+        }
+        else
         {
-            // RLR hack - need to distinguish between progress bar real submission
+            // RLR hack - need to distinguish between progress bar real
+            // submission
             String ccLicenseUrl = request.getParameter("cc_license_url");
 
             if ((ccLicenseUrl != null) && (ccLicenseUrl.length() > 0))
@@ -1617,7 +1716,8 @@ public class SubmitServlet extends DSpaceServlet
                 userHasReached(subInfo, GRANT_LICENSE);
                 doStep(context, request, response, subInfo, GRANT_LICENSE);
                 context.complete();
-            } else
+            }
+            else
             {
                 doStepJump(context, request, response, subInfo);
             }
@@ -1631,20 +1731,24 @@ public class SubmitServlet extends DSpaceServlet
     //****************************************************************
 
     /**
-     * Process a click on a buttonin the progress bar. to jump to a step.
-     * This method should be called when it has been determined that no
-     * other button has been pressed.
-     *
-     * @param context     DSpace context object
-     * @param request     the request object
-     * @param response    the response object
-     * @param subInfo     SubmissionInfo pertaining to this submission
+     * Process a click on a buttonin the progress bar. to jump to a step. This
+     * method should be called when it has been determined that no other button
+     * has been pressed.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param request
+     *            the request object
+     * @param response
+     *            the response object
+     * @param subInfo
+     *            SubmissionInfo pertaining to this submission
      */
     private void doStepJump(Context context, HttpServletRequest request,
-                            HttpServletResponse response, SubmissionInfo subInfo)
-                     throws ServletException, IOException, SQLException
+            HttpServletResponse response, SubmissionInfo subInfo)
+            throws ServletException, IOException, SQLException
     {
-        // Find the button that was pressed.  It would start with
+        // Find the button that was pressed. It would start with
         // "submit_jump_".
         String buttonPressed = UIUtil.getSubmitButton(request, "");
 
@@ -1665,7 +1769,8 @@ public class SubmitServlet extends DSpaceServlet
             try
             {
                 nextStep = Integer.parseInt(buttonPressed.substring(12, 13));
-            } catch (NumberFormatException ne)
+            }
+            catch (NumberFormatException ne)
             {
                 // mangled number
                 nextStep = -1;
@@ -1687,12 +1792,13 @@ public class SubmitServlet extends DSpaceServlet
         if (nextStep == -1)
         {
             // Either no button pressed, or an illegal stage
-            // reached.  UI doesn't allow this, so something's
+            // reached. UI doesn't allow this, so something's
             // wrong if that happens.
-            log.warn(LogManager.getHeader(context, "integrity_error",
-                                          UIUtil.getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
-        } else
+        }
+        else
         {
             // Do the relevant step
             doStep(context, request, response, subInfo, nextStep);
@@ -1700,112 +1806,117 @@ public class SubmitServlet extends DSpaceServlet
     }
 
     /**
-     * Display the page for the relevant step.  Pass in a step number
-     * between SubmitServlet.INITIAL_QUESTIONS and
-     * SubmitServlet.SUBMISSION_COMPLETE - other cases (such as cancellations
-     * and multi-file upload interactions) are handled elsewhere.
-     *
-     * @param context     DSpace context
-     * @param request     the request object
-     * @param response    the response object
-     * @param subInfo     SubmissionInfo pertaining to this submission
-     * @param step        the step number to display
+     * Display the page for the relevant step. Pass in a step number between
+     * SubmitServlet.INITIAL_QUESTIONS and SubmitServlet.SUBMISSION_COMPLETE -
+     * other cases (such as cancellations and multi-file upload interactions)
+     * are handled elsewhere.
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            the request object
+     * @param response
+     *            the response object
+     * @param subInfo
+     *            SubmissionInfo pertaining to this submission
+     * @param step
+     *            the step number to display
      */
     private void doStep(Context context, HttpServletRequest request,
-                        HttpServletResponse response, SubmissionInfo subInfo,
-                        int step)
-                 throws ServletException, IOException, SQLException
+            HttpServletResponse response, SubmissionInfo subInfo, int step)
+            throws ServletException, IOException, SQLException
     {
         // All steps require the submitforminfo
         request.setAttribute("submission.info", subInfo);
 
         switch (step)
         {
-            case INITIAL_QUESTIONS:
-                JSPManager.showJSP(request, response,
-                                   "/submit/initial-questions.jsp");
+        case INITIAL_QUESTIONS:
+            JSPManager.showJSP(request, response,
+                    "/submit/initial-questions.jsp");
 
-                break;
+            break;
 
-            case EDIT_METADATA_1:
-                JSPManager.showJSP(request, response,
-                                   "/submit/edit-metadata-1.jsp");
+        case EDIT_METADATA_1:
+            JSPManager
+                    .showJSP(request, response, "/submit/edit-metadata-1.jsp");
 
-                break;
+            break;
 
-            case EDIT_METADATA_2:
-                JSPManager.showJSP(request, response,
-                                   "/submit/edit-metadata-2.jsp");
+        case EDIT_METADATA_2:
+            JSPManager
+                    .showJSP(request, response, "/submit/edit-metadata-2.jsp");
 
-                break;
+            break;
 
-            case UPLOAD_FILES:
-                showFirstUploadPage(context, request, response, subInfo);
+        case UPLOAD_FILES:
+            showFirstUploadPage(context, request, response, subInfo);
 
-                break;
+            break;
 
-            case CHOOSE_FILE:
-                JSPManager.showJSP(request, response, "/submit/choose-file.jsp");
+        case CHOOSE_FILE:
+            JSPManager.showJSP(request, response, "/submit/choose-file.jsp");
 
-                break;
+            break;
 
-            case FILE_LIST:
-                showUploadFileList(request, response, subInfo, false, false);
+        case FILE_LIST:
+            showUploadFileList(request, response, subInfo, false, false);
 
-                break;
+            break;
 
-            case REVIEW_SUBMISSION:
-                JSPManager.showJSP(request, response, "/submit/review.jsp");
+        case REVIEW_SUBMISSION:
+            JSPManager.showJSP(request, response, "/submit/review.jsp");
 
-                break;
+            break;
 
-            case GRANT_LICENSE:
+        case GRANT_LICENSE:
 
-                Collection c = subInfo.submission.getCollection();
-                request.setAttribute("license", c.getLicense());
-                JSPManager.showJSP(request, response, "/submit/show-license.jsp");
+            Collection c = subInfo.submission.getCollection();
+            request.setAttribute("license", c.getLicense());
+            JSPManager.showJSP(request, response, "/submit/show-license.jsp");
 
-                break;
+            break;
 
-            case CC_LICENSE:
+        case CC_LICENSE:
 
-                // Do we already have a CC license?
-                Item item = subInfo.submission.getItem();
-                boolean exists = CreativeCommons.hasLicense(context, item);
-                request.setAttribute("cclicense.exists", new Boolean(exists));
-                JSPManager.showJSP(request, response,
-                                   "/submit/creative-commons.jsp");
+            // Do we already have a CC license?
+            Item item = subInfo.submission.getItem();
+            boolean exists = CreativeCommons.hasLicense(context, item);
+            request.setAttribute("cclicense.exists", new Boolean(exists));
+            JSPManager.showJSP(request, response,
+                    "/submit/creative-commons.jsp");
 
-                break;
+            break;
 
-            case SUBMISSION_COMPLETE:
-                JSPManager.showJSP(request, response, "/submit/complete.jsp");
+        case SUBMISSION_COMPLETE:
+            JSPManager.showJSP(request, response, "/submit/complete.jsp");
 
-                break;
+            break;
 
-            default:
-                log.warn(LogManager.getHeader(context, "integrity_error",
-                                              UIUtil.getRequestLogInfo(request)));
-                JSPManager.showIntegrityError(request, response);
+        default:
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(request)));
+            JSPManager.showIntegrityError(request, response);
         }
     }
 
     /**
      * Respond to the user clicking "cancel".
-     *
-     * @param request      current servlet request object
-     * @param response     current servlet response object
-     * @param subInfo      SubmissionInfo object
-     * @param step         step corresponding to the page the user
-     *                     clicked "cancel" on.
-     * @param displayStep  the step the user had reached in terms
-     *                     of the progress bar.
+     * 
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            SubmissionInfo object
+     * @param step
+     *            step corresponding to the page the user clicked "cancel" on.
+     * @param displayStep
+     *            the step the user had reached in terms of the progress bar.
      */
     private void doCancellation(HttpServletRequest request,
-                                HttpServletResponse response,
-                                SubmissionInfo subInfo, int step,
-                                int displayStep)
-                         throws ServletException, IOException, SQLException
+            HttpServletResponse response, SubmissionInfo subInfo, int step,
+            int displayStep) throws ServletException, IOException, SQLException
     {
         // If this is a workflow item, we need to return the
         // user to the "perform task" page
@@ -1813,7 +1924,8 @@ public class SubmitServlet extends DSpaceServlet
         {
             request.setAttribute("workflow.item", subInfo.submission);
             JSPManager.showJSP(request, response, "/mydspace/perform-task.jsp");
-        } else
+        }
+        else
         {
             request.setAttribute("submission.info", subInfo);
             request.setAttribute("step", String.valueOf(step));
@@ -1823,21 +1935,23 @@ public class SubmitServlet extends DSpaceServlet
     }
 
     /**
-     * Display the first appropriate page in the file upload sequence.
-     * Which page this is depends on whether the user has uploaded
-     * any files in this item already.
-     *
-     * @param context   the DSpace context object
-     * @param request   the request object
-     * @param response  the response object
-     * @param subInfo   the SubmissionInfo object
+     * Display the first appropriate page in the file upload sequence. Which
+     * page this is depends on whether the user has uploaded any files in this
+     * item already.
+     * 
+     * @param context
+     *            the DSpace context object
+     * @param request
+     *            the request object
+     * @param response
+     *            the response object
+     * @param subInfo
+     *            the SubmissionInfo object
      */
     private void showFirstUploadPage(Context context,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     SubmissionInfo subInfo)
-                              throws SQLException, ServletException, 
-                                     IOException
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo) throws SQLException, ServletException,
+            IOException
     {
         Bundle[] bundles = subInfo.submission.getItem().getBundles("ORIGINAL");
 
@@ -1845,7 +1959,8 @@ public class SubmitServlet extends DSpaceServlet
         {
             // The item has files associated with it.
             showUploadFileList(request, response, subInfo, false, false);
-        } else
+        }
+        else
         {
             // No items uploaded yet; show the "choose file" page
             doStep(context, request, response, subInfo, CHOOSE_FILE);
@@ -1854,19 +1969,22 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Show the upload file page
-     *
-     * @param request       the request object
-     * @param response      the response object
-     * @param subInfo           the SubmissionInfo object
-     * @param justUploaded  pass in true if the user just successfully
-     *                      uploaded a file
-     * @param showChecksums pass in true if checksums should be displayed
+     * 
+     * @param request
+     *            the request object
+     * @param response
+     *            the response object
+     * @param subInfo
+     *            the SubmissionInfo object
+     * @param justUploaded
+     *            pass in true if the user just successfully uploaded a file
+     * @param showChecksums
+     *            pass in true if checksums should be displayed
      */
     private void showUploadFileList(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    SubmissionInfo subInfo,
-                                    boolean justUploaded, boolean showChecksums)
-                             throws SQLException, ServletException, IOException
+            HttpServletResponse response, SubmissionInfo subInfo,
+            boolean justUploaded, boolean showChecksums) throws SQLException,
+            ServletException, IOException
     {
         // Set required attributes
         request.setAttribute("submission.info", subInfo);
@@ -1876,28 +1994,35 @@ public class SubmitServlet extends DSpaceServlet
         // Always go to advanced view in workflow mode
         if (isWorkflow(subInfo) || subInfo.submission.hasMultipleFiles())
         {
-            JSPManager.showJSP(request, response, "/submit/upload-file-list.jsp");
-        } else
+            JSPManager.showJSP(request, response,
+                    "/submit/upload-file-list.jsp");
+        }
+        else
         {
             // FIXME: Assume one and only one bitstream
             JSPManager.showJSP(request, response,
-                               "/submit/show-uploaded-file.jsp");
+                    "/submit/show-uploaded-file.jsp");
         }
     }
 
     /**
      * Get the type of a file from the user
-     *
-     * @param context       context object
-     * @param request       the request object
-     * @param response      the response object
-     * @param subInfo       the SubmissionInfo object
-     * @param bitstream     the Bitstream to get the type of
+     * 
+     * @param context
+     *            context object
+     * @param request
+     *            the request object
+     * @param response
+     *            the response object
+     * @param subInfo
+     *            the SubmissionInfo object
+     * @param bitstream
+     *            the Bitstream to get the type of
      */
     private void showGetFileFormat(Context context, HttpServletRequest request,
-                                   HttpServletResponse response,
-                                   SubmissionInfo subInfo, Bitstream bitstream)
-                            throws SQLException, ServletException, IOException
+            HttpServletResponse response, SubmissionInfo subInfo,
+            Bitstream bitstream) throws SQLException, ServletException,
+            IOException
     {
         BitstreamFormat[] formats = BitstreamFormat.findNonInternal(context);
 
@@ -1907,7 +2032,8 @@ public class SubmitServlet extends DSpaceServlet
         request.setAttribute("bitstream.formats", formats);
 
         // What does the system think it is?
-        BitstreamFormat guess = FormatIdentifier.guessFormat(context, bitstream);
+        BitstreamFormat guess = FormatIdentifier
+                .guessFormat(context, bitstream);
 
         request.setAttribute("guessed.format", guess);
 
@@ -1921,18 +2047,18 @@ public class SubmitServlet extends DSpaceServlet
     //****************************************************************
 
     /**
-     * Get a filled-out submission info object from the parameters
-     * in the current request.  If there is a problem, <code>null</code>
-     * is returned.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request
-     *
+     * Get a filled-out submission info object from the parameters in the
+     * current request. If there is a problem, <code>null</code> is returned.
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request
+     * 
      * @return filled-out submission info, or null
      */
     private SubmissionInfo getSubmissionInfo(Context context,
-                                             HttpServletRequest request)
-                                      throws SQLException
+            HttpServletRequest request) throws SQLException
     {
         SubmissionInfo info = new SubmissionInfo();
 
@@ -1940,10 +2066,11 @@ public class SubmitServlet extends DSpaceServlet
         {
             int workflowID = UIUtil.getIntParameter(request, "workflow_id");
             info.submission = WorkflowItem.find(context, workflowID);
-        } else
+        }
+        else
         {
             int workspaceID = UIUtil.getIntParameter(request,
-                                                     "workspace_item_id");
+                    "workspace_item_id");
             info.submission = WorkspaceItem.find(context, workspaceID);
         }
 
@@ -1970,20 +2097,21 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Is the submission in the workflow process?
-     *
-     * @param  si  the submission info
-     * @return  true if the submission is in the workflow process
+     * 
+     * @param si
+     *            the submission info
+     * @return true if the submission is in the workflow process
      */
     public static boolean isWorkflow(SubmissionInfo si)
     {
-        return ((si.submission != null) &&
-               si.submission instanceof WorkflowItem);
+        return ((si.submission != null) && si.submission instanceof WorkflowItem);
     }
 
     /**
      * Return the submission info as hidden parameters for an HTML form
-     *
-     * @param si  the submission info
+     * 
+     * @param si
+     *            the submission info
      * @return HTML hidden parameters
      */
     public static String getSubmissionParameters(SubmissionInfo si)
@@ -1992,24 +2120,25 @@ public class SubmitServlet extends DSpaceServlet
 
         if (isWorkflow(si))
         {
-            info = info + "<input type=hidden name=workflow_id value=\"" +
-                   si.submission.getID() + "\">";
-        } else
+            info = info + "<input type=hidden name=workflow_id value=\""
+                    + si.submission.getID() + "\">";
+        }
+        else
         {
-            info = info + "<input type=hidden name=workspace_item_id value=\"" +
-                   si.submission.getID() + "\">";
+            info = info + "<input type=hidden name=workspace_item_id value=\""
+                    + si.submission.getID() + "\">";
         }
 
         if (si.bundle != null)
         {
-            info = info + "<input type=hidden name=bundle_id value=\"" +
-                   si.bundle.getID() + "\">";
+            info = info + "<input type=hidden name=bundle_id value=\""
+                    + si.bundle.getID() + "\">";
         }
 
         if (si.bitstream != null)
         {
-            info = info + "<input type=hidden name=bitstream_id value=\"" +
-                   si.bitstream.getID() + "\">";
+            info = info + "<input type=hidden name=bitstream_id value=\""
+                    + si.bitstream.getID() + "\">";
         }
 
         return info;
@@ -2017,10 +2146,11 @@ public class SubmitServlet extends DSpaceServlet
 
     /**
      * Return text information suitable for logging
-     *
-     * @param si  the submission info
-     * @return  the type and ID of the submission, bundle and/or bitstream
-     *          for logging
+     * 
+     * @param si
+     *            the submission info
+     * @return the type and ID of the submission, bundle and/or bitstream for
+     *         logging
      */
     public String getSubmissionLogInfo(SubmissionInfo si)
     {
@@ -2029,7 +2159,8 @@ public class SubmitServlet extends DSpaceServlet
         if (isWorkflow(si))
         {
             info = info + "workflow_id=" + si.submission.getID();
-        } else
+        }
+        else
         {
             info = info + "workspace_item_id" + si.submission.getID();
         }
@@ -2048,17 +2179,18 @@ public class SubmitServlet extends DSpaceServlet
     }
 
     /**
-     * Indicate the user has advanced to the given stage.  This will
-     * only actually do anything when it's a user initially entering
-     * a submission.  It will only increase the "stage reached" column -
-     * it will not "set back" where a user has reached.
-     *
-     * @param subInfo  the SubmissionInfo object pertaining to the current
-     *             submission
-     * @param step  the step the user has just reached
+     * Indicate the user has advanced to the given stage. This will only
+     * actually do anything when it's a user initially entering a submission. It
+     * will only increase the "stage reached" column - it will not "set back"
+     * where a user has reached.
+     * 
+     * @param subInfo
+     *            the SubmissionInfo object pertaining to the current submission
+     * @param step
+     *            the step the user has just reached
      */
     private void userHasReached(SubmissionInfo subInfo, int step)
-                         throws SQLException, AuthorizeException, IOException
+            throws SQLException, AuthorizeException, IOException
     {
         if (!isWorkflow(subInfo))
         {
@@ -2073,12 +2205,12 @@ public class SubmitServlet extends DSpaceServlet
     }
 
     /**
-     * Find out which step a user has reached in the submission process.  If
-     * the submission is in the workflow process, this returns
-     * REVIEW_SUBMISSION.
-     *
-     * @param subInfo  submission info object
-     *
+     * Find out which step a user has reached in the submission process. If the
+     * submission is in the workflow process, this returns REVIEW_SUBMISSION.
+     * 
+     * @param subInfo
+     *            submission info object
+     * 
      * @return step reached, between SELECT_COLLECTION and SUBMISSION_COMPLETE
      */
     public static int getStepReached(SubmissionInfo subInfo)
@@ -2086,7 +2218,8 @@ public class SubmitServlet extends DSpaceServlet
         if (isWorkflow(subInfo))
         {
             return -1;
-        } else
+        }
+        else
         {
             WorkspaceItem wi = (WorkspaceItem) subInfo.submission;
             int i = wi.getStageReached();
@@ -2110,41 +2243,45 @@ public class SubmitServlet extends DSpaceServlet
     //****************************************************************
 
     /**
-     * Set relevant DC fields in an item from name values in the form.
-     * Some fields are repeatable in the form.  If this is the case, and
-     * the field is "contributor.author", the names in the request
-     * will be from the fields as follows:
-     *
-     * contributor_author_last_0       -> last name of first author
-     * contributor_author_first_0      -> first name(s) of first author
-     * contributor_author_last_1       -> last name of second author
-     * contributor_author_first_1      -> first name(s) of second author
-     *
-     * and so on.  If the field is unqualified:
-     *
-     * contributor_last_0        -> last name of first contributor
-     * contributor_first_0       -> first name(s) of first contributor
-     *
-     * If the parameter "submit_contributor_author_remove_n" is set, that
-     * value is removed.
-     *
+     * Set relevant DC fields in an item from name values in the form. Some
+     * fields are repeatable in the form. If this is the case, and the field is
+     * "contributor.author", the names in the request will be from the fields as
+     * follows:
+     * 
+     * contributor_author_last_0 -> last name of first author
+     * contributor_author_first_0 -> first name(s) of first author
+     * contributor_author_last_1 -> last name of second author
+     * contributor_author_first_1 -> first name(s) of second author
+     * 
+     * and so on. If the field is unqualified:
+     * 
+     * contributor_last_0 -> last name of first contributor contributor_first_0 ->
+     * first name(s) of first contributor
+     * 
+     * If the parameter "submit_contributor_author_remove_n" is set, that value
+     * is removed.
+     * 
      * Otherwise the parameters are of the form:
-     *
-     * contributor_author_last
-     * contributor_author_first
-     *
-     * The values will be put in separate DCValues, in the form
-     * "last name, first name(s)", ordered as they appear in the list.
-     * These will replace any existing values.
-     *
-     * @param request    the request object
-     * @param item       the item to update
-     * @param element    the DC element
-     * @param qualifier  the DC qualifier, or null if unqualified
-     * @param repeated   set to true if the field is repeatable on the form
+     * 
+     * contributor_author_last contributor_author_first
+     * 
+     * The values will be put in separate DCValues, in the form "last name,
+     * first name(s)", ordered as they appear in the list. These will replace
+     * any existing values.
+     * 
+     * @param request
+     *            the request object
+     * @param item
+     *            the item to update
+     * @param element
+     *            the DC element
+     * @param qualifier
+     *            the DC qualifier, or null if unqualified
+     * @param repeated
+     *            set to true if the field is repeatable on the form
      */
     private void readNames(HttpServletRequest request, Item item,
-                           String element, String qualifier, boolean repeated)
+            String element, String qualifier, boolean repeated)
     {
         String dcname = element;
 
@@ -2168,12 +2305,14 @@ public class SubmitServlet extends DSpaceServlet
 
             if (buttonPressed.startsWith(removeButton))
             {
-                int valToRemove = Integer.parseInt(buttonPressed.substring(removeButton.length()));
+                int valToRemove = Integer.parseInt(buttonPressed
+                        .substring(removeButton.length()));
 
                 firsts.remove(valToRemove);
                 lasts.remove(valToRemove);
             }
-        } else
+        }
+        else
         {
             // Just a single name
             String lastName = request.getParameter(dcname + "_last");
@@ -2219,41 +2358,44 @@ public class SubmitServlet extends DSpaceServlet
                 }
 
                 // Add to the database
-                item.addDC(element, qualifier, null,
-                           new DCPersonName(l, f).toString());
+                item.addDC(element, qualifier, null, new DCPersonName(l, f)
+                        .toString());
             }
         }
     }
 
     /**
-     * Fill out an item's DC values from a plain standard text field.
-     * If the field isn't repeatable, the input field name is called:
-     *
+     * Fill out an item's DC values from a plain standard text field. If the
+     * field isn't repeatable, the input field name is called:
+     * 
      * element_qualifier
-     *
+     * 
      * or for an unqualified element:
-     *
+     * 
      * element
-     *
-     * Repeated elements are appended with an underscore then an integer.
-     * e.g.:
-     *
-     * title_alternative_0
-     * title_alternative_1
-     *
-     * The values will be put in separate DCValues, ordered as they appear
-     * in the list.  These will replace any existing values.
-     *
-     * @param request    the request object
-     * @param item       the item to update
-     * @param element    the DC element
-     * @param qualifier  the DC qualifier, or null if unqualified
-     * @param repeated   set to true if the field is repeatable on the form
-     * @param lang       language to set (ISO code)
+     * 
+     * Repeated elements are appended with an underscore then an integer. e.g.:
+     * 
+     * title_alternative_0 title_alternative_1
+     * 
+     * The values will be put in separate DCValues, ordered as they appear in
+     * the list. These will replace any existing values.
+     * 
+     * @param request
+     *            the request object
+     * @param item
+     *            the item to update
+     * @param element
+     *            the DC element
+     * @param qualifier
+     *            the DC qualifier, or null if unqualified
+     * @param repeated
+     *            set to true if the field is repeatable on the form
+     * @param lang
+     *            language to set (ISO code)
      */
     private void readText(HttpServletRequest request, Item item,
-                          String element, String qualifier, boolean repeated,
-                          String lang)
+            String element, String qualifier, boolean repeated, String lang)
     {
         // FIXME: Of course, language should be part of form, or determined
         // some other way
@@ -2277,11 +2419,13 @@ public class SubmitServlet extends DSpaceServlet
 
             if (buttonPressed.startsWith(removeButton))
             {
-                int valToRemove = Integer.parseInt(buttonPressed.substring(removeButton.length()));
+                int valToRemove = Integer.parseInt(buttonPressed
+                        .substring(removeButton.length()));
 
                 vals.remove(valToRemove);
             }
-        } else
+        }
+        else
         {
             // Just a single name
             vals.add(request.getParameter(dcname).trim());
@@ -2305,24 +2449,25 @@ public class SubmitServlet extends DSpaceServlet
     }
 
     /**
-     * Fill out a DC date field with the value from a form.  The date is
-     * taken from the three parameters:
-     *
-     * element_qualifier_year
-     * element_qualifier_month
-     * element_qualifier_day
-     *
-     * The granularity is determined by the values that are actually set.
-     * If the year isn't set (or is invalid)
-     *
-     * @param request    the request object
-     * @param item       the item to update
-     * @param element    the DC element
-     * @param qualifier  the DC qualifier, or null if unqualified
+     * Fill out a DC date field with the value from a form. The date is taken
+     * from the three parameters:
+     * 
+     * element_qualifier_year element_qualifier_month element_qualifier_day
+     * 
+     * The granularity is determined by the values that are actually set. If the
+     * year isn't set (or is invalid)
+     * 
+     * @param request
+     *            the request object
+     * @param item
+     *            the item to update
+     * @param element
+     *            the DC element
+     * @param qualifier
+     *            the DC qualifier, or null if unqualified
      */
     private void readDate(HttpServletRequest request, Item item,
-                          String element, String qualifier)
-                   throws SQLException
+            String element, String qualifier) throws SQLException
     {
         String dcname = element;
 
@@ -2351,39 +2496,39 @@ public class SubmitServlet extends DSpaceServlet
     }
 
     /**
-     * Set relevant DC fields in an item from series/number values in the
-     * form. Some fields are repeatable in the form.  If this is the case,
-     * and the field is "relation.ispartof", the names in the request
-     * will be from the fields as follows:
-     *
-     * relation_ispartof_series_0
-     * relation_ispartof_number_0
-     * relation_ispartof_series_1
-     * relation_ispartof_number_1
-     *
-     * and so on.  If the field is unqualified:
-     *
-     * relation_series_0
-     * relation_number_0
-     *
+     * Set relevant DC fields in an item from series/number values in the form.
+     * Some fields are repeatable in the form. If this is the case, and the
+     * field is "relation.ispartof", the names in the request will be from the
+     * fields as follows:
+     * 
+     * relation_ispartof_series_0 relation_ispartof_number_0
+     * relation_ispartof_series_1 relation_ispartof_number_1
+     * 
+     * and so on. If the field is unqualified:
+     * 
+     * relation_series_0 relation_number_0
+     * 
      * Otherwise the parameters are of the form:
-     *
-     * relation_ispartof_series
-     * relation_ispartof_number
-     *
-     * The values will be put in separate DCValues, in the form
-     * "last name, first name(s)", ordered as they appear in the list.
-     * These will replace any existing values.
-     *
-     * @param request    the request object
-     * @param item       the item to update
-     * @param element    the DC element
-     * @param qualifier  the DC qualifier, or null if unqualified
-     * @param repeated   set to true if the field is repeatable on the form
+     * 
+     * relation_ispartof_series relation_ispartof_number
+     * 
+     * The values will be put in separate DCValues, in the form "last name,
+     * first name(s)", ordered as they appear in the list. These will replace
+     * any existing values.
+     * 
+     * @param request
+     *            the request object
+     * @param item
+     *            the item to update
+     * @param element
+     *            the DC element
+     * @param qualifier
+     *            the DC qualifier, or null if unqualified
+     * @param repeated
+     *            set to true if the field is repeatable on the form
      */
     private void readSeriesNumbers(HttpServletRequest request, Item item,
-                                   String element, String qualifier,
-                                   boolean repeated)
+            String element, String qualifier, boolean repeated)
     {
         String dcname = element;
 
@@ -2407,12 +2552,14 @@ public class SubmitServlet extends DSpaceServlet
 
             if (buttonPressed.startsWith(removeButton))
             {
-                int valToRemove = Integer.parseInt(buttonPressed.substring(removeButton.length()));
+                int valToRemove = Integer.parseInt(buttonPressed
+                        .substring(removeButton.length()));
 
                 series.remove(valToRemove);
                 numbers.remove(valToRemove);
             }
-        } else
+        }
+        else
         {
             // Just a single name
             String s = request.getParameter(dcname + "_series");
@@ -2438,19 +2585,21 @@ public class SubmitServlet extends DSpaceServlet
             // Only add non-empty
             if (!s.equals("") || !n.equals(""))
             {
-                item.addDC(element, qualifier, null,
-                           new DCSeriesNumber(s, n).toString());
+                item.addDC(element, qualifier, null, new DCSeriesNumber(s, n)
+                        .toString());
             }
         }
     }
 
     /**
-     * Get repeated values from a form.  If "foo" is passed in, values in
-     * the form of parameters "foo_0", "foo_1", etc. are returned.
-     *
-     * @param request   the HTTP request containing the form information
-     * @param param     the repeated parameter
-     *
+     * Get repeated values from a form. If "foo" is passed in, values in the
+     * form of parameters "foo_0", "foo_1", etc. are returned.
+     * 
+     * @param request
+     *            the HTTP request containing the form information
+     * @param param
+     *            the repeated parameter
+     * 
      * @return a List of Strings
      */
     private List getRepeatedParameter(HttpServletRequest request, String param)
@@ -2469,7 +2618,8 @@ public class SubmitServlet extends DSpaceServlet
             if (s != null)
             {
                 vals.add(s.trim());
-            } else
+            }
+            else
             {
                 // If the value was null (as opposed to present,
                 // but empty) we've reached the last name

@@ -55,13 +55,12 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
  * Utility class for extracting information about items, possibly just within a
  * certain community or collection, that have been created, modified or
  * withdrawn within a particular range of dates.
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class Harvest
@@ -71,39 +70,48 @@ public class Harvest
 
     /**
      * Obtain information about items that have been created, modified or
-     * withdrawn within a given date range.  You can also specify 'offset'
-     * and 'limit' so that a big harvest can be split up into smaller sections.
+     * withdrawn within a given date range. You can also specify 'offset' and
+     * 'limit' so that a big harvest can be split up into smaller sections.
      * <P>
-     * Note that dates are passed in the standard ISO8601 format used by
-     * DSpace (and OAI-PMH).<P>
+     * Note that dates are passed in the standard ISO8601 format used by DSpace
+     * (and OAI-PMH).
+     * <P>
      * FIXME: Assumes all in_archive items have public metadata
-     *
-     * @param context     DSpace context
-     * @param scope       a Collection, or <code>null</code>
-     *                    indicating the scope is all of DSpace
-     * @param startDate   start of date range, or <code>null</code>
-     * @param endDate     end of date range, or <code>null</code>
-     * @param offset      for a partial harvest, the point in the overall list
-     *                    of matching items to start at.  0 means just start
-     *                    at the beginning.
-     * @param limit       the number of matching items to return in a partial
-     *                    harvest.  Specify 0 to return the whole list
-     *                    (or the rest of the list if an offset was specified.)
-     * @param items       if <code>true</code> the <code>item</code> field of
-     *                    each <code>HarvestedItemInfo</code> object is
-     *                    filled out
-     * @param collections if <code>true</code> the <code>collectionHandles</code>
-     *                    field of each <code>HarvestedItemInfo</code> object
-     *                    is filled out
-     * @param withdrawn   If <code>true</code>, information about withdrawn
-     *                    items is included
-     * @return  List of <code>HarvestedItemInfo</code> objects
+     * 
+     * @param context
+     *            DSpace context
+     * @param scope
+     *            a Collection, or <code>null</code> indicating the scope is
+     *            all of DSpace
+     * @param startDate
+     *            start of date range, or <code>null</code>
+     * @param endDate
+     *            end of date range, or <code>null</code>
+     * @param offset
+     *            for a partial harvest, the point in the overall list of
+     *            matching items to start at. 0 means just start at the
+     *            beginning.
+     * @param limit
+     *            the number of matching items to return in a partial harvest.
+     *            Specify 0 to return the whole list (or the rest of the list if
+     *            an offset was specified.)
+     * @param items
+     *            if <code>true</code> the <code>item</code> field of each
+     *            <code>HarvestedItemInfo</code> object is filled out
+     * @param collections
+     *            if <code>true</code> the <code>collectionHandles</code>
+     *            field of each <code>HarvestedItemInfo</code> object is
+     *            filled out
+     * @param withdrawn
+     *            If <code>true</code>, information about withdrawn items is
+     *            included
+     * @return List of <code>HarvestedItemInfo</code> objects
      * @throws SQLException
      */
     public static List harvest(Context context, Collection scope,
-                               String startDate, String endDate, int offset,
-                               int limit, boolean items, boolean collections,
-                               boolean withdrawn) throws SQLException
+            String startDate, String endDate, int offset, int limit,
+            boolean items, boolean collections, boolean withdrawn)
+            throws SQLException
     {
         // SQL to add to the list of tables after the SELECT
         String scopeTableSQL = "";
@@ -114,18 +122,20 @@ public class Harvest
         if (scope != null)
         {
             scopeTableSQL = ", collection2item";
-            scopeWhereSQL = " AND collection2item.collection_id=" +
-                            scope.getID() +
-                            " AND collection2item.item_id=handle.resource_id";
+            scopeWhereSQL = " AND collection2item.collection_id="
+                    + scope.getID()
+                    + " AND collection2item.item_id=handle.resource_id";
         }
 
-        // Put together our query.  Note there is no need for an
+        // Put together our query. Note there is no need for an
         // "in_archive=true" condition, we are using the existence of
         // Handles as our 'existence criterion'.
-        String query =
-            "SELECT handle.handle, handle.resource_id, item.withdrawn, item.last_modified FROM handle, item" +
-            scopeTableSQL + " WHERE handle.resource_type_id=" + Constants.ITEM +
-            " AND handle.resource_id=item.item_id" + scopeWhereSQL;
+        String query = "SELECT handle.handle, handle.resource_id, item.withdrawn, item.last_modified FROM handle, item"
+                + scopeTableSQL
+                + " WHERE handle.resource_type_id="
+                + Constants.ITEM
+                + " AND handle.resource_id=item.item_id"
+                + scopeWhereSQL;
 
         if (startDate != null)
         {
@@ -134,24 +144,24 @@ public class Harvest
 
         if (endDate != null)
         {
-            /* If the end date has seconds precision, e.g.:
-            *
-            *    2004-04-29T13:45:43Z
-            *
-            * we need to add 999 milliseconds to this.  This is because
-            * SQL TIMESTAMPs have millisecond precision, and so might
-            * have a value:
-            *
-            *    2004-04-29T13:45:43.952Z
-            *
-            * and so <= '2004-04-29T13:45:43Z' would not pick this up.
-            * Reading things out of the database, TIMESTAMPs are rounded
-            * down, so the above value would be read as
-            * '2004-04-29T13:45:43Z', and therefore a caller would expect
-            * <= '2004-04-29T13:45:43Z' to include that value.
-            *
-            * Got that? ;-)
-            */
+            /*
+             * If the end date has seconds precision, e.g.:
+             * 
+             * 2004-04-29T13:45:43Z
+             * 
+             * we need to add 999 milliseconds to this. This is because SQL
+             * TIMESTAMPs have millisecond precision, and so might have a value:
+             * 
+             * 2004-04-29T13:45:43.952Z
+             * 
+             * and so <= '2004-04-29T13:45:43Z' would not pick this up. Reading
+             * things out of the database, TIMESTAMPs are rounded down, so the
+             * above value would be read as '2004-04-29T13:45:43Z', and
+             * therefore a caller would expect <= '2004-04-29T13:45:43Z' to
+             * include that value.
+             * 
+             * Got that? ;-)
+             */
             if (endDate.length() == 20)
             {
                 endDate = endDate.substring(0, 19) + ".999Z";
@@ -166,7 +176,8 @@ public class Harvest
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
                 query = query + " AND withdrawn=0";
-            } else
+            }
+            else
             {
                 // postgres uses booleans
                 query = query + " AND withdrawn=false";
@@ -174,7 +185,7 @@ public class Harvest
         }
 
         // Order by item ID, so that for a given harvest the order will be
-        // consistent.  This is so that big harvests can be broken up into
+        // consistent. This is so that big harvests can be broken up into
         // several smaller operations (e.g. for OAI resumption tokens.)
         query = query + " ORDER BY handle.resource_id";
 
@@ -191,11 +202,11 @@ public class Harvest
             TableRow row = tri.next();
 
             /*
-             * This conditional ensures that we only process items within
-             * any constraints specified by 'offset' and 'limit' parameters.
+             * This conditional ensures that we only process items within any
+             * constraints specified by 'offset' and 'limit' parameters.
              */
-            if ((index >= offset) &&
-                    ((limit == 0) || (index < (offset + limit))))
+            if ((index >= offset)
+                    && ((limit == 0) || (index < (offset + limit))))
             {
                 HarvestedItemInfo itemInfo = new HarvestedItemInfo();
 
@@ -227,22 +238,24 @@ public class Harvest
     }
 
     /**
-     * Get harvested item info for a single item.  <code>item</code> field in
+     * Get harvested item info for a single item. <code>item</code> field in
      * returned <code>HarvestedItemInfo</code> object is always filled out.
-     *
-     * @param context     DSpace context
-     * @param handle      Prefix-less Handle of item
-     * @param collections if <code>true</code> the <code>collectionHandles</code>
-     *                    field of the <code>HarvestedItemInfo</code> object
-     *                    is filled out
-     *
-     * @return  <code>HarvestedItemInfo</code> object for the single item, or
-     *          <code>null</code>
+     * 
+     * @param context
+     *            DSpace context
+     * @param handle
+     *            Prefix-less Handle of item
+     * @param collections
+     *            if <code>true</code> the <code>collectionHandles</code>
+     *            field of the <code>HarvestedItemInfo</code> object is filled
+     *            out
+     * 
+     * @return <code>HarvestedItemInfo</code> object for the single item, or
+     *         <code>null</code>
      * @throws SQLException
      */
     public static HarvestedItemInfo getSingle(Context context, String handle,
-                                              boolean collections)
-                                       throws SQLException
+            boolean collections) throws SQLException
     {
         // FIXME: Assume Handle is item
         Item i = (Item) HandleManager.resolveToObject(context, handle);
@@ -272,21 +285,24 @@ public class Harvest
 
     /**
      * Fill out the containers field of the HarvestedItemInfo object
-     *
-     * @param context  DSpace context
-     * @param itemInfo HarvestedItemInfo object to fill out
+     * 
+     * @param context
+     *            DSpace context
+     * @param itemInfo
+     *            HarvestedItemInfo object to fill out
      * @throws SQLException
      */
     private static void fillCollections(Context context,
-                                        HarvestedItemInfo itemInfo)
-                                 throws SQLException
+            HarvestedItemInfo itemInfo) throws SQLException
     {
         // Get the collection Handles from DB
-        TableRowIterator colRows = DatabaseManager.query(context,
-                                                         "SELECT handle.handle FROM handle, collection2item WHERE handle.resource_type_id=" +
-                                                         Constants.COLLECTION +
-                                                         " AND collection2item.collection_id=handle.resource_id AND collection2item.item_id = " +
-                                                         itemInfo.itemID);
+        TableRowIterator colRows = DatabaseManager
+                .query(
+                        context,
+                        "SELECT handle.handle FROM handle, collection2item WHERE handle.resource_type_id="
+                                + Constants.COLLECTION
+                                + " AND collection2item.collection_id=handle.resource_id AND collection2item.item_id = "
+                                + itemInfo.itemID);
 
         // Chuck 'em in the itemInfo object
         itemInfo.collectionHandles = new LinkedList();

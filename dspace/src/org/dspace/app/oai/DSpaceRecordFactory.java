@@ -52,11 +52,10 @@ import org.dspace.search.HarvestedItemInfo;
 import ORG.oclc.oai.server.catalog.RecordFactory;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 
-
 /**
  * Implementation of the OAICat RecordFactory base class for DSpace items.
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class DSpaceRecordFactory extends RecordFactory
@@ -77,9 +76,8 @@ public class DSpaceRecordFactory extends RecordFactory
     }
 
     public String quickCreate(Object nativeItem, String schemaURL,
-                              String metadataPrefix)
-                       throws IllegalArgumentException, 
-                              CannotDisseminateFormatException
+            String metadataPrefix) throws IllegalArgumentException,
+            CannotDisseminateFormatException
     {
         // Not supported
         return null;
@@ -87,8 +85,8 @@ public class DSpaceRecordFactory extends RecordFactory
 
     protected String getOAIIdentifier(Object nativeItem)
     {
-        String h = DSpaceOAICatalog.OAI_ID_PREFIX +
-                   ((HarvestedItemInfo) nativeItem).handle;
+        String h = DSpaceOAICatalog.OAI_ID_PREFIX
+                + ((HarvestedItemInfo) nativeItem).handle;
 
         return h;
     }

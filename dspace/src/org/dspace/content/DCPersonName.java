@@ -39,18 +39,17 @@
  */
 package org.dspace.content;
 
-
 /**
  * DSpace person name utility class
  * <P>
- * Person names in the Dublin Core value table in the DSpace database are
- * stored in the following simple format:
+ * Person names in the Dublin Core value table in the DSpace database are stored
+ * in the following simple format:
  * <P>
  * <code>Lastname, First name(s)</code>
  * <P>
  * <em>FIXME:  No policy for dealing with "van"/"van der" and "Jr."</em>
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class DCPersonName
@@ -70,8 +69,9 @@ public class DCPersonName
 
     /**
      * Construct a name from a raw DC value
-     *
-     * @param rawValue  the value entry from the database
+     * 
+     * @param rawValue
+     *            the value entry from the database
      */
     public DCPersonName(String rawValue)
     {
@@ -98,7 +98,8 @@ public class DCPersonName
             if (rawValue.length() > (commaIndex + 2))
             {
                 firstNames = rawValue.substring(commaIndex + 2);
-            } else
+            }
+            else
             {
                 // Since we have a name, we don't want to
                 // leave the last name as null
@@ -109,9 +110,11 @@ public class DCPersonName
 
     /**
      * Construct a name from a last name and first name
-     *
-     * @param  lastNameIn    the last name
-     * @param  firstNamesIn  the first names
+     * 
+     * @param lastNameIn
+     *            the last name
+     * @param firstNamesIn
+     *            the first names
      */
     public DCPersonName(String lastNameIn, String firstNamesIn)
     {
@@ -121,8 +124,8 @@ public class DCPersonName
 
     /**
      * Return a string for writing the name to the database
-     *
-     * @return  the name, suitable for putting in the database
+     * 
+     * @return the name, suitable for putting in the database
      */
     public String toString()
     {
@@ -142,8 +145,8 @@ public class DCPersonName
     }
 
     /**
-     * Get the first name(s).  Guaranteed non-null.
-     *
+     * Get the first name(s). Guaranteed non-null.
+     * 
      * @return the first name(s), or an empty string if none
      */
     public String getFirstNames()
@@ -152,8 +155,8 @@ public class DCPersonName
     }
 
     /**
-     * Get the last name.  Guaranteed non-null.
-     *
+     * Get the last name. Guaranteed non-null.
+     * 
      * @return the last name, or an empty string if none
      */
     public String getLastName()

@@ -52,17 +52,16 @@ import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
-
 /**
- * MIT implementation of DSpace Web UI authentication.  This version detects
+ * MIT implementation of DSpace Web UI authentication. This version detects
  * whether the user is an MIT user, and if so, the user is redirected to the
- * certificate login page.  Otherwise, the email/password page is used.
+ * certificate login page. Otherwise, the email/password page is used.
  * <P>
- * The special group at MIT is an "MIT Users" group.  Users who are on an
- * MIT IP address, or have an e-mail ending in "mit.edu" are implictly
- * members of this group.
- *
- * @author  Robert Tansley
+ * The special group at MIT is an "MIT Users" group. Users who are on an MIT IP
+ * address, or have an e-mail ending in "mit.edu" are implictly members of this
+ * group.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class SimpleAuthenticator implements SiteAuthenticator
@@ -71,65 +70,74 @@ public class SimpleAuthenticator implements SiteAuthenticator
     private static Logger log = Logger.getLogger(SiteAuthenticator.class);
 
     public void startAuthentication(Context context,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response)
-                             throws ServletException, IOException
+            HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException
     {
         // Present the username/password screen
-        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                         "/password-login"));
+        response.sendRedirect(response.encodeRedirectURL(request
+                .getContextPath()
+                + "/password-login"));
     }
 
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
-                           throws SQLException
+            throws SQLException
     {
         // Return a list of special group IDs.
         return new int[0];
     }
 
-    /** Indicate whether or not a particular self-registering user can set
+    /**
+     * Indicate whether or not a particular self-registering user can set
      * themselves a password in the profile info form.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request, in case anything in that is used to
-     *                  decide
-     * @param email     e-mail address of user attempting to register
-     *
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request, in case anything in that is used to decide
+     * @param email
+     *            e-mail address of user attempting to register
+     *  
      */
     public boolean allowSetPassword(Context context,
-                                    HttpServletRequest request, String email)
-                             throws SQLException
+            HttpServletRequest request, String email) throws SQLException
     {
         // Anyone can set themselves a password
         return true;
     }
 
-    /** Indicate whether or not a particular user can self-register, based
-     * on e-mail address.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request, in case anything in that is used to
-     *                  decide
-     * @param email     e-mail address of user attempting to register
-     *
+    /**
+     * Indicate whether or not a particular user can self-register, based on
+     * e-mail address.
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request, in case anything in that is used to decide
+     * @param email
+     *            e-mail address of user attempting to register
+     *  
      */
     public boolean canSelfRegister(Context context, HttpServletRequest request,
-                                   String email) throws SQLException
+            String email) throws SQLException
     {
         // Anyone can register
         return true;
     }
 
-    /** Initialise a new e-person record for a self-registered new user.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request, in case it's needed
-     * @param eperson   newly created EPerson record - email + information
-     *                  from the registration form will have been filled out.
-     *
+    /**
+     * Initialise a new e-person record for a self-registered new user.
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request, in case it's needed
+     * @param eperson
+     *            newly created EPerson record - email + information from the
+     *            registration form will have been filled out.
+     *  
      */
     public void initEPerson(Context context, HttpServletRequest request,
-                            EPerson eperson) throws SQLException
+            EPerson eperson) throws SQLException
     {
         // Any default fields set in an e-person record would be set here
     }

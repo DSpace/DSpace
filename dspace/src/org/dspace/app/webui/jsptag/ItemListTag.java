@@ -73,10 +73,9 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
-
 /**
  * Tag for display a list of items
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -96,6 +95,7 @@ public class ItemListTag extends TagSupport
 
     /** Config browse/search width and height */
     private int thumbItemListMaxWidth;
+
     private int thumbItemListMaxHeight;
 
     /** Config browse/search thumbnail link behaviour */
@@ -125,14 +125,14 @@ public class ItemListTag extends TagSupport
             out.println("<table align=center class=\"miscTable\">");
 
             // Write column headings
-            out.print("<tr><th class=\"oddRowOddCol\">" +
-                      (emphasiseDate ? "<strong>" : "") +
-                      "Date&nbsp;of&nbsp;Issue" +
-                      (emphasiseDate ? "</strong>" : "") + "</th>");
+            out.print("<tr><th class=\"oddRowOddCol\">"
+                    + (emphasiseDate ? "<strong>" : "")
+                    + "Date&nbsp;of&nbsp;Issue"
+                    + (emphasiseDate ? "</strong>" : "") + "</th>");
 
-            out.println("<th class=\"oddRowEvenCol\">" +
-                        (emphasiseTitle ? "<strong>" : "") + "Title" +
-                        (emphasiseTitle ? "</strong>" : "") + "</th>");
+            out.println("<th class=\"oddRowEvenCol\">"
+                    + (emphasiseTitle ? "<strong>" : "") + "Title"
+                    + (emphasiseTitle ? "</strong>" : "") + "</th>");
 
             out.println("<th class=\"oddRowOddCol\">Authors</th></tr>");
 
@@ -152,10 +152,11 @@ public class ItemListTag extends TagSupport
 
                 // Authors....
                 DCValue[] authors = items[i].getDC("contributor", Item.ANY,
-                                                   Item.ANY);
+                        Item.ANY);
 
                 // Date issued
-                DCValue[] dateIssued = items[i].getDC("date", "issued", Item.ANY);
+                DCValue[] dateIssued = items[i].getDC("date", "issued",
+                        Item.ANY);
                 DCDate dd = null;
 
                 if (dateIssued.length > 0)
@@ -180,7 +181,8 @@ public class ItemListTag extends TagSupport
                     out.print("</strong>");
                 }
 
-                HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
+                HttpServletRequest hrq = (HttpServletRequest) pageContext
+                        .getRequest();
 
                 // display thumbnails if required
                 if (showThumbs)
@@ -218,8 +220,8 @@ public class ItemListTag extends TagSupport
 
                 for (int j = 0; j < authors.length; j++)
                 {
-                    out.print("<em>" + Utils.addEntities(authors[j].value) +
-                              "</em>");
+                    out.print("<em>" + Utils.addEntities(authors[j].value)
+                            + "</em>");
 
                     if (j < (authors.length - 1))
                     {
@@ -233,7 +235,8 @@ public class ItemListTag extends TagSupport
             }
 
             out.println("</table>");
-        } catch (IOException ie)
+        }
+        catch (IOException ie)
         {
             throw new JspException(ie);
         }
@@ -243,7 +246,7 @@ public class ItemListTag extends TagSupport
 
     /**
      * Get the items to list
-     *
+     * 
      * @return the items
      */
     public Item[] getItems()
@@ -253,7 +256,7 @@ public class ItemListTag extends TagSupport
 
     /**
      * Set the items to list
-     *
+     * 
      * @param itemsIn
      *            the items
      */
@@ -264,7 +267,7 @@ public class ItemListTag extends TagSupport
 
     /**
      * Get the row to highlight - null or -1 for no row
-     *
+     * 
      * @return the row to highlight
      */
     public String getHighlightrow()
@@ -274,7 +277,7 @@ public class ItemListTag extends TagSupport
 
     /**
      * Set the row to highlight
-     *
+     * 
      * @param highlightRowIn
      *            the row to highlight or -1 for no highlight
      */
@@ -283,12 +286,14 @@ public class ItemListTag extends TagSupport
         if ((highlightRowIn == null) || highlightRowIn.equals(""))
         {
             highlightRow = -1;
-        } else
+        }
+        else
         {
             try
             {
                 highlightRow = Integer.parseInt(highlightRowIn);
-            } catch (NumberFormatException nfe)
+            }
+            catch (NumberFormatException nfe)
             {
                 highlightRow = -1;
             }
@@ -297,7 +302,7 @@ public class ItemListTag extends TagSupport
 
     /**
      * Get the column to emphasise - "title", "date" or null
-     *
+     * 
      * @return the column to emphasise
      */
     public String getEmphcolumn()
@@ -307,7 +312,7 @@ public class ItemListTag extends TagSupport
 
     /**
      * Set the column to emphasise - "title", "date" or null
-     *
+     * 
      * @param emphcolumnIn
      *            column to emphasise
      */
@@ -326,26 +331,32 @@ public class ItemListTag extends TagSupport
     /* get the required thumbnail config items */
     private void getThumbSettings()
     {
-        showThumbs = ConfigurationManager.getBooleanProperty("webui.browse.thumbnail.show");
+        showThumbs = ConfigurationManager
+                .getBooleanProperty("webui.browse.thumbnail.show");
 
         if (showThumbs)
         {
-            thumbItemListMaxHeight = ConfigurationManager.getIntProperty("webui.browse.thumbnail.maxheight");
+            thumbItemListMaxHeight = ConfigurationManager
+                    .getIntProperty("webui.browse.thumbnail.maxheight");
 
             if (thumbItemListMaxHeight == 0)
             {
-                thumbItemListMaxHeight = ConfigurationManager.getIntProperty("thumbnail.maxheight");
+                thumbItemListMaxHeight = ConfigurationManager
+                        .getIntProperty("thumbnail.maxheight");
             }
 
-            thumbItemListMaxWidth = ConfigurationManager.getIntProperty("webui.browse.thumbnail.maxwidth");
+            thumbItemListMaxWidth = ConfigurationManager
+                    .getIntProperty("webui.browse.thumbnail.maxwidth");
 
             if (thumbItemListMaxWidth == 0)
             {
-                thumbItemListMaxWidth = ConfigurationManager.getIntProperty("thumbnail.maxwidth");
+                thumbItemListMaxWidth = ConfigurationManager
+                        .getIntProperty("thumbnail.maxwidth");
             }
         }
 
-        String linkBehaviour = ConfigurationManager.getProperty("webui.browse.thumbnail.linkbehaviour");
+        String linkBehaviour = ConfigurationManager
+                .getProperty("webui.browse.thumbnail.linkbehaviour");
 
         if (linkBehaviour != null)
         {
@@ -364,7 +375,7 @@ public class ItemListTag extends TagSupport
      * the search/browse
      */
     private String getScalingAttr(HttpServletRequest hrq, Bitstream bitstream)
-                           throws JspException
+            throws JspException
     {
         BufferedImage buf;
 
@@ -372,16 +383,18 @@ public class ItemListTag extends TagSupport
         {
             Context c = UIUtil.obtainContext(hrq);
 
-            InputStream is = BitstreamStorageManager.retrieve(c,
-                                                              bitstream.getID());
+            InputStream is = BitstreamStorageManager.retrieve(c, bitstream
+                    .getID());
 
             //AuthorizeManager.authorizeAction(bContext, this, Constants.READ);
             // 	read in bitstream's image
             buf = ImageIO.read(is);
-        } catch (SQLException sqle)
+        }
+        catch (SQLException sqle)
         {
             throw new JspException(sqle.getMessage());
-        } catch (IOException ioe)
+        }
+        catch (IOException ioe)
         {
             throw new JspException(ioe.getMessage());
         }
@@ -412,16 +425,15 @@ public class ItemListTag extends TagSupport
             ysize = ysize * scale_factor;
         }
 
-        StringBuffer sb = new StringBuffer("width=\"").append(xsize)
-                                                      .append("\" height=\"")
-                                                      .append(ysize).append("\"");
+        StringBuffer sb = new StringBuffer("width=\"").append(xsize).append(
+                "\" height=\"").append(ysize).append("\"");
 
         return sb.toString();
     }
 
     /* generate the (X)HTML required to show the thumbnail */
     private String getThumbMarkup(HttpServletRequest hrq, Item item)
-                           throws JspException
+            throws JspException
     {
         Bundle[] original = item.getBundles("ORIGINAL");
         boolean html = false;
@@ -433,9 +445,11 @@ public class ItemListTag extends TagSupport
 
             for (int i = 0; (i < bitstreams.length) && !html; i++)
             {
-                if (bitstreams[i].getID() == original[0].getPrimaryBitstreamID())
+                if (bitstreams[i].getID() == original[0]
+                        .getPrimaryBitstreamID())
                 {
-                    html = bitstreams[i].getFormat().getMIMEType().equals("text/html");
+                    html = bitstreams[i].getFormat().getMIMEType().equals(
+                            "text/html");
                 }
             }
         }
@@ -453,62 +467,68 @@ public class ItemListTag extends TagSupport
                 Bitstream thumbnailBitstream;
                 Bitstream originalBitstream;
 
-                if ((original[0].getBitstreams().length > 1) &&
-                        (original[0].getPrimaryBitstreamID() > -1))
+                if ((original[0].getBitstreams().length > 1)
+                        && (original[0].getPrimaryBitstreamID() > -1))
                 {
-                    originalBitstream = Bitstream.find(c,
-                                                       original[0].getPrimaryBitstreamID());
-                    thumbnailBitstream = thumbs[0].getBitstreamByName(originalBitstream.getName() +
-                                                                      ".jpg");
-                } else
+                    originalBitstream = Bitstream.find(c, original[0]
+                            .getPrimaryBitstreamID());
+                    thumbnailBitstream = thumbs[0]
+                            .getBitstreamByName(originalBitstream.getName()
+                                    + ".jpg");
+                }
+                else
                 {
                     originalBitstream = original[0].getBitstreams()[0];
                     thumbnailBitstream = thumbs[0].getBitstreams()[0];
                 }
 
-                if ((thumbnailBitstream != null) &&
-                        (AuthorizeManager.authorizeActionBoolean(c,
-                                                                     thumbnailBitstream,
-                                                                     Constants.READ)))
+                if ((thumbnailBitstream != null)
+                        && (AuthorizeManager.authorizeActionBoolean(c,
+                                thumbnailBitstream, Constants.READ)))
                 {
                     StringBuffer thumbLink;
 
                     if (linkToBitstream)
                     {
-                        thumbLink = new StringBuffer("<br/><a target=_blank href=\"").append(hrq.getContextPath())
-                                                                                     .append("/bitstream/")
-                                                                                     .append(item.getHandle())
-                                                                                     .append("/")
-                                                                                     .append(originalBitstream.getSequenceID())
-                                                                                     .append("/")
-                                                                                     .append(URLEncoder.encode(originalBitstream.getName(),
-                                                                                                               Constants.DEFAULT_ENCODING));
-                    } else
+                        thumbLink = new StringBuffer(
+                                "<br/><a target=_blank href=\"").append(
+                                hrq.getContextPath()).append("/bitstream/")
+                                .append(item.getHandle()).append("/").append(
+                                        originalBitstream.getSequenceID())
+                                .append("/").append(
+                                        URLEncoder.encode(originalBitstream
+                                                .getName(),
+                                                Constants.DEFAULT_ENCODING));
+                    }
+                    else
                     {
-                        thumbLink = new StringBuffer("<br/><a href=\"").append(hrq.getContextPath())
-                                                                       .append("/handle/")
-                                                                       .append(item.getHandle());
+                        thumbLink = new StringBuffer("<br/><a href=\"").append(
+                                hrq.getContextPath()).append("/handle/")
+                                .append(item.getHandle());
                     }
 
-                    thumbLink.append("\"><img src=\"")
-                             .append(hrq.getContextPath()).append("/retrieve/")
-                             .append(thumbnailBitstream.getID()).append("/")
-                             .append(URLEncoder.encode(thumbnailBitstream.getName(),
-                                                       Constants.DEFAULT_ENCODING))
-                             .append("\" alt=\"")
-                             .append(thumbnailBitstream.getName()).append("\" ")
-                             .append(getScalingAttr(hrq, thumbnailBitstream))
-                             .append("/></a>");
+                    thumbLink.append("\"><img src=\"").append(
+                            hrq.getContextPath()).append("/retrieve/").append(
+                            thumbnailBitstream.getID()).append("/").append(
+                            URLEncoder.encode(thumbnailBitstream.getName(),
+                                    Constants.DEFAULT_ENCODING)).append(
+                            "\" alt=\"").append(thumbnailBitstream.getName())
+                            .append("\" ").append(
+                                    getScalingAttr(hrq, thumbnailBitstream))
+                            .append("/></a>");
 
                     return thumbLink.toString();
                 }
-            } catch (SQLException sqle)
+            }
+            catch (SQLException sqle)
             {
                 throw new JspException(sqle.getMessage());
-            } catch (UnsupportedEncodingException e)
+            }
+            catch (UnsupportedEncodingException e)
             {
-                throw new JspException("Server does not support DSpace's default encoding. ",
-                                       e);
+                throw new JspException(
+                        "Server does not support DSpace's default encoding. ",
+                        e);
             }
         }
 

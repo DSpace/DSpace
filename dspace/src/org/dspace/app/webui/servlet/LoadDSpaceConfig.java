@@ -45,10 +45,11 @@ import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.dspace.core.ConfigurationManager;
+
 /**
- * Simple servlet to load in DSpace and log4j configurations.  Should always
- * be started up before other servlets (use <loadOnStartup>)
- *
+ * Simple servlet to load in DSpace and log4j configurations. Should always be
+ * started up before other servlets (use <loadOnStartup>)
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -63,9 +64,9 @@ public class LoadDSpaceConfig extends HttpServlet
         ConfigurationManager.loadConfig(config);
 
         // Load in log4j config
-        String log4jConf = ConfigurationManager.getProperty("dspace.dir") +
-                           File.separator + "config" + File.separator +
-                           "log4j.properties";
+        String log4jConf = ConfigurationManager.getProperty("dspace.dir")
+                + File.separator + "config" + File.separator
+                + "log4j.properties";
 
         PropertyConfigurator.configure(log4jConf);
     }

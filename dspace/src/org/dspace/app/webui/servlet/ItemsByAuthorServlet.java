@@ -58,11 +58,10 @@ import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
-
 /**
  * Displays the items with a particular author.
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class ItemsByAuthorServlet extends DSpaceServlet
@@ -71,9 +70,8 @@ public class ItemsByAuthorServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(ItemsByAuthorServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // We will resolve the HTTP request parameters into a scope
         BrowseScope scope = new BrowseScope(context);
@@ -92,7 +90,8 @@ public class ItemsByAuthorServlet extends DSpaceServlet
         {
             orderByTitle = true;
             logInfo = "order=title";
-        } else
+        }
+        else
         {
             orderByTitle = false;
             logInfo = "order=date";
@@ -106,7 +105,8 @@ public class ItemsByAuthorServlet extends DSpaceServlet
         {
             logInfo = logInfo + ",collection_id=" + collection.getID();
             scope.setScope(collection);
-        } else if (community != null)
+        }
+        else if (community != null)
         {
             logInfo = logInfo + ",community_id=" + community.getID();
             scope.setScope(community);
@@ -123,9 +123,8 @@ public class ItemsByAuthorServlet extends DSpaceServlet
 
         BrowseInfo browseInfo = Browse.getItemsByAuthor(scope, orderByTitle);
 
-        log.info(LogManager.getHeader(context, "items_by_author",
-                                      logInfo + ",result_count=" +
-                                      browseInfo.getResultCount()));
+        log.info(LogManager.getHeader(context, "items_by_author", logInfo
+                + ",result_count=" + browseInfo.getResultCount()));
 
         // Display the JSP
         request.setAttribute("community", community);

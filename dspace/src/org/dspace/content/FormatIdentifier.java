@@ -45,29 +45,28 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
  * This class handles the recognition of bitstream formats, using the format
- * registry in the database.  For the moment, the format identifier simply
- * uses file extensions stored in the "BitstreamFormatIdentifier" table.
- * This probably isn't a particularly satisfactory long-term solution.
- *
- * @author  Robert Tansley
+ * registry in the database. For the moment, the format identifier simply uses
+ * file extensions stored in the "BitstreamFormatIdentifier" table. This
+ * probably isn't a particularly satisfactory long-term solution.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class FormatIdentifier
 {
     /**
-     * Attempt to identify the format of a particular bitstream.  If the format
+     * Attempt to identify the format of a particular bitstream. If the format
      * is unknown, null is returned.
-     *
-     * @param bitstream  the bitstream to identify the format of
-     *
-     * @return  a format from the bitstream format registry, or null
+     * 
+     * @param bitstream
+     *            the bitstream to identify the format of
+     * 
+     * @return a format from the bitstream format registry, or null
      */
     public static BitstreamFormat guessFormat(Context context,
-                                              Bitstream bitstream)
-                                       throws SQLException
+            Bitstream bitstream) throws SQLException
     {
         // FIXME: Just setting format to first guess
         // For now just get the file name
@@ -79,7 +78,7 @@ public class FormatIdentifier
             return null;
         }
 
-        // This isn't rocket science.  We just get the name of the
+        // This isn't rocket science. We just get the name of the
         // bitstream, get the extension, and see if we know the type.
         String extension = filename;
         int lastDot = filename.lastIndexOf('.');
@@ -90,7 +89,7 @@ public class FormatIdentifier
         }
 
         // If the last character was a dot, then extension will now be
-        // an empty string.  If this is the case, we don't know what
+        // an empty string. If this is the case, we don't know what
         // file type it is.
         if (extension.equals(""))
         {
@@ -99,17 +98,18 @@ public class FormatIdentifier
 
         // See if the extension is in the fileextension table
         TableRowIterator tri = DatabaseManager.query(context,
-                                                     "SELECT bitstreamformatregistry.* FROM bitstreamformatregistry, " +
-                                                     "fileextension WHERE fileextension.extension LIKE '" +
-                                                     extension +
-                                                     "' AND bitstreamformatregistry.bitstream_format_id=" +
-                                                     "fileextension.bitstream_format_id");
+                "SELECT bitstreamformatregistry.* FROM bitstreamformatregistry, "
+                        + "fileextension WHERE fileextension.extension LIKE '"
+                        + extension
+                        + "' AND bitstreamformatregistry.bitstream_format_id="
+                        + "fileextension.bitstream_format_id");
 
         if (tri.hasNext())
         {
             // Return first match
             return new BitstreamFormat(context, tri.next());
-        } else
+        }
+        else
         {
             return null;
         }

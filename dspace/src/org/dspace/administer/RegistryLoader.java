@@ -59,19 +59,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-
 /**
- * Loads the bitstream format and Dublin Core type registries into the
- * database.  Intended for use as a command-line tool.
+ * Loads the bitstream format and Dublin Core type registries into the database.
+ * Intended for use as a command-line tool.
  * <P>
  * Example usage:
  * <P>
  * <code>RegistryLoader -bitstream bitstream-formats.xml</code>
  * <P>
  * <code>RegistryLoader -dc dc-types.xml</code>
- *
- * @author   Robert Tansley
- * @version  $Revision$
+ * 
+ * @author Robert Tansley
+ * @version $Revision$
  */
 public class RegistryLoader
 {
@@ -80,13 +79,14 @@ public class RegistryLoader
 
     /**
      * For invoking via the command line
-     *
-     * @param argv  command-line arguments
+     * 
+     * @param argv
+     *            command-line arguments
      */
     public static void main(String[] argv) throws Exception
     {
-        String usage = "Usage: " + RegistryLoader.class.getName() +
-                       " (-bitstream | -dc) registry-file.xml";
+        String usage = "Usage: " + RegistryLoader.class.getName()
+                + " (-bitstream | -dc) registry-file.xml";
 
         Context context = null;
 
@@ -102,10 +102,12 @@ public class RegistryLoader
             if (argv[0].equalsIgnoreCase("-bitstream"))
             {
                 RegistryLoader.loadBitstreamFormats(context, argv[1]);
-            } else if (argv[0].equalsIgnoreCase("-dc"))
+            }
+            else if (argv[0].equalsIgnoreCase("-dc"))
             {
                 loadDublinCoreTypes(context, argv[1]);
-            } else
+            }
+            else
             {
                 System.err.println(usage);
             }
@@ -113,7 +115,8 @@ public class RegistryLoader
             context.complete();
 
             System.exit(0);
-        } catch (ArrayIndexOutOfBoundsException ae)
+        }
+        catch (ArrayIndexOutOfBoundsException ae)
         {
             System.err.println(usage);
 
@@ -123,10 +126,11 @@ public class RegistryLoader
             }
 
             System.exit(1);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             log.fatal(LogManager.getHeader(context, "error_loading_registries",
-                                           ""), e);
+                    ""), e);
 
             if (context != null)
             {
@@ -139,21 +143,21 @@ public class RegistryLoader
 
     /**
      * Load Bitstream Format metadata
-     *
-     * @param context    DSpace context object
-     * @param filename   the filename of the XML file to load
+     * 
+     * @param context
+     *            DSpace context object
+     * @param filename
+     *            the filename of the XML file to load
      */
     public static void loadBitstreamFormats(Context context, String filename)
-                                     throws SQLException, IOException, 
-                                            ParserConfigurationException, 
-                                            SAXException, TransformerException, 
-                                            AuthorizeException
+            throws SQLException, IOException, ParserConfigurationException,
+            SAXException, TransformerException, AuthorizeException
     {
         Document document = loadXML(filename);
 
         // Get the nodes corresponding to formats
         NodeList typeNodes = XPathAPI.selectNodeList(document,
-                                                     "dspace-bitstream-types/bitstream-type");
+                "dspace-bitstream-types/bitstream-type");
 
         // Add each one as a new format to the registry
         for (int i = 0; i < typeNodes.getLength(); i++)
@@ -163,19 +167,21 @@ public class RegistryLoader
         }
 
         log.info(LogManager.getHeader(context, "load_bitstream_formats",
-                                      "number_loaded=" + typeNodes.getLength()));
+                "number_loaded=" + typeNodes.getLength()));
     }
 
     /**
-     * Process a node in the bitstream format registry XML file.  The node
-     * must be a "bitstream-type" node
-     *
-     * @param context   DSpace context object
-     * @param node      the node in the DOM tree
+     * Process a node in the bitstream format registry XML file. The node must
+     * be a "bitstream-type" node
+     * 
+     * @param context
+     *            DSpace context object
+     * @param node
+     *            the node in the DOM tree
      */
     private static void loadFormat(Context context, Node node)
-                            throws SQLException, IOException, 
-                                   TransformerException, AuthorizeException
+            throws SQLException, IOException, TransformerException,
+            AuthorizeException
     {
         // Get the values
         String mimeType = getElementData(node, "mimetype");
@@ -207,21 +213,21 @@ public class RegistryLoader
 
     /**
      * Load Dublin Core types
-     *
-     * @param context    DSpace context object
-     * @param filename   the filename of the XML file to load
+     * 
+     * @param context
+     *            DSpace context object
+     * @param filename
+     *            the filename of the XML file to load
      */
     public static void loadDublinCoreTypes(Context context, String filename)
-                                    throws SQLException, IOException, 
-                                           ParserConfigurationException, 
-                                           SAXException, TransformerException, 
-                                           AuthorizeException
+            throws SQLException, IOException, ParserConfigurationException,
+            SAXException, TransformerException, AuthorizeException
     {
         Document document = loadXML(filename);
 
         // Get the nodes corresponding to formats
         NodeList typeNodes = XPathAPI.selectNodeList(document,
-                                                     "/dspace-dc-types/dc-type");
+                "/dspace-dc-types/dc-type");
 
         // Add each one as a new format to the registry
         for (int i = 0; i < typeNodes.getLength(); i++)
@@ -231,19 +237,21 @@ public class RegistryLoader
         }
 
         log.info(LogManager.getHeader(context, "load_dublin_core_types",
-                                      "number_loaded=" + typeNodes.getLength()));
+                "number_loaded=" + typeNodes.getLength()));
     }
 
     /**
-     * Process a node in the bitstream format registry XML file.  The node
-     * must be a "bitstream-type" node
-     *
-     * @param context   DSpace context object
-     * @param node      the node in the DOM tree
+     * Process a node in the bitstream format registry XML file. The node must
+     * be a "bitstream-type" node
+     * 
+     * @param context
+     *            DSpace context object
+     * @param node
+     *            the node in the DOM tree
      */
     private static void loadDCType(Context context, Node node)
-                            throws SQLException, IOException, 
-                                   TransformerException, AuthorizeException
+            throws SQLException, IOException, TransformerException,
+            AuthorizeException
     {
         // Get the values
         String element = getElementData(node, "element");
@@ -261,40 +269,42 @@ public class RegistryLoader
 
     /**
      * Load in the XML from file.
-     *
-     * @param filename  the filename to load from
-     *
-     * @return  the DOM representation of the XML file
+     * 
+     * @param filename
+     *            the filename to load from
+     * 
+     * @return the DOM representation of the XML file
      */
-    private static Document loadXML(String filename)
-                             throws IOException, ParserConfigurationException, 
-                                    SAXException
+    private static Document loadXML(String filename) throws IOException,
+            ParserConfigurationException, SAXException
     {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder();
+                .newDocumentBuilder();
 
         return builder.parse(new File(filename));
     }
 
     /**
-     * Get the CDATA of a particular element.  For example, if the XML document
+     * Get the CDATA of a particular element. For example, if the XML document
      * contains:
      * <P>
      * <code>
      * &lt;foo&gt;&lt;mimetype&gt;application/pdf&lt;/mimetype&gt;&lt;/foo&gt;
      * </code>
      * passing this the <code>foo</code> node and <code>mimetype</code> will
-     * return <code>application/pdf</code>.</P>
+     * return <code>application/pdf</code>.
+     * </P>
      * Why this isn't a core part of the XML API I do not know...
-     *
-     * @param parentElement  the element, whose child element you want
-     *                       the CDATA from
-     * @param childName      the name of the element you want the CDATA from
-     *
-     * @return  the CDATA as a <code>String</code>
+     * 
+     * @param parentElement
+     *            the element, whose child element you want the CDATA from
+     * @param childName
+     *            the name of the element you want the CDATA from
+     * 
+     * @return the CDATA as a <code>String</code>
      */
     private static String getElementData(Node parentElement, String childName)
-                                  throws TransformerException
+            throws TransformerException
     {
         // Grab the child node
         Node childNode = XPathAPI.selectSingleNode(parentElement, childName);
@@ -320,7 +330,7 @@ public class RegistryLoader
     }
 
     /**
-     * Get repeated CDATA for a particular element.  For example, if the XML
+     * Get repeated CDATA for a particular element. For example, if the XML
      * document contains:
      * <P>
      * <code>
@@ -330,18 +340,19 @@ public class RegistryLoader
      * &lt;/foo&gt;
      * </code>
      * passing this the <code>foo</code> node and <code>bar</code> will
-     * return <code>val1</code> and <code>val2</code>.</P>
+     * return <code>val1</code> and <code>val2</code>.
+     * </P>
      * Why this also isn't a core part of the XML API I do not know...
-     *
-     * @param parentElement  the element, whose child element you want
-     *                       the CDATA from
-     * @param childName      the name of the element you want the CDATA from
-     *
-     * @return  the CDATA as a <code>String</code>
+     * 
+     * @param parentElement
+     *            the element, whose child element you want the CDATA from
+     * @param childName
+     *            the name of the element you want the CDATA from
+     * 
+     * @return the CDATA as a <code>String</code>
      */
     private static String[] getRepeatedElementData(Node parentElement,
-                                                   String childName)
-                                            throws TransformerException
+            String childName) throws TransformerException
     {
         // Grab the child node
         NodeList childNodes = XPathAPI.selectNodeList(parentElement, childName);

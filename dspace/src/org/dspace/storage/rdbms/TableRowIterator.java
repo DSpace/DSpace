@@ -44,11 +44,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Represents the results of a database query
- *
- * @author  Peter Breton
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class TableRowIterator
@@ -75,8 +74,9 @@ public class TableRowIterator
 
     /**
      * Constructor
-     *
-     * @param results - A JDBC ResultSet
+     * 
+     * @param results -
+     *            A JDBC ResultSet
      */
     TableRowIterator(ResultSet results)
     {
@@ -85,9 +85,11 @@ public class TableRowIterator
 
     /**
      * Constructor
-     *
-     * @param results - A JDBC ResultSet
-     * @param table - The name of the table
+     * 
+     * @param results -
+     *            A JDBC ResultSet
+     * @param table -
+     *            The name of the table
      */
     TableRowIterator(ResultSet results, String table)
     {
@@ -104,12 +106,12 @@ public class TableRowIterator
     }
 
     /**
-     * Advance to the next row and return it.
-     * Returns null if there are no more rows.
-     *
+     * Advance to the next row and return it. Returns null if there are no more
+     * rows.
+     * 
      * @return - The next row, or null if no more rows
-     * @exception SQLException - If a database error occurs while fetching
-     * values
+     * @exception SQLException -
+     *                If a database error occurs while fetching values
      */
     public TableRow next() throws SQLException
     {
@@ -130,10 +132,10 @@ public class TableRowIterator
 
     /**
      * Return true if there are more rows, false otherwise
-     *
+     * 
      * @return - true if there are more rows, false otherwise
-     * @exception SQLException - If a database error occurs while fetching
-     * values
+     * @exception SQLException -
+     *                If a database error occurs while fetching values
      */
     public boolean hasNext() throws SQLException
     {
@@ -161,10 +163,10 @@ public class TableRowIterator
 
     /**
      * Saves all the values returned by iterator into a list.
-     *
+     * 
      * @return - A list of all the values returned by the iterator.
-     * @exception SQLException - If a database error occurs while fetching
-     * values
+     * @exception SQLException -
+     *                If a database error occurs while fetching values
      */
     public List toList() throws SQLException
     {
@@ -187,7 +189,8 @@ public class TableRowIterator
         {
             results.close();
             results = null;
-        } catch (SQLException sqle)
+        }
+        catch (SQLException sqle)
         {
         }
     }

@@ -51,52 +51,53 @@ import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 
-
 /**
  * Support to install item in the archive
- *
- * @author   dstuve
- * @version  $Revision$
+ * 
+ * @author dstuve
+ * @version $Revision$
  */
 public class InstallItem
 {
     /**
      * Take an InProgressSubmission and turn it into a fully-archived Item.
+     * 
      * @param Context
      * @param InProgressSubmission
      */
     public static Item installItem(Context c, InProgressSubmission is)
-                            throws SQLException, IOException, 
-                                   AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         return installItem(c, is, c.getCurrentUser());
     }
 
     /**
      * Take an InProgressSubmission and turn it into a fully-archived Item.
+     * 
      * @param Context
      * @param InProgressSubmission
-     * @param handle to assign instead of creating new one
+     * @param handle
+     *            to assign instead of creating new one
      */
     public static Item installItem(Context c, InProgressSubmission is,
-                                   String handle)
-                            throws SQLException, IOException, 
-                                   AuthorizeException
+            String handle) throws SQLException, IOException, AuthorizeException
     {
         return installItem(c, is, c.getCurrentUser(), handle);
     }
 
     /**
-     *  Take an InProgressSubmission and turn it into a fully-archived Item.
-     *  @param Context
-     *  @param InProgressSubmission
-     *  @param EPerson (unused, should be removed from API)
-     *  @param previous handle
+     * Take an InProgressSubmission and turn it into a fully-archived Item.
+     * 
+     * @param Context
+     * @param InProgressSubmission
+     * @param EPerson
+     *            (unused, should be removed from API)
+     * @param previous
+     *            handle
      */
     public static Item installItem(Context c, InProgressSubmission is,
-                                   EPerson e2, String suppliedHandle)
-                            throws SQLException, IOException, 
-                                   AuthorizeException
+            EPerson e2, String suppliedHandle) throws SQLException,
+            IOException, AuthorizeException
     {
         Item item = is.getItem();
         String handle;
@@ -107,8 +108,8 @@ public class InstallItem
         if (dc.length < 1)
         {
             // Just set default language
-            item.addDC("language", "iso", null,
-                       ConfigurationManager.getProperty("default.language"));
+            item.addDC("language", "iso", null, ConfigurationManager
+                    .getProperty("default.language"));
         }
 
         // create accession date
@@ -129,7 +130,8 @@ public class InstallItem
         {
             // create handle
             handle = HandleManager.createHandle(c, item);
-        } else
+        }
+        else
         {
             handle = HandleManager.createHandle(c, item, suppliedHandle);
         }
@@ -145,20 +147,20 @@ public class InstallItem
         for (int i = 0; i < bitstreams.length; i++)
         {
             BitstreamFormat bf = bitstreams[i].getFormat();
-            item.addDC("format", "extent", null,
-                       String.valueOf(bitstreams[i].getSize()) + " bytes");
+            item.addDC("format", "extent", null, String.valueOf(bitstreams[i]
+                    .getSize())
+                    + " bytes");
             item.addDC("format", "mimetype", null, bf.getMIMEType());
         }
 
-        String provDescription = "Made available in DSpace on " + now +
-                                 " (GMT). " +
-                                 getBitstreamProvenanceMessage(item);
+        String provDescription = "Made available in DSpace on " + now
+                + " (GMT). " + getBitstreamProvenanceMessage(item);
 
         if (currentDateIssued.length != 0)
         {
             DCDate d = new DCDate(currentDateIssued[0].value);
-            provDescription = provDescription + "  Previous issue date: " +
-                              d.toString();
+            provDescription = provDescription + "  Previous issue date: "
+                    + d.toString();
         }
 
         // Add provenance description
@@ -190,22 +192,24 @@ public class InstallItem
     }
 
     /**
-     *  Take an InProgressSubmission and turn it into a fully-archived Item,
-     *   no previous handle specified
-     *  @param Context
-     *  @param InProgressSubmission
-     *  @param EPerson (unused, should be removed from API)
+     * Take an InProgressSubmission and turn it into a fully-archived Item, no
+     * previous handle specified
+     * 
+     * @param Context
+     * @param InProgressSubmission
+     * @param EPerson
+     *            (unused, should be removed from API)
      */
     public static Item installItem(Context c, InProgressSubmission is,
-                                   EPerson e2)
-                            throws SQLException, IOException, 
-                                   AuthorizeException
+            EPerson e2) throws SQLException, IOException, AuthorizeException
     {
         return installItem(c, is, e2, null);
     }
 
-    /** generate provenance-worthy description of the bitstreams
-     * contained in an item
+    /**
+     * generate provenance-worthy description of the bitstreams contained in an
+     * item
+     * 
      * @param item
      */
     public static String getBitstreamProvenanceMessage(Item myitem)
@@ -219,10 +223,10 @@ public class InstallItem
         // Add sizes and checksums of bitstreams
         for (int j = 0; j < bitstreams.length; j++)
         {
-            mymessage = mymessage + bitstreams[j].getName() + ": " +
-                        bitstreams[j].getSize() + " bytes, checksum: " +
-                        bitstreams[j].getChecksum() + " (" +
-                        bitstreams[j].getChecksumAlgorithm() + ")\n";
+            mymessage = mymessage + bitstreams[j].getName() + ": "
+                    + bitstreams[j].getSize() + " bytes, checksum: "
+                    + bitstreams[j].getChecksum() + " ("
+                    + bitstreams[j].getChecksumAlgorithm() + ")\n";
         }
 
         return mymessage;

@@ -63,30 +63,25 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 
-
 /**
-    Item exporter to create simple AIPs for DSpace content.
-    Currently exports individual items, or entire collections.
-    For instructions on use, see printUsage() method.
-
-    ItemExport creates the simple AIP package that the importer also
-    uses.  It consists of:
-
-    /exportdir/42/ (one directory per item)
-      / dublin_core.xml - qualified dublin core in RDF schema
-      / contents - text file, listing one file per line
-      / file1 - files contained in the item
-      / file2
-      / ...
-
-    issues
-        -doesn't handle special characters in metadata
-          (needs to turn &'s into &amp;, etc.)
+ * Item exporter to create simple AIPs for DSpace content. Currently exports
+ * individual items, or entire collections. For instructions on use, see
+ * printUsage() method.
+ * 
+ * ItemExport creates the simple AIP package that the importer also uses. It
+ * consists of:
+ * 
+ * /exportdir/42/ (one directory per item) / dublin_core.xml - qualified dublin
+ * core in RDF schema / contents - text file, listing one file per line / file1 -
+ * files contained in the item / file2 / ...
+ * 
+ * issues -doesn't handle special characters in metadata (needs to turn &'s into
+ * &amp;, etc.)
  */
 public class ItemExport
 {
     /*
-
+     *  
      */
     public static void main(String[] argv) throws Exception
     {
@@ -98,9 +93,9 @@ public class ItemExport
         options.addOption("t", "type", true, "type: COLLECTION or ITEM");
         options.addOption("i", "id", true, "ID or handle of thing to export");
         options.addOption("d", "dest", true,
-                          "destination where you want items to go");
+                "destination where you want items to go");
         options.addOption("n", "number", true,
-                          "sequence number to begin exporting items with");
+                "sequence number to begin exporting items with");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
@@ -118,8 +113,10 @@ public class ItemExport
         {
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("ItemExport\n", options);
-            System.out.println("\nfull collection: ItemExport -t COLLECTION -i ID -d dest -n number");
-            System.out.println("singleitem:       ItemExport -t ITEM -i ID -d dest -n number");
+            System.out
+                    .println("\nfull collection: ItemExport -t COLLECTION -i ID -d dest -n number");
+            System.out
+                    .println("singleitem:       ItemExport -t ITEM -i ID -d dest -n number");
 
             System.exit(0);
         }
@@ -131,7 +128,8 @@ public class ItemExport
             if (typeString.equals("ITEM"))
             {
                 myType = Constants.ITEM;
-            } else if (typeString.equals("COLLECTION"))
+            }
+            else if (typeString.equals("COLLECTION"))
             {
                 myType = Constants.COLLECTION;
             }
@@ -155,25 +153,29 @@ public class ItemExport
         // now validate the args
         if (myType == -1)
         {
-            System.out.println("type must be either COLLECTION or ITEM (-h for help)");
+            System.out
+                    .println("type must be either COLLECTION or ITEM (-h for help)");
             System.exit(1);
         }
 
         if (destDirName == null)
         {
-            System.out.println("destination directory must be set (-h for help)");
+            System.out
+                    .println("destination directory must be set (-h for help)");
             System.exit(1);
         }
 
         if (seqStart == -1)
         {
-            System.out.println("sequence start number must be set (-h for help)");
+            System.out
+                    .println("sequence start number must be set (-h for help)");
             System.exit(1);
         }
 
         if (myIDString == null)
         {
-            System.out.println("ID must be set to either a database ID or a handle (-h for help)");
+            System.out
+                    .println("ID must be set to either a database ID or a handle (-h for help)");
             System.exit(1);
         }
 
@@ -191,39 +193,42 @@ public class ItemExport
                 {
                     myItem = null;
                 }
-            } else
+            }
+            else
             {
                 myItem = Item.find(c, Integer.parseInt(myIDString));
             }
 
             if (myItem == null)
             {
-                System.out.println("Error, item cannot be found: " +
-                                   myIDString);
+                System.out
+                        .println("Error, item cannot be found: " + myIDString);
             }
-        } else
+        }
+        else
         {
             if (myIDString.indexOf('/') != -1)
             {
                 // has a / must be a handle
                 mycollection = (Collection) HandleManager.resolveToObject(c,
-                                                                          myIDString);
+                        myIDString);
 
                 // ensure it's a collection
-                if ((mycollection == null) ||
-                        (mycollection.getType() != Constants.COLLECTION))
+                if ((mycollection == null)
+                        || (mycollection.getType() != Constants.COLLECTION))
                 {
                     mycollection = null;
                 }
-            } else if (myIDString != null)
+            }
+            else if (myIDString != null)
             {
                 mycollection = Collection.find(c, Integer.parseInt(myIDString));
             }
 
             if (mycollection == null)
             {
-                System.out.println("Error, collection cannot be found: " +
-                                   myIDString);
+                System.out.println("Error, collection cannot be found: "
+                        + myIDString);
                 System.exit(1);
             }
         }
@@ -232,7 +237,8 @@ public class ItemExport
         {
             // it's only a single item
             exportItem(c, myItem, destDirName, seqStart);
-        } else
+        }
+        else
         {
             System.out.println("Exporting from collection: " + myIDString);
 
@@ -250,15 +256,17 @@ public class ItemExport
     private static void printUsage()
     {
         System.out.println("Output simple AIPs, given collection or item ID");
-        System.out.println("Usage: ITEM|COLLECTION ID dest_dir sequence_number");
+        System.out
+                .println("Usage: ITEM|COLLECTION ID dest_dir sequence_number");
         System.out.println("  dest_dir = destination of archive files");
-        System.out.println("  sequence_number = 0, or some other number to start naming the archive directories");
-        System.out.println("  first item dir is sequence_number, then sequence_number+1, etc.");
+        System.out
+                .println("  sequence_number = 0, or some other number to start naming the archive directories");
+        System.out
+                .println("  first item dir is sequence_number, then sequence_number+1, etc.");
     }
 
     private static void exportItem(Context c, ItemIterator i,
-                                   String destDirName, int seqStart)
-                            throws Exception
+            String destDirName, int seqStart) throws Exception
     {
         int mySequenceNumber = seqStart;
 
@@ -273,7 +281,7 @@ public class ItemExport
     }
 
     private static void exportItem(Context c, Item myItem, String destDirName,
-                                   int seqStart) throws Exception
+            int seqStart) throws Exception
     {
         File destDir = new File(destDirName);
 
@@ -282,14 +290,15 @@ public class ItemExport
             // now create a subdirectory
             File itemDir = new File(destDir + "/" + seqStart);
 
-            System.out.println("Exporting Item " + myItem.getID() + " to " +
-                               itemDir);
+            System.out.println("Exporting Item " + myItem.getID() + " to "
+                    + itemDir);
 
             if (itemDir.exists())
             {
-                throw new Exception("Directory " + destDir + "/" + seqStart +
-                                    " already exists!");
-            } else
+                throw new Exception("Directory " + destDir + "/" + seqStart
+                        + " already exists!");
+            }
+            else
             {
                 if (itemDir.mkdir())
                 {
@@ -297,21 +306,23 @@ public class ItemExport
                     writeMetadata(c, myItem, itemDir);
                     writeBitstreams(c, myItem, itemDir);
                     writeHandle(c, myItem, itemDir);
-                } else
+                }
+                else
                 {
                     throw new Exception("Error, can't make dir " + itemDir);
                 }
             }
-        } else
+        }
+        else
         {
-            throw new Exception("Error, directory " + destDirName +
-                                " doesn't exist!");
+            throw new Exception("Error, directory " + destDirName
+                    + " doesn't exist!");
         }
     }
 
     // output the item's dublin core into the item directory
     private static void writeMetadata(Context c, Item i, File destDir)
-                               throws Exception
+            throws Exception
     {
         File outFile = new File(destDir, "dublin_core.xml");
 
@@ -335,16 +346,17 @@ public class ItemExport
                     qualifier = "none";
                 }
 
-                String output = "  <dcvalue element=\"" + dcv.element + "\" " +
-                                "qualifier=\"" + qualifier + "\">" +
-                                Utils.addEntities(dcv.value) + "</dcvalue>";
+                String output = "  <dcvalue element=\"" + dcv.element + "\" "
+                        + "qualifier=\"" + qualifier + "\">"
+                        + Utils.addEntities(dcv.value) + "</dcvalue>";
 
                 out.println(output);
             }
 
             out.println("</dublin_core>");
             out.close();
-        } else
+        }
+        else
         {
             throw new Exception("Cannot create dublin_core.xml in " + destDir);
         }
@@ -352,7 +364,7 @@ public class ItemExport
 
     // create the file 'handle' which contains the handle assigned to the item
     private static void writeHandle(Context c, Item i, File destDir)
-                             throws Exception
+            throws Exception
     {
         String filename = "handle";
 
@@ -366,16 +378,17 @@ public class ItemExport
 
             // close the contents file
             out.close();
-        } else
+        }
+        else
         {
-            throw new Exception("Cannot create file " + filename + " in " +
-                                destDir);
+            throw new Exception("Cannot create file " + filename + " in "
+                    + destDir);
         }
     }
 
     // create both the bitstreams and the contents file
     private static void writeBitstreams(Context c, Item i, File destDir)
-                                 throws Exception
+            throws Exception
     {
         File outFile = new File(destDir, "contents");
 
@@ -402,7 +415,8 @@ public class ItemExport
 
                     InputStream is = b.retrieve();
 
-                    boolean isDone = false; // done when bitstream is finally written
+                    boolean isDone = false; // done when bitstream is finally
+                                            // written
 
                     while (!isDone)
                     {
@@ -417,9 +431,13 @@ public class ItemExport
                             out.println(myName + "\tbundle:" + bundleName);
 
                             isDone = true;
-                        } else
+                        }
+                        else
                         {
-                            myName = myPrefix + "_" + oldName; // keep appending numbers to the filename until unique
+                            myName = myPrefix + "_" + oldName; // keep appending
+                                                               // numbers to the
+                                                               // filename until
+                                                               // unique
                             myPrefix++;
                         }
                     }
@@ -428,7 +446,8 @@ public class ItemExport
 
             // close the contents file
             out.close();
-        } else
+        }
+        else
         {
             throw new Exception("Cannot create contents in " + destDir);
         }

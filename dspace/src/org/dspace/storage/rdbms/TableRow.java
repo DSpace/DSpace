@@ -45,10 +45,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.dspace.core.ConfigurationManager;
+
 /**
  * Represents a database row.
- *
- * @author  Peter Breton
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class TableRow
@@ -60,21 +61,22 @@ public class TableRow
     private String table;
 
     /**
-     * A map of column names to column values.
-     * The key of the map is a String, the column name;
-     * the value is an Object, either an Integer, Boolean, Date, or String.
-     * If the value is NULL_OBJECT, then the column was NULL.
+     * A map of column names to column values. The key of the map is a String,
+     * the column name; the value is an Object, either an Integer, Boolean,
+     * Date, or String. If the value is NULL_OBJECT, then the column was NULL.
      */
     private Map data = new HashMap();
 
     /**
      * Constructor
-     *
-     * @param table The name of the database table containing this row.
-     * @param columns A list of column names. Each member of the
-     *   List is a String. After construction, the list of columns
-     *   is fixed; attempting to access a column not in the list
-     *   will cause an IllegalArgumentException to be thrown.
+     * 
+     * @param table
+     *            The name of the database table containing this row.
+     * @param columns
+     *            A list of column names. Each member of the List is a String.
+     *            After construction, the list of columns is fixed; attempting
+     *            to access a column not in the list will cause an
+     *            IllegalArgumentException to be thrown.
      */
     public TableRow(String table, List columns)
     {
@@ -83,9 +85,9 @@ public class TableRow
     }
 
     /**
-     * Return the name of the table containing this row, or null if
-     * this row is not associated with a database table.
-     *
+     * Return the name of the table containing this row, or null if this row is
+     * not associated with a database table.
+     * 
      * @return The name of the table containing this row
      */
     public String getTable()
@@ -95,8 +97,9 @@ public class TableRow
 
     /**
      * Return true if this row contains a column with this name.
-     *
-     * @param column The column name (case-insensitive)
+     * 
+     * @param column
+     *            The column name (case-insensitive)
      * @return True if this row contains a column with this name.
      */
     public boolean hasColumn(String column)
@@ -106,8 +109,9 @@ public class TableRow
 
     /**
      * Return true if the column is an SQL NULL.
-     *
-     * @param column The column name (case-insensitive)
+     * 
+     * @param column
+     *            The column name (case-insensitive)
      * @return True if the column is an SQL NULL
      */
     public boolean isColumnNull(String column)
@@ -122,13 +126,14 @@ public class TableRow
 
     /**
      * Return the integer value of column.
-     *
-     * If the column's type is not an integer, or the column does not
-     * exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @return The integer value of the column, or -1 if the column
-     * is an SQL null.
+     * 
+     * If the column's type is not an integer, or the column does not exist, an
+     * IllegalArgumentException is thrown.
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @return The integer value of the column, or -1 if the column is an SQL
+     *         null.
      */
     public int getIntColumn(String column)
     {
@@ -148,14 +153,14 @@ public class TableRow
 
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column +
-                                               " not present");
+            throw new IllegalArgumentException("Column " + column
+                    + " not present");
         }
 
         if (!(value instanceof Integer))
         {
-            throw new IllegalArgumentException("Value for " + column +
-                                               " is not an integer");
+            throw new IllegalArgumentException("Value for " + column
+                    + " is not an integer");
         }
 
         return ((Integer) value).intValue();
@@ -163,13 +168,13 @@ public class TableRow
 
     /**
      * Return the long value of column.
-     *
-     * If the column's type is not an long, or the column does not
-     * exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @return The long value of the column, or -1 if the column
-     * is an SQL null.
+     * 
+     * If the column's type is not an long, or the column does not exist, an
+     * IllegalArgumentException is thrown.
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @return The long value of the column, or -1 if the column is an SQL null.
      */
     public long getLongColumn(String column)
     {
@@ -189,8 +194,8 @@ public class TableRow
 
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column +
-                                               " not present");
+            throw new IllegalArgumentException("Column " + column
+                    + " not present");
         }
 
         if (!(value instanceof Long))
@@ -203,13 +208,14 @@ public class TableRow
 
     /**
      * Return the String value of column.
-     *
-     * If the column's type is not a String, or the column does not
-     * exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @return The String value of the column, or null if the column
-     * is an SQL null.
+     * 
+     * If the column's type is not a String, or the column does not exist, an
+     * IllegalArgumentException is thrown.
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @return The String value of the column, or null if the column is an SQL
+     *         null.
      */
     public String getStringColumn(String column)
     {
@@ -229,8 +235,8 @@ public class TableRow
 
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column +
-                                               " not present");
+            throw new IllegalArgumentException("Column " + column
+                    + " not present");
         }
 
         if (!(value instanceof String))
@@ -243,13 +249,14 @@ public class TableRow
 
     /**
      * Return the boolean value of column.
-     *
-     * If the column's type is not a boolean, or the column does not
-     * exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @return The boolean value of the column, or false if the column
-     * is an SQL null.
+     * 
+     * If the column's type is not a boolean, or the column does not exist, an
+     * IllegalArgumentException is thrown.
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @return The boolean value of the column, or false if the column is an SQL
+     *         null.
      */
     public boolean getBooleanColumn(String column)
     {
@@ -270,14 +277,15 @@ public class TableRow
         // make sure that we tolerate integers or booleans
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column +
-                                               " not present");
+            throw new IllegalArgumentException("Column " + column
+                    + " not present");
         }
 
         if ((value instanceof Boolean))
         {
             return ((Boolean) value).booleanValue();
-        } else if ((value instanceof Integer))
+        }
+        else if ((value instanceof Integer))
         {
             int i = ((Integer) value).intValue();
 
@@ -287,21 +295,24 @@ public class TableRow
             }
 
             return true; // nonzero is true
-        } else
+        }
+        else
         {
-            throw new IllegalArgumentException("Value is not a boolean or an integer");
+            throw new IllegalArgumentException(
+                    "Value is not a boolean or an integer");
         }
     }
 
     /**
      * Return the date value of column.
-     *
-     * If the column's type is not a date, or the column does not
-     * exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @return - The date value of the column, or null if the column
-     * is an SQL null.
+     * 
+     * If the column's type is not a date, or the column does not exist, an
+     * IllegalArgumentException is thrown.
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @return - The date value of the column, or null if the column is an SQL
+     *         null.
      */
     public java.util.Date getDateColumn(String column)
     {
@@ -321,8 +332,8 @@ public class TableRow
 
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column +
-                                               " not present");
+            throw new IllegalArgumentException("Column " + column
+                    + " not present");
         }
 
         if (!(value instanceof java.util.Date))
@@ -335,10 +346,11 @@ public class TableRow
 
     /**
      * Set column to an SQL NULL.
-     *
+     * 
      * If the column does not exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
+     * 
+     * @param column
+     *            The column name (case-insensitive)
      */
     public void setColumnNull(String column)
     {
@@ -352,11 +364,13 @@ public class TableRow
 
     /**
      * Set column to the boolean b.
-     *
+     * 
      * If the column does not exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @param b The boolean value
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @param b
+     *            The boolean value
      */
     public void setColumn(String column, boolean b)
     {
@@ -369,7 +383,8 @@ public class TableRow
         {
             // if oracle, use 1 or 0 for true/false
             data.put(canonicalize(column), b ? new Integer(1) : new Integer(0));
-        } else
+        }
+        else
         {
             // default to postgres true/false
             data.put(canonicalize(column), b ? Boolean.TRUE : Boolean.FALSE);
@@ -377,13 +392,14 @@ public class TableRow
     }
 
     /**
-     * Set column to the String s.
-     * If s is null, the column is set to null.
-     *
+     * Set column to the String s. If s is null, the column is set to null.
+     * 
      * If the column does not exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @param s The String value
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @param s
+     *            The String value
      */
     public void setColumn(String column, String s)
     {
@@ -397,11 +413,13 @@ public class TableRow
 
     /**
      * Set column to the integer i.
-     *
+     * 
      * If the column does not exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @param i The integer value
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @param i
+     *            The integer value
      */
     public void setColumn(String column, int i)
     {
@@ -415,11 +433,13 @@ public class TableRow
 
     /**
      * Set column to the long l.
-     *
+     * 
      * If the column does not exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @param l The long value
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @param l
+     *            The long value
      */
     public void setColumn(String column, long l)
     {
@@ -432,13 +452,15 @@ public class TableRow
     }
 
     /**
-     * Set column to the date d. If the date is null, the column is
-     * set to NULL as well.
-     *
+     * Set column to the date d. If the date is null, the column is set to NULL
+     * as well.
+     * 
      * If the column does not exist, an IllegalArgumentException is thrown.
-     *
-     * @param column The column name (case-insensitive)
-     * @param d The date value
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @param d
+     *            The date value
      */
     public void setColumn(String column, java.util.Date d)
     {
@@ -463,6 +485,7 @@ public class TableRow
 
     /**
      * Return a String representation of this object.
+     * 
      * @return String representaton
      */
     public String toString()
@@ -473,9 +496,9 @@ public class TableRow
         for (Iterator iterator = data.keySet().iterator(); iterator.hasNext();)
         {
             String column = (String) iterator.next();
-            result.append("\t").append(column).append(" = ")
-                  .append(isColumnNull(column) ? "NULL" : data.get(column))
-                  .append(NEWLINE);
+            result.append("\t").append(column).append(" = ").append(
+                    isColumnNull(column) ? "NULL" : data.get(column)).append(
+                    NEWLINE);
         }
 
         return result.toString();
@@ -483,6 +506,7 @@ public class TableRow
 
     /**
      * Return a hash code for this object.
+     * 
      * @return int hash of object
      */
     public int hashCode()
@@ -492,6 +516,7 @@ public class TableRow
 
     /**
      * Return true if this object equals obj, false otherwise.
+     * 
      * @param obj
      * @return true if TableRow objects are equal
      */
@@ -507,8 +532,9 @@ public class TableRow
 
     /**
      * Return the canonical name for column.
-     *
-     * @param column The name of the column.
+     * 
+     * @param column
+     *            The name of the column.
      * @return The canonical name of the column.
      */
     static String canonicalize(String column)
@@ -525,9 +551,10 @@ public class TableRow
 
     /**
      * Set columns to null.
-     *
-     * @param columns - A list of the columns to set to null.
-     * Each element of the list is a String.
+     * 
+     * @param columns -
+     *            A list of the columns to set to null. Each element of the list
+     *            is a String.
      */
     private void nullColumns(List columns)
     {
@@ -538,8 +565,9 @@ public class TableRow
     }
 
     /**
-     * Internal method to set column to null.
-     * The public method ensures that column actually exists.
+     * Internal method to set column to null. The public method ensures that
+     * column actually exists.
+     * 
      * @param column
      */
     private void setColumnNullInternal(String column)

@@ -64,7 +64,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
-
 /**
  * DSIndexer contains the methods that index Items and their metadata,
  * collections, communities, etc. It is meant to either be invoked from the
@@ -79,7 +78,7 @@ public class DSIndexer
      * IndexItem() adds a single item to the index
      */
     public static void indexContent(Context c, DSpaceObject dso)
-                             throws SQLException, IOException
+            throws SQLException, IOException
     {
         IndexWriter writer = openIndex(c, false);
 
@@ -87,24 +86,25 @@ public class DSIndexer
         {
             switch (dso.getType())
             {
-                case Constants.ITEM:
-                    writeItemIndex(c, writer, (Item) dso);
+            case Constants.ITEM:
+                writeItemIndex(c, writer, (Item) dso);
 
-                    break;
+                break;
 
-                case Constants.COLLECTION:
-                    writeCollectionIndex(c, writer, (Collection) dso);
+            case Constants.COLLECTION:
+                writeCollectionIndex(c, writer, (Collection) dso);
 
-                    break;
+                break;
 
-                case Constants.COMMUNITY:
-                    writeCommunityIndex(c, writer, (Community) dso);
+            case Constants.COMMUNITY:
+                writeCommunityIndex(c, writer, (Community) dso);
 
-                    break;
+                break;
 
-                // FIXME: should probably default unknown type exception
+            // FIXME: should probably default unknown type exception
             }
-        } finally
+        }
+        finally
         {
             closeIndex(c, writer);
         }
@@ -113,12 +113,12 @@ public class DSIndexer
     /**
      * unIndex removes an Item, Collection, or Community only works if the
      * DSpaceObject has a handle (uses the handle for its unique ID)
-     *
+     * 
      * @param dso
-     *           DSpace Object, can be Community, Item, or Collection
+     *            DSpace Object, can be Community, Item, or Collection
      */
     public static void unIndexContent(Context c, DSpaceObject dso)
-                               throws SQLException, IOException
+            throws SQLException, IOException
     {
         String h = HandleManager.findHandle(c, dso);
 
@@ -126,7 +126,7 @@ public class DSIndexer
     }
 
     public static void unIndexContent(Context c, String myhandle)
-                               throws SQLException, IOException
+            throws SQLException, IOException
     {
         String index_directory = ConfigurationManager.getProperty("search.dir");
         IndexReader ir = IndexReader.open(index_directory);
@@ -138,7 +138,8 @@ public class DSIndexer
                 // we have a handle (our unique ID, so remove)
                 Term t = new Term("handle", myhandle);
                 ir.delete(t);
-            } else
+            }
+            else
             {
                 log.warn("unindex of content with null handle attempted");
 
@@ -146,7 +147,8 @@ public class DSIndexer
                 //System.out.println("Error in unIndexContent: Object had no
                 // handle!");
             }
-        } finally
+        }
+        finally
         {
             ir.close();
         }
@@ -154,12 +156,12 @@ public class DSIndexer
 
     /**
      * reIndexContent removes something from the index, then re-indexes it
-     *
+     * 
      * @param context
      * @param DSpaceObject
      */
     public static void reIndexContent(Context c, DSpaceObject dso)
-                               throws SQLException, IOException
+            throws SQLException, IOException
     {
         unIndexContent(c, dso);
         indexContent(c, dso);
@@ -167,7 +169,7 @@ public class DSIndexer
 
     /**
      * create full index - wiping old index
-     *
+     * 
      * @param context
      */
     public static void createIndex(Context c) throws SQLException, IOException
@@ -180,11 +182,13 @@ public class DSIndexer
             indexAllCollections(c, writer);
             indexAllItems(c, writer);
 
-            // optimize the index - important to do regularly to reduce filehandle
+            // optimize the index - important to do regularly to reduce
+            // filehandle
             // usage
             // and keep performance fast!
             writer.optimize();
-        } finally
+        }
+        finally
         {
             closeIndex(c, writer);
         }
@@ -192,9 +196,9 @@ public class DSIndexer
 
     /**
      * When invoked as a command-line tool, (re)-builds the whole index
-     *
+     * 
      * @param args
-     *           the command-line arguments, none used
+     *            the command-line arguments, none used
      */
     public static void main(String[] args) throws Exception
     {
@@ -204,7 +208,8 @@ public class DSIndexer
         if ((args.length == 2) && (args[0].equals("remove")))
         {
             unIndexContent(c, args[1]);
-        } else
+        }
+        else
         {
             c.setIgnoreAuthorization(true);
 
@@ -222,14 +227,14 @@ public class DSIndexer
      * prepare index, opening writer, and wiping out existing index if necessary
      */
     private static IndexWriter openIndex(Context c, boolean wipe_existing)
-                                  throws IOException
+            throws IOException
     {
         IndexWriter writer;
 
         String index_directory = ConfigurationManager.getProperty("search.dir");
 
         writer = new IndexWriter(index_directory, new DSAnalyzer(),
-                                 wipe_existing);
+                wipe_existing);
 
         // Potential improvement for large indices to avoid TooManyFiles
         // exception.
@@ -241,7 +246,7 @@ public class DSIndexer
      * close up the indexing engine
      */
     private static void closeIndex(Context c, IndexWriter writer)
-                            throws IOException
+            throws IOException
     {
         if (writer != null)
         {
@@ -250,7 +255,7 @@ public class DSIndexer
     }
 
     private static String buildItemLocationString(Context c, Item myitem)
-                                           throws SQLException
+            throws SQLException
     {
         // build list of community ids
         Community[] communities = myitem.getCommunities();
@@ -272,8 +277,7 @@ public class DSIndexer
     }
 
     private static String buildCollectionLocationString(Context c,
-                                                        Collection target)
-                                                 throws SQLException
+            Collection target) throws SQLException
     {
         // build list of community ids
         Community[] communities = target.getCommunities();
@@ -292,7 +296,7 @@ public class DSIndexer
      * iterate through the communities, and index each one
      */
     private static void indexAllCommunities(Context c, IndexWriter writer)
-                                     throws SQLException, IOException
+            throws SQLException, IOException
     {
         Community[] targets = Community.findAll(c);
 
@@ -306,7 +310,7 @@ public class DSIndexer
      * iterate through collections, indexing each one
      */
     private static void indexAllCollections(Context c, IndexWriter writer)
-                                     throws SQLException, IOException
+            throws SQLException, IOException
     {
         Collection[] targets = Collection.findAll(c);
 
@@ -320,7 +324,7 @@ public class DSIndexer
      * iterate through all items, indexing each one
      */
     private static void indexAllItems(Context c, IndexWriter writer)
-                               throws SQLException, IOException
+            throws SQLException, IOException
     {
         ItemIterator i = Item.findAll(c);
 
@@ -336,8 +340,7 @@ public class DSIndexer
      * write index record for a community
      */
     private static void writeCommunityIndex(Context c, IndexWriter writer,
-                                            Community target)
-                                     throws SQLException, IOException
+            Community target) throws SQLException, IOException
     {
         // build a hash for the metadata
         HashMap textvalues = new HashMap();
@@ -363,8 +366,7 @@ public class DSIndexer
      * write an index record for a collection
      */
     private static void writeCollectionIndex(Context c, IndexWriter writer,
-                                             Collection target)
-                                      throws SQLException, IOException
+            Collection target) throws SQLException, IOException
     {
         String location_text = buildCollectionLocationString(c, target);
 
@@ -394,8 +396,7 @@ public class DSIndexer
      * which are sent to Lucene.
      */
     private static void writeItemIndex(Context c, IndexWriter writer,
-                                       Item myitem)
-                                throws SQLException, IOException
+            Item myitem) throws SQLException, IOException
     {
         // get the location string (for searching by collection & community)
         String location_text = buildItemLocationString(c, myitem);
@@ -404,9 +405,7 @@ public class DSIndexer
         ArrayList indexes = new ArrayList();
 
         // read in search.index.1, search.index.2....
-        for (int i = 1;
-                 ConfigurationManager.getProperty("search.index." + i) != null;
-                 i++)
+        for (int i = 1; ConfigurationManager.getProperty("search.index." + i) != null; i++)
         {
             indexes.add(ConfigurationManager.getProperty("search.index." + i));
         }
@@ -438,24 +437,28 @@ public class DSIndexer
                 if (qualifier.equals("*"))
                 {
                     mydc = myitem.getDC(element, Item.ANY, Item.ANY);
-                } else
+                }
+                else
                 {
                     mydc = myitem.getDC(element, qualifier, Item.ANY);
                 }
 
-                // put them all from an array of strings to one string for writing
+                // put them all from an array of strings to one string for
+                // writing
                 // out
-                // pack all of the arrays of DCValues into plain text strings for
+                // pack all of the arrays of DCValues into plain text strings
+                // for
                 // the indexer
                 String content_text = "";
 
                 for (j = 0; j < mydc.length; j++)
                 {
-                    content_text = new String(content_text + mydc[j].value +
-                                              " ");
+                    content_text = new String(content_text + mydc[j].value
+                            + " ");
                 }
 
-                // arranges content with fields in ArrayLists with same index to put
+                // arranges content with fields in ArrayLists with same index to
+                // put
                 // into hash later
                 k = fields.indexOf(myindex);
 
@@ -463,10 +466,11 @@ public class DSIndexer
                 {
                     fields.add(myindex);
                     content.add(content_text);
-                } else
+                }
+                else
                 {
-                    content_text = new String(content_text +
-                                              (String) content.get(k) + " ");
+                    content_text = new String(content_text
+                            + (String) content.get(k) + " ");
                     content.set(k, content_text);
                 }
             }
@@ -478,7 +482,9 @@ public class DSIndexer
             }
 
             textvalues.put("location", location_text);
-        } else // if no search indexes found in cfg file, for backward compatibility
+        }
+        else
+        // if no search indexes found in cfg file, for backward compatibility
         {
             // extract metadata (ANY is wildcard from Item class)
             DCValue[] authors = myitem.getDC("contributor", Item.ANY, Item.ANY);
@@ -487,20 +493,21 @@ public class DSIndexer
             DCValue[] keywords = myitem.getDC("subject", Item.ANY, Item.ANY);
 
             DCValue[] abstracts = myitem.getDC("description", "abstract",
-                                               Item.ANY);
+                    Item.ANY);
             DCValue[] sors = myitem.getDC("description",
-                                          "statementofresponsibility", Item.ANY);
+                    "statementofresponsibility", Item.ANY);
             DCValue[] series = myitem.getDC("relation", "ispartofseries",
-                                            Item.ANY);
+                    Item.ANY);
             DCValue[] tocs = myitem.getDC("description", "tableofcontents",
-                                          Item.ANY);
+                    Item.ANY);
             DCValue[] mimetypes = myitem.getDC("format", "mimetype", Item.ANY);
             DCValue[] sponsors = myitem.getDC("description", "sponsorship",
-                                              Item.ANY);
+                    Item.ANY);
             DCValue[] identifiers = myitem.getDC("identifier", Item.ANY,
-                                                 Item.ANY);
+                    Item.ANY);
 
-            // put them all from an array of strings to one string for writing out
+            // put them all from an array of strings to one string for writing
+            // out
             String author_text = "";
             String title_text = "";
             String keyword_text = "";
@@ -512,7 +519,8 @@ public class DSIndexer
             String sponsor_text = "";
             String id_text = "";
 
-            // pack all of the arrays of DCValues into plain text strings for the
+            // pack all of the arrays of DCValues into plain text strings for
+            // the
             // indexer
             for (j = 0; j < authors.length; j++)
             {
@@ -536,14 +544,14 @@ public class DSIndexer
 
             for (j = 0; j < keywords.length; j++)
             {
-                keyword_text = new String(keyword_text + keywords[j].value +
-                                          " ");
+                keyword_text = new String(keyword_text + keywords[j].value
+                        + " ");
             }
 
             for (j = 0; j < abstracts.length; j++)
             {
-                abstract_text = new String(abstract_text + abstracts[j].value +
-                                           " ");
+                abstract_text = new String(abstract_text + abstracts[j].value
+                        + " ");
             }
 
             for (j = 0; j < tocs.length; j++)
@@ -563,8 +571,8 @@ public class DSIndexer
 
             for (j = 0; j < sponsors.length; j++)
             {
-                sponsor_text = new String(sponsor_text + sponsors[j].value +
-                                          " ");
+                sponsor_text = new String(sponsor_text + sponsors[j].value
+                        + " ");
             }
 
             for (j = 0; j < identifiers.length; j++)
@@ -593,8 +601,8 @@ public class DSIndexer
 
         for (int i = 0; i < myBundles.length; i++)
         {
-            if ((myBundles[i].getName() != null) &&
-                    myBundles[i].getName().equals("TEXT"))
+            if ((myBundles[i].getName() != null)
+                    && myBundles[i].getName().equals("TEXT"))
             {
                 // a-ha! grab the text out of the bitstreams
                 Bitstream[] myBitstreams = myBundles[i].getBitstreams();
@@ -603,7 +611,8 @@ public class DSIndexer
                 {
                     try
                     {
-                        InputStreamReader is = new InputStreamReader(myBitstreams[j].retrieve()); // get input stream
+                        InputStreamReader is = new InputStreamReader(
+                                myBitstreams[j].retrieve()); // get input stream
                         StringBuffer sb = new StringBuffer();
                         char[] charBuffer = new char[1024];
 
@@ -627,7 +636,8 @@ public class DSIndexer
 
                         //                        System.out.println("Found extracted text!\n" + new
                         // String(sb));
-                    } catch (AuthorizeException e)
+                    }
+                    catch (AuthorizeException e)
                     {
                         // this will never happen, but compiler is now happy.
                     }
@@ -642,7 +652,7 @@ public class DSIndexer
         // write out the metatdata (for scalability, using hash instead of
         // individual strings)
         writeIndexRecord(writer, Constants.ITEM, itemhandle, textvalues,
-                         extractedText);
+                extractedText);
     }
 
     /**
@@ -650,9 +660,8 @@ public class DSIndexer
      * the index that is opened
      */
     private static void writeIndexRecord(IndexWriter iw, int type,
-                                         String handle, HashMap textvalues,
-                                         String extractedText)
-                                  throws IOException
+            String handle, HashMap textvalues, String extractedText)
+            throws IOException
     {
         Document doc = new Document();
         Integer ty = new Integer(type);

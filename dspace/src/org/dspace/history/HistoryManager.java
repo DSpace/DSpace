@@ -77,51 +77,55 @@ import com.hp.hpl.mesa.rdf.jena.model.Property;
 import com.hp.hpl.mesa.rdf.jena.model.RDFException;
 import com.hp.hpl.mesa.rdf.jena.model.Resource;
 
-
 /**
- * Records information about changes in DSpace. The information
- * about changes is written out in RDF format to one or more files
- * in the directory given by the configuration property
- * <em>history.dir</em>.
- *
- * @author  Peter Breton
+ * Records information about changes in DSpace. The information about changes is
+ * written out in RDF format to one or more files in the directory given by the
+ * configuration property <em>history.dir</em>.
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class HistoryManager
 {
     // Action constants
     public static final int NONE = 0;
+
     public static final int CREATE = 1;
+
     public static final int MODIFY = 2;
+
     public static final int REMOVE = 3;
-    private static final String uriPrefixConfig = ConfigurationManager.getProperty("history.uri.prefix");
+
+    private static final String uriPrefixConfig = ConfigurationManager
+            .getProperty("history.uri.prefix");
 
     /** URI prefix */
-    private static final String uriPrefix = (uriPrefixConfig != null)
-                                            ? uriPrefixConfig
-                                            : "http://www.dspace.org";
+    private static final String uriPrefix = (uriPrefixConfig != null) ? uriPrefixConfig
+            : "http://www.dspace.org";
 
     /** Handle prefix */
-    private static String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
+    private static String handlePrefix = ConfigurationManager
+            .getProperty("handle.prefix");
 
     /** log4j category */
     private static Logger log = Logger.getLogger(HistoryManager.class);
 
     /** Directory for history serialization */
-    private static String historyDirectory = ConfigurationManager.getProperty("history.dir");
+    private static String historyDirectory = ConfigurationManager
+            .getProperty("history.dir");
 
     // These settings control the way an identifier is hashed into
     // directory and file names
     // FIXME: This is basically stolen from the bitstore code, and thus
     // could be factored out into a common location
     private static int digitsPerLevel = 2;
+
     private static int directoryLevels = 3;
 
     /** Identifier for the generator */
-    private static final String ID = new StringBuffer().append(HistoryManager.class.getName())
-                                                       .append(" ")
-                                                       .append("$Revision$")
-                                                       .toString();
+    private static final String ID = new StringBuffer().append(
+            HistoryManager.class.getName()).append(" ").append(
+            "$Revision$").toString();
 
     /**
      * Private Constructor
@@ -131,23 +135,27 @@ public class HistoryManager
     }
 
     /**
-     * Save history information about this object.
-     * Errors are simply logged.
-     *
-     * @param context The current DSpace context
-     * @param obj The object to record History information about
-     * @param flag One of CREATE, MODIFY or REMOVE.
-     * @param user The user who performed the action that is being recorded
-     * @param tool A description of the tool that was used to effect
-     * the action.
+     * Save history information about this object. Errors are simply logged.
+     * 
+     * @param context
+     *            The current DSpace context
+     * @param obj
+     *            The object to record History information about
+     * @param flag
+     *            One of CREATE, MODIFY or REMOVE.
+     * @param user
+     *            The user who performed the action that is being recorded
+     * @param tool
+     *            A description of the tool that was used to effect the action.
      */
     public static void saveHistory(Context context, Object obj, int flag,
-                                   EPerson user, String tool)
+            EPerson user, String tool)
     {
         try
         {
             createHarmonyData(context, obj, flag, user, tool);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             if (log.isDebugEnabled())
             {
@@ -158,22 +166,24 @@ public class HistoryManager
 
     /**
      * Create Harmony data which describes the event.
-     *
-     * @param context The current DSpace context
-     * @param obj The object to record History information about
-     * @param flag One of CREATE, MODIFY or REMOVE.
-     * @param user The user who performed the action that is being recorded
-     * @param tool A description of the tool that was used to effect
-     * the action.
+     * 
+     * @param context
+     *            The current DSpace context
+     * @param obj
+     *            The object to record History information about
+     * @param flag
+     *            One of CREATE, MODIFY or REMOVE.
+     * @param user
+     *            The user who performed the action that is being recorded
+     * @param tool
+     *            A description of the tool that was used to effect the action.
      */
     private static void createHarmonyData(Context context, Object historyObj,
-                                          int flag, EPerson theUser,
-                                          String theTool)
-                                   throws SQLException, RDFException, 
-                                          IOException
+            int flag, EPerson theUser, String theTool) throws SQLException,
+            RDFException, IOException
     {
-        String id = (flag == REMOVE) ? getUniqueId(historyObj)
-                                     : doSerialize(context, historyObj);
+        String id = (flag == REMOVE) ? getUniqueId(historyObj) : doSerialize(
+                context, historyObj);
 
         // Figure out the tool used
         if (theTool == null)
@@ -207,17 +217,17 @@ public class HistoryManager
         Resource event = model.createResource(eventId);
 
         //  States
-        Resource outputState = (flag == REMOVE) ? null
-                                                : model.createResource(stateId.toString());
-        Resource inputState = (flag == CREATE) ? null
-                                               : model.createResource(inputStateId);
+        Resource outputState = (flag == REMOVE) ? null : model
+                .createResource(stateId.toString());
+        Resource inputState = (flag == CREATE) ? null : model
+                .createResource(inputStateId);
 
         //  FIXME The action (also typed??)
         Resource action = model.createResource(getUniqueId("action", NONE));
 
         //  The user
-        Resource user = (theUser != null)
-                        ? model.createResource(getUniqueId(theUser)) : null;
+        Resource user = (theUser != null) ? model
+                .createResource(getUniqueId(theUser)) : null;
 
         // These verbs are essentially constant
         Property atTime = model.createProperty(getHarmonyId("atTime"));
@@ -225,7 +235,7 @@ public class HistoryManager
         Property hasOutput = model.createProperty(getHarmonyId("hasOutput"));
         Property inState = model.createProperty(getHarmonyId("inState"));
 
-        //Property contains  = model.createProperty(getHarmonyId("contains"));
+        //Property contains = model.createProperty(getHarmonyId("contains"));
         Property hasAction = model.createProperty(getHarmonyId("hasAction"));
         Property usesTool = model.createProperty(getHarmonyId("usesTool"));
         Property hasAgent = model.createProperty(getHarmonyId("hasAgent"));
@@ -235,16 +245,19 @@ public class HistoryManager
         if (flag == CREATE)
         {
             operation = model.createProperty(getHarmonyId("creates"));
-        } else if (flag == REMOVE)
+        }
+        else if (flag == REMOVE)
         {
             operation = model.createProperty(getHarmonyId("destroys"));
-        } else if (flag == MODIFY)
+        }
+        else if (flag == MODIFY)
         {
             operation = model.createProperty(getHarmonyId("transforms"));
-        } else
+        }
+        else
         {
-            throw new IllegalArgumentException("Unknown value for flag: " +
-                                               flag);
+            throw new IllegalArgumentException("Unknown value for flag: "
+                    + flag);
         }
 
         // Creation events do not have input states, but everything
@@ -261,7 +274,7 @@ public class HistoryManager
             model.add(event, hasOutput, outputState);
             model.add(obj, inState, outputState);
 
-            //model.add(outputState,  contains,  obj);
+            //model.add(outputState, contains, obj);
         }
 
         // Time that this event occurred
@@ -274,7 +287,8 @@ public class HistoryManager
         if (theUser != null)
         {
             model.add(action, hasAgent, user);
-        } else
+        }
+        else
         {
             model.add(action, hasAgent, model.createLiteral("Unknown User"));
         }
@@ -321,8 +335,9 @@ public class HistoryManager
 
     /**
      * Return a unique id for an object.
-     *
-     * @param obj The object to return an id for
+     * 
+     * @param obj
+     *            The object to return an id for
      * @return A unique id for the object.
      */
     private static String getUniqueId(Object obj)
@@ -339,54 +354,59 @@ public class HistoryManager
         if (obj instanceof Community)
         {
             id = ((Community) obj).getID();
-        } else if (obj instanceof Collection)
+        }
+        else if (obj instanceof Collection)
         {
             id = ((Collection) obj).getID();
-        } else if (obj instanceof Item)
+        }
+        else if (obj instanceof Item)
         {
             id = ((Item) obj).getID();
-        } else if (obj instanceof EPerson)
+        }
+        else if (obj instanceof EPerson)
         {
             id = ((EPerson) obj).getID();
-        } else if (obj instanceof WorkspaceItem)
+        }
+        else if (obj instanceof WorkspaceItem)
         {
             id = ((WorkspaceItem) obj).getID();
-        } else if (obj instanceof WorkflowItem)
+        }
+        else if (obj instanceof WorkflowItem)
         {
             id = ((WorkflowItem) obj).getID();
         }
 
         return getUniqueIdInternal(uriPrefix, handlePrefix, getShortName(obj),
-                                   Integer.toString(id));
+                Integer.toString(id));
     }
 
     /**
      * Return a unique id corresponding to a Harmony object.
-     *
-     * @param name The name of a Harmony object (action, event, etc)
-     * @param flag One of CREATE, MODIFY, REMOVE
+     * 
+     * @param name
+     *            The name of a Harmony object (action, event, etc)
+     * @param flag
+     *            One of CREATE, MODIFY, REMOVE
      * @return A unique id
      */
     private static String getUniqueId(String name, int flag)
     {
         String objname = new StringBuffer("harmony").append("/").append(name)
-                                                    .append((flag == CREATE)
-                                                            ? "create" : "")
-                                                    .append((flag == MODIFY)
-                                                            ? "modify" : "")
-                                                    .append((flag == REMOVE)
-                                                            ? "remove" : "")
-                                                    .toString();
+                .append((flag == CREATE) ? "create" : "").append(
+                        (flag == MODIFY) ? "modify" : "").append(
+                        (flag == REMOVE) ? "remove" : "").toString();
 
-        return getUniqueIdInternal(uriPrefix, null, objname,
-                                   Utils.generateHexKey());
+        return getUniqueIdInternal(uriPrefix, null, objname, Utils
+                .generateHexKey());
     }
 
     /**
      * Return an RDF property id.
-     *
-     * @param objname The name of an object
-     * @param property The name of a property of the objecty
+     * 
+     * @param objname
+     *            The name of an object
+     * @param property
+     *            The name of a property of the objecty
      * @return The id for the property
      */
     private static String getPropertyId(String objname, String property)
@@ -396,8 +416,9 @@ public class HistoryManager
 
     /**
      * Return an RDF property id for Harmony property.
-     *
-     * @param property The name of a Harmony property
+     * 
+     * @param property
+     *            The name of a Harmony property
      * @return The id for the property
      */
     private static String getHarmonyId(String property)
@@ -407,29 +428,25 @@ public class HistoryManager
 
     /**
      * Internal method for id generation.
-     *
-     * @param uriPrefix A URI
+     * 
+     * @param uriPrefix
+     *            A URI
      * @param handlePrefix
      * @param objname
      * @param objid
      * @return A unique id
      */
     private static String getUniqueIdInternal(String uriPrefix,
-                                              String handlePrefix,
-                                              String objname, String objid)
+            String handlePrefix, String objname, String objid)
     {
         final String SLASH = "/";
 
-        return new StringBuffer().append(uriPrefix)
-                                 .append(uriPrefix.endsWith(SLASH) ? "" : SLASH)
-                                 .append(objname)
-                                 .append(objname.endsWith(SLASH) ? "" : SLASH)
-                                 .append((handlePrefix == null) ? ""
-                                                                : handlePrefix)
-                                 .append(((handlePrefix == null) ||
-                                         (handlePrefix.endsWith(SLASH))) ? ""
-                                                                         : SLASH)
-                                 .append(objid).toString();
+        return new StringBuffer().append(uriPrefix).append(
+                uriPrefix.endsWith(SLASH) ? "" : SLASH).append(objname).append(
+                objname.endsWith(SLASH) ? "" : SLASH).append(
+                (handlePrefix == null) ? "" : handlePrefix).append(
+                ((handlePrefix == null) || (handlePrefix.endsWith(SLASH))) ? ""
+                        : SLASH).append(objid).toString();
     }
 
     ////////////////////////////////////////
@@ -438,17 +455,19 @@ public class HistoryManager
 
     /**
      * Return an RDF stream for this object.
-     *
-     * @param context Current DSpace context
-     * @param obj The object to serialize
+     * 
+     * @param context
+     *            Current DSpace context
+     * @param obj
+     *            The object to serialize
      * @return The serialization of the object
-     * @exception RDFException If an error occurs while constructing
-     * an RDF graph
-     * @exception SQLException If an error occurs while accessing
-     * the database
+     * @exception RDFException
+     *                If an error occurs while constructing an RDF graph
+     * @exception SQLException
+     *                If an error occurs while accessing the database
      */
     private static String serialize(Context context, Object obj)
-                             throws RDFException, SQLException
+            throws RDFException, SQLException
     {
         if (obj == null)
         {
@@ -468,7 +487,8 @@ public class HistoryManager
         try
         {
             data.close();
-        } catch (IOException ioe)
+        }
+        catch (IOException ioe)
         {
         }
 
@@ -477,18 +497,20 @@ public class HistoryManager
 
     /**
      * Add RDF statements about this object to the model.
-     *
-     * @param context Current DSpace context
-     * @param obj The object to make statements about
-     * @param model The RDF statement graph
-     * @exception RDFException If an error occurs while constructing
-     * an RDF graph
-     * @exception SQLException If an error occurs while accessing
-     * the database
+     * 
+     * @param context
+     *            Current DSpace context
+     * @param obj
+     *            The object to make statements about
+     * @param model
+     *            The RDF statement graph
+     * @exception RDFException
+     *                If an error occurs while constructing an RDF graph
+     * @exception SQLException
+     *                If an error occurs while accessing the database
      */
     private static void serializeInternal(Context context, Object obj,
-                                          Model model)
-                                   throws RDFException, SQLException
+            Model model) throws RDFException, SQLException
     {
         if (obj == null)
         {
@@ -507,19 +529,24 @@ public class HistoryManager
         if (obj instanceof Community)
         {
             addData(context, (Community) obj, res, model);
-        } else if (obj instanceof Collection)
+        }
+        else if (obj instanceof Collection)
         {
             addData(context, (Collection) obj, res, model);
-        } else if (obj instanceof Item)
+        }
+        else if (obj instanceof Item)
         {
             addData(context, (Item) obj, res, model);
-        } else if (obj instanceof WorkspaceItem)
+        }
+        else if (obj instanceof WorkspaceItem)
         {
             addData(context, (WorkspaceItem) obj, res, model);
-        } else if (obj instanceof WorkflowItem)
+        }
+        else if (obj instanceof WorkflowItem)
         {
             addData(context, (WorkflowItem) obj, res, model);
-        } else if (obj instanceof EPerson)
+        }
+        else if (obj instanceof EPerson)
         {
             addData(context, (EPerson) obj, res, model);
         }
@@ -527,19 +554,21 @@ public class HistoryManager
 
     /**
      * Serialize and store an object.
-     *
-     * @param context Current DSpace context.
-     * @param obj The object to serialize and store.
+     * 
+     * @param context
+     *            Current DSpace context.
+     * @param obj
+     *            The object to serialize and store.
      * @return A unique id for the object.
-     * @exception RDFException If an error occurs while constructing
-     * an RDF graph
-     * @exception IOException If an error occurs while storing
-     * the serialization
-     * @exception SQLException If an error occurs while accessing
-     * the database
+     * @exception RDFException
+     *                If an error occurs while constructing an RDF graph
+     * @exception IOException
+     *                If an error occurs while storing the serialization
+     * @exception SQLException
+     *                If an error occurs while accessing the database
      */
     private static String doSerialize(Context context, Object obj)
-                               throws SQLException, IOException, RDFException
+            throws SQLException, IOException, RDFException
     {
         if (obj == null)
         {
@@ -556,20 +585,22 @@ public class HistoryManager
 
     /**
      * Store the serialization (unless it already exists).
-     *
-     * @param context Current DSpace context.
-     * @param serialization The serialization to store.
-     * @exception IOException If an error occurs while storing
-     * the serialization
-     * @exception SQLException If an error occurs while accessing
-     * the database
+     * 
+     * @param context
+     *            Current DSpace context.
+     * @param serialization
+     *            The serialization to store.
+     * @exception IOException
+     *                If an error occurs while storing the serialization
+     * @exception SQLException
+     *                If an error occurs while accessing the database
      */
     private static void store(Context context, String serialization)
-                       throws SQLException, IOException
+            throws SQLException, IOException
     {
         String checksum = Utils.getMD5(serialization);
         TableRow row = DatabaseManager.findByUnique(context, "history",
-                                                    "checksum", checksum);
+                "checksum", checksum);
 
         // Already stored
         if (row != null)
@@ -593,13 +624,13 @@ public class HistoryManager
 
     /**
      * Return the last state for the object with id, or null.
-     *
-     * @param id The object's history id
-     * @exception SQLException If an error occurs while accessing
-     * the database
+     * 
+     * @param id
+     *            The object's history id
+     * @exception SQLException
+     *                If an error occurs while accessing the database
      */
-    private static String findPreviousState(String id)
-                                     throws SQLException
+    private static String findPreviousState(String id) throws SQLException
     {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -615,7 +646,8 @@ public class HistoryManager
             ResultSet results = statement.executeQuery();
 
             return results.next() ? results.getString(1) : null;
-        } finally
+        }
+        finally
         {
             if (statement != null)
             {
@@ -635,34 +667,35 @@ public class HistoryManager
 
     /**
      * Add community-specific data to the model.
-     *
-     * @param context Current DSpace context.
-     * @param community The community
-     * @param res RDF resource for the community
-     * @param model The RDF graph
-     * @exception RDFException If an error occurs while constructing
-     * an RDF graph
-     * @exception SQLException If an error occurs while accessing
-     * the database
+     * 
+     * @param context
+     *            Current DSpace context.
+     * @param community
+     *            The community
+     * @param res
+     *            RDF resource for the community
+     * @param model
+     *            The RDF graph
+     * @exception RDFException
+     *                If an error occurs while constructing an RDF graph
+     * @exception SQLException
+     *                If an error occurs while accessing the database
      */
     private static void addData(Context context, Community community,
-                                Resource res, Model model)
-                         throws RDFException, SQLException
+            Resource res, Model model) throws RDFException, SQLException
     {
         String shortname = getShortName(community);
         model.add(res, model.createProperty(getPropertyId(shortname, "ID")),
-                  community.getID());
+                community.getID());
 
-        String[] metadata = new String[]
-                            {
-                                "name", "short_description", "introductory_text",
-                                "copyright_text", "side_bar_text"
-                            };
+        String[] metadata = new String[] { "name", "short_description",
+                "introductory_text", "copyright_text", "side_bar_text" };
 
         for (int i = 0; i < metadata.length; i++)
         {
             String meta = metadata[i];
-            addMetadata(model, res, shortname, meta, community.getMetadata(meta));
+            addMetadata(model, res, shortname, meta, community
+                    .getMetadata(meta));
         }
 
         Property hasPart = model.createProperty(getHarmonyId("hasPart"));
@@ -676,40 +709,40 @@ public class HistoryManager
 
     /**
      * Add collection-specific data to the model.
-     *
-     * @param context Current DSpace context.
-     * @param collection The collection
-     * @param res RDF resource for the collection
-     * @param model The RDF graph
-     * @exception RDFException If an error occurs while constructing
-     * an RDF graph
-     * @exception SQLException If an error occurs while accessing
-     * the database
+     * 
+     * @param context
+     *            Current DSpace context.
+     * @param collection
+     *            The collection
+     * @param res
+     *            RDF resource for the collection
+     * @param model
+     *            The RDF graph
+     * @exception RDFException
+     *                If an error occurs while constructing an RDF graph
+     * @exception SQLException
+     *                If an error occurs while accessing the database
      */
     private static void addData(Context context, Collection collection,
-                                Resource res, Model model)
-                         throws SQLException, RDFException
+            Resource res, Model model) throws SQLException, RDFException
     {
         String shortname = getShortName(collection);
 
         model.add(res, model.createProperty(getPropertyId(shortname, "ID")),
-                  collection.getID());
-        model.add(res,
-                  model.createProperty(getPropertyId(shortname, "license")),
-                  collection.getLicense());
+                collection.getID());
+        model.add(res, model
+                .createProperty(getPropertyId(shortname, "license")),
+                collection.getLicense());
 
-        String[] metadata = new String[]
-                            {
-                                "name", "short_description", "introductory_text",
-                                "copyright_text", "side_bar_text",
-                                "provenance_description"
-                            };
+        String[] metadata = new String[] { "name", "short_description",
+                "introductory_text", "copyright_text", "side_bar_text",
+                "provenance_description" };
 
         for (int i = 0; i < metadata.length; i++)
         {
             String meta = metadata[i];
-            addMetadata(model, res, shortname, meta,
-                        collection.getMetadata(meta));
+            addMetadata(model, res, shortname, meta, collection
+                    .getMetadata(meta));
         }
 
         Property hasPart = model.createProperty(getHarmonyId("hasPart"));
@@ -725,18 +758,22 @@ public class HistoryManager
 
     /**
      * Add item-specific data to the model.
-     *
-     * @param context Current DSpace context.
-     * @param item The item
-     * @param res RDF resource for the item
-     * @param model The RDF graph
-     * @exception RDFException If an error occurs while constructing
-     * an RDF graph
-     * @exception SQLException If an error occurs while accessing
-     * the database
+     * 
+     * @param context
+     *            Current DSpace context.
+     * @param item
+     *            The item
+     * @param res
+     *            RDF resource for the item
+     * @param model
+     *            The RDF graph
+     * @exception RDFException
+     *                If an error occurs while constructing an RDF graph
+     * @exception SQLException
+     *                If an error occurs while accessing the database
      */
     private static void addData(Context context, Item item, Resource res,
-                                Model model) throws RDFException, SQLException
+            Model model) throws RDFException, SQLException
     {
         DCValue[] dcfields = item.getDC(Item.ANY, Item.ANY, Item.ANY);
 
@@ -746,14 +783,12 @@ public class HistoryManager
             String element = dc.element;
             String qualifier = dc.qualifier;
 
-            String type = new StringBuffer().append(element)
-                                            .append((qualifier == null) ? "" : ".")
-                                            .append((qualifier == null) ? ""
-                                                                        : qualifier)
-                                            .toString();
+            String type = new StringBuffer().append(element).append(
+                    (qualifier == null) ? "" : ".").append(
+                    (qualifier == null) ? "" : qualifier).toString();
 
-            Property p = model.createProperty(uriPrefix + "/dublincore/" +
-                                              type);
+            Property p = model
+                    .createProperty(uriPrefix + "/dublincore/" + type);
             model.add(res, p, dc.value);
         }
 
@@ -778,19 +813,23 @@ public class HistoryManager
 
     /**
      * Add workspace-item-specific data to the model.
-     *
-     * @param context The current DSpace context
-     * @param wi The WorkspaceItem
-     * @param res The RDF Resource representing the WorkspaceItem
-     * @param model The RDF Model
-     * @exception SQLException If an error occurs reading data about
-     * the WorkspaceItem from the database
-     * @exception RDFException If an error occurs adding RDF statements
-     * to the model
+     * 
+     * @param context
+     *            The current DSpace context
+     * @param wi
+     *            The WorkspaceItem
+     * @param res
+     *            The RDF Resource representing the WorkspaceItem
+     * @param model
+     *            The RDF Model
+     * @exception SQLException
+     *                If an error occurs reading data about the WorkspaceItem
+     *                from the database
+     * @exception RDFException
+     *                If an error occurs adding RDF statements to the model
      */
     private static void addData(Context context, WorkspaceItem wi,
-                                Resource res, Model model)
-                         throws SQLException, RDFException
+            Resource res, Model model) throws SQLException, RDFException
     {
         Item item = Item.find(context, wi.getItem().getID());
 
@@ -799,18 +838,23 @@ public class HistoryManager
 
     /**
      * Add workflow-item-specific data to the model.
-     *
-     * @param context The current DSpace context
-     * @param wi The WorkflowItem
-     * @param res The RDF Resource representing the WorkflowItem
-     * @param model The RDF Model
-     * @exception SQLException If an error occurs reading data about
-     * the WorkflowItem from the database
-     * @exception RDFException If an error occurs adding RDF statements
-     * to the model
+     * 
+     * @param context
+     *            The current DSpace context
+     * @param wi
+     *            The WorkflowItem
+     * @param res
+     *            The RDF Resource representing the WorkflowItem
+     * @param model
+     *            The RDF Model
+     * @exception SQLException
+     *                If an error occurs reading data about the WorkflowItem
+     *                from the database
+     * @exception RDFException
+     *                If an error occurs adding RDF statements to the model
      */
     private static void addData(Context context, WorkflowItem wi, Resource res,
-                                Model model) throws SQLException, RDFException
+            Model model) throws SQLException, RDFException
     {
         Item item = Item.find(context, wi.getItem().getID());
 
@@ -819,37 +863,39 @@ public class HistoryManager
 
     /**
      * Add eperson-specific data to the model.
-     *
-     * @param context The current DSpace context
-     * @param eperson The EPerson
-     * @param res The RDF Resource representing the EPerson
-     * @param model The RDF Model
-     * @exception SQLException If an error occurs reading data about
-     * the EPerson from the database
-     * @exception RDFException If an error occurs adding RDF statements
-     * to the model
+     * 
+     * @param context
+     *            The current DSpace context
+     * @param eperson
+     *            The EPerson
+     * @param res
+     *            The RDF Resource representing the EPerson
+     * @param model
+     *            The RDF Model
+     * @exception SQLException
+     *                If an error occurs reading data about the EPerson from the
+     *                database
+     * @exception RDFException
+     *                If an error occurs adding RDF statements to the model
      */
     private static void addData(Context context, EPerson eperson, Resource res,
-                                Model model) throws SQLException, RDFException
+            Model model) throws SQLException, RDFException
     {
         String shortname = getShortName(eperson);
         model.add(res, model.createProperty(getPropertyId(shortname, "ID")),
-                  eperson.getID());
+                eperson.getID());
         model.add(res, model.createProperty(getPropertyId(shortname, "email")),
-                  eperson.getEmail());
+                eperson.getEmail());
+        model.add(res, model.createProperty(getPropertyId(shortname,
+                "firstname")), eperson.getFirstName());
+        model.add(res, model
+                .createProperty(getPropertyId(shortname, "lastname")), eperson
+                .getLastName());
         model.add(res,
-                  model.createProperty(getPropertyId(shortname, "firstname")),
-                  eperson.getFirstName());
-        model.add(res,
-                  model.createProperty(getPropertyId(shortname, "lastname")),
-                  eperson.getLastName());
-        model.add(res,
-                  model.createProperty(getPropertyId(shortname, "active")),
-                  eperson.canLogIn());
-        model.add(res,
-                  model.createProperty(getPropertyId(shortname,
-                                                     "require_certificate")),
-                  eperson.getRequireCertificate());
+                model.createProperty(getPropertyId(shortname, "active")),
+                eperson.canLogIn());
+        model.add(res, model.createProperty(getPropertyId(shortname,
+                "require_certificate")), eperson.getRequireCertificate());
 
         String[] metadata = new String[] { "phone" };
 
@@ -862,18 +908,22 @@ public class HistoryManager
 
     /**
      * Convenience method to add a metadata statement to a model.
-     *
-     * @param model The RDF graph
-     * @param res RDF resource
-     * @param object The name of the object
-     * @param property The name of a property of the object
-     * @param value The value of the property
-     * @exception RDFException If an error occurs while constructing
-     * an RDF graph
+     * 
+     * @param model
+     *            The RDF graph
+     * @param res
+     *            RDF resource
+     * @param object
+     *            The name of the object
+     * @param property
+     *            The name of a property of the object
+     * @param value
+     *            The value of the property
+     * @exception RDFException
+     *                If an error occurs while constructing an RDF graph
      */
     private static void addMetadata(Model model, Resource res, String object,
-                                    String property, String value)
-                             throws RDFException
+            String property, String value) throws RDFException
     {
         if (value == null)
         {
@@ -881,7 +931,7 @@ public class HistoryManager
         }
 
         model.add(res, model.createProperty(getPropertyId(object, property)),
-                  value);
+                value);
     }
 
     ////////////////////////////////////////
@@ -890,13 +940,16 @@ public class HistoryManager
 
     /**
      * Return the File corresponding to id.
-     *
-     * @param id The id
-     * @param create If true, the file will be created if it does
-     * not exist. Otherwise, null will be returned.
+     * 
+     * @param id
+     *            The id
+     * @param create
+     *            If true, the file will be created if it does not exist.
+     *            Otherwise, null will be returned.
      * @return The File corresponding to id
-     * @exception IOException If a filesystem error occurs while
-     * determining the corresponding file.
+     * @exception IOException
+     *                If a filesystem error occurs while determining the
+     *                corresponding file.
      */
     private static File forId(int id, boolean create) throws IOException
     {
@@ -924,11 +977,12 @@ public class HistoryManager
 
     /**
      * Return the filename corresponding to id.
-     *
-     * @param id The id
+     * 
+     * @param id
+     *            The id
      * @return The filename corresponding to id
-     * @exception IOException If a filesystem error occurs while
-     * determining the name.
+     * @exception IOException
+     *                If a filesystem error occurs while determining the name.
      */
     private static String id2Filename(int id) throws IOException
     {
@@ -950,9 +1004,8 @@ public class HistoryManager
         {
             int digits = i * digitsPerLevel;
 
-            result.append(File.separator).append(ID.substring(digits,
-                                                              digits +
-                                                              digitsPerLevel));
+            result.append(File.separator).append(
+                    ID.substring(digits, digits + digitsPerLevel));
         }
 
         // Lastly, add the id itself
@@ -972,7 +1025,7 @@ public class HistoryManager
 
     /**
      * Return a basic idea of which tool was used to do something.
-     *
+     * 
      * @return A String indicating the tool used
      */
     private static String getTool()
@@ -982,7 +1035,8 @@ public class HistoryManager
         // Find the highest stack frame that contains org.dspace.
         try
         {
-            BufferedReader reader = new BufferedReader(new StringReader(stacktrace));
+            BufferedReader reader = new BufferedReader(new StringReader(
+                    stacktrace));
             String line = null;
             String match = null;
 
@@ -1006,7 +1060,7 @@ public class HistoryManager
 
     /**
      * Return a String containing the stack trace of the caller.
-     *
+     * 
      * @return A String containing the stack trace of the caller.
      */
     public static String getStackTrace()
@@ -1020,8 +1074,9 @@ public class HistoryManager
 
     /**
      * Return the unqualified classname for object.
-     *
-     * @param obj The object to check
+     * 
+     * @param obj
+     *            The object to check
      * @return The object's unqualified classname
      */
     private static String getShortName(Object obj)
@@ -1039,7 +1094,7 @@ public class HistoryManager
 
     /**
      * Return the current instant as an SQL timestamp.
-     *
+     * 
      * @return The current instant as an SQL timestamp.
      */
     private static Timestamp nowAsTimeStamp()
@@ -1053,8 +1108,9 @@ public class HistoryManager
 
     /**
      * Embedded test harness
-     *
-     * @param argv - Command-line arguments
+     * 
+     * @param argv -
+     *            Command-line arguments
      */
     public static void main(String[] argv)
     {
@@ -1112,10 +1168,12 @@ public class HistoryManager
             }
 
             System.exit(0);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
-        } finally
+        }
+        finally
         {
             if (context != null)
             {

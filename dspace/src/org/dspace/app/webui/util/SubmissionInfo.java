@@ -43,12 +43,11 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
 
-
 /**
  * Information about an item being editing with the submission UI
- *
- * @author   Robert Tansley
- * @version  $Revision$
+ * 
+ * @author Robert Tansley
+ * @version $Revision$
  */
 public class SubmissionInfo
 {

@@ -96,16 +96,16 @@ import edu.harvard.hul.ois.mets.helper.MetsWriter;
 import edu.harvard.hul.ois.mets.helper.PCData;
 import edu.harvard.hul.ois.mets.helper.PreformedXML;
 
-
 /**
  * Tool for exporting DSpace AIPs with the metadata serialised in METS format
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
 public class METSExport
 {
     private static int licenseFormat = -1;
+
     private static Properties dcToMODS;
 
     public static void main(String[] args) throws Exception
@@ -120,7 +120,7 @@ public class METSExport
         Options options = new Options();
 
         options.addOption("c", "collection", true,
-                          "Handle of collection to export");
+                "Handle of collection to export");
         options.addOption("i", "item", true, "Handle of item to export");
         options.addOption("a", "all", false, "Export all items in the archive");
         options.addOption("d", "destination", true, "Destination directory");
@@ -132,8 +132,10 @@ public class METSExport
         {
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("metsexport", options);
-            System.out.println("\nExport a collection:  metsexport -c hdl:123.456/789");
-            System.out.println("Export an item:       metsexport -i hdl:123.456/890");
+            System.out
+                    .println("\nExport a collection:  metsexport -c hdl:123.456/789");
+            System.out
+                    .println("Export an item:       metsexport -i hdl:123.456/890");
             System.out.println("Export everything:    metsexport -a");
 
             System.exit(0);
@@ -163,10 +165,11 @@ public class METSExport
             {
                 writeAIP(context, (Item) o, dest);
                 System.exit(0);
-            } else
+            }
+            else
             {
-                System.err.println(line.getOptionValue('i') +
-                                   " is not a valid item Handle");
+                System.err.println(line.getOptionValue('i')
+                        + " is not a valid item Handle");
                 System.exit(1);
             }
         }
@@ -183,10 +186,11 @@ public class METSExport
             if ((o != null) && o instanceof Collection)
             {
                 items = ((Collection) o).getItems();
-            } else
+            }
+            else
             {
-                System.err.println(line.getOptionValue('c') +
-                                   " is not a valid collection Handle");
+                System.err.println(line.getOptionValue('c')
+                        + " is not a valid collection Handle");
                 System.exit(1);
             }
         }
@@ -212,8 +216,9 @@ public class METSExport
 
     /**
      * Initialise various variables, read in config etc.
-     *
-     *  @param context  DSpace context
+     * 
+     * @param context
+     *            DSpace context
      */
     private static void init(Context context) throws SQLException, IOException
     {
@@ -225,13 +230,12 @@ public class METSExport
 
         // Find the License format
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(context,
-                                                                    "License");
+                "License");
         licenseFormat = bf.getID();
 
         // get path to DC->MODS map info file
-        String configFile = ConfigurationManager.getProperty("dspace.dir") +
-                            File.separator + "config" + File.separator +
-                            "dc2mods.cfg";
+        String configFile = ConfigurationManager.getProperty("dspace.dir")
+                + File.separator + "config" + File.separator + "dc2mods.cfg";
 
         // Read it in
         InputStream is = new FileInputStream(configFile);
@@ -240,26 +244,25 @@ public class METSExport
     }
 
     /**
-     * Write out the AIP for the given item to the given directory.
-     * A new directory will be created with the Handle (URL-encoded)
-     * as the directory name, and inside, a mets.xml file written,
-     * together with the bitstreams.
-     *
-     * @param context   DSpace context to use
-     * @param item      Item to write
-     * @param dest      destination directory
+     * Write out the AIP for the given item to the given directory. A new
+     * directory will be created with the Handle (URL-encoded) as the directory
+     * name, and inside, a mets.xml file written, together with the bitstreams.
+     * 
+     * @param context
+     *            DSpace context to use
+     * @param item
+     *            Item to write
+     * @param dest
+     *            destination directory
      */
     public static void writeAIP(Context context, Item item, String dest)
-                         throws SQLException, IOException, AuthorizeException, 
-                                MetsException
+            throws SQLException, IOException, AuthorizeException, MetsException
     {
         System.out.println("Exporting item hdl:" + item.getHandle());
 
         // Create aip directory
-        java.io.File aipDir = new java.io.File(dest +
-                                               URLEncoder.encode("hdl:" +
-                                                                 item.getHandle(),
-                                                                 "UTF-8"));
+        java.io.File aipDir = new java.io.File(dest
+                + URLEncoder.encode("hdl:" + item.getHandle(), "UTF-8"));
 
         if (!aipDir.mkdir())
         {
@@ -268,9 +271,8 @@ public class METSExport
         }
 
         // Write the METS file
-        FileOutputStream out = new FileOutputStream(aipDir.toString() +
-                                                    java.io.File.separator +
-                                                    "mets.xml");
+        FileOutputStream out = new FileOutputStream(aipDir.toString()
+                + java.io.File.separator + "mets.xml");
         writeMETS(context, item, out);
         out.close();
 
@@ -284,14 +286,13 @@ public class METSExport
             for (int b = 0; b < bitstreams.length; b++)
             {
                 // Skip license bitstream and unauthorized resources
-                if ((bitstreams[b].getFormat().getID() != licenseFormat) &&
-                        AuthorizeManager.authorizeActionBoolean(context,
-                                                                    bitstreams[b],
-                                                                    Constants.READ))
+                if ((bitstreams[b].getFormat().getID() != licenseFormat)
+                        && AuthorizeManager.authorizeActionBoolean(context,
+                                bitstreams[b], Constants.READ))
                 {
-                    out = new FileOutputStream(aipDir.toString() +
-                                               java.io.File.separator +
-                                               bitstreams[b].getChecksum());
+                    out = new FileOutputStream(aipDir.toString()
+                            + java.io.File.separator
+                            + bitstreams[b].getChecksum());
 
                     InputStream in = bitstreams[b].retrieve();
                     Utils.bufferedCopy(in, out);
@@ -304,13 +305,15 @@ public class METSExport
 
     /**
      * Write METS metadata corresponding to the metadata for an item
-     *
-     * @param context  DSpace context
-     * @param item     DSpace item to create METS object for
-     * @return  METS object for DSpace item
+     * 
+     * @param context
+     *            DSpace context
+     * @param item
+     *            DSpace item to create METS object for
+     * @return METS object for DSpace item
      */
     public static void writeMETS(Context context, Item item, OutputStream os)
-                          throws SQLException, IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         try
         {
@@ -323,11 +326,13 @@ public class METSExport
             mets.setOBJID("hdl:" + item.getHandle());
             mets.setLABEL("DSpace Item");
             mets.setSchema("mods", "http://www.loc.gov/mods/v3",
-                           "http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
+                    "http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
 
             // MetsHdr
             MetsHdr metsHdr = new MetsHdr();
-            metsHdr.setCREATEDATE(new Date()); // FIXME: CREATEDATE is now:  maybe should be item create date?
+            metsHdr.setCREATEDATE(new Date()); // FIXME: CREATEDATE is now:
+                                               // maybe should be item create
+                                               // date?
 
             // Agent
             Agent agent = new Agent();
@@ -335,7 +340,10 @@ public class METSExport
             agent.setTYPE(Type.ORGANIZATION);
 
             Name name = new Name();
-            name.getContent().add(new PCData(ConfigurationManager.getProperty("dspace.name")));
+            name.getContent()
+                    .add(
+                            new PCData(ConfigurationManager
+                                    .getProperty("dspace.name")));
             agent.getContent().add(name);
 
             metsHdr.getContent().add(agent);
@@ -380,7 +388,7 @@ public class METSExport
                 amdSec.getContent().add(rightsMD);
             }
 
-            // FIXME: History data???? Nooooo!!!! 
+            // FIXME: History data???? Nooooo!!!!
             mets.getContent().add(amdSec);
 
             // fileSec
@@ -392,7 +400,8 @@ public class METSExport
             {
                 Bitstream[] bitstreams = bundles[i].getBitstreams();
 
-                // First: we skip the license bundle, since it's included elsewhere
+                // First: we skip the license bundle, since it's included
+                // elsewhere
                 if (bitstreams[0].getFormat().getID() == licenseFormat)
                 {
                     continue;
@@ -402,8 +411,8 @@ public class METSExport
                 FileGrp fileGrp = new FileGrp();
 
                 // Bundle name for USE attribute
-                if ((bundles[i].getName() != null) &&
-                        !bundles[i].getName().equals(""))
+                if ((bundles[i].getName() != null)
+                        && !bundles[i].getName().equals(""))
                 {
                     fileGrp.setUSE(bundles[i].getName());
                 }
@@ -411,52 +420,61 @@ public class METSExport
                 for (int bits = 0; bits < bitstreams.length; bits++)
                 {
                     // What's the persistent(-ish) ID?
-                    String bitstreamPID = ConfigurationManager.getProperty("dspace.url") +
-                                          "/bitstream/" + item.getHandle() +
-                                          "/" +
-                                          bitstreams[bits].getSequenceID() +
-                                          "/" +
-                                          URLEncoder.encode(bitstreams[bits].getName(),
-                                                            "UTF-8");
+                    String bitstreamPID = ConfigurationManager
+                            .getProperty("dspace.url")
+                            + "/bitstream/"
+                            + item.getHandle()
+                            + "/"
+                            + bitstreams[bits].getSequenceID()
+                            + "/"
+                            + URLEncoder.encode(bitstreams[bits].getName(),
+                                    "UTF-8");
 
                     edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
 
-                    /* ID: we use the unique part of the persistent ID, i.e. the
-                     * Handle + sequence number, but with _'s instead of /'s
-                     * so it's a legal xsd:ID. */
-                    String xmlIDstart = item.getHandle().replaceAll("/", "_") +
-                                        "_";
+                    /*
+                     * ID: we use the unique part of the persistent ID, i.e. the
+                     * Handle + sequence number, but with _'s instead of /'s so
+                     * it's a legal xsd:ID.
+                     */
+                    String xmlIDstart = item.getHandle().replaceAll("/", "_")
+                            + "_";
 
                     file.setID(xmlIDstart + bitstreams[bits].getSequenceID());
 
-                    String groupID = "GROUP_" + xmlIDstart +
-                                     bitstreams[bits].getSequenceID();
+                    String groupID = "GROUP_" + xmlIDstart
+                            + bitstreams[bits].getSequenceID();
 
-                    /* If we're in THUMBNAIL or TEXT bundles, the bitstream is
+                    /*
+                     * If we're in THUMBNAIL or TEXT bundles, the bitstream is
                      * extracted text or a thumbnail, so we use the name to work
                      * out which bitstream to be in the same group as
                      */
-                    if ((bundles[i].getName() != null) &&
-                            (bundles[i].getName().equals("THUMBNAIL") ||
-                            bundles[i].getName().equals("TEXT")))
+                    if ((bundles[i].getName() != null)
+                            && (bundles[i].getName().equals("THUMBNAIL") || bundles[i]
+                                    .getName().equals("TEXT")))
                     {
-                        // Try and find the original bitstream, and chuck the derived
+                        // Try and find the original bitstream, and chuck the
+                        // derived
                         // bitstream in the same group
                         Bitstream original = findOriginalBitstream(item,
-                                                                   bitstreams[bits]);
+                                bitstreams[bits]);
 
                         if (original != null)
                         {
-                            groupID = "GROUP_" + xmlIDstart +
-                                      original.getSequenceID();
+                            groupID = "GROUP_" + xmlIDstart
+                                    + original.getSequenceID();
                         }
                     }
 
                     file.setGROUPID(groupID);
                     file.setOWNERID(bitstreamPID);
 
-                    // FIXME: ADMID should point to appropriate TechMD section above
-                    file.setMIMETYPE(bitstreams[bits].getFormat().getMIMEType());
+                    // FIXME: ADMID should point to appropriate TechMD section
+                    // above
+                    file
+                            .setMIMETYPE(bitstreams[bits].getFormat()
+                                    .getMIMEType());
 
                     // FIXME: CREATED: no date
                     file.setSIZE(bitstreams[bits].getSize());
@@ -484,7 +502,8 @@ public class METSExport
             mets.validate(new MetsValidator());
 
             mets.write(new MetsWriter(os));
-        } catch (MetsException e)
+        }
+        catch (MetsException e)
         {
             // We don't pass up a MetsException, so callers don't need to
             // know the details of the METS toolkit
@@ -495,16 +514,18 @@ public class METSExport
 
     /**
      * Utility to find the license bitstream from an item
-     *
-     * @param  context  DSpace context
-     * @param  item     the item
-     * @return  the license as a string
-     *
-     * @throws IOException  if the license bitstream can't be read
+     * 
+     * @param context
+     *            DSpace context
+     * @param item
+     *            the item
+     * @return the license as a string
+     * 
+     * @throws IOException
+     *             if the license bitstream can't be read
      */
     private static InputStream findLicense(Context context, Item item)
-                                    throws SQLException, IOException, 
-                                           AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         Bundle[] bundles = item.getBundles();
 
@@ -520,17 +541,19 @@ public class METSExport
             }
         }
 
-        // Oops!  No license!
+        // Oops! No license!
         return null;
     }
 
     /**
      * For a bitstream that's a thumbnail or extracted text, find the
      * corresponding bitstream in the ORIGINAL bundle
-     *
-     * @param item     the item we're dealing with
-     * @param derived  the derived bitstream
-     *
+     * 
+     * @param item
+     *            the item we're dealing with
+     * @param derived
+     *            the derived bitstream
+     * 
      * @return the corresponding original bitstream (or null)
      */
     private static Bitstream findOriginalBitstream(Item item, Bitstream derived)
@@ -540,17 +563,15 @@ public class METSExport
         // Filename of original will be filename of the derived bitstream
         // minus the extension (last 4 chars - .jpg or .txt)
         String originalFilename = derived.getName().substring(0,
-                                                              derived.getName()
-                                                                     .length() -
-                                                              4);
+                derived.getName().length() - 4);
 
         // First find "original" bundle
         for (int i = 0; i < bundles.length; i++)
         {
-            if ((bundles[i].getName() != null) &&
-                    bundles[i].getName().equals("ORIGINAL"))
+            if ((bundles[i].getName() != null)
+                    && bundles[i].getName().equals("ORIGINAL"))
             {
-                // Now find the corresponding bitstream 
+                // Now find the corresponding bitstream
                 Bitstream[] bitstreams = bundles[i].getBitstreams();
 
                 for (int bsnum = 0; bsnum < bitstreams.length; bsnum++)
@@ -568,11 +589,13 @@ public class METSExport
     }
 
     /**
-     * Create MODS metadata from the DC in the item, and add to the given XmlData
-     * METS object.
-     *
-     * @param item    the item
-     * @param xmlData xmlData to add MODS to.
+     * Create MODS metadata from the DC in the item, and add to the given
+     * XmlData METS object.
+     * 
+     * @param item
+     *            the item
+     * @param xmlData
+     *            xmlData to add MODS to.
      */
     private static void createMODS(Item item, XmlData xmlData)
     {
@@ -584,19 +607,19 @@ public class METSExport
         {
             // Get the property name - element[.qualifier]
             String propName = ((dc[i].qualifier == null) ? dc[i].element
-                                                         : (dc[i].element +
-                                                         "." + dc[i].qualifier));
+                    : (dc[i].element + "." + dc[i].qualifier));
 
             String modsMapping = dcToMODS.getProperty(propName);
 
             if (modsMapping == null)
             {
                 System.err.println("WARNING: No MODS mapping for " + propName);
-            } else
+            }
+            else
             {
                 // Replace '%s' with DC value (with entities encoded)
-                modsXML.append(modsMapping.replaceAll("%s",
-                                                      Utils.addEntities(dc[i].value)));
+                modsXML.append(modsMapping.replaceAll("%s", Utils
+                        .addEntities(dc[i].value)));
                 modsXML.append("\n"); // For readability
             }
         }
@@ -606,12 +629,12 @@ public class METSExport
     }
 
     /**
-     * Get the handle from the command line in the form 123.456/789.
-     * Doesn't matter if incoming handle has 'hdl:' or 'http://hdl....'
-     * before it.
-     *
-     * @param original  Handle as passed in by user
-     * @return  Handle as can be looked up in our table
+     * Get the handle from the command line in the form 123.456/789. Doesn't
+     * matter if incoming handle has 'hdl:' or 'http://hdl....' before it.
+     * 
+     * @param original
+     *            Handle as passed in by user
+     * @return Handle as can be looked up in our table
      */
     private static String getHandleArg(String original)
     {

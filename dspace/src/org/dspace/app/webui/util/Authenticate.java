@@ -53,14 +53,12 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
-
 /**
- * Methods for authenticating the user.  This is DSpace platform code, as
- * opposed to the site-specific authentication code, that resides in
- * implementations of the <code>org.dspace.app.webui.SiteAuthenticator</code>
- * interface.
- *
- * @author  Robert Tansley
+ * Methods for authenticating the user. This is DSpace platform code, as opposed
+ * to the site-specific authentication code, that resides in implementations of
+ * the <code>org.dspace.app.webui.SiteAuthenticator</code> interface.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class Authenticate
@@ -72,11 +70,10 @@ public class Authenticate
     private static SiteAuthenticator siteAuth = null;
 
     /**
-     * Get the site authenticator.  Reads the appropriate configuration
-     * property.
-     *
-     * @return   the implementation of the SiteAuthenticator interface to
-     *           use for this DSpace site.
+     * Get the site authenticator. Reads the appropriate configuration property.
+     * 
+     * @return the implementation of the SiteAuthenticator interface to use for
+     *         this DSpace site.
      */
     public static SiteAuthenticator getSiteAuth()
     {
@@ -86,13 +83,15 @@ public class Authenticate
         }
 
         // Instantiate the site authenticator
-        String siteAuthClassName = ConfigurationManager.getProperty("webui.site.authenticator");
+        String siteAuthClassName = ConfigurationManager
+                .getProperty("webui.site.authenticator");
 
         try
         {
             Class siteAuthClass = Class.forName(siteAuthClassName);
             siteAuth = (SiteAuthenticator) siteAuthClass.newInstance();
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             // Problem instantiating
             if (siteAuthClassName == null)
@@ -101,8 +100,7 @@ public class Authenticate
             }
 
             log.fatal(LogManager.getHeader(null, "no_site_authenticator",
-                                           "webui.site.authenticator=" +
-                                           siteAuthClassName), e);
+                    "webui.site.authenticator=" + siteAuthClassName), e);
 
             throw new IllegalStateException(e.toString());
         }
@@ -112,13 +110,14 @@ public class Authenticate
 
     /**
      * Return the request that the system should be dealing with, given the
-     * request that the browse just sent.  If the incoming request is from
-     * a redirect resulting from successful authentication, a request object
+     * request that the browse just sent. If the incoming request is from a
+     * redirect resulting from successful authentication, a request object
      * corresponding to the original request that prompted authentication is
-     * returned.  Otherwise, the request passed in is returned.
-     *
-     * @param request   the incoming HTTP request
-     * @return   the HTTP request the DSpace system should deal with
+     * returned. Otherwise, the request passed in is returned.
+     * 
+     * @param request
+     *            the incoming HTTP request
+     * @return the HTTP request the DSpace system should deal with
      */
     public static HttpServletRequest getRealRequest(HttpServletRequest request)
     {
@@ -127,7 +126,8 @@ public class Authenticate
         if (session.getAttribute("resuming.request") != null)
         {
             // Get info about the interrupted request
-            RequestInfo requestInfo = (RequestInfo) session.getAttribute("interrupted.request.info");
+            RequestInfo requestInfo = (RequestInfo) session
+                    .getAttribute("interrupted.request.info");
 
             HttpServletRequest actualRequest;
 
@@ -136,11 +136,12 @@ public class Authenticate
                 // Can't find the wrapped request information.
                 // FIXME: Proceed with current request - correct?
                 actualRequest = request;
-            } else
+            }
+            else
             {
                 /*
-                 * Wrap the current request to make it look like the
-                 * interruped one
+                 * Wrap the current request to make it look like the interruped
+                 * one
                  */
                 actualRequest = requestInfo.wrapRequest(request);
             }
@@ -152,33 +153,37 @@ public class Authenticate
 
             // Return the wrapped request
             return actualRequest;
-        } else
+        }
+        else
         {
             return request;
         }
     }
 
     /**
-     * Resume a previously interrupted request.  This is invoked when a user
-     * has been successfully authenticated.  The request which led to
-     * authentication will be resumed.
-     *
-     * @param request   <em>current</em> HTTP request
-     * @param response  HTTP response
+     * Resume a previously interrupted request. This is invoked when a user has
+     * been successfully authenticated. The request which led to authentication
+     * will be resumed.
+     * 
+     * @param request
+     *            <em>current</em> HTTP request
+     * @param response
+     *            HTTP response
      */
     public static void resumeInterruptedRequest(HttpServletRequest request,
-                                                HttpServletResponse response)
-                                         throws IOException
+            HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession();
-        String originalURL = (String) session.getAttribute("interrupted.request.url");
+        String originalURL = (String) session
+                .getAttribute("interrupted.request.url");
 
         if (originalURL == null)
         {
             // If for some reason we don't have the original URL, redirect
             // to My DSpace
             originalURL = request.getContextPath() + "/mydspace";
-        } else
+        }
+        else
         {
             // Set the flag in the session, so that when the redirect is
             // followed, we'll know to resume the interrupted request
@@ -190,19 +195,20 @@ public class Authenticate
     }
 
     /**
-     * Start the authentication process.  This packages up the request that
-     * led to authentication being required, and then invokes the site-specific
+     * Start the authentication process. This packages up the request that led
+     * to authentication being required, and then invokes the site-specific
      * authentication method.
-     *
-     * @param context   current DSpace context
-     * @param request   current HTTP request - the one that prompted
-     *                  authentication
-     * @param response  current HTTP response
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current HTTP request - the one that prompted authentication
+     * @param response
+     *            current HTTP response
      */
     public static void startAuthentication(Context context,
-                                           HttpServletRequest request,
-                                           HttpServletResponse response)
-                                    throws ServletException, IOException
+            HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException
     {
         HttpSession session = request.getSession();
 
@@ -217,8 +223,8 @@ public class Authenticate
         session.setAttribute("interrupted.request.info", info);
 
         // Store the URL of the request that led to authentication
-        session.setAttribute("interrupted.request.url",
-                             UIUtil.getOriginalURL(request));
+        session.setAttribute("interrupted.request.url", UIUtil
+                .getOriginalURL(request));
 
         // Start up the site authenticator
         getSiteAuth().startAuthentication(context, request, response);
@@ -226,13 +232,16 @@ public class Authenticate
 
     /**
      * Store information about the current user in the request and context
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request
-     * @param eperson   the eperson logged in
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request
+     * @param eperson
+     *            the eperson logged in
      */
     public static void loggedIn(Context context, HttpServletRequest request,
-                                EPerson eperson)
+            EPerson eperson)
     {
         HttpSession session = request.getSession();
 
@@ -242,15 +251,17 @@ public class Authenticate
         request.setAttribute("dspace.current.user", eperson);
 
         // and in the session as an ID
-        session.setAttribute("dspace.current.user.id",
-                             new Integer(eperson.getID()));
+        session.setAttribute("dspace.current.user.id", new Integer(eperson
+                .getID()));
     }
 
     /**
      * Log the user out
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request
      */
     public static void loggedOut(Context context, HttpServletRequest request)
     {

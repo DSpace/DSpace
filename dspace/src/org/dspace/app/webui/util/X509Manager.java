@@ -62,13 +62,12 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
-
 /**
- * High-level manager for X509 certificates.
- * Note that the String form (base64 encoding) for certs is
- * very, very picky about whitespace, line endings and such.
- *
- * @author  Peter Breton
+ * High-level manager for X509 certificates. Note that the String form (base64
+ * encoding) for certs is very, very picky about whitespace, line endings and
+ * such.
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class X509Manager
@@ -78,13 +77,15 @@ public class X509Manager
 
     /**
      * Return true if and only if CERTIFICATE is valid.
-     *
-     * @param certificate - An X509 certificate object
+     * 
+     * @param certificate -
+     *            An X509 certificate object
      * @return - true if the certificate is valid, false otherwise
-     * @exception CertificateException - If an error occurs
+     * @exception CertificateException -
+     *                If an error occurs
      */
     public static boolean isValid(X509Certificate certificate)
-                           throws CertificateException
+            throws CertificateException
     {
         initialize();
 
@@ -92,19 +93,19 @@ public class X509Manager
     }
 
     /**
-     * Return the email address from CERTIFICATE, or null if an email
-     * address cannot be found in the certificate.
-     *
-     * Note that the certificate parsing has only been tested with
-     * certificates granted by the MIT Certification Authority,
-     * and may not work elsewhere.
-     *
-     * @param certificate - An X509 certificate object
-     * @return - The email address found in certificate, or null if an
-     *   email address cannot be found in the certificate.
+     * Return the email address from CERTIFICATE, or null if an email address
+     * cannot be found in the certificate.
+     * 
+     * Note that the certificate parsing has only been tested with certificates
+     * granted by the MIT Certification Authority, and may not work elsewhere.
+     * 
+     * @param certificate -
+     *            An X509 certificate object
+     * @return - The email address found in certificate, or null if an email
+     *         address cannot be found in the certificate.
      */
     public static String getEmail(X509Certificate certificate)
-                           throws AuthorizeException, SQLException
+            throws AuthorizeException, SQLException
     {
         Principal principal = certificate.getSubjectDN();
 
@@ -147,17 +148,17 @@ public class X509Manager
     /**
      * Return the eperson from CERTIFICATE, or null if the email in the
      * certificate doesn't correspond to an eperson.
-     *
-     * Note that the certificate parsing has only been tested with
-     * certificates granted by the MIT Certification Authority,
-     * and may not work elsewhere.
-     *
-     * @param certificate - An X509 certificate object
-     * @return - The email address found in certificate, or null if an
-     *   email address cannot be found in the certificate.
+     * 
+     * Note that the certificate parsing has only been tested with certificates
+     * granted by the MIT Certification Authority, and may not work elsewhere.
+     * 
+     * @param certificate -
+     *            An X509 certificate object
+     * @return - The email address found in certificate, or null if an email
+     *         address cannot be found in the certificate.
      */
     public static EPerson getUser(Context context, X509Certificate certificate)
-                           throws AuthorizeException, SQLException
+            throws AuthorizeException, SQLException
     {
         String email = getEmail(certificate);
 
@@ -170,10 +171,11 @@ public class X509Manager
     }
 
     /**
-     * Load the CA Public Key from a file
-     * We assume that it does not come from a keystore
-     *
-     * @exception CertificateException - If an error occurs
+     * Load the CA Public Key from a file We assume that it does not come from a
+     * keystore
+     * 
+     * @exception CertificateException -
+     *                If an error occurs
      */
     private static void initialize() throws CertificateException
     {
@@ -181,7 +183,8 @@ public class X509Manager
 
         if (cert == null)
         {
-            throw new CertificateException("Unable to initialize CA certificate: configuration property \"webui.cert.ca\" is not set");
+            throw new CertificateException(
+                    "Unable to initialize CA certificate: configuration property \"webui.cert.ca\" is not set");
         }
 
         try
@@ -189,19 +192,21 @@ public class X509Manager
             InputStream is = new BufferedInputStream(new FileInputStream(cert));
 
             caPublicKey = getPublicKey(is);
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
-            throw new CertificateException("Unable to initialize CA certificate: " +
-                                           e);
+            throw new CertificateException(
+                    "Unable to initialize CA certificate: " + e);
         }
     }
 
     /**
-     * Return the PublicKey that we use to validate X509 certs.
-     * For now, we assume that there's only one key.
-     *
+     * Return the PublicKey that we use to validate X509 certs. For now, we
+     * assume that there's only one key.
+     * 
      * @return - The PublicKey that we use to validate X509 certs.
-     * @exception CertificateException - If an error occurs
+     * @exception CertificateException -
+     *                If an error occurs
      */
     private static PublicKey getCAPublicKey() throws CertificateException
     {
@@ -215,27 +220,31 @@ public class X509Manager
 
     /**
      * Convert the stream containing certificate to an X509 certificate object.
-     *
-     * @param stream - An InputStream containing an X509 certificate
+     * 
+     * @param stream -
+     *            An InputStream containing an X509 certificate
      * @return - An X509 certificate object.
-     * @exception CertificateException - If an error occurs
+     * @exception CertificateException -
+     *                If an error occurs
      */
     private static X509Certificate loadCertificate(InputStream stream)
-                                            throws CertificateException
+            throws CertificateException
     {
         return (X509Certificate) CertificateFactory.getInstance("X.509")
-                                                   .generateCertificate(stream);
+                .generateCertificate(stream);
     }
 
     /**
      * Return the PublicKey read from STREAM.
-     *
-     * @param stream - An InputStream containing an X509 certificate
+     * 
+     * @param stream -
+     *            An InputStream containing an X509 certificate
      * @return - The public key from the certificate, or null
-     * @exception CertificateException - If an error occurs
+     * @exception CertificateException -
+     *                If an error occurs
      */
     private static PublicKey getPublicKey(InputStream stream)
-                                   throws CertificateException
+            throws CertificateException
     {
         X509Certificate cert = loadCertificate(stream);
 
@@ -243,14 +252,15 @@ public class X509Manager
     }
 
     /**
-     * Verify CERTIFICATE against KEY.
-     * Return true if and only if CERTIFICATE is valid and can
-     * be verified against KEY.
-     *
-     * @param certificate - An X509 certificate object
-     * @param key - PublicKey to check the certificate against.
-     * @return - True if CERTIFICATE is valid and can be verified against
-     * KEY, false otherwise.
+     * Verify CERTIFICATE against KEY. Return true if and only if CERTIFICATE is
+     * valid and can be verified against KEY.
+     * 
+     * @param certificate -
+     *            An X509 certificate object
+     * @param key -
+     *            PublicKey to check the certificate against.
+     * @return - True if CERTIFICATE is valid and can be verified against KEY,
+     *         false otherwise.
      */
     private static boolean isValid(X509Certificate certificate, PublicKey key)
     {
@@ -267,10 +277,12 @@ public class X509Manager
         try
         {
             certificate.checkValidity();
-        } catch (CertificateExpiredException cee)
+        }
+        catch (CertificateExpiredException cee)
         {
             return false;
-        } catch (CertificateNotYetValidException cnyve)
+        }
+        catch (CertificateNotYetValidException cnyve)
         {
             return false;
         }
@@ -279,19 +291,24 @@ public class X509Manager
         try
         {
             certificate.verify(key);
-        } catch (CertificateException ce)
+        }
+        catch (CertificateException ce)
         {
             return false;
-        } catch (NoSuchAlgorithmException nsae)
+        }
+        catch (NoSuchAlgorithmException nsae)
         {
             return false;
-        } catch (InvalidKeyException ike)
+        }
+        catch (InvalidKeyException ike)
         {
             return false;
-        } catch (NoSuchProviderException nspe)
+        }
+        catch (NoSuchProviderException nspe)
         {
             return false;
-        } catch (SignatureException se)
+        }
+        catch (SignatureException se)
         {
             return false;
         }

@@ -48,11 +48,10 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.dspace.content.Collection;
 
-
 /**
  * Tag for display a list of collections
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class CollectionListTag extends TagSupport
@@ -74,8 +73,8 @@ public class CollectionListTag extends TagSupport
             out.println("<table align=center class=\"miscTable\">");
 
             // Write column headings
-            out.print("<tr><th class=\"oddRowOddCol\">" + "Collection Name" +
-                      "</th></tr>");
+            out.print("<tr><th class=\"oddRowOddCol\">" + "Collection Name"
+                    + "</th></tr>");
 
             // Row: toggles between Odd and Even
             String row = "even";
@@ -89,7 +88,8 @@ public class CollectionListTag extends TagSupport
                 out.print("</td><td class=\"" + row + "RowEvenCol\">");
                 out.print("<A HREF=\"");
 
-                HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
+                HttpServletRequest hrq = (HttpServletRequest) pageContext
+                        .getRequest();
                 out.print(hrq.getContextPath() + "/handle/");
                 out.print(collections[i].getHandle());
                 out.print("\">");
@@ -102,7 +102,8 @@ public class CollectionListTag extends TagSupport
             }
 
             out.println("</table>");
-        } catch (IOException ie)
+        }
+        catch (IOException ie)
         {
             throw new JspException(ie);
         }
@@ -112,7 +113,7 @@ public class CollectionListTag extends TagSupport
 
     /**
      * Get the collections to list
-     *
+     * 
      * @return the collections
      */
     public Collection[] getCollections()
@@ -122,8 +123,9 @@ public class CollectionListTag extends TagSupport
 
     /**
      * Set the collections to list
-     *
-     * @param  collectionsIn  the collections
+     * 
+     * @param collectionsIn
+     *            the collections
      */
     public void setCollections(Collection[] collectionsIn)
     {

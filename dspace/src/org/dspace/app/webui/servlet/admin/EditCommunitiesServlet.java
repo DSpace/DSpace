@@ -68,12 +68,11 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 
-
 /**
  * Servlet for editing communities and collections, including deletion,
  * creation, and metadata editing
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class EditCommunitiesServlet extends DSpaceServlet
@@ -99,7 +98,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
     /** User commited community edit or creation */
     public static final int CONFIRM_EDIT_COMMUNITY = 7;
 
-    /** User confirmed community deletion*/
+    /** User confirmed community deletion */
     public static final int CONFIRM_DELETE_COMMUNITY = 8;
 
     /** User commited collection edit or creation */
@@ -112,24 +111,22 @@ public class EditCommunitiesServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(EditCommunitiesServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // GET just displays the list of communities and collections
         showControls(context, request, response);
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // First, see if we have a multipart request (uploading a logo)
         String contentType = request.getContentType();
 
-        if ((contentType != null) &&
-                (contentType.indexOf("multipart/form-data") != -1))
+        if ((contentType != null)
+                && (contentType.indexOf("multipart/form-data") != -1))
         {
             // This is a multipart request, so it's a file upload
             processUploadLogo(context, request, response);
@@ -138,25 +135,22 @@ public class EditCommunitiesServlet extends DSpaceServlet
         }
 
         /*
-         * Respond to submitted forms.  Each form includes an "action" parameter
+         * Respond to submitted forms. Each form includes an "action" parameter
          * indicating what needs to be done (from the constants above.)
          */
         int action = UIUtil.getIntParameter(request, "action");
 
         /*
-         * Most of the forms supply one or more of these values.  Since we just
-         * get null if we try and find something with ID -1, we'll just try
-         * and find both here to save hassle later on
+         * Most of the forms supply one or more of these values. Since we just
+         * get null if we try and find something with ID -1, we'll just try and
+         * find both here to save hassle later on
          */
-        Community community = Community.find(context,
-                                             UIUtil.getIntParameter(request,
-                                                                    "community_id"));
-        Community parentCommunity = Community.find(context,
-                                                   UIUtil.getIntParameter(request,
-                                                                          "parent_community_id"));
-        Collection collection = Collection.find(context,
-                                                UIUtil.getIntParameter(request,
-                                                                       "collection_id"));
+        Community community = Community.find(context, UIUtil.getIntParameter(
+                request, "community_id"));
+        Community parentCommunity = Community.find(context, UIUtil
+                .getIntParameter(request, "parent_community_id"));
+        Collection collection = Collection.find(context, UIUtil
+                .getIntParameter(request, "collection_id"));
 
         // Just about every JSP will need the values we received
         request.setAttribute("community", community);
@@ -183,131 +177,133 @@ public class EditCommunitiesServlet extends DSpaceServlet
         // Now proceed according to "action" parameter
         switch (action)
         {
-            case START_EDIT_COMMUNITY:
+        case START_EDIT_COMMUNITY:
 
-                // Display the relevant "edit community" page
-                JSPManager.showJSP(request, response,
-                                   "/tools/edit-community.jsp");
+            // Display the relevant "edit community" page
+            JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
 
-                break;
+            break;
 
-            case START_DELETE_COMMUNITY:
+        case START_DELETE_COMMUNITY:
 
-                // Show "confirm delete" page
-                JSPManager.showJSP(request, response,
-                                   "/tools/confirm-delete-community.jsp");
+            // Show "confirm delete" page
+            JSPManager.showJSP(request, response,
+                    "/tools/confirm-delete-community.jsp");
 
-                break;
+            break;
 
-            case START_CREATE_COMMUNITY:
+        case START_CREATE_COMMUNITY:
 
-                // Display edit community page with empty fields + create button
-                JSPManager.showJSP(request, response,
-                                   "/tools/edit-community.jsp");
+            // Display edit community page with empty fields + create button
+            JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
 
-                break;
+            break;
 
-            case START_EDIT_COLLECTION:
+        case START_EDIT_COLLECTION:
 
-                // Display the relevant "edit collection" page
-                JSPManager.showJSP(request, response,
-                                   "/tools/edit-collection.jsp");
+            // Display the relevant "edit collection" page
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
 
-                break;
+            break;
 
-            case START_DELETE_COLLECTION:
+        case START_DELETE_COLLECTION:
 
-                // Show "confirm delete" page
-                JSPManager.showJSP(request, response,
-                                   "/tools/confirm-delete-collection.jsp");
+            // Show "confirm delete" page
+            JSPManager.showJSP(request, response,
+                    "/tools/confirm-delete-collection.jsp");
 
-                break;
+            break;
 
-            case START_CREATE_COLLECTION:
+        case START_CREATE_COLLECTION:
 
-                // Forward to collection creation wizard
-                response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                                 "/tools/collection-wizard?community_id=" +
-                                                                 community.getID()));
+            // Forward to collection creation wizard
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/collection-wizard?community_id="
+                    + community.getID()));
 
-                break;
+            break;
 
-            case CONFIRM_EDIT_COMMUNITY:
+        case CONFIRM_EDIT_COMMUNITY:
 
-                // Edit or creation of a community confirmed
-                processConfirmEditCommunity(context, request, response,
-                                            community);
+            // Edit or creation of a community confirmed
+            processConfirmEditCommunity(context, request, response, community);
 
-                break;
+            break;
 
-            case CONFIRM_DELETE_COMMUNITY:
+        case CONFIRM_DELETE_COMMUNITY:
 
-                // remember the parent community, if any
-                Community parent = community.getParentCommunity();
+            // remember the parent community, if any
+            Community parent = community.getParentCommunity();
 
-                // Delete the community
-                community.delete();
+            // Delete the community
+            community.delete();
 
-                // if community was top-level, redirect to community-list page
-                if (parent == null)
-                {
-                    response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                                     "/community-list"));
-                } else // redirect to parent community page
-                {
-                    response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                                     "/handle/" +
-                                                                     parent.getHandle()));
-                }
+            // if community was top-level, redirect to community-list page
+            if (parent == null)
+            {
+                response.sendRedirect(response.encodeRedirectURL(request
+                        .getContextPath()
+                        + "/community-list"));
+            }
+            else
+            // redirect to parent community page
+            {
+                response.sendRedirect(response.encodeRedirectURL(request
+                        .getContextPath()
+                        + "/handle/" + parent.getHandle()));
+            }
 
-                // Show main control page
-                //showControls(context, request, response);
-                // Commit changes to DB
-                context.complete();
+            // Show main control page
+            //showControls(context, request, response);
+            // Commit changes to DB
+            context.complete();
 
-                break;
+            break;
 
-            case CONFIRM_EDIT_COLLECTION:
+        case CONFIRM_EDIT_COLLECTION:
 
-                // Edit or creation of a collection confirmed
-                processConfirmEditCollection(context, request, response,
-                                             community, collection);
+            // Edit or creation of a collection confirmed
+            processConfirmEditCollection(context, request, response, community,
+                    collection);
 
-                break;
+            break;
 
-            case CONFIRM_DELETE_COLLECTION:
+        case CONFIRM_DELETE_COLLECTION:
 
-                // Delete the collection
-                community.removeCollection(collection);
+            // Delete the collection
+            community.removeCollection(collection);
 
-                // Show main control page
-                showControls(context, request, response);
+            // Show main control page
+            showControls(context, request, response);
 
-                // Commit changes to DB
-                context.complete();
+            // Commit changes to DB
+            context.complete();
 
-                break;
+            break;
 
-            default:
+        default:
 
-                // Erm... weird action value received.
-                log.warn(LogManager.getHeader(context, "integrity_error",
-                                              UIUtil.getRequestLogInfo(request)));
-                JSPManager.showIntegrityError(request, response);
+            // Erm... weird action value received.
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(request)));
+            JSPManager.showIntegrityError(request, response);
         }
     }
 
     /**
      * Show community home page with admin controls
-     *
-     * @param context   Current DSpace context
-     * @param request   Current HTTP request
-     * @param response  Current HTTP response
+     * 
+     * @param context
+     *            Current DSpace context
+     * @param request
+     *            Current HTTP request
+     * @param response
+     *            Current HTTP response
      */
     private void showControls(Context context, HttpServletRequest request,
-                              HttpServletResponse response)
-                       throws ServletException, IOException, SQLException, 
-                              AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // new approach - eliminate the 'list-communities' page in favor of the
         // community home page, enhanced with admin controls. If no community,
@@ -316,49 +312,54 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
         if (community != null)
         {
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/handle/" +
-                                                             community.getHandle()));
-        } else
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/handle/" + community.getHandle()));
+        }
+        else
         {
             // see if a parent community was specified
             Community parent = (Community) request.getAttribute("parent");
 
             if (parent != null)
             {
-                response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                                 "/handle/" +
-                                                                 parent.getHandle()));
-            } else
+                response.sendRedirect(response.encodeRedirectURL(request
+                        .getContextPath()
+                        + "/handle/" + parent.getHandle()));
+            }
+            else
             {
                 // fall back on community-list page
-                response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                                 "/community-list"));
+                response.sendRedirect(response.encodeRedirectURL(request
+                        .getContextPath()
+                        + "/community-list"));
             }
         }
     }
 
     /**
      * Create/update community metadata from a posted form
-     *
-     * @param context     DSpace context
-     * @param request     the HTTP request containing posted info
-     * @param response    the HTTP response
-     * @param community   the community to update (or null for creation)
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            the HTTP request containing posted info
+     * @param response
+     *            the HTTP response
+     * @param community
+     *            the community to update (or null for creation)
      */
     private void processConfirmEditCommunity(Context context,
-                                             HttpServletRequest request,
-                                             HttpServletResponse response,
-                                             Community community)
-                                      throws ServletException, IOException, 
-                                             SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            Community community) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         if (request.getParameter("create").equals("true"))
         {
             // if there is a parent community id specified, create community
             // as its child; otherwise, create it as a top-level community
             int parentCommunityID = UIUtil.getIntParameter(request,
-                                                           "parent_community_id");
+                    "parent_community_id");
 
             if (parentCommunityID != -1)
             {
@@ -368,7 +369,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 {
                     community = parent.createSubcommunity();
                 }
-            } else
+            }
+            else
             {
                 community = Community.create(null, context);
             }
@@ -378,8 +380,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         }
 
         community.setMetadata("name", request.getParameter("name"));
-        community.setMetadata("short_description",
-                              request.getParameter("short_description"));
+        community.setMetadata("short_description", request
+                .getParameter("short_description"));
 
         String intro = request.getParameter("introductory_text");
 
@@ -416,11 +418,12 @@ public class EditCommunitiesServlet extends DSpaceServlet
             community.setLogo(null);
             community.update();
 
-            // Display "upload logo" page.  Necessary attributes already set by
+            // Display "upload logo" page. Necessary attributes already set by
             // doDSPost()
             JSPManager.showJSP(request, response,
-                               "/dspace-admin/upload-logo.jsp");
-        } else if (button.equals("submit_delete_logo"))
+                    "/dspace-admin/upload-logo.jsp");
+        }
+        else if (button.equals("submit_delete_logo"))
         {
             // Simply delete logo
             community.setLogo(null);
@@ -428,14 +431,16 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Show edit page again - attributes set in doDSPost()
             JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
-        } else if (button.equals("submit_authorization_edit"))
+        }
+        else if (button.equals("submit_authorization_edit"))
         {
             // Forward to policy edit page
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/dspace-admin/authorize?community_id=" +
-                                                             community.getID() +
-                                                             "&submit_community_select=1"));
-        } else
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/dspace-admin/authorize?community_id="
+                    + community.getID() + "&submit_community_select=1"));
+        }
+        else
         {
             // Button at bottom clicked - show main control page
             showControls(context, request, response);
@@ -447,20 +452,23 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
     /**
      * Create/update collection metadata from a posted form
-     *
-     * @param context     DSpace context
-     * @param request     the HTTP request containing posted info
-     * @param response    the HTTP response
-     * @param community   the community the collection is in
-     * @param collection  the collection to update (or null for creation)
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            the HTTP request containing posted info
+     * @param response
+     *            the HTTP response
+     * @param community
+     *            the community the collection is in
+     * @param collection
+     *            the collection to update (or null for creation)
      */
     private void processConfirmEditCollection(Context context,
-                                              HttpServletRequest request,
-                                              HttpServletResponse response,
-                                              Community community,
-                                              Collection collection)
-                                       throws ServletException, IOException, 
-                                              SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response,
+            Community community, Collection collection)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         if (request.getParameter("create").equals("true"))
         {
@@ -471,8 +479,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
         // Update the basic metadata
         collection.setMetadata("name", request.getParameter("name"));
-        collection.setMetadata("short_description",
-                               request.getParameter("short_description"));
+        collection.setMetadata("short_description", request
+                .getParameter("short_description"));
 
         String intro = request.getParameter("introductory_text");
 
@@ -523,82 +531,91 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Change the logo - delete any that might be there first
             collection.setLogo(null);
 
-            // Display "upload logo" page.  Necessary attributes already set by
+            // Display "upload logo" page. Necessary attributes already set by
             // doDSPost()
             JSPManager.showJSP(request, response,
-                               "/dspace-admin/upload-logo.jsp");
-        } else if (button.equals("submit_delete_logo"))
+                    "/dspace-admin/upload-logo.jsp");
+        }
+        else if (button.equals("submit_delete_logo"))
         {
             // Simply delete logo
             collection.setLogo(null);
 
             // Show edit page again - attributes set in doDSPost()
             JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
-        } else if (button.startsWith("submit_wf_create_"))
+        }
+        else if (button.startsWith("submit_wf_create_"))
         {
             int step = Integer.parseInt(button.substring(17));
 
             // Create new group
             Group newGroup = Group.create(context);
-            newGroup.setName("COLLECTION_" + collection.getID() + "_WFSTEP_" +
-                             step);
+            newGroup.setName("COLLECTION_" + collection.getID() + "_WFSTEP_"
+                    + step);
             newGroup.update();
             collection.setWorkflowGroup(step, newGroup);
             collection.update();
 
             // Forward to group edit page
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/tools/group-edit?group_id=" +
-                                                             newGroup.getID()));
-        } else if (button.equals("submit_admins_create"))
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/group-edit?group_id=" + newGroup.getID()));
+        }
+        else if (button.equals("submit_admins_create"))
         {
             // Create new group
             Group newGroup = collection.createAdministrators();
 
             // Forward to group edit page
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/tools/group-edit?group_id=" +
-                                                             newGroup.getID()));
-        } else if (button.equals("submit_submitters_create"))
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/group-edit?group_id=" + newGroup.getID()));
+        }
+        else if (button.equals("submit_submitters_create"))
         {
             // Create new group
             Group newGroup = collection.createSubmitters();
 
             // Forward to group edit page
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/tools/group-edit?group_id=" +
-                                                             newGroup.getID()));
-        } else if (button.equals("submit_authorization_edit"))
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/group-edit?group_id=" + newGroup.getID()));
+        }
+        else if (button.equals("submit_authorization_edit"))
         {
             // Forward to policy edit page
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/dspace-admin/authorize?collection_id=" +
-                                                             collection.getID() +
-                                                             "&submit_collection_select=1"));
-        } else if (button.startsWith("submit_wf_edit_"))
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/dspace-admin/authorize?collection_id="
+                    + collection.getID() + "&submit_collection_select=1"));
+        }
+        else if (button.startsWith("submit_wf_edit_"))
         {
             int step = Integer.parseInt(button.substring(15));
 
             // Edit workflow group
             Group g = collection.getWorkflowGroup(step);
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/tools/group-edit?group_id=" +
-                                                             g.getID()));
-        } else if (button.equals("submit_submitters_edit"))
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/group-edit?group_id=" + g.getID()));
+        }
+        else if (button.equals("submit_submitters_edit"))
         {
             // Edit submitters group
             Group g = collection.getSubmitters();
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/tools/group-edit?group_id=" +
-                                                             g.getID()));
-        } else if (button.equals("submit_admins_edit"))
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/group-edit?group_id=" + g.getID()));
+        }
+        else if (button.equals("submit_admins_edit"))
         {
             // Edit 'collection administrators' group
             Group g = collection.getAdministrators();
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/tools/group-edit?group_id=" +
-                                                             g.getID()));
-        } else if (button.startsWith("submit_wf_delete_"))
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/group-edit?group_id=" + g.getID()));
+        }
+        else if (button.startsWith("submit_wf_delete_"))
         {
             // Delete workflow group
             int step = Integer.parseInt(button.substring(17));
@@ -612,7 +629,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Show edit page again - attributes set in doDSPost()
             JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
-        } else if (button.equals("submit_create_template"))
+        }
+        else if (button.equals("submit_create_template"))
         {
             // Create a template item
             collection.createTemplateItem();
@@ -625,25 +643,28 @@ public class EditCommunitiesServlet extends DSpaceServlet
             i.update();
             collection.update();
             context.complete();
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/tools/edit-item?item_id=" +
-                                                             i.getID()));
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/edit-item?item_id=" + i.getID()));
 
             return;
-        } else if (button.equals("submit_edit_template"))
+        }
+        else if (button.equals("submit_edit_template"))
         {
             // Forward to edit page for template item
             Item i = collection.getTemplateItem();
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/tools/edit-item?item_id=" +
-                                                             i.getID()));
-        } else if (button.equals("submit_delete_template"))
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/edit-item?item_id=" + i.getID()));
+        }
+        else if (button.equals("submit_delete_template"))
         {
             collection.removeTemplateItem();
 
             // Show edit page again - attributes set in doDSPost()
             JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
-        } else
+        }
+        else
         {
             // Plain old "create/update" button pressed - go back to main page
             showControls(context, request, response);
@@ -656,25 +677,25 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
     /**
      * Process the input from the upload logo page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
      */
     private void processUploadLogo(Context context, HttpServletRequest request,
-                                   HttpServletResponse response)
-                            throws ServletException, IOException, SQLException, 
-                                   AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Wrap multipart request to get the submission info
         FileUploadRequest wrapper = new FileUploadRequest(request);
 
-        Community community = Community.find(context,
-                                             UIUtil.getIntParameter(wrapper,
-                                                                    "community_id"));
-        Collection collection = Collection.find(context,
-                                                UIUtil.getIntParameter(wrapper,
-                                                                       "collection_id"));
+        Community community = Community.find(context, UIUtil.getIntParameter(
+                wrapper, "community_id"));
+        Collection collection = Collection.find(context, UIUtil
+                .getIntParameter(wrapper, "collection_id"));
 
         File temp = wrapper.getFile("file");
 
@@ -685,12 +706,13 @@ public class EditCommunitiesServlet extends DSpaceServlet
         if (collection == null)
         {
             logoBS = community.setLogo(is);
-        } else
+        }
+        else
         {
             logoBS = collection.setLogo(is);
         }
 
-        // Strip all but the last filename.  It would be nice
+        // Strip all but the last filename. It would be nice
         // to know which OS the file came from.
         String noPath = wrapper.getFilesystemName("file");
 
@@ -710,8 +732,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         // Identify the format
         BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
         logoBS.setFormat(bf);
-        AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE,
-                                   context.getCurrentUser());
+        AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context
+                .getCurrentUser());
         logoBS.update();
 
         if (AuthorizeManager.isAdmin(context))
@@ -727,7 +749,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Show community edit page
             request.setAttribute("community", community);
             JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
-        } else
+        }
+        else
         {
             collection.update();
 

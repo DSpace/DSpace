@@ -39,10 +39,9 @@
  */
 package org.dspace.content;
 
-
 /**
  * Series and report number, as stored in relation.ispartofseries
- *
+ * 
  * @author Robert Tansley
  * @version $Id$
  */
@@ -63,8 +62,9 @@ public class DCSeriesNumber
 
     /**
      * Construct from raw DC value
-     *
-     * @param value  value from database
+     * 
+     * @param value
+     *            value from database
      */
     public DCSeriesNumber(String value)
     {
@@ -81,7 +81,8 @@ public class DCSeriesNumber
         {
             series = value.substring(0, semicolon);
             number = value.substring(semicolon + 1);
-        } else
+        }
+        else
         {
             series = value;
         }
@@ -89,9 +90,11 @@ public class DCSeriesNumber
 
     /**
      * Construct from given values
-     *
-     * @param s  the series
-     * @param n  the number
+     * 
+     * @param s
+     *            the series
+     * @param n
+     *            the number
      */
     public DCSeriesNumber(String s, String n)
     {
@@ -101,7 +104,7 @@ public class DCSeriesNumber
 
     /**
      * Write as raw DC value
-     *
+     * 
      * @return the series and number as they should be stored in the DB
      */
     public String toString()
@@ -109,10 +112,12 @@ public class DCSeriesNumber
         if (series == null)
         {
             return (null);
-        } else if (number == null)
+        }
+        else if (number == null)
         {
             return (series);
-        } else
+        }
+        else
         {
             return (series + ";" + number);
         }

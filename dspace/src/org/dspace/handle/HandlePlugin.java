@@ -58,20 +58,21 @@ import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
-
 /**
  * Extension to the CNRI Handle Server that translates requests to resolve
- * handles into DSpace API calls. The implementation simply stubs out most
- * of the methods, and delegates the rest to the
- * {@link org.dspace.handle.HandleManager}. This only provides some of
- * the functionality (namely, the resolving of handles to URLs) of the
- * CNRI HandleStorage interface.
- *
- * <p>This class is intended to be embedded in the CNRI Handle Server.
- * It conforms to the HandleStorage interface that was delivered
- * with Handle Server version 5.2.0.</p>
- *
- * @author  Peter Breton
+ * handles into DSpace API calls. The implementation simply stubs out most of
+ * the methods, and delegates the rest to the
+ * {@link org.dspace.handle.HandleManager}. This only provides some of the
+ * functionality (namely, the resolving of handles to URLs) of the CNRI
+ * HandleStorage interface.
+ * 
+ * <p>
+ * This class is intended to be embedded in the CNRI Handle Server. It conforms
+ * to the HandleStorage interface that was delivered with Handle Server version
+ * 5.2.0.
+ * </p>
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class HandlePlugin implements HandleStorage
@@ -106,7 +107,7 @@ public class HandlePlugin implements HandleStorage
      * HandleStorage interface method - not implemented.
      */
     public void setHaveNA(byte[] theHandle, boolean haveit)
-                   throws HandleException
+            throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
@@ -119,7 +120,7 @@ public class HandlePlugin implements HandleStorage
      * HandleStorage interface method - not implemented.
      */
     public void createHandle(byte[] theHandle, HandleValue[] values)
-                      throws HandleException
+            throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
@@ -146,7 +147,7 @@ public class HandlePlugin implements HandleStorage
      * HandleStorage interface method - not implemented.
      */
     public void updateValue(byte[] theHandle, HandleValue[] values)
-                     throws HandleException
+            throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
@@ -220,20 +221,22 @@ public class HandlePlugin implements HandleStorage
     ////////////////////////////////////////
 
     /**
-     * Return the raw values for this handle.
-     * This implementation returns a single URL value.
-     *
-     * @param theHandle byte array representation of handle
-     * @param indexList ignored
-     * @param typeList ignored
-     * @return A byte array with the raw data for this handle.
-     * Currently, this consists of a single URL value.
-     * @exception HandleException If an error occurs while calling the
-     * Handle API.
+     * Return the raw values for this handle. This implementation returns a
+     * single URL value.
+     * 
+     * @param theHandle
+     *            byte array representation of handle
+     * @param indexList
+     *            ignored
+     * @param typeList
+     *            ignored
+     * @return A byte array with the raw data for this handle. Currently, this
+     *         consists of a single URL value.
+     * @exception HandleException
+     *                If an error occurs while calling the Handle API.
      */
     public byte[][] getRawHandleValues(byte[] theHandle, int[] indexList,
-                                       byte[][] typeList)
-                                throws HandleException
+            byte[][] typeList) throws HandleException
     {
         if (log.isInfoEnabled())
         {
@@ -289,10 +292,12 @@ public class HandlePlugin implements HandleStorage
             }
 
             return rawValues;
-        } catch (HandleException he)
+        }
+        catch (HandleException he)
         {
             throw he;
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             if (log.isDebugEnabled())
             {
@@ -300,14 +305,16 @@ public class HandlePlugin implements HandleStorage
             }
 
             throw new HandleException(HandleException.INTERNAL_ERROR);
-        } finally
+        }
+        finally
         {
             if (context != null)
             {
                 try
                 {
                     context.complete();
-                } catch (SQLException sqle)
+                }
+                catch (SQLException sqle)
                 {
                 }
             }
@@ -316,11 +323,12 @@ public class HandlePlugin implements HandleStorage
 
     /**
      * Return true if we have this handle in storage.
-     *
-     * @param theHandle byte array representation of handle
+     * 
+     * @param theHandle
+     *            byte array representation of handle
      * @return True if we have this handle in storage
-     * @exception HandleException If an error occurs while calling the
-     * Handle API.
+     * @exception HandleException
+     *                If an error occurs while calling the Handle API.
      */
     public boolean haveNA(byte[] theHandle) throws HandleException
     {
@@ -331,19 +339,19 @@ public class HandlePlugin implements HandleStorage
 
         /*
          * Naming authority Handles are in the form: 0.NA/1721.1234
-         *
-         * 0.NA is basically the naming authority for naming authorities.
-         * For this simple implementation, we will just check that the prefix
-         * configured in dspace.cfg is the one in the request, returning true
-         * if this is the case, false otherwise.
-         *
+         * 
+         * 0.NA is basically the naming authority for naming authorities. For
+         * this simple implementation, we will just check that the prefix
+         * configured in dspace.cfg is the one in the request, returning true if
+         * this is the case, false otherwise.
+         * 
          * FIXME: For more complex Handle situations, this will need enhancing.
          */
 
         // First, construct a string representating the naming authority Handle
         // we'd expect.
-        String expected = "0.NA/" +
-                          ConfigurationManager.getProperty("handle.prefix");
+        String expected = "0.NA/"
+                + ConfigurationManager.getProperty("handle.prefix");
 
         // Which authority does the request pertain to?
         String received = Util.decodeString(theHandle);
@@ -353,18 +361,18 @@ public class HandlePlugin implements HandleStorage
     }
 
     /**
-     * Return all handles in local storage which start with the naming
-     * authority handle.
-     *
-     * @param theNAHandle byte array representation of naming authority
-     * handle
+     * Return all handles in local storage which start with the naming authority
+     * handle.
+     * 
+     * @param theNAHandle
+     *            byte array representation of naming authority handle
      * @return All handles in local storage which start with the naming
-     * authority handle.
-     * @exception HandleException If an error occurs while calling the
-     * Handle API.
+     *         authority handle.
+     * @exception HandleException
+     *                If an error occurs while calling the Handle API.
      */
     public Enumeration getHandlesForNA(byte[] theNAHandle)
-                                throws HandleException
+            throws HandleException
     {
         String naHandle = Util.decodeString(theNAHandle);
 
@@ -391,7 +399,8 @@ public class HandlePlugin implements HandleStorage
             }
 
             return Collections.enumeration(results);
-        } catch (SQLException sqle)
+        }
+        catch (SQLException sqle)
         {
             if (log.isDebugEnabled())
             {
@@ -399,14 +408,16 @@ public class HandlePlugin implements HandleStorage
             }
 
             throw new HandleException(HandleException.INTERNAL_ERROR);
-        } finally
+        }
+        finally
         {
             if (context != null)
             {
                 try
                 {
                     context.complete();
-                } catch (SQLException sqle)
+                }
+                catch (SQLException sqle)
                 {
                 }
             }

@@ -57,16 +57,17 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
  * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
- * System</a>.
- *
- * <p>Currently, this class simply maps handles to local facilities;
- * handles which are owned by other sites (including other DSpaces) are
- * treated as non-existent.</p>
- *
- * @author  Peter Breton
+ * System </a>.
+ * 
+ * <p>
+ * Currently, this class simply maps handles to local facilities; handles which
+ * are owned by other sites (including other DSpaces) are treated as
+ * non-existent.
+ * </p>
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class HandleManager
@@ -74,24 +75,27 @@ public class HandleManager
     /** log4j category */
     private static Logger log = Logger.getLogger(HandleManager.class);
 
-    /** Private Constructor  */
+    /** Private Constructor */
     private HandleManager()
     {
     }
 
     /**
      * Return the local URL for handle, or null if handle cannot be found.
-     *
-     * The returned URL is a (non-handle-based) location where a
-     * dissemination of the object referred to by handle can be obtained.
-     *
-     * @param context DSpace context
-     * @param handle The handle
+     * 
+     * The returned URL is a (non-handle-based) location where a dissemination
+     * of the object referred to by handle can be obtained.
+     * 
+     * @param context
+     *            DSpace context
+     * @param handle
+     *            The handle
      * @return The local URL
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static String resolveToURL(Context context, String handle)
-                               throws SQLException
+            throws SQLException
     {
         TableRow dbhandle = findHandleInternal(context, handle);
 
@@ -100,8 +104,8 @@ public class HandleManager
             return null;
         }
 
-        String url = ConfigurationManager.getProperty("dspace.url") +
-                     "/handle/" + handle;
+        String url = ConfigurationManager.getProperty("dspace.url")
+                + "/handle/" + handle;
 
         if (log.isDebugEnabled())
         {
@@ -113,10 +117,11 @@ public class HandleManager
 
     /**
      * Transforms handle into the canonical form <em>hdl:handle</em>.
-     *
+     * 
      * No attempt is made to verify that handle is in fact valid.
-     *
-     * @param handle The handle
+     * 
+     * @param handle
+     *            The handle
      * @return The canonical form
      */
     public static String getCanonicalForm(String handle)
@@ -139,17 +144,19 @@ public class HandleManager
     //    {
     //        return "http://hdl.handle.net/" + handle;
     //    }
-
     /**
      * Creates a new handle in the database.
-     *
-     * @param context DSpace context
-     * @param dso The DSpaceObject to create a handle for
+     * 
+     * @param context
+     *            DSpace context
+     * @param dso
+     *            The DSpaceObject to create a handle for
      * @return The newly created handle
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static String createHandle(Context context, DSpaceObject dso)
-                               throws SQLException
+            throws SQLException
     {
         TableRow handle = DatabaseManager.create(context, "Handle");
         String handleId = createId(handle.getIntColumn("handle_id"));
@@ -161,8 +168,8 @@ public class HandleManager
 
         if (log.isDebugEnabled())
         {
-            log.debug("Created new handle for " +
-                      Constants.typeText[dso.getType()] + " " + handleId);
+            log.debug("Created new handle for "
+                    + Constants.typeText[dso.getType()] + " " + handleId);
         }
 
         return handleId;
@@ -170,14 +177,15 @@ public class HandleManager
 
     /**
      * Creates a handle entry, but with a handle supplied by the caller
-     *
-     * @param context DSpace context
-     * @param dso DSpaceObject
+     * 
+     * @param context
+     *            DSpace context
+     * @param dso
+     *            DSpaceObject
      * @param supppliedHandle
      */
     public static String createHandle(Context context, DSpaceObject dso,
-                                      String suppliedHandle)
-                               throws SQLException
+            String suppliedHandle) throws SQLException
     {
         TableRow handle = DatabaseManager.create(context, "Handle");
         String handleId = suppliedHandle;
@@ -189,25 +197,28 @@ public class HandleManager
 
         if (log.isDebugEnabled())
         {
-            log.debug("Created new handle for " +
-                      Constants.typeText[dso.getType()] + " " + handleId);
+            log.debug("Created new handle for "
+                    + Constants.typeText[dso.getType()] + " " + handleId);
         }
 
         return handleId;
     }
 
     /**
-     * Return the object which handle maps to, or null.
-     * This is the object itself, not a URL which points to it.
-     *
-     * @param context DSpace context
-     * @param handle The handle to resolve
-     * @return The object which handle maps to, or null if handle
-     * is not mapped to any object.
-     * @exception SQLException If a database error occurs
+     * Return the object which handle maps to, or null. This is the object
+     * itself, not a URL which points to it.
+     * 
+     * @param context
+     *            DSpace context
+     * @param handle
+     *            The handle to resolve
+     * @return The object which handle maps to, or null if handle is not mapped
+     *         to any object.
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static DSpaceObject resolveToObject(Context context, String handle)
-                                        throws SQLException
+            throws SQLException
     {
         TableRow dbhandle = findHandleInternal(context, handle);
 
@@ -216,8 +227,8 @@ public class HandleManager
             return null;
         }
 
-        if ((dbhandle.isColumnNull("resource_type_id")) ||
-                (dbhandle.isColumnNull("resource_id")))
+        if ((dbhandle.isColumnNull("resource_type_id"))
+                || (dbhandle.isColumnNull("resource_id")))
         {
             throw new IllegalStateException("No associated resource type");
         }
@@ -232,50 +243,54 @@ public class HandleManager
 
             if (log.isDebugEnabled())
             {
-                log.debug("Resolved handle " + handle + " to item " +
-                          ((item == null) ? (-1) : item.getID()));
+                log.debug("Resolved handle " + handle + " to item "
+                        + ((item == null) ? (-1) : item.getID()));
             }
 
             return item;
-        } else if (handletypeid == Constants.COLLECTION)
+        }
+        else if (handletypeid == Constants.COLLECTION)
         {
             Collection collection = Collection.find(context, resourceID);
 
             if (log.isDebugEnabled())
             {
-                log.debug("Resolved handle " + handle + " to collection " +
-                          ((collection == null) ? (-1) : collection.getID()));
+                log.debug("Resolved handle " + handle + " to collection "
+                        + ((collection == null) ? (-1) : collection.getID()));
             }
 
             return collection;
-        } else if (handletypeid == Constants.COMMUNITY)
+        }
+        else if (handletypeid == Constants.COMMUNITY)
         {
             Community community = Community.find(context, resourceID);
 
             if (log.isDebugEnabled())
             {
-                log.debug("Resolved handle " + handle + " to community " +
-                          ((community == null) ? (-1) : community.getID()));
+                log.debug("Resolved handle " + handle + " to community "
+                        + ((community == null) ? (-1) : community.getID()));
             }
 
             return community;
         }
 
-        throw new IllegalStateException("Unsupported Handle Type " +
-                                        Constants.typeText[handletypeid]);
+        throw new IllegalStateException("Unsupported Handle Type "
+                + Constants.typeText[handletypeid]);
     }
 
     /**
-     * Return the handle for an Object, or null if the Object has no
-     * handle.
-     *
-     * @param context DSpace context
-     * @param obj The object to obtain a handle for
+     * Return the handle for an Object, or null if the Object has no handle.
+     * 
+     * @param context
+     *            DSpace context
+     * @param obj
+     *            The object to obtain a handle for
      * @return The handle for object, or null if the object has no handle.
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     public static String findHandle(Context context, DSpaceObject dso)
-                             throws SQLException
+            throws SQLException
     {
         //        if (!(obj instanceof Item))
         //            return null;
@@ -285,19 +300,21 @@ public class HandleManager
 
     /**
      * Return all the handles which start with prefix.
-     *
-     * @param context DSpace context
-     * @param prefix The handle prefix
-     * @return A list of the handles starting with prefix. The
-     * list is guaranteed to be non-null. Each element of the list
-     * is a String.
-     * @exception SQLException If a database error occurs
+     * 
+     * @param context
+     *            DSpace context
+     * @param prefix
+     *            The handle prefix
+     * @return A list of the handles starting with prefix. The list is
+     *         guaranteed to be non-null. Each element of the list is a String.
+     * @exception SQLException
+     *                If a database error occurs
      */
     static List getHandlesForPrefix(Context context, String prefix)
-                             throws SQLException
+            throws SQLException
     {
-        String sql = "SELECT handle FROM handle WHERE handle LIKE " + prefix +
-                     "%";
+        String sql = "SELECT handle FROM handle WHERE handle LIKE " + prefix
+                + "%";
         TableRowIterator iterator = DatabaseManager.query(context, null, sql);
         List results = new ArrayList();
 
@@ -315,22 +332,24 @@ public class HandleManager
     ////////////////////////////////////////
 
     /**
-     * Return the handle for an Object, or null if the Object has no
-     * handle.
-     *
-     * @param context DSpace context
-     * @param type The type of object
-     * @param id The id of object
+     * Return the handle for an Object, or null if the Object has no handle.
+     * 
+     * @param context
+     *            DSpace context
+     * @param type
+     *            The type of object
+     * @param id
+     *            The id of object
      * @return The handle for object, or null if the object has no handle.
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     private static String getHandleInternal(Context context, int type, int id)
-                                     throws SQLException
+            throws SQLException
     {
-        String sql = new StringBuffer().append("SELECT handle FROM Handle WHERE resource_type_id = ")
-                                       .append(type)
-                                       .append(" AND resource_id = ").append(id)
-                                       .toString();
+        String sql = new StringBuffer().append(
+                "SELECT handle FROM Handle WHERE resource_type_id = ").append(
+                type).append(" AND resource_id = ").append(id).toString();
 
         TableRow row = DatabaseManager.querySingle(context, null, sql);
 
@@ -339,36 +358,40 @@ public class HandleManager
 
     /**
      * Find the database row corresponding to handle.
-     *
-     * @param context DSpace context
-     * @param handle The handle to resolve
+     * 
+     * @param context
+     *            DSpace context
+     * @param handle
+     *            The handle to resolve
      * @return The database row corresponding to the handle
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     private static TableRow findHandleInternal(Context context, String handle)
-                                        throws SQLException
+            throws SQLException
     {
         if (handle == null)
         {
             throw new IllegalArgumentException("Handle is null");
         }
 
-        return DatabaseManager.findByUnique(context, "Handle", "handle", handle);
+        return DatabaseManager
+                .findByUnique(context, "Handle", "handle", handle);
     }
 
     /**
-     * Create a new handle id. The implementation uses the PK of
-     * the RDBMS Handle table.
-     *
+     * Create a new handle id. The implementation uses the PK of the RDBMS
+     * Handle table.
+     * 
      * @return A new handle id
-     * @exception SQLException If a database error occurs
+     * @exception SQLException
+     *                If a database error occurs
      */
     private static String createId(int id) throws SQLException
     {
         String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
 
-        return new StringBuffer().append(handlePrefix)
-                                 .append(handlePrefix.endsWith("/") ? "" : "/")
-                                 .append(id).toString();
+        return new StringBuffer().append(handlePrefix).append(
+                handlePrefix.endsWith("/") ? "" : "/").append(id).toString();
     }
 }

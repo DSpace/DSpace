@@ -43,13 +43,11 @@ import java.io.FileReader;
 
 import org.apache.log4j.Logger;
 
-
 /**
- * Command-line executed class for initializing the DSpace database.  This
- * should be invoked with a single argument, the filename of the database
- * schema file.
- *
- * @author  Robert Tansley
+ * Command-line executed class for initializing the DSpace database. This should
+ * be invoked with a single argument, the filename of the database schema file.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class InitializeDatabase
@@ -72,7 +70,8 @@ public class InitializeDatabase
         {
             DatabaseManager.loadSql(new FileReader(argv[0]));
             System.exit(0);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             log.fatal("Caught exception:", e);
             System.exit(1);

@@ -57,17 +57,15 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
-
 /**
  * Class representing bitstreams stored in the DSpace system.
  * <P>
  * When modifying the bitstream metadata, changes are not reflected in the
- * database until <code>update</code> is called.  Note that you cannot alter
+ * database until <code>update</code> is called. Note that you cannot alter
  * the contents of a bitstream; you need to create a new bitstream.
- *
- * @author   Robert Tansley
- * @version  $Revision$
+ * 
+ * @author Robert Tansley
+ * @version $Revision$
  */
 public class Bitstream extends DSpaceObject
 {
@@ -84,11 +82,13 @@ public class Bitstream extends DSpaceObject
     private BitstreamFormat bitstreamFormat;
 
     /**
-     * Private constructor for creating a Bitstream object
-     * based on the contents of a DB table row.
-     *
-     * @param context  the context this object exists in
-     * @param row      the corresponding row in the table
+     * Private constructor for creating a Bitstream object based on the contents
+     * of a DB table row.
+     * 
+     * @param context
+     *            the context this object exists in
+     * @param row
+     *            the corresponding row in the table
      * @throws SQLException
      */
     Bitstream(Context context, TableRow row) throws SQLException
@@ -97,8 +97,8 @@ public class Bitstream extends DSpaceObject
         bRow = row;
 
         // Get the bitstream format
-        bitstreamFormat = BitstreamFormat.find(context,
-                                               row.getIntColumn("bitstream_format_id"));
+        bitstreamFormat = BitstreamFormat.find(context, row
+                .getIntColumn("bitstream_format_id"));
 
         if (bitstreamFormat == null)
         {
@@ -117,20 +117,22 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Get a bitstream from the database.  The bitstream metadata is
-     * loaded into memory.
-     *
-     * @param  context  DSpace context object
-     * @param  id       ID of the bitstream
-     *
-     * @return  the bitstream, or null if the ID is invalid.
+     * Get a bitstream from the database. The bitstream metadata is loaded into
+     * memory.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param id
+     *            ID of the bitstream
+     * 
+     * @return the bitstream, or null if the ID is invalid.
      * @throws SQLException
      */
-    public static Bitstream find(Context context, int id)
-                          throws SQLException
+    public static Bitstream find(Context context, int id) throws SQLException
     {
         // First check the cache
-        Bitstream fromCache = (Bitstream) context.fromCache(Bitstream.class, id);
+        Bitstream fromCache = (Bitstream) context
+                .fromCache(Bitstream.class, id);
 
         if (fromCache != null)
         {
@@ -144,7 +146,7 @@ public class Bitstream extends DSpaceObject
             if (log.isDebugEnabled())
             {
                 log.debug(LogManager.getHeader(context, "find_bitstream",
-                                               "not_found,bitstream_id=" + id));
+                        "not_found,bitstream_id=" + id));
             }
 
             return null;
@@ -154,34 +156,35 @@ public class Bitstream extends DSpaceObject
         if (log.isDebugEnabled())
         {
             log.debug(LogManager.getHeader(context, "find_bitstream",
-                                           "bitstream_id=" + id));
+                    "bitstream_id=" + id));
         }
 
         return new Bitstream(context, row);
     }
 
     /**
-     * Create a new bitstream, with a new ID.  The checksum and file size
-     * are calculated.  This method is not public, and does not check
-     * authorisation; other methods such as Bundle.createBitstream() will
-     * check authorisation.  The newly created bitstream has the "unknown"
-     * format.
-     *
-     * @param  context   DSpace context object
-     * @param  is        the bits to put in the bitstream
-     *
-     * @return  the newly created bitstream
+     * Create a new bitstream, with a new ID. The checksum and file size are
+     * calculated. This method is not public, and does not check authorisation;
+     * other methods such as Bundle.createBitstream() will check authorisation.
+     * The newly created bitstream has the "unknown" format.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param is
+     *            the bits to put in the bitstream
+     * 
+     * @return the newly created bitstream
      * @throws IOException
      * @throws SQLException
      */
     static Bitstream create(Context context, InputStream is)
-                     throws IOException, SQLException
+            throws IOException, SQLException
     {
         // Store the bits
         int bitstreamID = BitstreamStorageManager.store(context, is);
 
         log.info(LogManager.getHeader(context, "create_bitstream",
-                                      "bitstream_id=" + bitstreamID));
+                "bitstream_id=" + bitstreamID));
 
         // Set the format to "unknown"
         Bitstream bitstream = find(context, bitstreamID);
@@ -192,7 +195,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the internal identifier of this bitstream
-     *
+     * 
      * @return the internal identifier
      */
     public int getID()
@@ -208,7 +211,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the sequence ID of this bitstream
-     *
+     * 
      * @return the sequence ID
      */
     public int getSequenceID()
@@ -218,8 +221,9 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Set the sequence ID of this bitstream
-     *
-     * @param  sid  the ID
+     * 
+     * @param sid
+     *            the ID
      */
     public void setSequenceID(int sid)
     {
@@ -227,10 +231,10 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Get the name of this bitstream - typically the filename, without
-     * any path information
-     *
-     * @return  the name of the bitstream
+     * Get the name of this bitstream - typically the filename, without any path
+     * information
+     * 
+     * @return the name of the bitstream
      */
     public String getName()
     {
@@ -239,8 +243,9 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Set the name of the bitstream
-     *
-     * @param  n   the new name of the bitstream
+     * 
+     * @param n
+     *            the new name of the bitstream
      */
     public void setName(String n)
     {
@@ -248,11 +253,11 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Get the source of this bitstream - typically the filename with
-     * path information (if originally provided) or the name of the tool
-     * that generated this bitstream
-     *
-     * @return  the source of the bitstream
+     * Get the source of this bitstream - typically the filename with path
+     * information (if originally provided) or the name of the tool that
+     * generated this bitstream
+     * 
+     * @return the source of the bitstream
      */
     public String getSource()
     {
@@ -261,8 +266,9 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Set the source of the bitstream
-     *
-     * @param  n   the new source of the bitstream
+     * 
+     * @param n
+     *            the new source of the bitstream
      */
     public void setSource(String n)
     {
@@ -272,8 +278,8 @@ public class Bitstream extends DSpaceObject
     /**
      * Get the description of this bitstream - optional free text, typically
      * provided by a user at submission time
-     *
-     * @return  the description of the bitstream
+     * 
+     * @return the description of the bitstream
      */
     public String getDescription()
     {
@@ -282,8 +288,9 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Set the description of the bitstream
-     *
-     * @param  n   the new description of the bitstream
+     * 
+     * @param n
+     *            the new description of the bitstream
      */
     public void setDescription(String n)
     {
@@ -292,7 +299,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the checksum of the content of the bitstream, for integrity checking
-     *
+     * 
      * @return the checksum
      */
     public String getChecksum()
@@ -302,7 +309,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the algorithm used to calculate the checksum
-     *
+     * 
      * @return the algorithm, e.g. "MD5"
      */
     public String getChecksumAlgorithm()
@@ -312,8 +319,8 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the size of the bitstream
-     *
-     * @return  the size in bytes
+     * 
+     * @return the size in bytes
      */
     public int getSize()
     {
@@ -327,10 +334,11 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Set the user's format description.  This implies that the format of the
+     * Set the user's format description. This implies that the format of the
      * bitstream is uncertain, and the format is set to "unknown."
-     *
-     * @param desc   the user's description of the format
+     * 
+     * @param desc
+     *            the user's description of the format
      * @throws SQLException
      */
     public void setUserFormatDescription(String desc) throws SQLException
@@ -342,9 +350,9 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Get the user's format description.  Returns null if the format is known
-     * by the system.
-     *
+     * Get the user's format description. Returns null if the format is known by
+     * the system.
+     * 
      * @return the user's format description.
      */
     public String getUserFormatDescription()
@@ -355,7 +363,7 @@ public class Bitstream extends DSpaceObject
     /**
      * Get the description of the format - either the user's or the description
      * of the format defined by the system.
-     *
+     * 
      * @return a description of the format.
      */
     public String getFormatDescription()
@@ -379,8 +387,8 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the format of the bitstream
-     *
-     * @return   the format of this bitstream
+     * 
+     * @return the format of this bitstream
      */
     public BitstreamFormat getFormat()
     {
@@ -388,11 +396,12 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Set the format of the bitstream.  If the user has supplied a type
-     * description, it is cleared.  Passing in <code>null</code> sets the
-     * type of this bitstream to "unknown".
-     *
-     * @param  f  the format of this bitstream, or <code>null</code> for
+     * Set the format of the bitstream. If the user has supplied a type
+     * description, it is cleared. Passing in <code>null</code> sets the type
+     * of this bitstream to "unknown".
+     * 
+     * @param f
+     *            the format of this bitstream, or <code>null</code> for
      *            unknown
      * @throws SQLException
      */
@@ -404,7 +413,8 @@ public class Bitstream extends DSpaceObject
         {
             // Use "Unknown" format
             bitstreamFormat = BitstreamFormat.findUnknown(bContext);
-        } else
+        }
+        else
         {
             bitstreamFormat = f;
         }
@@ -417,8 +427,9 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Update the bitstream metadata.  Note that the content of the bitstream
+     * Update the bitstream metadata. Note that the content of the bitstream
      * cannot be changed - for that you need to create a new bitstream.
+     * 
      * @throws SQLException
      * @throws AuthorizeException
      */
@@ -428,13 +439,14 @@ public class Bitstream extends DSpaceObject
         AuthorizeManager.authorizeAction(bContext, this, Constants.WRITE);
 
         log.info(LogManager.getHeader(bContext, "update_bitstream",
-                                      "bitstream_id=" + getID()));
+                "bitstream_id=" + getID()));
 
         DatabaseManager.update(bContext, bRow);
     }
 
     /**
      * Delete the bitstream, including any mappings to bundles
+     * 
      * @throws SQLException
      */
     void delete() throws SQLException
@@ -443,7 +455,7 @@ public class Bitstream extends DSpaceObject
         // Check authorisation
         //AuthorizeManager.authorizeAction(bContext, this, Constants.DELETE);
         log.info(LogManager.getHeader(bContext, "delete_bitstream",
-                                      "bitstream_id=" + getID()));
+                "bitstream_id=" + getID()));
 
         // Remove from cache
         bContext.removeCached(this, getID());
@@ -452,43 +464,42 @@ public class Bitstream extends DSpaceObject
         AuthorizeManager.removeAllPolicies(bContext, this);
 
         // Remove bitstream itself
-        BitstreamStorageManager.delete(bContext,
-                                       bRow.getIntColumn("bitstream_id"));
+        BitstreamStorageManager.delete(bContext, bRow
+                .getIntColumn("bitstream_id"));
     }
 
     /**
      * Retrieve the contents of the bitstream
-     *
-     * @return   a stream from which the bitstream can be read.
+     * 
+     * @return a stream from which the bitstream can be read.
      * @throws IOException
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public InputStream retrieve()
-                         throws IOException, SQLException, AuthorizeException
+    public InputStream retrieve() throws IOException, SQLException,
+            AuthorizeException
     {
         // Maybe should return AuthorizeException??
         AuthorizeManager.authorizeAction(bContext, this, Constants.READ);
 
-        return BitstreamStorageManager.retrieve(bContext,
-                                                bRow.getIntColumn("bitstream_id"));
+        return BitstreamStorageManager.retrieve(bContext, bRow
+                .getIntColumn("bitstream_id"));
     }
 
     /**
      * Get the bundles this bitstream appears in
-     *
-     * @return  array of <code>Bundle</code>s this bitstream
-     *          appears in
+     * 
+     * @return array of <code>Bundle</code> s this bitstream appears in
      * @throws SQLException
      */
     public Bundle[] getBundles() throws SQLException
     {
         // Get the bundle table rows
         TableRowIterator tri = DatabaseManager.query(bContext, "bundle",
-                                                     "SELECT bundle.* FROM bundle, bundle2bitstream WHERE " +
-                                                     "bundle.bundle_id=bundle2bitstream.bundle_id AND " +
-                                                     "bundle2bitstream.bitstream_id=" +
-                                                     bRow.getIntColumn("bitstream_id"));
+                "SELECT bundle.* FROM bundle, bundle2bitstream WHERE "
+                        + "bundle.bundle_id=bundle2bitstream.bundle_id AND "
+                        + "bundle2bitstream.bitstream_id="
+                        + bRow.getIntColumn("bitstream_id"));
 
         // Build a list of Bundle objects
         List bundles = new ArrayList();
@@ -498,13 +509,14 @@ public class Bitstream extends DSpaceObject
             TableRow r = tri.next();
 
             // First check the cache
-            Bundle fromCache = (Bundle) bContext.fromCache(Bundle.class,
-                                                           r.getIntColumn("bundle_id"));
+            Bundle fromCache = (Bundle) bContext.fromCache(Bundle.class, r
+                    .getIntColumn("bundle_id"));
 
             if (fromCache != null)
             {
                 bundles.add(fromCache);
-            } else
+            }
+            else
             {
                 bundles.add(new Bundle(bContext, r));
             }
@@ -518,6 +530,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * return type found in Constants
+     * 
      * @return int Constants.BITSTREAM
      */
     public int getType()

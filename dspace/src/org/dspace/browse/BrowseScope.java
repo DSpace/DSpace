@@ -44,40 +44,37 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
-
 /**
- * Object which describes the desired parameters for a browse.
- * A scope object contains the following:
- *
- *  <dl>
- *  <dt>scope</dt>
- *  <dd>A {@link org.dspace.content.Community}, a
- *   {@link org.dspace.content.Collection}, or null. If the scope is a
- *    community or collection, browses return only objects within the
- *    community or collection.</dd>
- *
- *  <dt>focus</dt>
- *      <dd>The point at which a Browse begins. This can be a String,
- *      an {@link org.dspace.content.Item} (given by either the Item
- *      object or its id), or null.<br>
- *      If a String, Browses begin with values lexicographically greater
- *      than or equal to the String.<br>
- *      If an Item, Browses begin with the value of the Item in the
- *      corresponding browse index. If the item has multiple values
- *      in the index, the behavior is undefined.<br>
- *      If null, Browses begin at the start of the index.
- *      </dd>
- *
- *  <dt>total</dt>
- *  <dd>The total number of results returned from a Browse.
- *  A total of -1 means to return all results.</dd>
- *
- *  <dt>numberBefore</dt>
- *  <dd>The maximum number of results returned previous
- *  to the focus.</dd>
- *  </dl>
- *
- * @author  Peter Breton
+ * Object which describes the desired parameters for a browse. A scope object
+ * contains the following:
+ * 
+ * <dl>
+ * <dt>scope</dt>
+ * <dd>A {@link org.dspace.content.Community}, a
+ * {@link org.dspace.content.Collection}, or null. If the scope is a community
+ * or collection, browses return only objects within the community or
+ * collection.</dd>
+ * 
+ * <dt>focus</dt>
+ * <dd>The point at which a Browse begins. This can be a String, an
+ * {@link org.dspace.content.Item}(given by either the Item object or its id),
+ * or null. <br>
+ * If a String, Browses begin with values lexicographically greater than or
+ * equal to the String. <br>
+ * If an Item, Browses begin with the value of the Item in the corresponding
+ * browse index. If the item has multiple values in the index, the behavior is
+ * undefined. <br>
+ * If null, Browses begin at the start of the index.</dd>
+ * 
+ * <dt>total</dt>
+ * <dd>The total number of results returned from a Browse. A total of -1 means
+ * to return all results.</dd>
+ * 
+ * <dt>numberBefore</dt>
+ * <dd>The maximum number of results returned previous to the focus.</dd>
+ * </dl>
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class BrowseScope implements Cloneable
@@ -109,16 +106,17 @@ public class BrowseScope implements Cloneable
     private Boolean sort;
 
     /**
-     * Create a browse scope with the given context.
-     * The default scope settings are:
-     *   <ul>
-     *   <li> Include results from all of DSpace
-     *   <li> Start from the beginning of the given index
-     *   <li> Return 21 total results
-     *   <li> Return 3 values previous to focus
-     *   </ul>
-     *
-     * @param context The DSpace context.
+     * Create a browse scope with the given context. The default scope settings
+     * are:
+     * <ul>
+     * <li>Include results from all of DSpace
+     * <li>Start from the beginning of the given index
+     * <li>Return 21 total results
+     * <li>Return 3 values previous to focus
+     * </ul>
+     * 
+     * @param context
+     *            The DSpace context.
      */
     public BrowseScope(Context context)
     {
@@ -157,8 +155,9 @@ public class BrowseScope implements Cloneable
 
     /**
      * Limit the browse to a community.
-     *
-     * @param community The community to browse.
+     * 
+     * @param community
+     *            The community to browse.
      */
     public void setScope(Community community)
     {
@@ -167,8 +166,9 @@ public class BrowseScope implements Cloneable
 
     /**
      * Limit the browse to a collection.
-     *
-     * @param collection The collection to browse.
+     * 
+     * @param collection
+     *            The collection to browse.
      */
     public void setScope(Collection collection)
     {
@@ -176,13 +176,14 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * Browse starts at item i. Note that if the item has more
-     * than one value for the given browse, the results are undefined.
-     *
-     * This setting is ignored for itemsByAuthor, byAuthor, and
-     * lastSubmitted browses.
-     *
-     * @param item The item to begin the browse at.
+     * Browse starts at item i. Note that if the item has more than one value
+     * for the given browse, the results are undefined.
+     * 
+     * This setting is ignored for itemsByAuthor, byAuthor, and lastSubmitted
+     * browses.
+     * 
+     * @param item
+     *            The item to begin the browse at.
      */
     public void setFocus(Item item)
     {
@@ -190,13 +191,13 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * Browse starts at value. If value is null, Browses begin from
-     * the start of the index.
-     *
-     * This setting is ignored for itemsByAuthor and
-     * lastSubmitted browses.
-     *
-     * @param value The value to begin the browse at.
+     * Browse starts at value. If value is null, Browses begin from the start of
+     * the index.
+     * 
+     * This setting is ignored for itemsByAuthor and lastSubmitted browses.
+     * 
+     * @param value
+     *            The value to begin the browse at.
      */
     public void setFocus(String value)
     {
@@ -204,14 +205,15 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * Browse starts at the item with the given id. Note that if the item
-     * has more than one value for the given browse index, the results are
+     * Browse starts at the item with the given id. Note that if the item has
+     * more than one value for the given browse index, the results are
      * undefined.
-     *
-     * This setting is ignored for itemsByAuthor, byAuthor, and
-     * lastSubmitted browses.
-     *
-     * @param item_id The item to begin the browse at.
+     * 
+     * This setting is ignored for itemsByAuthor, byAuthor, and lastSubmitted
+     * browses.
+     * 
+     * @param item_id
+     *            The item to begin the browse at.
      */
     public void setFocus(int item_id)
     {
@@ -227,10 +229,10 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * Set the total returned to n.
-     * If n is -1, all results are returned.
-     *
-     * @param n The total number of results to return
+     * Set the total returned to n. If n is -1, all results are returned.
+     * 
+     * @param n
+     *            The total number of results to return
      */
     public void setTotal(int n)
     {
@@ -246,11 +248,10 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * Set the maximum number of results to return previous to
-     * the focus.
-     *
-     * @param n The maximum number of results to return previous to
-     * the focus.
+     * Set the maximum number of results to return previous to the focus.
+     * 
+     * @param n
+     *            The maximum number of results to return previous to the focus.
      */
     public void setNumberBefore(int n)
     {
@@ -263,7 +264,7 @@ public class BrowseScope implements Cloneable
 
     /**
      * Return the context for the browse.
-     *
+     * 
      * @return The context for the browse.
      */
     public Context getContext()
@@ -273,7 +274,7 @@ public class BrowseScope implements Cloneable
 
     /**
      * Return the browse scope.
-     *
+     * 
      * @return The browse scope.
      */
     public Object getScope()
@@ -283,9 +284,8 @@ public class BrowseScope implements Cloneable
 
     /**
      * Return the browse focus. This is either an
-     * {@link org.dspace.content.Item}, an Integer (the Item id)
-     * or a String.
-     *
+     * {@link org.dspace.content.Item}, an Integer (the Item id) or a String.
+     * 
      * @return The focus of the browse.
      */
     public Object getFocus()
@@ -294,10 +294,9 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * Return the maximum number of results to return.
-     * A total of -1 indicates that all matching results should
-     * be returned.
-     *
+     * Return the maximum number of results to return. A total of -1 indicates
+     * that all matching results should be returned.
+     * 
      * @return The maximum number of results.
      */
     public int getTotal()
@@ -306,9 +305,8 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * Return the maximum number of results to return previous to
-     * the focus.
-     *
+     * Return the maximum number of results to return previous to the focus.
+     * 
      * @return The maximum number of results previous to the focus.
      */
     public int getNumberBefore()
@@ -317,8 +315,8 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * Return true if there is no limit on the number of matches
-     * returned, false otherwise.
+     * Return true if there is no limit on the number of matches returned, false
+     * otherwise.
      */
     public boolean hasNoLimit()
     {
@@ -418,8 +416,7 @@ public class BrowseScope implements Cloneable
     ////////////////////////////////////////
 
     /**
-     * Return the type of browse (one of the constants
-     * in Browse).
+     * Return the type of browse (one of the constants in Browse).
      */
     int getBrowseType()
     {
@@ -432,8 +429,7 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * If true, sort the results by title.
-     * If false, sort the results by date.
+     * If true, sort the results by title. If false, sort the results by date.
      * If null, do no sorting at all.
      */
     Boolean getSortByTitle()
@@ -447,8 +443,8 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * If true, results are in ascending order.
-     * Otherwise, results are in descending order.
+     * If true, results are in ascending order. Otherwise, results are in
+     * descending order.
      */
     boolean getAscending()
     {
@@ -461,12 +457,13 @@ public class BrowseScope implements Cloneable
     }
 
     /**
-     * Return true if this BrowseScope is equal to another object,
-     * false otherwise.
-     *
-     * @param obj The object to compare to
-     * @return True if this BrowseScope is equal to the other object,
-     * false otherwise.
+     * Return true if this BrowseScope is equal to another object, false
+     * otherwise.
+     * 
+     * @param obj
+     *            The object to compare to
+     * @return True if this BrowseScope is equal to the other object, false
+     *         otherwise.
      */
     public boolean equals(Object obj)
     {
@@ -477,11 +474,11 @@ public class BrowseScope implements Cloneable
 
         BrowseScope other = (BrowseScope) obj;
 
-        return _equals(scope, other.scope) && _equals(focus, other.focus) &&
-               _equals(sort, other.sort) && (total == other.total) &&
-               (browseType == other.browseType) &&
-               (ascending == other.ascending) &&
-               (numberBefore == other.numberBefore);
+        return _equals(scope, other.scope) && _equals(focus, other.focus)
+                && _equals(sort, other.sort) && (total == other.total)
+                && (browseType == other.browseType)
+                && (ascending == other.ascending)
+                && (numberBefore == other.numberBefore);
     }
 
     private boolean _equals(Object first, Object second)
@@ -510,8 +507,7 @@ public class BrowseScope implements Cloneable
     public int hashCode()
     {
         return new StringBuffer().append(scope).append(focus).append(total)
-                                 .append(numberBefore).append(browseType)
-                                 .append(ascending).append(sort).toString()
-                                 .hashCode();
+                .append(numberBefore).append(browseType).append(ascending)
+                .append(sort).toString().hashCode();
     }
 }

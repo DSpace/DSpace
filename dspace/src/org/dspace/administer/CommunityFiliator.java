@@ -1,25 +1,24 @@
 /*
  * CommunityFiliator.java
- *
+ * 
  * Version: $Revision$
- *
+ * 
  * Date: $Date$
- *
+ * 
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts Institute of
  * Technology. All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *  - Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *  - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
+ * modification, are permitted provided that the following conditions are met: -
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer. - Redistributions in binary
+ * form must reproduce the above copyright notice, this list of conditions and
+ * the following disclaimer in the documentation and/or other materials provided
+ * with the distribution. - Neither the name of the Hewlett-Packard Company nor
+ * the name of the Massachusetts Institute of Technology nor the names of their
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +48,6 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 
-
 public class CommunityFiliator
 {
     public static void main(String[] argv) throws Exception
@@ -61,11 +59,11 @@ public class CommunityFiliator
 
         options.addOption("s", "set", false, "set a parent/child relationship");
         options.addOption("r", "remove", false,
-                          "remove a parent/child relationship");
+                "remove a parent/child relationship");
         options.addOption("p", "parent", true,
-                          "parent community (handle or database ID)");
+                "parent community (handle or database ID)");
         options.addOption("c", "child", true,
-                          "child community (handle or databaseID)");
+                "child community (handle or databaseID)");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
@@ -78,8 +76,10 @@ public class CommunityFiliator
         {
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("CommunityFiliator\n", options);
-            System.out.println("\nestablish a relationship: CommunityFiliator -s -p parentID -c childID");
-            System.out.println("remove a relationship: CommunityFiliator -r -p parentID -c childID");
+            System.out
+                    .println("\nestablish a relationship: CommunityFiliator -s -p parentID -c childID");
+            System.out
+                    .println("remove a relationship: CommunityFiliator -r -p parentID -c childID");
 
             System.exit(0);
         }
@@ -108,7 +108,8 @@ public class CommunityFiliator
         // must have a command set
         if (command == null)
         {
-            System.out.println("Error - must run with either set or remove (run with -h flag for details)");
+            System.out
+                    .println("Error - must run with either set or remove (run with -h flag for details)");
             System.exit(1);
         }
 
@@ -116,13 +117,15 @@ public class CommunityFiliator
         {
             if (parentID == null)
             {
-                System.out.println("Error - a parentID must be specified (run with -h flag for details)");
+                System.out
+                        .println("Error - a parentID must be specified (run with -h flag for details)");
                 System.exit(1);
             }
 
             if (childID == null)
             {
-                System.out.println("Error - a childID must be specified (run with -h flag for details)");
+                System.out
+                        .println("Error - a childID must be specified (run with -h flag for details)");
                 System.exit(1);
             }
         }
@@ -141,40 +144,44 @@ public class CommunityFiliator
 
             if (parent == null)
             {
-                System.out.println("Error, parent community cannot be found: " +
-                                   parentID);
+                System.out.println("Error, parent community cannot be found: "
+                        + parentID);
                 System.exit(1);
             }
 
             if (child == null)
             {
-                System.out.println("Error, child community cannot be found: " +
-                                   childID);
+                System.out.println("Error, child community cannot be found: "
+                        + childID);
                 System.exit(1);
             }
 
             if (command.equals("set"))
             {
                 filiator.filiate(c, parent, child);
-            } else
+            }
+            else
             {
                 filiator.defiliate(c, parent, child);
             }
-        } catch (SQLException sqlE)
+        }
+        catch (SQLException sqlE)
         {
             System.out.println("Error - SQL exception: " + sqlE.toString());
-        } catch (AuthorizeException authE)
+        }
+        catch (AuthorizeException authE)
         {
-            System.out.println("Error - Authorize exception: " +
-                               authE.toString());
-        } catch (IOException ioE)
+            System.out.println("Error - Authorize exception: "
+                    + authE.toString());
+        }
+        catch (IOException ioE)
         {
             System.out.println("Error - IO exception: " + ioE.toString());
         }
     }
 
     public void filiate(Context c, Community parent, Community child)
-                 throws SQLException, AuthorizeException, IOException
+            throws SQLException, AuthorizeException, IOException
     {
         // check that a valid filiation would be established
         // first test - proposed child must currently be an orphan (i.e.
@@ -183,8 +190,8 @@ public class CommunityFiliator
 
         if (childDad != null)
         {
-            System.out.println("Error, child community: " + child.getID() +
-                               " already a child of: " + childDad.getID());
+            System.out.println("Error, child community: " + child.getID()
+                    + " already a child of: " + childDad.getID());
             System.exit(1);
         }
 
@@ -196,7 +203,8 @@ public class CommunityFiliator
         {
             if (parentDads[i].getID() == child.getID())
             {
-                System.out.println("Error, circular parentage - child is parent of parent");
+                System.out
+                        .println("Error, circular parentage - child is parent of parent");
                 System.exit(1);
             }
         }
@@ -206,12 +214,12 @@ public class CommunityFiliator
 
         // complete the pending transaction
         c.complete();
-        System.out.println("Filiation complete. Community: '" + parent.getID() +
-                           "' is parent of community: '" + child.getID() + "'");
+        System.out.println("Filiation complete. Community: '" + parent.getID()
+                + "' is parent of community: '" + child.getID() + "'");
     }
 
     public void defiliate(Context c, Community parent, Community child)
-                   throws SQLException, AuthorizeException, IOException
+            throws SQLException, AuthorizeException, IOException
     {
         // verify that child is indeed a child of parent
         Community[] parentKids = parent.getSubcommunities();
@@ -229,42 +237,44 @@ public class CommunityFiliator
 
         if (!isChild)
         {
-            System.out.println("Error, child community not a child of parent community");
+            System.out
+                    .println("Error, child community not a child of parent community");
             System.exit(1);
         }
 
         // OK remove the mappings - but leave the community, which will become
         // top-level
         DatabaseManager.updateQuery(c,
-                                    "DELETE FROM community2community WHERE parent_comm_id=" +
-                                    parent.getID() + " AND child_comm_id=" +
-                                    child.getID());
+                "DELETE FROM community2community WHERE parent_comm_id="
+                        + parent.getID() + " AND child_comm_id="
+                        + child.getID());
 
         // complete the pending transaction
         c.complete();
-        System.out.println("Defiliation complete. Community: '" +
-                           child.getID() +
-                           "' is no longer a child of community: '" +
-                           parent.getID() + "'");
+        System.out.println("Defiliation complete. Community: '" + child.getID()
+                + "' is no longer a child of community: '" + parent.getID()
+                + "'");
     }
 
     private Community resolveCommunity(Context c, String communityID)
-                                throws SQLException
+            throws SQLException
     {
         Community community = null;
 
         if (communityID.indexOf('/') != -1)
         {
             // has a / must be a handle
-            community = (Community) HandleManager.resolveToObject(c, communityID);
+            community = (Community) HandleManager.resolveToObject(c,
+                    communityID);
 
             // ensure it's a community
-            if ((community == null) ||
-                    (community.getType() != Constants.COMMUNITY))
+            if ((community == null)
+                    || (community.getType() != Constants.COMMUNITY))
             {
                 community = null;
             }
-        } else
+        }
+        else
         {
             community = Community.find(c, Integer.parseInt(communityID));
         }

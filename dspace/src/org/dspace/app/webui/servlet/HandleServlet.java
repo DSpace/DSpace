@@ -69,21 +69,20 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.dspace.handle.HandleManager;
 
-
 /**
- * Servlet for handling requests within a community or collection.  The
- * Handle is extracted from the URL, e.g: <code>/community/1721.1/1234</code>.
- * If there is anything after the Handle, the request is forwarded to the
- * appropriate servlet.  For example:
+ * Servlet for handling requests within a community or collection. The Handle is
+ * extracted from the URL, e.g: <code>/community/1721.1/1234</code>. If there
+ * is anything after the Handle, the request is forwarded to the appropriate
+ * servlet. For example:
  * <P>
  * <code>/community/1721.1/1234/simple-search</code>
  * <P>
- * would be forwarded to <code>/simple-search</code>.  If there is nothing after
- * the Handle, the community or collection home page is shown.
+ * would be forwarded to <code>/simple-search</code>. If there is nothing
+ * after the Handle, the community or collection home page is shown.
  * <P>
  * If the initial parameter " **FIXME**
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class HandleServlet extends DSpaceServlet
@@ -96,17 +95,15 @@ public class HandleServlet extends DSpaceServlet
 
     public void init()
     {
-        // Sort out what we're dealing with  default is titles
+        // Sort out what we're dealing with default is titles
         String param = getInitParameter("location");
 
-        collections = ((param != null) &&
-                      param.equalsIgnoreCase("collections"));
+        collections = ((param != null) && param.equalsIgnoreCase("collections"));
     }
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String handle = null;
         String extraPathInfo = null;
@@ -132,12 +129,14 @@ public class HandleServlet extends DSpaceServlet
                     // We have extra path info
                     handle = path.substring(0, secondSlash);
                     extraPathInfo = path.substring(secondSlash);
-                } else
+                }
+                else
                 {
                     // The path is just the Handle
                     handle = path;
                 }
-            } catch (NumberFormatException nfe)
+            }
+            catch (NumberFormatException nfe)
             {
                 // Leave handle as null
             }
@@ -151,19 +150,20 @@ public class HandleServlet extends DSpaceServlet
 
         if (dso == null)
         {
-            log.info(LogManager.getHeader(context, "invalid_id", "path=" +
-                                          path));
+            log.info(LogManager
+                    .getHeader(context, "invalid_id", "path=" + path));
             JSPManager.showInvalidIDError(request, response, path, -1);
 
             return;
         }
 
-        // OK, we have a valid Handle.  What is it?
+        // OK, we have a valid Handle. What is it?
         if (dso.getType() == Constants.ITEM)
         {
             // Display the item page
             displayItem(context, request, response, (Item) dso, handle);
-        } else if (dso.getType() == Constants.COLLECTION)
+        }
+        else if (dso.getType() == Constants.COLLECTION)
         {
             Collection c = (Collection) dso;
 
@@ -172,10 +172,9 @@ public class HandleServlet extends DSpaceServlet
 
             /*
              * Find the "parent" community the collection, mainly for
-             * "breadcrumbs"
-             * FIXME: At the moment, just grab the first community the
-             * collection is in.  This should probably be more context sensitive
-             * when we have multiple inclusion.
+             * "breadcrumbs" FIXME: At the moment, just grab the first community
+             * the collection is in. This should probably be more context
+             * sensitive when we have multiple inclusion.
              */
             Community[] parents = c.getCommunities();
             request.setAttribute("dspace.community", parents[0]);
@@ -184,20 +183,22 @@ public class HandleServlet extends DSpaceServlet
              * Find all the "parent" communities for the collection for
              * "breadcrumbs"
              */
-            request.setAttribute("dspace.communities",
-                                 getParents(parents[0], true));
+            request.setAttribute("dspace.communities", getParents(parents[0],
+                    true));
 
             // home page, or forward to another page?
             if (extraPathInfo == null)
             {
                 collectionHome(context, request, response, parents[0], c);
-            } else
+            }
+            else
             {
                 // Forward to another servlet
                 request.getRequestDispatcher(extraPathInfo).forward(request,
-                                                                    response);
+                        response);
             }
-        } else if (dso.getType() == Constants.COMMUNITY)
+        }
+        else if (dso.getType() == Constants.COMMUNITY)
         {
             Community c = (Community) dso;
 
@@ -213,18 +214,20 @@ public class HandleServlet extends DSpaceServlet
             if (extraPathInfo == null)
             {
                 communityHome(context, request, response, c);
-            } else
+            }
+            else
             {
                 // Forward to another servlet
                 request.getRequestDispatcher(extraPathInfo).forward(request,
-                                                                    response);
+                        response);
             }
-        } else
+        }
+        else
         {
-            // Shouldn't happen.  Log and treat as invalid ID
+            // Shouldn't happen. Log and treat as invalid ID
             log.info(LogManager.getHeader(context,
-                                          "Handle not an item, collection or community",
-                                          "handle=" + handle));
+                    "Handle not an item, collection or community", "handle="
+                            + handle));
             JSPManager.showInvalidIDError(request, response, path, -1);
 
             return;
@@ -233,18 +236,22 @@ public class HandleServlet extends DSpaceServlet
 
     /**
      * Show an item page
-     *
-     * @param context     Context object
-     * @param request     the HTTP request
-     * @param response    the HTTP response
-     * @param item        the item
-     * @param handle      the item's handle
+     * 
+     * @param context
+     *            Context object
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the HTTP response
+     * @param item
+     *            the item
+     * @param handle
+     *            the item's handle
      */
     private void displayItem(Context context, HttpServletRequest request,
-                             HttpServletResponse response, Item item,
-                             String handle)
-                      throws ServletException, IOException, SQLException, 
-                             AuthorizeException
+            HttpServletResponse response, Item item, String handle)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         // Tombstone?
         if (item.isWithdrawn())
@@ -257,7 +264,9 @@ public class HandleServlet extends DSpaceServlet
         // Ensure the user has authorisation
         AuthorizeManager.authorizeAction(context, item, Constants.READ);
 
-        log.info(LogManager.getHeader(context, "view_item", "handle=" + handle));
+        log
+                .info(LogManager.getHeader(context, "view_item", "handle="
+                        + handle));
 
         // show edit link
         if (item.canEdit())
@@ -270,7 +279,7 @@ public class HandleServlet extends DSpaceServlet
         Collection[] collections = item.getCollections();
 
         // For the breadcrumbs, get the first collection and the first community
-        // that is in.  FIXME: Not multiple-inclusion friendly--should be
+        // that is in. FIXME: Not multiple-inclusion friendly--should be
         // smarter, context-sensitive
         request.setAttribute("dspace.collection", item.getOwningCollection());
 
@@ -300,22 +309,26 @@ public class HandleServlet extends DSpaceServlet
 
     /**
      * Show a community home page, or deal with button press on home page
-     *
-     * @param context     Context object
-     * @param request     the HTTP request
-     * @param response    the HTTP response
-     * @param community   the community
+     * 
+     * @param context
+     *            Context object
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the HTTP response
+     * @param community
+     *            the community
      */
     private void communityHome(Context context, HttpServletRequest request,
-                               HttpServletResponse response, Community community)
-                        throws ServletException, IOException, SQLException
+            HttpServletResponse response, Community community)
+            throws ServletException, IOException, SQLException
     {
         // Handle click on a browse or search button
         if (!handleButton(request, response, community.getHandle()))
         {
             // No button pressed, display community home page
             log.info(LogManager.getHeader(context, "view_community",
-                                          "community_id=" + community.getID()));
+                    "community_id=" + community.getID()));
 
             // Get the collections within the community
             Collection[] collections = community.getCollections();
@@ -343,7 +356,7 @@ public class HandleServlet extends DSpaceServlet
 
             // can they add to this community?
             if (AuthorizeManager.authorizeActionBoolean(context, community,
-                                                            Constants.ADD))
+                    Constants.ADD))
             {
                 // set a variable to create an edit button
                 request.setAttribute("add_button", new Boolean(true));
@@ -351,7 +364,7 @@ public class HandleServlet extends DSpaceServlet
 
             // can they remove from this community?
             if (AuthorizeManager.authorizeActionBoolean(context, community,
-                                                            Constants.REMOVE))
+                    Constants.REMOVE))
             {
                 // set a variable to create an edit button
                 request.setAttribute("remove_button", new Boolean(true));
@@ -369,18 +382,22 @@ public class HandleServlet extends DSpaceServlet
 
     /**
      * Show a collection home page, or deal with button press on home page
-     *
-     * @param context     Context object
-     * @param request     the HTTP request
-     * @param response    the HTTP response
-     * @param community   the community
-     * @param collection  the collection
+     * 
+     * @param context
+     *            Context object
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the HTTP response
+     * @param community
+     *            the community
+     * @param collection
+     *            the collection
      */
     private void collectionHome(Context context, HttpServletRequest request,
-                                HttpServletResponse response,
-                                Community community, Collection collection)
-                         throws ServletException, IOException, SQLException, 
-                                AuthorizeException
+            HttpServletResponse response, Community community,
+            Collection collection) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Handle click on a browse or search button
         if (!handleButton(request, response, collection.getHandle()))
@@ -388,33 +405,35 @@ public class HandleServlet extends DSpaceServlet
             // Will need to know whether to commit to DB
             boolean updated = false;
 
-            // No search or browse button pressed, check for 
+            // No search or browse button pressed, check for
             if (request.getParameter("submit_subscribe") != null)
             {
                 // Subscribe button pressed.
                 if (context.getCurrentUser() == null)
                 {
                     // Only registered can subscribe
-                    Authenticate.startAuthentication(context, request, response);
+                    Authenticate
+                            .startAuthentication(context, request, response);
 
                     return;
-                } else
+                }
+                else
                 {
                     Subscribe.subscribe(context, context.getCurrentUser(),
-                                        collection);
+                            collection);
                     updated = true;
                 }
-            } else if (request.getParameter("submit_unsubscribe") != null)
+            }
+            else if (request.getParameter("submit_unsubscribe") != null)
             {
                 Subscribe.unsubscribe(context, context.getCurrentUser(),
-                                      collection);
+                        collection);
                 updated = true;
             }
 
             // display collection home page
             log.info(LogManager.getHeader(context, "view_collection",
-                                          "collection_id=" +
-                                          collection.getID()));
+                    "collection_id=" + collection.getID()));
 
             // Find the 5 last submitted items
             BrowseScope scope = new BrowseScope(context);
@@ -444,8 +463,7 @@ public class HandleServlet extends DSpaceServlet
 
                 // can they admin this collection?
                 if (AuthorizeManager.authorizeActionBoolean(context,
-                                                                collection,
-                                                                Constants.COLLECTION_ADMIN))
+                        collection, Constants.COLLECTION_ADMIN))
                 {
                     request.setAttribute("admin_button", new Boolean(true));
 
@@ -477,20 +495,21 @@ public class HandleServlet extends DSpaceServlet
     }
 
     /**
-     * Check to see if a browse or search button has been pressed on
-     * a community or collection home page.  If so, redirect to the appropriate
-     * URL.
-     *
-     * @param request   HTTP request
-     * @param response  HTTP response
-     * @param handle    Handle of the community/collection home page
-     *
-     * @return  true if a browse/search button was pressed and the user
-     *          was redirected
+     * Check to see if a browse or search button has been pressed on a community
+     * or collection home page. If so, redirect to the appropriate URL.
+     * 
+     * @param request
+     *            HTTP request
+     * @param response
+     *            HTTP response
+     * @param handle
+     *            Handle of the community/collection home page
+     * 
+     * @return true if a browse/search button was pressed and the user was
+     *         redirected
      */
     private boolean handleButton(HttpServletRequest request,
-                                 HttpServletResponse response, String handle)
-                          throws IOException
+            HttpServletResponse response, String handle) throws IOException
     {
         String button = UIUtil.getSubmitButton(request, "");
         String location = request.getParameter("location");
@@ -503,10 +522,9 @@ public class HandleServlet extends DSpaceServlet
         }
 
         /*
-         * Work out the "prefix" to which to redirect
-         * If "/", scope is all of DSpace, so prefix is "/"
-         * If prefix is a handle, scope is a community or collection,
-         * so "/handle/1721.x/xxxx/" is the prefix.
+         * Work out the "prefix" to which to redirect If "/", scope is all of
+         * DSpace, so prefix is "/" If prefix is a handle, scope is a community
+         * or collection, so "/handle/1721.x/xxxx/" is the prefix.
          */
         if (!location.equals("/"))
         {
@@ -517,25 +535,30 @@ public class HandleServlet extends DSpaceServlet
         {
             // Redirect to browse by title
             url = request.getContextPath() + prefix + "browse-title";
-        } else if (button.equals("submit_authors"))
+        }
+        else if (button.equals("submit_authors"))
         {
             // Redirect to browse authors
             url = request.getContextPath() + prefix + "browse-author";
-        } else if (button.equals("submit_dates"))
+        }
+        else if (button.equals("submit_dates"))
         {
             // Redirect to browse by date
             url = request.getContextPath() + prefix + "browse-date";
-        } else if (button.equals("submit_search") ||
-                       (request.getParameter("query") != null))
+        }
+        else if (button.equals("submit_search")
+                || (request.getParameter("query") != null))
         {
             /*
-             * Have to check for search button and query - in some
-             * browsers, typing a query into the box and hitting
-             * return doesn't produce a submit button parameter.
-             * Redirect to appropriate search page
+             * Have to check for search button and query - in some browsers,
+             * typing a query into the box and hitting return doesn't produce a
+             * submit button parameter. Redirect to appropriate search page
              */
-            url = request.getContextPath() + prefix + "simple-search?query=" +
-                  URLEncoder.encode(request.getParameter("query"), Constants.DEFAULT_ENCODING);
+            url = request.getContextPath()
+                    + prefix
+                    + "simple-search?query="
+                    + URLEncoder.encode(request.getParameter("query"),
+                            Constants.DEFAULT_ENCODING);
         }
 
         // If a button was pressed, redirect to appropriate page
@@ -551,9 +574,10 @@ public class HandleServlet extends DSpaceServlet
 
     /**
      * Utility method to obtain the titles for the Items in the given list.
-     *
-     * @param List of Items
-     * @return  array of corresponding titles
+     * 
+     * @param List
+     *            of Items
+     * @return array of corresponding titles
      */
     private String[] getItemTitles(List items)
     {
@@ -571,7 +595,8 @@ public class HandleServlet extends DSpaceServlet
             {
                 // No title at all!
                 titles[i] = "Untitled";
-            } else
+            }
+            else
             {
                 // Use first title
                 titles[i] = titlesForThis[0].value;
@@ -583,13 +608,15 @@ public class HandleServlet extends DSpaceServlet
 
     /**
      * Utility method obtain URLs for the most recent items
-     *
-     * @param context   DSpace context
-     * @param items     the items to get URLs for
-     * @return  an array of URLs (in Strings) corresponding to those items
+     * 
+     * @param context
+     *            DSpace context
+     * @param items
+     *            the items to get URLs for
+     * @return an array of URLs (in Strings) corresponding to those items
      */
     private String[] getItemURLs(Context context, List items)
-                          throws SQLException
+            throws SQLException
     {
         String[] urls = new String[items.size()];
 
@@ -603,14 +630,14 @@ public class HandleServlet extends DSpaceServlet
     }
 
     /**
-     * Utility method to produce a list of parent communities
-     * for a given community, ending with the passed community,
-     * if include is true. If commmunity is top-level,
-     * the array will be empty, or contain only the passed community,
-     * if include is true. The array is ordered highest level to lowest
+     * Utility method to produce a list of parent communities for a given
+     * community, ending with the passed community, if include is true. If
+     * commmunity is top-level, the array will be empty, or contain only the
+     * passed community, if include is true. The array is ordered highest level
+     * to lowest
      */
     private Community[] getParents(Community c, boolean include)
-                            throws SQLException
+            throws SQLException
     {
         // Find all the "parent" communities for the community
         Community[] parents = c.getAllParents();

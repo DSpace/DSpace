@@ -59,13 +59,12 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
-
 /**
- * DSpace filter that only allows requests from authenticated administrators
- * to proceed.  Anonymous requests prompt the authentication procedure.
- * Requests from authenticated non-admins result in an authorisation error.
- *
- * @author  Robert Tansley
+ * DSpace filter that only allows requests from authenticated administrators to
+ * proceed. Anonymous requests prompt the authentication procedure. Requests
+ * from authenticated non-admins result in an authorisation error.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class AdminOnlyFilter implements Filter
@@ -79,8 +78,7 @@ public class AdminOnlyFilter implements Filter
     }
 
     public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain)
-                  throws ServletException, IOException
+            FilterChain chain) throws ServletException, IOException
     {
         Context context = null;
 
@@ -97,24 +95,27 @@ public class AdminOnlyFilter implements Filter
             {
                 // No current user, prompt authentication
                 Authenticate.startAuthentication(context, hrequest, hresponse);
-            } else
+            }
+            else
             {
                 // User is authenticated
                 if (AuthorizeManager.isAdmin(context))
                 {
                     // User is an admin, allow request to proceed
                     chain.doFilter(hrequest, hresponse);
-                } else
+                }
+                else
                 {
                     // User is not an admin
                     log.info(LogManager.getHeader(context, "admin_only", ""));
                     JSPManager.showAuthorizeError(hrequest, hresponse, null);
                 }
             }
-        } catch (SQLException se)
+        }
+        catch (SQLException se)
         {
-            log.warn(LogManager.getHeader(context, "database_error",
-                                          se.toString()), se);
+            log.warn(LogManager.getHeader(context, "database_error", se
+                    .toString()), se);
             JSPManager.showInternalError(hrequest, hresponse);
         }
 

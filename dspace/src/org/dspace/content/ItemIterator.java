@@ -45,13 +45,12 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
- * Specialized iterator for DSpace Items.  This iterator is used for loading
- * items into memory one by one, since in many cases, it would not make sense
- * to load a set of items into memory all at once.  For example, loading in
- * an entire community or site's worth of items wouldn't make sense.
- *
+ * Specialized iterator for DSpace Items. This iterator is used for loading
+ * items into memory one by one, since in many cases, it would not make sense to
+ * load a set of items into memory all at once. For example, loading in an
+ * entire community or site's worth of items wouldn't make sense.
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -68,12 +67,13 @@ public class ItemIterator
     private TableRowIterator itemRows;
 
     /**
-     * Construct an item iterator.  This is not a public method, since this
+     * Construct an item iterator. This is not a public method, since this
      * iterator is only created by CM API methods.
-     *
-     * @param  context  our context
-     * @param  rows     the rows that correspond to the Items to be iterated
-     *                  over
+     * 
+     * @param context
+     *            our context
+     * @param rows
+     *            the rows that correspond to the Items to be iterated over
      */
     ItemIterator(Context context, TableRowIterator rows)
     {
@@ -83,8 +83,8 @@ public class ItemIterator
 
     /**
      * Find out if there are any more items to iterate over
-     *
-     * @return  <code>true</code> if there are more items
+     * 
+     * @return <code>true</code> if there are more items
      */
     public boolean hasNext() throws SQLException
     {
@@ -92,10 +92,10 @@ public class ItemIterator
     }
 
     /**
-     * Get the next item in the iterator.  Returns <code>null</code> if there
+     * Get the next item in the iterator. Returns <code>null</code> if there
      * are no more items.
-     *
-     * @return  the next item, or <code>null</code>
+     * 
+     * @return the next item, or <code>null</code>
      */
     public Item next() throws SQLException
     {
@@ -105,17 +105,19 @@ public class ItemIterator
             TableRow row = itemRows.next();
 
             // Check cache
-            Item fromCache = (Item) ourContext.fromCache(Item.class,
-                                                         row.getIntColumn("item_id"));
+            Item fromCache = (Item) ourContext.fromCache(Item.class, row
+                    .getIntColumn("item_id"));
 
             if (fromCache != null)
             {
                 return fromCache;
-            } else
+            }
+            else
             {
                 return new Item(ourContext, row);
             }
-        } else
+        }
+        else
         {
             return null;
         }

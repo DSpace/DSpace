@@ -48,11 +48,9 @@ import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
-
-
 /**
  * Class representing a ResourcePolicy
- *
+ * 
  * @author David Stuve
  * @version $Revision$
  */
@@ -66,8 +64,11 @@ public class ResourcePolicy
 
     /**
      * Construct an ResourcePolicy
-     * @param context  the context this object exists in
-     * @param row      the corresponding row in the table
+     * 
+     * @param context
+     *            the context this object exists in
+     * @param row
+     *            the corresponding row in the table
      */
     ResourcePolicy(Context context, TableRow row)
     {
@@ -77,21 +78,24 @@ public class ResourcePolicy
 
     /**
      * Get an ResourcePolicy from the database.
-     *
-     * @param  context  DSpace context object
-     * @param  id       ID of the ResourcePolicy
-     *
-     * @return  the ResourcePolicy format, or null if the ID is invalid.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param id
+     *            ID of the ResourcePolicy
+     * 
+     * @return the ResourcePolicy format, or null if the ID is invalid.
      */
     public static ResourcePolicy find(Context context, int id)
-                               throws SQLException
+            throws SQLException
     {
         TableRow row = DatabaseManager.find(context, "ResourcePolicy", id);
 
         if (row == null)
         {
             return null;
-        } else
+        }
+        else
         {
             return new ResourcePolicy(context, row);
         }
@@ -99,13 +103,14 @@ public class ResourcePolicy
 
     /**
      * Create a new ResourcePolicy
-     *
-     * @param  context  DSpace context object
+     * 
+     * @param context
+     *            DSpace context object
      */
-    public static ResourcePolicy create(Context context)
-                                 throws SQLException, AuthorizeException
+    public static ResourcePolicy create(Context context) throws SQLException,
+            AuthorizeException
     {
-        // FIXME: Check authorisation 
+        // FIXME: Check authorisation
         // Create a table row
         TableRow row = DatabaseManager.create(context, "ResourcePolicy");
 
@@ -114,7 +119,7 @@ public class ResourcePolicy
 
     /**
      * Delete an ResourcePolicy
-     *
+     *  
      */
     public void delete() throws SQLException
     {
@@ -125,7 +130,7 @@ public class ResourcePolicy
 
     /**
      * Get the e-person's internal identifier
-     *
+     * 
      * @return the internal identifier
      */
     public int getID()
@@ -135,7 +140,7 @@ public class ResourcePolicy
 
     /**
      * Get the type of the objects referred to by policy
-     *
+     * 
      * @return type of object/resource
      */
     public int getResourceType()
@@ -145,7 +150,7 @@ public class ResourcePolicy
 
     /**
      * set both type and id of resource referred to by policy
-     *
+     *  
      */
     public void setResource(DSpaceObject o)
     {
@@ -155,8 +160,9 @@ public class ResourcePolicy
 
     /**
      * Set the type of the resource referred to by the policy
-     *
-     * @param mytype type of the resource
+     * 
+     * @param mytype
+     *            type of the resource
      */
     public void setResourceType(int mytype)
     {
@@ -164,9 +170,9 @@ public class ResourcePolicy
     }
 
     /**
-     * Get the ID of a resource pointed to by the policy
-     *  (is null if policy doesn't apply to a single resource.)
-     *
+     * Get the ID of a resource pointed to by the policy (is null if policy
+     * doesn't apply to a single resource.)
+     * 
      * @return resource_id
      */
     public int getResourceID()
@@ -175,9 +181,9 @@ public class ResourcePolicy
     }
 
     /**
-     * If the policy refers to a single resource, this
-     *  is the ID of that resource.
-     *
+     * If the policy refers to a single resource, this is the ID of that
+     * resource.
+     * 
      * @param resource_id
      */
     public void setResourceID(int myid)
@@ -203,7 +209,8 @@ public class ResourcePolicy
         if (myAction == -1)
         {
             return "...";
-        } else
+        }
+        else
         {
             return Constants.actionText[myAction];
         }
@@ -211,7 +218,7 @@ public class ResourcePolicy
 
     /**
      * set the action this policy authorizes
-     *
+     * 
      * @param id
      */
     public void setAction(int myid)
@@ -229,7 +236,7 @@ public class ResourcePolicy
 
     /**
      * get EPerson this policy relates to
-     *
+     * 
      * @return EPerson, or null
      */
     public EPerson getEPerson() throws SQLException
@@ -246,6 +253,7 @@ public class ResourcePolicy
 
     /**
      * assign an EPerson to this policy
+     * 
      * @param EPerson
      */
     public void setEPerson(EPerson e)
@@ -253,7 +261,8 @@ public class ResourcePolicy
         if (e != null)
         {
             myRow.setColumn("eperson_id", e.getID());
-        } else
+        }
+        else
         {
             myRow.setColumnNull("epersongroup_id");
         }
@@ -261,7 +270,7 @@ public class ResourcePolicy
 
     /**
      * gets ID for Group referred to by this policy
-     *
+     * 
      * @return groupID, or -1 if no group set
      */
     public int getGroupID()
@@ -271,7 +280,7 @@ public class ResourcePolicy
 
     /**
      * gets Group for this policy
-     *
+     * 
      * @return Group, or -1 if no group set
      */
     public Group getGroup() throws SQLException
@@ -281,7 +290,8 @@ public class ResourcePolicy
         if (gid == -1)
         {
             return null;
-        } else
+        }
+        else
         {
             return Group.find(myContext, gid);
         }
@@ -289,6 +299,7 @@ public class ResourcePolicy
 
     /**
      * set Group for this policy
+     * 
      * @param group
      */
     public void setGroup(Group g)
@@ -296,7 +307,8 @@ public class ResourcePolicy
         if (g != null)
         {
             myRow.setColumn("epersongroup_id", g.getID());
-        } else
+        }
+        else
         {
             myRow.setColumnNull("epersongroup_id");
         }
@@ -304,9 +316,9 @@ public class ResourcePolicy
 
     /**
      * figures out if the date is valid for the policy
-     *
-     * @return true if policy has begun and hasn't expired yet
-     *   (or no dates are set)
+     * 
+     * @return true if policy has begun and hasn't expired yet (or no dates are
+     *         set)
      */
     public boolean isDateValid()
     {
@@ -322,7 +334,7 @@ public class ResourcePolicy
         // one is set, now need to do some date math
         Date now = new Date();
 
-        // check start date first        
+        // check start date first
         if (sd != null)
         {
             // start date is set, return false if we're before it
@@ -348,9 +360,9 @@ public class ResourcePolicy
 
     /**
      * Get the start date of the policy
-     *
-     * @return start date, or null if there is no start date set
-     *   (probably most common case)
+     * 
+     * @return start date, or null if there is no start date set (probably most
+     *         common case)
      */
     public java.util.Date getStartDate()
     {
@@ -359,8 +371,9 @@ public class ResourcePolicy
 
     /**
      * Set the start date for the policy
-     *
-     * @param date, or null for no start date
+     * 
+     * @param date,
+     *            or null for no start date
      */
     public void setStartDate(java.util.Date d)
     {
@@ -369,7 +382,7 @@ public class ResourcePolicy
 
     /**
      * Get end date for the policy
-     *
+     * 
      * @return end date or null for no end date
      */
     public java.util.Date getEndDate()
@@ -379,8 +392,9 @@ public class ResourcePolicy
 
     /**
      * Set end date for the policy
-     *
-     * @param end date, or null
+     * 
+     * @param end
+     *            date, or null
      */
     public void setEndDate(java.util.Date d)
     {

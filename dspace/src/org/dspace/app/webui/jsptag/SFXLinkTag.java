@@ -51,17 +51,16 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 
-
 /**
- * Renders an SFX query link.  Takes one attribute - "item" which must be an
- * Item object.
- *
- * @author  Robert Tansley
+ * Renders an SFX query link. Takes one attribute - "item" which must be an Item
+ * object.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class SFXLinkTag extends TagSupport
 {
-    /** Item to display SFX link for*/
+    /** Item to display SFX link for */
     private Item item;
 
     public SFXLinkTag()
@@ -73,7 +72,8 @@ public class SFXLinkTag extends TagSupport
     {
         try
         {
-            String sfxServer = ConfigurationManager.getProperty("sfx.server.url");
+            String sfxServer = ConfigurationManager
+                    .getProperty("sfx.server.url");
 
             if (sfxServer == null)
             {
@@ -87,8 +87,10 @@ public class SFXLinkTag extends TagSupport
 
             if (titles.length > 0)
             {
-                sfxQuery = sfxQuery + "&title=" +
-                           URLEncoder.encode(titles[0].value, Constants.DEFAULT_ENCODING);
+                sfxQuery = sfxQuery
+                        + "&title="
+                        + URLEncoder.encode(titles[0].value,
+                                Constants.DEFAULT_ENCODING);
             }
 
             DCValue[] authors = item.getDC("contributor", "author", Item.ANY);
@@ -96,26 +98,34 @@ public class SFXLinkTag extends TagSupport
             if (authors.length > 0)
             {
                 DCPersonName dpn = new DCPersonName(authors[0].value);
-                sfxQuery = sfxQuery + "&aulast=" +
-                           URLEncoder.encode(dpn.getLastName(), Constants.DEFAULT_ENCODING);
-                sfxQuery = sfxQuery + "&aufirst=" +
-                           URLEncoder.encode(dpn.getFirstNames(), Constants.DEFAULT_ENCODING);
+                sfxQuery = sfxQuery
+                        + "&aulast="
+                        + URLEncoder.encode(dpn.getLastName(),
+                                Constants.DEFAULT_ENCODING);
+                sfxQuery = sfxQuery
+                        + "&aufirst="
+                        + URLEncoder.encode(dpn.getFirstNames(),
+                                Constants.DEFAULT_ENCODING);
             }
 
             DCValue[] isbn = item.getDC("identifier", "isbn", Item.ANY);
 
             if (isbn.length > 0)
             {
-                sfxQuery = sfxQuery + "&isbn=" +
-                           URLEncoder.encode(isbn[0].value, Constants.DEFAULT_ENCODING);
+                sfxQuery = sfxQuery
+                        + "&isbn="
+                        + URLEncoder.encode(isbn[0].value,
+                                Constants.DEFAULT_ENCODING);
             }
 
             DCValue[] issn = item.getDC("identifier", "issn", Item.ANY);
 
             if (issn.length > 0)
             {
-                sfxQuery = sfxQuery + "&issn=" +
-                           URLEncoder.encode(issn[0].value, Constants.DEFAULT_ENCODING);
+                sfxQuery = sfxQuery
+                        + "&issn="
+                        + URLEncoder.encode(issn[0].value,
+                                Constants.DEFAULT_ENCODING);
             }
 
             DCValue[] dates = item.getDC("date", "issued", Item.ANY);
@@ -124,13 +134,17 @@ public class SFXLinkTag extends TagSupport
             {
                 String fullDate = dates[0].value;
 
-                // Remove the time if there is one - day is greatest granularity for SFX
+                // Remove the time if there is one - day is greatest granularity
+                // for SFX
                 if (fullDate.length() > 10)
                 {
                     fullDate = fullDate.substring(0, 10);
                 }
 
-                sfxQuery = sfxQuery + "&date=" + URLEncoder.encode(fullDate, Constants.DEFAULT_ENCODING);
+                sfxQuery = sfxQuery
+                        + "&date="
+                        + URLEncoder.encode(fullDate,
+                                Constants.DEFAULT_ENCODING);
             }
 
             // Remove initial &, if any
@@ -140,7 +154,8 @@ public class SFXLinkTag extends TagSupport
             }
 
             pageContext.getOut().print(sfxServer + sfxQuery);
-        } catch (IOException ie)
+        }
+        catch (IOException ie)
         {
             throw new JspException(ie);
         }
@@ -150,7 +165,7 @@ public class SFXLinkTag extends TagSupport
 
     /**
      * Get the item this tag should display SFX Link for
-     *
+     * 
      * @return the item
      */
     public Item getItem()
@@ -160,8 +175,9 @@ public class SFXLinkTag extends TagSupport
 
     /**
      * Set the item this tag should display SFX Link for
-     *
-     * @param  itemIn  the item
+     * 
+     * @param itemIn
+     *            the item
      */
     public void setItem(Item itemIn)
     {

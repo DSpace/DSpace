@@ -18,52 +18,50 @@ import org.dspace.core.Context;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
-
 /**
  * Servlet for aborting workflows
+ * 
  * @author dstuve
  * @version $Revision$
  */
 public class WorkflowAbortServlet extends DSpaceServlet
 {
     protected void doDSGet(Context c, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Get displays list of workflows
         showWorkflows(c, request, response);
     }
 
     protected void doDSPost(Context c, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit");
 
         if (button.equals("submit_abort"))
         {
             // bring up the confirm page
-            WorkflowItem wi = WorkflowItem.find(c,
-                                                UIUtil.getIntParameter(request,
-                                                                       "workflow_id"));
+            WorkflowItem wi = WorkflowItem.find(c, UIUtil.getIntParameter(
+                    request, "workflow_id"));
 
             request.setAttribute("workflow", wi);
             JSPManager.showJSP(request, response,
-                               "/dspace-admin/workflow-abort-confirm.jsp");
-        } else if (button.equals("submit_abort_confirm"))
+                    "/dspace-admin/workflow-abort-confirm.jsp");
+        }
+        else if (button.equals("submit_abort_confirm"))
         {
             // do the actual abort
-            WorkflowItem wi = WorkflowItem.find(c,
-                                                UIUtil.getIntParameter(request,
-                                                                       "workflow_id"));
+            WorkflowItem wi = WorkflowItem.find(c, UIUtil.getIntParameter(
+                    request, "workflow_id"));
 
             WorkflowManager.abort(c, wi, c.getCurrentUser());
 
             // now show what's left
             showWorkflows(c, request, response);
-        } else
+        }
+        else
         {
             // must have been cancel
             showWorkflows(c, request, response);
@@ -74,13 +72,13 @@ public class WorkflowAbortServlet extends DSpaceServlet
     }
 
     private void showWorkflows(Context c, HttpServletRequest request,
-                               HttpServletResponse response)
-                        throws ServletException, IOException, SQLException, 
-                               AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         WorkflowItem[] w = WorkflowItem.findAll(c);
 
         request.setAttribute("workflows", w);
-        JSPManager.showJSP(request, response, "/dspace-admin/workflow-list.jsp");
+        JSPManager
+                .showJSP(request, response, "/dspace-admin/workflow-list.jsp");
     }
 }

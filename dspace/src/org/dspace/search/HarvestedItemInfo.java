@@ -44,11 +44,10 @@ import java.util.List;
 
 import org.dspace.content.Item;
 
-
 /**
  * Simple container class containing information about a harvested DSpace item.
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class HarvestedItemInfo
@@ -62,12 +61,12 @@ public class HarvestedItemInfo
     /** The datestamp */
     public Date datestamp;
 
-    /** The item.  Only filled out if requested */
+    /** The item. Only filled out if requested */
     public Item item;
 
     /**
-     * A List of Strings.  The Handles of collections this item is in.  Only filled
-     * out if originally requested when invoking <code>Harvest</code>
+     * A List of Strings. The Handles of collections this item is in. Only
+     * filled out if originally requested when invoking <code>Harvest</code>
      * (N.B. not Collection objects)
      */
     public List collectionHandles;

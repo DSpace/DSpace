@@ -54,13 +54,12 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
-
 /**
- * Simple username and password authentication servlet.  Displays the
- * login form <code>/login/password.jsp</code> on a GET,
- * otherwise process the parameters as an email and password.
- *
- * @author  Robert Tansley
+ * Simple username and password authentication servlet. Displays the login form
+ * <code>/login/password.jsp</code> on a GET, otherwise process the parameters
+ * as an email and password.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class PasswordServlet extends DSpaceServlet
@@ -69,18 +68,16 @@ public class PasswordServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(PasswordServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Simply forward to the plain form
         JSPManager.showJSP(request, response, "/login/password.jsp");
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Process the POSTed email and password
         String email = request.getParameter("login_email");
@@ -98,15 +95,17 @@ public class PasswordServlet extends DSpaceServlet
             {
                 // they must use a certificate
                 JSPManager.showJSP(request, response,
-                                   "/error/require-certificate.jsp");
+                        "/error/require-certificate.jsp");
 
                 return;
-            } else if (eperson.checkPassword(password))
+            }
+            else if (eperson.checkPassword(password))
             {
                 // Logged in OK.
                 Authenticate.loggedIn(context, request, eperson);
 
-                log.info(LogManager.getHeader(context, "login", "type=password"));
+                log.info(LogManager
+                        .getHeader(context, "login", "type=password"));
 
                 // resume previous request
                 Authenticate.resumeInterruptedRequest(request, response);
@@ -116,8 +115,8 @@ public class PasswordServlet extends DSpaceServlet
         }
 
         // If we reach here, supplied email/password was duff.
-        log.info(LogManager.getHeader(context, "failed_login", "email=" +
-                                      email));
+        log.info(LogManager
+                .getHeader(context, "failed_login", "email=" + email));
         JSPManager.showJSP(request, response, "/login/incorrect.jsp");
     }
 }

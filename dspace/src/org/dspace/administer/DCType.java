@@ -52,14 +52,13 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
  * Class representing a particular Dublin Core metadata type, with various
- * utility methods.  In general, only used for manipulating the registry of
+ * utility methods. In general, only used for manipulating the registry of
  * Dublin Core types in the system, so most users will not need this.
- *
- * @author   Robert Tansley
- * @version  $Revision$
+ * 
+ * @author Robert Tansley
+ * @version $Revision$
  */
 public class DCType
 {
@@ -67,8 +66,7 @@ public class DCType
     private static Logger log = Logger.getLogger(DCType.class);
 
     /**
-     * For quick access in the system, an array of the elements in the
-     * registry
+     * For quick access in the system, an array of the elements in the registry
      */
     private static String[] elements = null;
 
@@ -82,11 +80,13 @@ public class DCType
     private TableRow typeRow;
 
     /**
-     * Class constructor for creating a BitstreamFormat object
-     * based on the contents of a DB table row.
-     *
-     * @param context  the context this object exists in
-     * @param row      the corresponding row in the table
+     * Class constructor for creating a BitstreamFormat object based on the
+     * contents of a DB table row.
+     * 
+     * @param context
+     *            the context this object exists in
+     * @param row
+     *            the corresponding row in the table
      */
     DCType(Context context, TableRow row)
     {
@@ -95,16 +95,18 @@ public class DCType
     }
 
     /**
-     * Utility method for quick access to an element and qualifier
-     * given the type ID.
-     *
-     * @param context  context, in case DC types need to be read in from DB
-     * @param id   the DC type ID
-     * @return  a two-String array, string 0 is the element,
-     *          string 1 is the qualifier
+     * Utility method for quick access to an element and qualifier given the
+     * type ID.
+     * 
+     * @param context
+     *            context, in case DC types need to be read in from DB
+     * @param id
+     *            the DC type ID
+     * @return a two-String array, string 0 is the element, string 1 is the
+     *         qualifier
      */
     public static String[] quickFind(Context context, int id)
-                              throws SQLException
+            throws SQLException
     {
         if (elements == null)
         {
@@ -112,7 +114,7 @@ public class DCType
         }
 
         // We use the ID to get the element and qualifier out of
-        // the relevant array.  But should 'sanity check' first.
+        // the relevant array. But should 'sanity check' first.
         if ((id > elements.length) || (id < 0))
         {
             return null;
@@ -127,14 +129,15 @@ public class DCType
 
     /**
      * Load in the DC type registry for quick access via quickFind.
-     *
-     * @param context  DSpace context object
+     * 
+     * @param context
+     *            DSpace context object
      */
     public static void loadDC(Context context) throws SQLException
     {
         // First get the highest ID so we know how big to make the array
         TableRow row = DatabaseManager.querySingle(context,
-                                                   "SELECT MAX(dc_type_id) AS foo FROM dctyperegistry");
+                "SELECT MAX(dc_type_id) AS foo FROM dctyperegistry");
         int numberFields = row.getIntColumn("foo") + 1;
 
         elements = new String[numberFields];
@@ -142,7 +145,7 @@ public class DCType
 
         // Grab rows from DB
         TableRowIterator tri = DatabaseManager.query(context,
-                                                     "SELECT * FROM dctyperegistry");
+                "SELECT * FROM dctyperegistry");
 
         while (tri.hasNext())
         {
@@ -156,14 +159,15 @@ public class DCType
 
     /**
      * Get a bitstream format from the database.
-     *
-     * @param  context  DSpace context object
-     * @param  id       ID of the bitstream format
-     *
-     * @return  the bitstream format, or null if the ID is invalid.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param id
+     *            ID of the bitstream format
+     * 
+     * @return the bitstream format, or null if the ID is invalid.
      */
-    public static DCType find(Context context, int id)
-                       throws SQLException
+    public static DCType find(Context context, int id) throws SQLException
     {
         TableRow row = DatabaseManager.find(context, "dctyperegistry", id);
 
@@ -172,16 +176,17 @@ public class DCType
             if (log.isDebugEnabled())
             {
                 log.debug(LogManager.getHeader(context, "find_dc_type",
-                                               "not_found,dc_type_id=" + id));
+                        "not_found,dc_type_id=" + id));
             }
 
             return null;
-        } else
+        }
+        else
         {
             if (log.isDebugEnabled())
             {
                 log.debug(LogManager.getHeader(context, "find_dc_type",
-                                               "dc_type_id=" + id));
+                        "dc_type_id=" + id));
             }
 
             return new DCType(context, row);
@@ -189,41 +194,45 @@ public class DCType
     }
 
     /**
-     * Find a given Dublin Core type.  Returns <code>null</code> if the
-     * Dublin Core type doesn't exist.
-     *
-     * @param   context    the DSpace context to use
-     * @param   element    the element to find
-     * @param   qualifier  the qualifier, or <code>null</code> to find an
-     *                     unqualified type
-     *
+     * Find a given Dublin Core type. Returns <code>null</code> if the Dublin
+     * Core type doesn't exist.
+     * 
+     * @param context
+     *            the DSpace context to use
+     * @param element
+     *            the element to find
+     * @param qualifier
+     *            the qualifier, or <code>null</code> to find an unqualified
+     *            type
+     * 
      * @return the Dublin Core type, or <code>null</code> if there isn't a
      *         corresponding type in the registry
      */
     public static DCType findByElement(Context context, String element,
-                                       String qualifier)
-                                throws SQLException
+            String qualifier) throws SQLException
     {
-        String sql = "SELECT * FROM dctyperegistry WHERE element LIKE '" +
-                     element + "' AND qualifier";
+        String sql = "SELECT * FROM dctyperegistry WHERE element LIKE '"
+                + element + "' AND qualifier";
 
         if (qualifier == null)
         {
             sql = sql + " is null";
-        } else
+        }
+        else
         {
             sql = sql + " LIKE '" + qualifier + "'";
         }
 
         TableRowIterator tri = DatabaseManager.query(context, "dctyperegistry",
-                                                     sql);
+                sql);
 
         // Return the first matching element (if two match there's a problem,
         // but not one dealt with here)
         if (tri.hasNext())
         {
             return new DCType(context, tri.next());
-        } else
+        }
+        else
         {
             // No match means there's no corresponding element
             return null;
@@ -232,8 +241,8 @@ public class DCType
 
     /**
      * Retrieve all Dublin Core types from the registry
-     *
-     * @return  an array of all the Dublin Core types
+     * 
+     * @return an array of all the Dublin Core types
      */
     public static DCType[] findAll(Context context) throws SQLException
     {
@@ -241,7 +250,7 @@ public class DCType
 
         // Get all the dctyperegistry rows
         TableRowIterator tri = DatabaseManager.query(context, "dctyperegistry",
-                                                     "SELECT * FROM dctyperegistry ORDER BY element, qualifier");
+                "SELECT * FROM dctyperegistry ORDER BY element, qualifier");
 
         // Make into DC Type objects
         while (tri.hasNext())
@@ -259,45 +268,47 @@ public class DCType
 
     /**
      * Create a new Dublin Core type
-     *
-     * @param  context  DSpace context object
-     * @return  the newly created DCType
+     * 
+     * @param context
+     *            DSpace context object
+     * @return the newly created DCType
      */
-    public static DCType create(Context context)
-                         throws SQLException, AuthorizeException
+    public static DCType create(Context context) throws SQLException,
+            AuthorizeException
     {
         // Check authorisation: Only admins may create DC types
         if (!AuthorizeManager.isAdmin(context))
         {
-            throw new AuthorizeException("Only administrators may modify the Dublin Core registry");
+            throw new AuthorizeException(
+                    "Only administrators may modify the Dublin Core registry");
         }
 
         // Create a table row
         TableRow row = DatabaseManager.create(context, "dctyperegistry");
 
-        log.info(LogManager.getHeader(context, "create_dc_type",
-                                      "dc_type_id=" +
-                                      row.getIntColumn("dc_type_id")));
+        log.info(LogManager.getHeader(context, "create_dc_type", "dc_type_id="
+                + row.getIntColumn("dc_type_id")));
 
         return new DCType(context, row);
     }
 
     /**
-     * Delete this DC type.  This won't work if there are any DC values
-     * in the database of this type - they need to be updated first.
-     * An <code>SQLException</code> (referential integrity violation)
-     * will be thrown in this case.
+     * Delete this DC type. This won't work if there are any DC values in the
+     * database of this type - they need to be updated first. An
+     * <code>SQLException</code> (referential integrity violation) will be
+     * thrown in this case.
      */
     public void delete() throws SQLException, AuthorizeException
     {
         // Check authorisation: Only admins may create DC types
         if (!AuthorizeManager.isAdmin(ourContext))
         {
-            throw new AuthorizeException("Only administrators may modify the Dublin Core registry");
+            throw new AuthorizeException(
+                    "Only administrators may modify the Dublin Core registry");
         }
 
         log.info(LogManager.getHeader(ourContext, "delete_dc_type",
-                                      "dc_type_id=" + getID()));
+                "dc_type_id=" + getID()));
 
         DatabaseManager.delete(ourContext, typeRow);
 
@@ -307,7 +318,7 @@ public class DCType
 
     /**
      * Get the internal identifier of this bitstream format
-     *
+     * 
      * @return the internal identifier
      */
     public int getID()
@@ -317,8 +328,8 @@ public class DCType
 
     /**
      * Get the DC element
-     *
-     * @return  the element
+     * 
+     * @return the element
      */
     public String getElement()
     {
@@ -327,8 +338,9 @@ public class DCType
 
     /**
      * Set the DC element
-     *
-     * @param  s   the new element
+     * 
+     * @param s
+     *            the new element
      */
     public void setElement(String s)
     {
@@ -337,9 +349,9 @@ public class DCType
 
     /**
      * Get the DC qualifier, if any.
-     *
-     * @return  the DC qualifier, or <code>null</code> if this is an
-     *          unqualified element
+     * 
+     * @return the DC qualifier, or <code>null</code> if this is an
+     *         unqualified element
      */
     public String getQualifier()
     {
@@ -348,9 +360,10 @@ public class DCType
 
     /**
      * Set the DC qualifier
-     *
-     * @param s  the DC qualifier, or <code>null</code> if this is an
-     *           unqualified element
+     * 
+     * @param s
+     *            the DC qualifier, or <code>null</code> if this is an
+     *            unqualified element
      */
     public void setQualifier(String s)
     {
@@ -359,8 +372,8 @@ public class DCType
 
     /**
      * Get the scope note - information about the DC type and its use
-     *
-     * @return  the scope note
+     * 
+     * @return the scope note
      */
     public String getScopeNote()
     {
@@ -369,8 +382,9 @@ public class DCType
 
     /**
      * Set the scope note
-     *
-     * @param  s   the new scope note
+     * 
+     * @param s
+     *            the new scope note
      */
     public void setScopeNote(String s)
     {
@@ -385,15 +399,15 @@ public class DCType
         // Check authorisation: Only admins may update DC types
         if (!AuthorizeManager.isAdmin(ourContext))
         {
-            throw new AuthorizeException("Only administrators may modiffy the Dublin Core registry");
+            throw new AuthorizeException(
+                    "Only administrators may modiffy the Dublin Core registry");
         }
 
         DatabaseManager.update(ourContext, typeRow);
 
         log.info(LogManager.getHeader(ourContext, "update_dctype",
-                                      "dc_type_id=" + getID() + "element=" +
-                                      getElement() + "qualifier=" +
-                                      getQualifier()));
+                "dc_type_id=" + getID() + "element=" + getElement()
+                        + "qualifier=" + getQualifier()));
 
         // Update in-memory cache of DC types
         loadDC(ourContext);

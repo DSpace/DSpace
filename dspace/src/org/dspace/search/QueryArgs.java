@@ -48,10 +48,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.oro.text.perl.Perl5Util;
 
-
 /**
- * Contains the arguments for a query.  Fill it out and pass
- *  to the query engine
+ * Contains the arguments for a query. Fill it out and pass to the query engine
  */
 public class QueryArgs
 {
@@ -61,10 +59,12 @@ public class QueryArgs
     // start and count defines a search 'cursor' or page
     // query will return 'count' hits beginning at offset 'start'
     private int start = 0; // default values
+
     private int pageSize = 10;
 
     /**
      * set the query string
+     * 
      * @param newQuery
      */
     public void setQuery(String newQuery)
@@ -74,6 +74,7 @@ public class QueryArgs
 
     /**
      * retrieve the query string
+     * 
      * @return the current query string
      */
     public String getQuery()
@@ -82,10 +83,11 @@ public class QueryArgs
     }
 
     /**
-     * set the offset of the desired search results,
-     *  beginning with 0 ; used to page results
-     *  (the default value is 0)
-     * @param newStart index of first desired result
+     * set the offset of the desired search results, beginning with 0 ; used to
+     * page results (the default value is 0)
+     * 
+     * @param newStart
+     *            index of first desired result
      */
     public void setStart(int newStart)
     {
@@ -94,6 +96,7 @@ public class QueryArgs
 
     /**
      * read the search's starting offset
+     * 
      * @return current index of first desired result
      */
     public int getStart()
@@ -102,10 +105,11 @@ public class QueryArgs
     }
 
     /**
-     * set the count of hits to return;
-     *  used to implement paged searching
-     *  see the initializer for the default value
-     * @param newSize number of hits per page
+     * set the count of hits to return; used to implement paged searching see
+     * the initializer for the default value
+     * 
+     * @param newSize
+     *            number of hits per page
      */
     public void setPageSize(int newSize)
     {
@@ -114,6 +118,7 @@ public class QueryArgs
 
     /**
      * get the count of hits to return
+     * 
      * @return number of results per page
      */
     public int getPageSize()
@@ -182,32 +187,29 @@ public class QueryArgs
     public HashMap buildQueryHash(HttpServletRequest request)
     {
         HashMap queryHash = new HashMap();
-        queryHash.put("query1",
-                      (request.getParameter("query1") == null) ? ""
-                                                               : request.getParameter("query1"));
-        queryHash.put("query2",
-                      (request.getParameter("query2") == null) ? ""
-                                                               : request.getParameter("query2"));
-        queryHash.put("query3",
-                      (request.getParameter("query3") == null) ? ""
-                                                               : request.getParameter("query3"));
+        queryHash.put("query1", (request.getParameter("query1") == null) ? ""
+                : request.getParameter("query1"));
+        queryHash.put("query2", (request.getParameter("query2") == null) ? ""
+                : request.getParameter("query2"));
+        queryHash.put("query3", (request.getParameter("query3") == null) ? ""
+                : request.getParameter("query3"));
 
         queryHash.put("field1",
-                      (request.getParameter("field1") == null) ? "ANY"
-                                                               : request.getParameter("field1"));
+                (request.getParameter("field1") == null) ? "ANY" : request
+                        .getParameter("field1"));
         queryHash.put("field2",
-                      (request.getParameter("field2") == null) ? "ANY"
-                                                               : request.getParameter("field2"));
+                (request.getParameter("field2") == null) ? "ANY" : request
+                        .getParameter("field2"));
         queryHash.put("field3",
-                      (request.getParameter("field3") == null) ? "ANY"
-                                                               : request.getParameter("field3"));
+                (request.getParameter("field3") == null) ? "ANY" : request
+                        .getParameter("field3"));
 
         queryHash.put("conjunction1",
-                      (request.getParameter("conjunction1") == null) ? "AND"
-                                                                     : request.getParameter("conjunction1"));
+                (request.getParameter("conjunction1") == null) ? "AND"
+                        : request.getParameter("conjunction1"));
         queryHash.put("conjunction2",
-                      (request.getParameter("conjunction2") == null) ? "AND"
-                                                                     : request.getParameter("conjunction1"));
+                (request.getParameter("conjunction2") == null) ? "AND"
+                        : request.getParameter("conjunction1"));
 
         return (queryHash);
     }

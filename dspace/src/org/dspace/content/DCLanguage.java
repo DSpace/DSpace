@@ -41,11 +41,10 @@ package org.dspace.content;
 
 import java.util.Locale;
 
-
 /**
  * Utility class for dealing with languages
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class DCLanguage
@@ -58,8 +57,9 @@ public class DCLanguage
 
     /**
      * Construct a language object from a database entry
-     *
-     * @param  l  the language text from the database
+     * 
+     * @param l
+     *            the language text from the database
      */
     public DCLanguage(String l)
     {
@@ -68,18 +68,20 @@ public class DCLanguage
 
     /**
      * Write the language out to the database
-     *
-     * @return  the language in a form for writing to the DCValue table
+     * 
+     * @return the language in a form for writing to the DCValue table
      */
     public String toString()
     {
         if (language.equals(""))
         {
             return "";
-        } else if (country.equals(""))
+        }
+        else if (country.equals(""))
         {
             return language;
-        } else
+        }
+        else
         {
             return country + "_" + language;
         }
@@ -87,8 +89,9 @@ public class DCLanguage
 
     /**
      * Set the language and country
-     *
-     * @param l  The language and country code, e.g. "en_US" or "fr"
+     * 
+     * @param l
+     *            The language and country code, e.g. "en_US" or "fr"
      */
     public void setLanguage(String l)
     {
@@ -96,15 +99,18 @@ public class DCLanguage
         {
             language = "other";
             country = "";
-        } else if (l.length() == 2)
+        }
+        else if (l.length() == 2)
         {
             language = l;
             country = "";
-        } else if (l.length() == 5)
+        }
+        else if (l.length() == 5)
         {
             language = l.substring(0, 2);
             country = l.substring(3);
-        } else
+        }
+        else
         {
             language = "";
             country = "";
@@ -113,8 +119,8 @@ public class DCLanguage
 
     /**
      * Get the displayable name for this language
-     *
-     * @return  the displayable name
+     * 
+     * @return the displayable name
      */
     public String getDisplayName()
     {
@@ -123,10 +129,12 @@ public class DCLanguage
         if (language.equals("other"))
         {
             return "(Other)";
-        } else if (language.equals(""))
+        }
+        else if (language.equals(""))
         {
             return "N/A";
-        } else
+        }
+        else
         {
             locale = new Locale(language, country);
 

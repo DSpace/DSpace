@@ -47,43 +47,36 @@ import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
 
-
 /**
- * Custom Lucene Analyzer that combines the
- *  standard filter, lowercase filter, stemming
- *  and stopword filters.
+ * Custom Lucene Analyzer that combines the standard filter, lowercase filter,
+ * stemming and stopword filters.
  */
 public class DSAnalyzer extends Analyzer
 {
     /*
-     * An array containing some common words that
-     * are not usually useful for searching.
+     * An array containing some common words that are not usually useful for
+     * searching.
      */
-    private static final String[] STOP_WORDS = 
-                                               {
-                                                   
+    private static final String[] STOP_WORDS = {
+
     // new stopwords (per MargretB)
-    "a", "am", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in",
-                                                   "into", "is", "it", "no",
-                                                   "not", "of", "on", "or",
-                                                   "the", "to", "was"
-                                               // old stopwords (Lucene default)
-    /*                "a",        "and",        "are",        "as",
-     "at",        "be",        "but",        "by",
-     "for",        "if",        "in",        "into",
-     "is",        "it",        "no",        "not",
-     "of",        "on",        "or",        "s",
-     "such",        "t",        "that",        "the",
-     "their","then", "there","these",
-     "they",        "this", "to",        "was",
-     "will",        "with"
+            "a", "am", "and", "are", "as", "at", "be", "but", "by", "for",
+            "if", "in", "into", "is", "it", "no", "not", "of", "on", "or",
+            "the", "to", "was"
+    // old stopwords (Lucene default)
+    /*
+     * "a", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in",
+     * "into", "is", "it", "no", "not", "of", "on", "or", "s", "such", "t",
+     * "that", "the", "their","then", "there","these", "they", "this", "to",
+     * "was", "will", "with"
      */
     };
 
     /*
      * Stop table
      */
-    final static private Hashtable stopTable = StopFilter.makeStopTable(STOP_WORDS);
+    final static private Hashtable stopTable = StopFilter
+            .makeStopTable(STOP_WORDS);
 
     /*
      * Create a token stream for this analyzer.

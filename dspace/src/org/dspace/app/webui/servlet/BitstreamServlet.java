@@ -59,13 +59,12 @@ import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 
-
 /**
- * Servlet for retrieving bitstreams.  The bits are simply piped to the user.
+ * Servlet for retrieving bitstreams. The bits are simply piped to the user.
  * <P>
  * <code>/bitstream/handle/sequence_id/filename</code>
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class BitstreamServlet extends DSpaceServlet
@@ -74,9 +73,8 @@ public class BitstreamServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(RetrieveServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         Bitstream bitstream = null;
 
@@ -113,13 +111,15 @@ public class BitstreamServlet extends DSpaceServlet
             // Find the corresponding bitstream
             try
             {
-                Item item = (Item) HandleManager.resolveToObject(context, handle);
+                Item item = (Item) HandleManager.resolveToObject(context,
+                        handle);
 
                 if (item == null)
                 {
                     log.info(LogManager.getHeader(context, "invalid_id",
-                                                  "path=" + handle));
-                    JSPManager.showInvalidIDError(request, response, handle, -1);
+                            "path=" + handle));
+                    JSPManager
+                            .showInvalidIDError(request, response, handle, -1);
 
                     return;
                 }
@@ -142,7 +142,8 @@ public class BitstreamServlet extends DSpaceServlet
                         }
                     }
                 }
-            } catch (NumberFormatException nfe)
+            }
+            catch (NumberFormatException nfe)
             {
                 // Invalid ID - this will be dealt with below
             }
@@ -152,14 +153,14 @@ public class BitstreamServlet extends DSpaceServlet
         if (bitstream != null)
         {
             log.info(LogManager.getHeader(context, "view_bitstream",
-                                          "bitstream_id=" + bitstream.getID()));
+                    "bitstream_id=" + bitstream.getID()));
 
             // Set the response MIME type
             response.setContentType(bitstream.getFormat().getMIMEType());
 
             // Response length
-            response.setHeader("Content-Length",
-                               String.valueOf(bitstream.getSize()));
+            response.setHeader("Content-Length", String.valueOf(bitstream
+                    .getSize()));
 
             // Pipe the bits
             InputStream is = bitstream.retrieve();
@@ -167,14 +168,15 @@ public class BitstreamServlet extends DSpaceServlet
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();
             response.getOutputStream().flush();
-        } else
+        }
+        else
         {
             // No bitstream - we got an invalid ID
             log.info(LogManager.getHeader(context, "view_bitstream",
-                                          "invalid_bitstream_id=" + idString));
+                    "invalid_bitstream_id=" + idString));
 
             JSPManager.showInvalidIDError(request, response, idString,
-                                          Constants.BITSTREAM);
+                    Constants.BITSTREAM);
         }
     }
 }

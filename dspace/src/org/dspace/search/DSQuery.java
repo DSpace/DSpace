@@ -1,41 +1,36 @@
 /*
  * DSQuery.java
- *
+ * 
  * Version: $Revision$
- *
+ * 
  * Date: $Date$
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
+ * 
+ * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts Institute of
+ * Technology. All rights reserved.
+ * 
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * modification, are permitted provided that the following conditions are met:
+ *  - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *  - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *  - Neither the name of the Hewlett-Packard Company nor the name of the
+ * Massachusetts Institute of Technology nor the names of their contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.dspace.search;
 
@@ -63,7 +58,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
-
 // issues
 //   need to filter query string for security
 //   cmd line query needs to process args correctly (seems to split them up)
@@ -71,25 +65,33 @@ public class DSQuery
 {
     // Result types
     static final String ALL = "999";
+
     static final String ITEM = "" + Constants.ITEM;
+
     static final String COLLECTION = "" + Constants.COLLECTION;
+
     static final String COMMUNITY = "" + Constants.COMMUNITY;
 
     // cache a Lucene IndexSearcher for more efficient searches
     private static Searcher searcher;
+
     private static long lastModified;
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(DSQuery.class);
 
-    /** Do a query, returning a List of DSpace Handles to objects matching the query.
-     *  @param query string in Lucene query syntax
-     *
-     *  @return HashMap with lists for items, communities, and collections
-     *        (keys are strings from Constants.ITEM, Constants.COLLECTION, etc.
+    /**
+     * Do a query, returning a List of DSpace Handles to objects matching the
+     * query.
+     * 
+     * @param query
+     *            string in Lucene query syntax
+     * 
+     * @return HashMap with lists for items, communities, and collections (keys
+     *         are strings from Constants.ITEM, Constants.COLLECTION, etc.
      */
     public static QueryResults doQuery(Context c, QueryArgs args)
-                                throws IOException
+            throws IOException
     {
         String querystring = args.getQuery();
         QueryResults qr = new QueryResults();
@@ -102,16 +104,21 @@ public class DSQuery
         qr.setStart(args.getStart());
         qr.setPageSize(args.getPageSize());
 
-        // massage the query string a bit                    
-        querystring = checkEmptyQuery(querystring); // change nulls to an empty string
-        querystring = workAroundLuceneBug(querystring); // logicals changed to && ||, etc.
-        querystring = stripHandles(querystring); // remove handles from query string
-        querystring = stripAsterisk(querystring); // remove asterisk from beginning of string
+        // massage the query string a bit
+        querystring = checkEmptyQuery(querystring); // change nulls to an empty
+                                                    // string
+        querystring = workAroundLuceneBug(querystring); // logicals changed to
+                                                        // && ||, etc.
+        querystring = stripHandles(querystring); // remove handles from query
+                                                 // string
+        querystring = stripAsterisk(querystring); // remove asterisk from
+                                                  // beginning of string
 
         try
         {
             // grab a searcher, and do the search
-            Searcher searcher = getSearcher(ConfigurationManager.getProperty("search.dir"));
+            Searcher searcher = getSearcher(ConfigurationManager
+                    .getProperty("search.dir"));
 
             QueryParser qp = new QueryParser("default", new DSAnalyzer());
 
@@ -131,11 +138,10 @@ public class DSQuery
                 // how many are available after snipping off at offset 'start'?
                 int hitsRemaining = hits.length() - args.getStart();
 
-                int hitsToProcess = (hitsRemaining < args.getPageSize())
-                                    ? hitsRemaining : args.getPageSize();
+                int hitsToProcess = (hitsRemaining < args.getPageSize()) ? hitsRemaining
+                        : args.getPageSize();
 
-                for (int i = args.getStart();
-                         i < (args.getStart() + hitsToProcess); i++)
+                for (int i = args.getStart(); i < (args.getStart() + hitsToProcess); i++)
                 {
                     Document d = hits.doc(i);
 
@@ -147,33 +153,43 @@ public class DSQuery
                     if (handletype.equals("" + Constants.ITEM))
                     {
                         hitTypes.add(new Integer(Constants.ITEM));
-                    } else if (handletype.equals("" + Constants.COLLECTION))
+                    }
+                    else if (handletype.equals("" + Constants.COLLECTION))
                     {
                         hitTypes.add(new Integer(Constants.COLLECTION));
-                    } else if (handletype.equals("" + Constants.COMMUNITY))
+                    }
+                    else if (handletype.equals("" + Constants.COMMUNITY))
                     {
                         hitTypes.add(new Integer(Constants.COMMUNITY));
-                    } else
+                    }
+                    else
                     {
-                        // error!  unknown type!
+                        // error! unknown type!
                     }
                 }
             }
-        } catch (NumberFormatException e)
+        }
+        catch (NumberFormatException e)
         {
-            log.warn(LogManager.getHeader(c, "Number format exception", "" + e));
+            log
+                    .warn(LogManager.getHeader(c, "Number format exception", ""
+                            + e));
 
             qr.setErrorMsg("Number format exception");
-        } catch (ParseException e)
+        }
+        catch (ParseException e)
         {
             // a parse exception - log and return null results
             log.warn(LogManager.getHeader(c, "Invalid search string", "" + e));
 
             qr.setErrorMsg("Invalid search string");
-        } catch (TokenMgrError tme)
+        }
+        catch (TokenMgrError tme)
         {
             // Similar to parse exception
-            log.warn(LogManager.getHeader(c, "Invalid search string", "" + tme));
+            log
+                    .warn(LogManager.getHeader(c, "Invalid search string", ""
+                            + tme));
 
             qr.setErrorMsg("Invalid search string");
         }
@@ -195,8 +211,8 @@ public class DSQuery
     {
         // Lucene currently has a bug which breaks wildcard
         // searching when you have uppercase characters.
-        // Here we substitute the boolean operators -- which 
-        // have to be uppercase -- before tranforming the 
+        // Here we substitute the boolean operators -- which
+        // have to be uppercase -- before tranforming the
         // query string to lowercase.
         Perl5Util util = new Perl5Util();
 
@@ -215,7 +231,7 @@ public class DSQuery
         Perl5Util util = new Perl5Util();
 
         myquery = util.substitute("s|^(\\s+)?http://hdl\\.handle\\.net/||",
-                                  myquery);
+                myquery);
         myquery = util.substitute("s|^(\\s+)?hdl:||", myquery);
 
         return myquery;
@@ -223,7 +239,7 @@ public class DSQuery
 
     static String stripAsterisk(String myquery)
     {
-        // query strings (or words) begining with "*" cause a null pointer error 
+        // query strings (or words) begining with "*" cause a null pointer error
         Perl5Util util = new Perl5Util();
 
         myquery = util.substitute("s/^\\*//", myquery);
@@ -234,15 +250,16 @@ public class DSQuery
         return myquery;
     }
 
-    /** Do a query, restricted to a collection
+    /**
+     * Do a query, restricted to a collection
+     * 
      * @param query
      * @param collection
-     *
+     * 
      * @return QueryResults same results as doQuery, restricted to a collection
      */
     public static QueryResults doQuery(Context c, QueryArgs args,
-                                       Collection coll)
-                                throws IOException
+            Collection coll) throws IOException
     {
         String querystring = args.getQuery();
 
@@ -250,22 +267,24 @@ public class DSQuery
 
         String location = "l" + (coll.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\"" +
-                                     location + "\"");
+        String newquery = new String("+(" + querystring + ") +location:\""
+                + location + "\"");
 
         args.setQuery(newquery);
 
         return doQuery(c, args);
     }
 
-    /** Do a query, restricted to a community
+    /**
+     * Do a query, restricted to a community
+     * 
      * @param querystring
      * @param community
-     *
+     * 
      * @return HashMap results, same as full doQuery, only hits in a Community
      */
     public static QueryResults doQuery(Context c, QueryArgs args, Community comm)
-                                throws IOException
+            throws IOException
     {
         String querystring = args.getQuery();
 
@@ -273,17 +292,20 @@ public class DSQuery
 
         String location = "m" + (comm.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\"" +
-                                     location + "\"");
+        String newquery = new String("+(" + querystring + ") +location:\""
+                + location + "\"");
 
         args.setQuery(newquery);
 
         return doQuery(c, args);
     }
 
-    /** return everything from a query
-     * @param results hashmap from doQuery
-     *
+    /**
+     * return everything from a query
+     * 
+     * @param results
+     *            hashmap from doQuery
+     * 
      * @return List of all objects returned by search
      */
     public static List getResults(HashMap results)
@@ -291,9 +313,12 @@ public class DSQuery
         return ((List) results.get(ALL));
     }
 
-    /** return just the items from a query
-     * @param results hashmap from doQuery
-     *
+    /**
+     * return just the items from a query
+     * 
+     * @param results
+     *            hashmap from doQuery
+     * 
      * @return List of items found by query
      */
     public static List getItemResults(HashMap results)
@@ -301,9 +326,12 @@ public class DSQuery
         return ((List) results.get(ITEM));
     }
 
-    /** return just the collections from a query
-     * @param results hashmap from doQuery
-     *
+    /**
+     * return just the collections from a query
+     * 
+     * @param results
+     *            hashmap from doQuery
+     * 
      * @return List of collections found by query
      */
     public static List getCollectionResults(HashMap results)
@@ -311,9 +339,12 @@ public class DSQuery
         return ((List) results.get(COLLECTION));
     }
 
-    /** return just the communities from a query
-     * @param results hashmap from doQuery
-     *
+    /**
+     * return just the communities from a query
+     * 
+     * @param results
+     *            hashmap from doQuery
+     * 
      * @return list of Communities found by query
      */
     public static List getCommunityResults(HashMap results)
@@ -321,9 +352,12 @@ public class DSQuery
         return ((List) results.get(COMMUNITY));
     }
 
-    /** returns true if anything found
-     * @param results hashmap from doQuery
-     *
+    /**
+     * returns true if anything found
+     * 
+     * @param results
+     *            hashmap from doQuery
+     * 
      * @return true if anything found, false if nothing
      */
     public static boolean resultsFound(HashMap results)
@@ -333,9 +367,12 @@ public class DSQuery
         return (!thislist.isEmpty());
     }
 
-    /** returns true if items found
-     * @param results hashmap from doQuery
-     *
+    /**
+     * returns true if items found
+     * 
+     * @param results
+     *            hashmap from doQuery
+     * 
      * @return true if items found, false if none found
      */
     public static boolean itemsFound(HashMap results)
@@ -345,9 +382,12 @@ public class DSQuery
         return (!thislist.isEmpty());
     }
 
-    /** returns true if collections found
-     * @param results hashmap from doQuery
-     *
+    /**
+     * returns true if collections found
+     * 
+     * @param results
+     *            hashmap from doQuery
+     * 
      * @return true if collections found, false if none
      */
     public static boolean collectionsFound(HashMap results)
@@ -357,9 +397,12 @@ public class DSQuery
         return (!thislist.isEmpty());
     }
 
-    /** returns true if communities found
-     * @param results hashmap from doQuery
-     *
+    /**
+     * returns true if communities found
+     * 
+     * @param results
+     *            hashmap from doQuery
+     * 
      * @return true if communities found, false if none
      */
     public static boolean communitiesFound(HashMap results)
@@ -369,8 +412,9 @@ public class DSQuery
         return (!thislist.isEmpty());
     }
 
-    /** Do a query, printing results to stdout
-     *  largely for testing, but it is useful
+    /**
+     * Do a query, printing results to stdout largely for testing, but it is
+     * useful
      */
     public static void doCMDLineQuery(String query)
     {
@@ -398,7 +442,8 @@ public class DSQuery
                 // also look up type
                 System.out.println(type + "\t" + thisHandle);
             }
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             System.out.println("Exception caught: " + e);
         }
@@ -415,13 +460,12 @@ public class DSQuery
     /*---------  private methods ----------*/
 
     /**
-     * get an IndexSearcher, hopefully a cached one
-     *  (gives much better performance.) checks to see
-     *  if the index has been modified - if so, it
-     *  creates a new IndexSearcher
+     * get an IndexSearcher, hopefully a cached one (gives much better
+     * performance.) checks to see if the index has been modified - if so, it
+     * creates a new IndexSearcher
      */
     private static synchronized Searcher getSearcher(String indexDir)
-                                              throws IOException
+            throws IOException
     {
         if (lastModified != IndexReader.getCurrentVersion(indexDir))
         {

@@ -1,41 +1,36 @@
 /*
  * CreativeCommons.java
- *
+ * 
  * Version: $Revision$
- *
+ * 
  * Date: $Date$
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
+ * 
+ * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts Institute of
+ * Technology. All rights reserved.
+ * 
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * modification, are permitted provided that the following conditions are met:
+ *  - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *  - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *  - Neither the name of the Hewlett-Packard Company nor the name of the
+ * Massachusetts Institute of Technology nor the names of their contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.dspace.license;
 
@@ -55,33 +50,40 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 
-
 public class CreativeCommons
 {
     /**
      * The Bundle Name
      */
     private static final String CC_BUNDLE_NAME = "CC-LICENSE";
+
     private static final String CC_BS_SOURCE = "org.dspace.license.CreativeCommons";
 
     /**
      * Some BitStream Names (BSN)
-     **/
+     */
     private static final String BSN_LICENSE_URL = "license_url";
+
     private static final String BSN_LICENSE_TEXT = "license_text";
+
     private static final String BSN_LICENSE_RDF = "license_rdf";
+
     private static boolean enabled_p;
 
     static
     {
         // we only check the property once
-        enabled_p = ConfigurationManager.getBooleanProperty("webui.submit.enable-cc");
+        enabled_p = ConfigurationManager
+                .getBooleanProperty("webui.submit.enable-cc");
 
         if (enabled_p)
         {
-            // if defined, set a proxy server for http requests to Creative Commons site
-            String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-            String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+            // if defined, set a proxy server for http requests to Creative
+            // Commons site
+            String proxyHost = ConfigurationManager
+                    .getProperty("http.proxy.host");
+            String proxyPort = ConfigurationManager
+                    .getProperty("http.proxy.port");
 
             if ((proxyHost != null) && (proxyPort != null))
             {
@@ -93,19 +95,18 @@ public class CreativeCommons
 
     /**
      * Simple accessor for enabling of CC
-     **/
+     */
     public static boolean isEnabled()
     {
         return enabled_p;
     }
 
     /**
-     * This is a bit of the "do-the-right-thing" method
-     * for CC stuff in an item
+     * This is a bit of the "do-the-right-thing" method for CC stuff in an item
      */
     public static void setLicense(Context context, Item item,
-                                  String cc_license_url)
-                           throws SQLException, IOException, AuthorizeException
+            String cc_license_url) throws SQLException, IOException,
+            AuthorizeException
     {
         // only if CC is enabled
         if (!CreativeCommons.isEnabled())
@@ -134,35 +135,36 @@ public class CreativeCommons
 
         // the 10 is the length of the license closing tag.
         int license_end = license_rdf.indexOf("</License>") + 10;
-        String document_rdf = "<rdf:RDF xmlns=\"http://web.resource.org/cc/\"\n" +
-                              "   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n" +
-                              "   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                              "<Work rdf:about=\"\">\n" +
-                              "<license rdf:resource=\"" + cc_license_url +
-                              "\">\n" + "</Work>\n\n" +
-                              license_rdf.substring(license_start, license_end) +
-                              "\n\n</rdf:RDF>";
+        String document_rdf = "<rdf:RDF xmlns=\"http://web.resource.org/cc/\"\n"
+                + "   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
+                + "   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
+                + "<Work rdf:about=\"\">\n"
+                + "<license rdf:resource=\""
+                + cc_license_url
+                + "\">\n"
+                + "</Work>\n\n"
+                + license_rdf.substring(license_start, license_end)
+                + "\n\n</rdf:RDF>";
 
         // set the format
-        BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(context,
-                                                                           "License");
+        BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(
+                context, "License");
 
         // set the URL bitstream
         setBitstreamFromBytes(item, bundle, BSN_LICENSE_URL, bs_format,
-                              cc_license_url.getBytes());
+                cc_license_url.getBytes());
 
         // set the license text bitstream
         setBitstreamFromBytes(item, bundle, BSN_LICENSE_TEXT, bs_format,
-                              license_text.getBytes());
+                license_text.getBytes());
 
         // set the RDF bitstream
         setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_format,
-                              document_rdf.getBytes());
+                document_rdf.getBytes());
     }
 
     public static void removeLicense(Context context, Item item)
-                              throws SQLException, IOException, 
-                                     AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         // only if CC is enabled
         if (!CreativeCommons.isEnabled())
@@ -180,7 +182,7 @@ public class CreativeCommons
     }
 
     public static boolean hasLicense(Context context, Item item)
-                              throws SQLException, IOException
+            throws SQLException, IOException
     {
         // only if CC is enabled
         if (!CreativeCommons.isEnabled())
@@ -199,13 +201,13 @@ public class CreativeCommons
         // verify it has correct contents
         try
         {
-            if ((getLicenseURL(item) == null) ||
-                    (getLicenseText(item) == null) ||
-                    (getLicenseRDF(item) == null))
+            if ((getLicenseURL(item) == null) || (getLicenseText(item) == null)
+                    || (getLicenseRDF(item) == null))
             {
                 return false;
             }
-        } catch (AuthorizeException ae)
+        }
+        catch (AuthorizeException ae)
         {
             return false;
         }
@@ -213,30 +215,27 @@ public class CreativeCommons
         return true;
     }
 
-    public static String getLicenseURL(Item item)
-                                throws SQLException, IOException, 
-                                       AuthorizeException
+    public static String getLicenseURL(Item item) throws SQLException,
+            IOException, AuthorizeException
     {
         return getStringFromBitstream(item, BSN_LICENSE_URL);
     }
 
-    public static String getLicenseText(Item item)
-                                 throws SQLException, IOException, 
-                                        AuthorizeException
+    public static String getLicenseText(Item item) throws SQLException,
+            IOException, AuthorizeException
     {
         return getStringFromBitstream(item, BSN_LICENSE_TEXT);
     }
 
-    public static String getLicenseRDF(Item item)
-                                throws SQLException, IOException, 
-                                       AuthorizeException
+    public static String getLicenseRDF(Item item) throws SQLException,
+            IOException, AuthorizeException
     {
         return getStringFromBitstream(item, BSN_LICENSE_RDF);
     }
 
     /**
-     * Get a few license-specific properties. We expect these to
-     * be cached at least per server run.
+     * Get a few license-specific properties. We expect these to be cached at
+     * least per server run.
      */
     public static String fetchLicenseText(String license_url)
     {
@@ -258,16 +257,12 @@ public class CreativeCommons
     // bitstreams are short and easily expressed as byte arrays in RAM
 
     /**
-     * This helper method
-     * takes some bytes and stores them as a bitstream
-     * for an item, under the CC bundle, with the given bitstream name
-     **/
+     * This helper method takes some bytes and stores them as a bitstream for an
+     * item, under the CC bundle, with the given bitstream name
+     */
     private static void setBitstreamFromBytes(Item item, Bundle bundle,
-                                              String bitstream_name,
-                                              BitstreamFormat format,
-                                              byte[] bytes)
-                                       throws SQLException, IOException, 
-                                              AuthorizeException
+            String bitstream_name, BitstreamFormat format, byte[] bytes)
+            throws SQLException, IOException, AuthorizeException
     {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         Bitstream bs = bundle.createBitstream(bais);
@@ -282,13 +277,12 @@ public class CreativeCommons
     }
 
     /**
-     * This helper method wraps a String around a byte array
-     * returned from the bitstream method further down
-     **/
+     * This helper method wraps a String around a byte array returned from the
+     * bitstream method further down
+     */
     private static String getStringFromBitstream(Item item,
-                                                 String bitstream_name)
-                                          throws SQLException, IOException, 
-                                                 AuthorizeException
+            String bitstream_name) throws SQLException, IOException,
+            AuthorizeException
     {
         if (!CreativeCommons.isEnabled())
         {
@@ -306,13 +300,11 @@ public class CreativeCommons
     }
 
     /**
-     * This helper method
-     * retrieves the bytes of a bitstream for an item under the CC bundle,
-     * with the given bitstream name
-     **/
+     * This helper method retrieves the bytes of a bitstream for an item under
+     * the CC bundle, with the given bitstream name
+     */
     private static byte[] getBytesFromBitstream(Item item, String bitstream_name)
-                                         throws SQLException, IOException, 
-                                                AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         Bundle cc_bundle = null;
 
@@ -324,11 +316,13 @@ public class CreativeCommons
             if ((bundles != null) && (bundles.length > 0))
             {
                 cc_bundle = bundles[0];
-            } else
+            }
+            else
             {
                 return null;
             }
-        } catch (Exception exc)
+        }
+        catch (Exception exc)
         {
             // this exception catching is a bit generic,
             // but basically it happens if there is no CC bundle
@@ -352,7 +346,7 @@ public class CreativeCommons
 
     /**
      * Fetch the contents of a URL
-     **/
+     */
     private static byte[] fetchURL(String url_string)
     {
         try
@@ -367,8 +361,7 @@ public class CreativeCommons
             while (true)
             {
                 int len = connection.getInputStream().read(bytes, offset,
-                                                           bytes.length -
-                                                           offset);
+                        bytes.length - offset);
 
                 if (len == -1)
                 {
@@ -379,7 +372,8 @@ public class CreativeCommons
             }
 
             return bytes;
-        } catch (Exception exc)
+        }
+        catch (Exception exc)
         {
             return null;
         }

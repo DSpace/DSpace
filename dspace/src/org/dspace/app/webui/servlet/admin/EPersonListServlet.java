@@ -53,24 +53,22 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
-
 /**
  * Servlet browsing through e-people and selecting them
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class EPersonListServlet extends DSpaceServlet
 {
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Are we for selecting a single or multiple epeople?
         boolean multiple = UIUtil.getBoolParameter(request, "multiple");
 
-        // What are we sorting by.  Lastname is default
+        // What are we sorting by. Lastname is default
         int sortBy = EPerson.LASTNAME;
 
         String sbParam = request.getParameter("sortby");
@@ -78,15 +76,17 @@ public class EPersonListServlet extends DSpaceServlet
         if ((sbParam != null) && sbParam.equals("lastname"))
         {
             sortBy = EPerson.LASTNAME;
-        } else if ((sbParam != null) && sbParam.equals("email"))
+        }
+        else if ((sbParam != null) && sbParam.equals("email"))
         {
             sortBy = EPerson.EMAIL;
-        } else if ((sbParam != null) && sbParam.equals("id"))
+        }
+        else if ((sbParam != null) && sbParam.equals("id"))
         {
             sortBy = EPerson.ID;
         }
 
-        // What's the index of the first eperson to show?  Default is 0
+        // What's the index of the first eperson to show? Default is 0
         int first = UIUtil.getIntParameter(request, "first");
 
         if (first == -1)

@@ -57,11 +57,10 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonDeletionException;
 
-
 /**
  * Servlet for editing and creating e-people
- *
- * @author  David Stuve
+ * 
+ * @author David Stuve
  * @version $Revision$
  */
 public class EPersonAdminServlet extends DSpaceServlet
@@ -70,17 +69,15 @@ public class EPersonAdminServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(EPersonAdminServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         showMain(context, request, response);
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit");
 
@@ -89,35 +86,35 @@ public class EPersonAdminServlet extends DSpaceServlet
             // add an EPerson, then jump user to edit page
             EPerson e = EPerson.create(context);
 
-            // create clever name and do update before continuing            
+            // create clever name and do update before continuing
             e.setEmail("newuser" + e.getID());
             e.update();
 
             request.setAttribute("eperson", e);
 
             JSPManager.showJSP(request, response,
-                               "/dspace-admin/eperson-edit.jsp");
+                    "/dspace-admin/eperson-edit.jsp");
 
             context.complete();
-        } else if (button.equals("submit_edit"))
+        }
+        else if (button.equals("submit_edit"))
         {
             // edit an eperson
-            EPerson e = EPerson.find(context,
-                                     UIUtil.getIntParameter(request,
-                                                            "eperson_id"));
+            EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
+                    "eperson_id"));
 
             request.setAttribute("eperson", e);
 
             JSPManager.showJSP(request, response,
-                               "/dspace-admin/eperson-edit.jsp");
+                    "/dspace-admin/eperson-edit.jsp");
 
             context.complete();
-        } else if (button.equals("submit_save"))
+        }
+        else if (button.equals("submit_save"))
         {
             // Update the metadata for an e-person
-            EPerson e = EPerson.find(context,
-                                     UIUtil.getIntParameter(request,
-                                                            "eperson_id"));
+            EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
+                    "eperson_id"));
 
             // see if the user changed the email - if so, make sure
             // the new email is unique
@@ -132,98 +129,112 @@ public class EPersonAdminServlet extends DSpaceServlet
                     // it's unique - proceed!
                     e.setEmail(newEmail);
 
-                    e.setFirstName(request.getParameter("firstname").equals("")
-                                   ? null : request.getParameter("firstname"));
+                    e
+                            .setFirstName(request.getParameter("firstname")
+                                    .equals("") ? null : request
+                                    .getParameter("firstname"));
 
-                    e.setLastName(request.getParameter("lastname").equals("")
-                                  ? null : request.getParameter("lastname"));
+                    e
+                            .setLastName(request.getParameter("lastname")
+                                    .equals("") ? null : request
+                                    .getParameter("lastname"));
 
                     // FIXME: More data-driven?
-                    e.setMetadata("phone",
-                                  request.getParameter("phone").equals("")
-                                  ? null : request.getParameter("phone"));
+                    e.setMetadata("phone", request.getParameter("phone")
+                            .equals("") ? null : request.getParameter("phone"));
 
-                    e.setCanLogIn((request.getParameter("can_log_in") != null) &&
-                                  request.getParameter("can_log_in").equals("true"));
+                    e.setCanLogIn((request.getParameter("can_log_in") != null)
+                            && request.getParameter("can_log_in")
+                                    .equals("true"));
 
-                    e.setRequireCertificate((request.getParameter("require_certificate") != null) &&
-                                            request.getParameter("require_certificate")
-                                                   .equals("true"));
+                    e.setRequireCertificate((request
+                            .getParameter("require_certificate") != null)
+                            && request.getParameter("require_certificate")
+                                    .equals("true"));
 
                     e.update();
 
                     showMain(context, request, response);
                     context.complete();
-                } else
+                }
+                else
                 {
                     // not unique - send error message & let try again
                     request.setAttribute("eperson", e);
-                    request.setAttribute("error_message",
-                                         "That EMail is in use by another EPerson.  Emails  must be unique.");
+                    request
+                            .setAttribute("error_message",
+                                    "That EMail is in use by another EPerson.  Emails  must be unique.");
 
                     JSPManager.showJSP(request, response,
-                                       "/dspace-admin/eperson-edit.jsp");
+                            "/dspace-admin/eperson-edit.jsp");
 
                     context.complete();
                 }
-            } else
+            }
+            else
             {
                 // no change to email
-                e.setFirstName(request.getParameter("firstname").equals("")
-                               ? null : request.getParameter("firstname"));
+                e
+                        .setFirstName(request.getParameter("firstname").equals(
+                                "") ? null : request.getParameter("firstname"));
 
-                e.setLastName(request.getParameter("lastname").equals("")
-                              ? null : request.getParameter("lastname"));
+                e
+                        .setLastName(request.getParameter("lastname")
+                                .equals("") ? null : request
+                                .getParameter("lastname"));
 
                 // FIXME: More data-driven?
                 e.setMetadata("phone",
-                              request.getParameter("phone").equals("") ? null
-                                                                       : request.getParameter("phone"));
+                        request.getParameter("phone").equals("") ? null
+                                : request.getParameter("phone"));
 
-                e.setCanLogIn((request.getParameter("can_log_in") != null) &&
-                              request.getParameter("can_log_in").equals("true"));
+                e.setCanLogIn((request.getParameter("can_log_in") != null)
+                        && request.getParameter("can_log_in").equals("true"));
 
-                e.setRequireCertificate((request.getParameter("require_certificate") != null) &&
-                                        request.getParameter("require_certificate")
-                                               .equals("true"));
+                e.setRequireCertificate((request
+                        .getParameter("require_certificate") != null)
+                        && request.getParameter("require_certificate").equals(
+                                "true"));
 
                 e.update();
 
                 showMain(context, request, response);
                 context.complete();
             }
-        } else if (button.equals("submit_delete"))
+        }
+        else if (button.equals("submit_delete"))
         {
             // Start delete process - go through verification step
-            EPerson e = EPerson.find(context,
-                                     UIUtil.getIntParameter(request,
-                                                            "eperson_id"));
+            EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
+                    "eperson_id"));
 
             request.setAttribute("eperson", e);
 
             JSPManager.showJSP(request, response,
-                               "/dspace-admin/eperson-confirm-delete.jsp");
-        } else if (button.equals("submit_confirm_delete"))
+                    "/dspace-admin/eperson-confirm-delete.jsp");
+        }
+        else if (button.equals("submit_confirm_delete"))
         {
             // User confirms deletion of type
-            EPerson e = EPerson.find(context,
-                                     UIUtil.getIntParameter(request,
-                                                            "eperson_id"));
+            EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
+                    "eperson_id"));
 
             try
             {
                 e.delete();
-            } catch (EPersonDeletionException ex)
+            }
+            catch (EPersonDeletionException ex)
             {
                 request.setAttribute("eperson", e);
                 request.setAttribute("tableList", ex.getTables());
                 JSPManager.showJSP(request, response,
-                                   "/dspace-admin/eperson-deletion-error.jsp");
+                        "/dspace-admin/eperson-deletion-error.jsp");
             }
 
             showMain(context, request, response);
             context.complete();
-        } else
+        }
+        else
         {
             // Cancel etc. pressed - show list again
             showMain(context, request, response);
@@ -231,9 +242,8 @@ public class EPersonAdminServlet extends DSpaceServlet
     }
 
     private void showMain(Context c, HttpServletRequest request,
-                          HttpServletResponse response)
-                   throws ServletException, IOException, SQLException, 
-                          AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         JSPManager.showJSP(request, response, "/dspace-admin/eperson-main.jsp");
     }

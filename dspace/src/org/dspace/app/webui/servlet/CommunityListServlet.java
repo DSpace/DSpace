@@ -57,11 +57,10 @@ import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
-
 /**
  * Servlet for listing communities (and collections within them)
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class CommunityListServlet extends DSpaceServlet
@@ -70,9 +69,8 @@ public class CommunityListServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(CommunityListServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         log.info(LogManager.getHeader(context, "view_community_list", ""));
 

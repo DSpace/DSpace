@@ -57,12 +57,11 @@ import org.dspace.core.Email;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
-
 /**
  * Servlet for handling user feedback
- *
- * @author  Peter Breton
- * @author  Robert Tansley
+ * 
+ * @author Peter Breton
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class FeedbackServlet extends DSpaceServlet
@@ -71,9 +70,8 @@ public class FeedbackServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(FeedbackServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Obtain information from request
         // The page where the user came from
@@ -103,11 +101,11 @@ public class FeedbackServlet extends DSpaceServlet
             String feedback = request.getParameter("feedback");
 
             // Check all data is there
-            if ((formEmail == null) || formEmail.equals("") ||
-                    (feedback == null) || feedback.equals(""))
+            if ((formEmail == null) || formEmail.equals("")
+                    || (feedback == null) || feedback.equals(""))
             {
                 log.info(LogManager.getHeader(context, "show_feedback_form",
-                                              "problem=true"));
+                        "problem=true"));
                 request.setAttribute("feedback.problem", new Boolean(true));
                 JSPManager.showJSP(request, response, "/feedback/form.jsp");
 
@@ -118,7 +116,8 @@ public class FeedbackServlet extends DSpaceServlet
             try
             {
                 Email email = ConfigurationManager.getEmail("feedback");
-                email.addRecipient(ConfigurationManager.getProperty("feedback.recipient"));
+                email.addRecipient(ConfigurationManager
+                        .getProperty("feedback.recipient"));
 
                 email.addArgument(new Date()); // Date
                 email.addArgument(formEmail); // Email
@@ -133,32 +132,33 @@ public class FeedbackServlet extends DSpaceServlet
 
                 email.send();
 
-                log.info(LogManager.getHeader(context, "sent_feedback",
-                                              "from=" + formEmail));
+                log.info(LogManager.getHeader(context, "sent_feedback", "from="
+                        + formEmail));
 
                 JSPManager.showJSP(request, response,
-                                   "/feedback/acknowledge.jsp");
-            } catch (MessagingException me)
+                        "/feedback/acknowledge.jsp");
+            }
+            catch (MessagingException me)
             {
                 log.warn(LogManager.getHeader(context,
-                                              "error_mailing_feedback", ""), me);
+                        "error_mailing_feedback", ""), me);
 
                 JSPManager.showInternalError(request, response);
             }
-        } else
+        }
+        else
         {
             // Display feedback form
             log.info(LogManager.getHeader(context, "show_feedback_form",
-                                          "problem=false"));
+                    "problem=false"));
             request.setAttribute("authenticated.email", authEmail);
             JSPManager.showJSP(request, response, "/feedback/form.jsp");
         }
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Treat as a GET
         doDSGet(context, request, response);

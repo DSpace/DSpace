@@ -21,21 +21,24 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.search.DSIndexer;
 
-
 /**
  * MediaFilterManager is the class that invokes the media filters over the
  * repository's content. a few command line flags affect the operation of the
  * MFM: -v verbose outputs all extracted text to SDTDOUT -f force forces all
  * bitstreams to be processed, even if they have been before -n noindex does not
  * recreate index after processing bitstreams
- *
+ *  
  */
 public class MediaFilterManager
 {
     private static Map filterNames = new HashMap();
+
     private static Map filterCache = new HashMap();
+
     public static boolean createIndex = true; // default to creating index
+
     public static boolean isVerbose = false; // default to not verbose
+
     public static boolean isForce = false; // default to not forced
 
     public static void main(String[] argv) throws Exception
@@ -49,11 +52,11 @@ public class MediaFilterManager
         Options options = new Options();
 
         options.addOption("v", "verbose", false,
-                          "print all extracted text and other details to STDOUT");
+                "print all extracted text and other details to STDOUT");
         options.addOption("f", "force", false,
-                          "force all bitstreams to be processed");
+                "force all bitstreams to be processed");
         options.addOption("n", "noindex", false,
-                          "do NOT re-create search index after filtering bitstreams");
+                "do NOT re-create search index after filtering bitstreams");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
@@ -82,9 +85,9 @@ public class MediaFilterManager
         }
 
         // get path to config file
-        String myPath = ConfigurationManager.getProperty("dspace.dir") +
-                        File.separator + "config" + File.separator +
-                        "mediafilter.cfg";
+        String myPath = ConfigurationManager.getProperty("dspace.dir")
+                + File.separator + "config" + File.separator
+                + "mediafilter.cfg";
 
         // format name, classname
         System.out.println("Using configuration in " + myPath);
@@ -134,13 +137,13 @@ public class MediaFilterManager
                         myFormat = myFormat + " " + tokens[i];
                     }
 
-                    System.out.println("Format: '" + myFormat +
-                                       "' Filtering Class: '" + myClass + "'");
+                    System.out.println("Format: '" + myFormat
+                            + "' Filtering Class: '" + myClass + "'");
 
-                    // now convert format name to a format ID (int) for the hash key
+                    // now convert format name to a format ID (int) for the hash
+                    // key
                     int formatID = BitstreamFormat.findByShortDescription(c,
-                                                                          myFormat)
-                                                  .getID();
+                            myFormat).getID();
 
                     filterNames.put(new Integer(formatID), myClass);
                 }
@@ -160,7 +163,8 @@ public class MediaFilterManager
 
             c.complete();
             c = null;
-        } finally
+        }
+        finally
         {
             if (c != null)
             {
@@ -169,8 +173,7 @@ public class MediaFilterManager
         }
     }
 
-    public static void applyFiltersAllItems(Context c)
-                                     throws Exception
+    public static void applyFiltersAllItems(Context c) throws Exception
     {
         ItemIterator i = Item.findAll(c);
 
@@ -186,8 +189,7 @@ public class MediaFilterManager
      * iterate through the item's bitstreams in the ORIGINAL bundle, applying
      * filters if possible
      */
-    public static void filterItem(Context c, Item myItem)
-                           throws Exception
+    public static void filterItem(Context c, Item myItem) throws Exception
     {
         // get 'original' bundles
         Bundle[] myBundles = myItem.getBundles();
@@ -210,14 +212,13 @@ public class MediaFilterManager
 
     /**
      * Attempt to filter a bitstream
-     *
+     * 
      * An exception will be thrown if the media filter class cannot be
      * instantiated, exceptions from filtering will be logged to STDOUT and
      * swallowed.
      */
     public static void filterBitstream(Context c, Item myItem,
-                                       Bitstream myBitstream)
-                                throws Exception
+            Bitstream myBitstream) throws Exception
     {
         // do we have a filter for that format?
         Integer formatID = new Integer(myBitstream.getFormat().getID());
@@ -242,12 +243,14 @@ public class MediaFilterManager
                 // only update item if bitstream not skipped
                 if (myFilter.processBitstream(c, myItem, myBitstream))
                 {
-                    myItem.update(); // Make sure new bitstream has a sequence number
+                    myItem.update(); // Make sure new bitstream has a sequence
+                                     // number
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                System.out.println("ERROR filtering, skipping bitstream #" +
-                                   myBitstream.getID() + " " + e);
+                System.out.println("ERROR filtering, skipping bitstream #"
+                        + myBitstream.getID() + " " + e);
                 e.printStackTrace();
             }
         }

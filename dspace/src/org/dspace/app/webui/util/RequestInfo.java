@@ -47,13 +47,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-
 /**
- * Stores information about an HTTP request.  This is used so that the request
+ * Stores information about an HTTP request. This is used so that the request
  * can be replicated during a later request, once authentication has
  * successfully occurred.
- *
- * @author  Robert Tansley
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class RequestInfo
@@ -70,8 +69,9 @@ public class RequestInfo
     /**
      * Construct a request info object storing information about the given
      * request
-     *
-     * @param  request  the request to get information from
+     * 
+     * @param request
+     *            the request to get information from
      */
     public RequestInfo(HttpServletRequest request)
     {
@@ -83,11 +83,12 @@ public class RequestInfo
     /**
      * Wrap an incoming request to make it look like the request that the
      * constructor was called with
-     *
-     * @param  request   the request to wrap
-     *
-     * @return  a wrapper around the request passed into this method, wrapped
-     *          so that it looks like the request passed into the constructor
+     * 
+     * @param request
+     *            the request to wrap
+     * 
+     * @return a wrapper around the request passed into this method, wrapped so
+     *         that it looks like the request passed into the constructor
      */
     public HttpServletRequest wrapRequest(HttpServletRequest request)
     {
@@ -95,8 +96,8 @@ public class RequestInfo
     }
 
     /**
-     * Our own flavour of HTTP request wrapper, that uses information from=
-     * this RequestInfo object
+     * Our own flavour of HTTP request wrapper, that uses information from= this
+     * RequestInfo object
      */
     class MyWrapper extends HttpServletRequestWrapper
     {
@@ -115,7 +116,8 @@ public class RequestInfo
                 // Delegate to wrapped object
                 // FIXME: This is possibly a bug in Tomcat
                 return super.getParameter(name);
-            } else
+            }
+            else
             {
                 return vals[0];
             }
@@ -149,11 +151,11 @@ public class RequestInfo
         }
 
         /**
-         * This class converts an interator into an enumerator.  This is done
-         * because we have the parameters as a Map (JDK 1.2 style), but for
-         * some weird reason the HttpServletRequest interface returns an
-         * Enumeration from getParameterNames() (JDK1.0 style.)  JDK apparently
-         * offers no way of simply changing between the new styles.
+         * This class converts an interator into an enumerator. This is done
+         * because we have the parameters as a Map (JDK 1.2 style), but for some
+         * weird reason the HttpServletRequest interface returns an Enumeration
+         * from getParameterNames() (JDK1.0 style.) JDK apparently offers no way
+         * of simply changing between the new styles.
          */
         class EnumIterator implements Enumeration
         {

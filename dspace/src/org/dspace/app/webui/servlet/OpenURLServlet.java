@@ -51,11 +51,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
-
 /**
- * Simple servlet for open URL support.  Presently, simply extracts terms from
+ * Simple servlet for open URL support. Presently, simply extracts terms from
  * open URL and redirects to search.
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -65,13 +64,12 @@ public class OpenURLServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(OpenURLServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String query = "";
 
-        // Extract open URL terms.  Note: assume no repetition
+        // Extract open URL terms. Note: assume no repetition
         String title = request.getParameter("title");
         String authorFirst = request.getParameter("aufirst");
         String authorLast = request.getParameter("aulast");
@@ -96,18 +94,17 @@ public class OpenURLServlet extends DSpaceServlet
             logInfo = logInfo + "aulast=\"" + authorLast + "\",";
         }
 
-        log.info(LogManager.getHeader(context, "openURL",
-                                      logInfo + "dspacequery=" + query));
+        log.info(LogManager.getHeader(context, "openURL", logInfo
+                + "dspacequery=" + query));
 
-        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                         "/simple-search?query=" +
-                                                         query));
+        response.sendRedirect(response.encodeRedirectURL(request
+                .getContextPath()
+                + "/simple-search?query=" + query));
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Same as a GET
         doDSGet(context, request, response);

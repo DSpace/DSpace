@@ -53,8 +53,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-
-
 /**
  * Class representing an e-mail message, also used to send e-mails.
  * <P>
@@ -72,46 +70,58 @@ import javax.mail.internet.MimeMessage;
  * message with.
  * <P>
  * Emails are formatted using <code>java.text.MessageFormat.</code>
- * Additionally, comment lines (starting with '#') are stripped, and
- * if a line starts with "Subject:" the text on the right of the colon is used
- * for the subject line.  For example:<P>
+ * Additionally, comment lines (starting with '#') are stripped, and if a line
+ * starts with "Subject:" the text on the right of the colon is used for the
+ * subject line. For example:
+ * <P>
+ * 
  * <pre>
- * # This is a comment line which is stripped
- * #
- * # Parameters:   {0}  is a person's name
- * #               {1}  is the name of a submission
- * #
- * Subject: Example e-mail
- *
- * Dear {0},
- *
- * Thank you for sending us your submission "{1}".
- * </pre><P>
+ * 
+ *  # This is a comment line which is stripped
+ *  #
+ *  # Parameters:   {0}  is a person's name
+ *  #               {1}  is the name of a submission
+ *  #
+ *  Subject: Example e-mail
+ * 
+ *  Dear {0},
+ * 
+ *  Thank you for sending us your submission &quot;{1}&quot;.
+ *  
+ * </pre>
+ * 
+ * <P>
  * If the example code above was used to send this mail, the resulting mail
- * would have the subject <code>Example e-mail</code> and the body would be:<P>
+ * would have the subject <code>Example e-mail</code> and the body would be:
+ * <P>
+ * 
  * <pre>
- *
- * Dear John,
- *
- * Thank you for sending us your submission "On the Testing of DSpace".
- * </pre><P>
+ * 
+ * 
+ *  Dear John,
+ * 
+ *  Thank you for sending us your submission &quot;On the Testing of DSpace&quot;.
+ *  
+ * </pre>
+ * 
+ * <P>
  * Note that parameters like <code>{0}</code> cannot be placed in the subject
  * of the e-mail; they won't get filled out.
- *
- *
+ * 
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
 public class Email
 {
     /*
-     * Implementation note:  It might be necessary to add a quick utility
-     * method like "send(to, subject, message)".  We'll see how far we get
-     * without it - having all emails as templates in the config allows
-     * customisation and internationalisation.
-     *
-     * Note that everything is stored and the run in send() so that only
-     * send() throws a MessagingException.
+     * Implementation note: It might be necessary to add a quick utility method
+     * like "send(to, subject, message)". We'll see how far we get without it -
+     * having all emails as templates in the config allows customisation and
+     * internationalisation.
+     * 
+     * Note that everything is stored and the run in send() so that only send()
+     * throws a MessagingException.
      */
 
     /** The content of the message */
@@ -143,8 +153,9 @@ public class Email
 
     /**
      * Add a recipient
-     *
-     * @param  email   the recipient's email address
+     * 
+     * @param email
+     *            the recipient's email address
      */
     public void addRecipient(String email)
     {
@@ -152,11 +163,12 @@ public class Email
     }
 
     /**
-     * Set the content of the message.  Setting this "resets" the message
-     * formatting - <code>addArgument</code> will start.  Comments and any
+     * Set the content of the message. Setting this "resets" the message
+     * formatting -<code>addArgument</code> will start. Comments and any
      * "Subject:" line must be stripped.
-     *
-     * @param  cnt   the content of the message
+     * 
+     * @param cnt
+     *            the content of the message
      */
     void setContent(String cnt)
     {
@@ -166,8 +178,9 @@ public class Email
 
     /**
      * Set the subject of the message
-     *
-     * @param  s  the subject of the message
+     * 
+     * @param s
+     *            the subject of the message
      */
     void setSubject(String s)
     {
@@ -176,8 +189,9 @@ public class Email
 
     /**
      * Set the reply-to email address
-     *
-     * @param  email   the reply-to email address
+     * 
+     * @param email
+     *            the reply-to email address
      */
     public void setReplyTo(String email)
     {
@@ -186,8 +200,9 @@ public class Email
 
     /**
      * Fill out the next argument in the template
-     *
-     * @param  arg   the value for the next argument
+     * 
+     * @param arg
+     *            the value for the next argument
      */
     public void addArgument(Object arg)
     {
@@ -195,8 +210,8 @@ public class Email
     }
 
     /**
-     * "Reset" the message.  Clears the arguments and recipients, but leaves
-     * the subject and content intact.
+     * "Reset" the message. Clears the arguments and recipients, but leaves the
+     * subject and content intact.
      */
     public void reset()
     {
@@ -207,8 +222,9 @@ public class Email
 
     /**
      * Sends the email.
-     *
-     * @throws MessagingException  if there was a problem sending the mail.
+     * 
+     * @throws MessagingException
+     *             if there was a problem sending the mail.
      */
     public void send() throws MessagingException
     {
@@ -231,8 +247,8 @@ public class Email
 
         while (i.hasNext())
         {
-            message.addRecipient(Message.RecipientType.TO,
-                                 new InternetAddress((String) i.next()));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(
+                    (String) i.next()));
         }
 
         // Format the mail message

@@ -211,7 +211,8 @@ public class ItemImport
             System.out
                     .println("Error - must run with either add, replace, or remove (run with -h flag for details)");
             System.exit(1);
-        } else if (command.equals("add") || command.equals("replace"))
+        }
+        else if (command.equals("add") || command.equals("replace"))
         {
             if (sourcedir == null)
             {
@@ -244,7 +245,8 @@ public class ItemImport
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
             }
-        } else if (command.equals("delete"))
+        }
+        else if (command.equals("delete"))
         {
             if (eperson == null)
             {
@@ -293,7 +295,8 @@ public class ItemImport
         {
             // @ sign, must be an email
             myEPerson = EPerson.findByEmail(c, eperson);
-        } else
+        }
+        else
         {
             myEPerson = EPerson.find(c, Integer.parseInt(eperson));
         }
@@ -369,17 +372,20 @@ public class ItemImport
             if (command.equals("add"))
             {
                 myloader.addItems(c, mycollections, sourcedir, mapfile);
-            } else if (command.equals("replace"))
+            }
+            else if (command.equals("replace"))
             {
                 myloader.replaceItems(c, mycollections, sourcedir, mapfile);
-            } else if (command.equals("delete"))
+            }
+            else if (command.equals("delete"))
             {
                 myloader.deleteItems(c, mapfile);
             }
 
             // complete all transactions
             c.complete();
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             // abort all operations
             if (mapOut != null)
@@ -453,7 +459,8 @@ public class ItemImport
             if (skipItems.containsKey(dircontents[i]))
             {
                 System.out.println("Skipping import of " + dircontents[i]);
-            } else
+            }
+            else
             {
                 addItem(c, mycollections, sourceDir, dircontents[i], mapOut);
                 System.out.println(i + " " + dircontents[i]);
@@ -496,7 +503,8 @@ public class ItemImport
 
                 // add new item, locate old one
                 oldItem = (Item) HandleManager.resolveToObject(c, oldHandle);
-            } else
+            }
+            else
             {
                 oldItem = Item.find(c, Integer.parseInt(oldHandle));
             }
@@ -538,7 +546,8 @@ public class ItemImport
                 String myhandle = itemID;
                 System.out.println("Deleting item " + myhandle);
                 deleteItem(c, myhandle);
-            } else
+            }
+            else
             {
                 // it's an ID
                 Item myitem = Item.find(c, Integer.parseInt(itemID));
@@ -590,7 +599,8 @@ public class ItemImport
                 // send ID to the mapfile
                 mapOutput = itemname + " " + myitem.getID();
             }
-        } else
+        }
+        else
         {
             // only process handle file if not using workflow system
             String myhandle = processHandleFile(c, myitem, path
@@ -656,7 +666,8 @@ public class ItemImport
         if (myitem == null)
         {
             System.out.println("Error - cannot locate item - already deleted?");
-        } else
+        }
+        else
         {
             deleteItem(c, myitem);
         }
@@ -688,7 +699,8 @@ public class ItemImport
                 if (st.hasMoreTokens())
                 {
                     myfile = st.nextToken();
-                } else
+                }
+                else
                 {
                     throw new Exception("Bad mapfile line:\n" + line);
                 }
@@ -696,14 +708,16 @@ public class ItemImport
                 if (st.hasMoreTokens())
                 {
                     myhandle = st.nextToken();
-                } else
+                }
+                else
                 {
                     throw new Exception("Bad mapfile line:\n" + line);
                 }
 
                 myhash.put(myfile, myhandle);
             }
-        } finally
+        }
+        finally
         {
             if (is != null)
             {
@@ -811,19 +825,22 @@ public class ItemImport
 
             System.out.println("read handle: '" + result + "'");
 
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             // probably no handle file, just return null
             System.out
                     .println("It appears there is no handle file -- generating one");
-        } finally
+        }
+        finally
         {
             if (is != null)
             {
                 try
                 {
                     is.close();
-                } catch (IOException e1)
+                }
+                catch (IOException e1)
                 {
                     System.err
                             .println("Non-critical problem releasing resources.");
@@ -869,7 +886,8 @@ public class ItemImport
                     // no bundle found
                     processContentFileEntry(c, i, path, line, null);
                     System.out.println("\tBitstream: " + line);
-                } else
+                }
+                else
                 {
                     // found bundle
                     String bundleName = line.substring(markerIndex
@@ -882,7 +900,8 @@ public class ItemImport
                             + "\tBundle: " + bundleName);
                 }
             }
-        } finally
+        }
+        finally
         {
             if (is != null)
             {
@@ -911,7 +930,8 @@ public class ItemImport
             if (fileName.equals("license.txt"))
             {
                 newBundleName = "LICENSE";
-            } else
+            }
+            else
             {
                 // call it ORIGINAL
                 newBundleName = "ORIGINAL";
@@ -928,7 +948,8 @@ public class ItemImport
             {
                 // not found, create a new one
                 targetBundle = i.createBundle(newBundleName);
-            } else
+            }
+            else
             {
                 // put bitstreams into first bundle
                 targetBundle = bundles[0];

@@ -65,10 +65,9 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
-
 /**
  * Tag for displaying an item
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -99,14 +98,17 @@ public class ItemTag extends TagSupport
             if ((style != null) && style.equals("full"))
             {
                 renderFull();
-            } else
+            }
+            else
             {
                 renderDefault();
             }
-        } catch (java.sql.SQLException e)
+        }
+        catch (java.sql.SQLException e)
         {
             throw new JspException(e);
-        } catch (IOException ie)
+        }
+        catch (IOException ie)
         {
             throw new JspException(ie);
         }
@@ -116,7 +118,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Get the item this tag should display
-     *
+     * 
      * @return the item
      */
     public Item getItem()
@@ -126,7 +128,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Set the item this tag should display
-     *
+     * 
      * @param itemIn
      *            the item to display
      */
@@ -137,7 +139,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Get the collections this item is in
-     *
+     * 
      * @return the collections
      */
     public Collection[] getCollections()
@@ -147,7 +149,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Set the collections this item is in
-     *
+     * 
      * @param collectionsIn
      *            the collections
      */
@@ -158,7 +160,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Get the style this tag should display
-     *
+     * 
      * @return the style
      */
     public String getStyle()
@@ -168,7 +170,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Set the style this tag should display
-     *
+     * 
      * @param styleIn
      *            the Style to display
      */
@@ -205,7 +207,8 @@ public class ItemTag extends TagSupport
         if (titleDC.length == 0)
         {
             fields.add(new String[] { "Title", "Untitled" });
-        } else
+        }
+        else
         {
             fields.add(new String[] { "Title", "title", null });
         }
@@ -229,10 +232,8 @@ public class ItemTag extends TagSupport
 
         fields.add(new String[] { "Publisher", "publisher", null });
         fields.add(new String[] { "Citation", "identifier", "citation" });
-        fields.add(new String[]
-                   {
-                       "Series/Report no.", "relation", "ispartofseries"
-                   });
+        fields.add(new String[] { "Series/Report no.", "relation",
+                "ispartofseries" });
 
         // Truncate abstract
         DCValue[] abstrDC = item.getDC("description", "abstract", Item.ANY);
@@ -257,7 +258,8 @@ public class ItemTag extends TagSupport
         fields.add(new String[] { "ISMN", "identifier", "ismn" });
         fields.add(new String[] { "Other Identifiers", "identifier", null });
 
-        HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+        HttpServletRequest request = (HttpServletRequest) pageContext
+                .getRequest();
 
         out.println("<center><table class=\"itemDisplayTable\">");
 
@@ -275,7 +277,8 @@ public class ItemTag extends TagSupport
                 v.value = fieldData[1];
                 values = new DCValue[1];
                 values[0] = v;
-            } else
+            }
+            else
             {
                 // Grab the value from the item
                 values = item.getDC(fieldData[1], fieldData[2], Item.ANY);
@@ -318,20 +321,22 @@ public class ItemTag extends TagSupport
 
         out.println("<P align=center>Full metadata record</P>");
 
-        HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+        HttpServletRequest request = (HttpServletRequest) pageContext
+                .getRequest();
 
         // Three column table - DC field, value, language
         out.println("<center><table class=\"itemDisplayTable\">");
-        out.println("<tr><th class=\"standard\">DC Field</th><th class=\"standard\">Value</th><th class=\"standard\">Language</th></tr>");
+        out
+                .println("<tr><th class=\"standard\">DC Field</th><th class=\"standard\">Value</th><th class=\"standard\">Language</th></tr>");
 
         for (int i = 0; i < values.length; i++)
         {
             boolean hidden = false;
 
             // Mask description.provenance
-            if (values[i].element.equals("description") &&
-                    ((values[i].qualifier != null) &&
-                    values[i].qualifier.equals("provenance")))
+            if (values[i].element.equals("description")
+                    && ((values[i].qualifier != null) && values[i].qualifier
+                            .equals("provenance")))
             {
                 hidden = true;
             }
@@ -353,7 +358,8 @@ public class ItemTag extends TagSupport
                 if (values[i].language == null)
                 {
                     out.print("-");
-                } else
+                }
+                else
                 {
                     out.print(values[i].language);
                 }
@@ -375,12 +381,14 @@ public class ItemTag extends TagSupport
     private void listCollections() throws IOException
     {
         JspWriter out = pageContext.getOut();
-        HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+        HttpServletRequest request = (HttpServletRequest) pageContext
+                .getRequest();
 
         if (collections != null)
         {
-            out.print("<tr><td class=\"metadataFieldLabel\">" +
-                      "Appears in Collections:</td><td class=\"metadataFieldValue\">");
+            out
+                    .print("<tr><td class=\"metadataFieldLabel\">"
+                            + "Appears in Collections:</td><td class=\"metadataFieldValue\">");
 
             for (int i = 0; i < collections.length; i++)
             {
@@ -403,17 +411,20 @@ public class ItemTag extends TagSupport
     private void listBitstreams() throws IOException
     {
         JspWriter out = pageContext.getOut();
-        HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+        HttpServletRequest request = (HttpServletRequest) pageContext
+                .getRequest();
 
         out.print("<table align=center class=\"miscTable\"><tr>");
-        out.println("<td class=evenRowEvenCol><P><strong>Files in This Item:</strong></P>");
+        out
+                .println("<td class=evenRowEvenCol><P><strong>Files in This Item:</strong></P>");
 
         Bundle[] bundles = item.getBundles("ORIGINAL");
 
         if (bundles.length == 0)
         {
             out.println("<P>There are no files associated with this item.</P>");
-        } else
+        }
+        else
         {
             boolean html = false;
             String handle = item.getHandle();
@@ -427,8 +438,8 @@ public class ItemTag extends TagSupport
             boolean multiFile = false;
             Bundle[] allBundles = item.getBundles();
 
-            for (int i = 0, filecount = 0;
-                     (i < allBundles.length) && !multiFile; i++)
+            for (int i = 0, filecount = 0; (i < allBundles.length)
+                    && !multiFile; i++)
             {
                 filecount += allBundles[i].getBitstreams().length;
                 multiFile = (filecount > 1);
@@ -443,20 +454,23 @@ public class ItemTag extends TagSupport
                 {
                     if (bits[i].getID() == bunds[0].getPrimaryBitstreamID())
                     {
-                        html = bits[i].getFormat().getMIMEType().equals("text/html");
+                        html = bits[i].getFormat().getMIMEType().equals(
+                                "text/html");
                         primaryBitstream = bits[i];
                     }
                 }
             }
 
-            out.println("<table cellpadding=6><tr><th class=\"standard\">File</th>");
+            out
+                    .println("<table cellpadding=6><tr><th class=\"standard\">File</th>");
 
             if (multiFile)
             {
                 out.println("<th class=\"standard\">Description</th>");
             }
 
-            out.println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th></tr>");
+            out
+                    .println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th></tr>");
 
             // if primary bitstream is html, display a link for only that one to
             // HTMLServlet
@@ -485,14 +499,16 @@ public class ItemTag extends TagSupport
                 out.print(primaryBitstream.getSize() / 1024);
                 out.print("Kb</td><td class=\"standard\">");
                 out.print(primaryBitstream.getFormatDescription());
-                out.print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
+                out
+                        .print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
                 out.print(request.getContextPath());
                 out.print("/html/");
                 out.print(handle + "/");
                 out.print(URLEncoder.encode(primaryBitstream.getName(),
-                                            Constants.DEFAULT_ENCODING));
+                        Constants.DEFAULT_ENCODING));
                 out.print("\">View/Open</A></td></tr>");
-            } else
+            }
+            else
             {
                 for (int i = 0; i < bundles.length; i++)
                 {
@@ -518,45 +534,48 @@ public class ItemTag extends TagSupport
                             out.print(bitstreams[k].getSize() / 1024);
                             out.print("Kb</td><td class=\"standard\">");
                             out.print(bitstreams[k].getFormatDescription());
-                            out.print("</td><td class=\"standard\" align=\"center\">");
+                            out
+                                    .print("</td><td class=\"standard\" align=\"center\">");
 
                             // Work out what the bitstream link should be
                             // (persistent
                             // ID if item has Handle)
-                            String bsLink = "<A TARGET=_blank HREF=\"" +
-                                            request.getContextPath();
+                            String bsLink = "<A TARGET=_blank HREF=\""
+                                    + request.getContextPath();
 
-                            if ((handle != null) &&
-                                    (bitstreams[k].getSequenceID() > 0))
+                            if ((handle != null)
+                                    && (bitstreams[k].getSequenceID() > 0))
                             {
-                                bsLink = bsLink + "/bitstream/" +
-                                         item.getHandle() + "/" +
-                                         bitstreams[k].getSequenceID() + "/";
-                            } else
+                                bsLink = bsLink + "/bitstream/"
+                                        + item.getHandle() + "/"
+                                        + bitstreams[k].getSequenceID() + "/";
+                            }
+                            else
                             {
-                                bsLink = bsLink + "/retrieve/" +
-                                         bitstreams[k].getID() + "/";
+                                bsLink = bsLink + "/retrieve/"
+                                        + bitstreams[k].getID() + "/";
                             }
 
-                            bsLink = bsLink +
-                                     URLEncoder.encode(bitstreams[k].getName(),
-                                                       Constants.DEFAULT_ENCODING) +
-                                     "\">";
+                            bsLink = bsLink
+                                    + URLEncoder.encode(
+                                            bitstreams[k].getName(),
+                                            Constants.DEFAULT_ENCODING) + "\">";
 
                             // is there a thumbnail bundle?
                             if ((thumbs.length > 0) && showThumbs)
                             {
-                                String tName = bitstreams[k].getName() +
-                                               ".jpg";
-                                Bitstream tb = thumbs[0].getBitstreamByName(tName);
+                                String tName = bitstreams[k].getName() + ".jpg";
+                                Bitstream tb = thumbs[0]
+                                        .getBitstreamByName(tName);
 
                                 if (tb != null)
                                 {
-                                    String myPath = request.getContextPath() +
-                                                    "/retrieve/" + tb.getID() +
-                                                    "/" +
-                                                    URLEncoder.encode(tb.getName(),
-                                                                      Constants.DEFAULT_ENCODING);
+                                    String myPath = request.getContextPath()
+                                            + "/retrieve/"
+                                            + tb.getID()
+                                            + "/"
+                                            + URLEncoder.encode(tb.getName(),
+                                                    Constants.DEFAULT_ENCODING);
 
                                     out.print(bsLink);
                                     out.print("<img src=\"" + myPath + "\" ");
@@ -578,6 +597,7 @@ public class ItemTag extends TagSupport
 
     private void getThumbSettings()
     {
-        showThumbs = ConfigurationManager.getBooleanProperty("webui.item.thumbnail.show");
+        showThumbs = ConfigurationManager
+                .getBooleanProperty("webui.item.thumbnail.show");
     }
 }

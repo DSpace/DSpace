@@ -66,22 +66,22 @@ import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
 
-
 /**
  * Servlet for handling a simple search.
  * <P>
- * All metadata is search for the value contained in the "query" parameter.
- * If the "location" parameter is present, the user's location is switched
- * to that location using a redirect.  Otherwise, the user's current
- * location is used to constrain the query; i.e., if the user is "in" a
- * collection, only results from the collection will be returned.
+ * All metadata is search for the value contained in the "query" parameter. If
+ * the "location" parameter is present, the user's location is switched to that
+ * location using a redirect. Otherwise, the user's current location is used to
+ * constrain the query; i.e., if the user is "in" a collection, only results
+ * from the collection will be returned.
  * <P>
- * The value of the "location" parameter should be ALL (which means no location),
- * a the ID of a community (e.g. "123"), or a community ID, then a slash, then
- * a collection ID, e.g. "123/456".
- *
+ * The value of the "location" parameter should be ALL (which means no
+ * location), a the ID of a community (e.g. "123"), or a community ID, then a
+ * slash, then a collection ID, e.g. "123/456".
+ * 
  * @author Robert Tansley
- * @version $Id$
+ * @version $Id: SimpleSearchServlet.java,v 1.17 2004/12/15 15:21:10 jimdowning
+ *          Exp $
  */
 public class SimpleSearchServlet extends DSpaceServlet
 {
@@ -89,9 +89,8 @@ public class SimpleSearchServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(SimpleSearchServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // Get the query
         String query = request.getParameter("query");
@@ -118,7 +117,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         QueryResults qResults = null;
         QueryArgs qArgs = new QueryArgs();
 
-        // if the "advanced" flag is set, build the query string from the 
+        // if the "advanced" flag is set, build the query string from the
         // multiple query fields
         if (advanced != null)
         {
@@ -157,10 +156,9 @@ public class SimpleSearchServlet extends DSpaceServlet
             }
 
             // Do the redirect
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             url +
-                                                             "/simple-search?query=" +
-                                                             query));
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + url + "/simple-search?query=" + query));
 
             return;
         }
@@ -187,17 +185,21 @@ public class SimpleSearchServlet extends DSpaceServlet
             request.setAttribute("collection", collection);
 
             qResults = DSQuery.doQuery(context, qArgs, collection);
-        } else if (community != null)
+        }
+        else if (community != null)
         {
             logInfo = "community_id=" + community.getID() + ",";
 
             request.setAttribute("community", community);
 
             // Get the collections within the community for the dropdown box
-            request.setAttribute("collection.array", community.getCollections());
+            request
+                    .setAttribute("collection.array", community
+                            .getCollections());
 
             qResults = DSQuery.doQuery(context, qArgs, community);
-        } else
+        }
+        else
         {
             // Get all communities for dropdown box
             Community[] communities = Community.findAll(context);
@@ -215,20 +217,20 @@ public class SimpleSearchServlet extends DSpaceServlet
             // add the handle to the appropriate lists
             switch (myType.intValue())
             {
-                case Constants.ITEM:
-                    itemHandles.add(myHandle);
+            case Constants.ITEM:
+                itemHandles.add(myHandle);
 
-                    break;
+                break;
 
-                case Constants.COLLECTION:
-                    collectionHandles.add(myHandle);
+            case Constants.COLLECTION:
+                collectionHandles.add(myHandle);
 
-                    break;
+                break;
 
-                case Constants.COMMUNITY:
-                    communityHandles.add(myHandle);
+            case Constants.COMMUNITY:
+                communityHandles.add(myHandle);
 
-                    break;
+                break;
             }
         }
 
@@ -251,9 +253,8 @@ public class SimpleSearchServlet extends DSpaceServlet
 
             if (resultsItems[i] == null)
             {
-                throw new SQLException("Query \"" + query +
-                                       "\" returned unresolvable handle: " +
-                                       myhandle);
+                throw new SQLException("Query \"" + query
+                        + "\" returned unresolvable handle: " + myhandle);
             }
         }
 
@@ -267,9 +268,8 @@ public class SimpleSearchServlet extends DSpaceServlet
 
             if (resultsCollections[i] == null)
             {
-                throw new SQLException("Query \"" + query +
-                                       "\" returned unresolvable handle: " +
-                                       myhandle);
+                throw new SQLException("Query \"" + query
+                        + "\" returned unresolvable handle: " + myhandle);
             }
         }
 
@@ -283,31 +283,27 @@ public class SimpleSearchServlet extends DSpaceServlet
 
             if (resultsCommunities[i] == null)
             {
-                throw new SQLException("Query \"" + query +
-                                       "\" returned unresolvable handle: " +
-                                       myhandle);
+                throw new SQLException("Query \"" + query
+                        + "\" returned unresolvable handle: " + myhandle);
             }
         }
 
         // Log
-        log.info(LogManager.getHeader(context, "search",
-                                      logInfo + "query=\"" + query +
-                                      "\",results=(" +
-                                      resultsCommunities.length + "," +
-                                      resultsCollections.length + "," +
-                                      resultsItems.length + ")"));
+        log.info(LogManager.getHeader(context, "search", logInfo + "query=\""
+                + query + "\",results=(" + resultsCommunities.length + ","
+                + resultsCollections.length + "," + resultsItems.length + ")"));
 
         // Pass in some page qualities
         // total number of pages
-        int pageTotal = 1 +
-                        ((qResults.getHitCount() - 1) / qResults.getPageSize());
+        int pageTotal = 1 + ((qResults.getHitCount() - 1) / qResults
+                .getPageSize());
 
         // current page being displayed
         int pageCurrent = 1 + (qResults.getStart() / qResults.getPageSize());
 
         // pageLast = min(pageCurrent+9,pageTotal)
         int pageLast = ((pageCurrent + 9) > pageTotal) ? pageTotal
-                                                       : (pageCurrent + 9);
+                : (pageCurrent + 9);
 
         // pageFirst = max(1,pageCurrent-9)
         int pageFirst = ((pageCurrent - 9) > 1) ? (pageCurrent - 9) : 1;
@@ -347,7 +343,8 @@ public class SimpleSearchServlet extends DSpaceServlet
             }
 
             JSPManager.showJSP(request, response, "/search/advanced.jsp");
-        } else
+        }
+        else
         {
             JSPManager.showJSP(request, response, "/search/results.jsp");
         }

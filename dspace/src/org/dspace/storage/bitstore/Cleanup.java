@@ -41,11 +41,10 @@ package org.dspace.storage.bitstore;
 
 import org.apache.log4j.Logger;
 
-
 /**
  * Cleans up asset store.
- *
- * @author  Peter Breton
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class Cleanup
@@ -55,8 +54,9 @@ public class Cleanup
 
     /**
      * Cleans up asset store.
-     *
-     * @param argv - Command-line arguments
+     * 
+     * @param argv -
+     *            Command-line arguments
      */
     public static void main(String[] argv)
     {
@@ -67,7 +67,8 @@ public class Cleanup
             BitstreamStorageManager.cleanup();
 
             System.exit(0);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             log.fatal("Caught exception:", e);
             System.exit(1);

@@ -57,12 +57,11 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-
 /**
  * Class representing an item in the process of being submitted by a user
- *
- * @author   Robert Tansley
- * @version  $Revision$
+ * 
+ * @author Robert Tansley
+ * @version $Revision$
  */
 public class WorkspaceItem implements InProgressSubmission
 {
@@ -83,9 +82,11 @@ public class WorkspaceItem implements InProgressSubmission
 
     /**
      * Construct a workspace item corresponding to the given database row
-     *
-     * @param context  the context this object exists in
-     * @param row      the database row
+     * 
+     * @param context
+     *            the context this object exists in
+     * @param row
+     *            the database row
      */
     WorkspaceItem(Context context, TableRow row) throws SQLException
     {
@@ -93,28 +94,30 @@ public class WorkspaceItem implements InProgressSubmission
         wiRow = row;
 
         item = Item.find(context, wiRow.getIntColumn("item_id"));
-        collection = Collection.find(context,
-                                     wiRow.getIntColumn("collection_id"));
+        collection = Collection.find(context, wiRow
+                .getIntColumn("collection_id"));
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("workspace_item_id"));
     }
 
     /**
-     * Get a workspace item from the database.  The item, collection and
+     * Get a workspace item from the database. The item, collection and
      * submitter are loaded into memory.
-     *
-     * @param  context  DSpace context object
-     * @param  id       ID of the workspace item
-     *
-     * @return  the workspace item, or null if the ID is invalid.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param id
+     *            ID of the workspace item
+     * 
+     * @return the workspace item, or null if the ID is invalid.
      */
     public static WorkspaceItem find(Context context, int id)
-                              throws SQLException
+            throws SQLException
     {
         // First check the cache
-        WorkspaceItem fromCache = (WorkspaceItem) context.fromCache(WorkspaceItem.class,
-                                                                    id);
+        WorkspaceItem fromCache = (WorkspaceItem) context.fromCache(
+                WorkspaceItem.class, id);
 
         if (fromCache != null)
         {
@@ -128,17 +131,17 @@ public class WorkspaceItem implements InProgressSubmission
             if (log.isDebugEnabled())
             {
                 log.debug(LogManager.getHeader(context, "find_workspace_item",
-                                               "not_found,workspace_item_id=" +
-                                               id));
+                        "not_found,workspace_item_id=" + id));
             }
 
             return null;
-        } else
+        }
+        else
         {
             if (log.isDebugEnabled())
             {
                 log.debug(LogManager.getHeader(context, "find_workspace_item",
-                                               "workspace_item_id=" + id));
+                        "workspace_item_id=" + id));
             }
 
             return new WorkspaceItem(context, row);
@@ -146,20 +149,22 @@ public class WorkspaceItem implements InProgressSubmission
     }
 
     /**
-     * Create a new workspace item, with a new ID.  An Item is also
-     * created.  The submitter is the current user in the context.
-     *
-     * @param  context   DSpace context object
-     * @param  coll      Collection being submitted to
-     * @param  template  if <code>true</code>, the workspace item starts as a
-     *                   copy of the collection's template item
-     *
-     * @return  the newly created workspace item
+     * Create a new workspace item, with a new ID. An Item is also created. The
+     * submitter is the current user in the context.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param coll
+     *            Collection being submitted to
+     * @param template
+     *            if <code>true</code>, the workspace item starts as a copy
+     *            of the collection's template item
+     * 
+     * @return the newly created workspace item
      */
     public static WorkspaceItem create(Context c, Collection coll,
-                                       boolean template)
-                                throws AuthorizeException, SQLException, 
-                                       IOException
+            boolean template) throws AuthorizeException, SQLException,
+            IOException
     {
         // Check the user has permission to ADD to the collection
         AuthorizeManager.authorizeAction(c, coll, Constants.ADD);
@@ -273,50 +278,50 @@ public class WorkspaceItem implements InProgressSubmission
         row.setColumn("collection_id", coll.getID());
 
         log.info(LogManager.getHeader(c, "create_workspace_item",
-                                      "workspace_item_id=" +
-                                      row.getIntColumn("workspace_item_id") +
-                                      "item_id=" + i.getID() +
-                                      "collection_id=" + coll.getID()));
+                "workspace_item_id=" + row.getIntColumn("workspace_item_id")
+                        + "item_id=" + i.getID() + "collection_id="
+                        + coll.getID()));
 
         DatabaseManager.update(c, row);
 
         WorkspaceItem wi = new WorkspaceItem(c, row);
 
-        HistoryManager.saveHistory(c, wi, HistoryManager.CREATE,
-                                   c.getCurrentUser(), c.getExtraLogInfo());
+        HistoryManager.saveHistory(c, wi, HistoryManager.CREATE, c
+                .getCurrentUser(), c.getExtraLogInfo());
 
         return wi;
     }
 
     /**
-     * Get all workspace items for a particular e-person.  These are ordered by
+     * Get all workspace items for a particular e-person. These are ordered by
      * workspace item ID, since this should likely keep them in the order in
      * which they were created.
-     *
-     * @param context   the context object
-     * @param ep        the eperson
-     *
-     * @return  the corresponding workspace items
+     * 
+     * @param context
+     *            the context object
+     * @param ep
+     *            the eperson
+     * 
+     * @return the corresponding workspace items
      */
     public static WorkspaceItem[] findByEPerson(Context context, EPerson ep)
-                                         throws SQLException
+            throws SQLException
     {
         List wsItems = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context, "workspaceitem",
-                                                     "SELECT workspaceitem.* FROM workspaceitem, item WHERE " +
-                                                     "workspaceitem.item_id=item.item_id AND " +
-                                                     "item.submitter_id=" +
-                                                     ep.getID() +
-                                                     " ORDER BY workspaceitem.workspace_item_id");
+                "SELECT workspaceitem.* FROM workspaceitem, item WHERE "
+                        + "workspaceitem.item_id=item.item_id AND "
+                        + "item.submitter_id=" + ep.getID()
+                        + " ORDER BY workspaceitem.workspace_item_id");
 
         while (tri.hasNext())
         {
             TableRow row = tri.next();
 
             // Check the cache
-            WorkspaceItem wi = (WorkspaceItem) context.fromCache(WorkspaceItem.class,
-                                                                 row.getIntColumn("workspace_item_id"));
+            WorkspaceItem wi = (WorkspaceItem) context.fromCache(
+                    WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
 
             if (wi == null)
             {
@@ -334,31 +339,32 @@ public class WorkspaceItem implements InProgressSubmission
 
     /**
      * Get all workspace items for a particular collection.
-     *
-     * @param context   the context object
-     * @param c         the collection
-     *
-     * @return  the corresponding workspace items
+     * 
+     * @param context
+     *            the context object
+     * @param c
+     *            the collection
+     * 
+     * @return the corresponding workspace items
      */
     public static WorkspaceItem[] findByCollection(Context context, Collection c)
-                                            throws SQLException
+            throws SQLException
     {
         List wsItems = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context, "workspaceitem",
-                                                     "SELECT workspaceitem.* FROM workspaceitem WHERE " +
-                                                     "workspaceitem.collection_id=" +
-                                                     c.getID());
+                "SELECT workspaceitem.* FROM workspaceitem WHERE "
+                        + "workspaceitem.collection_id=" + c.getID());
 
         while (tri.hasNext())
         {
             TableRow row = tri.next();
 
             // Check the cache
-            WorkspaceItem wi = (WorkspaceItem) context.fromCache(WorkspaceItem.class,
-                                                                 row.getIntColumn("workspace_item_id"));
+            WorkspaceItem wi = (WorkspaceItem) context.fromCache(
+                    WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
 
-            // not in cache?  turn row into workspaceitem
+            // not in cache? turn row into workspaceitem
             if (wi == null)
             {
                 wi = new WorkspaceItem(context, row);
@@ -375,7 +381,7 @@ public class WorkspaceItem implements InProgressSubmission
 
     /**
      * Get the internal ID of this workspace item
-     *
+     * 
      * @return the internal identifier
      */
     public int getID()
@@ -385,8 +391,8 @@ public class WorkspaceItem implements InProgressSubmission
 
     /**
      * Get the value of the stage reached column
-     *
-     * @return  the value of the stage reached column
+     * 
+     * @return the value of the stage reached column
      */
     public int getStageReached()
     {
@@ -395,8 +401,9 @@ public class WorkspaceItem implements InProgressSubmission
 
     /**
      * Set the value of the stage reached column
-     *
-     * @param  v  the value of the stage reached column
+     * 
+     * @param v
+     *            the value of the stage reached column
      */
     public void setStageReached(int v)
     {
@@ -410,11 +417,10 @@ public class WorkspaceItem implements InProgressSubmission
     {
         // Authorisation is checked by the item.update() method below
         HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY,
-                                   ourContext.getCurrentUser(),
-                                   ourContext.getExtraLogInfo());
+                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
 
         log.info(LogManager.getHeader(ourContext, "update_workspace_item",
-                                      "workspace_item_id=" + getID()));
+                "workspace_item_id=" + getID()));
 
         // Update the item
         item.update();
@@ -424,37 +430,34 @@ public class WorkspaceItem implements InProgressSubmission
     }
 
     /**
-     * Delete the workspace item.  The entry in workspaceitem, the
-     * unarchived item and its contents are all removed (multiple inclusion
+     * Delete the workspace item. The entry in workspaceitem, the unarchived
+     * item and its contents are all removed (multiple inclusion
      * notwithstanding.)
      */
-    public void deleteAll()
-                   throws SQLException, AuthorizeException, IOException
+    public void deleteAll() throws SQLException, AuthorizeException,
+            IOException
     {
         /*
-         * Authorisation is a special case.  The submitter won't have REMOVE
-         * permission on the collection, so our policy is this:
-         * Only the original submitter or an administrator can delete a
-         * workspace item.
+         * Authorisation is a special case. The submitter won't have REMOVE
+         * permission on the collection, so our policy is this: Only the
+         * original submitter or an administrator can delete a workspace item.
          */
-        if (!AuthorizeManager.isAdmin(ourContext) &&
-                ((ourContext.getCurrentUser() == null) ||
-                (ourContext.getCurrentUser().getID() != item.getSubmitter()
-                                                                .getID())))
+        if (!AuthorizeManager.isAdmin(ourContext)
+                && ((ourContext.getCurrentUser() == null) || (ourContext
+                        .getCurrentUser().getID() != item.getSubmitter()
+                        .getID())))
         {
             // Not an admit, not the submitter
-            throw new AuthorizeException("Must be an administrator or the " +
-                                         "original submitter to delete a workspace item");
+            throw new AuthorizeException("Must be an administrator or the "
+                    + "original submitter to delete a workspace item");
         }
 
         HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
-                                   ourContext.getCurrentUser(),
-                                   ourContext.getExtraLogInfo());
+                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
 
         log.info(LogManager.getHeader(ourContext, "delete_workspace_item",
-                                      "workspace_item_id=" + getID() +
-                                      "item_id=" + item.getID() +
-                                      "collection_id=" + collection.getID()));
+                "workspace_item_id=" + getID() + "item_id=" + item.getID()
+                        + "collection_id=" + collection.getID()));
 
         //deleteSubmitPermissions();
         // Remove from cache
@@ -468,20 +471,18 @@ public class WorkspaceItem implements InProgressSubmission
         item.delete();
     }
 
-    public void deleteWrapper()
-                       throws SQLException, AuthorizeException, IOException
+    public void deleteWrapper() throws SQLException, AuthorizeException,
+            IOException
     {
-        // Check authorisation.  We check permissions on the enclosed item.
+        // Check authorisation. We check permissions on the enclosed item.
         AuthorizeManager.authorizeAction(ourContext, item, Constants.WRITE);
 
         HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
-                                   ourContext.getCurrentUser(),
-                                   ourContext.getExtraLogInfo());
+                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
 
         log.info(LogManager.getHeader(ourContext, "delete_workspace_item",
-                                      "workspace_item_id=" + getID() +
-                                      "item_id=" + item.getID() +
-                                      "collection_id=" + collection.getID()));
+                "workspace_item_id=" + getID() + "item_id=" + item.getID()
+                        + "collection_id=" + collection.getID()));
 
         //        deleteSubmitPermissions();
         // Remove from cache

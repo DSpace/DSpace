@@ -48,23 +48,27 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.dspace.eperson.EPerson;
 
-
 /**
- * <P>Tag for producing an e-person select widget in a form.  Somewhat
- * analogous to the HTML SELECT element.  An input
- * field is produced with a button which pops up a window from which
- * e-people can be selected.  Selected e-epeople are added to the field
- * in the form.  If the selector is for multiple e-people, a 'remove
- * selected from list' button is also added.</P>
- *
- * <P>On any form that has a selecteperson tag (only one allowed per page),
- * you need to include the following Javascript code on all of the submit
- * buttons, to ensure that the e-people IDs are posted and that the popup
- * window is closed:</P>
- *
- * <P><code>onclick="javascript:finishEPerson();"</code></P>
- *
- * @author  Robert Tansley
+ * <P>
+ * Tag for producing an e-person select widget in a form. Somewhat analogous to
+ * the HTML SELECT element. An input field is produced with a button which pops
+ * up a window from which e-people can be selected. Selected e-epeople are added
+ * to the field in the form. If the selector is for multiple e-people, a 'remove
+ * selected from list' button is also added.
+ * </P>
+ * 
+ * <P>
+ * On any form that has a selecteperson tag (only one allowed per page), you
+ * need to include the following Javascript code on all of the submit buttons,
+ * to ensure that the e-people IDs are posted and that the popup window is
+ * closed:
+ * </P>
+ * 
+ * <P>
+ * <code>onclick="javascript:finishEPerson();"</code>
+ * </P>
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class SelectEPersonTag extends TagSupport
@@ -82,16 +86,18 @@ public class SelectEPersonTag extends TagSupport
 
     /**
      * Setter for multiple attribute
-     *
-     * @param s  attribute from JSP
+     * 
+     * @param s
+     *            attribute from JSP
      */
     public void setMultiple(String s)
     {
-        if ((s != null) &&
-                (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true")))
+        if ((s != null)
+                && (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true")))
         {
             multiple = true;
-        } else
+        }
+        else
         {
             multiple = false;
         }
@@ -99,8 +105,9 @@ public class SelectEPersonTag extends TagSupport
 
     /**
      * Setter for e-people in list
-     *
-     * @param e  attribute from JSP
+     * 
+     * @param e
+     *            attribute from JSP
      */
     public void setSelected(Object e)
     {
@@ -108,7 +115,8 @@ public class SelectEPersonTag extends TagSupport
         {
             epeople = new EPerson[1];
             epeople[0] = (EPerson) e;
-        } else if (e instanceof EPerson[])
+        }
+        else if (e instanceof EPerson[])
         {
             epeople = (EPerson[]) e;
         }
@@ -125,9 +133,11 @@ public class SelectEPersonTag extends TagSupport
         try
         {
             JspWriter out = pageContext.getOut();
-            HttpServletRequest req = (HttpServletRequest) pageContext.getRequest();
+            HttpServletRequest req = (HttpServletRequest) pageContext
+                    .getRequest();
 
-            out.print("<table><tr><td colspan=2><select multiple name=\"eperson_id\" SIZE=");
+            out
+                    .print("<table><tr><td colspan=2><select multiple name=\"eperson_id\" SIZE=");
             out.print(multiple ? "10" : "1");
             out.println(">");
 
@@ -136,8 +146,8 @@ public class SelectEPersonTag extends TagSupport
                 for (int i = 0; i < epeople.length; i++)
                 {
                     out.print("<OPTION VALUE=\"" + epeople[i].getID() + "\">");
-                    out.print(epeople[i].getFullName() + " (" +
-                              epeople[i].getEmail() + ")");
+                    out.print(epeople[i].getFullName() + " ("
+                            + epeople[i].getEmail() + ")");
                     out.println("</OPTION>");
                 }
             }
@@ -147,25 +157,28 @@ public class SelectEPersonTag extends TagSupport
             if (multiple)
             {
                 out.print("</TR><TR><TD width=\"50%\" align=\"center\">");
-            } else
+            }
+            else
             {
                 out.print("<TD>");
             }
 
             String p = (multiple ? "people" : "person");
-            out.print("<input type=\"button\" value=\"Select E-" + p +
-                      "...\" onclick=\"javascript:popup_window('" +
-                      req.getContextPath() + "/tools/eperson-list?multiple=" +
-                      multiple + "', 'eperson_popup');\">");
+            out.print("<input type=\"button\" value=\"Select E-" + p
+                    + "...\" onclick=\"javascript:popup_window('"
+                    + req.getContextPath() + "/tools/eperson-list?multiple="
+                    + multiple + "', 'eperson_popup');\">");
 
             if (multiple)
             {
                 out.print("</TD><TD width=\"50%\" align=\"center\">");
-                out.print("<input type=\"button\" value=\"Remove Selected\" onclick=\"javascript:removeSelected(window.document.forms[0].eperson_id);\">");
+                out
+                        .print("<input type=\"button\" value=\"Remove Selected\" onclick=\"javascript:removeSelected(window.document.forms[0].eperson_id);\">");
             }
 
             out.println("</TD></TR></TABLE>");
-        } catch (IOException ie)
+        }
+        catch (IOException ie)
         {
             throw new JspException(ie);
         }

@@ -55,17 +55,16 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
-
 /**
- * MIT implementation of DSpace Web UI authentication.  This version detects
+ * MIT implementation of DSpace Web UI authentication. This version detects
  * whether the user is an MIT user, and if so, the user is redirected to the
- * certificate login page.  Otherwise, the email/password page is used.
+ * certificate login page. Otherwise, the email/password page is used.
  * <P>
- * The special group at MIT is an "MIT Users" group.  Users who are on an
- * MIT IP address, or have an e-mail ending in "mit.edu" are implictly
- * members of this group.
- *
- * @author  Robert Tansley
+ * The special group at MIT is an "MIT Users" group. Users who are on an MIT IP
+ * address, or have an e-mail ending in "mit.edu" are implictly members of this
+ * group.
+ * 
+ * @author Robert Tansley
  * @version $Revision$
  */
 public class MITAuthenticator implements SiteAuthenticator
@@ -74,30 +73,32 @@ public class MITAuthenticator implements SiteAuthenticator
     private static Logger log = Logger.getLogger(SiteAuthenticator.class);
 
     public void startAuthentication(Context context,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response)
-                             throws ServletException, IOException
+            HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException
     {
         if (isMITUser(request))
         {
             // Try and get a certificate by default
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/certificate-login"));
-        } else
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/certificate-login"));
+        }
+        else
         {
             // Present the username/password screen (with cert option)
-            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
-                                                             "/password-login"));
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/password-login"));
         }
     }
 
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
-                           throws SQLException
+            throws SQLException
     {
         // Add user to "MIT Users" special group if they're an MIT user
         EPerson user = context.getCurrentUser();
-        boolean hasMITEmail = ((user != null) &&
-                              user.getEmail().toLowerCase().endsWith("@mit.edu"));
+        boolean hasMITEmail = ((user != null) && user.getEmail().toLowerCase()
+                .endsWith("@mit.edu"));
 
         if (hasMITEmail || isMITUser(request))
         {
@@ -108,8 +109,7 @@ public class MITAuthenticator implements SiteAuthenticator
             {
                 // Oops - the group isn't there.
                 log.warn(LogManager.getHeader(context,
-                                              "No MIT Group found!! Admin needs to create one!",
-                                              ""));
+                        "No MIT Group found!! Admin needs to create one!", ""));
 
                 return new int[0];
             }
@@ -121,34 +121,32 @@ public class MITAuthenticator implements SiteAuthenticator
     }
 
     /**
-     * Check to see if the user is an MIT user.  At present, it just
-     * checks the source IP address. Note this is independent of user
-     * authentication - if the user is an off-site MIT user, this will
-     * still return false.
-     *
-     * @param request current request
-     *
-     * @return  true if the user is an MIT user.
+     * Check to see if the user is an MIT user. At present, it just checks the
+     * source IP address. Note this is independent of user authentication - if
+     * the user is an off-site MIT user, this will still return false.
+     * 
+     * @param request
+     *            current request
+     * 
+     * @return true if the user is an MIT user.
      */
     public static boolean isMITUser(HttpServletRequest request)
     {
         String addr = request.getRemoteAddr();
 
-        final String[] mitIPs = 
-                                {
-                                    "18.", "128.52.", // AI
-        "129.55.", // Lincoln
-        "192.52.65.", // Haystack
-        "192.52.61.", // Haystack
-        "198.125.160.", // Physicists/ESnet ranges purchased
-        "198.125.161.", // ...
-        "198.125.162.", // ...
-        "198.125.163.", // ...
-        "198.125.176.", // ...
-        "198.125.177.", // ...
-        "198.125.178.", // ...
-        "198.125.179." // ...
-                                };
+        final String[] mitIPs = { "18.", "128.52.", // AI
+                "129.55.", // Lincoln
+                "192.52.65.", // Haystack
+                "192.52.61.", // Haystack
+                "198.125.160.", // Physicists/ESnet ranges purchased
+                "198.125.161.", // ...
+                "198.125.162.", // ...
+                "198.125.163.", // ...
+                "198.125.176.", // ...
+                "198.125.177.", // ...
+                "198.125.178.", // ...
+                "198.125.179." // ...
+        };
 
         for (int i = 0; i < mitIPs.length; i++)
         {
@@ -161,18 +159,20 @@ public class MITAuthenticator implements SiteAuthenticator
         return false;
     }
 
-    /** Indicate whether or not a particular self-registering user can set
+    /**
+     * Indicate whether or not a particular self-registering user can set
      * themselves a password in the profile info form.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request, in case anything in that is used to
-     *                  decide
-     * @param email     e-mail address of user attempting to register
-     *
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request, in case anything in that is used to decide
+     * @param email
+     *            e-mail address of user attempting to register
+     *  
      */
     public boolean allowSetPassword(Context context,
-                                    HttpServletRequest request, String email)
-                             throws SQLException
+            HttpServletRequest request, String email) throws SQLException
     {
         // Anyone whose email address ends with @mit.edu must use a Web cert
         // to log in, so can't set a password
@@ -185,32 +185,39 @@ public class MITAuthenticator implements SiteAuthenticator
         return true;
     }
 
-    /** Indicate whether or not a particular user can self-register, based
-     * on e-mail address.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request, in case anything in that is used to
-     *                  decide
-     * @param email     e-mail address of user attempting to register
-     *
+    /**
+     * Indicate whether or not a particular user can self-register, based on
+     * e-mail address.
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request, in case anything in that is used to decide
+     * @param email
+     *            e-mail address of user attempting to register
+     *  
      */
     public boolean canSelfRegister(Context context, HttpServletRequest request,
-                                   String email) throws SQLException
+            String email) throws SQLException
     {
         // Anyone can register
         return true;
     }
 
-    /** Initialise a new e-person record for a self-registered new user.
-     *
-     * @param context   DSpace context
-     * @param request   HTTP request, in case it's needed
-     * @param eperson   newly created EPerson record - email + information
-     *                  from the registration form will have been filled out.
-     *
+    /**
+     * Initialise a new e-person record for a self-registered new user.
+     * 
+     * @param context
+     *            DSpace context
+     * @param request
+     *            HTTP request, in case it's needed
+     * @param eperson
+     *            newly created EPerson record - email + information from the
+     *            registration form will have been filled out.
+     *  
      */
     public void initEPerson(Context context, HttpServletRequest request,
-                            EPerson eperson) throws SQLException
+            EPerson eperson) throws SQLException
     {
         // If an MIT user, they must use a certificate
         if (eperson.getEmail().toLowerCase().trim().endsWith("@mit.edu"))

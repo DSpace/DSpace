@@ -58,25 +58,24 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
 
-
 /**
  * Servlet for handling user registration and forgotten passwords.
  * <P>
  * This servlet handles both forgotten passwords and initial registration of
- * users.  Which it handles depends on the initialisation parameter
- * "register" - if it's "true", it is treated as an initial registration
- * and the user is asked to input their personal information.
+ * users. Which it handles depends on the initialisation parameter "register" -
+ * if it's "true", it is treated as an initial registration and the user is
+ * asked to input their personal information.
  * <P>
- * The sequence of events is this:  The user clicks on "register" or "I forgot
- * my password."  This servlet then displays the relevant "enter your e-mail"
- * form.  An e-mail address is POSTed back, and if this is valid, a token
- * is created and e-mailed, otherwise an error is displayed, with another
- * "enter your e-mail" form.
+ * The sequence of events is this: The user clicks on "register" or "I forgot my
+ * password." This servlet then displays the relevant "enter your e-mail" form.
+ * An e-mail address is POSTed back, and if this is valid, a token is created
+ * and e-mailed, otherwise an error is displayed, with another "enter your
+ * e-mail" form.
  * <P>
- * When the user clicks on the token URL mailed to them, this servlet receives
- * a GET with the token as the parameter "KEY".  If this is a valid token,
- * the servlet then displays the "edit profile" or "edit password" screen
- * as appropriate.
+ * When the user clicks on the token URL mailed to them, this servlet receives a
+ * GET with the token as the parameter "KEY". If this is a valid token, the
+ * servlet then displays the "edit profile" or "edit password" screen as
+ * appropriate.
  */
 public class RegisterServlet extends DSpaceServlet
 {
@@ -101,14 +100,14 @@ public class RegisterServlet extends DSpaceServlet
     }
 
     protected void doDSGet(Context context, HttpServletRequest request,
-                           HttpServletResponse response)
-                    throws ServletException, IOException, SQLException, 
-                           AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
-        /* Respond to GETs.  A simple GET with no parameters will display
-         * the relevant "type in your e-mail" form.  A GET with a "token"
-         * parameter will go to the "enter personal info" or "enter new
-         * password" page as appropriate.
+        /*
+         * Respond to GETs. A simple GET with no parameters will display the
+         * relevant "type in your e-mail" form. A GET with a "token" parameter
+         * will go to the "enter personal info" or "enter new password" page as
+         * appropriate.
          */
         boolean updated = false;
 
@@ -122,15 +121,17 @@ public class RegisterServlet extends DSpaceServlet
             {
                 // Registering a new user
                 JSPManager.showJSP(request, response, "/register/new-user.jsp");
-            } else
+            }
+            else
             {
                 // User forgot their password
                 JSPManager.showJSP(request, response,
-                                   "/register/forgot-password.jsp");
+                        "/register/forgot-password.jsp");
             }
-        } else
+        }
+        else
         {
-            // We have a token.  Find out who the it's for
+            // We have a token. Find out who the it's for
             String email = AccountManager.getEmail(context, token);
 
             EPerson eperson = null;
@@ -150,24 +151,24 @@ public class RegisterServlet extends DSpaceServlet
             {
                 // Indicate if user can set password
                 boolean setPassword = Authenticate.getSiteAuth()
-                                                  .allowSetPassword(context,
-                                                                    request,
-                                                                    email);
+                        .allowSetPassword(context, request, email);
                 request.setAttribute("set.password", new Boolean(setPassword));
 
                 // Forward to "personal info page"
                 JSPManager.showJSP(request, response,
-                                   "/register/registration-form.jsp");
-            } else if (!registering && (eperson != null))
+                        "/register/registration-form.jsp");
+            }
+            else if (!registering && (eperson != null))
             {
                 // Token relates to user who's forgotten password
                 JSPManager.showJSP(request, response,
-                                   "/register/new-password.jsp");
-            } else
+                        "/register/new-password.jsp");
+            }
+            else
             {
                 // Duff token!
                 JSPManager.showJSP(request, response,
-                                   "/register/invalid-token.jsp");
+                        "/register/invalid-token.jsp");
 
                 return;
             }
@@ -175,14 +176,13 @@ public class RegisterServlet extends DSpaceServlet
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-                            HttpServletResponse response)
-                     throws ServletException, IOException, SQLException, 
-                            AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         /*
-         * POSTs are the result of entering an e-mail in the
-         * "forgot my password" or "new user" forms, or the "enter profile
-         * information" or "enter new password" forms.
+         * POSTs are the result of entering an e-mail in the "forgot my
+         * password" or "new user" forms, or the "enter profile information" or
+         * "enter new password" forms.
          */
 
         // First get the step
@@ -190,41 +190,43 @@ public class RegisterServlet extends DSpaceServlet
 
         switch (step)
         {
-            case ENTER_EMAIL_PAGE:
-                processEnterEmail(context, request, response);
+        case ENTER_EMAIL_PAGE:
+            processEnterEmail(context, request, response);
 
-                break;
+            break;
 
-            case PERSONAL_INFO_PAGE:
-                processPersonalInfo(context, request, response);
+        case PERSONAL_INFO_PAGE:
+            processPersonalInfo(context, request, response);
 
-                break;
+            break;
 
-            case NEW_PASSWORD_PAGE:
-                processNewPassword(context, request, response);
+        case NEW_PASSWORD_PAGE:
+            processNewPassword(context, request, response);
 
-                break;
+            break;
 
-            default:
-                log.warn(LogManager.getHeader(context, "integrity_error",
-                                              UIUtil.getRequestLogInfo(request)));
-                JSPManager.showIntegrityError(request, response);
+        default:
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(request)));
+            JSPManager.showIntegrityError(request, response);
         }
     }
 
     /**
-     * Process information from the "enter e-mail" page.  If the e-mail
-     * corresponds to a valid user of the system, a token is generated
-     * and sent to that user.
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
+     * Process information from the "enter e-mail" page. If the e-mail
+     * corresponds to a valid user of the system, a token is generated and sent
+     * to that user.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
      */
     private void processEnterEmail(Context context, HttpServletRequest request,
-                                   HttpServletResponse response)
-                            throws ServletException, IOException, SQLException, 
-                                   AuthorizeException
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         String email = request.getParameter("email").toLowerCase().trim();
         EPerson eperson = EPerson.findByEmail(context, email);
@@ -233,109 +235,113 @@ public class RegisterServlet extends DSpaceServlet
         {
             if (registering)
             {
-                // If an already-active user is trying to register, inform them so
+                // If an already-active user is trying to register, inform them
+                // so
                 if ((eperson != null) && eperson.canLogIn())
                 {
                     log.info(LogManager.getHeader(context,
-                                                  "already_registered",
-                                                  "email=" + email));
+                            "already_registered", "email=" + email));
 
                     JSPManager.showJSP(request, response,
-                                       "/register/already-registered.jsp");
-                } else
+                            "/register/already-registered.jsp");
+                }
+                else
                 {
                     // Find out from site authenticator whether this email can
                     // self-register
                     boolean canRegister = Authenticate.getSiteAuth()
-                                                      .canSelfRegister(context,
-                                                                       request,
-                                                                       email);
+                            .canSelfRegister(context, request, email);
 
                     if (canRegister)
                     {
-                        // OK to register.  Send token.
+                        // OK to register. Send token.
                         log.info(LogManager.getHeader(context,
-                                                      "sendtoken_register",
-                                                      "email=" + email));
+                                "sendtoken_register", "email=" + email));
 
                         AccountManager.sendRegistrationInfo(context, email);
                         JSPManager.showJSP(request, response,
-                                           "/register/registration-sent.jsp");
+                                "/register/registration-sent.jsp");
 
                         // Context needs completing to write registration data
                         context.complete();
-                    } else
+                    }
+                    else
                     {
                         JSPManager.showJSP(request, response,
-                                           "/register/cannot-register.jsp");
+                                "/register/cannot-register.jsp");
                     }
                 }
-            } else
+            }
+            else
             {
                 if (eperson == null)
                 {
                     // Invalid email address
                     log.info(LogManager.getHeader(context, "unknown_email",
-                                                  "email=" + email));
+                            "email=" + email));
 
                     request.setAttribute("retry", new Boolean(true));
 
                     JSPManager.showJSP(request, response,
-                                       "/register/forgot-password.jsp");
-                } else if (!eperson.canLogIn())
+                            "/register/forgot-password.jsp");
+                }
+                else if (!eperson.canLogIn())
                 {
                     // Can't give new password to inactive user
                     log.info(LogManager.getHeader(context,
-                                                  "unregistered_forgot_password",
-                                                  "email=" + email));
+                            "unregistered_forgot_password", "email=" + email));
 
                     JSPManager.showJSP(request, response,
-                                       "/register/inactive-account.jsp");
-                } else if (eperson.getRequireCertificate() && !registering)
+                            "/register/inactive-account.jsp");
+                }
+                else if (eperson.getRequireCertificate() && !registering)
                 {
                     // User that requires certificate can't get password
                     log.info(LogManager.getHeader(context,
-                                                  "certificate_user_forgot_password",
-                                                  "email=" + email));
+                            "certificate_user_forgot_password", "email="
+                                    + email));
 
                     JSPManager.showJSP(request, response,
-                                       "/error/require-certificate.jsp");
-                } else
+                            "/error/require-certificate.jsp");
+                }
+                else
                 {
                     // OK to send forgot pw token.
                     log.info(LogManager.getHeader(context,
-                                                  "sendtoken_forgotpw",
-                                                  "email=" + email));
+                            "sendtoken_forgotpw", "email=" + email));
 
                     AccountManager.sendForgotPasswordInfo(context, email);
                     JSPManager.showJSP(request, response,
-                                       "/register/password-token-sent.jsp");
+                            "/register/password-token-sent.jsp");
 
                     // Context needs completing to write registration data
                     context.complete();
                 }
             }
-        } catch (AddressException ae)
+        }
+        catch (AddressException ae)
         {
             // Malformed e-mail address
-            log.info(LogManager.getHeader(context, "bad_email", "email=" +
-                                          email));
+            log.info(LogManager.getHeader(context, "bad_email", "email="
+                    + email));
 
             request.setAttribute("retry", new Boolean(true));
 
             if (registering)
             {
                 JSPManager.showJSP(request, response, "/register/new-user.jsp");
-            } else
+            }
+            else
             {
                 JSPManager.showJSP(request, response,
-                                   "/register/forgot-password.jsp");
+                        "/register/forgot-password.jsp");
             }
-        } catch (MessagingException me)
+        }
+        catch (MessagingException me)
         {
             // Some other mailing error
-            log.info(LogManager.getHeader(context, "error_emailing",
-                                          "email=" + email), me);
+            log.info(LogManager.getHeader(context, "error_emailing", "email="
+                    + email), me);
 
             JSPManager.showInternalError(request, response);
         }
@@ -343,16 +349,18 @@ public class RegisterServlet extends DSpaceServlet
 
     /**
      * Process information from "Personal information page"
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
      */
     private void processPersonalInfo(Context context,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response)
-                              throws ServletException, IOException, 
-                                     SQLException, AuthorizeException
+            HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         // Get the token
         String token = request.getParameter("token");
@@ -363,11 +371,12 @@ public class RegisterServlet extends DSpaceServlet
         // If the token isn't valid, show an error
         if (email == null)
         {
-            log.info(LogManager.getHeader(context, "invalid_token",
-                                          "token=" + token));
+            log.info(LogManager.getHeader(context, "invalid_token", "token="
+                    + token));
 
             // Invalid token
-            JSPManager.showJSP(request, response, "/register/invalid-token.jsp");
+            JSPManager
+                    .showJSP(request, response, "/register/invalid-token.jsp");
 
             return;
         }
@@ -404,19 +413,19 @@ public class RegisterServlet extends DSpaceServlet
         // If the user set a password, make sure it's OK
         boolean passwordOK = true;
 
-        if ((eperson.getRequireCertificate() == false) &&
-                Authenticate.getSiteAuth().allowSetPassword(context, request,
-                                                                eperson.getEmail()))
+        if ((eperson.getRequireCertificate() == false)
+                && Authenticate.getSiteAuth().allowSetPassword(context,
+                        request, eperson.getEmail()))
         {
             passwordOK = EditProfileServlet.confirmAndSetPassword(eperson,
-                                                                  request);
+                    request);
         }
 
         if (infoOK && passwordOK)
         {
             // All registered OK.
             log.info(LogManager.getHeader(context, "usedtoken_register",
-                                          "email=" + eperson.getEmail()));
+                    "email=" + eperson.getEmail()));
 
             // delete the token
             AccountManager.deleteToken(context, token);
@@ -427,7 +436,8 @@ public class RegisterServlet extends DSpaceServlet
             request.setAttribute("eperson", eperson);
             JSPManager.showJSP(request, response, "/register/registered.jsp");
             context.complete();
-        } else
+        }
+        else
         {
             request.setAttribute("token", token);
             request.setAttribute("eperson", eperson);
@@ -435,13 +445,12 @@ public class RegisterServlet extends DSpaceServlet
             request.setAttribute("password.problem", new Boolean(!passwordOK));
 
             // Indicate if user can set password
-            boolean setPassword = Authenticate.getSiteAuth().allowSetPassword(context,
-                                                                              request,
-                                                                              email);
+            boolean setPassword = Authenticate.getSiteAuth().allowSetPassword(
+                    context, request, email);
             request.setAttribute("set.password", new Boolean(setPassword));
 
             JSPManager.showJSP(request, response,
-                               "/register/registration-form.jsp");
+                    "/register/registration-form.jsp");
 
             // Changes to/creation of e-person in DB cancelled
             context.abort();
@@ -450,16 +459,18 @@ public class RegisterServlet extends DSpaceServlet
 
     /**
      * Process information from "enter new password"
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
      */
     private void processNewPassword(Context context,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response)
-                             throws ServletException, IOException, SQLException, 
-                                    AuthorizeException
+            HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         // Get the token
         String token = request.getParameter("token");
@@ -470,11 +481,12 @@ public class RegisterServlet extends DSpaceServlet
         // If the token isn't valid, show an error
         if (eperson == null)
         {
-            log.info(LogManager.getHeader(context, "invalid_token",
-                                          "token=" + token));
+            log.info(LogManager.getHeader(context, "invalid_token", "token="
+                    + token));
 
             // Invalid token
-            JSPManager.showJSP(request, response, "/register/invalid-token.jsp");
+            JSPManager
+                    .showJSP(request, response, "/register/invalid-token.jsp");
 
             return;
         }
@@ -486,20 +498,21 @@ public class RegisterServlet extends DSpaceServlet
 
         // Confirm and set the password
         boolean passwordOK = EditProfileServlet.confirmAndSetPassword(eperson,
-                                                                      request);
+                request);
 
         if (passwordOK)
         {
             log.info(LogManager.getHeader(context, "usedtoken_forgotpw",
-                                          "email=" + eperson.getEmail()));
+                    "email=" + eperson.getEmail()));
 
             eperson.update();
             AccountManager.deleteToken(context, token);
 
             JSPManager.showJSP(request, response,
-                               "/register/password-changed.jsp");
+                    "/register/password-changed.jsp");
             context.complete();
-        } else
+        }
+        else
         {
             request.setAttribute("password.problem", new Boolean(true));
             request.setAttribute("token", token);

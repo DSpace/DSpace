@@ -43,11 +43,10 @@ import java.sql.SQLException;
 
 import org.dspace.core.Context;
 
-
 /**
  * Command-line tool to create Browse indexes.
- *
- * @author  Peter Breton
+ * 
+ * @author Peter Breton
  * @version $Revision$
  */
 public class InitializeBrowse
@@ -59,8 +58,9 @@ public class InitializeBrowse
 
     /**
      * Creates Browse indexes, destroying the old ones.
-     *
-     * @param argv Command-line arguments
+     * 
+     * @param argv
+     *            Command-line arguments
      */
     public static void main(String[] argv)
     {
@@ -75,7 +75,8 @@ public class InitializeBrowse
             context.complete();
 
             System.out.println(" ... Done");
-        } catch (SQLException sqle)
+        }
+        catch (SQLException sqle)
         {
             if (context != null)
             {
