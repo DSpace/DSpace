@@ -99,7 +99,7 @@
                     <input type="submit" name="submit_save" value="Save Edits">
                 </td>
                 <td align="right">
-                    <input type="submit" name="submit_delete" value="Delete EPerson">
+                    <input type="submit" name="submit_delete" value="Delete EPerson...">
                 </td>
             </tr>
         </table>

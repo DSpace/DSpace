@@ -151,7 +151,7 @@
 <%      if (request.getParameter("sortby") != null) { %>
                     <input type="hidden" name="sortby" value="<%= request.getParameter("sortby") %>">
 <%      } %>
-                    <input type="submit" name="submit_edit" value="Edit">
+                    <input type="submit" name="submit_edit" value="Edit...">
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <input type="submit" name="submit_delete" value="Delete...">

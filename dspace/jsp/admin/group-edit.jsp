@@ -84,7 +84,7 @@
     <P align="center">
         <form method=POST>
             <input type="hidden" name="group_id" value="<%=group.getID()%>">
-            <input type="submit" name="submit_add_eperson" value="Add EPerson to Group">
+            <input type="submit" name="submit_add_eperson" value="Add EPerson to Group...">
         </form>
     </p>
 

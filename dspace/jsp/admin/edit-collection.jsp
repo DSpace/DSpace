@@ -182,13 +182,13 @@
                                 <img src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>">
                             </td>
                             <td>
-                                <input type="submit" name="submit_set_logo" value="Upload new logo"><br><br>
+                                <input type="submit" name="submit_set_logo" value="Upload new logo..."><br><br>
                                 <input type="submit" name="submit_delete_logo" value="Delete (no logo)">
                             </td>
                         </tr>
                     </table>
 <%  } else { %>
-                    <input type="submit" name="submit_set_logo" value="Upload a logo">
+                    <input type="submit" name="submit_set_logo" value="Upload a logo...">
 <%  } %>
                 </td>
             </tr>
@@ -200,9 +200,9 @@
                 <td class="submitFormLabel">Workflow step <%= i + 1 %> group:</td>
                 <td>
 <%      if (wfGroups[i] == null) { %>
-                    <input type="submit" name="submit_wf_create_<%= i + 1 %>" value="Create">
+                    <input type="submit" name="submit_wf_create_<%= i + 1 %>" value="Create...">
 <%      } else { %>
-                    <input type="submit" name="submit_wf_edit_<%= i + 1 %>" value="Edit">
+                    <input type="submit" name="submit_wf_edit_<%= i + 1 %>" value="Edit...">
                     <input type="submit" name="submit_wf_delete_<%= i + 1 %>" value="Delete">
 <%      } %>
                 </td>
@@ -215,9 +215,9 @@
                 <td class="submitFormLabel">Item template:</td>
                 <td>
 <%  if (template == null) {%>
-                    <input type="submit" name="submit_create_template" value="Create">
+                    <input type="submit" name="submit_create_template" value="Create...">
 <%  } else { %>
-                    <input type="submit" name="submit_edit_template" value="Edit">
+                    <input type="submit" name="submit_edit_template" value="Edit...">
                     <input type="submit" name="submit_delete_template" value="Delete">
 <%  } %>                    
                 </td>

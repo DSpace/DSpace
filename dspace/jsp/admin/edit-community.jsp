@@ -148,13 +148,13 @@
                                 <img src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>">
                             </td>
                             <td>
-                                <input type="submit" name="submit_set_logo" value="Upload new logo"><br><br>
+                                <input type="submit" name="submit_set_logo" value="Upload new logo..."><br><br>
                                 <input type="submit" name="submit_delete_logo" value="Delete (no logo)">
                             </td>
                         </tr>
                     </table>
 <%  } else { %>
-                    <input type="submit" name="submit_set_logo" value="Upload a logo">
+                    <input type="submit" name="submit_set_logo" value="Upload a logo...">
 <%  } %>
                 </td>
             </tr>

@@ -67,7 +67,7 @@
     
     <form method=POST>
         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY %>">
-        <P align="center"><input type="submit" name="submit" value="Create Community"></P>
+        <P align="center"><input type="submit" name="submit" value="Create Community..."></P>
     </form>
 
     <table class="miscTable" align="center">
@@ -83,21 +83,21 @@
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COMMUNITY %>">
                     <input type="hidden" name="community_id" value="<%= communities[i].getID() %>">
-                    <input type="submit" name="submit" value="Edit">
+                    <input type="submit" name="submit" value="Edit...">
                 </td>
             </form>
             <form method=POST>
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COMMUNITY %>">
                     <input type="hidden" name="community_id" value="<%= communities[i].getID() %>">
-                    <input type="submit" name="submit" value="Delete">
+                    <input type="submit" name="submit" value="Delete...">
                 </td>
             </form>
             <form method=POST>
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COLLECTION %>">
                     <input type="hidden" name="community_id" value="<%= communities[i].getID() %>">
-                    <input type="submit" name="submit" value="Create Collection">
+                    <input type="submit" name="submit" value="Create Collection...">
                 </td>
             </form>
         </tr>
@@ -116,14 +116,14 @@
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
                     <input type="hidden" name="collection_id" value="<%= collections[j].getID() %>">
-                    <input type="submit" name="submit" value="Edit">
+                    <input type="submit" name="submit" value="Edit...">
                 </td>
             </form>
             <form method=POST>
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>">
                     <input type="hidden" name="collection_id" value="<%= collections[j].getID() %>">
-                    <input type="submit" name="submit" value="Delete">
+                    <input type="submit" name="submit" value="Delete...">
                 </td>
             </form>
         </tr>

@@ -97,7 +97,7 @@
                 </td>
                 <td class="<%= row %>RowOddCol">
                     <input type="hidden" name="group_id" value="<%= groups[i].getID() %>">
-                    <input type="submit" name="submit_edit" value="Edit">
+                    <input type="submit" name="submit_edit" value="Edit...">
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <input type="submit" name="submit_group_delete" value="Delete">

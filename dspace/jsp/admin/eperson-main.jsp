@@ -36,12 +36,12 @@
         <table width="70%">
             <tr>
                 <td>
-                    <input type="submit" name="submit_add" value="Add EPerson">
+                    <input type="submit" name="submit_add" value="Add EPerson...">
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input type="submit" name="submit_browse" value="Browse EPeople">
+                    <input type="submit" name="submit_browse" value="Browse EPeople...">
                 </td>
             </tr>
 
