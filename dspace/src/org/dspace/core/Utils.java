@@ -234,7 +234,9 @@ public class Utils
     {
         value = value.replaceAll("&", "&amp;");
         value = value.replaceAll("\"", "&quot;");
-        value = value.replaceAll("'", "&apos;");
+	// actually, &apos; is an XML entity, not in HTML.
+	// that's why it's commented out.
+        //value = value.replaceAll("'", "&apos;");
         value = value.replaceAll("<", "&lt;");
         value = value.replaceAll(">", "&gt;");  
 
