@@ -75,7 +75,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.license.CC;
+import org.dspace.license.CreativeCommons;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -577,9 +577,9 @@ public class SubmitServlet extends DSpaceServlet
 
         if (multipleFiles == false)
         {
-            // see if number of bitstreams in bundle[0] > 1
+            // see if number of bitstreams in "ORIGINAL" bundle > 1
             // FIXME: Assumes multiple bundles, clean up someday...
-            Bundle[] bundles = subInfo.submission.getItem().getBundles();
+            Bundle[] bundles = subInfo.submission.getItem().getBundles("ORIGINAL");
 
             if (bundles.length > 0)
             {
@@ -702,7 +702,7 @@ public class SubmitServlet extends DSpaceServlet
             // FIXME: Assumes multiple bundles, clean up someday...
             // (only messes with the first bundle.)
 
-            Bundle[] bundles = item.getBundles();
+            Bundle[] bundles = item.getBundles("ORIGINAL");
 
             if (bundles.length > 0)
             {
@@ -1044,7 +1044,7 @@ public class SubmitServlet extends DSpaceServlet
                         new FileInputStream(temp));
                     
                     // do we already have a bundle?    
-                    Bundle [] bundles = item.getBundles();
+                    Bundle [] bundles = item.getBundles("ORIGINAL");
                     
                     if( bundles.length < 1)
                     {
@@ -1119,7 +1119,7 @@ public class SubmitServlet extends DSpaceServlet
             // screen is the edit metadata 2 page.  If there are
             // upload files, we go back to the file list page,
             // without uploading the file they've specified.
-            if (subInfo.submission.getItem().getBundles().length > 0)
+            if (subInfo.submission.getItem().getBundles("ORIGINAL").length > 0)
             {
                 // Have files, go to list
                 showUploadFileList(request,
@@ -1270,7 +1270,7 @@ public class SubmitServlet extends DSpaceServlet
 	    // set primary bitstream
 	    if (request.getParameter("primary_bitstream_id") != null)
 	    {
-		Bundle[] bundles = item.getBundles();
+		Bundle[] bundles = item.getBundles("ORIGINAL");
 		bundles[0].setPrimaryBitstreamID(new Integer(request.getParameter("primary_bitstream_id")).intValue());
 		bundles[0].update();
 	    }
@@ -1284,7 +1284,7 @@ public class SubmitServlet extends DSpaceServlet
             // set primary bitstream
             if (request.getParameter("primary_bitstream_id") != null)
             {
-                Bundle[] bundles = item.getBundles();
+                Bundle[] bundles = item.getBundles("ORIGINAL");
                 bundles[0].setPrimaryBitstreamID(new Integer(request.getParameter("primary_bitstream_id")).intValue());
                 bundles[0].update();
 		context.commit();
@@ -1562,7 +1562,7 @@ public class SubmitServlet extends DSpaceServlet
             if (!isWorkflow(subInfo))
             {
 		// proceed to next step conditional on CC
-                int nextStep = CC.isEnabled() ? CC_LICENSE : GRANT_LICENSE;
+                int nextStep = CreativeCommons.isEnabled() ? CC_LICENSE : GRANT_LICENSE;
                 userHasReached(subInfo, nextStep);
                 doStep(context, request, response, subInfo, nextStep);
                 context.complete();
@@ -1676,11 +1676,22 @@ public class SubmitServlet extends DSpaceServlet
             // Back to review submission
             doStep(context, request, response, subInfo, REVIEW_SUBMISSION);
         }
+        else if (buttonPressed.equals("submit_next"))
+	{
+            // Update user's progress
+            userHasReached(subInfo, GRANT_LICENSE);
+
+            // User has clicked "Next"
+            doStep(context, request, response, subInfo, GRANT_LICENSE);
+            context.complete();
+        }
         else if (buttonPressed.equals("submit_no_cc"))
 	{
-            // Skipping the CC license
+            // Skipping the CC license - remove any existing license selection
+            CreativeCommons.removeLicense(context, subInfo.submission.getItem());
             userHasReached(subInfo, GRANT_LICENSE);
             doStep(context, request, response, subInfo, GRANT_LICENSE);
+            context.complete();
         }
  	else
         {
@@ -1691,7 +1702,7 @@ public class SubmitServlet extends DSpaceServlet
  	        Item item = subInfo.submission.getItem();
  	
  	        // set the CC license
- 	        CC.setLicense(context, item, request.getParameter("cc_license_url"));
+ 	        CreativeCommons.setLicense(context, item, ccLicenseUrl);
 
                 userHasReached(subInfo, GRANT_LICENSE);
                 doStep(context, request, response, subInfo, GRANT_LICENSE);
@@ -1854,7 +1865,11 @@ public class SubmitServlet extends DSpaceServlet
             break;
 
         case CC_LICENSE:
-            JSPManager.showJSP(request, response, "/submit/cc.jsp");
+            // Do we already have a CC license?
+            Item item = subInfo.submission.getItem();
+            boolean exists =  CreativeCommons.hasLicense(context, item);
+            request.setAttribute("cclicense.exists", new Boolean(exists) );
+            JSPManager.showJSP(request, response, "/submit/creative-commons.jsp");
             break;
 
         case SUBMISSION_COMPLETE:
@@ -1922,7 +1937,7 @@ public class SubmitServlet extends DSpaceServlet
         SubmissionInfo subInfo)
         throws SQLException, ServletException, IOException
     {
-        Bundle[] bundles = subInfo.submission.getItem().getBundles();
+        Bundle[] bundles = subInfo.submission.getItem().getBundles("ORIGINAL");
 
         if (bundles.length > 0)
         {
