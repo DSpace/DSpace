@@ -59,10 +59,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.InstallItem;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.ingest.WorkspaceItem;
 import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -168,32 +169,9 @@ public class WorkflowManager
                 "item_id="       + myitem.getID() +
                 "collection_id=" + collection.getID()));
 
-        // Set accession date
-        DCDate d = DCDate.getCurrent();
-        myitem.addDC("date", "accessioned", null, d.toString());
-
-        // Get non-internal format bitstreams
-        Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
-
-        // Create provenance description
-        String provMessage = "Submitted by" + 
-            myitem.getSubmitter().getFullName() + " (" +
-            myitem.getSubmitter().getEmail() + ").  DSpace accession date:" +
-            d.toString() + "\n Submission has " + bitstreams.length +
-            " bitstreams:\n";
-
-        // Add sizes and checksums of bitstreams
-        for (int j = 0; j < bitstreams.length; j++)
-        {
-            provMessage = provMessage + bitstreams[j].getName() + ": " +
-                bitstreams[j].getSize() + " bytes, checksum: " +
-                bitstreams[j].getChecksum() + " (" + 
-                bitstreams[j].getChecksumAlgorithm() + ")\n";
-        }
-                    
-        // Add message to the DC
-        myitem.addDC("description", "provenance", "en", provMessage);
-
+        // record the start of the workflow w/provenance message
+        recordStart(c, myitem);
+        
         // create the WorkflowItem
         TableRow row = DatabaseManager.create(c, "workflowitem");
         row.setColumn( "item_id", myitem.getID() );
@@ -201,9 +179,10 @@ public class WorkflowManager
                 
         WorkflowItem wfi = new WorkflowItem(c, row);
         
-        wfi.setMultipleFiles  ( wsi.hasMultipleFiles()   );
-        wfi.setMultipleTitles ( wsi.hasMultipleTitles()  );
+        wfi.setMultipleFiles  ( wsi.hasMultipleFiles()  );
+        wfi.setMultipleTitles ( wsi.hasMultipleTitles() );
         wfi.setPublishedBefore( wsi.isPublishedBefore() );
+
 
         // remove the WorkspaceItem
         wsi.delete();
@@ -214,27 +193,6 @@ public class WorkflowManager
         // Return the workflow item
         return wfi;
     }
-
-    // creates workflow tasklist entries for a workflow
-    //  from a given eperson group
-    private static void createTasks(Context c, WorkflowItem wi, Group eg)
-        throws SQLException
-    {
-        // get a list of epeople
-        EPerson [] epa = eg.getMembers();
-        
-        // create a tasklist entry for each eperson
-        for( int i=0; i<epa.length; i++ )
-        {
-            // can we get away without creating a tasklistitem class?
-            // do we want to?
-            TableRow tr = DatabaseManager.create(c, "tasklistitem");
-            tr.setColumn( "eperson_id", epa[i].getID() );
-            tr.setColumn( "workflow_id", wi.getID() );
-            DatabaseManager.update( c, tr );
-        }
-    }
-
 
 
 	/** getOwnedTasks() returns a List of WorkflowItems containing
@@ -294,7 +252,7 @@ public class WorkflowManager
 
     // claim an item and become it's owner
     public static void claim(Context c,WorkflowItem wi, EPerson e)
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
         int taskstate = wi.getState();
 
@@ -331,7 +289,7 @@ public class WorkflowManager
 	 * @param e  EPerson doing the approval
 	 */
     public static void advance(Context c,WorkflowItem wi, EPerson e)
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
         int taskstate = wi.getState();
 
@@ -371,7 +329,7 @@ public class WorkflowManager
 
     // return task to pool
     public static void unclaim(Context c,WorkflowItem wi, EPerson e)
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
 
         int taskstate = wi.getState();
@@ -418,71 +376,9 @@ public class WorkflowManager
         reject(c, wi, e, "This item's submission has been aborted by an admin.");
     }
 
-    // FIXME - still needed?
-    private static EPerson getSubmitterEPerson(WorkflowItem wi)
-        throws SQLException
-    {
-        EPerson e = wi.getSubmitter();
-
-        return e;
-    }
-
-    private static String getItemTitle(WorkflowItem wi)
-        throws SQLException
-    {
-        Item   myitem   = wi.getItem();
-        DCValue titles[] = myitem.getDC("title", null, Item.ANY);
-
-        // only return the first element, or "Untitled"
-        if( titles.length > 0 )
-            return titles[0].value;
-        else
-            return "Untitled";
-    }
-
-
-    private static String getSubmitterName(WorkflowItem wi)
-        throws SQLException
-    {
-        EPerson e = wi.getSubmitter();
-
-        return getEPersonName( e );
-    }
-
-    private static String getEPersonName(EPerson e)
-        throws SQLException
-    {
-        String submitter = e.getFullName();
-
-        submitter = submitter + "(" + e.getEmail() + ")";
-
-        return submitter;
-    }
-
-
-    // Record approval provenance statement
-    private static void recordApproval(Context c,WorkflowItem wi, EPerson e)
-        throws SQLException, AuthorizeException
-    {
-        Item item = wi.getItem();
-
-        // Get user's name + email address
-        String usersName = getEPersonName( e );
-
-        // Get current date
-        String now = DCDate.getCurrent().toString();
-
-        // Here's what happened
-        String provDescription = "Approved for entry into archive by " + usersName +
-            " on " + now + " (GMT)";
-
-        // Add to item as a DC field
-        item.addDC("description", "provenance", null, provDescription);
-        item.update();
-    }
 
     private static void doState(Context c,WorkflowItem wi, int newstate, EPerson newowner)
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
         Collection mycollection = wi.getCollection();
         Group mygroup = null;
@@ -625,6 +521,11 @@ public class WorkflowManager
 //                wi = null;
 
             }
+            catch(IOException e)
+            {
+                // indexer causes this
+                throw e;
+            }
             catch (SQLException e)
             {
                 // problem starting workflow - roll back
@@ -637,6 +538,8 @@ public class WorkflowManager
 
         if (wi != null) wi.update();
     }
+
+
     
     /**
      * Commit the contained item to the main archive.  The item is
@@ -647,7 +550,7 @@ public class WorkflowManager
      */
     
     public static Item archive(Context c, WorkflowItem wfi)
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
         // FIXME: Check auth
 
@@ -659,60 +562,11 @@ public class WorkflowManager
             "workflow_item_id=" + wfi.getID() + "item_id=" + item.getID() +
                 "collection_id=" + collection.getID()));
 
+        InstallItem.installItem(c, wfi);
+
         // Remove workflow item
-        wfi.delete(c);
-        //DatabaseManager.delete(c, wfRow);
+//        wfi.delete(c);        
 
-        // Add item to collection
-        collection.addItem(item);
-
-        // Assign handle
-        String handle = HandleManager.createHandle(c, item);
-
-        // Add handle as identifier.uri DC value
-        item.addDC("identifier", "uri", null, handle);
-
-        // Add format.mimetype and format.extent DC values
-        Bitstream[] bitstreams = item.getNonInternalBitstreams();
-        
-        for (int i = 0; i < bitstreams.length; i++)
-        {
-            BitstreamFormat bf = bitstreams[i].getFormat();
-            item.addDC("format",
-                "extent",
-                null,
-                String.valueOf(bitstreams[i].getSize()));
-            item.addDC("format", "mimetype", null, bf.getMIMEType());
-        }
-
-        // Assign issue date, if none exists, and build up provenance
-        DCDate now = DCDate.getCurrent();
-
-        DCValue[] currentDateIssued = item.getDC("date",
-            "issued",
-            null);
-
-        String provDescription = "Made available in DSpace on " + now +
-            " (GMT).";
-
-        if (currentDateIssued.length == 0)
-        {
-            item.addDC("date", "issued", null, now.toString());
-        }
-        else
-        {
-            DCDate d = new DCDate(currentDateIssued[0].value);
-            provDescription = provDescription + "  Previous issue date: " +
-                d.toString();
-        }
-
-        // Add provenance description
-        item.addDC("description", "provenance", "en", provDescription);
-
-        // Set in_archive bit
-        item.setArchived(true);
-        item.update();
-        
         // Log the event
         log.info(LogManager.getHeader(
             c,
@@ -722,6 +576,7 @@ public class WorkflowManager
 
         return item;
     }   
+
 
     /**
      * notify the submitter that the item is archived
@@ -759,8 +614,6 @@ public class WorkflowManager
     }
 
 
-
-
     /**
      * Return the workflow item to the workspace of the submitter.
      * The workflow item is removed, and a workspace item created.
@@ -769,7 +622,7 @@ public class WorkflowManager
      * @param wfi WorkflowItem to be 'dismantled'
      * @return  the workspace item
      */
-    public static WorkspaceItem returnToWorkspace(Context c, WorkflowItem wfi)
+    private static WorkspaceItem returnToWorkspace(Context c, WorkflowItem wfi)
         throws SQLException, AuthorizeException
     {
         Item myitem = wfi.getItem();
@@ -811,7 +664,7 @@ public class WorkflowManager
     }
 
 
-	/** rejectAction() rejects an item - rejection means undoing
+	/** rejects an item - rejection means undoing
 	 *  a submit - WorkspaceItem is created, and the WorkflowItem
 	 *  is removed, user is emailed rejection_message.
      *
@@ -835,7 +688,28 @@ public class WorkflowManager
         WorkspaceItem wsi = returnToWorkspace(c, wi);
     }
     
-    
+
+    // creates workflow tasklist entries for a workflow
+    //  from a given eperson group
+    private static void createTasks(Context c, WorkflowItem wi, Group eg)
+        throws SQLException
+    {
+        // get a list of epeople
+        EPerson [] epa = eg.getMembers();
+        
+        // create a tasklist entry for each eperson
+        for( int i=0; i<epa.length; i++ )
+        {
+            // can we get away without creating a tasklistitem class?
+            // do we want to?
+            TableRow tr = DatabaseManager.create(c, "tasklistitem");
+            tr.setColumn( "eperson_id", epa[i].getID() );
+            tr.setColumn( "workflow_id", wi.getID() );
+            DatabaseManager.update( c, tr );
+        }
+    }
+
+
     // deletes all tasks associated with a workflowitem
     private static void deleteTasks(Context c,WorkflowItem wi)
         throws SQLException
@@ -954,5 +828,108 @@ public class WorkflowManager
         }
     }
 
-}
 
+    // FIXME - still needed?
+    private static EPerson getSubmitterEPerson(WorkflowItem wi)
+        throws SQLException
+    {
+        EPerson e = wi.getSubmitter();
+
+        return e;
+    }
+
+    private static String getItemTitle(WorkflowItem wi)
+        throws SQLException
+    {
+        Item   myitem   = wi.getItem();
+        DCValue titles[] = myitem.getDC("title", null, Item.ANY);
+
+        // only return the first element, or "Untitled"
+        if( titles.length > 0 )
+            return titles[0].value;
+        else
+            return "Untitled";
+    }
+
+
+    private static String getSubmitterName(WorkflowItem wi)
+        throws SQLException
+    {
+        EPerson e = wi.getSubmitter();
+
+        return getEPersonName( e );
+    }
+
+    private static String getEPersonName(EPerson e)
+        throws SQLException
+    {
+        String submitter = e.getFullName();
+
+        submitter = submitter + "(" + e.getEmail() + ")";
+
+        return submitter;
+    }
+
+
+    // Record approval provenance statement
+    private static void recordApproval(Context c,WorkflowItem wi, EPerson e)
+        throws SQLException, AuthorizeException
+    {
+        Item item = wi.getItem();
+
+        // Get user's name + email address
+        String usersName = getEPersonName( e );
+
+        // Get current date
+        String now = DCDate.getCurrent().toString();
+
+        // Here's what happened
+        String provDescription = "Approved for entry into archive by " + usersName +
+            " on " + now + " (GMT)";
+            
+        // add bitstream descriptions (name, size, checksums)
+        provDescription += InstallItem.getBitstreamProvenanceMessage(item);    
+
+        // Add to item as a DC field
+        item.addDC("description", "provenance", null, provDescription);
+        item.update();
+    }
+
+
+    // Create workflow start provenance message
+    private static void recordStart(Context c, Item myitem)
+        throws SQLException, AuthorizeException
+    {
+        // Get non-internal format bitstreams
+        Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
+
+        // get date
+        DCDate now = DCDate.getCurrent();
+
+        // Create provenance description
+        String provmessage = "";
+        
+        if( myitem.getSubmitter() != null )
+        {
+            provmessage = "Submitted by" + 
+            myitem.getSubmitter().getFullName() + " (" +
+            myitem.getSubmitter().getEmail() + ").  DSpace accession date:" +
+            now.toString() + "\n Submission has " + bitstreams.length +
+            " bitstreams:\n";
+        }
+        else // null submitter
+        {
+            provmessage = "Submitted by unknown (probably automated)" + 
+                          "  DSpace accession date:" +
+            now.toString() + "\n Submission has " + bitstreams.length +
+            " bitstreams:\n";            
+        }
+
+        // add sizes and checksums of bitstreams
+        provmessage += InstallItem.getBitstreamProvenanceMessage(myitem);                    
+
+        // Add message to the DC
+        myitem.addDC("description", "provenance", "en", provmessage);
+        myitem.update();
+    }
+}
