@@ -123,6 +123,9 @@ public class DSpaceServlet extends HttpServlet
     {
         Context context = null;
 
+	// set all incoming encoding to UTF-8
+        request.setCharacterEncoding("UTF-8");
+
         // Get the URL from the request immediately, since forwarding
         // loses that information
         UIUtil.storeOriginalURL(request);
