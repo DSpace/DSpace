@@ -134,6 +134,8 @@ public class Constants
     /** Default Read policies for Items submitted to container */
     public static final int DEFAULT_ITEM_READ = 10;
 
+    /** collection editor -- metadata, icon, owned item metadata */
+    public static final int COLLECTION_EDITOR = 11;
 
     /**
      * lets you look up action names from the action IDs
@@ -150,7 +152,8 @@ public class Constants
         "WORKFLOW_STEP_3",
         "WORKFLOW_ABORT",
         "DEFAULT_BITSTREAM_READ",
-        "DEFAULT_ITEM_READ"
+        "DEFAULT_ITEM_READ",
+        "COLLECTION_EDITOR"
     };
 
 
@@ -183,7 +186,8 @@ public class Constants
         0,           // 7  - WORKFLOW_STEP_3
         0,           // 8  - WORKFLOW_ABORT
         RCOLLECTION, // 9  - DEFAULT_BITSTREAM_READ
-        RCOLLECTION  // 10 - DEFAULT_ITEM_READ
+        RCOLLECTION, // 10 - DEFAULT_ITEM_READ
+        RCOLLECTION  // 11 - COLLECTION_EDITOR 
     };
 
 
