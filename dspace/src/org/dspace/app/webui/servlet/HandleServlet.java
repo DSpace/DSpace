@@ -281,12 +281,12 @@ public class HandleServlet extends DSpaceServlet
         
         // Get the collections
         Collection[] collections = item.getCollections();
-
+       
         // For the breadcrumbs, get the first collection and the first community
         // that is in.  FIXME: Not multiple-inclusion friendly--should be
         // smarter, context-sensitive
-        request.setAttribute("dspace.collection", collections[0]);
-        Community[] comms = collections[0].getCommunities();
+        request.setAttribute("dspace.collection", item.getOwningCollection());
+        Community[] comms = item.getOwningCollection().getCommunities();
         request.setAttribute("dspace.community", comms[0]);
         /*
          * Find all the "parent" communities for the collection
