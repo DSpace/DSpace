@@ -42,6 +42,7 @@
 package org.dspace.storage.rdbms.test;
 
 import java.sql.*;
+import java.util.List;
 
 import junit.extensions.*;
 import junit.framework.*;
@@ -594,7 +595,7 @@ public class DatabaseManagerTest extends TestCase
     {
         return new TableRow
             (TABLENAME,
-             DatabaseManagerShim.publicGetNonPrimaryKeyColumnNames(TABLENAME));
+             DatabaseManagerShim.publicGetColumnNames(TABLENAME));
     }
 
     ////////////////////////////////////////
@@ -650,5 +651,27 @@ public class DatabaseManagerTest extends TestCase
     {
         junit.textui.TestRunner.run(suite());
         System.exit(0);
+    }
+}
+
+/**
+ * This class in a simple shim to allow tests of the
+ * <code>DatabaseManager</code> to invoke access-controlled methods.
+ *
+ * @author Robert Tansley
+ * @version $Revision$
+ */
+class DatabaseManagerShim extends DatabaseManager
+{
+    public static String publicGetPrimaryKeyColumn(String table)
+        throws SQLException
+    {
+        return getPrimaryKeyColumn(table);
+    }
+
+    public static List publicGetColumnNames(String table)
+        throws SQLException
+    {
+        return getColumnNames(table);
     }
 }
