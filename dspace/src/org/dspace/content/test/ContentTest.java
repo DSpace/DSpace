@@ -304,7 +304,7 @@ public class ContentTest extends TestCase
             "Perls before Swine"
         });
 
-        String LANG = "en";
+        final String LANG = "en";
         String now = new DCDate(new java.util.Date()).toString();
 
         try
@@ -412,6 +412,85 @@ public class ContentTest extends TestCase
             e.printStackTrace();
             System.out.println("Got exception: " + e);
             fail("Exception while running test: " + e);
+        }
+    }
+
+    /**
+     * Test of item comparator
+     */
+    public void testItemComparator()
+    {
+        Context context = null;
+
+        final String LANG = "en";
+        String now = new DCDate(new java.util.Date()).toString();
+
+        try
+        {
+            context = createContext();
+
+            Community community = Community.create(context);
+            Collection collection = community.createCollection();
+
+            WorkspaceItem wi = WorkspaceItem.create(context, collection);
+
+            int w_id = wi.getID();
+            Item first = wi.getItem();
+            int id = first.getID();
+
+            WorkspaceItem wi2 = WorkspaceItem.create(context, collection);
+
+            int w2_id = wi2.getID();
+            Item second = wi2.getItem();
+            int id2 = second.getID();
+
+            WorkspaceItem wi3 = WorkspaceItem.create(context, collection);
+
+            int w3_id = wi3.getID();
+            Item third = wi3.getItem();
+            int id3 = third.getID();
+
+
+            first.addDC("title", null, LANG, "Abc");
+            first.update();
+
+            second.addDC("title", null, LANG, "Def");
+            second.update();
+
+            third.addDC("title", null, LANG, "Aaa");
+            third.addDC("title", null, LANG, "Ghi");
+            second.update();
+
+            ItemComparator ic_max = new ItemComparator("title", null, LANG, true);
+            ItemComparator ic_min = new ItemComparator("title", null, LANG, false);
+            assertTrue("First is less than second",
+                       ic_max.compare(first, second) < 0);
+            assertTrue("Second is greater than first",
+                       ic_max.compare(second, first) > 0);
+            assertTrue("First is less than second",
+                       ic_min.compare(first, second) < 0);
+            assertTrue("Second is greater than first",
+                       ic_min.compare(second, first) > 0);
+            // Comparing the third will depend on max/min values
+            assertTrue("First is less than third",
+                       ic_max.compare(first, third) < 0);
+            assertTrue("Third is greater than first",
+                       ic_max.compare(third, first) > 0);
+            assertTrue("First is less than third",
+                       ic_min.compare(first, third) > 0);
+            assertTrue("Third is greater than first",
+                       ic_min.compare(third, first) < 0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.out.println("Got exception: " + e);
+            fail("Exception while running test: " + e);
+        }
+        finally
+        {
+            if (context != null)
+                context.abort();
         }
     }
 
