@@ -195,6 +195,9 @@ public class AuthorizeManager
     public static boolean authorize(Context c,int resourcetype, int resourceid, int actionid, int userid)
         throws SQLException
     {
+        // ignore authorization? if so, return true
+        if(c.ignoreAuthorization()) return true;
+    
         // admins can do everything
         if( isAdmin(c,userid) ) return true;
    
