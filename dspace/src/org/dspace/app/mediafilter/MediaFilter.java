@@ -139,12 +139,12 @@ public abstract class MediaFilter
         // Now set the format and name of the bitstream
         b.setName(newName);
         b.setSource("Written by MediaFilter " + this.getClass().getName() );  // or obj.getClass().getName();
-        b.update();
         
         // Find the proper format
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(
             c, getFormatString());
         b.setFormat(bf);
+        b.update();
         
         // fixme - set date?
         
