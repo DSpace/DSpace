@@ -70,10 +70,61 @@
 
 <dspace:layout title="Communities and Collections">
 
+<%
+    if (admin_button)
+    {
+%>
+      <table class=miscTable align=left>
+        <tr>
+        <td>
+            <H1>Communities and Collections</H1>
+
+            <P>Shown below is a list of communities and the collections and sub-communities within them.
+            Click on a name to view that community or collection home page.</P>
+        </td>
+        <td>
+        <table class=miscTable align=center>
+	    <tr>
+	        <td class="evenRowEvenCol" colspan=2>
+	            <table>
+                        <tr>
+                            <th class="standard">
+                                <strong>Admin Tools</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td class="standard" align="center">
+	                        <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+		                    <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
+                                    <input type="submit" name="submit" value="Create Top-Level Community...">
+                                </form>
+                            </td>
+                        </tr>
+	 	    </table>
+	 	</td>
+            </tr>
+            <tr>
+              <td class="standard" align="center">
+                 <dspace:popup page="/help/site-admin.html">Admin Help...</dspace:popup>
+              </td>
+            </tr>
+        </table>
+        </td>
+       </tr>
+      </table>
+
+<%
+    }
+    else
+    {
+%>
     <H1>Communities and Collections</H1>
 
     <P>Shown below is a list of communities and the collections and sub-communities within them.
     Click on a name to view that community or collection home page.</P>
+<%
+    }
+%>
   
     <UL>
 <%
@@ -119,35 +170,5 @@
     }
 %>
     </UL>
-<%
-    if(admin_button)
-    {
-%>
-      <dspace:sidebar>
-        <table class=miscTable align=center>
-	    <tr>
-	        <td class="evenRowEvenCol" colspan=2>
-	            <table>
-                        <tr>
-                            <th class="standard">
-                                <strong>Admin Tools</strong>
-                            </th>
-                        </tr>
-                        <tr>
-                            <td class="standard" align="center">
-	                        <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
-		                    <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
-                                    <input type="submit" name="submit" value="Create Top-Level Community...">
-                                </form>
-                            </td>
-                        </tr>
-	 	    </table>
-	 	</td>
-            </tr>
-        </table>
-      </dspace:sidebar>
-<%
-    }
-%>
  
 </dspace:layout>
