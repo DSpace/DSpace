@@ -139,18 +139,6 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                 margin-right: 10px;
                 white-space: nowrap }
 
-.loggedOutCell { background: #A7AABB;
-                 color: #252645;
-                 font-size: 10pt;
-                 font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
-                 font-weight: bold;
-                 vertical-align: middle;
-                 text-align: right;
-                 height: 1.0em;
-                 text-decoration: none;
-                 margin-right: 10px;
-                 white-space: nowrap }
-
 .centralPane { margin: 1px;
                vertical-align: top;
                padding: 3px;

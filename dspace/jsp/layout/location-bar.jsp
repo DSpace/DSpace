@@ -104,24 +104,17 @@
         </td>
         <td class="locationBarCell">&nbsp;&nbsp;&nbsp;</td>
 <%
-    if (eperson == null)
+    if (eperson != null)
     {
 %>
 <%-- HACK: &nbsp's are a workaround for Netscape 4.x, which doesn't honour
   -- "white-space: nowrap" CSS property --%>
-        <td class="loggedOutCell">
-            Not&nbsp;logged&nbsp;in&nbsp;&nbsp;&nbsp;
-<%
-    }
-    else
-    {
-%>
         <td class="loggedInCell">
             Logged&nbsp;in&nbsp;as&nbsp;<%= eperson.getEmail() %>&nbsp;&nbsp;&nbsp;
+      </td>
 <%
     }
 %>
-      </td>
     </tr>
   </table>
 </td>
