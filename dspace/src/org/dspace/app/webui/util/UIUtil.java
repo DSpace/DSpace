@@ -79,7 +79,7 @@ public class UIUtil
             
             // See if a user has authentication
             Integer userID = (Integer)
-                request.getSession().getAttribute("dspace.user");
+                request.getSession().getAttribute("dspace.current.userid");
 
             if (userID != null)
             {
@@ -89,6 +89,9 @@ public class UIUtil
                 // anonymous access
                 c.setCurrentUser(e);
             }
+
+            // Set the session ID
+            c.setExtraLogInfo("session_id=" + request.getSession().getId());
 
             // Store the context in the request
             request.setAttribute("dspace.context", c);
@@ -128,5 +131,73 @@ public class UIUtil
     }
 
 
+    /**
+     * Put the original request URL into the request object as an attribute
+     * for later use.  This is necessary because forwarding a request removes
+     * this information.  The attribute is only written if it hasn't been
+     * before; thus it can be called after a forward safely.
+     *
+     * @param request   the HTTP request
+     */
+    public static void storeOriginalURL(HttpServletRequest request)
+    {
+        String orig = (String) request.getAttribute("dspace.original.url");
+
+        if (orig == null)
+        {
+            String fullURL = request.getServletPath();
+            if (request.getQueryString() != null)
+            {
+                fullURL = fullURL + "?" + request.getQueryString();
+            }
+
+            request.setAttribute("dspace.original.url", fullURL);
+        }
+    }
     
+    
+    /**
+     * Get the original request URL.
+     *
+     * @param request   the HTTP request
+     *
+     * @return  the original request URL
+     */
+    public static String getOriginalURL(HttpServletRequest request)
+    {
+        // Make sure there's a URL in the attribute
+        storeOriginalURL(request);
+
+        return ((String) request.getAttribute("dspace.original.url"));
+    }        
+
+
+
+    /**
+     * Utility method to convert spaces in a string to HTML non-break space
+     * elements.
+     *
+     * @param s    string to change spaces in
+     * @return   the string passed in with spaces converted to HTML non-break
+     *           spaces
+     */
+    public static String nonBreakSpace(String s)
+    {
+        StringBuffer newString = new StringBuffer();
+
+        for (int i = 0; i < s.length(); i++)
+        {
+            char ch = s.charAt(i);
+            if (ch == ' ')
+            {
+                newString.append("&nbsp;");
+            }
+            else
+            {
+                newString.append(ch);
+            }
+        }
+
+        return newString.toString();
+    }
 }

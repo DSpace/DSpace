@@ -51,6 +51,10 @@ import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspException;
 import javax.servlet.RequestDispatcher;
 
+import org.apache.log4j.Logger;
+
+import org.dspace.core.ConfigurationManager;
+
 /**
  * Tag for HTML page layout ("skin").
  * <P>
@@ -58,17 +62,19 @@ import javax.servlet.RequestDispatcher;
  * footer to render the page appropriately:
  * <P><UL>
  * <LI><code>dspace.layout.title</code> - title of page</LI>
- * <LI><code>dspace.layout.locbar</code> - value will be "off", "link" or
- * "nolink"</LI>
- * <LI><code>dspace.layout.parents</code> - a <code>List</code> of
- * <code>String</code>s corresponding with names to put in the location bar.
- * Only set if <code>dspace.layout.locbar</code> is "link" or "nolink"</LI>
+ * <LI><code>dspace.layout.locbar</code> - value will Boolean true or false</LI>
+ * <LI><code>dspace.layout.parenttitles</code> - a <code>List</code> of
+ * <code>String</code>s corresponding with titles to put in the location bar.
+ * Only set if <code>dspace.layout.locbar</code> is true</LI>
  * <LI><code>dspace.layout.parentlinks</code> - a <code>List</code> of
  * <code>String</code>s corresponding with links to put in the location bar.
  * Empty strings mean no link.  Will only be set if
- * <code>dspace.layout.locbar</code> is "link" or "nolink".</LI> 
+ * <code>dspace.layout.locbar</code> is true.</LI> 
  * <LI><code>dspace.layout.navbar</code> - value will be "off", or the
  * navigation bar to include, e.g. "/layout/navbar_default.jsp"</LI>
+ * <LI><code>dspace.layout.sidebar</code> - contents of the sidebar</LI>
+ * <LI><code>dspace.current.user</code> - the EPerson currently logged in,
+ * or <code>null</code> if anonymous access</LI>
  * </UL>
  *
  * @author  Robert Tansley
@@ -76,6 +82,9 @@ import javax.servlet.RequestDispatcher;
  */
 public class Layout extends TagSupport
 {
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(Layout.class);
+
     /** layout style name */
     private String style;
     
@@ -93,6 +102,15 @@ public class Layout extends TagSupport
 
     /** Link to "parent" page */
     private String parentLink;
+
+    /** Contents of side bar */
+    private String sidebar;
+
+
+    public Layout()
+    {
+        super();
+    }
 
 
     public int doStartTag()
@@ -121,14 +139,14 @@ public class Layout extends TagSupport
         if (locbar.equalsIgnoreCase("off"))
         {
             // No location bar
-            request.setAttribute("dspace.layout.locbar", "off");
+            request.setAttribute("dspace.layout.locbar", new Boolean(false));
         }
         else
         {
             // Add DSpace Home
-            parents.add("DSpace Home");
+            parents.add(ConfigurationManager.getProperty("dspace.name"));
 
-            if (locbar.equals("nolink"))
+            if (locbar.equalsIgnoreCase("nolink"))
             {
                 parentLinks.add("");
             }
@@ -140,17 +158,19 @@ public class Layout extends TagSupport
             // Add other relevant components to the location bar
             if (locbar.equalsIgnoreCase("link"))
             {
-                parents.add(parentTitle);
-                parentLinks.add(parentLink);
-
-                request.setAttribute("dspace.layout.locbar", "link");
+                if (parentTitle != null)
+                {
+                    parents.add(parentTitle);
+                    parentLinks.add(parentLink);
+                }
             }
             else if (locbar.equalsIgnoreCase("nolink"))
             {
-                parents.add(parentTitle);
-                parentLinks.add("");
-
-                request.setAttribute("dspace.layout.locbar", "nolink");
+                if (parentTitle != null)
+                {
+                    parents.add(parentTitle);
+                    parentLinks.add("");
+                }
             }
             else
             {
@@ -158,15 +178,16 @@ public class Layout extends TagSupport
                 // by the LocationServlet
 
                 // FIXME: Add community + collection locations
-                request.setAttribute("dspace.layout.locbar", "link");
             }
+
+            request.setAttribute("dspace.layout.locbar", new Boolean(true));
 
             // Add current page title
             parents.add(title);
             parentLinks.add("");
         }
 
-        request.setAttribute("dspace.layout.parents", parents);
+        request.setAttribute("dspace.layout.parenttitles", parents);
         request.setAttribute("dspace.layout.parentlinks", parentLinks);
         
         // Navigation bar: "default" is default :)
@@ -205,14 +226,57 @@ public class Layout extends TagSupport
         }
         catch (ServletException se)
         {
+            log.warn("Exception", se.getRootCause());
             throw new JspException("Got ServletException: " + se);
         }
 
         return EVAL_BODY_INCLUDE;
-        
     }
 
 
+    public int doEndTag()
+        throws JspException
+    {
+        // Footer file to use
+        String footer = "/layout/footer-default.jsp";
+
+        // Choose default flavour unless one is specified
+        if (style != null)
+        {
+            footer = "/layout/footer-" + style.toLowerCase() + ".jsp";
+        }
+
+        try
+        {
+            // Ensure body is included before footer
+            pageContext.getOut().flush();
+
+            // Context objects
+            ServletRequest request = pageContext.getRequest();
+            ServletResponse response = pageContext.getResponse();
+            ServletConfig config = pageContext.getServletConfig();
+
+            if (sidebar != null)
+            {
+                request.setAttribute("dspace.layout.sidebar", sidebar);
+            }
+
+            RequestDispatcher rd =
+                config.getServletContext().getRequestDispatcher(footer);
+            
+            rd.include(request, response);
+        }
+        catch (ServletException se)
+        {
+            throw new JspException("Got ServletException: " + se);
+        }
+        catch (IOException ioe)
+        {
+            throw new JspException("Got IOException: " + ioe);
+        }
+
+        return EVAL_PAGE;
+    }
 
 
     /**
@@ -321,5 +385,36 @@ public class Layout extends TagSupport
     public void setStyle(String  v)
     {
         this.style = v;
+    }
+
+
+    /**
+     * Get the value of sidebar.
+     * @return Value of sidebar.
+     */
+    public String getSidebar()
+    {
+        return sidebar;
+    }
+
+    /**
+     * Set the value of sidebar.
+     * @param v  Value to assign to sidebar.
+     */
+    public void setSidebar(String  v)
+    {
+        this.sidebar = v;
+    }
+
+
+    public void release()
+    {
+        style = null;
+        title = null;
+        sidebar = null;
+        navbar = null;
+        locbar = null;
+        parentTitle = null;
+        parentLink = null;
     }
 }

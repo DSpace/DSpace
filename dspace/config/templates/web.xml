@@ -47,16 +47,24 @@
 
 <web-app>
 
+  <display-name>DSpace</display-name>
+  
+  <description>@@dspace.name@@ running at @@dspace.hostname@@</description>
+
+
+  <!-- Community list page -->
   <servlet>
-    <servlet-name>hello-world</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.HelloWorld</servlet-class>
+    <servlet-name>community-list</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.CommunityListServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>hello-world</servlet-name>
-    <url-pattern>/helloworld</url-pattern>
+    <servlet-name>community-list</servlet-name>
+    <url-pattern>/community-list</url-pattern>
   </servlet-mapping>
 
+
+  <!-- DSpace JSP Tag Library -->
   <taglib>
     <taglib-uri>http://www.dspace.org/dspace-tags.tld</taglib-uri>
     <taglib-location>/WEB-INF/dspace-tags.tld</taglib-location>

@@ -54,6 +54,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
 
 
 /**
@@ -126,7 +127,7 @@ public class DSpaceServlet extends HttpServlet
 
         // Get the URL from the request immediately, since forwarding
         // loses that information
-        // FIXME: grabURL();
+        UIUtil.storeOriginalURL(request);
 
         try
         {
@@ -165,7 +166,7 @@ public class DSpaceServlet extends HttpServlet
         }
         
         // Abort the context if it's still valid
-        if (context.isValid())
+        if (context != null && context.isValid())
         {
             context.abort();
         }

@@ -41,6 +41,9 @@
 package org.dspace.app.webui.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,7 +80,7 @@ public class JSPManager
         // For the moment, a simple forward
         request.getRequestDispatcher(jsp).forward(request, response);
     }
-
+        
 
     /**
      * Display an internal server error message - for example, a database

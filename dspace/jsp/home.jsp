@@ -42,9 +42,11 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout style="home" title="Home">
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
-  <h1>DSpace @ MIT Home</h1>
+<dspace:layout style="home" locbar="nolink" title="Home">
+
+  <h1><%= ConfigurationManager.getProperty("dspace.name") %> Home</h1>
 
   <form action="<%= request.getContextPath() %>/simple-search" method=GET>
     <table border=0 cellpadding=4 cellspacing=8>
@@ -112,8 +114,7 @@
     </table>
   </form>
 
-<%--  <dspace:sidebar>
+  <dspace:sidebar>
     <%@ include file="news.jsp" %>
   </dspace:sidebar>
---%>
 </dspace:layout>

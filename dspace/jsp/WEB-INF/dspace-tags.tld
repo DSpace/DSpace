@@ -49,10 +49,10 @@
 
 <taglib>
   <tlibversion>1.0</tlibversion>
-  <jspversion>1.2</jspversion>
+  <jspversion>1.1</jspversion>
   <shortname>dspace</shortname>
-  <info>DSpace JSP tags</info>
   <uri>http://www.dspace.org/dspace-tags.tld</uri>
+  <info>DSpace JSP tags</info>
 
   <!--
     - dspace:config tag for retrieving DSpace configuration values.
@@ -116,5 +116,13 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
-  
+
+  <tag>
+    <name>sidebar</name>
+    <tagclass>org.dspace.app.webui.jsptag.Sidebar</tagclass>
+    <info>
+      The contents of the tag are displayed in a column on the right-hand side
+      of the page.can be used only must be included within a layout tag.
+    </info>
+  </tag>
 </taglib>
