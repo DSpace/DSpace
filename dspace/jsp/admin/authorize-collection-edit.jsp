@@ -81,7 +81,7 @@
                parentlink="/admin"
                parenttitle="Administer">
 
-    <h1>Policies for collection <%= collection.getMetadata("name") %></h1>
+    <h1>Policies for collection <%= collection.getMetadata("name") %> (ID=<%= collection.getID() %>)</h1>
 
     <P align="center">
         <form method=POST>

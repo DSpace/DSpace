@@ -77,7 +77,7 @@
                parentlink="/admin"
                parenttitle="Administer">
 
-    <h1>Policies for community <%= community.getMetadata("name") %></h1>
+    <h1>Policies for community <%= community.getMetadata("name") %> (ID=<%=community.getID()%>)</h1>
 
     <P align="center">
         <form method=POST>
