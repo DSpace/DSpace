@@ -753,11 +753,11 @@ public class SubmitServlet extends DSpaceServlet
 
         // Update the item metadata.
         readNames(request, item, "contributor", "author", true);
-        readText(request, item, "title", null, false);
+        readText(request, item, "title", null, false, "en");
 
         if (subInfo.submission.hasMultipleTitles())
         {
-            readText(request, item, "title", "alternative", true);
+            readText(request, item, "title", "alternative", true, "en");
         }
 
         if (subInfo.submission.isPublishedBefore())
@@ -768,7 +768,7 @@ public class SubmitServlet extends DSpaceServlet
         readSeriesNumbers(request, item, "relation", "ispartofseries", true);
 
         // FIXME: Maybe should do integrity check using language object
-        readText(request, item, "language", "iso", false);
+        readText(request, item, "language", "iso", false, null);
 
         // Identifiers - A special case so do this here
         // First, remove existing identifiers.
@@ -883,10 +883,10 @@ public class SubmitServlet extends DSpaceServlet
         Item item = subInfo.submission.getItem();
 
         // Update object from form values
-        readText(request, item, "subject", null, true);
-        readText(request, item, "description", "abstract", false);
-        readText(request, item, "description", "sponsorship", false);
-        readText(request, item, "description", null, false);
+        readText(request, item, "subject", null, true, "en");
+        readText(request, item, "description", "abstract", false, "en");
+        readText(request, item, "description", "sponsorship", false, "en");
+        readText(request, item, "description", null, false, "en");
 
         // Proceed according to button pressed
         int nextStep = -1;
@@ -2168,13 +2168,17 @@ public class SubmitServlet extends DSpaceServlet
      * @param element    the DC element
      * @param qualifier  the DC qualifier, or null if unqualified
      * @param repeated   set to true if the field is repeatable on the form
+     * @param lang       language to set (ISO code)
      */
     private void readText(HttpServletRequest request,
         Item item,
         String element,
         String qualifier,
-        boolean repeated)
+        boolean repeated,
+        String lang)
     {
+        // FIXME: Of course, language should be part of form, or determined
+        // some other way
         String dcname = element;
         if (qualifier != null)
         {
@@ -2219,7 +2223,7 @@ public class SubmitServlet extends DSpaceServlet
         for (int i = 0; i < vals.size(); i++)
         {
             // Add to the database
-            item.addDC(element, qualifier, null, (String) vals.get(i));
+            item.addDC(element, qualifier, lang, (String) vals.get(i));
         }
     }
 
