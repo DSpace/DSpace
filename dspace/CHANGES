@@ -1,0 +1,14 @@
+1.2.1-beta1
+===========
+(Scott Yeadon)
+- Added browse and search thumbnail display (currently configurable on a repository, not collection, basis); ability to turn off thumbnails on display-item page
+- Added script to bin directory by Cody Green to assist with migrating items from one DSpace instance to another (removes handle files and updates DC metadata of exported items)
+
+(Jim Downing)
+- Cleaned up several loose resource cleanups to cure resource leakage under heavy loads.
+
+(Austin Kim)
+- Which metadata fields are indexed by lucene is now configurable.
+
+(Dave Stuve)
+- Oracle compatibility added

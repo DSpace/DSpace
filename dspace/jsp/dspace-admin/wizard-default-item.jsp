@@ -74,7 +74,7 @@
 	
 	<P>You can leave as many fields blank as you like.</P>
 	
-    <form method=POST action="<%= request.getContextPath() %>/dspace-admin/collection-wizard">
+    <form method=POST action="<%= request.getContextPath() %>/tools/collection-wizard">
         <center><table class="miscTable">
             <tr>
                 <th class="oddRowOddCol"><strong>Dublin Core Field</strong></th>

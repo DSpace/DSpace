@@ -215,10 +215,10 @@
               <th>
             </tr>
 
-<% if( admin_button ) { %>
+<% if( editor_button ) { %>
             <tr>
               <td class="standard" align="center">
-                 <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+                 <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
                   <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
                   <input type="hidden" name="community_id" value="<%= community.getID() %>">
                   <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
@@ -228,7 +228,7 @@
             </tr>
 <% } %>
 
-<% if( editor_button ) { %>
+<% if( admin_button ) { %>
             <tr>
               <td class="standard" align="center">
                  <form method=POST action="<%=request.getContextPath()%>/tools/itemmap">
@@ -252,11 +252,11 @@
                  <dspace:popup page="/help/collection-admin.html">Admin Help...</dspace:popup>
               </td>
             </tr>
+<% } %>
+
 	  </table>
 	</td>
       </tr>
-<% } %>
-
     </table>
 <%  } %>
 

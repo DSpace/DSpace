@@ -58,6 +58,8 @@
 <%
     Community community = (Community) request.getAttribute("community");
     int parentID = UIUtil.getIntParameter(request, "parent_community_id");
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     
     String name = "";
     String shortDesc = "";
@@ -105,6 +107,7 @@
     {
 %>
     <H1>Edit Community <%= community.getHandle() %></H1>
+    <% if(admin_button ) { %>
       <center>
         <table width="70%">
           <tr>
@@ -118,6 +121,7 @@
           </tr>
         </table>
       </center>
+    <% } %>
 <%
     }
 %>
@@ -184,6 +188,7 @@
 <%  } %>
                 </td>
             </tr>
+    <% if(admin_button ) { %>
 <%-- ===========================================================
      Edit community's policies
      =========================================================== --%>
@@ -193,6 +198,7 @@
                     <input type="submit" name="submit_authorization_edit" value="Edit...">
                 </td>
             </tr>   
+    <% } %>
 
 
         </table>

@@ -72,8 +72,12 @@
         request.getAttribute("last.submitted.titles");
     String[] lastSubmittedURLs = (String[])
         request.getAttribute("last.submitted.urls");
-    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
-    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    Boolean editor_b = (Boolean)request.getAttribute("editor_button");
+    boolean editor_button = (editor_b == null ? false : editor_b.booleanValue());
+    Boolean add_b = (Boolean)request.getAttribute("add_button");
+    boolean add_button = (add_b == null ? false : add_b.booleanValue());
+    Boolean remove_b = (Boolean)request.getAttribute("remove_button");
+    boolean remove_button = (remove_b == null ? false : remove_b.booleanValue());
 
 
     // Put the metadata values into guaranteed non-null variables
@@ -156,7 +160,7 @@
       </tr>
     </table>
   </form>
-
+    
   <%= intro %>
 
 <%
@@ -172,8 +176,25 @@
         {
 %>
     <LI>
-      <A HREF="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>">
-      <%= collections[i].getMetadata("name") %></A>
+	    <table>
+	    <tr>
+	    <td>
+	      <A HREF="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>">
+	      <%= collections[i].getMetadata("name") %></A>
+	    </td>
+	    <% if (remove_button) { %>
+	    <td>
+	      <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
+	          <input type="hidden" name="parent_community_id" value="<%= community.getID() %>">
+	          <input type="hidden" name="community_id" value="<%= community.getID() %>">
+	          <input type="hidden" name="collection_id" value="<%= collections[i].getID() %>">
+	          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COLLECTION%>">
+	          <input type="image" src="<%= request.getContextPath() %>/image/remove.gif">
+	      </form>
+	    </td>
+	    <% } %>
+	    </tr>
+	    </table>
       <P class="collectionDescription"><%= collections[i].getMetadata("short_description") %></P>
     </LI>
 <%
@@ -196,8 +217,24 @@
         {
 %>
             <LI>
-                <A HREF="<%= request.getContextPath() %>/handle/<%= subcommunities[j].getHandle() %>">
-                <%= subcommunities[j].getMetadata("name") %></A>
+			    <table>
+			    <tr>
+			    <td>
+	                <A HREF="<%= request.getContextPath() %>/handle/<%= subcommunities[j].getHandle() %>">
+	                <%= subcommunities[j].getMetadata("name") %></A>
+			    </td>
+	    		<% if (remove_button) { %>
+			    <td>
+	                <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
+			          <input type="hidden" name="parent_community_id" value="<%= community.getID() %>">
+			          <input type="hidden" name="community_id" value="<%= subcommunities[j].getID() %>">
+			          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COMMUNITY%>">
+	                  <input type="image" src="<%= request.getContextPath() %>/image/remove.gif">
+	                </form>
+			    </td>
+	    		<% } %>
+			    </tr>
+			    </table>
                 <P class="collectionDescription"><%= subcommunities[j].getMetadata("short_description") %></P>
             </LI>
 <%
@@ -211,7 +248,7 @@
   <P class="copyrightText"><%= copyright %></P>
 
   <dspace:sidebar>
-    <% if(admin_button)  // admin edit button
+    <% if(editor_button || add_button)  // edit button(s)
     { %>
     <table class=miscTable align=center>
 	  <tr>
@@ -224,20 +261,24 @@
             </tr>
             <tr>
               <td class="standard" align="center">
-	            <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+             <% if(editor_button) { %>
+	            <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
 		          <input type="hidden" name="community_id" value="<%= community.getID() %>">
 		          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COMMUNITY%>">
                   <input type="submit" value="Edit...">
                 </form>
-		<form method=POST action="<%=request.getContextPath()%>/dspace-admin/collection-wizard">
-		     <input type="hidden" name="community_id" value="<%= community.getID() %>">
-                     <input type="submit" value="Create collection">
+             <% } %>
+             <% if(add_button) { %>
+				<form method=POST action="<%=request.getContextPath()%>/tools/collection-wizard">
+		     		<input type="hidden" name="community_id" value="<%= community.getID() %>">
+                    <input type="submit" value="Create collection">
                 </form>
-                <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+                <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
                     <input type="hidden" name="parent_community_id" value="<%= community.getID() %>">
                     <input type="submit" name="submit" value="Create Sub-community">
                  </form>
+             <% } %>
               </td>
             </tr>
             <tr>

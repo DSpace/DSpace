@@ -432,8 +432,12 @@ public class Collection extends DSpaceObject
     public Bitstream setLogo(InputStream is)
         throws AuthorizeException, IOException, SQLException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+    	// Check authorisation
+    	// authorized to remove the logo when DELETE rights
+    	// authorized when canEdit
+    	if (! (is == null && AuthorizeManager.authorizeActionBoolean(ourContext, this, Constants.DELETE)) ) {
+    		canEdit();
+    	}
 
         // First, delete any existing logo
         if (!collectionRow.isColumnNull("logo_bitstream_id"))
@@ -721,7 +725,7 @@ public class Collection extends DSpaceObject
         throws SQLException, AuthorizeException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        canEdit();
 
         if (template == null)
         {
@@ -750,7 +754,7 @@ public class Collection extends DSpaceObject
         throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        canEdit();
 
         collectionRow.setColumnNull("template_item_id");
         DatabaseManager.update(ourContext, collectionRow);
@@ -828,6 +832,12 @@ public class Collection extends DSpaceObject
 
         if (!tri.hasNext())
         {
+            //make the right to remove the item explicit because the implicit relation
+        	//has been removed. This only has to concern the currentUser because
+        	//he started the removal process and he will end it too.
+        	//also add right to remove from the item to remove it's bundles.
+        	AuthorizeManager.addPolicy(ourContext, item, Constants.DELETE, ourContext.getCurrentUser());
+        	AuthorizeManager.addPolicy(ourContext, item, Constants.REMOVE, ourContext.getCurrentUser());
             // Orphan; delete it
             item.delete();
         }
@@ -845,7 +855,7 @@ public class Collection extends DSpaceObject
         throws SQLException, IOException, AuthorizeException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        canEdit();
 
         HistoryManager.saveHistory(ourContext,
             this,
@@ -861,6 +871,29 @@ public class Collection extends DSpaceObject
 
         // reindex this collection (could be smarter, to only do when name changes)
         DSIndexer.reIndexContent(ourContext, this);
+    }
+    
+    public boolean canEditBoolean() throws java.sql.SQLException {
+    	try {
+    		canEdit();
+    		return true;
+    	} catch (AuthorizeException e) {
+    		return false;
+    	}
+    }
+    
+    public void canEdit() throws AuthorizeException, SQLException {
+    	Community[] parents = getCommunities();
+    	for (int i = 0; i < parents.length; i++) {
+    		if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i], Constants.WRITE)) {
+        		return;
+        	}
+    		if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i], Constants.ADD)) {
+        		return;
+        	}
+		}
+    	
+    	AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
     }
 
 

@@ -58,7 +58,7 @@
 
     <H1>Describe the Collection</H1>
 
-    <form action="<%= request.getContextPath() %>/dspace-admin/collection-wizard" method=post>
+    <form action="<%= request.getContextPath() %>/tools/collection-wizard" method=post>
 
         <P>Please check the boxes next to the statements that apply to the collection.
           <dspace:popup page="/help/site-admin.html#createcollection">More Help...</dspace:popup></P>

@@ -61,6 +61,8 @@
 <%
     Collection collection = (Collection) request.getAttribute("collection");
     Community community = (Community) request.getAttribute("community");
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     
     String name = "";
     String shortDesc = "";
@@ -138,6 +140,7 @@
     <H1>Create Collection</H1>
 <% } else { %>
     <H1>Edit Collection <%= collection.getHandle() %></H1>
+    <% if(admin_button ) { %>
       <center>
         <table width="70%">
           <tr>
@@ -152,9 +155,10 @@
           </tr>
         </table>
       </center>
+    <% } %>
 <% } %>
 
-    <form method=POST action="<%= request.getContextPath() %>/dspace-admin/edit-communities">
+    <form method=POST action="<%= request.getContextPath() %>/tools/edit-communities">
         <table>
 <%-- ===========================================================
      Basic metadata
@@ -226,6 +230,7 @@
             <tr><td>&nbsp;</td></tr>
             <tr><td colspan=2><center><h3>Submission Workflow</h3></center></td></tr>
 
+<% if(admin_button ) { %>
 <%-- ===========================================================
      Collection Submitters
      =========================================================== --%>
@@ -274,6 +279,7 @@
 <%  } %>                    
                 </td>
             </tr>   
+<%  } %>
 <%-- ===========================================================
      Item template
      =========================================================== --%>
@@ -288,6 +294,7 @@
 <%  } %>                    
                 </td>
             </tr>   
+<% if(admin_button ) { %>
 <%-- ===========================================================
      Edit collection's policies
      =========================================================== --%>
@@ -297,7 +304,7 @@
                     <input type="submit" name="submit_authorization_edit" value="Edit...">
                 </td>
             </tr>   
-
+<%  } %>
 
         </table>
         

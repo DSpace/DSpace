@@ -349,11 +349,25 @@ public class HandleServlet extends DSpaceServlet
             String[] itemLinks = getItemURLs(context, items);
 
 
-            // can they admin this collection?
-            if(AuthorizeManager.authorizeActionBoolean(context, community, Constants.WRITE))
+            // is the user a COMMUNITY_EDITOR?
+            if(community.canEditBoolean())
             {
                 // set a variable to create an edit button
-                request.setAttribute("admin_button", new Boolean(true));
+                request.setAttribute("editor_button", new Boolean(true));
+            }
+            
+            // can they add to this community?
+            if(AuthorizeManager.authorizeActionBoolean(context, community, Constants.ADD))
+            {
+                // set a variable to create an edit button
+                request.setAttribute("add_button", new Boolean(true));
+            }
+            
+            // can they remove from this community?
+            if(AuthorizeManager.authorizeActionBoolean(context, community, Constants.REMOVE))
+            {
+                // set a variable to create an edit button
+                request.setAttribute("remove_button", new Boolean(true));
             }
 
             // Forward to community home page
@@ -438,17 +452,17 @@ public class HandleServlet extends DSpaceServlet
             {
                 subscribed = Subscribe.isSubscribed(context, e, collection);
 
-                // can they admin this collection?
-                if(AuthorizeManager.authorizeActionBoolean(context, collection, Constants.WRITE))
+                // is the user a COLLECTION_EDITOR?
+                if(collection.canEditBoolean())
                 {
                     // set a variable to create an edit button
-                    request.setAttribute("admin_button", new Boolean(true));
+                    request.setAttribute("editor_button", new Boolean(true));
                 }
-                                
-                // is the user a COLLECTION_EDITOR?
+
+                // can they admin this collection?
                 if(AuthorizeManager.authorizeActionBoolean(context, collection, Constants.COLLECTION_ADMIN))
                 {
-                    request.setAttribute("editor_button", new Boolean(true));
+                    request.setAttribute("admin_button", new Boolean(true));
                     
                     // give them a button to manage submitter list
                     // what group is the submitter?

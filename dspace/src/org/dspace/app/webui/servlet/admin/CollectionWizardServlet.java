@@ -641,7 +641,7 @@ public class CollectionWizardServlet extends DSpaceServlet
                 Community[] communities = collection.getCommunities();
                 request.setAttribute("community", communities[0]);
 	    }
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
             break;				
         }
     }

@@ -1,5 +1,5 @@
 <%--
-  - confirm-delete-collection.jsp
+  - confirm-delete-community.jsp
   -
   - Version: $Revision$
   -
@@ -39,42 +39,40 @@
   --%>
 
 <%--
-  - Confirm deletion of a collection
+  - Confirm deletion of a community
   -
   - Attributes:
-  -    collection   - collection we may delete
+  -    community   - community we may delete
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
-<%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    Collection collection = (Collection) request.getAttribute("collection");
     Community community = (Community) request.getAttribute("community");
 %>
 
-<dspace:layout title="Delete Collection" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer">
+<dspace:layout title="Delete Community" navbar="admin" locbar="link" parentlink="/tools" parenttitle="Administer">
 
-    <H1>Delete Collection: <%= collection.getID() %></H1>
+    <H1>Delete Community: <%= community.getID() %></H1>
     
-    <P>Are you sure the collection <strong><%= collection.getMetadata("name") %></strong>
+    <P>Are you sure the community <strong><%= community.getMetadata("name") %></strong>
     should be deleted?  This will delete:</P>
     
     <UL>
-        <LI>Any items and incomplete submissions in this collections that aren't contained in other collections</LI>
+        <LI>Any collections in the community that are not contained in other communities</LI>
+        <LI>Any items and incomplete submissions in those collections that aren't contained in other collections</LI>
         <LI>The contents of those items</LI>
         <LI>All associated authorisation policies</LI>
     </UL>
     
     <form method=POST>
-        <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
         <input type="hidden" name="community_id" value="<%= community.getID() %>">
-        <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_DELETE_COLLECTION %>">
+        <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_DELETE_COMMUNITY %>">
 
         <center>
             <table width="70%">

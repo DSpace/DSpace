@@ -177,11 +177,11 @@ public class Community extends DSpaceObject
      *
      * @return  the newly created community
      */
-    public static Community create(Context context)
+    public static Community create(Community parent, Context context)
         throws SQLException, AuthorizeException
     {
-        // Only administrators can create communities
-        if (!AuthorizeManager.isAdmin(context))
+        // Only administrators and adders can create communities
+        if (!(AuthorizeManager.isAdmin(context) || AuthorizeManager.authorizeActionBoolean(context, parent, Constants.ADD)) )
         {
             throw new AuthorizeException(
                 "Only administrators can create communities");
@@ -381,7 +381,11 @@ public class Community extends DSpaceObject
         throws AuthorizeException, IOException, SQLException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+    	// authorized to remove the logo when DELETE rights
+    	// authorized when canEdit
+    	if (! (is == null && AuthorizeManager.authorizeActionBoolean(ourContext, this, Constants.DELETE)) ) {
+    		canEdit();
+    	}
 
         // First, delete any existing logo
         if (logo != null)
@@ -424,7 +428,7 @@ public class Community extends DSpaceObject
         throws SQLException, IOException, AuthorizeException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        canEdit();
 
         HistoryManager.saveHistory(ourContext,
             this,
@@ -658,7 +662,7 @@ public class Community extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
-        Community c = create(ourContext);
+        Community c = create(this, ourContext);
         addSubcommunity(c);
         return c;
     }
@@ -725,6 +729,12 @@ public class Community extends DSpaceObject
 
         if (!tri.hasNext())
         {
+            //make the right to remove the collection explicit because the implicit relation
+        	//has been removed. This only has to concern the currentUser because
+        	//he started the removal process and he will end it too.
+        	//also add right to remove from the collection to remove it's items.
+        	AuthorizeManager.addPolicy(ourContext, c, Constants.DELETE, ourContext.getCurrentUser());
+        	AuthorizeManager.addPolicy(ourContext, c, Constants.REMOVE, ourContext.getCurrentUser());
             // Orphan; delete it
             c.delete();
         }
@@ -757,7 +767,13 @@ public class Community extends DSpaceObject
 
         if (!tri.hasNext())
         {
-            // Orphan; delete it
+            //make the right to remove the sub explicit because the implicit relation
+        	//has been removed. This only has to concern the currentUser because
+        	//he started the removal process and he will end it too.
+        	//also add right to remove from the subcommunity to remove it's children.
+        	AuthorizeManager.addPolicy(ourContext, c, Constants.DELETE, ourContext.getCurrentUser());
+        	AuthorizeManager.addPolicy(ourContext, c, Constants.REMOVE, ourContext.getCurrentUser());
+        	// Orphan; delete it
             c.delete();
         }
     }
@@ -771,8 +787,15 @@ public class Community extends DSpaceObject
         throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
-
+    	// FIXME: If this was a subcommunity, it is first removed from it's parent.
+    	// This means the parentCommunity == null
+    	// But since this is also the case for top-level communities, we would
+    	// give everyone rights to remove the top-level communities.
+    	// The same problem occurs in removing the logo
+    	if (! AuthorizeManager.authorizeActionBoolean(ourContext, getParentCommunity(), Constants.REMOVE) ) {
+    		AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
+    	}
+    	
         // If not a top-level community, have parent remove me; this
         // will call delete() after removing the linkage
         Community parent = getParentCommunity();
@@ -858,15 +881,26 @@ public class Community extends DSpaceObject
      *
      * @return boolean true = current user can edit community
      */
-    public boolean canEdit()
-        throws java.sql.SQLException
-    {
-        // can this person write to the community?
-        if( AuthorizeManager.authorizeActionBoolean(ourContext, this, Constants.WRITE) )
-        {
-            return true;
-        }
-                
-        return false;
+    public boolean canEditBoolean() throws java.sql.SQLException {
+    	try {
+    		canEdit();
+    		return true;
+    	} catch (AuthorizeException e) {
+    		return false;
+    	}
+    }
+    
+    public void canEdit() throws AuthorizeException, SQLException {
+    	Community[] parents = getAllParents();
+    	for (int i = 0; i < parents.length; i++) {
+    		if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i], Constants.WRITE)) {
+        		return;
+        	}
+    		if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i], Constants.ADD)) {
+        		return;
+        	}
+		}
+    	
+    	AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
     }
 }

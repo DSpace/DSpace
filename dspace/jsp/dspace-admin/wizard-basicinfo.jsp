@@ -67,7 +67,7 @@
     </tr>
   </table>
 
-    <form action="<%= request.getContextPath() %>/dspace-admin/collection-wizard" method=post enctype="multipart/form-data">
+    <form action="<%= request.getContextPath() %>/tools/collection-wizard" method=post enctype="multipart/form-data">
         <table>
             <tr>
             	<td><P class="submitFormLabel">Name:</P></td>

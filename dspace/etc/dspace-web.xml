@@ -360,7 +360,7 @@
 
   <servlet-mapping>
     <servlet-name>collection-wizard</servlet-name>
-    <url-pattern>/dspace-admin/collection-wizard</url-pattern>
+    <url-pattern>/tools/collection-wizard</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -370,8 +370,14 @@
 
   <servlet-mapping>
     <servlet-name>edit-communities</servlet-name>
+    <url-pattern>/tools/edit-communities</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>edit-communities</servlet-name>
     <url-pattern>/dspace-admin/edit-communities</url-pattern>
   </servlet-mapping>
+
 
   <servlet-mapping>
     <servlet-name>edit-epeople</servlet-name>

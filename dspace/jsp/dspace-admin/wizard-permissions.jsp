@@ -127,7 +127,7 @@ other collections to this collection (subject to authorization from that collect
 
 	<P>You can change this later using the relevant sections of the DSpace admin UI.</P>
 
-    <form action="<%= request.getContextPath() %>/dspace-admin/collection-wizard" method=post>
+    <form action="<%= request.getContextPath() %>/tools/collection-wizard" method=post>
 
 		<center>
 			<table>

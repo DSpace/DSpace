@@ -95,10 +95,12 @@ public class GroupEditServlet extends DSpaceServlet
             // is this user authorized to edit this group?
             AuthorizeManager.authorizeAction(c, group, Constants.ADD);
 
-            String button = UIUtil.getSubmitButton(request, "submit");
+            boolean submit_edit = (request.getParameter("submit_edit") != null);
+            boolean submit_group_update = (request.getParameter("submit_group_update") != null);
+            boolean submit_group_delete = (request.getParameter("submit_group_delete") != null);
         
             // just chosen a group to edit - get group and pass it to group-edit.jsp
-            if( button.equals("submit_edit") )
+            if( submit_edit && !submit_group_update && !submit_group_delete )
             {
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
@@ -106,7 +108,7 @@ public class GroupEditServlet extends DSpaceServlet
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
             }
             // update the members of the group
-            else if( button.equals("submit_group_update") )
+            else if( submit_group_update )
             {
                 // first off, did we change the group name?
                 String newName = request.getParameter("group_name");
@@ -179,7 +181,7 @@ public class GroupEditServlet extends DSpaceServlet
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
                 c.complete();
             }
-            else if( button.equals( "submit_group_delete" ) )
+            else if( submit_group_delete )
             {
                 // bogus authorize, only admins can do this
                 AuthorizeManager.authorizeAction(c, group, Constants.WRITE);

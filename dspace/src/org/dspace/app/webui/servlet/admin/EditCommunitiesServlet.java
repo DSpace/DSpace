@@ -59,12 +59,14 @@ import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
@@ -172,41 +174,46 @@ public class EditCommunitiesServlet extends DSpaceServlet
             showControls(context, request, response);
             return;
         }
+        if(AuthorizeManager.isAdmin(context))
+        {
+            // set a variable to show all buttons
+            request.setAttribute("admin_button", new Boolean(true));
+        }
 
         // Now proceed according to "action" parameter
         switch (action)
         {
         case START_EDIT_COMMUNITY:
             // Display the relevant "edit community" page
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-community.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
             break;
 
         case START_DELETE_COMMUNITY:
             // Show "confirm delete" page
             JSPManager.showJSP(request, response,
-                "/dspace-admin/confirm-delete-community.jsp");
+                "/tools/confirm-delete-community.jsp");
             break;
 
         case START_CREATE_COMMUNITY:
             // Display edit community page with empty fields + create button
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-community.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
             break;
 
         case START_EDIT_COLLECTION:
             // Display the relevant "edit collection" page
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
             break;
 
         case START_DELETE_COLLECTION:
             // Show "confirm delete" page
             JSPManager.showJSP(request, response,
-                "/dspace-admin/confirm-delete-collection.jsp");
+                "/tools/confirm-delete-collection.jsp");
             break;
 
         case START_CREATE_COLLECTION:
             // Forward to collection creation wizard
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/dspace-admin/collection-wizard?community_id=" +
+                request.getContextPath() + "/tools/collection-wizard?community_id=" +
                     community.getID()));
             break;
 
@@ -335,7 +342,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             }
             else
             {
-               community = Community.create(context);
+               community = Community.create(null, context);
             }
             // Set attribute
             request.setAttribute("community", community);
@@ -388,7 +395,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             community.update();
 
             // Show edit page again - attributes set in doDSPost()
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-community.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
         }
         else if(button.equals("submit_authorization_edit"))
         {
@@ -491,7 +498,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             collection.setLogo(null);
 
             // Show edit page again - attributes set in doDSPost()
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
         }
         else if(button.startsWith("submit_wf_create_"))
         {
@@ -575,7 +582,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             g.delete();
 
             // Show edit page again - attributes set in doDSPost()
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
         }
         else if(button.equals("submit_create_template"))
         {
@@ -584,7 +591,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Forward to edit page for new template item
             Item i = collection.getTemplateItem();
+            i.setOwningCollection(collection);
 	    // have to update to avoid ref. integrity error
+        i.update();
 	    collection.update();
 	    context.complete();
             response.sendRedirect(response.encodeRedirectURL(
@@ -605,7 +614,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             collection.removeTemplateItem();
 
             // Show edit page again - attributes set in doDSPost()
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
         }
         else
         {
@@ -675,7 +684,13 @@ public class EditCommunitiesServlet extends DSpaceServlet
         // Identify the format
         BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
         logoBS.setFormat(bf);
+        AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
         logoBS.update();
+        if(AuthorizeManager.isAdmin(context))
+        {
+            // set a variable to show all buttons
+            request.setAttribute("admin_button", new Boolean(true));
+        }
 
  
         if (collection == null)
@@ -684,7 +699,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Show community edit page
             request.setAttribute("community", community);
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-community.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
         }
         else
         {
@@ -693,7 +708,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             
             request.setAttribute("collection", collection);
             request.setAttribute("community", community);
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
         }
 
         // Remove temp file

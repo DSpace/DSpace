@@ -55,7 +55,7 @@
     List links = new LinkedList();
     
     labels.add("Communities/<br>Collections");
-    links.add("/dspace-admin/edit-communities");
+    links.add("/tools/edit-communities");
     
     labels.add("E-people");
     links.add("/dspace-admin/edit-epeople");

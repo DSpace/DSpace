@@ -986,6 +986,12 @@ public class Item extends DSpaceObject
 
         if (!tri.hasNext())
         {
+            //make the right to remove the bundle explicit because the implicit relation
+        	//has been removed. This only has to concern the currentUser because
+        	//he started the removal process and he will end it too.
+        	//also add right to remove from the bundle to remove it's bitstreams.
+        	AuthorizeManager.addPolicy(ourContext, b, Constants.DELETE, ourContext.getCurrentUser());
+        	AuthorizeManager.addPolicy(ourContext, b, Constants.REMOVE, ourContext.getCurrentUser());
             // The bundle is an orphan, delete it
             b.delete();
         }
@@ -1157,7 +1163,7 @@ public class Item extends DSpaceObject
         // Check authorisation
         
         // only do write authorization if user is not an editor
-        if( !AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(), Constants.COLLECTION_ADMIN) )
+        if( !canEdit() )
         {
             AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         }
@@ -1723,6 +1729,12 @@ public class Item extends DSpaceObject
         {
             return true;
         }
+        
+        // is this person an COLLECTION_EDITOR for the owning collection?
+        if( getOwningCollection().canEditBoolean())
+        {
+            return true;
+        }    
         
         // is this person an COLLECTION_EDITOR for the owning collection?
         if( AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(),
