@@ -73,14 +73,57 @@ indexes are automatically updated.
 </p>
 
 <p>
-You should not attempt to manipulate the tables which contain the items,
-metadata values, or indexes via direct database manipulation (eg, with SQL
-statements), because doing so incorrectly may corrupt the indexes. If the
-indexes somehow become corrupted, however, running the InitializeBrowse
-command-line tool will rebuild them:
+The mapping between the indexes and Dublin Core values is:
+</p>
+
+<table>
+
+<tr>
+  <th align="left">Index</th>
+  <th align="left">Element</th>
+  <th align="left">Qualifier</th>
+</tr>
+
+<tr>
+  <td>Title</td>
+  <td>title</td>
+  <td>none</td>
+</tr>
+
+<tr>
+  <td>Author</td>
+  <td>contributor</td>
+  <td>author</td>
+</tr>
+
+<tr>
+  <td>Date</td>
+  <td>date</td>
+  <td>issued</td>
+</tr>
+
+</table>
+</p>
+
+
+<p>
+You should not attempt to manipulate the tables which contain the
+items, metadata values, or indexes via direct database manipulation
+(eg, with SQL statements), because doing so incorrectly may corrupt
+the indexes. If the indexes somehow become corrupted, however, running
+the InitializeBrowse command-line tool will rebuild them:
 </p>
 
    <code>java org.dspace.browse.InitializeBrowse</code>
+
+<p>
+<!--
+     FIXME Should reference either the documentation for index-all
+     or for command-line tools
+-->
+Note that the <em>index-all</em> command-line tool rebuilds both the
+Browse and Search indexes.
+</p>
 
 </body>
 </html>
