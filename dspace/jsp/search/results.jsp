@@ -64,22 +64,31 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Item" %>
+<%@ page import="java.net.URLEncoder"            %>
+<%@ page import="org.dspace.content.Community"   %>
+<%@ page import="org.dspace.content.Collection"  %>
+<%@ page import="org.dspace.content.Item"        %>
+<%@ page import="org.dspace.search.QueryResults" %>
 
 <%
     // Get the attributes
-    Community   community  = (Community ) request.getAttribute("community" );
-    Collection  collection = (Collection) request.getAttribute("collection");
-    Community[] communityArray = (Community[]) request.getAttribute("community.array");
+    Community   community        = (Community ) request.getAttribute("community" );
+    Collection  collection       = (Collection) request.getAttribute("collection");
+    Community[] communityArray   = (Community[]) request.getAttribute("community.array");
     Collection[] collectionArray = (Collection[]) request.getAttribute("collection.array");
     
     Item      [] items       = (Item[]      )request.getAttribute("items");
     Community [] communities = (Community[] )request.getAttribute("communities");
     Collection[] collections = (Collection[])request.getAttribute("collections");
-    
+
     String query = (String) request.getAttribute("query");
+
+    QueryResults qResults = (QueryResults)request.getAttribute("queryresults");
+
+    int pageTotal   = ((Integer)request.getAttribute("pagetotal"  )).intValue();
+    int pageCurrent = ((Integer)request.getAttribute("pagecurrent")).intValue();
+    int pageLast    = ((Integer)request.getAttribute("pagelast"   )).intValue();
+    int pageFirst   = ((Integer)request.getAttribute("pagefirst"  )).intValue();
 %>
 
 <dspace:layout title="Search Results">
@@ -149,6 +158,20 @@
         </table>
     </form>
 
+<% if( qResults.getHitCount() == 0 )
+{
+ %>
+    <P align=center>Search produced no results.</P>
+<%
+}
+else
+{
+%>
+    <P align=center>Results <%=qResults.getStart()+1%>-<%=qResults.getStart()+qResults.getHitHandles().size()%> of
+    <%=qResults.getHitCount()%>. </P>
+
+<% } %>
+
 <% if (communities.length > 0 ) { %>
     <dspace:communitylist  communities="<%= communities %>" />
 <% } %>
@@ -158,10 +181,73 @@
     <dspace:collectionlist collections="<%= collections %>" />
 <% } %>
 
-    <P align=center>Found <%= items.length == 0 ? "no" : String.valueOf(items.length) %> item<%= items.length != 1 ? "s" : "" %>.</P>
-
 <% if (items.length > 0) { %>
+    <br>
     <dspace:itemlist items="<%= items %>" />
 <% } %>
+
+<P align="center">
+
+
+<%
+    String prevLink =  "<A HREF=\""
+                    + request.getContextPath()
+                    + "simple-search?query="
+                    + URLEncoder.encode(query)
+                    + "&start=";
+
+    String nextLink = prevLink;
+
+    prevLink = prevLink
+            + (pageCurrent-2) * qResults.getPageSize()
+            + "\">"
+            + "previous"
+            + "</A>";
+
+    nextLink = nextLink
+            + (pageCurrent) * qResults.getPageSize()
+            + "\">"
+            + "next"
+            + "</A>";
+    
+    
+    
+%>
+
+<%= (pageFirst != pageCurrent) ? prevLink : "" %>
+
+<% for( int q = pageFirst; q <= pageLast; q++ )
+{
+    String myLink = "<A HREF=\""
+                    + request.getContextPath()
+                    + "simple-search?query="
+                    + URLEncoder.encode(query)
+                    + "&start=";
+
+
+    if( q == pageCurrent )
+    {
+        myLink = "" + q;
+    }
+    else
+    {
+        myLink = myLink
+            + (q-1) * qResults.getPageSize()
+            + "\">"
+            + q
+            + "</A>";
+    }
+%>
+
+<%= myLink %>
+
+<%
+}
+%>
+
+<%= ((pageTotal > pageCurrent) ? nextLink : "") %>
+
+</P>
+
 </dspace:layout>
 

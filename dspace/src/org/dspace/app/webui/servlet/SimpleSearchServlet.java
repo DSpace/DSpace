@@ -63,11 +63,13 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSQuery;
-
+import org.dspace.search.QueryArgs;
+import org.dspace.search.QueryResults;
 
 /**
  * Servlet for handling a simple search.
@@ -89,8 +91,7 @@ public class SimpleSearchServlet extends DSpaceServlet
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(SimpleSearchServlet.class);
-
-	
+    
     protected void doDSGet(Context context,
         HttpServletRequest request,
         HttpServletResponse response)
@@ -98,6 +99,21 @@ public class SimpleSearchServlet extends DSpaceServlet
     {
         // Get the query
         String query = request.getParameter("query");
+        int    start = UIUtil.getIntParameter(request, "start");
+        
+        // can't start earlier than 0 in the results!
+        if( start < 0 ) { start = 0; }
+        
+        List itemHandles       = new ArrayList();
+        List collectionHandles = new ArrayList();
+        List communityHandles  = new ArrayList();
+
+        Item       [] resultsItems;
+        Collection [] resultsCollections;
+        Community  [] resultsCommunities;
+
+        QueryResults qResults = null;
+        QueryArgs    qArgs    = new QueryArgs();
 
         // Ensure the query is non-null
         if (query == null)
@@ -138,16 +154,15 @@ public class SimpleSearchServlet extends DSpaceServlet
         Community community   = UIUtil.getCommunityLocation(request);
         Collection collection = UIUtil.getCollectionLocation(request);
 
-        // handles for the search results or the results
-        List itemHandles       = null;
-        List communityHandles  = null;
-        List collectionHandles = null;
-
-        // 'de-handled' search results
-        Item[]       resultsItems;
-        Community[]  resultsCommunities;
-        Collection[] resultsCollections;
+        // get the start of the query results page
         
+
+//        List resultObjects = null;
+        
+
+        qArgs.setQuery( query );
+        qArgs.setStart( start );
+                
         // Perform the search
         try
         {
@@ -156,16 +171,10 @@ public class SimpleSearchServlet extends DSpaceServlet
                 logInfo = "collection_id=" + collection.getID() + ",";
 
                 // Values for drop-down box
-                request.setAttribute("community", community);
+                request.setAttribute("community",  community );
                 request.setAttribute("collection", collection);
 
-                // we're in a collection, only display item results
-                itemHandles = DSQuery.getItemResults(
-                            DSQuery.doQuery(context, query, collection)
-                        );
-                        
-                collectionHandles = new ArrayList();
-                communityHandles = new ArrayList();
+                qResults = DSQuery.doQuery(context, qArgs, collection);
             }
             else if (community != null)
             {
@@ -176,12 +185,7 @@ public class SimpleSearchServlet extends DSpaceServlet
                 request.setAttribute("collection.array",
                     community.getCollections());
 
-                HashMap results = DSQuery.doQuery(context, query, community);
-                
-                // we're in a community, display item and collection results
-                itemHandles       = DSQuery.getItemResults(results);
-                collectionHandles = DSQuery.getCollectionResults(results);
-                communityHandles = new ArrayList();
+                qResults = DSQuery.doQuery(context, qArgs, community);
             }
             else
             {
@@ -189,22 +193,40 @@ public class SimpleSearchServlet extends DSpaceServlet
                 Community[] communities = Community.findAll(context);
                 request.setAttribute("community.array", communities);
 
-                HashMap results = DSQuery.doQuery(context, query);
-                
-                // searching everything, return all results
-                itemHandles      = DSQuery.getItemResults(results);
-                communityHandles = DSQuery.getCommunityResults(results);
-                collectionHandles= DSQuery.getCollectionResults(results);
+                qResults = DSQuery.doQuery(context, qArgs);
             }
 
-            // limit search results to 50 or fewer items - no limit on
-            // number of communities and collections
-            int numItems = (itemHandles.size() > 50 ? 50 : itemHandles.size() );
-
+            // now instantiate the results and put them in their buckets
+            for( int i = 0; i < qResults.getHitHandles().size(); i++ )
+            {
+                String myHandle = (String )qResults.getHitHandles().get(i);
+                Integer myType  = (Integer)qResults.getHitTypes().get(i);
+                
+                // add the handle to the appropriate lists
+                switch( myType.intValue() )
+                {
+                    case Constants.ITEM:
+                        itemHandles.add( myHandle );
+                        break;
+                        
+                    case Constants.COLLECTION:
+                        collectionHandles.add( myHandle );
+                        break;
+                        
+                    case Constants.COMMUNITY:
+                        communityHandles.add( myHandle );
+                        break;
+                }
+            }
+            
+            int numCommunities = communityHandles.size();
+            int numCollections = collectionHandles.size();
+            int numItems       = itemHandles.size();
+            
             // Make objects from the handles - make arrays, fill them out
-            resultsItems       = new Item      [numItems                ];
-            resultsCommunities = new Community [communityHandles.size() ];
-            resultsCollections = new Collection[collectionHandles.size()];
+            resultsCommunities = new Community [numCommunities];
+            resultsCollections = new Collection[numCollections];
+            resultsItems       = new Item      [numItems      ];
             
             for (int i = 0; i < numItems; i++)
             {
@@ -267,12 +289,12 @@ public class SimpleSearchServlet extends DSpaceServlet
                 pe);
 
             // Empty results
-            resultsItems       = new Item[0];
-            resultsCommunities = new Community[0];
+            resultsItems       = new Item      [0];
+            resultsCommunities = new Community [0];
             resultsCollections = new Collection[0];
         }
     	catch (TokenMgrError tme)
-	{
+        {
             // Similar to parse exception
             log.warn(LogManager.getHeader(context,
                 "search_exception",
@@ -280,15 +302,36 @@ public class SimpleSearchServlet extends DSpaceServlet
                 tme);
 
             // Empty results
-            resultsItems       = new Item[0];
-            resultsCommunities = new Community[0];
+            resultsItems       = new Item      [0];
+            resultsCommunities = new Community [0];
             resultsCollections = new Collection[0];
-	}
+        }
+
+        // Pass in some page qualities
+        
+        // total number of pages
+        int pageTotal  = 1 + (qResults.getHitCount() - 1)/qResults.getPageSize();
+        
+        // current page being displayed
+        int pageCurrent= 1 + (qResults.getStart()/qResults.getPageSize());
+        
+        // pageLast = min(pageCurrent+9,pageTotal)
+        int pageLast   = (pageCurrent + 9) > pageTotal ? pageTotal : (pageCurrent+9);
+        
+        // pageFirst = max(1,pageCurrent-9)
+        int pageFirst  = (pageCurrent - 9) > 1 ? (pageCurrent - 9) : 1;  
 
         // Pass the results to the display JSP
         request.setAttribute("items",       resultsItems      );
         request.setAttribute("communities", resultsCommunities);
         request.setAttribute("collections", resultsCollections);
+
+        request.setAttribute("pagetotal",   new Integer(pageTotal  ) );
+        request.setAttribute("pagecurrent", new Integer(pageCurrent) );
+        request.setAttribute("pagelast",    new Integer(pageLast   ) );
+        request.setAttribute("pagefirst",   new Integer(pageFirst  ) );
+
+        request.setAttribute("queryresults", qResults );
 
         // And the original query string
         request.setAttribute("query", query);
