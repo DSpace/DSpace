@@ -106,10 +106,10 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     public Map getParameterMap()
     {
         Map map = new HashMap();
-        Enumeration enum = getParameterNames();
-        while (enum.hasMoreElements())
+        Enumeration eNum = getParameterNames();
+        while (eNum.hasMoreElements())
         {
-            String name = (String) enum.nextElement();
+            String name = (String) eNum.nextElement();
             map.put(name, mreq.getParameterValues(name));
         }
         return map;
