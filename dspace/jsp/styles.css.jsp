@@ -498,3 +498,30 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   text-decoration: none;
                   vertical-align: middle }
 
+.help {font-family: "verdana", "Arial", "Helvetica", sans-serif;
+        background: #ffffff;
+        margin-left:10px;}
+
+.help h2{text-align:center;
+                font-size:18pt;
+                color:#000000;}
+
+.help h3{font-weight:bold;
+         margin-left:0px;}
+
+.help h5{font-weight:bold;
+         margin-left:10px;
+         line-height:.5;}
+
+.help p {font-size:12pt;}
+
+.help table{margin-left:8px;
+            width:90%;}
+
+.help ul {font-size:12pt;}
+
+.help p.bottomLinks {font-size:10pt;
+                    font-weight:bold;}
+
+.help td.leftAlign{font-size:12pt;}
+.help td.rightAlign{text-align:right;}
