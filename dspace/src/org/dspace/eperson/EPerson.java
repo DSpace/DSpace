@@ -426,9 +426,9 @@ public class EPerson implements DSpaceObject
 
 
     /**
-     * Get active/inactive
+     * Get require certificate or not
      *
-     * @return isactive boolean, yes/no
+     * @return boolean, yes/no
      */
     public boolean getRequireCertificate()
     {
