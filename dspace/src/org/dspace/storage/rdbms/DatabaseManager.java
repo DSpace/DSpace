@@ -76,13 +76,6 @@ public class DatabaseManager
     private static boolean initialized = false;
 
     /**
-     * A map of unique ids.
-     * The key is the table name; the value is an Integer which is the
-     * highest value assigned.
-     */
-    private static Map ids = new HashMap();
-
-    /**
      * A map of database column information.
      * The key is the table name, a String; the value is
      * an array of ColumnInfo objects.
@@ -263,7 +256,6 @@ public class DatabaseManager
     {
         TableRow row = new TableRow(canonicalize(table),
                                     getColumnNames(table));
-        assignId(row);
         insert(context, row);
         return row;
     }
@@ -408,24 +400,36 @@ public class DatabaseManager
     {
         String table = canonicalize(row.getTable());
 
+        // Get an ID (primary key) for this row by using the "getnextid"
+        // SQL function
+        Statement statement = context.getDBConnection().createStatement();
+        ResultSet rs = statement.executeQuery(
+            "SELECT getnextid('" + table + "') AS result");        
+        rs.next();
+        int newID = rs.getInt(1);
+        statement.close();
+
+        // Set the ID in the table row object
+        row.setColumn(getPrimaryKeyColumn(table), newID);
+
         StringBuffer sql = new StringBuffer()
-            .append("insert into ")
+            .append("INSERT INTO ")
             .append(table)
             .append(" ( ");
 
         ColumnInfo[] info = getColumnInfo(table);
 
-        for (int i = 0; i < info.length; i++ )
+        for (int i = 0; i < info.length; i++)
         {
-            sql.append(i == 0 ? "" : ", ").append(info[i].getName());
+            sql.append(i == 0 ? "" : ",").append(info[i].getName());
         }
 
-        sql.append(") values ( ");
+        sql.append(") VALUES ( ");
 
         // Values to insert
-        for (int i = 0; i < info.length; i++ )
+        for (int i = 0; i < info.length; i++)
         {
-            sql.append(i == 0 ? "" : ", ").append("?");
+            sql.append(i == 0 ? "" : ",").append("?");
         }
 
         // Watch the syntax
@@ -900,72 +904,6 @@ public class DatabaseManager
     }
 
     /**
-     * Assign an ID to row.
-     *
-     * @param row The row to assign an id to.
-     * @exception SQLException If a database error occurs
-     */
-    private static synchronized void assignId (TableRow row)
-        throws SQLException
-    {
-        String table = canonicalize(row.getTable());
-        String pk = getPrimaryKeyColumn(table);
-        row.setColumn(pk, getID(table));
-    }
-
-    /**
-     * Return the next id for table.
-     *
-     * @param table The RDBMS table to obtain an ID for
-     * @return The next id
-     * @exception SQLException If a database error occurs
-     */
-    public static synchronized int getID (String table)
-        throws SQLException
-    {
-        // Assigned ids are simply one plus the maximum value
-        // of the primary key column, and incremented from there.
-
-        String pk = getPrimaryKeyColumn(table);
-        Integer id = (Integer) ids.get(table);
-        int current_id = id == null ? -1 : id.intValue();
-
-        if (id == null)
-        {
-            String sql = MessageFormat.format
-                ("select max({0}) from {1}",
-                 new Object[] { pk, table} );
-
-            Connection connection = null;
-            Statement statement = null;
-            try
-            {
-                connection = getConnection();
-                statement = connection.createStatement();
-                ResultSet results = statement.executeQuery(sql);
-                current_id = results.next() ? results.getInt(1): -1;
-            }
-            finally
-            {
-                if (statement != null)
-                {
-                    try
-                    {
-                        statement.close();
-                    }
-                    catch (SQLException sqle) {}
-                }
-                if (connection != null)
-                    connection.close();
-            }
-        }
-
-        int new_id = current_id + 1;
-        ids.put(table, new Integer(new_id));
-        return new_id;
-    }
-
-    /**
      * Execute SQL as a PreparedStatement on Connection.
      * Bind parameters in columns to the values in the table row before
      * executing.
@@ -1144,18 +1082,6 @@ public class DatabaseManager
 
         DriverManager.registerDriver(new SimplePool());
         initialized = true;
-    }
-
-
-    /**
-     * Simple workaround method to reset the in-memory ID generator.  This
-     * causes it to re-read the DB to find IDs to allocate to new objects.
-     * This should be invoked after another JVM has been writing to the DB.
-     */
-    public static void resetIDGenerator()
-    {
-        // Remove cached IDs
-        ids = new HashMap();
     }
 }
 

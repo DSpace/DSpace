@@ -40,19 +40,77 @@
 --
 --
 --
---   DSpace SQL table definitions
+--   DSpace SQL schema
 --
 --   Authors:   Peter Breton, Robert Tansley, David Stuve, Daniel Chudnov
 --
---       This file is used as-is to initialize a database. Therefore,
---       table and view definitions must be ordered correctly.
+--   This file is used as-is to initialize a database. Therefore,
+--   table and view definitions must be ordered correctly.
 --
+--   Caution: THIS IS POSTGRESQL-SPECIFIC:
+--
+--   * SEQUENCES are used for automatic ID generation
+--   * FUNCTION getnextid used for automatic ID generation
+--
+--
+--   To convert to work with another database, you need to ensure
+--   an SQL function 'getnextid', which takes a table name as an
+--   argument, will return a safe new ID to use to create a new
+--   row in that table.
+
+
+
+-------------------------------------------------------
+-- Function for obtaining new IDs.
+--
+--   * The argument is a table name
+--   * It returns a new ID safe to use for that table
+--
+--   The function reads the next value from the sequence
+--   'tablename_seq'
+-------------------------------------------------------
+CREATE FUNCTION getnextid(VARCHAR(40)) RETURNS INTEGER AS
+    'SELECT CAST (nextval($1 || ''_seq'') AS INTEGER) AS RESULT;' LANGUAGE SQL;
+
+
+-------------------------------------------------------
+-- Sequences for creating new IDs (primary keys) for
+-- tables.  Each table must have a corresponding
+-- sequence called 'tablename_seq'.
+-------------------------------------------------------
+CREATE SEQUENCE bitstreamformatregistry_seq;
+CREATE SEQUENCE fileextension_seq;
+CREATE SEQUENCE bitstream_seq;
+CREATE SEQUENCE eperson_seq;
+CREATE SEQUENCE epersongroup_seq;
+CREATE SEQUENCE item_seq;
+CREATE SEQUENCE bundle_seq;
+CREATE SEQUENCE item2bundle_seq;
+CREATE SEQUENCE bundle2bitstream_seq;
+CREATE SEQUENCE dctyperegistry_seq;
+CREATE SEQUENCE dcvalue_seq;
+CREATE SEQUENCE community_seq;
+CREATE SEQUENCE collection_seq;
+CREATE SEQUENCE community2collection_seq;
+CREATE SEQUENCE collection2item_seq;
+CREATE SEQUENCE resourcepolicy_seq;
+CREATE SEQUENCE epersongroup2eperson_seq;
+CREATE SEQUENCE handle_seq;
+CREATE SEQUENCE workspaceitem_seq;
+CREATE SEQUENCE workflowitem_seq;
+CREATE SEQUENCE tasklistitem_seq;
+CREATE SEQUENCE registrationdata_seq;
+CREATE SEQUENCE history_seq;
+CREATE SEQUENCE historystate_seq;
+CREATE SEQUENCE itemsbyauthor_seq;
+CREATE SEQUENCE itemsbytitle_seq;
+CREATE SEQUENCE itemsbydate_seq;
+CREATE SEQUENCE itemsbydateaccessioned_seq;
+
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
 -------------------------------------------------------
-DROP TABLE BitstreamFormatRegistry;
-
 CREATE TABLE BitstreamFormatRegistry
 (
   bitstream_format_id INTEGER PRIMARY KEY,
@@ -67,8 +125,6 @@ CREATE TABLE BitstreamFormatRegistry
 -------------------------------------------------------
 -- FileExtension table
 -------------------------------------------------------
-DROP TABLE FileExtension;
-
 CREATE TABLE FileExtension
 (
   file_extension_id    INTEGER PRIMARY KEY,
@@ -79,8 +135,6 @@ CREATE TABLE FileExtension
 -------------------------------------------------------
 -- Bitstream table
 -------------------------------------------------------
-DROP TABLE Bitstream;
-
 CREATE TABLE Bitstream
 (
    bitstream_id            INTEGER PRIMARY KEY,
@@ -99,8 +153,6 @@ CREATE TABLE Bitstream
 -------------------------------------------------------
 -- EPerson table
 -------------------------------------------------------
-DROP TABLE EPerson;
-
 CREATE TABLE EPerson
 (
   eperson_id          INTEGER PRIMARY KEY,
@@ -116,8 +168,6 @@ CREATE TABLE EPerson
 -------------------------------------------------------
 -- EPersonGroup table
 -------------------------------------------------------
-DROP TABLE EPersonGroup;
-
 CREATE TABLE EPersonGroup
 (
   eperson_group_id INTEGER PRIMARY KEY,
@@ -127,8 +177,6 @@ CREATE TABLE EPersonGroup
 -------------------------------------------------------
 -- Item table
 -------------------------------------------------------
-DROP TABLE Item;
-
 CREATE TABLE Item
 (
   item_id      INTEGER PRIMARY KEY,
@@ -139,8 +187,6 @@ CREATE TABLE Item
 -------------------------------------------------------
 -- Bundle table
 -------------------------------------------------------
-DROP TABLE Bundle;
-
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
@@ -150,8 +196,6 @@ CREATE TABLE Bundle
 -------------------------------------------------------
 -- Item2Bundle table
 -------------------------------------------------------
-DROP TABLE Item2Bundle;
-
 CREATE TABLE Item2Bundle
 (
   id        INTEGER PRIMARY KEY,
@@ -162,8 +206,6 @@ CREATE TABLE Item2Bundle
 -------------------------------------------------------
 -- Bundle2Bitstream table
 -------------------------------------------------------
-DROP TABLE Bundle2Bitstream;
-
 CREATE TABLE Bundle2Bitstream
 (
   id           INTEGER PRIMARY KEY,
@@ -174,8 +216,6 @@ CREATE TABLE Bundle2Bitstream
 -------------------------------------------------------
 -- DCTypeRegistry table
 -------------------------------------------------------
-DROP TABLE DCTypeRegistry;
-
 CREATE TABLE DCTypeRegistry
 (
   dc_type_id INTEGER PRIMARY KEY,
@@ -188,8 +228,6 @@ CREATE TABLE DCTypeRegistry
 -------------------------------------------------------
 -- DCValue table
 -------------------------------------------------------
-DROP TABLE DCValue;
-
 CREATE TABLE DCValue
 (
   dc_value_id   INTEGER PRIMARY KEY,
@@ -202,14 +240,11 @@ CREATE TABLE DCValue
 );
 
 -- An index for dctypes
-DROP INDEX dcvalue_dc_type_id_idx;
 CREATE INDEX dcvalue_dc_type_id_idx  on DCValue(dc_type_id);
 
 -------------------------------------------------------
 -- Community table
 -------------------------------------------------------
-DROP TABLE Community;
-
 CREATE TABLE Community
 (
   community_id      INTEGER PRIMARY KEY,
@@ -224,8 +259,6 @@ CREATE TABLE Community
 -------------------------------------------------------
 -- Collection table
 -------------------------------------------------------
-DROP TABLE Collection;
-
 CREATE TABLE Collection
 (
   collection_id     INTEGER PRIMARY KEY,
@@ -246,8 +279,6 @@ CREATE TABLE Collection
 -------------------------------------------------------
 -- Community2Collection table
 -------------------------------------------------------
-DROP TABLE Community2Collection;
-
 CREATE TABLE Community2Collection
 (
   id             INTEGER PRIMARY KEY,
@@ -258,8 +289,6 @@ CREATE TABLE Community2Collection
 -------------------------------------------------------
 -- Collection2Item table
 -------------------------------------------------------
-DROP TABLE Collection2Item;
-
 CREATE TABLE Collection2Item
 (
   id            INTEGER PRIMARY KEY,
@@ -270,8 +299,6 @@ CREATE TABLE Collection2Item
 -------------------------------------------------------
 -- ResourcePolicy table
 -------------------------------------------------------
-DROP TABLE ResourcePolicy;
-
 CREATE TABLE ResourcePolicy
 (
   policy_id            INTEGER PRIMARY KEY,
@@ -288,8 +315,6 @@ CREATE TABLE ResourcePolicy
 -------------------------------------------------------
 -- EPersonGroup2EPerson table
 -------------------------------------------------------
-DROP TABLE EPersonGroup2EPerson;
-
 CREATE TABLE EPersonGroup2EPerson
 (
   id               INTEGER PRIMARY KEY,
@@ -300,8 +325,6 @@ CREATE TABLE EPersonGroup2EPerson
 -------------------------------------------------------
 -- Handle table
 -------------------------------------------------------
-DROP TABLE Handle;
-
 CREATE TABLE Handle
 (
   handle_id        INTEGER PRIMARY KEY,
@@ -313,8 +336,6 @@ CREATE TABLE Handle
 -------------------------------------------------------
 --  WorkspaceItem table
 -------------------------------------------------------
-DROP TABLE WorkspaceItem;
-
 CREATE TABLE WorkspaceItem
 (
   workspace_item_id INTEGER PRIMARY KEY,
@@ -331,8 +352,6 @@ CREATE TABLE WorkspaceItem
 -------------------------------------------------------
 --  WorkflowItem table
 -------------------------------------------------------
-DROP TABLE WorkflowItem;
-
 CREATE TABLE WorkflowItem
 (
   workflow_id    INTEGER PRIMARY KEY,
@@ -353,8 +372,6 @@ CREATE TABLE WorkflowItem
 -------------------------------------------------------
 --  TasklistItem table
 -------------------------------------------------------
-DROP TABLE TasklistItem;
-
 CREATE TABLE TasklistItem
 (
   tasklist_id	INTEGER PRIMARY KEY,
@@ -366,8 +383,6 @@ CREATE TABLE TasklistItem
 -------------------------------------------------------
 --  RegistrationData table
 -------------------------------------------------------
-DROP TABLE RegistrationData;
-
 CREATE TABLE RegistrationData
 (
   registrationdata_id   INTEGER PRIMARY KEY,
@@ -380,22 +395,18 @@ CREATE TABLE RegistrationData
 -------------------------------------------------------
 --  History table
 -------------------------------------------------------
-DROP TABLE History;
-
 CREATE TABLE History
 (
   history_id           INTEGER PRIMARY KEY,
   -- When it was stored
   creation_date        TIMESTAMP,
-  -- A checksum to keep serializations from being stored more than once
+  -- A checksum to keep INTEGERizations from being stored more than once
   checksum             VARCHAR(32) UNIQUE
 );
 
 -------------------------------------------------------
 --  HistoryState table
 -------------------------------------------------------
-DROP TABLE HistoryState;
-
 CREATE TABLE HistoryState
 (
   history_state_id           INTEGER PRIMARY KEY,
@@ -403,41 +414,21 @@ CREATE TABLE HistoryState
 );
 
 ------------------------------------------------------------
--- Convenience views
+-- Browse subsystem tables and views
 ------------------------------------------------------------
-
--------------------------------------------------------
---  Item2Handle view
--------------------------------------------------------
--- Note: org.dspace.core.Constants.ITEM = 2
-DROP VIEW Item2Handle;
-
-CREATE VIEW Item2Handle as
-select handle_id, handle, resource_id as item_id 
-from Handle where resource_type_id = 2
-;
 
 -------------------------------------------------------
 --  Community2Item view
 -------------------------------------------------------
-DROP VIEW Community2Item;
-
 CREATE VIEW Community2Item as
 SELECT Community2Collection.community_id, Collection2Item.item_id 
 FROM Community2Collection, Collection2Item
 WHERE Collection2Item.collection_id   = Community2Collection.collection_id
 ;
 
-
-------------------------------------------------------------
--- Browse subsystem views
-------------------------------------------------------------
-
 -------------------------------------------------------
 --  ItemsByAuthor table
 -------------------------------------------------------
-DROP TABLE ItemsByAuthor;
-
 CREATE TABLE ItemsByAuthor
 (
    items_by_author_id INTEGER PRIMARY KEY,
@@ -448,8 +439,6 @@ CREATE TABLE ItemsByAuthor
 -------------------------------------------------------
 --  CollectionItemsByAuthor view
 -------------------------------------------------------
-DROP VIEW CollectionItemsByAuthor;
-
 CREATE VIEW CollectionItemsByAuthor as
 SELECT Collection2Item.collection_id, ItemsByAuthor.* 
 FROM ItemsByAuthor, Collection2Item
@@ -459,8 +448,6 @@ WHERE ItemsByAuthor.item_id = Collection2Item.item_id
 -------------------------------------------------------
 --  CommunityItemsByAuthor view
 -------------------------------------------------------
-DROP VIEW CommunityItemsByAuthor;
-
 CREATE VIEW CommunityItemsByAuthor as
 SELECT Community2Item.community_id, ItemsByAuthor.* 
 FROM ItemsByAuthor, Community2Item
@@ -470,9 +457,6 @@ WHERE ItemsByAuthor.item_id = Community2Item.item_id
 ----------------------------------------
 -- ItemsByTitle table
 ----------------------------------------
-
-DROP TABLE ItemsByTitle;
-
 CREATE TABLE ItemsByTitle
 (
    items_by_title_id  INTEGER PRIMARY KEY,
@@ -484,8 +468,6 @@ CREATE TABLE ItemsByTitle
 -------------------------------------------------------
 --  CollectionItemsByTitle view
 -------------------------------------------------------
-DROP VIEW CollectionItemsByTitle;
-
 CREATE VIEW CollectionItemsByTitle as
 SELECT Collection2Item.collection_id, ItemsByTitle.* 
 FROM ItemsByTitle, Collection2Item
@@ -495,8 +477,6 @@ WHERE ItemsByTitle.item_id = Collection2Item.item_id
 -------------------------------------------------------
 --  CommunityItemsByTitle view
 -------------------------------------------------------
-DROP VIEW CommunityItemsByTitle;
-
 CREATE VIEW CommunityItemsByTitle as
 SELECT Community2Item.community_id, ItemsByTitle.* 
 FROM ItemsByTitle, Community2Item
@@ -506,8 +486,6 @@ WHERE ItemsByTitle.item_id = Community2Item.item_id
 -------------------------------------------------------
 --  ItemsByDate table
 -------------------------------------------------------
-DROP TABLE ItemsByDate;
-
 CREATE TABLE ItemsByDate
 (
    items_by_date_id   INTEGER PRIMARY KEY,
@@ -518,8 +496,6 @@ CREATE TABLE ItemsByDate
 -------------------------------------------------------
 --  CollectionItemsByDate view
 -------------------------------------------------------
-DROP VIEW CollectionItemsByDate;
-
 CREATE VIEW CollectionItemsByDate as
 SELECT Collection2Item.collection_id, ItemsByDate.* 
 FROM ItemsByDate, Collection2Item
@@ -529,8 +505,6 @@ WHERE ItemsByDate.item_id = Collection2Item.item_id
 -------------------------------------------------------
 --  CommunityItemsByDate view
 -------------------------------------------------------
-DROP VIEW CommunityItemsByDate;
-
 CREATE VIEW CommunityItemsByDate as
 SELECT Community2Item.community_id, ItemsByDate.* 
 FROM ItemsByDate, Community2Item
@@ -540,8 +514,6 @@ WHERE ItemsByDate.item_id = Community2Item.item_id
 -------------------------------------------------------
 --  ItemsByDateAccessioned table
 -------------------------------------------------------
-DROP TABLE ItemsByDateAccessioned;
-
 CREATE TABLE ItemsByDateAccessioned
 (
    items_by_date_accessioned_id  INTEGER PRIMARY KEY,
@@ -552,8 +524,6 @@ CREATE TABLE ItemsByDateAccessioned
 -------------------------------------------------------
 --  CollectionItemsByDateAccessioned view
 -------------------------------------------------------
-DROP VIEW CollectionItemsByDateAccessioned;
-
 CREATE VIEW CollectionItemsByDateAccessioned as
 SELECT Collection2Item.collection_id, ItemsByDateAccessioned.* 
 FROM ItemsByDateAccessioned, Collection2Item
@@ -563,11 +533,10 @@ WHERE ItemsByDateAccessioned.item_id = Collection2Item.item_id
 -------------------------------------------------------
 --  CommunityItemsByDateAccessioned view
 -------------------------------------------------------
-DROP VIEW CommunityItemsByDateAccessioned;
-
 CREATE VIEW CommunityItemsByDateAccessioned as
 SELECT Community2Item.community_id, ItemsByDateAccessioned.* 
 FROM ItemsByDateAccessioned, Community2Item
 WHERE ItemsByDateAccessioned.item_id = Community2Item.item_id
 ;
+
 

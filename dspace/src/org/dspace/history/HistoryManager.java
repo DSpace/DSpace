@@ -180,9 +180,15 @@ public class HistoryManager
         // Create a model
         Model model = new ModelMem();
 
-        // An id for the new state
-        Integer stateId = (flag == REMOVE) ? null :
-            new Integer(DatabaseManager.getID("HistoryState"));
+        // A table row and id for the new state
+        Integer stateId = null;
+        TableRow row = null;
+
+        if (flag != REMOVE)
+        {
+            row = DatabaseManager.create(context, "HistoryState");
+            stateId = new Integer(row.getIntColumn("history_state_id"));
+        }
 
         // This is the object that we're making statements about....
         Resource obj = model.createResource(id);
@@ -251,10 +257,9 @@ public class HistoryManager
 
         if (flag != REMOVE)
         {
-            TableRow row = DatabaseManager.create(context, "HistoryState");
-
             row.setColumn("history_state_id", stateId.intValue());
             row.setColumn("object_id", id);
+            DatabaseManager.update(context, row);
         }
 
         StringWriter swdata = new StringWriter();

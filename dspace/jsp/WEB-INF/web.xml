@@ -275,11 +275,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>reset-id-generator</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.admin.ResetIDGenServlet</servlet-class>
-  </servlet>
-
-  <servlet>
     <servlet-name>retrieve</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
   </servlet>
@@ -415,11 +410,6 @@
   <servlet-mapping>
     <servlet-name>register</servlet-name>
     <url-pattern>/register</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>reset-id-generator</servlet-name>
-    <url-pattern>/admin/reset-id-generator</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

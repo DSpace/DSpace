@@ -175,14 +175,14 @@ Common usage:
 
 
   <!-- ============================================================= -->
-  <!-- Create the database tables, removing anything already there   -->
+  <!-- Create the database tables                                    -->
   <!-- ============================================================= -->
 
   <!-- We execute InitializeDatabase, passing in the simple log4j properties
     -  file in etc/ and the DSpace configuration file using system
     -  properties -->
   <target name="setup_database"
-          description="Create database tables, removing existing data">
+          description="Create database tables">
     <java classname="org.dspace.storage.rdbms.InitializeDatabase"
           classpathref="build.class.path"
           fork="yes"
@@ -194,6 +194,26 @@ Common usage:
   </target>
 
   
+  <!-- ============================================================= -->
+  <!-- Remove the database tables                                    -->
+  <!-- ============================================================= -->
+
+  <!-- We execute InitializeDatabase, passing in the simple log4j properties
+    -  file in etc/ and the DSpace configuration file using system
+    -  properties -->
+  <target name="clean_database"
+          description="Removes DSpace database tables, destroying data">
+    <java classname="org.dspace.storage.rdbms.InitializeDatabase"
+          classpathref="build.class.path"
+          fork="yes"
+          failonerror="yes">
+      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="dspace.configuration" value="${config}"/>
+      <arg value="${basedir}/etc/clean-database.sql"/>
+    </java>
+  </target>
+
+
   <!-- ============================================================= -->
   <!-- Load the initial contents of the registries into the database -->
   <!-- ============================================================= -->
