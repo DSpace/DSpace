@@ -220,6 +220,7 @@
               <td class="standard" align="center">
                  <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
                   <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
+                  <input type="hidden" name="community_id" value="<%= community.getID() %>">
                   <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
                   <input type="submit" value="Edit...">
                 </form>
