@@ -391,7 +391,6 @@ public class DSIndexer
         String abstract_text= "";
         String sor_text  	= "";
         String series_text  = "";
-        String toc_text 	= "";
         String mime_text	= "";
         String sponsor_text	= "";
         String id_text		= "";
@@ -428,16 +427,16 @@ public class DSIndexer
             abstract_text= new String(abstract_text+ abstracts[j].value + " ");
         }
 
+        for(j=0; j<tocs.length; j++)
+        {
+            abstract_text= new String(abstract_text + tocs[j].value + " ");
+        }
 
         for(j=0; j<series.length; j++)
         {
             series_text= new String(series_text + series[j].value + " ");
         }
 
-        for(j=0; j<tocs.length; j++)
-        {
-            toc_text= new String(toc_text + tocs[j].value + " ");
-        }
 
         for(j=0; j<mimetypes.length; j++)
         {
@@ -468,10 +467,9 @@ public class DSIndexer
         textvalues.put("abstract",  abstract_text);
 
         textvalues.put("series",    series_text	 );
-        textvalues.put("toc",   	toc_text 	 );
         textvalues.put("mimetype",  mime_text    );
-        textvalues.put("sponsor",	sponsor_text );
-        textvalues.put("identifier",id_text    );
+        textvalues.put("sponsor",   sponsor_text );
+        textvalues.put("identifier",id_text    	 );
         
       // write out the metatdata (for scalability, using hash instead of individual strings)
         writeIndexRecord(writer, Constants.ITEM, myitem.getID(), itemhandle, textvalues);
@@ -496,7 +494,7 @@ public class DSIndexer
 
         // want to be able to search for handle, so use keyword
         // (not tokenized, but it is indexed)    
-        doc.add(Field.Keyword  ("handle",   handle        ));
+        doc.add(Field.Keyword  ("handle",   handle  ));
 
         // now iterate through the hash, building full text string
         // and index all values
