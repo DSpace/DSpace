@@ -775,9 +775,12 @@ public class SubmitServlet extends DSpaceServlet
         // Type
         item.clearDC("type", null, Item.ANY);
         String[] types = request.getParameterValues("type");
-        for (int i = 0; i < types.length; i++)
+        if (types != null)
         {
-            item.addDC("type", null, "en", types[i]);
+            for (int i = 0; i < types.length; i++)
+            {
+                item.addDC("type", null, "en", types[i]);
+            }
         }
         
         // FIXME: Maybe should do integrity check using language object
