@@ -86,7 +86,7 @@
             </tr>
             <tr class="stripe"> <%-- Blue stripe --%>
                 <td colspan=3>&nbsp;</td>
-            </td>
+            </tr>
         </table>
 
         <%-- Page contents --%>
