@@ -255,7 +255,20 @@ public class ItemTag extends TagSupport
         fields.add(new String[] {"Issue Date", displayDate});
 
         fields.add(new String[] {"Series/Report no.", "relation", "ispartofseries"});
-        fields.add(new String[] {"Abstract", "description", "abstract"});
+
+        // Truncate abstract
+        DCValue[] abstrDC = item.getDC("description", "abstract", Item.ANY);
+        if (abstrDC.length > 0)
+        {
+            String abstr = abstrDC[0].value;
+            if (abstr.length() > 1000)
+            {
+                abstr = abstr.substring(0, 1000) + "...";
+            }
+
+            fields.add(new String[] {"Abstract", abstr});
+        }
+
         fields.add(new String[] {"Description", "description", null});
         fields.add(new String[] {"Gov't Doc # ", "identifier", "govdoc"});
         fields.add(new String[] {"URI", "identifier", "uri"});
@@ -417,7 +430,7 @@ public class ItemTag extends TagSupport
             (HttpServletRequest) pageContext.getRequest();
 
         out.print("<table align=center class=\"miscTable\"><tr>");
-        out.println("<td class=evenRowEvenCol><P><strong>Files:</strong></P>");
+        out.println("<td class=evenRowEvenCol><P><strong>Files in This Item:</strong></P>");
 
         Bundle[] bundles = item.getBundles();
     
@@ -427,7 +440,7 @@ public class ItemTag extends TagSupport
         }
         else
         {        
-            out.println("<UL>");
+            out.println("<table cellpadding=6><tr><th class=\"standard\">File</th><th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th></tr>");
 
             for (int i = 0; i < bundles.length; i++)
             {
@@ -438,21 +451,21 @@ public class ItemTag extends TagSupport
                     // Skip internal types
                     if (!bitstreams[k].getFormat().isInternal())
                     {
-                        out.print("<LI><A TARGET=_blank HREF=\"");
+                        out.print("<tr><td class=\"standard\">");
+                        out.print(bitstreams[k].getName());
+                        out.print("</td><td class=\"standard\">");
+                        out.print(bitstreams[k].getSize() / 1024);
+                        out.print("Kb</td><td class=\"standard\">");
+                        out.print(bitstreams[k].getFormatDescription());
+                        out.print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
                         out.print(request.getContextPath());
                         out.print("/retrieve/");
                         out.print(bitstreams[k].getID());
-                        out.print("\">");
-                        out.print(bitstreams[k].getName());
-                        out.print("</A> - ");
-                        out.print(bitstreams[k].getSize());
-                        out.print(" bytes; " + bitstreams[k].getFormatDescription());
-                        out.println("</LI>");
+                        out.print("\">View/Open</A></td></tr>");
                     }
                 }
             }
-        
-            out.println("</UL>");
+            out.println("</table>");
         }
         
         out.println("</td></tr></table>");
