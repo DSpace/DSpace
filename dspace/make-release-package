@@ -1,6 +1,6 @@
 #!/bin/sh
 
-USAGE="$0 cvs-tag target"
+USAGE="$0 cvs-tag version"
 
 # Just in case you need to 'socksify' etc
 CVS_COMMAND="cvs"
@@ -10,6 +10,9 @@ if [ "$#" != "2" ]; then
         echo $USAGE
         exit 1
 fi
+
+FILENAME="dspace-$2-source"
+
 
 mkdir tmp
 cd tmp
@@ -23,15 +26,18 @@ rm -f dspace/make-release-package
 # Or silly cvsignore file
 rm -f dspace/.cvsignore
 
-echo "Creating tarball..."
-mv dspace $2-source
+# get rid of silly GPL'd METS stuff
+#rm -f dspace/src/org/dspace/app/mets/METSExport.java
 
-tar -cf - $2-source | gzip -c > $2.tar.gz
+echo "Creating tarball..."
+mv dspace $FILENAME
+
+tar -cf - $FILENAME | gzip -c > $FILENAME.tar.gz
 
 echo "Cleaning up..."
 
 cd ..
-mv tmp/$2.tar.gz .
+mv tmp/$FILENAME.tar.gz .
 rm -r tmp
 
-echo "Package created as $2.tar.gz"
+echo "Package created as $FILENAME.tar.gz"
