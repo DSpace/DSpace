@@ -432,7 +432,8 @@ CREATE TABLE ItemsByAuthor
 (
    items_by_author_id INTEGER PRIMARY KEY,
    item_id            INTEGER REFERENCES Item(item_id),
-   author             TEXT
+   author             TEXT,
+   sort_author        TEXT
 );
 
 -------------------------------------------------------
