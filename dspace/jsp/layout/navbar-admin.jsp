@@ -76,12 +76,15 @@
     labels.add("Authorization");
     links.add("authorize");
 
+    labels.add("Reset ID<br>Generator");
+    links.add("reset-id-generator");
+
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);    
     int c = currentPage.indexOf( '?' );
     if( c > -1 )
     {
-        currentPage = currentPage.substring( 0, c );
+        currentPage = currentPage.substring(0, c);
     }
 %>
 

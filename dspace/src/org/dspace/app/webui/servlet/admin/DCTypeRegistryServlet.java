@@ -1,5 +1,5 @@
 /*
- * BitstreamFormatRegistry.java
+ * DCTypeRegistry.java
  *
  * Version: $Revision$
  *
@@ -42,8 +42,6 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -51,22 +49,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.administer.DCType;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.FormatIdentifier;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
 /**
- * Servlet for editing the bitstream format registry
+ * Servlet for editing the Dublin Core registry
  *
  * @author  Robert Tansley
  * @version $Revision$
  */
-public class BitstreamFormatRegistry extends DSpaceServlet
+public class DCTypeRegistryServlet extends DSpaceServlet
 {
     /** User wants to edit a format */
     public static final int START_EDIT = 1;
@@ -84,7 +81,7 @@ public class BitstreamFormatRegistry extends DSpaceServlet
     public static final int CREATE = 4;
 
     /** Logger */
-    private static Logger log = Logger.getLogger(BitstreamFormatRegistry.class);
+    private static Logger log = Logger.getLogger(DCTypeRegistryServlet.class);
 
 
     protected void doDSGet(Context context,
@@ -92,8 +89,8 @@ public class BitstreamFormatRegistry extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        // GET just displays the list of formats
-        showFormats(context, request, response);
+        // GET just displays the list of type
+        showTypes(context, request, response);
     }
     
     
@@ -106,106 +103,79 @@ public class BitstreamFormatRegistry extends DSpaceServlet
 
         if (button.equals("submit_update"))
         {
-            // Update the metadata for a bitstream format
-            BitstreamFormat bf = BitstreamFormat.find(context,
-                UIUtil.getIntParameter(request, "format_id"));
+            // Update the metadata for a DC type
+            DCType dc = DCType.find(context,
+                UIUtil.getIntParameter(request, "dc_type_id"));
 
-            bf.setMIMEType(request.getParameter("mimetype"));
-            bf.setShortDescription(request.getParameter("short_description"));
-            bf.setDescription(request.getParameter("description"));
-            bf.setSupportLevel(
-                UIUtil.getIntParameter(request, "support_level"));
-            bf.setInternal(request.getParameter("internal") != null &&
-                           request.getParameter("internal").equals("true"));
-
-            // Separate comma-separated extensions
-            List extensions = new LinkedList();
-            String extParam = request.getParameter("extensions");
-
-            while (extParam.length() > 0)
-            {
-                int c = extParam.indexOf(',');
-                if (c > 0)
-                {
-                    extensions.add(extParam.substring(0, c).trim());
-                    extParam = extParam.substring(c+1).trim();
-                }
-                else
-                {
-                    if (extParam.trim().length() > 0)
-                    {
-                        extensions.add(extParam.trim());
-                        extParam = "";
-                    }
-                }
-            }
-
-            // Set extensions in the format - convert to array
-            String[] extArray =
-                (String[]) extensions.toArray(new String[extensions.size()]);
-            bf.setExtensions(extArray);
-
-            bf.update();
+            dc.setElement(request.getParameter("element"));
             
-            showFormats(context, request, response);
+            String qual = request.getParameter("qualifier");
+            if (qual.equals(""))
+            {
+                qual = null;
+            }
+            dc.setQualifier(qual);
+            
+            dc.setScopeNote(request.getParameter("scope_note"));
+
+            dc.update();
+            
+            showTypes(context, request, response);
             context.complete();
         }
         else if (button.equals("submit_add"))
         {
-            // Add a new bitstream - simply add to the list, and let the user
+            // Add a new DC type - simply add to the list, and let the user
             // edit with the main form
-            BitstreamFormat bf = BitstreamFormat.create(context);
+            DCType dc = DCType.create(context);
             
-            // We set the "internal" flag to true, so that the empty bitstream
-            // format doesn't show up in the submission UI yet
-            bf.setInternal(true);
-            bf.update();
+            dc.update();
             
-            showFormats(context, request, response);
+            showTypes(context, request, response);
             context.complete();
         }
         else if (button.equals("submit_delete"))
         {
             // Start delete process - go through verification step
-            BitstreamFormat bf = BitstreamFormat.find(context,
-                UIUtil.getIntParameter(request, "format_id"));
-            request.setAttribute("format", bf);
+            DCType dc = DCType.find(context,
+                UIUtil.getIntParameter(request, "dc_type_id"));
+            request.setAttribute("type", dc);
             JSPManager.showJSP(request, response,
-                "/admin/confirm-delete-format.jsp");
+                "/admin/confirm-delete-dctype.jsp");
         }
         else if (button.equals("submit_confirm_delete"))
         {
-            // User confirms deletion of format
-            BitstreamFormat bf = BitstreamFormat.find(context,
-                UIUtil.getIntParameter(request, "format_id"));
-            bf.delete();
+            // User confirms deletion of type
+            DCType dc = DCType.find(context,
+                UIUtil.getIntParameter(request, "dc_type_id"));
+            dc.delete();
             
-            showFormats(context, request, response);
+            showTypes(context, request, response);
             context.complete();
         }            
         else
         {
             // Cancel etc. pressed - show list again
-            showFormats(context, request, response);
+            showTypes(context, request, response);
         }
     }
 
 
     /**
-     * Show list of bitstream formats
+     * Show list of DC type
      *
      * @param context   Current DSpace context
      * @param request   Current HTTP request
      * @param response  Current HTTP response
      */
-    private void showFormats(Context context,
+    private void showTypes(Context context,
         HttpServletRequest request,
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        BitstreamFormat[] formats = BitstreamFormat.findAll(context);
+        DCType[] types = DCType.findAll(context);
         
-        request.setAttribute("formats", formats);
-        JSPManager.showJSP(request, response, "/admin/list-formats.jsp");
+        request.setAttribute("types", types);
+        JSPManager.showJSP(request, response, "/admin/list-dc-types.jsp");
     }
 }

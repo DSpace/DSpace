@@ -1145,6 +1145,18 @@ public class DatabaseManager
         DriverManager.registerDriver(new SimplePool());
         initialized = true;
     }
+
+
+    /**
+     * Simple workaround method to reset the in-memory ID generator.  This
+     * causes it to re-read the DB to find IDs to allocate to new objects.
+     * This should be invoked after another JVM has been writing to the DB.
+     */
+    public static void resetIDGenerator()
+    {
+        // Remove cached IDs
+        ids = new HashMap();
+    }
 }
 
 /**

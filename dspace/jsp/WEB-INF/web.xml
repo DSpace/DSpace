@@ -177,6 +177,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>dc-registry</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.DCTypeRegistryServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>display-item</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.DisplayItemServlet</servlet-class>
   </servlet>
@@ -255,6 +260,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>reset-id-generator</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.ResetIDGenServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>retrieve</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
   </servlet>
@@ -295,6 +305,11 @@
   <servlet-mapping>
     <servlet-name>community-list</servlet-name>
     <url-pattern>/community-list</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>dc-registry</servlet-name>
+    <url-pattern>/admin/dc-registry</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -365,6 +380,11 @@
   <servlet-mapping>
     <servlet-name>register</servlet-name>
     <url-pattern>/register</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>reset-id-generator</servlet-name>
+    <url-pattern>/admin/reset-id-generator</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
