@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -771,44 +772,48 @@ public class DSpaceOAICatalog extends AbstractCatalog
     {
         Object[] obj = new Object[5];
         StringTokenizer st = new StringTokenizer(token, "/", true);
-        
-        // Extract from, until, set, prefix
-        for (int i = 0; i < 4; i++)
+
+        try
         {
+
+            // Extract from, until, set, prefix
+            for (int i = 0; i < 4; i++)
+            {
+                if (!st.hasMoreTokens())
+                {
+                    throw new BadResumptionTokenException();
+                }
+    
+                String s = st.nextToken();
+                // If this value is a delimiter /, we have no value for this part
+                // of the resumption token.
+                if (s.equals("/"))
+                {
+                    obj[i] = null;
+                }
+                else
+                {
+                    obj[i] = s;
+                    // Skip the delimiter
+                    st.nextToken();
+                }
+                log.debug("is: " + (String) obj[i]);
+            }
+        
             if (!st.hasMoreTokens())
             {
                 throw new BadResumptionTokenException();
             }
-
-            String s = st.nextToken();
-            // If this value is a delimiter /, we have no value for this part
-            // of the resumption token.
-            if (s.equals("/"))
-            {
-                obj[i] = null;
-            }
-            else
-            {
-                obj[i] = s;
-                // Skip the delimiter
-                st.nextToken();
-            }
-            log.debug("is: " + (String) obj[i]);
-        }
-        
-        if (!st.hasMoreTokens())
-        {
-            throw new BadResumptionTokenException();
-        }
-        
-        // Extract offset
-        try
-        {
+            
             obj[4] = new Integer(st.nextToken());
         }
         catch (NumberFormatException nfe)
         {
             throw new BadResumptionTokenException();
+        }
+        catch (NoSuchElementException nsee)
+        {
+        	throw new BadResumptionTokenException();
         }
         
         return obj;
