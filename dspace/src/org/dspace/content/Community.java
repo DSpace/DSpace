@@ -83,7 +83,6 @@ public class Community implements DSpaceObject
     /** The logo bitstream */
     private Bitstream logo;
 
-
     /**
      * Construct a community object from a database row.
      *
@@ -382,7 +381,8 @@ public class Community implements DSpaceObject
             "collection",
             "SELECT collection.* FROM collection, community2collection WHERE " +
                 "community2collection.collection_id=collection.collection_id " +
-                "AND community2collection.community_id=" + getID() + ";");
+                "AND community2collection.community_id=" + getID() +
+                " ORDER BY collection.name" );
 
         // Make Collection objects
         while (tri.hasNext())
