@@ -136,7 +136,11 @@ public class Constants
 
     /** collection editor -- metadata, icon, owned item metadata */
     public static final int COLLECTION_EDITOR = 11;
+    
+    public static final int NEWS_TOP = 0;
 
+    public static final int NEWS_SIDE = 1;
+    
     /**
      * lets you look up action names from the action IDs
      */
