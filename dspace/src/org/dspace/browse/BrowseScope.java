@@ -113,6 +113,22 @@ public class BrowseScope
     }
 
     /**
+     * Constructor
+     */
+    public BrowseScope(Context context,
+                       Object scope,
+                       Object focus,
+                       int total,
+                       int numberBefore)
+    {
+        this.context      = context;
+        this.scope        = scope;
+        this.focus        = focus;
+        this.total        = total;
+        this.numberBefore = numberBefore;
+    }
+
+    /**
      * Set the browse scope to all of DSpace.
      */
     public void setScopeAll()
