@@ -402,7 +402,6 @@ public class WorkflowManager
                 // there were approvers, change the state
                 //  timestamp, and add them to the list
                 createTasks(c, wi, mygroup );
-                //wi.update();
 
                 // email notification
                 notifyGroupOfTask(c, mygroup, wi);
@@ -521,7 +520,8 @@ public class WorkflowManager
      * notify the submitter that the item is archived
      */
     private static void notifyOfArchive(Context c, Item i,
-         Collection coll)
+            Collection coll)
+        throws SQLException, IOException
     {
         try
         {
@@ -547,13 +547,12 @@ public class WorkflowManager
 
             email.send();
         }
-        catch( Exception e )
+        catch( MessagingException e )
         {
-//            log.warn(LogManager.getHeader(c,
-//                "notifyOfArchive, cannot email submitter"
-//                + " item_id=" + i.getID()
-//                + " eperson_id=" + ep.getID()
-//                + e ));
+            log.warn(LogManager.getHeader(c,
+                "notifyOfArchive",
+                "cannot email user"
+                + " item_id=" + i.getID()));
         }
     }
 
@@ -670,7 +669,7 @@ public class WorkflowManager
 
     private static void notifyGroupOfTask(Context c, Group mygroup,
             WorkflowItem wi)
-        throws SQLException
+        throws SQLException, IOException
     {
         try
         {
@@ -711,9 +710,13 @@ public class WorkflowManager
 
             emailGroup(c, mygroup, email);
         }
-        catch( Exception e )
+        catch( MessagingException e )
         {
-            // FIXME: should log failed notification
+            log.warn(LogManager.getHeader(c,
+                "notifyGroupofTask",
+                "cannot email user"
+                + " group_id" + mygroup.getID()
+                + " workflow_item_id" + wi.getID() ));
         }
     }
 
