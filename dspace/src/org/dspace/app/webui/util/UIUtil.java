@@ -366,6 +366,41 @@ public class UIUtil
 
 
     /**
+     * Obtain an array of int parameters from the given request as an int.
+     * null is returned if parameter doesn't exist. <code>-1</code>
+     * is returned in array locations if that particular value is garbled.
+     *
+     * @param request   the HTTP request
+     * @param param     the name of the parameter
+     *
+     * @return  array of integers or null
+     */
+    public static int [] getIntParameters(HttpServletRequest request, String param)
+    {
+        String [] request_values = request.getParameterValues(param);
+        
+        if( request_values == null ) return null;
+
+        int [] return_values = new int[request_values.length];
+        
+        for( int x = 0; x < return_values.length; x++ )
+        {        
+            try
+            {
+                return_values[x] = Integer.parseInt(request_values[x]);
+            }
+            catch (Exception e)
+            {
+                // Problem with parameter, stuff -1 in this slot
+                return_values[x] = -1;
+            }
+        }
+        
+        return return_values;
+    }
+
+
+    /**
      * Obtain a parameter from the given request as a boolean.
      * <code>false</code> is returned if the parameter is garbled or does not
      * exist.

@@ -100,13 +100,24 @@ public class GroupEditServlet extends DSpaceServlet
         }
         else if( button.equals("submit_add_eperson_add") )
         {
-            // add a user to the group, return to group-edit.jsp
             Group group = Group.find(c, UIUtil.getIntParameter(request, "group_id"));
-            EPerson e   = EPerson.find(c,UIUtil.getIntParameter(request,"eperson_id") );            
-
-            group.addMember( e );
-            group.update();
+            int [] eperson_ids = UIUtil.getIntParameters(request,"eperson_id");
             
+            if( eperson_ids != null )
+            {
+                for(int x=0; x<eperson_ids.length; x++)
+                {
+                    if( eperson_ids[x] != -1 )
+                    {
+                        // add a user to the group, return to group-edit.jsp
+                        EPerson e   = EPerson.find(c, eperson_ids[x]);            
+
+                        group.addMember( e );
+                    }
+                }
+                group.update();
+            }
+                        
             request.setAttribute("group", group);
             request.setAttribute("members", group.getMembers());
             JSPManager.showJSP(request, response, "/dspace-admin/group-edit.jsp" );
