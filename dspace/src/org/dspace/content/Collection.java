@@ -226,7 +226,7 @@ public class Collection extends DSpaceObject
     {
         TableRow row = DatabaseManager.create(context, "collection");
         Collection c = new Collection(context, row);
-        String newHandle = HandleManager.createHandle(context, c);
+        c.handle = HandleManager.createHandle(context, c);
 
         // create the default authorization policy for collections
         // of 'anonymous' READ
@@ -261,7 +261,7 @@ public class Collection extends DSpaceObject
         log.info(LogManager.getHeader(context,
             "create_collection",
             "collection_id=" + row.getIntColumn("collection_id")) +
-            ",handle=" + newHandle);
+            ",handle=" + c.handle);
 
         return c;
     }
