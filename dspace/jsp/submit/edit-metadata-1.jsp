@@ -100,7 +100,7 @@
                 <tr>
                     <td colspan=4 class="submitFormHelp">
 <%
-    if (si.jumpToField != null && si.jumpToField.equals("contributor_author"))
+    if (si.jumpToField != null && "contributor_author".equals(si.jumpToField))
     {
 %>
                         <a name="field"></a>
@@ -120,7 +120,7 @@
 <%
     DCValue[] authors = item.getDC("contributor", "author", Item.ANY);
     int authorFieldCount = authors.length + 1;
-    if (si.moreBoxesFor != null && si.moreBoxesFor.equals("contributor_author"))
+    if (si.moreBoxesFor != null && "contributor_author".equals(si.moreBoxesFor))
     {
         authorFieldCount += 2;
     }
@@ -196,7 +196,7 @@
 
                 <tr>
 <%
-    if (si.missing && si.jumpToField != null && si.jumpToField.equals("title"))
+    if (si.missing && si.jumpToField != null && "title".equals(si.jumpToField))
     {
 %>
                     <td colspan=4 class="submitFormWarn">
@@ -242,7 +242,7 @@
                 <tr>
                     <td colspan=4 class="submitFormHelp">
 <%
-        if (si.jumpToField != null && si.jumpToField.equals("title_alternative"))
+        if (si.jumpToField != null && "title_alternative".equals(si.jumpToField))
         {
 %>
                         <a name="field"></a>
@@ -255,7 +255,7 @@
 <%
         DCValue[] altTitles = item.getDC("title", "alternative", Item.ANY);
         int altTitleFieldCount = altTitles.length + 1;
-        if (si.moreBoxesFor != null && si.moreBoxesFor.equals("title_alternative"))
+        if (si.moreBoxesFor != null && "title_alternative".equals(si.moreBoxesFor))
         {
             altTitleFieldCount += 2;
         }
@@ -341,7 +341,7 @@
         DCValue[] dateIssuedArray = item.getDC("date", "issued", Item.ANY);
         DCDate dateIssued = new DCDate(
             (dateIssuedArray.length > 0 ? dateIssuedArray[0].value : ""));
-	if (si.missing && dateIssued.getYear() <= 0 && si.jumpToField != null && si.jumpToField.equals("date_issued_year"))
+	if (si.missing && dateIssued.getYear() <= 0 && si.jumpToField != null && "date_issued_year".equals(si.jumpToField))
 	{
 %>
 		<tr>
@@ -441,7 +441,7 @@
                 <tr>
                     <td colspan=4 class="submitFormHelp">
 <%
-    if (si.jumpToField != null && si.jumpToField.equals("relation_ispartofseries"))
+    if (si.jumpToField != null && "relation_ispartofseries".equals(si.jumpToField))
     {
 %>
                         <a name="field"></a>
@@ -461,7 +461,7 @@
     DCValue[] seriesNumbers = item.getDC("relation", "ispartofseries", Item.ANY);
     int seriesNumberFieldCount = seriesNumbers.length + 1;
 
-    if (si.moreBoxesFor != null && si.moreBoxesFor.equals("relation_ispartofseries"))
+    if (si.moreBoxesFor != null && "relation_ispartofseries".equals(si.moreBoxesFor))
     {
         seriesNumberFieldCount += 2;
     }
@@ -567,7 +567,7 @@
                 <tr>
                     <td colspan=4 class="submitFormHelp">
 <%
-    if (si.jumpToField != null && si.jumpToField.equals("identifier"))
+    if (si.jumpToField != null && "identifier".equals(si.jumpToField))
     {
 %>
                         <a name="field"></a>
@@ -582,7 +582,7 @@
     // Work out how many input boxes to display
     int identifierFieldCount = identifiers.length + 1;
 
-    if (si.moreBoxesFor != null && si.moreBoxesFor.equals("identifier"))
+    if (si.moreBoxesFor != null && "identifier".equals(si.moreBoxesFor))
     {
         identifierFieldCount += 2;
     }
