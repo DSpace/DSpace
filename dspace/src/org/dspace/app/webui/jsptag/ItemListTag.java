@@ -102,8 +102,21 @@ public class ItemListTag extends TagSupport
         {
             out.println("<table align=center class=\"miscTable\">");
 
+            // Write column headings
+            out.print("<tr><th class=\"oddRowOddCol\">" +
+                (emphasiseDate ? "<strong>" : "") +
+                "Date&nbsp;of&nbsp;Issue" +
+                (emphasiseDate ? "</strong>" : "") + "</th>");
+
+            out.println("<th class=\"oddRowEvenCol\">" +
+                (emphasiseTitle ? "<strong>" : "") +
+                "Title" +
+                (emphasiseTitle ? "</strong>" : "") + "</th>");
+
+            out.println("<th class=\"oddRowOddCol\">Authors</th></tr>");
+
             // Row: toggles between Odd and Even
-            String row = "odd";
+            String row = "even";
 
             for (int i = 0; i < items.length; i++)
             {
@@ -117,7 +130,7 @@ public class ItemListTag extends TagSupport
 
                 // Authors....
                 DCValue[] authors = items[i].getDC("contributor",
-                    "author",
+                    Item.ANY,
                     Item.ANY);
 
                 // Date issued

@@ -238,7 +238,7 @@ public class ItemTag extends TagSupport
         }
 
         fields.add(new String[] {"Other Titles", "title", "alternative"});
-        fields.add(new String[] {"Authors", "contributor", "author"});
+        fields.add(new String[] {"Authors", "contributor", Item.ANY});
         fields.add(new String[] {"Keywords", "subject", null});
 
         // Date issued
