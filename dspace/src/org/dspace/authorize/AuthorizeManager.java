@@ -442,6 +442,32 @@ public class AuthorizeManager
             "resource_type_id=" + o.getType()   + " AND " +
             "resource_id="      + o.getID()   );
     }
+
+
+    /**
+     * Remove all policies from an object that match a given action
+     *
+     * @param context
+     * @param dso    DSpaceObject affected object
+     * @param action to match, or -1=all
+     */
+    public static void removePoliciesActionFilter(Context context, DSpaceObject dso, int actionID)
+        throws SQLException
+    {
+        if( actionID == -1)
+        {
+            // remove all policies from object
+            removeAllPolicies(context, dso);
+        }
+        else
+        {
+            DatabaseManager.updateQuery(context,
+                "DELETE FROM resourcepolicy WHERE " +
+                "resource_type_id=" + dso.getType()   + " AND " +
+                "resource_id="      + dso.getID()     + " AND " +
+                "action_id="        + actionID );
+        }
+    }
     
     
     /**
