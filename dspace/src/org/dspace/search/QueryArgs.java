@@ -1,3 +1,45 @@
+/*
+ * QueryArgs.java
+ *
+ * $Id$
+ *
+ * Version: $Revision$
+ *
+ * Date: $Date$
+ *
+ * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Institute of Technology.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * - Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the Hewlett-Packard Company nor the name of the
+ * Massachusetts Institute of Technology nor the names of their
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ */
+
 package org.dspace.search;
 
 import javax.servlet.http.HttpServletRequest;
@@ -5,7 +47,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import org.apache.oro.text.perl.Perl5Util;
 
-
+/**
+ * Contains the arguments for a query.  Fill it out and pass
+ *  to the query engine
+ */
 public class QueryArgs
 {
     // the query string
@@ -19,12 +64,14 @@ public class QueryArgs
 
     /**
      * set the query string
+     * @param newQuery
      */
     public void setQuery( String newQuery ) { query = newQuery; }
 
     
     /**
      * retrieve the query string
+     * @return the current query string
      */
     public String getQuery() { return query; }
     
@@ -33,12 +80,14 @@ public class QueryArgs
      * set the offset of the desired search results,
      *  beginning with 0 ; used to page results
      *  (the default value is 0)
+     * @param newStart index of first desired result
      */
     public void setStart( int newStart ) { start = newStart; }
     
     
     /**
      * read the search's starting offset
+     * @return current index of first desired result
      */
     public int getStart() { return start; }
     
@@ -47,12 +96,14 @@ public class QueryArgs
      * set the count of hits to return;
      *  used to implement paged searching
      *  see the initializer for the default value
+     * @param newSize number of hits per page
      */
     public void setPageSize( int newSize ) { pageSize = newSize; }
     
     
     /**
      * get the count of hits to return
+     * @return number of results per page
      */
     public int getPageSize() { return pageSize; }
     
