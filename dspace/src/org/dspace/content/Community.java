@@ -267,21 +267,16 @@ public class Community
         // FIXME: Check auth
 
         // First, delete any existing logo
-        if (!communityRow.isColumnNull("logo_bitstream_id"))
+        if (logo != null)
         {
-            logo.delete();
-        }
-
-        if (is == null)
-        {
-            communityRow.setColumnNull("logo_bitstream_id");
-            logo = null;
-
             log.info(LogManager.getHeader(ourContext,
                 "remove_logo",
                 "community_id=" + getID()));
+            communityRow.setColumnNull("logo_bitstream_id");
+            logo.delete();
         }
-        else
+
+        if (is != null)
         {
             Bitstream newLogo = Bitstream.create(ourContext, is);
             communityRow.setColumn("logo_bitstream_id", newLogo.getID());
@@ -437,6 +432,8 @@ public class Community
 
         // Remove the logo
         setLogo(null);
+
+System.err.println("ABOUT TO DELETE: " + communityRow.toString());
 
         // Delete community row
         DatabaseManager.delete(ourContext, communityRow);

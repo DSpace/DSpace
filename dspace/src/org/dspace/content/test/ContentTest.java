@@ -106,16 +106,34 @@ public class ContentTest extends TestCase
 
         try
         {
+            // Create context
             context = new Context();
+
+            // Create a community
             Community c1 = createCommunity(context);
+            int id = c1.getID();
+
+            // Check we can get it
             Community c2 = Community.find (context, c1.getID());
             assertNotNull("Found community", c2);
             assertEquals("Found community has correct name",
                          c2.getMetadata("name"), TEST_NAME_1);
             assertTrue("Found community in getAllCommunities array",
                        contains(Community.getAllCommunities(context), c1));
+
+            // FIXME: Start a new transaction - this is a workaround for
+            // a PostgreSQL 7.1 bug.
+
+            context.complete();
+            context = new Context();
+
+            c1 = Community.find(context, id);
+            assertNotNull("Found community", c1);
+
+            // Delete it
             c1.delete();
-            Community c3 = Community.find (context, c1.getID());
+
+            Community c3 = Community.find (context, id);
             assertNull("Did not find deleted community", c3);
             context.complete();
         }
