@@ -504,7 +504,7 @@ public class ItemListTag extends TagSupport
 						.append(thumbnailBitstream.getID())
 						.append("/")
    						.append(URLEncoder.encode(thumbnailBitstream.getName()))
-						.append("\" alt=")
+						.append("\" alt=\"")
 						.append(thumbnailBitstream.getName())
 						.append("\" ")
 						.append(getScalingAttr(hrq, thumbnailBitstream))
