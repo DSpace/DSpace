@@ -6,6 +6,7 @@ import java.io.FileReader;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -61,14 +62,30 @@ public class MediaFilterManager
         {
             // skip any lines beginning with #
             if(line.indexOf("#") == 0) continue;
+
+            // no comment, so try and parse line
+            StringTokenizer st = new StringTokenizer(line);
             
-            // look for the last space - it should be between Format Name and className
-            int lastSpace = line.lastIndexOf(" ");
-            
-            if(lastSpace != -1)
+            // has to have at least 2 tokens
+            if(st.countTokens() >= 2)
             {
-                String myFormat = line.substring(0, lastSpace);
-                String myClass  = line.substring(lastSpace+1, line.length());
+                String [] tokens = new String[st.countTokens()];
+                
+                // grab all tokens and stuff in array
+                for(int i=0; i<tokens.length; i++)
+                {
+                    tokens[i] = st.nextToken();
+                }
+                
+                // class is the last token
+                String myClass = tokens[tokens.length-1];
+                String myFormat = tokens[0];
+                
+                // everything else is the format
+                for(int i=1; i<(tokens.length-1); i++)
+                {
+                    myFormat = myFormat + " " + tokens[i];
+                }
                 
                 System.out.println("Format: '"+myFormat+"' Filtering Class: '"+myClass+"'");
                 
