@@ -391,6 +391,7 @@ public class Community extends DSpaceObject
                 "community_id=" + getID()));
             communityRow.setColumnNull("logo_bitstream_id");
             logo.delete();
+            logo = null;
         }
 
         if (is != null)
