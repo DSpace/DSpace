@@ -473,7 +473,7 @@ public class Bundle extends DSpaceObject
         throws SQLException, AuthorizeException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        //AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
         log.info(LogManager.getHeader(ourContext,
             "update_bundle",
