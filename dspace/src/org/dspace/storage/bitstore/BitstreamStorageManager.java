@@ -40,27 +40,46 @@
 
 package org.dspace.storage.bitstore;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
-import java.security.*;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.storage.rdbms.*;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 
 import org.apache.log4j.Logger;
 
 /**
  * Stores, retrieves and deletes bitstreams.
  *
- * @author  Peter Breton
+ * @author  Peter Breton, Robert Tansley
  * @version $Revision$
  */
 public class BitstreamStorageManager
 {
+    /** log4j log */
+    private static Logger log = Logger.getLogger(BitstreamStorageManager.class);
+
+    /** The asset stores locations*/
+    private static File[] assetStores;
+    
+    /** The asset store to use for new bitstreams */
+    private static int incoming;
+    
     // These settings control the way an identifier is hashed into
     // directory and file names
     //
@@ -74,23 +93,33 @@ public class BitstreamStorageManager
     private static final int digitsPerLevel = 2;
     private static final int directoryLevels = 3;
 
-    /** Root directory (as String) */
-    private static String root = ConfigurationManager.getProperty("assetstore.dir");
+    /* Read in the asset stores from the config. */
+    static
+    {
+        ArrayList stores = new ArrayList();
 
-    /** Root directory (as File) */
-    private static File rootDirectory;
+        // 'assetstore.dir' is always store number 0.
+        stores.add(ConfigurationManager.getProperty("assetstore.dir"));
 
-    /** Initialization flag */
-    private static boolean initialized = false;
+        // Read in assetstore.dir.1, assetstore.dir.2....
+        for (int i = 1;
+             ConfigurationManager.getProperty("assetstore.dir." + i) != null;
+             i++)
+        {
+            stores.add(ConfigurationManager.getProperty("assetstore.dir." + i));
+        }
+        
+        // Now make that list an array of Files.
+        assetStores = new File[stores.size()];
+        for (int i = 0; i < stores.size(); i++)
+        {
+            assetStores[i] = new File((String) stores.get(i));
+        }
+        
+        // Read asset store to put new files in.  Default is 0.
+        incoming = ConfigurationManager.getIntProperty("assetstore.incoming");
+    }
 
-    /** Algorithm for the MessageDigest */
-    private static final String DIGEST_ALGORITHM = "MD5";
-
-    /** log4j log */
-    private static Logger log = Logger.getLogger(BitstreamStorageManager.class);
-
-    /** Protected Constructor */
-    protected BitstreamStorageManager () {}
 
     /**
      * Store a stream of bits.
@@ -124,52 +153,78 @@ public class BitstreamStorageManager
     public static int store(Context context, InputStream is)
         throws SQLException, IOException
     {
-        initialize();
-
+        // Create internal ID
         String id = Utils.generateKey();
 
-        TableRow bitstream = createDeletedBitstream(id);
-
-        File file = forId(id, true);
-        String fullname = file.getAbsolutePath();
-        FileOutputStream fos = new FileOutputStream(file);
-
-        NumberBytesInputStream nbis = new NumberBytesInputStream(is);
-        DigestInputStream dis = null;
+        // Create a deleted bitstream row, using a separate DB connection
+        TableRow bitstream;
+        Context tempContext = null;
 
         try
         {
-            dis = new DigestInputStream(nbis, MessageDigest.getInstance(DIGEST_ALGORITHM));
+            tempContext = new Context();
+
+            bitstream = DatabaseManager.create(tempContext, "Bitstream");
+            bitstream.setColumn("deleted", true);
+            bitstream.setColumn("internal_id", id);
+            // Set the store number of the new bitstream
+            bitstream.setColumn("store_number", incoming);
+            DatabaseManager.update(tempContext, bitstream);
+
+            tempContext.complete();
+        }
+        catch (SQLException sqle)
+        {
+            if (tempContext != null)
+                tempContext.abort();
+
+            throw sqle;
+        }
+
+        // Where on the file system will this new bitstream go?
+        File file = getFile(bitstream);
+
+        // Make the parent dirs if necessary
+        File parent = file.getParentFile();
+        if (!parent.exists()) parent.mkdirs();
+
+        //Create the corresponding file and open it
+        file.createNewFile();
+        FileOutputStream fos = new FileOutputStream(file);
+
+        // Read through a digest input stream that will work out the MD5
+        DigestInputStream dis = null;
+        try
+        {
+            dis = new DigestInputStream(is, MessageDigest.getInstance("MD5"));
         }
         // Should never happen
         catch (NoSuchAlgorithmException nsae)
         {
-            if (log.isDebugEnabled())
-                log.debug("Caught NoSuchAlgorithmException", nsae);
+            log.warn("Caught NoSuchAlgorithmException", nsae);
         }
 
         Utils.bufferedCopy(dis, fos);
         fos.close();
         is.close();
 
-        bitstream.setColumn("size",
-                            nbis.getNumberOfBytesRead());
+        bitstream.setColumn("size", (int) file.length());
         bitstream.setColumn("checksum",
                             Utils.toHex(dis.getMessageDigest().digest()));
-        bitstream.setColumn("checksum_algorithm",
-                            DIGEST_ALGORITHM);
-        bitstream.setColumn("deleted",
-                            false);
+        bitstream.setColumn("checksum_algorithm", "MD5");
+        bitstream.setColumn("deleted", false);
         DatabaseManager.update(context, bitstream);
 
         int bitstream_id = bitstream.getIntColumn("bitstream_id");
 
         if (log.isDebugEnabled())
-            log.debug("Stored bitstream " + bitstream_id + " in file " + fullname);
+            log.debug("Stored bitstream " + bitstream_id + " in file " +
+                      file.getAbsolutePath());
 
         return bitstream_id;
     }
 
+    
     /**
      * Retrieve the bits for the bitstream with ID. If the bitstream
      * does not exist, or is marked deleted, returns null.
@@ -184,13 +239,12 @@ public class BitstreamStorageManager
     public static InputStream retrieve(Context context, int id)
         throws SQLException, IOException
     {
-        initialize();
-
-        File file = forId(context, id, false);
-
+        TableRow bitstream = DatabaseManager.find(context, "bitstream", id);
+        File file = getFile(bitstream);
         return (file != null) ? new FileInputStream(file) : null;
     }
 
+    
     /**
      * <p>Remove a bitstream from the asset store. This method does
      * not delete any bits, but simply marks the bitstreams as deleted
@@ -208,8 +262,6 @@ public class BitstreamStorageManager
     public static void delete(Context context, int id)
         throws SQLException, IOException
     {
-        initialize();
-
         DatabaseManager.updateQuery
             (context,
              "update Bitstream set deleted = 't' where bitstream_id = " + id);
@@ -226,8 +278,6 @@ public class BitstreamStorageManager
     public static void cleanup()
         throws SQLException, IOException
     {
-        initialize();
-
         Context context = null;
 
         try
@@ -243,12 +293,12 @@ public class BitstreamStorageManager
             {
                 TableRow row = (TableRow) iterator.next();
                 int bid = row.getIntColumn("bitstream_id");
-                File file = forId(getInternalId(context, bid));
+                File file = getFile(row);
 
                 // Make sure entries which do not exist are removed
                 if (file == null)
                 {
-                    DatabaseManager.delete (context, "Bitstream", bid);
+                    DatabaseManager.delete(context, "Bitstream", bid);
                     continue;
                 }
 
@@ -257,7 +307,7 @@ public class BitstreamStorageManager
                  if (isRecent(file))
                      continue;
 
-                 DatabaseManager.delete (context, "Bitstream", bid);
+                 DatabaseManager.delete(context, "Bitstream", bid);
                  boolean success = file.delete();
 
                  if (log.isDebugEnabled())
@@ -289,37 +339,6 @@ public class BitstreamStorageManager
     // Internal methods
     ////////////////////////////////////////
 
-    /**
-     * Set the assetstore root (for testing).
-     *
-     * @param dir The new asset store directory root
-     * @return The previous assetstore root
-     * @exception IOException If there is a problem with the asset store
-     * directory
-     */
-    protected static String setRoot(String dir)
-        throws IOException
-    {
-        String previous = root;
-        root = dir;
-
-        initializeInternal();
-
-        return previous;
-    }
-
-    /**
-     * Set the assetstore root to its default value (for testing).
-     *
-     * @return The previous assetstore root
-     * @exception IOException If there is a problem with the asset store
-     * directory
-     */
-    protected static String setRoot()
-        throws IOException
-    {
-        return setRoot(ConfigurationManager.getProperty("assetstore.dir"));
-    }
 
     /**
      * Return true if this file is too recent to be deleted,
@@ -366,132 +385,34 @@ public class BitstreamStorageManager
         }
     }
 
-    /**
-     * Initialize the storage area. Calling this method multiple times
-     * only initializes once.
-     *
-     * @exception IOException If there is a problem with the asset store
-     * directory
-     */
-    private synchronized static void initialize()
-        throws IOException
-    {
-        if (initialized)
-            return;
-
-        initializeInternal();
-
-        initialized = true;
-    }
-
-    /**
-     * Initialize the storage area.
-     *
-     * @exception IOException If there is a problem with the asset store
-     * directory
-     */
-    private synchronized static void initializeInternal()
-        throws IOException
-    {
-        File dir = new File(root);
-
-        // Sanity checks
-        if (!dir.exists())
-            throw new IOException("Asset store directory \"" + root + "\" does not exist");
-        if (!dir.isDirectory())
-            throw new IOException("\"" + root + "\" is not a directory");
-        if (!dir.canRead())
-            throw new IOException("Cannot read from \"" + root + "\"");
-        if (!dir.canWrite())
-            throw new IOException("Cannot write to \"" + root + "\"");
-
-        rootDirectory = dir;
-    }
 
     /**
      * Return the file corresponding to ID, or null.
      *
-     * @param context The current context
-     * @param id The ID of the bitstream
-     * @param includeDeleted If true, deleted bitstreams will be considered.
-     * @return The file corresponding to ID, or null
-     * @exception IOException If a problem occurs while determining the file
-     * @exception SQLException If a problem occurs accessing the RDBMS
-     */
-    protected static File forId(Context context, int id, boolean includeDeleted)
-        throws IOException, SQLException
-    {
-        String sql = new StringBuffer()
-            .append("select * from Bitstream where Bitstream.bitstream_id = ")
-            .append(id)
-            .append(includeDeleted  ? "" : " and deleted = 'f'")
-            .toString();
-
-        TableRow row = DatabaseManager.querySingle (context, "Bitstream", sql);
-
-        return row == null ? null :
-            forId(row.getStringColumn("internal_id"), false);
-    }
-
-    /**
-     * Returns the file corresponding to ID, or null.
-     *
-     * @param id The internal storage ID
+     * @param bitstream  the table row for the bitstream
      * @return The file corresponding to ID, or null
      * @exception IOException If a problem occurs while determining the file
      */
-    protected static File forId(String id)
+    private static File getFile(TableRow bitstream)
         throws IOException
     {
-        return forId(id, false);
-    }
-
-    /**
-     * Returns the file corresponding to ID.
-     * If CREATE is true and the file does not exist, it is created.
-     * Otherwise, null is returned.
-     *
-     * @param id The internal storage ID
-     * @param create If true, and the file does not exist, it will be
-     * created.
-     * @return The file corresponding to ID, or null
-     * @exception IOException If a problem occurs while determining the file
-     */
-    private static File forId(String id, boolean create)
-        throws IOException
-    {
-        File file = new File(id2Filename(id));
-
-        if (file.exists())
-            return file;
-
-        if (!create)
-            return null;
-
-        File parent = file.getParentFile();
-
-        if (!parent.exists())
-            parent.mkdirs();
-
-        file.createNewFile();
-
-        return file;
-    }
-
-    /**
-     * Maps ID to full filename.
-     *
-     * @param id The internal storage ID
-     * @return The full filename
-     * @exception IOException If a problem occurs while determining the
-     * file name
-     */
-    private static String id2Filename(String id)
-        throws IOException
-    {
+        // Get the store to use
+        int storeNumber = bitstream.getIntColumn("store_number");
+        
+        // Default to zero ('assetstore.dir') for backwards compatibility
+        if (storeNumber == -1)
+        {
+            storeNumber = 0;
+        }
+        
+        File store = assetStores[storeNumber];
+        
+        // Turn the internal ID into a file path relative to the asset store
+        // directory
+        String id = bitstream.getStringColumn("internal_id");
         BigInteger bigint = new BigInteger(id);
 
-        StringBuffer result = new StringBuffer().append(rootDirectory.getCanonicalPath());
+        StringBuffer result = new StringBuffer().append(store.getCanonicalPath());
 
         // Split the id into groups
         for (int i = 0; i < directoryLevels; i++)
@@ -506,134 +427,6 @@ public class BitstreamStorageManager
         if (log.isDebugEnabled())
             log.debug("Filename for " + id + " is " + theName);
 
-        return theName;
-    }
-
-    ////////////////////////////////////////
-    // RDBMS methods
-    ////////////////////////////////////////
-
-    /**
-     * Create and return a bitstream with ID which is marked deleted.
-     */
-    private static TableRow createDeletedBitstream(String id)
-        throws SQLException, IOException
-    {
-        Context context = null;
-
-        try
-        {
-            context = new Context();
-
-            TableRow bitstream = DatabaseManager.create(context, "Bitstream");
-            bitstream.setColumn("deleted", true);
-            bitstream.setColumn("internal_id", id);
-            DatabaseManager.update(context, bitstream);
-
-            context.complete();
-
-            return bitstream;
-        }
-        catch (SQLException sqle)
-        {
-            if (context != null)
-                context.abort();
-
-            throw sqle;
-        }
-    }
-
-    /**
-     * Return the internal storage id for the bitstream with ID,
-     * or null.
-     */
-    private static String getInternalId(Context context, int id)
-        throws SQLException
-    {
-        TableRow row = DatabaseManager.querySingle
-            (context, "Bitstream",
-             "select * from Bitstream where bitstream_id = " + id);
-
-        return row == null ? null : row.getStringColumn("internal_id");
-    }
-}
-
-/**
- * Simple filter which counts the number of bytes read.
- */
-class NumberBytesInputStream extends FilterInputStream
-{
-    /** Number of bytes read */
-    private int count = 0;
-
-    /**
-     * Constructor
-     *
-     * @param is The stream to filter.
-     */
-    public NumberBytesInputStream (InputStream is)
-    {
-        super(is);
-    }
-
-    ////////////////////////////////////////
-    // FilterInputStream methods
-    ////////////////////////////////////////
-
-    public int read()
-        throws java.io.IOException
-    {
-        int result = in.read();
-
-        if (result != -1)
-            count++;
-        return result;
-    }
-
-    public int read(byte[] data)
-        throws java.io.IOException
-    {
-        int result = in.read(data);
-
-        if (result != -1)
-            count += result;
-        return result;
-    }
-
-    public int read(byte[] data, int start, int length)
-        throws java.io.IOException
-    {
-        int result = in.read(data, start, length);
-
-        if (result != -1)
-            count += result;
-        return result;
-    }
-
-    public long skip(long length)
-        throws java.io.IOException
-    {
-        long result = in.skip(length);
-
-        count += (int) result;
-        return result;
-    }
-
-    public boolean markSupported()
-    {
-        return false;
-    }
-
-    ////////////////////////////////////////
-    // non-interface methods
-    ////////////////////////////////////////
-    /**
-     * Return the number of bytes read from the stream.
-     *
-     * @return The number of bytes read from the stream.
-     */
-    public int getNumberOfBytesRead()
-    {
-        return count;
+        return new File(theName);
     }
 }
