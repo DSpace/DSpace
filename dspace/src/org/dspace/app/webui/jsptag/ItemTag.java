@@ -305,6 +305,10 @@ public class ItemTag extends TagSupport
         out.println("</table></center><br>");
 
         listBitstreams();
+        
+        out.println("<br><br>");
+        
+        showLicence();
     }
 
     /**
@@ -371,6 +375,10 @@ public class ItemTag extends TagSupport
         out.println("</table></center><br>");
 
         listBitstreams();
+        
+        out.println("<br><br>");
+        
+        showLicence();
     }
 
     /**
@@ -597,5 +605,53 @@ public class ItemTag extends TagSupport
     {
         showThumbs = ConfigurationManager
                 .getBooleanProperty("webui.item.thumbnail.show");
+    }
+    
+    /**
+     * Link to the item licence
+     */
+    private void showLicence()
+        throws IOException
+    {
+        JspWriter out = pageContext.getOut();
+        HttpServletRequest request =
+            (HttpServletRequest) pageContext.getRequest();
+        
+        Bundle[] bundles = item.getBundles();
+        if (bundles.length == 0)
+        {
+            return;
+        }
+        
+        out.println("<table align=center class=\"attentionTable\"><tr>");
+        out.println("<td class=\"attentionCell\"><P><strong>This item is protected by original copyright:&nbsp;&nbsp;&nbsp;</strong></P>");
+        
+        out.println("<div align=center>");
+        out.println("<table cellpadding=6>");
+        for (int i = 0; i < bundles.length; i++)
+        {
+                Bitstream[] bitstreams = bundles[i].getBitstreams();
+
+                for (int k = 0; k < bitstreams.length ; k++)
+                {
+                    // only consider internal types called license.txt
+                    if (bitstreams[k].getFormat().isInternal() && 
+                        bitstreams[k].getName().equals("license.txt"))
+                    {
+                        out.print("<tr><th align=center class=\"standard\">");
+                        out.print("<a target=_blank href=\"");
+                        out.print(request.getContextPath());
+                        out.print("/retrieve/");
+                        out.print(bitstreams[k].getID() + "/");
+                        out.print(URLEncoder.encode(bitstreams[k].getName(), 
+                                                Constants.DEFAULT_ENCODING));
+                        out.print("\">View Licence</A></td></tr>");
+                    }
+                }
+                
+        }
+        out.println("</table>");
+        out.println("</div>");
+        out.println("</tr></table>");
     }
 }
