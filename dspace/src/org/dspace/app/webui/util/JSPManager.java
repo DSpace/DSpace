@@ -41,14 +41,15 @@
 package org.dspace.app.webui.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 
 /**
  * Methods for displaying UI pages to the user.
@@ -64,6 +65,9 @@ public class JSPManager
      * use this manager.
      */
 
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(JSPManager.class);
+
     /**
      * Forwards control of the request to the display JSP passed in.
      *
@@ -77,6 +81,14 @@ public class JSPManager
         String jsp )
         throws ServletException, IOException
     {
+        if (log.isDebugEnabled())
+        {
+            log.debug(LogManager.getHeader(
+                (Context) request.getAttribute("dspace.context"),
+                "view_jsp",
+                jsp));
+        }
+
         // For the moment, a simple forward
         request.getRequestDispatcher(jsp).forward(request, response);
     }
