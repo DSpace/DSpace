@@ -650,14 +650,11 @@ public class MyDSpaceServlet extends DSpaceServlet
             subList.add(subs.next());
         }
         
-        // Get corresponding Handles
         Item[] items = new Item[subList.size()];
-        String[] handles = new String[subList.size()];
         
         for (int i = 0; i < subList.size(); i++)
         {
             items[i] = (Item) subList.get(i);
-            handles[i] = HandleManager.findHandle(context, items[i]);
         }
 
         log.info(LogManager.getHeader(context,
@@ -666,7 +663,6 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         request.setAttribute("user", context.getCurrentUser());
         request.setAttribute("items", items);
-        request.setAttribute("handles", handles);
 
         JSPManager.showJSP(request,
             response,

@@ -55,7 +55,6 @@
 <%
     EPerson eperson = (EPerson) request.getAttribute("user");
     Item[] items = (Item[]) request.getAttribute("items");
-    String[] handles = (String[]) request.getAttribute("handles");
 %>
 
 <dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Your Submissions">
@@ -88,7 +87,7 @@
 <%
         }
 %>
-    <dspace:itemlist items="<%= items %>" handles="<%= handles %>" />
+    <dspace:itemlist items="<%= items %>" />
 <%
     }
 %>
