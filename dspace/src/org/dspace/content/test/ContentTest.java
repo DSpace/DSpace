@@ -82,7 +82,7 @@ public class ContentTest extends TestCase
         try
         {
 
-            Context context = new Context();
+            Context context = createContext();
             assertNull("Test community has been deleted",
                        DatabaseManager.findByUnique(context, "Community",
                                                     "name", TEST_NAME_1));
@@ -108,7 +108,7 @@ public class ContentTest extends TestCase
         try
         {
             // Create context
-            context = new Context();
+            context = createContext();
 
             // Create a community
             Community c1 = createCommunity(context);
@@ -117,7 +117,7 @@ public class ContentTest extends TestCase
             // FIXME: Start a new transaction - this is a workaround for
             // a PostgreSQL 7.1 bug.
             context.complete();
-            context = new Context();
+            context = createContext();
 
             // Check we can get it
             Community c2 = Community.find (context, c1.getID());
@@ -164,7 +164,7 @@ public class ContentTest extends TestCase
 
         try
         {
-            context = new Context();
+            context = createContext();
             Community c1 = createCommunity(context);
             Collection collection = c1.createCollection();
 
@@ -194,7 +194,7 @@ public class ContentTest extends TestCase
             // FIXME: Start a new transaction - this is a workaround for
             // a PostgreSQL 7.1 bug.
             context.complete();
-            context = new Context();
+            context = createContext();
 
             c1 = Community.find(context, community1ID);
             c2 = Community.find(context, community2ID);
@@ -235,7 +235,7 @@ public class ContentTest extends TestCase
 
         try
         {
-            context = new Context();
+            context = createContext();
             Community community = createCommunity(context);
             Collection c1 = community.createCollection();
             c1.setMetadata("name", TEST_NAME_1);
@@ -247,7 +247,7 @@ public class ContentTest extends TestCase
             // FIXME: Start a new transaction - this is a workaround for
             // a PostgreSQL 7.1 bug.
             context.complete();
-            context = new Context();
+            context = createContext();
 
             Collection c2 = Collection.find (context, collID);
 
@@ -262,7 +262,7 @@ public class ContentTest extends TestCase
 
             // Clean up community - delete tested elsewhere, so should work
             Community.find(context, commID).delete();
-            
+
             context.complete();
         }
         // Clean up context or the test hangs
@@ -308,7 +308,7 @@ public class ContentTest extends TestCase
 
         try
         {
-            context = new Context();
+            context = createContext();
 
             Community community = Community.create(context);
             Collection collection = community.createCollection();
@@ -332,7 +332,7 @@ public class ContentTest extends TestCase
             // FIXME: Start a new transaction - this is a workaround for
             // a PostgreSQL 7.1 bug.
             context.complete();
-            context = new Context();
+            context = createContext();
 
             item = Item.find(context, id);
 
@@ -343,7 +343,7 @@ public class ContentTest extends TestCase
                          titles.length,
                          TITLES.size() + 1);
 
-            List expectedTitles = new ArrayList();            
+            List expectedTitles = new ArrayList();
             expectedTitles.add(TITLES.get(0));
             expectedTitles.add(TITLES.get(1));
             expectedTitles.add(TITLES.get(2));
@@ -447,17 +447,17 @@ public class ContentTest extends TestCase
         {
             return false;
         }
-        
+
         for (int i = 0; i < array.length; i++)
         {
             String s = (String) list.get(i);
-            
+
             if (!s.equals(array[i].value))
             {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -477,6 +477,14 @@ public class ContentTest extends TestCase
         community.setMetadata("name", TEST_NAME_1);
         community.update();
         return community;
+    }
+
+    private Context createContext()
+        throws SQLException
+    {
+        Context context = new Context();
+        context.setIgnoreAuthorization(true);
+        return context;
     }
 
     ////////////////////////////////////////
