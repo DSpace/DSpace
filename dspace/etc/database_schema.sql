@@ -226,9 +226,9 @@ CREATE TABLE Collection
   license           TEXT,
   copyright_text    TEXT,
   side_bar_text     TEXT,
-  reviewers         INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  approvers         INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  editors           INTEGER REFERENCES EPersonGroup( eperson_group_id )
+  workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
 -------------------------------------------------------
@@ -394,7 +394,7 @@ CREATE TABLE HistoryState
 -------------------------------------------------------
 --  Item2Handle view
 -------------------------------------------------------
--- Note: DSpaceTypes.ITEM = 2
+-- Note: org.dspace.core.Constants.ITEM = 2
 DROP VIEW Item2Handle;
 
 CREATE VIEW Item2Handle as
@@ -417,17 +417,6 @@ WHERE Collection2Item.collection_id   = Community2Collection.collection_id
 ------------------------------------------------------------
 -- Browse subsystem views
 ------------------------------------------------------------
-
--------------------------------------------------------
---  DCResult view
--------------------------------------------------------
-DROP VIEW DCResult;
-
-CREATE VIEW DCResult as
-SELECT DCValue.*, Item.in_archive, Item.submitter_id
-FROM DCValue, Item
-WHERE Item.item_id = DCValue.item_id
-;
 
 -------------------------------------------------------
 --  ItemsByAuthor table
