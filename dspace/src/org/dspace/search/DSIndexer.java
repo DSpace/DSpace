@@ -297,7 +297,7 @@ private static synchronized void indexItems(Context c, Item target_item)
         String location_text = buildItemLocationString(c, myitem);
 
         // extract metadata (ANY is wildcard from Item class)
-        DCValue [] authors = myitem.getDC( "contributor","author",  Item.ANY );
+        DCValue [] authors = myitem.getDC( "contributor", Item.ANY,  Item.ANY );
         DCValue [] titles  = myitem.getDC( "title",     Item.ANY,   Item.ANY );
         DCValue [] keywords= myitem.getDC( "subject",   Item.ANY,   Item.ANY );
         DCValue [] abstracts= myitem.getDC( "description", "abstract",   Item.ANY );
