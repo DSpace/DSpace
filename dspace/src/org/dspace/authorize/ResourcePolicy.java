@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
