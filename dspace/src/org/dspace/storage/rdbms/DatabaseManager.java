@@ -910,7 +910,7 @@ public class DatabaseManager
     {
         String table = canonicalize(row.getTable());
         String pk = getPrimaryKeyColumn(table);
-        row.setColumn(pk, getId(table));
+        row.setColumn(pk, getID(table));
     }
 
     /**
@@ -920,7 +920,7 @@ public class DatabaseManager
      * @return The next id
      * @exception SQLException If a database error occurs
      */
-    public static synchronized int getId (String table)
+    public static synchronized int getID (String table)
         throws SQLException
     {
         // Assigned ids are simply one plus the maximum value

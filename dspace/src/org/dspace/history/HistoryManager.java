@@ -177,7 +177,7 @@ public class HistoryManager
 
         // An id for the new state
         Integer stateId = (flag == REMOVE) ? null :
-            new Integer(DatabaseManager.getId("HistoryState"));
+            new Integer(DatabaseManager.getID("HistoryState"));
 
         // This is the object that we're making statements about....
         Resource obj = model.createResource(id);
