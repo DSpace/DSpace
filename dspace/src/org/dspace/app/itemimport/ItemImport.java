@@ -867,7 +867,7 @@ public class ItemImport
         BufferedReader is = null;
         try
         {
-            new BufferedReader(new FileReader(contentspath));
+            is = new BufferedReader(new FileReader(contentspath));
 
             while ((line = is.readLine()) != null)
             {
