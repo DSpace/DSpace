@@ -392,55 +392,167 @@ public class DSIndexer
 
       // read in search.index.1, search.index.2....
       for (int i = 1;
-	   ConfigurationManager.getProperty("search.index." + i) != null;
-	   i++)
-	  {
-	      indexes.add(ConfigurationManager.getProperty("search.index." + i));
-	  }
+           ConfigurationManager.getProperty("search.index." + i) != null;
+           i++)
+      {
+	  indexes.add(ConfigurationManager.getProperty("search.index." + i));
+      }
 
-      ArrayList fields = new ArrayList();
-      ArrayList content = new ArrayList();
-      DCValue [] mydc;
       int j, k = 0;
 
-      for (int i = 0; i < indexes.size(); i++)
+      // initialize hash to be built
+      HashMap textvalues = new HashMap();
+
+      if (indexes.size() > 0)
       {
-	  String index = (String) indexes.get(i);
-
-	  String dc[] = index.split(":");
-	  String myindex = dc[0];
+	  ArrayList fields = new ArrayList();
+	  ArrayList content = new ArrayList();
+	  DCValue [] mydc;
 	  
-	  String elements[] = dc[1].split("\\.");
-	  String element = elements[0];
-	  String qualifier = elements[1];
+	  for (int i = 0; i < indexes.size(); i++)
+	  {
+	      String index = (String) indexes.get(i);
+	      
+	      String dc[] = index.split(":");
+	      String myindex = dc[0];
+	      
+	      String elements[] = dc[1].split("\\.");
+	      String element = elements[0];
+	      String qualifier = elements[1];
+	      
+	      // extract metadata (ANY is wildcard from Item class)
+	      if (qualifier.equals("*")) {
+		  mydc = myitem.getDC( element, Item.ANY, Item.ANY );
+	      } else {
+		  mydc = myitem.getDC( element, qualifier, Item.ANY );
+	      }
 
-	  // extract metadata (ANY is wildcard from Item class)
-	  if (qualifier.equals("*")) {
-	      mydc = myitem.getDC( element, Item.ANY, Item.ANY );
-	  } else {
-	      mydc = myitem.getDC( element, qualifier, Item.ANY );
+	      // put them all from an array of strings to one string for writing out
+	      // pack all of the arrays of DCValues into plain text strings for the indexer
+	      String content_text = "";
+	      for (j = 0; j < mydc.length; j++)
+	      {
+		  content_text = new String(content_text + mydc[j].value + " ");
+	      }
+	      
+	      // arranges content with fields in ArrayLists with same index to put into hash later
+	      k = fields.indexOf(myindex);
+	      if (k < 0)
+              {
+		  fields.add(myindex);
+		  content.add(content_text);
+	      } else {
+		  content_text = new String(content_text + (String)content.get(k) + " ");
+		  content.set(k, content_text);
+	      }
 	  }
 
-	  // put them all from an array of strings to one string for writing out
-	  // pack all of the arrays of DCValues into plain text strings for the indexer
-	  String content_text = "";
-	  for (j = 0; j < mydc.length; j++)
+	  // build the hash
+          for (int i = 0; i < fields.size(); i++)
 	  {
-	      content_text = new String(content_text + mydc[j].value + " ");
-	  }
-
-	  // arranges content with fields in ArrayLists with same index to put into hash later
-	  k = fields.indexOf(myindex);
-	  if (k < 0)
-	  {
-	      fields.add(myindex);
-	      content.add(content_text);
-	  } else {
-	      content_text = new String(content_text + (String)content.get(k) + " ");
-	      content.set(k, content_text);
+	      textvalues.put((String) fields.get(i), (String) content.get(i));
 	  }
       }
-      
+      else    // if no search indexes found in cfg file, for backward compatibility
+      {
+
+	  // extract metadata (ANY is wildcard from Item class)
+	  DCValue[] authors = myitem.getDC("contributor", Item.ANY, Item.ANY);
+	  DCValue[] creators = myitem.getDC("creator", Item.ANY, Item.ANY);
+	  DCValue[] titles = myitem.getDC("title", Item.ANY, Item.ANY);
+	  DCValue[] keywords = myitem.getDC("subject", Item.ANY, Item.ANY);
+	  
+	  DCValue[] abstracts = myitem.getDC("description", "abstract", Item.ANY);
+	  DCValue[] sors = myitem.getDC("description", "statementofresponsibility",
+					Item.ANY);
+	  DCValue[] series = myitem.getDC("relation", "ispartofseries", Item.ANY);
+	  DCValue[] tocs = myitem.getDC("description", "tableofcontents", Item.ANY);
+	  DCValue[] mimetypes = myitem.getDC("format", "mimetype", Item.ANY);
+	  DCValue[] sponsors = myitem.getDC("description", "sponsorship", Item.ANY);
+	  DCValue[] identifiers = myitem.getDC("identifier", Item.ANY, Item.ANY);
+	  
+	  // put them all from an array of strings to one string for writing out
+	  String author_text = "";
+	  String title_text = "";
+	  String keyword_text = "";
+	  
+	  String abstract_text = "";
+	  String sor_text = "";
+	  String series_text = "";
+	  String mime_text = "";
+	  String sponsor_text = "";
+	  String id_text = "";
+	  
+	  // pack all of the arrays of DCValues into plain text strings for the
+	  // indexer
+	  for (j = 0; j < authors.length; j++)
+	  {
+	      author_text = new String(author_text + authors[j].value + " ");
+	  }
+
+	  for (j = 0; j < creators.length; j++) //also authors
+	  {
+	      author_text = new String(author_text + creators[j].value + " ");
+	  }
+	  
+	  for (j = 0; j < sors.length; j++) //also authors
+          {
+	      author_text = new String(author_text + sors[j].value + " ");
+	  }
+	  
+	  for (j = 0; j < titles.length; j++)
+          {
+	      title_text = new String(title_text + titles[j].value + " ");
+	  }
+
+	  for (j = 0; j < keywords.length; j++)
+          {
+	      keyword_text = new String(keyword_text + keywords[j].value + " ");
+	  }
+
+	  for (j = 0; j < abstracts.length; j++)
+	  {
+	      abstract_text = new String(abstract_text + abstracts[j].value + " ");
+	  }
+
+	  for (j = 0; j < tocs.length; j++)
+	  {
+	      abstract_text = new String(abstract_text + tocs[j].value + " ");
+	  }
+	  
+	  for (j = 0; j < series.length; j++)
+          {
+	      series_text = new String(series_text + series[j].value + " ");
+	  }
+	  
+	  for (j = 0; j < mimetypes.length; j++)
+          {
+	      mime_text = new String(mime_text + mimetypes[j].value + " ");
+	  }
+
+	  for (j = 0; j < sponsors.length; j++)
+          {
+	      sponsor_text = new String(sponsor_text + sponsors[j].value + " ");
+	  }
+
+	  for (j = 0; j < identifiers.length; j++)
+          {
+	      id_text = new String(id_text + identifiers[j].value + " ");
+	  }
+
+	  // build the hash
+          textvalues.put("author", author_text);
+          textvalues.put("title", title_text);
+          textvalues.put("keyword", keyword_text);
+          textvalues.put("location", location_text);
+          textvalues.put("abstract", abstract_text);
+
+          textvalues.put("series", series_text);
+          textvalues.put("mimetype", mime_text);
+          textvalues.put("sponsor", sponsor_text);
+          textvalues.put("identifier", id_text);
+      }
+
       // now get full text of any bitstreams in the TEXT bundle
       String extractedText = "";
 
@@ -490,14 +602,7 @@ public class DSIndexer
 
       // lastly, get the handle
       String itemhandle = HandleManager.findHandle(c, myitem);
-
-      // build a hash
-      HashMap textvalues = new HashMap();
-
-      for (int i = 0; i < fields.size(); i++)
-      {
-	  textvalues.put((String) fields.get(i), (String) content.get(i));
-      }
+      textvalues.put("handletext", itemhandle);
 
       // write out the metatdata (for scalability, using hash instead of
       // individual strings)
