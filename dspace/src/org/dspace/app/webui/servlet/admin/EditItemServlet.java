@@ -566,8 +566,8 @@ public class EditItemServlet extends DSpaceServlet
         // now check to see if person can edit item
         checkEditAuthorization(context, item);
 
-        // do we already have a bundle?    
-        Bundle [] bundles = item.getBundles();
+        // do we already have an ORIGINAL bundle?    
+        Bundle [] bundles = item.getBundles("ORIGINAL");
                   
         if( bundles.length < 1)
         {
