@@ -1,10 +1,31 @@
+1.3 branch (unreleased)
+=======================
+
+(David Little)
+- SF patch #1165647, 1165649-52 - USCD mods to support SRB and Registration
+
+(Scott Yeadon)
+- Updated handle.jar and associated license to 5.4.3
+
+(Richard Jones)
+- Addition of supervision order setting tools for administration area, to allow
+user accounts to observe or collaborate on unfinished submission
+
+(Robert Tansley)
+- OAI-PMH set names now XML-encoded (e.g. &, <, >) (Collection names with such
+characters previously caused bad XML in OAI-PMH ListSets responses)
+
+
+1.2.2 beta 2
+============
+
 (Robert Tansley)
 - Fixed bug whereby 'Submit to this Collection' button only appears if admin.
 
 (Larry Stone)
 - SF patch #1143570 Fix various bugs handling slash ("/") in bitstream names
 
-(Scott Phillips)
+(Scott Phillips & David Little)
 - Patch for SF bug #1145527 Able to delete 'unknown' bitstream format
 
 (Mike Simpson)
