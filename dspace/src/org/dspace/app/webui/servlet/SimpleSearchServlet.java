@@ -53,6 +53,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.TokenMgrError;
 
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -213,7 +214,7 @@ public class SimpleSearchServlet extends DSpaceServlet
              * this shouldn't really happen.
              */
             log.warn(LogManager.getHeader(context,
-                "search_parse_exception",
+                "search_exception",
                 logInfo + "query=\"" + query + "\""),
                 pe);
 
@@ -221,6 +222,18 @@ public class SimpleSearchServlet extends DSpaceServlet
             items = new Item[0];
             handles = new String[0];
         }
+	catch (TokenMgrError tme)
+	{
+            // Similar to parse exception
+            log.warn(LogManager.getHeader(context,
+                "search_exception",
+                logInfo + "query=\"" + query + "\""),
+                tme);
+
+            // Empty results
+            items = new Item[0];
+            handles = new String[0];
+	}
 
         // Pass the results to the display JSP
         request.setAttribute("items", items);
