@@ -8,6 +8,12 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import org.apache.commons.cli.Options; 
+import org.apache.commons.cli.CommandLineParser; 
+import org.apache.commons.cli.CommandLine; 
+import org.apache.commons.cli.HelpFormatter; 
+import org.apache.commons.cli.PosixParser; 
+
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Bitstream;
@@ -23,7 +29,9 @@ public class MediaFilterManager
 {
     private static Map filterNames = new HashMap();
     private static Map filterCache = new HashMap();
-    private static boolean isForce = false;
+
+    public static boolean isVerbose = false; // default to not verbose
+    public static boolean isForce   = false; // default to not forced
 
     public static void main(String [] argv)
         throws Exception
@@ -31,19 +39,27 @@ public class MediaFilterManager
         // set headless for non-gui workstations
         System.setProperty("java.awt.headless", "true");
 
-        // only valid argument is FORCE
-        if(argv.length > 0)
+        // create an options object and populate it
+        CommandLineParser parser = new PosixParser(); 
+
+        Options options = new Options();
+
+        options.addOption( "v", "verbose", false, "print all extracted text and other details to STDOUT");
+        options.addOption( "f", "force",   false, "force all bitstreams to be processed");
+        options.addOption( "h", "help",    false, "help");
+
+        CommandLine line = parser.parse( options, argv );
+
+        if( line.hasOption('h') )
         {
-            if(argv[0].equals("FORCE"))
-            {
-                isForce = true;
-            }
-            else
-            {
-                System.out.println("args: FORCE\nforces filtering of bitstreams");
-                return;
-            }
+            HelpFormatter myhelp = new HelpFormatter();
+            myhelp.printHelp( "MediaFilter\n", options );
+
+            System.exit(0);
         }
+        
+        if( line.hasOption( 'v' ) ) { isVerbose = true; } 
+        if( line.hasOption( 'f' ) ) { isForce   = true; }
         
         // get path to config file
         String myPath = ConfigurationManager.getProperty("dspace.dir") + File.separator +
@@ -59,15 +75,15 @@ public class MediaFilterManager
 
         // read in the mediafilter.cfg file, store in HashMap
         BufferedReader is = new BufferedReader( new FileReader( myPath ) );
-        String line = null;
+        String myLine = null;
         
-        while( ( line = is.readLine() ) != null )
+        while( ( myLine = is.readLine() ) != null )
         {
             // skip any lines beginning with #
-            if(line.indexOf("#") == 0) continue;
+            if(myLine.indexOf("#") == 0) continue;
 
             // no comment, so try and parse line
-            StringTokenizer st = new StringTokenizer(line);
+            StringTokenizer st = new StringTokenizer(myLine);
             
             // has to have at least 2 tokens
             if(st.countTokens() >= 2)
@@ -179,7 +195,7 @@ public class MediaFilterManager
                        
             try
             {
-                myFilter.processBitstream(c, myItem, myBitstream, isForce);
+                myFilter.processBitstream(c, myItem, myBitstream);
                 myItem.update(); // Make sure new bitstream has a sequence number
             }
             catch(Exception e)

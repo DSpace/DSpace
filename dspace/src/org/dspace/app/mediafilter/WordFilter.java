@@ -119,6 +119,13 @@ public class WordFilter extends MediaFilter
         WordExtractor e = new WordExtractor();
         String extractedText = e.extractText(source);
 
+        // if verbose flag is set, print out extracted text
+        // to STDOUT
+        if( MediaFilterManager.isVerbose )
+       	{
+        	System.out.println(extractedText);
+       	}
+        
         // generate an input stream with the extracted text
         byte[] textBytes = extractedText.getBytes();
         ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);

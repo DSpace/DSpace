@@ -98,13 +98,14 @@ public abstract class MediaFilter
      * @param c context
      * @param item item containing bitstream to process
      * @param source source bitstream to process
-     * @param boolean owerWrite false means do nothing if a matching filter rendition alreads exists
      *
      * @return true if new rendition is created, false if rendition already exists and overWrite is not set
      */
-    public boolean processBitstream(Context c, Item item, Bitstream source, boolean overWrite)
+    public boolean processBitstream(Context c, Item item, Bitstream source)
         throws Exception
     {
+    	boolean overWrite = MediaFilterManager.isForce;
+    	
         // get bitstream filename, calculate destination filename
         String newName = getFilteredName(source.getName());
 

@@ -134,24 +134,38 @@ public class JPEGFilter extends MediaFilter
         // now get the image dimensions
         float xsize = (float)buf.getWidth (null);
         float ysize = (float)buf.getHeight(null);
-        
-        System.out.println("original size: " + xsize + "," + ysize);
 
+        // if verbose flag is set, print out dimensions
+        // to STDOUT
+        if( MediaFilterManager.isVerbose )
+       	{
+        	System.out.println("original size: " + xsize + "," + ysize);
+       	}
+        	
         // scale by x first if needed
         if( xsize > xmax )
         {
             // calculate scaling factor so that xsize * scale = new size (max)
             float scale_factor = xmax/xsize;
-            
-            System.out.println("x scale factor: " + scale_factor);
+         
+            // if verbose flag is set, print out extracted text
+            // to STDOUT
+            if( MediaFilterManager.isVerbose )
+           	{   
+            	System.out.println("x scale factor: " + scale_factor);
+           	}
             
             // now reduce x size
             // and y size
             xsize = xsize * scale_factor;
             ysize = ysize * scale_factor;
 
-            System.out.println("new size: " + xsize + "," + ysize);
-
+            // if verbose flag is set, print out extracted text
+            // to STDOUT
+            if( MediaFilterManager.isVerbose )
+           	{
+            	System.out.println("new size: " + xsize + "," + ysize);
+           	}
         }
         
         // scale by y if needed
@@ -164,8 +178,12 @@ public class JPEGFilter extends MediaFilter
             xsize = xsize * scale_factor;
             ysize = ysize * scale_factor;
         }
-        
-        System.out.println("thumbnail size: " + xsize + ", " + ysize);
+
+        // if verbose flag is set, print details to STDOUT
+        if( MediaFilterManager.isVerbose )
+       	{
+        	System.out.println("thumbnail size: " + xsize + ", " + ysize);
+       	}
         
         thumb = buf.getScaledInstance( (int)xsize,(int)ysize,Image.SCALE_SMOOTH );
         

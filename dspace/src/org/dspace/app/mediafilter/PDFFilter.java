@@ -132,8 +132,13 @@ public class PDFFilter extends MediaFilter
         // now close the pdf
         cos.close();
 
-        System.out.println(extractedText);
-
+        // if verbose flag is set, print out extracted text
+        // to STDOUT
+        if( MediaFilterManager.isVerbose )
+       	{
+        	System.out.println(extractedText);
+       	}
+        
         // generate an input stream with the extracted text
         byte[] textBytes = extractedText.getBytes();
         ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);
