@@ -149,7 +149,7 @@
                         </tr>
                         <tr>
                             <td align=center>
-                                for&nbsp;<input type="text" name="query" value="<%= (query==null ? "" : query) %>">&nbsp;<input type="submit" value="Go">
+                                for&nbsp;<input type="text" name="query" value='<%= (query==null ? "" : query) %>'>&nbsp;<input type="submit" value="Go">
                             </td>
                         </tr>
                     </table>
