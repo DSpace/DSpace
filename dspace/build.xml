@@ -130,6 +130,7 @@ Common usage:
     <mkdir dir="${log.dir}" />
     <mkdir dir="${dspace.dir}/bin"/>
     <mkdir dir="${dspace.dir}/lib"/>
+    <mkdir dir="${dspace.dir}/jsp/local"/>
     <mkdir dir="${dspace.dir}/jsp/WEB-INF"/>
     <mkdir dir="${dspace.dir}/oai/WEB-INF"/>
     <!-- Delete symlinks, otherwise ln -s commands below would create
