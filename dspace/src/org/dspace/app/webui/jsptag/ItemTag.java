@@ -330,26 +330,39 @@ public class ItemTag extends TagSupport
         
         for (int i = 0; i < values.length; i++)
         {
-            out.print("<tr><td class=\"metadataFieldLabel\">");
-            out.print(values[i].element);
-            if (values[i].qualifier != null)
+            boolean hidden = false;
+            
+            // Mask description.provenance
+            if (values[i].element.equals("description") &&
+                    (values[i].qualifier != null &&
+                     values[i].qualifier.equals("provenance")))
             {
-                out.print("." + values[i].qualifier);
+                hidden = true;
             }
-            out.print("</td><td class=\"metadataFieldValue\">");
-            out.print(values[i].value);
-            out.print("</td><td class=\"metadataFieldValue\">");
 
-            if (values[i].language == null)
+            if (!hidden)
             {
-                out.print("-");
+                out.print("<tr><td class=\"metadataFieldLabel\">");
+                out.print(values[i].element);
+                if (values[i].qualifier != null)
+                {
+                    out.print("." + values[i].qualifier);
+                }
+                out.print("</td><td class=\"metadataFieldValue\">");
+                out.print(values[i].value);
+                out.print("</td><td class=\"metadataFieldValue\">");
+
+                if (values[i].language == null)
+                {
+                    out.print("-");
+                }
+                else
+                {
+                    out.print(values[i].language);
+                }
+
+                out.println("</td></tr>");
             }
-            else
-            {
-                out.print(values[i].language);
-            }
-        
-            out.println("</td></tr>");
         }
         
         listCollections();
