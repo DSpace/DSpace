@@ -372,13 +372,19 @@ public class Item extends DSpaceObject
 
     
     /**
-     * Get the date the item was last modified.
+     * Get the date the item was last modified, or the current date
+     *  if last_modified is null
      *
-     * @return the date the item was last modified.
+     * @return the date the item was last modified, or the current date
+     *   if the column is null.
      */
     public Date getLastModified()
     {
-        return itemRow.getDateColumn("last_modified");
+        Date myDate = itemRow.getDateColumn("last_modified");
+ 
+        if( myDate == null ) { myDate = new Date(); } 
+
+        return myDate;
     }
 
     
