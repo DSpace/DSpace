@@ -76,7 +76,7 @@
                parenttitle="Administer">
 
 
-    <h1><%= errorMessage %></h1>
+    <h1><%= (errorMessage==null ? "" : errorMessage) %></h1>
 
     <h1>Edit EPerson <%= eperson.getEmail() %>:</h1>
 
