@@ -104,6 +104,7 @@ CREATE SEQUENCE registrationdata_seq;
 CREATE SEQUENCE subscription_seq;
 CREATE SEQUENCE history_seq;
 CREATE SEQUENCE historystate_seq;
+CREATE SEQUENCE communities2item_seq;
 CREATE SEQUENCE itemsbyauthor_seq;
 CREATE SEQUENCE itemsbytitle_seq;
 CREATE SEQUENCE itemsbydate_seq;
@@ -475,8 +476,18 @@ CREATE TABLE HistoryState
 ------------------------------------------------------------
 
 -------------------------------------------------------
---  Community2Item view
+--  Communities2Item table
 -------------------------------------------------------
+CREATE TABLE Communities2Item
+(
+   id                      INTEGER PRIMARY KEY,
+   community_id            INTEGER REFERENCES Community(community_id),
+   item_id                 INTEGER REFERENCES Item(item_id)
+);
+
+-------------------------------------------------------
+-- Community2Item view
+------------------------------------------------------
 CREATE VIEW Community2Item as
 SELECT Community2Collection.community_id, Collection2Item.item_id 
 FROM Community2Collection, Collection2Item
@@ -510,9 +521,9 @@ WHERE ItemsByAuthor.item_id = Collection2Item.item_id
 --  CommunityItemsByAuthor view
 -------------------------------------------------------
 CREATE VIEW CommunityItemsByAuthor as
-SELECT Community2Item.community_id, ItemsByAuthor.* 
-FROM ItemsByAuthor, Community2Item
-WHERE ItemsByAuthor.item_id = Community2Item.item_id
+SELECT Communities2Item.community_id, ItemsByAuthor.* 
+FROM ItemsByAuthor, Communities2Item
+WHERE ItemsByAuthor.item_id = Communities2Item.item_id
 ;
 
 ----------------------------------------
@@ -543,9 +554,9 @@ WHERE ItemsByTitle.item_id = Collection2Item.item_id
 --  CommunityItemsByTitle view
 -------------------------------------------------------
 CREATE VIEW CommunityItemsByTitle as
-SELECT Community2Item.community_id, ItemsByTitle.* 
-FROM ItemsByTitle, Community2Item
-WHERE ItemsByTitle.item_id = Community2Item.item_id
+SELECT Communities2Item.community_id, ItemsByTitle.* 
+FROM ItemsByTitle, Communities2Item
+WHERE ItemsByTitle.item_id = Communities2Item.item_id
 ;
 
 -------------------------------------------------------
@@ -574,9 +585,9 @@ WHERE ItemsByDate.item_id = Collection2Item.item_id
 --  CommunityItemsByDate view
 -------------------------------------------------------
 CREATE VIEW CommunityItemsByDate as
-SELECT Community2Item.community_id, ItemsByDate.* 
-FROM ItemsByDate, Community2Item
-WHERE ItemsByDate.item_id = Community2Item.item_id
+SELECT Communities2Item.community_id, ItemsByDate.* 
+FROM ItemsByDate, Communities2Item
+WHERE ItemsByDate.item_id = Communities2Item.item_id
 ;
 
 -------------------------------------------------------
@@ -602,9 +613,9 @@ WHERE ItemsByDateAccessioned.item_id = Collection2Item.item_id
 --  CommunityItemsByDateAccession view
 -------------------------------------------------------
 CREATE VIEW CommunityItemsByDateAccession as
-SELECT Community2Item.community_id, ItemsByDateAccessioned.* 
-FROM ItemsByDateAccessioned, Community2Item
-WHERE ItemsByDateAccessioned.item_id = Community2Item.item_id
+SELECT Communities2Item.community_id, ItemsByDateAccessioned.* 
+FROM ItemsByDateAccessioned, Communities2Item
+WHERE ItemsByDateAccessioned.item_id = Communities2Item.item_id
 ;
 
 
