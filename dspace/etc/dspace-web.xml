@@ -206,6 +206,11 @@
     <servlet-name>edit-item</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EditItemServlet</servlet-class>
   </servlet>
+  
+  <servlet>
+    <servlet-name>edit-news</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.NewsEditServlet</servlet-class>
+  </servlet>
 
   <servlet>
     <servlet-name>eperson-list</servlet-name>
@@ -376,6 +381,11 @@
   <servlet-mapping>
     <servlet-name>edit-item</servlet-name>
     <url-pattern>/tools/edit-item</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>edit-news</servlet-name>
+    <url-pattern>/dspace-admin/news-edit</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
