@@ -550,10 +550,15 @@ public class MyDSpaceServlet extends DSpaceServlet
         {
             String reason = request.getParameter("reason");
 
-            WorkflowManager.reject(context,
+            WorkspaceItem wsi = WorkflowManager.reject(context,
                 workflowItem,
                 context.getCurrentUser(),
                 reason);
+
+            // Set the "stage_reached" column on the returned workspace item
+            // to the "verify" stage
+            wsi.setStageReached(SubmitServlet.REVIEW_SUBMISSION);
+            wsi.update();
 
             JSPManager.showJSP(request, response,
                 "/mydspace/task-complete.jsp");

@@ -77,6 +77,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -1482,6 +1483,16 @@ public class SubmitServlet extends DSpaceServlet
                 "accept_license",
                 getSubmissionLogInfo(subInfo)));
 
+            // Add the license to the item
+            Item item = subInfo.submission.getItem();
+            EPerson submitter = context.getCurrentUser();
+
+            // FIXME: Probably need to take this from the form at some point
+            String license = subInfo.submission.getCollection().getLicense();
+            
+            item.licenseGranted(license, submitter);
+
+            // Start the workflow
             WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
 
             // FIXME: pass in more information about what happens next?
