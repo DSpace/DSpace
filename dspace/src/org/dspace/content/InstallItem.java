@@ -42,9 +42,11 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.browse.Browse;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -141,13 +143,10 @@ public class InstallItem
         // and replace them with the collection's READ
         // policies
         // FIXME: this is an inelegant hack, but out of time!
-        TableRowIterator tri = DatabaseManager.query(c,
-            "resourcepolicy",
-            "SELECT * FROM resourcepolicy WHERE " +
-            "resource_type_id=" + Constants.COLLECTION       + " AND " +
-            "resource_id="      + is.getCollection().getID() + " AND " +
-            "action_id="      + Constants.READ );
-        item.replaceAllPolicies(tri);
+        List policies = AuthorizeManager.getPoliciesActionFilter(c,
+            is.getCollection(), Constants.READ );
+            
+        item.replaceAllPolicies(policies);
 
         return item;
     }

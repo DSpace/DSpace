@@ -1164,10 +1164,11 @@ public class Item implements DSpaceObject
      * remove all of the policies for item and its children,
      *  replacing them with the policies passed in
      *  FIXME: a bit of a hack - put this method in all 'container' objects?
+     *
      * @param newpolicies - this will be all of the new policies for
      *   the item and its contents
      */      
-    public void replaceAllPolicies( TableRowIterator newpolicies )
+    public void replaceAllPolicies( List newpolicies )
         throws SQLException, AuthorizeException
     {
         // remove all our policies, add new ones
@@ -1197,7 +1198,5 @@ public class Item implements DSpaceObject
             AuthorizeManager.removeAllPolicies(ourContext, mybundle);
             AuthorizeManager.addPolicies(ourContext, newpolicies, mybundle);
         }
-    }
-    
-    
+    }    
 }
