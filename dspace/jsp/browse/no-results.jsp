@@ -76,7 +76,7 @@
     }
 %>
 
-<dspace:layout locbar="link" title="No Entries in Index">
+<dspace:layout title="No Entries in Index">
 
     <H1>No Entries in Index</H1>
     
