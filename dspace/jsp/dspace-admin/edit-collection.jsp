@@ -131,7 +131,7 @@
     <H1>Edit Collection <%= collection.getHandle() %></H1>
 <% } %>
 
-    <form method=POST>
+    <form method=POST action="<%= request.getContextPath() %>/dspace-admin/edit-communities">
         <table>
 <%-- ===========================================================
      Basic metadata

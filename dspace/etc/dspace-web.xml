@@ -168,6 +168,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>collection-wizard</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.CollectionWizardServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>community-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.CommunityListServlet</servlet-class>
   </servlet>
@@ -195,6 +200,11 @@
   <servlet>
     <servlet-name>edit-item</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EditItemServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>eperson-list</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.EPersonListServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -339,6 +349,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>collection-wizard</servlet-name>
+    <url-pattern>/dspace-admin/collection-wizard</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>dc-registry</servlet-name>
     <url-pattern>/dspace-admin/dc-registry</url-pattern>
   </servlet-mapping>
@@ -356,6 +371,11 @@
   <servlet-mapping>
     <servlet-name>edit-item</servlet-name>
     <url-pattern>/tools/edit-item</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>eperson-list</servlet-name>
+    <url-pattern>/dspace-admin/eperson-list</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
