@@ -2,6 +2,9 @@
 
 USAGE="$0 [-mit] cvs-tag target"
 
+# Just in case you need to 'socksify' etc
+CVS_COMMAND="cvs"
+
 mit=0
 
 # Check we have command-line arguments
@@ -19,7 +22,7 @@ mkdir tmp
 cd tmp
 
 echo "Checking out core code..."
-cvs -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 dspace
+$CVS_COMMAND -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 dspace
 
 # Don't need to include this script!
 rm -f dspace/make-release-package
@@ -37,18 +40,10 @@ if [ "$mit" == "0" ] ; then
         rm -f dspace/lib/*.policy
 fi
 
-echo "Checking out documentation"
-cvs -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 docs
-
-# Copy appropriate docs over
-
-mkdir dspace/docs
-cp -r docs/system/*.html docs/system/*.css docs/system/image dspace/docs
-
 
 if [ "$mit" == "1" ] ; then
         echo "Checking out MIT-specific code..."
-        cvs -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 mit
+        $CVS_COMMAND -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 mit
 
         echo "Overlaying MIT-specifics..."
         cp -r mit/* dspace
