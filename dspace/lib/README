@@ -1,18 +1,18 @@
 Libraries used by DSpace:
 
 activation.jar*:     The Java Activation Framework, used by JavaMail
-commons-collections.jar: Jakarta Commons collections API (v2.0)
+commons-collections.jar: Jakarta Commons collections API (v3.0)
 commons-cli.jar:     Jakarta Commons command line processing (v1.0)
 commons-dbcp.jar:    Jakarta Commons database connection pool (v1.0)
-commons-pool.jar:    Jakarta Commons object pooling API (v1.0)
+commons-pool.jar:    Jakarta Commons object pooling API (v1.1)
 cos.jar:             com.oreilly.servlet - multipart HTTP requests. 05Nov2002
 handle.jar:          CNRI Handle Server (version 5.3.0)
 jena.jar:            The Jena RDF framework (version 1.4.0)
-log4j.jar:           Log4j, for system logging (version 1.2.1)
+log4j.jar:           Log4j, for system logging (version 1.2.8)
 lucene.jar:          Lucene search engine (version 1.2)
 mail.jar*:           JavaMail, used for sending e-mail
 oaicat.jar:          OCLC's OAI data provider implementation (version 1.5.17)
-oro.jar:	     Jakarta-ORO, provide regular expressions (version 2.0.6)
+oro.jar:	     Jakarta-ORO, provide regular expressions (version 2.0.8)
 servlet.jar*:        Servlet interfaces (version 2.3)
 sunjce-1.2.1.jar**:   Java Cryptographic Extension (v1.2.1)--for JDK1.3
 sunjce_provider.jar**: Sun JCE provider implementation--for JDK1.3
