@@ -786,7 +786,8 @@ public class SubmitServlet extends DSpaceServlet
             String thisQual = (String) quals.get(i);
             String thisVal = (String) vals.get(i);
 
-            if (!buttonPressed.equals("submit_identifier_remove_" + i))
+            if (!buttonPressed.equals("submit_identifier_remove_" + i) &&
+                !thisVal.equals(""))
             {
                 item.addDC("identifier", thisQual, null, thisVal);
             }
@@ -2102,12 +2103,8 @@ public class SubmitServlet extends DSpaceServlet
             String lastName = request.getParameter(dcname + "_last");
             String firstNames = request.getParameter(dcname + "_first");
 
-            // Only put it in if there was a name present
-            if (lastName != null && !lastName.equals(""))
-            {
-                lasts.add(lastName);
-                firsts.add(firstNames);
-            }
+            lasts.add(lastName);
+            firsts.add(firstNames);
         }
 
         // Remove existing values
@@ -2116,29 +2113,39 @@ public class SubmitServlet extends DSpaceServlet
         // Put the names in the correct form
         for (int i = 0; i < lasts.size(); i++)
         {
-            String f = ((String) firsts.get(i)).trim();
-            String l = ((String) lasts.get(i)).trim();
+            String f = (String) firsts.get(i);
+            String l = (String) lasts.get(i);
 
-            // If there is a comma in the last name, we take everything
-            // after that comma, and add it to the right of the
-            // first name
-            int comma = l.indexOf(',');
-
-            if (comma >= 0)
+            // only add if lastname is non-empty
+            if (l != null && !((l.trim()).equals("")))
             {
-                f = f + l.substring(comma + 1);
-                l = l.substring(0, comma);
-
-                // Remove leading whitespace from first name
-                while (f.startsWith(" "))
+                // Ensure first name non-null
+                if (f == null)
                 {
-                    f = f.substring(1);
+                    f = "";
                 }
-            }
+                
+                // If there is a comma in the last name, we take everything
+                // after that comma, and add it to the right of the
+                // first name
+                int comma = l.indexOf(',');
 
-            // Add to the database
-            item.addDC(element, qualifier, null,
-                new DCPersonName(l, f).toString());
+                if (comma >= 0)
+                {
+                    f = f + l.substring(comma + 1);
+                    l = l.substring(0, comma);
+
+                    // Remove leading whitespace from first name
+                    while (f.startsWith(" "))
+                    {
+                        f = f.substring(1);
+                    }
+                }
+
+                // Add to the database
+                item.addDC(element, qualifier, null,
+                    new DCPersonName(l, f).toString());
+            }
         }
     }
 
@@ -2207,12 +2214,6 @@ public class SubmitServlet extends DSpaceServlet
         {
             // Just a single name
             String s = request.getParameter(dcname);
-
-            // Only put it in if there was a name present
-            if (s != null && !s.equals(""))
-            {
-                vals.add(s);
-            }
         }
 
         // Remove existing values
@@ -2221,8 +2222,12 @@ public class SubmitServlet extends DSpaceServlet
         // Put the names in the correct form
         for (int i = 0; i < vals.size(); i++)
         {
-            // Add to the database
-            item.addDC(element, qualifier, lang, (String) vals.get(i));
+            // Add to the database if non-empty
+            String s = (String) vals.get(i);
+            if (s != null && !s.trim().equals(""))
+            {
+                item.addDC(element, qualifier, lang, s);
+            }
         }
     }
 
@@ -2363,8 +2368,12 @@ public class SubmitServlet extends DSpaceServlet
             String s = ((String) series.get(i)).trim();
             String n = ((String) numbers.get(i)).trim();
 
-            item.addDC(element, qualifier, null,
-                new DCSeriesNumber(s, n).toString());
+            // Only add non-empty
+            if (!s.equals("") || !n.equals(""))
+            {
+                item.addDC(element, qualifier, null,
+                    new DCSeriesNumber(s, n).toString());
+            }
         }
     }
 
@@ -2391,19 +2400,21 @@ public class SubmitServlet extends DSpaceServlet
         {
             String s = request.getParameter(param + "_" + i);
 
-            // We're only going to add non-empty names
-            if (s != null && !s.equals(""))
+            // We're only going to add non-empty values
+            if (s != null)
             {
                 vals.add(s);
             }
+            else
+            {
+                // If the value was null (as opposed to present,
+                // but empty) we've reached the last name
+                foundLast = true;
+            }
 
-            // If the value was null (as opposed to present,
-            // but empty) we've reached the last name
-            foundLast = (s == null);
             i++;
         }
 
-        // Make into an array
         return vals;
     }
 }
