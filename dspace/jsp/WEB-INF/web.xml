@@ -164,7 +164,7 @@
 
   <servlet>
     <servlet-name>edit-epeople</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.admin.EditEPersonServlet</servlet-class>
+    <servlet-class>org.dspace.app.webui.servlet.admin.EPersonAdminServlet</servlet-class>
   </servlet>
 
   <servlet>
