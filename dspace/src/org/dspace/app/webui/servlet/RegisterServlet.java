@@ -142,7 +142,12 @@ public class RegisterServlet extends DSpaceServlet
         {
             // We have a token.  Find out who the it's for
             String email = AccountManager.getEmail(context, token);
-            EPerson eperson = EPerson.findByEmail(context, email);
+
+            EPerson eperson = null;
+            if (email != null)
+            {
+                eperson = EPerson.findByEmail(context, email);
+            }
             
             // Both forms need an EPerson object (if any)
             request.setAttribute("eperson", eperson);
