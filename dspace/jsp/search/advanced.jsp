@@ -53,6 +53,17 @@
 
 <%
     Community [] communityArray = (Community[] )request.getAttribute("communities");
+	String query1 			= request.getParameter("query1") == null ? "" : request.getParameter("query1");
+	String query2 			= request.getParameter("query2") == null ? "" : request.getParameter("query2");
+	String query3 			= request.getParameter("query3") == null ? "" : request.getParameter("query3");
+    	
+	String field1 			= request.getParameter("field1") == null ? "ANY" : request.getParameter("field1");
+	String field2 			= request.getParameter("field2") == null ? "ANY" : request.getParameter("field2");
+	String field3 			= request.getParameter("field3") == null ? "ANY" : request.getParameter("field3");
+
+	String conjunction1 	= request.getParameter("conjunction1") == null ? "AND" : request.getParameter("conjunction1");
+	String conjunction2 	= request.getParameter("conjunction2") == null ? "AND" : request.getParameter("conjunction1");
+
 %>
 
 <dspace:layout locbar="nolink" title="Advanced Search">
@@ -85,21 +96,21 @@
                 Search type: <br>
 
                   <select name="field1">
-                    <option value="ANY" selected>Keyword</option>
-                    <option value="author">Author</option>
-                    <option value="title">Title</option>
-                    <option value="subject">Subject</option>
-                    <option value="abstract">Abstract</option>
-                    <option value="series">Series</option>
-                    <option value="sponsor">Sponsor</option>
-                    <option value="identifier">ISSN/ISBN</option>
+                    <option value="ANY" <%= field1.equals("ANY") ? "selected" : "" %>>Keyword</option>
+                    <option value="author" <%= field1.equals("author") ? "selected" : "" %>>Author</option>
+                    <option value="title" <%= field1.equals("title") ? "selected" : "" %>>Title</option>
+                    <option value="subject" <%= field1.equals("subject") ? "selected" : "" %>>Subject</option>
+                    <option value="abstract" <%= field1.equals("abstract") ? "selected" : "" %>>Abstract</option>
+                    <option value="series" <%= field1.equals("series") ? "selected" : "" %>>Series</option>
+                    <option value="sponsor" <%= field1.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
+                    <option value="identifier" <%= field1.equals("identifier") ? "selected" : "" %>>ISSN/ISBN</option>
                   </select>
                 </p>
             </td>
             <td align="left" valign="top" nowrap width="68%">
 
               	Search for: <br>
-                <input type="text" name="query1" size="30">
+                <input type="text" name="query1" value="<%= query1 %>" size="30">
                 <br>
               </p>
             </td>
@@ -107,53 +118,51 @@
           <tr>
             <td width="12%" align="left" valign="top">
               <select name="conjunction1">
-                <option value="AND" selected> AND </option>
-                <option value="OR"> OR </option>
-
-                <option value="NOT"> NOT </option>
+                <option value="AND" <%= conjunction1.equals("AND") ? "selected" : "" %>> AND </option>
+                <option value="OR" <%= conjunction1.equals("OR") ? "selected" : "" %>> OR </option>
+                <option value="NOT" <%= conjunction1.equals("NOT") ? "selected" : "" %>> NOT </option>
               </select>
             </td>
             <td width="20%" align="left" valign="top" nowrap>
                   <select name="field2">
-                    <option value="ANY" selected>Keyword</option>
-                    <option value="author">Author</option>
-                    <option value="title">Title</option>
-                    <option value="subject">Subject</option>
-                    <option value="abstract">Abstract</option>
-                    <option value="series">Series</option>
-                    <option value="sponsor">Sponsor</option>
-                    <option value="identifier">ISSN/ISBN</option>
+                    <option value="ANY" <%= field2.equals("ANY") ? "selected" : "" %>>Keyword</option>
+                    <option value="author" <%= field2.equals("author") ? "selected" : "" %>>Author</option>
+                    <option value="title" <%= field2.equals("title") ? "selected" : "" %>>Title</option>
+                    <option value="subject" <%= field2.equals("subject") ? "selected" : "" %>>Subject</option>
+                    <option value="abstract" <%= field2.equals("abstract") ? "selected" : "" %>>Abstract</option>
+                    <option value="series" <%= field2.equals("series") ? "selected" : "" %>>Series</option>
+                    <option value="sponsor" <%= field2.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
+                    <option value="identifier" <%= field2.equals("identifier") ? "selected" : "" %>>ISSN/ISBN</option>
                   </select>
            </td>
             <td align="left" valign="top" nowrap width="68%">
-              <input type="text" name="query2" size="30">
+              <input type="text" name="query2" value="<%= query2 %>" size="30">
             </td>
           </tr>
           <tr>
             <td width="12%" align="left" valign="top">
               <select name="conjunction2">
-
-                <option value="AND" selected> AND </option>
-                <option value="OR"> OR </option>
-                <option value="NOT"> NOT </option>
+                <option value="AND" <%= conjunction2.equals("AND") ? "selected" : "" %>> AND </option>
+                <option value="OR" <%= conjunction2.equals("OR") ? "selected" : "" %>> OR </option>
+                <option value="NOT" <%= conjunction2.equals("NOT") ? "selected" : "" %>> NOT </option>
               </select>
             </td>
             <td width="20%" align="left" valign="top" nowrap>
 
                   <select name="field3">
-                    <option value="ANY" selected>Keyword</option>
-                    <option value="author">Author</option>
-                    <option value="title">Title</option>
-                    <option value="subject">Subject</option>
-                    <option value="abstract">Abstract</option>
-                    <option value="series">Series</option>
-                    <option value="sponsor">Sponsor</option>
-                    <option value="identifier">ISSN/ISBN</option>
+                    <option value="ANY" <%= field3.equals("ANY") ? "selected" : "" %>>Keyword</option>
+                    <option value="author" <%= field3.equals("author") ? "selected" : "" %>>Author</option>
+                    <option value="title" <%= field3.equals("title") ? "selected" : "" %>>Title</option>
+                    <option value="subject" <%= field3.equals("subject") ? "selected" : "" %>>Subject</option>
+                    <option value="abstract" <%= field3.equals("abstract") ? "selected" : "" %>>Abstract</option>
+                    <option value="series" <%= field3.equals("series") ? "selected" : "" %>>Series</option>
+                    <option value="sponsor" <%= field3.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
+                    <option value="identifier" <%= field3.equals("identifier") ? "selected" : "" %>>ISSN/ISBN</option>
                   </select>
                   <br>
             </td>
             <td align="left" valign="top" nowrap width="68%">
-              <input type="text" name="query3" size="30">
+              <input type="text" name="query3" value="<%= query3 %>" size="30">
             </td>
 
   </tr>
@@ -170,5 +179,13 @@
 </table>
 </table>
 </form>
+
+<% if( request.getParameter("query") != null )
+{
+ %>
+    <P align=center>Search produced no results.</P>
+<%
+}
+%>
 
 </dspace:layout>

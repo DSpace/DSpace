@@ -47,6 +47,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Iterator;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -98,10 +99,12 @@ public class SimpleSearchServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Get the query
-        String query 	= request.getParameter("query");
-        int    start 	= UIUtil.getIntParameter(request, "start");
-        String advanced = request.getParameter("advanced");
-        
+        String query 	  = request.getParameter("query");
+        int    start 	  = UIUtil.getIntParameter(request, "start");
+        String advanced   = request.getParameter("advanced");
+        String fromAdvanced   = request.getParameter("from_advanced");
+        String advancedQuery = "";
+        HashMap queryHash = new HashMap();
         
         // can't start earlier than 0 in the results!
         if( start < 0 ) { start = 0; }
@@ -117,9 +120,12 @@ public class SimpleSearchServlet extends DSpaceServlet
         QueryResults qResults = null;
         QueryArgs    qArgs    = new QueryArgs();
 
+		// if the "advanced" flag is set, build the query string from the 
+		// multiple query fields
         if (advanced != null) 
         {
         	query = qArgs.buildQuery(request);
+        	advancedQuery = qArgs.buildHTTPQuery(request);
         } 
 
         // Ensure the query is non-null
@@ -147,6 +153,10 @@ public class SimpleSearchServlet extends DSpaceServlet
             // Encode the query
             query = URLEncoder.encode(query);
             
+            if (advancedQuery.length() > 0) 
+            {
+            	query = query + "&from_advanced=true&" + advancedQuery;
+            }
             // Do the redirect
             response.sendRedirect(response.encodeRedirectURL(
                     request.getContextPath() + url +
@@ -342,7 +352,27 @@ public class SimpleSearchServlet extends DSpaceServlet
 
         // And the original query string
         request.setAttribute("query", query);
+        
+        if ((fromAdvanced != null) && (qResults.getHitCount() == 0))
+        {
+        	// send back to advanced form if no results
+        	Community[] communities = Community.findAll(context);
+        	request.setAttribute("communities", communities);
+        	request.setAttribute("no_results", "yes");
 
-        JSPManager.showJSP(request, response, "/search/results.jsp");
+			queryHash = qArgs.buildQueryHash(request);
+        	Iterator i = queryHash.keySet().iterator();
+        	while(i.hasNext())
+        	{
+            	String key   = (String)i.next();
+            	String value = (String)queryHash.get(key);
+            	
+            	request.setAttribute(key, value);
+            }
+
+        	JSPManager.showJSP(request, response, "/search/advanced.jsp");
+        } else {
+        	JSPManager.showJSP(request, response, "/search/results.jsp");
+        }
     }
 }

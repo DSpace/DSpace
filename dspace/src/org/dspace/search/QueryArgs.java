@@ -1,7 +1,10 @@
 package org.dspace.search;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Iterator;
 import org.apache.oro.text.perl.Perl5Util;
+
 
 public class QueryArgs
 {
@@ -107,4 +110,40 @@ public class QueryArgs
     	newquery = newquery +  myquery + ")";
     	return (newquery);
     }
+
+    public HashMap buildQueryHash (HttpServletRequest request)
+    {	
+    	HashMap queryHash = new HashMap();
+		queryHash.put("query1", request.getParameter("query1") == null ? "" : request.getParameter("query1"));
+		queryHash.put("query2", request.getParameter("query2") == null ? "" : request.getParameter("query2"));
+		queryHash.put("query3", request.getParameter("query3") == null ? "" : request.getParameter("query3"));
+    	
+		queryHash.put("field1", request.getParameter("field1") == null ? "ANY" : request.getParameter("field1"));
+		queryHash.put("field2", request.getParameter("field2") == null ? "ANY" : request.getParameter("field2"));
+		queryHash.put("field3", request.getParameter("field3") == null ? "ANY" : request.getParameter("field3"));
+
+		queryHash.put("conjunction1", request.getParameter("conjunction1") == null ? "AND" : request.getParameter("conjunction1"));
+		queryHash.put("conjunction2", request.getParameter("conjunction2") == null ? "AND" : request.getParameter("conjunction1"));
+    	
+    	return (queryHash);
+    }
+
+    public String buildHTTPQuery (HttpServletRequest request)
+    {	
+    	String querystring = "";
+    	HashMap queryHash = buildQueryHash(request);
+    	
+		Iterator i = queryHash.keySet().iterator();
+        while(i.hasNext())
+        {
+            String key   = (String)i.next();
+            String value = (String)queryHash.get(key);
+            	
+           	querystring = querystring + "&" + key + "=" + value;
+        }
+
+    	
+    	return (querystring);
+    }
+
 }
