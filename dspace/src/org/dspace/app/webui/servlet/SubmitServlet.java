@@ -267,7 +267,7 @@ public class SubmitServlet extends DSpaceServlet
 
 
 
-        Community com = UIUtil.getCommunityLocation(request);
+        Community  com = UIUtil.getCommunityLocation (request);
         Collection col = UIUtil.getCollectionLocation(request);
 
         if (col != null)

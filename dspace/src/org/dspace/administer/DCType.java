@@ -65,7 +65,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  */
 public class DCType
 {
-    /** log4j category */
+    /** log4j logger */
     private static Logger log = Logger.getLogger(DCType.class);
 
     /** Our context */
@@ -336,7 +336,7 @@ public class DCType
 
 
     /**
-     * Update the bitstream format metadata
+     * Update the dublin core registry
      */
     public void update()
         throws SQLException, AuthorizeException
@@ -348,10 +348,15 @@ public class DCType
                 "Only administrators may modiffy the Dublin Core registry");
         }
 
-        log.info(LogManager.getHeader(ourContext,
-            "update_dc_type",
-            "dc_type_id=" + getID()));
-
         DatabaseManager.update(ourContext, typeRow);
+        
+        log.info(LogManager.getHeader(ourContext,
+                    "update_dctype",
+                    "dc_type_id="        + getID()               +
+                        "element="       + getElement()          +
+                        "qualifier="     + getQualifier()
+                        )
+                );
+        
     }
 }

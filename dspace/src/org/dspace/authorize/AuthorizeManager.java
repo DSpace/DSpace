@@ -40,6 +40,8 @@
 
 package org.dspace.authorize;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.sql.SQLException;
 
@@ -50,6 +52,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.TableRow;
@@ -78,9 +81,13 @@ import org.dspace.history.HistoryManager;
  * statement saying that user 5432 and members of group 10 are
  * allowed to do the referred action.
  * <p>
- * Note: If an eperson is a member of the administrator group (id -1), then
+ * Note: If an eperson is a member of the administrator group (id 0), then
  *  they are automatically given permission for all requests.
  */
+
+
+
+
 
 public class AuthorizeManager
 {
@@ -88,72 +95,41 @@ public class AuthorizeManager
      * primary authorization interface, assumes user is the context's
      *  currentuser, and throws an exception
      *
-     * @param c Context object
-     * @param o DSpace object
-     * @param a action from org.dspace.core.Constants
+     * @param context
+     * @param object, a DSpaceObject
+     * @param action
      *
-     * @throws AuthorizeException if permission denied or object type unknown
+     * @throws AuthorizeException if the user is denied
      */
-    public static void authorizeAction(Context c,Object myobject, int myaction)
-        throws SQLException, AuthorizeException
+    public static void authorizeAction(Context c, DSpaceObject o, int action)
+        throws AuthorizeException, SQLException
     {
-        int otype;
-        int oid;
-        int userid = -1;  // -1 is anonymous
-
-        // now figure out the type and object id
-        if( myobject instanceof Item )
+        int otype = o.getType();
+        int oid   = o.getID();
+    
+        if( !authorize(c, otype, oid, action, c.getCurrentUser()) )
         {
-            otype = Constants.ITEM;
-            oid   = ((Item) myobject).getID();
-        }
-        else if( myobject instanceof Bitstream )
-        {
-            otype = Constants.BITSTREAM;
-            oid   = ((Bitstream) myobject).getID();
-        }
-        else if( myobject instanceof Collection )
-        {
-            otype = Constants.COLLECTION;
-            oid   = ((Collection) myobject).getID();
-        }
-        else if( myobject instanceof Community )
-        {
-            otype = Constants.COMMUNITY;
-            oid   = ((Community) myobject).getID();
-        }
-        else if( myobject instanceof Bundle )
-        {
-            otype = Constants.BUNDLE;
-            oid   = ((Bundle) myobject).getID();
-        }
-        else
-        {
-            throw new IllegalArgumentException("Unknown object type");
-        }
-
-        // now set the userid if context contains an eperson
-        EPerson e = c.getCurrentUser();
-
-        if( e != null ) userid = e.getID();
-
-        if (!authorize(c,otype,oid,myaction, userid))
-        {
-            System.out.println( HistoryManager.getStackTrace() );
+            int userid = c.getCurrentUser().getID();
+            AuthorizeException j = new AuthorizeException("test");
+            j.printStackTrace();
             
-            throw new AuthorizeException("Authorization denied for action "
-                                        + Constants.actiontext[myaction]
-                                        + "on " + Constants.typetext[otype]
-                                        + ":" + oid + " by user " + userid);
+            throw new AuthorizeException(
+                "Authorization denied for action " +
+                Constants.actiontext[action]       +
+                " on " + Constants.typetext[otype] +
+                ":"    + oid + " by user " + userid,
+                o,
+                action
+                );
         }
     }
 
 
     /**
-     * same authorize, returns boolean for those who don't want to bother
+     * same authorize, returns boolean for those who don't want to deal with
      *  catching exceptions.
      */
-    public static boolean authorize(Context c, Object o, int a)
+    public static boolean authorizeActionBoolean(Context c, DSpaceObject o, int a)
         throws SQLException
     {
         boolean isauthorized = true;
@@ -193,12 +169,13 @@ public class AuthorizeManager
 
     /**
      * check to see if the a given userid is an admin
+     * admin is group 0
      */
     public static boolean isAdmin(Context c,int userid)
         throws SQLException
     {
         // group is hardcoded as 'admin', and admins can do everything
-        if( Group.isMember(c,-1,userid) )
+        if( Group.isMember(c,0,userid) )
             return true;
         else
             return false;
@@ -213,6 +190,253 @@ public class AuthorizeManager
      * @param resorceidID of resource you're trying to do an authorize on
      * @param actionid - action to perform (read, write, etc)
      */
+    
+    /**
+     * add a policy for an eperson
+     */
+    public static void addPolicy(Context c, DSpaceObject o, int action,
+            EPerson e)
+        throws SQLException, AuthorizeException
+    {
+        ResourcePolicy rp = ResourcePolicy.create(c);
+        
+        rp.setResource(o);
+        rp.setAction(action);
+        rp.setEPerson(e);
+        
+        rp.update();
+    }
+
+    
+    /**
+     * add a policy for a group
+     */
+    public static void addPolicy(Context c, DSpaceObject o, int action, Group g)
+        throws SQLException, AuthorizeException
+    {
+        ResourcePolicy rp = ResourcePolicy.create(c);
+        
+        rp.setResource(o);
+        rp.setAction(action);
+        rp.setGroup(g);
+        
+        rp.update();
+    }
+
+
+    public static ResourcePolicy [] getPolicies(Context c, DSpaceObject o)
+        throws SQLException
+    {
+        TableRowIterator tri = getAllObjectPolicies(c, o);
+        
+        List policies = new ArrayList();
+        
+        while( tri.hasNext() )
+        {
+            TableRow row = tri.next();
+            
+            // first check the cache - what does this mean?
+            ResourcePolicy cachepolicy = (ResourcePolicy)c.fromCache(
+                ResourcePolicy.class, row.getIntColumn("policy_id") );
+            
+            if( cachepolicy != null )
+            {
+                policies.add(cachepolicy);
+            }
+            else
+            {
+                policies.add(new ResourcePolicy(c, row));
+            }
+        }
+        
+        ResourcePolicy[] policyArray = new ResourcePolicy[policies.size()];
+        
+        policyArray = (ResourcePolicy[])policies.toArray(policyArray);
+        
+        return policyArray;
+    }
+    
+
+
+    /**
+     * get all of the policies for an object
+     */
+    public static TableRowIterator getAllObjectPolicies(Context c, DSpaceObject o)
+        throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.query(c,
+            "resourcepolicy",
+            "SELECT * FROM resourcepolicy WHERE " +
+            "resource_type_id=" + o.getType() + " AND " +
+            "resource_id="      + o.getID()
+            );
+    
+        return tri;
+    }
+
+
+    /**
+     * add policies to an object to match those from
+     *  a previous object
+     */
+    public static void inheritPolicies(Context c, DSpaceObject src,
+                                        DSpaceObject dest )
+        throws SQLException, AuthorizeException
+    {
+        // find all policies for the source object
+        TableRowIterator tri = getAllObjectPolicies(c, src);
+        
+        addPolicies(c, tri, dest);
+    }                            
+    
+    
+    public static void addPolicies(Context c, TableRowIterator src,
+            DSpaceObject dest)
+        throws SQLException, AuthorizeException
+    {
+        // now add them to the destination object
+        while( src.hasNext() )
+        {
+            TableRow row = src.next();
+            
+            ResourcePolicy srp = new ResourcePolicy(c, row);
+            ResourcePolicy drp = ResourcePolicy.create(c);
+            
+            // copy over values
+            drp.setResource (dest);
+            drp.setPublic   ( srp.isPublic()     );
+            drp.setAction   ( srp.getAction()    );
+            drp.setEPerson  ( srp.getEPerson()   );
+            drp.setGroup    ( srp.getGroup()     );
+            drp.setStartDate( srp.getStartDate() );
+            drp.setEndDate  ( srp.getEndDate()   );
+            
+            // and write out new policy
+            drp.update();
+        }
+    }
+    
+
+    /**
+     * removes all policies for an object
+     */
+    public static void removeAllPolicies(Context c, DSpaceObject o)
+        throws SQLException
+    {
+        DatabaseManager.updateQuery(c,
+            "DELETE FROM resourcepolicy WHERE " +
+            "resource_type_id=" + o.getType()   + " AND " +
+            "resource_id="      + o.getID()   );
+    }
+
+
+    /**
+     * removes an eperson from all policies to do with an object
+     */
+/*    public static void removeAllPolicies(Context c, DSpaceObject o, EPerson e)
+        throws SQLException
+    {
+        DatabaseManager.updateQuery(c,
+            "DELETE FROM resourcepolicy WHERE "         +
+            "resource_type_id=" + o.getType() + " AND " +
+            "resource_id="      + o.getID()   + " AND " +
+            "eperson_id="       + e.getID() );
+    }
+*/    
+    
+    /**
+     * removes a group from all policies to do with an object
+     */
+/*    public static void removePolicies(Context c, DSpaceObject o, Group g)
+        throws SQLException
+    {
+        DatabaseManager.updateQuery(c,
+            "DELETE FROM resourcepolicy WHERE "         +
+            "resource_type_id=" + o.getType() + " AND " +
+            "resource_id="      + o.getID()   + " AND " +
+            "epersongroup_id="  + g.getID() );
+    }
+*/    
+
+    /**
+     * remove policies
+     *
+     * @param object or null
+     * @param action or -1 for all
+     * @param EPerson or null
+     */
+/*    public static void removePolicy(Context c, DSpaceObject o, int action,
+                            EPerson e )
+    {
+        // if object is set, delete policies for that object
+        if( o != null )
+        {
+            if( e != null )
+            {
+                // remove a policy for a single eperson
+            }
+            else
+            {
+                // remove policy for all epeople in object
+            }            
+        }
+        
+    }
+*/
+
+    public static boolean authorize(Context c, int object_type, int object_id,
+            int action, EPerson e)
+        throws SQLException
+    {
+        // is authorization disabled for this context?
+        if( c.ignoreAuthorization() ) return true;
+
+        // is user part of admin group?
+        if( isAdmin( c,e.getID() ) ) return true;
+
+        // get policies for this object and action
+        TableRowIterator tri = DatabaseManager.query(c,
+            "resourcepolicy",
+            "SELECT * FROM resourcepolicy WHERE " +
+            "resource_type_id=" + object_type     + " AND " +
+            "resource_id="      + object_id       + " AND " +
+            "action_id="        + action
+            );
+        
+        while( tri.hasNext() )
+        {
+            TableRow row = (TableRow)tri.next();
+            ResourcePolicy rp = new ResourcePolicy(c, row);
+            
+            // check policies for date validity
+            if( rp.isDateValid() )
+            {
+                // if public flag is set, action is authorize
+                //  for everyone (even anonymous use)
+                if( rp.isPublic() ) { return true; }
+            
+                if( (rp.getEPersonID() != -1)
+                    &&(rp.getEPersonID() == e.getID()) )
+                {
+                    return true; // match
+                }
+                                
+                if( (rp.getGroupID() != -1 )
+                    &&(Group.isMember(c, rp.getGroupID(), e.getID())) )
+                {
+                    // group was set, and eperson is a member
+                    // of that group
+                    return true;
+                }
+            }
+        }
+        
+        // default authorization is denial
+        return false;
+    }
+
+/* old authorize() - ready to delete yet?
+
     public static boolean authorize(Context c,int resourcetype, int resourceid, int actionid,
                                     int userid)
         throws SQLException
@@ -229,6 +453,9 @@ public class AuthorizeManager
         if (!i.hasNext())
         {
             //alert( "no policies for this object" );
+//            System.out.println("Error - no policies for this object " +
+//                Constants.typetext[resourcetype] + ":" +
+//                Constants.actiontext[actionid]);
         }
 
         while( i.hasNext() )
@@ -237,6 +464,12 @@ public class AuthorizeManager
 
             ResourcePolicy rp = new ResourcePolicy(c, row);
 
+//            String policymessage = Constants.typetext[resourcetype] + ":" +
+//                resourceid + ":" + Constants.actiontext[actionid]   + ":" +
+//                rp.getPolicy();
+            
+//            System.out.println( policymessage );
+
             // evaluate each statement
             StringTokenizer st = new StringTokenizer(rp.getPolicy(), ",");
 
@@ -244,6 +477,7 @@ public class AuthorizeManager
             {
                 String t = st.nextToken();
 
+//                System.out.println("Token: " + t);
                 if (t.startsWith("u"))      // userid
                 {
                     int uid = -1;
@@ -255,6 +489,7 @@ public class AuthorizeManager
                     catch (NumberFormatException e)
                     {
                         // eek! this should never happen
+//                        System.out.println("number format exception" + e);
                     }
 
                     if ((uid != -1) && (uid == userid)) return true;
@@ -269,7 +504,7 @@ public class AuthorizeManager
                     }
                     catch (NumberFormatException e)
                     {
-                        // once again, eek!
+//                        System.out.println("numero format exception" + e);
                     }
 
                     if (Group.isMember(c,gid, userid)) return true;
@@ -285,162 +520,6 @@ public class AuthorizeManager
 
         return false;  // default policy
     }
+*/
 
-
-    /**
-     * Fetches policies that apply to an object and action pair
-     * looks for policies specific to that object, and if not
-     * found, then looks for containers that may have policies
-     * that apply (bitstreams look for containing items & collections,
-     * items look for containing collections.)
-     * <p>
-     * Policies that apply specifically to an object override
-     * any policies that may apply due to reference by a container.
-     * This override is done simply by ceasing to look for other
-     * policies once a specific policy is found.
-     *
-     */
-    private static TableRowIterator policyLookup(Context c, int resource_type, int resource_id,
-                                                int action_id)
-        throws SQLException
-    {
-        String myquery = "";
-
-        // get the policies eonly for this object (rare)
-        TableRowIterator specific_policies = DatabaseManager.query(c,
-            "resourcepolicy",
-            "SELECT resourcepolicy.* FROM resourcepolicy WHERE" +
-            " resource_type_id=" + resource_type +
-            " AND action_id=" + action_id +
-            " AND resource_id=" + resource_id );
-
-        if (resource_type == Constants.BITSTREAM)
-        {
-            // if there are item specific policies, they have
-            //  the highest priority - return them
-            if (specific_policies.hasNext())
-            {
-                return specific_policies;
-            }
-
-            // need to look for policies from containing items
-            myquery = "SELECT * from ResourcePolicy where" +
-                    " resource_type_id = " + resource_type +
-                    " AND action_id = " + action_id +
-                    " AND container_type_id = " + Constants.ITEM +
-                    " AND container_id in " +
-                    "(select item_id from Item2Bundle where bundle_id in" +
-                    "(select bundle_id from Bundle2Bitstream where " +
-                    " bitstream_id = " + resource_id + "))";
-
-            TableRowIterator item_policies = DatabaseManager.query(c,
-                "resourcepolicy",
-               myquery );
-
-            if (item_policies.hasNext())
-            {
-                return item_policies;
-            }
-
-            // now look for policies from containing collections
-            myquery = "SELECT * from ResourcePolicy where" +
-                    " resource_type_id = " + resource_type +
-                    " AND action_id = " + action_id +
-                    " AND container_type_id = " + Constants.COLLECTION +
-                    " AND container_id in " +
-                    "(select collection_id from Collection2Item where" +
-                    " item_id in " +
-                    "(select item_id from Item2Bundle where bundle_id in" +
-                    "(select bundle_id from Bundle2Bitstream where " +
-                    " bitstream_id = " + resource_id + ")))";
-
-            TableRowIterator collection_policies = DatabaseManager.query(c,
-                "resourcepolicy",
-                myquery );
-
-            if (collection_policies.hasNext())
-            {
-                return collection_policies;
-            }
-        }
-
-        // bundles use the same permissions as bitstreams?
-        // inheriting from items and collections
-        if (resource_type == Constants.BUNDLE)
-        {
-            if (specific_policies.hasNext())
-            {
-                return specific_policies;
-            }
-
-            // need to look for policies from containing items
-            myquery = "SELECT * from ResourcePolicy where" +
-                    " resource_type_id = " + resource_type +
-                    " AND action_id = " + action_id +
-                    " AND container_type_id = " + Constants.ITEM +
-                    " AND container_id in " +
-                    "(select item_id from Item2Bundle where " +
-                    " bundle_id = " + resource_id + ")";
-
-            TableRowIterator item_policies = DatabaseManager.query(c,
-                "resourcepolicy",
-                myquery );
-
-            if (item_policies.hasNext())
-            {
-                return item_policies;
-            }
-
-            // now look for policies from containing collections
-            myquery = "SELECT * from ResourcePolicy where" +
-                    " resource_type_id = " + resource_type +
-                    " AND action_id = " + action_id +
-                    " AND container_type_id = " + Constants.COLLECTION +
-                    " AND container_id in " +
-                    "(select collection_id from Collection2Item where" +
-                    " item_id in " +
-                    "(select item_id from Item2Bundle where " +
-                    " bundle_id =" + resource_id + "))";
-
-            TableRowIterator collection_policies = DatabaseManager.query(c,
-                "resourcepolicy",
-                myquery );
-
-            if (collection_policies.hasNext())
-            {
-                return collection_policies;
-            }
-        }
-
-        // items inherit policies from containing collections
-        if (resource_type == Constants.ITEM)
-        {
-            if (specific_policies.hasNext())
-            {
-                return specific_policies;
-            }
-
-            myquery = "SELECT * from ResourcePolicy where" +
-                    " resource_type_id = " + resource_type +
-                    " AND action_id = " + action_id +
-                    " AND container_type_id = " + Constants.COLLECTION +
-                    " AND container_id in " +
-                    "(select collection_id from Collection2Item where" +
-                    " item_id = " + resource_id + ")";
-
-            TableRowIterator collection_policies = DatabaseManager.query(c,
-                "resourcepolicy",
-                myquery );
-
-            if (collection_policies.hasNext())
-            {
-                return collection_policies;
-            }
-        }
-
-        // end of inheritance check - handle any other
-        //  type (warning: may be an empty list of policies)
-
-        return specific_policies;
-    }
 }
