@@ -1,5 +1,5 @@
 /*
- * ItemLoader.java
+ * ItemImport.java
  *
  * $Id$
  *
@@ -100,19 +100,19 @@ list of collections to choose from would be nice too
 */
 
 public class ItemImport
-{
-        
+{        
     public static void main(String argv[])
         throws Exception
     {
         String usage = "Itemimport has three modes of operation:\n" +
-                       "  add     = import contents of source_dir, and create mapfile\n" +
+                       "  add     = import items from directories within items_dir, and create mapfile\n" +
                        "  replace = use mapfile from previously imported items and replace\n" +
                        "  remove  = use mapfile from previously imported items and delete them\n" +
                        "\n" +
-                       "ItemImport add EPersonID collectionID source_dir mapfile\n" +
-                       "ItemImport replace EPersonID collectionID source_dir mapfile\n" +
-                       "ItemImport remove mapfile\n";
+                       "ItemImport add EPersonID collectionID items_dir mapfile\n" +
+                       "ItemImport replace EPersonID collectionID items_dir mapfile\n" +
+                       "ItemImport remove EPersonID mapfile\n\n" +
+                       "see DSpace documentation for format of item directories\n";
 
         Context c = null;
 
@@ -133,7 +133,7 @@ public class ItemImport
         // now get the args
         if( argv[0].equals( "remove" ) && (argv.length == 3) )
         {
-//            collectionID = Integer.parseInt( argv[1] );
+            epersonID    = Integer.parseInt( argv[1] );
             mapFile      = argv[2];
         }
         else if( argv[0].equals( "add" ) && (argv.length == 5) )
@@ -201,7 +201,7 @@ public class ItemImport
         throws Exception
     {
         System.out.println( "Adding items from directory: " + sourceDir );
-        System.out.println( "Generating mapfile: " + mapFile );
+        System.out.println( "Generating mapfile: "          + mapFile   );
         
         // create the mapfile
         File outFile = new File( mapFile );
@@ -237,7 +237,7 @@ public class ItemImport
             String newItemName = (String)i.next();
             String oldHandle   = (String)myhash.get(newItemName);
 
-            System.out.println("Replacing:  " + oldHandle);
+            System.out.println("\tReplacing:  " + oldHandle);
 
             // add new item, locate old one
             Item oldItem = (Item)HandleManager.resolveToObject(c, oldHandle);
@@ -300,24 +300,29 @@ public class ItemImport
     {
         Item myitem = null;
 
+        System.out.println("Adding item from directory" + itemname );
+
         // create workspace item
         WorkspaceItem wi = WorkspaceItem.create(c, mycollection, false);
 
         myitem = wi.getItem();
 
-        // now fill out dublin core for item
+        // now fill out dublin core for item        
         loadDublinCore( c, myitem, path + "/" + itemname + "/" + "dublin_core.xml" );
 
         // and the bitstreams from the contents file
         // process contents file, add bistreams and bundles
         processContentsFile( c, myitem, path + "/" + itemname, "contents" );
 
-        // put item in system
-        InstallItem.installItem(c, wi);
+        String myhandle = processHandleFile( c, myitem, path + "/" + itemname,
+            "handle" );
 
-        // now output line to the mapfile
-        String myhandle = HandleManager.findHandle(c, myitem);
-        
+        // put item in system
+        InstallItem.installItem(c, wi, myhandle);
+
+        // find the handle, and output to map file
+        myhandle = HandleManager.findHandle(c, myitem);
+                
         if(mapOut!=null)
         {
             mapOut.println( itemname + " " + myhandle );       
@@ -399,7 +404,7 @@ public class ItemImport
         NodeList dcNodes = XPathAPI.selectNodeList(document,
             "/dublin_core/dcvalue");
 
-        System.out.println("Nodelist has # elements: " + dcNodes.getLength() );
+        System.out.println("\tLoading dublin core from " + filename );
 
         // Add each one as a new format to the registry
         for (int i=0; i < dcNodes.getLength(); i++)
@@ -417,7 +422,7 @@ public class ItemImport
         String element   = getAttributeValue(n, "element");
         String qualifier = getAttributeValue(n, "qualifier"); //NodeValue(); //getElementData(n, "qualifier");
 
-        System.out.println("Element: " + element + " Qualifier: " + qualifier +
+        System.out.println("\tElement: " + element + " Qualifier: " + qualifier +
         " Value: " + value );
 
         if( qualifier.equals("none") ) qualifier = null;
@@ -448,6 +453,38 @@ public class ItemImport
 
 
     /**
+     * Read in the handle file or return null if empty or doesn't exist
+     */
+    private String processHandleFile( Context c, Item i, String path, String filename )
+    {
+        String filePath = path + "/" + filename;
+        String line     = "";
+        String result   = null;
+        
+        System.out.println( "Processing handle file: " + filename );
+
+        try
+        {
+            BufferedReader is = new BufferedReader( new FileReader( filePath ) );
+
+            // result gets contents of file, or null            
+            result = is.readLine();
+            
+            System.out.println( "read handle: '" + result + "'");
+            
+            is.close();
+        }
+        catch( Exception e )
+        {
+            // probably no handle file, just return null
+            System.out.println( "It appears there is no handle file" );
+        }
+        
+        return result;
+    }
+
+
+    /**
      * Given a contents file and an item, stuffing it with bitstreams from the
      *  contents file
      */
@@ -456,14 +493,14 @@ public class ItemImport
         String contentspath = path + "/" + filename;
         String line = "";
 
-        System.out.println( "Processing contents file: " + contentspath );
+        System.out.println( "\tProcessing contents file: " + contentspath );
 
         try
         {
             BufferedReader is = new BufferedReader( new FileReader( contentspath ) );
             while( ( line = is.readLine() ) != null )
             {
-                System.out.println( "Bitstream: " + line );
+                System.out.println( "\tBitstream: " + line );
                 processContentFileEntry( c, i, path, line );
             }
             is.close();
@@ -540,7 +577,7 @@ public class ItemImport
      *
      * @return  the CDATA as a <code>String</code>
      */
-    private String getElementData(Node parentElement, String childName)
+    private String getElementData( Node parentElement, String childName )
         throws TransformerException
     {
         // Grab the child node
@@ -575,7 +612,7 @@ public class ItemImport
      *
      * @return  the DOM representation of the XML file
      */
-    private static Document loadXML(String filename)
+    private static Document loadXML( String filename )
         throws IOException, ParserConfigurationException, SAXException
     {
         DocumentBuilder builder =
