@@ -264,13 +264,10 @@ CREATE TABLE ResourcePolicy
   policy_id            INTEGER PRIMARY KEY,
   resource_type_id     INTEGER,
   resource_id          INTEGER,
-  resource_filter      INTEGER,
-  resource_filter_arg  INTEGER,
+  container_type_id    INTEGER,
+  container_id         INTEGER,
   action_id            INTEGER,
-  policy_statement     VARCHAR(256),
-  priority             INTEGER,
-  notes                TEXT,
-  owner_eperson_id     INTEGER REFERENCES EPerson(eperson_id)
+  policy_statement     VARCHAR(256)
 );
 
 -------------------------------------------------------
