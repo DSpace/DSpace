@@ -1,4 +1,10 @@
 /*
+ * ContentTest.java
+ *
+ * Version: $Revision$
+ *
+ * Date: $Date$
+ *
  * Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
@@ -35,11 +41,16 @@
 
 package org.dspace.content.test;
 
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import junit.framework.*;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.*;
-import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.*;
 
 /**
  * JUnit test for content API
@@ -96,9 +107,7 @@ public class ContentTest extends TestCase
         try
         {
             context = new Context();
-            Community c1 = Community.create(context);
-            c1.setMetadata("name", TEST_NAME_1);
-            c1.update();
+            Community c1 = createCommunity(context);
             Community c2 = Community.find (context, c1.getID());
             assertNotNull("Found community", c2);
             assertEquals("Found community has correct name",
@@ -137,10 +146,8 @@ public class ContentTest extends TestCase
         try
         {
             context = new Context();
-            Community c1 = Community.create(context);
-            c1.setMetadata("name", TEST_NAME_1);
-            c1.update();
-            Collection collection = Collection.create(context);
+            Community c1 = createCommunity(context);
+            Collection collection = c1.createCollection();
             int cid = collection.getID();
             c1.addCollection(collection);
             assertNotNull("Found new collection",
@@ -194,7 +201,8 @@ public class ContentTest extends TestCase
         try
         {
             context = new Context();
-            Collection c1 = Collection.create(context);
+            Community community = createCommunity(context);
+            Collection c1 = community.createCollection();
             c1.setMetadata("name", TEST_NAME_1);
             c1.update();
             Collection c2 = Collection.find (context, c1.getID());
@@ -226,10 +234,127 @@ public class ContentTest extends TestCase
         }
     }
 
+    /**
+     * Test of item
+     */
+    public void testItemDCValues()
+    {
+        Context context = null;
+
+        List TITLES = Arrays.asList( new String[] {
+            "Test Title",
+            "Warehouse Songs and Stories",
+            "Rainbow Soup"
+        });
+
+        List ALTERNATIVE_TITLES = Arrays.asList( new String[] {
+            "Test Title 2",
+            "Being and Nothingness",
+            "Jungle Book",
+            "Perls before Swine"
+        });
+
+        String LANG = "en";
+        String now = new DCDate(new java.util.Date()).toString();
+
+        try
+        {
+            context = new Context();
+
+            Community community = Community.create(context);
+            Collection collection = community.createCollection();
+
+            WorkspaceItem wi = WorkspaceItem.create(context, collection, null);
+
+            Item item = wi.getItem();
+            int id = item.getID();
+
+            // Add some DC fields
+            item.addDC("title", null, LANG,
+                       toStringArray(TITLES));
+            item.addDC("title", null, LANG,
+                       (String) TITLES.get(0));
+            item.addDC("title", "alternative", LANG,
+                       toStringArray(ALTERNATIVE_TITLES));
+            item.addDC("date","accessioned", null, now);
+            item.update();
+
+            // Retrieve titles
+            String[] titles = item.getDC("title", null, LANG);
+            assertNotNull("Retrieved titles", titles);
+            assertEquals("Got correct number of titles",
+                         titles.length,
+                         TITLES.size() + 1);
+            assertTrue("Got correct titles",
+                       containsAll(titles, TITLES));
+
+            // Retrieve alternative titles
+            String[] alt = item.getDC("title", "alternative", LANG);
+            assertNotNull("Retrieved titles", alt);
+            assertEquals("Got correct number of titles",
+                         alt.length,
+                         ALTERNATIVE_TITLES.size());
+            assertTrue("Got correct titles",
+                       containsAll(alt, ALTERNATIVE_TITLES));
+
+            // Retrieve dates
+            String[] dates = item.getDC("date", "accessioned", null);
+            assertNotNull("Retrieved dates", dates);
+            assertEquals("Got correct number of dates",
+                         dates.length, 1);
+            assertEquals("Got correct date", now, dates[0]);
+
+            // Retrieve wildcard
+            String[] all = item.getDC(Item.ANY, Item.ANY, Item.ANY);
+            assertNotNull("Got values", all);
+            assertEquals("Got correct number of values",
+                         all.length,
+                         TITLES.size() + ALTERNATIVE_TITLES.size() + 1 + 1);
+
+            // Retrieve wildcarded titles
+            String[] all_titles = item.getDC("title", Item.ANY, Item.ANY);
+            assertNotNull("Got values", all_titles);
+            assertEquals("Got correct number of values",
+                         all_titles.length,
+                         TITLES.size() + ALTERNATIVE_TITLES.size() + 1);
+
+            // Clear just the alternative title
+            item.clearDC("title", "alternative", LANG);
+            alt = item.getDC("title", "alternative", LANG);
+            assertNotNull("Retrieved titles", alt);
+            assertEquals("Got correct number of titles",
+                         alt.length, 0);
+
+            item.deleteWithContents();
+            assertNull("Item cannot be found after deletion",
+                       Item.find(context, id));
+            context.abort();
+        }
+        // Clean up context or the test hangs
+        catch (AssertionFailedError afe)
+        {
+            if (context != null)
+                context.abort();
+
+            throw afe;
+        }
+        catch (Exception e)
+        {
+            if (context != null)
+                context.abort();
+            e.printStackTrace();
+            System.out.println("Got exception: " + e);
+            fail("Exception while running test: " + e);
+        }
+    }
+
     ////////////////////////////////////////
     // Helper methods
     ////////////////////////////////////////
 
+    /**
+     * True if OBJ is in ARRAY, false otherwise
+     */
     private static boolean contains(Object[] array, Object obj)
     {
         for (int i = 0; i < array.length; i++ )
@@ -241,6 +366,43 @@ public class ContentTest extends TestCase
         return false;
     }
 
+    /**
+     * True if every member of LIST is in ARRAY.
+     */
+    private static boolean containsAll(Object[] array, List list)
+    {
+    LIST:
+        for (Iterator iterator = list.iterator(); iterator.hasNext(); )
+        {
+            Object obj = (Object) iterator.next();
+            for (int i = 0; i < array.length; i++ )
+            {
+                if (obj.equals(array[i]))
+                    continue LIST;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Convert list to String array.
+     */
+    private static String[] toStringArray(List list)
+    {
+        return (String[]) list.toArray(new String[list.size()]);
+    }
+
+    private Community createCommunity(Context context)
+        throws SQLException, AuthorizeException
+    {
+        Community community = Community.create(context);
+        community.setMetadata("name", TEST_NAME_1);
+        community.update();
+        return community;
+    }
 
     ////////////////////////////////////////
     // Static test methods
