@@ -54,7 +54,7 @@ public class WorkflowAbortServlet extends DSpaceServlet
             
             request.setAttribute("workflow", wi);
             JSPManager.showJSP(request, response,
-                "/admin/workflow_abort_confirm.jsp");
+                "/admin/workflow-abort-confirm.jsp");
         }
         else if( button.equals("submit_abort_confirm") )
         {
@@ -85,7 +85,7 @@ public class WorkflowAbortServlet extends DSpaceServlet
         WorkflowItem [] w = WorkflowItem.findAll(c);
         
         request.setAttribute("workflows", w);
-        JSPManager.showJSP(request, response, "/admin/workflow_list.jsp" );
+        JSPManager.showJSP(request, response, "/admin/workflow-list.jsp" );
     }
 }
 
