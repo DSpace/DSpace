@@ -266,6 +266,7 @@ CREATE TABLE Collection2Item
   collection_id INTEGER REFERENCES Collection(collection_id),
   item_id       INTEGER REFERENCES Item(item_id)
 );
+
 -------------------------------------------------------
 -- ResourcePolicy table
 -------------------------------------------------------
@@ -276,10 +277,12 @@ CREATE TABLE ResourcePolicy
   policy_id            INTEGER PRIMARY KEY,
   resource_type_id     INTEGER,
   resource_id          INTEGER,
-  container_type_id    INTEGER,
-  container_id         INTEGER,
   action_id            INTEGER,
-  policy_statement     VARCHAR(256)
+  is_public            BOOL,
+  eperson_id           INTEGER REFERENCES EPerson(eperson_id),
+  epersongroup_id      INTEGER REFERENCES EPersonGroup(eperson_group_id),
+  start_date           DATE,
+  end_date             DATE
 );
 
 -------------------------------------------------------
