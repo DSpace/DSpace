@@ -462,6 +462,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 step);
             newGroup.update();
             collection.setWorkflowGroup(step, newGroup);
+            collection.update();
 
             // Forward to group edit page
             response.sendRedirect(response.encodeRedirectURL(
