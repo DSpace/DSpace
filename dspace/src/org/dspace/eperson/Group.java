@@ -88,7 +88,7 @@ public class Group extends DSpaceObject
     /**
      * Construct a Group from a given context and tablerow
      * @param context
-     * @param tablerow
+     * @param row
      */
     Group(Context context, TableRow row)
         throws SQLException
@@ -239,7 +239,6 @@ public class Group extends DSpaceObject
      *
      * @param c context
      * @param groupid group ID to check
-     * @param userid userid
      */
     public static boolean isMember(Context c, int groupid)
         throws SQLException
@@ -374,7 +373,7 @@ public class Group extends DSpaceObject
                 s = "name";
         }
         
-        TableRowIterator rows = DatabaseManager.query(context,
+        TableRowIterator rows = DatabaseManager.query(context, "epersongroup",
             "SELECT * FROM epersongroup ORDER BY " + s);
 
         List gRows = rows.toList();
