@@ -1,3 +1,6 @@
+- (Scott Yeadon)
+  SF bug #1123304 ItemImport --replace created new Handles
+
 (Corey Harper)
 - Retain search scope while navigating result sets
   SF patch #1156356
