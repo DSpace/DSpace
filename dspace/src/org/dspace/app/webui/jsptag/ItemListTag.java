@@ -86,11 +86,7 @@ public class ItemListTag extends TagSupport
     
     /** Config value of thumbnail view toggle */
     private boolean showThumbs;
-    
-    /** Config thumb width and height */
-    private int thumbMaxWidth;
-    private int thumbMaxHeight;
-    
+       
     /** Config browse/search width and height */
     private int thumbItemListMaxWidth;
     private int thumbItemListMaxHeight;
@@ -339,9 +335,16 @@ public class ItemListTag extends TagSupport
     	if (showThumbs)
     	{
     		thumbItemListMaxHeight = ConfigurationManager.getIntProperty("webui.browse.thumbnail.maxheight");
+    		if (thumbItemListMaxHeight == 0)
+    		{
+    			thumbItemListMaxHeight = ConfigurationManager.getIntProperty("thumbnail.maxheight");
+    		}
+    		   		
     		thumbItemListMaxWidth = ConfigurationManager.getIntProperty("webui.browse.thumbnail.maxwidth");
-    		thumbMaxHeight = ConfigurationManager.getIntProperty("thumbnail.maxheight");
-    		thumbMaxWidth = ConfigurationManager.getIntProperty("thumbnail.maxwidth");  		
+    		if (thumbItemListMaxWidth == 0)
+    		{
+    			thumbItemListMaxWidth = ConfigurationManager.getIntProperty("thumbnail.maxwidth");
+    		}
     	}
     }
     
