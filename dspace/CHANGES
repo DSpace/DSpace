@@ -1,6 +1,10 @@
 1.3 branch (unreleased)
 =======================
 
+(Richard Jones)
+- Addition of Tapir workspace to MyDSpace pages: authoring and supervising item
+listings, a workspace for each item and a workspace item metadata viewer
+
 (David Little)
 - SF patch #1165647, 1165649-52 - USCD mods to support SRB and Registration
 
