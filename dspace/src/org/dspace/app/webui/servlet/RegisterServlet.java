@@ -437,7 +437,7 @@ public class RegisterServlet extends DSpaceServlet
             request.setAttribute("token", token);
             request.setAttribute("eperson", eperson);
             request.setAttribute("missing.fields", new Boolean(!infoOK));
-            request.setAttribute("password.problem", new Boolean(!infoOK));
+            request.setAttribute("password.problem", new Boolean(!passwordOK));
             // Indicate if user can set password
             boolean setPassword =
                 Authenticate.getSiteAuth().allowSetPassword(
