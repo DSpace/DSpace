@@ -472,6 +472,7 @@ public class RegisterServlet extends DSpaceServlet
         {
             request.setAttribute("password.problem", new Boolean(true));
             request.setAttribute("key", key);
+            request.setAttribute("eperson", eperson);
 
             JSPManager.showJSP(request,
                 response,
