@@ -813,7 +813,24 @@ public class DatabaseManager
             }
             else if (jdbctype == Types.VARCHAR)
             {
-                row.setColumn(name, results.getString(i));
+                try
+                {
+                    byte [] bytes = results.getBytes(i);
+
+                    if( bytes != null ) 
+                    {
+                       String mystring = new String(results.getBytes(i), "UTF-8");
+                       row.setColumn( name, mystring );
+                    }
+                    else
+                    {
+                        row.setColumn( name, results.getString(i) );
+                    }
+                } 
+                catch(UnsupportedEncodingException e)
+                {
+                    // do nothing, UTF-8 is built in!
+                }
             }
             else if (jdbctype == Types.DATE)
             {
