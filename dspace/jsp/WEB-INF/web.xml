@@ -82,8 +82,49 @@
 
   <filter-mapping>
     <filter-name>mit-only</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/browse-author</url-pattern>
   </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>mit-only</filter-name>
+    <url-pattern>/browse-date</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>mit-only</filter-name>
+    <url-pattern>/browse-title</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>mit-only</filter-name>
+    <url-pattern>/community-list</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>mit-only</filter-name>
+    <url-pattern>/display-item</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>mit-only</filter-name>
+    <url-pattern>/items-by-author</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>mit-only</filter-name>
+    <url-pattern>/communities/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>mit-only</filter-name>
+    <url-pattern>/retrieve/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>mit-only</filter-name>
+    <url-pattern>/simple-search</url-pattern>
+  </filter-mapping>
+
 
 
   <!-- Servlets -->
