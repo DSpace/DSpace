@@ -145,7 +145,7 @@ public class TableRow
         if (value == null)
             throw new IllegalArgumentException("Column " + column + " not present");
         if (!(value instanceof Integer))
-            throw new IllegalArgumentException("Value is not an integer");
+            throw new IllegalArgumentException("Value for " + column + " is not an integer");
 
         return ((Integer) value).intValue();
     }
