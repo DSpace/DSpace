@@ -433,8 +433,6 @@ public class Community
         // Remove the logo
         setLogo(null);
 
-System.err.println("ABOUT TO DELETE: " + communityRow.toString());
-
         // Delete community row
         DatabaseManager.delete(ourContext, communityRow);
     }
