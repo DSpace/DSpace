@@ -41,6 +41,7 @@
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -50,11 +51,20 @@ import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.http.HttpServletRequest;
+import javax.imageio.ImageIO;
+import java.net.URLEncoder;
+import java.awt.image.BufferedImage;
+import java.sql.SQLException;
 
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
+import org.dspace.content.Bundle;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
+import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.core.Utils;
 
 /**
@@ -74,10 +84,22 @@ public class ItemListTag extends TagSupport
     /** Column to emphasise - null, "title" or "date" */
     private String emphColumn;
     
+    /** Config value of thumbnail view toggle */
+    private boolean showThumbs;
+    
+    /** Config thumb width and height */
+    private int thumbMaxWidth;
+    private int thumbMaxHeight;
+    
+    /** Config browse/search width and height */
+    private int thumbItemListMaxWidth;
+    private int thumbItemListMaxHeight;
 
+    
     public ItemListTag()
     {
-        super();
+        super(); 
+        getThumbSettings();
     }
     
 
@@ -156,6 +178,15 @@ public class ItemListTag extends TagSupport
                 {
                     out.print("</strong>");
                 }
+
+            	HttpServletRequest hrq = (HttpServletRequest)
+                pageContext.getRequest();
+
+            	// display thumbnails if required
+                if (showThumbs)
+                {
+                	out.print(getThumbMarkup(hrq, items[i]));
+                }
                 
                 // Second column is title
                 out.print("</td><td class=\"");
@@ -168,8 +199,8 @@ public class ItemListTag extends TagSupport
                 }
                 
                 out.print("<A HREF=\"");
-                HttpServletRequest hrq = (HttpServletRequest)
-                    pageContext.getRequest();
+//                HttpServletRequest hrq = (HttpServletRequest)
+//                    pageContext.getRequest();
                 out.print(hrq.getContextPath());
                 out.print("/handle/");
                 out.print(items[i].getHandle());
@@ -298,5 +329,157 @@ public class ItemListTag extends TagSupport
         highlightRow = -1;
         emphColumn = null;
         items = null;
+    }
+
+    /* get the required thumbnail config items */
+    private void getThumbSettings()
+    {
+    	showThumbs = ConfigurationManager.getBooleanProperty("webui.browse.thumbnail.show");
+    	
+    	if (showThumbs)
+    	{
+    		thumbItemListMaxHeight = ConfigurationManager.getIntProperty("webui.browse.thumbnail.maxheight");
+    		thumbItemListMaxWidth = ConfigurationManager.getIntProperty("webui.browse.thumbnail.maxwidth");
+    		thumbMaxHeight = ConfigurationManager.getIntProperty("thumbnail.maxheight");
+    		thumbMaxWidth = ConfigurationManager.getIntProperty("thumbnail.maxwidth");  		
+    	}
+    }
+    
+    /* Get the (X)HTML width and height attributes. 
+     * As the browser is being used for scaling, we only scale down
+     * otherwise we'll get hideously chunky images. This means the media
+     * filter should be run with the maxheight and maxwidth set greater
+     * than or equal to the size of the images required in the
+     * search/browse
+     */
+    private String getScalingAttr(HttpServletRequest hrq,
+    							  Bitstream bitstream) throws JspException
+    {
+    	BufferedImage buf;
+    	
+    	try
+		{
+    		Context c = UIUtil.obtainContext(hrq);
+    	
+    		InputStream is = BitstreamStorageManager.retrieve(c,
+    			bitstream.getID());
+    		
+    		// 	read in bitstream's image    		
+    		buf = ImageIO.read(is);
+		}
+    	catch (SQLException sqle)
+		{
+    		throw new JspException(sqle.getMessage());
+		}
+    	catch (IOException ioe)
+		{
+    		throw new JspException(ioe.getMessage());
+		}
+        
+        // now get the image dimensions
+        float xsize = (float)buf.getWidth(null);
+        float ysize = (float)buf.getHeight(null);
+
+        // scale by x first if needed
+        if( xsize > (float)thumbItemListMaxWidth )
+        {
+            // calculate scaling factor so that xsize * scale = new size (max)
+            float scale_factor = (float)thumbItemListMaxWidth/xsize;
+            
+            // now reduce x size and y size
+            xsize = xsize * scale_factor;
+            ysize = ysize * scale_factor;
+        }
+ 
+        // scale by y if needed
+        if( ysize > (float)thumbItemListMaxHeight )
+        {
+            float scale_factor = (float)thumbItemListMaxHeight/ysize;
+            
+            // now reduce x size
+            // and y size
+            xsize = xsize * scale_factor;
+            ysize = ysize * scale_factor;
+        }
+
+        StringBuffer sb = new StringBuffer("width=\"")
+							.append(xsize)
+							.append("\" height=\"")
+							.append(ysize)
+							.append("\"");
+        
+        return sb.toString();
+    }
+    
+    
+    /* generate the (X)HTML required to show the thumbnail */
+    private String getThumbMarkup(HttpServletRequest hrq, Item item) throws JspException
+    {
+    	Bundle[] original = item.getBundles("ORIGINAL");
+    	boolean html = false; 
+    	
+    	// if multiple bitstreams, check if the primary one is HTML
+		if (original[0].getBitstreams().length > 1)
+		{
+            Bitstream[] bitstreams = original[0].getBitstreams();
+            for (int i = 0; i < bitstreams.length && !html; i++)
+            {
+                if (bitstreams[i].getID() == original[0].getPrimaryBitstreamID())
+                {
+                    html = bitstreams[i].getFormat().getMIMEType().equals("text/html");
+                }
+            }		
+		}
+		
+    	Bundle[] thumbs = item.getBundles("THUMBNAIL");
+    	
+    	// if there are thumbs and we're not dealing with an HTML item
+    	// then show the thumbnail
+    	if (thumbs.length > 0 && !html)
+        {
+    		Bitstream thumbnailBitstream;
+    		
+    		if (original[0].getBitstreams().length > 1 &&
+    			original[0].getPrimaryBitstreamID() > -1)
+    		{
+    			try
+				{
+    				Context c = UIUtil.obtainContext(hrq);
+    				thumbnailBitstream = thumbs[0].getBitstreamByName(Bitstream.find(c, original[0].getPrimaryBitstreamID()).getName() + ".jpg");
+				}
+    			catch (SQLException sqle)
+				{
+    				throw new JspException(sqle.getMessage());
+				}
+    		}
+    		else
+    		{
+    	  		thumbnailBitstream = thumbs[0].getBitstreams()[0];    	  		
+    		}	              		
+
+    		if (thumbnailBitstream != null)
+    		{
+        		StringBuffer thumbLink = new StringBuffer("<br/><a target=_blank href=\"")
+						.append(hrq.getContextPath())
+						.append("/handle/")
+						.append(item.getHandle())
+						.append("\"><img src=\"")
+						.append(hrq.getContextPath())
+						.append("/bitstream/")
+						.append(item.getHandle())
+						.append("/")
+						.append(thumbnailBitstream.getSequenceID())
+						.append("/")
+   						.append(URLEncoder.encode(thumbnailBitstream.getName()))
+						.append("\" alt=")
+						.append(thumbnailBitstream.getName())
+						.append("\" ")
+						.append(getScalingAttr(hrq, thumbnailBitstream))
+						.append("/></a>");
+        		
+        		return thumbLink.toString();
+    		}
+        }
+    	return "";
     }
 }

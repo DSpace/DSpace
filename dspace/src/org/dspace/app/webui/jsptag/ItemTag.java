@@ -58,6 +58,8 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.Utils;
+import org.dspace.core.ConfigurationManager;
+
 
 /**
  * Tag for displaying an item
@@ -76,10 +78,13 @@ public class ItemTag extends TagSupport
     /** The style to use - "default" or "full" */
     private String style;
     
+    /** Whether to show preview thumbs on the item page */
+    private boolean showThumbs;
     
     public ItemTag()
     {
         super();
+        getThumbSettings();
     }
     
     
@@ -521,7 +526,7 @@ public class ItemTag extends TagSupport
                             bsLink = bsLink + URLEncoder.encode(bitstreams[k].getName()) + "\">";
                             
                             // is there a thumbnail bundle?
-                            if(thumbs.length > 0)
+                            if(thumbs.length > 0 && showThumbs)
                             {
                                 String tName = bitstreams[k].getName()+".jpg";
                                 Bitstream tb = thumbs[0].getBitstreamByName(tName);
@@ -546,6 +551,11 @@ public class ItemTag extends TagSupport
         }
         
         out.println("</td></tr></table>");
+    }
+    
+    private void getThumbSettings()
+    {
+    	showThumbs = ConfigurationManager.getBooleanProperty("webui.item.thumbnail.show");
     }
 }
 
