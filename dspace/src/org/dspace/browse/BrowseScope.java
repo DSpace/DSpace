@@ -44,26 +44,35 @@ import org.dspace.core.Context;
 import org.dspace.content.*;
 
 /**
- * Scope object for browse. The scope object contains the following:
+ * Scope object for browse. A scope object contains the following:
  *
- *  scope: A Community, a collection, or null. If a community or
- *    collection, browses return only objects within the
- *    community or collection.
+ *  <dl>
+ *  <dt>scope</dt>
+ *  <dd>A {@link org.dspace.content.Community}, a
+ *   {@link org.dspace.content.Collection}, or null. If the scope is a
+ *    community or collection, browses return only objects within the
+ *    community or collection.</dd>
  *
- *  focus: The point at which a Browse begins. This can be a String,
- *      an Item (given by either the Item object or its id), or null.
+ *  <dt>focus</dt>
+ *      <dd>The point at which a Browse begins. This can be a String,
+ *      an {@link org.dspace.content.Item} (given by either the Item
+ *      object or its id), or null. <br>.
  *      If a String, Browses begin with values lexicographically greater
- *      than or equal to the String.
+ *      than or equal to the String.<br>
  *      If an Item, Browses begin with the value of the Item in the
  *      corresponding browse index. If the item has multiple values
- *      in the index, the behavior is undefined.
+ *      in the index, the behavior is undefined.<br>.
  *      If null, Browses begin at the start of the index.
+ *      </dd>
  *
- *  total: The total number of results returned from a Browse.
- *  A total of -1 means to return all results.
+ *  <dt>total</dt>
+ *  <dd>The total number of results returned from a Browse.
+ *  A total of -1 means to return all results.</dd>
  *
- *  numberBefore: The maximum number of results returned previous
- *    to the focus.
+ *  <dt>numberBefore</dt>
+ *  <dd>The maximum number of results returned previous
+ *  to the focus.</dd>
+ *  </dl>
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -88,12 +97,14 @@ public class BrowseScope
     /**
      * Create a browse scope with the given context.
      * The default scope settings are:
-     *   + Include results from all of DSpace
-     *   + Start from the beginning of the given index
-     *   + Return 0 total results
-     *   + Return 0 values previous to focus
+     *   <ul>
+     *   <li> Include results from all of DSpace
+     *   <li> Start from the beginning of the given index
+     *   <li> Return 0 total results
+     *   <li> Return 0 values previous to focus
+     *   </ul>
      *
-     * @param context - The DSpace context.
+     * @param context The DSpace context.
      */
     public BrowseScope(Context context)
     {
@@ -101,7 +112,7 @@ public class BrowseScope
     }
 
     /**
-     * Set the browse scope to all of DSpace
+     * Set the browse scope to all of DSpace.
      */
     public void setScopeAll()
     {
@@ -109,9 +120,9 @@ public class BrowseScope
     }
 
     /**
-     * Set the browse scope to COMMUNITY.
+     * Limit the browse to a community.
      *
-     * @param community - The community to browse.
+     * @param community The community to browse.
      */
    public void setScope(Community community)
     {
@@ -119,9 +130,9 @@ public class BrowseScope
     }
 
     /**
-     * Set the browse scope to COLLECTION.
+     * Limit the browse to a collection.
      *
-     * @param collection - The collection to browse.
+     * @param collection The collection to browse.
      */
    public void setScope(Collection collection)
     {
@@ -131,12 +142,11 @@ public class BrowseScope
     /**
      * Browse starts at item i. Note that if the item has more
      * than one value for the given browse, the results are undefined.
-     * (FIXME -- do we want to specify this at some point??)
      *
      * This setting is ignored for itemsByAuthor, byAuthor, and
      * lastSubmitted browses.
      *
-     * @param item - The item to begin the browse at.
+     * @param item The item to begin the browse at.
      */
     public void setFocus(Item item)
     {
@@ -144,13 +154,13 @@ public class BrowseScope
     }
 
     /**
-     * Browse starts at VALUE. If VALUE is null, Browses begin from
+     * Browse starts at value. If value is null, Browses begin from
      * the start of the index.
      *
      * This setting is ignored for itemsByAuthor and
      * lastSubmitted browses.
      *
-     * @param value - The value to begin the browse at.
+     * @param value The value to begin the browse at.
      */
     public void setFocus(String value)
     {
@@ -161,12 +171,11 @@ public class BrowseScope
      * Browse starts at the item with the given id. Note that if the item
      * has more than one value for the given browse index, the results are
      * undefined.
-     * (FIXME -- do we want to specify this at some point??)
      *
      * This setting is ignored for itemsByAuthor, byAuthor, and
      * lastSubmitted browses.
      *
-     * @param item_id - The item to begin the browse at.
+     * @param item_id The item to begin the browse at.
      */
     public void setFocus(int item_id)
     {
@@ -174,7 +183,7 @@ public class BrowseScope
     }
 
     /**
-     * Browse starts at beginning (default)
+     * Browse starts at beginning (default).
      */
     public void noFocus()
     {
@@ -185,7 +194,7 @@ public class BrowseScope
      * Set the total returned to n.
      * If n is -1, all results are returned.
      *
-     * @param n - The total number of results to return
+     * @param n The total number of results to return
      */
     public void setTotal(int n)
     {
@@ -204,7 +213,7 @@ public class BrowseScope
      * Set the maximum number of results to return previous to
      * the focus.
      *
-     * @param n - the maximum number of results to return previous to
+     * @param n The maximum number of results to return previous to
      * the focus.
      */
     public void setNumberBefore(int n)
@@ -219,7 +228,7 @@ public class BrowseScope
     /**
      * Return the context for the browse.
      *
-     * @return - The context for the browse.
+     * @return The context for the browse.
      */
     public Context getContext()
     {
@@ -229,7 +238,7 @@ public class BrowseScope
     /**
      * Return the browse scope.
      *
-     * @return - The browse scope.
+     * @return The browse scope.
      */
     public Object getScope()
     {
@@ -237,10 +246,11 @@ public class BrowseScope
     }
 
     /**
-     * Return the browse focus. This is either an Item, an
-     * Integer (the Item id) or a String.
+     * Return the browse focus. This is either an
+     * {@link org.dspace.content.Item}, an Integer (the Item id)
+     * or a String.
      *
-     * @return - The focus of the browse.
+     * @return The focus of the browse.
      */
     public Object getFocus()
     {
@@ -249,10 +259,10 @@ public class BrowseScope
 
     /**
      * Return the maximum number of results to return.
-     * A total of -1 indicates that the entire index should
+     * A total of -1 indicates that all matching results should
      * be returned.
      *
-     * @return - The maximum number of results.
+     * @return The maximum number of results.
      */
     public int getTotal()
     {
@@ -263,7 +273,7 @@ public class BrowseScope
      * Return the maximum number of results to return previous to
      * the focus.
      *
-     * @return - The maximum number of results previous to the focus.
+     * @return The maximum number of results previous to the focus.
      */
     public int getNumberBefore()
     {

@@ -45,17 +45,20 @@ import java.sql.SQLException;
 import org.dspace.core.Context;
 
 /**
- * Creates Browse indexes
+ * Command-line tool to create Browse indexes.
  *
  * @author  Peter Breton
  * @version $Revision$
  */
 public class InitializeBrowse
 {
+    /** Private Constructor */
+    private InitializeBrowse () {}
+
     /**
-     * Create Browse index, destroying the old one
+     * Creates Browse indexes, destroying the old ones.
      *
-     * @param argv - Command-line arguments
+     * @param argv Command-line arguments
      */
     public static void main(String[] argv)
     {

@@ -86,6 +86,11 @@ public class Browse
     private static Logger log = Logger.getLogger(Browse.class);
 
     /**
+     * Constructor
+     */
+    private Browse() {}
+
+    /**
      * Return distinct Authors in the given scope.
      * Results are returned in alphabetical order.
      *
@@ -251,9 +256,13 @@ public class Browse
     }
 
     /**
-     * This method should be called whenever an item has changed:
-     *   + DC values are added, removed, or modified
-     *   + the value of the in_archive flag changes
+     * This method should be called whenever an item has changed.
+     * Changes include:
+     *
+     *   <ul>
+     *    <li>DC values are added, removed, or modified
+     *    <li>the value of the in_archive flag changes
+     *   </ul>
      *
      * @param context - The database context
      * @param item - The item which has been added
@@ -368,6 +377,10 @@ public class Browse
     ////////////////////////////////////////
     // Other methods
     ////////////////////////////////////////
+
+    /**
+     * Return the normalized form of title.
+     */
     public static String getNormalizedTitle(String title, String lang)
     {
         return NormalizedTitle.normalize(title, lang);
