@@ -42,6 +42,8 @@
   - Navigation bar for admin pages
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page import="java.util.LinkedList" %>
 <%@ page import="java.util.List" %>
 
