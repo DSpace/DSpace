@@ -51,7 +51,28 @@ import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 /**
- * Simple connection pool
+ * <p>
+ * Simple connection pool. The pool is used internally by the
+ * DatabaseManager class, and normally should not be accessed
+ * directly.
+ * </p>
+ *
+ * <p>
+ * SimplePool is a virtual JDBC driver, which provides its own
+ * implementations of the Connection, Statement, and ResultSet
+ * interfaces. The implementations simply delegate to the
+ * corresponding objects created by another JDBC driver.
+ * When the pooled Connections, Statements and ResultSets are obtained,
+ * SimplePool marks them as in-use; when they are closed,
+ * either explicitly or through garbage collection, SimplePool
+ * marks them as free, and they are then available for use again.
+ * </p>
+ *
+ * <p>
+ * SimplePool uses a wait-then-balk strategy when highly loaded. If
+ * a connection cannot be obtained, SimplePool waits for 1 second and
+ * then tries again. After 5 such attempts, an SQLException is thrown.
+ * </p>
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -77,13 +98,15 @@ public class SimplePool implements java.sql.Driver
     private static int max_connections =
         ConfigurationManager.getIntProperty("simplepool.max.connections");
 
-    // Time to wait, in milliseconds
-    // If a connection is not available, the request will wait for
-    // this length of time before trying again
+    /**
+     * If a connection is not available, the request will wait for
+     * this many milliseconds before trying again.
+     */
     private static long WAIT_TIME = 1000;
 
     /**
-     * After this many connection attempts, an SQLException will be thrown
+     * After this many unsuccessful connection attempts, an SQLException
+     * will be thrown.
      */
     private static int MAX_ATTEMPTS = 5;
 
@@ -106,7 +129,7 @@ public class SimplePool implements java.sql.Driver
     }
 
     /**
-     * Register the driver with the DriverManager
+     * Register the driver with the DriverManager.
      */
     private void registerDriver(String classname)
         throws SQLException
@@ -140,7 +163,7 @@ public class SimplePool implements java.sql.Driver
     }
 
     /**
-     * Get a JDBC SQL connection
+     * Obtain a JDBC SQL connection.
      */
     public Connection connect(String s, Properties p)
         throws SQLException
@@ -149,9 +172,11 @@ public class SimplePool implements java.sql.Driver
     }
 
     /**
-     * Get a JDBC SQL connection
+     * Obtain a JDBC SQL connection.
      */
-    public synchronized Connection connectInternal(String s, Properties p, int count)
+    private synchronized Connection connectInternal(String s,
+                                                    Properties p,
+                                                    int count)
         throws SQLException
     {
         // Check the pool first
@@ -265,22 +290,35 @@ public class SimplePool implements java.sql.Driver
         return s.startsWith("jdbc:simplepool:");
     }
 
+    /**
+     * Return info about the JDBC Driver.
+     */
     public DriverPropertyInfo[] getPropertyInfo(String s, Properties p)
         throws SQLException
     {
         return driver.getPropertyInfo(s, p);
     }
 
+    /**
+     * Return the major version of this JDBC driver.
+     */
     public int getMajorVersion()
     {
         return 0;
     }
 
+    /**
+     * Return the minor version of this JDBC driver.
+     */
     public int getMinorVersion()
     {
         return 1;
     }
 
+    /**
+     * Return <code>true</code> if this driver is JDBC-compliant,
+     * false otherwise.
+     */
     public boolean jdbcCompliant()
     {
         // We are as compliant as the underlying driver
