@@ -43,6 +43,9 @@
   - Returns:
   -   submit_community
   -   submit_collection
+  -   submit_item
+  -       item_handle
+  -       item_id
   -   submit_advanced
   -
   --%>
@@ -85,7 +88,11 @@
                     <input type="submit" name="submit_advanced" value="Advanced Policy Admin Tool">
                 </td>
             </tr>
-
+            <tr>
+                <td align="left">
+                    <input type="submit" name="submit_item" value="Individual Item">
+                </td>
+            </tr>
         </table>
     </center>        
 

@@ -57,10 +57,13 @@ import org.dspace.authorize.PolicySet;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
 
 
 /**
@@ -74,7 +77,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                     HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        // show the main page (select communities, collections, etc)
+        // show the main page (select communities, collections, items, etc)
         showMainPage(c, request, response);
     }
     
@@ -111,6 +114,11 @@ public class AuthorizeAdminServlet extends DSpaceServlet
 
             JSPManager.showJSP(request, response, "/admin/authorize-advanced.jsp" );            
         }
+        else if( button.equals("submit_item") )
+        {
+            // select an item to work on
+            JSPManager.showJSP(request, response, "/admin/item-select.jsp" );            
+        }
         else if( button.equals("submit_collection_select") )
         {
             // edit the collection's permissions
@@ -122,6 +130,121 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute("policies", policies     );
             JSPManager.showJSP(request, response,
                 "/admin/authorize-collection-edit.jsp" );
+        }
+
+        // ITEMS ////////////////////////////////////////////////////
+        
+        else if( button.equals("submit_item_select") )
+        {
+            Item item = null;
+            
+            int    item_id = UIUtil.getIntParameter ( request, "item_id");
+            String handle  = request.getParameter   ( "handle"          );
+            
+            // if id is set, use it
+            if( item_id > 0 )
+            {
+                item = Item.find(c, item_id);
+            }
+            else if(handle != null && !handle.equals(""))
+            {
+                // otherwise, attempt to resolve handle
+                DSpaceObject dso = HandleManager.resolveToObject(c, handle);    
+
+                // make sure it's an item
+                if( dso != null && dso.getType() != Constants.ITEM )
+                {
+                    item = (Item) dso;
+                }
+            }
+            
+            // no item set yet, failed ID & handle, ask user to try again
+            if( item == null )
+            {
+                request.setAttribute("invalid.id", new Boolean(true));
+                JSPManager.showJSP(request, response, "/admin/item-select.jsp");
+            }
+            else
+            {
+                // show edit form!
+                List item_policies = AuthorizeManager.getPolicies(c, item);
+            
+                request.setAttribute("item", item);
+                request.setAttribute("item_policies", item_policies     );
+                JSPManager.showJSP(request, response,
+                    "/admin/authorize-item-edit.jsp" );
+            }
+        }
+        else if( button.equals( "submit_item_add_policy") )
+        {
+            // want to add a policy, create an empty one and invoke editor
+
+            Item item = Item.find(c,
+                            UIUtil.getIntParameter(request, "item_id"));
+
+            ResourcePolicy policy = ResourcePolicy.create(c);
+            policy.setResource( item );
+            policy.update();
+
+            Group   [] groups  = Group.findAll  (c, Group.NAME   );
+            EPerson [] epeople = EPerson.findAll(c, EPerson.EMAIL);
+            
+            // return to item permission page
+            request.setAttribute( "edit_title", "Item " + item.getID() );
+            request.setAttribute( "policy",     policy     );
+            request.setAttribute( "groups",     groups     );
+            request.setAttribute( "epeople",    epeople    );
+            request.setAttribute( "id_name",    "item_id" );
+            request.setAttribute( "id",         "" + item.getID() );
+            
+            JSPManager.showJSP(request, response,
+                "/admin/authorize-policy-edit.jsp" );
+        }
+        else if( button.equals("submit_item_delete_policy") )
+        {
+            // delete a permission from an item
+            Item item = Item.find(c,
+                            UIUtil.getIntParameter(request, "item_id"));
+            ResourcePolicy policy = ResourcePolicy.find(c, UIUtil.getIntParameter(request, "policy_id"));
+            
+            // do the remove
+            policy.delete();
+            
+            // return to collection permission page
+            request.setAttribute("item", item );
+
+            List item_policies = AuthorizeManager.getPolicies(c, item);
+            request.setAttribute("item_policies", item_policies);
+
+            JSPManager.showJSP(request, response, "/admin/authorize-item-edit.jsp" );
+        }
+        
+        // COLLECTIONS ////////////////////////////////////////////////////////
+        
+        else if( button.equals( "submit_collection_add_policy") )
+        {
+            // want to add a policy, create an empty one and invoke editor
+
+            Collection collection = Collection.find(c,
+                            UIUtil.getIntParameter(request, "collection_id"));
+
+            ResourcePolicy policy = ResourcePolicy.create(c);
+            policy.setResource( collection );
+            policy.update();
+
+            Group   [] groups  = Group.findAll  (c, Group.NAME   );
+            EPerson [] epeople = EPerson.findAll(c, EPerson.EMAIL);
+            
+            // return to collection permission page
+            request.setAttribute( "edit_title", "Collection " + collection.getID() );
+            request.setAttribute( "policy",     policy     );
+            request.setAttribute( "groups",     groups     );
+            request.setAttribute( "epeople",    epeople    );
+            request.setAttribute( "id_name",    "collection_id" );
+            request.setAttribute( "id",         "" + collection.getID() );
+            
+            JSPManager.showJSP(request, response,
+                "/admin/authorize-policy-edit.jsp" );
         }
         else if( button.equals("submit_community_select") )
         {
@@ -294,14 +417,17 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             int action_id     = UIUtil.getIntParameter(request, "action_id"    );
             int group_id      = UIUtil.getIntParameter(request, "group_id"     );
             int collection_id = UIUtil.getIntParameter(request, "collection_id");
-            int community_id  = UIUtil.getIntParameter(request, "community_id");
- 
+            int community_id  = UIUtil.getIntParameter(request, "community_id" );
+            int item_id       = UIUtil.getIntParameter(request, "item_id"      );
+            
+            Item item             = null;
             Collection collection = null;
             Community  community  = null;
             String display_page   = null;
             
             ResourcePolicy policy = ResourcePolicy.find(c, policy_id);
             Group group = Group.find(c, group_id);
+            
             
             if( collection_id != -1 )
             {
@@ -336,7 +462,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 display_page = "/admin/authorize-collection-edit.jsp";
             }
             
-            if( community_id != -1 )
+            else if( community_id != -1 )
             {
                 community = Community.find( c, community_id );
 
@@ -368,6 +494,22 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                     AuthorizeManager.getPolicies( c, community ) );
                 display_page = "/admin/authorize-community-edit.jsp";
             }
+            else if( item_id != -1 )
+            {
+                item = Item.find( c, item_id );
+
+                // modify the policy
+                policy.setAction  ( action_id  );
+                policy.setGroup   ( group      );
+                policy.update();
+
+                // set up page attributes
+                request.setAttribute("item", item );
+                request.setAttribute("item_policies",
+                    AuthorizeManager.getPolicies( c, item ) );
+                display_page = "/admin/authorize-item-edit.jsp";
+            }
+
 
             // now return to previous state
             JSPManager.showJSP( request, response, display_page );
