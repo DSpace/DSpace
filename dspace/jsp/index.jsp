@@ -45,11 +45,31 @@
   - via a Servlet.  This is because the standard servlet 2.3 deployment
   - descriptor does not seem to allow a servlet to be deployed at "/" without
   - it becoming the servlet for dealing with every request to the site.
+  -
+  - This also means there's some business logic, basically some minimal stuff
+  - from DSpaceServlet.java.  This shouldn't happen elsewhere in the JSPs.
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="java.sql.SQLException" %>
+
+<%@ page import="org.apache.log4j.Logger" %>
+
+<%@ page import="org.dspace.app.webui.util.JSPManager" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.core.LogManager" %>
+
+<%
+    // Obtain a context so that the location bar can display log in status
+    Context context = null;
+
+    try
+    {
+        context = UIUtil.obtainContext(request);
+%>
 
 <dspace:layout style="home" locbar="nolink" title="Home">
 
@@ -125,3 +145,20 @@
     <%@ include file="/components/news.jsp" %>
   </dspace:sidebar>
 </dspace:layout>
+
+<%
+    }
+    catch (SQLException se)
+    {
+        // Database error occurred.
+        Logger log = Logger.getLogger("org.dspace.jsp");
+        log.warn(LogManager.getHeader(context,
+            "database_error",
+            se.toString()), se);
+
+        // Also email an alert
+        UIUtil.sendAlert(request, se);
+
+        JSPManager.showInternalError(request, response);
+    }
+%>
