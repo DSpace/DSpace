@@ -57,7 +57,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.license.CC" %>
+<%@ page import="org.dspace.license.CreativeCommons" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -109,7 +109,7 @@
     for (int i = 1; i < step; i++)
     {
         // Hack for skipping CC step if not enabled
-        if (!CC.isEnabled() && i==SubmitServlet.CC_LICENSE)
+        if (!CreativeCommons.isEnabled() && i==SubmitServlet.CC_LICENSE)
         {
           continue;
         }
@@ -148,7 +148,7 @@
     for (int i = step + 1; i < lastStep; i++)
     {
         // Hack for skipping CC step if not enabled
-        if (!CC.isEnabled() && i==SubmitServlet.CC_LICENSE)
+        if (!CreativeCommons.isEnabled() && i==SubmitServlet.CC_LICENSE)
         {
           continue;
         }

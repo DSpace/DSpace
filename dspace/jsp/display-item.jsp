@@ -65,7 +65,7 @@
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.handle.HandleManager" %>
-<%@ page import="org.dspace.license.CC" %>
+<%@ page import="org.dspace.license.CreativeCommons" %>
 
 <%
     // Attributes
@@ -79,8 +79,8 @@
     String handle = item.getHandle();
 
     // CC URL & RDF
-    String cc_url = CC.getLicenseURL(item);
-    String cc_rdf = CC.getLicenseRDF(item);
+    String cc_url = CreativeCommons.getLicenseURL(item);
+    String cc_rdf = CreativeCommons.getLicenseRDF(item);
 
     // Full title needs to be put into a string to use as tag argument
     String title = "Item " + handle;
