@@ -44,9 +44,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -62,6 +65,9 @@ import org.dspace.storage.rdbms.TableRowIterator;
  */
 public class DCType
 {
+    /** log4j category */
+    private static Logger log = Logger.getLogger(DCType.class);
+
     /** Our context */
     private Context ourContext;
 
@@ -100,10 +106,24 @@ public class DCType
 
         if (row == null)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_dc_type",
+                    "not_found,dc_type_id=" + id));
+            }
+
             return null;
         }
         else
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_dc_type",
+                    "dc_type_id=" + id));
+            }
+
             return new DCType(context, row);
         }
     }
@@ -198,12 +218,41 @@ public class DCType
         if (!AuthorizeManager.isAdmin(context))
         {
             throw new AuthorizeException(
-                "Only administrators may modiffy the Dublin Core registry");
+                "Only administrators may modify the Dublin Core registry");
         }
 
         // Create a table row
         TableRow row = DatabaseManager.create(context, "dctyperegistry");
+
+        log.info(LogManager.getHeader(context,
+            "create_dc_type",
+            "dc_type_id=" + row.getIntColumn("dc_type_id")));
+
         return new DCType(context, row);
+    }
+
+    
+    /**
+     * Delete this DC type.  This won't work if there are any DC values
+     * in the database of this type - they need to be updated first.
+     * An <code>SQLException</code> (referential integrity violation)
+     * will be thrown in this case.
+     */
+    public void delete()
+        throws SQLException, AuthorizeException
+    {
+        // Check authorisation: Only admins may create DC types
+        if (!AuthorizeManager.isAdmin(ourContext))
+        {
+            throw new AuthorizeException(
+                "Only administrators may modify the Dublin Core registry");
+        }
+        
+        log.info(LogManager.getHeader(ourContext,
+            "delete_dc_type",
+            "dc_type_id=" + getID()));
+
+        DatabaseManager.delete(ourContext, typeRow);
     }
 
 
@@ -298,6 +347,10 @@ public class DCType
             throw new AuthorizeException(
                 "Only administrators may modiffy the Dublin Core registry");
         }
+
+        log.info(LogManager.getHeader(ourContext,
+            "update_dc_type",
+            "dc_type_id=" + getID()));
 
         DatabaseManager.update(ourContext, typeRow);
     }
