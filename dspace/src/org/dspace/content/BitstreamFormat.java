@@ -94,6 +94,9 @@ public class BitstreamFormat
     /** The row in the table representing this format */
     private TableRow bfRow;
 
+    /** File extensions for this format */
+    private List extensions;
+
 
     /**
      * Class constructor for creating a BitstreamFormat object
@@ -103,9 +106,20 @@ public class BitstreamFormat
      * @param row      the corresponding row in the table
      */
     BitstreamFormat(Context context, TableRow row)
+        throws SQLException
     {
         bfContext = context;
         bfRow = row;
+        extensions = new ArrayList();
+
+        TableRowIterator tri = DatabaseManager.query(context,
+            "SELECT * FROM formatidentifier WHERE bitstream_format_id=" +
+            getID());
+        
+        while (tri.hasNext())
+        {
+            extensions.add(tri.next().getStringColumn("extension"));
+        }
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bitstream_format_id"));
@@ -480,6 +494,21 @@ public class BitstreamFormat
             "update_bitstream_format",
             "bitstream_format_id=" + getID()));
 
+        // Delete extensions
+        DatabaseManager.updateQuery(bfContext,
+            "DELETE FROM formatidentifier WHERE bitstream_format_id=" +
+            getID());
+
+        // Rewrite extensions
+        for (int i = 0; i < extensions.size(); i++)
+        {
+            String s = (String) extensions.get(i);
+            TableRow r = DatabaseManager.create(bfContext, "formatidentifier");
+            r.setColumn("bitstream_format_id", getID());
+            r.setColumn("extension", s);
+            DatabaseManager.update(bfContext, r);
+        }
+
         DatabaseManager.update(bfContext, bfRow);
     }
 
@@ -509,6 +538,11 @@ public class BitstreamFormat
             "UPDATE bitstreams SET bitstream_format_id=" + unknown.getID() +
                 " WHERE bitstream_format_id=" + getID());
 
+        // Delete extensions
+        DatabaseManager.updateQuery(bfContext,
+            "DELETE FROM formatidentifier WHERE bitstream_format_id=" +
+            getID());
+
         // Delete this format from database
         DatabaseManager.delete(bfContext, bfRow);
 
@@ -516,5 +550,33 @@ public class BitstreamFormat
             "delete_bitstream_format",
             "bitstream_format_id=" + getID() + ",bitstreams_changed=" +
                 numberChanged));
+    }
+
+
+    /**
+     * Get the filename extensions associated with this format
+     *
+     * @return  the extensions
+     */
+    public String[] getExtensions()
+    {
+        String[] exts = new String[extensions.size()];
+        exts = (String[]) extensions.toArray(exts);
+        return exts;
+    }
+
+
+    /**
+     * Set the filename extensions associated with this format
+     *
+     * @param  the extensions
+     */
+    public void setExtensions(String[] exts)
+    {
+        extensions = new ArrayList();
+        for (int i = 0; i < exts.length; i++)
+        {
+            extensions.add(exts[i]);
+        }
     }
 }

@@ -15,6 +15,9 @@
   - valid support_levels:  0 = unknown,  1 = known,  2 = supported
   - internal:  specify true for internal types of bitstream (i.e. used
   -            by the system, not for distribution to users)
+  - extensions:  Typical filename extensions, used for identifying incoming
+  -              files.  Can have multiple extensions, as shown in the example
+  -              below.  "internal" formats shouldn't have these.
   -
   - <dspace-bitstream-types>
   -   <bitstream-type>
@@ -23,6 +26,8 @@
   -     <description>Thing Version 1 Document Format</description>
   -     <support_level>1</support_level>
   -     <internal>false</internal>
+  -     <extension>thingdoc</extension>
+  -     <extension>thd</extension>
   -   </bitstream-type>
   -  
   -    ...
@@ -39,6 +44,7 @@
     <description>Adobe Portable Document Format</description>
     <support_level>2</support_level>
     <internal>false</internal>
+    <extension>pdf</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -47,6 +53,7 @@
     <description>Extensible Markup Language</description>
     <support_level>2</support_level>
     <internal>false</internal>
+    <extension>xml</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -55,6 +62,8 @@
     <description>Plain Text</description>
     <support_level>2</support_level>
     <internal>false</internal>
+    <extension>txt</extension>
+    <extension>asc</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -63,6 +72,8 @@
     <description>Hypertext Markup Language</description>
     <support_level>2</support_level>
     <internal>false</internal>
+    <extension>htm</extension>
+    <extension>html</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -71,6 +82,7 @@
     <description>Microsoft Word</description>
     <support_level>1</support_level>
     <internal>false</internal>
+    <extension>doc</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -79,6 +91,7 @@
     <description>Microsoft Powerpoint</description>
     <support_level>1</support_level>
     <internal>false</internal>
+    <extension>ppt</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -87,6 +100,7 @@
     <description>Microsoft Excel</description>
     <support_level>1</support_level>
     <internal>false</internal>
+    <extension>xls</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -111,6 +125,8 @@
     <description>Joint Photographic Experts Group/JPEG File Interchange Format (JFIF)</description>
     <support_level>2</support_level>
     <internal>false</internal>
+    <extension>jpeg</extension>
+    <extension>jpg</extension>
   </bitstream-type>
   
   <bitstream-type>
@@ -119,6 +135,7 @@
     <description>Graphics Interchange Format</description>
     <support_level>2</support_level>
     <internal>false</internal>
+    <extension>gif</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -127,6 +144,7 @@
     <description>Portable Network Graphics</description>
     <support_level>2</support_level>
     <internal>false</internal>
+    <extension>png</extension>
   </bitstream-type>
   
   <bitstream-type>

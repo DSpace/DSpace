@@ -199,6 +199,8 @@ public class RegistryLoader
         String internalString = getElementData(node, "internal");
         boolean internal = new Boolean(internalString).booleanValue();
 
+        String[] extensions = getRepeatedElementData(node, "extension");
+
         // Create the format object
         BitstreamFormat format = BitstreamFormat.create(context);
 
@@ -208,9 +210,12 @@ public class RegistryLoader
         format.setDescription(desc);
         format.setSupportLevel(supportLevel);
         format.setInternal(internal);
+        format.setExtensions(extensions);
 
         // Write to database
         format.update();
+
+        
     }
 
 
@@ -329,5 +334,48 @@ public class RegistryLoader
         String value = dataNode.getNodeValue().trim();
 
         return value;
+    }
+
+
+    /**
+     * Get repeated CDATA for a particular element.  For example, if the XML
+     * document contains:
+     * <P>
+     * <code>
+     * &lt;foo&gt;
+     *   &lt;bar&gt;val1&lt;/bar&gt;
+     *   &lt;bar&gt;val2&lt;/bar&gt;
+     * &lt;/foo&gt;
+     * </code>
+     * passing this the <code>foo</code> node and <code>bar</code> will
+     * return <code>val1</code> and <code>val2</code>.</P>
+     * Why this also isn't a core part of the XML API I do not know...
+     *
+     * @param parentElement  the element, whose child element you want
+     *                       the CDATA from
+     * @param childName      the name of the element you want the CDATA from
+     *
+     * @return  the CDATA as a <code>String</code>
+     */
+    private static String[] getRepeatedElementData(
+        Node parentElement, String childName)
+        throws TransformerException
+    {
+        // Grab the child node
+        NodeList childNodes = XPathAPI.selectNodeList(parentElement,
+            childName);
+
+        String[] data = new String[childNodes.getLength()];
+        
+        for (int i = 0; i < childNodes.getLength(); i++)
+        {
+            // Get the #text node
+            Node dataNode = childNodes.item(i).getFirstChild();
+
+            // Get the data
+            data[i] = dataNode.getNodeValue().trim();
+        }
+        
+        return data;
     }
 }
