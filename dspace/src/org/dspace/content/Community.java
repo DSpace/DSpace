@@ -183,7 +183,7 @@ public class Community
      *
      * @return  the communities in the system
      */
-    public static Community[] getAllCommunities(Context context)
+    public static Community[] findAll(Context context)
         throws SQLException
     {
         TableRowIterator tri = DatabaseManager.query(context,

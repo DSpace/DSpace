@@ -125,8 +125,8 @@ public class ContentTest extends TestCase
             assertNotNull("Found community", c2);
             assertEquals("Found community has correct name",
                          c2.getMetadata("name"), TEST_NAME_1);
-            assertTrue("Found community in getAllCommunities array",
-                       contains(Community.getAllCommunities(context), c1));
+            assertTrue("Found community in findAll array",
+                       contains(Community.findAll(context), c1));
 
 
             c1 = Community.find(context, id);
