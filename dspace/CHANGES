@@ -1,5 +1,8 @@
-1.3 (?) beta 1
-==============
+1.2.2  beta 1
+=============
+(Jenny Toves, Brian Hughes, Larry Stone, William Reilly, Richard Rodgers)
+- Customisable submission forms
+
 (Barry Gaskin)
 - Fix for Oracle too many cursors problem
 
@@ -14,6 +17,7 @@
 
 (Trevor Swarm)
 - Submit button on collection pages only appears if user has authorisation
+
 
 1.2.1
 =====
