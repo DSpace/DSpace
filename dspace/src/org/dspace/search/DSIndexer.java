@@ -328,7 +328,7 @@ public class DSIndexer
         textvalues.put("handletext", myhandle     );
 
 
-        writeIndexRecord(writer, Constants.COMMUNITY, target.getID(), myhandle, textvalues, "");
+        writeIndexRecord(writer, Constants.COMMUNITY, myhandle, textvalues, "");
     }
 
 
@@ -357,7 +357,7 @@ public class DSIndexer
         textvalues.put("location",   location_text);
         textvalues.put("handletext", myhandle     );
 
-        writeIndexRecord(writer, Constants.COLLECTION, target.getID(), myhandle, textvalues, "");
+        writeIndexRecord(writer, Constants.COLLECTION, myhandle, textvalues, "");
     }
 
 
@@ -519,24 +519,22 @@ public class DSIndexer
         textvalues.put("identifier",id_text    	 );
         
         // write out the metatdata (for scalability, using hash instead of individual strings)
-        writeIndexRecord(writer, Constants.ITEM, myitem.getID(), itemhandle, textvalues, extractedText);
+        writeIndexRecord(writer, Constants.ITEM, itemhandle, textvalues, extractedText);
     }
 
 
     /** writeIndexRecord() creates a document from its args
      *  and writes it out to the index that is opened
      */
-    private static void writeIndexRecord(IndexWriter iw, int type, int id, String handle,
+    private static void writeIndexRecord(IndexWriter iw, int type, String handle,
                                             HashMap textvalues, String extractedText )
         throws IOException
     {
         Document doc     = new Document();
-        Integer  ti      = new Integer(id);
         Integer  ty      = new Integer(type);
         String   fulltext= "";
 
         // do id, type, handle first
-        doc.add(Field.UnIndexed("id",       ti.toString() ));
         doc.add(Field.UnIndexed("type",     ty.toString() ));
 
         // want to be able to search for handle, so use keyword
