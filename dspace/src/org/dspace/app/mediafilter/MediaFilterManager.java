@@ -188,7 +188,7 @@ public class MediaFilterManager
       for (int i = 0; i < myBundles.length; i++)
       {
          // could have multiple 'ORIGINAL' bundles (hmm, probably not)
-         if (myBundles[i].getName().equals("ORIGINAL"))
+         if ("ORIGINAL".equals(myBundles[i].getName()))
          {
             // now look at all of the bitstreams
             Bitstream[] myBitstreams = myBundles[i].getBitstreams();
