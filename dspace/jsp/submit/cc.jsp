@@ -66,28 +66,41 @@
     String exitURL = baseURL + "/submit/cc-license.jsp?license_url=[license_url]";
 %>
 
-<dspace:layout locbar="off" navbar="off" title="DSpace Distribution License">
+<dspace:layout locbar="off" navbar="off" title="DSpace Distribution License" nocache="true">
 
     <form name="foo" id="license_form" action="<%= request.getContextPath() %>/submit" method=post>
 
-        <jsp:include page="/submit/progressbar.jsp">
+        <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.CC_LICENSE %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
         </jsp:include>
 
         <H1>Submit: Use a Creative Commons License</H1>
-
-	<INPUT TYPE="submit" name="submit_cancel" value="Cancel/Save" />
-
-	<INPUT TYPE="submit" name="submit_no_cc" value="Don't Use Creative Commons" />
 <br />
 
-	<IFRAME src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="600">Your browser must support IFrames to use this feature
+	<IFRAME src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540">Your browser must support IFrames to use this feature
 	</IFRAME>
+
         <%= SubmitServlet.getSubmissionParameters(si) %>
         <input type=hidden name=step value=<%= SubmitServlet.CC_LICENSE %>>
 	<input type=hidden name=cc_license_url value="" />
 	<input type=hidden name=submit_grant value="I Grant the License" />
-
+        <center>
+            <table border=0 width=80%>
+                <tr>
+                    <td width="100%">&nbsp;</td>
+                    <td>
+                        <input type=submit name=submit_prev value="&lt; Previous">
+                    </td>
+                    <td>
+                        <input type=submit name=submit_no_cc value="Skip Creative Commons &gt;"/>
+                    </td>
+                    <td>&nbsp;&nbsp;&nbsp;</td>
+                    <td align=right>
+                        <input type=submit name=submit_cancel value="Cancel/Save"/>
+                    </td>
+                </tr>
+            </table>
+        </center>
     </form>
 </dspace:layout>
