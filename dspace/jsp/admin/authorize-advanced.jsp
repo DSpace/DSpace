@@ -100,7 +100,6 @@
             </td>
         </tr>
 
-
         <tr>
             <td>Content Type:</td>
             <td>
@@ -134,9 +133,6 @@
                 </select>
             </td>
         </tr>
-
-        <tr><td>Type:</td>
-            <td>select
               
     </table>
     

@@ -75,7 +75,7 @@
     <table class="miscTable" align="center">
         <tr>
             <td>
-                    <select size="5" name="community_id">
+                    <select size="12" name="community_id">
                         <%  for (int i = 0; i < communities.length; i++) { %>
                             <option value="<%= communities[i].getID()%>">
                                 <%= communities[i].getMetadata("name")%>

@@ -78,7 +78,7 @@
             <td>
                 <input type="hidden" name="group_id" value="<%=group.getID()%>">
                 
-                <select size="10" name="eperson_id" multiple>
+                <select size="15" name="eperson_id" multiple>
                         <%  for (int i = 0; i < epeople.length; i++) { %>
                             <option value="<%= epeople[i].getID()%>">
                                 <%= epeople[i].getEmail()%>

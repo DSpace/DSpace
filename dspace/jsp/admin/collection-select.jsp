@@ -72,7 +72,7 @@
     <table class="miscTable" align="center">
         <tr>
             <td>
-                    <select size="5" name="collection_id">
+                    <select size="12" name="collection_id">
                         <%  for (int i = 0; i < collections.length; i++) { %>
                             <option value="<%= collections[i].getID()%>">
                                 <%= collections[i].getMetadata("name")%>

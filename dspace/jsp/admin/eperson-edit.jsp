@@ -66,6 +66,7 @@
     String firstName = eperson.getFirstName();
     String lastName  = eperson.getLastName();
     String phone     = eperson.getMetadata("phone");
+    String errorMessage  = request.getAttribute("error_message");
 %>
 
 <dspace:layout title="Edit EPerson"
@@ -73,6 +74,9 @@
                locbar="link"
                parentlink="/admin"
                parenttitle="Administer">
+
+
+    <h1><%= errorMessage %></h1>
 
     <h1>Edit EPerson <%= eperson.getEmail() %>:</h1>
 

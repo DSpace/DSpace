@@ -67,11 +67,16 @@
 
 <%
     ResourcePolicy policy = (ResourcePolicy) request.getAttribute("policy"    );
-    Group   [] groups     = (Group []      ) request.getAttribute("groups"    );
+    Group   [] groups     = (Group  []     ) request.getAttribute("groups"    );
     EPerson [] epeople    = (EPerson[]     ) request.getAttribute("epeople"   );
     String edit_title     = (String        ) request.getAttribute("edit_title");
     String id_name        = (String        ) request.getAttribute("id_name"   );
     String id             = (String        ) request.getAttribute("id"        );
+
+    // calculate the resource type and its relevance ID
+    // to check what actions to present
+    int resourceType      = policy.getResourceType();
+    int resourceRelevance = 1 << resourceType;     
 %>
 
 <dspace:layout title="Edit Policy"
@@ -102,12 +107,18 @@
             <td><input type="hidden" name="<%=id_name%>" value="<%=id%>">
                 <input type="hidden" name="policy_id" value="<%=policy.getID()%>" >
                 <select name="action_id">
-                    <%  for( int i = 0; i < Constants.actionText.length; i++ ) { %>
-                        <option value="<%= i %>"
-                            <%=(policy.getAction() == i ? "selected" : "")%>>
-                            <%= Constants.actionText[i]%>
-                        </option>
-                    <%  } %>
+                    <%  for( int i = 0; i < Constants.actionText.length; i++ )
+                            {
+                                // only display if action i is relevant
+                                //  to resource type resourceRelevance                             
+                                if( Constants.actionTypeRelevance[i]|resourceRelevance )
+                                { %>
+                                    <option value="<%= i %>"
+                                    <%=(policy.getAction() == i ? "selected" : "")%>>
+                                    <%= Constants.actionText[i]%>
+                                    </option>
+                    <%          }
+                            } %>
                 </select>
             </td>
         </tr>
