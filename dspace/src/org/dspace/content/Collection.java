@@ -109,7 +109,9 @@ public class Collection extends DSpaceObject
     /** The default group of submitters */
     private Group submitters;
 
-
+    /** The default group of editors */
+    private Group editors;
+    
     /**
      * Construct a collection with the given table row
      *
@@ -556,6 +558,52 @@ public class Collection extends DSpaceObject
 
 
     /**
+     * Create a default editors group if one does not already exist.
+     * Returns either the newly created group or the previously existing one.
+     * Note that other groups may also be editors.
+     *
+     * @return  the default group of editors associated with this collection
+     */
+    public Group createEditors()
+        throws SQLException, AuthorizeException
+    {
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+
+        if( editors == null)
+        {
+            editors = Group.create(ourContext);
+            editors.setName("COLLECTION_" + getID() + "_EDITOR");
+            editors.update();
+        }
+
+        // editors also get ADD on the submitter group
+        if( submitters != null )
+        {
+            AuthorizeManager.addPolicy(ourContext, submitters, Constants.ADD, editors);
+        }
+
+        return editors;
+    }
+
+
+    /**
+     * Get the default group of editors, if there is one.  Note that the
+     * authorization system may allow others to be editors for the collection.
+     * <P>
+     * The default group of submitters for collection 100 is the one called
+     * <code>collection_100_editor</code>.
+     *
+     * @return  group of editors, or <code>null</code> if
+     *          there is no default group.
+     */
+    public Group getEditors()
+    {
+        return editors;
+    }
+
+
+    /**
      * Get the license that users must grant before submitting to this
      * collection.  If the collection does not have a specific license,
      * the site-wide default is returned.
@@ -827,7 +875,6 @@ public class Collection extends DSpaceObject
             wsarray[x].deleteAll();
         }
 
-
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);
         
@@ -838,6 +885,11 @@ public class Collection extends DSpaceObject
         g = getWorkflowGroup(2);  if( g != null ) { g.delete(); }
         g = getWorkflowGroup(3);  if( g != null ) { g.delete(); }
 
+        // Remove default editors group
+        g = getEditors(); if( g!=null ) { g.delete(); }        
+        
+        // Remove default submitters group
+        g = getSubmitters(); if( g!=null ) { g.delete(); }        
     }
 
 
