@@ -240,6 +240,8 @@
         </center>
     </form>
 
+    <P align="center"><A HREF="<%= request.getContextPath() %>/subscribe">See Your Subscriptions</A></P>
+
 <%
     // Display workspace items, if any
     if (workspaceItems.length > 0)
