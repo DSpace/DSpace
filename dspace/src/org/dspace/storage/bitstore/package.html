@@ -9,6 +9,93 @@
 </head>
 <body bgcolor="white">
 Provides an API for storing, retrieving and deleting streams of bits in
-a transactionally safe fashion.
+a transactionally safe fashion. The main class is
+<a href="BitstreamStorageManager.html">BitstreamStorageManager</a>.
+
+<h2>Using the Bitstore API</h2>
+
+<p>
+An example use of the Bitstore API is shown below:
+<pre>
+    // Create or obtain a context object
+    Context context;
+    // Stream to store
+    InputStream stream;
+    
+    try
+    {
+        // Store the stream
+        int id = BitstreamStorageManager.store (context, stream);
+        // Retrieve it
+        InputStream retrieved = BitstreamStorageManager.retrieve(context, id);
+        // Delete it
+        BitstreamStorageManager.delete(context, id);
+
+        // Complete the context object so changes are written
+    }
+    // Error with I/O operations
+    catch (IOException ioe)
+    {
+       
+    }
+    // Database error
+    catch (SQLException sqle)
+    {
+    }
+</pre>
+</p>
+
+<h2>Storage mechanism</h2>
+
+<p>
+The BitstreamStorageManager stores its data under the directory
+given by the configuration property <em>assetstore.dir</em>.
+When given a stream of bits to store, the BitstreamStorageManager
+generates a unique key for the stream. The key takes the form of
+a long sequence of digits, which is transformed into a file path.
+The BitstreamStorageManager stores the contents of the stream in
+this path, creating parent directories as necessary.
+</p>
+
+<h3>Changing the location of the Asset Store</h3>
+
+To change the location of the asset store, do the following:
+
+<ol>
+  <li>Shut down the DSpace system.
+  <li>Move the asset store directory to the new location.
+  <!-- FIXME: This should refer DSpace configuration info -->
+  <li>Change the configuration property <em>assetstore.dir</em>
+      to refer to the new location.
+  <li>Restart the DSpace system.
+</ol>
+
+No database changes are necessary.
+
+<h2>The Bitstore and Transactions</h2>
+
+<p>
+The bitstore is carefully engineered to prevent data loss, using
+transactional flags in the database. Before a bitstream is 
+actually stored, a metadata entry with the unique bitstream id is
+committed to the database. If the storage operations fails or is
+aborted, the deleted flag remains, and the bitstore API ensures
+that the bitstream cannot be retrieved. Only when all of the
+</p>
+
+<p>
+Similarly, bitstreams are deleted by simply setting the
+deleted flag. 
+</p>
+
+<h2>Cleaning up the Asset Store</h2>
+
+As noted above, sometimes files will be physically present in the
+Asset Store even though they are marked deleted in the database.
+You can use the command-line utility class
+<code>org.dspace.storage.bitstore.Cleanup</code>
+to remove the bitstreams which are marked deleted from the Asset Store.
+
 </body>
 </html>
+
