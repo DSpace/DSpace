@@ -177,6 +177,7 @@ public class MediaFilterManager
             try
             {
                 myFilter.processBitstream(c, myItem, myBitstream, isForce);
+                myItem.update(); // Make sure new bitstream has a sequence number
             }
             catch(Exception e)
             {
