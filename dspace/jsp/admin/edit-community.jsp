@@ -56,6 +56,7 @@
     Community community = (Community) request.getAttribute("community");
     
     String name = "";
+    String shortDesc = "";
     String intro = "";
     String copy = "";
     String side = "";
@@ -65,6 +66,7 @@
     if (community != null)
     {
         name = community.getMetadata("name");
+        shortDesc = community.getMetadata("short_description");
         intro = community.getMetadata("introductory_text");
         copy = community.getMetadata("copyright_text");
         side = community.getMetadata("side_bar_text");
@@ -108,6 +110,12 @@
             <tr>
                 <td class="submitFormLabel">Name:</td>
                 <td><input type="text" name="name" value="<%= name %>" size=50></td>
+            </tr>
+            <tr>
+                <td class="submitFormLabel">Short Description</td>
+                <td>
+                    <input type="text" name="short_description" value="<%= shortDesc %>" size=50>
+                </td>
             </tr>
             <tr>
                 <td class="submitFormLabel">Introductory text (HTML):</td>
