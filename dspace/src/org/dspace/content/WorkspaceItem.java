@@ -299,7 +299,7 @@ public class WorkspaceItem implements InProgressSubmission
             "SELECT workspaceitem.* FROM workspaceitem, item WHERE " +
                 "workspaceitem.item_id=item.item_id AND " +
                 "item.submitter_id=" + ep.getID() +
-                " ORDER BY workspaceitem.workspace_item_id;");
+                " ORDER BY workspaceitem.workspace_item_id");
 
         while (tri.hasNext())
         {
