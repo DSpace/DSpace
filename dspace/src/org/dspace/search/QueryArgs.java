@@ -1,5 +1,7 @@
 package org.dspace.search;
 
+import javax.servlet.http.HttpServletRequest;
+
 public class QueryArgs
 {
     // the query string
@@ -49,4 +51,52 @@ public class QueryArgs
      * get the count of hits to return
      */
     public int getPageSize() { return pageSize; }
+    
+    public String buildQuery (HttpServletRequest request)
+    {
+    	String newquery = "(";
+    	String query1 	= request.getParameter("query1");
+    	String query2 	= request.getParameter("query2");
+    	String query3 	= request.getParameter("query3");
+    	
+    	String field1 	= request.getParameter("field1");
+    	String field2 	= request.getParameter("field2");
+    	String field3 	= request.getParameter("field3");
+
+    	String conjunction1 	= request.getParameter("conjunction1");
+    	String conjunction2 	= request.getParameter("conjunction2");
+    	
+    	if (query1.length() > 0)
+    	{
+    		if (!field1.equals("ANY")) {
+    			newquery = newquery + field1 + ":";
+    		}
+    		
+    		newquery = newquery + '"' + query1 + '"';
+    	}
+    	
+    	if (query2.length() > 0)
+    	{
+    		newquery = newquery + " " + conjunction1 + " ";
+    		if (!field2.equals("ANY")) {
+    			newquery = newquery + field2 + ":";
+    		}
+    		
+    		newquery = newquery + '"' + query2 + '"';
+    	}
+    	
+    	newquery = newquery + ")";
+    	
+    	if (query3.length() > 0)
+    	{
+			newquery = newquery + " " + conjunction2 + " ";
+    		if (!field3.equals("ANY")) {
+    			newquery = newquery + field3 + ":";
+    		}
+    		
+    		newquery = newquery + "\"" + query3 + "\"";
+    	}
+
+    	return (newquery);
+    }
 }
