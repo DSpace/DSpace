@@ -76,6 +76,10 @@
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     
+    // get the workspace id if one has been passed
+    Integer workspace_id = (Integer) request.getAttribute("workspace_id");
+    
+    // get the handle if the item has one yet
     String handle = item.getHandle();
 
     // CC URL & RDF
@@ -83,7 +87,15 @@
     String cc_rdf = CreativeCommons.getLicenseRDF(item);
 
     // Full title needs to be put into a string to use as tag argument
-    String title = "Item " + handle;
+    String title = "";
+    if (handle != null)
+    {
+        title = "Item " + handle;
+    }
+    else
+    {
+        title = "Workspace Item";
+    }
 %>
 
 <dspace:layout title="<%= title %>">
@@ -124,17 +136,73 @@
     if (displayAll)
     {
 %>
-    <P align=center><A HREF="<%= locationLink %>?mode=simple">Show simple item record</A></P>
+    <div align=center>
+<%
+        if (workspace_id != null)
+        {
+%>
+    <form method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
+        <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>">
+        <input type="submit" name="submit_simple" value="Show simple item record">
+    </form>
+<%
+        }
+        else
+        {
+%>
+    <form method="get" action="<%=locationLink %>">
+        <input type="hidden" name="mode" value="simple">
+        <input type="submit" name="submit_simple" value="Show simple item record">
+    </form>
+<%
+        }
+%>
+    </div>
 <%
     }
     else
     {
 %>
-    <P align=center><A HREF="<%= locationLink %>?mode=full">Show full item record</A></P>
+    <div align=center>
+<%
+        if (workspace_id != null)
+        {
+%>
+    <form method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
+        <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>">
+        <input type="submit" name="submit_full" value="Show full item record">
+    </form>
+<%
+        }
+        else
+        {
+%>
+    <form method="get" action="<%=locationLink %>">
+        <input type="hidden" name="mode" value="full">
+        <input type="submit" name="submit_simple" value="Show full item record">
+    </form>
+<%
+        }
+%>
+    </div>
 <%
     }
 %>
 
+
+<%
+    if (workspace_id != null)
+    {
+%>
+<div align="center">
+   <form method="post" action="<%= request.getContextPath() %>/workspace">
+        <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>"/>
+        <input type="submit" name="submit_open" value="Back to Workspace"/>
+    </form>
+</div>
+<%
+    }
+%>
     <%-- SFX Link --%>
 <%
     if (ConfigurationManager.getProperty("sfx.server.url") != null)
