@@ -16,5 +16,84 @@ The {@link org.dspace.storage.rdbms.InitializeDatabase} class is used to
 load SQL into the RDBMS via JDBC. The
 {@link org.dspace.storage.rdbms.SimplePool} class provides a database
 connection pooling API.
+
+<h2>Using the Database API</h2>
+
+<p>
+An example use of the Database API is shown below. Note that in most
+cases, direct use of the Database API is discouraged; you should use
+the <a href="../../content/package-summary.html">Content API</a>, which
+encapsulates use of the database.
+
+<pre>
+    // Create or obtain a context object
+    Context context;
+
+    try
+    {
+      // Run an arbitrary query
+      // Each object returned by the iterator is a TableRow,
+      // with values obtained from the results of the query
+      TableRowIterator iterator = DatabaseManager.query(context,
+      "SELECT * FROM Community WHERE name LIKE 'T%'");
+
+      // Find a single row, using an arbitrary query
+      // If no rows are found, then null is returned.
+      TableRow row = DatabaseManager.querySingle(context,
+      "SELECT * FROM EPerson WHERE email = 'pbreton@mit.edu'");
+
+      // Run an insert, update or delete SQL command
+      // Returns the number of rows affected.
+      int rowsAffected = DatabaseManager.updateQuery(context,
+      "DELETE FROM EPersonGroup WHERE name LIKE 'collection_100_%'");
+
+      // Find a row in a particular table
+      // This will return the row in the eperson table with id 1, or null
+      // if no such row exists
+      TableRow epersonrow = DatabaseManager.find(context, "eperson", 1);
+
+      // Create a new row, and assign a primary key
+      TableRow newrow = DatabaseManager.create(context, "Collection");
+      newrow.setColumn("name", "Test Collection for example code");
+      newrow.setColumn("provenance_description", "Created via test program");
+      // Save changes to the database
+      DatabaseManager.update(context, newrow);
+      // Delete the row
+      DatabaseManager.delete(context, newrow);
+
+      // Make sure all changes are committed
+      context.complete();
+    }
+    catch (SQLException sqle)
+    {
+        // Handle database error
+    }
+</pre>
+</p>
+
+<h2>Database Ids</h2>
+
+<p>
+All tables in the DSpace system have a single primary key, which is an
+integer. The primary key column is named for the table; for example,
+the EPerson table has eperson_id.
+</p>
+
+<p>
+Assigning database ids is done automatically by the DatabaseManager
+class. When requested to assign an id to a table, the DatabaseManager
+queries the database for the maximum id for that table, adds one, and
+returns that. Assignments thereafter are done in-memory (without
+re-querying); each time an id is requested, the DatabaseManager
+increments the current id, and returns it.
+</p>
+
+<p>
+This strategy works if all id assignment occurs via the
+DatabaseManager API, in a single JVM. It is known to have problems if
+the primary key ids are incremented externally (eg, via another JVM,
+direct database access, and so forth).
+</p>
+
 </body>
 </html>
