@@ -384,6 +384,13 @@ public class Collection implements DSpaceObject
             collectionRow.setColumn("logo_bitstream_id", newLogo.getID());
             logo = newLogo;
 
+            // now create policy for logo bitstream
+            // to match our READ policy
+            List policies = AuthorizeManager.getPoliciesActionFilter(ourContext,
+                                                 this, Constants.READ);
+            AuthorizeManager.addPolicies(ourContext, policies, this );
+
+
             log.info(LogManager.getHeader(ourContext,
                 "set_logo",
                 "collection_id=" + getID() +

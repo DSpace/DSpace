@@ -326,6 +326,13 @@ public class Community implements DSpaceObject
             communityRow.setColumn("logo_bitstream_id", newLogo.getID());
             logo = newLogo;
 
+            // now create policy for logo bitstream
+            // to match our READ policy
+            List policies = AuthorizeManager.getPoliciesActionFilter(ourContext,
+                                                 this, Constants.READ);
+            AuthorizeManager.addPolicies(ourContext, policies, this );
+
+
             log.info(LogManager.getHeader(ourContext,
                 "set_logo",
                 "community_id=" + getID() +
