@@ -287,14 +287,6 @@ else
                 $summary .= "to $enddate";
         }
         
-        if ((!defined $startdate) &&
-            (!defined $enddate))
-        {
-                # give the logfile name just in case, but chop off the path
-                my ($log_filename, $path, $suffix) = fileparse($logfile);                
-                $summary .= "$log_filename";
-        }
-
         # appropriate whitespace
         if (defined $no_subject)
         {
