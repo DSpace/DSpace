@@ -3,7 +3,6 @@
 # {0}  Title of submission
 # {1}  Name of collection
 # {2}  handle 
-# {3}  URL including handle
 #
 Subject: DSpace: Submission Approved and Archived 
 
@@ -19,4 +18,4 @@ Please use this identifier when citing your submission.
 
 Many thanks!
 
-DSpace @ MIT
+DSpace

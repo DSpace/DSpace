@@ -42,7 +42,7 @@
     <mimetype>application/pdf</mimetype>
     <short_description>Adobe PDF</short_description>
     <description>Adobe Portable Document Format</description>
-    <support_level>2</support_level>
+    <support_level>1</support_level>
     <internal>false</internal>
     <extension>pdf</extension>
   </bitstream-type>
@@ -51,7 +51,7 @@
     <mimetype>text/xml</mimetype>
     <short_description>XML</short_description>
     <description>Extensible Markup Language</description>
-    <support_level>2</support_level>
+    <support_level>1</support_level>
     <internal>false</internal>
     <extension>xml</extension>
   </bitstream-type>
@@ -60,7 +60,7 @@
     <mimetype>text/plain</mimetype>
     <short_description>Text</short_description>
     <description>Plain Text</description>
-    <support_level>2</support_level>
+    <support_level>1</support_level>
     <internal>false</internal>
     <extension>txt</extension>
     <extension>asc</extension>
@@ -70,7 +70,7 @@
     <mimetype>text/html</mimetype>
     <short_description>HTML</short_description>
     <description>Hypertext Markup Language</description>
-    <support_level>2</support_level>
+    <support_level>1</support_level>
     <internal>false</internal>
     <extension>htm</extension>
     <extension>html</extension>
@@ -115,7 +115,7 @@
     <mimetype>application/marc</mimetype>
     <short_description>MARC</short_description>
     <description>Machine-Readable Cataloging records</description>
-    <support_level>2</support_level>
+    <support_level>1</support_level>
     <internal>false</internal>
   </bitstream-type>
 
@@ -123,7 +123,7 @@
     <mimetype>image/jpeg</mimetype>
     <short_description>JPEG</short_description>
     <description>Joint Photographic Experts Group/JPEG File Interchange Format (JFIF)</description>
-    <support_level>2</support_level>
+    <support_level>1</support_level>
     <internal>false</internal>
     <extension>jpeg</extension>
     <extension>jpg</extension>
@@ -133,7 +133,7 @@
     <mimetype>image/gif</mimetype>
     <short_description>GIF</short_description>
     <description>Graphics Interchange Format</description>
-    <support_level>2</support_level>
+    <support_level>1</support_level>
     <internal>false</internal>
     <extension>gif</extension>
   </bitstream-type>
@@ -142,7 +142,7 @@
     <mimetype>image/png</mimetype>
     <short_description>image/png</short_description>
     <description>Portable Network Graphics</description>
-    <support_level>2</support_level>
+    <support_level>1</support_level>
     <internal>false</internal>
     <extension>png</extension>
   </bitstream-type>
@@ -151,7 +151,7 @@
     <mimetype>text/plain</mimetype>
     <short_description>License</short_description>
     <description>Item-specific license agreed upon to submission</description>
-    <support_level>2</support_level>
+    <support_level>1</support_level>
     <internal>true</internal>
   </bitstream-type>
      

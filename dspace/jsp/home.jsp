@@ -102,11 +102,8 @@
 
   <dspace:sidebar>
     <%-- non-break spaces to make sidebar a reasonable width--%>
-    <H2>What&nbsp;can&nbsp;you find&nbsp;in&nbsp;DSpace?</H2>
-    <P><strong>MIT</strong> Research in digital form, including preprints, technical reports, working papers, conference papers, images, and more.</P>
-
-    <br>
-    <H2>Is this all of MIT's&nbsp;research?</H2>
-    <P>No. DSpace is limited to digital research products. For items in print, go to <A HREF="http://libraries.mit.edu/barton">Barton: MIT Libraries' catalog</a>. DSpace is young and growing rapidly. Check back often.</P>
+    <H2>This&nbsp;is&nbsp;a&nbsp;default installation of DSpace!</H2>
+    <P>It can be extensively configured by installing modified JSPs,
+    and altering the site configuration.</P>
   </dspace:sidebar>
 </dspace:layout>

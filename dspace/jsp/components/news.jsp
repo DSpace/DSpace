@@ -42,5 +42,5 @@
   - DSpace News.  This appears near the top of the home page.
   --%>
 <H3>DSpace is Live</H3>
-<P>Welcome to our digital repository of MIT research!</P>
-<P><A HREF="http://dspace.org/news/dspace-news.html">More news...</A></P>
+<P>Welcome to our digital repository of My University research!</P>
+<P>More exciting news to appear here.</P>

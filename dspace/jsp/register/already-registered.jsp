@@ -52,9 +52,8 @@
     <P>Our records show that you've already registered with DSpace and have
     an active account with us.</P>
 
-    <P><strong>If you are not an MIT user</strong> you can
-    <a href="<%= request.getContextPath() %>/forgot"> set a new password if
-    you've forgotten it</A>.</P>
+    <P><strong>You can <a href="<%= request.getContextPath() %>/forgot"> set
+    a new password if you've forgotten it</A>.</P>
 
     <P>If you're having trouble logging in, please contact us.</P>
     

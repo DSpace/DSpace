@@ -59,11 +59,6 @@
   </filter>
 
   <filter>
-    <filter-name>mit-only</filter-name>
-    <filter-class>edu.mit.dspace.MITOnlyFilter</filter-class>
-  </filter>
-
-  <filter>
     <filter-name>registered-only</filter-name>
     <filter-class>org.dspace.app.webui.filter.RegisteredOnlyFilter</filter-class>
   </filter>

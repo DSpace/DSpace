@@ -48,13 +48,6 @@
 
     <h1>Thank you for your comments!</h1>
 
-    <p>
-        DSpace staff at MIT use a tool called Casetracker to track problems and
-        issues with our system.  Your message was sent to the DSpace Casetracker
-        queue, and will be received by DSpace support staff, who will respond
-        within one business day.  You will also receive a copy of your message;
-        this is for confirmation only, so you don't need to do anything else
-        before you hear back from the DSpace support team.
-    </p>
+    <p>Your comments have been received.</p>
 
 </dspace:layout>

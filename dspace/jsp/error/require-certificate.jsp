@@ -49,12 +49,8 @@
 
     <h1>Certificate Required</h1>
 
-    <P>MIT users must log in using a valid MIT Web personal certificate.
-    See the <A HREF="http://web.mit.edu/is/cert/">MIT Information Systems
-    Web certificate information page</A>.</P>
-
-    <P>If you are not an MIT user, or you feel that there are extenuating
-    circumstances that mean you should not be required to use a certificate,
+    <P>The configuration of this DSpace site means that you need a valid
+    Web certificate to log in.  If you are having problems with this,
     please contact us.</P>
 
     <dspace:include page="/components/contact-info.jsp" />

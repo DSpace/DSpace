@@ -45,20 +45,6 @@
 <table class="miscTable" align=center width="70%">
     <tr>
         <td class="evenRowEvenCol">
-            <H2 align=center>MIT Users</H2>
-            <P align=center><strong><A HREF="<%= request.getContextPath() %>/certificate-login?from_form=true">Click here if you are an MIT user</A></strong>.</P>
-            <P align=center>MIT users must have a valid MIT Personal Certificate to log in.    Please see the <A HREF="http://web.mit.edu/is/cert/">MIT Information Systems certificate information page</A>.</P>
-        </td>
-    </tr>
-</table>
-
-<br>
-
-<table class="miscTable" align=center width="70%">
-    <tr>
-        <td class="evenRowEvenCol">
-
-            <H2 align=center>Non-MIT Users</H2>
 
             <P><strong>New user?  <A HREF="<%= request.getContextPath() %>/register">Click here to register</A>.</strong></P>
             

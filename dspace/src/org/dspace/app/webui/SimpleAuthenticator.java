@@ -1,5 +1,5 @@
 /*
- * MITAuthenticator.java
+ * SimpleAuthenticator.java
  *
  * $Id$
  *
@@ -40,7 +40,7 @@
  * DAMAGE.
  */
 
-package edu.mit.dspace;
+package org.dspace.app.webui;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -68,7 +68,7 @@ import org.dspace.eperson.Group;
  * @author  Robert Tansley
  * @version $Revision$
  */
-public class MITAuthenticator implements SiteAuthenticator
+public class SimpleAuthenticator implements SiteAuthenticator
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(SiteAuthenticator.class);
@@ -78,18 +78,9 @@ public class MITAuthenticator implements SiteAuthenticator
         HttpServletResponse response)
         throws ServletException, IOException
     {
-        if (isMITUser(request))
-        {
-            // Try and get a certificate by default
-            response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/certificate-login"));
-        }
-        else
-        {
-            // Present the username/password screen (with cert option)
-            response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/password-login"));
-        }
+        // Present the username/password screen
+        response.sendRedirect(response.encodeRedirectURL(
+            request.getContextPath() + "/password-login"));
     }
 
 
@@ -97,75 +88,10 @@ public class MITAuthenticator implements SiteAuthenticator
         HttpServletRequest request)
         throws SQLException
     {        
-        // Add user to "MIT Users" special group if they're an MIT user
-
-        EPerson user = context.getCurrentUser();
-        boolean hasMITEmail = (user != null &&
-            user.getEmail().toLowerCase().endsWith("@mit.edu"));
-
-        if (hasMITEmail || isMITUser(request))
-        {
-            // add the user to the special group "MIT Users"
-            Group mitGroup = Group.findByName(context, "MIT Users");
-
-            if (mitGroup == null)
-            {
-                // Oops - the group isn't there.
-                log.warn(LogManager.getHeader(context,
-                    "No MIT Group found!! Admin needs to create one!",
-                    ""));
-                return new int[0];
-            }
-
-            return new int[] {mitGroup.getID()};
-        }
-
+        // Return a list of special group IDs.
         return new int[0];
     }
 
-
-    /**
-     * Check to see if the user is an MIT user.  At present, it just
-     * checks the source IP address. Note this is independent of user
-     * authentication - if the user is an off-site MIT user, this will
-     * still return false.
-     *
-     * @param request current request
-     *
-     * @return  true if the user is an MIT user.
-     */
-    public static boolean isMITUser(HttpServletRequest request)
-    {
-        String addr = request.getRemoteAddr();
-
-        final String[] mitIPs =
-        {
-            "18.",
-            "128.52.",       // AI
-            "129.55.",       // Lincoln
-            "192.52.65.",    // Haystack
-            "192.52.61.",    // Haystack
-            "198.125.160.",  // Physicists/ESnet ranges purchased
-            "198.125.161.",  // ...
-            "198.125.162.",  // ...
-            "198.125.163.",  // ...
-            "198.125.176.",  // ...
-            "198.125.177.",  // ...
-            "198.125.178.",  // ...
-            "198.125.179."   // ...
-        };
-
-        for (int i = 0; i < mitIPs.length; i++)
-        {
-            if (addr.startsWith(mitIPs[i]))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    
     /** Indicate whether or not a particular self-registering user can set
      * themselves a password in the profile info form.
      *
@@ -179,14 +105,7 @@ public class MITAuthenticator implements SiteAuthenticator
         String email)
         throws SQLException
     {
-        // Anyone whose email address ends with @mit.edu must use a Web cert
-        // to log in, so can't set a password
-        if (email.toLowerCase().trim().endsWith("@mit.edu"))
-        {
-            return false;
-        }
-        
-        // Anyone else can set themselves a password
+        // Anyone can set themselves a password
         return true;
     }
 
@@ -219,11 +138,6 @@ public class MITAuthenticator implements SiteAuthenticator
     public void initEPerson(Context context, HttpServletRequest request,
         EPerson eperson) throws SQLException
     {
-        // If an MIT user, they must use a certificate
-        if (eperson.getEmail().toLowerCase().trim().endsWith("@mit.edu"))
-        {
-            eperson.setRequireCertificate(true);
-        }
+        // Any default fields set in an e-person record would be set here
     }
-    
 }

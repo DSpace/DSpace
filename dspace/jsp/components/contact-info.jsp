@@ -51,11 +51,11 @@
     <table>
         <tr>
             <td class="standard">By e-mail:</td>
-            <td class="standard"><a href="mailto:dspace-help@mit.edu">dspace-help@mit.edu</a></td>
+            <td class="standard"><a href="mailto:dspace-help@myu.edu">dspace-help@myu.edu</a></td>
         </tr>
         <tr>
             <td class="standard">Or telephone:</td>
-            <td class="standard">617-452-3485</td>
+            <td class="standard">xxx-555-xxxx</td>
         </tr>
     </table>
 </center>

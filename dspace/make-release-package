@@ -1,0 +1,28 @@
+#!/bin/sh
+
+USAGE="$0 cvs-tag target"
+
+# Check we have command-line arguments
+if [ "$#" != "2" ]; then
+    echo $USAGE
+    exit 1
+fi
+
+mkdir tmp
+cd tmp
+
+echo "Checking out core code..."
+cvs -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' checkout -r $1 dspace
+
+echo "Creating tarball..."
+mv dspace $2
+
+tar -cf $2.tar.gz | gzip -c > $2
+
+echo "Cleaning up..."
+
+cd ..
+mv tmp/$1.tar.gz .
+rm -r tmp
+
+echo "Package created as $2.tar.gz"
