@@ -57,6 +57,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
+<%@ page import="org.dspace.license.CC" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -71,6 +72,7 @@
         "upload",
         "verify",
         "license",
+        "license",
         "complete"
     };
 
@@ -83,6 +85,7 @@
         "Describe",
         "Upload",
         "Verify",
+        "License",
         "License",
         "Complete"
     };
@@ -105,6 +108,11 @@
     // Show previous (done by definition!) steps
     for (int i = 1; i < step; i++)
     {
+        // Hack for skipping CC step if not enabled
+        if (!CC.isEnabled() && i==SubmitServlet.CC_LICENSE)
+        {
+          continue;
+        }
         // If the step has been done, and we're not on the final step,
         // the user can jump back
         if (step != SubmitServlet.SUBMISSION_COMPLETE)
@@ -139,6 +147,11 @@
     // Show next steps (some of which may have been done)
     for (int i = step + 1; i < lastStep; i++)
     {
+        // Hack for skipping CC step if not enabled
+        if (!CC.isEnabled() && i==SubmitServlet.CC_LICENSE)
+        {
+          continue;
+        }
         if (i <= stageReached)
         {
             // Stage has been previously accessed, so user may jump to it
