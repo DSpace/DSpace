@@ -1,0 +1,9 @@
+Libraries used by DSpace:
+
+activation.jar:    The Java Activation Framework, used by JavaMail
+junit.jar:         JUnit Test Framework, for automatic system tests
+log4j-1.2.1.jar:   Log4j, for system logging
+mail.jar:          JavaMail, used for sending e-mail
+postgresql.jar:    JDBC driver for PostgreSQL
+xalan.jar:         XSLT processor - used for XPath functionality
+xerces.jar:        XML processor - used for parsing XML files

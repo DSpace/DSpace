@@ -49,7 +49,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -68,8 +68,8 @@ import org.apache.log4j.Category;
 public class ConfigurationManager
 {
     /** log4j category */
-    private static Category log =
-        Category.getInstance(ConfigurationManager.class);
+    private static Logger log =
+        Logger.getLogger(ConfigurationManager.class);
 
     /** The configuration properties */
     private static Properties properties = null;
@@ -178,13 +178,56 @@ public class ConfigurationManager
      *
      * @param template   name for the email template, for example "register".
      *
-     * @return  the template for that email, or null if that template doesn't
-     *          exist.
+     * @return  the email object, with the content and subject filled out
+     *          from the template
+     *
+     * @throws IOException   if the template couldn't be found, or there
+     *                       was some other error reading the template
      */
-    public static String getEmail(String template)
+    public static Email getEmail(String template)
+        throws IOException
     {
-        // FIXME: Read in template
-        return "";
+        String subject = "";
+        StringBuffer contentBuffer = new StringBuffer();
+
+        // Read in template
+        BufferedReader reader = new BufferedReader(new FileReader(
+            getProperty("dspace.dir") + File.separator +
+            "config" + File.separator + "emails" + File.separator +
+            template));
+        
+        boolean more = true;
+        
+        while (more)
+        {
+            String line = reader.readLine();
+
+            if (line==null)
+            {
+                more = false;
+            }
+            else if (line.toLowerCase().startsWith("subject:"))
+            {
+                // Extract the first subject line - everything to the right
+                // of the colon, trimmed of whitespace
+                subject = line.substring(8).trim();
+            }
+            else if(!line.startsWith("#"))
+            {
+                // Add non-comment lines to the content
+                contentBuffer.append(line);
+                contentBuffer.append("\n");
+            }
+        }
+
+        reader.close();
+        
+        // Create an email
+        Email email = new Email();
+        email.setSubject(subject);
+        email.setContent(contentBuffer.toString());
+
+        return email;
     }
 
 
