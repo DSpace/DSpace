@@ -305,7 +305,6 @@ CREATE TABLE ResourcePolicy
   resource_type_id     INTEGER,
   resource_id          INTEGER,
   action_id            INTEGER,
-  is_public            BOOL,
   eperson_id           INTEGER REFERENCES EPerson(eperson_id),
   epersongroup_id      INTEGER REFERENCES EPersonGroup(eperson_group_id),
   start_date           DATE,
@@ -540,3 +539,10 @@ WHERE ItemsByDateAccessioned.item_id = Community2Item.item_id
 ;
 
 
+-------------------------------------------------------
+--  Create 'special' groups, for anonymous access
+--  and administrators
+-------------------------------------------------------
+-- We don't use getnextid() for 'anonymous' since the sequences start at '1'
+INSERT INTO epersongroup VALUES(0, 'Anonymous');
+INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator');
