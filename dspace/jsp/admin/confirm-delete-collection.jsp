@@ -49,11 +49,13 @@
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.Community" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
     Collection collection = (Collection) request.getAttribute("collection");
+    Community community = (Community) request.getAttribute("community");
 %>
 
 <dspace:layout title="Delete Collection" navbar="admin" locbar="link" parentlink="/admin" parenttitle="Administer">
@@ -71,6 +73,7 @@
     
     <form method=POST>
         <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
+        <input type="hidden" name="community_id" value="<%= community.getID() %>">
         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_DELETE_COLLECTION %>">
 
         <center>
