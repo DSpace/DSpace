@@ -56,7 +56,7 @@
 <HTML>
     <head>
         <title>DSpace: <%= title %></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp">
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon">
     </head>
