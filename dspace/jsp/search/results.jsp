@@ -201,7 +201,7 @@ else
 <%
     String prevLink =  "<A HREF=\""
                     + request.getContextPath()
-                    + "simple-search?query="
+                    + "/simple-search?query="
                     + URLEncoder.encode(query)
                     + "&start=";
 
@@ -229,7 +229,7 @@ else
 {
     String myLink = "<A HREF=\""
                     + request.getContextPath()
-                    + "simple-search?query="
+                    + "/simple-search?query="
                     + URLEncoder.encode(query)
                     + "&start=";
 
