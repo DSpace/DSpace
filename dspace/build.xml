@@ -102,7 +102,7 @@ Common usage:
   <!-- ============================================================= -->
 
   <target name="compile"
-          description="Compile the source code and build .war files">
+          description="Compile the source code">
     <mkdir dir="build/classes"/>
     <javac srcdir="src"
            destdir="build/classes"
@@ -110,6 +110,16 @@ Common usage:
       <include name="**/*.java"/>
       <classpath refid="build.class.path"/>
     </javac>
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- Build the .war files                                          -->
+  <!-- ============================================================= -->
+
+  <target name="build_wars"
+          depends="compile"
+          description="Build the .war files">  
     <!-- Build DSpace UI .war -->
     <copy file="etc/dspace-web.xml"
           tofile="build/dspace-web.xml"
@@ -117,9 +127,19 @@ Common usage:
     <replace file="build/dspace-web.xml"
              token="@@dspace.dir@@"
              value="${dspace.dir}" />
+    <!-- Copy original JSPs, then copy localised versions on top -->
+    <mkdir dir="build/jsp" />
+    <copy todir="build/jsp" preservelastmodified="true">
+      <fileset dir="jsp">
+        <exclude name="local/**" />
+      </fileset>
+    </copy>
+    <copy todir="build/jsp" preservelastmodified="true" overwrite="true">
+      <fileset dir="jsp/local" />
+    </copy>
     <war destfile="build/dspace.war"
          webxml="build/dspace-web.xml">
-       <fileset dir="jsp" />
+       <fileset dir="build/jsp" />
        <lib dir="lib">
          <exclude name="servlet.jar" />
        </lib>
@@ -141,13 +161,13 @@ Common usage:
     </war>
   </target>
   
-  
+    
   <!-- ============================================================= -->
   <!-- Update an installation (except database)                      -->
   <!-- ============================================================= -->
 
   <target name="update"
-          depends="install_code"
+          depends="install_code,build_wars"
           description="Update installed code (without clobbering data/config)">
     <echo>
 ====================================================================
@@ -295,7 +315,7 @@ Common usage:
   <!-- ============================================================= -->
   
   <target name="fresh_install"
-          depends="install_code,init_configs,setup_database,load_registries"
+          depends="install_code,build_wars,init_configs,setup_database,load_registries"
           description="Do a fresh install of the system, overwriting any data">
     <java classname="org.dspace.core.ConfigurationManager"
           classpathref="build.class.path"

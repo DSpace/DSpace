@@ -84,13 +84,9 @@ public class IncludeTag extends TagSupport
     public int doStartTag()
         throws JspException
     {
-        // Find real path for JSP
-        String realPath = JSPManager.getLocalJSP(page);
-
         try
         {
-            // Now include it
-            pageContext.include(realPath);
+            pageContext.include(page);
         }
         catch (IOException ie)
         {

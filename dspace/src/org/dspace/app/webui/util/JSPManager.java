@@ -42,7 +42,9 @@ package org.dspace.app.webui.util;
 
 import java.io.File;
 import java.io.IOException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -83,54 +85,18 @@ public class JSPManager
         String jsp )
         throws ServletException, IOException
     {
-        String actualJSP = getLocalJSP(jsp);
-
         if (log.isDebugEnabled())
         {
             log.debug(LogManager.getHeader(
                 (Context) request.getAttribute("dspace.context"),
                 "view_jsp",
-                actualJSP));
+                jsp));
         }
 
         // For the moment, a simple forward
-        request.getRequestDispatcher(actualJSP).forward(request, response);
+        request.getRequestDispatcher(jsp).forward(request, response);
     }
         
-
-    /**
-     * Get the path of the appropriate localised version of a JSP.  For example,
-     * passing in <code>/register/new-user.jsp</code> will return the path to
-     * a locally-modified version of that JSP 
-     * (say <code>/local/register-new-user.jsp</code>), or will simply return
-     * the original path if a locally modified version does not exist.
-     *
-     * @param  jsp   the default path of the JSP, for example
-     * @return  the path for the localised version, if any, or the default path
-     *          if no localised version exists
-     */
-    public static String getLocalJSP(String jsp)
-    {
-        String actualJSP = jsp;
-
-        // See if a localised version of the page exists
-
-        // FIXME: This will not work on a platform where "/" is not the
-        // filesystem separator - the JSP path "/path/to/page.jsp" would
-        // need to be translated.
-        File localised = new File(
-            ConfigurationManager.getProperty("dspace.dir") +
-            File.separator + "jsp" + File.separator + "local" + jsp);
-
-        if (localised.exists())
-        {
-            // Forward to the localised version
-            actualJSP = "/local" + jsp;
-        }
-        
-        return actualJSP;
-    }
-
 
     /**
      * Display an internal server error message - for example, a database

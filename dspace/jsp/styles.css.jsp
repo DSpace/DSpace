@@ -41,12 +41,7 @@
 <%--
   - Main DSpace Web UI stylesheet
   -
-  - This is a JSP so:
-  - a) it can be tailored for different browser types
-  - b) we can forward to a locally modified version if necessary
-  -
-  - NOTE!! If you're copying and pasting this to make local modifications,
-  - remove the "localVersion.equals()" if statement!!
+  - This is a JSP so it can be tailored for different browser types
   --%>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 
@@ -54,27 +49,15 @@
     // Make sure the browser knows we're a stylesheet
     response.setContentType("text/css");
 
-    // Check for locally modified version
-    String localVersion = JSPManager.getLocalJSP("/styles.css.jsp");
-    
-    if (!localVersion.equals("/styles.css.jsp"))
+    String imageUrl   = request.getContextPath() + "/image/";
+
+    // Netscape 4.x?
+    boolean usingNetscape4 = false;
+    String userAgent = request.getHeader( "User-Agent" );
+    if( userAgent != null && userAgent.startsWith( "Mozilla/4" ) )
     {
-        // Local version is different
-        JSPManager.showJSP(request, response, "/styles.css.jsp");
+        usingNetscape4 = true;
     }
-    else
-    {
-        // Use this version (site default)
-
-        String imageUrl   = request.getContextPath() + "/image/";
-
-        // Netscape 4.x?
-        boolean usingNetscape4 = false;
-        String userAgent = request.getHeader( "User-Agent" );
-        if( userAgent != null && userAgent.startsWith( "Mozilla/4" ) )
-        {
-            usingNetscape4 = true;
-        }
 %>
 
 A { color: #336699 }
@@ -515,7 +498,3 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   text-decoration: none;
                   vertical-align: middle }
 
-<%
-        // Close conditional above
-    }
-%>

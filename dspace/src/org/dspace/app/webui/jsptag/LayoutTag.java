@@ -235,9 +235,8 @@ public class LayoutTag extends TagSupport
             ServletResponse response = pageContext.getResponse();
             ServletConfig config = pageContext.getServletConfig();
 
-            String headerJSP = JSPManager.getLocalJSP(header);
             RequestDispatcher rd =
-                config.getServletContext().getRequestDispatcher(headerJSP);
+                config.getServletContext().getRequestDispatcher(header);
             
             rd.include(request, response);
         }
@@ -282,9 +281,8 @@ public class LayoutTag extends TagSupport
                 request.setAttribute("dspace.layout.sidebar", sidebar);
             }
 
-            String footerJSP = JSPManager.getLocalJSP(footer);
             RequestDispatcher rd =
-                config.getServletContext().getRequestDispatcher(footerJSP);
+                config.getServletContext().getRequestDispatcher(footer);
             
             rd.include(request, response);
         }
