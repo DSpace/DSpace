@@ -764,6 +764,9 @@ public class SubmitServlet extends DSpaceServlet
         // Update the item metadata.
         readNames(request, item, "contributor", "author", true);
         readText(request, item, "title", null, false, "en");
+	// verify that a title has been entered
+	DCValue[] dcValues = item.getDC("title", null, "en");
+	subInfo.missing = dcValues.length == 0;
 
         if (subInfo.submission.hasMultipleTitles())
         {
@@ -854,8 +857,17 @@ public class SubmitServlet extends DSpaceServlet
         }
         else if (buttonPressed.equals("submit_next"))
         {
-            userHasReached(subInfo, EDIT_METADATA_2);
-            nextStep = EDIT_METADATA_2;
+	    // return to edit metadata 1 if title missing
+	    if ( subInfo.missing )
+	    {
+		subInfo.jumpToField = "title";
+		nextStep = EDIT_METADATA_1;
+	    }
+	    else
+	    {
+		userHasReached(subInfo, EDIT_METADATA_2);
+		nextStep = EDIT_METADATA_2;
+	    }
         }
         else if (buttonPressed.indexOf("remove") > -1)
         {
