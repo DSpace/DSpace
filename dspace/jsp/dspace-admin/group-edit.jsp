@@ -67,7 +67,8 @@
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitle="Administer"
+               nocache="true">
 
     <h1>Edit Group : <%=group.getName()%> (<%=group.getID()%>)</h1>
 

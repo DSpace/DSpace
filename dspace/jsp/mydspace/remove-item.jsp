@@ -56,7 +56,7 @@
     WorkspaceItem wi = (WorkspaceItem) request.getAttribute("workspace.item");
 %>
 
-<dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Remove Item">
+<dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Remove Item" nocache="true">
 
     <H1>Remove Item</H1>
     

@@ -55,7 +55,7 @@
   <info>DSpace JSP tags</info>
 
   <!--
-    - dspace:page tag - main tag for laying out pages.  If you specify a
+    - dspace:layout tag - main tag for laying out pages.  If you specify a
     - that you want a "link" or "nolink" location bar, you can specify a
     - "parent" page using "parent" and "parentlink".  Otherwise, the page is
     - treated as a "top-level" page directly under the home page.
@@ -75,6 +75,8 @@
     - parentlink - path to parent page - must be specified if "parent" specified
     - style   - page layout style.  Default is "default".  Page is loaded
     -            from layout/header-XXX.jsp and layout/footer-XXX.jsp.
+    - noache  - if true, set apprpropriate headers to stop browsers caching
+    -           the page (and possible back-button-related mishaps)
     -->
   <tag>
     <name>layout</name>
@@ -107,6 +109,11 @@
     </attribute>
     <attribute>
       <name>style</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>nocache</name>
       <required>false</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>

@@ -60,7 +60,7 @@
     String license = (String) request.getAttribute("license");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="DSpace Distribution License">
+<dspace:layout locbar="off" navbar="off" title="DSpace Distribution License" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 

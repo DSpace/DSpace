@@ -81,7 +81,7 @@
         (WorkflowItem[]) request.getAttribute("workflow.pooled");
 %>
 
-<dspace:layout title="My DSpace">
+<dspace:layout title="My DSpace" nocache="true">
 
     <table width="100%" border=0>
         <tr>

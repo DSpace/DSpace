@@ -78,7 +78,8 @@
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitle="Administer"
+               nocache="true">
     <H1>Edit Item</H1>
     
     <P><strong>PLEASE NOTE: These changes are not validated in any way.

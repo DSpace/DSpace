@@ -67,7 +67,8 @@
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitle="Administer"
+               nocache="true">
 
     <h1>Select EPerson to Add to Group <%= group.getID() %></h1>
 

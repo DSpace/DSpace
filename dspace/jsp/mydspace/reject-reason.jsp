@@ -59,7 +59,11 @@
         (WorkflowItem) request.getAttribute("workflow.item");
 %>
 
-<dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Enter Reason for Rejection">
+<dspace:layout locbar="link"
+               parenttitle="My DSpace"
+               parentlink="/mydspace"
+               title="Enter Reason for Rejection"
+               nocache="true">
 
     <H1>Enter Reason for Rejection</H1>
 

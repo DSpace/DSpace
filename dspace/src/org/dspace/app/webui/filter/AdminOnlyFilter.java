@@ -56,7 +56,6 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -91,7 +90,7 @@ public class AdminOnlyFilter implements Filter
         // We need HTTP request objects
         HttpServletRequest hrequest = (HttpServletRequest) request;
         HttpServletResponse hresponse = (HttpServletResponse) response;
-
+        
         try
         {
             // Obtain a context
@@ -100,7 +99,7 @@ public class AdminOnlyFilter implements Filter
             if (context.getCurrentUser() == null)
             {
                 // No current user, prompt authentication
-                Authenticate.startAuthentication(context, hrequest, hresponse);
+            	Authenticate.startAuthentication(context, hrequest, hresponse);
             }
             else
             {

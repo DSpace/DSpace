@@ -57,7 +57,7 @@
         (Collection[]) request.getAttribute("collections");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Select Collection to Submit to">
+<dspace:layout locbar="off" navbar="off" title="Select Collection to Submit to" nocache="true">
 
     <jsp:include page="/submit/progressbar.jsp">
         <jsp:param name="current_stage" value="<%= SubmitServlet.SELECT_COLLECTION %>"/>

@@ -87,7 +87,7 @@
     }
 %>
 
-<dspace:layout title="Edit Community" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer">
+<dspace:layout title="Edit Community" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer" nocache="true">
 
 <%
     if (community == null)

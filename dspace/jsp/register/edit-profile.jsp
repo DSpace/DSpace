@@ -65,7 +65,7 @@
     boolean passwordProblem = (attr != null && attr.booleanValue());
 %>
 
-<dspace:layout title="Edit Your Profile">
+<dspace:layout title="Edit Your Profile" nocache="true">
 
     <H1>Edit Your Profile</H1>
     

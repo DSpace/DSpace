@@ -57,7 +57,12 @@
     Item item = (Item) request.getAttribute("item");
 %>
 
-<dspace:layout title="Withdraw Item" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer">
+<dspace:layout title="Withdraw Item"
+               navbar="admin"
+               locbar="link"
+               parentlink="/dspace-admin"
+               parenttitle="Administer"
+               nocache="true">
 
     <H1>Withdraw Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1>
     

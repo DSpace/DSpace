@@ -66,7 +66,7 @@
     boolean passwordProblem = (attr != null && attr.booleanValue());
 %>
 
-<dspace:layout title="Enter New Password">
+<dspace:layout title="Enter New Password" nocache="true">
 
     <h1>Enter a New Password</H1>
     

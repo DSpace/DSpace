@@ -73,7 +73,8 @@
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitle="Administer"
+               nocache="true">
 
 
     <h1><%= (errorMessage==null ? "" : errorMessage) %></h1>

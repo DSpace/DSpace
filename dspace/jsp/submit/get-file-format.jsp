@@ -71,7 +71,7 @@
     Item item = si.submission.getItem();
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Select File Format">
+<dspace:layout locbar="off" navbar="off" title="Select File Format" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 

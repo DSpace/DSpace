@@ -118,7 +118,12 @@
     }
 %>
 
-<dspace:layout title="Edit Collection" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer">
+<dspace:layout title="Edit Collection"
+               navbar="admin"
+               locbar="link"
+               parentlink="/dspace-admin"
+               parenttitle="Administer"
+               nocache="true">
 
 <%  if (collection == null) { %>
     <H1>Create Collection</H1>

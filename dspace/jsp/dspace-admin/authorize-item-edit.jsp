@@ -99,7 +99,8 @@
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitle="Administer"
+               nocache="true">
 
     <h1>Policies for Item <%= item.getHandle() %> (ID=<%= item.getID() %>)</h1>
 

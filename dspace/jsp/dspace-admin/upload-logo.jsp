@@ -65,7 +65,12 @@
     }
 %>
 
-<dspace:layout title="Upload Logo" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer">
+<dspace:layout title="Upload Logo"
+               navbar="admin"
+               locbar="link"
+               parentlink="/dspace-admin" 
+               parenttitle="Administer" 
+               nocache="true">
 
     <H1>Upload Logo</H1>
     

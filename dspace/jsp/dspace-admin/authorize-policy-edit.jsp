@@ -83,7 +83,8 @@
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitle="Administer"
+               nocache="true">
 
     <h1>Edit Policy for <%= edit_title %>:</h1>
     <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method=POST>

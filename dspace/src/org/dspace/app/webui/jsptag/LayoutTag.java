@@ -47,13 +47,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspException;
 import javax.servlet.RequestDispatcher;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.app.webui.util.JSPManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
@@ -109,7 +109,10 @@ public class LayoutTag extends TagSupport
     /** Contents of side bar */
     private String sidebar;
 
+    /** Whether to add headers to prevent browsers caching the page */
+    private String noCache; 
 
+    
     public LayoutTag()
     {
         super();
@@ -232,7 +235,17 @@ public class LayoutTag extends TagSupport
         // Now include the header
         try
         {
-            ServletResponse response = pageContext.getResponse();
+            HttpServletResponse response =
+            	(HttpServletResponse) pageContext.getResponse();
+
+            // Set headers to prevent browser caching, if appropriate
+            if (noCache != null && noCache.equalsIgnoreCase("true"))
+            {	
+            	response.addDateHeader("expires", 1);
+            	response.addHeader("Pragma", "no-cache");
+            	response.addHeader("Cache-control", "no-store");
+            }
+            
             ServletConfig config = pageContext.getServletConfig();
 
             RequestDispatcher rd =
@@ -426,6 +439,24 @@ public class LayoutTag extends TagSupport
         this.sidebar = v;
     }
 
+    /**
+     * Get the value of sidebar.
+     * @return Value of sidebar.
+     */
+    public String getNocache()
+	{
+    	return noCache;
+    }
+
+    /**
+     * Set the value of sidebar.
+     * @param v  Value to assign to sidebar.
+     */
+    public void setNocache(String  v)
+	{
+    	this.noCache = v;
+    }
+    
 
     public void release()
     {
@@ -436,5 +467,6 @@ public class LayoutTag extends TagSupport
         locbar = null;
         parentTitle = null;
         parentLink = null;
+        noCache = null;
     }
 }

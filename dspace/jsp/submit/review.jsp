@@ -77,7 +77,7 @@
     identifierQualNames.put( "other", "Other" );
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Verify Submission">
+<dspace:layout locbar="off" navbar="off" title="Verify Submission" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
         <jsp:include page="/submit/progressbar.jsp">

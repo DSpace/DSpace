@@ -63,7 +63,11 @@
     Item item = workflowItem.getItem();
 %>
 
-<dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Preview Task">
+<dspace:layout locbar="link"
+               parenttitle="My DSpace"
+               parentlink="/mydspace"
+               title="Preview Task"
+               nocache="true">
 
     <H1>Preview Task</H1>
     

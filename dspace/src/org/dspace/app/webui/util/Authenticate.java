@@ -218,6 +218,12 @@ public class Authenticate
         throws ServletException, IOException
     {
         HttpSession session = request.getSession();
+
+        // Since we may be doing a redirect, make sure the redirect is not
+        // cached
+        response.addDateHeader("expires", 1);
+        response.addHeader("Pragma", "no-cache");
+        response.addHeader("Cache-control", "no-store");
         
         // Store the data from the request that led to authentication
         RequestInfo info = new RequestInfo(request);

@@ -55,7 +55,7 @@
     Item item = (Item) request.getAttribute("item");
 %>
 
-<dspace:layout title="Upload Bitstream" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer">
+<dspace:layout title="Upload Bitstream" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer" nocache="true">
 
     <H1>Upload Bitstream</H1>
     

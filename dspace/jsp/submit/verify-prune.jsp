@@ -72,7 +72,7 @@
     String buttonPressed = (String) request.getAttribute("button.pressed");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Answers to Initial Questions Changed">
+<dspace:layout locbar="off" navbar="off" title="Answers to Initial Questions Changed" nocache="true">
 
     <H1>Submit: Caution</H1>
     

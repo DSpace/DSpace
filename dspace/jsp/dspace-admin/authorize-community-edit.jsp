@@ -77,7 +77,8 @@
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitle="Administer"
+               nocache="true">
 
     <h1>Policies for community <%= community.getMetadata("name") %> (ID=<%=community.getID()%>)</h1>
 

@@ -75,7 +75,7 @@
     boolean setPassword = (attr != null && attr.booleanValue());
 %>
 
-<dspace:layout title="Registration Information">
+<dspace:layout title="Registration Information" nocache="true">
 
     <H1>Registration Information</H1>
     

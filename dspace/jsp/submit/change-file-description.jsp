@@ -59,7 +59,7 @@
         (SubmissionInfo) request.getAttribute("submission.info");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Change File Description">
+<dspace:layout locbar="off" navbar="off" title="Change File Description" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 

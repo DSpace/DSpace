@@ -81,7 +81,8 @@
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitle="Administer"
+               nocache="true">
 
     <h1>Policies for collection <%= collection.getMetadata("name") %> (ID=<%= collection.getID() %>)</h1>
 
