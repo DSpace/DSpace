@@ -60,7 +60,6 @@ import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.storage.rdbms.DatabaseManager;
 
 
 /**
