@@ -40,12 +40,14 @@
 
 package org.dspace.eperson;
 
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import java.sql.SQLException;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.history.HistoryManager;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 
 /**
  * Class representing an e-person.
@@ -154,7 +156,15 @@ public class EPerson
 
         // Create a table row
         TableRow row = DatabaseManager.create(context, "eperson");
-        return new EPerson(context, row);
+        EPerson e = new EPerson(context, row);
+
+        HistoryManager.saveHistory(context,
+            e,
+            HistoryManager.REMOVE,
+            context.getCurrentUser(),
+            context.getExtraLogInfo());
+
+        return e;
     }
 
 
@@ -166,6 +176,12 @@ public class EPerson
         throws SQLException
     {
         // FIXME: authorizations
+
+        HistoryManager.saveHistory(myContext,
+            this,
+            HistoryManager.REMOVE,
+            myContext.getCurrentUser(),
+            myContext.getExtraLogInfo());
 
         // Remove from cache
         myContext.removeCached(this, getID());
@@ -384,6 +400,12 @@ public class EPerson
         throws SQLException, AuthorizeException
     {
         // FIXME: Check authorisation
+
+        HistoryManager.saveHistory(myContext,
+            this,
+            HistoryManager.MODIFY,
+            myContext.getCurrentUser(),
+            myContext.getExtraLogInfo());
 
         DatabaseManager.update(myContext, myRow);
     }

@@ -55,6 +55,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
+import org.dspace.history.HistoryManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -213,12 +214,19 @@ public class Collection
         throws SQLException
     {
         TableRow row = DatabaseManager.create(context, "collection");
+        Collection c = new Collection(context, row);
+
+        HistoryManager.saveHistory(context,
+            c,
+            HistoryManager.CREATE,
+            context.getCurrentUser(),
+            context.getExtraLogInfo());
 
         log.info(LogManager.getHeader(context,
             "create_collection",
             "collection_id=" + row.getIntColumn("collection_id")));
 
-        return new Collection(context, row);
+        return c;
     }
 
 
@@ -678,6 +686,12 @@ public class Collection
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
+        HistoryManager.saveHistory(ourContext,
+            this,
+            HistoryManager.MODIFY,
+            ourContext.getCurrentUser(),
+            ourContext.getExtraLogInfo());
+
         log.info(LogManager.getHeader(ourContext,
             "update_collection",
             "collection_id=" + getID()));
@@ -701,6 +715,12 @@ public class Collection
 
         // Remove from cache
         ourContext.removeCached(this, getID());
+
+        HistoryManager.saveHistory(ourContext,
+            this,
+            HistoryManager.REMOVE,
+            ourContext.getCurrentUser(),
+            ourContext.getExtraLogInfo());
 
         // Remove items
         ItemIterator items = getItems();

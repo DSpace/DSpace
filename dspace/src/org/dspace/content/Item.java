@@ -61,6 +61,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.history.HistoryManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -253,16 +254,20 @@ public class Item
         throws SQLException
     {
         TableRow row = DatabaseManager.create(context, "item");
+        Item i = new Item(context, row);
 
-        if (log.isDebugEnabled())
-        {
-            log.debug(LogManager.getHeader(context,
-                "create_item",
-                "item_id=" + row.getIntColumn("item_id")));
-        }
+        HistoryManager.saveHistory(context,
+            i,
+            HistoryManager.CREATE,
+            context.getCurrentUser(),
+            context.getExtraLogInfo());
+
+        log.info(LogManager.getHeader(context,
+            "create_item",
+            "item_id=" + row.getIntColumn("item_id")));
 
 
-        return new Item(context, row);
+        return i;
     }
 
 
@@ -954,6 +959,12 @@ public class Item
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
+        HistoryManager.saveHistory(ourContext,
+            this,
+            HistoryManager.MODIFY,
+            ourContext.getCurrentUser(),
+            ourContext.getExtraLogInfo());
+
         log.info(LogManager.getHeader(ourContext,
             "update_item",
             "item_id=" + getID()));
@@ -1054,6 +1065,12 @@ public class Item
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
+
+        HistoryManager.saveHistory(ourContext,
+            this,
+            HistoryManager.REMOVE,
+            ourContext.getCurrentUser(),
+            ourContext.getExtraLogInfo());
 
         log.info(LogManager.getHeader(ourContext,
             "delete_item",

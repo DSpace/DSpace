@@ -64,6 +64,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
+import org.dspace.history.HistoryManager;
 import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -159,6 +160,12 @@ public class WorkflowManager
         wfi.setMultipleTitles ( wsi.hasMultipleTitles() );
         wfi.setPublishedBefore( wsi.isPublishedBefore() );
 
+        // Write history creation event
+        HistoryManager.saveHistory(c,
+            wfi,
+            HistoryManager.CREATE,
+            c.getCurrentUser(),
+            c.getExtraLogInfo());
 
         // remove the WorkspaceItem
         wsi.deleteWrapper();

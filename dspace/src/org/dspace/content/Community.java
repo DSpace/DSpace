@@ -53,6 +53,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.history.HistoryManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -178,12 +179,19 @@ public class Community
         }
 
         TableRow row = DatabaseManager.create(context, "community");
+        Community c = new Community(context, row);
+
+        HistoryManager.saveHistory(context,
+            c,
+            HistoryManager.CREATE,
+            context.getCurrentUser(),
+            context.getExtraLogInfo());
 
         log.info(LogManager.getHeader(context,
             "create_community",
             "community_id=" + row.getIntColumn("community_id")));
 
-        return new Community(context, row);
+        return c;
     }
 
 
@@ -337,6 +345,12 @@ public class Community
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
+        HistoryManager.saveHistory(ourContext,
+            this,
+            HistoryManager.MODIFY,
+            ourContext.getCurrentUser(),
+            ourContext.getExtraLogInfo());
+
         log.info(LogManager.getHeader(ourContext,
             "update_community",
             "community_id=" + getID()));
@@ -489,6 +503,12 @@ public class Community
         log.info(LogManager.getHeader(ourContext,
             "delete_community",
             "community_id=" + getID()));
+
+        HistoryManager.saveHistory(ourContext,
+            this,
+            HistoryManager.REMOVE,
+            ourContext.getCurrentUser(),
+            ourContext.getExtraLogInfo());
 
         // Remove from cache
         ourContext.removeCached(this, getID());
