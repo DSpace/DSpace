@@ -159,6 +159,7 @@ public class WorkspaceItem implements InProgressSubmission
         // Create an item
         Item i = Item.create(context);
         i.setSubmitter(sub);
+        i.update();
         
         // Create the personal workspace row
         TableRow row = DatabaseManager.create(context, "personalworkspace");
@@ -170,6 +171,8 @@ public class WorkspaceItem implements InProgressSubmission
             "create_workspace_item",
             "workspace_item_id=" + row.getIntColumn("personal_workspace_id") +
                 "item_id=" + i.getID() + "collection_id=" + coll.getID()));
+
+        DatabaseManager.update(context, row );
 
         return new WorkspaceItem(context, row);
     }
@@ -215,7 +218,7 @@ public class WorkspaceItem implements InProgressSubmission
      */
     public int getID()
     {
-        return pwRow.getIntColumn("workspace_id");
+        return pwRow.getIntColumn("personal_workspace_id");
     }
 
 
