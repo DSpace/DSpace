@@ -128,6 +128,11 @@ Common usage:
     <copy todir="${dspace.dir}/bin">
       <fileset dir="bin"/>
     </copy>
+    <exec executable="chmod">
+      <arg value="-R" />
+      <arg value="a+x" />
+      <arg value="${dspace.dir}/bin" />
+    </exec>
     <copy todir="${dspace.dir}/jsp/WEB-INF/lib">
       <fileset dir="lib"/>
     </copy>
@@ -181,21 +186,8 @@ Common usage:
       <arg value="${basedir}/etc/database_schema.sql"/>
     </java>
   </target>
-    
 
-  <!-- FIXME:  This is temporary, and will be replaced by a script to be
-    -  run from the DSpace installation rather than the source tree -->
-  <target name="setup_browse"
-          description="Create the browse index, removing the old one">
-    <java classname="org.dspace.browse.InitializeBrowse"
-          classpathref="build.class.path"
-          fork="yes"
-          failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
-      <sysproperty key="dspace.configuration" value="${config}"/>
-    </java>
-  </target>
-
+  
   <!-- ============================================================= -->
   <!-- Load the initial contents of the registries into the database -->
   <!-- ============================================================= -->
@@ -222,7 +214,6 @@ Common usage:
       <arg value="${dspace.dir}/config/registries/dublin-core-types.xml"/>
     </java>
   </target>
-      
 
 
   <!-- ============================================================= -->
@@ -289,7 +280,7 @@ Common usage:
     -  (e.g. ContentTest.java). -->
 
   <!-- First, we see if JUnit is on the CLASSPATH.  If it is, we run the tests
-    - directly.  If not, we re-run ant with CLASSPATH. set appropriately -->
+    - directly.  If not, we re-run ant with CLASSPATH set appropriately -->
   <target name="test"
           description="Run JUnit regression tests">
     <property name="second_test_target" value="test_rerun_ant" />
@@ -327,7 +318,7 @@ Common usage:
 
 
   <!-- ============================================================= -->
-  <!-- Check the style                                               -->
+  <!-- Check the source code follows conventions                     -->
   <!-- ============================================================= -->
 
   <!-- checkstyle-all-2.2.jar (or later) must be on CLASSPATH -->
