@@ -795,7 +795,7 @@ public class DatabaseManager
      * row has no primary key.
      * @exception SQLException If a database error occurs
      */
-    static String getPrimaryKeyColumn(TableRow row)
+    public static String getPrimaryKeyColumn(TableRow row)
         throws SQLException
     {
         return getPrimaryKeyColumn(row.getTable());
@@ -1044,12 +1044,16 @@ public class DatabaseManager
             DatabaseMetaData metadata = connection.getMetaData();
             HashMap results = new HashMap();
 
-            ResultSet pkcolumns = metadata.getPrimaryKeys(null, null, table);
+            int max = metadata.getMaxTableNameLength();
+            String tname = table.length() >= max ?
+                table.substring(0, max - 1) : table;
+
+            ResultSet pkcolumns = metadata.getPrimaryKeys(null, null, tname);
             Set pks = new HashSet();
             while (pkcolumns.next())
                 pks.add(pkcolumns.getString(4));
 
-            ResultSet columns = metadata.getColumns(null, null, table, null);
+            ResultSet columns = metadata.getColumns(null, null, tname, null);
             while (columns.next())
             {
                 String column = columns.getString(4);
