@@ -76,6 +76,7 @@ import org.apache.commons.cli.PosixParser;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
@@ -683,12 +684,36 @@ public class ItemImport
         // get an input stream
         BufferedInputStream bis = new BufferedInputStream( new FileInputStream( fullpath ) );
 
-        // add it to the item in a bundle
-        Bitstream bs = i.createSingleBitstream(bis);
+        Bitstream bs = null;
+
+        if(name.equals("license.txt"))
+        {
+            bs = i.createSingleBitstream(bis, "LICENSE");
+        }
+        else
+        {
+            // add it to the item in a bundle
+
+            // do we already have a bundle?    
+            Bundle [] bundles = i.getBundles();
+                    
+            if( bundles.length < 1)
+            {
+                // set bundle's name to ORIGINAL    
+                bs = i.createSingleBitstream(bis, "ORIGINAL");
+            }
+            else
+            {
+                // we have a bundle already, just add bitstream
+                bs = bundles[0].createBitstream(bis);
+            }
+        }
+
 
         bs.setName( name );
 
         // Identify the format
+        // FIXME - guessing format guesses license.txt incorrectly as a text file format!
         BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
         bs.setFormat(bf);
 
