@@ -845,13 +845,18 @@ public class Item extends DSpaceObject
     /**
      * Create a bundle in this item, with immediate effect
      *
-     * @param name bundle name (ORIGINAL/TEXT/THUMBNAIL
+     * @param name bundle name (ORIGINAL/TEXT/THUMBNAIL)
      *
      * @return  the newly created bundle
      */
     public Bundle createBundle(String name)
         throws SQLException, AuthorizeException
     {
+        if(name == null || "".equals(name))
+        {
+            throw new SQLException("Bundle must be created with non-null name");
+        }
+        
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
@@ -1257,7 +1262,7 @@ public class Item extends DSpaceObject
     {
         String timestamp = DCDate.getCurrent().toString();
         
-        // Check permission.  User must have REMOVE on all collections.
+
         // Build some provenance data while we're at it.
         String collectionProv = "";
         Collection[] colls = getCollections();
@@ -1265,8 +1270,21 @@ public class Item extends DSpaceObject
         {
             collectionProv = collectionProv + colls[i].getMetadata("name") +
                 " (ID: " + colls[i].getID() + ")\n";
-            AuthorizeManager.authorizeAction(ourContext, colls[i],
-                Constants.REMOVE);
+        }
+
+        // Check permission.  User either has to have REMOVE on owning collection
+        // or be COLLECTION_EDITOR of owning collection
+
+        if( AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(),
+                Constants.COLLECTION_ADMIN) ||
+            AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(),
+                Constants.REMOVE))
+        {
+           // authorized
+        }
+        else
+        {
+            throw new AuthorizeException("To withdraw item must be COLLECTION_ADMIN or have REMOVE authorization on owning Collection");
         }
         
         // Set withdrawn flag. timestamp will be set; last_modified in update()
