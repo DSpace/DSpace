@@ -460,7 +460,7 @@ public class ItemImport
             // don't process handle file
 
             // start up a workflow
-            WorkflowManager.start( c, wi );
+            WorkflowManager.startWithoutNotify( c, wi );
 
             // send ID to the mapfile
             if( mapOut != null ) mapOut.println( itemname + " " + myitem.getID() );

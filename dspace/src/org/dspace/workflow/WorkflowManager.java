@@ -41,7 +41,9 @@
 package org.dspace.workflow;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.mail.MessagingException;
@@ -116,6 +118,9 @@ public class WorkflowManager
 	public static final int WFSTATE_STEP3		= 6; // task - editor has claimed the item
 	public static final int WFSTATE_ARCHIVE		= 7; // probably don't need this one either
 
+    /* support for 'no notification'  */
+    private static Map noEMail = new HashMap();
+
     /** log4j logger */
     private static Logger log = Logger.getLogger(WorkflowManager.class);
 
@@ -127,6 +132,7 @@ public class WorkflowManager
 	 * @param pw The PersonalWorkspace to convert to a workflow item
 	 * @return   The resulting workflow item
 	 */
+
     public static WorkflowItem start(Context c,WorkspaceItem wsi)
         throws SQLException, AuthorizeException, IOException
     {
@@ -172,12 +178,25 @@ public class WorkflowManager
         return wfi;
     }
 
+   /** startWithoutNotify() starts the workflow normally, but disables notifications
+    *  (useful for large imports,) for the first workflow step - subsequent notifications
+    *  happen normally
+    */
+    public static WorkflowItem startWithoutNotify(Context c, WorkspaceItem wsi)
+        throws SQLException, AuthorizeException, IOException
+    {
+        // make a hash table entry with item ID for no notify
+        // notify code checks no notify hash for item id
+        noEMail.put( new Integer(wsi.getItem().getID()), new Boolean(true) );
 
-	/** getOwnedTasks() returns a List of WorkflowItems containing
-	 *  the tasks claimed and owned by an EPerson.  The GUI displays
-	 *  this info on the MyDSpace page.
-	 * @param e The EPerson we want to fetch owned tasks for.
-	 */
+        return start(c, wsi);
+    }
+
+    /** getOwnedTasks() returns a List of WorkflowItems containing
+     *  the tasks claimed and owned by an EPerson.  The GUI displays
+     *  this info on the MyDSpace page.
+     * @param e The EPerson we want to fetch owned tasks for.
+    */
     public static List getOwnedTasks(Context c, EPerson e)
         throws java.sql.SQLException
     {
@@ -759,6 +778,19 @@ public class WorkflowManager
             WorkflowItem wi)
         throws SQLException, IOException
     {
+        // check to see if notification is turned off
+        // and only do it once - delete key after notification has
+        // been suppressed for the first time
+        Integer myID = new Integer( wi.getItem().getID() ); 
+
+        if( noEMail.containsKey( myID ) )
+        {
+            // suppress email, and delete key
+            noEMail.remove( myID );
+        } 
+
+        else
+        {
         try
         {
             // Get the item title
@@ -805,6 +837,7 @@ public class WorkflowManager
                 "cannot email user"
                 + " group_id" + mygroup.getID()
                 + " workflow_item_id" + wi.getID() ));
+        }
         }
     }
 
