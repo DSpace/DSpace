@@ -65,11 +65,11 @@ import org.apache.lucene.analysis.*;
 
 public class DSQuery
 {
-    /* 
+    /*
      * doQuery Returns a an arraylist of item ids, just pass
      *  in a string with the FreeWAIS query syntax
      */
-    
+
     public static synchronized List doQuery(String querystring)
         throws ParseException, IOException
     {
@@ -78,12 +78,12 @@ public class DSQuery
         try
         {
             IndexSearcher searcher = new IndexSearcher(
-                ConfigurationManager.getProperty("dspace.search.directory")); 
+                ConfigurationManager.getProperty("search.dir"));
 
             QueryParser qp = new QueryParser("default", new DSAnalyzer());
 
             Query myquery = qp.parse(querystring);
-            Hits hits = searcher.search(myquery);   
+            Hits hits = searcher.search(myquery);
 
             for (int i = 0; i < hits.length(); i++)
             {
@@ -91,7 +91,7 @@ public class DSQuery
 
                 String idstring = d.get("id");
                 String locstring = d.get("location");
-			
+
                 int itemid = Integer.parseInt(idstring);
 
                 items.add(new Integer(itemid));
@@ -100,7 +100,7 @@ public class DSQuery
         catch (NumberFormatException e)
         {
 	    // a bad parse means that there are no results
-            // doing nothing with the exception gets you 
+            // doing nothing with the exception gets you
             //   throw new SQLException( "Error parsing search results: " + e );
             // ?? quit?
         }
@@ -118,34 +118,34 @@ public class DSQuery
         String location = "l" + (coll.getID());
 
         String newquery = new String("+(" + querystring + ") +location:\"" + location + "\"");
-      
+
         return doQuery(newquery);
     }
-   
+
     /*
      * do a query, restricting to a community
      */
-    
+
     public static List doQuery(String querystring, Community comm)
         throws IOException, ParseException
     {
         String location = "m" + (comm.getID());
 
         String newquery = new String("+(" + querystring + ") +location:\"" + location + "\"");
-      
+
         return doQuery(newquery);
     }
-   
+
     public static void doCMDLineQuery(String query)
     {
         System.out.println("Command line query: " + query);
-      
+
         try
         {
             List results = doQuery(query);
-      
+
             Iterator i = results.iterator();
-      
+
             while (i.hasNext())
             {
                 System.out.println(i.next());
@@ -154,13 +154,13 @@ public class DSQuery
         catch (Exception e)
         {
             System.out.println("Exception caught: " + e);
-        } 
+        }
     }
 
     public static void main(String[] args)
     {
         DSQuery q = new DSQuery();
-      
+
         if (args.length > 0)
         {
             q.doCMDLineQuery(args[0]);

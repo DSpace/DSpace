@@ -43,7 +43,7 @@ package org.dspace.search;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
-import org.dspace.administer.DCType;
+//import org.dspace.administer.DCType;
 
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -60,24 +60,6 @@ import org.apache.lucene.index.IndexWriter;
 import java.sql.SQLException;
 import java.io.IOException;
 
-//import org.apache.lucene.document.*;
-
-//import java.io.*;
-//import java.sql.*;
-//import java.util.StringTokenizer;
-//
-// dspace
-//import org.dspace.db.*;
-//import org.dspace.db.generated.*;
-//import org.dspace.db.other.*;
-//import org.dspace.util.beans.BeanUtils;
-//
-// lucene
-//import org.apache.lucene.analysis.*;
-//import org.apache.lucene.index.*;
-//import org.apache.lucene.document.*;
-//
-//
 // issues:
 //   need to use in_archive field
 //   only does author and title
@@ -94,7 +76,7 @@ public class DSIndexer
 
     /** createIndex() creates an entirely new index in /tmp
      */
-    
+
     public static void createIndex(Context c)
     {
 //        System.out.println("Beginning indexing");
@@ -110,13 +92,13 @@ public class DSIndexer
     private static synchronized void indexItems(Context c, Item target_item)
     {
         // actually create the index
-      
+
         try
         {
             // Set up the Lucene index engine
             IndexWriter writer;
 
-            String index_directory = ConfigurationManager.getProperty("dspace.search.directory");
+            String index_directory = ConfigurationManager.getProperty("search.dir");
 
             if (target_item != null)
             {
@@ -130,7 +112,7 @@ public class DSIndexer
             }
 
             if( target_item != null )
-            {	    
+            {
                 // If only one item, find it and index
                 indexSingleItem(c, writer, target_item);
             }
@@ -164,17 +146,17 @@ public class DSIndexer
     {
         // build list of community ids
         Community [] communities = myitem.getCommunities();
-        
+
         // build list of collection ids
         Collection [] collections = myitem.getCollections();
-        
+
         // now put those into strings
         String location = "";
         int i = 0;
-        
+
         for(i=0; i<communities.length; i++ ) location = new String(location + " m" + communities[i].getID() );
         for(i=0; i<collections.length; i++ ) location = new String(location + " l" + collections[i].getID() );
-        
+
         return location;
     }
 
@@ -185,7 +167,7 @@ public class DSIndexer
 
         // get the location string (for searching by collection & community)
         String location_text = buildLocationString(c, myitem);
-                
+
         // extract metadata (ANY is wildcard from Item class)
         DCValue [] authors = myitem.getDC( "contributor","author", Item.ANY );
         DCValue [] titles  = myitem.getDC( "title",      Item.ANY,     Item.ANY );
@@ -196,24 +178,24 @@ public class DSIndexer
         String author_text = "";
         String title_text  = "";
         String keyword_text= "";
-                
+
         // pack all of the arrays of DCValues into plain text strings for the indexer
         for(j=0; j<authors.length;  j++ ) author_text = new String( author_text  + authors [j].value + " " );
         for(j=0; j<titles.length;   j++ ) title_text  = new String( title_text   + titles  [j].value + " " );
         for(j=0; j<keywords.length; j++ ) keyword_text= new String( keyword_text + keywords[j].value + " " );
 
-        // write out the metatdata (for scalability, should probably be a hash instead of single strings)	
+        // write out the metatdata (for scalability, should probably be a hash instead of single strings)
         writeIndexRecord(writer, myitem.getID(), title_text, author_text, keyword_text, location_text);
     }
 
 
-    /** writeIndexRecord() creates a document from its args 
+    /** writeIndexRecord() creates a document from its args
      *  and writes it out to the index that is opened
      */
-	 
+
     private static void writeIndexRecord(IndexWriter iw, int id,
         String title, String authors, String keywords, String location)
-        throws IOException	
+        throws IOException
     {
 
         Document doc = new Document();
@@ -231,13 +213,13 @@ public class DSIndexer
 
         iw.addDocument(doc);
     }
-   
+
 /*
     FIXME - need to produce a Context object (anonymous
     public static void main(String[] args)
     {
         createIndex();
         System.out.println("Done with indexing");
-    }   
+    }
 */
 }
