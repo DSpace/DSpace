@@ -75,6 +75,10 @@
     </tr>
   </table>
 
+    <p align="center">
+        Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!
+    </p>
+
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
