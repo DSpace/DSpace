@@ -16,7 +16,21 @@ import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.Utils;
 
-/*
+/**
+    Item exporter to create simple AIPs for DSpace content.
+    Currently exports individual items, or entire collections.
+    For instructions on use, see printUsage() method.
+    
+    ItemExport creates the simple AIP package that the importer also
+    uses.  It consists of:
+    
+    /exportdir/42/ (one directory per item)
+      / dublin_core.xml - qualified dublin core in RDF schema
+      / contents - text file, listing one file per line
+      / file1 - files contained in the item
+      / file2
+      / ...   
+
     issues
         -doesn't handle special characters in metadata
           (needs to turn &'s into &amp;, etc.)
@@ -71,10 +85,14 @@ public class ItemExport
         }
         else
         {
+            System.out.println("Exporting from collection " + myID );
+
             // it's a collection, so do a bunch of items
             Collection myCollection = Collection.find( c, myID );
             
             ItemIterator i = myCollection.getItems();
+
+            exportItem(c, i, destDirName, seqStart);
         }
         
         File destDir = new File( destDirName );
@@ -96,8 +114,11 @@ public class ItemExport
     {
         int mySequenceNumber = seqStart;
         
+        System.out.println("Beginning export");
+        
         while( i.hasNext() )
         {
+            System.out.println("Exporting item to " + mySequenceNumber );
             exportItem(c, i.next(), destDirName, mySequenceNumber);
             mySequenceNumber++;
         }
@@ -112,7 +133,8 @@ public class ItemExport
         {
             // now create a subdirectory
             File itemDir = new File ( destDir + "/" + seqStart );
-            
+
+            System.out.println("Exporting Item " + myItem.getID() + " to " + itemDir);            
             if( itemDir.exists() )
             {
                 throw new Exception("Directory " + destDir + "/" + seqStart + " already exists!");
