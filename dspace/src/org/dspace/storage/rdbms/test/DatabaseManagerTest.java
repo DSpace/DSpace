@@ -42,6 +42,7 @@
 package org.dspace.storage.rdbms.test;
 
 import java.sql.*;
+import java.util.Iterator;
 import java.util.List;
 
 import junit.extensions.*;
@@ -506,6 +507,23 @@ public class DatabaseManagerTest extends TestCase
         assertEquals("Column returns the value it was set to",
                      row.getIntColumn(column.toUpperCase()), testInt);
 
+    }
+
+    /**
+     * Test that we can still retrieve column info for long tablenames
+     */
+    public void testLongTableNames()
+    {
+        try
+        {
+            // Exceeds Postgres limit of 32 characters
+            List columns = DatabaseManagerShim.publicGetColumnNames("CollectionItemsByDateAccessioned");
+            assertTrue("Retrieved column names", columns.size() > 0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     ////////////////////////////////////////
