@@ -78,14 +78,17 @@ No database changes are necessary.
 The bitstore is carefully engineered to prevent data loss, using
 transactional flags in the database. Before a bitstream is 
 actually stored, a metadata entry with the unique bitstream id is
-committed to the database. If the storage operations fails or is
-aborted, the deleted flag remains, and the bitstore API ensures
-that the bitstream cannot be retrieved. Only when all of the
+committed to the database. If the storage operation fails or is
+aborted, the deleted flag remains. The bitstore API then ensures
+that the bitstream cannot be retrieved, and after an hour, the
+bitstream is eligible for cleanup. The bitstream is accessible only
+after all database operations have been successfully committed.
 </p>
 
 <p>
-Similarly, bitstreams are deleted by simply setting the
-deleted flag. 
+Similarly, bitstreams are deleted by simply setting the deleted
+flag. If an deletion operation is rolled back, the bitstream is still
+present in the asset store.
 </p>
 
 <h2>Cleaning up the Asset Store</h2>
@@ -95,7 +98,9 @@ Asset Store even though they are marked deleted in the database.
 You can use the command-line utility class
 <code>org.dspace.storage.bitstore.Cleanup</code>
 to remove the bitstreams which are marked deleted from the Asset Store.
-
+To prevent accidental deletion of bitstreams which are in the process
+of being stored, cleanup only removes bitstreams which are more than
+an hour old.
 </body>
 </html>
 
