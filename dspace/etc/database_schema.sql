@@ -49,19 +49,19 @@
 --
 
 -------------------------------------------------------
--- BitstreamTypeRegistry table
+-- BitstreamFormatRegistry table
 -------------------------------------------------------
-DROP TABLE BitstreamTypeRegistry;
+DROP TABLE BitstreamFormatRegistry;
 
-CREATE TABLE BitstreamTypeRegistry
+CREATE TABLE BitstreamFormatRegistry
 (
-  bitstream_type_id INTEGER PRIMARY KEY,
-  mimetype          VARCHAR(48),
-  short_description VARCHAR(128) UNIQUE,
-  description       TEXT,
-  support_level     INTEGER,
+  bitstream_format_id INTEGER PRIMARY KEY,
+  mimetype            VARCHAR(48),
+  short_description   VARCHAR(128) UNIQUE,
+  description         TEXT,
+  support_level       INTEGER,
   -- Identifies internal types
-  internal          BOOL
+  internal             BOOL
 );
 
 -------------------------------------------------------
@@ -71,18 +71,17 @@ DROP TABLE Bitstream;
 
 CREATE TABLE Bitstream
 (
-   bitstream_id          INTEGER PRIMARY KEY,
-   bitstream_type_id     INTEGER REFERENCES 
-BitstreamTypeRegistry(bitstream_type_id),
-   name                  VARCHAR(256),
-   size                  INTEGER,
-   checksum              VARCHAR(64),
-   checksum_algorithm    VARCHAR(32),
-   description           TEXT,
-   user_type_description TEXT,
-   source                VARCHAR(256),
-   internal_id           VARCHAR(256),
-   deleted               BOOL
+   bitstream_id            INTEGER PRIMARY KEY,
+   bitstream_format_id     INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),
+   name                    VARCHAR(256),
+   size                    INTEGER,
+   checksum                VARCHAR(64),
+   checksum_algorithm      VARCHAR(32),
+   description             TEXT,
+   user_format_description TEXT,
+   source                  VARCHAR(256),
+   internal_id             VARCHAR(256),
+   deleted                 BOOL
 );
 
 -------------------------------------------------------
@@ -300,21 +299,21 @@ CREATE TABLE Handle
 );
 
 -------------------------------------------------------
---  PersonalWorkspace table
+--  WorkspaceItem table
 -------------------------------------------------------
-DROP TABLE PersonalWorkspace;
+DROP TABLE WorkspaceItem;
 
-CREATE TABLE PersonalWorkspace
+CREATE TABLE WorkspaceItem
 (
-  personal_workspace_id INTEGER PRIMARY KEY,
-  item_id		INTEGER REFERENCES Item(item_id),
-  collection_id		INTEGER REFERENCES Collection(collection_id),
+  workspace_item_id INTEGER PRIMARY KEY,
+  item_id           INTEGER REFERENCES Item(item_id),
+  collection_id     INTEGER REFERENCES Collection(collection_id),
   -- Answers to questions on first page of submit UI
-  multiple_titles       BOOL,
-  published_before      BOOL,
-  multiple_files        BOOL,
+  multiple_titles   BOOL,
+  published_before  BOOL,
+  multiple_files    BOOL,
   -- How for the user has got in the submit process
-  stage_reached         INTEGER
+  stage_reached     INTEGER
 );
 
 -------------------------------------------------------
@@ -352,8 +351,6 @@ CREATE TABLE TasklistItem
 );
 
 
-
-
 -------------------------------------------------------
 --  RegistrationData table
 -------------------------------------------------------
@@ -362,14 +359,11 @@ DROP TABLE RegistrationData;
 CREATE TABLE RegistrationData
 (
   registrationdata_id   INTEGER PRIMARY KEY,
-  lookup_key            VARCHAR(64) UNIQUE,
-  creator		VARCHAR(64),
-  created		TIMESTAMP,
-  expires		TIMESTAMP,
-  table_name		VARCHAR(64),
-  column_name		VARCHAR(64),
-  table_id		INTEGER
+  eperson_id            INTEGER REFERENCES EPerson(eperson_id),
+  token                 VARCHAR(48),
+  expires		TIMESTAMP
 );
+
 
 -------------------------------------------------------
 --  History table

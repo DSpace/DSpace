@@ -147,10 +147,10 @@ public class WorkflowItem implements InProgressSubmission
 
 
     /**
-     * Return the workflow item to the personal workspace of the submitter.
+     * Return the workflow item to the workspace of the submitter.
      * The workflow item is removed, and a workspace item created.
      * 
-     * @return  the personal workspace item
+     * @return  the workspace item
      */
     public WorkspaceItem returnToWorkspace()
         throws SQLException, AuthorizeException
@@ -163,8 +163,8 @@ public class WorkflowItem implements InProgressSubmission
         item.clearDC("date", "accessioned", Item.ANY);
         item.update();
 
-        // Create the new personal workspace row
-        TableRow row = DatabaseManager.create(ourContext, "personalworkspace");
+        // Create the new workspace item row
+        TableRow row = DatabaseManager.create(ourContext, "workspaceitem");
         row.setColumn("item_id", item.getID());
         row.setColumn("collection_id", collection.getID());
 
@@ -176,7 +176,7 @@ public class WorkflowItem implements InProgressSubmission
         
         log.info(LogManager.getHeader(ourContext,
             "return_to_workspace",
-            "workflow_item_id=" + getID() + "workspace_id=" + wi.getID()));
+            "workflow_item_id=" + getID() + "workspace_item_id=" + wi.getID()));
 
         // Now remove the workflow object
         DatabaseManager.delete(ourContext, wfRow);

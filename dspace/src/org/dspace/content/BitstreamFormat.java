@@ -116,7 +116,7 @@ public class BitstreamFormat
         throws SQLException
     {
         TableRow row = DatabaseManager.find(context,
-            "bitstreamtyperegistry",
+            "bitstreamformatregistry",
             id);
 
         if (row == null)
@@ -125,7 +125,7 @@ public class BitstreamFormat
             {
                 log.debug(LogManager.getHeader(context,
                     "find_bitstream_format",
-                    "not_found,bitstream_type_id=" + id));
+                    "not_found,bitstream_format_id=" + id));
             }
 
             return null;
@@ -136,7 +136,7 @@ public class BitstreamFormat
             {
                 log.debug(LogManager.getHeader(context,
                     "find_bitstream",
-                    "bitstream_type_id=" + id));
+                    "bitstream_format_id=" + id));
             }
 
             return new BitstreamFormat(context, row);
@@ -158,7 +158,7 @@ public class BitstreamFormat
         throws SQLException
     {
         TableRow formatRow = DatabaseManager.findByUnique(context,
-            "bitstreamtyperegistry", "short_description", "Unknown");
+            "bitstreamformatregistry", "short_description", "Unknown");
 
         if (formatRow == null)
         {
@@ -171,8 +171,8 @@ public class BitstreamFormat
             {
                 log.debug(LogManager.getHeader(context,
                     "find_bitstream",
-                    "bitstream_type_id=" + formatRow.getIntColumn(
-                        "bitstream_type_id")));
+                    "bitstream_format_id=" + formatRow.getIntColumn(
+                        "bitstream_format_id")));
             }
 
             return new BitstreamFormat(context, formatRow);
@@ -194,8 +194,8 @@ public class BitstreamFormat
         List formats = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context,
-            "bitstreamtyperegistry",
-            "SELECT * FROM bitstreamtyperegistry;");
+            "bitstreamformatregistry",
+            "SELECT * FROM bitstreamformatregistry;");
 
         while (tri.hasNext())
         {
@@ -222,11 +222,12 @@ public class BitstreamFormat
         // FIXME: Check authorisation 
         
         // Create a table row
-        TableRow row = DatabaseManager.create(context, "bitstreamtyperegistry");
+        TableRow row = DatabaseManager.create(context,
+            "bitstreamformatregistry");
 
         log.info(LogManager.getHeader(context,
             "create_bitstream_format",
-            "bitstream_type_id=" + row.getIntColumn("bitstream_type_id")));
+            "bitstream_format_id=" + row.getIntColumn("bitstream_format_id")));
 
         return new BitstreamFormat(context, row);
     }
@@ -239,7 +240,7 @@ public class BitstreamFormat
      */
     public int getID()
     {
-        return bfRow.getIntColumn("bitstream_type_id");
+        return bfRow.getIntColumn("bitstream_format_id");
     }
 
 
@@ -379,7 +380,7 @@ public class BitstreamFormat
 
         log.info(LogManager.getHeader(bfContext,
             "update_bitstream_format",
-            "bitstream_type_id=" + getID()));
+            "bitstream_format_id=" + getID()));
 
         DatabaseManager.update(bfContext, bfRow);
     }
@@ -399,16 +400,15 @@ public class BitstreamFormat
 
         // Set bitstreams with this format to "unknown"
         int numberChanged = DatabaseManager.updateQuery(bfContext,
-            "UPDATE bitstreams SET bitstream_type_id=" + unknown.getID() +
-                " WHERE bitstream_type_id=" + getID());
+            "UPDATE bitstreams SET bitstream_format_id=" + unknown.getID() +
+                " WHERE bitstream_format_id=" + getID());
 
         // Delete this format from database
         DatabaseManager.delete(bfContext, bfRow);
 
         log.info(LogManager.getHeader(bfContext,
             "delete_bitstream_format",
-            "bitstream_type_id=" + getID() + ",bitstreams_changed=" +
+            "bitstream_format_id=" + getID() + ",bitstreams_changed=" +
                 numberChanged));
     }
-        
 }

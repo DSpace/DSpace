@@ -90,16 +90,16 @@ public class Bitstream
         bRow = row;
 
         // Get the bitstream format
-        int bfID = row.getIntColumn("bitstream_type_id");
+        int bfID = row.getIntColumn("bitstream_format_id");
 
         TableRow formatRow = DatabaseManager.find(context,
-            "bitstreamtyperegistry", bfID);
+            "bitstreamformatregistry", bfID);
         
         if (formatRow == null)
         {
             // No format: use "Unknown"
             formatRow = DatabaseManager.findByUnique(context,
-                "bitstreamtyperegistry", "short_description", "Unknown");
+                "bitstreamformatregistry", "short_description", "Unknown");
 
             // Panic if we can't find it
             if (formatRow == null)
@@ -309,7 +309,7 @@ public class Bitstream
         // FIXME: Would be better if this didn't throw an SQLException,
         // but we need to find the unknown format!
         setFormat(null);
-        bRow.setColumn("user_type_description", desc);
+        bRow.setColumn("user_format_description", desc);
     }
 
 
@@ -321,7 +321,7 @@ public class Bitstream
      */
     public String getUserFormatDescription()
     {
-        return bRow.getStringColumn("user_type_description");
+        return bRow.getStringColumn("user_format_description");
     }
     
 
@@ -335,7 +335,7 @@ public class Bitstream
     {
         if (bitstreamFormat.getShortDescription().equals("Unknown"))
         {
-            return bRow.getStringColumn("user_type_description");
+            return bRow.getStringColumn("user_format_description");
         }
         else
         {
@@ -379,10 +379,10 @@ public class Bitstream
         }
 
         // Remove user type description
-        bRow.setColumnNull("user_type_description");
+        bRow.setColumnNull("user_format_description");
 
         // Update the ID in the table row
-        bRow.setColumn("bitstream_type_id", bitstreamFormat.getID());
+        bRow.setColumn("bitstream_format_id", bitstreamFormat.getID());
     }
 
 

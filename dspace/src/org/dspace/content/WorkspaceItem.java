@@ -74,7 +74,7 @@ public class WorkspaceItem implements InProgressSubmission
     private Context ourContext;
 
     /** The table row corresponding to this workspace item */
-    private TableRow pwRow;
+    private TableRow wiRow;
 
     /** The collection the item is being submitted to */
     private Collection collection;
@@ -90,11 +90,11 @@ public class WorkspaceItem implements InProgressSubmission
         throws SQLException
     {
         ourContext = context;
-        pwRow = row;
+        wiRow = row;
 
-        item = Item.find(context, pwRow.getIntColumn("item_id"));
+        item = Item.find(context, wiRow.getIntColumn("item_id"));
         collection = Collection.find(context,
-            pwRow.getIntColumn("collection_id"));
+            wiRow.getIntColumn("collection_id"));
     }
 
 
@@ -111,7 +111,7 @@ public class WorkspaceItem implements InProgressSubmission
         throws SQLException
     {
         TableRow row = DatabaseManager.find(context,
-            "personalworkspace",
+            "workspaceitem",
             id);
 
         if (row == null)
@@ -161,15 +161,15 @@ public class WorkspaceItem implements InProgressSubmission
         i.setSubmitter(sub);
         i.update();
         
-        // Create the personal workspace row
-        TableRow row = DatabaseManager.create(context, "personalworkspace");
+        // Create the workspace item row
+        TableRow row = DatabaseManager.create(context, "workspaceitem");
 
         row.setColumn("item_id", i.getID());
         row.setColumn("collection_id", coll.getID());
 
         log.info(LogManager.getHeader(context,
             "create_workspace_item",
-            "workspace_item_id=" + row.getIntColumn("personal_workspace_id") +
+            "workspace_item_id=" + row.getIntColumn("workspace_item_id") +
                 "item_id=" + i.getID() + "collection_id=" + coll.getID()));
 
         DatabaseManager.update(context, row );
@@ -179,7 +179,9 @@ public class WorkspaceItem implements InProgressSubmission
 
 
     /**
-     * Get all workspace items for a particular e-person
+     * Get all workspace items for a particular e-person.  These are ordered by
+     * workspace item ID, since this should likely keep them in the order in
+     * which they were created.
      *
      * @param context   the context object
      * @param ep        the eperson
@@ -192,10 +194,11 @@ public class WorkspaceItem implements InProgressSubmission
         List wsItems = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context,
-            "personalworkspace",
-            "SELECT personalworkspace.* FROM personalworkspace, item WHERE " +
-                "personalworkspace.item_id=item.item_id AND " +
-                "item.submitter_id=" + ep.getID() + ";");
+            "workspaceitem",
+            "SELECT workspaceitem.* FROM workspaceitem, item WHERE " +
+                "workspaceitem.item_id=item.item_id AND " +
+                "item.submitter_id=" + ep.getID() +
+                " ORDER BY workspaceitem.workspace_item_id;");
 
         while (tri.hasNext())
         {
@@ -218,13 +221,13 @@ public class WorkspaceItem implements InProgressSubmission
      */
     public int getID()
     {
-        return pwRow.getIntColumn("personal_workspace_id");
+        return wiRow.getIntColumn("workspace_item_id");
     }
 
 
     /**
      * Start the relevant workflow for this workspace item.  The entry in
-     * PersonalWorkspace is removed, a workflow item is created, and the
+     * workspaceitem is removed, a workflow item is created, and the
      * relevant workflow initiated.  If there is no workflow, i.e. the
      * item goes straight into the archive, <code>null</code> is returned.
      * <P>
@@ -291,12 +294,12 @@ public class WorkspaceItem implements InProgressSubmission
         item.update();
         
         // Update ourselves
-        DatabaseManager.update(ourContext, pwRow);
+        DatabaseManager.update(ourContext, wiRow);
     }
 
 
     /**
-     * Delete the workspace item.  The entry in PersonalWorkspace, the
+     * Delete the workspace item.  The entry in workspaceitem, the
      * unarchived item and its contents are all removed (multiple inclusion
      * notwithstanding.)
      */
@@ -311,9 +314,9 @@ public class WorkspaceItem implements InProgressSubmission
                 "item_id=" + item.getID() +
                 "collection_id=" + collection.getID()));
 
-        // Need to delete the personalworkspace row first since it refers
+        // Need to delete the workspaceitem row first since it refers
         // to item ID
-        DatabaseManager.delete(ourContext, pwRow);
+        DatabaseManager.delete(ourContext, wiRow);
         
         // Delete item
         item.deleteWithContents();
@@ -342,36 +345,36 @@ public class WorkspaceItem implements InProgressSubmission
 
     public boolean hasMultipleFiles()
     {
-        return pwRow.getBooleanColumn("multiple_files");
+        return wiRow.getBooleanColumn("multiple_files");
     }
 
     
     public void setMultipleFiles(boolean b)
     {
-        pwRow.setColumn("multiple_files", b);
+        wiRow.setColumn("multiple_files", b);
     }
     
 
     public boolean hasMultipleTitles()
     {
-        return pwRow.getBooleanColumn("multiple_titles");
+        return wiRow.getBooleanColumn("multiple_titles");
     }
     
 
     public void setMultipleTitles(boolean b)
     {
-        pwRow.setColumn("multiple_titles", b);
+        wiRow.setColumn("multiple_titles", b);
     }
 
 
     public boolean isPublishedBefore()
     {
-        return pwRow.getBooleanColumn("published_before");
+        return wiRow.getBooleanColumn("published_before");
     }
 
     
     public void setPublishedBefore(boolean b)
     {
-        pwRow.setColumn("published_before", b);
+        wiRow.setColumn("published_before", b);
     }
 }
