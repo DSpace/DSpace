@@ -348,7 +348,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 		   font-family: "verdana", "Arial", "Helvetica", sans-serif;
 		   font-weight: bold;
 		   font-size: 12pt;
-		   color: #882222;
+		   color: #ff6600;
 		   text-align: center }
 
 .uploadHelp { margin-left: 20px;
