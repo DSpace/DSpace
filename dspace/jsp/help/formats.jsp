@@ -1,5 +1,5 @@
 <%--
-  - format-list.jsp
+  - formats.jsp
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -35,7 +35,7 @@
   --%>
 
 <%--
-  - Format list JSP
+  - Formats JSP
   -
   - Note that this is a "stand-alone" JSP that is invoked directly, and not
   - via a Servlet.  
@@ -113,7 +113,7 @@
     </tr>
 </table>
 
-<table class="formats" align="center" border="0" >
+<table class="formats" border="0">
     <tr>
         <th align="left"><strong>MIME Type</strong></th>
         <th align="left"><strong>Extensions</strong></th>
