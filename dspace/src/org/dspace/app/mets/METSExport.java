@@ -46,6 +46,7 @@ import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.MetsValidator;
 import edu.harvard.hul.ois.mets.helper.MetsWriter;
 import edu.harvard.hul.ois.mets.helper.PCData;
+import edu.harvard.hul.ois.mets.helper.PreformedXML;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -379,7 +380,7 @@ public class METSExport
                 // FIXME: CREATED: no date
                 file.setSIZE(bitstreams[bits].getSize());
                 file.setCHECKSUM(bitstreams[bits].getChecksum());
-                file.setCHECKSUMTYPE(Checksumtype.MODS);
+                file.setCHECKSUMTYPE(Checksumtype.MD5);
                 
                 // FLocat: filename is MD5 checksum
                 FLocat flocat = new FLocat();
@@ -535,7 +536,8 @@ public class METSExport
             }
         }
 
-        xmlData.getContent().add(new Base64(modsXML.toString()));
+        PreformedXML pXML = new PreformedXML(modsXML.toString());
+        xmlData.getContent().add(pXML);
     }
 
 
