@@ -238,6 +238,8 @@ public class DSQuery
         
         myquery = util.substitute("s/^\\*//", myquery);
         myquery = util.substitute("s| \\*| |", myquery);
+        myquery = util.substitute("s|\\(\\*|\\(|", myquery);
+        myquery = util.substitute("s|:\\*|:|", myquery);
 
         return myquery;
     }
