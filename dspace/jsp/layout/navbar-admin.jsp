@@ -53,28 +53,28 @@
     List links = new LinkedList();
     
     labels.add("Communities/<br>Collections");
-    links.add("edit-communities");
+    links.add("/dspace-admin/edit-communities");
     
     labels.add("E-people");
-    links.add("edit-epeople");
+    links.add("/dspace-admin/edit-epeople");
     
     labels.add("Groups");
-    links.add("groups");
+    links.add("/dspace-admin/groups");
     
     labels.add("Items");
-    links.add("edit-item");
+    links.add("/tools/edit-item");
     
     labels.add("Dublin Core<br>Registry");
-    links.add("dc-registry");
+    links.add("/dspace-admin/dc-registry");
     
     labels.add("Bitstream Format<br>Registry");
-    links.add("format-registry");
+    links.add("/dspace-admin/format-registry");
     
     labels.add("Workflow");
-    links.add("workflow");
+    links.add("/dspace-admin/workflow");
     
     labels.add("Authorization");
-    links.add("authorize");
+    links.add("/dspace-admin/authorize");
 
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);    
@@ -101,7 +101,7 @@
             <img alt="" src="<%= request.getContextPath() %>/image/<%= image %>.gif" width="16" height="16">
         </td>
         <td nowrap class="navigationBarItem">
-            <a href="<%= request.getContextPath() %>/dspace-admin/<%= l %>"><%= s %></a>
+            <a href="<%= request.getContextPath() %><%= l %>"><%= s %></a>
         </td>
     </tr>
 <%
