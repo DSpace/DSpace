@@ -129,7 +129,7 @@ jhunter_AT_servlets.com
 
 ------------------------------------------------------------------------------
 Apache software license (commons-collections.jar, commons-dbcp.jar, 
-commons-pool.jar, log4j.jar, lucene.jar, xalan.jar, xerces.jar)
+commons-pool.jar, log4j.jar, lucene.jar, oro.jar, xalan.jar, xerces.jar)
 
 /*
  * The Apache Software License, Version 1.1
