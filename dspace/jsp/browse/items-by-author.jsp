@@ -94,7 +94,7 @@
     <table border=0 cellpadding=10 align=center>
         <tr>
             <td colspan=2 align=center class=standard>
-                <a href="browse-author?point=<%= URLEncoder.encode(author) %>">Return to Browse by Author</A>
+                <a href="browse-author?starts_with=<%= URLEncoder.encode(author) %>">Return to Browse by Author</A>
             </td>
         </tr>
         <tr>
