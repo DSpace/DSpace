@@ -43,6 +43,7 @@ package org.dspace.authorize;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.browse.Browse;
 import org.dspace.authorize.AuthorizeException;
@@ -53,6 +54,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -93,29 +95,42 @@ public class PolicySet
 
         Collection collection = Collection.find(c, collection_id);
 
+        syncCollection(c, collection);
+
+    	c.complete();
+    }
+    
+    public static void syncCollection(Context c, Collection collection)
+        throws SQLException, AuthorizeException
+    {
         // find all items in a collection, and clone the collection's read policy
         ItemIterator items = collection.getItems();
 
         int mycount = 0;
 
+        List policies = AuthorizeManager.getPoliciesActionFilter(
+            c, collection, Constants.READ);
+        
+        if( policies.isEmpty() )
+        {
+            System.out.println( "Error: collection has no READ policies" );
+            return;
+        }       
+                        
         while( items.hasNext() )
         {
             mycount++;
 
-            // now get the collection's read policies
-            TableRowIterator tri = DatabaseManager.query(c,
-                "resourcepolicy",
-                "SELECT * FROM resourcepolicy WHERE " +
-                "resource_type_id=" + Constants.COLLECTION + " AND " +
-                "resource_id="      + collection_id        + " AND " +
-                "action_id="        + Constants.READ       + ";" );
-
             Item i = items.next();
-	        System.out.println(mycount + ": Replacing policy for item " + i.getID() );
+	        System.out.println(mycount + ": Replacing policies for item " + i.getID() );
 
-            i.replaceAllPolicies(tri);
+            i.replaceAllPolicies(policies);
         }
 
-    	c.complete();
+        // now do the logo bitstream also (great variable name :-)
+        Bitstream bs = collection.getLogo();
+        AuthorizeManager.removeAllPolicies(c, bs);
+        AuthorizeManager.addPolicies(c, policies, bs);
+
     }
 }
