@@ -111,7 +111,7 @@ public class Group
         // FIXME: Check authorisation
 
         // Create a table row
-        TableRow row = DatabaseManager.create(context, "group");
+        TableRow row = DatabaseManager.create(context, "epersongroup");
         return new Group(context, row);
     }
 
@@ -174,20 +174,8 @@ public class Group
      */
     public void removeMember(EPerson e)
     {
-        ListIterator i = epeople.listIterator();
-
-        // find and remove the eperson
-        while(i.hasNext())
-        {
-            EPerson e2 = (EPerson)i.next();
-
-            if( e.getID() == e2.getID() )
-            {
-                // match, remove, and set epeople changed flag
-                i.remove();
-                epeoplechanged = true;
-            }
-        }
+        if (epeople.remove(e))
+            epeoplechanged = true;
     }
 
 
@@ -198,19 +186,7 @@ public class Group
      */
     public boolean isMember(EPerson e)
     {
-        // this is slow, should have a fast static db-check version
-        Iterator i = epeople.iterator();
-
-        while(i.hasNext())
-        {
-            EPerson e2 = (EPerson)i.next();
-
-            if(e2.getID() == e.getID())
-                return true;
-        }
-
-        // if we made it through the loop, must be false
-        return false;
+        return epeople.contains(e);
     }
 
 
@@ -305,6 +281,8 @@ public class Group
 
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
+
+        epeople.clear();
     }
 
 
@@ -354,5 +332,24 @@ public class Group
 
             epeoplechanged = false;
         }
+    }
+
+    /**
+     * Return <code>true</code> if <code>other</code> is the same Group as
+     * this object, <code>false</code> otherwise
+     *
+     * @param other   object to compare to
+     *
+     * @return  <code>true</code> if object passed in represents the same
+     *          group as this object
+     */
+    public boolean equals(Object other)
+    {
+        if (!(other instanceof Group))
+        {
+            return false;
+        }
+
+        return (getID() == ((Group) other).getID());
     }
 }
