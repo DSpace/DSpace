@@ -74,9 +74,18 @@
 
     <h2>Browse <%=browsetext%></h2>
 
+    <p>Check the box next to items you wish to add or remove, and choose 'add' or 'remove'.</p>
+
     <form method=POST action="<%= request.getContextPath() %>/tools/itemmap">
         <input type="hidden" name="cid" value="<%=collection.getID()%>">
-        <input type="submit" name="submit" value="Cancel">
+
+        <table>     
+          <tr>
+            <td><input type="submit" name="action" value="<%=browsetype%>"></td>
+            <td><input type="submit" name="submit" value="Cancel"></td>
+          </tr>
+        </table>
+
 
         <table class="miscTable" align="center">
         <tr>
@@ -126,7 +135,15 @@
         </tr>
 <% } %>
         
-        </table>     
+        </table>
+
+        <table>     
+          <tr>
+            <td><input type="submit" name="action" value="<%=browsetype%>"></td>
+            <td><input type="submit" name="submit" value="Cancel"></td>
+          </tr>
+        </table>
+
     </form>
 
 </dspace:layout>        

@@ -79,10 +79,10 @@
 
     <h2>Item Mapper - Map Items from Other Collections</h2>
 
-    <p>This Collection: <%=collection.getMetadata("name")%></p>
+    <p>Collection: "<%=collection.getMetadata("name")%>"</p>
 
     <p>There are <%=count_native%> items owned by this collection, and
-    <%=count_import%> items mapped from other collections.</p>
+    <%=count_import%> items mapped in from other collections.</p>
    
 <%-- 
     <h3>Quick Add Item:</h3>
@@ -144,11 +144,21 @@
         <br>
     </form> 
 
-    <h3>Browse Item Imported From Collections:</h3>
-    
+    <h3>Browse Items Imported From Collections:</h3>
+
+    <p>Click on collection names to browse for items to remove that were mapped in from that collection.</p>
+
 <%
     String row = "even";
     Iterator colKeys = collections.keySet().iterator();
+
+    if(!colKeys.hasNext())
+    {
+%>
+    <p>This collection has no items mapped into it.</p>
+<%
+    }
+
 
     while( colKeys.hasNext() )
     {
