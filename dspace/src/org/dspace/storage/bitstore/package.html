@@ -8,14 +8,13 @@
 -->
 </head>
 <body bgcolor="white">
-Provides an API for storing, retrieving and deleting streams of bits in
+<P>Provides an API for storing, retrieving and deleting streams of bits in
 a transactionally safe fashion. The main class is
-<a href="BitstreamStorageManager.html">BitstreamStorageManager</a>.
+<a href="BitstreamStorageManager.html">BitstreamStorageManager</a>.</P>
 
 <h2>Using the Bitstore API</h2>
 
-<p>
-An example use of the Bitstore API is shown below:
+<p>An example use of the Bitstore API is shown below:</P>
 <pre>
     // Create or obtain a context object
     Context context;
@@ -43,34 +42,53 @@ An example use of the Bitstore API is shown below:
     {
     }
 </pre>
-</p>
 
 <h2>Storage mechanism</h2>
 
-<p>
-The BitstreamStorageManager stores its data under the directory
-given by the configuration property <em>assetstore.dir</em>.
-When given a stream of bits to store, the BitstreamStorageManager
+<p>The BitstreamStorageManager stores files in one or more <em>asset store</em>
+directories.  These can be configured in <code>dspace.cfg</code>.  For
+example:</P>
+
+<PRE>assetstore.dir = /dspace/assetstore</PRE>
+
+<P>The above example specifies a single asset store.</P>
+
+<PRE>assetstore.dir = /dspace/assetstore_0
+assetstore.dir.1 = /mnt/other_filesystem/assetstore_1</PRE>
+
+<P>The above example specifies two asset stores.  <code>assetstore.dir</code>
+specifies the asset store number 0 (zero); after that use 
+<code>assetstore.dir.1</code>, <code>assetstore.dir.2</code> and so on.  The
+particular asset store a bitstream is stored in is held in the database, so
+don't move bitstreams between asset stores, and don't renumber them.</P>
+
+<P>By default, newly created bitstreams are put in asset store 0 (i.e. the one specified by the
+<code>assetstore.dir</code> property.)  To change this, for example when asset
+store 0 is getting full, add a line to <code>dspace.cfg</code> like:</P>
+
+<PRE>assetstore.incoming = 1</PRE>
+
+<P>Then restart DSpace (Tomcat).  New bitstreams will be written to the asset
+store specified by <code>assetstore.dir.1</code>, which is
+<code>/mnt/other_filesystem/assetstore_1</code> in the above example.</P>
+  
+
+<H3>Moving an Asset Store</H3>
+
+<P>You can move an asset store as a whole to a new location in the file system; stop DSpace
+(Tomcat), move all of the contents to the new location, change the appropriate
+line in <code>dspace.cfg</code>, and restart DSpace (Tomcat).</P>
+
+<P>We will be providing administration tools for more sophisticated management
+of these asset stores in the future.</P>
+
+<P>When given a stream of bits to store, the BitstreamStorageManager
 generates a unique key for the stream. The key takes the form of
 a long sequence of digits, which is transformed into a file path.
 The BitstreamStorageManager stores the contents of the stream in
 this path, creating parent directories as necessary.
 </p>
 
-<h3>Changing the location of the Asset Store</h3>
-
-To change the location of the asset store, do the following:
-
-<ol>
-  <li>Shut down the DSpace system.
-  <li>Move the asset store directory to the new location.
-  <!-- FIXME: This should refer DSpace configuration info -->
-  <li>Change the configuration property <em>assetstore.dir</em>
-      to refer to the new location.
-  <li>Restart the DSpace system.
-</ol>
-
-No database changes are necessary.
 
 <h2>The Bitstore and Transactions</h2>
 
@@ -93,14 +111,15 @@ present in the asset store.
 
 <h2>Cleaning up the Asset Store</h2>
 
-As noted above, sometimes files will be physically present in the
+<P>As noted above, sometimes files will be physically present in the
 Asset Store even though they are marked deleted in the database.
 You can use the command-line utility class
-<code>org.dspace.storage.bitstore.Cleanup</code>
+<code>org.dspace.storage.bitstore.Cleanup</code> (which is invoked via
+<code>/dspace/bin/cleanup</code>)
 to remove the bitstreams which are marked deleted from the Asset Store.
 To prevent accidental deletion of bitstreams which are in the process
 of being stored, cleanup only removes bitstreams which are more than
-an hour old.
+an hour old.</P>
 </body>
 </html>
 
