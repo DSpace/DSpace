@@ -217,4 +217,29 @@ public class Utils
         copy( input, output );
         output.flush();
     }
+    
+     /**
+     * Replace characters that could be interpreted as HTML codes with symbolic
+     * references (entities). This function should be called before displaying any metadata
+     * fields that could contain the characters "<", ">", "&", "'", and 
+     * double quotation marks.
+     * This will effectively disable HTML links in metadata.
+     *
+     * @param value     the metadata value to be scrubbed for display
+     *
+     * @return      the passed-in string, with html special characters replaced 
+     * with entities.
+     */
+    public static String addEntities(String value)
+    {
+       
+        value = value.replaceAll("<", "&lt;");
+        value = value.replaceAll(">", "&gt;");  
+        value = value.replaceAll("&", "&amp;");
+        value = value.replaceAll("\"", "&quot;");
+        value = value.replaceAll("'", "&apos;");
+        
+        return value;
+        
+    }
 }
