@@ -343,6 +343,14 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 		   font-size: 8pt;
 		   text-align: center }
 
+.submitFormWarn {  margin-left: 10px;
+		   margin-right: 10px;
+		   font-family: "verdana", "Arial", "Helvetica", sans-serif;
+		   font-weight: bold;
+		   font-size: 12pt;
+		   color: #882222;
+		   text-align: center }
+
 .uploadHelp { margin-left: 20px;
               margin-right: 20px;
               font-family: "verdana", "Arial", "Helvetica", sans-serif;
