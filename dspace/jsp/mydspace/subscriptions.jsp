@@ -68,7 +68,6 @@
                title="Your Subscriptions">
 
     <H1>Your Subscriptions</H1>
-
 <%
     if (updated)
     {
@@ -76,7 +75,10 @@
     <P><strong>Your subscriptions have been updated.</strong></P>
 <%
     }
-
+%>
+    <P>To subscribe to a collection, visit the collection's home page, and
+    click on the "Subscribe" button.</P>
+<%
     if (subscriptions.length > 0)
     {
 %>
