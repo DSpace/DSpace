@@ -148,18 +148,18 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
         if (itemInfo == null)
         {
+            throw new IdDoesNotExistException(identifier);
+        }
+        else
+        {
             if (itemInfo.withdrawn)
             {
                 throw new NoMetadataFormatsException();
             }
             else
             {
-                throw new IdDoesNotExistException(identifier);
+                return getRecordFactory().getSchemaLocations(itemInfo);
             }
-        }
-        else
-        {
-            return getRecordFactory().getSchemaLocations(itemInfo);
         }
     }
 
