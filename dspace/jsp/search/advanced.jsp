@@ -103,7 +103,7 @@
                     <option value="abstract" <%= field1.equals("abstract") ? "selected" : "" %>>Abstract</option>
                     <option value="series" <%= field1.equals("series") ? "selected" : "" %>>Series</option>
                     <option value="sponsor" <%= field1.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
-                    <option value="identifier" <%= field1.equals("identifier") ? "selected" : "" %>>ISSN/ISBN</option>
+                    <option value="identifier" <%= field1.equals("identifier") ? "selected" : "" %>>Identifier</option>
                   </select>
                 </p>
             </td>
@@ -132,7 +132,7 @@
                     <option value="abstract" <%= field2.equals("abstract") ? "selected" : "" %>>Abstract</option>
                     <option value="series" <%= field2.equals("series") ? "selected" : "" %>>Series</option>
                     <option value="sponsor" <%= field2.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
-                    <option value="identifier" <%= field2.equals("identifier") ? "selected" : "" %>>ISSN/ISBN</option>
+                    <option value="identifier" <%= field2.equals("identifier") ? "selected" : "" %>>Identifier</option>
                   </select>
            </td>
             <td align="left" valign="top" nowrap width="68%">
@@ -157,7 +157,7 @@
                     <option value="abstract" <%= field3.equals("abstract") ? "selected" : "" %>>Abstract</option>
                     <option value="series" <%= field3.equals("series") ? "selected" : "" %>>Series</option>
                     <option value="sponsor" <%= field3.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
-                    <option value="identifier" <%= field3.equals("identifier") ? "selected" : "" %>>ISSN/ISBN</option>
+                    <option value="identifier" <%= field3.equals("identifier") ? "selected" : "" %>>Identifier</option>
                   </select>
                   <br>
             </td>
