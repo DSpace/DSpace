@@ -149,7 +149,12 @@ public class JSPManager
         int type)
         throws ServletException, IOException
     {
-        // FIXME: Tailor message
-        showJSP(request, response, "/error/invalidID.jsp");
+        request.setAttribute("bad.id", badID);
+        if (type != -1)
+        {
+            request.setAttribute("bad.type", new Integer(type));
+        }
+        
+        showJSP(request, response, "/error/invalid-id.jsp");
     }
 }

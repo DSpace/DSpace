@@ -53,6 +53,8 @@ import javax.servlet.RequestDispatcher;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -133,6 +135,8 @@ public class Layout extends TagSupport
             locbar = "auto";
         }
 
+        // These lists will contain titles and links to put in the location
+        // bar
         List parents = new ArrayList();
         List parentLinks = new ArrayList();
 
@@ -143,7 +147,7 @@ public class Layout extends TagSupport
         }
         else
         {
-            // Add DSpace Home
+            // We'll always add "DSpace Home" to the a location bar
             parents.add(ConfigurationManager.getProperty("dspace.name"));
 
             if (locbar.equalsIgnoreCase("nolink"))
@@ -158,6 +162,8 @@ public class Layout extends TagSupport
             // Add other relevant components to the location bar
             if (locbar.equalsIgnoreCase("link"))
             {
+                // "link" mode - next thing in location bar is taken from
+                // parameters of tag, with a link
                 if (parentTitle != null)
                 {
                     parents.add(parentTitle);
@@ -166,6 +172,8 @@ public class Layout extends TagSupport
             }
             else if (locbar.equalsIgnoreCase("nolink"))
             {
+                // "nolink" mode - next thing in location bar is taken from
+                // parameters of tag, with no link
                 if (parentTitle != null)
                 {
                     parents.add(parentTitle);
@@ -177,7 +185,23 @@ public class Layout extends TagSupport
                 // Grab parents from the URL - these should have been picked up
                 // by the LocationServlet
 
-                // FIXME: Add community + collection locations
+                Community com = (Community)
+                    request.getAttribute("dspace.community");
+                Collection col = (Collection)
+                    request.getAttribute("dspace.collection");
+
+                if (com != null)
+                {
+                    parents.add(com.getMetadata("name"));
+                    parentLinks.add("/communities/" + com.getID() + "/");
+
+                    if (col != null)
+                    {
+                        parents.add(col.getMetadata("name"));
+                        parentLinks.add("/communities/" + com.getID() +
+                            "/collections/" + col.getID() + "/");
+                    }
+                }
             }
 
             request.setAttribute("dspace.layout.locbar", new Boolean(true));
@@ -337,7 +361,7 @@ public class Layout extends TagSupport
      * Get the value of parentTitle.
      * @return Value of parentTitle.
      */
-    public String getParentTitle()
+    public String getParenttitle()
     {
         return parentTitle;
     }
@@ -346,7 +370,7 @@ public class Layout extends TagSupport
      * Set the value of parent.
      * @param v  Value to assign to parent.
      */
-    public void setParentTitle(String  v)
+    public void setParenttitle(String  v)
     {
         this.parentTitle = v;
     }

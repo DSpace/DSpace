@@ -1,5 +1,5 @@
 <%--
-  - contact-info.jsp
+  - invalid-id.jsp
   -
   - Version: $Revision$
   -
@@ -39,24 +39,59 @@
   --%>
 
 <%--
-  - Contact information for the DSpace site.
+  - Page representing an invalid ID error
+  -
+  - Attributes:
+  -    bad.id   - Optional.  The ID that is invalid.
+  -    bad.type - Optional.  The type of the ID (or the type the system thought
+  -               is was!) from org.dspace.core.Constants.
   --%>
 
-<%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page isErrorPage="true" %>
+<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<center>
-    <P><%= ConfigurationManager.getProperty("dspace.name") %> administration
-    contact details:</P>
+<%@ page import="org.dspace.core.Constants" %>
 
-    <table>
-        <tr>
-            <td class="standard">By e-mail:</td>
-            <td class="standard"><a href="mailto:dspace-help@mit.edu">dspace-help@mit.edu</a></td>
-        </tr>
-        <tr>
-            <td class="standard">Or telephone:</td>
-            <td class="standard">617-452-3485</td>
-        </tr>
-    </table>
-</center>
+<%
+    String badID = (String) request.getAttribute("bad.id");
+    Integer type = (Integer) request.getAttribute("bad.type");
 
+    // Make sure badID isn't null
+    if (badID == null)
+    {
+        badID = "";
+    }
+
+    // Get text for the type
+    String typeString = "object";
+    if (type != null)
+    {
+        typeString = Constants.typetext[type.intValue()].toLowerCase();
+    }
+%>
+
+<dspace:layout locbar="off" title="Invalid Identifier">
+
+    <H1>Invalid Identifier</H1>
+
+    <P>The identifier <%= badID %> does not correspond to a valid
+    <%= typeString %> in DSpace.  This may be because of one of the following
+    reasons:</P>
+
+    <UL>
+        <LI>The URL of the current page is incorrect - if you followed a link
+        from outside of DSpace it may be mistyped or corrupt.</LI>
+        <LI>You entered an invalid ID into a form - please try again.</LI>
+    </UL>
+    
+    <P>If you're having problems, or you expected the ID to work, feel free to
+    contact the site administrators.</P>
+
+    <%@ include file="/contact-info.jsp" %>
+
+    <P align=center>
+        <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>
+    </P>
+	
+
+</dspace:layout>

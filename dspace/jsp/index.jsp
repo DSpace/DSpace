@@ -1,5 +1,5 @@
 <%--
-  - home.jsp
+  - index.jsp
   -
   - Version: $Revision$
   -
@@ -38,7 +38,14 @@
   - DAMAGE.
   --%>
 
-<%-- Home page JSP --%>
+<%--
+  - Home page JSP
+  -
+  - Note that this is a "stand-alone" JSP that is invoked directly, and not
+  - via a Servlet.  This is because the standard servlet 2.3 deployment
+  - descriptor does not seem to allow a servlet to be deployed at "/" without
+  - it becoming the servlet for dealing with every request to the site.
+  --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 

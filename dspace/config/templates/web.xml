@@ -52,15 +52,29 @@
   <description>@@dspace.name@@ running at @@dspace.hostname@@</description>
 
 
-  <!-- Community list page -->
+  <!-- Servlets -->
   <servlet>
     <servlet-name>community-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.CommunityListServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>location</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.LocationServlet</servlet-class>
+  </servlet>
+
+
+
+  <!-- Servlet Mappings -->
+
   <servlet-mapping>
     <servlet-name>community-list</servlet-name>
     <url-pattern>/community-list</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>location</servlet-name>
+    <url-pattern>/communities/*</url-pattern>
   </servlet-mapping>
 
 
