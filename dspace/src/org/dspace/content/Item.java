@@ -41,24 +41,24 @@
 package org.dspace.content;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.administer.DCType;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.Browse;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -125,6 +125,7 @@ public class Item extends DSpaceObject
      *
      * @param context  the context this object exists in
      * @param row      the corresponding row in the table
+     * @throws SQLException
      */
     Item(Context context, TableRow row)
         throws SQLException
@@ -153,7 +154,7 @@ public class Item extends DSpaceObject
 
         while (tri.hasNext())
         {
-            TableRow r = (TableRow) tri.next();
+            TableRow r = tri.next();
 
             // First check the cache
             Bundle fromCache = (Bundle) context.fromCache(
@@ -177,7 +178,7 @@ public class Item extends DSpaceObject
 
         while (tri.hasNext())
         {
-            TableRow resultRow = (TableRow) tri.next();
+            TableRow resultRow = tri.next();
 
             // Get the Dublin Core type
             String[] dcType = DCType.quickFind(context,
@@ -214,6 +215,7 @@ public class Item extends DSpaceObject
      * @param  id       Internal ID of the item
      *
      * @return  the item, or null if the internal ID is invalid.
+     * @throws SQLException
      */
     public static Item find(Context context, int id)
         throws SQLException
@@ -241,17 +243,16 @@ public class Item extends DSpaceObject
 
             return null;
         }
-        else
+        
+        // not null, return item
+        if (log.isDebugEnabled())
         {
-            if (log.isDebugEnabled())
-            {
-                log.debug(LogManager.getHeader(context,
-                    "find_item",
-                    "item_id=" + id));
-            }
-
-            return new Item(context, row);
+            log.debug(LogManager.getHeader(context,
+                "find_item",
+                "item_id=" + id));
         }
+
+        return new Item(context, row);
     }
 
 
@@ -263,9 +264,11 @@ public class Item extends DSpaceObject
      * @param  context  DSpace context object
      *
      * @return  the newly created item
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     static Item create(Context context)
-        throws SQLException, AuthorizeException, IOException
+        throws SQLException, AuthorizeException
     {
         TableRow row = DatabaseManager.create(context, "item");
         Item i = new Item(context, row);
@@ -298,13 +301,24 @@ public class Item extends DSpaceObject
      * @param  context  DSpace context object
      *
      * @return  an iterator over the items in the archive.
+     * @throws SQLException
      */
     public static ItemIterator findAll(Context context)
         throws SQLException
     {
-        TableRowIterator rows = DatabaseManager.query(context,
-            "item",
-            "SELECT * FROM item WHERE in_archive=true");
+        String myQuery = null;
+        
+        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        {
+            myQuery = "SELECT * FROM item WHERE in_archive=1";
+        }
+        else
+        {
+            // default postgres
+            myQuery = "SELECT * FROM item WHERE in_archive=true";
+        }
+
+        TableRowIterator rows = DatabaseManager.query(context, "item", myQuery );
 
         return new ItemIterator(context, rows);
     }
@@ -318,14 +332,24 @@ public class Item extends DSpaceObject
      * @param  eperson  the submitter
      *
      * @return an iterator over the items submitted by eperson
+     * @throws SQLException
      */
     public static ItemIterator findBySubmitter(Context context, EPerson eperson)
         throws SQLException
     {
-        TableRowIterator rows = DatabaseManager.query(context,
-            "item",
-            "SELECT * FROM item WHERE in_archive=true AND submitter_id=" +
-                eperson.getID() );
+        String myQuery = null;
+        
+        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        {
+            myQuery = "SELECT * FROM item WHERE in_archive=1 AND submitter_id=" + eperson.getID();
+        }
+        else
+        {
+            // default postgres
+            myQuery = "SELECT * FROM item WHERE in_archive=true AND submitter_id=" + eperson.getID();
+        }
+        
+        TableRowIterator rows = DatabaseManager.query(context, "item", myQuery );
 
         return new ItemIterator(context, rows);
     }
@@ -403,7 +427,7 @@ public class Item extends DSpaceObject
     /**
      * Set the owning Collection for the item
      *
-     * @param collection
+     * @param c Collection
      */
     public void setOwningCollection(Collection c)
     {
@@ -413,8 +437,8 @@ public class Item extends DSpaceObject
 
     /**
      * Get the owning Collection for the item
-     *
-     * @returns Collection that is the owner of the item
+     * @return Collection that is the owner of the item
+     * @throws SQLException
      */    
     public Collection getOwningCollection()
         throws java.sql.SQLException
@@ -708,6 +732,7 @@ public class Item extends DSpaceObject
      * Get the collections this item is in.  The order is indeterminate.
      *
      * @return the collections this item is in, if any.
+     * @throws SQLException
      */
     public Collection[] getCollections()
         throws SQLException
@@ -753,6 +778,7 @@ public class Item extends DSpaceObject
      * parent communities of the owning collections.
      *
      * @return  the communities this item is in.
+     * @throws SQLException
      */
     public Community[] getCommunities()
         throws SQLException
@@ -814,6 +840,7 @@ public class Item extends DSpaceObject
      *  (name corresponds roughly to type)
      *
      * @param name name of bundle (ORIGINAL/TEXT/THUMBNAIL)
+     * @return Bundle []
      *
      * @returns the bundles in an unordered array
      */
@@ -848,6 +875,8 @@ public class Item extends DSpaceObject
      * @param name bundle name (ORIGINAL/TEXT/THUMBNAIL)
      *
      * @return  the newly created bundle
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public Bundle createBundle(String name)
         throws SQLException, AuthorizeException
@@ -873,6 +902,8 @@ public class Item extends DSpaceObject
      * Add an existing bundle to this item.  This has immediate effect.
      *
      * @param b  the bundle to add
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public void addBundle(Bundle b)
         throws SQLException, AuthorizeException
@@ -916,6 +947,8 @@ public class Item extends DSpaceObject
      * bundle is orphaned.
      *
      * @param b  the bundle to remove
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public void removeBundle(Bundle b)
         throws SQLException, AuthorizeException, IOException
@@ -965,6 +998,10 @@ public class Item extends DSpaceObject
      *
      * @param is   the stream to create the new bitstream from
      * @param name is the name of the bundle (ORIGINAL, TEXT, THUMBNAIL)
+     * @return Bitstream that is created
+     * @throws AuthorizeException
+     * @throws IOException
+     * @throws SQLException
      */
     public Bitstream createSingleBitstream(InputStream is, String name)
         throws AuthorizeException, IOException, SQLException
@@ -981,17 +1018,21 @@ public class Item extends DSpaceObject
         return bitstream;
     }
 
-   
     /**
-    * Just for backwards compatibility - bitstream stored
-    * in bundle "ORIGINAL"
-    */
+     * Convenience method, calls createSingleBitstream() with
+     * name "ORIGINAL"
+     * @param is InputStream
+     * @return created bitstream
+     * @throws AuthorizeException
+     * @throws IOException
+     * @throws SQLException
+     */
     public Bitstream createSingleBitstream(InputStream is)
-        throws AuthorizeException, IOException, SQLException
+    	throws AuthorizeException, IOException, SQLException
     {
-        return createSingleBitstream(is, "ORIGINAL");
+    	return createSingleBitstream(is, "ORIGINAL");
     }
-
+    
 
     /**
      * Get all non-internal bitstreams in the item.  This is mainly used
@@ -1033,6 +1074,9 @@ public class Item extends DSpaceObject
      *
      * @param license   the license the user granted
      * @param eperson   the eperson who granted the license
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
      */
     public void licenseGranted(String license, EPerson eperson)
         throws SQLException, IOException, AuthorizeException
@@ -1062,9 +1106,11 @@ public class Item extends DSpaceObject
 
     /**
      * Remove all licenses from an item - it was rejected
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public void removeLicenses()
-        throws SQLException, IOException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         // Find the License format
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(
@@ -1102,6 +1148,8 @@ public class Item extends DSpaceObject
     /**
      * Update the item "in archive" flag and Dublin Core metadata in the
      * database
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public void update()
         throws SQLException, AuthorizeException
@@ -1212,37 +1260,35 @@ public class Item extends DSpaceObject
                     throw new SQLException( "bad_dublin_core " + dcv.element
                                 + " " + dcv.qualifier );
                 }
-                else
+
+                // Work out the place number for ordering
+                int current = 0;
+                
+                // Key into map is "element" or "element.qualifier"
+                String key = dcv.element +
+					(dcv.qualifier == null ? "" : "." + dcv.qualifier);
+                
+                Integer currentInteger = (Integer) elementCount.get(key);
+                
+                if (currentInteger != null)
                 {
-                    // Work out the place number for ordering
-                    int current = 0;
-
-                    // Key into map is "element" or "element.qualifier"
-                    String key = dcv.element +
-                        (dcv.qualifier == null ? "" : "." + dcv.qualifier);
-
-                    Integer currentInteger = (Integer) elementCount.get(key);
-
-                    if (currentInteger != null)
-                    {
-                        current = currentInteger.intValue();
-                    }
-
-                    current++;
-                    elementCount.put(key, new Integer(current));
-
-                    // Write DCValue
-                    TableRow valueRow = DatabaseManager.create(ourContext,
-                        "dcvalue");
-
-                    valueRow.setColumn("item_id", getID());
-                    valueRow.setColumn("dc_type_id", dcType.getID());
-                    valueRow.setColumn("text_value", dcv.value);
-                    valueRow.setColumn("text_lang", dcv.language);
-                    valueRow.setColumn("place", current);
-
-                    DatabaseManager.update(ourContext, valueRow);
+                	current = currentInteger.intValue();
                 }
+                
+                current++;
+                elementCount.put(key, new Integer(current));
+                
+                // Write DCValue
+                TableRow valueRow = DatabaseManager.create(ourContext,
+                	"dcvalue");
+                
+                valueRow.setColumn("item_id", getID());
+                valueRow.setColumn("dc_type_id", dcType.getID());
+                valueRow.setColumn("text_value", dcv.value);
+                valueRow.setColumn("text_lang", dcv.language);
+                valueRow.setColumn("place", current);
+                
+                DatabaseManager.update(ourContext, valueRow);
             }
 
             dublinCoreChanged = false;
@@ -1256,6 +1302,9 @@ public class Item extends DSpaceObject
      * Withdraw the item from the archive.  It is kept in place, and the
      * content and metadata are not deleted, but it is not publicly
      * accessible.
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void withdraw()
         throws SQLException, AuthorizeException, IOException
@@ -1327,6 +1376,9 @@ public class Item extends DSpaceObject
 
     /**
      * Reinstate a withdrawn item
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void reinstate()
             throws SQLException, AuthorizeException, IOException
@@ -1394,6 +1446,9 @@ public class Item extends DSpaceObject
      * Delete (expunge) the item.  Bundles and bitstreams are also deleted if
      * they are not also included in another item.  The Dublin Core metadata is
      * deleted.
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     void delete()
         throws SQLException, AuthorizeException, IOException
@@ -1468,7 +1523,7 @@ public class Item extends DSpaceObject
     /**
      * Return true if this Collection 'owns' this item
      *
-     * @param collection
+     * @param c Collection
      *
      * @return true if this Collection owns this item
      *
@@ -1478,13 +1533,16 @@ public class Item extends DSpaceObject
         int owner_id = itemRow.getIntColumn("owning_collection");
         
         if(c.getID() == owner_id) return true;
-        else return false;
+        
+        // not the owner
+        return false;
     }
 
 
     /**
      * Utility method to remove all Dublin Core associated with the item
      * from the database (regardless of in-memory version)
+     * @throws SQLException
      */
     private void removeDCFromDatabase()
         throws SQLException
@@ -1496,6 +1554,7 @@ public class Item extends DSpaceObject
 
     /**
      * return type found in Constants
+     * @return int Constants.ITEM
      */
     public int getType()
     {
@@ -1509,6 +1568,7 @@ public class Item extends DSpaceObject
      *
      * @param newpolicies - this will be all of the new policies for
      *   the item and its contents
+     * @throws SQLException
      */      
     public void replaceAllItemPolicies( List newpolicies )
         throws SQLException, AuthorizeException
@@ -1524,6 +1584,7 @@ public class Item extends DSpaceObject
      *
      * @param newpolicies - this will be all of the new policies for
      *   the bundle and bitstream contents
+     * @throws SQLException
      */      
     public void replaceAllBitstreamPolicies( List newpolicies )
         throws SQLException, AuthorizeException
@@ -1558,9 +1619,10 @@ public class Item extends DSpaceObject
      *    that belong to a given Group 
      *
      * @param g Group referenced by policies that needs to be removed
+     * @throws SQLException
      */      
     public void removeGroupPolicies( Group g )
-        throws SQLException, AuthorizeException
+        throws SQLException
     {
         // remove Group's policies from Item
         AuthorizeManager.removeGroupPolicies(ourContext, this, g);
@@ -1651,6 +1713,7 @@ public class Item extends DSpaceObject
      * return TRUE if context's user can edit item, false otherwise
      *
      * @return boolean true = current user can edit item
+     * @throws SQLException
      */
     public boolean canEdit()
         throws java.sql.SQLException
