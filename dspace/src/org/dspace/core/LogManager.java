@@ -54,7 +54,7 @@ public class LogManager
     /**
      * Generate the log header
      *
-     * @param context    the current Context
+     * @param context    the current Context - safe to pass in <code>null</code>
      * @param action     string describing the action
      * @param extrainfo  string with extra information, like parameters
      *
@@ -64,15 +64,25 @@ public class LogManager
         String extrainfo)
     {
         String email = "anonymous";
+        String extraInfo;
 
-        EPerson e = context.getCurrentUser();
-
-        if (e != null)
+        if (context != null)
         {
-            email = e.getEmail();
+            EPerson e = context.getCurrentUser();
+
+            if (e != null)
+            {
+                email = e.getEmail();
+            }
+
+            extraInfo = context.getExtraLogInfo();
+        }
+        else
+        {
+            extraInfo = "no_context";
         }
 
-        String result = new String(email + ":" + context.getExtraLogInfo() +
+        String result = new String(email + ":" + extraInfo +
             ":" + action + ":" + extrainfo);
 
         return result;
