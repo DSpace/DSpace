@@ -57,7 +57,6 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-
 import org.dspace.history.HistoryManager;
 
 /**
@@ -73,7 +72,8 @@ import org.dspace.history.HistoryManager;
  * as submit (ADD) permission to a collection.)
  * <p>
  * Note: If an eperson is a member of the administrator group (id 1), then
- *  they are automatically given permission for all requests.
+ *  they are automatically given permission for all requests another special
+ *  group is group 0, which is anonymous - all EPeople are members of group 0.
  */
 public class AuthorizeManager
 {

@@ -337,8 +337,8 @@ public class Context
     /**
      * test if member of special group
      *
-     * @param groupid to test
-     * @returns true if member
+     * @param  groupid to test
+     * @return true if member
      */
     public boolean inSpecialGroup(int groupID)
     {

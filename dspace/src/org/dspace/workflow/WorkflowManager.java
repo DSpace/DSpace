@@ -73,42 +73,36 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 
 
-/*
- issues
- abort has to go through reject - they should share code
- authorization isn't done
- */
 
-/*
+/**
+ * Workflow state machine
+ *
  * Notes:
-
-Determining item status from the database:
-
-When an item has not been submitted yet, it is in the user's
-personal workspace (there is a row in PersonalWorkspace pointing
-to it.)
-
-When an item is submitted and is somewhere in a workflow, it has
-a row in the WorkflowItem table pointing to it.  The state of the
-workflow can be determined by looking at WorkflowItem.getState()
-
-When a submission is complete, the WorkflowItem pointing to the item
-is destroyed and SubmitServlet.insertItem() is called, which hooks
-the item up to the archive.
-
-Notification:
-  When an item enters a state that requires notification, (WFSTATE_STEP1POOL,
-  WFSTATE_STEP2POOL, WFSTATE_STEP3POOL,) the workflow needs to notify
-  the appropriate groups that they have a pending task to claim.
-
-Revealing lists of approvers, editors, and reviewers.  A method could
-be added to do this, but it isn't strictly necessary.
-(say public List getStateEPeople( WorkflowItem wi, int state ) could
-  return people affected by the item's current state.
-
+ *
+ * Determining item status from the database:
+ *
+ * When an item has not been submitted yet, it is in the user's
+ * personal workspace (there is a row in PersonalWorkspace pointing
+ * to it.)
+ *
+ * When an item is submitted and is somewhere in a workflow, it has
+ * a row in the WorkflowItem table pointing to it.  The state of the
+ * workflow can be determined by looking at WorkflowItem.getState()
+ *
+ * When a submission is complete, the WorkflowItem pointing to the item
+ * is destroyed and SubmitServlet.insertItem() is called, which hooks
+ * the item up to the archive.
+ *
+ * Notification:
+ *  When an item enters a state that requires notification, (WFSTATE_STEP1POOL,
+ *  WFSTATE_STEP2POOL, WFSTATE_STEP3POOL,) the workflow needs to notify
+ *  the appropriate groups that they have a pending task to claim.
+ *
+ * Revealing lists of approvers, editors, and reviewers.  A method could
+ * be added to do this, but it isn't strictly necessary.
+ * (say public List getStateEPeople( WorkflowItem wi, int state ) could
+ * return people affected by the item's current state.
  */
-
-
 public class WorkflowManager
 {
 	// states to store in WorkflowItem for the GUI to report on

@@ -64,43 +64,20 @@ import org.dspace.storage.rdbms.DatabaseManager;
 
 
 /**
- * Hack/Tool to set policies for items, bundles, and bitstreams
- *  to match their owning collection's READ policy
- *
- * To use: make sure a collection has a READ policy
- *  dsrun org.dspace.authorize.PolicySet ID
- *
- * Where ID is the ID of the collection
- *
- * Note, does not alter the policy of the collection's logo
- *  bitstream, if it has one
+ * Was Hack/Tool to set policies for items, bundles, and bitstreams.
+ *  Now has helpful method, setPolicies();
  *
  * @author   dstuve
  * @version  $Revision$
  */
 public class PolicySet
 {
-    // invoke with collection id
-    public static void main_old(String argv[])
-        throws Exception
-    {
-        Context c = new Context();
-
-        // turn off authorization
-        c.setIgnoreAuthorization(true);
-
-        int collection_id = Integer.parseInt(argv[0]);
-
-        System.out.println("Collection ID: " + collection_id);
-
-
-        Collection collection = Collection.find(c, collection_id);
-
-        syncCollection(c, collection);
-
-    	c.complete();
-    }
-    
+    /**
+     *  Old code, kept around in case there's a need to bring a collection's
+     *   contents' policies in line with the collections'
+     * @param context
+     * @param collection
+     */
     public static void syncCollection(Context c, Collection collection)
         throws SQLException, AuthorizeException
     {
@@ -137,9 +114,9 @@ public class PolicySet
 
 
 
-    
-    
-    // policyset container containerID contenttype actionID groupID command
+    /**
+     * Command line interface to setPolicies - run to see arguments
+     */
     public static void main( String [] argv )
         throws Exception
     {
@@ -178,6 +155,17 @@ public class PolicySet
         c.complete();
     }
 
+
+    /**
+     * Useful policy wildcard tool.  Can set entire collections' contents'
+     *  policies
+     * @param context
+     * @param container type, Constants.ITEM or Constants.COLLECTION
+     * @param container ID
+     * @param content type (BUNDLE, ITEM, or BITSTREAM)
+     * @param replace, removing old policies, or just add to existing policies
+     * @param just delete all policies for matching objects
+     */
     public static void setPolicies(Context c, int containerType, int containerID,
                              int contentType, int actionID, int groupID,
                              boolean isReplace, boolean clearOnly)
