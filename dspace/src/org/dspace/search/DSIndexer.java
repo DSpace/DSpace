@@ -465,7 +465,8 @@ public class DSIndexer
         
         for(int i = 0; i<myBundles.length; i++)
         {
-            if(myBundles[i].getName().equals("TEXT"))
+            if (myBundles[i].getName() != null &&
+                myBundles[i].getName().equals("TEXT"))
             {
                 // a-ha! grab the text out of the bitstreams
                 Bitstream [] myBitstreams = myBundles[i].getBitstreams();
