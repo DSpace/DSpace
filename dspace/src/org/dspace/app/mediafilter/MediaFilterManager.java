@@ -28,6 +28,9 @@ public class MediaFilterManager
     public static void main(String [] argv)
         throws Exception
     {
+        // set headless for non-gui workstations
+        System.setProperty("java.awt.headless", "true");
+
         // only valid argument is FORCE
         if(argv.length > 0)
         {
