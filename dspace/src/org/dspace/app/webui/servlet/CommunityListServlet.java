@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -96,6 +97,13 @@ public class CommunityListServlet extends DSpaceServlet
             Community[] comms = communities[com].getSubcommunities();
             commMap.put(comID, comms);
 
+        }
+
+        // can they admin communities?
+        if(AuthorizeManager.isAdmin(context))
+        {
+            // set a variable to create an edit button
+            request.setAttribute("admin_button", new Boolean(true));
         }
         
         request.setAttribute("communities", communities);
