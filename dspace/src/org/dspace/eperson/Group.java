@@ -90,7 +90,7 @@ public class Group
             "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
                 "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
                 "epersongroup2eperson.epersongroup_id=" +
-                myRow.getIntColumn("eperson_id") + ";");
+                myRow.getIntColumn("eperson_group_id") + ";");
 
         while (tri.hasNext())
         {
@@ -225,12 +225,24 @@ public class Group
      * @param userid userid
      */
     public static boolean isMember(Context c, int groupid, int userid)
+        throws SQLException
     {
-        return false;
+        TableRowIterator tri = DatabaseManager.query(c,
+            "eperson",
+            "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
+                "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
+                "epersongroup2eperson.epersongroup_id=" +
+                groupid +
+                " AND eperson.eperson_id=" +
+                userid );
+
+        if( tri.hasNext() )
+            return true;
+        else
+            return false;
     }
 
 
-    
     /**
      * find the group by its ID
      *
