@@ -60,27 +60,25 @@
     <P>Enter the Handle or internal item ID of the item you want to edit or
     delete:</P>
     
-    <center>
-        <table class=miscTable>
-            <tr class="oddRowEvenCol">
-                <td class="submitFormLabel">Handle:</td>
-                <td>
-                    <form method=GET>
-                        <input type="text" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size=12>
-                        <input type="submit" name="submit" value="Find">
-                    </form>
-                </td>
-            </tr>
-            <tr></tr>
-            <tr class="oddRowEvenCol">
-                <td class="submitFormLabel">Internal ID:</td>
-                <td>
-                    <form method=GET>
-                        <input type="text" name="item_id" size=12>
-                        <input type="submit" name="submit" value="Find">
-                    </form>
-                </td>
-            </tr>
-        </table>
-    </center>
+    <form method=GET>
+        <center>
+            <table class=miscTable>
+                <tr class="oddRowEvenCol">
+                    <td class="submitFormLabel">Handle:</td>
+                    <td>
+                            <input type="text" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size=12>
+                            <input type="submit" name="submit" value="Find">
+                    </td>
+                </tr>
+                <tr></tr>
+                <tr class="oddRowEvenCol">
+                    <td class="submitFormLabel">Internal ID:</td>
+                    <td>
+                            <input type="text" name="item_id" size=12>
+                            <input type="submit" name="submit" value="Find">
+                    </td>
+                </tr>
+            </table>
+        </center>
+    </form>
 </dspace:layout>
