@@ -125,6 +125,7 @@
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>">
                     <input type="hidden" name="collection_id" value="<%= collections[j].getID() %>">
+                    <input type="hidden" name="community_id" value="<%= communities[i].getID() %>">
                     <input type="submit" name="submit" value="Delete...">
                 </td>
             </form>
