@@ -305,6 +305,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
         {
             // We need to create a new community
             community = Community.create(context);
+
+            // Set attribute
+            request.setAttribute("community", community);
         }
 
         community.setMetadata("name", request.getParameter("name"));
