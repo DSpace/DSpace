@@ -357,7 +357,7 @@ public class DSIndexer
         {
             abstract_text= new String(abstract_text+ abstracts[j].value + " ");
         }
-        
+
         // build a hash
         HashMap textvalues = new HashMap();
 
@@ -391,7 +391,7 @@ public class DSIndexer
 
         // do id, type, handle first
         doc.add(Field.UnIndexed("id",       ti.toString() ));
-        doc.add(Field.UnIndexed("type",     ti.toString() ));
+        doc.add(Field.UnIndexed("type",     ty.toString() ));
         doc.add(Field.UnIndexed("handle",   handle        ));
 
         // now iterate through the hash, building full text string
