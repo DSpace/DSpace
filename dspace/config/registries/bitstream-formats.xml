@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+
+<!--
+  - bitstream-formats.xml
+  -
+  - Version:  $Revision$
+  -
+  - Date:     $Date$
+  -
+  - Initial contents for bitstream format registry.  Once the registry has
+  - been loaded, this file becomes obsolete; the current version of the
+  - registry must be read from the database.  Use
+  - org.dspace.content.BitstreamFormat.
+  -
+  - valid support_levels:  0 = unknown,  1 = known,  2 = supported
+  - internal:  specify true for internal types of bitstream (i.e. used
+  -            by the system, not for distribution to users)
+  -
+  - <dspace-bitstream-types>
+  -   <bitstream-type>
+  -     <mimetype>mime/type</mimetype>
+  -     <short_description>Thing v1</short_description>
+  -     <description>Thing Version 1 Document Format</description>
+  -     <support_level>1</support_level>
+  -     <internal>false</internal>
+  -   </bitstream-type>
+  -  
+  -    ...
+  - </dspace-bitstream-types>
+  -->
+
+
+
+<dspace-bitstream-types>
+
+  <bitstream-type>
+    <mimetype>application/pdf</mimetype>
+    <short_description>Adobe PDF</short_description>
+    <description>Adobe Portable Document Format</description>
+    <support_level>2</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>text/xml</mimetype>
+    <short_description>XML</short_description>
+    <description>Extensible Markup Language</description>
+    <support_level>2</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>text/plain</mimetype>
+    <short_description>Text</short_description>
+    <description>Plain Text</description>
+    <support_level>2</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>text/html</mimetype>
+    <short_description>HTML</short_description>
+    <description>Hypertext Markup Language</description>
+    <support_level>2</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/msword</mimetype>
+    <short_description>Microsoft Word</short_description>
+    <description>Microsoft Word</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/vnd.ms-powerpint</mimetype>
+    <short_description>Microsoft Powerpoint</short_description>
+    <description>Microsoft Powerpoint</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/vnd.ms-excel</mimetype>
+    <short_description>Microsoft Excel</short_description>
+    <description>Microsoft Excel</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/octet-stream</mimetype>
+    <short_description>Unknown</short_description>
+    <description>Unknown data format</description>
+    <support_level>0</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/marc</mimetype>
+    <short_description>MARC</short_description>
+    <description>Machine-Readable Cataloging records</description>
+    <support_level>2</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>image/jpeg</mimetype>
+    <short_description>JPEG</short_description>
+    <description>Joint Photographic Experts Group/JPEG File Interchange Format (JFIF)</description>
+    <support_level>2</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+  
+  <bitstream-type>
+    <mimetype>image/gif</mimetype>
+    <short_description>GIF</short_description>
+    <description>Graphics Interchange Format</description>
+    <support_level>2</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>image/png</mimetype>
+    <short_description>image/png</short_description>
+    <description>Portable Network Graphics</description>
+    <support_level>2</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+  
+  <bitstream-type>
+    <mimetype>text/plain</mimetype>
+    <short_description>License</short_description>
+    <description>Item-specific license agreed upon to submission</description>
+    <support_level>2</support_level>
+    <internal>true</internal>
+  </bitstream-type>
+     
+</dspace-bitstream-types>
