@@ -1,3 +1,7 @@
+(Richard Jones)
+- Addition of supervision order setting tools for administration area, to allow
+user accounts to observe or collaborate on unfinished submission
+
 (Robert Tansley)
 - OAI-PMH set names now XML-encoded (e.g. &, <, >) (Collection names with such
 characters previously caused bad XML in OAI-PMH ListSets responses)
