@@ -162,7 +162,7 @@ public class ResourcePolicy
     }
 
 
-// resource_type_id, resource_id, resource_filter, resource_filter_arg
+// resource_type_id, resource_id, container_type_id, container_id
 // action_id, policy_statement, priority, notes, owner_eperson_id
 // doing nothing for priority, notes, owner_eperson_id
 
@@ -220,7 +220,7 @@ public class ResourcePolicy
 
     public int getContainerType()
     {
-        return myRow.getIntColumn("resource_filter");
+        return myRow.getIntColumn("container_type_id");
     }
 
     /**
@@ -232,7 +232,7 @@ public class ResourcePolicy
 
     public void setContainerType( int mytype )
     {
-        myRow.setColumn("resource_id" ,mytype);
+        myRow.setColumn("container_type_id" ,mytype);
     }
     
     /**
@@ -243,7 +243,7 @@ public class ResourcePolicy
 
     public int getContainerID()
     {
-        return myRow.getIntColumn("resource_filter_arg");
+        return myRow.getIntColumn("container_id");
     }
 
     /**
@@ -256,7 +256,7 @@ public class ResourcePolicy
 
     public void setContainerID( int myid )
     {
-        myRow.setColumn("resource_filter_arg" ,myid);
+        myRow.setColumn("container_id" ,myid);
     }
 
 
