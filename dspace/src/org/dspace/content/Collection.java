@@ -612,6 +612,7 @@ public class Collection extends DSpaceObject
         if (template == null)
         {
             template = Item.create(ourContext);
+            collectionRow.setColumn("template_item_id", template.getID());
 
             log.info(LogManager.getHeader(ourContext,
                 "create_template_item",
