@@ -984,20 +984,20 @@ public class Browse
      */
     private static void logInfo(BrowseInfo info)
     {
-        if (! log.isInfoEnabled())
+        if (! log.isDebugEnabled())
             return;
 
-        log.info("Number of Results: " + info.getResultCount() +
-                 " Overall position: " + info.getOverallPosition() +
-                 " Total " + info.getTotal() +
-                 " Offset " + info.getOffset());
+        log.debug("Number of Results: " + info.getResultCount() +
+                  " Overall position: " + info.getOverallPosition() +
+                  " Total " + info.getTotal() +
+                  " Offset " + info.getOffset());
         int lastIndex = (info.getOverallPosition() + info.getResultCount());
         boolean noresults = (info.getTotal() == 0) || (info.getResultCount() == 0);
 
         if (noresults)
-            log.info("Got no results");
+            log.debug("Got no results");
 
-        log.info("Got results: " +
+        log.debug("Got results: " +
                  info.getOverallPosition() +
                  " to " +
                  lastIndex +
