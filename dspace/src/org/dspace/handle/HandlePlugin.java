@@ -41,24 +41,28 @@
 package org.dspace.handle;
 
 
-import java.net.URL;
 import java.sql.*;
 import java.util.*;
 
 import net.handle.hdllib.*;
-import net.handle.util.StringUtils;
 import net.handle.util.StreamTable;
 
 import org.apache.log4j.Logger;
 
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 
 
 /**
- * "Storage" class which resolves handles. The implementation
- * simply stubs out most requests, and delegates the rest
- * to the HandleManager class.
+ * Extension to the CNRI Handle Server that translates requests to resolve
+ * handles into DSpace API calls. The implementation simply stubs out most
+ * of the methods, and delegates the rest to the
+ * {@link org.dspace.handle.HandleManager}. This only provides some of
+ * the functionality (namely, the resolving of handles to URLs) of the
+ * CNRI HandleStorage interface.
+ *
+ * <p>This class is intended to be embedded in the CNRI Handle Server.
+ * It conforms to the HandleStorage interface that was delivered
+ * with Handle Server version 5.2.0.</p>
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -68,10 +72,18 @@ public class HandlePlugin implements HandleStorage
     /** log4j category */
     private static Logger log = Logger.getLogger(HandlePlugin.class);
 
+    /**
+     * Constructor
+     */
+    public HandlePlugin () {}
+
     ////////////////////////////////////////
     // Non-Resolving methods -- unimplemented
     ////////////////////////////////////////
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public void init(StreamTable st)
         throws Exception
     {
@@ -80,6 +92,9 @@ public class HandlePlugin implements HandleStorage
             log.info("Called init (not implemented)");
     }
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public void setHaveNA(byte[] theHandle, boolean haveit)
         throws HandleException
     {
@@ -88,6 +103,9 @@ public class HandlePlugin implements HandleStorage
             log.info("Called setHaveNA (not implemented)");
     }
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public void createHandle(byte[] theHandle, HandleValue[] values)
         throws HandleException
     {
@@ -96,6 +114,9 @@ public class HandlePlugin implements HandleStorage
             log.info("Called createHandle (not implemented)");
     }
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public boolean deleteHandle(byte[] theHandle)
         throws HandleException
     {
@@ -105,6 +126,9 @@ public class HandlePlugin implements HandleStorage
         return false;
     }
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public void updateValue(byte[] theHandle, HandleValue[] values)
         throws HandleException
     {
@@ -113,6 +137,9 @@ public class HandlePlugin implements HandleStorage
             log.info("Called updateValue (not implemented)");
     }
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public void deleteAllRecords()
         throws HandleException
     {
@@ -121,6 +148,9 @@ public class HandlePlugin implements HandleStorage
             log.info("Called deleteAllRecords (not implemented)");
     }
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public void checkpointDatabase()
         throws HandleException
     {
@@ -129,6 +159,9 @@ public class HandlePlugin implements HandleStorage
             log.info("Called checkpointDatabase (not implemented)");
     }
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public void shutdown()
     {
         // Not implemented
@@ -136,6 +169,9 @@ public class HandlePlugin implements HandleStorage
             log.info("Called shutdown (not implemented)");
     }
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public void scanHandles(ScanCallback callback)
         throws HandleException
     {
@@ -144,6 +180,9 @@ public class HandlePlugin implements HandleStorage
             log.info("Called scanHandles (not implemented)");
     }
 
+    /**
+     * HandleStorage interface method - not implemented.
+     */
     public void scanNAs(ScanCallback callback)
         throws HandleException
     {
@@ -158,7 +197,15 @@ public class HandlePlugin implements HandleStorage
 
     /**
      * Return the raw values for this handle.
-     * The implementation returns a single URL value.
+     * This implementation returns a single URL value.
+     *
+     * @param theHandle byte array representation of handle
+     * @param indexList ignored
+     * @param typeList ignored
+     * @return A byte array with the raw data for this handle.
+     * Currently, this consists of a single URL value.
+     * @exception HandleException If an error occurs while calling the
+     * Handle API.
      */
     public byte[][] getRawHandleValues(byte[] theHandle,
         int[] indexList,
@@ -235,7 +282,12 @@ public class HandlePlugin implements HandleStorage
     }
 
     /**
-     * True if we have this handle in storage
+     * Return true if we have this handle in storage.
+     *
+     * @param theHandle byte array representation of handle
+     * @return True if we have this handle in storage
+     * @exception HandleException If an error occurs while calling the
+     * Handle API.
      */
     public boolean haveNA(byte[] theHandle)
         throws HandleException
@@ -271,7 +323,15 @@ public class HandlePlugin implements HandleStorage
     }
 
     /**
-     * Return all handles which start with theNAHandle.
+     * Return all handles in local storage which start with the naming
+     * authority handle.
+     *
+     * @param theNAHandle byte array representation of naming authority
+     * handle
+     * @return All handles in local storage which start with the naming
+     * authority handle.
+     * @exception HandleException If an error occurs while calling the
+     * Handle API.
      */
     public Enumeration getHandlesForNA(byte[] theNAHandle)
         throws HandleException

@@ -40,7 +40,6 @@
 
 package org.dspace.handle;
 
-import java.security.Security;
 import java.sql.*;
 import java.util.*;
 
@@ -51,11 +50,12 @@ import org.dspace.content.Item;
 import org.dspace.storage.rdbms.*;
 
 /**
- * Utility class which does handle management.
+ * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
+ * System</a>.
  *
- * Currently, this class simply maps handles to local facilities;
- * handles which are owned by another DSpace site are treated as
- * non-existent.
+ * <p>Currently, this class simply maps handles to local facilities;
+ * handles which are owned by other sites (including other DSpaces) are
+ * treated as non-existent.</p>
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -65,16 +65,19 @@ public class HandleManager
     /** log4j category */
     private static Logger log = Logger.getLogger(HandleManager.class);
 
+    /** Private Constructor  */
+    private HandleManager () {}
+
     /**
-     * Return the local URL for HANDLE, or null if HANDLE cannot be found.
+     * Return the local URL for handle, or null if handle cannot be found.
      *
      * The returned URL is a (non-handle-based) location where a
-     * dissemination of the object referred to by HANDLE can be obtained.
+     * dissemination of the object referred to by handle can be obtained.
      *
-     * @param context - DSpace context
-     * @param handle - The handle
-     * @return - The local URL
-     * @exception SQLException - If a database error occurs
+     * @param context DSpace context
+     * @param handle The handle
+     * @return The local URL
+     * @exception SQLException If a database error occurs
      */
     public static String resolveToURL(Context context, String handle)
         throws SQLException
@@ -105,12 +108,12 @@ public class HandleManager
     }
 
     /**
-     * Transforms HANDLE into the canonical form hdl:HANDLE.
+     * Transforms handle into the canonical form <em>hdl:handle</em>.
      *
-     * No attempt is made to verify that HANDLE is in fact valid.
+     * No attempt is made to verify that handle is in fact valid.
      *
-     * @param handle - The handle
-     * @return - The canonical form
+     * @param handle The handle
+     * @return The canonical form
      */
     public static String getCanonicalForm(String handle)
     {
@@ -120,10 +123,10 @@ public class HandleManager
     /**
      * Creates a new handle in the database.
      *
-     * @param context - DSpace context
-     * @param item - The item to create a handle for
-     * @return  - The newly created handle
-     * @exception SQLException - If a database error occurs
+     * @param context DSpace context
+     * @param item The item to create a handle for
+     * @return The newly created handle
+     * @exception SQLException If a database error occurs
      */
     public static String createHandle(Context context, Item item)
         throws SQLException
@@ -143,14 +146,14 @@ public class HandleManager
     }
 
     /**
-     * Return the object which HANDLE maps to, or null.
+     * Return the object which handle maps to, or null.
      * This is the object itself, not a URL which points to it.
      *
-     * @param context - DSpace context
-     * @param handle - The handle to resolve
-     * @return - The object which HANDLE maps to, or null if HANDLE
+     * @param context DSpace context
+     * @param handle The handle to resolve
+     * @return The object which handle maps to, or null if handle
      * is not mapped to any object.
-     * @exception SQLException - If a database error occurs
+     * @exception SQLException If a database error occurs
      */
     public static Object resolveToObject(Context context, String handle)
         throws SQLException
@@ -184,10 +187,10 @@ public class HandleManager
      * Return the handle for an Object, or null if the Object has no
      * handle.
      *
-     * @param context - DSpace context
-     * @param obj - The object to obtain a handle for
-     * @return - The handle for object, or null if the object has no handle.
-     * @exception SQLException - If a database error occurs
+     * @param context DSpace context
+     * @param obj The object to obtain a handle for
+     * @return The handle for object, or null if the object has no handle.
+     * @exception SQLException If a database error occurs
      */
     public static String findHandle(Context context, Object obj)
         throws SQLException
@@ -200,14 +203,14 @@ public class HandleManager
     }
 
     /**
-     * Return all the handles which start with PREFIX.
+     * Return all the handles which start with prefix.
      *
-     * @param context - DSpace context
-     * @param prefix - The handle prefix
-     * @return - A list of the handles starting with PREFIX. The
+     * @param context DSpace context
+     * @param prefix The handle prefix
+     * @return A list of the handles starting with prefix. The
      * list is guaranteed to be non-null. Each element of the list
      * is a String.
-     * @exception SQLException - If a database error occurs
+     * @exception SQLException If a database error occurs
      */
     static List getHandlesForPrefix(Context context,
                                            String prefix)
@@ -233,17 +236,17 @@ public class HandleManager
      * Return the handle for an Object, or null if the Object has no
      * handle.
      *
-     * @param context - DSpace context
-     * @param type - The type of object
-     * @param id - The id of object
-     * @return - The handle for object, or null if the object has no handle.
-     * @exception SQLException - If a database error occurs
+     * @param context DSpace context
+     * @param type The type of object
+     * @param id The id of object
+     * @return The handle for object, or null if the object has no handle.
+     * @exception SQLException If a database error occurs
      */
     private static String getHandleInternal(Context context, int type, int id)
         throws SQLException
     {
         String sql = new StringBuffer()
-            .append("SELECT handle from Handle WHERE resource_type_id = ")
+            .append("SELECT handle FROM Handle WHERE resource_type_id = ")
             .append(type)
             .append(" AND resource_id = ")
             .append(id)
@@ -254,12 +257,12 @@ public class HandleManager
     }
 
     /**
-     * Find the row corresponding to HANDLE.
+     * Find the database row corresponding to handle.
      *
-     * @param context - DSpace context
-     * @param handle - The handle to resolve
-     * @return - The database row corresponding to the handle
-     * @exception SQLException - If a database error occurs
+     * @param context DSpace context
+     * @param handle The handle to resolve
+     * @return The database row corresponding to the handle
+     * @exception SQLException If a database error occurs
      */
     private static TableRow findHandleInternal(Context context, String handle)
         throws SQLException
@@ -277,8 +280,8 @@ public class HandleManager
      * Create a new handle id. The implementation uses the PK of
      * the RDBMS Handle table.
      *
-     * @return - A new handle id
-     * @exception SQLException - If a database error occurs
+     * @return A new handle id
+     * @exception SQLException If a database error occurs
      */
     private static String createId()
         throws SQLException
