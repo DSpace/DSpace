@@ -49,8 +49,7 @@
 # Sample uses:
 # 
 #   reporter.pl --startdate "2 weeks ago sunday" \
-#               --enddate "last saturday" \
-#               --logfile dspace.log
+#               --enddate "last saturday"
 #
 #   ...generates a summary suitable for email (w/subject: line)
 #   for all of the last calendar week.
@@ -59,7 +58,7 @@
 #   reporter.pl --date yesterday --nosubject
 #
 #   ...generates a summary without email header for log records
-#   from previous day only using default logfile "dspace.log".
+#   from previous day only
 
 
 use Getopt::Long;
@@ -79,7 +78,6 @@ my $help;
 GetOptions("date=s"      => \$date,
            "startdate=s" => \$startdate,
            "enddate=s"   => \$enddate,
-           "logfile:s"   => \$logfile,
            "nosubject"   => \$no_subject,
            "help"        => \$help);
         
@@ -87,19 +85,6 @@ if (defined $help)
 {
         usage();
         exit(1);
-}
-
-if (!defined $logfile)
-{
-	# Use default of (logdir)/dspace.log if none specified
-
-        # Get DSpace bin directory
-        my $bindir = dirname $0;
-
-        # Get the DSpace log directory
-        my $logdir = `$bindir/dsrun org.dspace.core.ConfigurationManager -property log.dir`;
-	chomp $logdir;
-        $logfile = $logdir . "/dspace.log";
 }
                 
 
@@ -137,6 +122,13 @@ if (defined $enddate)
 }
 
 
+# Get DSpace bin directory
+my $bindir = dirname $0;
+
+# Get the DSpace log directory
+my $logdir = `$bindir/dsrun org.dspace.core.ConfigurationManager -property log.dir`;
+chomp $logdir;
+
 
 my $line_count = 0;
 
@@ -149,108 +141,110 @@ my %item_views;
 my @searches;
 my %all_events;
 
-open (IN, "<$logfile");
-
-while (<IN>)
+foreach $logfile (<$logdir/dspace.log.*>)
 {
-        $line_count++;
-        
-        # Read in log data
-        
-        # Sample log line:
-        # 2002-09-12 15:20:39,549 INFO  org.dspace.content.Item @ rtansley@mit.edu:session_id=4C1D7E8E5C132788A87BD76C683C5CA2:update_item:item_id=2
+        open (IN, $logfile);
 
-        # record warnings - sometimes these don't have the full header
-        if ($_ =~ /^(\d\d\d\d-\d\d\-\d\d) \d\d:\d\d:\d\d,\d\d\d WARN/)
+        while (<IN>)
         {
-                push (@warnings, $line_count);
-        }
+                $line_count++;
 
-        #                                                            Java class     session ID     parameters
-        #                                                                +             +              +
-        #                   date            time                level    +     user    +    action    +
-        #           --------------------- +++++++++++++++++++++ -----   +++   ------- ++++  ------- ++++
-        if ($_ !~ /^(\d\d\d\d-\d\d\-\d\d) \d\d:\d\d:\d\d,\d\d\d (\w+)\s+\S+ @ ([^:]+):[^:]+:([^:]+):(.*)/)
-        {
-                # FIXME: throw away bad input lines for now
-                next;
-        }
-        
-        my $logdate = ParseDate($1);
-        my $level = $2;
-        my $user = $3;
-        my $action = $4;
-        my $params = $5;
+                # Read in log data
 
-        my ($year, $month, $day) = UnixDate($logdate, "%Y", "%m", "%d");
-        $logdate = "$year-$month-$day";
+                # Sample log line:
+                # 2002-09-12 15:20:39,549 INFO  org.dspace.content.Item @ rtansley@mit.edu:session_id=4C1D7E8E5C132788A87BD76C683C5CA2:update_item:item_id=2
 
-        # skip if the log record is too old
-        if (defined $startdate)
-        {
-                if ($logdate lt $startdate)
+                # record warnings - sometimes these don't have the full header
+                if ($_ =~ /^(\d\d\d\d-\d\d\-\d\d) \d\d:\d\d:\d\d,\d\d\d WARN/)
                 {
+                        push (@warnings, $line_count);
+                }
+
+                #                                                            Java class     session ID     parameters
+                #                                                                +             +              +
+                #                   date            time                level    +     user    +    action    +
+                #           --------------------- +++++++++++++++++++++ -----   +++   ------- ++++  ------- ++++
+                if ($_ !~ /^(\d\d\d\d-\d\d\-\d\d) \d\d:\d\d:\d\d,\d\d\d (\w+)\s+\S+ @ ([^:]+):[^:]+:([^:]+):(.*)/)
+                {
+                        # FIXME: throw away bad input lines for now
                         next;
                 }
-        }
 
-        # skip if the log record is too new
-        if (defined $enddate)
-        {
-                if ($logdate gt $enddate)
+                my $logdate = ParseDate($1);
+                my $level = $2;
+                my $user = $3;
+                my $action = $4;
+                my $params = $5;
+
+                my ($year, $month, $day) = UnixDate($logdate, "%Y", "%m", "%d");
+                $logdate = "$year-$month-$day";
+
+                # skip if the log record is too old
+                if (defined $startdate)
                 {
-                        next;
+                        if ($logdate lt $startdate)
+                        {
+                                next;
+                        }
                 }
+
+                # skip if the log record is too new
+                if (defined $enddate)
+                {
+                        if ($logdate gt $enddate)
+                        {
+                                next;
+                        }
+                }
+
+
+                # consider adding current record into the summary
+
+                # record logins
+                if ($action eq "login")
+                {
+                        push (@logins, $user);
+                }
+
+                # record submissions
+                if ($action eq "start_workflow")
+                {
+                        $params =~ /.*item_id=(\d+).*/;
+
+                        push (@submissions, "$1 ($user)");
+                }
+
+	        # Record item installations
+                if ($action eq "install_item")
+                {
+        	        $params =~ s/workflow_id=\d+, //;
+                        push (@installations, "$params ($user)");
+	        }
+
+                # record search terms and hit count
+                if( $action eq "search" )
+                {
+                        $params =~ s/query=//;
+                        push (@searches, $params);
+                }
+
+                # record item views
+                if( $action eq "view_item" )
+                {
+                        $params =~ s/handle=//;
+                        $params =~ s/,item_id=.*$//;
+                        $item_views{$params}++;
+                }        
+
+
+
+                # record all events
+                $all_events{$action}++;
+
         }
 
-        
-        # consider adding current record into the summary
-
-        # record logins
-        if ($action eq "login")
-        {
-                push (@logins, $user);
-        }
-                        
-        # record submissions
-        if ($action eq "start_workflow")
-        {
-                $params =~ /.*item_id=(\d+).*/;
-
-                push (@submissions, "$1 ($user)");
-        }
-        
-	# Record item installations
-        if ($action eq "install_item")
-        {
-        	$params =~ s/workflow_id=\d+, //;
-                push (@installations, "$params ($user)");
-	}
-
-        # record search terms and hit count
-        if( $action eq "search" )
-        {
-                $params =~ s/query=//;
-                push (@searches, $params);
-        }
-
-        # record item views
-        if( $action eq "view_item" )
-        {
-                $params =~ s/handle=//;
-                $params =~ s/,item_id=.*$//;
-                $item_views{$params}++;
-        }        
-
-
-        
-        # record all events
-        $all_events{$action}++;
-        
+        close (IN);
 }
-
-close (IN);
-
 
 
 # write the actual summary
@@ -417,8 +411,7 @@ exit(0);
 sub usage
 {
         print "Usage: reporter.pl [--date DATE] " .
-                "[--startdate STARTDATE] [--enddate ENDDATE] " .
-                "[--logfile LOGFILE]\n";
+                "[--startdate STARTDATE] [--enddate ENDDATE]\n";
             
 
 }
