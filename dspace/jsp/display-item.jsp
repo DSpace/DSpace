@@ -136,7 +136,7 @@
 
     <%-- SFX Link --%>
     <P align=center>
-        <A HREF="<dspace:sfxlink item="<%= item %>" />">SFX Query</A>
+        <A HREF="<dspace:sfxlink item="<%= item %>" />"><IMG SRC="<%= request.getContextPath() %>/image/sfx-link.gif" BORDER=0 ALT="SFX Query"></A>
     </P>
 
 </dspace:layout>
