@@ -506,10 +506,15 @@ public class AuthorizeAdminServlet extends DSpaceServlet
         }
         else if( button.equals("submit_cancel_policy") )
         {
-            // return to the previous page
-            int collection_id =UIUtil.getIntParameter (request, "collection_id");
-            int community_id  =UIUtil.getIntParameter (request, "community_id" );
+            // delete the policy that we created
+            int policy_id     =UIUtil.getIntParameter(request, "policy_id"    );
+            ResourcePolicy rp = ResourcePolicy.find(c, policy_id);
+            rp.delete();            
 
+            // return to the previous page
+            int collection_id =UIUtil.getIntParameter(request, "collection_id");
+            int community_id  =UIUtil.getIntParameter(request, "community_id" );
+            int item_id       =UIUtil.getIntParameter(request, "item_id"      );
             String display_page = null;
             
             if( collection_id != -1 )
@@ -532,6 +537,16 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                     AuthorizeManager.getPolicies( c, t ) );
                 display_page = "/admin/authorize-community-edit.jsp";
                 
+            }
+            else if( item_id != -1 )
+            {
+                // set up for return to item edit page
+                Item t = Item.find( c, item_id );
+
+                request.setAttribute("item", t );
+                request.setAttribute("item_policies",
+                    AuthorizeManager.getPolicies( c, t ) );
+                display_page = "/admin/authorize-item-edit.jsp";
             }
 
             JSPManager.showJSP(request, response, display_page );
