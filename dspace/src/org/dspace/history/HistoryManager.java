@@ -65,7 +65,10 @@ import com.hp.hpl.mesa.rdf.jena.model.*;
 
 
 /**
- * Records information about changes in DSpace.
+ * Records information about changes in DSpace. The information
+ * about changes is written out in RDF format to one or more files
+ * in the directory given by the configuration property
+ * <em>history.dir</em>.
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -78,9 +81,12 @@ public class HistoryManager
     public static final int MODIFY = 2;
     public static final int REMOVE = 3;
 
-    //  FIXME Config this?
+    private static final String uriPrefixConfig =
+        ConfigurationManager.getProperty("history.uri.prefix");
+
     /** URI prefix */
-    private static final String uriPrefix = "http://www.dspace.org";
+    private static final String uriPrefix = uriPrefixConfig != null ?
+        uriPrefixConfig : "http://www.dspace.org";
 
     /** Handle prefix */
     private static String handlePrefix =
@@ -288,6 +294,8 @@ public class HistoryManager
             return null;
 
         int id = -1;
+        //  FIXME This would be easier there were a ContentObject
+        //  interface/base class
         if (obj instanceof Community)
             id = ((Community) obj).getID();
         else if (obj instanceof Collection)
@@ -308,7 +316,11 @@ public class HistoryManager
     }
 
     /**
-     * Return a unique id corresponding to a harmony object.
+     * Return a unique id corresponding to a Harmony object.
+     *
+     * @param name The name of a Harmony object (action, event, etc)
+     * @param flag One of CREATE, MODIFY, REMOVE
+     * @return A unique id
      */
     private static String getUniqueId(String name, int flag)
     {
@@ -326,21 +338,27 @@ public class HistoryManager
                                    Utils.generateHexKey());
     }
 
-    //  FIXME Not currently used
     /**
      * Return an RDF property id.
+     *
+     * @param objname The name of an object
+     * @param property The name of a property of the objecty
+     * @return The id for the property
      */
-    private static String getPropertyId(String type, String property)
+    private static String getPropertyId(String objname, String property)
     {
         return getUniqueIdInternal
             (uriPrefix,
              null,
-             type,
+             objname,
              property);
     }
 
     /**
-     * Return an RDF property id for Harmony property
+     * Return an RDF property id for Harmony property.
+     *
+     * @param property The name of a Harmony property
+     * @return The id for the property
      */
     private static String getHarmonyId(String property)
     {
@@ -353,6 +371,12 @@ public class HistoryManager
 
     /**
      * Internal method for id generation.
+     *
+     * @param uriPrefix A URI
+     * @param handlePrefix
+     * @param objname
+     * @param objid
+     * @return A unique id
      */
     private static String getUniqueIdInternal(String uriPrefix,
                                               String handlePrefix,
@@ -360,8 +384,6 @@ public class HistoryManager
                                               String objid)
     {
         final String SLASH = "/";
-
-        System.out.println("Name " + objname + " id " + objid);
 
         return new StringBuffer()
             .append(uriPrefix)
@@ -381,9 +403,17 @@ public class HistoryManager
 
     /**
      * Return an RDF stream for this object.
+     *
+     * @param context Current DSpace context
+     * @param obj The object to serialize
+     * @return The serialization of the object
+     * @exception RDFException If an error occurs while constructing
+     * an RDF graph
+     * @exception SQLException If an error occurs while accessing
+     * the database
      */
     private static String serialize(Context context, Object obj)
-        throws RDFException, IOException, SQLException
+        throws RDFException, SQLException
     {
         if (obj == null)
             return null;
@@ -396,12 +426,26 @@ public class HistoryManager
         StringWriter data = new StringWriter();
 
         model.write(data);
-        data.close();
+        // Since this is all in-memory, IOExceptions should never happen
+        try
+        {
+            data.close();
+        }
+        catch (IOException ioe) {}
+
         return data.toString();
     }
 
     /**
      * Add RDF statements about this object to the model.
+     *
+     * @param context Current DSpace context
+     * @param obj The object to make statements about
+     * @param model The RDF statement graph
+     * @exception RDFException If an error occurs while constructing
+     * an RDF graph
+     * @exception SQLException If an error occurs while accessing
+     * the database
      */
     private static void serializeInternal(Context context,
                                           Object obj,
@@ -440,6 +484,12 @@ public class HistoryManager
      * @param context Current DSpace context.
      * @param obj The object to serialize and store.
      * @return A unique id for the object.
+     * @exception RDFException If an error occurs while constructing
+     * an RDF graph
+     * @exception IOException If an error occurs while storing
+     * the serialization
+     * @exception SQLException If an error occurs while accessing
+     * the database
      */
     private static String doSerialize(Context context, Object obj)
         throws SQLException, IOException, RDFException
@@ -460,6 +510,10 @@ public class HistoryManager
      *
      * @param context Current DSpace context.
      * @param serialization The serialization to store.
+     * @exception IOException If an error occurs while storing
+     * the serialization
+     * @exception SQLException If an error occurs while accessing
+     * the database
      */
     private static void store(Context context,
                               String serialization)
@@ -491,6 +545,10 @@ public class HistoryManager
 
     /**
      * Return the last state for the object with id, or null.
+     *
+     * @param id The object's history id
+     * @exception SQLException If an error occurs while accessing
+     * the database
      */
     private static String findPreviousState(String id)
         throws SQLException
@@ -523,6 +581,15 @@ public class HistoryManager
 
     /**
      * Add community-specific data to the model.
+     *
+     * @param context Current DSpace context.
+     * @param community The community
+     * @param res RDF resource for the community
+     * @param model The RDF graph
+     * @exception RDFException If an error occurs while constructing
+     * an RDF graph
+     * @exception SQLException If an error occurs while accessing
+     * the database
      */
     private static void addData(Context context,
                                 Community community,
@@ -557,6 +624,15 @@ public class HistoryManager
 
     /**
      * Add collection-specific data to the model.
+     *
+     * @param context Current DSpace context.
+     * @param collection The collection
+     * @param res RDF resource for the collection
+     * @param model The RDF graph
+     * @exception RDFException If an error occurs while constructing
+     * an RDF graph
+     * @exception SQLException If an error occurs while accessing
+     * the database
      */
     private static void addData(Context context,
                                 Collection collection,
@@ -596,6 +672,15 @@ public class HistoryManager
 
     /**
      * Add item-specific data to the model.
+     *
+     * @param context Current DSpace context.
+     * @param item The item
+     * @param res RDF resource for the item
+     * @param model The RDF graph
+     * @exception RDFException If an error occurs while constructing
+     * an RDF graph
+     * @exception SQLException If an error occurs while accessing
+     * the database
      */
     private static void addData(Context context,
                                 Item item,
@@ -732,12 +817,20 @@ public class HistoryManager
     }
 
     /**
-     * Add a statement
+     * Convenience method to add a metadata statement to a model.
+     *
+     * @param model The RDF graph
+     * @param res RDF resource
+     * @param object The name of the object
+     * @param property The name of a property of the object
+     * @param value The value of the property
+     * @exception RDFException If an error occurs while constructing
+     * an RDF graph
      */
     private static void addMetadata(Model model,
                                     Resource res,
-                                    String type,
-                                    String name,
+                                    String object,
+                                    String property,
                                     String value)
         throws RDFException
     {
@@ -745,7 +838,7 @@ public class HistoryManager
             return;
 
         model.add(res,
-                  model.createProperty(getPropertyId(type, name)),
+                  model.createProperty(getPropertyId(object, property)),
                   value);
     }
 
@@ -829,6 +922,8 @@ public class HistoryManager
 
     /**
      * Return a basic idea of which tool was used to do something.
+     *
+     * @return A String indicating the tool used
      */
     private static String getTool()
     {
@@ -859,6 +954,8 @@ public class HistoryManager
 
     /**
      * Return a String containing the stack trace of the caller.
+     *
+     * @return A String containing the stack trace of the caller.
      */
     public static String getStackTrace()
     {
@@ -904,43 +1001,66 @@ public class HistoryManager
      * @param argv - Command-line arguments
      */
     public static void main(String[] argv)
-        throws Exception
     {
-        Context context = new Context();
-        Community c = Community.find(context, 1);
+        Context context = null;
 
-        System.out.println("Got unique id " + getUniqueId(c));
+        try
+        {
+            context = new Context();
+            Community c = Community.find(context, 1);
 
-        saveHistory(context, c, CREATE, null, null);
+            if (c != null)
+            {
+                System.out.println("Got unique id " + getUniqueId(c));
 
-        Collection collection = Collection.find(context, 3);
+                saveHistory(context, c, CREATE, null, null);
+            }
 
-        System.out.println("Got unique id " + getUniqueId(collection));
+            Collection collection = Collection.find(context, 3);
 
-        saveHistory(context, collection, CREATE, null, null);
+            if (collection != null)
+            {
+                System.out.println("Got unique id " + getUniqueId(collection));
 
-        // New eperson
-        EPerson nep = EPerson.findByEmail(context, "bob@theshaq");
-        if (nep == null)
-            nep = EPerson.create(context);
+                saveHistory(context, collection, CREATE, null, null);
+            }
 
-        nep.setFirstName("Bob");
-        nep.setEmail("bob@theshaq");
-        nep.update();
+            // New eperson
+            String email = "historytestuser@HistoryManager";
+            EPerson nep = EPerson.findByEmail(context, email);
+            if (nep == null)
+                nep = EPerson.create(context);
 
-        saveHistory(context, nep, CREATE, null, null);
+            nep.setFirstName("History");
+            nep.setEmail(email);
+            nep.update();
 
-        // Change some things around
-        nep.setFirstName("Bah-bah-Bob");
-        nep.setLastName("Branigan");
-        nep.update();
+            saveHistory(context, nep, CREATE, null, null);
 
-        saveHistory(context, nep, MODIFY, null, null);
+            // Change some things around
+            nep.setFirstName("History Test");
+            nep.setLastName("User");
+            nep.update();
 
-        Item item = Item.find(context, 1);
+            saveHistory(context, nep, MODIFY, null, null);
 
-        saveHistory(context, item, CREATE, null, null);
+            Item item = Item.find(context, 1);
 
-        System.exit(0);
+            if (item != null)
+            {
+                saveHistory(context, item, CREATE, null, null);
+            }
+
+            System.exit(0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (context != null)
+                context.abort();
+        }
     }
 }
