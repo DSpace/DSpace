@@ -62,6 +62,13 @@
     {
         currentPage = currentPage.substring( 0, c );
     }
+
+    // E-mail may have to be truncated
+    String navbarEmail = user.getEmail();
+    if (navbarEmail.length() > 18)
+    {
+        navbarEmail = navbarEmail.substring(0, 17) + "...";
+    }
 %>
 
 <%-- Search Box --%>
@@ -71,7 +78,7 @@
     if (user != null)
     {
 %>
-  <P class="loggedIn">Logged&nbsp;in&nbsp;as <%= user.getEmail() %>
+  <P class="loggedIn">Logged&nbsp;in&nbsp;as <%= navbarEmail %>
     (<A HREF="<%= request.getContextPath() %>/logout">Logout</A>)</P>
 <%
     }
