@@ -57,10 +57,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
-import org.dspace.ingest.WorkspaceItem;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
