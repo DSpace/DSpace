@@ -575,18 +575,18 @@ CREATE TABLE ItemsByDateAccessioned
 );
 
 -------------------------------------------------------
---  CollectionItemsByDateAccessioned view
+--  CollectionItemsByDateAccession view
 -------------------------------------------------------
-CREATE VIEW CollectionItemsByDateAccessioned as
+CREATE VIEW CollectionItemsByDateAccession as
 SELECT Collection2Item.collection_id, ItemsByDateAccessioned.* 
 FROM ItemsByDateAccessioned, Collection2Item
 WHERE ItemsByDateAccessioned.item_id = Collection2Item.item_id
 ;
 
 -------------------------------------------------------
---  CommunityItemsByDateAccessioned view
+--  CommunityItemsByDateAccession view
 -------------------------------------------------------
-CREATE VIEW CommunityItemsByDateAccessioned as
+CREATE VIEW CommunityItemsByDateAccession as
 SELECT Community2Item.community_id, ItemsByDateAccessioned.* 
 FROM ItemsByDateAccessioned, Community2Item
 WHERE ItemsByDateAccessioned.item_id = Community2Item.item_id

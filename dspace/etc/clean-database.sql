@@ -55,8 +55,8 @@
 DROP INDEX dcvalue_dc_type_id_idx;
 
 -- Drop the views
-DROP VIEW CommunityItemsByDateAccessioned;
-DROP VIEW CollectionItemsByDateAccessioned;
+DROP VIEW CommunityItemsByDateAccession;
+DROP VIEW CollectionItemsByDateAccession;
 DROP VIEW CommunityItemsByDate;
 DROP VIEW CollectionItemsByDate;
 DROP VIEW CommunityItemsByTitle;

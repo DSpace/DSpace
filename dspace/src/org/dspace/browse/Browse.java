@@ -261,9 +261,9 @@ public class Browse
     private static String getLastSubmittedTable(BrowseScope scope)
     {
         if (scope.isCommunityScope())
-            return "CommunityItemsByDateAccessioned";
+            return "CommunityItemsByDateAccession";
         else if (scope.isCollectionScope())
-            return "CollectionItemsByDateAccessioned";
+            return "CollectionItemsByDateAccession";
 
         return "ItemsByDateAccessioned";
     }
