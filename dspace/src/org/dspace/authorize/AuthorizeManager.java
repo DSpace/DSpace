@@ -102,7 +102,7 @@ public class AuthorizeManager
             else            { userid = e.getID(); }
             
             AuthorizeException j = new AuthorizeException("Denied");
-            j.printStackTrace();
+            //j.printStackTrace();
             
             throw new AuthorizeException(
                 "Authorization denied for action " +
