@@ -332,8 +332,8 @@ public class Item
      *                    unqualified
      * @param  lang       the ISO639 language code, optionally followed by
      *                    an underscore and the ISO3166 country code.
-     *                    <code>null means the value has no language (e.g.
-     *                    a date).
+     *                    <code>null</code> means the value has no language
+     *                    (for example, a date).
      * @param  values     the values to add.
      */
     public void addDC(String element,
@@ -370,8 +370,8 @@ public class Item
      *                    unqualified
      * @param  lang       the ISO639 language code, optionally followed by
      *                    an underscore and the ISO3166 country code.
-     *                    <code>null means the value has no language (e.g.
-     *                    a date).
+     *                    <code>null</code> means the value has no language
+     *                    (for example, a date).
      * @param  value      the value to add.
      */
     public void addDC(String element,

@@ -1,5 +1,5 @@
 /*
- * LogManager - class that generates standard logging header
+ * LogManager.java
  *
  * Version: $Revision$
  *
