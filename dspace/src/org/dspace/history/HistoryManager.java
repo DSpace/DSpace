@@ -56,7 +56,6 @@ import org.dspace.content.*;
 import org.dspace.core.*;
 import org.dspace.eperson.*;
 import org.dspace.storage.rdbms.*;
-import org.dspace.ingest.WorkspaceItem;
 import org.dspace.workflow.WorkflowItem;
 
 import com.hp.hpl.mesa.rdf.jena.common.*;
