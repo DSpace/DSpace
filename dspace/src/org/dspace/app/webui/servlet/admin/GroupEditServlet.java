@@ -73,7 +73,7 @@ public class GroupEditServlet extends DSpaceServlet
                     HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        doDSPost(c, request, response);
+        showMainPage(c, request, response);
     }
     
     protected void doDSPost(Context c,
@@ -98,27 +98,25 @@ public class GroupEditServlet extends DSpaceServlet
             String button = UIUtil.getSubmitButton(request, "submit");
         
             // just chosen a group to edit - get group and pass it to group-edit.jsp
-            if( button.equals("submit_edit") || button.equals("submit_add_eperson_cancel") )
+            if( button.equals("submit_edit") )
             {
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
             
-                JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
-            }
-
-            // alter group's name and return to group-edit.jsp
-            else if( button.equals("submit_change_name") )
-            {
-                group.setName( request.getParameter("group_name") );
-                group.update();
-            
-                request.setAttribute("group", group);
-                request.setAttribute("members", group.getMembers());
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
             }
             // update the members of the group
-            else if( button.equals("submit_members_update") )
+            else if( button.equals("submit_group_update") )
             {
+                // first off, did we change the group name?
+                String newName = request.getParameter("group_name");
+
+                if( !newName.equals(group.getName()) )
+                {
+                    group.setName( newName );
+                    group.update();
+                } 
+
                 int [] eperson_ids = UIUtil.getIntParameters(request,"eperson_id");
 
                 if( eperson_ids != null )
@@ -133,14 +131,14 @@ public class GroupEditServlet extends DSpaceServlet
 
                         for(int y=0; y<members.length; y++)
                         {
-                            if(members[y].getID() == eperson_ids[x])
+                            if((members[y]!=null) && (members[y].getID() == eperson_ids[x]))
                             {
                                 foundIndex = y;
                                 break;
                             }
                         }
 
-                        if(foundIndex != -1)
+                        if(foundIndex == -1)
                         {
                             // didn't find it, add eperson 
                             EPerson e   = EPerson.find(c, eperson_ids[x]);            
@@ -169,6 +167,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
+                c.complete();
             }
             else if( button.equals( "submit_group_delete" ) )
             {
@@ -179,6 +178,7 @@ public class GroupEditServlet extends DSpaceServlet
                 group.delete();
             
                 showMainPage(c, request, response);
+                c.complete();
             }
             else
             {
@@ -187,10 +187,10 @@ public class GroupEditServlet extends DSpaceServlet
             }
 
             // Show edit page for group
-            request.setAttribute("group", group);
-            request.setAttribute("members", group.getMembers());
-            
-            JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
+            //#request.setAttribute("group", group);
+            //request.setAttribute("members", group.getMembers());
+           // 
+            //JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
         }
         else  // no group set
         {
@@ -206,6 +206,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
+                c.complete();
             }
             else
             {
@@ -213,8 +214,6 @@ public class GroupEditServlet extends DSpaceServlet
                 showMainPage(c, request, response);
             }
         }
-        c.complete();
-
     }
     
     private void showMainPage(Context c,
@@ -229,6 +228,7 @@ public class GroupEditServlet extends DSpaceServlet
         request.setAttribute("groups", groups);
         
         JSPManager.showJSP(request, response, "/tools/group-list.jsp" );
+        c.complete();
     }   
 }
 

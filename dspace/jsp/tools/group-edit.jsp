@@ -72,25 +72,20 @@
 
     <h1>Edit Group : <%=group.getName()%> (<%=group.getID()%>)</h1>
 
-    <p align="center">
-        <form method=post>
+    <p align="left">
+    <form method=post>
+
             Name: <input name="group_name" value="<%=group.getName()%>">
-            <input type="hidden" name="group_id" value="<%=group.getID()%>">
-            <input type="submit" name="submit_change_name" value="Update Name">
-        </form>
-    </p>
 
+        <h3>Current Group Members</h3>
 
-    <p>
-    <br>
-    </p>
-
-
-    <center><h3>Current Group Members</h3></center>
-
-    <form method=POST>
         <input type="hidden" name="group_id" value="<%=group.getID()%>">
         <dspace:selecteperson multiple="true" selected="<%= epeople %>"/> 
-        <input type="submit" name="submit_members_update" value="Update Members" onclick="javascript:finishEPerson();">
+
+        <br>
+        <br>
+
+        <input type="submit" name="submit_group_update" value="Update Group" onclick="javascript:finishEPerson();">
     </form>
+    </p>
 </dspace:layout>
