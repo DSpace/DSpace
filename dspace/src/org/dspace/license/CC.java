@@ -89,7 +89,18 @@ public class CC
 
     static {
 	// we only check the property once
-	enabled_p = ConfigurationManager.getBooleanProperty("cc.enabled");
+	enabled_p = ConfigurationManager.getBooleanProperty("webui.submit.enable-cc");
+        if (enabled_p)
+	{
+            // if defined, set a proxy server for http requests to Creative Commons site
+            String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
+            String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+            if ( proxyHost != null && proxyPort != null )
+	    {
+		System.setProperty("http.proxyHost", proxyHost);
+                System.setProperty("http.proxyPort", proxyPort);
+            }
+        }
     }
 
     /**
@@ -171,12 +182,16 @@ public class CC
 
     public static String fetchLicenseText(String license_url) {
 	String text_url = license_url;
-	return new String(fetchURL(text_url));
+        byte[] urlBytes = fetchURL(text_url);
+        return (urlBytes != null) ? new String(urlBytes) : "";
+	//return new String(fetchURL(text_url));
     }
 
     public static String fetchLicenseRDF(String license_url) {
 	String rdf_url = license_url + "rdf";
-	return new String(fetchURL(rdf_url));
+        byte[] urlBytes = fetchURL(rdf_url);
+        return (urlBytes != null) ? new String(urlBytes) : "";
+	//return new String(fetchURL(rdf_url));
     }
 
     // The following two helper methods assume that the CC
