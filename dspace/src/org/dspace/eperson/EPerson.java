@@ -324,6 +324,11 @@ public class EPerson implements DSpaceObject
      */
     public void setEmail(String s)
     {
+        if (s != null)
+        {
+            s = s.toLowerCase();
+        }
+    
         myRow.setColumn("email", s);
     }
 
