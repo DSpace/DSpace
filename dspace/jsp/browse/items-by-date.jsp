@@ -104,6 +104,15 @@
     <%-- Date browse controls table --%>
     <form action="browse-date" method=GET>
  
+<%
+    if (oldestFirst)
+    {
+        // Remember ordering when using browse controls
+%>
+        <input type=hidden name="order" value="oldestfirst">
+<%
+    }
+%>
         <table align=center border=0 bgcolor="#CCCCCC" cellpadding=0>
             <tr>
                 <td>

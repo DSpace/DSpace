@@ -352,7 +352,7 @@ public class LocationServlet extends DSpaceServlet
             Item item = (Item) items.get(i);
 
             String handle = HandleManager.findHandle(context, item);
-            urls[i] = HandleManager.resolveToURL(context, handle);
+            urls[i] = "item/" + handle;
         }
         
         return urls;

@@ -156,7 +156,7 @@ public class BrowseServlet extends DSpaceServlet
         if (browseDates &&
             year != null &&
             !year.equals("") &&
-            startsWith == null)
+            (startsWith == null || startsWith.equals("")))
         {
             // We're browsing items by date, the user hasn't typed anything
             // into the "year" text box, and they've selected a year from
@@ -167,6 +167,12 @@ public class BrowseServlet extends DSpaceServlet
             if (month != null & !month.equals("-1"))
             {
                 // They've selected a month as well
+                if (month.length() == 1)
+                {
+                    // Ensure double-digit month number
+                    month = "0" + month;
+                }
+
                 startsWith = year + "-" + month;
             }
         }
@@ -211,7 +217,7 @@ public class BrowseServlet extends DSpaceServlet
                 flipOrderingQuery = "focus=" + URLEncoder.encode(focus) + "&";
             }
         }
-        else if (!browseDates && startsWith != null)
+        else if (startsWith != null)
         {
             // ----------------------------------------------
             // Start the browse using user-specified text
