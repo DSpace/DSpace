@@ -79,76 +79,95 @@ public class DSQuery
     static final String COLLECTION	= "" + Constants.COLLECTION;
     static final String COMMUNITY	= "" + Constants.COMMUNITY;
 
+    // cache a Lucene IndexSearcher for more efficient searches
+    private static Searcher searcher;
+    private static long lastModified;
+    
+
     /** log4j logger */
     private static Logger log = Logger.getLogger(DSQuery.class);
     
-
+    
     /** Do a query, returning a List of DSpace Handles to objects matching the query.
      *  @param query string in Lucene query syntax
      *
      *  @return HashMap with lists for items, communities, and collections
      *        (keys are strings from Constants.ITEM, Constants.COLLECTION, etc.
      */
-    public static synchronized HashMap doQuery(Context c, String querystring)
+    public static QueryResults doQuery(Context c, QueryArgs args)
         throws IOException
     {
-        querystring = checkEmptyQuery( querystring );
-        querystring = workAroundLuceneBug( querystring );
-        querystring = stripHandles( querystring );
-                        
-        ArrayList resultlist= new ArrayList();
-        ArrayList itemlist 	= new ArrayList();
-        ArrayList commlist 	= new ArrayList();
-        ArrayList colllist 	= new ArrayList();
-        HashMap   metahash 	= new HashMap();
+        String querystring = args.getQuery();
+        QueryResults qr    = new QueryResults();
+        List hitHandles    = new ArrayList();
+        List hitTypes      = new ArrayList();
+        
+        // set up the QueryResults object
+        qr.setHitHandles( hitHandles );
+        qr.setHitTypes( hitTypes );
+        qr.setStart( args.getStart() );
+        qr.setPageSize( args.getPageSize() );        
 
-        // initial results are empty
-        metahash.put(ALL,       resultlist);
-        metahash.put(ITEM,      itemlist  );
-        metahash.put(COLLECTION,colllist  );
-        metahash.put(COMMUNITY, commlist  );
+        // massage the query string a bit                    
+        querystring = checkEmptyQuery    ( querystring );  // change nulls to an empty string
+        querystring = workAroundLuceneBug( querystring );  // logicals changed to && ||, etc.
+        querystring = stripHandles       ( querystring );  // remove handles from query string
 
         try
         {
-            IndexSearcher searcher = new IndexSearcher(
-                ConfigurationManager.getProperty("search.dir"));
-
+            // grab a searcher, and do the search
+            Searcher searcher = getSearcher( ConfigurationManager.getProperty("search.dir") );
+            
             QueryParser qp = new QueryParser("default", new DSAnalyzer());
 
             Query myquery = qp.parse(querystring);
-            Hits hits = searcher.search(myquery);
+            Hits hits     = searcher.search(myquery);
+            
+            // set total number of hits
+            qr.setHitCount( hits.length() );
 
-            for (int i = 0; i < hits.length(); i++)
+            // We now have a bunch of hits - snip out a 'window'
+            // defined in start, count and return the handles
+            // from that window
+            
+            // first, are there enough hits?
+            if( args.getStart() < hits.length() )
             {
-                Document d = hits.doc(i);
-
-                String handletext = d.get("handle");
-                String handletype = d.get("type");
+                // get as many as we can, up to the window size
                 
-                resultlist.add(handletext);
+                // how many are available after snipping off at offset 'start'?
+                int hitsRemaining = hits.length() - args.getStart(); 
                 
-                if (handletype.equals(ITEM)) 
-                { 
-                	itemlist.add(handletext); 
-                } 
-                else if (handletype.equals(COLLECTION))
+                int hitsToProcess = ( hitsRemaining < args.getPageSize() )
+                                ? hitsRemaining : args.getPageSize();
+                                
+                for( int i = args.getStart(); i < args.getStart() + hitsToProcess; i++ )
                 {
-                    colllist.add(handletext);
-                }
-                else if (handletype.equals(COMMUNITY))
-                {	
-                    commlist.add(handletext); break;
+                    Document d = hits.doc(i);
+
+                    String handleText = d.get("handle");
+                    String handletype = d.get("type"  );
+                
+                    hitHandles.add(handleText);
+                    
+                    if( handletype.equals( "" + Constants.ITEM ) )
+                    {
+                        hitTypes.add( new Integer( Constants.ITEM ) );
+                    }
+                    else if( handletype.equals( "" + Constants.COLLECTION ) )
+                    {
+                        hitTypes.add( new Integer( Constants.COLLECTION ) );
+                    }
+                    else if( handletype.equals( "" + Constants.COMMUNITY ) )
+                    {
+                        hitTypes.add( new Integer( Constants.COMMUNITY ) );
+                    }
+                    else
+                    {
+                        // error!  unknown type!
+                    }
                 }
             }
-
-            // close the IndexSearcher - and all its filehandles
-            searcher.close();
-
-            // store all of the different types of hits in the hash            
-            metahash.put(ALL,       resultlist);
-            metahash.put(ITEM,      itemlist  );
-            metahash.put(COLLECTION,colllist  );
-            metahash.put(COMMUNITY, commlist  );
         }
         catch (NumberFormatException e)
         {
@@ -163,10 +182,9 @@ public class DSQuery
             log.warn(LogManager.getHeader(c,
                 "Lucene Parse Exception",
                 "" + e));
-
         }
 
-        return metahash;
+        return qr;
     }
 
     static String checkEmptyQuery( String myquery )
@@ -215,18 +233,22 @@ public class DSQuery
      * @param query
      * @param collection
      *
-     * @return HashMap same results as doQuery, restricted to a collection
+     * @return QueryResults same results as doQuery, restricted to a collection
      */
-    public static HashMap doQuery(Context c, String querystring, Collection coll)
+    public static QueryResults doQuery(Context c, QueryArgs args, Collection coll)
         throws IOException, ParseException
     {
+        String querystring = args.getQuery();
+        
         querystring = checkEmptyQuery( querystring );
     
         String location = "l" + (coll.getID());
 
         String newquery = new String("+(" + querystring + ") +location:\"" + location + "\"");
 
-        return doQuery(c, newquery);
+        args.setQuery( newquery );
+
+        return doQuery(c, args);
     }
 
 
@@ -236,16 +258,20 @@ public class DSQuery
      *
      * @return HashMap results, same as full doQuery, only hits in a Community
      */
-    public static HashMap doQuery(Context c, String querystring, Community comm)
+    public static QueryResults doQuery(Context c, QueryArgs args, Community comm)
         throws IOException, ParseException
     {
+        String querystring = args.getQuery();
+        
         querystring = checkEmptyQuery( querystring );
 
         String location = "m" + (comm.getID());
 
         String newquery = new String("+(" + querystring + ") +location:\"" + location + "\"");
 
-        return doQuery(c, newquery);
+        args.setQuery( newquery );
+
+        return doQuery(c, args);
     }
 
     /** return everything from a query
@@ -258,6 +284,7 @@ public class DSQuery
     	return ((List)results.get(ALL));
     }
 
+
     /** return just the items from a query
      * @param results hashmap from doQuery
      *
@@ -267,6 +294,7 @@ public class DSQuery
     {
     	return ((List)results.get(ITEM));
     }
+
 
     /** return just the collections from a query
      * @param results hashmap from doQuery
@@ -278,6 +306,7 @@ public class DSQuery
     	return ((List)results.get(COLLECTION));
     }
 
+
     /** return just the communities from a query
      * @param results hashmap from doQuery
      *
@@ -287,6 +316,7 @@ public class DSQuery
     {
     	return ((List)results.get(COMMUNITY));
     }
+
 
     /** returns true if anything found
      * @param results hashmap from doQuery
@@ -338,54 +368,30 @@ public class DSQuery
     public static void doCMDLineQuery(String query)
     {
         System.out.println("Command line query: " + query);
-
+        System.out.println("Only reporting default-sized results list");
+        
         try
         {
             Context c = new Context();
-            HashMap results = doQuery(c, query);
-            
-            List itemlist = getItemResults(results);
-            List colllist = getCollectionResults(results);
-            List commlist = getCommunityResults(results);
-            
-            if (communitiesFound(results)) 
-            {
-	            System.out.println("\n" + "Communities: ");
-    	        Iterator i = commlist.iterator();
-            
-    	        while (i.hasNext())
-    	        {
-    	        	Object thishandle = i.next();
-    	            System.out.println("\t" + thishandle.toString());
-    	        }
-    	    }
 
-            if (collectionsFound(results)) 
-            {
-            	System.out.println("\n" + "Collections: ");
-            	Iterator j = colllist.iterator();
-            
-            	while (j.hasNext())
-	            {
-    	        	Object thishandle = j.next();
-    	            System.out.println("\t" + thishandle.toString());
-    	        }
-    	    }
-    	    
+            QueryArgs args = new QueryArgs();
+            args.setQuery(query);
 
-   	        System.out.println("\n" + "Items: ");
-            Iterator k = itemlist.iterator();
+            QueryResults results = doQuery(c, args);
+
+            Iterator i = results.getHitHandles().iterator();
+            Iterator j = results.getHitTypes().iterator();
             
-            while (k.hasNext())
+            while( i.hasNext() )
             {
-            	Object thishandle = k.next();
-                System.out.println("\t" + thishandle.toString());
+                String thisHandle  = (String)i.next();
+                Integer thisType   = (Integer)j.next();
+                String type = Constants.typeText[thisType.intValue()];
+                
+                // also look up type
+                System.out.println( type + "\t" + thisHandle );
             }
             
-            if (!itemsFound(results))
-            { 
-            	System.out.println ("\tNo items found!");
-            }
         }
         catch (Exception e)
         {
@@ -403,4 +409,36 @@ public class DSQuery
             q.doCMDLineQuery(args[0]);
         }
     }
+
+
+    /*---------  private methods ----------*/
+    
+    /**
+     * get an IndexSearcher, hopefully a cached one
+     *  (gives much better performance.) checks to see
+     *  if the index has been modified - if so, it
+     *  creates a new IndexSearcher
+     */
+    private static synchronized Searcher getSearcher( String indexDir )
+        throws IOException
+    {
+        if( lastModified != IndexReader.lastModified( indexDir ) )
+        {
+            // there's a new index, open it
+            lastModified = IndexReader.lastModified( indexDir );
+            searcher = new IndexSearcher( indexDir );
+        }
+        
+        return searcher;
+    }
 }
+
+
+
+
+
+
+ 
+// it's now up to the display page to do the right thing displaying
+// items & communities & collections
+

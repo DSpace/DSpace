@@ -156,6 +156,10 @@ public class DSIndexer
         indexAllCollections(c, writer);
         indexAllItems(c, writer);
 
+	// optimize the index - important to do regularly to reduce filehandle usage
+	// and keep performance fast!
+	writer.optimize();
+	
         closeIndex(c, writer);
     }
 
@@ -454,4 +458,3 @@ public class DSIndexer
         iw.addDocument(doc);
     }
 }
-
