@@ -133,8 +133,6 @@ public class PopupTag extends BodyTagSupport
             "</SCRIPT><NOSCRIPT><A HREF=\"" + actualPage + "\" TARGET=\"dspacepopup\">" +
             linkText + "</A></NOSCRIPT>";
         
-System.err.println(html);
-
         try
         {
             getPreviousOut().print(html);
