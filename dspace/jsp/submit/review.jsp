@@ -325,13 +325,13 @@ title="Verify Submission">
     String type = "<em>None</em>";
     if (typeDC.length > 0)
     {
-        title = typeDC[0].value;
+        type = typeDC[0].value;
     }
 %>    
                                     <tr>
                                         <td class=metadataFieldLabel>Type:</td>
                                         <td class=metadataFieldValue>
-                                            <%= title %>
+                                            <%= type %>
                                         </td>
                                     </tr>
 <%
