@@ -46,9 +46,11 @@ import org.textmining.text.extraction.WordExtractor;
 
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.ChangedCharSetException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -117,11 +119,14 @@ public class HTMLFilter extends MediaFilter
     public InputStream getDestinationStream(InputStream source)
         throws Exception
     {
-        // get input stream from bitstream
-        // pass to filter, get string back
- 
+        // try and read the document - set to ignore character set directive,
+        // assuming that the input stream is already set properly (I hope)
+
         HTMLEditorKit kit = new HTMLEditorKit();
         Document doc = kit.createDefaultDocument();
+
+        doc.putProperty("IgnoreCharsetDirective", new Boolean(true));
+
         kit.read(source, doc, 0);
  
         String extractedText = doc.getText(0, doc.getLength());
