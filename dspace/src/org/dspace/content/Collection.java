@@ -465,10 +465,10 @@ public class Collection extends DSpaceObject
 
         if (workflowGroup[step-1] == null)
         {
-            workflowGroup[step-1] = Group.create(ourContext);
-            workflowGroup[step-1].setName(
-                "COLLECTION_" + getID() + "_WORKFLOW_STEP_" + step);
-            workflowGroup[step-1].update();
+        	Group g = Group.create(ourContext);
+        	g.setName("COLLECTION_" + getID() + "_WORKFLOW_STEP_" + step);
+        	g.update();
+        	setWorkflowGroup(step, g);
         }
 
         return workflowGroup[step-1];
