@@ -50,6 +50,8 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -60,7 +62,7 @@ import org.dspace.core.LogManager;
  * @author David Stuve
  * @version $Revision$
  */
-public class Group
+public class Group extends DSpaceObject
 {
     /** Our context */
     private Context myContext;
@@ -517,4 +519,15 @@ public class Group
 
         return (getID() == ((Group) other).getID());
     }
+
+    public int getType()
+    {
+        return Constants.GROUP;
+    }
+
+    public String getHandle()
+    {
+        return null;
+    }
+
 }
