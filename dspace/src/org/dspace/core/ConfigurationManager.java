@@ -153,7 +153,7 @@ public class ConfigurationManager
             log = Logger.getLogger(ConfigurationManager.class);
         }
 
-        return null;
+        return log;
     }
 
     /**
