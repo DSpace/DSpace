@@ -58,11 +58,6 @@
 <%
     Collection collection = (Collection) request.getAttribute("collection");
     Community community = (Community) request.getAttribute("community");
-
-    if (collection != null)
-    {
-        community = null;
-    }
 %>
 
 <dspace:layout title="Upload Logo"
@@ -84,9 +79,8 @@
             <input type=file size=40 name="file">
         </P>
         
-<%  if (collection == null) { %>
         <input type="hidden" name="community_id" value="<%= community.getID() %>">
-<%  } else { %>
+<%  if (collection != null) { %>
         <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
 <%  } %>
 
