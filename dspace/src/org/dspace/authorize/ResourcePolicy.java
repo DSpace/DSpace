@@ -1,9 +1,7 @@
 /*
  * ResourcePolicy
  *
- * Version: $Revision$
- *
- * Date: $Date$
+ * $Id$
  *
  * Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -221,30 +219,6 @@ public class ResourcePolicy
         myRow.setColumn("action_id",myid);
     }
 
-
-    /**
-     * is this action public?  open to all?
-     *  even anonymous use?
-     *
-     * @return true if action is authorized to all
-     */
-    public boolean isPublic()
-    {
-        return myRow.getBooleanColumn("is_public");
-    }
-    
-    
-    /**
-     * modify public flag
-     *
-     * @param true if authorized to all, false if not
-     *  if true, overrides others (epeople, groups)
-     */
-     public void setPublic( boolean isPublic )
-     {
-        myRow.setColumn("is_public", isPublic);
-     }
-    
 
     /**
      * get EPersonID, or -1 if EPerson not set

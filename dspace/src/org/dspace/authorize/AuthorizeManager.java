@@ -185,7 +185,7 @@ public class AuthorizeManager
             {
                 // if public flag is set, action is authorize
                 //  for everyone (even anonymous use)
-                if( rp.isPublic() ) { return true; }
+                //if( rp.isPublic() ) { return true; }
             
                 if( (rp.getEPersonID() != -1)
                     &&(rp.getEPersonID() == userid) )
