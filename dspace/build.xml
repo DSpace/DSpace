@@ -153,8 +153,8 @@
           classpathref="build.class.path"
           fork="yes"
           failonerror="yes">
-      <jvmarg value="-Dlog4j.configuration=file:${basedir}/etc/log4j.build.properties"/>
-      <jvmarg value="-Ddspace.configuration=${config}"/>
+      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="dspace.configuration" value="${config}"/>
       <arg value="${basedir}/etc/database_schema.sql"/>
     </java>
   </target>
@@ -202,5 +202,52 @@
              bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved."
              classpathref="build.class.path" />
   </target>
+
+
+
+  <!-- ============================================================= -->
+  <!-- Regression tests                                              -->
+  <!-- ============================================================= -->
+
+  <!-- By convention, tests should be in a "test" package (e.g.
+    -  org.dspace.content.test) and be in files ending with "Test.java",
+    -  (e.g. ContentTest.java). -->
+
+  <!-- First, we see if JUnit is on the CLASSPATH.  If it is, we run the tests
+    - directly.  If not, we re-run ant with CLASSPATH. set appropriately -->
+  <target name="test"
+          description="Run JUnit regression tests">
+    <property name="second_test_target" value="test_rerun_ant" />
+    <available classname="junit.framework.TestCase"
+               property="second_test_target"
+               value="run_tests" />
+    <antcall target="${second_test_target}" />
+  </target>
+
+  <!-- Run the tests - junit.jar must be in CLASSPATH -->
+  <target name="run_tests">
+    <mkdir dir="${basedir}/build/test-reports"/>
+    <junit printsummary="yes" haltonfailure="no">
+      <classpath refid="build.class.path"/>
+      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="dspace.configuration" value="${config}"/>
+      <formatter type="plain"/>
+      <batchtest fork="yes" todir="${basedir}/build/test-reports">
+        <fileset dir="${basedir}/src">
+          <include name="**/test/*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <!-- Launch a new ant process with junit.jar in the CLASSPATH -->
+  <target name="test_rerun_ant">
+    <exec dir="${basedir}"
+          executable="ant">
+          <env key="CLASSPATH" path="${basedir}/lib/junit.jar"/>
+          <arg value="run_tests"/>
+    </exec>
+  </target>
+
 
 </project>
