@@ -44,6 +44,7 @@
   - Attributes required:
   -    community             - Community to render home page for
   -    collections           - array of Collections in this community
+  -    subcommunities        - array of Sub-communities in this community
   -    last.submitted.titles - String[] of titles of recently submitted items
   -    last.submitted.urls   - String[] of URLs of recently submitted items
   -    admin_button - Boolean, show admin 'edit' button
@@ -64,6 +65,8 @@
     Community community = (Community) request.getAttribute( "community" );
     Collection[] collections =
         (Collection[]) request.getAttribute("collections");
+    Community[] subcommunities =
+        (Community[]) request.getAttribute("subcommunities");
 
     String[] lastSubmittedTitles = (String[])
         request.getAttribute("last.submitted.titles");
@@ -93,7 +96,7 @@
 %>
 
 
-<dspace:layout locbar="link" title="<%= name %>">
+<dspace:layout locbar="commLink" title="<%= name %>">
   <table border=0 cellpadding=5 width=100%>
     <tr>
       <td width=100%>
@@ -140,6 +143,14 @@ value="<%=community.getID()%>
 <%
     }
 %>
+<%
+    for (int j = 0; j < subcommunities.length; j++)
+    {
+%>    
+                  <option value="<%= subcommunities[j].getHandle() %>"><%= subcommunities[j].getMetadata("name") %></option>
+<%
+    }
+%>
                 </select>
               </td>
             </tr>
@@ -161,19 +172,14 @@ value="<%=community.getID()%>
 
   <%= intro %>
 
-  <H2>Collections in this community</H2>
+<%
+    if (collections.length != 0)
+    {
+%>
+
+        <H2>Collections in this community</H2>
    
-<%
-    if (collections.length == 0)
-    {
-%>
-  <P>This community contains no collections.</P>
-<%
-    }
-    else
-    {
-%>
-  <UL class="collectionListItem">
+        <UL class="collectionListItem">
 <%
         for (int i = 0; i < collections.length; i++)
         {
@@ -187,6 +193,30 @@ value="<%=community.getID()%>
         }
 %>
   </UL>
+<%
+    }
+%>
+
+<%
+    if (subcommunities.length != 0)
+    {
+%>
+        <H2>Sub-communities within this community</H2>
+   
+        <UL class="collectionListItem">
+<%
+        for (int j = 0; j < subcommunities.length; j++)
+        {
+%>
+            <LI>
+                <A HREF="<%= request.getContextPath() %>/handle/<%= subcommunities[j].getHandle() %>">
+                <%= subcommunities[j].getMetadata("name") %></A>
+                <P class="collectionDescription"><%= subcommunities[j].getMetadata("short_description") %></P>
+            </LI>
+<%
+        }
+%>
+        </UL>
 <%
     }
 %>

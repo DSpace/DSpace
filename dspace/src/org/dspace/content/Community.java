@@ -259,6 +259,50 @@ public class Community extends DSpaceObject
         return communityArray;
     }
 
+    /**
+     * Get a list of all top-level communities in the system.  These are alphabetically
+     * sorted by community name. A top-level community is one without a parent community.
+     *
+     * @param  context  DSpace context object
+     *
+     * @return  the top-level communities in the system
+     */
+    public static Community[] findAllTop(Context context)
+        throws SQLException
+    {
+        // get all communities that are not children
+        TableRowIterator tri = DatabaseManager.query(context,
+            "community",
+            "SELECT * FROM community WHERE NOT community_id IN " +
+            "(SELECT child_comm_id FROM community2community) " +
+	    "ORDER BY name;" );        
+
+        List topCommunities = new ArrayList();
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            // First check the cache
+            Community fromCache = (Community) context.fromCache(
+                Community.class, row.getIntColumn("community_id"));
+
+            if (fromCache != null)
+            {
+                topCommunities.add(fromCache);
+            }
+            else
+            {
+                topCommunities.add(new Community(context, row));
+            }
+        }
+
+        Community[] communityArray = new Community[topCommunities.size()];
+        communityArray = (Community[]) topCommunities.toArray(communityArray);
+
+        return communityArray;
+    }
+
 
     /**
      * Get the internal ID of this collection
@@ -443,6 +487,112 @@ public class Community extends DSpaceObject
         return collectionArray;
     }
 
+    /**
+     * Get the immediate sub-communities of this community.  Throws an SQLException because
+     * creating a community object won't load in all collections.
+     *
+     * @return  array of Community objects
+     */
+    public Community[] getSubcommunities()
+        throws SQLException
+    {
+        List subcommunities = new ArrayList();
+
+        // Get the table rows
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "community",
+            "SELECT community.* FROM community, community2community WHERE " +
+                "community2community.child_comm_id=community.community_id " +
+                "AND community2community.parent_comm_id=" + getID() +
+                " ORDER BY community.name" );
+
+        // Make Community objects
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            // First check the cache
+            Community fromCache = (Community) ourContext.fromCache(
+                Community.class, row.getIntColumn("community_id"));
+
+            if (fromCache != null)
+            {
+                subcommunities.add(fromCache);
+            }
+            else
+            {
+                subcommunities.add(new Community(ourContext, row));
+            }
+        }
+
+        // Put them in an array
+        Community[] communityArray = new Community[subcommunities.size()];
+        communityArray = (Community[]) subcommunities.toArray(communityArray);
+
+        return communityArray;
+    }
+
+    /**
+     * Return the parent community of this community, or null if
+     * the community is top-level
+     * @return  the immediate parent community, or null if top-level
+     */
+    public Community getParentCommunity()
+        throws SQLException
+    {
+        Community parentCommunity = null;
+
+        // Get the table rows
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "community",
+            "SELECT community.* FROM community, community2community WHERE " +
+                "community2community.parent_comm_id=community.community_id " +
+                "AND community2community.child_comm_id=" + getID() + ";" );
+
+        // Make Community object
+        if (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            // First check the cache
+            Community fromCache = (Community) ourContext.fromCache(
+                Community.class, row.getIntColumn("community_id"));
+
+            if (fromCache != null)
+            {
+                parentCommunity = fromCache;
+            }
+            else
+            {
+                parentCommunity = new Community(ourContext, row);
+            }
+        }
+
+        return parentCommunity;
+    }
+
+    /**
+     * Return an array of parent communities of this community,
+     * in ascending order. If community is top-level, return an empty
+     * array.
+     * @return  an array of parent communities, empty if top-level
+     */
+    public Community[] getAllParents()
+        throws SQLException
+    {
+        List parentList = new ArrayList();
+        Community parent = getParentCommunity();
+        while (parent != null)
+	{
+            parentList.add(parent);
+            parent = parent.getParentCommunity();
+        }
+        // Put them in an array
+        Community[] communityArray = new Community[parentList.size()];
+        communityArray = (Community[]) parentList.toArray(communityArray);
+
+	return communityArray;
+    }
+
 
     /**
      * Create a new collection within this community.  The collection is
@@ -496,6 +646,56 @@ public class Community extends DSpaceObject
         }
     }
 
+    /**
+     * Create a new sub-community within this community.
+     *
+     * @return  the new community
+     */
+    public Community createSubcommunity()
+        throws SQLException, AuthorizeException
+    {
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
+
+        Community c = create(ourContext);
+        addSubcommunity(c);
+        return c;
+    }
+
+
+    /**
+     * Add an exisiting community as a subcommunity to the community
+     *
+     * @param c  subcommunity to add
+     */
+    public void addSubcommunity(Community c)
+        throws SQLException, AuthorizeException
+    {
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
+
+        log.info(LogManager.getHeader(ourContext,
+            "add_subcommunity",
+            "parent_comm_id=" + getID() + ",child_comm_id=" + c.getID()));
+
+        // Find out if mapping exists
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "community2community",
+            "SELECT * FROM community2community WHERE parent_comm_id=" +
+                getID() + " AND child_comm_id=" + c.getID() + ";");
+
+        if (!tri.hasNext())
+        {
+            // No existing mapping, so add one
+            TableRow mappingRow = DatabaseManager.create(ourContext,
+                "community2community");
+
+            mappingRow.setColumn("parent_comm_id", getID());
+            mappingRow.setColumn("child_comm_id", c.getID());
+
+            DatabaseManager.update(ourContext, mappingRow);
+        }
+    }
 
     /**
      * Remove a collection.  Any items then orphaned are deleted.
@@ -529,10 +729,42 @@ public class Community extends DSpaceObject
         }
     }
 
+    /**
+     * Remove a subcommunity.  Any substructure then orphaned is deleted.
+     *
+     * @param c  subcommunity to remove
+     */
+    public void removeSubcommunity(Community c)
+        throws SQLException, AuthorizeException, IOException
+    {
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
+
+        log.info(LogManager.getHeader(ourContext,
+            "remove_subcommunity",
+            "parent_comm_id=" + getID() + ",child_comm_id=" + c.getID()));
+
+        // Remove any mappings
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM community2community WHERE parent_comm_id=" +
+                getID() + " AND child_comm_id=" + c.getID() + ";");
+
+        // Is the subcommunity an orphan?
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "SELECT * FROM community2community WHERE child_comm_id=" +
+                c.getID());
+
+        if (!tri.hasNext())
+        {
+            // Orphan; delete it
+            c.delete();
+        }
+    }
+
 
     /**
      * Delete the community, including the metadata and logo.  Collections
-     * that are then orphans are deleted.
+     * and subcommunities that are then orphans are deleted.
      */
     public void delete()
         throws SQLException, AuthorizeException, IOException
@@ -562,6 +794,14 @@ public class Community extends DSpaceObject
         for (int i = 0; i < cols.length; i++)
         {
             removeCollection(cols[i]);
+        }
+
+        // Remove subcommunities
+        Community[] comms = getSubcommunities();
+        
+        for (int j = 0; j < comms.length; j++)
+        {
+            removeSubcommunity(comms[j]);
         }
 
         // Remove the logo
@@ -600,5 +840,22 @@ public class Community extends DSpaceObject
     public int getType()
     {
         return Constants.COMMUNITY;
+    }
+
+    /**
+     * return TRUE if context's user can edit community, false otherwise
+     *
+     * @return boolean true = current user can edit community
+     */
+    public boolean canEdit()
+        throws java.sql.SQLException
+    {
+        // can this person write to the community?
+        if( AuthorizeManager.authorizeActionBoolean(ourContext, this, Constants.WRITE) )
+        {
+            return true;
+        }
+                
+        return false;
     }
 }

@@ -91,6 +91,7 @@ CREATE SEQUENCE dctyperegistry_seq;
 CREATE SEQUENCE dcvalue_seq;
 CREATE SEQUENCE community_seq;
 CREATE SEQUENCE collection_seq;
+CREATE SEQUENCE community2community_seq;
 CREATE SEQUENCE community2collection_seq;
 CREATE SEQUENCE collection2item_seq;
 CREATE SEQUENCE resourcepolicy_seq;
@@ -296,6 +297,16 @@ CREATE TABLE Collection
   workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id )
+);
+
+-------------------------------------------------------
+-- Community2Community table
+-------------------------------------------------------
+CREATE TABLE Community2Community
+(
+  id             INTEGER PRIMARY KEY,
+  parent_comm_id INTEGER REFERENCES Community(community_id),
+  child_comm_id  INTEGER REFERENCES Community(community_id)
 );
 
 -------------------------------------------------------

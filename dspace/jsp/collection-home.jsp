@@ -107,10 +107,7 @@
 %>
 
 
-<dspace:layout locbar="link"
-               parenttitle="<%= communityName %>"
-               parentlink="<%= communityLink %>"
-               title="<%= name %>">
+<dspace:layout locbar="commLink" title="<%= name %>">
 
   <table border=0 cellpadding=5 width=100%>
     <tr>

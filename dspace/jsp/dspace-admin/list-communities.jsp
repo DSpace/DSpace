@@ -69,7 +69,7 @@
     
     <form method=POST>
         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY %>">
-        <P align="center"><input type="submit" name="submit" value="Create Community..."></P>
+        <P align="center"><input type="submit" name="submit" value="Create Top Community..."></P>
     </form>
 
     <table class="miscTable" align="center">
@@ -101,6 +101,13 @@
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COLLECTION %>">
                     <input type="hidden" name="community_id" value="<%= communities[i].getID() %>">
                     <input type="submit" name="submit" value="Create Collection...">
+                </td>
+            </form>
+            <form method=POST>
+                <td>
+                    <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY %>">
+                    <input type="hidden" name="parent_community_id" value="<%= communities[i].getID() %>">
+                    <input type="submit" name="submit" value="Create Sub-community...">
                 </td>
             </form>
         </tr>

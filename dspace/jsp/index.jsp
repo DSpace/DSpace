@@ -73,7 +73,7 @@
         context = UIUtil.obtainContext(request);
         
         // Home page shows community list
-        Community[] communities = Community.findAll(context);
+        Community[] communities = Community.findAllTop(context);
         request.setAttribute("communities", communities);
         
         // Show home page JSP

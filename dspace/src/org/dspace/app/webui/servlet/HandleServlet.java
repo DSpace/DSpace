@@ -185,6 +185,13 @@ public class HandleServlet extends DSpaceServlet
             Community[] parents = c.getCommunities();
             request.setAttribute("dspace.community", parents[0]);
 
+            /*
+             * Find all the "parent" communities for the collection for
+             * "breadcrumbs"
+             */
+            request.setAttribute("dspace.communities", getParents(parents[0],true));
+
+
             // home page, or forward to another page?
             if (extraPathInfo == null)
             {
@@ -204,6 +211,11 @@ public class HandleServlet extends DSpaceServlet
 
             // Store collection location in request
             request.setAttribute("dspace.community", c);
+            /*
+             * Find all the "parent" communities for the community
+             */
+            request.setAttribute("dspace.communities", getParents(c,false));
+
 
             // home page, or forward to another page?
             if (extraPathInfo == null)
@@ -269,6 +281,11 @@ public class HandleServlet extends DSpaceServlet
         request.setAttribute("dspace.collection", collections[0]);
         Community[] comms = collections[0].getCommunities();
         request.setAttribute("dspace.community", comms[0]);
+        /*
+         * Find all the "parent" communities for the collection
+         */
+        request.setAttribute("dspace.communities", getParents(comms[0],true));
+
 
         // Full or simple display?
         boolean displayAll = false;
@@ -310,6 +327,9 @@ public class HandleServlet extends DSpaceServlet
             // Get the collections within the community
             Collection[] collections = community.getCollections();
 
+            // get any subcommunities of the community
+            Community[] subcommunities = community.getSubcommunities();
+
             // Find the 5 last submitted items
             BrowseScope scope = new BrowseScope(context);
             scope.setScope(community);
@@ -334,6 +354,7 @@ public class HandleServlet extends DSpaceServlet
             request.setAttribute("last.submitted.urls", itemLinks);
             request.setAttribute("community", community);
             request.setAttribute("collections", collections);
+            request.setAttribute("subcommunities", subcommunities);
             JSPManager.showJSP(request, response, "/community-home.jsp");
         }
     }
@@ -588,5 +609,32 @@ public class HandleServlet extends DSpaceServlet
         }
 
         return urls;
+    }
+
+    /**
+     * Utility method to produce a list of parent communities
+     * for a given community, ending with the passed community,
+     * if include is true. If commmunity is top-level,
+     * the array will be empty, or contain only the passed community,
+     * if include is true. The array is ordered highest level to lowest
+     */
+    private Community[] getParents(Community c, boolean include)
+        throws SQLException
+    {
+        // Find all the "parent" communities for the community
+        Community[] parents = c.getAllParents();
+        // put into an array in reverse order
+        int revLength = include ? parents.length + 1 : parents.length;
+        Community[] reversedParents = new Community[revLength];
+        int index = parents.length - 1;
+        for (int i = 0; i < parents.length; i++)
+	{
+            reversedParents[i] = parents[index-i];
+        }
+        if (include)
+	{
+            reversedParents[revLength-1] = c;
+        }
+        return reversedParents;
     }
 }

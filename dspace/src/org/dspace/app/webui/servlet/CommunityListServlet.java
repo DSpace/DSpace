@@ -79,8 +79,10 @@ public class CommunityListServlet extends DSpaceServlet
         
 	// This will map community IDs to arrays of collections
 	Map colMap = new HashMap();
+        // This will map communityIDs to arrays of sub-communities
+        Map commMap = new HashMap();
         
-        Community[] communities = Community.findAll(context);
+        Community[] communities = Community.findAllTop(context);
         
         for (int com = 0; com < communities.length; com++)
         {
@@ -89,10 +91,16 @@ public class CommunityListServlet extends DSpaceServlet
             // Find collections in community
             Collection[] colls = communities[com].getCollections();
             colMap.put(comID, colls);
+
+            // Find subcommunties in community
+            Community[] comms = communities[com].getSubcommunities();
+            commMap.put(comID, comms);
+
         }
         
         request.setAttribute("communities", communities);
         request.setAttribute("collections.map", colMap);
+        request.setAttribute("subcommunities.map", commMap);
         JSPManager.showJSP(request, response, "/community-list.jsp");
     }
 }

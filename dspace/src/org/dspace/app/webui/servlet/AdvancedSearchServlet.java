@@ -74,8 +74,8 @@ public class AdvancedSearchServlet extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        // just build a list of communities and pass along to the jsp
-        Community[] communities = Community.findAll(context);
+        // just build a list of top-level communities and pass along to the jsp
+        Community[] communities = Community.findAllTop(context);
         
         request.setAttribute("communities", communities);
         

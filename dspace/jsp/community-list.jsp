@@ -46,6 +46,8 @@
   -    communities         - array of communities
   -    collections.map  - Map where a keys is a community IDs (Integers) and 
   -                      the value is the array of collections in that community
+  -    subcommunities.map  - Map where a keys is a community IDs (Integers) and 
+  -                      the value is the array of subcommunities in that community
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -59,13 +61,14 @@
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
     Map collectionMap = (Map) request.getAttribute("collections.map");
+    Map subcommunityMap = (Map) request.getAttribute("subcommunities.map");
 %>
 
 <dspace:layout title="Communities and Collections">
 
     <H1>Communities and Collections</H1>
 
-    <P>Shown below is a list of communites and the collections within them.
+    <P>Shown below is a list of communities and the collections and sub-communities within them.
     Click on a name to view that community or collection home page.</P>
   
     <UL>
@@ -87,6 +90,21 @@
         {
 %>
                 <LI class="collectionListItem"><A HREF="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></A></LI>
+<%
+        }
+%>
+            </UL>
+            <P>&nbsp;</P>
+	    <UL>
+<%
+        // Get the sub-communities in this community from the map
+        Community[] comms = (Community[]) subcommunityMap.get(
+            new Integer(communities[i].getID()));
+
+        for (int k = 0; k < comms.length; k++)
+        {
+%>
+                <LI class="communityLink"><A HREF="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></A></LI>
 <%
         }
 %>

@@ -174,6 +174,20 @@ public class LayoutTag extends TagSupport
                     parentLinks.add(parentLink);
                 }
             }
+            else if (locbar.equalsIgnoreCase("commLink"))
+	    {
+                // "commLink" mode - show all parent communities
+                Community[] comms = (Community[])
+                    request.getAttribute("dspace.communities");
+                if (comms != null)
+		{
+                    for (int i = 0; i < comms.length; i++)
+		    {
+                        parents.add(comms[i].getMetadata("name"));
+                        parentLinks.add("/handle/" + comms[i].getHandle());
+                    }
+		}
+            }
             else if (locbar.equalsIgnoreCase("nolink"))
             {
                 // "nolink" mode - next thing in location bar is taken from
@@ -188,17 +202,18 @@ public class LayoutTag extends TagSupport
             {
                 // Grab parents from the URL - these should have been picked up
                 // by the HandleServlet
-
-                Community com = (Community)
-                    request.getAttribute("dspace.community");
                 Collection col = (Collection)
                     request.getAttribute("dspace.collection");
+                Community[] comms = (Community[])
+                    request.getAttribute("dspace.communities");
 
-                if (com != null)
-                {
-                    parents.add(com.getMetadata("name"));
-                    parentLinks.add("/handle/" + com.getHandle());
-
+                if (comms != null)
+		{
+                    for (int i = 0; i < comms.length; i++)
+		    {
+                        parents.add(comms[i].getMetadata("name"));
+                        parentLinks.add("/handle/" + comms[i].getHandle());
+                    }
                     if (col != null)
                     {
                         parents.add(col.getMetadata("name"));

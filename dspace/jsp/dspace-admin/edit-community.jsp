@@ -51,11 +51,13 @@
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
     Community community = (Community) request.getAttribute("community");
+    int parentID = UIUtil.getIntParameter(request, "parent_community_id");
     
     String name = "";
     String shortDesc = "";
@@ -184,6 +186,7 @@
     if (community == null)
     {
 %>
+                        <input type="hidden" name="parent_community_id" value="<%= parentID %>">
                         <input type="hidden" name="create" value="true">
                         <input type="submit" name="submit" value="Create">
 <%

@@ -303,9 +303,21 @@ public class EditCommunitiesServlet extends DSpaceServlet
     {
         if (request.getParameter("create").equals("true"))
         {
-            // We need to create a new community
-            community = Community.create(context);
-
+            // if there is a parent community id specified, create community
+            // as its child; otherwise, create it as a top-level community
+            int parentCommunityID = UIUtil.getIntParameter(request, "parent_community_id");
+            if (parentCommunityID != -1)
+	    {
+                Community parent = Community.find(context, parentCommunityID);
+                if (parent != null)
+	        {
+		    community = parent.createSubcommunity();
+                }
+            }
+            else
+            {
+               community = Community.create(context);
+            }
             // Set attribute
             request.setAttribute("community", community);
         }
