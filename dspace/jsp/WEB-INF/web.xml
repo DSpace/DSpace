@@ -68,7 +68,7 @@
   
   <filter-mapping>
     <filter-name>admin-only</filter-name>
-    <url-pattern>/admin/*</url-pattern>
+    <url-pattern>/dspace-admin/*</url-pattern>
   </filter-mapping>
 
   <filter-mapping>
@@ -89,6 +89,11 @@
   <filter-mapping>
     <filter-name>registered-only</filter-name>
     <url-pattern>/subscribe</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>registered-only</filter-name>
+    <url-pattern>/tools</url-pattern>
   </filter-mapping>
 
 
@@ -260,12 +265,17 @@
     <servlet-class>org.dspace.app.webui.servlet.admin.WorkflowAbortServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>itemmap</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.tools.ItemMapServlet</servlet-class>
+  </servlet>
+
 
   <!-- Servlet Mappings -->
 
   <servlet-mapping>
     <servlet-name>authorize</servlet-name>
-    <url-pattern>/admin/authorize</url-pattern>
+    <url-pattern>/dspace-admin/authorize</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -300,22 +310,22 @@
 
   <servlet-mapping>
     <servlet-name>dc-registry</servlet-name>
-    <url-pattern>/admin/dc-registry</url-pattern>
+    <url-pattern>/dspace-admin/dc-registry</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>edit-communities</servlet-name>
-    <url-pattern>/admin/edit-communities</url-pattern>
+    <url-pattern>/dspace-admin/edit-communities</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>edit-epeople</servlet-name>
-    <url-pattern>/admin/edit-epeople</url-pattern>
+    <url-pattern>/dspace-admin/edit-epeople</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>edit-item</servlet-name>
-    <url-pattern>/admin/edit-item</url-pattern>
+    <url-pattern>/dspace-admin/edit-item</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -330,12 +340,12 @@
 
   <servlet-mapping>
     <servlet-name>format-registry</servlet-name>
-    <url-pattern>/admin/format-registry</url-pattern>
+    <url-pattern>/dspace-admin/format-registry</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>groups</servlet-name>
-    <url-pattern>/admin/groups</url-pattern>
+    <url-pattern>/dspace-admin/groups</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -405,7 +415,12 @@
 
   <servlet-mapping>
     <servlet-name>workflow</servlet-name>
-    <url-pattern>/admin/workflow</url-pattern>
+    <url-pattern>/dspace-admin/workflow</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>itemmap</servlet-name>
+    <url-pattern>/tools/itemmap</url-pattern>
   </servlet-mapping>
 
 
