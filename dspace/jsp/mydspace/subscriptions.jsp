@@ -84,7 +84,7 @@
 %>
     <P>Below are the collections you are subscribed to.  You will be sent an
     e-mail each day detailing new items that have become available in these
-    collection.  On days that no new items have appeared, no e-mail will be
+    collections.  On days that no new items have appeared, no e-mail will be
     sent.</P>
     
     <center>
