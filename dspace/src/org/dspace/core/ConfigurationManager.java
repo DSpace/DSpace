@@ -259,7 +259,7 @@ public class ConfigurationManager
         return license;
     }
     
-          /**
+     /**
      * Get the path for the news files.
      *
      */
@@ -272,8 +272,7 @@ public class ConfigurationManager
     }
      
      /**
-     * Reads news from a text file. Called by home.jsp to get the front page
-     * news, which can be configured by the admin. 
+     * Reads news from a text file.  
      *
      * @param position a constant indicating which file (top or side)
       *should be read in.
