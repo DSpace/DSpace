@@ -12,21 +12,15 @@ jena.jar:            The Jena RDF framework (version 1.4.0)
 log4j.jar:           Log4j, for system logging (version 1.2.8)
 lucene.jar:          Lucene search engine (version 1.3)
 mail.jar*:           JavaMail, used for sending e-mail
+mets.jar**:          Harvard University Libraries METS toolkit (version 1.3.1)
 oaicat.jar:          OCLC's OAI data provider implementation (version 1.5.17)
 oro.jar:	     Jakarta-ORO, provide regular expressions (version 2.0.8)
 PDFBox.jar           PDF Utilities, used for text extraction v 0.6.4
 servlet.jar*:        Servlet interfaces (version 2.3)
-sunjce-1.2.1.jar**:   Java Cryptographic Extension (v1.2.1)--for JDK1.3
-sunjce_provider.jar**: Sun JCE provider implementation--for JDK1.3
 tm-extractors.jar:   textmining.org PDFExtract and WordExtract classes (v.0.2)
 xalan.jar:           XSLT processor - used for XPath functionality
 xerces.jar:          XML processor - used for parsing XML files
 
-default_local.policy**:      JCE Policy files--for JDK1.3
-default_US_export.policy**:  Ditto
-
-
 * - Not included with DSpace source bundle for licensing reasons
 
-** - Also not included for licensing reasons, and are only required when
-running JDK 1.3--they're integrated with JDK 1.4.
+** - Source code is available from http://hul.harvard.edu/mets/
