@@ -99,20 +99,26 @@ title="Select Collection to Submit to">
                         </select>
                     </td>
                 </tr>
+            </table>
+
+            <%-- Hidden field indicating the step --%>
+            <input type="hidden" name="step" value="<%= SubmitServlet.SELECT_COLLECTION %>">
+            <br>
+
+            <table border=0 width=80%>
                 <tr>
-                    <td colspan=2>&nbsp;</td>
-                </tr>
-                <tr>
-                    <td align=left>
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                    <td width="100%">&nbsp;</td>
+                    <td>
+                        <input type=submit name=submit_next value="Next &gt;">
                     </td>
+                    <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
-<%-- Hidden field indicating the step --%>
-                        <input type="hidden" name="step" value="<%= SubmitServlet.SELECT_COLLECTION %>">
-                        <input type="submit" name="submit_next" value="Next &gt;">
+                        <input type=submit name=submit_cancel value="Cancel/Save">
                     </td>
                 </tr>
             </table>
+
+
         </center>
     </form>
     
