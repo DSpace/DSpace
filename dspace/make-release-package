@@ -1,18 +1,11 @@
 #!/bin/sh
 
-USAGE="$0 [-mit] cvs-tag target"
+USAGE="$0 cvs-tag target"
 
 # Just in case you need to 'socksify' etc
 CVS_COMMAND="cvs"
 
-mit=0
-
 # Check we have command-line arguments
-if [ "$#" == "3" ]; then
-   mit=1
-   shift
-fi
-
 if [ "$#" != "2" ]; then
         echo $USAGE
         exit 1
@@ -22,33 +15,13 @@ mkdir tmp
 cd tmp
 
 echo "Checking out core code..."
-$CVS_COMMAND -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 dspace
+$CVS_COMMAND -q export -r $1 dspace
 
 # Don't need to include this script!
 rm -f dspace/make-release-package
 
 # Or silly cvsignore file
 rm -f dspace/.cvsignore
-
-
-# Remove Sun JARs due to licensing issues
-if [ "$mit" == "0" ] ; then
-        rm -f dspace/lib/activation.jar
-        rm -f dspace/lib/mail.jar
-        rm -f dspace/lib/servlet.jar
-        rm -f dspace/lib/sunjce*.jar
-        rm -f dspace/lib/*.policy
-fi
-
-
-if [ "$mit" == "1" ] ; then
-        echo "Checking out MIT-specific code..."
-        $CVS_COMMAND -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 mit
-
-        echo "Overlaying MIT-specifics..."
-        cp -r mit/* dspace
-fi
-
 
 echo "Creating tarball..."
 mv dspace $2
