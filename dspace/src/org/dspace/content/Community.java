@@ -280,7 +280,7 @@ public class Community
      * Get the collections in this community.  Throws an SQLException because
      * creating a community object won't load in all collections.
      *
-     * @return  List of Collection objects
+     * @return  array of Collection objects
      */
     public Collection[] getCollections()
         throws SQLException
@@ -406,19 +406,5 @@ public class Community
                 collections[i].deleteWithContents();
             }
         }
-    }
-
-
-    /**
-     * Get recent additions to the community.
-     *
-     * @param  n  the number of recent additions to retrieve.
-     *
-     * @return  a list of the most recent additions.
-     */
-    public List getRecentAdditions(int n)
-        throws SQLException
-    {
-        return null;
     }
 }

@@ -165,7 +165,7 @@ public class Bundle
 
 
     /**
-     * Get the bitstreams in this budnle
+     * Get the bitstreams in this bundle
      *
      * @return the bitstreams
      */
@@ -181,7 +181,7 @@ public class Bundle
     /**
      * Get the items this bundle appears in
      *
-     * @return <code>List<code> of <code>Item</code>s this bundle appears
+     * @return array of <code>Item</code>s this bundle appears
      *         in
      */
     public Item[] getItems()

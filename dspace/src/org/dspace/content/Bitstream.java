@@ -410,7 +410,7 @@ public class Bitstream
     /**
      * Get the bundles this bitstream appears in
      *
-     * @return  <code>List</code> of <code>Bundle</code>s this bitstream
+     * @return  array of <code>Bundle</code>s this bitstream
      *          appears in
      */
     public Bundle[] getBundles()

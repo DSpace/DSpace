@@ -161,11 +161,40 @@
     
 
   <!-- ============================================================= -->
+  <!-- Load the initial contents of the registries into the database -->
+  <!-- ============================================================= -->
+
+  <!-- Loads bitstream format and Dublin Core type registries -->
+  <target name="load_registries"
+          description="Load initial contents of registries">
+    <java classname="org.dspace.administer.RegistryLoader"
+          classpathref="build.class.path"
+          fork="yes"
+          failonerror="yes">
+      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="dspace.configuration" value="${config}"/>
+      <arg value="-bitstream"/>
+      <arg value="${dspace.dir}/config/registries/bitstream-formats.xml"/>
+    </java>
+    <java classname="org.dspace.administer.RegistryLoader"
+          classpathref="build.class.path"
+          fork="yes"
+          failonerror="yes">
+      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="dspace.configuration" value="${config}"/>
+      <arg value="-dc"/>
+      <arg value="${dspace.dir}/config/registries/dublin-core-types.xml"/>
+    </java>
+  </target>
+      
+
+
+  <!-- ============================================================= -->
   <!-- Do a fresh system install                                     -->
   <!-- ============================================================= -->
   
   <target name="fresh_install"
-          depends="install_code,setup_database"
+          depends="install_code,setup_database,load_registries"
           description="Do a fresh install of the system, overwriting any data">
   </target>
 

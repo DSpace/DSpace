@@ -46,9 +46,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.log4j.Category;
 
+import org.dspace.administer.DCType;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -126,7 +129,7 @@ public class Item
         // Get bitstreams
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "bundle",
-            "select bundle.* from bundle, item2bundle where " +
+            "SELECT bundle.* FROM bundle, item2bundle WHERE " +
                 "item2bundle.bundle_id=bundle.bundle_id AND " +
                 "item2bundle.item_id=" +
                 itemRow.getIntColumn("item_id") + ";");
@@ -139,7 +142,7 @@ public class Item
 
         // Get Dublin Core metadata
         tri = DatabaseManager.query(ourContext, "dcresult",
-            "select * from dcresult where item_id=" +
+            "SELECT * FROM dcresult WHERE item_id=" +
                 itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
@@ -680,6 +683,12 @@ public class Item
     {
         // FIXME: Check authorisation
         
+        // Map counting number of values for each element/qualifier.
+        // Keys are Strings: "element" or "element.qualifier"
+        // Values are Integers indicating number of values written for a
+        // element/qualifier
+        Map elementCount = new HashMap();
+
         DatabaseManager.update(ourContext, itemRow);
         
         // Redo bundle mappings if they've changed
@@ -720,21 +729,13 @@ public class Item
                 DCValue dcv = (DCValue) i.next();
                 
                 // Get the DC Type
-                // FIXME: Maybe should use RegistryManager?
-                String query = "select * from dctyperegistry where element " +
-                    "LIKE \"" + dcv.element + "\" AND qualifier" +
-                    (dcv.qualifier == null
-                        ? "=null"
-                        : " LIKE \"" + dcv.qualifier + "\"") +
-                    ";";
+                DCType dcType = DCType.findByElement(ourContext,
+                    dcv.element,
+                    dcv.qualifier);
 
-                TableRow dcTypeRow = DatabaseManager.querySingle(ourContext,
-                    "dctyperegistry",
-                    query);
-
-                if (dcTypeRow == null)
+                if (dcType == null)
                 {
-                    // Bad DC field
+                    // Bad DC field, ignore it
                     // FIXME: An error?
                     log.warn(LogManager.getHeader(ourContext,
                         "bad_dc",
@@ -747,26 +748,34 @@ public class Item
                 }
                 else
                 {
+                    // Work out the place number for ordering
+                    int current = 0;
+
+                    // Key into map is "element" or "element.qualifier"
+                    String key = dcv.element +
+                        (dcv.qualifier == null ? "" : "." + dcv.qualifier);
+
+                    Integer currentInteger = (Integer) elementCount.get(key);
+
+                    if (currentInteger != null)
+                    {
+                        current = currentInteger.intValue();
+                    }
+                    
+                    current++;
+                    elementCount.put(key, new Integer(current));
+
                     // Write DCValue
                     TableRow valueRow = DatabaseManager.create(ourContext,
                         "dcvalue");
 
+                    valueRow.setColumn("item_id", getID());
+                    valueRow.setColumn("dc_type_id", dcType.getID());
                     valueRow.setColumn("text_value", dcv.value);
                     valueRow.setColumn("text_lang", dcv.language);
+                    valueRow.setColumn("place", current);
 
                     DatabaseManager.update(ourContext, valueRow);
-                    
-                    // Write mapping
-                    TableRow mappingRow = DatabaseManager.create(ourContext,
-                        "item2dcvalue");
-
-                    mappingRow.setColumn("item_id", getID());
-                    mappingRow.setColumn("dc_value_id",
-                        valueRow.getIntColumn("dc_value_id"));
-                    mappingRow.setColumn("dc_type_id",
-                        dcTypeRow.getIntColumn("dc_type_id"));
-
-                    DatabaseManager.update(ourContext, mappingRow);
                 }
             }
             
@@ -834,23 +843,7 @@ public class Item
     private void removeDCFromDatabase()
         throws SQLException
     {
-        // We need to delete the mapping rows first, but get the dcvalue
-        // rows before we do since we'll need to delete them afterwards
-        TableRowIterator dcValueRows = DatabaseManager.query(ourContext,
-            "dcvalue",
-            "SELECT dcvalue.* FROM dcvalue, item2dcvalue WHERE " +
-                "dcvalue.dc_value_id=item2dcvalue.dc_value_id AND " +
-                "item2dcvalue.item_id=" + getID() + ";");
-
-        // Now delete the mappings
         DatabaseManager.updateQuery(ourContext,
-            "delete from item2dcvalue where item_id=" + getID() + ";");
-
-        // And the values
-        while (dcValueRows.hasNext())
-        {
-            TableRow r = dcValueRows.next();
-            DatabaseManager.delete(ourContext, r);
-        }
+            "DELETE FROM dcvalue WHERE item_id=" + getID() + ";");
     }    
 }

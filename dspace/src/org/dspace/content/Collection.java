@@ -597,24 +597,9 @@ public class Collection
 
 
     /**
-     * Get recent additions to the collection.
-     *
-     * @param  n  the number of recent additions to retrieve.
-     *
-     * @return  a list of the most recent additions.
-     */
-    public List getRecentAdditions(int n)
-        throws SQLException
-    {
-        // FIXME: Use browse code
-        return null;
-    }
-
-
-    /**
      * Get the communities this collection appears in
      *
-     * @return   a <code>List</code> of <code>Community</code> objects
+     * @return   array of <code>Community</code> objects
      */
     public Community[] getCommunities()
         throws SQLException
