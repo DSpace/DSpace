@@ -432,9 +432,16 @@
 
     for (int i = 0; i < bitstreams.length ; i++)
     {
+        // Work out whether to use /retrieve link for simple downloading,
+        // or /html link for HTML files
         BitstreamFormat format = bitstreams[i].getFormat();
+        String downloadLink = "retrieve/" + bitstreams[i].getID();
+        if (format != null && format.getMIMEType().equals("text/html"))
+        {
+            downloadLink = "html/db-id/" + item.getID();
+        }
 %>
-                                            <A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= java.net.URLEncoder.encode(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A> - <%= bitstreams[i].getFormatDescription() %>
+                                            <A HREF="<%= request.getContextPath() %>/<%= downloadLink %>/<%= java.net.URLEncoder.encode(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A> - <%= bitstreams[i].getFormatDescription() %>
 <%
         switch (format.getSupportLevel())
         {
