@@ -139,14 +139,29 @@ public class Browse
      *
      * <p>
      * If oldestfirst is true, the dates returned are the ones
-     * after the focus; otherwise the dates are the ones before the
-     * focus. Results will be ordered in increasing order (ie, earliest
-     * to latest) if oldestfirst is true; in decreasing order otherwise.
+     * after the focus, ordered from earliest to latest. Otherwise the
+     * dates are the ones before the focus, and ordered from latest to
+     * earliest. For example:
      * </p>
+     *
+     * <p>
+     * For example, if the focus is <em>1995</em>, and oldestfirst is true, the
+     * results might look like this:
+     * </p>
+     *
+     * <code>1993, 1994, 1995 (the focus), 1996, 1997.....</code>
+     *
+     * <p>
+     * While if the focus is <em>1995</em>, and oldestfirst is false, the
+     * results would be:
+     * </p>
+     *
+     * <code>1997, 1996, 1995 (the focus), 1994, 1993 .....</code>
      *
      * @param scope The BrowseScope
      * @param oldestfirst If true, the dates returned are the ones
-     * after focus; otherwise the dates are the ones before focus.
+     * after focus, ordered from earliest to latest; otherwise the dates
+     * are the ones before focus, ordered from latest to earliest.
      * @return A BrowseInfo object, the results of the browse
      * @exception SQLException If a database error occurs
      */
@@ -162,9 +177,17 @@ public class Browse
     }
 
     /**
-     * Return Items in the given scope by Author (exact match).
+     * <p>
+     * Return Items in the given scope by the author (exact match).
+     * The focus of the BrowseScope is the author to use; using a
+     * BrowseScope without a focus causes an IllegalArgumentException
+     * to be thrown.
+     * </p>
+     *
+     * <p>
      * Author refers to a Dublin Core field with element
      * <em>contributor</em> and qualifier <em>author</em>.
+     * </p>
      *
      * @param scope The BrowseScope
      * @param sortbytitle If true, the returned items are sorted by title;
@@ -269,9 +292,9 @@ public class Browse
     /**
      * This method should be called whenever an item is removed.
      *
-     * @param context - The database context
-     * @param id - The id of the item which has been removed
-     * @exception SQLException - If a database error occurs
+     * @param context The current DSpace context
+     * @param id The id of the item which has been removed
+     * @exception SQLException If a database error occurs
      */
     public static void itemRemoved(Context context, int id)
         throws SQLException
@@ -319,9 +342,9 @@ public class Browse
     /**
      * This method should be called whenever an item is added.
      *
-     * @param context - The database context
-     * @param item - The item which has been added
-     * @exception SQLException - If a database error occurs
+     * @param context The current DSpace context
+     * @param item The item which has been added
+     * @exception SQLException If a database error occurs
      */
     public static void itemAdded(Context context, Item item)
         throws SQLException
