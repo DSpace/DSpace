@@ -226,7 +226,7 @@ title="Describe Your Item">
 <%-- ================================================ --%>
                 <tr>
                     <td colspan=3 class="submitFormHelp">
-                        Enter any other description or comments relating to the item in this box.
+                        Enter any other description or comments in this box.
                     </td>
                 </tr>
 <%
