@@ -83,6 +83,8 @@ public class GroupTest extends TestCase
             g.setName(name);
             g.addMember(e1);
             g.addMember(e2);
+            // Deliberately duplicate e2
+            g.addMember(e2);
             // The static isMember method will not work until update
             // has been called
             g.update();
@@ -102,6 +104,9 @@ public class GroupTest extends TestCase
                        g.isMember(e2));
             assertTrue("EPerson is member of group",
                        Group.isMember(context, g.getID(), e2.getID()));
+            EPerson[] members = g.getMembers();
+            assertNotNull("Got group members", members);
+            assertEquals("Group size is 2", members.length, 2);
 
             // Test deletion of eperson
             g.removeMember(e2);
