@@ -172,17 +172,30 @@ public class DSQuery
         }
         catch (NumberFormatException e)
         {
-            // a bad parse means that there are no results
-            // doing nothing with the exception gets you
-            //   throw new SQLException( "Error parsing search results: " + e );
-            // ?? quit?
+            
+            log.warn(LogManager.getHeader(c,
+                "Number format exception",
+                "" + e));
+            
+            qr.setErrorMsg("Number format exception");
         }
         catch (ParseException e)
         {
             // a parse exception - log and return null results
             log.warn(LogManager.getHeader(c,
-                "Lucene Parse Exception",
+                "Invalid search string",
                 "" + e));
+            
+            qr.setErrorMsg("Invalid search string");
+        }
+        catch (TokenMgrError tme)
+        {
+            // Similar to parse exception
+            log.warn(LogManager.getHeader(c,
+                "Invalid search string", "" + tme));
+            
+            qr.setErrorMsg("Invalid search string");
+
         }
 
         return qr;
@@ -252,7 +265,7 @@ public class DSQuery
      * @return QueryResults same results as doQuery, restricted to a collection
      */
     public static QueryResults doQuery(Context c, QueryArgs args, Collection coll)
-        throws IOException, ParseException
+        throws IOException
     {
         String querystring = args.getQuery();
         
@@ -275,7 +288,7 @@ public class DSQuery
      * @return HashMap results, same as full doQuery, only hits in a Community
      */
     public static QueryResults doQuery(Context c, QueryArgs args, Community comm)
-        throws IOException, ParseException
+        throws IOException
     {
         String querystring = args.getQuery();
         
