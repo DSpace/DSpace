@@ -618,7 +618,7 @@ public class Collection
         while (tri.hasNext())
         {
             // FIXME
-            //communities.add(new Community(ourContext, tri.next()));
+            communities.add(new Community(ourContext, tri.next()));
         }
 
         Community[] communityArray = new Community[communities.size()];
