@@ -222,15 +222,47 @@ public class BrowseServlet extends DSpaceServlet
             // ----------------------------------------------
             // Start the browse using user-specified text
             // ----------------------------------------------
-            scope.setFocus(startsWith);
-            highlight = true;
-            logInfo = "starts_with=" + startsWith + ",";
-
             if (browseDates)
             {
                 // if the date order is flipped, we'll keep the same focus
                 flipOrderingQuery = "starts_with=" +
                     URLEncoder.encode(startsWith) + "&";
+
+                /*
+                 * When the user is browsing with the most recent items first,
+                 * the browse code algorithm doesn't quite do what some people
+                 * might expect.  For example, if in the index there are
+                 * entries:
+                 *
+                 * Mar-2000
+                 * 15-Feb-2000
+                 * 6-Feb-2000
+                 * 15-Jan-2000
+                 *
+                 * and the user has selected "Feb 2000" as the start point for
+                 * the browse, the browse algorithm will start at the first
+                 * point in that index *after* "Feb 2000".  "Feb 2000" would
+                 * appear in the index above between 6-Feb-2000 and 15-Jan-2000.
+                 * So, the browse code in this case will start the browse at
+                 * "15-Jan-2000".  This isn't really what users are likely to
+                 * want:  They're more likely to want the browse to start at
+                 * the first Feb 2000 date, i.e. 15-Feb-2000.  A similar
+                 * scenario occurs when the user enters just a year.
+                 * Our quick hack to produce this behaviour is to add "-32" to
+                 * the startsWith variable, when sorting with most recent items
+                 * first.  This means the browse code starts at the topmost
+                 * item in the index that matches the user's input, rather
+                 * than the point in the index where the user's input would
+                 * appear.
+                 */
+                if (!oldestFirst)
+                {
+                    startsWith = startsWith + "-32";
+                }
+
+                scope.setFocus(startsWith);
+                highlight = true;
+                logInfo = "starts_with=" + startsWith + ",";
             }
         }
         else if (top != null || bottom != null)
