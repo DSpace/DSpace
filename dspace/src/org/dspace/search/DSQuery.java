@@ -93,15 +93,8 @@ public class DSQuery
         throws IOException
     {
         querystring = checkEmptyQuery( querystring );
-        
-        // play with regular expressions to work around lucene bug
-        Perl5Util util = new Perl5Util();
-        
-        querystring = util.substitute("s/ AND / && /g", querystring);
-        querystring = util.substitute("s/ OR / || /g", querystring);
-        querystring = util.substitute("s/ NOT / ! /g", querystring);
-        
-        querystring = querystring.toLowerCase();
+        querystring = workAroundLuceneBug( querystring );
+        querystring = stripHandles( querystring );
                         
         ArrayList resultlist= new ArrayList();
         ArrayList itemlist 	= new ArrayList();
@@ -185,7 +178,38 @@ public class DSQuery
         
         return myquery;
     }
+    
+    static String workAroundLuceneBug( String myquery )
+    {
+		// Lucene currently has a bug which breaks wildcard
+		// searching when you have uppercase characters.
+		// Here we substitute the boolean operators -- which 
+		// have to be uppercase -- before tranforming the 
+		// query string to lowercase.
+        
+        Perl5Util util = new Perl5Util();
+        
+        myquery = util.substitute("s/ AND / && /g", myquery);
+        myquery = util.substitute("s/ OR / || /g", myquery);
+        myquery = util.substitute("s/ NOT / ! /g", myquery);
+        
+        myquery = myquery.toLowerCase();
 
+        return myquery;
+    }
+    
+
+    static String stripHandles( String myquery )
+    {
+		// Drop beginning pieces of full handle strings
+        
+        Perl5Util util = new Perl5Util();
+        
+        myquery = util.substitute("s|^(\\s+)?http://hdl\\.handle\\.net/||", myquery);
+        myquery = util.substitute("s|^(\\s+)?hdl:||", myquery);
+
+        return myquery;
+    }
 
     /** Do a query, restricted to a collection
      * @param query
