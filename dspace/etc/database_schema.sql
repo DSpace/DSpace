@@ -148,7 +148,8 @@ CREATE TABLE Bitstream
    user_format_description TEXT,
    source                  VARCHAR(256),
    internal_id             VARCHAR(256),
-   deleted                 BOOL
+   deleted                 BOOL,
+   store_number            INTEGER
 );
 
 -------------------------------------------------------
