@@ -44,6 +44,7 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -137,7 +138,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         }
 
         // For the results
-        List itemIDs;
+        List handles;
 
         // Build log information
         String logInfo = "";
@@ -147,7 +148,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         Collection collection = UIUtil.getCollectionLocation(request);
 
         Item[] items;
-        String[] handles;
+//        String[] handles;
 
         // Perform the search
         try
@@ -158,7 +159,7 @@ public class SimpleSearchServlet extends DSpaceServlet
 
                 request.setAttribute("collection", collection);
                 request.setAttribute("community", community);
-                itemIDs = DSQuery.doQuery(query, collection);
+                handles = DSQuery.doQuery(query, collection);
             }
             else if (community != null)
             {
@@ -169,7 +170,7 @@ public class SimpleSearchServlet extends DSpaceServlet
                 request.setAttribute("collection.array",
                     community.getCollections());
 
-                itemIDs = DSQuery.doQuery(query, community);
+                handles = DSQuery.doQuery(query, community);
             }
             else
             {
@@ -177,26 +178,30 @@ public class SimpleSearchServlet extends DSpaceServlet
                 Community[] communities = Community.findAll(context);
                 request.setAttribute("community.array", communities);
 
-                itemIDs = DSQuery.doQuery(query);
+                handles = DSQuery.doQuery(query);
             }
 
 
-            // Make Item objects and find the Handles
-            items = new Item[itemIDs.size()];
-            handles = new String[itemIDs.size()];
+            // Make Item objects from the handles
+            items = new Item[handles.size()];
+//            ItemIDs = new String[itemHandles.size()];
 
-            for (int i = 0; i < items.length; i++)
+            for (int i = 0; i < handles.size(); i++)
             {
-                Integer id = (Integer) itemIDs.get(i);
-                items[i] = Item.find(context, id.intValue());
+                String myhandle = (String) handles.get(i);
+                
+                Object o = HandleManager.resolveToObject(context, myhandle);
+                
+                // for now all returned objects are items
+                items[i] = (Item)o;
 
                 if (items[i] == null)
                 {
                     throw new SQLException("Query \"" + query +
-                        "\" returned unknown item ID " + id);
+                        "\" returned unresolvable handle: " + myhandle);
                 }
 
-                handles[i] = HandleManager.findHandle(context, items[i]);
+//                handles[i] = HandleManager.findHandle(context, items[i]);
             }
 
             // Log
@@ -219,8 +224,8 @@ public class SimpleSearchServlet extends DSpaceServlet
                 pe);
 
             // Empty results
-            items = new Item[0];
-            handles = new String[0];
+            items   = new Item[0];
+            handles = (List)new ArrayList();
         }
 	catch (TokenMgrError tme)
 	{
@@ -231,13 +236,16 @@ public class SimpleSearchServlet extends DSpaceServlet
                 tme);
 
             // Empty results
-            items = new Item[0];
-            handles = new String[0];
+            items   = new Item[0];
+            handles = (List)new ArrayList();
 	}
+
+    String [] handlesarray = new String[handles.size()];
+    handlesarray = (String [])handles.toArray(handlesarray);
 
         // Pass the results to the display JSP
         request.setAttribute("items", items);
-        request.setAttribute("handles", handles);
+        request.setAttribute("handles", handlesarray);
 
         // And the original query string
         request.setAttribute("query", query);
