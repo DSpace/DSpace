@@ -48,6 +48,12 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.PosixParser;
+
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -57,6 +63,7 @@ import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.Utils;
+import org.dspace.handle.HandleManager;
 
 /**
     Item exporter to create simple AIPs for DSpace content.
@@ -86,53 +93,149 @@ public class ItemExport
     public static void main(String [] argv)
         throws Exception
     {
-        if( argv.length < 4 )
+        // create an options object and populate it
+        CommandLineParser parser = new PosixParser();
+
+        Options options = new Options();
+
+        options.addOption( "t", "type",   true, "type: COLLECTION or ITEM");
+        options.addOption( "i", "id",     true, "ID or handle of thing to export");
+        options.addOption( "d", "dest",   true, "remove items in mapfile");
+        options.addOption( "n", "number", true, "sequence number to begin exporting items with");
+        options.addOption( "h", "help",   false, "help");
+
+        CommandLine line = parser.parse( options, argv );
+
+        String typeString   = null;
+        String destDirName  = null;
+        String myIDString   = null;
+        int seqStart        = -1;
+        int myType          = -1;
+
+        Item myItem = null;
+        Collection mycollection = null;
+
+        if( line.hasOption('h') )
         {
-            printUsage();
-            return;
+            HelpFormatter myhelp = new HelpFormatter();
+            myhelp.printHelp( "ItemExport\n", options );
+            System.out.println("\nfull collection: ItemExport -t COLLECTION -i ID -d dest -n number");
+            System.out.println("singleitem:       ItemExport -t ITEM -i ID -d dest -n number");
+
+            System.exit(0);
         }
 
-        String typeString   = argv[0];
-        String idString     = argv[1];
-        String destDirName  = argv[2];
-        String seqNumString = argv[3];
+        if( line.hasOption( 't' ) ) // type
+        {
+            typeString = line.getOptionValue( 't' );
+            if( typeString.equals("ITEM") )
+            {
+                myType = Constants.ITEM;
+            }
+            else if( typeString.equals("COLLECTION") )
+            {
+                myType = Constants.COLLECTION;
+            }
+        }
 
-        int myID     = Integer.parseInt( idString     );
-        int seqStart = Integer.parseInt( seqNumString ); 
-        int myType;
-        
-        if( typeString.equals("ITEM") )
+        if( line.hasOption( 'i' ) ) // id
         {
-            myType = Constants.ITEM;
+            myIDString = line.getOptionValue( 'i' );
         }
-        else if( typeString.equals("COLLECTION") )
+
+        if( line.hasOption( 'd' ) ) // dest
         {
-            myType = Constants.COLLECTION;
+            destDirName = line.getOptionValue( 'd' );
         }
-        else
+
+        if( line.hasOption( 'n' ) ) // number
         {
-            printUsage();
-            return;
+            seqStart = Integer.parseInt( line.getOptionValue( 'n' ) );
         }
-        
+
+
+        // now validate the args
+        if( myType == -1 )
+        {
+            System.out.println("type must be either COLLECTION or ITEM (-h for help)");
+            System.exit(1);
+        }
+        if( destDirName == null )
+        {
+            System.out.println("destination directory must be set (-h for help)");
+            System.exit(1);
+        }
+        if( seqStart == -1 )
+        {
+            System.out.println("sequence start number must be set (-h for help)");
+            System.exit(1);
+        }
+        if( myIDString == null )
+        {
+            System.out.println("ID must be set to either a database ID or a handle (-h for help)");
+            System.exit(1);
+        }
+       
         Context c = new Context();
         c.setIgnoreAuthorization( true );
         
         if( myType == Constants.ITEM )
         {
+            // first, is myIDString a handle?
+            if( myIDString.indexOf('/') != -1 )
+            {
+                myItem = (Item)HandleManager.resolveToObject( c, myIDString);
+
+                if( myItem == null || myItem.getType() != Constants.ITEM )
+                {
+                    myItem = null;
+                }
+            }
+            else
+            {
+                myItem = Item.find( c, Integer.parseInt( myIDString ) );
+            }
+            if( myItem == null )
+            {
+                System.out.println("Error, item cannot be found: " + myIDString);
+            }
+        }
+        else
+        {
+            if( myIDString.indexOf('/') != -1 )
+            {
+                // has a / must be a handle
+                mycollection = (Collection)HandleManager.resolveToObject( c, myIDString );
+
+                // ensure it's a collection
+                if( (mycollection == null) || (mycollection.getType() != Constants.COLLECTION) )
+                {
+                    mycollection = null;
+                }
+            }
+            else if( myIDString != null )
+            {
+                mycollection = Collection.find( c, Integer.parseInt( myIDString ) );
+            }
+
+            if( mycollection == null )
+            {
+                System.out.println( "Error, collection cannot be found: " + myIDString );
+                System.exit(1);
+            }
+        }
+        
+        if( myItem != null )
+        {
             // it's only a single item
-            Item myItem = Item.find( c, myID );
-            
             exportItem( c, myItem, destDirName, seqStart);
         }
         else
         {
-            System.out.println("Exporting from collection " + myID );
+            System.out.println("Exporting from collection: " + myIDString );
 
             // it's a collection, so do a bunch of items
-            Collection myCollection = Collection.find( c, myID );
-            
-            ItemIterator i = myCollection.getItems();
+            ItemIterator i = mycollection.getItems();
 
             exportItem(c, i, destDirName, seqStart);
         }

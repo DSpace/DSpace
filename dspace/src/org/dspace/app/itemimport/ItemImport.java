@@ -107,6 +107,8 @@ list of collections to choose from would be nice too
 
 public class ItemImport
 {
+    static boolean useWorkflow = false;
+
     public static void main(String argv[])
         throws Exception
     {
@@ -118,10 +120,11 @@ public class ItemImport
         options.addOption( "a", "add",         false, "add items to DSpace");
         options.addOption( "r", "replace",     false, "replace items in mapfile");
         options.addOption( "R", "remove",      false, "remove items in mapfile");
-        options.addOption( "s", "source",      true, "source of items (directory)");
-        options.addOption( "c", "collection",  true, "destination collection databse ID");
-        options.addOption( "m", "mapfile",     true, "mapfile items in mapfile");
-        options.addOption( "e", "eperson",     true, "remove items in mapfile");
+        options.addOption( "s", "source",      true,  "source of items (directory)");
+        options.addOption( "c", "collection",  true,  "destination collection databse ID");
+        options.addOption( "m", "mapfile",     true,  "mapfile items in mapfile");
+        options.addOption( "e", "eperson",     true,  "remove items in mapfile");
+        options.addOption( "w", "workflow",    false, "send submission through collection's workflow");
         options.addOption( "h", "help",        false, "help");
 
         CommandLine line = parser.parse( options, argv );
@@ -146,6 +149,8 @@ public class ItemImport
         if( line.hasOption( 'a' ) ) { command = "add";    } 
         if( line.hasOption( 'r' ) ) { command = "replace";}
         if( line.hasOption( 'R' ) ) { command = "remove"; }
+
+        if( line.hasOption( 'w' ) ) { useWorkflow = true; }
        
         if( line.hasOption( 's' ) ) // source
         {
@@ -306,7 +311,12 @@ public class ItemImport
         // create the mapfile
         File outFile = new File( mapFile );
         PrintWriter mapOut = new PrintWriter( new FileWriter( outFile ) );
-        
+       
+        if( mapOut == null )
+        {
+            throw new Exception("can't open mapfile: " + mapFile);
+        }
+ 
         // now process the source directory
         File d = new java.io.File( sourceDir );
 
@@ -320,7 +330,7 @@ public class ItemImport
 
         for( int i = 0; i < dircontents.length; i++ )
         {
-            addItem( c, mycollection, sourceDir, dircontents[ i ], null, mapOut );
+            addItem( c, mycollection, sourceDir, dircontents[ i ], mapOut );
             System.out.println( i + " " + dircontents[ i ] );
         }
         
@@ -353,13 +363,22 @@ public class ItemImport
             // get the old handle
             String newItemName = (String)i.next();
             String oldHandle   = (String)myhash.get(newItemName);
+            Item oldItem = null;
+            Item newItem = null;
+ 
+            if( oldHandle.indexOf( '/' ) != -1 )
+            {
+                System.out.println("\tReplacing:  " + oldHandle);
 
-            System.out.println("\tReplacing:  " + oldHandle);
+                // add new item, locate old one
+                oldItem = (Item)HandleManager.resolveToObject(c, oldHandle);
+            }
+            else
+            {
+                oldItem = Item.find( c, Integer.parseInt(oldHandle) );
+            } 
 
-            // add new item, locate old one
-            Item oldItem = (Item)HandleManager.resolveToObject(c, oldHandle);
-            Item newItem = addItem(c, mycollection, sourceDir, newItemName, oldHandle, null);
-
+            newItem = addItem(c, mycollection, sourceDir, newItemName, null);
             // schedule item for demolition
             itemsToDelete.add( oldItem );
         }
@@ -388,9 +407,21 @@ public class ItemImport
         
         while( i.hasNext() )
         {
-            String myhandle = (String)myhash.get( i.next() );
-            System.out.println("Deleting item " + myhandle);
-            removeItem(c, myhandle);
+            String itemID = (String)myhash.get( i.next() );
+
+            if( itemID.indexOf( '/' ) != -1 )
+            {
+                String myhandle = itemID;
+                System.out.println("Deleting item " + myhandle);
+                removeItem(c, myhandle);
+            }
+            else
+            {
+                // it's an ID
+                Item myitem = Item.find(c, Integer.parseInt(itemID));
+                System.out.println("Deleting item " + itemID);
+                removeItem(c, myitem);
+            }
         }
     }
 
@@ -404,7 +435,7 @@ public class ItemImport
      *   handle - non-null means we have a pre-defined handle already
      *   mapOut - mapfile we're writing
      */   
-    private Item addItem( Context c, Collection mycollection, String path, String itemname, String handle, PrintWriter mapOut )
+    private Item addItem( Context c, Collection mycollection, String path, String itemname, PrintWriter mapOut )
         throws Exception
     {
         Item myitem = null;
@@ -423,18 +454,30 @@ public class ItemImport
         // process contents file, add bistreams and bundles
         processContentsFile( c, myitem, path + File.separatorChar + itemname, "contents" );
 
-        String myhandle = processHandleFile( c, myitem, path + File.separatorChar + itemname,
-            "handle" );
 
-        // put item in system
-        InstallItem.installItem(c, wi, myhandle);
-
-        // find the handle, and output to map file
-        myhandle = HandleManager.findHandle(c, myitem);
-                
-        if(mapOut!=null)
+        if( useWorkflow )
         {
-            mapOut.println( itemname + " " + myhandle );       
+            // don't process handle file
+
+            // start up a workflow
+            WorkflowManager.start( c, wi );
+
+            // send ID to the mapfile
+            if( mapOut != null ) mapOut.println( itemname + " " + myitem.getID() );
+        }
+        else
+        {
+            // only process handle file if not using workflow system 
+            String myhandle = processHandleFile( c, myitem, path + File.separatorChar + itemname,
+                "handle" );
+
+            // put item in system
+            InstallItem.installItem(c, wi, myhandle);
+
+            // find the handle, and output to map file
+            myhandle = HandleManager.findHandle(c, myitem);
+                
+            if( mapOut != null ) mapOut.println( itemname + " " + myhandle );       
         }
 
         return myitem;
