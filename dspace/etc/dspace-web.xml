@@ -131,6 +131,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>itemmap</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.ItemMapServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>bitstream</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.BitstreamServlet</servlet-class>
   </servlet>
@@ -377,6 +382,12 @@
     <servlet-name>eperson-list</servlet-name>
     <url-pattern>/tools/eperson-list</url-pattern>
   </servlet-mapping>
+  
+ <servlet-mapping>
+    <servlet-name>itemmap</servlet-name>
+    <url-pattern>/tools/itemmap</url-pattern>
+  </servlet-mapping>
+
 
   <servlet-mapping>
     <servlet-name>feedback</servlet-name>

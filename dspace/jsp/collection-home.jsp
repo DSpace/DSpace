@@ -213,10 +213,18 @@
             </tr>
             <tr>
               <td class="standard" align="center">
-	            <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+                 <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
                   <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
                   <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
                   <input type="submit" value="Edit...">
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td class="standard" align="center">
+                 <form method=POST action="<%=request.getContextPath()%>/tools/itemmap">
+                  <input type="hidden" name="cid" value="<%= collection.getID() %>">
+                  <input type="submit" value="Item Mapper">
                 </form>
               </td>
             </tr>
