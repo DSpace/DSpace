@@ -80,16 +80,12 @@ import java.util.StringTokenizer;
 
 public class AuthorizeManager
 {
-    public static void authorizeAction(Context c,Object o, int a, EPerson e)
+    public static void authorizeAction(Context c,Object o, int a)
         throws java.sql.SQLException, AuthorizeException
     {
         // initialize so that -1s get passed on unknown objects
         int otype	= -1;
         int oid 	= -1;
-        int userid	= -1;
-
-        // figure out eperson id
-        userid = e.getID();
 
         // now figure out the type and object id
         if( o instanceof Item )
@@ -117,7 +113,7 @@ public class AuthorizeManager
             throw new AuthorizeException("Unknown object type");
         }
 		
-        authorizeAction( c,otype, oid, a, userid );
+        authorizeAction( c,otype,oid,a);
     }
 
     /**
@@ -129,13 +125,28 @@ public class AuthorizeManager
      * @param userid		who wants to perform the action?
      * @throws AuthorizeException
      */
-    public static void authorizeAction(Context c,int resourcetype, int resourceid, int actionid, int userid)
+    public static void authorizeAction(Context c,int resourcetype, int resourceid, int actionid)
         throws java.sql.SQLException, AuthorizeException
     {
-        if (!authorize(c,resourcetype, resourceid, actionid, userid))
-            throw new AuthorizeException("Authorization denied for action " + actionid + " by user " + userid);
+        if (!authorize(c,resourcetype, resourceid, actionid))
+            throw new AuthorizeException("Authorization denied for action " + actionid + " by user " + c.getCurrentUser().getID());
 
     }
+
+    /**
+     * check to see if the current user is an admin
+     */
+
+    public static boolean isAdmin(Context c)
+        throws java.sql.SQLException
+    {
+        // group is hardcoded as 'admin', and admins can do everything
+        if (Group.isMember(c,-1,c.getCurrentUser().getID()))
+            return true;
+        else
+            return false;
+    }
+
 
     /**
      * authorize() is the authorize method that returns a boolean
@@ -143,15 +154,15 @@ public class AuthorizeManager
      * @param resourcetype - found core.Constants (collection, item, etc.)
      * @param resorceidID of resource you're trying to do an authorize on
      * @param actionid - action to perform (read, write, etc)
-     * @param userid - who wants to perform the action?
      */
-    public static boolean authorize(Context c,int resourcetype, int resourceid, int actionid, int userid)
+    public static boolean authorize(Context c,int resourcetype, int resourceid, int actionid)
         throws java.sql.SQLException
     {
+        int userid = c.getCurrentUser().getID();
+        
+        // admins can do everything
+        if( isAdmin(c) ) return true;
    
-        // group is hardcoded as 'admin', and admins can do everything
-        if (Group.isMember(c,-1, userid)) return true;
-      
         TableRowIterator i = policyLookup(c,resourcetype, resourceid, actionid);
 
         // no policies?  notify admins and give 'false'
@@ -213,7 +224,17 @@ public class AuthorizeManager
     }
 
 	/**
-	 *
+	 * Fetches policies that apply to an object and action pair
+     * looks for policies specific to that object, and if not
+     * found, then looks for containers that may have policies
+     * that apply (bitstreams look for containing items & collections,
+     * items look for containing collections.)
+     * <p>
+     * Policies that apply specifically to an object override
+     * any policies that may apply due to reference by a container.
+     * This override is done simply by ceasing to look for other
+     * policies once a specific policy is found.
+     * 
 	 */
 	 
     static TableRowIterator policyLookup(Context c, int resource_type, int resource_id, int action_id)
