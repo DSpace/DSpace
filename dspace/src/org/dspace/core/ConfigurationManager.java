@@ -61,6 +61,10 @@ import org.apache.log4j.Logger;
  * <code>/dspace.cfg</code>.  To specify a different configuration, the
  * system property <code>dspace.configuration</code> should be set to the
  * <em>filename</em> of the configuration file.
+ * <P>
+ * Other configuration files are read from the <code>config</code> directory
+ * of the DSpace installation directory (specified as the property
+ * <code>dspace.dir</code> in the main configuration file.)
  *
  * @author  Robert Tansley
  * @version $Revision$
