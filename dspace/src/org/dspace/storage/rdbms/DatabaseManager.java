@@ -99,7 +99,6 @@ public class DatabaseManager
      * @param query The SQL query
      * @return A TableRowIterator with the results of the query
      * @exception SQLException If a database error occurs
-     * @deprecated
      */
     public static TableRowIterator query(Context context,
                                          String table,
@@ -146,7 +145,6 @@ public class DatabaseManager
      * @param table The name of the table which results
      * @return A TableRowIterator with the results of the query
      * @exception SQLException If a database error occurs
-     * @deprecated
      */
     public static TableRowIterator query(String table,
                                          PreparedStatement statement)
@@ -198,7 +196,6 @@ public class DatabaseManager
      * @param query The SQL query
      * @return A TableRow object, or null if no result
      * @exception SQLException If a database error occurs
-     * @deprecated
      */
     public static TableRow querySingle( Context context,
                                         String table,
