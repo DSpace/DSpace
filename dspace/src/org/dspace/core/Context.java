@@ -147,7 +147,7 @@ public class Context
 
     /**
      * Specify whether the authorisation system should be ignored for this
-     * context.
+     * context.  This should be used sparingly.
      *
      * @param  b  if <code>true</code>, authorisation should be ignored
      *            for this session.
@@ -232,5 +232,19 @@ public class Context
             DatabaseManager.freeConnection(connection);
             connection = null;
         }
+    }
+
+
+    /**
+     * Find out if this context is valid.  Returns <code>false</code> if this
+     * context has been aborted or completed.
+     *
+     * @return  <code>true</code> if the context is still valid,
+     *          otherwise <code>false</code>
+     */
+    public boolean isValid()
+    {
+        // Only return true if our DB connection is live
+        return (connection != null);
     }
 }
