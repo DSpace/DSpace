@@ -312,11 +312,10 @@ public class WorkflowManager
         log.info(LogManager.getHeader(c,
                     "advance_workflow",
                     "workflow_item_id="  + wi.getID()                 +
-                        "item_id="       + wi.getItem().getID()       +
-                        "collection_id=" + wi.getCollection().getID() +
-                        "eperson_id="    + wi.getOwner().getID()      +
-                        "old_state="     + taskstate                  +
-                        "new_state="     + wi.getState()
+                        ",item_id="       + wi.getItem().getID()       +
+                        ",collection_id=" + wi.getCollection().getID() +
+                        ",old_state="     + taskstate                  +
+                        ",new_state="     + wi.getState()
                         )
                 );
 
@@ -358,11 +357,10 @@ public class WorkflowManager
         log.info(LogManager.getHeader(c,
                     "unclaim_workflow",
                     "workflow_item_id="  + wi.getID()                 +
-                        "item_id="       + wi.getItem().getID()       +
-                        "collection_id=" + wi.getCollection().getID() +
-                        "eperson_id="    + wi.getOwner().getID()      +
-                        "old_state="     + taskstate                  +
-                        "new_state="     + wi.getState()
+                        ",item_id="       + wi.getItem().getID()       +
+                        ",collection_id=" + wi.getCollection().getID() +
+                        ",old_state="     + taskstate                  +
+                        ",new_state="     + wi.getState()
                         )
                 );
     }
