@@ -559,7 +559,7 @@ public class DSIndexer
 
         fulltext = fulltext.concat(extractedText);
         
-        System.out.println("Full Text:\n" + fulltext + "------------\n\n");
+//        System.out.println("Full Text:\n" + fulltext + "------------\n\n");
 
         // add the full text
         doc.add( Field.Text("default", fulltext));
