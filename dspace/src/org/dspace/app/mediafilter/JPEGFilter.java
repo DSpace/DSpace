@@ -47,11 +47,10 @@ import javax.imageio.ImageIO;
 
 import org.dspace.core.ConfigurationManager;
 
-/*
- * 
- * to do: helpful error messages - can't find mediafilter.cfg - can't
- * instantiate filter - bitstream format doesn't exist
- *  
+/**
+ * Filter image bitstreams, scaling the image to be within the bounds of
+ * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
+ * no bigger than. Creates only JPEGs.
  */
 public class JPEGFilter extends MediaFilter
 {
@@ -162,23 +161,19 @@ public class JPEGFilter extends MediaFilter
         // if verbose flag is set, print details to STDOUT
         if (MediaFilterManager.isVerbose)
         {
-            System.out.println("thumbnail size: " + xsize + ", " + ysize);
+            System.out.println("created thumbnail size: " + xsize + ", "
+                    + ysize);
         }
 
-        thumb = buf.getScaledInstance((int) xsize, (int) ysize,
-                Image.SCALE_SMOOTH);
+        // create an image buffer for the thumbnail with the new xsize, ysize
+        BufferedImage thumbnail = new BufferedImage((int) xsize, (int) ysize,
+                BufferedImage.TYPE_INT_RGB);
 
-        // create a BufferedImage to draw this image into...
-        BufferedImage thumbnail = new BufferedImage(thumb.getWidth(null), thumb
-                .getHeight(null), BufferedImage.TYPE_3BYTE_BGR);
-
+        // now render the image into the thumbnail buffer
         Graphics2D g2d = thumbnail.createGraphics();
+        g2d.drawImage(buf, 0, 0, (int) xsize, (int) ysize, null);
 
-        // draw thumb into thumbnail
-        g2d.drawImage(thumb, null, null);
-
-        // now create an input stream and return it
-        // there has got to be a better way than this!
+        // now create an input stream for the thumbnail buffer and return it
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         ImageIO.write(thumbnail, "jpeg", baos);
@@ -186,6 +181,6 @@ public class JPEGFilter extends MediaFilter
         // now get the array
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
-        return bais; // will this work? or will the byte array be out of scope?
+        return bais; // hope this gets written out before its garbage collected!
     }
 }

@@ -182,6 +182,9 @@ public class MediaFilterManager
             Item myItem = i.next();
 
             filterItem(c, myItem);
+
+            // commit changes after each filtered item
+            c.commit();
         }
     }
 
