@@ -922,9 +922,8 @@ public class Browse
         // Add an order by clause -- a parameter
 	sqlb.append(" order by ").append(column).append("{2}")
        	// If an item, make sure it's ordered by item_id as well
-       	.append((scope.focusIsString() ||
-  	    (scope.getBrowseType() == AUTHORS_BROWSE))
-       	    ? "" : ", item_id");
+       	.append(((scope.focusIsString() && (scope.getBrowseType() != ITEMS_BY_DATE_BROWSE)) || (scope.getBrowseType() == AUTHORS_BROWSE)) ? "" : ", item_id{2}");
+
         // A limit on the total returned (Postgres extension)
         if (! scope.hasNoLimit())
             sqlb.append(" LIMIT {3} ");
@@ -967,6 +966,20 @@ public class Browse
         {
             beforeOperator = ">";
             afterOperator = "<=";
+        }
+        
+        if (browseType == ITEMS_BY_DATE_BROWSE) 
+        {
+        	if (!ascending)
+        	{
+            	beforeOperator = ">";
+            	afterOperator = "<";
+        	}
+        	else 
+        	{
+           	 	beforeOperator = "<";
+           	 	afterOperator = ">";
+        	}
         }
 
         String beforeSubqueryOperator = "<";
