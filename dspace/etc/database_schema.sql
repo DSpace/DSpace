@@ -71,16 +71,18 @@ DROP TABLE Bitstream;
 
 CREATE TABLE Bitstream
 (
-  bitstream_id          INTEGER PRIMARY KEY,
-  bitstream_type_id     INTEGER REFERENCES BitstreamTypeRegistry(bitstream_type_id),
-  name                  VARCHAR(256),
-  size                  INTEGER,
-  checksum              VARCHAR(64),
-  checksum_algorithm    VARCHAR(32),
-  description           TEXT,
-  user_type_description TEXT,
-  source                VARCHAR(256),
-  deleted               BOOL
+   bitstream_id          INTEGER PRIMARY KEY,
+   bitstream_type_id     INTEGER REFERENCES 
+BitstreamTypeRegistry(bitstream_type_id),
+   name                  VARCHAR(256),
+   size                  INTEGER,
+   checksum              VARCHAR(64),
+   checksum_algorithm    VARCHAR(32),
+   description           TEXT,
+   user_type_description TEXT,
+   source                VARCHAR(256),
+   internal_id           VARCHAR(256),
+   deleted               BOOL
 );
 
 -------------------------------------------------------
@@ -181,43 +183,16 @@ DROP TABLE DCValue;
 CREATE TABLE DCValue
 (
   dc_value_id   INTEGER PRIMARY KEY,
+  item_id       INTEGER REFERENCES Item(item_id),
+  dc_type_id    INTEGER REFERENCES DCTypeRegistry(dc_type_id),
   text_value TEXT,
   text_lang  VARCHAR(24),
+  place      INTEGER,
   source_id  INTEGER
 );
 
--- An index for text_value
--- CREATE INDEX dcvalue_text_value_idx ON DCValue(text_value);
-
--------------------------------------------------------
--- Item2DCValue table
--------------------------------------------------------
-DROP TABLE Item2DCValue;
-
-CREATE TABLE Item2DCValue
-(
-  id            INTEGER PRIMARY KEY,
-  item_id       INTEGER REFERENCES Item(item_id),
-  dc_value_id   INTEGER REFERENCES DCValue(dc_value_id),
-  dc_type_id    INTEGER REFERENCES DCTypeRegistry(dc_type_id),
-  -- index, position, etc are reserved words!
-  place      INTEGER
-);
-
 -- An index for dctypes
-CREATE INDEX dcvalue_dc_type_id_idx  on Item2DCValue(dc_type_id);
-
--------------------------------------------------------
--- ItemVersion table
--------------------------------------------------------
-DROP TABLE ItemVersion;
-
-CREATE TABLE ItemVersion
-(
-  id          INTEGER PRIMARY KEY,
-  old_item_id INTEGER REFERENCES Item(item_id),
-  new_item_id INTEGER REFERENCES Item(item_id)
-);
+CREATE INDEX dcvalue_dc_type_id_idx  on DCValue(dc_type_id);
 
 -------------------------------------------------------
 -- Community table
@@ -322,31 +297,6 @@ CREATE TABLE Handle
   handle           VARCHAR(256) UNIQUE,
   resource_type_id INTEGER,
   resource_id      INTEGER
-);
-
--------------------------------------------------------
--- Storage table
--------------------------------------------------------
-DROP TABLE Storage;
-
-CREATE TABLE Storage
-(
-  storage_id   INTEGER PRIMARY KEY,
-  storage_name VARCHAR(256),
-  internal_id  VARCHAR(256),
-  UNIQUE(storage_name, internal_id)
-);
-
--------------------------------------------------------
--- Bitstream2Storage table
--------------------------------------------------------
-DROP TABLE Bitstream2Storage;
-
-CREATE TABLE Bitstream2Storage
-(
-  id           INTEGER PRIMARY KEY,
-  bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
-  storage_id   INTEGER REFERENCES Storage(storage_id)
 );
 
 -------------------------------------------------------
@@ -492,18 +442,15 @@ CREATE TABLE TestTableMapping
 -- Convenience views
 ------------------------------------------------------------
 
--- Views for CM API
-
 -------------------------------------------------------
---  DCResult view
+--  Item2Handle view
 -------------------------------------------------------
-DROP VIEW DCResult;
+-- Note: DSpaceTypes.ITEM = 2
+DROP VIEW Item2Handle;
 
-CREATE VIEW DCResult as
-SELECT Item.item_id, Item.in_archive, Item.submitter_id, dc_type_id, DCValue.*
-FROM Item2DCValue, DCValue, Item
-WHERE Item2DCValue.dc_value_id = DCValue.dc_value_id
-AND Item.item_id = Item2DCValue.item_id
+CREATE VIEW Item2Handle as
+select handle_id, handle, resource_id as item_id 
+from Handle where resource_type_id = 2
 ;
 
 -------------------------------------------------------
@@ -515,6 +462,22 @@ CREATE VIEW Community2Item as
 SELECT Community2Collection.community_id, Collection2Item.item_id 
 FROM Community2Collection, Collection2Item
 WHERE Collection2Item.collection_id   = Community2Collection.collection_id
+;
+
+
+------------------------------------------------------------
+-- Browse subsystem views
+------------------------------------------------------------
+
+-------------------------------------------------------
+--  DCResult view
+-------------------------------------------------------
+DROP VIEW DCResult;
+
+CREATE VIEW DCResult as
+SELECT DCValue.*, Item.in_archive, Item.submitter_id
+FROM DCValue, Item
+WHERE Item.item_id = DCValue.item_id
 ;
 
 -------------------------------------------------------
@@ -678,75 +641,6 @@ ORDER BY DateIssued desc, ItemsByDate.item_id
 ;
 
 -------------------------------------------------------
---  AllStorage view
--------------------------------------------------------
-DROP VIEW AllStorage;
-
-CREATE VIEW AllStorage as
-SELECT Bitstream.*, Storage.*, 
-  BitstreamTypeRegistry.mimetype, BitstreamTypeRegistry.short_description
-FROM Bitstream, Storage, Bitstream2Storage, BitstreamTypeRegistry
-WHERE Bitstream.bitstream_id = Bitstream2Storage.bitstream_id
-AND Storage.storage_id          = Bitstream2Storage.storage_id
-AND Bitstream.bitstream_type_id = BitstreamTypeRegistry.bitstream_type_id
-;
-
--------------------------------------------------------
---  Item2Bitstream view
--------------------------------------------------------
-DROP VIEW Item2Bitstream;
-
-CREATE VIEW Item2Bitstream as
-SELECT Item2Bundle.item_id, Bundle2Bitstream.bitstream_id
-FROM Item2Bundle, Bundle2Bitstream
-WHERE Item2Bundle.bundle_id = Bundle2Bitstream.bundle_id
-;
-
--------------------------------------------------------
---  Collection2Bitstream view
--------------------------------------------------------
-DROP VIEW Collection2Bitstream;
-
-CREATE VIEW Collection2Bitstream as
-SELECT Collection2Item.collection_id, Bundle2Bitstream.bitstream_id
-FROM Collection2Item, Item2Bundle, Bundle2Bitstream
-WHERE Collection2Item.item_id = Item2Bundle.item_id
-AND Item2Bundle.bundle_id = Bundle2Bitstream.bundle_id
-;
-
-
--------------------------------------------------------
---  Community2Bitstream view
--------------------------------------------------------
-DROP VIEW Community2Bitstream;
-
-CREATE VIEW Community2Bitstream as
-SELECT Community2Collection.community_id, Collection2Bitstream.bitstream_id
-FROM Community2Collection, Collection2Bitstream
-WHERE Community2Collection.collection_id = Collection2Bitstream.collection_id
-;
-
--------------------------------------------------------
---  WorkflowItemsBySubmitter view
--------------------------------------------------------
-DROP VIEW WorkflowItemBySubmitter;
-
-CREATE VIEW WorkflowItemBySubmitter as
-SELECT WorkflowItem.*, Item.submitter_id 
-FROM WorkflowItem, Item 
-WHERE WorkflowItem.item_id = Item.item_id;
-
--------------------------------------------------------
---  PersonalWorkspaceBySubmitter view
--------------------------------------------------------
-DROP VIEW PersonalWorkspaceBySubmitter;
-
-CREATE VIEW PersonalWorkspaceBySubmitter as
-SELECT PersonalWorkspace.*, Item.submitter_id 
-FROM PersonalWorkspace, Item 
-WHERE PersonalWorkspace.item_id = Item.item_id;
-
--------------------------------------------------------
 --  ItemsByDateAccessioned view
 -------------------------------------------------------
 DROP VIEW ItemsByDateAccessioned;
@@ -785,14 +679,3 @@ WHERE ItemsByDateAccessioned.item_id = Community2Item.item_id
 ORDER BY DateAccessioned desc, ItemsByDateAccessioned.item_id
 ;
 
--------------------------------------------------------
---  Item2Handle view
--------------------------------------------------------
--- Note: DSpaceTypes.ITEM = 2
-DROP VIEW Item2Handle;
-
-CREATE VIEW Item2Handle as
-select handle_id, handle, resource_id as item_id 
-from Handle where resource_type_id = 2
-
-;
