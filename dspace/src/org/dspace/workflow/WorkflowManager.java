@@ -576,10 +576,6 @@ public class WorkflowManager
         // FIXME: Remove license
         // FIXME: Provenance statement?
         
-        // Remove accession date
-        myitem.clearDC("date", "accessioned", Item.ANY);
-        myitem.update();
-
         // Create the new workspace item row
         TableRow row = DatabaseManager.create(c, "workspaceitem");
         row.setColumn("item_id", myitem.getID());
@@ -868,16 +864,12 @@ public class WorkflowManager
         {
             provmessage = "Submitted by " + 
             myitem.getSubmitter().getFullName() + " (" +
-            myitem.getSubmitter().getEmail() + "). DSpace accession date: " +
-            now.toString() + "\n Submission has " + bitstreams.length +
-            " bitstreams:\n";
+            myitem.getSubmitter().getEmail() + ") on " + now.toString() + "\n";
         }
         else // null submitter
         {
-            provmessage = "Submitted by unknown (probably automated)" + 
-                          "  DSpace accession date:" +
-            now.toString() + "\n Submission has " + bitstreams.length +
-            " bitstreams:\n";            
+            provmessage = "Submitted by unknown (probably automated) on" + 
+            now.toString() + "\n";
         }
 
         // add sizes and checksums of bitstreams

@@ -146,7 +146,7 @@ public class InstallItem
         Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
 
         // Create provenance description
-        String mymessage = "";
+        String mymessage = "No. of bitstreams: " + bitstreams.length + "\n";
 
         // Add sizes and checksums of bitstreams
         for (int j = 0; j < bitstreams.length; j++)
