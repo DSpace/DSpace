@@ -46,6 +46,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.TableRow;
@@ -89,7 +90,7 @@ public class AuthorizeManager
      * @param c Context object
      * @param o DSpace object
      * @param a action from org.dspace.core.Constants
-     * 
+     *
      * @throws AuthorizeException if permission denied or object type unknown
      */
     public static void authorizeAction(Context c,Object myobject, int myaction)
@@ -98,7 +99,7 @@ public class AuthorizeManager
         int otype;
         int oid;
         int userid = -1;  // -1 is anonymous
-        
+
         // now figure out the type and object id
         if( myobject instanceof Item )
         {
@@ -109,12 +110,17 @@ public class AuthorizeManager
         {
             otype = Constants.BITSTREAM;
             oid   = ((Bitstream) myobject).getID();
-        }		
+        }
         else if( myobject instanceof Collection )
         {
             otype = Constants.COLLECTION;
             oid   = ((Collection) myobject).getID();
-        }		
+        }
+        else if( myobject instanceof Community )
+        {
+            otype = Constants.COMMUNITY;
+            oid   = ((Community) myobject).getID();
+        }
         else if( myobject instanceof Bundle )
         {
             otype = Constants.BUNDLE;
@@ -124,12 +130,12 @@ public class AuthorizeManager
         {
             throw new IllegalArgumentException("Unknown object type");
         }
-		
+
         // now set the userid if context contains an eperson
         EPerson e = c.getCurrentUser();
-        
+
         if( e != null ) userid = e.getID();
-        
+
         if (!authorize(c,otype,oid,myaction, userid))
             throw new AuthorizeException("Authorization denied for action " + myaction + " by user " + userid);
     }
@@ -143,7 +149,7 @@ public class AuthorizeManager
         throws SQLException
     {
         boolean isauthorized = true;
-        
+
         try
         {
             authorizeAction(c,o,a);
@@ -152,7 +158,7 @@ public class AuthorizeManager
         {
             isauthorized = false;
         }
-        
+
         return isauthorized;
     }
 
@@ -165,11 +171,11 @@ public class AuthorizeManager
     {
         // if we're ignoring authorization, user is member of admin
         if(c.ignoreAuthorization()) return true;
-    
+
         EPerson e = c.getCurrentUser();
-        
+
         if( e == null ) return false; // anonymous users can't be admins....
-        
+
         else
             return isAdmin(c,e.getID());
     }
@@ -202,10 +208,10 @@ public class AuthorizeManager
     {
         // ignore authorization? if so, return true
         if(c.ignoreAuthorization()) return true;
-    
+
         // admins can do everything
         if( isAdmin(c,userid) ) return true;
-   
+
         TableRowIterator i = policyLookup(c,resourcetype, resourceid, actionid);
 
         // no policies?  notify admins and give 'false'
@@ -216,7 +222,7 @@ public class AuthorizeManager
         while( i.hasNext() )
         {
             TableRow row = (TableRow)i.next();
-            
+
             ResourcePolicy rp = new ResourcePolicy(c, row);
 
             // evaluate each statement
@@ -277,13 +283,13 @@ public class AuthorizeManager
      * any policies that may apply due to reference by a container.
      * This override is done simply by ceasing to look for other
      * policies once a specific policy is found.
-     * 
+     *
 	 */
     private static TableRowIterator policyLookup(Context c, int resource_type, int resource_id, int action_id)
         throws SQLException
     {
         String myquery = "";
-        
+
         // get the policies eonly for this object (rare)
         TableRowIterator specific_policies = DatabaseManager.query(c,
             "resourcepolicy",
