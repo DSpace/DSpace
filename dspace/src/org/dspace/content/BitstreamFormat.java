@@ -45,10 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.Constants;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -104,6 +103,7 @@ public class BitstreamFormat
      *
      * @param context  the context this object exists in
      * @param row      the corresponding row in the table
+     * @throws SQLException
      */
     BitstreamFormat(Context context, TableRow row)
         throws SQLException
@@ -133,6 +133,7 @@ public class BitstreamFormat
      * @param  id       ID of the bitstream format
      *   
      * @return  the bitstream format, or null if the ID is invalid.
+     * @throws SQLException
      */
     public static BitstreamFormat find(Context context, int id)
         throws SQLException
@@ -161,17 +162,16 @@ public class BitstreamFormat
 
             return null;
         }
-        else
-        {
-            if (log.isDebugEnabled())
-            {
-                log.debug(LogManager.getHeader(context,
-                    "find_bitstream",
-                    "bitstream_format_id=" + id));
-            }
 
-            return new BitstreamFormat(context, row);
+        // not null, return format object
+        if (log.isDebugEnabled())
+        {
+            log.debug(LogManager.getHeader(context,
+                "find_bitstream",
+                "bitstream_format_id=" + id));
         }
+
+        return new BitstreamFormat(context, row);
     }
 
     
@@ -183,6 +183,7 @@ public class BitstreamFormat
      *   
      * @return  the corresponding bitstream format, or <code>null</code> if
      *          there's no bitstream format with the given short description
+     * @throws SQLException
      */
     public static BitstreamFormat findByShortDescription(Context context,
         String desc)
@@ -195,29 +196,27 @@ public class BitstreamFormat
         {
             return null;
         }
-        else
+        
+        // not null
+        if (log.isDebugEnabled())
         {
-            if (log.isDebugEnabled())
-            {
-                log.debug(LogManager.getHeader(context,
-                    "find_bitstream",
-                    "bitstream_format_id=" + formatRow.getIntColumn(
-                        "bitstream_format_id")));
-            }
-
-            // From cache?
-            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
-                BitstreamFormat.class,
-                formatRow.getIntColumn("bitstream_format_id"));
-
-            if (fromCache != null)
-            {
-                return fromCache;
-            }
-            
-
-            return new BitstreamFormat(context, formatRow);
+            log.debug(LogManager.getHeader(context,
+                "find_bitstream",
+                "bitstream_format_id=" + formatRow.getIntColumn(
+                "bitstream_format_id")));
         }
+
+        // From cache?
+        BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
+            BitstreamFormat.class,
+            formatRow.getIntColumn("bitstream_format_id"));
+
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
+        return new BitstreamFormat(context, formatRow);
     }
 
 
@@ -227,6 +226,7 @@ public class BitstreamFormat
      * @param  context  DSpace context object
      *   
      * @return  the "unknown" bitstream format.
+     * @throws SQLException
      *
      * @throws IllegalStateException  
      *               if the "unknown" bitstream format couldn't be found
@@ -241,10 +241,8 @@ public class BitstreamFormat
             throw new IllegalStateException(
                 "No `Unknown' bitstream format in registry");
         }
-        else
-        {
-            return bf;
-        }
+
+        return bf;
     }
         
 
@@ -254,6 +252,7 @@ public class BitstreamFormat
      * @param  context  DSpace context object
      *   
      * @return  the bitstream formats.
+     * @throws SQLException
      */
     public static BitstreamFormat[] findAll(Context context)
         throws SQLException
@@ -262,7 +261,7 @@ public class BitstreamFormat
 
         TableRowIterator tri = DatabaseManager.query(context,
             "bitstreamformatregistry",
-            "SELECT * FROM bitstreamformatregistry ORDER BY bitstream_format_id;");
+            "SELECT * FROM bitstreamformatregistry ORDER BY bitstream_format_id");
 
         while (tri.hasNext())
         {
@@ -299,17 +298,32 @@ public class BitstreamFormat
      * @param  context  DSpace context object
      *   
      * @return  the bitstream formats.
+     * @throws SQLException
      */
     public static BitstreamFormat[] findNonInternal(Context context)
         throws SQLException
     {
         List formats = new ArrayList();
 
+        String myQuery = null;
+
+        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        {
+            myQuery = "SELECT * FROM bitstreamformatregistry WHERE internal=0 " +
+                "AND short_description NOT LIKE 'Unknown' " +
+                "ORDER BY support_level DESC, short_description";
+        }
+        else
+        {
+            // default postgres, use boolean
+            myQuery = "SELECT * FROM bitstreamformatregistry WHERE internal=false " +
+                "AND short_description NOT LIKE 'Unknown' " +
+                "ORDER BY support_level DESC, short_description";
+        }
+
         TableRowIterator tri = DatabaseManager.query(context,
-            "bitstreamformatregistry",
-            "SELECT * FROM bitstreamformatregistry WHERE internal=FALSE " +
-            "AND short_description NOT LIKE 'Unknown' " +
-            "ORDER BY support_level DESC, short_description");
+            "bitstreamformatregistry", myQuery );
+
 
         while (tri.hasNext())
         {
@@ -343,6 +357,8 @@ public class BitstreamFormat
      *
      * @param  context  DSpace context object
      * @return  the newly created BitstreamFormat
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public static BitstreamFormat create(Context context)
         throws SQLException, AuthorizeException
@@ -470,10 +486,8 @@ public class BitstreamFormat
         {
             throw new IllegalArgumentException("Invalid support level");
         }
-        else
-        {
-            bfRow.setColumn("support_level", sl);
-        }
+
+        bfRow.setColumn("support_level", sl);
     }
 
 
@@ -505,6 +519,8 @@ public class BitstreamFormat
 
     /**
      * Update the bitstream format metadata
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public void update()
         throws SQLException, AuthorizeException
@@ -542,6 +558,8 @@ public class BitstreamFormat
     /**
      * Delete this bitstream format.  This converts the types of any bitstreams
      * that may have this type to "unknown".  Use this with care!
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public void delete()
         throws SQLException, AuthorizeException
@@ -595,7 +613,7 @@ public class BitstreamFormat
     /**
      * Set the filename extensions associated with this format
      *
-     * @param  the extensions
+     * @param  exts String [] array of extensions
      */
     public void setExtensions(String[] exts)
     {
