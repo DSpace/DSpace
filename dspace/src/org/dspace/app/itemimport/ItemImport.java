@@ -1,6 +1,8 @@
 /*
  * ItemLoader.java
  *
+ * $Id$
+ *
  * Version: $Revision$
  *
  * Date: $Date$
@@ -62,7 +64,9 @@ import org.apache.xpath.XPathAPI;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
+import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.Item;
@@ -273,6 +277,11 @@ public class ItemImport
         Bitstream bs = i.createSingleBitstream(bis);
 
         bs.setName( name );
+
+        // Identify the format
+        BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
+        bs.setFormat(bf);
+
         bs.update();
     }
 
