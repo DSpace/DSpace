@@ -715,7 +715,12 @@ public class DatabaseManager
     ////////////////////////////////////////
 
     /**
-     * Convert the current row given by results into a TableRow object.
+     * Convert the current row in a ResultSet into a TableRow object.
+     *
+     * @param results A ResultSet to process
+     * @param table The name of the table
+     * @return A TableRow object with the data from the ResultSet
+     * @exception SQLException If a database error occurs
      */
     static TableRow process (ResultSet results, String table)
         throws SQLException
@@ -782,6 +787,13 @@ public class DatabaseManager
 
     /**
      * Return the name of the primary key column.
+     * We assume there's only one primary key per table; if there
+     * are more, only the first one will be returned.
+     *
+     * @param row The TableRow to return the primary key for.
+     * @return The name of the primary key column, or null if the
+     * row has no primary key.
+     * @exception SQLException If a database error occurs
      */
     static String getPrimaryKeyColumn(TableRow row)
         throws SQLException
@@ -790,8 +802,14 @@ public class DatabaseManager
     }
 
     /**
-     * Return the name of the primary key column.
-     * We assume there's only one!
+     * Return the name of the primary key column in the given table.
+     * We assume there's only one primary key per table; if there
+     * are more, only the first one will be returned.
+     *
+     * @param table The name of the RDBMS table
+     * @return The name of the primary key column, or null if the
+     * table has no primary key.
+     * @exception SQLException If a database error occurs
      */
     protected static String getPrimaryKeyColumn(String table)
         throws SQLException
@@ -801,8 +819,15 @@ public class DatabaseManager
     }
 
     /**
-     * Return column information for the primary key column.
-     * We assume there's only one!
+     * Return column information for the primary key column, or
+     * null if the table has no primary key.
+     * We assume there's only one primary key per table; if there
+     * are more, only the first one will be returned.
+     *
+     * @param table The name of the RDBMS table
+     * @return A ColumnInfo object, or null if the table has no
+     * primary key.
+     * @exception SQLException If a database error occurs
      */
     static ColumnInfo getPrimaryKeyColumnInfo(String table)
         throws SQLException
@@ -820,6 +845,9 @@ public class DatabaseManager
 
     /**
      * Assign an ID to row.
+     *
+     * @param row The row to assign an id to.
+     * @exception SQLException If a database error occurs
      */
     private static synchronized void assignId (TableRow row)
         throws SQLException
@@ -830,11 +858,18 @@ public class DatabaseManager
     }
 
     /**
-     * Get the next id for table.
+     * Return the next id for table.
+     *
+     * @param table The RDBMS table to obtain an ID for
+     * @return The next id
+     * @exception SQLException If a database error occurs
      */
     public static synchronized int getId (String table)
         throws SQLException
     {
+        // Assigned ids are simply one plus the maximum value
+        // of the primary key column, and incremented from there.
+
         String pk = getPrimaryKeyColumn(table);
         Integer id = (Integer) ids.get(table);
         int current_id = id == null ? -1 : id.intValue();
@@ -856,8 +891,6 @@ public class DatabaseManager
             }
             finally
             {
-                if (connection != null)
-                    connection.close();
                 if (statement != null)
                 {
                     try
@@ -866,6 +899,8 @@ public class DatabaseManager
                     }
                     catch (SQLException sqle) {}
                 }
+                if (connection != null)
+                    connection.close();
             }
         }
 
@@ -875,15 +910,16 @@ public class DatabaseManager
     }
 
     /**
-     * Execute SQL as a PreparedStatement.
-     * Bind parameters in COLUMNS first.
+     * Execute SQL as a PreparedStatement on Connection.
+     * Bind parameters in columns to the values in the table row before
+     * executing.
      *
-     * @param connection - The SQL connection
-     * @param sql - The query to execute
-     * @param columns - The columns to bind
-     * @param row - The row
-     * @return - The number of rows affected
-     * @exception SQLException - If a database error occurs
+     * @param connection The SQL connection
+     * @param sql The query to execute
+     * @param columns The columns to bind
+     * @param row The row
+     * @return The number of rows affected by the query.
+     * @exception SQLException If a database error occurs
      */
     private static int execute(Connection connection,
                                String sql,
@@ -990,6 +1026,13 @@ public class DatabaseManager
 
     /**
      * Read metadata about a table from the database.
+     *
+     * @param table The RDBMS table.
+     * @return A map of information about the columns. The
+     * key is the name of the column, a String; the value is
+     * a ColumnInfo object.
+     * @exception SQLException If there is a problem retrieving information
+     * from the RDBMS.
      */
     private static Map retrieveColumnInfo ( String table )
         throws SQLException
@@ -1001,13 +1044,11 @@ public class DatabaseManager
             DatabaseMetaData metadata = connection.getMetaData();
             HashMap results = new HashMap();
 
-            // Find all the primary keys
             ResultSet pkcolumns = metadata.getPrimaryKeys(null, null, table);
             Set pks = new HashSet();
             while (pkcolumns.next())
                 pks.add(pkcolumns.getString(4));
 
-            // Then all the column info
             ResultSet columns = metadata.getColumns(null, null, table, null);
             while (columns.next())
             {
@@ -1030,7 +1071,7 @@ public class DatabaseManager
     }
 
     /**
-     * Initialize the DatabaseManager
+     * Initialize the DatabaseManager.
      */
     private static void initialize()
         throws SQLException
@@ -1047,7 +1088,7 @@ public class DatabaseManager
 }
 
 /**
- * Simple representation of column information
+ * Represents a column in an RDBMS table.
  */
 class ColumnInfo
 {
@@ -1075,9 +1116,9 @@ class ColumnInfo
     }
 
     /**
-     * Get the value of name
+     * Return the column name.
      *
-     * @return - The value of name
+     * @return - The column name
      */
     public String getName()
     {
@@ -1085,9 +1126,9 @@ class ColumnInfo
     }
 
     /**
-     * Set the value of name
+     * Set the column name
      *
-     * @param v - The value of name
+     * @param v - The column name
      */
     void setName(String v)
     {
@@ -1095,9 +1136,11 @@ class ColumnInfo
     }
 
     /**
-     * Get the value of type
+     * Return the JDBC type. This is one of the constants
+     * from java.sql.Types.
      *
-     * @return - The value of type
+     * @return - The JDBC type
+     * @see java.sql.Types
      */
     public int getType()
     {
@@ -1105,9 +1148,11 @@ class ColumnInfo
     }
 
     /**
-     * Set the value of type
+     * Set the JDBC type. This should be one of the constants
+     * from java.sql.Types.
      *
-     * @param v - The value of type
+     * @param v - The JDBC type
+     * @see java.sql.Types
      */
     void setType(int v)
     {
@@ -1116,7 +1161,8 @@ class ColumnInfo
 
     /**
      * Return true if this column is a primary key.
-     * @return True if this column is a primary key.
+     *
+     * @return True if this column is a primary key, false otherwise.
      */
     public boolean isPrimaryKey()
     {
@@ -1124,8 +1170,9 @@ class ColumnInfo
     }
 
     /**
-     * Set the value of isPrimaryKey.
-     * @param v  Value to assign to isPrimaryKey.
+     * Set whether this column is a primary key.
+     *
+     * @param v  True if this column is a primary key.
      */
     void setIsPrimaryKey(boolean  v)
     {
@@ -1133,7 +1180,9 @@ class ColumnInfo
     }
 
     /*
-     * Return true if this object is equal to other, false otherwise
+     * Return true if this object is equal to other, false otherwise.
+     *
+     * @return True if this object is equal to other, false otherwise.
      */
     public boolean equals(Object other)
     {
@@ -1151,6 +1200,8 @@ class ColumnInfo
 
     /*
      * Return a hashCode for this object.
+     *
+     * @return A hashcode for this object.
      */
     public int hashCode()
     {
