@@ -616,7 +616,7 @@ public class WorkflowManager
 	 * @param e  EPerson doing the operation
 	 * @param rejection_message message to email to user
 	 */
-    public static void reject(Context c,WorkflowItem wi, EPerson e,
+    public static WorkspaceItem reject(Context c,WorkflowItem wi, EPerson e,
              String rejection_message)
         throws SQLException, AuthorizeException
     {
@@ -630,6 +630,8 @@ public class WorkflowManager
 
         // convert into personal workspace
         WorkspaceItem wsi = returnToWorkspace(c, wi);
+
+        return wsi;
     }
     
 
