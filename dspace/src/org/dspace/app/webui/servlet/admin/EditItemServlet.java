@@ -71,7 +71,9 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
@@ -135,9 +137,17 @@ public class EditItemServlet extends DSpaceServlet
         else if (handle != null && !handle.equals(""))
         {
             // FIXME: Handles might resolve to other things
-            itemToEdit = (Item) HandleManager.resolveToObject(context, handle);
+            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
 
-            showError = (itemToEdit == null);
+            if (dso != null && dso.getType() == Constants.ITEM)
+            {
+                itemToEdit = (Item) dso;
+                showError = false;
+            }
+            else
+            {
+                showError = true;
+            }
         }
 
         // Show edit form if appropriate

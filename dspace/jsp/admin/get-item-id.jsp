@@ -54,7 +54,9 @@
     
 <%
     if (request.getAttribute("invalid.id") != null) { %>
-    <P><strong>The ID you entered was invalid.</strong></P>
+    <P><strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to
+    edit a community or collection, you need to use the
+    <A HREF="<%= request.getContextPath() %>/admin/edit-communities">communities/collections admin page.</A></P>
 <%  } %>
 
     <P>Enter the Handle or internal item ID of the item you want to edit or
