@@ -66,25 +66,15 @@
 
     <H1>Submit: Choose Collection</H1>
 
+    <p>Select the collection you wish to submit an item to from the list
+    below, then click "Next".  
+    <dspace:popup page="/help/index.html#choosecollection">(More Help...)</dspace:popup></p>
+
     <form action="<%= request.getContextPath() %>/submit" method=post>
 <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
 <%--       browsers to center the table. --%>
         <center>
             <table>
-                <tr>
-                    <td colspan=2 class="submitFormHelp">
-                        Have you read the <dspace:popup page="/help/submit_guide.html">Inessential Guide to Submitting to DSpace</dspace:popup>?
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan=2>&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan=2 class="submitFormHelp">
-                        Select the collection you wish to submit an item to from the list
-                        below, then click "Next".  <dspace:popup page="/help/index.html#choosecollection">More Help...</dspace:popup>
-                    </td>
-                </tr>
                 <tr>
                     <td class="submitFormLabel">Collection</td>
                     <td>
