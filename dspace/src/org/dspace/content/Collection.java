@@ -597,6 +597,11 @@ public class Collection
             "delete_collection",
             "collection_id=" + getID()));
 
+        // Delete community-collection mappings
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM community2collection WHERE collection_id=" + getID() +
+                ";");
+
         // Delete collection-item mappings
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM collection2item WHERE collection_id=" + getID() + ";");
@@ -622,24 +627,17 @@ public class Collection
         throws SQLException, AuthorizeException, IOException
     {
         // FIXME: Check auth
+        // FIXME: Groups?
 
-        // Get items
+        // Get items - we'll need to work out whether to delete them in a sec
         TableRowIterator items = DatabaseManager.query(ourContext,
             "item",
             "SELECT item.* FROM item, collection2item WHERE " +
                 "collection2item.item_id=item.item_id AND " +
                 "collection2item.collection_id=" + getID() + ";");
 
-
-        // Delete collection-item mappings
-        DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM collection2item WHERE collection_id=" + getID() + ";");
-
-        // Delete community-collection mappings
-        DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM community2collection WHERE collection_id=" + getID() +
-                ";");
-
+        // Delete ourselves
+        delete();
 
         // Delete items if they aren't contained within other collections
         while (items.hasNext())
@@ -654,8 +652,6 @@ public class Collection
                 i.deleteWithContents();
             }
         }
-
-        // FIXME: Groups?
     }
 
 
