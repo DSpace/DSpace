@@ -62,6 +62,7 @@
     <jsp:include page="/submit/progressbar.jsp">
         <jsp:param name="current_stage" value="<%= SubmitServlet.SELECT_COLLECTION %>"/>
         <jsp:param name="stage_reached" value="0"/>
+        <jsp:param name="md_pages" value="1"/>
     </jsp:include>
 
     <H1>Submit: Choose Collection</H1>

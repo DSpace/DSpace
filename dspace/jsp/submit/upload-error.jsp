@@ -67,6 +67,7 @@
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
+            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
         <H1>Submit: Error Uploading File</H1>

@@ -43,15 +43,19 @@
   -
   - Attributes to pass in to this page:
   -    submission.info  - the SubmissionInfo object
+  -    submission.inputs - the DCInputSet object
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Map" %>
+<%@ page import="java.io.IOException" %>
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.content.InProgressSubmission" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.app.webui.util.DCInputSet" %>
+<%@ page import="org.dspace.app.webui.util.DCInput" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.DCDate" %>
@@ -67,15 +71,90 @@
         (SubmissionInfo) request.getAttribute("submission.info");
 
     Item item = si.submission.getItem();
+    
+    DCInputSet inputSet =
+    	(DCInputSet) request.getAttribute("submission.inputs");
+%>
 
-    // Names of each identifier type
-    Map identifierQualNames = new HashMap();
-    identifierQualNames.put( "govdoc", "Gov't Doc #" );
-    identifierQualNames.put( "uri", "URI" );
-    identifierQualNames.put( "isbn", "ISBN" );
-    identifierQualNames.put( "issn", "ISSN" );
-    identifierQualNames.put( "ismn", "ISMN" );
-    identifierQualNames.put( "other", "Other" );
+<%!
+
+    void layoutSection(HttpServletRequest request, 
+                       javax.servlet.jsp.JspWriter out,
+                       DCInputSet inputSet,
+                       SubmissionInfo si,
+                       Item item, int pageNum)
+        throws ServletException, IOException
+    {
+       InProgressSubmission ip = si.submission;
+	   DCInput[] inputs = inputSet.getPageRows(pageNum,
+	                                           ip.hasMultipleTitles(),
+	                                           ip.isPublishedBefore());  
+       for (int z = 0; z < inputs.length; z++) 
+       { 
+          String inputType = inputs[z].getInputType();
+          String pairsName = inputs[z].getPairsType();
+          String value;
+          DCValue[] values;
+          StringBuffer row = new StringBuffer();
+          
+          row.append("<tr>");
+          row.append("<td class=metadataFieldLabel>");
+          row.append(inputs[z].getLabel());
+          row.append("</td>");
+          row.append("<td class=metadataFieldValue>");
+
+          if (inputType.equals("qualdrop_value"))
+          {
+             values = item.getDC(inputs[z].getElement(), Item.ANY, Item.ANY);
+          }
+          else
+          {
+             values = item.getDC(inputs[z].getElement(), inputs[z].getQualifier(), Item.ANY);
+          }
+          if (values.length == 0) 
+          {
+             row.append("<em>None</em>").append("</td>").append("</tr>");
+          }
+          else 
+          {
+             for (int i = 0; i < values.length; i++)
+             {
+                if (inputType.equals("date"))
+                {
+                   DCDate date = new DCDate(values[i].value);
+                   row.append(UIUtil.displayDate(date, false, true));
+                }
+                else if (inputType.equals("dropdown"))
+                {
+                   String storedVal = values[i].value;
+                   String displayVal = inputs[z].getDisplayString(pairsName,
+                                                                storedVal);
+                   row.append(Utils.addEntities(displayVal));
+                }
+                else if (inputType.equals("qualdrop_value"))
+                {
+                   String qual = values[i].qualifier;
+                   String displayQual = inputs[z].getDisplayString(pairsName, 
+                                                                 qual);
+                   String displayValue = Utils.addEntities(values[i].value);
+                   if (displayQual != null)
+                   {
+                       row.append(displayQual + ":" + displayValue);
+                   }
+                }
+                else 
+                {
+                   row.append(Utils.addEntities(values[i].value));
+                }
+                row.append("<br />");
+             }
+          }
+          row.append("</td>");
+          row.append("</tr>");
+   
+          out.write(row.toString());
+       }
+    }
 %>
 
 <dspace:layout locbar="off" navbar="off" title="Verify Submission" nocache="true">
@@ -84,6 +163,7 @@
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.REVIEW_SUBMISSION %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
+            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
         <H1>Submit: Verify Submission</H1>
@@ -134,278 +214,44 @@
             </tr>
 
 <%-- ====================================================== --%>
-<%--             DESCRIBE ITEM PAGE 1 ELEMENTS              --%>
+<%--             DESCRIBE ITEM ELEMENTS                     --%>
 <%-- ====================================================== --%>
+<%
+     for ( int i = 0; i < inputSet.getNumberPages(); i++ )
+     {
+%>
             <tr>
                 <td class="evenRowOddCol">
                     <table>
                         <tr>
                             <td width=100%>
                                 <table>
-                                    <tr>
-                                        <td class=metadataFieldLabel>Authors:</td>
-                                        <td class=metadataFieldValue>
-<%
-    DCValue[] authors = item.getDC("contributor", "author", Item.ANY);
-    if (authors.length == 0)
-    {
-%>
-                                            <em>None</em>
-<%
-    }
-    else
-    {
-        for (int i = 0; i < authors.length; i++)
-        {                                    
-%>
-                                            <%= Utils.addEntities(authors[i].value) %><br>
-<%
-        }
-    }
-%>
-                                        </td>
-                                    </tr>
-<%
-    DCValue[] titles = item.getDC("title", null, Item.ANY);
-    String title = "<em>None</em>";
-    if (titles.length > 0)
-    {
-        title = titles[0].value;
-    }
-%>    
-                                    <tr>
-                                        <td class=metadataFieldLabel>Title:</td>
-                                        <td class=metadataFieldValue>
-                                            <%= Utils.addEntities(title) %>
-                                        </td>
-                                    </tr>
-<%
-    if (si.submission.hasMultipleTitles())
-    {
-        DCValue[] altTitles = item.getDC("title", "alternative", Item.ANY);
-%>
-                                    <tr>
-                                        <td class=metadataFieldLabel>Alternative Titles:</td>
-                                        <td class=metadataFieldValue>
-<%
-        if (altTitles.length == 0)
-        {
-%>
-                                            <em>None</em>
-<%
-        }
-        else
-        {
-            for(int i = 0; i < altTitles.length ; i++)
-            {
-%>
-                                            <%= Utils.addEntities(altTitles[i].value) %><br>
-<%
-            }
-        }
-%>
-                                        </td>
-                                    </tr>
-<%
-    }
 
-    if (si.submission.isPublishedBefore())
-    {
-        DCValue[] dateIssued = item.getDC("date", "issued", Item.ANY);
+<%
+    layoutSection(request, out, inputSet, si, item, i);
 %>
-
-                                    <tr>
-                                        <td class=metadataFieldLabel>Date Issued:</td>
-                                        <td class=metadataFieldValue>
-<%
-        if (dateIssued.length == 0)
-        {
-%>
-                                            <em>None</em>
-<%
-        }
-        else
-        {
-%>
-                                            <dspace:date date="<%= new DCDate(dateIssued[0].value) %>" />
-<%
-        }
-%>
-                                        </td>
-                                    </tr>
-<%
-        DCValue[] publisher = item.getDC("publisher", null, Item.ANY);
-%>
-                                    <tr>
-                                        <td class=metadataFieldLabel>Publisher:</td>
-                                        <td class=metadataFieldValue>
-<%
-        if (publisher.length == 0)
-        {
-%>
-                                            <em>None</em>
-<%
-        }
-        else
-        {
-%>
-                                            <%= Utils.addEntities(publisher[0].value) %>
-<%
-        }
-%>
-                                        </td>
-                                    </tr>
-<%
-        DCValue[] citation = item.getDC("identifier", "citation", Item.ANY);
-%>
-                                    <tr>
-                                        <td class=metadataFieldLabel>Citation:</td>
-                                        <td class=metadataFieldValue>
-<%
-        if (citation.length == 0)
-        {
-%>
-                                            <em>None</em>
-<%
-        }
-        else
-        {
-%>
-                                            <%= Utils.addEntities(citation[0].value) %>
-<%
-        }
-%>
-                                        </td>
-                                    </tr>
-<%
-    }
-%>                                    
-                                    <tr>
-                                        <td class=metadataFieldLabel>Series/Report&nbsp;No:</td>
-                                        <td class=metadataFieldValue>
-<%
-    DCValue[] seriesNumbers = item.getDC("relation","ispartofseries", Item.ANY);
-    if (seriesNumbers.length == 0)
-    {
-%>
-                                            <em>None</em>
-<%
-    }
-    else
-    {
-        for (int i = 0; i < seriesNumbers.length ; i++)
-        {
-%>
-                                            <%= Utils.addEntities(seriesNumbers[i].value) %><br>
-<%
-        }
-    }
-%>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class=metadataFieldLabel>Identifiers:</td>
-                                        <td class=metadataFieldValue>
-<%
-    DCValue[] identifiers = item.getDC("identifier", Item.ANY, Item.ANY);
-
-    for (int i = 0; i < identifiers.length; i++)
-    {
-        // Skip citation, handled above
-        if (!identifiers[i].qualifier.equals("citation"))
-        {
-%>
-                        <%= identifierQualNames.get(identifiers[i].qualifier) %>: <%= Utils.addEntities(identifiers[i].value) %><br>
-<%
-        }
-    }
-%>
-                                        </td>
-                                    </tr>
-<%
-    DCValue[] typeDC = item.getDC("type", null, Item.ANY);
-    String type = "<em>None</em>";
-    if (typeDC.length > 0)
-    {
-        type = typeDC[0].value;
-    }
-%>    
-                                    <tr>
-                                        <td class=metadataFieldLabel>Type:</td>
-                                        <td class=metadataFieldValue>
-                                            <%= type %>
-                                        </td>
-                                    </tr>
-<%
-    DCValue[] langArray = item.getDC("language", "iso", null);
-    DCLanguage language = new DCLanguage("");
-    if (langArray.length > 0)
-    {
-        language = new DCLanguage(langArray[0].value);
-    }
-%>
-                                    <tr>
-                                        <td class=metadataFieldLabel>Language:</td>
-                                        <td class=metadataFieldValue><%= language.getDisplayName() %></td>
-                                    </tr>
                                 </table>
                             </td>
                             <td valign=middle>
-                                    <input type=submit name=submit_jump_<%= SubmitServlet.EDIT_METADATA_1 %> value="Correct one of these">
+                                 <input type=submit name=submit_jump_<%= SubmitServlet.EDIT_METADATA_1 + i %> value="Correct one of these">
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
+<%
+	}
+%>
 <%-- ====================================================== --%>
 <%--             DESCRIBE ITEM PAGE 2 ELEMENTS              --%>
-<%-- ====================================================== --%>
+<%-- ====================================================== 
             <tr>
                 <td class=oddRowOddCol>
                     <table>
                         <tr>
                             <td width=100%>
                                 <table>
-                                    <tr>
-                                        <td class=metadataFieldLabel>Keywords:</td>
-                                        <td class=metadataFieldValue>
-<%
-    DCValue[] keywords = item.getDC("subject", null, Item.ANY);
-
-    if (keywords.length == 0)
-    {
-%>
-                                            <em>None</em>
-<%
-    }
-    else
-    {
-        for (int i = 0; i < keywords.length; i++)
-        {
-%>
-<%= Utils.addEntities(keywords[i].value) %><br>
-<%
-        }
-    }
-
-    DCValue[] abstr = item.getDC("description", "abstract", Item.ANY);
-    DCValue[] sponsors = item.getDC("description", "sponsorship", Item.ANY);
-    DCValue[] otherDesc = item.getDC("description", null, Item.ANY);
-%>
-                                        </td>
-                                    </tr>                
-                                    <tr>
-                                        <td class=metadataFieldLabel>Abstract:</td>
-                                        <td class=metadataFieldValue><%= (abstr.length == 0 ? "<em>None</em>" : Utils.addEntities(abstr[0].value)) %></td>
-                                    </tr>
-                                    <tr>
-                                        <td class=metadataFieldLabel>Sponsors:</td>
-                                        <td class=metadataFieldValue><%= (sponsors.length == 0 ? "<em>None</em>" : Utils.addEntities(sponsors[0].value)) %></td>
-                                    </tr>
-                                    <tr>
-                                        <td class=metadataFieldLabel>Other&nbsp;Description:</td>
-                                        <td class=metadataFieldValue><%= (otherDesc.length == 0 ? "<em>None</em>" : Utils.addEntities(otherDesc[0].value)) %></td>
-                                    </tr>
+    layoutSection(request, out, inputSet, si, item, 1);
                                 </table>
                     </td>
                             <td valign=middle align=right>
@@ -415,6 +261,7 @@
                 </table>
                 </td>
             </tr>
+--%>
 <%-- ====================================================== --%>
 <%--                    UPLOADED_FILES                      --%>
 <%-- ====================================================== --%>

@@ -67,6 +67,7 @@
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.GRANT_LICENSE %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
+             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
         <H1>Submit: Grant DSpace Distribution License</H1>

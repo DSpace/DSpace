@@ -52,6 +52,8 @@
   -                    It can also be "-1" - in this case, the progress bar
   -                    is in "Workflow Item" mode - i.e. the "license" and
   -                    "complete" stages aren't shown
+  -    md_pages:       The number of pages used for metadata input/edit.
+  - 				   Configurable on a per-collection basis
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -67,8 +69,7 @@
     {
         "select",
         "describe",
-        "describe",
-        "describe",
+        "describe",	// all metadata edit steps mapped to this string
         "upload",
         "verify",
         "license",
@@ -81,8 +82,7 @@
     {
         "Select",
         "Describe",
-        "Describe",
-        "Describe",
+        "Describe", // all metadata edit steps mapped to this string
         "Upload",
         "Verify",
         "License",
@@ -92,7 +92,8 @@
 
     int step = Integer.parseInt(request.getParameter("current_stage"));
     int stageReached = Integer.parseInt(request.getParameter("stage_reached"));
-
+    int mdPages = Integer.parseInt(request.getParameter("md_pages")); 
+    
     // Are we in workflow mode?
     boolean workflowMode = false;
     if (stageReached == -1)
@@ -101,33 +102,64 @@
         stageReached = SubmitServlet.REVIEW_SUBMISSION;
     }
 %>
+
+<%!
+		int gap = SubmitServlet.EDIT_METADATA_2 - SubmitServlet.EDIT_METADATA_1;
+		
+		String step2Name(int step, String[] names)
+		{
+			if (step < SubmitServlet.EDIT_METADATA_1)
+			{
+				return names[step];
+			}
+			if (step > SubmitServlet.EDIT_METADATA_2)
+			{
+				return names[step-gap];
+			}
+			// map all metadata steps to one
+			return names[SubmitServlet.EDIT_METADATA_1];
+		}		
+%>
 <center>
     <table class=submitProgressTable border=0 cellspacing=0 cellpadding=0>
         <tr>
-<%
+<%    
+    int lastMDStep = SubmitServlet.EDIT_METADATA_1 + mdPages - 1;
+    int idx = SubmitServlet.INITIAL_QUESTIONS;  // don't show prior selection step
     // Show previous (done by definition!) steps
-    for (int i = 1; i < step; i++)
+    while( idx < step )
     {
         // Hack for skipping CC step if not enabled
-        if (!CreativeCommons.isEnabled() && i==SubmitServlet.CC_LICENSE)
+        if (!CreativeCommons.isEnabled() && idx==SubmitServlet.CC_LICENSE)
         {
-          continue;
+            idx++;
+          	continue;
         }
+
         // If the step has been done, and we're not on the final step,
         // the user can jump back
         if (step != SubmitServlet.SUBMISSION_COMPLETE)
         {
     %>
             <%-- HACK: border=0 for non-CSS compliant Netscape 4.x --%>
-            <td><input class="submitProgressButton" border=0 type=image name="submit_jump_<%= i %>" src="<%= request.getContextPath() %>/image/submit/<%= imageNames[i] %>-done.gif" value=" <%= stepNames[i] %> (Done) - " alt=" <%= stepNames[i] %> (Done) - "></td>
+            <td><input class="submitProgressButton" border=0 type=image name="submit_jump_<%= idx %>" src="<%= request.getContextPath() %>/image/submit/<%= step2Name(idx,imageNames) %>-done.gif" value=" <%= step2Name(idx,stepNames) %> (Done) - " alt=" <%= step2Name(idx,stepNames) %> (Done) - "></td>
     <%
         }
         else
         {
             // User has reached final step, cannot jump back
     %>
-            <td><IMG SRC="<%= request.getContextPath() %>/image/submit/<%= imageNames[i] %>-done.gif" ALT=" <%= stepNames[i] %> (Done) - "></td>
+            <td><IMG SRC="<%= request.getContextPath() %>/image/submit/<%= step2Name(idx,imageNames) %>-done.gif" ALT=" <%= step2Name(idx,stepNames) %> (Done) - "></td>
     <%
+        }
+        // skip unused metadata edit steps
+        if (idx == lastMDStep)
+        {
+        	idx = SubmitServlet.EDIT_METADATA_2 + 1;
+        }
+        else
+        {
+        	idx++;
         }
     }
 
@@ -136,36 +168,53 @@
     if (step > 0)
     {
 %>
-            <td><IMG SRC="<%= request.getContextPath() %>/image/submit/<%= imageNames[step] %>-current.gif" ALT=" <%= stepNames[step] %> (Current) - "></td>
+            <td><IMG SRC="<%= request.getContextPath() %>/image/submit/<%= step2Name(step,imageNames) %>-current.gif" ALT=" <%= step2Name(step,stepNames) %> (Current) - "></td>
 <%
     }
     
     // We only go up to the "verify" step if we're on a workflow item
     int lastStep = (workflowMode ? SubmitServlet.REVIEW_SUBMISSION+1
-                                 : stepNames.length);
+                                 : SubmitServlet.SUBMISSION_COMPLETE+1);
+                                 
+    // skip unused metadata edit steps
+    if ( step == lastMDStep )
+    {
+    	step = SubmitServlet.EDIT_METADATA_2;
+    } 
 
     // Show next steps (some of which may have been done)
-    for (int i = step + 1; i < lastStep; i++)
+    idx = step + 1;
+    while( idx < lastStep)
     {
         // Hack for skipping CC step if not enabled
-        if (!CreativeCommons.isEnabled() && i==SubmitServlet.CC_LICENSE)
+        if (!CreativeCommons.isEnabled() && idx==SubmitServlet.CC_LICENSE)
         {
-          continue;
+        	idx++;
+          	continue;
         }
-        if (i <= stageReached)
+        if (idx <= stageReached)
         {
             // Stage has been previously accessed, so user may jump to it
 %>
 <%-- HACK: border=0 for non-CSS compliant Netscape 4.x --%>
-            <td><input class="submitProgressButton" border=0 type=image name="submit_jump_<%= i %>" src="<%= request.getContextPath() %>/image/submit/<%= imageNames[i] %>-done.gif" value=" <%= stepNames[i] %> (Done) - " alt=" <%= stepNames[i] %> (Done) - "></td>
+            <td><input class="submitProgressButton" border=0 type=image name="submit_jump_<%= idx %>" src="<%= request.getContextPath() %>/image/submit/<%= step2Name(idx,imageNames) %>-done.gif" value=" <%= step2Name(idx,stepNames) %> (Done) - " alt=" <%= step2Name(idx,stepNames) %> (Done) - "></td>
 <%
         }
         else
         {
             // Stage hasn't been reached yet (can't be jumped to)
 %>
-            <td><IMG SRC="<%= request.getContextPath() %>/image/submit/<%= imageNames[i] %>-notdone.gif" ALT=" <%= stepNames[i] %> (Not Done) - "></td>
+            <td><IMG SRC="<%= request.getContextPath() %>/image/submit/<%= step2Name(idx,imageNames) %>-notdone.gif" ALT=" <%= step2Name(idx,stepNames) %> (Not Done) - "></td>
 <%
+        }
+        // skip unused metadata edit steps
+        if (idx == lastMDStep)
+        {
+        	idx = SubmitServlet.EDIT_METADATA_2 + 1;
+        }
+        else
+        {
+        	idx++;
         }
     }
 %>
