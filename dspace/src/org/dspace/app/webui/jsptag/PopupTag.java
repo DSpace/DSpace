@@ -41,6 +41,7 @@
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTagSupport;
@@ -121,7 +122,8 @@ public class PopupTag extends BodyTagSupport
         String linkText = bc.getString();
         bc.clearBody();
         
-        String actualPage = JSPManager.getLocalJSP(page);
+        HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
+        String actualPage = hrq.getContextPath() + JSPManager.getLocalJSP(page);
 
         String html = "<SCRIPT TYPE=\"text/javascript\">\n" +
             "<!-- Javascript starts here\n" +
