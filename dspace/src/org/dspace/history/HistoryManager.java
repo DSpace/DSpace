@@ -435,7 +435,11 @@ public class HistoryManager
     }
 
     /**
-     * Serialize and store
+     * Serialize and store an object.
+     *
+     * @param context Current DSpace context.
+     * @param obj The object to serialize and store.
+     * @return A unique id for the object.
      */
     private static String doSerialize(Context context, Object obj)
         throws SQLException, IOException, RDFException
@@ -446,7 +450,7 @@ public class HistoryManager
         String id = getUniqueId(obj);
         String serialization = serialize(context, obj);
 
-        store(context, serialization, id);
+        store(context, serialization);
 
         return id;
     }
@@ -458,8 +462,7 @@ public class HistoryManager
      * @param serialization The serialization to store.
      */
     private static void store(Context context,
-                              String serialization,
-                              String id2)
+                              String serialization)
         throws SQLException, IOException
     {
         String checksum = Utils.getMD5(serialization);
@@ -468,6 +471,7 @@ public class HistoryManager
                                                     "checksum",
                                                     checksum);
 
+        // Already stored
         if (row != null)
             return;
 
@@ -496,7 +500,7 @@ public class HistoryManager
 
         try
         {
-            String sql = "select max(history_state_id) from HistoryState where object_id = ?";
+            String sql = "SELECT MAX(history_state_id) FROM HistoryState WHERE object_id = ?";
 
             connection = DatabaseManager.getConnection();
             statement = connection.prepareStatement(sql);
@@ -636,20 +640,38 @@ public class HistoryManager
 
     /**
      * Add workspace-item-specific data to the model.
+     *
+     * @param context The current DSpace context
+     * @param wi The WorkspaceItem
+     * @param res The RDF Resource representing the WorkspaceItem
+     * @param model The RDF Model
+     * @exception SQLException If an error occurs reading data about
+     * the WorkspaceItem from the database
+     * @exception RDFException If an error occurs adding RDF statements
+     * to the model
      */
     private static void addData(Context context,
-                                WorkspaceItem pw,
+                                WorkspaceItem wi,
                                 Resource res,
                                 Model model)
         throws SQLException, RDFException
     {
-        Item item = Item.find(context, pw.getItem().getID());
+        Item item = Item.find(context, wi.getItem().getID());
 
         serializeInternal(context, item, model);
     }
 
     /**
      * Add workflow-item-specific data to the model.
+     *
+     * @param context The current DSpace context
+     * @param wi The WorkflowItem
+     * @param res The RDF Resource representing the WorkflowItem
+     * @param model The RDF Model
+     * @exception SQLException If an error occurs reading data about
+     * the WorkflowItem from the database
+     * @exception RDFException If an error occurs adding RDF statements
+     * to the model
      */
     private static void addData(Context context,
                                 WorkflowItem wi,
@@ -664,6 +686,15 @@ public class HistoryManager
 
     /**
      * Add eperson-specific data to the model.
+     *
+     * @param context The current DSpace context
+     * @param eperson The EPerson
+     * @param res The RDF Resource representing the EPerson
+     * @param model The RDF Model
+     * @exception SQLException If an error occurs reading data about
+     * the EPerson from the database
+     * @exception RDFException If an error occurs adding RDF statements
+     * to the model
      */
     private static void addData(Context context,
                                 EPerson eperson,
@@ -700,6 +731,9 @@ public class HistoryManager
         }
     }
 
+    /**
+     * Add a statement
+     */
     private static void addMetadata(Model model,
                                     Resource res,
                                     String type,
@@ -824,7 +858,7 @@ public class HistoryManager
     }
 
     /**
-     * Get a stack trace from a Throwable in String form
+     * Return a String containing the stack trace of the caller.
      */
     public static String getStackTrace()
     {
