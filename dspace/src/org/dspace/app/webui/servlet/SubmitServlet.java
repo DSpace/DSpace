@@ -944,24 +944,90 @@ public class SubmitServlet extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        // Wrap multipart request to get the submission info
         File temp = null;
-        FileUploadRequest wrapper = new FileUploadRequest(request);
-        SubmissionInfo subInfo = getSubmissionInfo(context, wrapper);
-        String buttonPressed = UIUtil.getSubmitButton(wrapper, "submit_next");
+        FileUploadRequest wrapper = null;
+        SubmissionInfo subInfo = null;
+        boolean ok = false;
+        String buttonPressed = null;
+        BitstreamFormat bf = null;
+        Bitstream b = null;
 
+        /*
+         * To distinguish between an IOException caused by a problem with the
+         * file upload and one caused by displaying a JSP, we do all the upload
+         * handling in a try/catch block
+         */
+        
+        try
+        {
+            // Wrap multipart request to get the submission info
+            wrapper = new FileUploadRequest(request);
+
+            subInfo = getSubmissionInfo(context, wrapper);
+            buttonPressed = UIUtil.getSubmitButton(wrapper, "submit_next");
+
+            if (subInfo != null && buttonPressed.equals("submit_next"))
+            {
+                // Create the bitstream
+                Item item = subInfo.submission.getItem();
+
+                temp = wrapper.getFile("file");
+
+                if (temp != null)
+                {
+                    // Read the temp file into a bitstream
+                    InputStream is = new BufferedInputStream(
+                        new FileInputStream(temp));
+                    b = item.createSingleBitstream(is);
+
+                    // Strip all but the last filename.  It would be nice
+                    // to know which OS the file came from.
+                    String noPath = wrapper.getFilesystemName("file");
+                    while (noPath.indexOf('/') > -1)
+                    {
+                        noPath = noPath.substring(
+                                    noPath.indexOf('/') + 1);
+                    }
+                    while (noPath.indexOf('\\') > -1)
+                    {
+                        noPath = noPath.substring(
+                                    noPath.indexOf('\\') + 1);
+                    }
+
+                    b.setName(noPath);
+                    b.setSource(wrapper.getFilesystemName("file"));
+                    b.setDescription(wrapper.getParameter("description"));
+
+                    // Identify the format
+                    bf = FormatIdentifier.guessFormat(context, b);
+                    b.setFormat(bf);
+
+                    // Update to DB
+                    b.update();
+                    item.update();
+                    
+                    ok = true;
+                }
+            }
+        }
+        catch (IOException ie)
+        {
+            // Problem with uploading
+            log.warn(LogManager.getHeader(context,
+                "upload_error",
+                ""),
+                ie);
+        }
+        
         if (subInfo == null)
         {
+            // In any event, if we don't have the submission info, the request
+            // was malformed
             log.warn(LogManager.getHeader(context,
                 "integrity_error",
                 UIUtil.getRequestLogInfo(request)));
-            JSPManager.showIntegrityError(request, response);
-            return;
         }
-
-        Item item = subInfo.submission.getItem();
-
-        if (buttonPressed.equals("submit_cancel"))
+        else if (buttonPressed.equals("submit_cancel"))
         {
             doCancellation(request,
                 response,
@@ -976,7 +1042,7 @@ public class SubmitServlet extends DSpaceServlet
             // screen is the edit metadata 2 page.  If there are
             // upload files, we go back to the file list page,
             // without uploading the file they've specified.
-            if (item.getBundles().length > 0)
+            if (subInfo.submission.getItem().getBundles().length > 0)
             {
                 // Have files, go to list
                 showUploadFileList(request,
@@ -993,66 +1059,7 @@ public class SubmitServlet extends DSpaceServlet
         }
         else if (buttonPressed.equals("submit_next"))
         {
-            boolean ok = false;
-            Bitstream b = null;
-            BitstreamFormat bf = null;
-
-            try
-            {
-                temp = wrapper.getFile("file");
-
-                if (temp == null)
-                {
-                    // No file specified
-                    doStep(context, request, response, subInfo, UPLOAD_FILES);
-                    return;
-                }
-
-                // Read the temp file into a bitstream
-                InputStream is = new BufferedInputStream(new FileInputStream(
-                    temp));
-                b = item.createSingleBitstream(is);
-
-                // Strip all but the last filename.  It would be nice
-                // to know which OS the file came from.
-                String noPath = wrapper.getFilesystemName("file");
-                while (noPath.indexOf('/') > -1)
-                {
-                    noPath = noPath.substring(
-                                noPath.indexOf('/') + 1);
-                }
-                while (noPath.indexOf('\\') > -1)
-                {
-                    noPath = noPath.substring(
-                                noPath.indexOf('\\') + 1);
-                }
-
-                b.setName(noPath);
-                b.setSource(wrapper.getFilesystemName("file"));
-                b.setDescription(wrapper.getParameter("description"));
-
-                // Identify the format
-                bf = FormatIdentifier.guessFormat(context, b);
-                b.setFormat(bf);
-
-                // Update to DB
-                b.update();
-                item.update();
-
-				// Remove temporary file
-				temp.delete();
-
-                ok = true;
-            }
-            catch (IOException ie)
-            {
-                // Error storing bitstream - log it, leave ok=false
-                log.warn(LogManager.getHeader(context,
-                    "upload_error",
-                    ""),
-                    ie);
-            }
-
+            // "Next" pressed - the actual upload was handled above.
             if (ok)
             {
                 // Uploaded etc. OK
@@ -1070,10 +1077,12 @@ public class SubmitServlet extends DSpaceServlet
             }
             else
             {
+                // If we get here, there was a problem uploading, but we
+                // still know which submission we're dealing with
                 request.setAttribute("submission.info", subInfo);
                 JSPManager.showJSP(request,
                     response,
-                    "/submit/upload_error.jsp");
+                    "/submit/upload-error.jsp");
             }
         }
         else
@@ -1081,11 +1090,11 @@ public class SubmitServlet extends DSpaceServlet
             doStepJump(context, request, response, subInfo);
         }
 
-		// Remove temp file if it's still around
-		if (temp != null)
-		{
-			temp.delete();
-		}
+	// Remove temp file if it's still around
+	if (temp != null)
+	{
+		temp.delete();
+	}
     }
 
 
