@@ -409,8 +409,12 @@ public class BitstreamFormat
      *            the new short description
      */
     public void setShortDescription(String s)
+       throws SQLException
     {
-        bfRow.setColumn("short_description", s);
+        // You can not reset the unknown's registry's name
+        BitstreamFormat unknown = findUnknown(bfContext);
+        if (unknown.getID() != getID())
+            bfRow.setColumn("short_description", s);
     }
 
     /**
@@ -562,11 +566,14 @@ public class BitstreamFormat
                     "Only administrators can delete bitstream formats");
         }
 
-        // Remove from cache
-        bfContext.removeCached(this, getID());
-
         // Find "unknown" type
         BitstreamFormat unknown = findUnknown(bfContext);
+
+        if (unknown.getID() == getID())
+	     throw new IllegalArgumentException("The Unknown bitstream format may not be deleted."); 
+
+        // Remove from cache
+        bfContext.removeCached(this, getID());
 
         // Set bitstreams with this format to "unknown"
         int numberChanged = DatabaseManager.updateQuery(bfContext,

@@ -52,6 +52,9 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.BitstreamFormat" %>
+<%@ page import="org.dspace.core.Context"%>
+<%@ page import="org.dspace.app.webui.util.UIUtil"%>
+
 
 <%
     BitstreamFormat[] formats =
@@ -87,6 +90,8 @@
         </tr>
 
 <%
+    Context context = UIUtil.obtainContext(request);
+
     String row = "even";
     for (int i = 0; i < formats.length; i++)
     {
@@ -109,7 +114,14 @@
                     <input type="text" name="mimetype" value="<%= formats[i].getMIMEType() %>" size=14>
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    <input type="text" name="short_description" value="<%= formats[i].getShortDescription() %>" size=10>
+                    <%
+                      if (BitstreamFormat.findUnknown(context).getID() == formats[i].getID()) {
+                    %>
+                      <i><%= formats[i].getShortDescription() %></i>
+                    <% } else { %>
+                      <input type="text" name="short_description" value="<%= formats[i].getShortDescription() %>" size=10>
+                    <% } %>
+
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <input type="text" name="description" value="<%= formats[i].getDescription() %>" size=20>
@@ -132,7 +144,13 @@
                     <input type="submit" name="submit_update" value="Update">
                 </td>
                 <td class="<%= row %>RowOddCol">
+                    <%
+                      if (BitstreamFormat.findUnknown(context).getID() != formats[i].getID()) {
+                    %>
                     <input type="submit" name="submit_delete" value="Delete...">
+                    <% 
+                      } 
+                    %>
                 </td>
             </tr>
         </form>
