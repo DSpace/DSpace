@@ -54,12 +54,13 @@ import org.dspace.content.*;
  *      an Item (given by either the Item object or its id), or null.
  *      If a String, Browses begin with values lexicographically greater
  *      than or equal to the String.
- *      If an Item, Browses begin with the value of the Item int the
+ *      If an Item, Browses begin with the value of the Item in the
  *      corresponding browse index. If the item has multiple values
  *      in the index, the behavior is undefined.
  *      If null, Browses begin at the start of the index.
  *
  *  total: The total number of results returned from a Browse.
+ *  A total of -1 means to return all results.
  *
  *  numberBefore: The maximum number of results returned previous
  *    to the focus.
