@@ -140,7 +140,7 @@
 <%  if (handle == null) { %>
                     <em>N/A</em>
 <%  } else {
-    String url = ConfigurationManager.getProperty("dspace.url") + "/item/" + handle; %>
+    String url = ConfigurationManager.getProperty("dspace.url") + "/handle/" + handle; %>
                     <A TARGET=_blank HREF="<%= url %>"><%= url %></A>
 <%  } %>
                 </td>
