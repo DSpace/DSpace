@@ -56,6 +56,7 @@ import ORG.oclc.oai.server.catalog.RecordFactory;
 import ORG.oclc.oai.server.verb.BadResumptionTokenException;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 import ORG.oclc.oai.server.verb.IdDoesNotExistException;
+import ORG.oclc.oai.server.verb.NoItemsMatchException;
 import ORG.oclc.oai.server.verb.NoMetadataFormatsException;
 import ORG.oclc.oai.server.verb.NoSetHierarchyException;
 import ORG.oclc.oai.server.verb.OAIInternalServerError;
@@ -187,7 +188,8 @@ public class DSpaceOAICatalog extends AbstractCatalog
      * is not supported by your repository.
      */
     public Map listIdentifiers(String from, String until, String set, String metadataPrefix)
-        throws OAIInternalServerError, NoSetHierarchyException, CannotDisseminateFormatException
+        throws OAIInternalServerError, NoSetHierarchyException,
+            NoItemsMatchException, CannotDisseminateFormatException
     {
         // We can produce oai_dc and simple DC for all items, so just return IDs
         Context context = null;
@@ -204,8 +206,13 @@ public class DSpaceOAICatalog extends AbstractCatalog
             DSpaceObject scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until,
                 false, true, true);
-            // No items, but we need to know containers and withdrawn items
+            // No Item objects, but we need to know containers and withdrawn items
 
+            if (itemInfos.size() == 0)
+            {
+                throw new NoItemsMatchException();
+            }
+            
             // Build up lists of headers and identifiers
             Iterator i = itemInfos.iterator();
 
@@ -348,7 +355,8 @@ public class DSpaceOAICatalog extends AbstractCatalog
      * supported by the item.
      */
     public Map listRecords(String from, String until, String set, String metadataPrefix)
-        throws OAIInternalServerError, NoSetHierarchyException, CannotDisseminateFormatException
+        throws OAIInternalServerError, NoSetHierarchyException,
+            CannotDisseminateFormatException, NoItemsMatchException
     {
         Context context = null;
         String schemaURL = getCrosswalks().getSchemaURL(metadataPrefix);
@@ -369,6 +377,11 @@ public class DSpaceOAICatalog extends AbstractCatalog
             DSpaceObject scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until,
                 true, true, true);  // Need items, containers + withdrawals
+
+            if (itemInfos.size() == 0)
+            {
+                throw new NoItemsMatchException();
+            }
 
             // Build list of XML records from item info objects
             Iterator i = itemInfos.iterator();
