@@ -98,8 +98,10 @@ public class SimpleSearchServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Get the query
-        String query = request.getParameter("query");
-        int    start = UIUtil.getIntParameter(request, "start");
+        String query 	= request.getParameter("query");
+        int    start 	= UIUtil.getIntParameter(request, "start");
+        String advanced = request.getParameter("advanced");
+        
         
         // can't start earlier than 0 in the results!
         if( start < 0 ) { start = 0; }
@@ -114,6 +116,11 @@ public class SimpleSearchServlet extends DSpaceServlet
 
         QueryResults qResults = null;
         QueryArgs    qArgs    = new QueryArgs();
+
+        if (advanced != null) 
+        {
+        	query = qArgs.buildQuery(request);
+        } 
 
         // Ensure the query is non-null
         if (query == null)
