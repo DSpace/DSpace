@@ -507,6 +507,8 @@ public class WorkspaceItem implements InProgressSubmission
                 "item_id=" + item.getID() +
                 "collection_id=" + collection.getID()));
 
+        deleteSubmitPermissions();
+
         // Remove from cache
         ourContext.removeCached(this, getID());
 
@@ -534,12 +536,33 @@ public class WorkspaceItem implements InProgressSubmission
                 "item_id=" + item.getID() +
                 "collection_id=" + collection.getID()));
 
+        deleteSubmitPermissions();
+
         // Remove from cache
         ourContext.removeCached(this, getID());
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
         DatabaseManager.delete(ourContext, wiRow);
+    }
+
+    /**
+     * Lots of temporary permissions/policies are created
+     *  with the workspace.  Remove them.
+     */
+
+    private void deleteSubmitPermissions()
+        throws SQLException
+    {
+        // all policies specifically for the item
+        String myrequest = "DELETE FROM ResourcePolicy WHERE "
+            + "resource_type_id=" + Constants.ITEM
+            + " AND id=" + item.getID();
+
+        // all policies where the item is a container
+        myrequest = "DELETE FROM ResourcePolicy WHERE "
+            + "container_type_id=" + Constants.ITEM
+            + "AND container_id=" + item.getID();            
     }
 
 

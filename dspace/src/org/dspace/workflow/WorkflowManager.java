@@ -70,27 +70,15 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
 
-//import java.sql.*;
-//import org.dspace.core.*;
-//import org.dspace.db.*;
-//import org.dspace.db.generated.*;
-//import org.dspace.util.handles.HandleManager;
-//import org.dspace.jsptags.DateTag;
-//import org.dspace.servlets.SubmitServlet;
-//import org.dspace.util.DSpaceDate;
-//import org.dspace.util.email.*;
 
 /*
  issues
  abort has to go through reject - they should share code
  authorization isn't done
- should do log4j for email errors
  */
 
 /*
  * Notes:
-
-Table definitions:
 
 Determining item status from the database:
 
@@ -143,7 +131,6 @@ public class WorkflowManager
 	 * @param pw The PersonalWorkspace to convert to a workflow item
 	 * @return   The resulting workflow item
 	 */
-
     public static WorkflowItem start(Context c,WorkspaceItem wsi)
         throws SQLException, AuthorizeException, IOException
     {
@@ -189,7 +176,6 @@ public class WorkflowManager
 	 *  this info on the MyDSpace page.
 	 * @param e The EPerson we want to fetch owned tasks for.
 	 */
-
     public static List getOwnedTasks(Context c, EPerson e)
         throws java.sql.SQLException
     {
@@ -213,7 +199,6 @@ public class WorkflowManager
 	 *   (as a reviewer, etc.) for display on a user's MyDSpace page.
 	 * @param e The Eperson we want to fetch the pooled tasks for.
 	 */
-
     public static List getPooledTasks(Context c, EPerson e)
         throws SQLException
     {
@@ -238,8 +223,6 @@ public class WorkflowManager
 	 * @param wi WorkflowItem to do the claim on
 	 * @param e  The EPerson doing the claim
 	 */
-
-    // claim an item and become it's owner
     public static void claim(Context c,WorkflowItem wi, EPerson e)
         throws SQLException, IOException, AuthorizeException
     {
@@ -315,8 +298,6 @@ public class WorkflowManager
 	 * @param wi WorkflowItem to operate on
 	 * @param e  EPerson doing the operation
 	 */
-
-    // return task to pool
     public static void unclaim(Context c,WorkflowItem wi, EPerson e)
         throws SQLException, IOException, AuthorizeException
     {
@@ -354,7 +335,6 @@ public class WorkflowManager
 	 * @param wi WorkflowItem to operate on
 	 * @param e  EPerson doing the operation
 	 */
-         // abort workflow - admin to delete all
     public static void abort(Context c,WorkflowItem wi, EPerson e)
         throws SQLException, AuthorizeException
     {
@@ -373,7 +353,6 @@ public class WorkflowManager
         Group mygroup = null;
         
         wi.setState(newstate);
-        //		wi.update();
 
         switch (newstate)
         {
@@ -407,7 +386,6 @@ public class WorkflowManager
             // assign owner
             deleteTasks(c, wi);
             wi.setOwner(newowner);
-            //wi.update();
             break;
 
         case WFSTATE_STEP2POOL:
@@ -416,7 +394,6 @@ public class WorkflowManager
             // if so, add them to tasklist
             // if not, skip to next state
             wi.setOwner( null );
-            //wi.update();
 
             // get approvers (group 2)
             mygroup = mycollection.getWorkflowGroup( 2 );
@@ -442,14 +419,12 @@ public class WorkflowManager
             // assign owner
             deleteTasks(c, wi);
             wi.setOwner(newowner);
-            //wi.update();
             break;
 
         case WFSTATE_STEP3POOL:
             // any editors?
             // if so, add them to tasklist
             wi.setOwner( null );
-            //wi.update();
 
             mygroup = mycollection.getWorkflowGroup( 3 );
             
@@ -458,7 +433,6 @@ public class WorkflowManager
                 // there were editors, change the state
                 //  timestamp, and add them to the list
                 createTasks(c, wi, mygroup);
-                //wi.update();
 
                 // email notification
                 notifyGroupOfTask(c, mygroup, wi);
@@ -475,22 +449,12 @@ public class WorkflowManager
             // assign owner
             deleteTasks(c, wi);
             wi.setOwner(newowner);
-            //wi.update();
             break;
 
         case WFSTATE_ARCHIVE:
             // put in archive in one transaction
-
-//            int itemid = wi.getItemId();
-//            Collection col =
-//                wi.getCollectionFromCollectionId();
-
             try
             {
-                // notify that it's been archived
-                //notifyOfArchive( wi );
-
-
                 // remove workflow tasks
                 deleteTasks(c, wi);
                 
@@ -499,16 +463,6 @@ public class WorkflowManager
 
                 // now email notification
                 notifyOfArchive(c, myitem, mycollection);
-
-                // index the item
-//                DSIndexer.indexItem(c, myitem);
-
-//                SubmitServlet.installItem(connection, wi);
-
-                // delete workflow - done in installItem
-                //					wi.delete( connection );
-//                wi = null;
-
             }
             catch(IOException e)
             {
@@ -517,8 +471,7 @@ public class WorkflowManager
             }
             catch (SQLException e)
             {
-                // problem starting workflow - roll back
-//                connection.rollback();
+                // problem starting workflow
                 throw e;
             }
 
@@ -538,7 +491,7 @@ public class WorkflowManager
      * @return  the fully archived item.
      */
     
-    public static Item archive(Context c, WorkflowItem wfi)
+    private static Item archive(Context c, WorkflowItem wfi)
         throws SQLException, IOException, AuthorizeException
     {
         // FIXME: Check auth
@@ -552,9 +505,6 @@ public class WorkflowManager
                 "collection_id=" + collection.getID()));
 
         InstallItem.installItem(c, wfi);
-
-        // Remove workflow item
-//        wfi.delete(c);        
 
         // Log the event
         log.info(LogManager.getHeader(
@@ -570,8 +520,8 @@ public class WorkflowManager
     /**
      * notify the submitter that the item is archived
      */
-
-    private static void notifyOfArchive(Context c, Item i, Collection coll)
+    private static void notifyOfArchive(Context c, Item i,
+         Collection coll)
     {
         try
         {
@@ -587,7 +537,8 @@ public class WorkflowManager
             // Get submitter
             EPerson ep = i.getSubmitter();
 
-            Email email = ConfigurationManager.getEmail( "submit_archive" );
+            Email email = ConfigurationManager.getEmail(
+                 "submit_archive" );
         
             email.addRecipient( ep.getEmail() );
             email.addArgument( title );
@@ -598,7 +549,11 @@ public class WorkflowManager
         }
         catch( Exception e )
         {
-            //FIXME: should log this failed attempt at notification
+//            log.warn(LogManager.getHeader(c,
+//                "notifyOfArchive, cannot email submitter"
+//                + " item_id=" + i.getID()
+//                + " eperson_id=" + ep.getID()
+//                + e ));
         }
     }
 
@@ -611,7 +566,8 @@ public class WorkflowManager
      * @param wfi WorkflowItem to be 'dismantled'
      * @return  the workspace item
      */
-    private static WorkspaceItem returnToWorkspace(Context c, WorkflowItem wfi)
+    private static WorkspaceItem returnToWorkspace(Context c,
+             WorkflowItem wfi)
         throws SQLException, AuthorizeException
     {
         Item myitem = wfi.getItem();
@@ -640,14 +596,13 @@ public class WorkflowManager
         
         log.info(LogManager.getHeader(c,
             "return_to_workspace",
-            "workflow_item_id=" + wfi.getID() + "workspace_item_id=" + wi.getID()));
+            "workflow_item_id=" + wfi.getID() +
+            "workspace_item_id=" + wi.getID()));
 
         // Now remove the workflow object manually from the database
         DatabaseManager.updateQuery(c,
             "DELETE FROM WorkflowItem WHERE workflow_id=" +
                	wfi.getID() );
-
-        //DatabaseManager.delete(c, wfRow);
 
         return wi;
     }
@@ -662,7 +617,8 @@ public class WorkflowManager
 	 * @param e  EPerson doing the operation
 	 * @param rejection_message message to email to user
 	 */
-    public static void reject(Context c,WorkflowItem wi, EPerson e, String rejection_message)
+    public static void reject(Context c,WorkflowItem wi, EPerson e,
+             String rejection_message)
         throws SQLException, AuthorizeException
     {
         // authorize a DSpaceActions.REJECT
@@ -680,7 +636,8 @@ public class WorkflowManager
 
     // creates workflow tasklist entries for a workflow
     //  from a given eperson group
-    private static void createTasks(Context c, WorkflowItem wi, Group eg)
+    private static void createTasks(Context c, WorkflowItem wi,
+            Group eg)
         throws SQLException
     {
         // get a list of epeople
@@ -703,14 +660,16 @@ public class WorkflowManager
     private static void deleteTasks(Context c,WorkflowItem wi)
         throws SQLException
     {
-        String myrequest = "DELETE FROM TaskListItem WHERE workflow_id="
+        String myrequest =
+            "DELETE FROM TaskListItem WHERE workflow_id="
             + wi.getID();
         
         DatabaseManager.updateQuery( c, myrequest );
     }
 
 
-    private static void notifyGroupOfTask(Context c, Group mygroup, WorkflowItem wi)
+    private static void notifyGroupOfTask(Context c, Group mygroup,
+            WorkflowItem wi)
         throws SQLException
     {
         try
@@ -765,8 +724,8 @@ public class WorkflowManager
      * @param mygroup Group to get members from
      * @param email Email object containing the message
      */
-      
-    private static void emailGroup(Context c, Group mygroup, Email email )
+    private static void emailGroup(Context c, Group mygroup,
+            Email email )
         throws SQLException, MessagingException
     {
         // send message to each member of the group
@@ -787,7 +746,8 @@ public class WorkflowManager
     }
 
     
-    private static void notifyOfReject(Context c,WorkflowItem wi, EPerson e, String reason)
+    private static void notifyOfReject(Context c,WorkflowItem wi,
+            EPerson e, String reason)
     {
         try
         {
@@ -803,17 +763,17 @@ public class WorkflowManager
             Email email = ConfigurationManager.getEmail("submit_reject");
         
             email.addRecipient( getSubmitterEPerson(wi).getEmail() );
-            email.addArgument( title );
+            email.addArgument( title                    );
             email.addArgument( coll.getMetadata("name") );
-            email.addArgument( rejector );
-            email.addArgument( reason );
-            email.addArgument( getMyDSpaceLink() );
+            email.addArgument( rejector                 );
+            email.addArgument( reason                   );
+            email.addArgument( getMyDSpaceLink()        );
         
             email.send();
         }
         catch( Exception ex )
         {
-            // FIXME: should log this vital email error
+            // FIXME: should log this email error
         }
     }
 
@@ -861,7 +821,8 @@ public class WorkflowManager
 
 
     // Record approval provenance statement
-    private static void recordApproval(Context c,WorkflowItem wi, EPerson e)
+    private static void recordApproval(Context c,WorkflowItem wi,
+            EPerson e)
         throws SQLException, AuthorizeException
     {
         Item item = wi.getItem();
@@ -874,7 +835,7 @@ public class WorkflowManager
 
         // Here's what happened
         String provDescription = "Approved for entry into archive by " + usersName +
-            " on " + now + " (GMT)";
+            " on " + now + " (GMT) ";
             
         // add bitstream descriptions (name, size, checksums)
         provDescription += InstallItem.getBitstreamProvenanceMessage(item);    
@@ -900,9 +861,9 @@ public class WorkflowManager
         
         if( myitem.getSubmitter() != null )
         {
-            provmessage = "Submitted by" + 
+            provmessage = "Submitted by " + 
             myitem.getSubmitter().getFullName() + " (" +
-            myitem.getSubmitter().getEmail() + ").  DSpace accession date:" +
+            myitem.getSubmitter().getEmail() + "). DSpace accession date: " +
             now.toString() + "\n Submission has " + bitstreams.length +
             " bitstreams:\n";
         }

@@ -72,6 +72,7 @@ public class InstallItem
         // create accession date
         DCDate now = DCDate.getCurrent();
         item.addDC("date", "accessioned", null, now.toString());
+        item.addDC("date", "available",   null, now.toString());
 
         // create issue date if not present
         DCValue[] currentDateIssued = item.getDC("date", "issued", null);
@@ -100,15 +101,8 @@ public class InstallItem
             item.addDC("format", "mimetype", null, bf.getMIMEType());
         }
 
-        // create issue date provenance
-//        DCDate now = DCDate.getCurrent();
-
-//        DCValue[] currentDateIssued = item.getDC("date",
-//            "issued",
-//            null);
-
         String provDescription = "Made available in DSpace on " + now +
-            " (GMT).";
+            " (GMT). " + getBitstreamProvenanceMessage(item);
 
         if (currentDateIssued.length != 0)
         {
