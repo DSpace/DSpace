@@ -10,8 +10,7 @@ jena.jar:            The Jena RDF framework (version 1.4.0)
 log4j.jar:           Log4j, for system logging (version 1.2.1)
 lucene.jar:          Lucene search engine (version 1.2)
 mail.jar*:           JavaMail, used for sending e-mail
-oaicat.jar:          OCLC's OAI data provider implementation
-                     (v1.5.6 with setSpec URL encoding fix, dated 2003-04-16)
+oaicat.jar:          OCLC's OAI data provider implementation (version 1.5.8)
 oro.jar:	     Jakarta-ORO, provide regular expressions (version 2.0.6)
 servlet.jar*:        Servlet interfaces (version 2.3)
 sunjce-1.2.1.jar**:   Java Cryptographic Extension (v1.2.1)--for JDK1.3
