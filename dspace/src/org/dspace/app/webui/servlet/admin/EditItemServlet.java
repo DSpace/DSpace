@@ -136,9 +136,10 @@ public class EditItemServlet extends DSpaceServlet
         }
         else if (handle != null && !handle.equals(""))
         {
-            // FIXME: Handles might resolve to other things
+            // resolve handle
             DSpaceObject dso = HandleManager.resolveToObject(context, handle);
 
+            // make sure it's an ITEM
             if (dso != null && dso.getType() == Constants.ITEM)
             {
                 itemToEdit = (Item) dso;
@@ -153,7 +154,11 @@ public class EditItemServlet extends DSpaceServlet
         // Show edit form if appropriate
         if (itemToEdit != null)
         {
+            // now check to see if person can edit item
+            checkEditAuthorization(context, itemToEdit);
+
             showEditForm(context, request, response, itemToEdit);
+
         }
         else
         {
@@ -161,9 +166,12 @@ public class EditItemServlet extends DSpaceServlet
             {
                 request.setAttribute("invalid.id", new Boolean(true));
             }
-            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
         }
     }
+
+
+
 
 
     protected void doDSPost(Context context,
@@ -188,7 +196,7 @@ public class EditItemServlet extends DSpaceServlet
          */
         if (request.getParameter("submit_cancel") != null)
         {
-            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             return;
         }
 
@@ -202,6 +210,9 @@ public class EditItemServlet extends DSpaceServlet
             UIUtil.getIntParameter(request, "item_id"));
         String handle = HandleManager.findHandle(context, item);
 
+        // now check to see if person can edit item
+        checkEditAuthorization(context, item);
+
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);
 
@@ -211,7 +222,7 @@ public class EditItemServlet extends DSpaceServlet
             // Show "delete item" confirmation page
             JSPManager.showJSP(request,
                 response,
-                "/dspace-admin/confirm-delete-item.jsp");
+                "/tools/confirm-delete-item.jsp");
             break;
 
         case CONFIRM_DELETE:
@@ -226,7 +237,7 @@ public class EditItemServlet extends DSpaceServlet
                 collections[i].removeItem(item);
             }
 
-            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             context.complete();
             break;
 
@@ -238,19 +249,19 @@ public class EditItemServlet extends DSpaceServlet
             // Show "withdraw item" confirmation page
             JSPManager.showJSP(request,
                 response,
-                "/dspace-admin/confirm-withdraw-item.jsp");
+                "/tools/confirm-withdraw-item.jsp");
             break;
 
         case CONFIRM_WITHDRAW:
             // Withdraw the item
             item.withdraw();
-            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             context.complete();
             break;
             
         case REINSTATE:
             item.reinstate();
-            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             context.complete();
             break;
             
@@ -260,6 +271,31 @@ public class EditItemServlet extends DSpaceServlet
                 "integrity_error",
                 UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
+        }
+    }
+
+
+    /**
+     * Throw an exception if user isn't authorized to edit this item
+     * @param context
+     * @param item
+     */
+    private void checkEditAuthorization(Context c, Item item)
+        throws AuthorizeException, java.sql.SQLException
+    {
+        if(!item.canEdit())
+        {
+            int userID = 0;
+            
+            // first, check if userid is set
+            if(c.getCurrentUser() != null)
+            {
+                userID = c.getCurrentUser().getID();
+            }
+            
+            // show an error or throw an authorization exception
+            throw new AuthorizeException("EditItemServlet: User " + userID
+                            + " not authorized to edit item " + item.getID());
         }
     }
 
@@ -292,7 +328,7 @@ public class EditItemServlet extends DSpaceServlet
         request.setAttribute("collections", collections);
         request.setAttribute("dc.types", dcTypes);
 
-        JSPManager.showJSP(request, response, "/dspace-admin/edit-item-form.jsp");
+        JSPManager.showJSP(request, response, "/tools/edit-item-form.jsp");
     }
 
 
@@ -489,7 +525,7 @@ public class EditItemServlet extends DSpaceServlet
             // Show upload bitstream page
             request.setAttribute("item", item);
             JSPManager.showJSP(request, response,
-                "/dspace-admin/upload-bitstream.jsp");
+                "/tools/upload-bitstream.jsp");
         }
         else
         {
@@ -526,6 +562,9 @@ public class EditItemServlet extends DSpaceServlet
         // Read the temp file as logo
         InputStream is = new BufferedInputStream(new FileInputStream(
             temp));
+
+        // now check to see if person can edit item
+        checkEditAuthorization(context, item);
 
         // do we already have a bundle?    
         Bundle [] bundles = item.getBundles();
