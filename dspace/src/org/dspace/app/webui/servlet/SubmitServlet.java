@@ -1038,8 +1038,9 @@ public class SubmitServlet extends DSpaceServlet
                     Bundle [] bundles = item.getBundles();
                     
                     if( bundles.length < 1)
-                    {    
-                        b = item.createSingleBitstream(is);
+                    {
+                        // set bundle's name to ORIGINAL    
+                        b = item.createSingleBitstream(is, "ORIGINAL");
                     }
                     else
                     {
