@@ -55,6 +55,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.core.Utils;
 
 /**
  * Tag for display a list of items
@@ -173,7 +174,7 @@ public class ItemListTag extends TagSupport
                 out.print("/handle/");
                 out.print(items[i].getHandle());
                 out.print("\">");
-                out.print(title);
+                out.print(Utils.addEntities(title));
                 out.print("</A>");
                 
                 if (emphasiseTitle)
@@ -188,7 +189,7 @@ public class ItemListTag extends TagSupport
 
                 for (int j = 0; j < authors.length; j++)
                 {
-                    out.print("<em>" + authors[j].value + "</em>");
+                    out.print("<em>" + Utils.addEntities(authors[j].value) + "</em>");
                     
                     if (j < authors.length - 1)
                     {

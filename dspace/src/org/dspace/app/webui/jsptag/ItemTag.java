@@ -57,6 +57,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.core.Utils;
 
 /**
  * Tag for displaying an item
@@ -283,12 +284,12 @@ public class ItemTag extends TagSupport
 				out.print("<tr><td class=\"metadataFieldLabel\">");
 				out.print(fieldData[0]);
 				out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
-				out.print(values[0].value);
+				out.print(Utils.addEntities(values[0].value));
 				
 				for (int j = 1; j < values.length; j++)
 				{
 					out.print("<br>");
-					out.print(values[j].value);
+					out.print(Utils.addEntities(values[j].value));
 				}
 				out.println("</td></tr>");
 			}
@@ -343,7 +344,7 @@ public class ItemTag extends TagSupport
 					out.print("." + values[i].qualifier);
 				}
 				out.print("</td><td class=\"metadataFieldValue\">");
-				out.print(values[i].value);
+				out.print(Utils.addEntities(values[i].value));
 				out.print("</td><td class=\"metadataFieldValue\">");
 				
 				if (values[i].language == null)
