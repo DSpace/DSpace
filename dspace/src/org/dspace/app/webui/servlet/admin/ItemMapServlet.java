@@ -368,7 +368,7 @@ public class ItemMapServlet extends DSpaceServlet
 
             TableRowIterator tri = DatabaseManager.query(context,
                 "SELECT * from ItemsByAuthor WHERE sort_author like '%"
-                    + myQuery + "%' AND item_id NOT IN (SELECT item_id FROM collection2item WHERE collection_id="
+                    + myQuery.toLowerCase() + "%' AND item_id NOT IN (SELECT item_id FROM collection2item WHERE collection_id="
                     + myCollection.getID() + ")" );
 
             Map items = new HashMap();
