@@ -157,11 +157,15 @@ public class AuthorizeManager
     }
 
     /**
-     * check to see if the current user is an admin
+     * check to see if the current user is an admin,
+     *  or always return true if c.ignoreAuthorization is set
      */
     public static boolean isAdmin(Context c)
         throws SQLException
     {
+        // if we're ignoring authorization, user is member of admin
+        if(c.ignoreAuthorization()) return true;
+    
         EPerson e = c.getCurrentUser();
         
         if( e == null ) return false; // anonymous users can't be admins....
@@ -186,7 +190,8 @@ public class AuthorizeManager
 
 
     /**
-     * authorize() is the authorize method that returns a boolean
+     * authorize() is the authorize method that returns a boolean - always
+     *  returns true if c.ignoreAuthorization is set
 	 *
      * @param resourcetype - found core.Constants (collection, item, etc.)
      * @param resorceidID of resource you're trying to do an authorize on
