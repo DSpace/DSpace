@@ -772,6 +772,16 @@ public class Community extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
 
+        // If not a top-level community, have parent remove me; this
+        // will call delete() after removing the linkage
+        Community parent = getParentCommunity();
+        if (parent != null)
+        {
+            parent.removeSubcommunity(this);
+            return;
+        }
+
+
         log.info(LogManager.getHeader(ourContext,
             "delete_community",
             "community_id=" + getID()));
