@@ -125,6 +125,8 @@ my $subscription_count           = CountRows( "subscription" );
 my @subscribers                  = FindSubscribers();
 my $subscriber_count             = $#subscribers + 1;
 
+# how big is each collection? ############
+my @collection_sizes             = FindCollectionSizes();
 
 ############################################
 # display report ###########################
@@ -135,39 +137,56 @@ print "DSpace site statistics for site: '" . GetConfigParameter("dspace.name") .
 print "Date: " . localtime() . "\n";
 print "\n"; 
 print "Size of Important Directories:\n";
-print "\tAsset store:           $assetstore_size MB\n";
-print "\tDatabase:              $database_size MB\n";
-print "\tSearch Directory:      $search_size MB\n";
-print "\tHistory Directory:     $history_size MB\n";
-print "\tLogs Directory:        $logs_size MB\n";
+SizeReport("Asset store:",      $assetstore_size);
+SizeReport("Database:",         $database_size  );
+SizeReport("Search Directory:", $search_size    );
+SizeReport("History Directory:",$history_size   );
+SizeReport("Logs Directory:",   $logs_size      );
 print "\n";
 print "\n";
 print "Counts of Important DSpace Objects:\n";
-print "\tEPeople:               $eperson_count\n";
-print "\tCommunities:           $community_count\n";
-print "\tCollections:           $collection_count\n";
-print "\tItems:                 $item_count\n";
+NumberReport("EPeople:",     $eperson_count   );
+NumberReport("Communities:", $community_count );
+NumberReport("Collections:", $collection_count);
+NumberReport("Items:",       $item_count      );
 print "\n";
-print "\tBundles:               $bundle_count\n";
-print "\tBitstreams:            $bitstream_count\n";
-print "\tDublin Core Elements:  $dcvalue_count\n";
-print "\tEPerson Groups:        $group_count\n";
-print "\tHandles:               $handle_count\n";
-print "\tSubmissions Active:    $workspaceitem_count\n";
-print "\tWorkflows Active:      $workflowitem_count\n";
+NumberReport("Bundles:",               $bundle_count       );
+NumberReport("Bitstreams:",            $bitstream_count    );
+NumberReport("Dublin Core Elements:",  $dcvalue_count      );
+NumberReport("EPerson Groups:",        $group_count        );
+NumberReport("Handles:",               $handle_count       );
+NumberReport("Submissions Active:",    $workspaceitem_count);
+NumberReport("Workflows Active:",      $workflowitem_count );
 print "\n";
-print "\tSubscriptions:         $subscription_count\n";
-print "\tSubscribers:           $subscriber_count\n";
-print "\tSubscribed Collections: $subscribed_collections_count\n";
+NumberReport("Subscriptions:",         $subscription_count );
+NumberReport("Subscribers:",           $subscriber_count   );
+NumberReport("Subscribed Collections:", $subscribed_collections_count);
 print "\n";
+
 print "Potential Problems:\n";
+
+sub SizeReport
+{
+    my $string = shift;
+    my $size   = shift;
+    
+    print "\t".FormatText($string).FormatSize($size)."\n";
+}
+
+sub NumberReport
+{
+    my $string = shift;
+    my $number = shift;
+    
+    print "\t".FormatText($string).FormatNumber($number)."\n";
+}
 
 # only show problems if they exist! ######
 
 if( $deleted_bitstreams[0] > 0 )
 {
-    print "  Deleted bitstreams:    $deleted_bitstreams[0]\n";
-    print "  Size of deleted:       $deleted_bitstreams[1] MB\n"; 
+    NumberReport("Deleted bitstreams:",         $deleted_bitstreams[0]);
+    SizeReport  ("Size of deleted bitstreams:", $deleted_bitstreams[1]);
     print "\n";
 }
 if( $#communities_without_logos >= 0 )
@@ -177,8 +196,8 @@ if( $#communities_without_logos >= 0 )
     print "  Communities without Logos:  $count\n";
     foreach( @communities_without_logos )
     {
-	my ($id, $name) = split /\|/;
-	print "\t$id\t$name\n";
+        my ($id, $name) = split /\|/;
+        print "\t$id\t$name\n";
     } 
     print "\n";
 }
@@ -190,8 +209,8 @@ if( $#collections_without_logos >= 0 )
     print "  Collections without Logos:  $count\n";
     foreach( @collections_without_logos )
     {
-	my ($id, $name) = split /\|/;
-	print "\t$id\t$name\n";
+        my ($id, $name) = split /\|/;
+        print "\t$id\t$name\n";
     } 
     print "\n";
 }
@@ -203,21 +222,37 @@ if( $#empty_groups >= 0 )
     print "  Empty Groups:  $count\n";
     foreach( @empty_groups )
     {
-	my ($id, $name) = split /\|/;
-	print "\t$id\t$name\n";
+        my ($id, $name) = split /\|/;
+        print "\t$id\t$name\n";
     }
     print "\n";
 }
+
+print "Collection sizes:\n";
+# sorted, of course
+foreach( sort { (split/\|/,$b)[1] <=> (split/\|/,$a)[1] } @collection_sizes )
+{
+    my ($name, $size) = split /\|/;
+
+    # spruce up the strings a bit
+    $size = FormatSize( $size );
+
+    # pad length of name string to right w/spaces
+    $name = FormatText( $name );  
+    
+    print "\t$name\t$size\n";
+}
+print "\n";
 
 if( $#bitstreams_without_policies >= 0 )
 {
     my $count = $#bitstreams_without_policies + 1;
 
-    print "  Bitstreams without policies:  $count\n";
+    print "Bitstreams without policies:  $count\n";
     foreach( sort { $a <=> $b } @bitstreams_without_policies )
     {
-	my ($id) = split /\|/;
-	print "\t$id\n";
+        my ($id) = split /\|/;
+        print "\t$id\n";
     } 
     print "\n";
 }
@@ -272,7 +307,24 @@ sub DirectorySize
 
     find sub { $sum += -s }, $directory;
 
-    return int($sum/(1024*1024)*10)/10;
+    return $sum;
+}
+
+# find collection sizes
+sub FindCollectionSizes
+{
+    my $arg =
+        "SELECT c1.name, SUM(bs.size) FROM " .
+            "collection c1, collection2item c2i1, item2bundle i2b1, " .
+            "bundle2bitstream b2b1, bitstream bs " .
+        "WHERE " .
+            "c1.collection_id=c2i1.collection_id AND " .
+            "c2i1.item_id=i2b1.item_id AND " .
+            "i2b1.bundle_id=b2b1.bundle_id AND " .
+            "b2b1.bitstream_id=bs.bitstream_id " .
+        "GROUP BY c1.name";
+
+    return ExecuteSQL( $arg );
 }
 
 
@@ -335,7 +387,34 @@ sub FindDeletedBitstreams
     $arg = "SELECT SUM(size) from bitstream where deleted=true";
     my @deleted_size = ExecuteSQL( $arg );
 
-    return ($deleted_count[0], int($deleted_size[0]/(1024*1024)*10)/10);
+    return ($deleted_count[0], $deleted_size[0]);
+}
+
+# given a string, pad it right to the correct width
+sub FormatText
+{
+    my $string = shift;
+
+    return pack("A50",$string);  
+}
+
+# size comes in as bytes, is returned as padded MB number
+sub FormatSize
+{
+    my $size = shift;
+
+    $size = (int($size/(1024*1024)*10))/10;
+    $size = sprintf("%10s", $size);
+
+    return "$size MB";
+}
+
+# given an arbitrary number, format it padded left
+sub FormatNumber
+{
+    my $number = shift;
+    
+    return sprintf("%10s", $number);
 }
 
 # other possibilities
