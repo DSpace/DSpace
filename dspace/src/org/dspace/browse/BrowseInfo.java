@@ -89,6 +89,11 @@ public class BrowseInfo
     private int total;
 
     /**
+     * True if this browse was cached
+     */
+    private boolean cached;
+
+    /**
      * Constructor
      *
      * @param results - A List of Browse results
@@ -182,5 +187,21 @@ public class BrowseInfo
     public boolean isLast()
     {
         return overallPosition + results.size() == total;
+    }
+
+    /**
+     * True if this browse was cached
+     */
+    public boolean wasCached()
+    {
+        return cached;
+    }
+
+    /**
+     * Set whether this browse was cached
+     */
+    void setCached(boolean cached)
+    {
+        this.cached = cached;
     }
 }
