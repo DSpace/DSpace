@@ -386,6 +386,7 @@ public class Subscribe
         {
             Email email = ConfigurationManager.getEmail("subscription");
             
+            email.addRecipient(eperson.getEmail());
             email.addArgument(emailText.toString());
             email.send();
 
