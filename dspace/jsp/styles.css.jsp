@@ -425,8 +425,9 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                       background: #bbbbcc;
                       <%= padding %> }
 
-.itemDisplayTable{ border: 0;
-                   padding: 3px;
+.itemDisplayTable{ text-align: center;
+                   border: 0;
+                   padding: 6px;
                    color: #000000 }
 
 .metadataFieldLabel{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
@@ -437,7 +438,8 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                      vertical-align: top;
                      text-align: right;
                      text-decoration: none;
-                     white-space: nowrap }
+                     white-space: nowrap;
+                     padding: 3px }
 
 .metadataFieldValue{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
                      font-size: 12pt;
@@ -447,7 +449,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                      vertical-align: top;
                      text-align: left;
                      text-decoration: none;
-                     width: 100% }
+                     padding: 3px }  <%-- width 100% ?? --%>
 
 .recentItem { margin-left: 10px;
               margin-right: 10px;

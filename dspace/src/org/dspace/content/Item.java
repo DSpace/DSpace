@@ -583,7 +583,7 @@ public class Item
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            collections.add(new Item(ourContext, r));
+            collections.add(new Collection(ourContext, r));
         }
 
         Collection[] collectionArray = new Collection[collections.size()];

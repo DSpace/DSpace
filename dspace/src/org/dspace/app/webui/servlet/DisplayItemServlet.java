@@ -1,5 +1,5 @@
 /*
- * CommunityListServlet.java
+ * DSpaceServlet.java
  *
  * Version: $Revision$
  *
@@ -42,9 +42,8 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -54,20 +53,22 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-
+import org.dspace.handle.HandleManager;
 
 /**
- * Servlet for listing communities (and collections within them)
+ * Servlet for displaying item pages
  *
  * @author  Robert Tansley
  * @version $Revision$
  */
-public class CommunityListServlet extends DSpaceServlet
+public class DisplayItemServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(CommunityListServlet.class);
+    private static Logger log = Logger.getLogger(DisplayItemServlet.class);
     
 
     protected void doDSGet(Context context,
@@ -75,21 +76,68 @@ public class CommunityListServlet extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        log.info(LogManager.getHeader(context, "view_community_list", ""));
-        
-	// This will map community IDs to arrays of collections
-	Map colMap = new HashMap();
+        Item item = null;
 
-        Community[] communities = Community.findAll(context);
-        
-        for (int com = 0; com < communities.length; com++)
+        // Get the item handle from the URL
+        String handle = request.getPathInfo();
+
+        if (handle != null)
         {
-            Integer comID = new Integer(communities[com].getID());
-            colMap.put(comID, communities[com].getCollections());
+            // Remove leading slash
+            if (handle.startsWith("/"))
+            {
+                handle = handle.substring(1);
+            }
+
+            // Attempt to resolve
+            item = (Item) HandleManager.resolveToObject(context, handle);
         }
-        
-        request.setAttribute("communities", communities);
-        request.setAttribute("collections.map", colMap);
-        JSPManager.showJSP(request, response, "/community-list.jsp");
+
+        // If everything is OK, display the item
+        if (item != null)
+        {
+            log.info(LogManager.getHeader(context,
+                "view_item",
+                "handle=" + handle));
+            
+            // Get the collections
+            Collection[] collections = item.getCollections();
+
+            // Get corresponding communities
+            Community[] communities = new Community[collections.length];
+            
+            // FIXME: (maybe) We just grab the first community if there are
+            // multiple communities
+            for (int i = 0; i < collections.length; i++)
+            {
+                Community[] commsForThis = collections[i].getCommunities();
+                communities[i] = commsForThis[0];
+            }
+            
+            // Full or simple display?
+            boolean displayAll = false;
+            String modeParam = request.getParameter("mode");
+            if (modeParam != null && modeParam.equalsIgnoreCase("full"))
+            {
+                displayAll = true;
+            }
+
+            
+            // Set attributes and display
+            request.setAttribute("display.all", new Boolean(displayAll));
+            request.setAttribute("handle", handle);
+            request.setAttribute("item", item);
+            request.setAttribute("collections", collections);
+            request.setAttribute("communities", communities);
+            JSPManager.showJSP(request, response, "/display-item.jsp");
+        }
+        else
+        {
+            // Show an error
+            JSPManager.showInvalidIDError(request,
+                response,
+                handle,
+                Constants.ITEM);
+        }
     }
 }

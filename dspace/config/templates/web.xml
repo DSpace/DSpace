@@ -53,9 +53,15 @@
 
 
   <!-- Servlets -->
+
   <servlet>
     <servlet-name>community-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.CommunityListServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>display-item</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.DisplayItemServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -70,6 +76,11 @@
   <servlet-mapping>
     <servlet-name>community-list</servlet-name>
     <url-pattern>/community-list</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>display-item</servlet-name>
+    <url-pattern>/item/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

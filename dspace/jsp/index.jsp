@@ -62,7 +62,7 @@
           <table width=100% border=0 cellpadding=6>
             <tr>
               <td valign=middle><h2>What can you find in DSpace?</h2></td>
-              <td valign=middle align=right class="standard"><a href="http://www.dspace.org/">More Information</a>&nbsp;&nbsp;&nbsp;</td>
+              <td valign=middle align=right class="standard"><a href="http://www.dspace.org/">More&nbsp;Information</a>&nbsp;&nbsp;&nbsp;</td>
             </tr>
           </table>
           <table width=100%>
