@@ -42,6 +42,9 @@
 
 package org.dspace.content;
 
+/**
+ * Abstract base class for DSpace objects
+ */
 public abstract class DSpaceObject
 {
     /**
