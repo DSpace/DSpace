@@ -155,6 +155,8 @@ public class DCType
             elements[id] = row.getStringColumn("element");
             qualifiers[id] = row.getStringColumn("qualifier");
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
     }
 
     /**
@@ -228,15 +230,20 @@ public class DCType
 
         // Return the first matching element (if two match there's a problem,
         // but not one dealt with here)
+        DCType retType = null;
         if (tri.hasNext())
         {
-            return new DCType(context, tri.next());
+            retType = new DCType(context, tri.next());
         }
         else
         {
             // No match means there's no corresponding element
-            return null;
+            retType = null;
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
+
+        return retType;
     }
 
     /**
@@ -257,6 +264,8 @@ public class DCType
         {
             dcTypes.add(new DCType(context, tri.next()));
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         // Convert list into an array
         DCType[] typeArray = new DCType[dcTypes.size()];

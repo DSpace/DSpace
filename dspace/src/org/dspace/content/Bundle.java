@@ -123,6 +123,8 @@ public class Bundle extends DSpaceObject
                 bitstreams.add(new Bitstream(ourContext, r));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bundle_id"));
@@ -327,6 +329,8 @@ public class Bundle extends DSpaceObject
                 items.add(new Item(ourContext, r));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         Item[] itemArray = new Item[items.size()];
         itemArray = (Item[]) items.toArray(itemArray);
@@ -443,6 +447,8 @@ public class Bundle extends DSpaceObject
             // The bitstream is an orphan, delete it
             b.delete();
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
     }
 
     /**

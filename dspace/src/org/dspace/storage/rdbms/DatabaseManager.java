@@ -132,8 +132,11 @@ public class DatabaseManager
 
         Statement statement = context.getDBConnection().createStatement();
 
-        return new TableRowIterator(statement.executeQuery(query),
+        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(query),
                 canonicalize(table));
+
+        retTRI.setStatement(statement);
+        return retTRI;
     }
 
     /**
@@ -157,7 +160,10 @@ public class DatabaseManager
 
         Statement statement = context.getDBConnection().createStatement();
 
-        return new TableRowIterator(statement.executeQuery(query));
+        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(query));
+
+        retTRI.setStatement(statement);
+        return retTRI;
     }
 
     /**
@@ -177,8 +183,11 @@ public class DatabaseManager
     public static TableRowIterator query(String table,
             PreparedStatement statement) throws SQLException
     {
-        return new TableRowIterator(statement.executeQuery(),
+        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(),
                 canonicalize(table));
+
+        retTRI.setStatement(statement);
+        return retTRI;
     }
 
     /**
@@ -194,7 +203,10 @@ public class DatabaseManager
     public static TableRowIterator query(PreparedStatement statement)
             throws SQLException
     {
-        return new TableRowIterator(statement.executeQuery());
+        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery());
+
+        retTRI.setStatement(statement);
+        return retTRI;
     }
 
     /**
@@ -214,7 +226,9 @@ public class DatabaseManager
     {
         TableRowIterator iterator = query(context, query);
 
-        return (!iterator.hasNext()) ? null : iterator.next();
+        TableRow retRow = (!iterator.hasNext()) ? null : iterator.next();
+        iterator.close();
+        return (retRow);
     }
 
     /**
@@ -236,7 +250,9 @@ public class DatabaseManager
     {
         TableRowIterator iterator = query(context, canonicalize(table), query);
 
-        return (!iterator.hasNext()) ? null : iterator.next();
+        TableRow retRow = (!iterator.hasNext()) ? null : iterator.next();
+        iterator.close();
+        return (retRow);
     }
 
     /**
@@ -483,6 +499,7 @@ public class DatabaseManager
         rs.next();
 
         int newID = rs.getInt(1);
+        rs.close();
 
         statement.close();
 

@@ -118,6 +118,8 @@ public class BitstreamFormat
         {
             extensions.add(tri.next().getStringColumn("extension"));
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bitstream_format_id"));
@@ -277,6 +279,8 @@ public class BitstreamFormat
                 formats.add(new BitstreamFormat(context, row));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         // Return the formats as an array
         BitstreamFormat[] formatArray = new BitstreamFormat[formats.size()];
@@ -338,6 +342,8 @@ public class BitstreamFormat
                 formats.add(new BitstreamFormat(context, row));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         // Return the formats as an array
         BitstreamFormat[] formatArray = new BitstreamFormat[formats.size()];

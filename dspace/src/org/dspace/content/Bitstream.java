@@ -522,6 +522,9 @@ public class Bitstream extends DSpaceObject
             }
         }
 
+        // close the TableRowIterator to free up resources
+        tri.close();
+
         Bundle[] bundleArray = new Bundle[bundles.size()];
         bundleArray = (Bundle[]) bundles.toArray(bundleArray);
 

@@ -330,6 +330,8 @@ public class WorkspaceItem implements InProgressSubmission
 
             wsItems.add(wi);
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
         wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
@@ -372,6 +374,8 @@ public class WorkspaceItem implements InProgressSubmission
 
             wsItems.add(wi);
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
         wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);

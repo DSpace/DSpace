@@ -41,6 +41,7 @@ package org.dspace.storage.rdbms;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +57,11 @@ public class TableRowIterator
      * Results from a query
      */
     private ResultSet results;
+
+    /**
+     * Statement used to submit the query
+     */
+    private Statement statemt = null;
 
     /**
      * The name of the RDBMS table
@@ -81,6 +87,7 @@ public class TableRowIterator
     TableRowIterator(ResultSet results)
     {
         this(results, null);
+        statemt = null;
     }
 
     /**
@@ -95,6 +102,7 @@ public class TableRowIterator
     {
         this.results = results;
         this.table = table;
+        statemt = null;
     }
 
     /**
@@ -103,6 +111,19 @@ public class TableRowIterator
     public void finalize()
     {
         close();
+    }
+
+    /**
+     * setStatement -- this method saves the statement used to do the query. We
+     * must keep this so that the statement can be closed when we are finished.
+     * 
+     * @param st -
+     *            The statement used to do the query that created this
+     *            TableRowIterator
+     */
+    public void setStatement(Statement st)
+    {
+        statemt = st;
     }
 
     /**
@@ -188,7 +209,19 @@ public class TableRowIterator
         try
         {
             results.close();
-            results = null;
+            if (results != null)
+                results.close();
+        }
+        catch (SQLException sqle)
+        {
+        }
+
+        // try to close the statement if we have one
+        try
+        {
+            if (statemt != null)
+                statemt.close();
+            statemt = null;
         }
         catch (SQLException sqle)
         {

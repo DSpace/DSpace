@@ -297,6 +297,8 @@ public class Collection extends DSpaceObject
                 collections.add(new Collection(context, row));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         Collection[] collectionArray = new Collection[collections.size()];
         collectionArray = (Collection[]) collections.toArray(collectionArray);
@@ -811,6 +813,8 @@ public class Collection extends DSpaceObject
             // Orphan; delete it
             item.delete();
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
     }
 
     /**
@@ -1026,6 +1030,8 @@ public class Collection extends DSpaceObject
                 communities.add(parents[i]);
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         Community[] communityArray = new Community[communities.size()];
         communityArray = (Community[]) communities.toArray(communityArray);

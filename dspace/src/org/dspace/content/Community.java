@@ -239,6 +239,8 @@ public class Community extends DSpaceObject
                 communities.add(new Community(context, row));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         Community[] communityArray = new Community[communities.size()];
         communityArray = (Community[]) communities.toArray(communityArray);
@@ -283,6 +285,8 @@ public class Community extends DSpaceObject
                 topCommunities.add(new Community(context, row));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         Community[] communityArray = new Community[topCommunities.size()];
         communityArray = (Community[]) topCommunities.toArray(communityArray);
@@ -461,6 +465,8 @@ public class Community extends DSpaceObject
                 collections.add(new Collection(ourContext, row));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         // Put them in an array
         Collection[] collectionArray = new Collection[collections.size()];
@@ -508,6 +514,8 @@ public class Community extends DSpaceObject
                 subcommunities.add(new Community(ourContext, row));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         // Put them in an array
         Community[] communityArray = new Community[subcommunities.size()];
@@ -554,6 +562,8 @@ public class Community extends DSpaceObject
                 parentCommunity = new Community(ourContext, row);
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         return parentCommunity;
     }
@@ -632,6 +642,8 @@ public class Community extends DSpaceObject
 
             DatabaseManager.update(ourContext, mappingRow);
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
     }
 
     /**
@@ -683,6 +695,8 @@ public class Community extends DSpaceObject
 
             DatabaseManager.update(ourContext, mappingRow);
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
     }
 
     /**
@@ -727,6 +741,8 @@ public class Community extends DSpaceObject
             // Orphan; delete it
             c.delete();
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
     }
 
     /**
@@ -771,6 +787,8 @@ public class Community extends DSpaceObject
             // Orphan; delete it
             c.delete();
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
     }
 
     /**

@@ -167,6 +167,8 @@ public class Item extends DSpaceObject
                 bundles.add(new Bundle(ourContext, r));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         // Get Dublin Core metadata
         tri = DatabaseManager.query(ourContext, "dcvalue",
@@ -192,6 +194,8 @@ public class Item extends DSpaceObject
             // Add it to the list
             dublinCore.add(dcv);
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         // commented out - this belongs in the create() method, not the
         // constructor
@@ -754,6 +758,8 @@ public class Item extends DSpaceObject
                 collections.add(new Collection(ourContext, row));
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         Collection[] collectionArray = new Collection[collections.size()];
         collectionArray = (Collection[]) collections.toArray(collectionArray);
@@ -806,6 +812,8 @@ public class Item extends DSpaceObject
                 communities.add(parents[i]);
             }
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
 
         Community[] communityArray = new Community[communities.size()];
         communityArray = (Community[]) communities.toArray(communityArray);
@@ -988,6 +996,8 @@ public class Item extends DSpaceObject
             // The bundle is an orphan, delete it
             b.delete();
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
     }
 
     /**

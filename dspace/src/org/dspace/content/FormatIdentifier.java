@@ -104,14 +104,18 @@ public class FormatIdentifier
                         + "' AND bitstreamformatregistry.bitstream_format_id="
                         + "fileextension.bitstream_format_id");
 
+        BitstreamFormat retFormat = null;
         if (tri.hasNext())
         {
             // Return first match
-            return new BitstreamFormat(context, tri.next());
+            retFormat = new BitstreamFormat(context, tri.next());
         }
         else
         {
-            return null;
+            retFormat = null;
         }
+        // close the TableRowIterator to free up resources
+        tri.close();
+        return retFormat;
     }
 }
