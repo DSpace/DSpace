@@ -117,7 +117,7 @@ public class InstallItem
             item.addDC("format",
                 "extent",
                 null,
-                String.valueOf(bitstreams[i].getSize()));
+                String.valueOf(bitstreams[i].getSize()) + " bytes");
             item.addDC("format", "mimetype", null, bf.getMIMEType());
         }
 
