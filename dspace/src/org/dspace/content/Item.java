@@ -142,9 +142,9 @@ public class Item
         }
 
         // Get Dublin Core metadata
-        tri = DatabaseManager.query(ourContext, "dcresult",
-            "SELECT * FROM dcresult WHERE item_id=" +
-                itemRow.getIntColumn("item_id"));
+        tri = DatabaseManager.query(ourContext, "dcvalue",
+            "SELECT * FROM dcvalue WHERE item_id=" +
+                itemRow.getIntColumn("item_id") + " ORDER BY place;");
 
         while (tri.hasNext())
         {
@@ -350,7 +350,13 @@ public class Item
             dcv.element = element;
             dcv.qualifier = qualifier;
             dcv.language = lang;
+            dcv.value = values[i];
             dublinCore.add(dcv);
+        }
+
+        if (values.length > 0)
+        {
+            dublinCoreChanged = true;
         }
     }
 
@@ -413,7 +419,7 @@ public class Item
             
             if (!match(element, qualifier, lang, dcv))
             {
-                values.add(dcv.value);
+                values.add(dcv);
             }
         }
 
@@ -755,6 +761,7 @@ public class Item
             {
                 DCValue dcv = (DCValue) i.next();
                 
+
                 // Get the DC Type
                 DCType dcType = DCType.findByElement(ourContext,
                     dcv.element,
