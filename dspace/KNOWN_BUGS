@@ -1,0 +1,43 @@
+This release of DSpace contains two known bugs, described below. If you
+encounter these bugs and they cause you problems please report this to
+dspace-devel@lists.sourceforge.net so that the developers can know that
+these bugs are a user priority.
+
+[ 1088692 ] Edit item template as a collection administrator
+
+The problem described below occurs only when the item template is defined
+ during the create collection wizard.
+
+If I check "New submissions will have some metadata already filled out
+with defaults", during the create collection wizard, and then I log in as
+a collection admin and try to edit the item template, I get an internal
+server error.
+
+-- Gabriela Mircea
+
+
+[ 1105336 ] Inappropriate Auth required when creating collection
+ 
+ Group G has at least ADD and WRITE permissions on
+ Community Cy
+ Logged in as anyone in G
+
+ 1) In Cy, create a new collection.
+
+ 2) Check none but "This collection will have delegated
+ collection administrators"
+
+ 3) Click Next>.
+
+ System shows you the 401/403 screen (Forbidden / Authorization required)
+
+ Same result occurs immediately if you check "Some users will be able to
+ submit to this collection".
+
+ If you deselect all options, you can edit the collection details and
+ select epeople to have read permissions, but get Auth Required when you
+ try to commit the read permissions.
+
+-- Jim Downing
+
+

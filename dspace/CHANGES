@@ -1,3 +1,13 @@
+1.2.1
+=====
+(Jim Downing)
+- Added KNOWN_BUGS file to caveat problems in this release
+
+1.2.1-beta4
+===========
+(Jim Downing)
+- More bug fixes for various small NPEs
+
 1.2.1-beta3
 ===========
 (Jim Downing)
