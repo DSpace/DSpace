@@ -941,12 +941,11 @@ public class Item
             dublinCoreChanged = false;
         }
 
-        // Update indices if appropriate
+        // Update browse indices
+        Browse.itemChanged(ourContext, this);
+
         if (isArchived())
         {
-            // Update browse indices
-            Browse.itemChanged(ourContext, this);
-
             // FIXME: Update search index
         }
     }
