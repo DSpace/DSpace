@@ -440,7 +440,7 @@ public class Item implements DSpaceObject
             dcv.element = element;
             dcv.qualifier = qualifier;
             dcv.language = lang;
-            dcv.value = values[i];
+            dcv.value = values[i].trim();
             dublinCore.add(dcv);
         }
 
