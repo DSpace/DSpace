@@ -287,12 +287,12 @@ public class SubmitServlet extends DSpaceServlet
             if (com != null)
             {
                 // In a community.  Show collections in that community only.
-                collections = com.getCollections();
+                collections = Collection.findAuthorized(context, com, Constants.ADD);
             }
             else
             {
                 // Show all collections
-                collections = Collection.findAll(context);
+                collections = Collection.findAuthorized(context, null, Constants.ADD);
             }
 
             log.info(LogManager.getHeader(context,
