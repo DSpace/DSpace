@@ -54,7 +54,7 @@ import org.dspace.storage.rdbms.*;
 import org.apache.log4j.Logger;
 
 /**
- * Manages bitstream storage
+ * Stores, retrieves and deletes bitstreams.
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -89,19 +89,23 @@ public class BitstreamStorageManager
     /** log4j log */
     private static Logger log = Logger.getLogger(BitstreamStorageManager.class);
 
+    /** Private Constructor */
+    private BitstreamStorageManager () {}
+
     /**
      * Store a stream of bits.
      *
-     * If this method returns successfully, the bits have been stored,
+     * <p>If this method returns successfully, the bits have been stored,
      * and RDBMS metadata entries are in place (the context still
-     * needs to be completed to finalize the transaction).
+     * needs to be completed to finalize the transaction).</p>
      *
-     * If this method returns successfully and the context is aborted,
+     * <p>If this method returns successfully and the context is aborted,
      * then the bits will be stored in the asset store and the RDBMS
-     * metadata entries will exist, but with the deleted flag set.
+     * metadata entries will exist, but with the deleted flag set.</p>
      *
      * If this method throws an exception, then any of the following
      * may be true:
+     *
      * <ul>
      *    <li>Neither bits nor RDBMS metadata entries have been stored.
      *    <li>RDBMS metadata entries with the deleted flag set have been
@@ -110,12 +114,12 @@ public class BitstreamStorageManager
      *        stored, and some or all of the bits have also been stored.
      * </ul>
      *
-     * @param context -   the current context
-     * @param is -       the stream of bits to store
-     * @exception IOException - If a problem occurs while storing the bits
-     * @exception SQLException - If a problem occurs accessing the RDBMS
+     * @param context The current context
+     * @param is The stream of bits to store
+     * @exception IOException If a problem occurs while storing the bits
+     * @exception SQLException If a problem occurs accessing the RDBMS
      *
-     * @return - the ID of the stored bitstream
+     * @return The ID of the stored bitstream
      */
     public static int store(Context context, InputStream is)
         throws SQLException, IOException
@@ -170,12 +174,12 @@ public class BitstreamStorageManager
      * Retrieve the bits for the bitstream with ID. If the bitstream
      * does not exist, or is marked deleted, returns null.
      *
-     * @param context -   the current context
-     * @param id -       the ID of the bitstream to retrieve
-     * @exception IOException - If a problem occurs while retrieving the bits
-     * @exception SQLException - If a problem occurs accessing the RDBMS
+     * @param context The current context
+     * @param id The ID of the bitstream to retrieve
+     * @exception IOException If a problem occurs while retrieving the bits
+     * @exception SQLException If a problem occurs accessing the RDBMS
      *
-     * @return -  the stream of bits, or null
+     * @return The stream of bits, or null
      */
     public static InputStream retrieve(Context context, int id)
         throws SQLException, IOException
@@ -188,17 +192,18 @@ public class BitstreamStorageManager
     }
 
     /**
-     * Remove a bitstream from the asset store. This method does
+     * <p>Remove a bitstream from the asset store. This method does
      * not delete any bits, but simply marks the bitstreams as deleted
      * (the context still needs to be completed to finalize the transaction).
+     * </p>
      *
-     * If the context is aborted, the bitstreams deletion status
-     * remains unchanged.
+     * <p>If the context is aborted, the bitstreams deletion status
+     * remains unchanged.</p>
      *
-     * @param context -   the current context
-     * @param id -       the ID of the bitstream to delete
-     * @exception IOException - If a problem occurs while deleting the bits
-     * @exception SQLException - If a problem occurs accessing the RDBMS
+     * @param context The current context
+     * @param id The ID of the bitstream to delete
+     * @exception IOException If a problem occurs while deleting the bits
+     * @exception SQLException If a problem occurs accessing the RDBMS
      */
     public static void delete(Context context, int id)
         throws SQLException, IOException
@@ -215,8 +220,8 @@ public class BitstreamStorageManager
      * This method deletes any bitstreams which are more than 1 hour
      * old and marked deleted. The deletions cannot be undone.
      *
-     * @exception IOException - If a problem occurs while cleaning up
-     * @exception SQLException - If a problem occurs accessing the RDBMS
+     * @exception IOException If a problem occurs while cleaning up
+     * @exception SQLException If a problem occurs accessing the RDBMS
      */
     public static void cleanup()
         throws SQLException, IOException
@@ -283,11 +288,11 @@ public class BitstreamStorageManager
     ////////////////////////////////////////
 
     /**
-     * Set the assetstore root (for testing)
+     * Set the assetstore root (for testing).
      *
-     * @param dir - The new asset store directory root
-     * @return - The previous assetstore root
-     * @exception IOException - If there is a problem with the asset store
+     * @param dir The new asset store directory root
+     * @return The previous assetstore root
+     * @exception IOException If there is a problem with the asset store
      * directory
      */
     protected static String setRoot(String dir)
@@ -302,10 +307,10 @@ public class BitstreamStorageManager
     }
 
     /**
-     * Set the assetstore root to its default value (for testing)
+     * Set the assetstore root to its default value (for testing).
      *
-     * @return - The previous assetstore root
-     * @exception IOException - If there is a problem with the asset store
+     * @return The previous assetstore root
+     * @exception IOException If there is a problem with the asset store
      * directory
      */
     protected static String setRoot()
@@ -318,8 +323,8 @@ public class BitstreamStorageManager
      * Return true if this file is too recent to be deleted,
      * false otherwise.
      *
-     * @param file - The file to check
-     * @return - true if this file is too recent to be deleted
+     * @param file The file to check
+     * @return True if this file is too recent to be deleted
      */
     private static boolean isRecent(File file)
     {
@@ -334,9 +339,9 @@ public class BitstreamStorageManager
     }
 
     /**
-     * Delete empty parent directories
+     * Delete empty parent directories.
      *
-     * @param file - The file with parent directories to delete
+     * @param file The file with parent directories to delete
      */
     private synchronized static void deleteParents(File file)
     {
@@ -363,7 +368,7 @@ public class BitstreamStorageManager
      * Initialize the storage area. Calling this method multiple times
      * only initializes once.
      *
-     * @exception IOException - If there is a problem with the asset store
+     * @exception IOException If there is a problem with the asset store
      * directory
      */
     private synchronized static void initialize()
@@ -378,9 +383,9 @@ public class BitstreamStorageManager
     }
 
     /**
-     * Initialize the storage area
+     * Initialize the storage area.
      *
-     * @exception IOException - If there is a problem with the asset store
+     * @exception IOException If there is a problem with the asset store
      * directory
      */
     private synchronized static void initializeInternal()
@@ -404,12 +409,12 @@ public class BitstreamStorageManager
     /**
      * Return the file corresponding to ID, or null.
      *
-     * @param context - the current context
-     * @param id - the ID of the bitstream
-     * @param includeDeleted - If true, deleted bitstreams will be considered.
-     * @return - The file corresponding to ID, or null
-     * @exception IOException - If a problem occurs while determining the file
-     * @exception SQLException - If a problem occurs accessing the RDBMS
+     * @param context The current context
+     * @param id The ID of the bitstream
+     * @param includeDeleted If true, deleted bitstreams will be considered.
+     * @return The file corresponding to ID, or null
+     * @exception IOException If a problem occurs while determining the file
+     * @exception SQLException If a problem occurs accessing the RDBMS
      */
     protected static File forId(Context context, int id, boolean includeDeleted)
         throws IOException, SQLException
@@ -429,9 +434,9 @@ public class BitstreamStorageManager
     /**
      * Returns the file corresponding to ID, or null.
      *
-     * @param id - the internal storage ID
-     * @return - The file corresponding to ID, or null
-     * @exception IOException - If a problem occurs while determining the file
+     * @param id The internal storage ID
+     * @return The file corresponding to ID, or null
+     * @exception IOException If a problem occurs while determining the file
      */
     protected static File forId(String id)
         throws IOException
@@ -444,11 +449,11 @@ public class BitstreamStorageManager
      * If CREATE is true and the file does not exist, it is created.
      * Otherwise, null is returned.
      *
-     * @param id - the internal storage ID
-     * @param create - If true, and the file does not exist, it will be
+     * @param id The internal storage ID
+     * @param create If true, and the file does not exist, it will be
      * created.
-     * @return - The file corresponding to ID, or null
-     * @exception IOException - If a problem occurs while determining the file
+     * @return The file corresponding to ID, or null
+     * @exception IOException If a problem occurs while determining the file
      */
     private static File forId(String id, boolean create)
         throws IOException
@@ -472,11 +477,12 @@ public class BitstreamStorageManager
     }
 
     /**
-     * Maps ID to full filename
+     * Maps ID to full filename.
      *
-     * @param id - the internal storage ID
-     * @return - the full filename
-     * @exception IOException - If a problem occurs while determining the file name
+     * @param id The internal storage ID
+     * @return The full filename
+     * @exception IOException If a problem occurs while determining the
+     * file name
      */
     private static String id2Filename(String id)
         throws IOException
@@ -539,18 +545,17 @@ public class BitstreamStorageManager
 }
 
 /**
- * Simple filter which counts the number of bytes read
+ * Simple filter which counts the number of bytes read.
  */
 class NumberBytesInputStream extends FilterInputStream
 {
-
-    /**
-     * Number of bytes read
-     */
+    /** Number of bytes read */
     private int count = 0;
 
     /**
      * Constructor
+     *
+     * @param is The stream to filter.
      */
     public NumberBytesInputStream (InputStream is)
     {
@@ -608,6 +613,11 @@ class NumberBytesInputStream extends FilterInputStream
     ////////////////////////////////////////
     // non-interface methods
     ////////////////////////////////////////
+    /**
+     * Return the number of bytes read from the stream.
+     *
+     * @return The number of bytes read from the stream.
+     */
     public int getNumberOfBytesRead()
     {
         return count;
