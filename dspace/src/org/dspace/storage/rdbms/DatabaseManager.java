@@ -663,6 +663,7 @@ public class DatabaseManager
         try
         {
             connection = getConnection();
+            connection.setAutoCommit(true);
             statement = connection.createStatement();
             boolean inquote = false;
 
