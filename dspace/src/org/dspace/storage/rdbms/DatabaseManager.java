@@ -307,7 +307,8 @@ public class DatabaseManager
     {
         try
         {
-            c.close();
+            if (c != null)
+                c.close();
         }
         catch (SQLException e) {}
     }
@@ -541,111 +542,123 @@ public class DatabaseManager
 
         String line = null;
 
-        Statement statement = getConnection().createStatement();
-        boolean inquote = false;
-
-        while ((line = reader.readLine()) != null)
+        Connection connection = null;
+        Statement statement = null;
+        try
         {
-            // Look for comments
-            int commentStart = line.indexOf("--");
+            connection = getConnection();
+            statement = connection.createStatement();
+            boolean inquote = false;
 
-            String input = (commentStart != -1) ?
-                line.substring(0, commentStart) : line;
-            // Empty line, skip
-            if (input.trim().equals(""))
-                continue;
-            // Put it on the SQL buffer
-            sql.append(input);
-            // Add a space
-            sql.append(" ");
-            // More to come?
-
-            // Look for quotes
-            int index = 0;
-            int count = 0;
-            int inputlen = input.length();
-
-            while ((index = input.indexOf("'", count)) != -1)
+            while ((line = reader.readLine()) != null)
             {
-                // Flip the value of inquote
-                inquote = !inquote;
+                // Look for comments
+                int commentStart = line.indexOf("--");
 
-                // Move the index
-                count = index + 1;
-                // Make sure we do not exceed the string length
-                if (count >= inputlen)
-                    break;
-            }
+                String input = (commentStart != -1) ?
+                    line.substring(0, commentStart) : line;
+                // Empty line, skip
+                if (input.trim().equals(""))
+                    continue;
+                // Put it on the SQL buffer
+                sql.append(input);
+                // Add a space
+                sql.append(" ");
+                // More to come?
 
-            // If we are in a quote, keep going
-            // Note that this is STILL a simple heuristic that is not
-            // guaranteed to be correct
-            if (inquote)
-                continue;
+                // Look for quotes
+                int index = 0;
+                int count = 0;
+                int inputlen = input.length();
 
-            int endMarker = input.indexOf(";", index);
+                while ((index = input.indexOf("'", count)) != -1)
+                {
+                    // Flip the value of inquote
+                    inquote = !inquote;
 
-            if (endMarker == -1)
-                continue;
+                    // Move the index
+                    count = index + 1;
+                    // Make sure we do not exceed the string length
+                    if (count >= inputlen)
+                        break;
+                }
 
-            if (log.isDebugEnabled())
-                log.debug("Running database query \"" + sql + "\"");
+                // If we are in a quote, keep going
+                // Note that this is STILL a simple heuristic that is not
+                // guaranteed to be correct
+                if (inquote)
+                    continue;
 
-            SQL = sql.toString();
+                int endMarker = input.indexOf(";", index);
 
-            try
-            {
-                // Use execute, not executeQuery (which expects results) or
-                // executeUpdate
-                boolean succeeded = statement.execute(SQL);
-            }
-            catch (SQLWarning sqlw)
-            {
+                if (endMarker == -1)
+                    continue;
+
                 if (log.isDebugEnabled())
-                    log.debug("Got SQL Warning: " + sqlw, sqlw);
-            }
-            catch (SQLException sqle)
-            {
-                String msg = "Got SQL Exception: " + sqle;
-                String sqlmessage = sqle.getMessage();
+                    log.debug("Running database query \"" + sql + "\"");
 
-                // These are Postgres-isms:
+                SQL = sql.toString();
 
-                // There's no easy way to check if a table exists before
-                // creating it, so we always drop tables, then create them
-                boolean isDrop =
-                    ((SQL != null) &&
-                        (sqlmessage != null) &&
-                        (SQL.toUpperCase().startsWith("DROP")) &&
-                        (sqlmessage.indexOf("does not exist") != -1));
-
-                // Creating a view causes a bogus warning
-                boolean isNoResults =
-                    ((SQL != null) &&
-                        (sqlmessage != null) &&
-                        ((SQL.toUpperCase().startsWith("CREATE VIEW")) ||
-                         ((SQL.toUpperCase().startsWith("CREATE FUNCTION")))) &&
-                     (sqlmessage.indexOf("No results were returned") != -1));
-
-                // If the messages are bogus, give them a low priority
-                if (isDrop || isNoResults)
+                try
+                {
+                    // Use execute, not executeQuery (which expects results) or
+                    // executeUpdate
+                    boolean succeeded = statement.execute(SQL);
+                }
+                catch (SQLWarning sqlw)
                 {
                     if (log.isDebugEnabled())
-                        log.debug(msg, sqle);
+                        log.debug("Got SQL Warning: " + sqlw, sqlw);
                 }
-                // Otherwise, we need to know!
-                else
+                catch (SQLException sqle)
                 {
-                    if (log.isEnabledFor(Priority.WARN))
-                        log.warn(msg, sqle);
-                }
-            }
-            // Reset SQL buffer
-            sql = new StringBuffer();
-            SQL = null;
-        }
+                    String msg = "Got SQL Exception: " + sqle;
+                    String sqlmessage = sqle.getMessage();
 
-        statement.close();
+                    // These are Postgres-isms:
+
+                    // There's no easy way to check if a table exists before
+                    // creating it, so we always drop tables, then create them
+                    boolean isDrop =
+                        ((SQL != null) &&
+                         (sqlmessage != null) &&
+                         (SQL.toUpperCase().startsWith("DROP")) &&
+                         (sqlmessage.indexOf("does not exist") != -1));
+
+                    // Creating a view causes a bogus warning
+                    boolean isNoResults =
+                        ((SQL != null) &&
+                         (sqlmessage != null) &&
+                         ((SQL.toUpperCase().startsWith("CREATE VIEW")) ||
+                          ((SQL.toUpperCase().startsWith("CREATE FUNCTION")))) &&
+                         (sqlmessage.indexOf("No results were returned") != -1));
+
+                    // If the messages are bogus, give them a low priority
+                    if (isDrop || isNoResults)
+                    {
+                        if (log.isDebugEnabled())
+                            log.debug(msg, sqle);
+                    }
+                    // Otherwise, we need to know!
+                    else
+                    {
+                        if (log.isEnabledFor(Priority.WARN))
+                            log.warn(msg, sqle);
+                    }
+                }
+
+                // Reset SQL buffer
+                sql = new StringBuffer();
+                SQL = null;
+            }
+        }
+        finally
+        {
+            if (connection != null)
+                connection.close();
+            if (statement != null)
+                statement.close();
+        }
     }
 
     ////////////////////////////////////////
@@ -784,15 +797,19 @@ public class DatabaseManager
                 ("select max({0}) from {1}",
                  new Object[] { pk, table} );
 
+            Connection connection = null;
             Statement statement = null;
             try
             {
-                statement = getConnection().createStatement();
+                connection = getConnection();
+                statement = connection.createStatement();
                 ResultSet results = statement.executeQuery(sql);
                 current_id = results.next() ? results.getInt(1): -1;
             }
             finally
             {
+                if (connection != null)
+                    connection.close();
                 if (statement != null)
                 {
                     try
@@ -929,29 +946,39 @@ public class DatabaseManager
     private static Map retrieveColumnInfo ( String table )
         throws SQLException
     {
-        DatabaseMetaData metadata = getConnection().getMetaData();
-        HashMap results = new HashMap();
-
-        // Find all the primary keys
-        ResultSet pkcolumns = metadata.getPrimaryKeys(null, null, table);
-        Set pks = new HashSet();
-        while (pkcolumns.next())
-            pks.add(pkcolumns.getString(4));
-
-        // Then all the column info
-        ResultSet columns = metadata.getColumns(null, null, table, null);
-        while (columns.next())
+        Connection connection = null;
+        try
         {
-            String column = columns.getString(4);
-            ColumnInfo cinfo = new ColumnInfo();
-            cinfo.setName(column);
-            cinfo.setType((int) columns.getShort(5));
-            if (pks.contains(column))
-                cinfo.setIsPrimaryKey(true);
-            results.put(column, cinfo);
-        }
+            connection = getConnection();
+            DatabaseMetaData metadata = connection.getMetaData();
+            HashMap results = new HashMap();
 
-        return results;
+            // Find all the primary keys
+            ResultSet pkcolumns = metadata.getPrimaryKeys(null, null, table);
+            Set pks = new HashSet();
+            while (pkcolumns.next())
+                pks.add(pkcolumns.getString(4));
+
+            // Then all the column info
+            ResultSet columns = metadata.getColumns(null, null, table, null);
+            while (columns.next())
+            {
+                String column = columns.getString(4);
+                ColumnInfo cinfo = new ColumnInfo();
+                cinfo.setName(column);
+                cinfo.setType((int) columns.getShort(5));
+                if (pks.contains(column))
+                    cinfo.setIsPrimaryKey(true);
+                results.put(column, cinfo);
+            }
+
+            return results;
+        }
+        finally
+        {
+            if (connection != null)
+                connection.close();
+        }
     }
 
     /**
