@@ -172,15 +172,25 @@ public class PolicySet
         //////////////////////
         // carnage begins here
         //////////////////////
-                
-        if( containertype == Constants.COLLECTION )
+
+        setPolicies(c, containertype, containerID, contenttype, actionID, groupID, isReplace, false);
+ 
+        c.complete();
+    }
+
+    public static void setPolicies(Context c, int containerType, int containerID,
+                             int contentType, int actionID, int groupID,
+                             boolean isReplace, boolean clearOnly)
+        throws SQLException, AuthorizeException
+    {
+        if( containerType == Constants.COLLECTION )
         {
             Collection collection = Collection.find(c, containerID);
             Group group = Group.find(c, groupID);
             
             ItemIterator i = collection.getItems();
             
-            if( contenttype == Constants.ITEM )
+            if( contentType == Constants.ITEM )
             {
                 // build list of all items in a collection
                 while( i.hasNext() )
@@ -188,22 +198,25 @@ public class PolicySet
                     Item myitem = i.next();
                     
                     // is this a replace? delete policies first
-                    if( isReplace )
+                    if( isReplace || clearOnly )
                     {
                          AuthorizeManager.removeAllPolicies(c, myitem);
                     }
-                    
-                    // now add the policy
-                    ResourcePolicy rp = ResourcePolicy.create(c);
+                   
+                    if( !clearOnly )
+                    { 
+                        // now add the policy
+                        ResourcePolicy rp = ResourcePolicy.create(c);
                         
-                    rp.setResource( myitem   );
-                    rp.setAction  ( actionID );
-                    rp.setGroup   ( group    );
+                        rp.setResource( myitem   );
+                        rp.setAction  ( actionID );
+                        rp.setGroup   ( group    );
                         
-                    rp.update();
+                        rp.update();
+                    }
                 }
             }
-            else if( contenttype == Constants.BUNDLE    )
+            else if( contentType == Constants.BUNDLE    )
             {
                 // build list of all items in a collection
                 // build list of all bundles in those items
@@ -219,25 +232,28 @@ public class PolicySet
                         Bundle t = bundles[j]; // t for target
                         
                         // is this a replace? delete policies first
-                        if( isReplace )
+                        if( isReplace || clearOnly )
                         {
                             AuthorizeManager.removeAllPolicies(c, t);
                         }
+
+                        if( !clearOnly )
+                        { 
+                            // now add the policy
+                            ResourcePolicy rp = ResourcePolicy.create(c);
                         
-                        // now add the policy
-                        ResourcePolicy rp = ResourcePolicy.create(c);
+                            rp.setResource( t        );
+                            rp.setAction  ( actionID );
+                            rp.setGroup   ( group    );
                         
-                        rp.setResource( t        );
-                        rp.setAction  ( actionID );
-                        rp.setGroup   ( group    );
-                        
-                        rp.update();
+                            rp.update();
+                        }
                     }
                 }
                 
 
             }
-            else if( contenttype == Constants.BITSTREAM )
+            else if( contentType == Constants.BITSTREAM )
             {
                 // build list of all bitstreams in a collection
                 // iterate over items, bundles, get bitstreams
@@ -259,25 +275,26 @@ public class PolicySet
                             Bitstream t = bitstreams[k];  // t for target
                             
                             // is this a replace? delete policies first
-                            if( isReplace )
+                            if( isReplace || clearOnly )
                             {
                                 AuthorizeManager.removeAllPolicies(c, t);
                             }
+                       
+                            if( !clearOnly ) 
+                            {
+                                // now add the policy
+                                ResourcePolicy rp = ResourcePolicy.create(c);
                         
-                            // now add the policy
-                            ResourcePolicy rp = ResourcePolicy.create(c);
+                                rp.setResource( t        );
+                                rp.setAction  ( actionID );
+                                rp.setGroup   ( group    );
                         
-                            rp.setResource( t        );
-                            rp.setAction  ( actionID );
-                            rp.setGroup   ( group    );
-                        
-                            rp.update();
-                            System.out.println("Bitstream " + t.getID() );
+                                rp.update();
+                            }
                         }
                     }
                 }
             }
         }
-        c.complete();
     }
 }
