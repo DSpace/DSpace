@@ -65,13 +65,22 @@ import org.dspace.core.ConfigurationManager;
 
 public class DSQuery
 {
+    // Result types
+    static final String ITEM		= "2";
+    static final String COLLECTION	= "3";
+    static final String COMMUNITY	= "4";
+
     /** Do a query, returning a List of DSpace Handles to objects matching the query.
      *  @param query string in Lucene query syntax
      */
-    public static synchronized List doQuery(String querystring)
+    public static synchronized HashMap doQuery(String querystring)
         throws ParseException, IOException
     {
-        ArrayList handlelist = new ArrayList();
+                        
+        ArrayList itemlist = new ArrayList();
+        ArrayList commlist = new ArrayList();
+        ArrayList colllist = new ArrayList();
+        HashMap   metahash = new HashMap();
 
         try
         {
@@ -88,12 +97,29 @@ public class DSQuery
                 Document d = hits.doc(i);
 
                 String handletext = d.get("handle");
-//unused?                String locstring = d.get("location");
-
-                //int itemid = Integer.parseInt(handlestring);
-
-                handlelist.add(handletext); //new Integer(itemid));
+                String handletype = d.get("type");
+                
+                if (handletype.equals(ITEM)) 
+                { 
+                	itemlist.add(handletext); 
+//                	System.out.println (handletext + " is an item!");
+                } 
+                else if (handletype.equals(COLLECTION))
+                {
+//	        	System.out.println (handletext + " is a " + handletype);
+			colllist.add(handletext);
+	        }
+	        else if (handletype.equals(COMMUNITY))
+	        {	
+//	        	System.out.println (handletext + " is a " + handletype);
+		        commlist.add(handletext); break;
+		}
+                	
             }
+            
+            metahash.put(ITEM, itemlist);
+            metahash.put(COLLECTION, colllist);
+            metahash.put(COMMUNITY, commlist);
         }
         catch (NumberFormatException e)
         {
@@ -103,7 +129,7 @@ public class DSQuery
             // ?? quit?
         }
 
-        return handlelist;
+        return metahash;
     }
 
 
@@ -111,7 +137,7 @@ public class DSQuery
      * @param query
      * @param collection
      */
-    public static List doQuery(String querystring, Collection coll)
+    public static HashMap doQuery(String querystring, Collection coll)
         throws IOException, ParseException
     {
         String location = "l" + (coll.getID());
@@ -126,7 +152,7 @@ public class DSQuery
      * @param querystring
      * @param community
      */
-    public static List doQuery(String querystring, Community comm)
+    public static HashMap doQuery(String querystring, Community comm)
         throws IOException, ParseException
     {
         String location = "m" + (comm.getID());
@@ -136,6 +162,56 @@ public class DSQuery
         return doQuery(newquery);
     }
 
+    /** return just the items from a query
+     * @param results hashmap from doQuery
+     */
+    public static List getItemResults(HashMap results)
+    {
+    	return ((List)results.get(ITEM));
+    }
+
+    /** return just the collections from a query
+     * @param results hashmap from doQuery
+     */
+    public static List getCollectionResults(HashMap results)
+    {
+    	return ((List)results.get(COLLECTION));
+    }
+
+    /** return just the communities from a query
+     * @param results hashmap from doQuery
+     */
+    public static List getCommunityResults(HashMap results)
+    {
+    	return ((List)results.get(COMMUNITY));
+    }
+
+    /** returns true if items found
+     * @param results hashmap from doQuery
+     */
+    public static boolean itemsFound(HashMap results)
+    {
+		List thislist = getItemResults(results);
+		return (!thislist.isEmpty());
+	}
+
+    /** returns true if collections found
+     * @param results hashmap from doQuery
+     */
+    public static boolean collectionsFound(HashMap results)
+    {
+		List thislist = getCollectionResults(results);
+		return (!thislist.isEmpty());
+	}
+
+    /** returns true if communities found
+     * @param results hashmap from doQuery
+     */
+    public static boolean communitiesFound(HashMap results)
+    {
+		List thislist = getCommunityResults(results);
+		return (!thislist.isEmpty());
+	}
 
     /** Do a query, printing results to stdout
      */
@@ -145,13 +221,49 @@ public class DSQuery
 
         try
         {
-            List results = doQuery(query);
-
-            Iterator i = results.iterator();
-
-            while (i.hasNext())
+            HashMap results = doQuery(query);
+            
+            List itemlist = getItemResults(results);
+            List colllist = getCollectionResults(results);
+            List commlist = getCommunityResults(results);
+            
+            if (communitiesFound(results)) 
             {
-                System.out.println(i.next());
+	            System.out.println("\n" + "Communities: ");
+    	        Iterator i = commlist.iterator();
+            
+    	        while (i.hasNext())
+    	        {
+    	        	Object thishandle = i.next();
+    	            System.out.println("\t" + thishandle.toString());
+    	        }
+    	    }
+
+            if (collectionsFound(results)) 
+            {
+            	System.out.println("\n" + "Collections: ");
+            	Iterator j = colllist.iterator();
+            
+            	while (j.hasNext())
+	            {
+    	        	Object thishandle = j.next();
+    	            System.out.println("\t" + thishandle.toString());
+    	        }
+    	    }
+    	    
+
+   	        System.out.println("\n" + "Items: ");
+            Iterator k = itemlist.iterator();
+            
+            while (k.hasNext())
+            {
+            	Object thishandle = k.next();
+                System.out.println("\t" + thishandle.toString());
+            }
+            
+            if (!itemsFound(results))
+            { 
+            	System.out.println ("\tNo items found!");
             }
         }
         catch (Exception e)
