@@ -470,7 +470,7 @@ public class EPerson extends DSpaceObject
      *
      * @return boolean, yes/no
      */
-    public boolean setSelfRegistered()
+    public boolean getSelfRegistered()
     {
         return myRow.getBooleanColumn("self_registered");
     }
@@ -505,9 +505,6 @@ public class EPerson extends DSpaceObject
     {
        	myRow.setColumn(field, value);
     }
-
-
-    // lastname, active, requirecertificate, phone
 
 
     /**
