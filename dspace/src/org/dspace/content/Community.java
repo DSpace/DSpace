@@ -330,7 +330,7 @@ public class Community implements DSpaceObject
             // to match our READ policy
             List policies = AuthorizeManager.getPoliciesActionFilter(ourContext,
                                                  this, Constants.READ);
-            AuthorizeManager.addPolicies(ourContext, policies, this );
+            AuthorizeManager.addPolicies(ourContext, policies, newLogo );
 
 
             log.info(LogManager.getHeader(ourContext,
