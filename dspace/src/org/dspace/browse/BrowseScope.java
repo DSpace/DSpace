@@ -212,7 +212,7 @@ public class BrowseScope
     }
 
     ////////////////////////////////////////
-    // Package-level accessor methods
+    // Accessor methods
     ////////////////////////////////////////
 
     /**
@@ -220,7 +220,7 @@ public class BrowseScope
      *
      * @return - The context for the browse.
      */
-    Context getContext()
+    public Context getContext()
     {
         return context;
     }
@@ -230,7 +230,7 @@ public class BrowseScope
      *
      * @return - The browse scope.
      */
-    Object getScope()
+    public Object getScope()
     {
         return scope;
     }
@@ -241,7 +241,7 @@ public class BrowseScope
      *
      * @return - The focus of the browse.
      */
-    Object getFocus()
+    public Object getFocus()
     {
         return focus;
     }
@@ -253,7 +253,7 @@ public class BrowseScope
      *
      * @return - The maximum number of results.
      */
-    int getTotal()
+    public int getTotal()
     {
         return total;
     }
@@ -264,7 +264,7 @@ public class BrowseScope
      *
      * @return - The maximum number of results previous to the focus.
      */
-    int getNumberBefore()
+    public int getNumberBefore()
     {
         return numberBefore;
     }
