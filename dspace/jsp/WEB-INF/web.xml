@@ -433,6 +433,13 @@
   </servlet-mapping>
 
 
+  <!-- Icon MIME type -->
+  <mime-mapping>
+    <extension>ico</extension>
+    <mime-type>image/x-icon</mime-type>
+  </mime-mapping>
+
+
   <!-- Error pages -->
   <error-page>
     <error-code>404</error-code>
