@@ -41,6 +41,7 @@
 package org.dspace.eperson;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -48,6 +49,7 @@ import org.dspace.core.Utils;
 import org.dspace.history.HistoryManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Class representing an e-person.
@@ -57,6 +59,15 @@ import org.dspace.storage.rdbms.TableRow;
  */
 public class EPerson
 {
+    /** The e-mail field (for sorting) */
+    public static final int EMAIL = 1;
+
+    /** The last name (for sorting) */
+    public static final int LASTNAME = 2;
+
+    /** The e-mail field (for sorting) */
+    public static final int ID = 3;
+
     /** Our context */
     private Context myContext;
 
@@ -142,6 +153,62 @@ public class EPerson
             }
         }
     }
+
+
+    /**
+     * Retrieve all e-person records from the database, sorted by a
+     * particular field.  Fields are:
+     * <UL>
+     * <LI><code>ID</code></LI>
+     * <LI><code>LASTNAME</code></LI>
+     * <LI><code>EMAIL</code></LI>
+     * </UL>
+     */
+    public static EPerson[] findAll(Context context, int sortField)
+        throws SQLException
+    {
+        String s;
+        
+        switch (sortField)
+        {
+        case ID:
+            s = "eperson_id";
+            break;
+        case EMAIL:
+            s = "email";
+            break;
+        default:
+            s = "lastname";
+        }
+        
+        TableRowIterator rows = DatabaseManager.query(context,
+            "SELECT * FROM eperson ORDER BY " + s);
+
+        List epeopleRows = rows.toList();
+        
+        EPerson[] epeople = new EPerson[epeopleRows.size()];
+        
+        for (int i = 0; i < epeopleRows.size(); i++)
+        {
+            TableRow row = (TableRow) epeopleRows.get(i);
+
+            // First check the cache
+            EPerson fromCache = (EPerson) context.fromCache(
+                EPerson.class,
+                row.getIntColumn("eperson_id"));
+
+            if (fromCache != null)
+            {
+                epeople[i] = fromCache;
+            }
+            else
+            {
+                epeople[i] = new EPerson(context, row);
+            }
+        }
+
+        return epeople;
+    }        
 
 
     /**

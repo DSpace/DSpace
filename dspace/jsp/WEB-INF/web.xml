@@ -192,6 +192,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>edit-epeople</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.EditEPersonServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>edit-item</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EditItemServlet</servlet-class>
   </servlet>
@@ -320,6 +325,11 @@
   <servlet-mapping>
     <servlet-name>edit-communities</servlet-name>
     <url-pattern>/admin/edit-communities</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>edit-epeople</servlet-name>
+    <url-pattern>/admin/edit-epeople</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
