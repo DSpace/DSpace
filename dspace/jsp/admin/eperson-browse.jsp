@@ -103,15 +103,16 @@
 
     <table class="miscTable" align="center">
         <tr>
-            <th class="oddRowOddCol"><strong> <A HREF="<%= request.getContextPath() %>/admin/edit-epeople?submit_browse=1&sortby=id">ID</A></strong></th>
+            <th class="oddRowOddCol"> <strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?submit_browse=1&sortby=id">ID</A></strong></th>
             <th class="oddRowEvenCol"><strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?submit_browse=1&sortby=email">E-mail Address</A></strong></th>
-            <th class="oddRowOddCol"><strong> <A HREF="<%= request.getContextPath() %>/admin/edit-epeople?submit_browse=1&sortby=lastname">Last Name</A></strong></th>
+            <th class="oddRowOddCol"> <strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?submit_browse=1&sortby=lastname">Last Name</A></strong></th>
             <th class="oddRowEvenCol"><strong>First Name</strong></th>
-            <th class="oddRowOddCol"><strong>Can Log In?</strong></th>
+            <th class="oddRowOddCol"> <strong>Can Log In?</strong></th>
             <th class="oddRowEvenCol"><strong>Must Use Cert?</strong></th>
-            <th class="oddRowOddCol"><strong>Telephone</strong></th>
-            <th class="oddRowEvenCol">&nbsp;</th>
+            <th class="oddRowOddCol"> <strong>Self Registered</strong></th>
+            <th class="oddRowEvenCol"><strong>Telephone</strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
+            <th class="oddRowEvenCol">&nbsp;</th>
         </tr>
 
 <%
@@ -140,16 +141,19 @@
                     <%= e.getRequireCertificate() ? "yes" : "no" %>
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    <%= (e.getMetadata("phone") == null ? "" : e.getMetadata("phone")) %>
+                    <%= e.getSelfRegistered() ? "yes" : "no" %>
                 </td>
                 <td class="<%= row %>RowEvenCol">
+                    <%= (e.getMetadata("phone") == null ? "" : e.getMetadata("phone")) %>
+                </td>
+                <td class="<%= row %>RowOddCol">
                     <input type="hidden" name="eperson_id" value="<%= e.getID() %>">
 <%      if (request.getParameter("sortby") != null) { %>
                     <input type="hidden" name="sortby" value="<%= request.getParameter("sortby") %>">
 <%      } %>
                     <input type="submit" name="submit_edit" value="Edit">
                 </td>
-                <td class="<%= row %>RowOddCol">
+                <td class="<%= row %>RowEvenCol">
                     <input type="submit" name="submit_delete" value="Delete...">
                 </td>
             </tr>
