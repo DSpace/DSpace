@@ -76,7 +76,7 @@ public class Constants
     /**
      * lets you look up type names from the type IDs
      */
-    public static final String[] typetext =
+    public static final String[] typeText =
     {
         "BITSTREAM",
         "BUNDLE",
@@ -132,7 +132,7 @@ public class Constants
     /**
      * lets you look up action names from the action IDs
      */
-    public static final String[] actiontext =
+    public static final String[] actionText =
     {
         "READ",
         "WRITE",
@@ -154,11 +154,11 @@ public class Constants
      * @return  the corresponding type ID, or <code>-1</code> if the type
      *          string is unknown
      */
-    public static int getTypeNumber(String type)
+    public static int getTypeID(String type)
     {
-        for (int i = 0; i < typetext.length; i++)
+        for (int i = 0; i < typeText.length; i++)
         {
-            if (typetext[i].equals(type))
+            if (typeText[i].equals(type))
             {
                 return i;
             }
@@ -177,11 +177,11 @@ public class Constants
      * @return  the corresponding action ID, or <code>-1</code> if the action
      *          string is unknown
      */
-    public static int getActionNumber(String action)
+    public static int getActionID(String action)
     {
-        for (int i = 0; i < actiontext.length; i++)
+        for (int i = 0; i < actionText.length; i++)
         {
-            if (actiontext[i].equals(action))
+            if (actionText[i].equals(action))
             {
                 return i;
             }

@@ -151,8 +151,7 @@ public class Group
                     "group_id=" + g.getID() )
                 );
 
-        return g;
-        
+        return g;        
     }
 
 
@@ -347,6 +346,13 @@ public class Group
     }
 
 
+    /**
+     * finds all groups in the site
+     * @param context
+     * @param sortField, Group.ID or Group.NAME (default)
+     *
+     * @return Group []
+     */
     public static Group[] findAll(Context context, int sortField)
         throws SQLException
     {

@@ -605,7 +605,6 @@ public class WorkflowManager
             email.addArgument( title );
             email.addArgument( coll.getMetadata("name")               );
             email.addArgument( HandleManager.getCanonicalForm(handle) );
-//            email.addArgument( HandleManager.getURLForm(handle)       );
             
             email.send();
         }

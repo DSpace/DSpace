@@ -46,6 +46,10 @@ import java.io.Reader;
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.standard.*;
 
+/**
+* Customized Lucene Tokenizer, since the standard one
+*  rejects numbers from indexing/querying.
+*/
 public final class DSTokenizer extends CharTokenizer
 {
 	/**

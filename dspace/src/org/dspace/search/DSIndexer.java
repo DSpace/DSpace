@@ -119,7 +119,7 @@ public class DSIndexer
         }
         else
         {
-            // FIXME: no handle, fail quietly
+            // FIXME: no handle, fail quietly - should log failure
         }
     }
 
@@ -433,37 +433,5 @@ public class DSIndexer
         // index the document
         iw.addDocument(doc);
     }
-
-
 }
-
-/* to-do
--allow indexing of different types
--allow list of fields to index, along with different types
--index handles too
-
-Constants.ITEM
-Constants.COLLECTION
-Constants.COMMUNITY
-
-new key: type_id
-
-fixed fields:
-id
-type
-handle
-
-item
-  author
-  title
-  keyword
-  location (collection & community info)
-  default (simple search combination of authors + title + keywords)
-
-collection
-  ??
-
-community
-  ??
-*/
 

@@ -45,6 +45,12 @@ import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.standard.*;
 
 
+/**
+ * Custom Lucene Analyzer that combines the
+ *  standard filter, lowercase filter, stemming
+ *  and stopword filters.
+ */
+
 public class DSAnalyzer extends Analyzer
 {
     /*
@@ -54,7 +60,7 @@ public class DSAnalyzer extends Analyzer
     private static final String[] STOP_WORDS =
     {
 
-            // new stopwords (per Margret)
+            // new stopwords (per MargretB)
             "a", "am", "and", "are", "as",
             "at", "be", "but", "by",
             "for", "if", "in", "into",

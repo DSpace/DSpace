@@ -151,7 +151,7 @@ public class HandleManager
         DatabaseManager.update(context, handle);
 
         if (log.isDebugEnabled())
-            log.debug("Created new handle for " + Constants.typetext[dso.getType()] + " "
+            log.debug("Created new handle for " + Constants.typeText[dso.getType()] + " "
              + handleId);
 
         return handleId;
@@ -215,7 +215,7 @@ public class HandleManager
         }
 
         throw new IllegalStateException("Unsupported Handle Type " +
-            Constants.typetext[handletypeid]);
+            Constants.typeText[handletypeid]);
     }
 
     /**

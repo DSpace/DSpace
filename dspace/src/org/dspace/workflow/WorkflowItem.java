@@ -165,6 +165,8 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * return all workflowitems
+     * @param context
+     * @return WorkflowItem [] of all workflows in system
      */
     public static WorkflowItem[] findAll(Context c)
         throws SQLException
@@ -245,12 +247,19 @@ public class WorkflowItem implements InProgressSubmission
     }
 
 
+    /**
+     * get owner of WorkflowItem
+     * @return EPerson owner
+     */
     public EPerson getOwner()
     {        
         return owner;
     }
 
-    
+    /**
+     * set owner of WorkflowItem
+     * @param EPerson owner
+     */
     public void setOwner( EPerson ep )
     {
         owner = ep;
@@ -261,13 +270,19 @@ public class WorkflowItem implements InProgressSubmission
             wfRow.setColumn( "owner", ep.getID() );
     }
 
-    
+    /**
+     * Get state of WorkflowItem
+     * @return state
+     */
     public int getState()
     {
         return wfRow.getIntColumn( "state" );
     }
 
-    
+    /**
+     * Set state of WorkflowItem
+     * @param new state
+     */
     public void setState( int newstate )
     {
         wfRow.setColumn( "state", newstate );
@@ -300,6 +315,10 @@ public class WorkflowItem implements InProgressSubmission
             ourContext.getExtraLogInfo());
     }
 
+
+    /**
+     * delete the WorkflowItem, retaining the Item
+     */
     public void deleteWrapper()
         throws SQLException, IOException, AuthorizeException
     {
