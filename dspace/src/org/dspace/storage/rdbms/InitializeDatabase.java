@@ -43,13 +43,8 @@ package org.dspace.storage.rdbms;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 import org.apache.log4j.Category;
-
-import org.dspace.core.ConfigurationManager;
 
 /**
  * Command-line executed class for initializing the DSpace database.  This
@@ -79,11 +74,8 @@ public class InitializeDatabase
 
         log.info("Initializing Database");
 
-        Connection connection = null;
-
         try
         {
-            connection = DatabaseManager.getConnection();
             DatabaseManager.loadSql(new FileReader(argv[0]));
             System.exit(0);
         }
@@ -91,13 +83,6 @@ public class InitializeDatabase
         {
             log.fatal("Caught exception:", e);
             System.exit(1);
-        }
-        finally
-        {
-            if (connection != null)
-            {
-                DatabaseManager.freeConnection(connection);
-            }
         }
     }
 }
