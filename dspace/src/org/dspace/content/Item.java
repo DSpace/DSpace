@@ -40,6 +40,7 @@
 
 package org.dspace.content;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -858,6 +859,38 @@ public class Item
         bsArray = (Bitstream[]) bitstreamList.toArray(bsArray);
 
         return bsArray;
+    }
+
+
+    /**
+     * Store a copy of the license a user granted in this item.
+     *
+     * @param license   the license the user granted
+     * @param eperson   the eperson who granted the license
+     */
+    public void licenseGranted(String license, EPerson eperson)
+        throws SQLException, IOException, AuthorizeException
+    {
+        // Put together text to store
+        String licenseText = "License granted by " +
+            eperson.getFullName() + " (" + eperson.getEmail() + ") on " +
+            DCDate.getCurrent().toString() + " (GMT):\n\n" + license;
+
+        // Store text as a bitstream
+        byte[] licenseBytes = licenseText.getBytes();
+        ByteArrayInputStream bais = new ByteArrayInputStream(licenseBytes);
+        Bitstream b = createSingleBitstream(bais);
+
+        // Now set the format and name of the bitstream
+        b.setName("license.txt");
+        b.setSource("Written by org.dspace.content.Item");
+
+        // Find the License format
+        BitstreamFormat bf = BitstreamFormat.findByShortDescription(
+            ourContext, "License");
+        b.setFormat(bf);
+        
+        b.update();
     }
 
 
