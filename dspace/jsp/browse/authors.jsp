@@ -67,6 +67,7 @@
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     // Get attributes
@@ -171,7 +172,7 @@
 %>
             <tr>
                 <td class="<%= highlight && i==browseInfo.getOffset() ? "highlight" : row %>RowOddCol">
-                    <A HREF="items-by-author?author=<%= URLEncoder.encode(results[i]) %>"><%= results[i] %></A>
+                    <A HREF="items-by-author?author=<%= URLEncoder.encode(results[i]) %>"><%= Utils.addEntities(results[i]) %></A>
                 </td>
             </tr>
 <%
