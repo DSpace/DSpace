@@ -92,17 +92,6 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 Table definitions:
 
-TABLE PersonalWorkspace
-  personal_workspace_id INTEGER PRIMARY KEY,
-  item_id		INTEGER REFERENCES Item(item_id),
-  collection_id		INTEGER REFERENCES Collection(collection_id)
-
-TABLE WorkflowItem
-  workflow_id    INTEGER PRIMARY KEY,
-  item_id        INTEGER REFERENCES Item(item_id) UNIQUE,
-  collection_id  INTEGER REFERENCES Collection(collection_id)
-  state		INTEGER -- state of workflow
-
 Determining item status from the database:
 
 When an item has not been submitted yet, it is in the user's
@@ -234,7 +223,7 @@ public class WorkflowManager
             + " WHERE tasklistitem.eperson_id=" + e.getID()
             + " AND tasklistitem.workflow_id=workflowitem.workflow_id";
             
-        TableRowIterator tri = DatabaseManager.query(c, "tasklistitem", myquery);
+        TableRowIterator tri = DatabaseManager.query(c, "workflowitem", myquery);
 
         while( tri.hasNext() )
         {
