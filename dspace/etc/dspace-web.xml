@@ -88,6 +88,11 @@
     <filter-name>registered-only</filter-name>
     <url-pattern>/mydspace</url-pattern>
   </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>registered-only</filter-name>
+    <url-pattern>/tools/*</url-pattern>
+  </filter-mapping>
     
   <filter-mapping>
     <filter-name>registered-only</filter-name>
@@ -335,7 +340,7 @@
 
   <servlet-mapping>
     <servlet-name>edit-item</servlet-name>
-    <url-pattern>/dspace-admin/edit-item</url-pattern>
+    <url-pattern>/tools/edit-item</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
