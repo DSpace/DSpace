@@ -45,7 +45,7 @@ import org.dspace.storage.rdbms.TableRow;
 import java.sql.SQLException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import java.security.MessageDigest;
+import org.dspace.core.Utils;
 
 /**
  * Class representing an e-person.
@@ -78,7 +78,7 @@ public class EPerson
      *
      * @param  context  DSpace context object
      * @param  id       ID of the EPerson
-     *   
+     *
      * @return  the EPerson format, or null if the ID is invalid.
      */
     public static EPerson find(Context context, int id)
@@ -99,7 +99,7 @@ public class EPerson
     /**
      * Find the eperson by their email address
      *
-     * @ return EPerson 
+     * @ return EPerson
      */
     public static EPerson findByEmail(Context context, String email)
         throws SQLException, AuthorizeException
@@ -113,7 +113,7 @@ public class EPerson
         else
         {
             return new EPerson( context, row );
-        }    
+        }
     }
 
 
@@ -125,10 +125,10 @@ public class EPerson
     public static EPerson create(Context context)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation 
-        
+        // FIXME: Check authorisation
+
         // Create a table row
-        TableRow row = DatabaseManager.create(context, "eperson");        
+        TableRow row = DatabaseManager.create(context, "eperson");
         return new EPerson(context, row);
     }
 
@@ -195,7 +195,7 @@ public class EPerson
     {
         // FIXME: make this work.  ;-)
         String t = myRow.getStringColumn("firstname") + " " + myRow.getStringColumn("lastname");
-        
+
         return t;
     }
 
@@ -253,7 +253,7 @@ public class EPerson
     {
         myRow.setColumn("active", isactive);
     }
-    
+
     /**
      * Get active/inactive
      *
@@ -275,7 +275,7 @@ public class EPerson
         myRow.setColumn("requirecertificate", isrequired);
     }
 
-    
+
     /**
      * Get active/inactive
      *
@@ -318,7 +318,7 @@ public class EPerson
     }
 
 
-    // lastname, active, requirecertificate, phone  
+    // lastname, active, requirecertificate, phone
 
 
     /**
@@ -330,7 +330,7 @@ public class EPerson
     {
         // FIXME:  encoding
         String encoded = encodePassword(s);
-        
+
         myRow.setColumn("password", encoded);
     }
 
@@ -347,10 +347,10 @@ public class EPerson
 
         if(attempt.equals(myRow.getStringColumn("password")))
             return true;
-    
+
         return false;
     }
-    
+
 
     /**
      * Update the EPerson
@@ -373,57 +373,6 @@ public class EPerson
 
     private static String encodePassword(String cleartextpw)
     {
-        String myresult = "";
-
-        // create a digest object
-        try
-        {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-
-            // turn our cleartext password into bytes
-            byte[] buf = cleartextpw.getBytes();
-
-            // generate digest of password bytes
-            md.update(buf);
-
-            myresult = toHex(md.digest());
-        }
-        catch (java.security.NoSuchAlgorithmException e)
-        {
-            // FIXME need to log error here
-            // (it is, however, built in, and should never happen)
-        }
-
-        return myresult;
-    }
-
-
-    /** 
-     * toHex() just makes a hex-encoded string from a byte array
-     * Return a hex representation of the byte array
-     *
-     * @param hex byte array to convert
-     *
-     * @return string containing hex representation
-     */
-
-    private static String toHex(byte[] hex)
-    {
-        if ((hex == null) || (hex.length == 0))
-            return null;
-
-        StringBuffer result = new StringBuffer();
-
-        // This is far from the most efficient way to do things...
-        for (int i = 0; i < hex.length; i++)
-        {
-            int low = (int) (hex[i] & 0x0F);
-            int high = (int) (hex[i] & 0xF0);
-
-            result.append(Integer.toHexString(high).substring(0, 1));
-            result.append(Integer.toHexString(low));
-        }
-
-        return result.toString();
+        return Utils.getMD5(cleartextpw);
     }
 }
