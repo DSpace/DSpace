@@ -785,7 +785,7 @@ public class SubmitServlet extends DSpaceServlet
                 item.addDC("type", null, "en", types[i]);
             }
         }
-        
+
         // FIXME: Maybe should do integrity check using language object
         readText(request, item, "language", "iso", false, null);
 
@@ -1003,7 +1003,7 @@ public class SubmitServlet extends DSpaceServlet
          * file upload and one caused by displaying a JSP, we do all the upload
          * handling in a try/catch block
          */
-        
+
         try
         {
             // Wrap multipart request to get the submission info
@@ -1051,7 +1051,7 @@ public class SubmitServlet extends DSpaceServlet
                     // Update to DB
                     b.update();
                     item.update();
-                    
+
                     ok = true;
                 }
             }
@@ -1064,7 +1064,7 @@ public class SubmitServlet extends DSpaceServlet
                 ""),
                 ie);
         }
-        
+
         if (subInfo == null)
         {
             // In any event, if we don't have the submission info, the request
@@ -1620,7 +1620,7 @@ public class SubmitServlet extends DSpaceServlet
             FileUploadRequest fur = (FileUploadRequest) request;
             request = fur.getOriginalRequest();
         }
-        
+
         int nextStep = -1;
 
         if (buttonPressed.startsWith("submit_jump_"))
@@ -1731,11 +1731,11 @@ public class SubmitServlet extends DSpaceServlet
         case GRANT_LICENSE:
             Collection c = subInfo.submission.getCollection();
             request.setAttribute("license", c.getLicense());
-            JSPManager.showJSP(request, response, "submit/show-license.jsp");
+            JSPManager.showJSP(request, response, "/submit/show-license.jsp");
             break;
 
         case SUBMISSION_COMPLETE:
-            JSPManager.showJSP(request, response, "submit/complete.jsp");
+            JSPManager.showJSP(request, response, "/submit/complete.jsp");
             break;
 
         default:
@@ -2188,7 +2188,7 @@ public class SubmitServlet extends DSpaceServlet
                 {
                     f = "";
                 }
-                
+
                 // If there is a comma in the last name, we take everything
                 // after that comma, and add it to the right of the
                 // first name
