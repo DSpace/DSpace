@@ -96,7 +96,7 @@
 <%
         if (admin_button)  // admin edit button
         { %>
-			<td class=evenRowEvenCol align="center"
+			<td class=evenRowEvenCol align="center">
 				<form method=GET action="<%= request.getContextPath() %>/tools/edit-item">
 					<input type="hidden" name="item_id" value="<%= item.getID() %>">
 				    <input type="submit" name="submit" value="Edit...">
