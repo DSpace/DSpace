@@ -538,12 +538,14 @@ public class DSIndexer
         String   fulltext= "";
 
         // do id, type, handle first
-        doc.add(Field.UnIndexed("type",     ty.toString() ));
+       doc.add(Field.UnIndexed("type",     ty.toString() ));
 
         // want to be able to search for handle, so use keyword
         // (not tokenized, but it is indexed)    
-        doc.add(Field.Keyword  ("handle",   handle  ));
-
+        if(handle != null)
+        {
+            doc.add(Field.Keyword  ("handle",   handle  ));
+        }
         // now iterate through the hash, building full text string
         // and index all values
         Iterator i = textvalues.keySet().iterator();
@@ -555,7 +557,10 @@ public class DSIndexer
 
             fulltext = fulltext + " " + value;
 
-            doc.add(Field.Text(key, value));
+            if(value != null)
+            {
+                doc.add(Field.Text(key, value));
+            }
         }
 
         fulltext = fulltext.concat(extractedText);
