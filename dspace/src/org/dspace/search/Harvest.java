@@ -139,6 +139,29 @@ public class Harvest
         
         if (endDate != null)
         {
+        	/* If the end date has seconds precision, e.g.:
+             * 
+             *    2004-04-29T13:45:43Z
+             * 
+             * we need to add 999 milliseconds to this.  This is because
+             * SQL TIMESTAMPs have millisecond precision, and so might
+             * have a value:
+             * 
+             *    2004-04-29T13:45:43.952Z
+             * 
+             * and so <= '2004-04-29T13:45:43Z' would not pick this up.
+             * Reading things out of the database, TIMESTAMPs are rounded
+             * down, so the above value would be read as
+             * '2004-04-29T13:45:43Z', and therefore a caller would expect
+             * <= '2004-04-29T13:45:43Z' to include that value.
+             * 
+             * Got that? ;-)
+             */ 
+            if (endDate.length() == 20)
+            {
+            	endDate = endDate.substring(0, 19) + ".999Z";
+            }
+            
             query = query + " AND item.last_modified <= '" + endDate + "'";
         }
 
