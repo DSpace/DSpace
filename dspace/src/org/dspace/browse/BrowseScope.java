@@ -101,8 +101,8 @@ public class BrowseScope
      *   <ul>
      *   <li> Include results from all of DSpace
      *   <li> Start from the beginning of the given index
-     *   <li> Return 0 total results
-     *   <li> Return 0 values previous to focus
+     *   <li> Return 21 total results
+     *   <li> Return 3 values previous to focus
      *   </ul>
      *
      * @param context The DSpace context.
@@ -110,6 +110,10 @@ public class BrowseScope
     public BrowseScope(Context context)
     {
         this.context = context;
+        scope = null;
+        focus = null;
+        total = 21;
+        numberBefore = 3;
     }
 
     /**
