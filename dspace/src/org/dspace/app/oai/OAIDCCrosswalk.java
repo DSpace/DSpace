@@ -47,6 +47,7 @@ import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.search.HarvestedItemInfo;
 
 /**
  * An OAICat Crosswalk implementation that extracts unqualified Dublin Core
@@ -73,7 +74,7 @@ public class OAIDCCrosswalk extends Crosswalk
     public String createMetadata(Object nativeItem)
         throws CannotDisseminateFormatException
     {
-        Item item = ((OAIItemInfo) nativeItem).item;
+        Item item = ((HarvestedItemInfo) nativeItem).item;
         
         // Get all the DC
         DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);

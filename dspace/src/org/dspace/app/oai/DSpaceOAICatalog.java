@@ -70,12 +70,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
-
-// FIXME: "Tentacle" - shouldn't access storage layer directly here!!!
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
-
+import org.dspace.search.Harvest;
+import org.dspace.search.HarvestedItemInfo;
 
 /**
  * This is class extends OAICat's AbstractCatalog base class to allow
@@ -94,42 +90,10 @@ public class DSpaceOAICatalog extends AbstractCatalog
         "http://www.openarchives.org/OAI/2.0/oai_dc/ " +
         "http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
     
-    private int dcTypeID;
-
-
-    //** Location of qualified DC schema */
-    //private final String simpleDC =
-    //    "http://dublincore.org/schemas/xmls/simpledc20020312.xsd";
-    
+   
     public DSpaceOAICatalog(Properties properties)
-        throws SQLException
     {
-        // Find the Dublin Core DC type ID
-        Context context = null;
-
-        try
-        {
-            context = new Context();
-
-            DCType type = DCType.findByElement(context, "date", "available");
-            dcTypeID = type.getID();
-        }
-        catch (SQLException se)
-        {
-            // Log the error
-            log.warn(LogManager.getHeader(context,
-                "database_error",
-                ""), se);
-            
-            throw se;
-        }
-        finally
-        {
-            if (context != null)
-            {
-                context.abort();
-            }
-        }
+        // Don't need to do anything
     }
 
 
@@ -148,7 +112,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
     public Vector getSchemaLocations(String identifier)
         throws OAIInternalServerError, IdDoesNotExistException, NoMetadataFormatsException
     {
-        OAIItemInfo itemInfo = null;
+        HarvestedItemInfo itemInfo = null;
         Context context = null;
 
         // Get the item from the DB
@@ -156,7 +120,13 @@ public class DSpaceOAICatalog extends AbstractCatalog
         {
             context = new Context();
 
-            itemInfo = getItem(context, identifier);
+            // Valid identifiers all have prefix "hdl:"
+            if (identifier.startsWith("hdl:"))
+            {
+                itemInfo = Harvest.getSingle(context,
+                    identifier.substring(4),  // Remove "hdl:"
+                    false);
+            }
         }
         catch (SQLException se)
         {
@@ -225,14 +195,15 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
             // Get the relevant OAIItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
-            List itemHeaderInfos = getHeaderInfo(context, scope, from, until);
+            List itemInfos = Harvest.harvest(context, scope, from, until,
+                false, true); // No items, but we need to know containers
 
             // Build up lists of headers and identifiers
-            Iterator i = itemHeaderInfos.iterator();
+            Iterator i = itemInfos.iterator();
 
             while (i.hasNext())
             {
-                OAIItemInfo itemInfo = (OAIItemInfo) i.next();
+                HarvestedItemInfo itemInfo = (HarvestedItemInfo) i.next();
                 
                 String[] header = getRecordFactory().createHeader(itemInfo);
 
@@ -300,14 +271,14 @@ public class DSpaceOAICatalog extends AbstractCatalog
                IdDoesNotExistException
     {
         Context context = null;
-        OAIItemInfo itemInfo = null;
+        HarvestedItemInfo itemInfo = null;
 
         // First get the item from the DB
         try
         {
             context = new Context();
 
-            itemInfo = getItem(context, identifier);
+            itemInfo = Harvest.getSingle(context, identifier, false);
         }
         catch (SQLException se)
         {
@@ -380,16 +351,17 @@ public class DSpaceOAICatalog extends AbstractCatalog
         {
             context = new Context();
 
-            // Get the relevant OAIItemInfo objects to make headers
+            // Get the relevant HarvestedItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
-            List itemInfos = getItems(context, scope, from, until);
+            List itemInfos = Harvest.harvest(context, scope, from, until,
+                true, true);  // Need items and containers
 
-            // Build list of records from item info objects
+            // Build list of XML records from item info objects
             Iterator i = itemInfos.iterator();
 
             while (i.hasNext())
             {
-                OAIItemInfo itemInfo = (OAIItemInfo) i.next();
+                HarvestedItemInfo itemInfo = (HarvestedItemInfo) i.next();
 
                 /*
                  * FIXME: I've a feeling a "CannotDisseminateFormatException"
@@ -582,196 +554,5 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Just a community ID
             return Community.find(context, Integer.parseInt(set));
         }
-    }
-
-
-    /**
-     * Get information about a single item
-     *
-     * @param context    DSpace context
-     * @param handle     the Handle, as provided by OAI
-     *
-     * @return  the item info, or null
-     */
-    private OAIItemInfo getItem(Context context, String handle)
-        throws SQLException
-    {
-        OAIItemInfo itemInfo = null;
-
-        if (handle.startsWith("hdl:"))
-        {
-            // FIXME: Assume Handle is item
-            Item i = (Item) HandleManager.resolveToObject(context,
-                handle.substring(4)); // strip hdl: prefix
-
-            if (i != null)
-            {
-                // Fill out OAI info item object
-                itemInfo = new OAIItemInfo();
-
-                itemInfo.item = i;
-                itemInfo.handle = handle;
-                // FIXME: Assume data.available is there
-                DCValue[] dateAvail =
-                    i.getDC("date", "available", Item.ANY);
-                itemInfo.datestamp = dateAvail[0].value;
-                itemInfo.itemID = i.getID();
-
-                // Get the sets
-                itemInfo.setSpecs = new LinkedList();
-                Collection[] colls = i.getCollections();
-                
-                for (int colNo = 0; colNo < colls.length; colNo++)
-                {
-                    Community[] comms = colls[colNo].getCommunities();
-                    
-                    for (int comNo = 0; comNo < comms.length; comNo++)
-                    {
-                        // For each container, we add a setSpec of:
-                        // community-id:collection-id
-                        String setSpec =
-                            String.valueOf(comms[comNo].getID()) +
-                            ":" +
-                            String.valueOf(colls[colNo].getID());
-
-                        itemInfo.setSpecs.add(setSpec);
-                    }
-                }
-            }
-        }
-        
-        return itemInfo;
-    }
-    
-
-    /**
-     * Obtain Handles for a given date range.
-     * FIXME: Assumes all in_archive items have date.available set,
-     * and have public metadata
-     * FIXME: Shouldn't use storage layer directly!
-     *
-     * @param context    DSpace context
-     * @param scope      a Community or Collection, or null
-     * @param startDate  start of date range, or null
-     * @param endDate    end of date range, or null
-     *
-     * @return  List of OAIItemInfo objects, without the item field
-     */
-    private List getHeaderInfo(Context context, DSpaceObject scope,
-        String startDate, String endDate)
-        throws SQLException
-    {
-        // SQL to add to the list of tables after the SELECT
-        String scopeTableSQL = "";
-
-        // SQL to add to the WHERE clause of the query
-        String scopeWhereSQL = "";
-
-        if (scope != null)
-        {
-            if (scope.getType() == Constants.COMMUNITY)
-            {
-                // Getting things within a community
-                scopeTableSQL = ", community2item";
-                scopeWhereSQL = " AND community2item.community_id=" +
-                    scope.getID() +
-                    " AND community2item.item_id=handle.resource_id";
-            }
-            else if (scope.getType() == Constants.COLLECTION)
-            {
-                scopeTableSQL = ", collection2item";
-                scopeWhereSQL = " AND collection2item.collection_id=" +
-                    scope.getID() +
-                    " AND collection2item.item_id=handle.resource_id";
-            }
-            // Theoretically, no other possibilities, won't bother to check
-        }
-
-        // Put together our query
-        String query = 
-            "SELECT handle.handle, handle.resource_id, dcvalue.text_value FROM handle, dcvalue" +
-            scopeTableSQL + " WHERE handle.resource_type_id=" + Constants.ITEM +
-            " AND handle.resource_id=dcvalue.item_id AND dcvalue.dc_type_id=" +
-            dcTypeID + scopeWhereSQL;
-        
-        if (startDate != null)
-        {
-            query = query + " AND dcvalue.text_value >= '" + startDate + "'";
-        }
-        
-        if (endDate != null)
-        {
-            query = query + " AND dcvalue.text_value <= '" + endDate + "'";
-        }
-
-System.err.println("OAI SQL query: " + query);
-
-        // Execute
-        TableRowIterator tri = DatabaseManager.query(context, query);
-        List infoObjects = new LinkedList();
-        
-        while (tri.hasNext())
-        {
-            TableRow row = tri.next();
-            OAIItemInfo itemInfo = new OAIItemInfo();
-            
-            itemInfo.handle = "hdl:" + row.getStringColumn("handle");
-            itemInfo.itemID = row.getIntColumn("resource_id");
-            itemInfo.datestamp = row.getStringColumn("text_value");
-
-            // Get the sets (communities/collections)
-            TableRowIterator containers = DatabaseManager.query(context,
-                "SELECT community2collection.community_id, community2collection.collection_id FROM community2collection, collection2item WHERE community2collection.collection_id=collection2item.collection_id AND collection2item.item_id=" +
-                itemInfo.itemID);
-            
-            itemInfo.setSpecs = new LinkedList();
-            while (containers.hasNext())
-            {
-                TableRow containerRow = containers.next();
-                
-                // For each container, we add a setSpec of:
-                // community-id:collection-id
-                String setSpec =
-                    String.valueOf(containerRow.getIntColumn("community_id")) +
-                    ":" +
-                    String.valueOf(containerRow.getIntColumn("collection_id"));
-
-                itemInfo.setSpecs.add(setSpec);
-            }
-
-            infoObjects.add(itemInfo);
-        }
-            
-        return infoObjects;
-    }
-
-
-    /**
-     * Obtain items and Handles with a given date range
-     * FIXME: Same caveats as getHandles()
-     *
-     * @param context    DSpace context
-     * @param scope      a Community or Collection, or null
-     * @param startDate  start of date range, or null
-     * @param endDate    end of date range, or null
-     *
-     * @return  List of OAIItemInfo objects, without the item field
-     */
-    private List getItems(Context context, DSpaceObject scope,
-        String startDate, String endDate)
-        throws SQLException
-    {
-        // Get header info objects
-        List infoObjects = getHeaderInfo(context, scope, startDate, endDate);
-        
-        // Fill out the item fields
-        Iterator i = infoObjects.iterator();
-        while (i.hasNext())
-        {
-            OAIItemInfo itemInfo = (OAIItemInfo) i.next();
-            itemInfo.item = Item.find(context, itemInfo.itemID);
-        }
-
-        return infoObjects;
     }
 }

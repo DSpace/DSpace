@@ -56,6 +56,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.LogManager;
+import org.dspace.search.HarvestedItemInfo;
 
 /**
  * Implementation of the OAICat RecordFactory base class for DSpace items.
@@ -93,20 +94,29 @@ public class DSpaceRecordFactory extends RecordFactory
 
     protected String getOAIIdentifier(Object nativeItem)
     {
-        return ((OAIItemInfo) nativeItem).handle;
+        String h = "hdl:" + ((HarvestedItemInfo) nativeItem).handle;
+        return h;
     }
     
     
     protected String getDatestamp(Object nativeItem)
     {
-        return ((OAIItemInfo) nativeItem).datestamp;
+        return ((HarvestedItemInfo) nativeItem).datestamp;
     }
 
 
     protected Iterator getSetSpecs(Object nativeItem)
     {
-        List setSpecs = ((OAIItemInfo) nativeItem).setSpecs;
-
+        HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
+        List setSpecs = new LinkedList();
+        
+        // Convert container IDs to set specs (comm-id:coll-id)
+        for (int i = 0; i < hii.containers.length; i++)
+        {
+            setSpecs.add(String.valueOf(hii.containers[i][0]) + ":" +
+                         String.valueOf(hii.containers[i][1]));
+        }
+        
         return setSpecs.iterator();
     }
     

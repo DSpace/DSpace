@@ -1,5 +1,5 @@
 /*
- * NativeItem.java
+ * HarvestedItemInfo.java
  *
  * Version: $Revision$
  *
@@ -38,32 +38,41 @@
  * DAMAGE.
  */
 
-package org.dspace.app.oai;
+package org.dspace.search;
 
 import java.util.List;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
- * Simple container class containing information about a DSpace item.
+ * Simple container class containing information about a harvested DSpace item.
+ *
+ * @author  Robert Tansley
+ * @version $Revision$
  */
-public class OAIItemInfo
+public class HarvestedItemInfo
 {
-    /** DSpace context object */
-    public Context context;
-
-    /** The item.  Note that not all calls fill this out */
-    public Item item;
-    
     /** Internal item ID (as opposed to item's OAI ID, which is the Handle) */
     public int itemID;
 
-    /** The Handle */
+    /** The Handle, with no prefix */
     public String handle;
 
     /** The datestamp (ISO8601) */
     public String datestamp;
     
-    /** Set specs - Strings */
-    public List setSpecs;
+    /** The item.  Only filled out if requested */
+    public Item item;
+    
+    /**
+     * Containers (communities and collections).  Only filled out if
+     * requested.  An example of how this is filled out:  Say the item
+     * contained by collectionY in communityX, and collectionB in communityC.
+     * This field is filled out as follows: <P>
+     * <code>containers[0][0]</code> - ID of communityX <br>
+     * <code>containers[0][1]</code> - ID of collectionY <br>
+     * <code>containers[1][0]</code> - ID of communityA <br>
+     * <code>containers[1][1]</code> - ID of collectionB <br>
+     */
+    public int[][] containers;
 }
