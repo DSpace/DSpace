@@ -57,6 +57,7 @@ import org.apache.lucene.analysis.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 
 
 // issues
@@ -67,9 +68,9 @@ public class DSQuery
 {
     // Result types
     static final String ALL		    = "999";
-    static final String ITEM		= "2";
-    static final String COLLECTION	= "3";
-    static final String COMMUNITY	= "4";
+    static final String ITEM		= "" + Constants.ITEM;
+    static final String COLLECTION	= "" + Constants.COLLECTION;
+    static final String COMMUNITY	= "" + Constants.COMMUNITY;
 
     /** Do a query, returning a List of DSpace Handles to objects matching the query.
      *  @param query string in Lucene query syntax
@@ -81,7 +82,7 @@ public class DSQuery
         throws ParseException, IOException
     {
                         
-        ArrayList resultlist	= new ArrayList();
+        ArrayList resultlist= new ArrayList();
         ArrayList itemlist 	= new ArrayList();
         ArrayList commlist 	= new ArrayList();
         ArrayList colllist 	= new ArrayList();
@@ -112,19 +113,22 @@ public class DSQuery
                 } 
                 else if (handletype.equals(COLLECTION))
                 {
-			colllist.add(handletext);
-	        }
-	        else if (handletype.equals(COMMUNITY))
-	        {	
-		        commlist.add(handletext); break;
-		}
-                	
+                    colllist.add(handletext);
+                }
+                else if (handletype.equals(COMMUNITY))
+                {	
+                    commlist.add(handletext); break;
+                }
             }
-            
-            metahash.put(ALL, resultlist);
-            metahash.put(ITEM, itemlist);
-            metahash.put(COLLECTION, colllist);
-            metahash.put(COMMUNITY, commlist);
+
+            // close the IndexSearcher - and all its filehandles
+            searcher.close();
+
+            // store all of the different types of hits in the hash            
+            metahash.put(ALL,       resultlist);
+            metahash.put(ITEM,      itemlist  );
+            metahash.put(COLLECTION,colllist  );
+            metahash.put(COMMUNITY, commlist  );
         }
         catch (NumberFormatException e)
         {

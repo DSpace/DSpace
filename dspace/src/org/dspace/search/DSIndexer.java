@@ -126,7 +126,7 @@ public class DSIndexer
         else
         {
             // FIXME: no handle, fail quietly - should log failure
-            System.out.println("Error in unIndexContent: Object had no handle!");            
+            //System.out.println("Error in unIndexContent: Object had no handle!");            
         }
     }
 
