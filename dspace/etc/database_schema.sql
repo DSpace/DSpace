@@ -42,7 +42,7 @@
 --
 --   DSpace SQL table definitions
 --
---   Author:   Peter Breton
+--   Authors:   Peter Breton, Robert Tansley, David Stuve, Daniel Chudnov
 --
 --       This file is used as-is to initialize a database. Therefore,
 --       table and view definitions must be ordered correctly.
@@ -156,7 +156,6 @@ CREATE TABLE Bundle2Bitstream
 (
   id           INTEGER PRIMARY KEY,
   bundle_id    INTEGER REFERENCES Bundle(bundle_id),
-  -- FIXME: UNIQUE?
   bitstream_id INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
@@ -374,8 +373,6 @@ DROP TABLE History;
 CREATE TABLE History
 (
   history_id           INTEGER PRIMARY KEY,
-  -- The RDF
-  data                 TEXT,
   -- When it was stored
   creation_date        TIMESTAMP,
   -- A checksum to keep serializations from being stored more than once
@@ -390,48 +387,8 @@ DROP TABLE HistoryState;
 CREATE TABLE HistoryState
 (
   history_state_id           INTEGER PRIMARY KEY,
-  -- The id of the object
   object_id                  VARCHAR(64)
 );
-
--------------------------------------------------------
--- Example table for test purposes
--------------------------------------------------------
-DROP TABLE TestTable;
-
-CREATE TABLE TestTable
-(
-  Id     INTEGER PRIMARY KEY,
-  Name   VARCHAR(64),
-  Date   DATE,
-  Stuff  VARCHAR(255),
-  Amount INTEGER
-);
-
--------------------------------------------------------
--- Test table
--------------------------------------------------------
-DROP TABLE TestTable2;
-
-CREATE TABLE TestTable2
-(
-  Id     INTEGER PRIMARY KEY,
-  Name   VARCHAR(64) UNIQUE,
-  Test_Table_Id INTEGER REFERENCES TestTable(Id)
-);
-
--------------------------------------------------------
--- Test table for mapping
--------------------------------------------------------
-DROP TABLE TestTableMapping;
-
-CREATE TABLE TestTableMapping
-(
-  Id     INTEGER PRIMARY KEY,
-  Test_Table_Id  INTEGER REFERENCES TestTable(Id),
-  Test_Table2_Id INTEGER REFERENCES TestTable2(Id)
-);
-
 
 ------------------------------------------------------------
 -- Convenience views
@@ -476,7 +433,7 @@ WHERE Item.item_id = DCValue.item_id
 ;
 
 -------------------------------------------------------
---  ItemsByAuthor view
+--  ItemsByAuthor table
 -------------------------------------------------------
 DROP TABLE ItemsByAuthor;
 
@@ -509,48 +466,8 @@ FROM ItemsByAuthor, Community2Item
 WHERE ItemsByAuthor.item_id = Community2Item.item_id
 ;
 
--------------------------------------------------------
---   Function sorttitle
--------------------------------------------------------
-DROP FUNCTION sorttitle(varchar);
-
-CREATE FUNCTION sorttitle(varchar) RETURNS varchar AS 
-'
-declare
-    title  alias for $1;
-    ltitle TEXT;
-    stitle TEXT;
-    stop   TEXT;
-begin
-    -- Strip out whitespace
-    select into stitle trim(title);
-    -- Lower-case the title (ONLY FOR COMPARISON PURPOSES)
-    select into ltitle lower(stitle);
-
-    -- Check for occurrences of the
-    select into stop ''the '';
-    if position(stop in ltitle) = 1 then
-       return substring(stitle, char_length(stop) + 1) || '', '' || substring(stitle, 0, char_length(stop));
-    end if;
-
-    -- Check for occurrences of an
-    select into stop ''an '';
-    if position(stop in ltitle) = 1 then
-       return substring(stitle, char_length(stop) + 1) || '', '' || substring(stitle, 0, char_length(stop));
-    end if;
-
-    -- Check for occurrences of a
-    select into stop ''a '';
-    if position(stop in ltitle) = 1 then
-       return substring(stitle, char_length(stop) + 1) || '', '' || substring(stitle, 0, char_length(stop));
-    end if;
-
-    return stitle;
-end;
-' language 'plpgsql';
-
 ----------------------------------------
--- ItemsByTitle view
+-- ItemsByTitle table
 ----------------------------------------
 
 DROP TABLE ItemsByTitle;
