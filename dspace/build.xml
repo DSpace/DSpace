@@ -207,6 +207,7 @@ Common usage:
     <mkdir dir="${upload.temp.dir}" />
     <mkdir dir="${dspace.dir}/bin"/>
     <mkdir dir="${dspace.dir}/lib"/>
+    <mkdir dir="${dspace.dir}/reports"/>
     <copy todir="${dspace.dir}/bin" preservelastmodified="true">
       <fileset dir="bin"/>
     </copy>
