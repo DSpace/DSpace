@@ -54,6 +54,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -64,7 +65,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
 import org.apache.xpath.XPathAPI;
 import org.apache.commons.cli.Options; 
@@ -87,21 +87,21 @@ import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
 
-
 /**
-* The Item importer does exactly that - imports items into
-*  the repository.
-*/
-
+ * The Item importer does exactly that - imports items into
+ *  the repository.
+ */
 public class ItemImport
 {
     static boolean useWorkflow = false;
+    static boolean isTest      = false;
+    static boolean isResume    = false;
 
+    static PrintWriter mapOut  = null;
+    
     public static void main(String argv[])
         throws Exception
     {
@@ -110,22 +110,25 @@ public class ItemImport
 
         Options options = new Options();
 
-        options.addOption( "a", "add",         false, "add items to DSpace");
-        options.addOption( "r", "replace",     false, "replace items in mapfile");
-        options.addOption( "R", "remove",      false, "remove items in mapfile");
-        options.addOption( "s", "source",      true,  "source of items (directory)");
-        options.addOption( "c", "collection",  true,  "destination collection(s) databse ID");
-        options.addOption( "m", "mapfile",     true,  "mapfile items in mapfile");
-        options.addOption( "e", "eperson",     true,  "email of eperson doing importing");
-        options.addOption( "w", "workflow",    false, "send submission through collection's workflow");
-        options.addOption( "h", "help",        false, "help");
+        options.addOption( "a", "add",        false, "add items to DSpace");
+        options.addOption( "r", "replace",    false, "replace items in mapfile");
+        options.addOption( "d", "delete",     false, "delete items listed in mapfile");
+        options.addOption( "s", "source",     true,  "source of items (directory)");
+        options.addOption( "c", "collection", true,  "destination collection(s) databse ID");
+        options.addOption( "m", "mapfile",    true,  "mapfile items in mapfile");
+        options.addOption( "e", "eperson",    true,  "email of eperson doing importing");
+        options.addOption( "w", "workflow",   false, "send submission through collection's workflow");
+        options.addOption( "t", "test",       false, "test run - do not actually import items");
+        options.addOption( "R", "resume",     false, "resume a failed import (add only)");
+        
+        options.addOption( "h", "help",       false, "help");
 
         CommandLine line = parser.parse( options, argv );
 
-        String command    = null;  // add replace remove, etc
-        String sourcedir  = null;
-        String mapfile    = null;
-        String eperson    = null;  // db ID or email
+        String command   = null;  // add replace remove, etc
+        String sourcedir = null;
+        String mapfile   = null;
+        String eperson   = null;  // db ID or email
         String [] collections = null; // db ID or handles
 
         if( line.hasOption('h') )
@@ -134,7 +137,7 @@ public class ItemImport
             myhelp.printHelp( "ItemImport\n", options );
             System.out.println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
             System.out.println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
-            System.out.println("removing items:  ItemImport -R -e eperson -m mapfile");
+            System.out.println("deleting items:  ItemImport -d -e eperson -m mapfile");
             System.out.println("If multiple collections are specified, the first collection will be the one that owns the item.");
 
             System.exit(0);
@@ -142,9 +145,14 @@ public class ItemImport
 
         if( line.hasOption( 'a' ) ) { command = "add";    } 
         if( line.hasOption( 'r' ) ) { command = "replace";}
-        if( line.hasOption( 'R' ) ) { command = "remove"; }
+        if( line.hasOption( 'd' ) ) { command = "delete"; }
 
         if( line.hasOption( 'w' ) ) { useWorkflow = true; }
+        if( line.hasOption( 't' ) )
+        {
+        	isTest = true;
+        	System.out.println("**Test Run** - not actually importing items.");
+        }
        
         if( line.hasOption( 's' ) ) // source
         {
@@ -166,38 +174,47 @@ public class ItemImport
             collections = line.getOptionValues( 'c' );    
         }
 
+        if( line.hasOption( 'R' ) )
+        {
+        	isResume = true;
+        	System.out.println("**Resume import** - attempting to import items not already imported");
+        }
+        
         // now validate
         // must have a command set
         if( command == null )
         {
             System.out.println("Error - must run with either add, replace, or remove (run with -h flag for details)");
-                System.exit(1);
+            System.exit(1);
         }
         else if( command.equals("add") || command.equals("replace") )
         {
             if( sourcedir == null )
             {
-                System.out.println("Error - a source directory containing items must be set (run with -h flag for details)"); 
+                System.out.println("Error - a source directory containing items must be set");
+                System.out.println(" (run with -h flag for details)"); 
                 System.exit(1);
             }
             if( mapfile == null )
             {
-                System.out.println("Error - a map file to hold importing results must be specified (run with -h flag for details)");
+                System.out.println("Error - a map file to hold importing results must be specified");
+                System.out.println(" (run with -h flag for details)"); 
                 System.exit(1);
             }
             if( eperson == null )
             {
-                System.out.println("Error - an eperson to do the importing must be specified (run with -h flag for details)");
+                System.out.println("Error - an eperson to do the importing must be specified");
+                System.out.println(" (run with -h flag for details)"); 
                 System.exit(1);
             }
             if( collections == null )
             {
-                System.out.println("Error - at least one destination collection must be specified (run with -h flag for details)");
+                System.out.println("Error - at least one destination collection must be specified");
+                System.out.println(" (run with -h flag for details)"); 
                 System.exit(1);
             }
-
         }
-        else if( command.equals("remove") )
+        else if( command.equals("delete") )
         {
             if( eperson == null )
             {
@@ -211,7 +228,23 @@ public class ItemImport
             }
         } 
 
+        // can only resume for adds
+        if(isResume && !command.equals("add"))
+        {
+        	System.out.println("Error - resume option only works with --add command");
+        	System.exit(1);
+        }
 
+        // do checks around mapfile - if mapfile exists and 'add' is selected, resume must be chosen
+        File myFile = new File(mapfile);
+
+        if(myFile.exists() && command.equals("add") && !isResume)
+        {
+        	System.out.println("Error - the mapfile " + mapfile + " already exists.");
+        	System.out.println("Either delete it or use --resume if attempting to resume an aborted import.");
+        	System.exit(1);
+        }
+        
         ItemImport myloader = new ItemImport();
 
         // create a context
@@ -219,7 +252,7 @@ public class ItemImport
 
         // find the EPerson, assign to context
         EPerson myEPerson = null;
-	if( eperson.indexOf('@') != -1)
+        if( eperson.indexOf('@') != -1)
         {
             // @ sign, must be an email
             myEPerson = EPerson.findByEmail( c, eperson );
@@ -240,14 +273,13 @@ public class ItemImport
         // find collections
         Collection [] mycollections = null;
 
-        // don't need to validate collections set if command is "remove"
-        if( !command.equals("remove") )
+        // don't need to validate collections set if command is "delete"
+        if( !command.equals("delete") )
         {
             System.out.println("Destination collections:");
 
             mycollections =  new Collection[collections.length];
 
-            
             // validate each collection arg to see if it's a real collection
             for(int i=0; i<collections.length; i++)
             {
@@ -282,7 +314,6 @@ public class ItemImport
                 if( i == 0 ) owningPrefix = "Owning ";
                 System.out.println( owningPrefix + " Collection: " + mycollections[i].getMetadata("name"));
             }
-
         } // end of validating collections
         
         try
@@ -297,9 +328,9 @@ public class ItemImport
             {
                 myloader.replaceItems( c, mycollections, sourcedir, mapfile );
             }
-            else if( command.equals( "remove" ) )
+            else if( command.equals( "delete" ) )
             {
-                myloader.removeItems( c, mapfile );
+                myloader.deleteItems( c, mapfile );
             }
 
             // complete all transactions
@@ -308,29 +339,50 @@ public class ItemImport
         catch( Exception e )
         {
             // abort all operations
-            c.abort();
+           	if( mapOut != null ) mapOut.close();
+           	mapOut = null;
+           	
+           	c.abort();
             e.printStackTrace();
             System.out.println( e );
         }
+        
+        if( mapOut != null ) mapOut.close();
+        
+        if(isTest) System.out.println("***End of Test Run***");
     }
 
     
     private void addItems( Context c, Collection [] mycollections, String sourceDir, String mapFile )
         throws Exception
     {
+    	Map skipItems = new HashMap(); // set of items to skip if in 'resume' mode
+    	
         System.out.println( "Adding items from directory: " + sourceDir );
         System.out.println( "Generating mapfile: "          + mapFile   );
         
         // create the mapfile
-        File        outFile = new File( mapFile );
-        PrintWriter mapOut  = new PrintWriter( new FileWriter( outFile ) );
-       
-        if( mapOut == null )
+        File outFile = null;
+        
+        if( !isTest )
         {
-            throw new Exception("can't open mapfile: " + mapFile);
+        	// get the directory names of items to skip (will be in keys of hash)
+        	if(isResume)
+        	{
+        		skipItems = readMapFile(mapFile);
+        	}
+        	
+        	// sneaky isResume == true means open file in append mode
+        	outFile = new File( mapFile );
+            mapOut  = new PrintWriter( new FileWriter(outFile, isResume) );
+
+            if( mapOut == null )
+            {
+            	throw new Exception("can't open mapfile: " + mapFile);
+            }
         }
  
-        // now process the source directory
+        // open and process the source directory
         File d = new java.io.File( sourceDir );
 
         if( d == null )
@@ -341,13 +393,16 @@ public class ItemImport
 
         String [] dircontents = d.list();
 
-        for( int i = 0; i < dircontents.length; i++ )
-        {
-            addItem( c, mycollections, sourceDir, dircontents[ i ], mapOut );
-            System.out.println( i + " " + dircontents[ i ] );
-        }
-        
-        mapOut.close();
+       	for( int i = 0; i < dircontents.length; i++ )
+       	{
+       		if(skipItems.containsKey(dircontents[i]))
+       			System.out.println("Skipping import of " + dircontents[i]);
+       		else
+       		{	
+       			addItem( c, mycollections, sourceDir, dircontents[ i ], mapOut );
+       			System.out.println( i + " " + dircontents[ i ] );
+       		}
+       	}
     }
 
 
@@ -364,7 +419,7 @@ public class ItemImport
         }
 
         // read in HashMap first, to get list of handles & source dirs
-        HashMap myhash = readMapFile( mapFile );
+        Map myhash = readMapFile( mapFile );
         
         // for each handle, re-import the item, discard the new handle
         // and re-assign the old handle
@@ -392,28 +447,28 @@ public class ItemImport
             } 
 
             newItem = addItem(c, mycollections, sourceDir, newItemName, null);
+            
             // schedule item for demolition
             itemsToDelete.add( oldItem );
         }
                 
         // now run through again, deleting items (do this last to avoid disasters!)
         // (this way deletes only happen if there have been no errors previously) 
-        i = itemsToDelete.iterator();
+       	i = itemsToDelete.iterator();
         
-        while( i.hasNext() )
-        {
-            removeItem(c, (Item)i.next());
+       	while( i.hasNext() )
+       	{
+       	    deleteItem(c, (Item)i.next());
         }
     }
 
-
-    private void removeItems( Context c, String mapFile )
+    private void deleteItems( Context c, String mapFile )
         throws Exception
     {
         System.out.println( "Deleting items listed in mapfile: " + mapFile );
         
         // read in the mapfile
-        HashMap myhash = readMapFile( mapFile );
+        Map myhash = readMapFile( mapFile );
 
         // now delete everything that appeared in the mapFile
         Iterator i = myhash.keySet().iterator();
@@ -426,18 +481,17 @@ public class ItemImport
             {
                 String myhandle = itemID;
                 System.out.println("Deleting item " + myhandle);
-                removeItem(c, myhandle);
+                deleteItem(c, myhandle);
             }
             else
             {
                 // it's an ID
                 Item myitem = Item.find(c, Integer.parseInt(itemID));
                 System.out.println("Deleting item " + itemID);
-                removeItem(c, myitem);
+                deleteItem(c, myitem);
             }
         }
     }
-
 
 
     /** item?  try and add it to the archive
@@ -451,15 +505,20 @@ public class ItemImport
     private Item addItem( Context c, Collection [] mycollections, String path, String itemname, PrintWriter mapOut )
         throws Exception
     {
-        Item myitem = null;
-
+    	String mapOutput = null;
+    	
         System.out.println("Adding item from directory " + itemname );
 
         // create workspace item
-        WorkspaceItem wi = WorkspaceItem.create(c, mycollections[0], false);
-
-        myitem = wi.getItem();
-
+        Item myitem      = null;
+        WorkspaceItem wi = null;
+        
+        if( !isTest )
+        {
+        	wi = WorkspaceItem.create(c, mycollections[0], false);
+        	myitem = wi.getItem();
+        }
+        
         // now fill out dublin core for item        
         loadDublinCore( c, myitem, path + File.separatorChar + itemname + File.separatorChar + "dublin_core.xml" );
 
@@ -467,16 +526,17 @@ public class ItemImport
         // process contents file, add bistreams and bundles
         processContentsFile( c, myitem, path + File.separatorChar + itemname, "contents" );
 
-
         if( useWorkflow )
         {
             // don't process handle file
-
             // start up a workflow
-            WorkflowManager.startWithoutNotify( c, wi );
+            if(!isTest)
+            {
+            	WorkflowManager.startWithoutNotify( c, wi );
 
-            // send ID to the mapfile
-            if( mapOut != null ) mapOut.println( itemname + " " + myitem.getID() );
+                // send ID to the mapfile
+            	mapOutput = itemname + " " + myitem.getID();
+            }
         }
         else
         {
@@ -485,12 +545,15 @@ public class ItemImport
                 "handle" );
 
             // put item in system
-            InstallItem.installItem(c, wi, myhandle);
+            if(!isTest)
+            {
+            	InstallItem.installItem(c, wi, myhandle);
 
-            // find the handle, and output to map file
-            myhandle = HandleManager.findHandle(c, myitem);
+            	// find the handle, and output to map file
+            	myhandle = HandleManager.findHandle(c, myitem);
                 
-            if( mapOut != null ) mapOut.println( itemname + " " + myhandle );       
+            	mapOutput = itemname + " " + myhandle;       
+            }
         }
 
         // now add to multiple collections if requested
@@ -498,28 +561,35 @@ public class ItemImport
         {
             for(int i = 1; i < mycollections.length; i++ )
             {
-                mycollections[i].addItem(myitem);
+                if(!isTest) mycollections[i].addItem(myitem);
             }
         }
-
+        
+        // made it this far, everything is fine, commit transaction
+        if(mapOut != null) mapOut.println(mapOutput);
+        c.commit();
+        
         return myitem;
     }
 
     // remove, given the actual item
-    private void removeItem( Context c, Item myitem )
+    private void deleteItem( Context c, Item myitem )
         throws Exception
     {
-        Collection[] collections = myitem.getCollections();
+    	if(!isTest)
+    	{
+    		Collection[] collections = myitem.getCollections();
 
-        // Remove item from all the collections it's in
-        for (int i = 0; i < collections.length; i++)
-        {
-           	collections[i].removeItem(myitem);
-        }
+    		// Remove item from all the collections it's in
+    		for (int i = 0; i < collections.length; i++)
+    		{
+    			collections[i].removeItem(myitem);
+    		}
+    	}
     }
 
     // remove, given a handle
-    private void removeItem( Context c, String myhandle )
+    private void deleteItem( Context c, String myhandle )
         throws Exception
     {
         // bit of a hack - to remove an item, you must remove it
@@ -530,8 +600,10 @@ public class ItemImport
         {
             System.out.println("Error - cannot locate item - already deleted?");
         }
-
-        removeItem( c, myitem );
+        else
+        {
+        	deleteItem( c, myitem );
+        }
     }
 
     ////////////////////////////////////
@@ -539,12 +611,12 @@ public class ItemImport
     ////////////////////////////////////
 
     // read in the map file and generate a hashmap of (file,handle) pairs
-    private HashMap readMapFile( String filename )
+    private Map readMapFile( String filename )
         throws Exception
     {
-        HashMap myhash = new HashMap();
+        Map myhash = new HashMap();
 
-        BufferedReader is = new BufferedReader( new FileReader( filename     ) );
+        BufferedReader is = new BufferedReader( new FileReader(filename) );
         String line;
 
         while( ( line = is.readLine() ) != null )
@@ -616,8 +688,10 @@ public class ItemImport
         // a goofy default, but there it is
         if( language == null ) { language = "en"; }
 
-
-        i.addDC(element, qualifier, language, value);
+        if(!isTest)
+        {
+        	i.addDC(element, qualifier, language, value);
+        }
     }
 
 
@@ -711,7 +785,6 @@ public class ItemImport
                 processContentFileEntry( c, i, path, bitstreamName, bundleName );
                 System.out.println( "\tBitstream: " + bitstreamName + "\tBundle: " + bundleName );
             }
-        
         }
         is.close();
     }
@@ -742,34 +815,36 @@ public class ItemImport
                 newBundleName = "ORIGINAL";
             }
         }
-        
-        
-        // find the bundle
-        Bundle [] bundles = i.getBundles( newBundleName );
-        Bundle targetBundle = null;
-            
-        if( bundles.length < 1 )
+
+        if(!isTest)
         {
-            // not found, create a new one
-            targetBundle = i.createBundle( newBundleName );
+        	// find the bundle
+	        Bundle [] bundles = i.getBundles( newBundleName );
+	        Bundle targetBundle = null;
+	            
+	        if( bundles.length < 1 )
+	        {
+	            // not found, create a new one
+	            targetBundle = i.createBundle( newBundleName );
+	        }
+	        else
+	        {
+	            // put bitstreams into first bundle
+	            targetBundle = bundles[0];
+	        }
+	
+	        // now add the bitstream
+	        bs = targetBundle.createBitstream( bis );
+	
+	        bs.setName( fileName );
+	
+	        // Identify the format
+	        // FIXME - guessing format guesses license.txt incorrectly as a text file format!
+	        BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
+	        bs.setFormat(bf);
+	
+	        bs.update();
         }
-        else
-        {
-            // put bitstreams into first bundle
-            targetBundle = bundles[0];
-        }
-
-        // now add the bitstream
-        bs = targetBundle.createBitstream( bis );
-
-        bs.setName( fileName );
-
-        // Identify the format
-        // FIXME - guessing format guesses license.txt incorrectly as a text file format!
-        BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
-        bs.setFormat(bf);
-
-        bs.update();
     }
 
 
@@ -859,5 +934,3 @@ public class ItemImport
         return builder.parse(new File(filename));
     }
 }
-
-
