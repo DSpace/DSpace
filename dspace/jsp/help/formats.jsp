@@ -113,8 +113,7 @@
     </tr>
 </table>
 
-<table align="center" border="0" 
- cellspacing="5" cellpadding="5" width="95%">
+<table class="formats" align="center" border="0" >
     <tr>
         <th align="left"><strong>MIME Type</strong></th>
         <th align="left"><strong>Extensions</strong></th>
