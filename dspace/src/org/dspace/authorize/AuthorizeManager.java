@@ -40,10 +40,6 @@
 
 package org.dspace.authorize;
 
-//import org.dspace.db.*;
-//import org.dspace.db.generated.*;
-//import org.dspace.util.beans.BeanUtils;
-
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -51,7 +47,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-//import org.dspace.core.DSpaceTypes;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.eperson.EPerson;
@@ -60,6 +55,27 @@ import org.dspace.eperson.Group;
 import java.util.StringTokenizer;
 
 /**
+ * AuthorizeManager handles all authorization checks for DSpace.
+ * For better security, DSpace assumes that you do not have the right
+ * to do something unless that permission is spelled out somewhere.
+ * That "somewhere" is the ResourcePolicy table.  The AuthorizeManager
+ * is given a user, an object, and an action, and it then does a lookup
+ * in the ResourcePolicy table to see if there are any policies giving
+ * the user permission to do that action.
+ * <p>
+ * ResourcePolicies will usually apply to a single object (such
+ * as submit permission to a collection,) or a container full
+ * of objects, such as read permission for items contained in
+ * a collection.
+ * <p>
+ * PolicyStatements are currently a very simple language - a list
+ * of comma-delimited groups and users.  Groups are identified
+ * by gID and users by uID, so <code>g10,u5432</code> is a policy
+ * statement saying that user 5432 and members of group 10 are
+ * allowed to do the referred action.
+ * <p>
+ * Note: If an eperson is a member of the administrator group (id -1), then
+ *  they are automatically given permission for all requests.
  */
 
 public class AuthorizeManager
