@@ -70,6 +70,8 @@ public class DSQuery
     static final String COLLECTION	= "3";
     static final String COMMUNITY	= "4";
 
+    static final int MAXITEMHITS        = 50;
+
     /** Do a query, returning a List of DSpace Handles to objects matching the query.
      *  @param query string in Lucene query syntax
      */
@@ -91,6 +93,7 @@ public class DSQuery
 
             Query myquery = qp.parse(querystring);
             Hits hits = searcher.search(myquery);
+            int itemCounter = 0;
 
             for (int i = 0; i < hits.length(); i++)
             {
@@ -101,7 +104,11 @@ public class DSQuery
                 
                 if (handletype.equals(ITEM)) 
                 { 
-                	itemlist.add(handletext); 
+                        itemCounter++;
+                        if (itemCounter <= MAXITEMHITS)
+                	{
+                            itemlist.add(handletext);
+                        }
 //                	System.out.println (handletext + " is an item!");
                 } 
                 else if (handletype.equals(COLLECTION))
