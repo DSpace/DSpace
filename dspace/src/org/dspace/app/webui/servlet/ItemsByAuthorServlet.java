@@ -65,7 +65,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.handle.HandleManager;
 
 
 
@@ -134,24 +133,12 @@ public class ItemsByAuthorServlet extends DSpaceServlet
             "items_by_author",
             logInfo + ",result_count=" + browseInfo.getResultCount()));
 
-        
-        // Get the Handles
-        Item[] results = browseInfo.getItemResults();
-        String[] handles = new String[results.length];
-
-        for (int i = 0; i < results.length; i++)
-        {
-            handles[i] = HandleManager.findHandle(context, results[i]);
-        }
-
-
         // Display the JSP
         request.setAttribute("community", community);
         request.setAttribute("collection", collection);
         request.setAttribute("author", author);
         request.setAttribute("order.by.title", new Boolean(orderByTitle));
         request.setAttribute("browse.info", browseInfo);
-        request.setAttribute("handles", handles);
 
         JSPManager.showJSP(request, response, "/browse/items-by-author.jsp");
     }

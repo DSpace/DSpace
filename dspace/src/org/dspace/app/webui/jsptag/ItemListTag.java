@@ -55,7 +55,6 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.handle.HandleManager;
 
 /**
  * Tag for display a list of items
@@ -67,9 +66,6 @@ public class ItemListTag extends TagSupport
 {
     /** Items to display */
     private Item[] items;
-    
-    /** Corresponding handles */
-    private String[] handles;
     
     /** Row to highlight, -1 for no row */
     private int highlightRow = -1;
@@ -170,8 +166,12 @@ public class ItemListTag extends TagSupport
                     out.print("<strong>");
                 }
                 
-                out.print("<A HREF=\"item/");
-                out.print(handles[i]);
+                out.print("<A HREF=\"");
+                HttpServletRequest hrq = (HttpServletRequest)
+                    pageContext.getRequest();
+                out.print(hrq.getContextPath());
+                out.print("/handle/");
+                out.print(items[i].getHandle());
                 out.print("\">");
                 out.print(title);
                 out.print("</A>");
@@ -231,28 +231,6 @@ public class ItemListTag extends TagSupport
     public void setItems(Item[] itemsIn)
     {
         items = itemsIn;
-    }
-
-
-    /**
-     * Get the corresponding handles
-     *
-     * @return the handles
-     */
-    public String[] getHandles()
-    {
-        return handles;
-    }
-    
-
-    /**
-     * Set the handles corresponding to items
-     * 
-     * @param  handlesIn  the handles 
-     */
-    public void setHandles(String[] handlesIn)
-    {
-        handles = handlesIn;
     }
 
 
@@ -319,6 +297,5 @@ public class ItemListTag extends TagSupport
         highlightRow = -1;
         emphColumn = null;
         items = null;
-        handles = null;
     }
 }

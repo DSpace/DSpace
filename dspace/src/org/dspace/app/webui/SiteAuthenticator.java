@@ -81,6 +81,11 @@ public interface SiteAuthenticator
 
 
     /**
+     * Register a new user in the system.  This is invoked when a user enters
+     * an e-mail address into the "register with DSpace" box.  This 
+    
+    
+    /**
      * Work out if the current user is implicitly a member of any groups.
      * This may include checking an IP address etc.
      *

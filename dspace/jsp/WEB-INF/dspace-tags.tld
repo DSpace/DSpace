@@ -164,9 +164,7 @@
       be omitted to use "default".  "collections" should be the array of
       collections the item is in, worked out beforehand to avoid the chance
       of an error occurring during display.  If collections is null, the
-      collections the item is in aren't listed.  If collections is specified,
-      "communities" must also be specified, such that collections[n] is
-      contained in communities[n].
+      collections the item is in aren't listed.
     </info>
     <attribute>
       <name>item</name>
@@ -175,11 +173,6 @@
     </attribute>
     <attribute>
       <name>style</name>
-      <required>false</required>
-      <rtexprvalue>true</rtexprvalue>
-    </attribute>
-    <attribute>
-      <name>communities</name>
       <required>false</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>
@@ -195,18 +188,12 @@
     <name>itemlist</name>
     <tagclass>org.dspace.app.webui.jsptag.ItemListTag</tagclass>
     <info>
-      Tag for displaying a list of items.  "handles" must be an array of the
-      Handles corresponding to those items.  Specify highlightrow (starting
+      Tag for displaying a list of items.  Specify highlightrow (starting
       from zero) if a row should be highlit.  Specify an emphcolumn of
       "date" or "title" to emphasise the contents of a column.
     </info>
     <attribute>
       <name>items</name>
-      <required>true</required>
-      <rtexprvalue>true</rtexprvalue>
-    </attribute>
-    <attribute>
-      <name>handles</name>
       <required>true</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>
@@ -226,16 +213,10 @@
     <name>communitylist</name>
     <tagclass>org.dspace.app.webui.jsptag.CommunityListTag</tagclass>
     <info>
-      Tag for displaying a list of communities.  "handles" must be an array of the
-      Handles corresponding to those communities.
+      Tag for displaying a list of communities.
     </info>
     <attribute>
       <name>communities</name>
-      <required>true</required>
-      <rtexprvalue>true</rtexprvalue>
-    </attribute>
-    <attribute>
-      <name>handles</name>
       <required>true</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>
@@ -245,16 +226,10 @@
     <name>collectionlist</name>
     <tagclass>org.dspace.app.webui.jsptag.CollectionListTag</tagclass>
     <info>
-      Tag for displaying a list of collections.  "handles" must be an array of the
-      Handles corresponding to those collections.
+      Tag for displaying a list of collections.
     </info>
     <attribute>
       <name>collections</name>
-      <required>true</required>
-      <rtexprvalue>true</rtexprvalue>
-    </attribute>
-    <attribute>
-      <name>handles</name>
       <required>true</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>

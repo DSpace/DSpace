@@ -60,6 +60,7 @@
     Community community = (Community) request.getAttribute( "community" );
     Collection[] collections =
         (Collection[]) request.getAttribute("collections");
+
     String[] lastSubmittedTitles = (String[])
         request.getAttribute("last.submitted.titles");
     String[] lastSubmittedURLs = (String[])
@@ -111,12 +112,12 @@
               <td class="standard">
                 <small><strong>In:</strong></small>&nbsp;<select name="location">
                   <option value="/">All of DSpace</option>
-                  <option selected value="/communities/<%= community.getID() %>/"><%= name %></option>
+                  <option selected value="<%= community.getHandle() %>"><%= name %></option>
 <%
     for (int i = 0; i < collections.length; i++)
     {
 %>    
-                  <option value="/communities/<%= community.getID() %>/collections/<%= collections[i].getID() %>/"><%= collections[i].getMetadata("name") %></option>
+                  <option value="<%= collections[i].getHandle() %>"><%= collections[i].getMetadata("name") %></option>
 <%
     }
 %>
@@ -159,7 +160,7 @@
         {
 %>
     <LI>
-      <A HREF="collections/<%= collections[i].getID() %>/">
+      <A HREF="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>">
       <%= collections[i].getMetadata("name") %></A>
       <P class="collectionDescription"><%= collections[i].getMetadata("short_description") %></P>
     </LI>
@@ -180,7 +181,7 @@
     for (int i = 0; i < lastSubmittedTitles.length; i++)
     {
 %>
-    <P class="recentItem"><A HREF="<%= lastSubmittedURLs[i] %>"><%= lastSubmittedTitles[i] %></A></P>
+    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= lastSubmittedTitles[i] %></A></P>
 <%
   }
 %>

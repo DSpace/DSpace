@@ -51,11 +51,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
 import org.dspace.content.Collection;
-import org.dspace.handle.HandleManager;
 
 /**
  * Tag for display a list of collections
@@ -67,16 +63,7 @@ public class CollectionListTag extends TagSupport
 {
     /** Collections to display */
     private Collection[] collections;
-    
-    /** Corresponding handles */
-    private String[] handles;
-    
-    /** Row to highlight, -1 for no row */
-    private int highlightRow = -1;
-    
-    /** Column to emphasise - null, "title" or "date" */
-    private String emphColumn;
-    
+
 
     public CollectionListTag()
     {
@@ -89,25 +76,13 @@ public class CollectionListTag extends TagSupport
     {
         JspWriter out = pageContext.getOut();
 
-// ignore emphasis        
-//        boolean emphasiseDate  = false;
-//        boolean emphasiseTitle = false;
-//        
-//        if (emphColumn != null)
-//        {
-//            emphasiseDate  = emphColumn.equalsIgnoreCase("date");
-//            emphasiseTitle = emphColumn.equalsIgnoreCase("title");
-//        }
-
         try
         {
             out.println("<table align=center class=\"miscTable\">");
 
             // Write column headings
             out.print("<tr><th class=\"oddRowOddCol\">" +
-//                (emphasiseDate ? "<strong>" : "") +
                 "Collection Name" +
-//                (emphasiseDate ? "</strong>" : "") + 
                 "</th></tr>");
 
             // Row: toggles between Odd and Even
@@ -119,25 +94,15 @@ public class CollectionListTag extends TagSupport
                 String name = collections[i].getMetadata("name");
                 
                 // first and only column is 'name'
-                out.print("</td><td class=\"");
-                out.print(i == highlightRow ? "highlight" : row);
-                out.print("RowEvenCol\">");
-                
-//                if (emphasiseTitle)
-//                {
-//                    out.print("<strong>");
-//                }
-                
-                out.print("<A HREF=\"collection/");
-                out.print(handles[i]);
+                out.print("</td><td class=\"" + row + "RowEvenCol\">");
+                out.print("<A HREF=\"");
+                HttpServletRequest hrq = (HttpServletRequest)
+                    pageContext.getRequest();
+                out.print(hrq.getContextPath() + "/handle/");
+                out.print(collections[i].getHandle());
                 out.print("\">");
                 out.print(name);
                 out.print("</A>");
-                
-//                if (emphasiseTitle)
-//                {
-//                    out.print("</strong>");
-//                }
                 
                 out.println("</td></tr>");
 
@@ -177,91 +142,8 @@ public class CollectionListTag extends TagSupport
     }
 
 
-    /**
-     * Get the corresponding handles
-     *
-     * @return the handles
-     */
-    public String[] getHandles()
-    {
-        return handles;
-    }
-    
-
-    /**
-     * Set the handles corresponding to collections
-     * 
-     * @param  handlesIn  the handles 
-     */
-    public void setHandles(String[] handlesIn)
-    {
-        handles = handlesIn;
-    }
-
-
-    /**
-     * Get the row to highlight - null or -1 for no row
-     *
-     * @return the row to highlight
-     */
-    public String getHighlightrow()
-    {
-        return String.valueOf(highlightRow);
-    }
-    
-
-    /**
-     * Set the row to highlight
-     * 
-     * @param  highlightRowIn  the row to highlight or -1 for no highlight
-     */
-    public void setHighlightrow(String highlightRowIn)
-    {
-        if (highlightRowIn == null || highlightRowIn.equals(""))
-        {
-            highlightRow = -1;
-        }
-        else
-        {
-            try
-            {
-                highlightRow = Integer.parseInt(highlightRowIn);
-            }
-            catch(NumberFormatException nfe)
-            {
-                highlightRow = -1;
-            }
-        }
-    }
-
-
-    /**
-     * Get the column to emphasise - "title", "date" or null
-     *
-     * @return the column to emphasise
-     */
-    public String getEmphcolumn()
-    {
-        return emphColumn;
-    }
-    
-
-    /**
-     * Set the column to emphasise - "title", "date" or null
-     * 
-     * @param  emphcolumnIn  column to emphasise
-     */
-    public void setEmphcolumn(String emphColumnIn)
-    {
-        emphColumn = emphColumnIn;
-    }
-
-
     public void release()
     {
-        highlightRow = -1;
-        emphColumn   = null;
         collections  = null;
-        handles      = null;
     }
 }

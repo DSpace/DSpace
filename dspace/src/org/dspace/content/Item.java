@@ -61,6 +61,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.HandleManager;
 import org.dspace.history.HistoryManager;
 import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -81,7 +82,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Item implements DSpaceObject
+public class Item extends DSpaceObject
 {
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
@@ -105,6 +106,9 @@ public class Item implements DSpaceObject
 
     /** The Dublin Core metadata - a list of DCValue objects. */
     private List dublinCore;
+
+    /** Handle, if any */
+    private String handle;
 
     /**
      * True if the Dublin Core has changed since reading from the DB
@@ -187,6 +191,9 @@ public class Item implements DSpaceObject
             // Add it to the list
             dublinCore.add(dcv);
         }
+
+        // Get our Handle if any
+        handle = HandleManager.findHandle(context, this);
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("item_id"));
@@ -321,6 +328,12 @@ public class Item implements DSpaceObject
     public int getID()
     {
         return itemRow.getIntColumn("item_id");
+    }
+
+
+    public String getHandle()
+    {
+        return handle;
     }
 
 

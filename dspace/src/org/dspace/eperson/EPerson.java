@@ -63,7 +63,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author David Stuve
  * @version $Revision$
  */
-public class EPerson implements DSpaceObject
+public class EPerson extends DSpaceObject
 {
     /** The e-mail field (for sorting) */
     public static final int EMAIL = 1;
@@ -303,6 +303,13 @@ public class EPerson implements DSpaceObject
     public int getID()
     {
         return myRow.getIntColumn("eperson_id");
+    }
+
+
+    public String getHandle()
+    {
+        // No Handles for e-people
+        return null;
     }
 
 

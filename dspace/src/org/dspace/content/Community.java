@@ -71,7 +71,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Community implements DSpaceObject
+public class Community extends DSpaceObject
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(Community.class);
@@ -84,6 +84,9 @@ public class Community implements DSpaceObject
 
     /** The logo bitstream */
     private Bitstream logo;
+
+    /** Handle, if any */
+    private String handle;
 
     /**
      * Construct a community object from a database row.
@@ -107,6 +110,9 @@ public class Community implements DSpaceObject
             logo = Bitstream.find(ourContext,
                 communityRow.getIntColumn("logo_bitstream_id"));
         }
+
+        // Get our Handle if any
+        handle = HandleManager.findHandle(context, this);
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("community_id"));
@@ -181,7 +187,7 @@ public class Community implements DSpaceObject
 
         TableRow row = DatabaseManager.create(context, "community");
         Community c = new Community(context, row);
-        String handle= HandleManager.createHandle(context, c);
+        String newHandle = HandleManager.createHandle(context, c);
 
         HistoryManager.saveHistory(context,
             c,
@@ -192,7 +198,7 @@ public class Community implements DSpaceObject
         log.info(LogManager.getHeader(context,
             "create_community",
             "community_id=" + row.getIntColumn("community_id")) +
-            " handle=" + handle);
+            ",handle=" + newHandle);
 
         return c;
     }
@@ -248,6 +254,12 @@ public class Community implements DSpaceObject
     public int getID()
     {
         return communityRow.getIntColumn("community_id");
+    }
+
+
+    public String getHandle()
+    {
+        return handle;
     }
 
 

@@ -97,7 +97,7 @@
     else
     {
 %>
-    <H1>Edit Community ID: <%= community.getID() %></H1>
+    <H1>Edit Community <%= community.getHandle() %></H1>
 <%
     }
 %>

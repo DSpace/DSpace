@@ -148,11 +148,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>display-item</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.DisplayItemServlet</servlet-class>
-  </servlet>
-
-  <servlet>
     <servlet-name>edit-communities</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EditCommunitiesServlet</servlet-class>
   </servlet>
@@ -192,6 +187,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>handle</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.HandleServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>internal-error</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.InternalErrorServlet</servlet-class>
   </servlet>
@@ -199,11 +199,6 @@
   <servlet>
     <servlet-name>items-by-author</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ItemsByAuthorServlet</servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>location</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.LocationServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -299,11 +294,6 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>display-item</servlet-name>
-    <url-pattern>/item/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
     <servlet-name>edit-communities</servlet-name>
     <url-pattern>/admin/edit-communities</url-pattern>
   </servlet-mapping>
@@ -311,11 +301,6 @@
   <servlet-mapping>
     <servlet-name>edit-epeople</servlet-name>
     <url-pattern>/admin/edit-epeople</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>groups</servlet-name>
-    <url-pattern>/admin/groups</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -339,6 +324,16 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>groups</servlet-name>
+    <url-pattern>/admin/groups</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>handle</servlet-name>
+    <url-pattern>/handle/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>internal-error</servlet-name>
     <url-pattern>/internal-error</url-pattern>
   </servlet-mapping>
@@ -346,11 +341,6 @@
   <servlet-mapping>
     <servlet-name>items-by-author</servlet-name>
     <url-pattern>/items-by-author</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>location</servlet-name>
-    <url-pattern>/communities/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

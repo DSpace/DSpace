@@ -79,13 +79,16 @@ public class CommunityListServlet extends DSpaceServlet
         
 	// This will map community IDs to arrays of collections
 	Map colMap = new HashMap();
-
+        
         Community[] communities = Community.findAll(context);
         
         for (int com = 0; com < communities.length; com++)
         {
             Integer comID = new Integer(communities[com].getID());
-            colMap.put(comID, communities[com].getCollections());
+
+            // Find collections in community
+            Collection[] colls = communities[com].getCollections();
+            colMap.put(comID, colls);
         }
         
         request.setAttribute("communities", communities);

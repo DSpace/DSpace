@@ -184,7 +184,7 @@ public class LayoutTag extends TagSupport
             else
             {
                 // Grab parents from the URL - these should have been picked up
-                // by the LocationServlet
+                // by the HandleServlet
 
                 Community com = (Community)
                     request.getAttribute("dspace.community");
@@ -194,13 +194,12 @@ public class LayoutTag extends TagSupport
                 if (com != null)
                 {
                     parents.add(com.getMetadata("name"));
-                    parentLinks.add("/communities/" + com.getID() + "/");
+                    parentLinks.add("/handle/" + com.getHandle());
 
                     if (col != null)
                     {
                         parents.add(col.getMetadata("name"));
-                        parentLinks.add("/communities/" + com.getID() +
-                            "/collections/" + col.getID() + "/");
+                        parentLinks.add("/handle/" + col.getHandle());
                     }
                 }
             }

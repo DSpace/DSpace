@@ -46,7 +46,6 @@
   -                    a collection within this community
   -   collection     - pass in if the scope of the browse is a collection
   -   browse.info    - the BrowseInfo containing the items to display
-  -   handles        - String[] of Handles corresponding to the browse results
   -   highlight      - Boolean.  If true, the focus point of the browse
   -                    is highlighted
   -   previous.query - The query string to pass to the servlet to get the
@@ -70,7 +69,6 @@
     Community community = (Community) request.getAttribute("community");
 
     BrowseInfo browseInfo = (BrowseInfo) request.getAttribute("browse.info");
-    String[] handles = (String[]) request.getAttribute("handles");
 
     boolean highlight = ((Boolean) request.getAttribute("highlight")).booleanValue();
 
@@ -165,7 +163,7 @@
         highlightAttribute = String.valueOf(browseInfo.getOffset());
     }    
 %>
-    <dspace:itemlist items="<%= browseInfo.getItemResults() %>" handles="<%= handles %>" emphcolumn="title" highlightrow="<%= highlightAttribute %>" />
+    <dspace:itemlist items="<%= browseInfo.getItemResults() %>" emphcolumn="title" highlightrow="<%= highlightAttribute %>" />
 
 
     <%-- Previous page/Next page --%>

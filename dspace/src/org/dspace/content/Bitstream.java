@@ -68,7 +68,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Bitstream implements DSpaceObject
+public class Bitstream extends DSpaceObject
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(Bitstream.class);
@@ -81,7 +81,7 @@ public class Bitstream implements DSpaceObject
 
     /** The bitstream format corresponding to this bitstream */
     private BitstreamFormat bitstreamFormat;
-
+    
     /**
      * Private constructor for creating a Bitstream object
      * based on the contents of a DB table row.
@@ -204,6 +204,13 @@ public class Bitstream implements DSpaceObject
     public int getID()
     {
         return bRow.getIntColumn("bitstream_id");
+    }
+
+
+    public String getHandle()
+    {
+        // No Handles for bitstreams
+        return null;
     }
 
 

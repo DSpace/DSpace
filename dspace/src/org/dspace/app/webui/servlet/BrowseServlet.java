@@ -392,22 +392,6 @@ public class BrowseServlet extends DSpaceServlet
         }
         else
         {
-            // If we're browsing items by title or date, we need to work
-            // out the Handles for the items
-            if (browseDates || browseTitles)
-            {
-                Item[] items = browseInfo.getItemResults();
-                String[] handles = new String[items.length];
-                
-                for (int i = 0; i < items.length; i++)
-                {
-                    handles[i] = HandleManager.findHandle(context, items[i]);
-                }
-
-                request.setAttribute("handles", handles);
-            }
-
-
             // Work out what the query strings will be for the previous
             // and next pages
 
@@ -425,7 +409,7 @@ public class BrowseServlet extends DSpaceServlet
                 else
                 {
                     Item firstItem = (browseInfo.getItemResults())[0];
-                    s = HandleManager.findHandle(context, firstItem);
+                    s = firstItem.getHandle();
                 }
 
                 if (browseDates && oldestFirst)
@@ -459,7 +443,7 @@ public class BrowseServlet extends DSpaceServlet
                 {
                     Item[] items = browseInfo.getItemResults();
                     Item lastItem = items[items.length - 1];
-                    s = HandleManager.findHandle(context, lastItem);
+                    s = lastItem.getHandle();
                 }
 
                 if (browseDates && oldestFirst)

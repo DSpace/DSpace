@@ -54,11 +54,8 @@
   -                      array of the collections in the community to put in
   -                      the drop-down box
   -   items            - the results.  An array of Items, most relevant first
-  -   communities
-  -   collections
-  -   item_handles     - Handles corresponding to the results. (String[])
-  -   community_handles
-  -   collection_handles
+  -   communities      - results, Community[]
+  -   collections      - results, Collection[]
   -
   -   query            - The original query
   --%>
@@ -79,10 +76,6 @@
     Item      [] items       = (Item[]      )request.getAttribute("items");
     Community [] communities = (Community[] )request.getAttribute("communities");
     Collection[] collections = (Collection[])request.getAttribute("collections");
-    
-    String[] itemHandles       = (String[]) request.getAttribute("item_handles");
-    String[] communityHandles  = (String[]) request.getAttribute("community_handles");
-    String[] collectionHandles = (String[]) request.getAttribute("collection_handles");
     
     String query = (String) request.getAttribute("query");
 %>
@@ -111,7 +104,7 @@
         for (int i = 0; i < communityArray.length; i++)
         {
 %>
-                                    <option value="/communities/<%= communityArray[i].getID() %>/"><%= communityArray[i].getMetadata("name") %></option>
+                                    <option value="<%= communityArray[i].getHandle() %>"><%= communityArray[i].getMetadata("name") %></option>
 <%
         }
     }
@@ -121,12 +114,12 @@
         // "all of DSpace", the community, and the collections within the community.
 %>
                                     <option value="/">All of DSpace</option>
-                                    <option selected value="/communities/<%= community.getID() %>/"><%= community.getMetadata("name") %></option>
+                                    <option selected value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
 <%
         for (int i = 0; i < collectionArray.length; i++)
         {
 %>
-                                    <option value="/communities/<%= community.getID() %>/collections/<%= collectionArray[i].getID() %>/"><%= collectionArray[i].getMetadata("name") %></option>
+                                    <option value="<%= collectionArray[i].getHandle() %>"><%= collectionArray[i].getMetadata("name") %></option>
 <%
         }
     }
@@ -135,8 +128,8 @@
         // Scope of the search is a specific collection
 %>
                                     <option value="/">All of DSpace</option>
-                                    <option value="/communities/<%= community.getID() %>/"><%= community.getMetadata("name") %></option>
-                                    <option selected value="/communities/<%= community.getID() %>/collections/<%= collection.getID() %>/"><%= collection.getMetadata("name") %></option>
+                                    <option value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
+                                    <option selected value="<%= collection.getHandle() %>"><%= collection.getMetadata("name") %></option>
 <%
     }
 %>
@@ -155,17 +148,16 @@
     </form>
 
 <% if (communities.length > 0 ) { %>
-    <dspace:communitylist  communities="<%= communities %>" handles="<%=
-    communityHandles %>" />
+    <dspace:communitylist  communities="<%= communities %>" />
 <% } %>
 
 <% if (collections.length > 0 ) { %>   
-    <dspace:collectionlist collections="<%= collections %>" handles="<%=
-    collectionHandles %>" />
+    <br>
+    <dspace:collectionlist collections="<%= collections %>" />
 <% } %>
 
     <P align=center>Found <%= items.length == 0 ? "no" : String.valueOf(items.length) %> item<%= items.length != 1 ? "s" : "" %>.</P>
 
-    <dspace:itemlist items="<%= items %>" handles="<%= itemHandles %>" />
+    <dspace:itemlist items="<%= items %>" />
 </dspace:layout>
 

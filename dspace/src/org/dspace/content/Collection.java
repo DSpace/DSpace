@@ -77,7 +77,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Collection implements DSpaceObject
+public class Collection extends DSpaceObject
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(Collection.class);
@@ -93,6 +93,10 @@ public class Collection implements DSpaceObject
 
     /** The item template */
     private Item template;
+
+    /** Our Handle */
+    private String handle;
+
 
     /**
      * Groups corresponding to workflow steps - NOTE these start from one,
@@ -149,6 +153,9 @@ public class Collection implements DSpaceObject
         // where XX is the ID of this collection
         submitters = Group.findByName(ourContext,
             "COLLECTION_" + getID() + "_SUBMIT");
+
+        // Get our Handle if any
+        handle = HandleManager.findHandle(context, this);
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("collection_id"));
@@ -217,7 +224,7 @@ public class Collection implements DSpaceObject
     {
         TableRow row = DatabaseManager.create(context, "collection");
         Collection c = new Collection(context, row);
-        String handle= HandleManager.createHandle(context, c);
+        String newHandle = HandleManager.createHandle(context, c);
         
         HistoryManager.saveHistory(context,
             c,
@@ -228,7 +235,7 @@ public class Collection implements DSpaceObject
         log.info(LogManager.getHeader(context,
             "create_collection",
             "collection_id=" + row.getIntColumn("collection_id")) +
-            " handle=" + handle);
+            ",handle=" + newHandle);
 
         return c;
     }
@@ -303,6 +310,12 @@ public class Collection implements DSpaceObject
     public int getID()
     {
         return collectionRow.getIntColumn("collection_id");
+    }
+
+
+    public String getHandle()
+    {
+        return handle;
     }
 
 

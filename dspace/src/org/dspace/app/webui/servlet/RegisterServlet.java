@@ -403,7 +403,7 @@ public class RegisterServlet extends DSpaceServlet
                 JSPManager.showJSP(request,
                     response,
                     "/register/forgot-password.jsp");
-            }                
+            }
         }
     }
 

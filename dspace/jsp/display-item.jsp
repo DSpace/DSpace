@@ -44,7 +44,6 @@
   -
   - Attributes:
   -    display.all - Boolean - if true, display full metadata record
-  -    handle      - Handle of the item, if any
   -    item        - the Item to display
   -    collections - Array of Collections this item appears in.  This must be
   -                  passed in for two reasons: 1) item.getCollections() could
@@ -53,9 +52,6 @@
   -                  a mapping between the item and collection might not
   -                  appear yet.  If this is omitted, the item display won't
   -                  display any collections.
-  -    communities - Array of communities corresponding to above collections.
-  -                  i.e. communities[n] contains collections[n].  Must be
-  -                  supplied if collections is supplied.
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -70,10 +66,10 @@
     // Attributes
     Boolean displayAllBoolean = (Boolean) request.getAttribute("display.all");
     boolean displayAll = (displayAllBoolean != null && displayAllBoolean.booleanValue());
-    String handle = (String) request.getAttribute("handle");
     Item item = (Item) request.getAttribute("item");
     Collection[] collections = (Collection[]) request.getAttribute("collections");
-    Community[] communities = (Community[]) request.getAttribute("communities");
+
+    String handle = item.getHandle();
 
     // Full title needs to be put into a string to use as tag argument
     String title = "Item " + handle;
@@ -99,27 +95,11 @@
 
     String displayStyle = (displayAll ? "full" : "default");
 %>
-    <dspace:item item="<%= item %>" communities="<%= communities %>" collections="<%= collections %>" style="<%= displayStyle %>" />
+    <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
 
 <%
-    // Work out location link
-    Community com = UIUtil.getCommunityLocation(request);
-    Collection col = UIUtil.getCollectionLocation(request);
-
-    String locationLink = request.getContextPath();
+    String locationLink = request.getContextPath() + "/handle/" + handle;
     
-    if (com != null)
-    {
-        locationLink = locationLink + "/communities/" + com.getID();
-        if (col != null)
-        {
-            locationLink = locationLink + "/collections/" + col.getID();
-        }
-    }
-    
-    locationLink = locationLink + "/item/" + handle;
-
-
     if (displayAll)
     {
 %>

@@ -92,50 +92,13 @@ public class HandleManager
         if (dbhandle == null)
             return null;
 
-        int handletypeid = dbhandle.getIntColumn("resource_type_id");
+        String url = ConfigurationManager.getProperty("dspace.url") +
+            "/handle/" + handle;
 
-        if (handletypeid == Constants.ITEM)
-        {
-            String prefix = ConfigurationManager.getProperty("dspace.url");
-            String url = prefix + "/item/" + handle;
+        if (log.isDebugEnabled())
+            log.debug("Resolved " + handle + " to " + url);
 
-            if (log.isDebugEnabled())
-            {
-                log.debug("Resolved " + handle + " to " + url);
-            }
-            
-            return url;
-        }
-        else
-        if (handletypeid == Constants.COLLECTION)
-        {
-            String prefix = ConfigurationManager.getProperty("dspace.url");
-            String url = prefix + "/collection/" + handle;
-
-            if (log.isDebugEnabled())
-            {
-                log.debug("Resolved " + handle + " to " + url);
-            }
-            
-            return url;
-        }
-        else
-        if (handletypeid == Constants.COMMUNITY)
-        {
-            String prefix = ConfigurationManager.getProperty("dspace.url");
-            String url = prefix + "/community/" + handle;
-
-            if (log.isDebugEnabled())
-            {
-                log.debug("Resolved " + handle + " to " + url);
-            }
-            
-            return url;
-        }
-
-
-        throw new IllegalArgumentException("Unsupported handle type" +
-            Constants.typetext[handletypeid]);
+        return url;
     }
 
     /**

@@ -121,7 +121,7 @@
 <%  if (collection == null) { %>
     <H1>Create Collection</H1>
 <% } else { %>
-    <H1>Edit Collection ID: <%= collection.getID() %></H1>
+    <H1>Edit Collection <%= collection.getHandle() %></H1>
 <% } %>
 
     <form method=POST>

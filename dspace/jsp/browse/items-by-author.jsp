@@ -48,7 +48,6 @@
   -                    a collection within this community
   -   collection     - pass in if the scope of the browse is a collection
   -   browse.info    - the BrowseInfo containing the items to display
-  -   handles        - String[] of Handles corresponding to the browse results
   -   author         - The name of the author
   -   sort.by.date   - Boolean.  if true, we're sorting by date, otherwise by
   -                    title.
@@ -67,7 +66,6 @@
     Collection collection = (Collection) request.getAttribute("collection");
     Community community = (Community) request.getAttribute("community");
     BrowseInfo browseInfo = (BrowseInfo) request.getAttribute("browse.info" );
-    String[] handles = (String[]) request.getAttribute("handles");
     String author = (String) request.getAttribute("author");
     boolean orderByTitle = ((Boolean) request.getAttribute("order.by.title")).booleanValue();
 
@@ -130,7 +128,7 @@
 <%
     String emphColumn = (orderByTitle ? "title" : "date");
 %>
-    <dspace:itemlist items="<%= browseInfo.getItemResults() %>" handles="<%= handles %>" emphcolumn="<%= emphColumn %>" />
+    <dspace:itemlist items="<%= browseInfo.getItemResults() %>" emphcolumn="<%= emphColumn %>" />
 
 
 </dspace:layout>

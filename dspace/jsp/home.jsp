@@ -40,6 +40,9 @@
 
 <%--
   - Home page JSP
+  -
+  - Attributes:
+  -    communities - Community[] all communities in DSpace
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -68,10 +71,8 @@
             <tr>
                 <td class="oddRowEvenCol">
                     <H3>Search</H3>
-                      <P align="center">Enter some text in the box below to search DSpace.</P>
-                      <center><%-- HACK for Netscape 4.xx, "align=center" doesn't seem to work--%>
-                        <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="Go"></P>
-                      </center>
+                      <P>Enter some text in the box below to search DSpace.</P>
+                      <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="Go"></P>
                 </td>
             </tr>
         </table>
@@ -81,14 +82,14 @@
         <tr>
             <td class="oddRowEvenCol">
                 <H3>Communities in DSpace</H3>
-                <P align="center">Select a community to browse its collections.</P>
+                <P>Select a community to browse its collections.</P>
                 <table border=0 cellpadding=2>
 <%
     for (int i = 0; i < communities.length; i++)
     {
 %>                  <tr>
                         <td class="standard">
-                            <A HREF="<%= request.getContextPath() %>/communities/<%= communities[i].getID() %>/"><%= communities[i].getMetadata("name") %></A>
+                            <A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></A>
                         </td>
                     </tr>
 <%

@@ -150,18 +150,7 @@ public class SubscribeServlet extends DSpaceServlet
         Collection[] subs = Subscribe.getSubscriptions(context,
             context.getCurrentUser());
         
-        // Get corresponding communities to make the link
-        Community[] communities = new Community[subs.length];
-        for (int i = 0; i < subs.length; i++)
-        {
-            Community[] theseComms = subs[i].getCommunities();
-            // FIXME: Assume first community is container - maybe something
-            // more context sensitive?
-            communities[i] = theseComms[0];
-        }
-        
         request.setAttribute("subscriptions", subs);
-        request.setAttribute("communities", communities);
         request.setAttribute("updated", new Boolean(updated));
         
         JSPManager.showJSP(request, response, "/mydspace/subscriptions.jsp");

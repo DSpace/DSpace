@@ -54,7 +54,6 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -73,13 +72,6 @@ public class ItemTag extends TagSupport
     /** Collections this item appears in */
     private Collection[] collections;
     
-    /**
-     * Communities corresponding to the collections, such that collections[n] is
-     * contained by communities[n].  This must have the same number of elements
-     * as collections.
-     */
-    private Community[] communities;
-
     /** The style to use - "default" or "full" */
     private String style;
 
@@ -158,28 +150,6 @@ public class ItemTag extends TagSupport
 
 
     /**
-     * Get the communities corresponding to collections
-     *
-     * @return the communities
-     */
-    public Community[] getCommunities()
-    {
-        return communities;
-    }
-    
-
-    /**
-     * Set the communities corresponding to collections
-     * 
-     * @param  communitiesIn  the communities
-     */
-    public void setCommunities(Community[] communitiesIn)
-    {
-        communities = communitiesIn;
-    }
-
-
-    /**
      * Get the style this tag should display
      *
      * @return the style
@@ -205,7 +175,6 @@ public class ItemTag extends TagSupport
     {
         style = "default";
         item = null;
-        communities = null;
         collections = null;
     }
     
@@ -407,11 +376,9 @@ public class ItemTag extends TagSupport
             {
                 out.print("<A HREF=\"");
                 out.print(request.getContextPath());
-                out.print("/communities/");
-                out.print(communities[i].getID());
-                out.print("/collections/");
-                out.print(collections[i].getID());
-                out.print("/\">");
+                out.print("/handle/");
+                out.print(collections[i].getHandle());
+                out.print("\">");
                 out.print(collections[i].getMetadata("name"));
                 out.print("</A><BR>");
             }

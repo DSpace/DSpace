@@ -43,8 +43,6 @@
   -
   - Attributes:
   -   subscriptions  - Collection[] - collections user is subscribed to
-  -   communities    - Community[]  - communities that subscribed collections
-  -                    are in - i.e. subscriptions[0] is in communities[0].
   -   updated        - Boolean - if true, subscriptions have just been updated
   --%>
 
@@ -56,8 +54,6 @@
 <%
     Collection[] subscriptions =
         (Collection[]) request.getAttribute("subscriptions");
-    Community[] communities =
-        (Community[]) request.getAttribute("communities");
     boolean updated =
         ((Boolean) request.getAttribute("updated")).booleanValue();
 %>
@@ -102,7 +98,7 @@
                   --%>
                 <form method=POST>
                     <td class="<%= row %>RowOddCol">
-                        <A HREF="<%= request.getContextPath() %>/communities/<%= communities[i].getID() %>/collections/<%= subscriptions[i].getID() %>/"><%= subscriptions[i].getMetadata("name") %></A>
+                        <A HREF="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= subscriptions[i].getMetadata("name") %></A>
                     </td>
                     <td class="<%= row %>RowEvenCol">
                         <input type="hidden" name="collection" value="<%= subscriptions[i].getID() %>">

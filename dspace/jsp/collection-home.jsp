@@ -42,8 +42,8 @@
   - Collection home JSP
   -
   - Attributes required:
-  -    community   - Collection to render home page for
-  -    collection  - Community this collection is in
+  -    collection  - Collection to render home page for
+  -    community   - Community this collection is in
   -    last.submitted.titles - String[], titles of recent submissions
   -    last.submitted.urls   - String[], corresponding URLs
   -    logged.in  - Boolean, true if a user is logged in
@@ -59,12 +59,14 @@
 
 <%
     // Retrieve attributes
-    Community community = (Community) request.getAttribute("community");
     Collection collection = (Collection) request.getAttribute("collection");
+    Community community = (Community) request.getAttribute("community");
+
     String[] lastSubmittedTitles = (String[])
         request.getAttribute("last.submitted.titles");
     String[] lastSubmittedURLs = (String[])
         request.getAttribute("last.submitted.urls");
+
     boolean loggedIn =
         ((Boolean) request.getAttribute("logged.in")).booleanValue();
     boolean subscribed =
@@ -89,13 +91,16 @@
     }
 
     String communityName = community.getMetadata("name");
-    String communityLink = "/communities/" + community.getID() + "/";
+    String communityLink = "/handle/" + community.getHandle();
 
     Bitstream logo = collection.getLogo();
 %>
 
 
-<dspace:layout locbar="link" parenttitle="<%= communityName %>" parentlink="<%= communityLink %>" title="<%= name %>">
+<dspace:layout locbar="link"
+               parenttitle="<%= communityName %>"
+               parentlink="<%= communityLink %>"
+               title="<%= name %>">
 
   <table border=0 cellpadding=5 width=100%>
     <tr>
@@ -120,8 +125,8 @@
               <td class="standard">
                 <small><strong>In:</strong></small>&nbsp;<select name="location">
                   <option value="/">All of DSpace</option>
-                  <option selected value="/communities/<%= community.getID() %>/"><%= communityName %></option>
-                  <option selected value="/communities/<%= community.getID() %>/collections/<%= collection.getID() %>/"><%= name %></option>
+                  <option selected value="<%= community.getHandle() %>"><%= communityName %></option>
+                  <option selected value="<%= collection.getHandle() %>/"><%= name %></option>
                 </select>
               </td>
             </tr>

@@ -43,9 +43,9 @@
   - Display hierarchical list of communities and collections
   -
   - Attributes to be passed in:
-  -    communities     - array of communities
-  -    collections.map  - Map where a keys is a community IDs and the value is
-  -                      the array of collections in that community.
+  -    communities         - array of communities
+  -    collections.map  - Map where a keys is a community IDs (Integers) and 
+  -                      the value is the array of collections in that community
   --%>
 
 <%@ page import="java.util.Map" %>
@@ -73,7 +73,7 @@
 %>		
         <LI class="communityLink">
             <%-- HACK: <strong> tags here for broken Netscape 4.x CSS support --%>
-            <strong><A HREF="<%= request.getContextPath() %>/communities/<%= communities[i].getID() %>/"><%= communities[i].getMetadata("name") %></A></strong>
+            <strong><A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></A></strong>
             <P class="communityDescription"><%= communities[i].getMetadata("short_description") %></P>
 	    <UL>
 <%
@@ -84,7 +84,7 @@
         for (int j = 0; j < cols.length; j++)
         {
 %>
-                <LI class="collectionListItem"><A HREF="<%= request.getContextPath() %>/communities/<%= communities[i].getID() %>/collections/<%= cols[j].getID() %>/"><%= cols[j].getMetadata("name") %></A></LI>
+                <LI class="collectionListItem"><A HREF="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></A></LI>
 <%
         }
 %>

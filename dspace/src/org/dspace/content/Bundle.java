@@ -71,7 +71,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Bundle implements DSpaceObject
+public class Bundle extends DSpaceObject
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(Bundle.class);
@@ -211,6 +211,13 @@ public class Bundle implements DSpaceObject
     public int getID()
     {
         return bundleRow.getIntColumn("bundle_id");
+    }
+
+
+    public String getHandle()
+    {
+        // No Handles for bundles
+        return null;
     }
 
 
