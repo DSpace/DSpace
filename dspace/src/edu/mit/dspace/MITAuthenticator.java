@@ -112,7 +112,7 @@ public class MITAuthenticator implements SiteAuthenticator
             {
                 // Oops - the group isn't there.
                 log.warn(LogManager.getHeader(context,
-                    "No MIT Group!!",
+                    "No MIT Group found!! Admin needs to create one!",
                     ""));
                 return new int[0];
             }
