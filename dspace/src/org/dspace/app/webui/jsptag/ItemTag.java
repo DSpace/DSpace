@@ -409,9 +409,17 @@ public class ItemTag extends TagSupport
             out.println("<P>There are no files associated with this item.</P>");
         }
         else
-        {        
-            out.println("<table cellpadding=6><tr><th class=\"standard\">File</th><th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th></tr>");
+        {   
+	    // if item contains multiple non-license bundles, display bitstream description
+	    boolean multiFile = (bundles.length > 2);
 
+	    out.println("<table cellpadding=6><tr><th class=\"standard\">File</th>");
+	    if (multiFile)
+	    {
+		out.println("<th class=\"standard\">Description</th>");
+	    }
+	    out.println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th></tr>");
+	    
             for (int i = 0; i < bundles.length; i++)
             {
                 Bitstream[] bitstreams = bundles[i].getBitstreams();
@@ -423,6 +431,12 @@ public class ItemTag extends TagSupport
                     {
                         out.print("<tr><td class=\"standard\">");
                         out.print(bitstreams[k].getName());
+			if (multiFile)
+			{
+			    out.print("</td><td class=\"standard\">");
+			    String desc = bitstreams[k].getDescription();
+			    out.print(desc != null ? desc : "");
+			}
                         out.print("</td><td class=\"standard\">");
                         out.print(bitstreams[k].getSize() / 1024);
                         out.print("Kb</td><td class=\"standard\">");
