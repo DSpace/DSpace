@@ -976,6 +976,17 @@ public class Item extends DSpaceObject
         return bitstream;
     }
 
+   
+    /**
+    * Just for backwards compatibility - bitstream stored
+    * in bundle "ORIGINAL"
+    */
+    public Bitstream createSingleBitstream(InputStream is)
+        throws AuthorizeException, IOException, SQLException
+    {
+        return createSingleBitstream(is, "ORIGINAL");
+    }
+
 
     /**
      * Get all non-internal bitstreams in the item.  This is mainly used
@@ -1088,7 +1099,7 @@ public class Item extends DSpaceObject
      * database
      */
     public void update()
-        throws SQLException, AuthorizeException, IOException
+        throws SQLException, AuthorizeException
     {
         // Check authorisation
         
