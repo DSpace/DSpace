@@ -330,7 +330,7 @@ public class MyDSpaceServlet extends DSpaceServlet
                 "remove_submission",
                 "workspace_item_id=" + workspaceItem.getID() +
                 ",item_id=" + workspaceItem.getItem().getID()));
-            workspaceItem.deleteWrapper();
+            workspaceItem.deleteAll();
             showMainPage(context, request, response);
             context.complete();
         }

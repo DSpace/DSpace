@@ -1066,9 +1066,6 @@ public class Item implements DSpaceObject
     void delete()
         throws SQLException, AuthorizeException, IOException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
-
         HistoryManager.saveHistory(ourContext,
             this,
             HistoryManager.REMOVE,
