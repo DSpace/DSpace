@@ -63,6 +63,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.history.HistoryManager;
 import org.dspace.search.DSIndexer;
@@ -1394,6 +1395,40 @@ public class Item extends DSpaceObject
         }
     }
     
+    /**
+     * remove all of the policies for item's bitstreams and bundles
+     *    that belong to a given Group 
+     *
+     * @param g Group referenced by policies that needs to be removed
+     */      
+    public void removeGroupPolicies( Group g )
+        throws SQLException, AuthorizeException
+    {
+        // remove Group's policies from Item
+        AuthorizeManager.removeGroupPolicies(ourContext, this, g);
+
+        // remove all policies from bundles
+        Bundle[] bundles = getBundles();
+
+        for (int i = 0; i < bundles.length; i++)
+        {
+            Bundle mybundle = bundles[i];
+            
+            Bitstream[] bs = mybundle.getBitstreams();
+            
+            for(int j = 0; j < bs.length; j++ )
+            {
+                Bitstream mybitstream = bs[j];
+
+                // remove bitstream policies                
+                AuthorizeManager.removeGroupPolicies(ourContext, bs[j], g);
+            }
+
+            // change bundle policies            
+            AuthorizeManager.removeGroupPolicies(ourContext, mybundle, g);
+        }
+    }
+
     
     /**
      * remove all policies on an item and its contents, and
