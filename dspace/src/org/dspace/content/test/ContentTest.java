@@ -115,11 +115,6 @@ public class ContentTest extends TestCase
             Community c1 = createCommunity(context);
             int id = c1.getID();
 
-            // FIXME: Start a new transaction - this is a workaround for
-            // a PostgreSQL 7.1 bug.
-            context.complete();
-            context = createContext();
-
             // Check we can get it
             Community c2 = Community.find (context, c1.getID());
             assertNotNull("Found community", c2);
@@ -137,22 +132,17 @@ public class ContentTest extends TestCase
 
             Community c3 = Community.find (context, id);
             assertNull("Did not find deleted community", c3);
-            context.complete();
-        }
-        // Clean up context or the test hangs
-        catch (AssertionFailedError afe)
-        {
-            if (context != null)
-                context.abort();
-            throw afe;
         }
         catch (Exception e)
         {
-            if (context != null)
-                context.abort();
             e.printStackTrace();
             System.out.println("Got exception: " + e);
             fail("Exception while running test: " + e);
+        }
+        finally
+        {
+            if (context != null)
+                context.abort();
         }
     }
 
@@ -192,11 +182,6 @@ public class ContentTest extends TestCase
             assertTrue("Community includes this collection",
                        contains(collection.getCommunities(), c2));
 
-            // FIXME: Start a new transaction - this is a workaround for
-            // a PostgreSQL 7.1 bug.
-            context.complete();
-            context = createContext();
-
             c1 = Community.find(context, community1ID);
             c2 = Community.find(context, community2ID);
             collection = Collection.find(context, collectionID);
@@ -208,22 +193,17 @@ public class ContentTest extends TestCase
              c1.deleteWithContents();
              assertNull("Collection does not exist after all containing communities are deleted",
                          Collection.find(context, collectionID));
-            context.complete();
-        }
-        // Clean up context or the test hangs
-        catch (AssertionFailedError afe)
-        {
-            if (context != null)
-                context.abort();
-            throw afe;
         }
         catch (Exception e)
         {
-            if (context != null)
-                context.abort();
             e.printStackTrace();
             System.out.println("Got exception: " + e);
             fail("Exception while running test: " + e);
+        }
+        finally
+        {
+            if (context != null)
+                context.abort();
         }
     }
 
@@ -245,10 +225,6 @@ public class ContentTest extends TestCase
             int commID = community.getID();
             int collID = c1.getID();
 
-            // FIXME: Start a new transaction - this is a workaround for
-            // a PostgreSQL 7.1 bug.
-            context.complete();
-            context = createContext();
 
             Collection c2 = Collection.find (context, collID);
 
@@ -263,24 +239,17 @@ public class ContentTest extends TestCase
 
             // Clean up community - delete tested elsewhere, so should work
             Community.find(context, commID).delete();
-
-            context.complete();
-        }
-        // Clean up context or the test hangs
-        catch (AssertionFailedError afe)
-        {
-            if (context != null)
-                context.abort();
-
-            throw afe;
         }
         catch (Exception e)
         {
-            if (context != null)
-                context.abort();
             e.printStackTrace();
             System.out.println("Got exception: " + e);
             fail("Exception while running test: " + e);
+        }
+        finally
+        {
+            if (context != null)
+                context.abort();
         }
     }
 
@@ -329,11 +298,6 @@ public class ContentTest extends TestCase
                        toStringArray(ALTERNATIVE_TITLES));
             item.addDC("date","accessioned", null, now);
             item.update();
-
-            // FIXME: Start a new transaction - this is a workaround for
-            // a PostgreSQL 7.1 bug.
-            context.complete();
-            context = createContext();
 
             item = Item.find(context, id);
 
@@ -395,23 +359,17 @@ public class ContentTest extends TestCase
 
             assertNull("Item cannot be found after deletion",
                        Item.find(context, id));
-            context.abort();
-        }
-        // Clean up context or the test hangs
-        catch (AssertionFailedError afe)
-        {
-            if (context != null)
-                context.abort();
-
-            throw afe;
         }
         catch (Exception e)
         {
-            if (context != null)
-                context.abort();
             e.printStackTrace();
             System.out.println("Got exception: " + e);
             fail("Exception while running test: " + e);
+        }
+        finally
+        {
+            if (context != null)
+                context.abort();
         }
     }
 
