@@ -149,7 +149,7 @@ public class Item extends DSpaceObject
             "SELECT bundle.* FROM bundle, item2bundle WHERE " +
                 "item2bundle.bundle_id=bundle.bundle_id AND " +
                 "item2bundle.item_id=" +
-                itemRow.getIntColumn("item_id") + ";");
+                itemRow.getIntColumn("item_id") );
 
         while (tri.hasNext())
         {
@@ -173,7 +173,7 @@ public class Item extends DSpaceObject
         tri = DatabaseManager.query(ourContext, "dcvalue",
             "SELECT * FROM dcvalue WHERE item_id=" +
                 itemRow.getIntColumn("item_id") +
-                " ORDER BY dc_type_id, place;");
+                " ORDER BY dc_type_id, place");
 
         while (tri.hasNext())
         {
@@ -304,7 +304,7 @@ public class Item extends DSpaceObject
     {
         TableRowIterator rows = DatabaseManager.query(context,
             "item",
-            "SELECT * FROM item WHERE in_archive=true;");
+            "SELECT * FROM item WHERE in_archive=true");
 
         return new ItemIterator(context, rows);
     }
@@ -325,7 +325,7 @@ public class Item extends DSpaceObject
         TableRowIterator rows = DatabaseManager.query(context,
             "item",
             "SELECT * FROM item WHERE in_archive=true AND submitter_id=" +
-                eperson.getID() + ";");
+                eperson.getID() );
 
         return new ItemIterator(context, rows);
     }
@@ -720,7 +720,7 @@ public class Item extends DSpaceObject
             "SELECT collection.* FROM collection, collection2item WHERE " +
                 "collection2item.collection_id=collection.collection_id AND " +
                 "collection2item.item_id=" +
-                itemRow.getIntColumn("item_id") + ";");
+                itemRow.getIntColumn("item_id") );
 
         while (tri.hasNext())
         {
@@ -765,7 +765,7 @@ public class Item extends DSpaceObject
             "SELECT community.* FROM community, community2item " +
                 "WHERE community2item.community_id=community.community_id " +
                 "AND community2item.item_id=" +
-                itemRow.getIntColumn("item_id") + ";");
+                itemRow.getIntColumn("item_id") );
 
         while (tri.hasNext())
         {
@@ -1234,12 +1234,6 @@ public class Item extends DSpaceObject
 
         // Update browse indices
         Browse.itemChanged(ourContext, this);
-
-        if (isArchived())
-        {
-          	// Update search index
-	        DSIndexer.reIndexContent(ourContext, this);
-        }
     }
 
     /**
@@ -1467,7 +1461,7 @@ public class Item extends DSpaceObject
         throws SQLException
     {
         DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM dcvalue WHERE item_id=" + getID() + ";");
+            "DELETE FROM dcvalue WHERE item_id=" + getID() );
     }
 
 
