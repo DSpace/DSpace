@@ -368,10 +368,18 @@ public class DSIndexer
         String location_text = buildItemLocationString(c, myitem);
 
         // extract metadata (ANY is wildcard from Item class)
-        DCValue [] authors  = myitem.getDC( "contributor", Item.ANY,   Item.ANY );
-        DCValue [] titles   = myitem.getDC( "title",       Item.ANY,   Item.ANY );
-        DCValue [] keywords = myitem.getDC( "subject",     Item.ANY,   Item.ANY );
-        DCValue [] abstracts= myitem.getDC( "description", "abstract", Item.ANY );
+        DCValue [] authors  	= myitem.getDC( "contributor", 	Item.ANY,   Item.ANY );
+        DCValue [] creators 	= myitem.getDC( "creator", 	   	Item.ANY,   Item.ANY );
+        DCValue [] titles   	= myitem.getDC( "title",       	Item.ANY,   Item.ANY );
+        DCValue [] keywords 	= myitem.getDC( "subject",     	Item.ANY,   Item.ANY );
+
+        DCValue [] abstracts	= myitem.getDC( "description", 	"abstract", Item.ANY );
+        DCValue [] sors 		= myitem.getDC( "description", 	"statementofresponsibility",   Item.ANY );
+        DCValue [] series  		= myitem.getDC( "relation", 	"ispartofseries",   Item.ANY );
+        DCValue [] tocs 		= myitem.getDC( "description", 	"tableofcontents",   Item.ANY );
+        DCValue [] mimetypes  	= myitem.getDC( "format", 		"mimetype",   Item.ANY );
+        DCValue [] sponsors  	= myitem.getDC( "description", 	"sponsorship",   Item.ANY );
+        DCValue [] identifiers  = myitem.getDC( "identifier", 	Item.ANY,   Item.ANY );
 
 
         // put them all from an array of strings to one string for writing out
@@ -379,24 +387,71 @@ public class DSIndexer
         String author_text  = "";
         String title_text   = "";
         String keyword_text = "";
+
         String abstract_text= "";
+        String sor_text  	= "";
+        String series_text  = "";
+        String toc_text 	= "";
+        String mime_text	= "";
+        String sponsor_text	= "";
+        String id_text		= "";
+
 
         // pack all of the arrays of DCValues into plain text strings for the indexer
         for(j=0; j<authors.length; j++)
         {
-            author_text  = new String(author_text  + authors [j].value + " ");
+            author_text  = new String(author_text  + authors[j].value + " ");
         }
+        
+        for(j=0; j<creators.length; j++) //also authors
+        {
+            author_text  = new String(author_text  + creators[j].value + " ");
+        }
+
+        for(j=0; j<sors.length; j++) //also authors
+        {
+            author_text= new String(author_text + sors[j].value + " ");
+        }
+
         for(j=0; j<titles.length;  j++)
         {
-            title_text   = new String(title_text   + titles  [j].value + " ");
+            title_text   = new String(title_text   + titles[j].value + " ");
         }
+        
         for(j=0; j<keywords.length;  j++)
         {
             keyword_text = new String(keyword_text + keywords[j].value + " ");
         }
+        
         for(j=0; j<abstracts.length; j++)
         {
             abstract_text= new String(abstract_text+ abstracts[j].value + " ");
+        }
+
+
+        for(j=0; j<series.length; j++)
+        {
+            series_text= new String(series_text + series[j].value + " ");
+        }
+
+        for(j=0; j<tocs.length; j++)
+        {
+            toc_text= new String(toc_text + tocs[j].value + " ");
+        }
+
+        for(j=0; j<mimetypes.length; j++)
+        {
+            mime_text= new String(mime_text + mimetypes[j].value + " ");
+        }
+
+        for(j=0; j<sponsors.length; j++)
+        {
+            sponsor_text= new String(sponsor_text + sponsors[j].value + " ");
+        }
+
+        for(j=0; j<identifiers.length; j++)
+        {
+            id_text= new String(id_text + identifiers[j].value + " ");
         }
 
         // lastly, get the handle
@@ -412,7 +467,13 @@ public class DSIndexer
         textvalues.put("handletext",itemhandle   );
         textvalues.put("abstract",  abstract_text);
 
-        // write out the metatdata (for scalability, using hash instead of individual strings)
+        textvalues.put("series",    series_text	 );
+        textvalues.put("toc",   	toc_text 	 );
+        textvalues.put("mimetype",  mime_text    );
+        textvalues.put("sponsor",	sponsor_text );
+        textvalues.put("identifier",id_text    );
+        
+      // write out the metatdata (for scalability, using hash instead of individual strings)
         writeIndexRecord(writer, Constants.ITEM, myitem.getID(), itemhandle, textvalues);
     }
 
