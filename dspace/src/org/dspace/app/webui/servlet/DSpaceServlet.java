@@ -51,7 +51,6 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.RequestMimic;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -100,7 +99,7 @@ public class DSpaceServlet extends HttpServlet
         HttpServletResponse response)
         throws ServletException, IOException
     {
-        processRequest(request, response, false);
+        processRequest(request, response);
     }
     
     
@@ -108,7 +107,7 @@ public class DSpaceServlet extends HttpServlet
         HttpServletResponse response)
         throws ServletException, IOException
     {
-        processRequest(request, response, true);
+        processRequest(request, response);
     }
 
 
@@ -117,11 +116,9 @@ public class DSpaceServlet extends HttpServlet
      *
      * @param request    the request object
      * @param response   the response object
-     * @param isPost     if true, this is a POST
      */
     private void processRequest(HttpServletRequest request,
-        HttpServletResponse response,
-        boolean isPost)
+        HttpServletResponse response)
         throws ServletException, IOException
     {
         Context context = null;
@@ -140,8 +137,15 @@ public class DSpaceServlet extends HttpServlet
             // authentication?
             request = Authenticate.getRealRequest(request);
 
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "http_request",
+                    UIUtil.getRequestLogInfo(request)));
+            }
+
             // Invoke the servlet code
-            if (isPost)
+            if (request.getMethod().equals("POST"))
             {
                 doDSPost(context, request, response);
             }

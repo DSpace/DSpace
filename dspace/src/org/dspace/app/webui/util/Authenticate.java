@@ -68,6 +68,7 @@ public class Authenticate
     /** log4j category */
     private static Logger log = Logger.getLogger(Authenticate.class);
 
+
     /**
      * Return the request that the system should be dealing with, given the
      * request that the browse just sent.  If the incoming request is from
@@ -84,14 +85,21 @@ public class Authenticate
     
         if (session.getAttribute("resuming.request") != null)
         {
-            // Resume that interrupted request
-            HttpServletRequest actualRequest = (HttpServletRequest)
-                session.getAttribute("interrupted.request");
+log.info("RESUMING AN INTERRUPTED REQUEST");
+
+            // Get info about the interrupted request
+            RequestInfo requestInfo = (RequestInfo)
+                session.getAttribute("interrupted.request.info");
+
+            // Wrap the current request to make it look like the interruped one
+            HttpServletRequest actualRequest = requestInfo.wrapRequest(request);
 
             // Remove the info from the session so it isn't resumed twice
             session.removeAttribute("resuming.request");
-            session.removeAttribute("interrupted.request");
+            session.removeAttribute("interrupted.request.info");
+            session.removeAttribute("interrupted.request.url");
             
+            // Return the wrapped request
             return actualRequest;
         }
         else
@@ -133,7 +141,7 @@ public class Authenticate
         // Send the redirect
         response.sendRedirect(response.encodeRedirectURL(originalURL));
     }
-        
+
         
     /**
      * Start the authentication process.  This packages up the request that
@@ -153,8 +161,8 @@ public class Authenticate
         HttpSession session = request.getSession();
         
         // Store the data from the request that led to authentication
-        RequestMimic mimic = new RequestMimic(request);
-        session.setAttribute("interrupted.request", mimic);
+        RequestInfo info = new RequestInfo(request);
+        session.setAttribute("interrupted.request.info", info);
 
         // Store the URL of the request that led to authentication
         session.setAttribute("interrupted.request.url",
