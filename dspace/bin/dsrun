@@ -55,7 +55,7 @@ fi
 
 # Assume we're in the bin subdirectory of the DSpace installation directory
 BINDIR=`dirname $0`
-DSPACEDIR=`dirname $BINDIR`
+DSPACEDIR=`cd "$BINDIR/.." ; pwd`
 
 # Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
 JARS=`echo $DSPACEDIR/jsp/WEB-INF/lib/*.jar | sed 's/ /\:/g'`
