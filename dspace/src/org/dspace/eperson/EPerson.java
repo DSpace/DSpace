@@ -350,11 +350,21 @@ public class EPerson extends DSpaceObject
      */
     public String getFullName()
     {
-        // FIXME: make this work.  ;-)
-        String t = myRow.getStringColumn("firstname") +
-                   " " + myRow.getStringColumn("lastname");
-
-        return t;
+        String f = myRow.getStringColumn("firstname");
+        String l = myRow.getStringColumn("lastname");
+        
+        if (l == null && f == null)
+        {
+            return getEmail();
+        }
+        else if (f == null)
+        {
+            return l;
+        }
+        else
+        {
+            return (f + " " + l);
+        }
     }
 
 

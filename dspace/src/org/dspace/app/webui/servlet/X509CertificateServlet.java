@@ -141,6 +141,11 @@ public class X509CertificateServlet extends DSpaceServlet
                         {
                             // Register the new user automatically
                             String email = X509Manager.getEmail(certs[0]);
+                            log.info(LogManager.getHeader(context,
+                                "autoregister",
+                                "email=" + email));
+                            // TEMPORARILY turn off authorisation
+                            context.setIgnoreAuthorization(true);
                             eperson = EPerson.create(context);
                             eperson.setEmail(email);
                             eperson.setCanLogIn(true);
@@ -148,6 +153,7 @@ public class X509CertificateServlet extends DSpaceServlet
                                 request, eperson);
                             eperson.update();
                             context.commit();
+                            context.setIgnoreAuthorization(false);
                         }
                         else
                         {
