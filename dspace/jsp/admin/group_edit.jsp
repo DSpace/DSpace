@@ -79,6 +79,13 @@
         </form>
     </p>
 
+    <P align="center">
+        <form method=POST>
+            <input type="hidden" name="group_id" value="<%=group.getID()%>">
+            <input type="submit" name="submit_add_eperson" value="Add New EPerson">
+        </form>
+    </p>
+
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
@@ -111,10 +118,5 @@
 %>
     </table>
         
-    <P align="center">
-        <form method=POST>
-            <input type="hidden" name="group_id" value="<%=group.getID()%>">
-            <input type="submit" name="submit_add_eperson" value="Add New EPerson">
-        </form>
-    </p>
+
 </dspace:layout>
