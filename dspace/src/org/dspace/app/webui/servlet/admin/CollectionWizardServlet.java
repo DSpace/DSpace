@@ -46,20 +46,13 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.administer.DCType;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -68,19 +61,14 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.Community;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
-import org.dspace.content.Item;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.handle.HandleManager;
 
 /**
  * Collection creation wizard UI

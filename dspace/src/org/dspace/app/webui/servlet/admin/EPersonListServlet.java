@@ -43,18 +43,14 @@ package org.dspace.app.webui.servlet.admin;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
 
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -83,7 +79,11 @@ public class EPersonListServlet extends DSpaceServlet
 		{
 			sortBy = EPerson.EMAIL;
 		}
-
+		else if (sbParam != null && sbParam.equals("id"))
+		{
+			sortBy = EPerson.ID;
+		}
+		
 		// What's the index of the first eperson to show?  Default is 0
 		int first = UIUtil.getIntParameter(request, "first");
 		if (first == -1) first = 0;
