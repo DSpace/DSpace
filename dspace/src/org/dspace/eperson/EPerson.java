@@ -40,19 +40,115 @@
 
 package org.dspace.eperson;
 
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import java.sql.SQLException;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import java.security.MessageDigest;
+
 /**
- * Class representing an e-person.  Currently just a placeholder.
+ * Class representing an e-person.
  *
- * @author Robert Tansley
+ * @author David Stuve
  * @version $Revision$
  */
 public class EPerson
 {
+    /** Our context */
+    private Context myContext;
+
+    /** The row in the table representing this format */
+    private TableRow myRow;
+
+
     /**
      * Construct an EPerson
+     * @param context  the context this object exists in
+     * @param row      the corresponding row in the table
      */
-    public EPerson()
+    EPerson( Context context, TableRow row )
     {
+        myContext = context;
+        myRow = row;
+    }
+
+    /**
+     * Get an EPerson from the database.
+     *
+     * @param  context  DSpace context object
+     * @param  id       ID of the EPerson
+     *   
+     * @return  the EPerson format, or null if the ID is invalid.
+     */
+    public static EPerson find(Context context, int id)
+        throws SQLException
+    {
+        TableRow row = DatabaseManager.find( context, "eperson", id );
+
+        if ( row == null )
+        {
+            return null;
+        }
+        else
+        {
+            return new EPerson( context, row );
+        }
+    }
+
+    /**
+     * Find the eperson by their email address
+     *
+     * @ return EPerson 
+     */
+    public static EPerson findByEmail(Context context, String email)
+        throws SQLException, AuthorizeException
+    {
+        TableRow row = DatabaseManager.findByUnique( context, "eperson", "email", email );
+
+        if ( row == null )
+        {
+            return null;
+        }
+        else
+        {
+            return new EPerson( context, row );
+        }    
+    }
+
+
+    /**
+     * Create a new eperson
+     *
+     * @param  context  DSpace context object
+     */
+    public static EPerson create(Context context)
+        throws SQLException, AuthorizeException
+    {
+        // FIXME: Check authorisation 
+        
+        // Create a table row
+        TableRow row = DatabaseManager.create(context, "eperson");        
+        return new EPerson(context, row);
+    }
+
+
+    /**
+     * Delete an eperson
+     *
+     */
+    public void delete()
+        throws SQLException
+    {
+        // FIXME: authorizations
+
+       	// Remove any group memberships first
+       	DatabaseManager.updateQuery(myContext,
+            "DELETE FROM EPersonGroup2EPerson WHERE eperson_id=" +
+               	getID() );
+
+        // Remove ourself
+        DatabaseManager.delete(myContext, myRow);
     }
 
 
@@ -63,7 +159,7 @@ public class EPerson
      */
     public int getID()
     {
-        return -1;
+        return myRow.getIntColumn("eperson_id");
     }
 
 
@@ -74,17 +170,259 @@ public class EPerson
      */
     public String getEmail()
     {
-        return "";
+        return myRow.getStringColumn("email");
     }
 
 
     /**
-     * Get the e-person's full name
+     * Set the EPerson's email
+     *
+     * @param  s   the new email
+     */
+    public void setEmail(String s)
+    {
+        myRow.setColumn("email", s);
+    }
+
+
+    /**
+     * Get the e-person's full name, combining first and last name
+     * in a displayable string.
      *
      * @return  their full name
      */
     public String getFullName()
     {
+        // FIXME: make this work.  ;-)
+        
         return "";
+    }
+
+
+    /**
+     * Get the eperson's first name.
+     *
+     * @return their first name
+     */
+    public String getFirstName()
+    {
+        return myRow.getStringColumn("firstname");
+    }
+
+
+    /**
+     * Set the eperson's first name
+     *
+     * @param firstname the person's first name
+     */
+    public void setFirstName(String firstname)
+    {
+        myRow.setColumn("firstname", firstname);
+    }
+
+
+    /**
+     * Get the eperson's last name.
+     *
+     * @return their last name
+     */
+    public String getLastName()
+    {
+        return myRow.getStringColumn("lastname");
+    }
+
+
+    /**
+     * Set the eperson's last name
+     *
+     * @param lastname the person's last name
+     */
+    public void setLastName(String lastname)
+    {
+        myRow.setColumn("lastname", lastname);
+    }
+
+
+    /**
+     * Set active/inactive
+     *
+     * @param isactive boolean yes/no
+     */
+    public void setActive(boolean isactive)
+    {
+        myRow.setColumn("active", isactive);
+    }
+    
+    /**
+     * Get active/inactive
+     *
+     * @return isactive boolean, yes/no
+     */
+    public boolean getActive()
+    {
+        return myRow.getBooleanColumn("active");
+    }
+
+
+    /**
+     * Set require cert yes/no
+     *
+     * @param isrequired boolean yes/no
+     */
+    public void setRequireCertificate(boolean isrequired)
+    {
+        myRow.setColumn("requirecertificate", isrequired);
+    }
+
+    
+    /**
+     * Get active/inactive
+     *
+     * @return isactive boolean, yes/no
+     */
+    public boolean getRequireCertificate()
+    {
+        return myRow.getBooleanColumn("requirecertificate");
+    }
+
+
+    /**
+     * Get the value of a metadata field
+     *
+     * @param  field   the name of the metadata field to get
+     *
+     * @return  the value of the metadata field
+     *
+     * @exception IllegalArgumentException   if the requested metadata
+     *            field doesn't exist
+     */
+    public String getMetadata(String field)
+    {
+       	return myRow.getStringColumn(field);
+    }
+
+
+    /**
+     * Set a metadata value
+     *
+     * @param  field   the name of the metadata field to get
+     * @param  value   value to set the field to
+     *
+     * @exception IllegalArgumentException   if the requested metadata
+     *            field doesn't exist
+     */
+    public void setMetadata(String field, String value)
+    {
+       	myRow.setColumn(field, value);
+    }
+
+
+    // lastname, active, requirecertificate, phone  
+
+
+    /**
+     * Set the EPerson's password
+     *
+     * @param  s   the new email
+     */
+    public void setPassword(String s)
+    {
+        // FIXME:  encoding
+        String encoded = encodePassword(s);
+        
+        myRow.setColumn("password", encoded);
+    }
+
+
+    /**
+     * Check EPerson's password
+     *
+     * @param attempt the password attempt
+     * @return boolean successful/unsuccessful
+     */
+    public boolean checkPassword(String attempt)
+    {
+        String encoded = encodePassword( attempt);
+
+        if(attempt.equals(myRow.getStringColumn("password")))
+            return true;
+    
+        return false;
+    }
+    
+
+    /**
+     * Update the EPerson
+     */
+    public void update()
+        throws SQLException, AuthorizeException
+    {
+        // FIXME: Check authorisation
+
+        DatabaseManager.update(myContext, myRow);
+    }
+
+    //--------- private methods ------------------
+
+    /**
+     * encodePassword() is a utility function to encode a password,
+     *
+     * @param cleartextpw   cleartext password to encode
+     */
+
+    private static String encodePassword(String cleartextpw)
+    {
+        String myresult = "";
+
+        // create a digest object
+        try
+        {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            // turn our cleartext password into bytes
+            byte[] buf = cleartextpw.getBytes();
+
+            // generate digest of password bytes
+            md.update(buf);
+
+            myresult = toHex(md.digest());
+        }
+        catch (java.security.NoSuchAlgorithmException e)
+        {
+            // FIXME need to log error here
+            // (it is, however, built in, and should never happen)
+        }
+
+        return myresult;
+    }
+
+
+    /** 
+     * toHex() just makes a hex-encoded string from a byte array
+     * Return a hex representation of the byte array
+     *
+     * @param hex byte array to convert
+     *
+     * @return string containing hex representation
+     */
+
+    private static String toHex(byte[] hex)
+    {
+        if ((hex == null) || (hex.length == 0))
+            return null;
+
+        StringBuffer result = new StringBuffer();
+
+        // This is far from the most efficient way to do things...
+        for (int i = 0; i < hex.length; i++)
+        {
+            int low = (int) (hex[i] & 0x0F);
+            int high = (int) (hex[i] & 0xF0);
+
+            result.append(Integer.toHexString(high).substring(0, 1));
+            result.append(Integer.toHexString(low));
+        }
+
+        return result.toString();
     }
 }
