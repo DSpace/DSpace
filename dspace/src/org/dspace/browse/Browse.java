@@ -702,8 +702,8 @@ public class Browse
             return;
 
         ItemComparator ic = params.getSortByTitle().booleanValue() ?
-            new ItemComparator("title", null,          Item.ANY, true) :
-            new ItemComparator("date",  "accessioned", Item.ANY, true);
+            new ItemComparator("title", null,     Item.ANY, true) :
+            new ItemComparator("date",  "issued", Item.ANY, true);
 
         Collections.sort(results, ic);
     }

@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.dspace.browse.Browse;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 
@@ -108,6 +109,13 @@ public class ItemComparator implements Comparator
         // Retrieve a chosen value from the array for comparison
         String firstValue = getValue(firstItem.getDC(element, qualifier, language));
         String secondValue = getValue(secondItem.getDC(element, qualifier, language));
+
+        // Normalize titles for comparison purposes
+        if ("title".equals(element))
+        {
+            firstValue = Browse.getNormalizedTitle(firstValue, language);
+            secondValue = Browse.getNormalizedTitle(secondValue, language);
+        }
 
         if ((firstValue == null) && (secondValue == null))
             return 0;
