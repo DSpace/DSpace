@@ -43,16 +43,29 @@
   -
   - Form where new users enter their email address to get a token to access
   - the personal info page.
+  -
+  - Attributes to pass in:
+  -     retry  - if set, this is a retry after the user entered an invalid email
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.RegisterServlet" %>
 
+<%
+    boolean retry = (request.getAttribute("retry") != null);
+%>
+
 <dspace:layout title="User Registration">
 
     <H1>User Registration</H1>
     
+<%
+    if (retry)
+    { %>
+    <P><strong>The e-mail address you entered was invalid.</strong>  Please try again.</strong></P>
+<%  } %>
+
     <P>If you've never logged on to DSpace before, please enter your e-mail
     address in the box below and click "Register".</P>
     

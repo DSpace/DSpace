@@ -303,6 +303,12 @@ public class DatabaseManager
                                          String value)
         throws SQLException
     {
+        // Fix common error--value ends with \.  Escape this with an extra \.
+        if (value.endsWith("\\"))
+        {
+            value = value + "\\";
+        }
+
         String ctable = canonicalize(table);
         // Need a pair of single quote marks:
         // MessageFormat treats this: '{2}' as the literal {2}

@@ -43,6 +43,7 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -333,8 +334,29 @@ public class RegisterServlet extends DSpaceServlet
                 }
             }
         }
+        catch (AddressException ae)
+        {
+            // Malformed e-mail address
+            log.info(LogManager.getHeader(context,
+                "bad_email",
+                "email=" + email));
+
+            request.setAttribute("retry", new Boolean(true));
+
+            if (registering)
+            {
+                JSPManager.showJSP(request, response, "/register/new-user.jsp");
+            }
+            else
+            {
+                JSPManager.showJSP(request,
+                    response,
+                    "/register/forgot-password.jsp");
+            }
+        }            
         catch (MessagingException me)
         {
+            // Some other mailing error
             log.info(LogManager.getHeader(context,
                 "error_emailing",
                 "email=" + email),
