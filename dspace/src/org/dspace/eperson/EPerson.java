@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Vector;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -263,7 +264,7 @@ public class EPerson extends DSpaceObject
      *
      */
     public void delete()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, EPersonDeletionException
     {
         // authorized?
         if( !AuthorizeManager.isAdmin(myContext) )
@@ -278,12 +279,26 @@ public class EPerson extends DSpaceObject
             myContext.getCurrentUser(),
             myContext.getExtraLogInfo());
 
+        //check for presence of eperson in tables that
+        //have constraints on eperson_id
+        Vector constraintList = getDeleteConstraints();
+        
+        //if eperson exists in tables that have constraints
+        //on eperson, throw an exception
+        if(constraintList.size() > 0)
+            throw new EPersonDeletionException(constraintList);
+        
         // Remove from cache
         myContext.removeCached(this, getID());
 
        	// Remove any group memberships first
        	DatabaseManager.updateQuery(myContext,
             "DELETE FROM EPersonGroup2EPerson WHERE eperson_id=" +
+               	getID() );
+        
+        // Remove any subscriptions
+       	DatabaseManager.updateQuery(myContext,
+            "DELETE FROM subscription WHERE eperson_id=" +
                	getID() );
 
         // Remove ourself
@@ -591,5 +606,54 @@ public class EPerson extends DSpaceObject
     public int getType()
     {
         return Constants.EPERSON;
+    }
+    
+    
+    /**
+     * Check for presence of EPerson in tables that have constraints
+     * on EPersons. Called by delete() to determine whether the
+     * eperson can actually be deleted.
+     *
+     * An EPerson cannot be deleted if it exists in the item,
+     * workflowitem, or tasklistitem tables.
+     *
+     * @return  Vector of tables that contain a reference to the
+     * eperson.
+     */
+    public Vector getDeleteConstraints()
+        throws SQLException
+    {
+        Vector tableList = new Vector();
+        
+        //check for eperson in item table
+        TableRowIterator tri = DatabaseManager.query(myContext,
+            "SELECT * from item where submitter_id=" + getID());
+        
+        if(tri.hasNext())
+        {
+            tableList.add("item");
+        }
+        
+        //check for eperson in workflowitem table
+        tri = DatabaseManager.query(myContext,
+            "SELECT * from workflowitem where owner=" + getID());
+            
+        if(tri.hasNext())
+        {
+            tableList.add("workflowitem");
+        }
+        
+        //check for eperson in tasklistitem table      
+        tri = DatabaseManager.query(myContext,
+                "SELECT * from tasklistitem where eperson_id=" + getID());
+
+        if(tri.hasNext())
+        {
+             tableList.add("tasklistitem");
+        }
+                   
+       //the list of tables can be used to construct an error message
+        //explaining to the user why the eperson cannot be deleted.
+        return tableList;   
     }
 }
