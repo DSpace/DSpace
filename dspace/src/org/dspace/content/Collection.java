@@ -461,7 +461,7 @@ public class Collection
         if (submitters == null)
         {
             submitters = Group.create(ourContext);
-            submitters.setName("COLLECTION_100_SUBMIT");
+            submitters.setName("COLLECTION_" + getID() + "_SUBMIT");
             submitters.update();
         }
 
