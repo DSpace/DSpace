@@ -1,5 +1,5 @@
 <%--
-  - header-default.jsp
+  - header-home.jsp
   -
   - Version: $Revision$
   -
@@ -39,12 +39,13 @@
   --%>
 
 <%--
-  - HTML header for most UI pages
+  - HTML header for main home page
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.util.List"%>
+<%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%
@@ -68,38 +69,28 @@
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
     <body leftmargin=0 topmargin=0 marginwidth=0 marginheight=0>
 
-
         <%-- DSpace top-of-page banner --%>
-
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
         <table class="pageBanner" width="100%" border=0 cellpadding=0 cellspacing=0>
 
-
-            <%-- DSpace logo and star background --%>
-
-            <%-- HACK: background:  for non-CSS compliant Netscape 4.x browser --%>
+            <%-- DSpace logo --%>
             <tr>
-                <td class="logoBar" background="<%= request.getContextPath() %>/images/star-background.jpg">
-                    <img src="<%= request.getContextPath() %>/image/banner-small.jpg" width="288" height="49" alt="DSpace">
+                <td>
+                    <A HREF="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="DSpace" width=198 height=79 border=0></A></td>
+                <td class="tagLine" width="99%" cellpadding=10> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
+                    <A class="tagLineText" target=_blank href="http://www.dspace.org/">About DSpace</A>
+                </td>
+                <td nowrap valign=middle>
+                    &nbsp;&nbsp;&nbsp;<A HREF="http://libraries.mit.edu/"><img src="<%= request.getContextPath() %>/image/dome-bluewhite-smaller.gif" border=0 alt="MIT Libraries"></A>&nbsp;&nbsp;&nbsp;
                 </td>
             </tr>
-
-
-            <%-- Location bar --%>
-<%
-    if (locbar)
-    {
-%>
-            <tr>
-                <dspace:include page="/layout/location-bar.jsp" />
-            </tr>
+            <tr class="stripe"> <%-- Blue stripe --%>
+                <td colspan=3>&nbsp;</td>
+            </td>
         </table>
-<%
-    }
-%>
 
         <%-- Page contents --%>
-    
+
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
         <table class="centralPane" width="100%" border=0 cellpadding=3 cellspacing=1>
 
@@ -123,4 +114,14 @@
             <%-- HACK: Width shouldn't really be 100%, but omitting this means --%>
             <%--       navigation bar gets far too wide on certain pages --%>
             <td class="pageContents" width="100%">
+
+                <%-- Location bar --%>
+<%
+    if (locbar)
+    {
+%>
+                <dspace:include page="/layout/location-bar.jsp" />
+<%
+    }
+%>
 

@@ -1,5 +1,5 @@
 <%--
-  -- footer-default.jsp
+  -- footer-home.jsp
   --
   -- Version: $Revision$
   --
@@ -39,7 +39,7 @@
   --%>
 
 <%--
-  - Footer for default style of page
+  - Footer for home page
   --%>
 
 <%@ page import="java.net.URLEncoder" %>
@@ -47,17 +47,10 @@
 
 <%
     String sidebar = (String) request.getAttribute("dspace.layout.sidebar");
-    String navbar = (String) request.getAttribute("dspace.layout.navbar");
-    int overallColSpan = 1;
-
-    if (sidebar != null)
+    int overallColSpan = 3;
+    if (sidebar == null)
     {
-        overallColSpan++;
-    }
-    
-    if (!navbar.equals("off"))
-    {
-        overallColSpan++;
+        overallColSpan = 2;
     }
 %>
                     <%-- End of page content --%>
@@ -84,8 +77,18 @@
 %>
              <tr class="pageFooterBar">
                 <td colspan=<%= overallColSpan %> class="pageFootnote">
-                    Copyright&nbsp;&copy;&nbsp;2002&nbsp;<a target=_blank href="http://web.mit.edu/">MIT</a>&nbsp;and&nbsp;<a target=_blank href="http://www.hp.com/">Hewlett-Packard</a>&nbsp;-
-                    <a target=_blank href="<%= request.getContextPath() %>/feedback?fromPage=<%= fromPage %>">Feedback</a>
+                    <table class="pageFooterBar" width="100%">
+                        <tr>
+                            <td><A target=_blank HREF="http://www.hp.com/"><img src="<%= request.getContextPath() %>/image/hp-mit.gif" alt="invent @ MIT: The HP-MIT Alliance" border=0></A></td>
+                            <td class="pageFootnote">
+                                Copyright&nbsp;&copy;&nbsp;2002&nbsp;<a target=_blank href="http://web.mit.edu/">MIT</a>&nbsp;and&nbsp;<a target=_blank href="http://www.hp.com/">Hewlett-Packard</a>&nbsp;-
+                                <a target=_blank href="<%= request.getContextPath() %>/feedback?fromPage=<%= fromPage %>">Feedback</a>
+                            </td>
+                            <td nowrap valign=middle> <%-- nowrap, valign for broken NS 4.x --%>
+                                &nbsp;&nbsp;&nbsp;<A HREF="http://www.hp.com/"><img src="<%= request.getContextPath() %>/image/hp.gif" border=0 alt="Hewlett Packard"></A>&nbsp;&nbsp;&nbsp;
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </table>

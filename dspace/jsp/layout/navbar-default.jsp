@@ -49,10 +49,11 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.eperson.EPerson" %>
 
 <%
     // Is anyone logged in?
-    boolean loggedIn = (request.getAttribute("dspace.current.user") != null);
+    EPerson user = (EPerson) request.getAttribute("dspace.current.user");
     
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);    
@@ -66,6 +67,15 @@
 <%-- Search Box --%>
 <form method=GET action="<%= request.getContextPath() %>/simple-search">
 
+<%
+    if (user != null)
+    {
+%>
+  <P class="loggedIn">Logged&nbsp;in&nbsp;as <%= user.getEmail() %>
+    (<A HREF="<%= request.getContextPath() %>/logout">Logout</A>)</P>
+<%
+    }
+%> 
   <table width="100%" class="searchBox">
     <tr>
       <td>
@@ -88,6 +98,19 @@
 <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
 <table width="100%" border="0" cellspacing="2" cellpadding="2">
 
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/index.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/">Home</a>
+    </td>
+  </tr>
+
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+
   <tr>
     <td nowrap colspan="2" class="navigationBarSublabel">Browse</td>
   </tr>
@@ -97,7 +120,7 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.equals( "/community-list" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/community-list">Communities/<br />Collections</a>
+      <a href="<%= request.getContextPath() %>/community-list">Communities<br />&amp;&nbsp;Collections</a>
     </td>
   </tr>
 
@@ -133,15 +156,24 @@
   </tr>
 
   <tr>
-    <td nowrap colspan="2" class="navigationBarSublabel">Members</td>
+    <td nowrap colspan="2" class="navigationBarSublabel">Sign on to:</td>
   </tr>
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/submit" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/subscribe" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/submit">Submit</a>
+      <a href="<%= request.getContextPath() %>/subscribe">Receive email<br>updates</a>
+    </td>
+  </tr>
+
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.equals( "/mydspace" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/mydspace">My DSpace</a><br><small>authorized users</small>
     </td>
   </tr>
 
@@ -154,45 +186,8 @@
     </td>
   </tr>
 
-  <tr class="navigationBarItem">
-    <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.equals( "/mydspace" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
-    </td>
-    <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/mydspace">My DSpace</a>
-    </td>
-  </tr>
-
   <tr>
     <td colspan="2">&nbsp;</td>
-  </tr>
-
-<%
-  // If logged in
-  if( loggedIn )
-  {
-%>
-
-  <tr class="navigationBarItem">
-    <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.equals( "/logout" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
-    </td>
-    <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/logout">Log Out</a>
-    </td>
-  </tr>
-
-<%
-  }
-%>
-
-  <tr class="navigationBarItem">
-    <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.equals( "/about" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
-    </td>
-    <td nowrap class="navigationBarItem">
-      <a href="http://www.dspace.org/">About</a>
-    </td>
   </tr>
 
   <tr class="navigationBarItem">
@@ -201,6 +196,15 @@
     </td>
     <td nowrap class="navigationBarItem">
       <dspace:popup page="/help/index.html">Help</dspace:popup>
+    </td>
+  </tr>
+
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.equals( "/about" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="http://www.dspace.org/">About DSpace</a>
     </td>
   </tr>
 

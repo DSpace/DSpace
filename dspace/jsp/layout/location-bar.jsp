@@ -42,7 +42,7 @@
   - Location bar component
   -
   - This component displays the "breadcrumb" style navigation aid at the top
-  - of most screens.  Also indicates whether or not the user is logged in.
+  - of most screens.
   -
   - Uses request attributes set in org.dspace.app.webui.jsptag.Layout, and
   - hence must only be used as part of the execution of that tag.  Plus,
@@ -51,70 +51,38 @@
   -  dspace.layout.parenttitles - List of titles of parent pages
   -  dspace.layout.parentlinks  - List of URLs of parent pages, empty string
   -                               for non-links
-  -  dspace.current.user        - Current EPerson user, or null
   --%>
 
 <%@ page import="java.util.List" %>
 
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.eperson.EPerson" %>
-
-
+<P class="locationBar">
 <%
     List parentTitles = (List) request.getAttribute("dspace.layout.parenttitles");
     List parentLinks = (List) request.getAttribute("dspace.layout.parentlinks");
-    EPerson eperson = (EPerson) request.getAttribute("dspace.current.user");
-%>
-<%-- HACK: Have to put some non-break spaces because "margin-left" CSS
-  -        property is poorly supported
-  -  HACK: height=32 inserted for Netscape 4.x which doesn't recognise
-  -        the "height: 2.0em" CSS property. --%>
 
-<td height=32 class="locationBar">
-    <table width=100% border=0 cellpadding=0 cellspacing=0>
-        <tr>
-        <td class="locationBarCell">&nbsp;&nbsp;&nbsp;</td>
-        <td class="locationBarCell" width="100%">
-<%
     for (int i = 0; i < parentTitles.size(); i++)
     {
-        String s = UIUtil.nonBreakSpace((String) parentTitles.get(i));
+        String s = (String) parentTitles.get(i);
         String u = (String) parentLinks.get(i);
 
-        if (i != 0)
+        // New line for each breadcrumb (no <br> needed for first)
+        if (i > 0)
         {
-            // Not the first element, so need a preceding chevron
-%>&gt;<%
+%><br><%
         }
 
         if (u.equals(""))
         {
 %>
-  <%= s %>
+<%= s %>&nbsp;&gt;
 <%
         }
         else
         {
 %>
-  <A HREF="<%= request.getContextPath() %><%= u %>"><%= s %></A>
+<A HREF="<%= request.getContextPath() %><%= u %>"><%= s %></A>&nbsp;&gt;
 <%
         }
-    }
+}
 %>
-        </td>
-        <td class="locationBarCell">&nbsp;&nbsp;&nbsp;</td>
-<%
-    if (eperson != null)
-    {
-%>
-<%-- HACK: &nbsp's are a workaround for Netscape 4.x, which doesn't honour
-  -- "white-space: nowrap" CSS property --%>
-        <td class="loggedInCell">
-            Logged&nbsp;in&nbsp;as&nbsp;<%= eperson.getEmail() %>&nbsp;&nbsp;&nbsp;
-      </td>
-<%
-    }
-%>
-    </tr>
-  </table>
-</td>
+</P>

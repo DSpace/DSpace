@@ -45,7 +45,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout locbar="nolink" parenttitle="Submit" title="Submission Cancelled">
+<dspace:layout locbar="off" title="Submission Cancelled">
 
     <H1>Submission Cancelled</H1>
 

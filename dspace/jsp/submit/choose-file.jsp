@@ -55,8 +55,7 @@
         (SubmissionInfo) request.getAttribute("submission.info");
 %>
 
-<dspace:layout locbar="nolink" navbar="off" parenttitle="Submit"
-title="Upload a File">
+<dspace:layout locbar="off" navbar="off" title="Upload a File">
 
     <form method=post action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data">
 

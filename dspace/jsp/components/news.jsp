@@ -39,26 +39,8 @@
   --%>
 
 <%--
-  - DSpace News.  This appears on the right-hand side of the front page.
+  - DSpace News.  This appears near the top of the home page.
   --%>
-<table border=0 cellpadding=5 cellspacing=0>
-  <tr>
-    <td align=center>
-      <img alt="Launching" src="<%= request.getContextPath() %>/image/flying-man.jpg" width="105" height="70" />
-    </td>
-  </tr>
-  <tr>
-    <td align=center nowrap>
-      <P><em>DSpace launches</em><br />
-      <strong>April 2002</strong></P>
-    </td>
-  </tr>
-</table>
-
-<H3>New&nbsp;Collections:</H3>
-<P class="recentItem">
-  <a href="<%= request.getContextPath() %>/communities/1/collections/100/">LIDS Technical Reports</a>
-</P>
-<P class="recentItem">
-  <a href="<%= request.getContextPath() %>/communities/3/collections/5/">MIT Press Out of Print Books</a>
-</P>
+<H3>DSpace is Live</H3>
+<P>Welcome to our digital repository of MIT research!</P>
+<P><A HREF="http://dspace.org/news/dspace-news.html">More news...</A></P>

@@ -206,10 +206,6 @@ public class LayoutTag extends TagSupport
             }
 
             request.setAttribute("dspace.layout.locbar", new Boolean(true));
-
-            // Add current page title
-            parents.add(title);
-            parentLinks.add("");
         }
 
         request.setAttribute("dspace.layout.parenttitles", parents);

@@ -69,8 +69,7 @@
     if (displayStep==null) displayStep = step;
 %>
 
-<dspace:layout locbar="nolink" navbar="off" parenttitle="Submit"
-title="Cancel or Save Submission">
+<dspace:layout locbar="off" navbar="off" title="Cancel or Save Submission">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 

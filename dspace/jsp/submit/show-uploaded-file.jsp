@@ -71,8 +71,7 @@
     BitstreamFormat format = bitstream.getFormat();
 %>
 
-<dspace:layout locbar="nolink" navbar="off" parenttitle="Submit"
-title="Uploaded File">
+<dspace:layout locbar="off" navbar="off" title="Uploaded File">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 

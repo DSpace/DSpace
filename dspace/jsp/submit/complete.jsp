@@ -46,8 +46,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout locbar="nolink" navbar="off" parenttitle="Submit"
-title="Submission Complete!">
+<dspace:layout locbar="off" navbar="off" title="Submission Complete!">
 
     <jsp:include page="/submit/progressbar.jsp">
         <jsp:param name="current_stage" value="<%= SubmitServlet.SUBMISSION_COMPLETE %>"/>

@@ -71,8 +71,7 @@
     final int formWidth = 50;
 %>
 
-<dspace:layout locbar="nolink" navbar="off" parenttitle="Submit"
-title="Describe Your Item">
+<dspace:layout locbar="off" navbar="off" title="Describe Your Item">
 
     <form action="<%= request.getContextPath() %>/submit#field" method=post>
 

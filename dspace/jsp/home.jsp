@@ -44,79 +44,68 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+
+<%
+    Community[] communities = (Community[]) request.getAttribute("communities");
+%>
 
 <dspace:layout style="home" locbar="nolink" title="Home">
 
-  <h1><%= ConfigurationManager.getProperty("dspace.name") %> Home</h1>
-
-  <form action="<%= request.getContextPath() %>/simple-search" method=GET>
-    <table border=0 cellpadding=4 cellspacing=8>
-      <tr>
-        <td colspan=2 bgcolor="#e0e0e0">
-          <table width=100% border=0 cellpadding=6>
-            <tr>
-              <td valign=middle><h2>What can you find in DSpace?</h2></td>
-              <td valign=middle align=right class="standard"><a href="http://www.dspace.org/">More&nbsp;Information</a>&nbsp;&nbsp;&nbsp;</td>
-            </tr>
-          </table>
-          <table width=100%>
-            <tr>
-              <td width="50%">
-                <UL>
-                  <li>Articles</li>
-                  <li>Technical Reports</li>
-                  <li>Working Papers</li>
-                </ul>
-              </td>
-              <td width="50%">
-                <ul>
-                  <li>Datasets</li>
-                  <li>Images</li>
-                  <li>Videos....and more</li>
-                </ul>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td width="50%" align=center bgcolor="#e0e0e0" valign=top>
-          <H2>Search</H2>
-          <P class="submitFormHelp">Enter some text in the box below to search DSpace.</P>
-          <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="Go"></P>
-        </td>
-        <td width="50%" align=center bgcolor="#e0e0e0" valign=top>
-          <H2>Submit</H2>
-          <P class="submitFormHelp">Submit your digital content to DSpace!  To
-          start the submission process, select the button below.</P>
-          <P align=center><A HREF="<%= request.getContextPath() %>/submit">Start Submitting</A></P>
-          <P class="submitFormHelp"><strong>Authorized Users Only</strong></P>
-        </td>
-      </tr>
-      <tr>
-        <td bgcolor="#e0e0e0" valign=top>
-          <H2 align=center>Browse</H2>
-          <P class="submitFormHelp">You can also browse a DSpace index:</P>
-          <UL>
-            <LI><A HREF="<%= request.getContextPath() %>/community-list">Communities and collections</A></LI>
-            <LI><A HREF="<%= request.getContextPath() %>/browse-title">Titles</A></LI>
-            <LI><A HREF="<%= request.getContextPath() %>/browse-author">Authors</A></LI>
-            <LI><A HREF="<%= request.getContextPath() %>/browse-date">Dates</A></LI>
-          </UL>
-        </td>
-        <td align=center bgcolor="#e0e0e0" valign=top>
-          <H2>My DSpace</H2>
-          <P class="submitFormHelp">You can visit "My DSpace" to resume half-finished
-          submissions and check on the progress of previous submissions.</P>
-          <P align=center><A HREF="<%= request.getContextPath() %>/mydspace">Visit My DSpace</A></P>
-          <P class="submitFormHelp"><strong>Authorized Users Only</strong></P>
-        </td>
-      </tr>
+    <table class="miscTable" width="95%" align="center">
+        <tr>
+            <td class="oddRowEvenCol">
+                <dspace:include page="/components/news.jsp" />
+            </td>
+        </tr>
     </table>
-  </form>
+  
+    <br>
+
+    <form action="<%= request.getContextPath() %>/simple-search" method=GET>
+        <table class="miscTable" width="95%" align="center">
+            <tr>
+                <td class="oddRowEvenCol">
+                    <H3>Search</H3>
+                      <P align="center">Enter some text in the box below to search DSpace.</P>
+                      <center><%-- HACK for Netscape 4.xx, "align=center" doesn't seem to work--%>
+                        <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="Go"></P>
+                      </center>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <table class="miscTable" width="95%" align="center">
+        <tr>
+            <td class="oddRowEvenCol">
+                <H3>Communities in DSpace</H3>
+                <P align="center">Select a community to browse its collections.</P>
+                <table border=0 cellpadding=2>
+<%
+    for (int i = 0; i < communities.length; i++)
+    {
+%>                  <tr>
+                        <td class="standard">
+                            <A HREF="<%= request.getContextPath() %>/communities/<%= communities[i].getID() %>/"><%= communities[i].getMetadata("name") %></A>
+                        </td>
+                    </tr>
+<%
+    }
+%>
+                </table>
+            </td>
+        </tr>
+    </table>
 
   <dspace:sidebar>
-    <dspace:include page="/components/news.jsp" />
+    <%-- non-break spaces to make sidebar a reasonable width--%>
+    <H2>What&nbsp;can&nbsp;you find&nbsp;in&nbsp;DSpace?</H2>
+    <P><strong>MIT</strong> Research in digital form, including preprints, technical reports, working papers, conference papers, images, and more.</P>
+
+    <br>
+    <H2>Is this all of MIT's&nbsp;research?</H2>
+    <P>No. DSpace is limited to digital research products. For items in print, go to <A HREF="http://libraries.mit.edu/barton">Barton: MIT Libraries' catalog</a>. DSpace is young and growing rapidly. Check back often.</P>
   </dspace:sidebar>
 </dspace:layout>

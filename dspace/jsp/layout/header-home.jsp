@@ -69,35 +69,25 @@
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
     <body leftmargin=0 topmargin=0 marginwidth=0 marginheight=0>
 
-
         <%-- DSpace top-of-page banner --%>
-
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
         <table class="pageBanner" width="100%" border=0 cellpadding=0 cellspacing=0>
 
-
-            <%-- DSpace logo and star background --%>
-
-            <%-- HACK: background:  for non-CSS compliant Netscape 4.x browser --%>
+            <%-- DSpace logo --%>
             <tr>
-                <td class="logoBar" background="<%= request.getContextPath() %>/images/star-background.jpg">
-                    <img src="<%= request.getContextPath() %>/image/banner-large.jpg" width="576" height="98" alt="DSpace">
+                <td>
+                    <A HREF="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="DSpace" width=198 height=79 border=0></A></td>
+                <td class="tagLine" width="99%" cellpadding=10> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
+                    <A class="tagLineText" target=_blank href="http://www.dspace.org/">About DSpace</A>
+                </td>
+                <td nowrap valign=middle>
+                    &nbsp;&nbsp;&nbsp;<A HREF="http://libraries.mit.edu/"><img src="<%= request.getContextPath() %>/image/dome-bluewhite-smaller.gif" border=0 alt="MIT Libraries"></A>&nbsp;&nbsp;&nbsp;
                 </td>
             </tr>
-
-
-            <%-- Location bar --%>
-<%
-    if (locbar)
-    {
-%>
-            <tr>
-                <dspace:include page="/layout/location-bar.jsp" />
-            </tr>
+            <tr class="stripe"> <%-- Blue stripe --%>
+                <td colspan=3>&nbsp;</td>
+            </td>
         </table>
-<%
-    }
-%>
 
         <%-- Page contents --%>
 
@@ -108,14 +98,30 @@
             <tr valign=top>
 
             <%-- Navigation bar --%>
+<%
+    if (!navbar.equals("off"))
+    {
+%>
             <td class="navigationBar">
                 <dspace:include page="<%= navbar %>" />
             </td>
-
+<%
+    }
+%>
             <%-- Page Content --%>
 
             <%-- HACK: width specified here for non-CSS compliant Netscape 4.x --%>
             <%-- HACK: Width shouldn't really be 100%, but omitting this means --%>
             <%--       navigation bar gets far too wide on certain pages --%>
             <td class="pageContents" width="100%">
+
+                <%-- Location bar --%>
+<%
+    if (locbar)
+    {
+%>
+                <dspace:include page="/layout/location-bar.jsp" />
+<%
+    }
+%>
 

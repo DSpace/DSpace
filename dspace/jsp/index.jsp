@@ -58,6 +58,7 @@
 
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.LogManager" %>
 
@@ -68,6 +69,10 @@
     {
         // Obtain a context so that the location bar can display log in status
         context = UIUtil.obtainContext(request);
+        
+        // Home page shows community list
+        Community[] communities = Community.findAll(context);
+        request.setAttribute("communities", communities);
         
         // Show home page JSP
         JSPManager.showJSP(request, response, "/home.jsp");

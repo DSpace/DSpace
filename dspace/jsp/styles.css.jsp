@@ -77,85 +77,87 @@
         }
 %>
 
-A {  color: #003366 }
+A { color: #336699 }
 
-BODY { font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
        font-size: 10pt;
        font-style: normal;
-       color: black;
-       background: black;
+       color: #000000;
+       background: #bbbbbb;
        margin: 0;
        padding: 0 }
 
+<%-- Note: Font information must be repeated for broken Netscape 4.xx --%>
 H1 { margin-left: 10px;
      margin-right: 10px;
-     font-size: 18pt;
+     font-size: 16pt;
+     font-weight: bold;
      font-style: normal;
-     color: #006699 }
+     font-family: "verdana", "Arial", "Helvetica", sans-serif;
+     color: #336699 }
 
 H2 { margin-left: 10px;
      margin-right: 10px;
-     font-size: 16pt;
+     font-size: 14pt;
      font-style: normal;
-     color: #006699 }
+     font-family: "verdana", "Arial", "Helvetica", sans-serif;
+     color: #336699 }
 
 H3 { margin-left: 10px;
      margin-right: 10px;
      font-size: 12pt;
      font-weight: bold;
+     font-family: "verdana", "Arial", "Helvetica", sans-serif;
      color: black }
 
 p {  margin-left: 10px;
      margin-right: 10px;
-     font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
-     font-size: 12pt }
+     font-family: "verdana", "Arial", "Helvetica", sans-serif;
+     font-size: 10pt }
 
-UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
-     font-size: 12pt }
+UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+     font-size: 10pt }
 
 <%-- This class is here so the standard style from "P" above can be applied --%.
 <%-- to anything else. --%>
 
 .standard { margin-left: 10px;
             margin-right: 10px;
-            font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
-            font-size: 12pt }
+            font-family: "verdana", "Arial", "Helvetica", sans-serif;
+            font-size: 10pt }
 
 .pageBanner { width: 100%;
               border: 0;
-              margin: 1px;
-              padding: 0 }
+              margin: 0;
+              background: #ffffff;
+              color: #000000;
+              padding: 0;
+              vertical-align: middle }
 
-.logoBar { background: black url(<%= imageUrl %>star-background.jpg) repeat-x;
-           vertical-align: top }
+.tagLine { vertical-align: bottom;
+           padding: 10px;
+           border: 0;
+           margin: 0;
+           background: #ffffff;
+           color: #ff6600 }
 
-.locationBar { background: #A7AABB;
-               color: #252645;
-               vertical-align: middle;
-               height: 32px;
-               margin-left: 10px }
+.tagLineText { background: #ffffff;
+               color: #ff6600;
+               font-size: 10pt;
+               font-weight: bold;
+               border: 0;
+               margin: 0 }
 
-.locationBarCell { background: #A7AABB;
-                   color: #252645;
-                   font-size: 10pt;
-                   font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
-                   font-weight: bold;
-                   vertical-align: middle;
-                   text-align: left;
-                   height: 1.0em;
-                   text-decoration: none }
+.stripe { background: #336699 url(<%= imageUrl %>stripe.gif) repeat-x;
+          vertical-align: top;
+          border: 0;
+          padding: 0;
+          margin: 0;
+          color: #ffffff }
 
-.loggedInCell { background: #A7AABB;
-                color: #882222;
-                font-size: 10pt;
-                font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
-                font-weight: bold;
-                vertical-align: middle;
-                text-align: right;
-                height: 1.0em;
-                text-decoration: none;
-                margin-right: 10px;
-                white-space: nowrap }
+.locationBar { font-size: 10pt;
+               font-family: "verdana", "Arial", "Helvetica", sans-serif;
+               text-align: left }
 
 .centralPane { margin: 1px;
                vertical-align: top;
@@ -168,7 +170,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
 <%--       a width of 0%, but in practice browsers will only take this 100% --%>
 <%--       as a hint, and just make it as wide as it can without impinging --%>
 <%--       the other cells.  This, fortunately, is precisely what we want. --%>
-.pageContents { FONT-FAMILY: "Trebuchet MS", Arial, Helvetica, sans-serif;
+.pageContents { FONT-FAMILY: "verdana", Arial, Helvetica, sans-serif;
                 background: white;
                 color: black;
                 vertical-align: top;
@@ -179,7 +181,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                      margin: 2px;
                      border: 0 }
 
-.navigationBar { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.navigationBar { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  font-size: 10pt;
                  font-style: normal;
                  font-weight: bold;
@@ -187,8 +189,8 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                  text-decoration: none;
                  background: white }
 
-.navigationBarSublabel{  font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
-                         font-size: 10pt;
+.navigationBarSublabel{  font-family: "verdana", "Arial", "Helvetica", sans-serif;
+                         font-size: 12pt;
                          font-style: normal;
                          font-weight: bold;
                          color: black;
@@ -200,59 +202,71 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
 <%--       should be inherited from the parent, but isn't in Netscape 4.x, --%>
 <%--       IE or Opera.  (Only Mozilla functions correctly.) --%>
 
-.navigationBarItem { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.navigationBarItem { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      font-size: 10pt;
                      font-style: normal;
-                     font-weight: bold;
+                     font-weight: normal;
                      color: #252645;
+                     background: #ffffff;
                      text-decoration: none;
                      vertical-align: middle;
                      white-space: nowrap }
+
+.loggedIn { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+            font-size: 8pt;
+            font-style: normal;
+            font-weight: normal;
+            color: #882222;
+            background: #ffffff }
 
 .pageFooterBar { width: 100%;
                  border: 0;
                  margin: 0;
                  padding: 0;
-                 background: white }
+                 background: #ffffff;
+                 color: #000000;
+                 vertical-align: middle }
 
-.pageFootnote { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.pageFootnote { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 font-size: 10pt;
                 font-style: normal;
-                font-weight: bold;
+                font-weight: normal;
+                background: #ffffff;
                 color: #252645;
                 text-decoration: none;
-                text-align: center;
-                vertical-align: top;
+                text-align: left;
+                vertical-align: middle;
                 margin-left: 10px;
                 margin-right: 10px }
 
-.sidebar { background: white }
+.sidebar { background: #ffffff;
+           color: #000000 }
 
-.communityLink { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+.communityLink { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  font-size: 14pt;
                  font-weight: bold }
 
 .communityDescription { margin-left: 20px;
                         margin-right: 10px;
-                        font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+                        font-family: "verdana", "Arial", "Helvetica", sans-serif;
                         font-size: 10pt;
                         font-weight: normal;
                         list-style-type: none }
 
-.collectionListItem { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+.collectionListItem { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                       font-size: 12pt;
                       font-weight: normal }
 
 .collectionDescription { margin-left: 20px;
                 	 margin-right: 10px;
-                	 font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+                	 font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 	 font-size: 10pt;
                          font-weight: normal;
                 	 list-style-type: none }
 
 .miscListItem { margin-left: 20px;
                 margin-right: 10px;
-                font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+                font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 font-size: 12pt;
                 list-style-type: none }
 
@@ -260,27 +274,29 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                  margin-right: 20px;
                  text-align: center;
                  font-style: italic;
-                 font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+                 font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  font-size: 10pt;
                  list-style-type: none }
 
-.browseBarLabel { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.browseBarLabel { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   font-size: 10pt;
                   font-style: normal;
                   font-weight: bold;
-                  color: black;
+                  color: #000000;
+                  background: #ffffff;
                   vertical-align: middle;
                   text-decoration: none }
 
-.browseBar { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.browseBar { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              font-size: 12pt;
              font-style: normal;
              font-weight: bold;
+             background: #ffffff;
              color: #252645;
              vertical-align: middle;
              text-decoration: none }
 
-.itemListCellOdd { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.itemListCellOdd { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                    font-size: 12pt;
                    font-style: normal;
                    font-weight: normal;
@@ -290,7 +306,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                    background: #ffffff }
 
 
-.itemListCellEven { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.itemListCellEven { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                     font-size: 12pt;
                     font-style: normal;
                     font-weight: normal;
@@ -299,7 +315,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                     text-decoration: none;
                     background: #eeeeee }
 
-.itemListCellHilight { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.itemListCellHilight { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                        font-size: 12pt;
                        font-style: normal;
                        font-weight: normal;
@@ -310,32 +326,32 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
 
 .topNavLink { margin-left: 10px;
 	      margin-right: 10px;
-	      font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+	      font-family: "verdana", "Arial", "Helvetica", sans-serif;
 	      font-size: 10pt;
 	      text-align: center }
 
 .submitFormLabel { margin-left: 10px;
 		   margin-right: 10px;
-		   font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+		   font-family: "verdana", "Arial", "Helvetica", sans-serif;
                    font-weight: bold;
 		   font-size: 10pt;
 		   text-align: right }
 
 .submitFormHelp {  margin-left: 10px;
 		   margin-right: 10px;
-		   font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
-		   font-size: 10pt;
+		   font-family: "verdana", "Arial", "Helvetica", sans-serif;
+		   font-size: 8pt;
 		   text-align: center }
 
 .uploadHelp { margin-left: 20px;
               margin-right: 20px;
-              font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+              font-family: "verdana", "Arial", "Helvetica", sans-serif;
               font-size: 10pt;
               text-align: left }
 
 .submitFormDateLabel {  margin-left: 10px;
                         margin-right: 10px;
-                        font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+                        font-family: "verdana", "Arial", "Helvetica", sans-serif;
                         font-size: 10pt;
                         font-style: italic;
                         text-align: center }
@@ -349,7 +365,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
 
 .submitProgressButton{ border: 0 }
 
-.miscTable { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.miscTable { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              font-size: 12pt;
              font-style: normal;
              font-weight: normal;
@@ -371,7 +387,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
 %>
 
 
-.oddRowOddCol{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.oddRowOddCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                font-size: 12pt;
                font-style: normal;
                font-weight: normal;
@@ -381,7 +397,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                background: #ffffff;
                <%= padding %> }
 
-.evenRowOddCol{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.evenRowOddCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 font-size: 12pt;
                 font-style: normal;
                 font-weight: normal;
@@ -391,7 +407,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                 background: #eeeeee;
                 <%= padding %>  }
 
-.oddRowEvenCol{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.oddRowEvenCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 font-size: 12pt;
                 font-style: normal;
                 font-weight: normal;
@@ -401,7 +417,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                 background: #eeeeee;
                 <%= padding %>  }
 
-.evenRowEvenCol{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.evenRowEvenCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  font-size: 12pt;
                  font-style: normal;
                  font-weight: normal;
@@ -411,7 +427,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                  background: #dddddd;
                  <%= padding %>  }
 
-.highlightRowOddCol{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.highlightRowOddCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      font-size: 12pt;
                      font-style: normal;
                      font-weight: normal;
@@ -421,7 +437,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                      background: #ccccee;
                      <%= padding %> }
 
-.highlightRowEvenCol{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.highlightRowEvenCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                       font-size: 12pt;
                       font-style: normal;
                       font-weight: normal;
@@ -435,7 +451,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                    border: 0;
                    color: #000000 }
 
-.metadataFieldLabel{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.metadataFieldLabel{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      font-size: 12pt;
                      font-style: normal;
                      font-weight: bold;
@@ -446,7 +462,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                      white-space: nowrap;
                      <%= padding %> }
 
-.metadataFieldValue{ font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.metadataFieldValue{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      font-size: 12pt;
                      font-style: normal;
                      font-weight: normal;
@@ -458,10 +474,10 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
 
 .recentItem { margin-left: 10px;
               margin-right: 10px;
-              font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
+              font-family: "verdana", "Arial", "Helvetica", sans-serif;
               font-size: 10pt }
 
-.searchBox { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.searchBox { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              font-size: 10pt;
              font-style: normal;
              font-weight: bold;
@@ -473,7 +489,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
              border: 0;
              margin: 0 }
 
-.searchBoxLabel { font-family: "Tahoma", "Arial", "Helvetica", sans-serif;
+.searchBoxLabel { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   font-size: 10pt;
                   font-style: normal;
                   font-weight: bold;

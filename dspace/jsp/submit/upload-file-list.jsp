@@ -67,8 +67,7 @@
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
 %>
 
-<dspace:layout locbar="nolink" navbar="off" parenttitle="Submit"
-title="Uploaded Files">
+<dspace:layout locbar="off" navbar="off" title="Uploaded Files">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
