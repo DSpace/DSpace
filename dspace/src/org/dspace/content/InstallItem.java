@@ -157,7 +157,7 @@ public class InstallItem
         // Add sizes and checksums of bitstreams
         for (int j = 0; j < bitstreams.length; j++)
         {
-            mymessage = bitstreams[j].getName() + ": " +
+            mymessage = mymessage + bitstreams[j].getName() + ": " +
                 bitstreams[j].getSize() + " bytes, checksum: " +
                 bitstreams[j].getChecksum() + " (" + 
                 bitstreams[j].getChecksumAlgorithm() + ")\n";

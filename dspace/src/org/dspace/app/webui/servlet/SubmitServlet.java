@@ -1442,14 +1442,11 @@ public class SubmitServlet extends DSpaceServlet
                 // The user is performing an edit as part
                 // of a workflow task, so we take them
                 // back to the relevant perform task page
-/* FIXME                EPerson user = getCurrentUser(request);
-
-                MyDSpaceServlet.showPerformTask(
-                    request,
+                request.setAttribute("workflow.item", subInfo.submission);
+                JSPManager.showJSP(request,
                     response,
-                    user,
-                    subInfo.workflowItem);
-*/            }
+                    "/mydspace/perform-task.jsp");
+            }
         }
         else if (buttonPressed.equals("submit_prev"))
         {
@@ -1559,7 +1556,7 @@ public class SubmitServlet extends DSpaceServlet
                 nextStep = -1;
             }
 			
-            if (nextStep > getStepReached(subInfo))
+            if (!isWorkflow(subInfo) && nextStep > getStepReached(subInfo))
             {
                 nextStep = -1;
             }
@@ -1684,15 +1681,11 @@ public class SubmitServlet extends DSpaceServlet
         // user to the "perform task" page
         if (isWorkflow(subInfo))
         {
-/*            // Get the user
-            EPerson user = getCurrentUser(request);
-
-            MyDSpaceServlet.showPerformTask(
-                request,
+            request.setAttribute("workflow.item", subInfo.submission);
+            JSPManager.showJSP(request,
                 response,
-                user,
-                subInfo.workflowItem);
-*/        }
+                "/mydspace/perform-task.jsp");
+        }
         else
         {
             request.setAttribute("submission.info", subInfo);
@@ -1760,7 +1753,7 @@ public class SubmitServlet extends DSpaceServlet
         request.setAttribute("show.checksums", new Boolean(showChecksums));
 
         // Always go to advanced view in workflow mode
-        if (subInfo.submission.hasMultipleFiles())
+        if (isWorkflow(subInfo) || subInfo.submission.hasMultipleFiles())
         {
             JSPManager.showJSP(request,
                 response,
@@ -1987,7 +1980,7 @@ public class SubmitServlet extends DSpaceServlet
     {
         if (isWorkflow(subInfo))
         {
-            return REVIEW_SUBMISSION;
+            return -1;
         }
         else
         {

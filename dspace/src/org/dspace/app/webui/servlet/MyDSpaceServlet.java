@@ -601,7 +601,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         List pooledList = WorkflowManager.getPooledTasks(context,
             context.getCurrentUser());
         WorkflowItem[] pooled = new WorkflowItem[pooledList.size()];
-        pooled = (WorkflowItem[]) pooledList.toArray(owned);
+        pooled = (WorkflowItem[]) pooledList.toArray(pooled);
 
         // User's WorkflowItems
         WorkflowItem[] workflowItems = WorkflowItem.findByEPerson(context,

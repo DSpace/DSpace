@@ -497,7 +497,7 @@ public class Collection
     {
         String license = collectionRow.getStringColumn("license");
 
-        if (license == null)
+        if (license == null || license.equals(""))
         {
             // Fallback to site-wide default
             license = ConfigurationManager.getDefaultSubmissionLicense();

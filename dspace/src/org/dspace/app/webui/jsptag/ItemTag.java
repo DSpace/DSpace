@@ -433,7 +433,7 @@ public class ItemTag extends TagSupport
                         out.print(bitstreams[k].getName());
                         out.print("</A> - ");
                         out.print(bitstreams[k].getSize());
-                        out.print("bytes; " + bitstreams[k].getFormatDescription());
+                        out.print(" bytes; " + bitstreams[k].getFormatDescription());
                         out.println("</LI>");
                     }
                 }

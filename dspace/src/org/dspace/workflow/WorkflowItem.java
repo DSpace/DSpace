@@ -190,7 +190,7 @@ public class WorkflowItem implements InProgressSubmission
             
             // Check the cache
             WorkflowItem wi = (WorkflowItem) context.fromCache(
-                WorkflowItem.class, row.getIntColumn("workflow_item_id"));
+                WorkflowItem.class, row.getIntColumn("workflow_id"));
             
             if (wi == null)
             {

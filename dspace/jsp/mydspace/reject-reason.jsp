@@ -48,17 +48,12 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
-<%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
-<%@ page import="org.dspace.workflow.WorkflowManager" %>
 
 <%
     WorkflowItem workflowItem =
         (WorkflowItem) request.getAttribute("workflow.item");
-
-    Collection collection = workflowItem.getCollection();
-    Item item = workflowItem.getItem();
 %>
 
 <dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Enter Reason for Rejection">

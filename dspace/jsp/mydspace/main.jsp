@@ -136,9 +136,9 @@
 <%
             switch (owned[i].getState())
             {
-            case WorkflowManager.WFSTATE_ADMIN: %>Check Submission<% break;
-            case WorkflowManager.WFSTATE_REVIEW: %>Review Submission<% break;
-            case WorkflowManager.WFSTATE_EDIT: %>Final Edit of Submission<% break;
+            case WorkflowManager.WFSTATE_STEP1: %>Review Submission<% break;
+            case WorkflowManager.WFSTATE_STEP2: %>Check Submission<% break;
+            case WorkflowManager.WFSTATE_STEP3: %>Final Edit of Submission<% break;
             }
 %>
                 </td>
@@ -201,9 +201,9 @@
 <%
             switch (pooled[i].getState())
             {
-            case WorkflowManager.WFSTATE_ADMIN: %>Check Submission<% break;
-            case WorkflowManager.WFSTATE_REVIEW: %>Review Submission<% break;
-            case WorkflowManager.WFSTATE_EDIT: %>Final Edit of Submission<% break;
+            case WorkflowManager.WFSTATE_STEP1POOL: %>Review Submission<% break;
+            case WorkflowManager.WFSTATE_STEP2POOL: %>Check Submission<% break;
+            case WorkflowManager.WFSTATE_STEP3POOL: %>Final Edit of Submission<% break;
             }
 %>
                 </td>

@@ -43,9 +43,11 @@
   -
   -   workflow.item:  The workflow item for the task they're performing
   --%>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
+<%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
@@ -64,15 +66,7 @@
     <H1>Preview Task</H1>
     
 <%
-    if( workflowItem.getState() == Workflowable.WFSTATE_ADMINPOOL )
-    {
-%>    
-    <P>The following item has been submitted to collection
-    <strong><%= collection.getMetadata("name") %></strong>.  In order to
-    accept the task of checking this item, please click "Accept This Task" below.</P>
-<%
-    }
-    else if( workflowItem.getState() == Workflowable.WFSTATE_REVIEWPOOL )
+    if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP1POOL)
     {
 %>
     <P>The following item has been submitted to collection
@@ -80,7 +74,15 @@
     accept the task of reviewing this item, please click "Accept This Task" below.</P>
 <%
     }
-    else if( workflowItem.getState() == Workflowable.WFSTATE_EDITPOOL )
+    else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP2POOL)
+    {
+%>    
+    <P>The following item has been submitted to collection
+    <strong><%= collection.getMetadata("name") %></strong>.  In order to
+    accept the task of checking this item, please click "Accept This Task" below.</P>
+<%
+    }
+    else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP3POOL)
     {
 %>
     <P>The following item has been accepted for inclusion in collection

@@ -48,6 +48,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
+<%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
@@ -66,7 +67,7 @@
     <H1>Perform Task</H1>
     
 <%
-    if (workflowItem.getState() == Workflowable.WFSTATE_REVIEW)
+    if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP1)
     {
 %>
     <P>The following item has been submitted to collection <strong><%= collection.getMetadata("name") %></strong>.
@@ -75,7 +76,7 @@
     item using the controls at the bottom of the page.</P>
 <%
     }
-    else if (workflowItem.getState() == Workflowable.WFSTATE_ADMIN)
+    else if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP2)
     {
 %>
     <P>The following item has been submitted to collection <strong><%= collection.getMetadata("name") %></strong>.
@@ -85,7 +86,7 @@
     the page.</P>
 <%
     }
-    else if (workflowItem.getState() == Workflowable.WFSTATE_EDIT)
+    else if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP3)
     {
 %>
     <P>The following item has been accepted for inclusion in collection
@@ -108,8 +109,8 @@
 <%
     String row = "odd";
     
-    if (workflowItem.getState() == Workflowable.WFSTATE_REVIEW ||
-        workflowItem.getState() == Workflowable.WFSTATE_ADMIN)
+    if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP1 ||
+        workflowItem.getState() == WorkflowManager.WFSTATE_STEP2)
     {
 %>
             <tr>
@@ -124,7 +125,7 @@
     }
     else
     {
-        // Must be an editor
+        // Must be an editor (step 3)
 %>
             <tr>
                 <td class="<%= row %>RowOddCol">
@@ -139,8 +140,8 @@
     }
     row = "even";
 
-    if (workflowItem.getState() == Workflowable.WFSTATE_REVIEW ||
-        workflowItem.getState() == Workflowable.WFSTATE_ADMIN)
+    if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP1 ||
+        workflowItem.getState() == WorkflowManager.WFSTATE_STEP2)
     {
 %>
             <tr>
@@ -158,8 +159,8 @@
         row = ( row.equals( "odd" ) ? "even" : "odd" );
     }
 
-    if( workflowItem.getState() == Workflowable.WFSTATE_ADMIN ||
-        workflowItem.getState() == Workflowable.WFSTATE_EDIT )
+    if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP2 ||
+        workflowItem.getState() == WorkflowManager.WFSTATE_STEP3)
     {
 %>
             <tr>
@@ -171,7 +172,7 @@
                 </td>
             </tr>
 <%
-        row = ( row.equals( "odd" ) ? "even" : "odd" );
+        row = (row.equals( "odd" ) ? "even" : "odd");
     }
 %>
             <tr>
@@ -183,7 +184,7 @@
                 </td>
             </tr>
 <%
-    row = ( row.equals( "odd" ) ? "even" : "odd" );
+    row = (row.equals( "odd" ) ? "even" : "odd");
 %>
             <tr>
                 <td class="<%= row %>RowOddCol">

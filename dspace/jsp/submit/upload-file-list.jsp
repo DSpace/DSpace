@@ -224,8 +224,15 @@ title="Uploaded Files">
 
 <%-- HACK: Center used to align table; CSS and align=center ignored by some browsers --%>
         <center>
+<%
+    // Don't allow files to be added in workflow mode
+    if (!SubmitServlet.isWorkflow(si))
+    {
+%>
             <p><input type=submit name=submit_more value="Add Another File"></p>
-
+<%
+    }
+%>
             <table border=0 width=80%>
                 <tr>
                     <td width="100%">&nbsp;</td>
