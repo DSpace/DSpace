@@ -41,22 +41,22 @@
 package org.dspace.search;
 
 
-// java libraries
+// java classes
 import java.io.*;
 import java.util.*;
 import java.sql.*;
 
-// dspace libraries
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.core.ConfigurationManager;
-
-// lucene search engine
+// lucene search engine classes
 import org.apache.lucene.index.*;
 import org.apache.lucene.document.*;
 import org.apache.lucene.queryParser.*;
 import org.apache.lucene.search.*;
 import org.apache.lucene.analysis.*;
+
+// dspace classes
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.core.ConfigurationManager;
 
 
 // issues
@@ -65,15 +65,13 @@ import org.apache.lucene.analysis.*;
 
 public class DSQuery
 {
-    /*
-     * doQuery Returns a an arraylist of item ids, just pass
-     *  in a string with the FreeWAIS query syntax
+    /** Do a query, returning a List of DSpace Handles to objects matching the query.
+     *  @param query string in Lucene query syntax
      */
-
     public static synchronized List doQuery(String querystring)
         throws ParseException, IOException
     {
-        ArrayList items = new ArrayList();
+        ArrayList handlelist = new ArrayList();
 
         try
         {
@@ -89,29 +87,30 @@ public class DSQuery
             {
                 Document d = hits.doc(i);
 
-                String idstring = d.get("id");
-                String locstring = d.get("location");
+                String handletext = d.get("handle");
+//unused?                String locstring = d.get("location");
 
-                int itemid = Integer.parseInt(idstring);
+                //int itemid = Integer.parseInt(handlestring);
 
-                items.add(new Integer(itemid));
+                handlelist.add(handletext); //new Integer(itemid));
             }
         }
         catch (NumberFormatException e)
         {
-	    // a bad parse means that there are no results
+            // a bad parse means that there are no results
             // doing nothing with the exception gets you
             //   throw new SQLException( "Error parsing search results: " + e );
             // ?? quit?
         }
 
-        return items;
+        return handlelist;
     }
 
-    /*
-     * do a query, restricting to a collection
-     */
 
+    /** Do a query, restricted to a collection
+     * @param query
+     * @param collection
+     */
     public static List doQuery(String querystring, Collection coll)
         throws IOException, ParseException
     {
@@ -122,10 +121,11 @@ public class DSQuery
         return doQuery(newquery);
     }
 
-    /*
-     * do a query, restricting to a community
-     */
 
+    /** Do a query, restricted to a community
+     * @param querystring
+     * @param community
+     */
     public static List doQuery(String querystring, Community comm)
         throws IOException, ParseException
     {
@@ -136,6 +136,9 @@ public class DSQuery
         return doQuery(newquery);
     }
 
+
+    /** Do a query, printing results to stdout
+     */
     public static void doCMDLineQuery(String query)
     {
         System.out.println("Command line query: " + query);
@@ -156,6 +159,7 @@ public class DSQuery
             System.out.println("Exception caught: " + e);
         }
     }
+
 
     public static void main(String[] args)
     {
