@@ -1,9 +1,7 @@
 /*
  * DSIndexer.java
  *
- * Version: $Revision$
- *
- * Date: $Date$
+ * $Id$
  *
  * Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -97,6 +95,26 @@ public class DSIndexer
     }
 
 
+    /**
+     * When invoked as a command-line tool, (re)-builds the whole index
+     *
+     * @param args   the command-line arguments, none used
+     */
+    public static void main(String[] args) throws Exception
+    {
+        Context c = new Context();
+        c.setIgnoreAuthorization(true);
+
+        createIndex(c);
+
+        System.out.println("Done with indexing");
+    }
+
+
+    ////////////////////////////////////
+    //      Private
+    ////////////////////////////////////
+
     /** prepare index, opening writer, and wiping out existing index
      * if necessary
      */
@@ -121,64 +139,6 @@ public class DSIndexer
         writer.close();
     }
 
-
-//    /** indexItems() does the actual database query to generate the metadata
-//     *  file for freeWAIS to index
-//     * @param item_id if -1 means generate a full index
-//     */
-/* now obsolete, but keep around until new code is trusted.
-private static synchronized void indexItems(Context c, Item target_item)
-    {
-        // actually create the index
-
-        try
-        {
-            // Set up the Lucene index engine
-            IndexWriter writer;
-
-            String index_directory = ConfigurationManager.getProperty("search.dir");
-
-            if (target_item != null)
-            {
-                // does not clear the index (target_item is set)
-                writer = new IndexWriter(index_directory, new DSAnalyzer(), false);
-            }
-            else
-            {
-                // create an entirely new index
-                writer = new IndexWriter(index_directory, new DSAnalyzer(), true);
-            }
-
-            if( target_item != null )
-            {
-                // If only one item, find it and index
-                indexSingleItem(c, writer, target_item);
-            }
-            else
-            {
-                // If all items, find all and index
-                ItemIterator myitems = Item.findAll(c);
-
-                while( myitems.hasNext() )
-                {
-                    Item myitem = (Item)myitems.next();
-                    indexSingleItem(c, writer, myitem);
-                }
-            }
-
-            writer.close();
-        }
-        catch (SQLException e)
-        {
-            System.out.println("SQL Exception: " + e);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            System.out.println(e);
-        }
-    }
-*/
 
     private static String buildItemLocationString(Context c, Item myitem)
         throws SQLException
@@ -305,17 +265,29 @@ private static synchronized void indexItems(Context c, Item target_item)
 
         // put them all from an array of strings to one string for writing out
         int j = 0;
-        String author_text = "";
-        String title_text  = "";
-        String keyword_text= "";
-        String abstract_text="";
-        
-        // pack all of the arrays of DCValues into plain text strings for the indexer
-        for(j=0; j<authors.length;  j++) author_text = new String(author_text  + authors [j].value + " ");
-        for(j=0; j<titles.length;   j++) title_text  = new String(title_text   + titles  [j].value + " ");
-        for(j=0; j<keywords.length; j++) keyword_text= new String(keyword_text + keywords[j].value + " ");
-        for(j=0; j<abstracts.length; j++) abstract_text= new String(abstract_text + abstracts[j].value + " ");
+        String author_text  = "";
+        String title_text   = "";
+        String keyword_text = "";
+        String abstract_text= "";
 
+        // pack all of the arrays of DCValues into plain text strings for the indexer
+        for(j=0; j<authors.length; j++)
+        {
+            author_text  = new String(author_text  + authors [j].value + " ");
+        }
+        for(j=0; j<titles.length;  j++)
+        {
+            title_text   = new String(title_text   + titles  [j].value + " ");
+        }
+        for(j=0; j<keywords.length;  j++)
+        {
+            keyword_text = new String(keyword_text + keywords[j].value + " ");
+        }
+        for(j=0; j<abstracts.length; j++)
+        {
+            abstract_text= new String(abstract_text+ abstracts[j].value + " ");
+        }
+        
         // build a hash
         HashMap textvalues = new HashMap();
 
@@ -373,28 +345,12 @@ private static synchronized void indexItems(Context c, Item target_item)
     }
 
 
-    /**
-     * When invoked as a command-line tool, (re)-builds the whole index
-     *
-     * @param args   the command-line arguments, none used
-     */
-    public static void main(String[] args) throws Exception
-    {
-        Context c = new Context();
-        c.setIgnoreAuthorization(true);
-
-        createIndex(c);
-
-        System.out.println("Done with indexing");
-    }
 }
 
 /* to-do
-
 -allow indexing of different types
 -allow list of fields to index, along with different types
 -index handles too
-
 
 Constants.ITEM
 Constants.COLLECTION
@@ -419,8 +375,5 @@ collection
 
 community
   ??
-
-
-
 */
 
