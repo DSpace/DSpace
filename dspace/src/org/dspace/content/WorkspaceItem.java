@@ -285,8 +285,7 @@ public class WorkspaceItem implements InProgressSubmission
     public void update()
         throws SQLException, AuthorizeException
     {
-        // Check auth
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        // Authorisation is checked by the item.update() method below
     
         log.info(LogManager.getHeader(ourContext,
             "update_workspace_item",
@@ -308,8 +307,8 @@ public class WorkspaceItem implements InProgressSubmission
     public void delete()
         throws SQLException, AuthorizeException, IOException
     {
-        // Check auth
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
+        // Check authorisation.  We check permissions on the enclosed item.
+        AuthorizeManager.authorizeAction(ourContext, item, Constants.DELETE);
     
         log.info(LogManager.getHeader(ourContext,
             "delete_workspace_item",
