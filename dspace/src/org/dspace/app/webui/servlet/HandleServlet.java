@@ -56,11 +56,9 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.Browse;
-import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowseScope;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -250,7 +248,7 @@ public class HandleServlet extends DSpaceServlet
         // Tombstone?
         if (item.isWithdrawn())
         {
-            JSPManager.showJSP(request, response, "tombstone.jsp");
+            JSPManager.showJSP(request, response, "/tombstone.jsp");
             return;
         }
 
