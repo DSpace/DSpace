@@ -111,7 +111,7 @@
                             {
                                 // only display if action i is relevant
                                 //  to resource type resourceRelevance                             
-                                if( Constants.actionTypeRelevance[i]|resourceRelevance )
+                                if( (Constants.actionTypeRelevance[i]&resourceRelevance) > 0)
                                 { %>
                                     <option value="<%= i %>"
                                     <%=(policy.getAction() == i ? "selected" : "")%>>
