@@ -129,7 +129,7 @@ public class X509CertificateServlet extends DSpaceServlet
                     EPerson eperson = X509Manager.getUser(context, certs[0]);
 
                     // Do we have an e-person?
-                    if (eperson != null && eperson.getActive())
+                    if (eperson != null && eperson.canLogIn())
                     {
                         // Everything OK - log them in.
                         Authenticate.loggedIn(context, request, eperson);

@@ -41,6 +41,7 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -49,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -62,6 +64,8 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Subscribe;
 import org.dspace.handle.HandleManager;
 
 /**
@@ -169,17 +173,102 @@ public class LocationServlet extends DSpaceServlet
             // Show community or collection home page?
             if (path.equals("/"))
             {
-                if (collection == null)
+                /*
+                 * Work out if a browse or search was performed
+                 *
+                 * submit_search, submit_titles, submit_authors, submit_dates
+                 * are the buttons
+                 * location gives the value of the drop-down box in the form
+                 * "/",
+                 * "/communities/123/" or
+                 * "/communities/123/collections/456/"
+                 * which means it can just be prepended to the appropriate
+                 * search or browse URL to get the right scope.
+                 */
+                String button = UIUtil.getSubmitButton(request, "");
+                String location = request.getParameter("location");
+                
+                if (button.equals("submit_titles"))
                 {
+                    // Redirect to browse by title
+                    String url = request.getContextPath() + location +
+                        "browse-title";
+                    response.sendRedirect(response.encodeRedirectURL(url));
+                }
+                else if (button.equals("submit_authors"))
+                {
+                    // Redirect to browse authors
+                    String url = request.getContextPath() + location +
+                        "browse-author";
+                    response.sendRedirect(response.encodeRedirectURL(url));
+                }
+                else if (button.equals("submit_dates"))
+                {
+                    // Redirect to browse by date
+                    String url = request.getContextPath() + location +
+                        "browse-date";
+                    response.sendRedirect(response.encodeRedirectURL(url));
+                }
+                else if (button.equals("submit_search") ||
+                    request.getParameter("query") != null)
+                {
+                    /*
+                     * Have to check for search button and query - in some
+                     * browsers, typing a query into the box and hitting
+                     * return doesn't produce a submit button parameter.
+                     * Redirect to appropriate search page
+                     */
+                    String url = request.getContextPath() + location +
+                        "simple-search?query=" +
+                        URLEncoder.encode(request.getParameter("query"));
+                    response.sendRedirect(response.encodeRedirectURL(url));
+                }
+                else if (collection == null)
+                {
+                    // Community home page, no button pressed
                     showCommunityHome(context, request, response, community);
                 }
                 else
                 {
+                    boolean updated = false;
+
+                    // Collection home page.  Check for collection home
+                    // buttons
+                    if (button.equals("submit_subscribe"))
+                    {
+                        if (context.getCurrentUser() == null)
+                        {
+                            // Only registered can subscribe
+                            Authenticate.startAuthentication(context, request,
+                                response);
+                            return;
+                        }
+                        else
+                        {
+                            Subscribe.subscribe(context,
+                                context.getCurrentUser(),
+                                collection);
+                            updated = true;
+                        }
+                    }
+                    else if (button.equals("submit_unsubscribe"))
+                    {
+                        Subscribe.unsubscribe(context,
+                            context.getCurrentUser(),
+                            collection);
+                        updated = true;
+                    }                        
+
                     showCollectionHome(context,
                         request,
                         response,
                         community,
                         collection);
+
+                    if (updated)
+                    {
+                        context.complete();
+                    }
                 }
             }
             else
@@ -292,11 +381,21 @@ public class LocationServlet extends DSpaceServlet
         String[] itemTitles = getItemTitles(items);
         String[] itemLinks = getItemURLs(context, items);
 
-        // Forward to community home page
+        // Is the user logged in/subscribed?
+        EPerson e = context.getCurrentUser();
+        boolean subscribed = false;
+        if (e != null)
+        {
+            subscribed = Subscribe.isSubscribed(context, e, collection);
+        }
+        
+        // Forward to collection home page
         request.setAttribute("last.submitted.titles", itemTitles);
         request.setAttribute("last.submitted.urls", itemLinks);
         request.setAttribute("community", community);
         request.setAttribute("collection", collection);
+        request.setAttribute("logged.in", new Boolean(e != null));
+        request.setAttribute("subscribed", new Boolean(subscribed));
         JSPManager.showJSP(request, response, "/collection-home.jsp");
     }
 

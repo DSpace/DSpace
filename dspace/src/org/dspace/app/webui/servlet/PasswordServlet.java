@@ -94,7 +94,7 @@ public class PasswordServlet extends DSpaceServlet
         boolean loggedIn = false;
 
         // Verify the password
-        if (eperson != null && eperson.getActive())
+        if (eperson != null && eperson.canLogIn())
         {
             // e-mail address corresponds to active account
             if (eperson.getRequireCertificate())

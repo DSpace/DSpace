@@ -77,6 +77,7 @@ SELECT setval('workspaceitem_seq', max(workspace_item_id)) FROM workspaceitem;
 SELECT setval('workflowitem_seq', max(workflow_id)) FROM workflowitem;
 SELECT setval('tasklistitem_seq', max(tasklist_id)) FROM tasklistitem;
 SELECT setval('registrationdata_seq', max(registrationdata_id)) FROM registrationdata;
+SELECT setval('subscription_seq', max(subscription_id)) FROM subscription;
 SELECT setval('history_seq', max(history_id)) FROM history;
 SELECT setval('historystate_seq', max(history_state_id)) FROM historystate;
 SELECT setval('itemsbyauthor_seq', max(items_by_author_id)) FROM itemsbyauthor;

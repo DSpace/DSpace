@@ -145,9 +145,9 @@ public class RegisterServlet extends DSpaceServlet
              *  An inactive (unregistered) eperson is trying to set a new p/w
              */
             if (eperson == null ||
-               (eperson.getActive() && registering) ||
-               (eperson.getActive() && eperson.getRequireCertificate() && registering) ||
-               (!registering && !eperson.getActive()))
+               (eperson.canLogIn() && registering) ||
+               (eperson.canLogIn() && eperson.getRequireCertificate() && registering) ||
+               (!registering && !eperson.canLogIn()))
             {
                 // Invalid token
                 JSPManager.showJSP(request,
@@ -236,7 +236,7 @@ public class RegisterServlet extends DSpaceServlet
         if (eperson != null)
         {
             // Can't register an already active user
-            if (eperson.getActive() && registering)
+            if (eperson.canLogIn() && registering)
             {
                 log.info(LogManager.getHeader(context,
                     "already_registered",
@@ -249,7 +249,7 @@ public class RegisterServlet extends DSpaceServlet
             }
 
             // Can't give new password to inactive user
-            if (!eperson.getActive() && !registering)
+            if (!eperson.canLogIn() && !registering)
             {
                 log.info(LogManager.getHeader(context,
                     "unregistered_forgot_password",
@@ -407,7 +407,7 @@ public class RegisterServlet extends DSpaceServlet
             AccountManager.deleteToken(context, key);
 			
             // Set the user as active
-            eperson.setActive(true);
+            eperson.setCanLogIn(true);
             eperson.update();
 			
             JSPManager.showJSP(request, response, "/register/registered.jsp");

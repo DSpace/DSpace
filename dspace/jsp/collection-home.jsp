@@ -44,6 +44,10 @@
   - Attributes required:
   -    community   - Collection to render home page for
   -    collection  - Community this collection is in
+  -    last.submitted.titles - String[], titles of recent submissions
+  -    last.submitted.urls   - String[], corresponding URLs
+  -    logged.in  - Boolean, true if a user is logged in
+  -    subscribed - Boolean, true if user is subscribed to this collection
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -61,6 +65,10 @@
         request.getAttribute("last.submitted.titles");
     String[] lastSubmittedURLs = (String[])
         request.getAttribute("last.submitted.urls");
+    boolean loggedIn =
+        ((Boolean) request.getAttribute("logged.in")).booleanValue();
+    boolean subscribed =
+        ((Boolean) request.getAttribute("subscribed")).booleanValue();
 
     // Put the metadata values into guaranteed non-null variables
     String name = collection.getMetadata("name");
@@ -102,26 +110,29 @@
     </tr>
   </table>
 
-  <%= intro %>
-
-  <%-- Search --%>
-  <form action="simple-search" method=GET>
+  <%-- Search/Browse --%>
+  <form method=GET>
     <table class=miscTable align=center>
       <tr>
-        <td class="evenRowEvenCol">
+        <td class="evenRowEvenCol" colspan=2>
           <table>
             <tr>
-              <td>
-                <strong>Search:</strong>&nbsp;<select name="location">
-                  <option value="ALL">All of DSpace</option>
-                  <option selected value="<%= community.getID() %>"><%= communityName %></option>
-                  <option selected value="<%= community.getID() %>/<%= collection.getID() %>"><%= name %></option>
+              <td class="standard">
+                <small><strong>In:</strong></small>&nbsp;<select name="location">
+                  <option value="/">All of DSpace</option>
+                  <option selected value="/communities/<%= community.getID() %>/"><%= communityName %></option>
+                  <option selected value="/communities/<%= community.getID() %>/collections/<%= collection.getID() %>/"><%= name %></option>
                 </select>
               </td>
             </tr>
             <tr>
-              <td align=center>
-                for&nbsp;<input type="text" name="query">&nbsp;<input type="submit" value="Go">
+              <td class="standard" align=center>
+                <small><strong>Search</strong>&nbsp;for&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="Go">
+              </td>
+            </tr>
+            <tr>
+              <td align=center class="standard">
+                <small>or&nbsp;<strong>browse</strong>&nbsp;</small><input type="submit" name="submit_titles" value="Titles">&nbsp;<input type="submit" name="submit_authors" value="Authors">&nbsp;<input type="submit" name="submit_dates" value="By Date">
               </td>
             </tr>
           </table>
@@ -129,18 +140,49 @@
       </tr>
     </table>
   </form>
-  
-  <P align=center><strong>Browse</strong> the collection by <A HREF="browse-title">Title</A>,
-  <A HREF="browse-author">Author</A>, or <A HREF="browse-date">Date</A>.</P>
 
-  <%-- HACK: <center> used for Netscape 4.x, which doesn't accept align=center
+  <table width="100%" align="center" cellspacing=10>
+    <tr>
+      <td>
+<%-- HACK: <center> used for Netscape 4.x, which doesn't accept align=center
   for a paragraph with a button in it --%>
-  <center>
-    <form action="<%= request.getContextPath() %>/submit" method=POST>
-      <input type=hidden name=collection value="<%= collection.getID() %>">
-      <P><input type=submit name=submit value="Submit to This Collection"></P>
-    </form>
-  </center>
+        <center>
+          <form action="<%= request.getContextPath() %>/submit" method=POST>
+            <input type=hidden name=collection value="<%= collection.getID() %>">
+            <input type=submit name=submit value="Submit to This Collection">
+          </form>
+        </center>
+      </td>
+      <td class="oddRowEvenCol">
+        <form method=GET>
+          <table>
+            <tr>
+              <td class="standard">
+<%  if (loggedIn && subscribed)
+    { %>
+                <small>You are subscribed to this collection. <A HREF="<%= request.getContextPath() %>/subscribe">See&nbsp;Subscriptions</A></small>
+              </td>
+              <td class="standard">
+                <input type="submit" name="submit_unsubscribe" value="Unsubscribe">
+<%  } else { %>
+                <small>
+                  Subscribe to this collection to receive daily e-mail notification of new additions
+                </small>
+              </td>
+              <td class="standard">
+                <input type="submit" name="submit_subscribe" value="Subscribe">
+<% } %>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </form>
+    </tr>
+  </table>
+
+  <%= intro %>
+
+  
 
   <P class="copyrightText"><%= copyright %></P>
 
@@ -155,7 +197,6 @@
   }
 %>
     <%= sidebar %>
-
   </dspace:sidebar>
 
 </dspace:layout>

@@ -79,7 +79,7 @@
             <th class="oddRowEvenCol"><strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?sortby=email">E-mail Address</A></strong></th>
             <th class="oddRowOddCol"><strong><A HREF="<%= request.getContextPath() %>/admin/edit-epeople?sortby=lastname">Last Name</A></strong></th>
             <th class="oddRowEvenCol"><strong>First Name</strong></th>
-            <th class="oddRowOddCol"><strong>Active?</strong></th>
+            <th class="oddRowOddCol"><strong>Can Log In?</strong></th>
             <th class="oddRowEvenCol"><strong>Must Use Cert?</strong></th>
             <th class="oddRowOddCol"><strong>Telephone</strong></th>
             <th class="oddRowEvenCol">&nbsp;</th>
@@ -104,7 +104,7 @@
                     <input type="text" name="firstname" value="<%= (epeople[i].getFirstName() == null ? "" : epeople[i].getFirstName()) %>" size=12>
                 </td>
                 <td class="<%= row %>RowOddCol" align="center">
-                    <input type="checkbox" name="active" value="true"<%= epeople[i].getActive() ? " CHECKED" : "" %>>
+                    <input type="checkbox" name="active" value="true"<%= epeople[i].canLogIn() ? " CHECKED" : "" %>>
                 </td>
                 <td class="<%= row %>RowEvenCol" align="center">
                     <input type="checkbox" name="require_certificate" value="true"<%= epeople[i].getRequireCertificate() ? " CHECKED" : "" %>>

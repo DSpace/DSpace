@@ -81,7 +81,7 @@ public class EPersonTest extends TestCase
             e1.setFirstName("Bob");
             e1.setLastName("Brannigan");
             e1.setPassword("password");
-            e1.setActive(true);
+            e1.setCanLogIn(true);
             e1.setRequireCertificate(false);
             e1.update();
 

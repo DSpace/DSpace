@@ -98,12 +98,12 @@
         // Scope of the search was all of DSpace.  The scope control will list
         // "all of DSpace" and the communities.
 %>
-                                    <option selected value="ALL">All of DSpace</option>
+                                    <option selected value="/">All of DSpace</option>
 <%
         for (int i = 0; i < communityArray.length; i++)
         {
 %>
-                                    <option value="<%= communityArray[i].getID() %>"><%= communityArray[i].getMetadata("name") %></option>
+                                    <option value="/communities/<%= communityArray[i].getID() %>/"><%= communityArray[i].getMetadata("name") %></option>
 <%
         }
     }
@@ -112,13 +112,13 @@
         // Scope of the search was within a community.  Scope control will list
         // "all of DSpace", the community, and the collections within the community.
 %>
-                                    <option value="ALL">All of DSpace</option>
-                                    <option selected value="<%= community.getID() %>"><%= community.getMetadata("name") %></option>
+                                    <option value="/">All of DSpace</option>
+                                    <option selected value="/communities/<%= community.getID() %>/"><%= community.getMetadata("name") %></option>
 <%
         for (int i = 0; i < collectionArray.length; i++)
         {
 %>
-                                    <option value="<%= community.getID() %>/<%= collectionArray[i].getID() %>"><%= collectionArray[i].getMetadata("name") %></option>
+                                    <option value="/communities/<%= community.getID() %>/collections/<%= collectionArray[i].getID() %>/"><%= collectionArray[i].getMetadata("name") %></option>
 <%
         }
     }
@@ -126,9 +126,9 @@
     {
         // Scope of the search is a specific collection
 %>
-                                    <option value="ALL">All of DSpace</option>
-                                    <option value="<%= community.getID() %>"><%= community.getMetadata("name") %></option>
-                                    <option selected value="<%= community.getID() %>/<%= collection.getID() %>"><%= collection.getMetadata("name") %></option>
+                                    <option value="/">All of DSpace</option>
+                                    <option value="/communities/<%= community.getID() %>/"><%= community.getMetadata("name") %></option>
+                                    <option selected value="/communities/<%= community.getID() %>/collections/<%= collection.getID() %>/"><%= collection.getMetadata("name") %></option>
 <%
     }
 %>

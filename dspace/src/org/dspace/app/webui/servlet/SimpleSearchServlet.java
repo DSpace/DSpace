@@ -106,32 +106,9 @@ public class SimpleSearchServlet extends DSpaceServlet
         // do the search with the correct location.
         if (location != null && !location.equals(""))
         {
-            int slash = location.indexOf('/');
-
-            // We have a location parameter, so do a redirect
-            if (location.equals("ALL"))
-            {
-                // All of DSpace location
-                newURL = "/";
-            }
-            else if (slash > -1)
-            {
-                // community and collection location
-                newURL = "/communities/" + 
-                        location.substring(0, slash) +
-                        "/collections/" +
-                        location.substring(slash + 1) +
-                        "/";
-            }
-            else
-            {
-                // community location
-                newURL = "/communities/" + location + "/";
-            }
-
             // Do the redirect
             response.sendRedirect(response.encodeRedirectURL(
-                    request.getContextPath() + newURL +
+                    request.getContextPath() + location +
                     "simple-search?query=" + query));
 
             return;

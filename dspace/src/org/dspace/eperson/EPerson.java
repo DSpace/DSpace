@@ -394,23 +394,23 @@ public class EPerson implements DSpaceObject
 
 
     /**
-     * Set active/inactive
+     * Indicate whether the user can log in
      *
-     * @param isactive boolean yes/no
+     * @param login boolean yes/no
      */
-    public void setActive(boolean isactive)
+    public void setCanLogIn(boolean login)
     {
-        myRow.setColumn("active", isactive);
+        myRow.setColumn("can_log_in", login);
     }
 
     /**
-     * Get active/inactive
+     * Can the user log in?
      *
-     * @return isactive boolean, yes/no
+     * @return boolean, yes/no
      */
-    public boolean getActive()
+    public boolean canLogIn()
     {
-        return myRow.getBooleanColumn("active");
+        return myRow.getBooleanColumn("can_log_in");
     }
 
 
@@ -436,6 +436,27 @@ public class EPerson implements DSpaceObject
     }
 
 
+    /**
+     * Indicate whether the user self-registered
+     *
+     * @param sr boolean yes/no
+     */
+    public void setSelfRegistered(boolean sr)
+    {
+        myRow.setColumn("self_registered", sr);
+    }
+
+    /**
+     * Can the user log in?
+     *
+     * @return boolean, yes/no
+     */
+    public boolean setSelfRegistered()
+    {
+        return myRow.getBooleanColumn("self_registered");
+    }
+
+    
     /**
      * Get the value of a metadata field
      *

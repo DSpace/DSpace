@@ -158,8 +158,9 @@ public class CreateAdministrator
             eperson.setLastName (lastName );
             eperson.setFirstName(firstName);
             eperson.setPassword (password1);
-            eperson.setActive   (true     );
+            eperson.setCanLogIn (true     );
             eperson.setRequireCertificate(false);
+            eperson.setSelfRegistered(false);
             eperson.update();
             
             admins.addMember(eperson);

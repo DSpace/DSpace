@@ -100,6 +100,7 @@ CREATE SEQUENCE workspaceitem_seq;
 CREATE SEQUENCE workflowitem_seq;
 CREATE SEQUENCE tasklistitem_seq;
 CREATE SEQUENCE registrationdata_seq;
+CREATE SEQUENCE subscription_seq;
 CREATE SEQUENCE history_seq;
 CREATE SEQUENCE historystate_seq;
 CREATE SEQUENCE itemsbyauthor_seq;
@@ -160,8 +161,11 @@ CREATE TABLE EPerson
   password            VARCHAR(64),
   firstname           VARCHAR(64),
   lastname            VARCHAR(64),
-  active              BOOL,
+  can_log_in          BOOL,
   require_certificate BOOL,
+  self_registered     BOOL,
+  last_active         TIMESTAMP,
+  sub_frequency       INTEGER,
   phone	              VARCHAR(32)
 );
 
@@ -388,6 +392,17 @@ CREATE TABLE RegistrationData
   eperson_id            INTEGER REFERENCES EPerson(eperson_id),
   token                 VARCHAR(48),
   expires		TIMESTAMP
+);
+
+
+-------------------------------------------------------
+--  Subscription table
+-------------------------------------------------------
+CREATE TABLE Subscription
+(
+  subscription_id   INTEGER PRIMARY KEY,
+  eperson_id        INTEGER REFERENCES EPerson(eperson_id),
+  collection_id     INTEGER REFERENCES Collection(collection_id)
 );
 
 

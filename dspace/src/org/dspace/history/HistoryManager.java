@@ -806,7 +806,7 @@ public class HistoryManager
                   eperson.getLastName());
         model.add(res,
                   model.createProperty(getPropertyId(shortname, "active")),
-                  eperson.getActive());
+                  eperson.canLogIn());
         model.add(res,
                   model.createProperty(getPropertyId(shortname, "require_certificate")),
                   eperson.getRequireCertificate());

@@ -108,7 +108,7 @@ public class EditEPersonServlet extends DSpaceServlet
                     ? null
                     : request.getParameter("phone"));
 
-            e.setActive(request.getParameter("active") != null &&
+            e.setCanLogIn(request.getParameter("active") != null &&
                         request.getParameter("active").equals("true"));
             
             e.setRequireCertificate(
