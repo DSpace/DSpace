@@ -64,20 +64,18 @@
     if (retry)
     {
 %>
-    <P><strong>The e-mail address you entered was not recognised.  Please
-    try again.</strong>
+    <P><strong>The e-mail address you entered was not recognized.  Please
+    try again.</strong></P>
 <%
     }
     else
     {
 %>
     <P>If you've never logged on to DSpace before, please enter your e-mail
-    address in the box below and click "Register".
+    address in the box below and click "Register".</P>
 <%
     }
-%>  Note that currently, the
-    DSpace service is only available to users who have been already registered
-    to use the DSpace system by their group, department, or laboratory.</P>
+%>
     
     <form action="<%= request.getContextPath() %>/register" method=POST>
 
