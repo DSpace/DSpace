@@ -508,6 +508,19 @@ public class Collection
 
 
     /**
+     * Find out if the collection has a custom license
+     *
+     * @return  <code>true</code> if the collection has a custom license
+     */
+    public boolean hasCustomLicense()
+    {
+        String license = collectionRow.getStringColumn("license");
+
+        return (license != null && !license.equals(""));
+    }
+
+
+    /**
      * Set the license for this collection.  Passing in <code>null</code>
      * means that the site-wide default will be used.
      *

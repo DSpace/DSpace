@@ -48,6 +48,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 
@@ -81,6 +82,8 @@
 
     String communityName = community.getMetadata("name");
     String communityLink = "/communities/" + community.getID() + "/";
+
+    Bitstream logo = collection.getLogo();
 %>
 
 
@@ -92,9 +95,10 @@
         <H1><%= name %></H1>
         <H3>Collection home page</H3>
       </td>
-<%-- FIXME: Logo
-      <td valign=top><% if( logo != null && !logo.equals( "" ) ) { %><img alt="Logo" src="<%= logo %>" /><% } %></td>
---%>
+      <td valign=top>
+<%  if (logo != null) { %>
+        <img alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>">
+<% } %></td>
     </tr>
   </table>
 
