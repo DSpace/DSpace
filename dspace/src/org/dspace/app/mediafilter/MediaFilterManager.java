@@ -185,6 +185,7 @@ public class MediaFilterManager
             catch(Exception e)
             {
                 System.out.println("ERROR filtering, skipping bitstream #" + myBitstream.getID() + " " + e);
+                e.printStackTrace();
             }
         }
     }

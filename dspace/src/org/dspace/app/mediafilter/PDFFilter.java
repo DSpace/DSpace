@@ -42,7 +42,11 @@
  
 package org.dspace.app.mediafilter;
 
-import org.textmining.text.extraction.PDFExtractor;
+//import org.textmining.text.extraction.PDFExtractor;
+
+import org.pdfbox.pdfparser.*;
+import org.pdfbox.util.*;
+import org.pdfbox.cos.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -116,8 +120,17 @@ public class PDFFilter extends MediaFilter
     {
         // get input stream from bitstream
         // pass to filter, get string back
-        PDFExtractor e = new PDFExtractor();
-        String extractedText = e.extractText(source);
+        PDFTextStripper pts = new PDFTextStripper();
+        PDFParser parser = new PDFParser(source);
+        
+        parser.parse();
+        
+        COSDocument cos = parser.getDocument();
+        
+        String extractedText = pts.getText(parser.getDocument());
+        
+        // now close the pdf
+        cos.close();
 
         System.out.println(extractedText);
 
