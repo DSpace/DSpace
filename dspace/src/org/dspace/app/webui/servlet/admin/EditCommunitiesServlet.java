@@ -488,7 +488,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Forward to group edit page
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/dspace-admin/groups?group=" +
+                request.getContextPath() + "/tools/group-edit?group_id=" +
                     newGroup.getID()));
         }
         else if(button.equals("submit_authorization_edit"))
@@ -505,7 +505,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Edit workflow group
             Group g = collection.getWorkflowGroup(step);
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/dspace-admin/groups?group=" +
+                request.getContextPath() + "/tools/group-edit?group_id=" +
                     g.getID()));
         }
         else if(button.startsWith("submit_wf_delete_"))
