@@ -76,6 +76,6 @@
     </tr>
     <tr>
         <td align=right class=standard><strong>Contact telephone:</strong></td>
-        <td class=standard><input type=text name="phone" size="40" value="<%= phone %>"></td>
+        <td class=standard><input type=text name="phone" size="40" maxlength="32" value="<%= phone %>"></td>
     </tr>
 </table>
