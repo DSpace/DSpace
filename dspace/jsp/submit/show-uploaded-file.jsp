@@ -135,7 +135,7 @@
     }
 
     // Full param to dspace:popup must be single variable
-    String supportLevelLink = "/help/formats.html#" + supportLevel;
+    String supportLevelLink = "/help/formats.jsp#" + supportLevel;
 %>
                     <%= description %> <dspace:popup page="<%= supportLevelLink %>">(<%= supportLevel %>)</dspace:popup>
                 </td>
