@@ -236,7 +236,7 @@
         highlightAttribute = String.valueOf(browseInfo.getOffset());
     }    
 %>
-    <dspace:itemlist items="<%= browseInfo.getResults() %>" handles="<%= handles %>" emphcolumn="date" highlightrow="<%= highlightAttribute %>" />
+    <dspace:itemlist items="<%= browseInfo.getItemResults() %>" handles="<%= handles %>" emphcolumn="date" highlightrow="<%= highlightAttribute %>" />
 
 
     <%-- Previous page/Next page --%>

@@ -338,9 +338,6 @@ public class BrowseServlet extends DSpaceServlet
             browseInfo = Browse.getItemsByTitle(scope);
         }
         
-        List results = browseInfo.getResults();
-
-
         // Write log entry
         String what = "title";
         if (browseAuthors) 
@@ -354,10 +351,10 @@ public class BrowseServlet extends DSpaceServlet
 
         log.info(LogManager.getHeader(context,
             "browse_" + what,
-            logInfo + ",results=" + results.size()));
+            logInfo + ",results=" + browseInfo.getResultCount()));
 
         
-        if (results.size() == 0)
+        if (browseInfo.getResultCount() == 0)
         {
             // No results!
             request.setAttribute("community", community);
@@ -371,12 +368,12 @@ public class BrowseServlet extends DSpaceServlet
             // out the Handles for the items
             if (browseDates || browseTitles)
             {
-                String[] handles = new String[results.size()];
+                Item[] items = browseInfo.getItemResults();
+                String[] handles = new String[items.length];
                 
-                for (int i = 0; i < results.size(); i++)
+                for (int i = 0; i < items.length; i++)
                 {
-                    Item item = (Item) results.get(i);
-                    handles[i] = HandleManager.findHandle(context, item);
+                    handles[i] = HandleManager.findHandle(context, items[i]);
                 }
 
                 request.setAttribute("handles", handles);
@@ -395,11 +392,11 @@ public class BrowseServlet extends DSpaceServlet
 
                 if (browseAuthors)
                 {
-                    s = (String) results.get(0);
+                    s = (browseInfo.getStringResults())[0];
                 }
                 else
                 {
-                    Item firstItem = (Item) results.get(0);
+                    Item firstItem = (browseInfo.getItemResults())[0];
                     s = HandleManager.findHandle(context, firstItem);
                 }
 
@@ -417,11 +414,13 @@ public class BrowseServlet extends DSpaceServlet
 
                 if (browseAuthors)
                 {
-                    s = (String) results.get(results.size() - 1);
+                    String[] authors = browseInfo.getStringResults();
+                    s = authors[authors.length - 1];
                 }
                 else
                 {
-                    Item lastItem = (Item) results.get(results.size() - 1);
+                    Item[] items = browseInfo.getItemResults();
+                    Item lastItem = items[items.length - 1];
                     s = HandleManager.findHandle(context, lastItem);
                 }
 

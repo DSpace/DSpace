@@ -92,6 +92,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>items-by-author</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.ItemsByAuthorServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>location</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.LocationServlet</servlet-class>
   </servlet>
@@ -128,6 +133,11 @@
   <servlet-mapping>
     <servlet-name>display-item</servlet-name>
     <url-pattern>/item/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>items-by-author</servlet-name>
+    <url-pattern>/items-by-author</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

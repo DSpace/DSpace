@@ -162,15 +162,14 @@
 <%
     // Row: toggles between Odd and Even
     String row = "odd";
-    List results = browseInfo.getResults();
+    String[] results = browseInfo.getStringResults();
 
-    for (int i = 0; i < results.size(); i++)
+    for (int i = 0; i < results.length; i++)
     {
-        String name = (String) results.get(i);
 %>
             <tr>
                 <td class="<%= highlight && i==browseInfo.getOffset() ? "highlight" : row %>RowOddCol">
-                    <A HREF="items-by-author?author=<%= URLEncoder.encode(name) %>"><%= name %></A>
+                    <A HREF="items-by-author?author=<%= URLEncoder.encode(results[i]) %>"><%= results[i] %></A>
                 </td>
             </tr>
 <%

@@ -72,7 +72,7 @@ public class ItemListTag extends TagSupport
     private String[] handles;
     
     /** Row to highlight, -1 for no row */
-    private int highlightRow;
+    private int highlightRow = -1;
     
     /** Column to emphasise - null, "title" or "date" */
     private String emphColumn;
@@ -100,6 +100,7 @@ public class ItemListTag extends TagSupport
 
         try
         {
+System.err.println("HIGHLIGHT ROW: " + highlightRow);
             out.println("<table align=center class=\"miscTable\">");
 
             // Row: toggles between Odd and Even
@@ -204,9 +205,9 @@ public class ItemListTag extends TagSupport
      *
      * @return the items
      */
-    public List getItems()
+    public Item[] getItems()
     {
-        return Arrays.asList(items);
+        return items;
     }
     
 
@@ -215,10 +216,9 @@ public class ItemListTag extends TagSupport
      * 
      * @param  itemsIn  the items
      */
-    public void setItems(List itemsIn)
+    public void setItems(Item[] itemsIn)
     {
-        items = new Item[itemsIn.size()];
-        items = (Item[]) itemsIn.toArray(items);
+        items = itemsIn;
     }
 
 
@@ -262,7 +262,9 @@ public class ItemListTag extends TagSupport
      */
     public void setHighlightrow(String highlightRowIn)
     {
-        if (highlightRowIn == null)
+System.err.println("HIGHLIGHT ROW IN: " + highlightRowIn);
+
+        if (highlightRowIn == null || highlightRowIn.equals(""))
         {
             highlightRow = -1;
         }
@@ -299,5 +301,14 @@ public class ItemListTag extends TagSupport
     public void setEmphcolumn(String emphColumnIn)
     {
         emphColumn = emphColumnIn;
+    }
+
+
+    public void release()
+    {
+        highlightRow = -1;
+        emphColumn = null;
+        items = null;
+        handles = null;
     }
 }
