@@ -506,7 +506,9 @@ public class EPerson implements DSpaceObject
     {
         // Check authorisation - if you're not the eperson
         // see if the authorization system says you can
-        if(  !( getID() == myContext.getCurrentUser().getID() ) )
+        if(!myContext.ignoreAuthorization() &&
+                (myContext.getCurrentUser() == null ||
+                 getID() != myContext.getCurrentUser().getID()))
         {
             AuthorizeManager.authorizeAction(myContext, this, Constants.WRITE);
         }
