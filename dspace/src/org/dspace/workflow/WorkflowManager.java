@@ -601,10 +601,12 @@ public class WorkflowManager
                  "submit_archive" );
         
             email.addRecipient( ep.getEmail() );
-            email.addArgument( title );
-            email.addArgument( coll.getMetadata("name") );
-            email.addArgument( handle );
 
+            email.addArgument( title );
+            email.addArgument( coll.getMetadata("name")               );
+            email.addArgument( HandleManager.getCanonicalForm(handle) );
+            email.addArgument( HandleManager.getURLForm(handle)       );
+            
             email.send();
         }
         catch( MessagingException e )

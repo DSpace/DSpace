@@ -116,6 +116,22 @@ public class HandleManager
         return "hdl:" + handle;
     }
 
+
+    /**
+     * Returns displayable string of the handle's 'temporary' URL
+     * <em>http://hdl.handle.net/handle/em>.
+     *
+     * No attempt is made to verify that handle is in fact valid.
+     *
+     * @param handle The handle
+     * @return The canonical form
+     */
+    public static String getURLForm(String handle)
+    {
+        return "http://hdl.handle.net/" + handle;
+    }
+
+
     /**
      * Creates a new handle in the database.
      *

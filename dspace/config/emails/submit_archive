@@ -3,6 +3,7 @@
 # {0}  Title of submission
 # {1}  Name of collection
 # {2}  handle 
+# {3}  URL including handle
 #
 Subject: DSpace: Submission Approved and Archived 
 
@@ -14,8 +15,11 @@ Your submission has been accepted and archived in DSpace.
 It has been assigned the following identifier:
 {2}
 
-Please use this identifier (which works in Web browsers) when
-citing or linking to your submission.
+Please use this identifier when citing your submission.
+
+Although discouraged for use in citations, this link will take 
+you to your item:
+{3}
 
 Many thanks!
 
