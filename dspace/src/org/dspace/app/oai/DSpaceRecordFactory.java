@@ -69,7 +69,7 @@ public class DSpaceRecordFactory extends RecordFactory
         super(properties);
     }
 
-    protected String fromOAIIdentifier(String identifier)
+    public String fromOAIIdentifier(String identifier)
     {
         // Our local identifier is actually the same as the OAI one (the Handle)
         return identifier;
@@ -83,7 +83,7 @@ public class DSpaceRecordFactory extends RecordFactory
         return null;
     }
 
-    protected String getOAIIdentifier(Object nativeItem)
+    public String getOAIIdentifier(Object nativeItem)
     {
         String h = DSpaceOAICatalog.OAI_ID_PREFIX
                 + ((HarvestedItemInfo) nativeItem).handle;
@@ -91,7 +91,7 @@ public class DSpaceRecordFactory extends RecordFactory
         return h;
     }
 
-    protected String getDatestamp(Object nativeItem)
+    public String getDatestamp(Object nativeItem)
     {
         Date d = ((HarvestedItemInfo) nativeItem).datestamp;
 
@@ -99,7 +99,7 @@ public class DSpaceRecordFactory extends RecordFactory
         return new DCDate(d).toString();
     }
 
-    protected Iterator getSetSpecs(Object nativeItem)
+    public Iterator getSetSpecs(Object nativeItem)
     {
         HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
         Iterator i = hii.collectionHandles.iterator();
@@ -116,14 +116,14 @@ public class DSpaceRecordFactory extends RecordFactory
         return setSpecs.iterator();
     }
 
-    protected boolean isDeleted(Object nativeItem)
+    public boolean isDeleted(Object nativeItem)
     {
         HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
 
         return hii.withdrawn;
     }
 
-    protected Iterator getAbouts(Object nativeItem)
+    public Iterator getAbouts(Object nativeItem)
     {
         // Nothing in the about section for now
         return new LinkedList().iterator();

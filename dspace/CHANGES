@@ -1,3 +1,7 @@
+(Robert Tansley)
+- Updated OAICat.jar, fixed DSpaceOAICatalog.java to suit.  New OAICat fixes
+  SF bug #1123934.
+
 1.2.2  beta 1
 =============
 (Jenny Toves, Brian Hughes, Larry Stone, William Reilly, Richard Rodgers)
