@@ -127,18 +127,26 @@ function clearEPeople()
 	<body class="pageContents">
 
     <h3>E-people <%= first + 1 %>-<%= last + 1 %> of <%= epeople.length %></H3>
+
+<%
+	if (multiple)
+	{ %>
+	<P class="submitFormHelp">Clicking on the 'Add' button next to an e-person will add that
+	e-person to the list on the main form. </P>
+<%  } %>
     
 <%-- Controls for jumping around list--%>
 	<table width="99%">
 		<tr>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %>0">First</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %>0">First</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td>
 		</tr>
 	</table>
+<br>
 
 	<form method=GET> <%-- Will never actually be posted, it's just so buttons will appear --%>
 
@@ -185,15 +193,17 @@ function clearEPeople()
 %>
     </table>
 
+<br>
+
 <%-- Controls for jumping around list--%>
 	<table width="99%">
 		<tr>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %>0">First</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</A></strong></td>
-			<td width="17%" align="center"><strong><A HREF="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %>0">First</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td>
 		</tr>
 	</table>
 
