@@ -151,19 +151,18 @@ public class AccountManagerTest extends TestCase
             AccountManager.deleteToken(context, change_password_token);
             assertNull("No EPerson corresponding to token",
                 AccountManager.getEPerson(context, change_password_token));
-
-            // Lastly, clean up the EPerson
-            DatabaseManager.delete(context, "eperson", eid);
-            context.complete();
         }
         catch (Exception e)
         {
-            if (context != null)
-                context.abort();
-
             e.printStackTrace();
             System.out.println("Got exception: " + e);
             fail("Exception while running test: " + e);
+        }
+        finally
+        {
+            // Do not leave stray data around
+            if (context != null)
+                context.abort();
         }
     }
 
