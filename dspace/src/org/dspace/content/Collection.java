@@ -93,7 +93,7 @@ public class Collection
 
     /**
      * Groups corresponding to workflow steps - NOTE these start from one,
-     * so workflowGroups[0] corresponds to workflow_step_1. 
+     * so workflowGroups[0] corresponds to workflow_step_1.
      */
     private Group[] workflowGroup;
 
@@ -141,7 +141,7 @@ public class Collection
         workflowGroup[0] = groupFromColumn("workflow_step_1");
         workflowGroup[1] = groupFromColumn("workflow_step_2");
         workflowGroup[2] = groupFromColumn("workflow_step_3");
-        
+
         // Default submitters are in a group called "COLLECTION_XX_SUBMIT"
         // where XX is the ID of this collection
         submitters = Group.findByName(ourContext,
@@ -254,8 +254,8 @@ public class Collection
                 "collection2item.collection_id=" + getID() + ";");
 
         return new ItemIterator(ourContext, rows);
-    }        
-    
+    }
+
 
     /**
      * Get the internal ID of this collection
@@ -356,7 +356,7 @@ public class Collection
                 "collection_id=" + getID() +
                     "logo_bitstream_id=" + newLogo.getID()));
         }
-        
+
         return logo;
     }
 
@@ -378,7 +378,7 @@ public class Collection
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
-    
+
         if (workflowGroup[step-1] == null)
         {
             workflowGroup[step-1] = Group.create(ourContext);
@@ -386,10 +386,10 @@ public class Collection
                 "COLLECTION_100_WORKFLOW_STEP_" + step);
             workflowGroup[step-1].update();
         }
-        
+
         return workflowGroup[step-1];
     }
-        
+
 
     /**
      * Set the workflow group corresponding to a particular workflow step.
@@ -397,7 +397,7 @@ public class Collection
      * group for that workflow step; any existing group is NOT deleted.
      *
      * @param   step   the workflow step (1-3)
-     * @param   g      the new workflow group, or <code>null</code> 
+     * @param   g      the new workflow group, or <code>null</code>
      */
     public void setWorkflowGroup(int step, Group g)
     {
@@ -440,7 +440,7 @@ public class Collection
             submitters.setName("COLLECTION_100_SUBMIT");
             submitters.update();
         }
-        
+
         return submitters;
     }
 
@@ -690,6 +690,8 @@ public class Collection
         AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
 
         // FIXME: Groups?
+        DatabaseManager.updateQuery(ourContext,
+                                    "DELETE FROM WorkspaceItem WHERE collection_id = " + getID());
 
         // Get items - we'll need to work out whether to delete them in a sec
         TableRowIterator items = DatabaseManager.query(ourContext,
