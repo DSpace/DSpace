@@ -56,6 +56,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.EPersonDeletionException;
 
 /**
  * Servlet for editing and creating e-people
