@@ -227,7 +227,7 @@ public class Item
      *
      * @return  the newly created item
      */
-    static Item create(Context context)
+    public static Item create(Context context)
         throws SQLException
     {
         TableRow row = DatabaseManager.create(context, "item");
@@ -285,12 +285,12 @@ public class Item
 
 
     /**
-     * Set the "is_archived" flag.  This is not public since only
+     * Set the "is_archived" flag.  This is public and only
      * <code>WorkflowItem.archive()</code> should set this.
      *
      * @param isArchived  new value for the flag
      */
-    void setArchived(boolean isArchived)
+    public void setArchived(boolean isArchived)
     {
         itemRow.setColumn("is_archived", isArchived);
     }
@@ -549,13 +549,14 @@ public class Item
 
 
     /**
-     * Set the e-person that originally submitted this item.  This is not a
-     * public method since it is handled by the WorkspaceItem class.
+     * Set the e-person that originally submitted this item.  This is a
+     * public method since it is handled by the WorkspaceItem class in the
+     * ingest package.
      * <code>update</code> must be called to write the change to the database.
      *
      * @param  sub  the submitter
      */
-    void setSubmitter(EPerson sub)
+    public void setSubmitter(EPerson sub)
     {
         submitter = sub;
     }
@@ -753,12 +754,12 @@ public class Item
 
     /**
      * Get all non-internal bitstreams in the item.  This is mainly used
-     * for auditing for provenance messages and adding format.* DC values,
-     * and is hence not public.  The order is indeterminate.
+     * for auditing for provenance messages and adding format.* DC values.
+     * The order is indeterminate.
      *
      * @return  non-internal bitstreams.
      */
-    Bitstream[] getNonInternalBitstreams()
+    public Bitstream[] getNonInternalBitstreams()
     {
         List bitstreamList = new ArrayList();
 
