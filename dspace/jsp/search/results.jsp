@@ -199,8 +199,19 @@ else
 
 
 <%
+    // retain scope when navigating result sets
+    String searchScope = ""; 
+    if (community == null && collection == null) {
+	searchScope = "";
+    } else if (collection == null) {
+	searchScope = "/handle/" + community.getHandle();
+    } else {
+	searchScope = "/handle/" + collection.getHandle();
+    } 
+
     String prevLink =  "<A HREF=\""
                     + request.getContextPath()
+                    + searchScope 
                     + "/simple-search?query="
                     + URLEncoder.encode(query)
                     + "&start=";
@@ -223,12 +234,14 @@ else
     
 %>
 
+
 <%= (pageFirst != pageCurrent) ? prevLink : "" %>
 
 <% for( int q = pageFirst; q <= pageLast; q++ )
 {
     String myLink = "<A HREF=\""
                     + request.getContextPath()
+                    + searchScope 
                     + "/simple-search?query="
                     + URLEncoder.encode(query)
                     + "&start=";
