@@ -2213,7 +2213,7 @@ public class SubmitServlet extends DSpaceServlet
         else
         {
             // Just a single name
-            String s = request.getParameter(dcname);
+            vals.add(request.getParameter(dcname).trim());;
         }
 
         // Remove existing values
@@ -2224,7 +2224,7 @@ public class SubmitServlet extends DSpaceServlet
         {
             // Add to the database if non-empty
             String s = (String) vals.get(i);
-            if (s != null && !s.trim().equals(""))
+            if (s != null && !s.equals(""))
             {
                 item.addDC(element, qualifier, lang, s);
             }
@@ -2400,10 +2400,10 @@ public class SubmitServlet extends DSpaceServlet
         {
             String s = request.getParameter(param + "_" + i);
 
-            // We're only going to add non-empty values
+            // We're only going to add non-null values
             if (s != null)
             {
-                vals.add(s);
+                vals.add(s.trim());
             }
             else
             {
