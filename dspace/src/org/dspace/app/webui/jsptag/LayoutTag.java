@@ -53,6 +53,7 @@ import javax.servlet.RequestDispatcher;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.app.webui.util.JSPManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
@@ -239,8 +240,9 @@ public class LayoutTag extends TagSupport
             ServletResponse response = pageContext.getResponse();
             ServletConfig config = pageContext.getServletConfig();
 
+            String headerJSP = JSPManager.getLocalJSP(header);
             RequestDispatcher rd =
-                config.getServletContext().getRequestDispatcher(header);
+                config.getServletContext().getRequestDispatcher(headerJSP);
             
             rd.include(request, response);
         }
@@ -285,8 +287,9 @@ public class LayoutTag extends TagSupport
                 request.setAttribute("dspace.layout.sidebar", sidebar);
             }
 
+            String footerJSP = JSPManager.getLocalJSP(footer);
             RequestDispatcher rd =
-                config.getServletContext().getRequestDispatcher(footer);
+                config.getServletContext().getRequestDispatcher(footerJSP);
             
             rd.include(request, response);
         }
