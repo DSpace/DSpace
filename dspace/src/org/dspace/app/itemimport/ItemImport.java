@@ -124,7 +124,7 @@ public class ItemImport
         options.addOption( "s", "source",      true,  "source of items (directory)");
         options.addOption( "c", "collection",  true,  "destination collection databse ID");
         options.addOption( "m", "mapfile",     true,  "mapfile items in mapfile");
-        options.addOption( "e", "eperson",     true,  "remove items in mapfile");
+        options.addOption( "e", "eperson",     true,  "email of eperson doing importing");
         options.addOption( "w", "workflow",    false, "send submission through collection's workflow");
         options.addOption( "h", "help",        false, "help");
 
