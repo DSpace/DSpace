@@ -149,7 +149,7 @@ public class DCDate
         {
             switch (fromDC.length())
             {
-            case 19:
+            case 20:
                 // Full date and time
                 hours = Integer.parseInt(
                             fromDC.substring(11, 13));
@@ -251,7 +251,8 @@ public class DCDate
                 .append(':')
                 .append(fleshOut(minutes))
                 .append(':')
-                .append(fleshOut(seconds));
+                .append(fleshOut(seconds))
+                .append("Z");
         }
 
         return (sb.toString());
