@@ -765,6 +765,16 @@ public class DatabaseManager
     {
         String table = canonicalize(row.getTable());
         String pk = getPrimaryKeyColumn(table);
+        row.setColumn(pk, getId(table));
+    }
+
+    /**
+     * Get the next id for TABLE.
+     */
+    public static synchronized int getId (String table)
+        throws SQLException
+    {
+        String pk = getPrimaryKeyColumn(table);
         Integer id = (Integer) ids.get(table);
         int current_id = id == null ? -1 : id.intValue();
 
@@ -795,8 +805,8 @@ public class DatabaseManager
         }
 
         int new_id = current_id + 1;
-        row.setColumn(pk, new_id);
         ids.put(table, new Integer(new_id));
+        return new_id;
     }
 
     /**
