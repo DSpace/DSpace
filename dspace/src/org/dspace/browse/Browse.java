@@ -355,6 +355,16 @@ public class Browse
     public static void itemAdded(Context context, Item item)
         throws SQLException
     {
+        // add all parent communities to communities2item table
+        Community[] parents = item.getCommunities();
+        for (int j = 0; j < parents.length; j++)
+	{
+            TableRow row = DatabaseManager.create(context, "Communities2Item");
+            row.setColumn("item_id", item.getID());
+            row.setColumn("community_id", parents[j].getID());
+            DatabaseManager.update(context, row); 
+	}
+
         Map table2dc = new HashMap();
         table2dc.put("ItemsByTitle",
                      item.getDC("title", null, Item.ANY));
@@ -1602,6 +1612,7 @@ class BrowseTables
 {
     private static final String[] BROWSE_TABLES = new String[]
     {
+        "Communities2Item",
         "ItemsByAuthor",
         "ItemsByDate",
         "ItemsByDateAccessioned",
