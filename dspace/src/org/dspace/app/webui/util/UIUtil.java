@@ -85,15 +85,12 @@ public class UIUtil
             
             // See if a user has authentication
             Integer userID = (Integer)
-                request.getSession().getAttribute("dspace.current.userid");
+                request.getSession().getAttribute("dspace.current.user.id");
 
             if (userID != null)
             {
                 EPerson e = EPerson.find(c, userID.intValue());
-
-                // If the user ID is invalid, this will just initialise
-                // anonymous access
-                c.setCurrentUser(e);
+                Authenticate.loggedIn(c, request, e);
             }
 
             // Set the session ID

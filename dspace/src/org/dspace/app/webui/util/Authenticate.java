@@ -100,6 +100,41 @@ public class Authenticate
         }
     }
 
+
+    /**
+     * Resume a previously interrupted request.  This is invoked when a user
+     * has been successfully authenticated.  The request which led to
+     * authentication will be resumed.
+     *
+     * @param request   <em>current</em> HTTP request
+     * @param response  HTTP response
+     */
+    public static void resumeInterruptedRequest(HttpServletRequest request,
+        HttpServletResponse response)
+        throws IOException
+    {
+        HttpSession session = request.getSession();
+        String originalURL = (String) 
+            session.getAttribute("interrupted.request.url");
+
+        if (originalURL == null)
+        {
+            // If for some reason we don't have the original URL, redirect
+            // to My DSpace
+            originalURL = request.getContextPath() + "/mydspace";
+        }
+        else
+        {
+            // Set the flag in the session, so that when the redirect is
+            // followed, we'll know to resume the interrupted request
+            session.setAttribute("resuming.request", new Boolean(true));
+        }
+        
+        // Send the redirect
+        response.sendRedirect(response.encodeRedirectURL(originalURL));
+    }
+        
+        
     /**
      * Start the authentication process.  This packages up the request that
      * led to authentication being required, and then invokes the site-specific
@@ -117,9 +152,13 @@ public class Authenticate
     {
         HttpSession session = request.getSession();
         
-        // Store the request that led to authentication
+        // Store the data from the request that led to authentication
         RequestMimic mimic = new RequestMimic(request);
         session.setAttribute("interrupted.request", mimic);
+
+        // Store the URL of the request that led to authentication
+        session.setAttribute("interrupted.request.url",
+            UIUtil.getOriginalURL(request));
         
         // Instantiate the site authenticator
         String siteAuthClassName = ConfigurationManager.getProperty(
@@ -149,5 +188,46 @@ public class Authenticate
 
         // Start up the site authenticator
         siteAuth.startAuthentication(context, request, response);
+    }
+
+
+    /**
+     * Store information about the current user in the request and context
+     *
+     * @param context   DSpace context
+     * @param request   HTTP request
+     * @param eperson   the eperson logged in
+     */
+    public static void loggedIn(Context context,
+        HttpServletRequest request,
+        EPerson eperson)
+    {
+        HttpSession session = request.getSession();
+
+        context.setCurrentUser(eperson);
+
+        // We store the current user in the request as an EPerson object...
+        request.setAttribute("dspace.current.user", eperson);
+                
+        // and in the session as an ID
+        session.setAttribute("dspace.current.user.id",
+            new Integer(eperson.getID()));
+    }
+
+
+    /**
+     * Log the user out
+     *
+     * @param context   DSpace context
+     * @param request   HTTP request
+     */
+    public static void loggedOut(Context context,
+        HttpServletRequest request)
+    {
+        HttpSession session = request.getSession();
+
+        context.setCurrentUser(null);
+        request.removeAttribute("dspace.current.user");
+        session.removeAttribute("dspace.current.user.id");
     }
 }

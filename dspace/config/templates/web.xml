@@ -52,6 +52,19 @@
   <description>@@dspace.name@@ running at @@dspace.hostname@@</description>
 
 
+  <!-- Filters -->
+
+  <filter>
+    <filter-name>mit-only</filter-name>
+    <filter-class>edu.mit.dspace.MITOnlyFilter</filter-class>
+  </filter>
+
+  <filter>
+    <filter-name>registered-only</filter-name>
+    <filter-class>org.dspace.app.webui.filter.RegisteredOnlyFilter</filter-class>
+  </filter>
+
+
   <!-- Servlets -->
 
   <servlet>
@@ -102,6 +115,16 @@
   </servlet>
 
   <servlet>
+    <servlet-name>logout</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.LogoutServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>password-login</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.PasswordServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>retrieve</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
   </servlet>
@@ -148,6 +171,16 @@
   <servlet-mapping>
     <servlet-name>location</servlet-name>
     <url-pattern>/communities/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>logout</servlet-name>
+    <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>password-login</servlet-name>
+    <url-pattern>/password-login</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

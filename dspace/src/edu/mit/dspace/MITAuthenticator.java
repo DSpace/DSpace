@@ -54,7 +54,7 @@ import org.dspace.core.Context;
  * certificate login page.  Otherwise, the email/password page is used
  *
  * @author  Robert Tansley
- * @version $Id$
+ * @version $Revision$
  */
 public class MITAuthenticator implements SiteAuthenticator
 {
@@ -73,7 +73,7 @@ public class MITAuthenticator implements SiteAuthenticator
         {
             // Present the username/password screen (with cert option)
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/login"));
+                request.getContextPath() + "/password-login"));
         }
     }
 

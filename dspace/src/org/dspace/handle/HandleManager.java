@@ -91,12 +91,8 @@ public class HandleManager
 
         if (handletypeid == Constants.ITEM)
         {
-            String prefix = ConfigurationManager.getProperty("handle.item.prefix");
-            String url = new StringBuffer()
-                .append(prefix)
-                .append((prefix != null) && (!prefix.endsWith("/")) ? "/" : "")
-                .append(handle)
-                .toString();
+            String prefix = ConfigurationManager.getProperty("dspace.url");
+            String url = prefix + "/item/" + handle;
 
             if (log.isDebugEnabled())
                 log.debug("Resolved " + handle + " to " + url);
