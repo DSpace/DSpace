@@ -169,7 +169,9 @@ public class ItemListTag extends TagSupport
                 }
                 
                 // Third column is authors
-                out.print("</td><td class=\"" + row + "RowOddCol\">");
+                out.print("</td><td class=\"");
+                out.print(i == highlightRow ? "highlight" : row);
+                out.print("RowOddCol\">");
 
                 for (int j = 0; j < authors.length; j++)
                 {

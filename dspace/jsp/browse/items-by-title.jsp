@@ -91,14 +91,6 @@
 
 <dspace:layout title="Browse by Title">
 
-<pre>
-Test:  result count = <%= browseInfo.getResultCount() %>
-       overall position = <%= browseInfo.getOverallPosition() %>
-       offset = <%= browseInfo.getOffset() %>
-       total = <%= browseInfo.getTotal() %>
-       isFirst = <%= browseInfo.isFirst() ? "true" : "false" %>
-       isLast = <%= browseInfo.isLast() ? "true" : "false" %>
-</pre>
     <H2>Browsing <%= scopeName %> by Title</H2>
 
     <%-- Title browse controls table --%>
