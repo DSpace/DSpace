@@ -1,0 +1,153 @@
+/*
+ * Authenticate.java
+ *
+ * Version: $Revision$
+ *
+ * Date: $Date$
+ *
+ * Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
+ * Institute of Technology.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * - Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the Hewlett-Packard Company nor the name of the
+ * Massachusetts Institute of Technology nor the names of their
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ */
+
+package org.dspace.app.webui.util;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+
+import org.dspace.app.webui.SiteAuthenticator;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
+
+/**
+ * Methods for authenticating the user.  This is DSpace platform code, as
+ * opposed to the site-specific authentication code, that resides in
+ * implementations of the <code>org.dspace.app.webui.SiteAuthenticator</code>
+ * interface.
+ *
+ * @author  Robert Tansley
+ * @version $Revision$
+ */
+public class Authenticate
+{
+    /** log4j category */
+    private static Logger log = Logger.getLogger(Authenticate.class);
+
+    /**
+     * Return the request that the system should be dealing with, given the
+     * request that the browse just sent.  If the incoming request is from
+     * a redirect resulting from successful authentication, a request object
+     * corresponding to the original request that prompted authentication is
+     * returned.  Otherwise, the request passed in is returned.
+     *
+     * @param request   the incoming HTTP request
+     * @return   the HTTP request the DSpace system should deal with
+     */
+    public static HttpServletRequest getRealRequest(HttpServletRequest request)
+    {
+        HttpSession session = request.getSession();
+    
+        if (session.getAttribute("resuming.request") != null)
+        {
+            // Resume that interrupted request
+            HttpServletRequest actualRequest = (HttpServletRequest)
+                session.getAttribute("interrupted.request");
+
+            // Remove the info from the session so it isn't resumed twice
+            session.removeAttribute("resuming.request");
+            session.removeAttribute("interrupted.request");
+            
+            return actualRequest;
+        }
+        else
+        {
+            return request;
+        }
+    }
+
+    /**
+     * Start the authentication process.  This packages up the request that
+     * led to authentication being required, and then invokes the site-specific
+     * authentication method.
+     *
+     * @param context   current DSpace context
+     * @param request   current HTTP request - the one that prompted
+     *                  authentication
+     * @param response  current HTTP response
+     */
+    public static void startAuthentication(Context context,
+        HttpServletRequest request,
+        HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        HttpSession session = request.getSession();
+        
+        // Store the request that led to authentication
+        RequestMimic mimic = new RequestMimic(request);
+        session.setAttribute("interrupted.request", mimic);
+        
+        // Instantiate the site authenticator
+        String siteAuthClassName = ConfigurationManager.getProperty(
+            "webui.site.authenticator");
+        SiteAuthenticator siteAuth;
+
+        try
+        {
+            Class siteAuthClass = Class.forName(siteAuthClassName);
+            siteAuth = (SiteAuthenticator) siteAuthClass.newInstance();
+        }
+        catch(Exception e)
+        {
+            // Problem instantiating
+            if (siteAuthClassName == null)
+            {
+                siteAuthClassName = "null";
+            }
+
+            log.fatal(LogManager.getHeader(context,
+                    "no_site_authenticator",
+                    "webui.site.authenticator=" + siteAuthClassName),
+                e);
+                
+            throw new ServletException(e);
+        }
+
+        // Start up the site authenticator
+        siteAuth.startAuthentication(context, request, response);
+    }
+}

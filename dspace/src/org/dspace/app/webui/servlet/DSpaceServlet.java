@@ -49,7 +49,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.RequestMimic;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -134,6 +136,10 @@ public class DSpaceServlet extends HttpServlet
             // an authentication filter
             context = UIUtil.obtainContext(request);
         
+            // Are we resuming a previous request that was interrupted for
+            // authentication?
+            request = Authenticate.getRealRequest(request);
+
             // Invoke the servlet code
             if (isPost)
             {
@@ -155,13 +161,27 @@ public class DSpaceServlet extends HttpServlet
         }
         catch (AuthorizeException ae)
         {
-            // FIXME: Log the right info?
-            // Log the error
-            log.info(LogManager.getHeader(context,
-                "authorize_error",
-                ae.toString()));
+            /* 
+             *If no user is logged in, we will start authentication, since if
+             * they authenticate, they might be allowed to do what they tried
+             * to do.  If someone IS logged in, and we got this exception, we
+             * know they tried to do something they aren't allowed to, so we
+             * display an error in that case.
+             */
+            if (context.getCurrentUser() == null)
+            {
+                Authenticate.startAuthentication(context, request, response);
+            }
+            else
+            {
+                // FIXME: Log the right info?
+                // Log the error
+                log.info(LogManager.getHeader(context,
+                    "authorize_error",
+                    ae.toString()));
 
-            JSPManager.showAuthorizeError(request, response, ae);
+                JSPManager.showAuthorizeError(request, response, ae);
+            }
         }
         
         // Abort the context if it's still valid

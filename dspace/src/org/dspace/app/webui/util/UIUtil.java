@@ -43,6 +43,8 @@ package org.dspace.app.webui.util;
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
+
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -58,6 +60,9 @@ import org.dspace.eperson.EPerson;
  */
 public class UIUtil
 {
+    /** log4j category */
+    private static Logger log = Logger.getLogger(UIUtil.class);
+
     /**
      * Obtain a new context object.  If a context object has already been
      * created for this HTTP request, it is re-used, otherwise it is created.
