@@ -1,6 +1,12 @@
 /*
  * ItemExport.java
  *
+ * *****
+ * Mods by David Little, UCSD Libraries 3/10/05
+ * Purpose: To allow support the export of registrated files (bitstreams).
+ * Mods mark: MOD DRL
+ * *****
+ * 
  * $Id$
  *
  * Version: $Revision$
@@ -386,7 +392,20 @@ public class ItemExport
         }
     }
 
-    // create both the bitstreams and the contents file
+    // MOD DRL
+    /**
+     * Create both the bitstreams and the contents file. Any bitstreams that
+     * were originally registered will be marked in the contents file as such.
+     * However, the export directory will contain actual copies of the content
+     * files being exported.
+     * 
+     * @param c the DSpace context
+     * @param i the item being exported
+     * @param destDir the item's export directory
+     * @throws Exception if there is any problem writing to the export 
+     * 		directory
+     */
+    // MOD end
     private static void writeBitstreams(Context c, Item i, File destDir)
             throws Exception
     {
@@ -428,7 +447,15 @@ public class ItemExport
                             Utils.bufferedCopy(is, fos);
 
                             // write the manifest file entry
-                            out.println(myName + "\tbundle:" + bundleName);
+                            // MOD DRL - to support registration
+                            if (b.isRegisteredBitstream()) {
+                                out.println("-r -s " + b.getStoreNumber() 
+                                		+ " -f " + myName 
+										+ "\tbundle:" + bundleName);
+                            } else {
+                                out.println(myName + "\tbundle:" + bundleName);
+                            }
+                            // MOD end
 
                             isDone = true;
                         }

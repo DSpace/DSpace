@@ -1,6 +1,13 @@
 /*
  * Bitstream.java
  *
+ * *****
+ * Mods by David Little, UCSD Libraries 02/17/05
+ * Purpose: To allow the registration of files (bitstreams) into DSpace. See
+ * class javadoc comments below.
+ * Mods mark: MOD DRL
+ * *****
+ *
  * Version: $Revision$
  *
  * Date: $Date$
@@ -185,6 +192,40 @@ public class Bitstream extends DSpaceObject
 
         log.info(LogManager.getHeader(context, "create_bitstream",
                 "bitstream_id=" + bitstreamID));
+
+        // Set the format to "unknown"
+        Bitstream bitstream = find(context, bitstreamID);
+        bitstream.setFormat(null);
+
+        return bitstream;
+    }
+
+    /**
+     * Register a new bitstream, with a new ID.  The checksum and file size
+     * are calculated.  This method is not public, and does not check
+     * authorisation; other methods such as Bundle.createBitstream() will
+     * check authorisation.  The newly created bitstream has the "unknown"
+     * format.
+     * MOD DRL: added method - parallels create()
+     *
+     * @param  context DSpace context object
+     * @param assetstore corresponds to an assetstore in dspace.cfg
+     * @param bitstreamPath the path and filename relative to the assetstore 
+     * @return  the newly registered bitstream
+     * @throws IOException
+     * @throws SQLException
+     */
+    static Bitstream register(Context context, 
+    		int assetstore, String bitstreamPath)
+        	throws IOException, SQLException
+    {
+        // Store the bits
+        int bitstreamID = BitstreamStorageManager.register(
+        		context, assetstore, bitstreamPath);
+
+        log.info(LogManager.getHeader(context,
+            "create_bitstream",
+            "bitstream_id=" + bitstreamID));
 
         // Set the format to "unknown"
         Bitstream bitstream = find(context, bitstreamID);
@@ -539,5 +580,26 @@ public class Bitstream extends DSpaceObject
     public int getType()
     {
         return Constants.BITSTREAM;
+    }
+    
+    /**
+     * Determine if this bitstream is registered
+     * MOD DRL: added method - used by ItemExport
+     * 
+     * @return true if the bitstream is registered, false otherwise
+     */
+    public boolean isRegisteredBitstream() {
+        return BitstreamStorageManager
+				.isRegisteredBitstream(bRow.getStringColumn("internal_id"));
+    }
+    
+    /**
+     * Get the asset store number where this bitstream is stored
+     * MOD DRL: added method - used by ItemExport
+     * 
+     * @return the asset store number of the bitstream
+     */
+    public int getStoreNumber() {
+        return bRow.getIntColumn("store_number");
     }
 }

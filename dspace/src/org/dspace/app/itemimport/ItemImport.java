@@ -1,6 +1,13 @@
 /*
  * ItemImport.java
  *
+ * *****
+ * Mods by David Little, UCSD Libraries 12/21/04
+ * Purpose: To allow the registration of files (bitstreams) into DSpace. See
+ * class javadoc comments below.
+ * Mods mark: MOD DRL
+ * *****
+ * 
  * $Id$
  *
  * Version: $Revision$
@@ -88,9 +95,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+//MOD DRL - class comment modified
 /**
- * The Item importer does exactly that - imports items into the repository.
+ * Import items into DSpace. The conventional use is upload files by copying
+ * them. DSpace writes the item's bitstreams into its assetstore. Metadata is
+ * also loaded to the DSpace database.
+ * 
+ * A second use assumes the bitstream files already exist in a storage
+ * resource accessible to DSpace. In this case the bitstreams are 'registered'.
+ * That is, the metadata is loaded to the DSpace database and DSpace is given
+ * the location of the file which is subsumed into DSpace.
+ * 
+ * The distinction is controlled by the format of lines in the 'contents' file.
+ * See comments in processContentsFile() below.
  */
+// MOD end
 public class ItemImport
 {
     static boolean useWorkflow = false;
@@ -861,6 +880,7 @@ public class ItemImport
         return result;
     }
 
+    // MOD DRL - this method has be modified for registration
     /**
      * Given a contents file and an item, stuffing it with bitstreams from the
      * contents file
@@ -886,7 +906,73 @@ public class ItemImport
                     continue;
                 }
 
-                // look for a bundle name
+            	// MOD DRL - determine if bitstreams are being 
+            	//	1) registered into dspace (leading -r)
+            	//  2) imported conventionally into dspace (no -r)
+            	if (line.trim().startsWith("-r "))
+            	{
+            	    // line should be one of these two:
+            	    // -r -s n -f filepath
+            	    // -r -s n -f filepath\tbundle:bundlename
+            	    // where 
+            	    //		n is the assetstore number
+            	    //  	filepath is the path of the file to be registered
+            	    //  	bundlename is an optional bundle name
+            	    String sRegistrationLine = line.trim();
+            	    int iAssetstore = -1;
+            	    String sFilePath = null;
+            	    String sBundle = null;
+                    StringTokenizer tokenizer = 
+                        	new StringTokenizer(sRegistrationLine);
+                    while (tokenizer.hasMoreTokens())
+                    {
+                        String sToken = tokenizer.nextToken(); 
+                        if (sToken.equals("-r"))
+                        {
+                            continue;
+                        }
+                        else if (sToken.equals("-s") && tokenizer.hasMoreTokens())
+                        {
+                            try
+                            {
+                                iAssetstore = 
+                                    Integer.parseInt(tokenizer.nextToken());
+                            } 
+                            catch (NumberFormatException e)
+                            {
+                                // ignore - iAssetstore remains -1
+                            }
+                        }
+                        else if (sToken.equals("-f") && tokenizer.hasMoreTokens())
+                        {
+                            sFilePath = tokenizer.nextToken();
+
+                        }
+                        else if (sToken.startsWith("bundle:"))
+                        {
+                            sBundle = sToken.substring(7);
+                        }
+                        else 
+                        {
+                            // unrecognized token - should be no problem
+                        }
+                    } // while
+                    if (iAssetstore == -1 || sFilePath == null) 
+                    {
+                        System.out.println("\tERROR: invalid contents file line");
+                        System.out.println("\t\tSkipping line: "
+                                + sRegistrationLine);
+                        continue;
+                    }
+                    registerBitstream(c, i, iAssetstore, sFilePath, sBundle);
+                    System.out.println("\tRegistering Bitstream: " + sFilePath
+                            + "\tAssetstore: " + iAssetstore 
+                            + "\tBundle: " + sBundle);
+                    continue;				// process next line in contents file
+            	}
+            	// MOD end
+
+            	// look for a bundle name
                 String bundleMarker = "\tbundle:";
 
                 int markerIndex = line.indexOf(bundleMarker);
@@ -977,6 +1063,76 @@ public class ItemImport
             bs.setFormat(bf);
 
             bs.update();
+        }
+    }
+
+    // MOD DRL: added method - parallels processContentFileEntry()
+    /**
+     * Register the bitstream file into DSpace
+     * 
+     * @param c
+     * @param i
+     * @param assetstore
+     * @param bitstreamPath the full filepath expressed in the contents file
+     * @param bundleName
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    public void registerBitstream(Context c, Item i, int assetstore, 
+            String bitstreamPath, String bundleName )
+        	throws SQLException, IOException, AuthorizeException
+    {
+        // TODO validate assetstore number
+        // TODO make sure the bitstream is there
+
+        Bitstream bs = null;
+        String newBundleName = bundleName;
+        
+        if (bundleName == null)
+        {
+            // is it license.txt?
+            if (bitstreamPath.endsWith("license.txt"))
+            {
+                newBundleName = "LICENSE";
+            }
+            else
+            {
+                // call it ORIGINAL
+                newBundleName = "ORIGINAL";
+            }
+        }
+
+        if(!isTest)
+        {
+        	// find the bundle
+	        Bundle[] bundles = i.getBundles(newBundleName);
+	        Bundle targetBundle = null;
+	            
+	        if( bundles.length < 1 )
+	        {
+	            // not found, create a new one
+	            targetBundle = i.createBundle(newBundleName);
+	        }
+	        else
+	        {
+	            // put bitstreams into first bundle
+	            targetBundle = bundles[0];
+	        }
+	
+	        // now add the bitstream
+	        bs = targetBundle.registerBitstream(assetstore, bitstreamPath);
+	
+	        // set the name to just the filename
+	        int iLastSlash = bitstreamPath.lastIndexOf('/');
+	        bs.setName(bitstreamPath.substring(iLastSlash + 1));
+	
+	        // Identify the format
+	        // FIXME - guessing format guesses license.txt incorrectly as a text file format!
+	        BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
+	        bs.setFormat(bf);
+	
+	        bs.update();
         }
     }
 
