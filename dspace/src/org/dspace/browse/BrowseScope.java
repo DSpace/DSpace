@@ -296,4 +296,28 @@ public class BrowseScope
     {
         return numberBefore;
     }
+
+    /**
+     * Return true if this BrowseScope is equal to another object,
+     * false otherwise.
+     *
+     * @param obj The object to compare to
+     * @return True if this BrowseScope is equal to the other object,
+     * false otherwise.
+     */
+    public boolean equals(Object obj)
+    {
+        if (! (obj instanceof BrowseScope))
+            return false;
+
+        BrowseScope other = (BrowseScope) obj;
+        return
+            (scope != null ? scope.equals(other.scope) :
+             other.scope == null) &&
+            (focus != null ? focus.equals(other.focus) :
+             other.focus == null) &&
+            total        == other.total &&
+            numberBefore == other.numberBefore
+            ;
+    }
 }
