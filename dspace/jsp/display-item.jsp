@@ -60,6 +60,7 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.handle.HandleManager" %>
 
 <%
@@ -83,7 +84,7 @@
 %>
     <table align=center class=miscTable>
         <tr>
-            <td class=evenRowEvenCol>
+            <td class=evenRowEvenCol align="center">
                 <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>
             </td>
@@ -115,8 +116,16 @@
 %>
 
     <%-- SFX Link --%>
+<%
+    if (ConfigurationManager.getProperty("sfx.server.url") != null)
+    {
+%>
     <P align=center>
         <A HREF="<dspace:sfxlink item="<%= item %>" />"><IMG SRC="<%= request.getContextPath() %>/image/sfx-link.gif" BORDER=0 ALT="SFX Query"></A>
     </P>
+<%
+    }
+%>
+    <P class="submitFormHelp">All items in DSpace are protected by copyright, with all rights reserved.</P>
 
 </dspace:layout>
