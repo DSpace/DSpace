@@ -72,9 +72,9 @@
 
 <%
     // Get the attributes
-    Community   community        = (Community ) request.getAttribute("community" );
-    Collection  collection       = (Collection) request.getAttribute("collection");
-    Community[] communityArray   = (Community[]) request.getAttribute("community.array");
+    Community   community        = (Community   ) request.getAttribute("community" );
+    Collection  collection       = (Collection  ) request.getAttribute("collection");
+    Community[] communityArray   = (Community[] ) request.getAttribute("community.array");
     Collection[] collectionArray = (Collection[]) request.getAttribute("collection.array");
     
     Item      [] items       = (Item[]      )request.getAttribute("items");
@@ -173,16 +173,19 @@ else
 <% } %>
 
 <% if (communities.length > 0 ) { %>
+    <h3>Community Hits:</h3>
     <dspace:communitylist  communities="<%= communities %>" />
 <% } %>
 
 <% if (collections.length > 0 ) { %>   
     <br>
+    <h3>Collection hits:</h3>
     <dspace:collectionlist collections="<%= collections %>" />
 <% } %>
 
 <% if (items.length > 0) { %>
     <br>
+    <h3>Item hits:</h3>
     <dspace:itemlist items="<%= items %>" />
 <% } %>
 
