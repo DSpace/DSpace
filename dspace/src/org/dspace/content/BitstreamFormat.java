@@ -249,7 +249,7 @@ public class BitstreamFormat
         
 
     /**
-     * Retrieve all bitstream formats from the registry.
+     * Retrieve all bitstream formats from the registry, ordered by ID
      *
      * @param  context  DSpace context object
      *   
@@ -262,7 +262,7 @@ public class BitstreamFormat
 
         TableRowIterator tri = DatabaseManager.query(context,
             "bitstreamformatregistry",
-            "SELECT * FROM bitstreamformatregistry;");
+            "SELECT * FROM bitstreamformatregistry ORDER BY bitstream_format_id;");
 
         while (tri.hasNext())
         {
@@ -561,7 +561,7 @@ public class BitstreamFormat
 
         // Set bitstreams with this format to "unknown"
         int numberChanged = DatabaseManager.updateQuery(bfContext,
-            "UPDATE bitstreams SET bitstream_format_id=" + unknown.getID() +
+            "UPDATE bitstream SET bitstream_format_id=" + unknown.getID() +
                 " WHERE bitstream_format_id=" + getID());
 
         // Delete extensions

@@ -206,6 +206,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>format-registry</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.BitstreamFormatRegistry</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>internal-error</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.InternalErrorServlet</servlet-class>
   </servlet>
@@ -315,6 +320,11 @@
   <servlet-mapping>
     <servlet-name>forgot</servlet-name>
     <url-pattern>/forgot</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>format-registry</servlet-name>
+    <url-pattern>/admin/format-registry</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
