@@ -92,6 +92,9 @@ public class ItemListTag extends TagSupport
     /** Config browse/search width and height */
     private int thumbItemListMaxWidth;
     private int thumbItemListMaxHeight;
+    
+    /** Config browse/search thumbnail link behaviour */
+    private boolean linkToBitstream = false;
 
     
     public ItemListTag()
@@ -346,6 +349,16 @@ public class ItemListTag extends TagSupport
     			thumbItemListMaxWidth = ConfigurationManager.getIntProperty("thumbnail.maxwidth");
     		}
     	}
+    	
+    	String linkBehaviour = ConfigurationManager.getProperty("webui.browse.thumbnail.linkbehaviour");
+    	
+    	if (linkBehaviour != null)
+    	{
+    		if (linkBehaviour.equals("bitstream"))
+    		{
+    			linkToBitstream = true;
+    		}
+    	}
     }
     
     /* Get the (X)HTML width and height attributes. 
@@ -447,37 +460,57 @@ public class ItemListTag extends TagSupport
 				Context c = UIUtil.obtainContext(hrq);
 
 				Bitstream thumbnailBitstream;
+				Bitstream originalBitstream;
     		
 	    		if (original[0].getBitstreams().length > 1 &&
 	    			original[0].getPrimaryBitstreamID() > -1)
 	    		{
-	    			thumbnailBitstream = thumbs[0].getBitstreamByName(Bitstream.find(c, original[0].getPrimaryBitstreamID()).getName() + ".jpg");
+	    			originalBitstream = Bitstream.find(c, original[0].getPrimaryBitstreamID());
+	    			thumbnailBitstream = thumbs[0].getBitstreamByName(originalBitstream.getName() + ".jpg");
 	    		}
 	    		else
 	    		{
+	    			originalBitstream = original[0].getBitstreams()[0];
 	    	  		thumbnailBitstream = thumbs[0].getBitstreams()[0];    	  		
 	    		}	              		
 	
 	    		if ((thumbnailBitstream != null) &&
 	    			(AuthorizeManager.authorizeActionBoolean(c, thumbnailBitstream, Constants.READ)))  
 	    		{
-	        		StringBuffer thumbLink = new StringBuffer("<br/><a target=_blank href=\"")
+	    			StringBuffer thumbLink;
+	    			
+	    			if (linkToBitstream)
+	    			{
+		        		thumbLink = new StringBuffer("<br/><a target=_blank href=\"")
+							.append(hrq.getContextPath())
+							.append("/bitstream/")
+							.append(item.getHandle())
+							.append("/")
+							.append(originalBitstream.getSequenceID())
+							.append("/")
+							.append(URLEncoder.encode(originalBitstream.getName()));
+	    			}
+	    			else
+	    			{
+		        		thumbLink = new StringBuffer("<br/><a target=_blank href=\"")
 							.append(hrq.getContextPath())
 							.append("/handle/")
-							.append(item.getHandle())
-							.append("\"><img src=\"")
-							.append(hrq.getContextPath())
-							.append("/retrieve/")
-							.append(thumbnailBitstream.getID())
-							.append("/")
-	   						.append(URLEncoder.encode(thumbnailBitstream.getName()))
-							.append("\" alt=")
-							.append(thumbnailBitstream.getName())
-							.append("\" ")
-							.append(getScalingAttr(hrq, thumbnailBitstream))
-							.append("/></a>");
-	        		
-	        		return thumbLink.toString();
+							.append(item.getHandle());
+	    			}
+					
+	    			thumbLink.append("\"><img src=\"")
+						.append(hrq.getContextPath())
+						.append("/retrieve/")
+						.append(thumbnailBitstream.getID())
+						.append("/")
+   						.append(URLEncoder.encode(thumbnailBitstream.getName()))
+						.append("\" alt=")
+						.append(thumbnailBitstream.getName())
+						.append("\" ")
+						.append(getScalingAttr(hrq, thumbnailBitstream))
+						.append("/></a>");
+	    			
+	    			return thumbLink.toString();
 	    		}
 			}
     		catch (SQLException sqle)
