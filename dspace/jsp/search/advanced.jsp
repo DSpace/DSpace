@@ -157,9 +157,9 @@
             </td>
 
   </tr>
+  </table>
   <tr>
-    <td colspan=2>&nbsp;  </td>
-    <td colspan=2 valign=bottom NOWRAP>
+    <td valign=bottom align=right NOWRAP>
       &nbsp; &nbsp; &nbsp;
       <input type="submit" name="submit" value="Search">
             &nbsp;  &nbsp; &nbsp;
