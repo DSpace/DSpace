@@ -489,8 +489,10 @@ public class EditItemServlet extends DSpaceServlet
                     bitstream.setDescription(desc);
                     bitstream.setFormat(
                         BitstreamFormat.find(context, formatID));
-		    bundle.setPrimaryBitstreamID(primaryBitstreamID);
-
+		    if (primaryBitstreamID > 0)
+		    {
+			bundle.setPrimaryBitstreamID(primaryBitstreamID);
+		    }
                     if (userFormatDesc != null)
                     {
                         bitstream.setUserFormatDescription(userFormatDesc);
