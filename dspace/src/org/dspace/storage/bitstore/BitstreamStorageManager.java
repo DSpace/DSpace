@@ -228,10 +228,12 @@ public class BitstreamStorageManager
     {
         initialize();
 
-        Context context = new Context();
+        Context context = null;
 
         try
         {
+            context = new Context();
+
             List storage = DatabaseManager.query
                 (context,
                  "Bitstream",
@@ -517,16 +519,28 @@ public class BitstreamStorageManager
     private static TableRow createDeletedBitstream(String id)
         throws SQLException, IOException
     {
-        Context context = new Context();
+        Context context = null;
 
-        TableRow bitstream = DatabaseManager.create(context, "Bitstream");
-        bitstream.setColumn("deleted", true);
-        bitstream.setColumn("internal_id", id);
-        DatabaseManager.update(context, bitstream);
+        try
+        {
+            context = new Context();
 
-        context.complete();
+            TableRow bitstream = DatabaseManager.create(context, "Bitstream");
+            bitstream.setColumn("deleted", true);
+            bitstream.setColumn("internal_id", id);
+            DatabaseManager.update(context, bitstream);
 
-        return bitstream;
+            context.complete();
+
+            return bitstream;
+        }
+        catch (SQLException sqle)
+        {
+            if (context != null)
+                context.abort();
+
+            throw sqle;
+        }
     }
 
     /**
