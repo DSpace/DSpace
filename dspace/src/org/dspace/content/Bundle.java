@@ -344,7 +344,8 @@ public class Bundle extends DSpaceObject
     
 
     /**
-     * Remove a bitstream from this bundle - the bitstream is not deleted
+     * Remove a bitstream from this bundle - the bitstream is only deleted
+     *   if this was the last reference to it
      *
      * @param b  the bitstream to remove
      */
