@@ -1,7 +1,13 @@
-DSpace Version 1.0, released 04-Nov-2002
+DSpace Version 1.1, released April 2003
 
-For installation instructions, please read the "Operation" chapter of the
-system documentation in the docs/ directory.
+Installation instructions are included in the 'dspace-docs' download,
+available from:
+
+http://sourceforge.net/projects/dspace/
+
+These documents may be viewed online:
+
+http://www.dspace.org/technology/system-docs/
 
 
 Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
