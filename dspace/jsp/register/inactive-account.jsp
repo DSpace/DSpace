@@ -52,7 +52,7 @@
     
     <P>The e-mail address you entered corresponds to an inactive account.
     Perhaps you haven't yet <A HREF="<%= request.getContextPath() %>/register">
-    registered</A> yet.  Please feel free to contact the site administrators
+    registered</A>.  Please feel free to contact the site administrators
     with any queries.</P>
     
     <dspace:include page="/components/contact-info.jsp" />
