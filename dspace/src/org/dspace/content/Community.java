@@ -50,9 +50,11 @@ import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.history.HistoryManager;
 import org.dspace.search.DSIndexer;
@@ -188,6 +190,18 @@ public class Community extends DSpaceObject
         TableRow row = DatabaseManager.create(context, "community");
         Community c = new Community(context, row);
         String newHandle = HandleManager.createHandle(context, c);
+
+
+        // create the default authorization policy for communities
+        // of 'anonymous' READ
+        Group anonymousGroup = Group.find(context, 0);
+
+        ResourcePolicy myPolicy = ResourcePolicy.create(context);
+        myPolicy.setResource( c );
+        myPolicy.setAction  ( Constants.READ );
+        myPolicy.setGroup   ( anonymousGroup );
+        myPolicy.update();
+
 
         HistoryManager.saveHistory(context,
             c,
@@ -552,6 +566,9 @@ public class Community extends DSpaceObject
 
         // Remove the logo
         setLogo(null);
+
+        // Remove all authorization policies
+        AuthorizeManager.removeAllPolicies(ourContext, this);
 
         // Delete community row
         DatabaseManager.delete(ourContext, communityRow);
