@@ -326,7 +326,7 @@ public class ItemTag extends TagSupport
 
         // Three column table - DC field, value, language
         out.println("<center><table class=\"itemDisplayTable\">");
-        out.println("<tr><th>DC Field</th><th>Value</th><th>Language</th></tr>");
+        out.println("<tr><th class=\"standard\">DC Field</th><th class=\"standard\">Value</th><th class=\"standard\">Language</th></tr>");
         
         for (int i = 0; i < values.length; i++)
         {
