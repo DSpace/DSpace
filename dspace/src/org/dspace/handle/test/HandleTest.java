@@ -51,6 +51,7 @@ import org.dspace.core.Context;
 import org.dspace.content.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
+import org.dspace.ingest.WorkspaceItem;
 import org.dspace.storage.rdbms.*;
 
 /**

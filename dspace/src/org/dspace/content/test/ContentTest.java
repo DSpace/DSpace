@@ -51,6 +51,7 @@ import junit.framework.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.*;
+import org.dspace.ingest.WorkspaceItem;
 import org.dspace.storage.rdbms.*;
 
 /**

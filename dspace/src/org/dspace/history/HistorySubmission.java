@@ -47,6 +47,8 @@ import java.util.List;
 import org.dspace.core.*;
 import org.dspace.content.*;
 import org.dspace.eperson.*;
+import org.dspace.ingest.WorkspaceItem;
+import org.dspace.workflow.WorkflowItem;
 
 import org.apache.log4j.Logger;
 
