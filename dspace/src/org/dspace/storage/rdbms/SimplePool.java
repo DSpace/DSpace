@@ -46,7 +46,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.core.ConfigurationManager;
 
@@ -61,7 +61,7 @@ public class SimplePool implements java.sql.Driver
     /**
      * Log4j category
      */
-    private static Category log = Category.getInstance(SimplePool.class);
+    private static Logger log = Logger.getLogger(SimplePool.class);
 
     /**
      * Constructor
@@ -194,7 +194,7 @@ public class SimplePool implements java.sql.Driver
     }
 
     // Simple info class
-    static class SimplePoolInfo
+    public static class SimplePoolInfo
     {
 
         /**
@@ -359,10 +359,10 @@ class PooledConnection implements java.sql.Connection
     private int id;
     private static int count = 0;
     private Connection physicalConnection = null;
-    private PooledCallableStatement statement = null;
     private boolean closed = false;
+    private Set statements = new HashSet();
 
-    private static Category log = Category.getInstance(PooledConnection.class);
+    private static Logger log = Logger.getLogger(PooledConnection.class);
 
     /**
      * Constructor
@@ -431,7 +431,7 @@ class PooledConnection implements java.sql.Connection
 
     public boolean isBeingUsed()
     {
-        return statement == null ? false : statement.isBeingUsed();
+        return ! statements.isEmpty();
     }
 
     public void reuse()
@@ -445,6 +445,11 @@ class PooledConnection implements java.sql.Connection
         if (closed)
             if (log.isDebugEnabled())
                 log.debug("Alert: connection " + id + " using closed connection");
+    }
+
+    public void removeStatement(Statement s)
+    {
+        statements.remove(s);
     }
 
     ////////////////////////////////////////
@@ -461,7 +466,8 @@ class PooledConnection implements java.sql.Connection
 
         Statement s = physicalConnection.createStatement();
 
-        statement = new PooledCallableStatement(physicalConnection, s, id);
+        Statement statement = new PooledCallableStatement(this, s, id);
+        statements.add(statement);
         return statement;
     }
 
@@ -475,7 +481,8 @@ class PooledConnection implements java.sql.Connection
 
         PreparedStatement s = physicalConnection.prepareStatement(sql);
 
-        statement = new PooledCallableStatement(physicalConnection, s, id);
+        PreparedStatement statement = new PooledCallableStatement(this, s, id);
+        statements.add(statement);
         return statement;
     }
 
@@ -486,7 +493,8 @@ class PooledConnection implements java.sql.Connection
 
         CallableStatement s = physicalConnection.prepareCall(sql);
 
-        statement = new PooledCallableStatement(physicalConnection, s, id);
+        CallableStatement statement = new PooledCallableStatement(this, s, id);
+        statements.add(statement);
         return statement;
     }
 
@@ -531,11 +539,14 @@ class PooledConnection implements java.sql.Connection
         if (log.isDebugEnabled())
             log.debug("Connection " + id + ": closed");
 
-            // Close the statement
-        if (statement != null)
-            statement.close();
+        // Close the statements
+        for (Iterator iterator = statements.iterator(); iterator.hasNext(); )
+        {
+            PooledCallableStatement statement = (PooledCallableStatement) iterator.next();
+            statement.close(false);
+        }
 
-        statement = null;
+        statements.clear();
         free = true;
         closed = true;
     }
@@ -653,21 +664,20 @@ class PooledConnection implements java.sql.Connection
     }
 }
 
-
 class PooledCallableStatement implements java.sql.CallableStatement
 {
-    private Connection connection;
+    private PooledConnection connection;
     private Statement statement;
     private PooledResultSet results;
     private int id;
     private boolean closed = false;
 
-    private static Category log = Category.getInstance(PooledCallableStatement.class);
+    private static Logger log = Logger.getLogger(PooledCallableStatement.class);
 
     /**
      * Constructor
      */
-    public PooledCallableStatement (Connection c, Statement s, int id)
+    public PooledCallableStatement (PooledConnection c, Statement s, int id)
     {
         this.connection = c;
         this.statement = s;
@@ -1173,16 +1183,32 @@ class PooledCallableStatement implements java.sql.CallableStatement
     public void close()
         throws SQLException
     {
+        close(true);
+    }
+
+    public void close(boolean closeConnection)
+        throws SQLException
+    {
         if (log.isDebugEnabled())
             log.debug("Connection " + id + ": closing statement");
 
         if (statement != null)
             statement.close();
         statement = null;
-        connection = null;
+
+        if (closeConnection)
+        {
+            if (connection != null)
+            {
+                connection.removeStatement(this);
+                connection = null;
+            }
+        }
+
         if (results != null)
             results.close();
         results = null;
+
         closed = true;
     }
 
@@ -1371,7 +1397,7 @@ class PooledCallableStatement implements java.sql.CallableStatement
 // ResultSet wrapper
 class PooledResultSet implements java.sql.ResultSet
 {
-    private static Category log = Category.getInstance(PooledResultSet.class);
+    private static Logger log = Logger.getLogger(PooledResultSet.class);
     private java.sql.ResultSet  delegate;
     private java.sql.Statement  s;
     private java.sql.Connection c;
