@@ -331,7 +331,7 @@ public class TableRow
         if (! hasColumn(column))
             throw new IllegalArgumentException("No such column " + column);
 
-        data.put(canonicalize(column), new Integer(i));
+	data.put(canonicalize(column), new Integer(i));
     }
 
     /**

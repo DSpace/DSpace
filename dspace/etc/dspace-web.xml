@@ -261,6 +261,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>html</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.HTMLServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>retrieve</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
   </servlet>
@@ -406,6 +411,11 @@
   <servlet-mapping>
     <servlet-name>register</servlet-name>
     <url-pattern>/register</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>html</servlet-name>
+    <url-pattern>/html/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

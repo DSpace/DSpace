@@ -57,6 +57,7 @@
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
+<%@ page import="org.dspace.content.Bundle" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -69,7 +70,7 @@
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Uploaded Files" nocache="true">
+<dspace:layout locbar="off" navbar="off" title="Uploaded Files">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
@@ -92,6 +93,7 @@
         
         <table class="miscTable" align=center>
             <tr>
+		<th class="oddRowEvenCol">Primary<br>bitstream</th>
                 <th class="oddRowOddCol">File</th>
                 <th class="oddRowEvenCol">Size</th>
                 <th class="oddRowOddCol">Description</th>
@@ -120,6 +122,11 @@
     String row = "even";
 
     Bitstream[] bitstreams = si.submission.getItem().getNonInternalBitstreams();
+    Bundle[] bundles = null;
+
+    if (bitstreams[0] != null) {
+        bundles = bitstreams[0].getBundles();
+    }
 
     for (int i = 0; i < bitstreams.length; i++)
     {
@@ -141,6 +148,14 @@
         String supportLevelLink = "/help/formats.html#" + supportLevel;
 %>
             <tr>
+		<td class="<%= row %>RowEvenCol" align="center">
+		    <input type="radio" name="primary_bitstream_id" value=<%= bitstreams[i].getID() %>
+			   <% if (bundles[0] != null) {
+				if (bundles[0].getPrimaryBitstreamID() == bitstreams[i].getID()) { %>
+			       	  <%="checked" %>
+			   <%   }
+			      } %> >
+		</td>
                 <td class="<%= row %>RowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= java.net.URLEncoder.encode(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A></td>
                 <td class="<%= row %>RowEvenCol"><%= bitstreams[i].getSize() %> bytes</td>
                 <td class="<%= row %>RowOddCol">

@@ -85,7 +85,6 @@ public class Bundle extends DSpaceObject
     /** The bitstreams in this bundle */
     private List bitstreams;
 
-
     /**
      * Construct a bundle object with the given table row
      *
@@ -235,6 +234,30 @@ public class Bundle extends DSpaceObject
     public void setName(String name)
     {
         bundleRow.setColumn("name", name);
+    }
+
+
+    /**
+     * Get the primary bitstream ID of the bundle
+     *
+     * @return primary bitstream ID
+     *  or -1 if not set
+     */
+    public int getPrimaryBitstreamID()
+    {
+	return bundleRow.getIntColumn("primary_bitstream_id");
+    }
+
+
+    /**
+     * Set the primary bitstream ID of the bundle
+     *
+     * @param bitstreamID int ID of primary bitstream
+     *  (e.g. index html file)
+     */
+    public void setPrimaryBitstreamID(int bitstreamID)
+    {
+	bundleRow.setColumn("primary_bitstream_id", bitstreamID);
     }
 
 

@@ -440,6 +440,23 @@ public class ItemTag extends TagSupport
         {   
 	    // if item contains multiple non-license bundles, display bitstream description
 	    boolean multiFile = (bundles.length > 2);
+            boolean html = false;
+	    Bitstream primaryBitstream = null;
+
+	    // check if primary bitstream is html
+	    Bundle[] bunds = item.getBundles("ORIGINAL");
+	    if (bunds[0] != null)
+	    {
+		Bitstream[] bits = bunds[0].getBitstreams();
+		for (int i = 0; i < bits.length && !html; i++)
+		{
+		    if (bits[i].getID() == bunds[0].getPrimaryBitstreamID())
+		    {
+			html = bits[i].getFormat().getMIMEType().equals("text/html");
+			primaryBitstream = bits[i];
+		    }
+		}
+	    }
 
 	    out.println("<table cellpadding=6><tr><th class=\"standard\">File</th>");
 	    if (multiFile)
@@ -447,40 +464,66 @@ public class ItemTag extends TagSupport
 		out.println("<th class=\"standard\">Description</th>");
 	    }
 	    out.println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th></tr>");
-	    
-            for (int i = 0; i < bundles.length; i++)
-            {
-                Bitstream[] bitstreams = bundles[i].getBitstreams();
 
-                for (int k = 0; k < bitstreams.length ; k++)
-                {
-                    // Skip internal types
-                    if (!bitstreams[k].getFormat().isInternal())
-                    {
-                        out.print("<tr><td class=\"standard\">");
-                        out.print(bitstreams[k].getName());
-			if (multiFile)
+            // if primary bitstream is html, display a link for only that one to HTMLServlet
+            if (html)
+	    {
+		out.print("<tr><td class=\"standard\">");
+		out.print(primaryBitstream.getName());
+		if (multiFile)
+		{
+		    out.print("</td><td class=\"standard\">");
+		    String desc = primaryBitstream.getDescription();
+		    out.print(desc != null ? desc : "");
+		}
+		out.print("</td><td class=\"standard\">");
+		out.print(primaryBitstream.getSize() / 1024);
+		out.print("Kb</td><td class=\"standard\">");
+		out.print(primaryBitstream.getFormatDescription());
+		out.print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
+		out.print(request.getContextPath());
+		out.print("/html/");
+		out.print(item.getHandle() + "/");
+		out.print(URLEncoder.encode(primaryBitstream.getName()));
+		out.print("\">View/Open</A></td></tr>");
+	    }
+	    else
+	    {	    
+		for (int i = 0; i < bundles.length; i++)
+		{
+		    Bitstream[] bitstreams = bundles[i].getBitstreams();
+			
+		    for (int k = 0; k < bitstreams.length ; k++)
+		    {
+			// Skip internal types
+			if (!bitstreams[k].getFormat().isInternal())
 			{
+			    out.print("<tr><td class=\"standard\">");
+			    out.print(bitstreams[k].getName());
+			    if (multiFile)
+			    {
+				out.print("</td><td class=\"standard\">");
+				String desc = bitstreams[k].getDescription();
+				out.print(desc != null ? desc : "");
+			    }
 			    out.print("</td><td class=\"standard\">");
-			    String desc = bitstreams[k].getDescription();
-			    out.print(desc != null ? desc : "");
+			    out.print(bitstreams[k].getSize() / 1024);
+			    out.print("Kb</td><td class=\"standard\">");
+			    out.print(bitstreams[k].getFormatDescription());
+			    out.print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
+			    out.print(request.getContextPath());
+			    out.print("/retrieve/");
+			    out.print(bitstreams[k].getID() + "/");
+			    out.print(URLEncoder.encode(bitstreams[k].getName()));
+			    out.print("\">View/Open</A></td></tr>");
 			}
-                        out.print("</td><td class=\"standard\">");
-                        out.print(bitstreams[k].getSize() / 1024);
-                        out.print("Kb</td><td class=\"standard\">");
-                        out.print(bitstreams[k].getFormatDescription());
-                        out.print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
-                        out.print(request.getContextPath());
-                        out.print("/retrieve/");
-                        out.print(bitstreams[k].getID() + "/");
-                        out.print(URLEncoder.encode(bitstreams[k].getName()));
-                        out.print("\">View/Open</A></td></tr>");
-                    }
-                }
-            }
+		    }
+		}
+	    }
             out.println("</table>");
         }
         
         out.println("</td></tr></table>");
     }
 }
+

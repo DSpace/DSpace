@@ -81,7 +81,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
-
 /**
  * Submission servlet for DSpace.  Handles the initial submission of items, as
  * well as the editing of items further down the line.
@@ -1257,12 +1256,30 @@ public class SubmitServlet extends DSpaceServlet
         {
             // Finished the uploading of files
             // FIXME Validation check here
+
+	    // set primary bitstream
+	    if (request.getParameter("primary_bitstream_id") != null)
+	    {
+		Bundle[] bundles = item.getBundles();
+		bundles[0].setPrimaryBitstreamID(new Integer(request.getParameter("primary_bitstream_id")).intValue());
+		bundles[0].update();
+	    }
+
             userHasReached(subInfo, REVIEW_SUBMISSION);
             doStep(context, request, response, subInfo, REVIEW_SUBMISSION);
             context.complete();
         }
         else if (buttonPressed.equals("submit_more"))
         {
+            // set primary bitstream
+            if (request.getParameter("primary_bitstream_id") != null)
+            {
+                Bundle[] bundles = item.getBundles();
+                bundles[0].setPrimaryBitstreamID(new Integer(request.getParameter("primary_bitstream_id")).intValue());
+                bundles[0].update();
+		context.commit();
+            }
+
             // Upload another file
             request.setAttribute("submission.info", subInfo);
             JSPManager.showJSP(request, response, "/submit/choose-file.jsp");
