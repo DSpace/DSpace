@@ -62,6 +62,7 @@ import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.workflow.WorkflowItem;
 
 
 /**
@@ -800,18 +801,38 @@ public class Collection extends DSpaceObject
         // Delete bitstream logo
         setLogo(null);
 
-        // Delete collection row
-        DatabaseManager.delete(ourContext, collectionRow);
 
         // Remove all authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
-        // Remove any workflow groups
+        // Remove any WorkflowItems
+        WorkflowItem [] wfarray = WorkflowItem.findByCollection(ourContext, this);
+        for( int x = 0; x < wfarray.length; x++ )
+        {
+            // remove the workflowitem first, then the item
+            Item myItem = wfarray[x].getItem();
+            wfarray[x].deleteWrapper();
+            myItem.delete();
+        }
+        
+        // Remove any WorkspaceItems
+        WorkspaceItem [] wsarray = WorkspaceItem.findByCollection(ourContext, this);
+        for( int x = 0; x < wsarray.length; x++ )
+        {
+            wsarray[x].deleteAll();
+        }
+
+
+        // Delete collection row
+        DatabaseManager.delete(ourContext, collectionRow);
+        
+        // Remove any workflow groups - must happen after deleting collection
         Group g = null;
         
         g = getWorkflowGroup(1);  if( g != null ) { g.delete(); }
         g = getWorkflowGroup(2);  if( g != null ) { g.delete(); }
         g = getWorkflowGroup(3);  if( g != null ) { g.delete(); }
+
     }
 
 

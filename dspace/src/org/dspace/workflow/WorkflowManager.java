@@ -744,7 +744,7 @@ public class WorkflowManager
 
 
     // deletes all tasks associated with a workflowitem
-    private static void deleteTasks(Context c,WorkflowItem wi)
+    static void deleteTasks(Context c,WorkflowItem wi)
         throws SQLException
     {
         String myrequest =

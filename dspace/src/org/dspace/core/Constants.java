@@ -173,8 +173,8 @@ public class Constants
      */
     public static final int [] actionTypeRelevance =
     {
-        RBITSTREAM|RBUNDLE|RITEM|RCOLLECTION, // 0 - READ
-        RBITSTREAM|RBUNDLE|RITEM|RCOLLECTION, // 1 - WRITE
+        RBITSTREAM|RBUNDLE|RITEM|RCOLLECTION|RCOMMUNITY, // 0 - READ
+        RBITSTREAM|RBUNDLE|RITEM|RCOLLECTION|RCOMMUNITY, // 1 - WRITE
         0,                                    // 2 - DELETE (obsolete)
         RBUNDLE|RITEM|RCOLLECTION|RCOMMUNITY, // 3 - ADD
         RBUNDLE|RITEM|RCOLLECTION|RCOMMUNITY, // 4 - REMOVE

@@ -237,6 +237,48 @@ public class WorkflowItem implements InProgressSubmission
 
 
     /**
+     * Get all workflow items for a particular collection.
+     *
+     * @param context   the context object
+     * @param c         the collection
+     *
+     * @return  array of the corresponding workflow items
+     */
+    public static WorkflowItem[] findByCollection(Context context, Collection c)
+        throws SQLException
+    {
+        List wsItems = new ArrayList();
+
+        TableRowIterator tri = DatabaseManager.query(context,
+            "workflowitem",
+            "SELECT workflowitem.* FROM workflowitem WHERE " +
+                "workflowitem.collection_id=" + c.getID() );
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            
+            // Check the cache
+            WorkflowItem wi = (WorkflowItem) context.fromCache(
+                WorkflowItem.class, row.getIntColumn("workflow_id"));
+            
+            // not in cache?  turn row into workflowitem
+            if (wi == null)
+            {
+                wi = new WorkflowItem(context, row);
+            }
+            
+            wsItems.add(wi);
+        }
+        
+        WorkflowItem[] wsArray = new WorkflowItem[wsItems.size()];
+        wsArray = (WorkflowItem[]) wsItems.toArray(wsArray);
+
+        return wsArray;
+    }
+
+
+    /**
      * Get the internal ID of this workflow item
      *
      * @return the internal identifier
@@ -330,6 +372,9 @@ public class WorkflowItem implements InProgressSubmission
             HistoryManager.REMOVE,
             ourContext.getCurrentUser(),
             ourContext.getExtraLogInfo());
+
+        // delete any pending tasks
+        WorkflowManager.deleteTasks(ourContext, this);
 
         // FIXME - auth?
         DatabaseManager.delete(ourContext, wfRow);
