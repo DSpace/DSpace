@@ -91,14 +91,6 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
-/*
-issues
-
-javadocs - even though it's not an API
-allow re-importing
-list of collections to choose from would be nice too
-
-*/
 
 
 /**
@@ -122,7 +114,7 @@ public class ItemImport
         options.addOption( "r", "replace",     false, "replace items in mapfile");
         options.addOption( "R", "remove",      false, "remove items in mapfile");
         options.addOption( "s", "source",      true,  "source of items (directory)");
-        options.addOption( "c", "collection",  true,  "destination collection databse ID");
+        options.addOption( "c", "collection",  true,  "destination collection(s) databse ID");
         options.addOption( "m", "mapfile",     true,  "mapfile items in mapfile");
         options.addOption( "e", "eperson",     true,  "email of eperson doing importing");
         options.addOption( "w", "workflow",    false, "send submission through collection's workflow");
@@ -143,6 +135,7 @@ public class ItemImport
             System.out.println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
             System.out.println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
             System.out.println("removing items:  ItemImport -R -e eperson -m mapfile");
+            System.out.println("If multiple collections are specified, the first collection will be the one that owns the item.");
 
             System.exit(0);
         }
@@ -245,32 +238,51 @@ public class ItemImport
         c.setCurrentUser( myEPerson );
 
         // find collections
-        Collection mycollection = null;
+        Collection [] mycollections = null;
 
-        // dont' need to validate collections set if command is "remove"
+        // don't need to validate collections set if command is "remove"
         if( !command.equals("remove") )
         {
-            if( collections[0].indexOf('/') != -1 )
-            {
-                // has a / must be a handle
-                mycollection = (Collection)HandleManager.resolveToObject( c, collections[0] );
+            System.out.println("Destination collections:");
 
-                // ensure it's a collection
-                if( (mycollection == null) || (mycollection.getType() != Constants.COLLECTION) )
+            mycollections =  new Collection[collections.length];
+
+            
+            // validate each collection arg to see if it's a real collection
+            for(int i=0; i<collections.length; i++)
+            {
+                // is the ID a handle?
+                if( collections[i].indexOf('/') != -1 )
                 {
-                    mycollection = null;
-                } 
-            } 
-            else if( collections != null )
-            {
-                mycollection = Collection.find( c, Integer.parseInt( collections[0] ) );
+                    // string has a / so it  must be a handle - try and resolve it
+                    mycollections[i] = (Collection)HandleManager.resolveToObject( c, collections[i] );
+
+                    // resolved, now make sure it's a collection
+                    if( (mycollections[i] == null) || (mycollections[i].getType() != Constants.COLLECTION) )
+                    {
+                        mycollections[i] = null;
+                    }
+                 
+                }
+                // not a handle, try and treat it as an integer collection database ID 
+                else if( collections[i] != null )
+                {
+                    mycollections[i] = Collection.find( c, Integer.parseInt( collections[i] ) );
+                }
+
+                // was the collection valid?
+                if( mycollections[i] == null )
+                {
+                    throw new IllegalArgumentException("Cannot resolve " + collections[i] + " to collection");
+                }
+                
+                // print progress info
+                String owningPrefix = "";
+                
+                if( i == 0 ) owningPrefix = "Owning ";
+                System.out.println( owningPrefix + " Collection: " + mycollections[i].getMetadata("name"));
             }
 
-            if( mycollection == null )
-            {
-                System.out.println( "Error, collection cannot be found: " + collections[0] );
-                System.exit(1);
-            }
         } // end of validating collections
         
         try
@@ -279,11 +291,11 @@ public class ItemImport
 
             if( command.equals( "add" ) )
             {
-                myloader.addItems( c, mycollection, sourcedir, mapfile );
+                myloader.addItems( c, mycollections, sourcedir, mapfile );
             }
             else if( command.equals( "replace" ) )
             {
-                myloader.replaceItems( c, mycollection, sourcedir, mapfile );
+                myloader.replaceItems( c, mycollections, sourcedir, mapfile );
             }
             else if( command.equals( "remove" ) )
             {
@@ -303,15 +315,15 @@ public class ItemImport
     }
 
     
-    private void addItems( Context c, Collection mycollection, String sourceDir, String mapFile )
+    private void addItems( Context c, Collection [] mycollections, String sourceDir, String mapFile )
         throws Exception
     {
         System.out.println( "Adding items from directory: " + sourceDir );
         System.out.println( "Generating mapfile: "          + mapFile   );
         
         // create the mapfile
-        File outFile = new File( mapFile );
-        PrintWriter mapOut = new PrintWriter( new FileWriter( outFile ) );
+        File        outFile = new File( mapFile );
+        PrintWriter mapOut  = new PrintWriter( new FileWriter( outFile ) );
        
         if( mapOut == null )
         {
@@ -331,7 +343,7 @@ public class ItemImport
 
         for( int i = 0; i < dircontents.length; i++ )
         {
-            addItem( c, mycollection, sourceDir, dircontents[ i ], mapOut );
+            addItem( c, mycollections, sourceDir, dircontents[ i ], mapOut );
             System.out.println( i + " " + dircontents[ i ] );
         }
         
@@ -339,7 +351,7 @@ public class ItemImport
     }
 
 
-    private void replaceItems( Context c, Collection mycollection, String sourceDir, String mapFile )
+    private void replaceItems( Context c, Collection [] mycollections, String sourceDir, String mapFile )
         throws Exception
     {
         // verify the source directory
@@ -379,7 +391,7 @@ public class ItemImport
                 oldItem = Item.find( c, Integer.parseInt(oldHandle) );
             } 
 
-            newItem = addItem(c, mycollection, sourceDir, newItemName, null);
+            newItem = addItem(c, mycollections, sourceDir, newItemName, null);
             // schedule item for demolition
             itemsToDelete.add( oldItem );
         }
@@ -436,7 +448,7 @@ public class ItemImport
      *   handle - non-null means we have a pre-defined handle already
      *   mapOut - mapfile we're writing
      */   
-    private Item addItem( Context c, Collection mycollection, String path, String itemname, PrintWriter mapOut )
+    private Item addItem( Context c, Collection [] mycollections, String path, String itemname, PrintWriter mapOut )
         throws Exception
     {
         Item myitem = null;
@@ -444,7 +456,7 @@ public class ItemImport
         System.out.println("Adding item from directory " + itemname );
 
         // create workspace item
-        WorkspaceItem wi = WorkspaceItem.create(c, mycollection, false);
+        WorkspaceItem wi = WorkspaceItem.create(c, mycollections[0], false);
 
         myitem = wi.getItem();
 
@@ -479,6 +491,15 @@ public class ItemImport
             myhandle = HandleManager.findHandle(c, myitem);
                 
             if( mapOut != null ) mapOut.println( itemname + " " + myhandle );       
+        }
+
+        // now add to multiple collections if requested
+        if( mycollections.length > 1 )
+        {
+            for(int i = 1; i < mycollections.length; i++ )
+            {
+                mycollections[i].addItem(myitem);
+            }
         }
 
         return myitem;
