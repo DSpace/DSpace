@@ -89,7 +89,7 @@ public class Group
             "eperson",
             "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
                 "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
-                "epersongroup2eperson.epersongroup_id=" +
+                "epersongroup2eperson.eperson_group_id=" +
                 myRow.getIntColumn("eperson_group_id") + ";");
 
         while (tri.hasNext())
@@ -123,7 +123,7 @@ public class Group
     */
     public int getID()
     {
-        return myRow.getIntColumn("epersongroup_id");
+        return myRow.getIntColumn("eperson_group_id");
     }
 
 
@@ -187,7 +187,7 @@ public class Group
                 i.remove();
                 epeoplechanged = true;
             }
-        }        
+        }
     }
 
 
@@ -204,13 +204,13 @@ public class Group
         while(i.hasNext())
         {
             EPerson e2 = (EPerson)i.next();
-            
+
             if(e2.getID() == e.getID())
                 return true;
         }
 
         // if we made it through the loop, must be false
-        return false; 
+        return false;
     }
 
 
@@ -231,7 +231,7 @@ public class Group
             "eperson",
             "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
                 "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
-                "epersongroup2eperson.epersongroup_id=" +
+                "epersongroup2eperson.eperson_group_id=" +
                 groupid +
                 " AND eperson.eperson_id=" +
                 userid );
@@ -287,10 +287,10 @@ public class Group
             return new Group( context, row );
         }
     }
-    
+
 
     /**
-     * Delete a group 
+     * Delete a group
      *
      */
     public void delete()
@@ -317,7 +317,7 @@ public class Group
         myArray = (EPerson[]) epeople.toArray(myArray);
 
         return myArray;
-    }    
+    }
 
 
     /**
@@ -336,7 +336,7 @@ public class Group
         {
             // Remove any existing mappings
             DatabaseManager.updateQuery(myContext,
-                "delete from epersongroup2eperson where epersongroup_id=" + getID());
+                "delete from epersongroup2eperson where eperson_group_id=" + getID());
 
             // Add new mappings
             Iterator i = epeople.iterator();
@@ -348,7 +348,7 @@ public class Group
                 TableRow mappingRow = DatabaseManager.create(myContext,
                     "epersongroup2eperson");
                 mappingRow.setColumn("eperson_id", e.getID());
-                mappingRow.setColumn("epersongroup_id", getID());
+                mappingRow.setColumn("eperson_group_id", getID());
                 DatabaseManager.update(myContext, mappingRow);
             }
 
