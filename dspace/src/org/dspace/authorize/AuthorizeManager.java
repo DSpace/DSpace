@@ -90,6 +90,22 @@ public class AuthorizeManager
     public static void authorizeAction(Context c, DSpaceObject o, int action)
         throws AuthorizeException, SQLException
     {
+        if( o == null )
+        {
+            // action can be -1 due to a null entry
+            String actionText;
+
+            if( action == -1 ) { actionText = "null"; }
+            else { actionText = Constants.actionText[action]; }
+
+            EPerson e = c.getCurrentUser();
+            int userid;
+            
+            if( e == null ) { userid = 0;         }
+            else            { userid = e.getID(); }
+
+            throw new AuthorizeException( "Authorization attempted on null DSpace object " + actionText + " by user " + userid);
+        }
         if( !authorize(c, o, action, c.getCurrentUser()) )
         {
             // denied, assemble and throw exception
@@ -101,8 +117,8 @@ public class AuthorizeManager
             if( e == null ) { userid = 0;         }
             else            { userid = e.getID(); }
             
-            //AuthorizeException j = new AuthorizeException("Denied");
-            //j.printStackTrace();
+//            AuthorizeException j = new AuthorizeException("Denied");
+//            j.printStackTrace();
 
             // action can be -1 due to a null entry
             String actionText;
@@ -135,6 +151,8 @@ public class AuthorizeManager
     {
         boolean isAuthorized = true;
 
+        if( o == null ) return false;
+        
         try
         {
             authorizeAction(c,o,a);
@@ -161,6 +179,9 @@ public class AuthorizeManager
         throws SQLException
     {
         int userid;
+
+        // return FALSE if there is no DSpaceObject
+        if( o == null ) return false;
 
         // is authorization disabled for this context?
         if( c.ignoreAuthorization() ) return true;
