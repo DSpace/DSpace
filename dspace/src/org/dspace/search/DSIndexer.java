@@ -105,21 +105,28 @@ public class DSIndexer
     public static void unIndexContent(Context c, DSpaceObject dso)
         throws SQLException, IOException
     {
+        String h = HandleManager.findHandle(c, dso);
+
+        unIndexContent(c, h);
+    }
+
+    public static void unIndexContent(Context c, String myhandle)
+        throws SQLException, IOException
+    {
         String index_directory = ConfigurationManager.getProperty("search.dir");
         IndexReader ir = IndexReader.open(index_directory);
 
-        String h = HandleManager.findHandle(c, dso);
-
-        if( h != null )
+        if( myhandle != null )
         {
             // we have a handle (our unique ID, so remove)
-            Term t = new Term("handle", h);
+            Term t = new Term("handle", myhandle);
             ir.delete(t);
             ir.close();
         }
         else
         {
             // FIXME: no handle, fail quietly - should log failure
+            System.out.println("Error in unIndexContent: Object had no handle!");            
         }
     }
 
@@ -161,11 +168,20 @@ public class DSIndexer
     public static void main(String[] args) throws Exception
     {
         Context c = new Context();
-        c.setIgnoreAuthorization(true);
 
-        createIndex(c);
+        // for testing, pass in a handle of something to remove...
+        if( (args.length == 2) && (args[0].equals("remove")) )
+        {
+            unIndexContent(c, args[1]);
+        }
+        else
+        {  
+            c.setIgnoreAuthorization(true);
 
-        System.out.println("Done with indexing");
+            createIndex(c);
+
+            System.out.println("Done with indexing");
+        }
     }
 
 
@@ -290,6 +306,9 @@ public class DSIndexer
         // build a hash for the metadata
         HashMap textvalues = new HashMap();
 
+        // get the handle
+        String myhandle = HandleManager.findHandle(c, target);
+
         // and populate it
         String name        = target.getMetadata("name");
 //        String description = target.getMetadata("short_description");
@@ -298,9 +317,8 @@ public class DSIndexer
         textvalues.put("name",        name       );
 //        textvalues.put("description", description);
 //        textvalues.put("intro_text",  intro_text );
+        textvalues.put("handletext", myhandle     );
 
-        // get the handle
-        String myhandle = HandleManager.findHandle(c, target);
 
         writeIndexRecord(writer, Constants.COMMUNITY, target.getID(), myhandle, textvalues);
     }
@@ -314,6 +332,9 @@ public class DSIndexer
     {
         String location_text = buildCollectionLocationString(c, target);
 
+        // get the handle
+        String myhandle = HandleManager.findHandle(c, target);
+
         // build a hash for the metadata
         HashMap textvalues = new HashMap();
 
@@ -326,9 +347,7 @@ public class DSIndexer
 //        textvalues.put("description",description  );
 //        textvalues.put("intro_text", intro_text   );
         textvalues.put("location",   location_text);
-
-        // get the handle
-        String myhandle = HandleManager.findHandle(c, target);
+        textvalues.put("handletext", myhandle     );
 
         writeIndexRecord(writer, Constants.COLLECTION, target.getID(), myhandle, textvalues);
     }
@@ -377,6 +396,9 @@ public class DSIndexer
             abstract_text= new String(abstract_text+ abstracts[j].value + " ");
         }
 
+        // lastly, get the handle
+        String itemhandle = HandleManager.findHandle(c, myitem);
+
         // build a hash
         HashMap textvalues = new HashMap();
 
@@ -384,12 +406,11 @@ public class DSIndexer
         textvalues.put("title",     title_text   );
         textvalues.put("keyword",   keyword_text );
         textvalues.put("location",  location_text);
-
+        textvalues.put("handletext",itemhandle   );
+        
 //      delayed until we can assign relative weights
 //        textvalues.put("abstract",  abstract_text);
 
-        // lastly, get the handle
-        String itemhandle = HandleManager.findHandle(c, myitem);
 
         // write out the metatdata (for scalability, using hash instead of individual strings)
         writeIndexRecord(writer, Constants.ITEM, myitem.getID(), itemhandle, textvalues);
@@ -411,7 +432,10 @@ public class DSIndexer
         // do id, type, handle first
         doc.add(Field.UnIndexed("id",       ti.toString() ));
         doc.add(Field.UnIndexed("type",     ty.toString() ));
-        doc.add(Field.UnIndexed("handle",   handle        ));
+
+        // want to be able to search for handle, so use keyword
+        // (not tokenized, but it is indexed)    
+        doc.add(Field.Keyword  ("handle",   handle        ));
 
         // now iterate through the hash, building full text string
         // and index all values
