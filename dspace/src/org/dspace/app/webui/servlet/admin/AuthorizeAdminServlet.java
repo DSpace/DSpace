@@ -318,8 +318,12 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                     
                     // remove all bitstream policies, then add READs                    
                     Bitstream bs = collection.getLogo();
-                    AuthorizeManager.removeAllPolicies(c, bs);
-                    AuthorizeManager.addPolicies(c, rps, bs);
+                    
+                    if( bs != null )
+                    {
+                        AuthorizeManager.removeAllPolicies(c, bs);
+                        AuthorizeManager.addPolicies(c, rps, bs);
+                    }
                 }
                 
                 // set up page attributes
@@ -348,8 +352,12 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                     
                     // remove all bitstream policies, then add READs                    
                     Bitstream bs = community.getLogo();
-                    AuthorizeManager.removeAllPolicies(c, bs);
-                    AuthorizeManager.addPolicies(c, rps, bs);
+
+                    if( bs != null )
+                    {
+                        AuthorizeManager.removeAllPolicies(c, bs);
+                        AuthorizeManager.addPolicies(c, rps, bs);
+                    }
                 }
 
                 // set up page attributes
