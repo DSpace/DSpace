@@ -471,6 +471,7 @@ public class RegisterServlet extends DSpaceServlet
                 "usedtoken_forgotpw",
                 "email=" + eperson.getEmail()));
 
+            eperson.update();
             AccountManager.deleteToken(context, key);
 			
             JSPManager.showJSP(request,
