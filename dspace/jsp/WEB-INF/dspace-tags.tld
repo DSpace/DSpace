@@ -223,6 +223,30 @@
   </tag>
 
   <tag>
+    <name>popup</name>
+    <tagclass>org.dspace.app.webui.jsptag.PopupTag</tagclass>
+    <info>
+      Tag for producing a popup window link.  Takes advantage of Javascript
+      to produce a small window that is brought to the front every time
+      a popup link is pressed.  If Javascript is not available, a simple
+      HTML link is used as a fallback.  The contents of the tag are used as
+      the text of the link.
+      
+      Additionally, this will link to the "local" version of the URL, if a
+      locally modified version exists.
+      
+      FIXME: Currently supports a single popup window at a hardcoded size;
+      extra attributes could be added at a later date (e.g. name, width, height)
+    </info>
+    <attribute>
+      <name>page</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+    
+
+  <tag>
     <name>sfxlink</name>
     <tagclass>org.dspace.app.webui.jsptag.SFXLinkTag</tagclass>
     <info>

@@ -85,7 +85,7 @@
 %>
 
     <P>Please enter or amend the following information.  The fields marked with a * are
-    required. <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#editprofile">(More Help...)</A></P>
+    required. <dspace:popup page="/help/index.html#editprofile">(More Help...)</dspace:popup></P>
     
     <form action="<%= request.getContextPath() %>/profile" method=POST>
 

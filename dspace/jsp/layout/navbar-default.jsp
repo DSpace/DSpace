@@ -42,6 +42,8 @@
   - Default navigation bar
   --%>
 
+<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
@@ -214,7 +216,7 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.equals( "/help" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <a target="dspace.help" href="<%= request.getContextPath() %>/help">Help</a>
+      <dspace:popup page="/help/index.html">Help</dspace:popup>
     </td>
   </tr>
 

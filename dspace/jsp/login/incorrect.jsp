@@ -51,7 +51,7 @@
                 <H1>Log In to DSpace</H1>
             </td>
             <td align="right" class="standard">
-                 <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#login">Help...</A>
+                <dspace:popup page="/help/index.html#login">Help...</dspace:popup>
             </td>
         </tr>
     </table>

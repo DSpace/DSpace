@@ -68,7 +68,8 @@ title="Describe Your Item">
         <H1>Submit: Describe Your Item</H1>
     
         <P>Please check the boxes next to the statements that apply to your
-        submission.  <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#describe1">(More Help...)</A></P>
+        submission.
+        <dspace:popup page="/help/index.html#describe1">(More Help...)</dspace:popup></P>
 
         <center>
             <table class="miscTable">

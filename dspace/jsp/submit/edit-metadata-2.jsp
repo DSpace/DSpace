@@ -74,7 +74,8 @@ title="Describe Your Item">
 
         <H1>Submit: Describe Your Item</H1>
     
-        <P>Please fill further information about your submission below. <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#describe3">(More Help...)</A></P>
+        <P>Please fill further information about your submission below.
+        <dspace:popup page="/help/index.html#describe3">(More Help...)</dspace:popup></P>
 
 <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
 <%--       browsers to center the table. --%>

@@ -72,7 +72,7 @@ title="Select Collection to Submit to">
             <table>
                 <tr>
                     <td colspan=2 class="submitFormHelp">
-                        Have you read the <a href="<%= request.getContextPath() %>/help/submit_guide.html" target="dspace.help">Inessential Guide to Submitting to DSpace</a>?
+                        Have you read the <dspace:popup page="/help/submit_guide.html">Inessential Guide to Submitting to DSpace</dspace:popup>?
                     </td>
                 </tr>
                 <tr>
@@ -81,7 +81,7 @@ title="Select Collection to Submit to">
                 <tr>
                     <td colspan=2 class="submitFormHelp">
                         Select the collection you wish to submit an item to from the list
-                        below, then click "Next".  <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#choosecollection">More Help...</A>
+                        below, then click "Next".  <dspace:popup page="/help/index.html#choosecollection">More Help...</dspace:popup>
                     </td>
                 </tr>
                 <tr>

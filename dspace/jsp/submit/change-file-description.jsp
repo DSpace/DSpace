@@ -69,7 +69,8 @@ title="Change File Description">
 
         <H1>Submit: Change File Description</H1>
         
-        <P>Here are the details of the file.  <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#filedescription">(More Help...)</A></P>
+        <P>Here are the details of the file.  
+        <dspace:popup page="/help/index.html#filedescription">(More Help...)</dspace:popup></P>
 
         <table class="miscTable" align=center>
             <tr>

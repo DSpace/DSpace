@@ -71,19 +71,20 @@ title="Upload a File">
         <%= (si.submission.hasMultipleFiles() ? "one of the files" : "the file" ) %> on your
         local hard drive corresponding to your item.  If you click "Browse...", a
         new window will appear in which you can locate and select the file on your
-        local hard drive. <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#upload">(More Help...)</A></P>
+        local hard drive. <dspace:popup page="/help/index.html#upload">(More Help...)</dspace:popup></P>
         
         <P class="submitFormHelp"><strong>Netscape users please note:</strong> By
         default, the window brought up by clicking "Browse..." will only display
         files of type HTML.  If the file you are uploading isn't an HTML file,
         you will need to select the option to display files of other types.
-        <a TARGET="dspace.help" href="<%= request.getContextPath() %>/help/index.html#netscapeupload">Instructions for Netscape users</A> are available.</P>
+        <dspace:popup page="/help/index.html#netscapeupload">Instructions for Netscape users</dspace:popup> are available.</P>
         
 <%-- FIXME: Collection-specific stuff should go here? --%>
 
         <P class="submitFormHelp">Please also note that the DSpace system is
         able to preserve the content of certain types of files better than other
-        types.  <A TARGET="dspace.help" href="<%= request.getContextPath() %>/help/submit_guide.html#formats">Information about file types</A> and levels of
+        types.
+        <dspace:popup page="/help/submit_guide.html#formats">Information about file types</dspace:popup> and levels of
         support for each are available.</P>
     
         <table border=0 align=center>

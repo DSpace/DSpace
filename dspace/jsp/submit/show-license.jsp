@@ -75,7 +75,7 @@ title="DSpace Distribution License">
         Please take a moment to read the terms of this license, and click on one of the
         buttons at the bottom of the page.  By clicking on the "Grant License"
         button, you indicate that you grant the following terms of the license.
-        <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#license">(More Help...)</A></P>
+        <dspace:popup page="/help/index.html#license">(More Help...)</dspace:popup></P>
 
         <P><strong>Not granting the license will not delete your submission.</strong>
         Your item will remain in your "My DSpace" page.  You can then either remove

@@ -111,7 +111,7 @@ title="Select File Format">
         <P>Select the format of the file from the list below, for example "Adobe
         PDF" or "Microsoft Word", <strong>OR</strong> if the format is not in the list, please describe
         the format file in the input box below the list.
-        <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#formats">(More Help...)</A></P>
+        <dspace:popup page="/help/index.html#formats">(More Help...)</dspace:popup></P>
     
         <center>
             <select name=format size=8>

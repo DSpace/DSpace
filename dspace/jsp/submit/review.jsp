@@ -91,7 +91,8 @@ title="Verify Submission">
         <P>Please spend a few minutes to examine what you've just submitted below.
         If anything is wrong, please go back and correct it by using the buttons
         next to the error, or by clicking on the progress bar at the top of the
-        page. <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#verify">(More Help...)</A></P>
+        page.
+        <dspace:popup page="/help/index.html#verify">(More Help...)</dspace:popup></P>
 
         <P><strong>If everything is OK,</strong> please click the "Next" button at the bottom of the page.</P>
 

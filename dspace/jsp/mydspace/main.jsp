@@ -89,7 +89,7 @@
                 </H1>
             </td>
             <td align=right class=standard>
-                <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#mydspace">(More Help...)</A>
+                <dspace:popup page="/help/index.html#mydspace">Help...</dspace:popup>
             </td>
         <tr>
     </table>

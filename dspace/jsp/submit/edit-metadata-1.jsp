@@ -85,7 +85,8 @@ title="Describe Your Item">
 
         <P>Please fill in the requested information about your submission below.  In
         most browsers, you can use the tab key to move the cursor to the next input
-        box or button, to save you having to use the mouse each time. <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#describe2">(More Help...)</A></P>
+        box or button, to save you having to use the mouse each time.
+        <dspace:popup page="/help/index.html#describe2">(More Help...)</dspace:popup></P>
     
         <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
         <%--       browsers to center the table. --%>

@@ -87,7 +87,7 @@ title="Uploaded Files">
 <%
     }
 %>
-        <P>The table below shows the files you have uploaded for this item. <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#uploadedfile">(More Help...)</A></P>
+        <P>The table below shows the files you have uploaded for this item. <dspace:popup page="/help/index.html#uploadedfile">(More Help...)</dspace:popup></P>
         
         <table class="miscTable" align=center>
             <tr>
@@ -147,7 +147,7 @@ title="Uploaded Files">
                     <input type=submit name="submit_describe_<%= bitstreams[i].getID() %>" value="Change">
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= description %> <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/formats.html#<%= supportLevel %>">(<%= supportLevel %>)</A>
+                    <%= description %> <dspace:popup page="/help/formats.html#<%= supportLevel %>">(<%= supportLevel %>)</dspace:popup>
                     <input type=submit name="submit_format_<%= bitstreams[i].getID() %>" value="Change">
                 </td>
 <%
@@ -187,7 +187,7 @@ title="Uploaded Files">
 <%-- Show information about how to verify correct upload, but not in workflow
      mode! --%>
 <%
-    if (SubmitServlet.isWorkflow(si))
+    if (!SubmitServlet.isWorkflow(si))
     {
 %>
         <P class="uploadHelp">You can verify that the file(s) have been uploaded correctly by:</P>
@@ -199,15 +199,15 @@ title="Uploaded Files">
         {
 %>
             <LI class="uploadHelp">Comparing checksums displayed above with checksums worked out on
-            your local computer.  They should be exactly the same. <A target="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#checksum">Click
-            here to find out how to do this.</A></LI>
+            your local computer.  They should be exactly the same.
+            <dspace:popup page="/help/index.html#checksum">Click here to find out how to do this.</dspace:popup></LI>
 <%
         }
         else
         {
 %>
-            <LI class="uploadHelp">The system can calculate a checksum you can verify.  <A target="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#checksum">Click
-            here for more information.</A> <input type=submit name=submit_show_checksums value="Show checksums"></LI>
+            <LI class="uploadHelp">The system can calculate a checksum you can verify.
+            <dspace:popup page="/help/index.html#checksum">Click here for more information.</dspace:popup> <input type=submit name=submit_show_checksums value="Show checksums"></LI>
 <%
         }
 %>

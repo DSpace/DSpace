@@ -98,7 +98,8 @@ title="Uploaded File">
     }
 %>
         <P>Here are the details of the file you have uploaded.  Please check the
-        details before going to the next step.  <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#uploadedfile">(More Help...)</A></P>
+        details before going to the next step.
+        <dspace:popup page="/help/index.html#uploadedfile">(More Help...)</dspace:popup></P>
 
         <table class="miscTable" align=center>
             <tr>
@@ -119,31 +120,30 @@ title="Uploaded File">
                 <td class="evenRowEvenCol"><%= bitstream.getSize() %> bytes</td>
                 <td class="evenRowOddCol">
 <%
-        String description = bitstream.getFormatDescription();
-        String supportLevel = "supported";
+    String description = bitstream.getFormatDescription();
+    String supportLevel = "supported";
 
-        if (format.getSupportLevel() == 1)
-        {
-            supportLevel = "known";
-        }
+    if (format.getSupportLevel() == 1)
+    {
+        supportLevel = "known";
+    }
 
-        if (format.getSupportLevel() == 0)
-        {
-            supportLevel = "unsupported";
-        }
+    if (format.getSupportLevel() == 0)
+    {
+        supportLevel = "unsupported";
+    }
 %>
-                    <%= description %> <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/formats.html#<%= supportLevel %>">(<%= supportLevel %>)</A>
+                    <%= description %> <dspace:popup page="/help/formats.html#<%= supportLevel %>">(<%= supportLevel %>)</dspace:popup>
                 </td>
-</td>
 <%
-        if (showChecksums)
-        {
+    if (showChecksums)
+    {
 %>
                 <td class="evenRowEvenCol">
                     <code><%= bitstream.getChecksum() %> (<%= bitstream.getChecksumAlgorithm() %>)</code>
                 </td>
 <%
-        }
+    }
 %>
             </tr>
         </table>
@@ -171,15 +171,15 @@ title="Uploaded File">
     {
 %>
             <LI class="uploadHelp">Comparing the checksum displayed above with a checksum worked out on
-            your local computer.  They should be exactly the same. <A target="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#checksum">Click
-            here to find out how to do this.</A></LI>
+            your local computer.  They should be exactly the same.
+            <dspace:popup page="/help/index.html#checksum">Click here to find out how to do this.</dspace:popup></LI>
 <%
     }
     else
     {
 %>
-            <LI class="uploadHelp">The system can calculate a checksum you can verify.  <A target="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#checksum">Click
-            here for more information.</A> <input type=submit name=submit_show_checksums value="Show checksums"></LI>
+            <LI class="uploadHelp">The system can calculate a checksum you can verify.
+            <dspace:popup page="/help/index.html#checksum">Click here for more information.</dspace:popup> <input type=submit name=submit_show_checksums value="Show checksums"></LI>
 <%
     }
 %>
