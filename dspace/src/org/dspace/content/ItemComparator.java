@@ -44,7 +44,10 @@ package org.dspace.content;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.dspace.browse.Browse;
 import org.dspace.content.DCValue;
@@ -63,9 +66,13 @@ import org.dspace.content.Item;
  */
 public class ItemComparator implements Comparator
 {
+    /** Dublin Core element */
     private String element;
+    /** Dublin Core qualifier */
     private String qualifier;
+    /** Language */
     private String language;
+    /** Whether maximum or minimum value will be used */
     private boolean max;
 
     /**
@@ -93,7 +100,17 @@ public class ItemComparator implements Comparator
      * Compare two Items by checking their DCValues for element,
      * qualifier, and language.
      *
+     * <p>
      * Return >= 1 if the first is lexicographically greater than
+     * the second; <= -1 if the second is lexicographically greater
+     * than the first, and 0 otherwise.
+     * </p>
+     *
+     * @param first The first object to compare. Must be an object of
+     * type org.dspace.content.Item.
+     * @param second The second object to compare. Must be an object of
+     * type org.dspace.content.Item.
+     * @return >= 1 if the first is lexicographically greater than
      * the second; <= -1 if the second is lexicographically greater
      * than the first, and 0 otherwise.
      */
@@ -103,19 +120,9 @@ public class ItemComparator implements Comparator
             (! (second instanceof Item)))
             throw new IllegalArgumentException("Arguments must be Items");
 
-        Item firstItem = (Item) first;
-        Item secondItem = (Item) second;
-
         // Retrieve a chosen value from the array for comparison
-        String firstValue = getValue(firstItem.getDC(element, qualifier, language));
-        String secondValue = getValue(secondItem.getDC(element, qualifier, language));
-
-        // Normalize titles for comparison purposes
-        if ("title".equals(element))
-        {
-            firstValue = Browse.getNormalizedTitle(firstValue, language);
-            secondValue = Browse.getNormalizedTitle(secondValue, language);
-        }
+        String firstValue = getValue((Item) first);
+        String secondValue = getValue((Item) second);
 
         if ((firstValue == null) && (secondValue == null))
             return 0;
@@ -170,34 +177,54 @@ public class ItemComparator implements Comparator
     }
 
     /**
-     * Choose the canonical value from values for comparison.
+     * Choose the canonical value from an item for comparison.
      * If there are no values, null is returned.
      * If there is exactly one value, then it is returned.
      * Otherwise, either the maximum or minimum lexicographical
      * value is returned; the parameter to the constructor says which.
      *
-     * @param dcvalues The values to check
+     * @param item The item to check
      * @return The chosen value, or null
      */
-    private String getValue(DCValue[] dcvalues)
+    private String getValue(Item item)
     {
-        if ((dcvalues == null) || (dcvalues.length == 0))
+        // The overall array and each element are guaranteed non-null
+        DCValue[] dcvalues = item.getDC(element, qualifier, language);
+
+        if (dcvalues.length == 0)
             return null;
         if (dcvalues.length == 1)
-            return dcvalues[0] == null ? null : dcvalues[0].value;
+            return normalizeTitle(dcvalues[0]);
 
-        List values = new ArrayList();
+        // We want to sort using Strings, but also keep track of
+        // which DCValue the value came from.
+        Map values = new HashMap();
         for (int i = 0; i < dcvalues.length; i++ )
         {
             String value = dcvalues[i].value;
             if (value != null)
-                values.add(value);
+                values.put(value, new Integer(i));
         }
 
         if (values.size() == 0)
             return null;
 
-        return max ? (String) Collections.max(values) :
-            (String) Collections.min(values);
+        Set valueSet = values.keySet();
+        String chosen = max ? (String) Collections.max(valueSet) :
+            (String) Collections.min(valueSet);
+
+        int index = ((Integer) values.get(chosen)).intValue();
+        return normalizeTitle(dcvalues[index]);
+    }
+
+    /**
+     * Normalize the title of a DCValue.
+     */
+    private String normalizeTitle(DCValue value)
+    {
+        if (! "title".equals(element))
+            return value.value;
+
+        return Browse.getNormalizedTitle(value.value, value.language);
     }
 }
