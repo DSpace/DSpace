@@ -1,3 +1,7 @@
+(Mike Simpson)
+- Remove unneeded transaction isolation level code from browse system for PostgreSQL 8.0
+  compatibility
+
 - (Scott Yeadon)
   SF bug #1123304 ItemImport --replace created new Handles
 

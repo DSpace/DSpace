@@ -560,46 +560,37 @@ public class Browse
             return cachedInfo;
         }
 
-        int transactionIsolation = setTransactionIsolation(scope);
+	// Run the Browse queries
+	// If the focus is an Item, this returns the value
+	String itemValue = getItemValue(scope);
+	List results = new ArrayList();
+	results.addAll(getResultsBeforeFocus(scope, itemValue));
 
-        try
+	int beforeFocus = results.size();
+	results.addAll(getResultsAfterFocus(scope, itemValue, beforeFocus));
+
+	// Find out the total in the index, and the number of
+	// matches for the query
+	int total = countTotalInIndex(scope, results.size());
+	int matches = countMatches(scope, itemValue, total, results.size());
+
+	if (log.isDebugEnabled())
         {
-            // Run the Browse queries
-            // If the focus is an Item, this returns the value
-            String itemValue = getItemValue(scope);
-            List results = new ArrayList();
-            results.addAll(getResultsBeforeFocus(scope, itemValue));
+	    log.debug("Number of matches " + matches);
+	}
 
-            int beforeFocus = results.size();
-            results.addAll(getResultsAfterFocus(scope, itemValue, beforeFocus));
+	int position = getPosition(total, matches, beforeFocus);
 
-            // Find out the total in the index, and the number of
-            // matches for the query
-            int total = countTotalInIndex(scope, results.size());
-            int matches = countMatches(scope, itemValue, total, results.size());
+	sortResults(scope, results);
 
-            if (log.isDebugEnabled())
-            {
-                log.debug("Number of matches " + matches);
-            }
+        BrowseInfo info = new BrowseInfo(results, position, total,
+                beforeFocus);
 
-            int position = getPosition(total, matches, beforeFocus);
+	logInfo(info);
 
-            sortResults(scope, results);
+	BrowseCache.add(scope, info);
 
-            BrowseInfo info = new BrowseInfo(results, position, total,
-                    beforeFocus);
-
-            logInfo(info);
-
-            BrowseCache.add(scope, info);
-
-            return info;
-        }
-        finally
-        {
-            restoreTransactionIsolation(scope, transactionIsolation);
-        }
+	return info;
     }
 
     /**
@@ -1297,59 +1288,6 @@ public class Browse
         Connection connection = scope.getContext().getDBConnection();
 
         return connection.prepareStatement(sql);
-    }
-
-    /**
-     * Set the JDBC transaction isolation level. Multiple SQL statements can be
-     * made transactionally safe by setting the transaction level appropriately.
-     * Essentially, the database guarantees that the application's view of the
-     * database is isolated from changes by anyone else. In our case, we are
-     * only doing multiple queries, so there are no updating issues.
-     * 
-     * @param scope
-     *            The current Browse scope
-     * @return The transaction isolation level of the database
-     * @exception SQLException
-     *                If a database error occurs
-     */
-    private static int setTransactionIsolation(BrowseScope scope)
-            throws SQLException
-    {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            return 1;
-        }
-
-        // postgres
-        Connection connection = scope.getContext().getDBConnection();
-        int level = connection.getTransactionIsolation();
-        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-
-        return level;
-    }
-
-    /**
-     * Restore the Database's transaction isolation level.
-     * 
-     * @param scope
-     *            The current Browse scope
-     * @param level
-     *            The transaction isolation level to set
-     * @exception SQLException
-     *                If a database error occurs
-     */
-    private static void restoreTransactionIsolation(BrowseScope scope, int level)
-            throws SQLException
-    {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-        }
-        else
-        {
-            // postgres
-            Connection connection = scope.getContext().getDBConnection();
-            connection.setTransactionIsolation(level);
-        }
     }
 
     /**
