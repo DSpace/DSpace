@@ -107,8 +107,8 @@ is destroyed and SubmitServlet.insertItem() is called, which hooks
 the item up to the archive.
 
 Notification:
-  When an item enters a state that requires notification, (WFSTATE_REVIEWPOOL,
-  WFSTATE_ADMINPOOL, WFSTATE_EDITPOOL,) the workflow needs to notify
+  When an item enters a state that requires notification, (WFSTATE_STEP1POOL,
+  WFSTATE_STEP2POOL, WFSTATE_STEP3POOL,) the workflow needs to notify
   the appropriate groups that they have a pending task to claim.
 
 Revealing lists of approvers, editors, and reviewers.  A method could
@@ -127,12 +127,12 @@ public class WorkflowManager
 	// states to store in WorkflowItem for the GUI to report on
 	// fits our current set of workflow states (stored in WorkflowItem.state)
 	public static final int WFSTATE_SUBMIT		= 0; // hmm, probably don't need
-	public static final int WFSTATE_REVIEWPOOL	= 1; // waiting for a reviewer to claim it
-	public static final int WFSTATE_REVIEW		= 2; // task - reviewer has claimed it
-	public static final int WFSTATE_ADMINPOOL	= 3; // waiting for an admin to claim it
-	public static final int WFSTATE_ADMIN		= 4; // task - admin has claimed item
-	public static final int WFSTATE_EDITPOOL	= 5; // waiting for an editor to claim it
-	public static final int WFSTATE_EDIT		= 6; // task - editor has claimed the item
+	public static final int WFSTATE_STEP1POOL	= 1; // waiting for a reviewer to claim it
+	public static final int WFSTATE_STEP1		= 2; // task - reviewer has claimed it
+	public static final int WFSTATE_STEP2POOL	= 3; // waiting for an admin to claim it
+	public static final int WFSTATE_STEP2		= 4; // task - admin has claimed item
+	public static final int WFSTATE_STEP3POOL	= 5; // waiting for an editor to claim it
+	public static final int WFSTATE_STEP3		= 6; // task - editor has claimed the item
 	public static final int WFSTATE_ARCHIVE		= 7; // probably don't need this one either
 
 	/** startWorkflow() begins a workflow - in a single transaction
@@ -177,7 +177,7 @@ public class WorkflowManager
         wsi.delete();
 
         // now get the worflow started
-        doState(c, wfi, WFSTATE_REVIEWPOOL, null);
+        doState(c, wfi, WFSTATE_STEP1POOL, null);
 
         // Return the workflow item
         return wfi;
@@ -247,19 +247,19 @@ public class WorkflowManager
 
         switch (taskstate)
         {
-            case WFSTATE_REVIEWPOOL:
+            case WFSTATE_STEP1POOL:
                 // authorize DSpaceActions.SUBMIT_REVIEW
-                doState(c, wi, WFSTATE_REVIEW, e);
+                doState(c, wi, WFSTATE_STEP1, e);
                 break;
 
-            case WFSTATE_ADMINPOOL:
-                // authorize DSpaceActions.SUBMIT_ADMIN
-                doState(c, wi, WFSTATE_ADMIN, e);
+            case WFSTATE_STEP2POOL:
+                // authorize DSpaceActions.SUBMIT_STEP2
+                doState(c, wi, WFSTATE_STEP2, e);
                 break;
 
-            case WFSTATE_EDITPOOL:
-                // authorize DSpaceActions.SUBMIT_EDIT
-                doState(c, wi, WFSTATE_EDIT, e);
+            case WFSTATE_STEP3POOL:
+                // authorize DSpaceActions.SUBMIT_STEP3
+                doState(c, wi, WFSTATE_STEP3, e);
                 break;
 
             // if we got here, we weren't pooled... error?
@@ -284,22 +284,22 @@ public class WorkflowManager
 
         switch (taskstate)
         {
-            case WFSTATE_REVIEW:
+            case WFSTATE_STEP1:
                 // authorize DSpaceActions.SUBMIT_REVIEW
                 // Record provenance
                 recordApproval(c, wi, e);
-                doState(c, wi, WFSTATE_ADMINPOOL, e);
+                doState(c, wi, WFSTATE_STEP2POOL, e);
                 break;
 
-            case WFSTATE_ADMIN:
-                // authorize DSpaceActions.SUBMIT_ADMIN
+            case WFSTATE_STEP2:
+                // authorize DSpaceActions.SUBMIT_STEP2
                 // Record provenance
                 recordApproval(c, wi, e);
-                doState(c, wi, WFSTATE_EDITPOOL, e);
+                doState(c, wi, WFSTATE_STEP3POOL, e);
                 break;
 
-            case WFSTATE_EDIT:
-                // authorize DSpaceActions.SUBMIT_EDIT
+            case WFSTATE_STEP3:
+                // authorize DSpaceActions.SUBMIT_STEP3
                 // We don't record approval for editors, since they can't reject,
                 // and thus didn't actually make a decision
                 doState(c, wi, WFSTATE_ARCHIVE, e);
@@ -325,19 +325,19 @@ public class WorkflowManager
 
         switch( taskstate )
         {
-            case WFSTATE_REVIEW:
-                // authorize DSpaceActions.REVIEW
-                doState(c, wi, WFSTATE_REVIEWPOOL, e);
+            case WFSTATE_STEP1:
+                // authorize DSpaceActions.STEP1
+                doState(c, wi, WFSTATE_STEP1POOL, e);
                 break;
 
-            case WFSTATE_ADMIN:
+            case WFSTATE_STEP2:
                 // authorize DSpaceActions.APPROVE
-                doState(c, wi, WFSTATE_ADMINPOOL, e);
+                doState(c, wi, WFSTATE_STEP2POOL, e);
                 break;
 
-            case WFSTATE_EDIT:
-                // authorize DSpaceActions.EDIT
-                doState(c, wi, WFSTATE_EDITPOOL, e);
+            case WFSTATE_STEP3:
+                // authorize DSpaceActions.STEP3
+                doState(c, wi, WFSTATE_STEP3POOL, e);
                 break;
     
                 // error handling?  shouldn't get here
@@ -377,7 +377,7 @@ public class WorkflowManager
 
         switch (newstate)
         {
-        case WFSTATE_REVIEWPOOL:
+        case WFSTATE_STEP1POOL:
             // any reviewers?
             // if so, add them to the tasklist
             wi.setOwner( null );
@@ -398,11 +398,11 @@ public class WorkflowManager
             else
             {
                 // no reviewers, skip ahead
-                doState(c, wi, WFSTATE_ADMINPOOL, null);
+                doState(c, wi, WFSTATE_STEP2POOL, null);
             }
             break;
 
-        case WFSTATE_REVIEW:
+        case WFSTATE_STEP1:
             // remove reviewers from tasklist
             // assign owner
             deleteTasks(c, wi);
@@ -410,7 +410,7 @@ public class WorkflowManager
             //wi.update();
             break;
 
-        case WFSTATE_ADMINPOOL:
+        case WFSTATE_STEP2POOL:
             // clear owner
             // any approvers?
             // if so, add them to tasklist
@@ -433,11 +433,11 @@ public class WorkflowManager
             else
             {
                 // no reviewers, skip ahead
-                doState(c, wi, WFSTATE_EDITPOOL, null);
+                doState(c, wi, WFSTATE_STEP3POOL, null);
             }
             break;
 
-        case WFSTATE_ADMIN:
+        case WFSTATE_STEP2:
             // remove admins from tasklist
             // assign owner
             deleteTasks(c, wi);
@@ -445,7 +445,7 @@ public class WorkflowManager
             //wi.update();
             break;
 
-        case WFSTATE_EDITPOOL:
+        case WFSTATE_STEP3POOL:
             // any editors?
             // if so, add them to tasklist
             wi.setOwner( null );
@@ -470,7 +470,7 @@ public class WorkflowManager
             }
             break;
 
-        case WFSTATE_EDIT:
+        case WFSTATE_STEP3:
             // remove editors from tasklist
             // assign owner
             deleteTasks(c, wi);
@@ -728,15 +728,15 @@ public class WorkflowManager
 
             switch (wi.getState())
             {
-                case WFSTATE_REVIEWPOOL:
+                case WFSTATE_STEP1POOL:
                     message = "It requires reviewing.";
                     break;
 
-                case WFSTATE_ADMINPOOL:
+                case WFSTATE_STEP2POOL:
                     message = "The submission must be checked before inclusion in the archive.";
                     break;
 
-                case WFSTATE_EDITPOOL:
+                case WFSTATE_STEP3POOL:
                     message = "The metadata needs to be checked to ensure compliance with the " +
                                 "collection's standards, and edited if necessary.";
                     break;
