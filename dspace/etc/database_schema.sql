@@ -191,7 +191,8 @@ CREATE TABLE Item
   submitter_id    INTEGER REFERENCES EPerson(eperson_id),
   in_archive      BOOL,
   withdrawn       BOOL,
-  last_modified   TIMESTAMP
+  last_modified   TIMESTAMP,
+  owning_collection INTEGER
 );
 
 -------------------------------------------------------
@@ -200,7 +201,8 @@ CREATE TABLE Item
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  mets_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id)
+  mets_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id),
+  name               VARCHAR(16)  -- ORIGINAL | THUMBNAIL | TEXT 
 );
 
 -------------------------------------------------------
