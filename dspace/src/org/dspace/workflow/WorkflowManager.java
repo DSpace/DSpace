@@ -891,7 +891,12 @@ public class WorkflowManager
     }
 
 
-    private static String getItemTitle(WorkflowItem wi)
+    /**
+     * get the title of the item in this workflow
+     *
+     * @param workflowitem
+     */
+    public static String getItemTitle(WorkflowItem wi)
         throws SQLException
     {
         Item   myitem   = wi.getItem();
@@ -904,8 +909,12 @@ public class WorkflowManager
             return "Untitled";
     }
 
-
-    private static String getSubmitterName(WorkflowItem wi)
+    /**
+     * get the name of the eperson who started this workflow
+     *
+     * @param workflowitem
+     */
+    public static String getSubmitterName(WorkflowItem wi)
         throws SQLException
     {
         EPerson e = wi.getSubmitter();

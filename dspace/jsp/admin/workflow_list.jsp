@@ -50,6 +50,10 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.administer.DCType" %>
+<%@ page import="org.dspace.workflow.WorkflowManager" %>
+<%@ page import="org.dspace.workflow.WorkflowItem" %>
+<%@ page import="org.dspace.content.Collection" %>
+
 
 <%
     WorkflowItem[] workflows =
@@ -66,9 +70,9 @@
 
     <table class="miscTable" align="center">
         <tr>
-            <th class="oddRowOddCol"><strong>ID</strong></th>
+            <th class="oddRowOddCol"> <strong>ID</strong></th>
             <th class="oddRowEvenCol"><strong>Collection</strong></th>
-            <th class="oddRowOddCol"><strong>Submitter</strong></th>
+            <th class="oddRowOddCol"> <strong>Submitter</strong></th>
             <th class="oddRowEvenCol"><strong>Title</strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
@@ -80,7 +84,7 @@
 %>
         <form method=POST>
             <tr>
-                <td class="<%= row %>RowOddCol"><%= types[i].getID() %></td>
+                <td class="<%= row %>RowOddCol"><%= workflows[i].getID() %></td>
                 <td class="<%= row %>RowEvenCol">
                     <%= workflows[i].getCollection().getMetadata("name") %>
                 </td>
@@ -92,10 +96,7 @@
                 </td>
                 <td class="<%= row %>RowOddCol">
                     <input type="hidden" name="workflow_id" value="<%= workflows[i].getID() %>">
-                    <input type="submit" name="submit_update" value="Update">
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="submit" name="abort_workflow" value="Abort...">
+                    <input type="submit" name="submit_abort" value="Abort...">
                 </td>
             </tr>
         </form>

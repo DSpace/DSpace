@@ -294,6 +294,11 @@
     <servlet-class>org.dspace.app.webui.servlet.SubmitServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>workflow</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.WorkflowAbortServlet</servlet-class>
+  </servlet>
+
 
   <!-- Servlet Mappings -->
 
@@ -431,6 +436,12 @@
     <servlet-name>submit</servlet-name>
     <url-pattern>/submit</url-pattern>
   </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>workflow</servlet-name>
+    <url-pattern>/admin/workflow</url-pattern>
+  </servlet-mapping>
+
 
 
   <!-- Icon MIME type -->

@@ -63,8 +63,8 @@
     
     <UL>
         <LI>Collection:Any items and incomplete submissions in this collections that aren't contained in other collections</LI>
-        <LI>Submitter: <%= WorkflowManager.getSubmitter(workflow) %></LI>
-        <LI>Title: <%= WorkflowManager.getItemTitle(workflow %></LI>
+        <LI>Submitter: <%= WorkflowManager.getSubmitterName(workflow) %></LI>
+        <LI>Title: <%= WorkflowManager.getItemTitle(workflow) %></LI>
     </UL>
     
     <form method=POST>

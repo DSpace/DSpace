@@ -72,6 +72,9 @@ public class WorkflowAbortServlet extends DSpaceServlet
             // must have been cancel
             showWorkflows(c, request, response);
         }
+        
+        // now commit the changes
+        c.complete();
     }
     
     private void showWorkflows(Context c,
@@ -82,7 +85,7 @@ public class WorkflowAbortServlet extends DSpaceServlet
         WorkflowItem [] w = WorkflowItem.findAll(c);
         
         request.setAttribute("workflows", w);
-        JSPManager.showJSP(request, response, "/admin/WorkflowList.jsp" );
+        JSPManager.showJSP(request, response, "/admin/workflow_list.jsp" );
     }
 }
 
