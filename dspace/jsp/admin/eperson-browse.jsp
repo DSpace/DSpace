@@ -124,7 +124,7 @@
         EPerson e = epeople[i];
         String commandString = request.getContextPath() + "/admin/edit-epeople?submit_edit&eperson_id=" + e.getID();
 %>
-        <form method=POST>
+        <form method=POST action="<%= request.getContextPath() %>/admin/edit-epeople">
             <tr>
                 <td class="<%= row %>RowOddCol"><%= e.getID() %></td>
                 <td class="<%= row %>RowEvenCol">
