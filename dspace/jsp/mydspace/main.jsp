@@ -300,7 +300,6 @@
         <tr>
             <th class=oddRowOddCol>Title</th>
             <th class=oddRowEvenCol>Submitted to</th>
-            <th class=oddRowOddCol>Date Submitted</th>
         </tr>
 <%
         for (int i = 0; i < workflowItems.length; i++)
@@ -309,10 +308,6 @@
                 workflowItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                                                   : "Untitled" );
-            DCValue[] dateArray =
-                workflowItems[i].getItem().getDC("date", "accessioned", Item.ANY);
-            DCDate date = (dateArray.length > 0 ? new DCDate(dateArray[0].value)
-                                                : new DCDate());
 %>
         <form action="<%= request.getContextPath() %>/mydspace" method=post>
             <tr>
@@ -322,7 +317,6 @@
                 <td class="<%= row %>RowEvenCol">
                     <%= workflowItems[i].getCollection().getMetadata("name") %>
                 </td>
-                <td class="<%= row %>RowOddCol"><dspace:date date="<%= date %>" /></td>
             </tr>
         </form>
 <%
