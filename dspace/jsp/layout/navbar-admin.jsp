@@ -75,6 +75,9 @@
     
     labels.add("Authorization");
     links.add("/dspace-admin/authorize");
+    
+    labels.add("Edit News");
+    links.add("/dspace-admin/news-edit");
 
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);    
