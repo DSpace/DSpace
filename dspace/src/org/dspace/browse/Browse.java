@@ -328,22 +328,25 @@ public class Browse
      * Index all items in DSpace. This method may be resource-intensive.
      *
      * @param context - The database context
+     * @return - The number of items indexed.
      * @exception SQLException - If a database error occurs
      */
-    public static void indexAll(Context context)
+    public static int indexAll(Context context)
         throws SQLException
     {
         indexRemoveAll(context);
 
-        TableRowIterator iterator = DatabaseManager.query(context, null, "select item_id from Item");
+        int count = 0;
+        ItemIterator iterator = Item.findAll(context);
+
         while (iterator.hasNext())
         {
-            TableRow row = (TableRow) iterator.next();
-            Item item = Item.find(context, row.getIntColumn("item_id"));
-            itemAdded(context, item);
+            itemAdded(context, (Item) iterator.next());
+            count++;
         }
-    }
 
+        return count;
+    }
 
     /**
      * Remove all items in DSpace from the Browse index.
@@ -360,6 +363,14 @@ public class Browse
             String table= (String) iterator.next();
             DatabaseManager.updateQuery(context, "delete from " + table);
         }
+    }
+
+    ////////////////////////////////////////
+    // Other methods
+    ////////////////////////////////////////
+    public static String getNormalizedTitle(String title, String lang)
+    {
+        return NormalizedTitle.normalize(title, lang);
     }
 
     ////////////////////////////////////////
@@ -394,10 +405,8 @@ public class Browse
         ////////////////////
         // Sanity checks
         ////////////////////
-        // No null collections
         if ((scopeType == COLLECTION_SCOPE) && (obj == null))
             throw new IllegalArgumentException("Collection is null");
-        // No null communities
         if ((scopeType == COMMUNITY_SCOPE) && (obj == null))
             throw new IllegalArgumentException("Community is null");
 
@@ -410,7 +419,10 @@ public class Browse
         BrowseInfo cachedInfo = (BrowseInfo) BrowseCache.get(key);
 
         if (cachedInfo != null)
+        {
+            cachedInfo.setCached(true);
             return cachedInfo;
+        }
 
         ////////////////////
         // Convenience booleans
@@ -420,8 +432,7 @@ public class Browse
         boolean valueIsItem = (value instanceof Item);
         boolean valueIsInteger = (value instanceof Integer);
         // True if we want to search from the start
-        // This is true when:
-        //   the client passed a null value
+        // This is true when the client passed a null value
         boolean searchFromStart = (value == null);
         // True if we want ALL values
         boolean nolimit = (total == -1);
@@ -450,16 +461,6 @@ public class Browse
         // See http://www.postgresql.org/idocs/index.php?xact-serializable.html
         //
         // Performance hit unknown...
-
-        boolean autocommit = connection.getAutoCommit();
-
-        if (!autocommit)
-        {
-            if (log.isInfoEnabled())
-                log.info("Browse: Autocommit is false");
-        }
-        connection.setAutoCommit(false);
-
         int transactionIsolation = connection.getTransactionIsolation();
 
         connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
@@ -471,7 +472,9 @@ public class Browse
         ////////////////////
         // Run a subquery, if necessary
         String subqueryValue = needsSubquery ?
-            doSubquery(connection, obj, scopeType, browseType, value) : null;
+            doSubquery(connection, obj,
+                       scopeType, browseType,
+                       getItemId(value)) : null;
 
         if (needsSubquery && log.isInfoEnabled())
             log.info("Got subquery value: \"" + subqueryValue + "\"");
@@ -483,8 +486,8 @@ public class Browse
         if (log.isInfoEnabled())
             log.info("Created sql: \"" + sql + "\"");
 
-            // Loop through twice -- once to get items _before_ the value,
-            // and once for those after.
+        // Loop through twice -- once to get items _before_ the value,
+        // and once for those after.
         try
         {
             List theResults = new ArrayList();
@@ -509,7 +512,7 @@ public class Browse
                 if ((!before) && (total == 0))
                     continue;
 
-                    // Format the SQL
+                // Format the SQL
                 String SQL = formatSql(sql,
                         browseType,
                         before ? numberBefore : total,
@@ -522,7 +525,7 @@ public class Browse
                     log.info("Formatted " + (before ? "before" : "after") +
                         " sql: \"" + SQL + "\"");
 
-                    // Create a PreparedStatement
+                // Create a PreparedStatement
                 statement = connection.prepareStatement(SQL);
 
                 /////////////////////////
@@ -531,8 +534,7 @@ public class Browse
                 String bindValue = ((!searchFromStart) && needsSubquery) ?
                     subqueryValue : (String) value;
 
-                bindParameters(statement, bindValue, searchFromStart, needsSubquery,
-                    false);
+                bindParameters(statement, bindValue, searchFromStart, needsSubquery);
 
                 // Run a query, get results
                 String table = BrowseTables.getTable(scopeType, browseType);
@@ -586,29 +588,7 @@ public class Browse
 
             int resultSize = theResults.size();
 
-            //////////////////////////////
-            // Counting
-            //////////////////////////////
-            boolean countTotal = true;
-            int theTotal = 0;
-
-            // Got less authors than requested
-            // This means that we do not need to count them
-            if ((browseType == ITEMS_BY_AUTHOR_BROWSE) && (total > resultSize))
-            {
-                countTotal = false;
-                theTotal = resultSize;
-            }
-
-            if (countTotal)
-            {
-                statement = createTotalSql(obj, scopeType, browseType, connection, value);
-
-                theTotal = getIntValue(statement);
-
-                // Cleanup the statement
-                statement.close();
-            }
+            int theTotal = getTotalInIndex(obj, scopeType, browseType, connection, value, total, resultSize);
 
             // OK, we've counted everything.
             // Now figure out how many things match the specific query.
@@ -657,7 +637,7 @@ public class Browse
                 //////////
                 String svalue = valueIsString ? (String) value : subqueryValue;
 
-                bindParameters(statement, svalue, searchFromStart, needsSubquery, true);
+                bindParameters(statement, svalue, searchFromStart, needsSubquery);
 
                 //////////
                 // Run the query, extract results
@@ -679,37 +659,12 @@ public class Browse
                 statement.close();
             }
 
-            if (log.isInfoEnabled())
-            {
-                log.info("Number of Results: " + theResults.size() +
-                    " Overall position: " + overallPosition +
-                    " Total " + theTotal +
-                    " Offset " + offset);
-                int lastIndex = (overallPosition + resultSize);
-                boolean noresults = (theTotal == 0) || (resultSize == 0);
+            //  FIXME -- sorting is busted
+            BrowseInfo info = new BrowseInfo
+                (theResults, overallPosition,
+                 theTotal, offset);
 
-                log.info("Got results: " +
-                         (noresults ? 0 : overallPosition) +
-                         " to " +
-                         (noresults ? 0 : lastIndex) +
-                         " out of " + theTotal);
-            }
-
-            BrowseInfo info = null;
-            if (sort == null)
-            {
-                info = new BrowseInfo(theResults, overallPosition, theTotal, offset);
-            }
-            else
-            {
-                String element   = sort.booleanValue() ? "title" : "date";
-                String qualifier = sort.booleanValue() ? null    : "issued";
-
-                //  FIXME
-                info = new BrowseInfo
-                    (theResults, overallPosition,
-                     theTotal, offset);
-            }
+            logInfo(info);
 
             BrowseCache.add(key, info);
             return info;
@@ -729,8 +684,7 @@ public class Browse
                 // Need to do this because "closing" the connection simply
                 // returns it to the pool
                 connection.setTransactionIsolation(transactionIsolation);
-                connection.setAutoCommit(autocommit);
-                connection.close();
+                // connection.close();
             }
         }
     }
@@ -750,48 +704,13 @@ public class Browse
     )
         throws SQLException
     {
-        ////////////////////
-        // Table and column
-        ////////////////////
         String tablename = BrowseTables.getTable(scope, browseType);
         String column = BrowseTables.getValueColumn(browseType);
 
-        ////////////////////
-        // Convenience booleans
-        ////////////////////
-        // True if the value is....
-        boolean valueIsString = (value instanceof String);
-        boolean valueIsItem = (value instanceof Item);
-        boolean valueIsInteger = (value instanceof Integer);
-        // True if we want to search from the start
-        // boolean searchFromStart = (value == null) && (! valueIsInteger) && (! valueIsInteger);
-        boolean searchFromStart = (value == null);
-        // True if we want ALL values
-        boolean nolimit = (total == -1);
-        // True if we added a where clause
-        boolean addedWhereClause = false;
-        // True if we need a subquery
-        boolean needsSubquery = valueIsInteger || valueIsItem;
-
-        ////////////////////
-        // Ids
-        ////////////////////
-        int communityId = (obj instanceof Community) ? ((Community) obj).getID() : -1;
-        int collectionId = (obj instanceof Collection) ? ((Collection) obj).getID() : -1;
-        int item_id = -1;
-
-        if (valueIsInteger)
-            item_id = ((Integer) value).intValue();
-        else if (valueIsItem)
-            item_id = ((Item) value).getID();
-
-            // Target columns are either just authors or everything
-        String targetColumns = (browseType == AUTHORS_BROWSE) ? "distinct author" : "*";
-
-        StringBuffer sqlb = new StringBuffer()// Column(s) to select
+        StringBuffer sqlb = new StringBuffer()
             .append("select ")
             .append(isCount ? "count(" : "")
-            .append(targetColumns)
+            .append(getTargetColumns(browseType))
             .append(isCount ? ")" : "")
             .append(" from ")
             .append(tablename);
@@ -801,26 +720,19 @@ public class Browse
         // We use a separate query to make sure the subquery works correctly
         // when item values are the same. (this is transactionally
         // safe because we set the isolation level).
-        String subquery = null;
 
-        if (subqueryValue != null)
+        // If we're NOT searching from the start, add some clauses
+        boolean addedWhereClause = false;
+        if (value != null)
         {
-            subquery = new StringBuffer()
-                .append(" or ( ")
-                .append(column)
-                // Item id must be before or after the desired item
-                .append(" = ? and item_id {0}  ")
-                .append(item_id)
-                .append(")")
-                .toString();
-        }
+            boolean needsSubquery = (value instanceof Integer) ||
+                (value instanceof Item);
+            String subquery = (subqueryValue == null ? null :
+                               getSubqueryClause(column, getItemId(value)));
 
-        if (log.isDebugEnabled())
-            log.debug("Subquery is \"" + subquery + "\"");
+            if (log.isDebugEnabled())
+                log.debug("Subquery is \"" + subquery + "\"");
 
-            // If we're NOT searching from the start, add some clauses
-        if (!searchFromStart)
-        {
             sqlb
                 .append(" where ")
                 .append("(")
@@ -834,79 +746,100 @@ public class Browse
             addedWhereClause = true;
         }
 
-        // Optionally, add a scope clause
-        if (scope == COLLECTION_SCOPE)
-            sqlb.append(addedWhereClause ? " and " : " where ").append(" collection_id = ").append(collectionId);
-        else if (scope == COMMUNITY_SCOPE)
-            sqlb.append(addedWhereClause ? " and " : " where ").append(" community_id = ").append(communityId);
+        addScopeClause(sqlb, scope, obj,
+                       addedWhereClause ? " and " : " where ");
 
-            // No more clauses after this (except maybe Santa Claus).....
-
-            // For counting, skip the "order by" and "limit" clauses
+        // For counting, skip the "order by" and "limit" clauses
         if (isCount)
             return sqlb.toString();
 
-            // Add an order by clause -- a parameter
+        // Add an order by clause -- a parameter
         sqlb.append(" order by ").append(column).append("{2}")
             // If an item, make sure it's ordered by item_id as well
-        .append((valueIsString || (browseType == AUTHORS_BROWSE))
+        .append(((value instanceof String) || (browseType == AUTHORS_BROWSE))
             ? "" : ", item_id");
 
         // A limit on the total returned (Postgres extension)
         // This is a parameter
-        if (!nolimit)
+        if (total != -1)
             sqlb.append(" LIMIT {3} ");
 
         return sqlb.toString();
     }
 
     /**
-     * Create a PreparedStatement which counts the total objects in an index.
+     * Return the total number of values in an index.
+     * Although this may look a bit dizzying, the basic idea is
+     * straightforward:
+     *
+     * We total Authors with SQL like:
+     *    select count(distinct author) from ItemsByAuthor;
+     * ItemsByAuthor with:
+     *    select count(*) from ItemsByAuthor where author = ?;
+     * and every other index with:
+     *    select count(*) from ItemsByTitle;
+     *
+     * If limiting to a community or collection, we add a clause like:
+     *    community_id = 7
+     *    collection_id = 201
      */
-    private static PreparedStatement createTotalSql(Object obj,
-        int scope,
-        int browseType,
-        Connection connection,
-        Object value
-    )
+    private static int getTotalInIndex(Object obj,
+                                       int scopeType,
+                                       int browseType,
+                                       Connection connection,
+                                       Object value,
+                                       int total,
+                                       int resultSize)
         throws SQLException
     {
-        // For counting the total, we need to know:
-        //   whether browseType is ITEMS_BY_AUTHOR_BROWSE. In this case, we'll
-        //   request different columns.
-        //   scope is COLLECTION_SCOPE or COMMUNITY_SCOPE. If it is, we'll
-        //   append a clause specifying the id.
+        if ((browseType == ITEMS_BY_AUTHOR_BROWSE) && (total > resultSize))
+            return resultSize;
 
-        boolean needsWhere = (browseType == ITEMS_BY_AUTHOR_BROWSE) ||
-            (scope == COLLECTION_SCOPE) || (scope == COMMUNITY_SCOPE);
-        boolean needsAnd = (browseType == ITEMS_BY_AUTHOR_BROWSE) &&
-            ((scope == COLLECTION_SCOPE) || (scope == COMMUNITY_SCOPE));
+        PreparedStatement statement = null;
 
-        ////////////////////
-        // Ids
-        ////////////////////
-        int communityId = (obj instanceof Community) ? ((Community) obj).getID() : -1;
-        int collectionId = (obj instanceof Collection) ? ((Collection) obj).getID() : -1;
+        try
+        {
+            String table = BrowseTables.getTable(scopeType, browseType);
 
-        String table = BrowseTables.getTable(scope, browseType);
+            StringBuffer buffer = new StringBuffer()
+                .append("select count(")
+                .append(getTargetColumns(browseType))
+                .append(") from ")
+                .append(table);
 
-        String sql = new StringBuffer().append("select count(").append((browseType == AUTHORS_BROWSE) ? "distinct author" : "*").append(") from ").append(table).append(needsWhere ? " where " : "").append((browseType == ITEMS_BY_AUTHOR_BROWSE) ? " author = ?" : "").append(needsAnd ? " and " : "")// Optionally, add a scope clause
-            .append((scope == COLLECTION_SCOPE) ? " collection_id = " : "").append((scope == COLLECTION_SCOPE) ? Integer.toString(collectionId) : "").append((scope == COMMUNITY_SCOPE) ? " community_id  = " : "").append((scope == COMMUNITY_SCOPE) ? Integer.toString(communityId) : "").toString();
+            boolean hasWhere = false;
+            if (browseType == ITEMS_BY_AUTHOR_BROWSE)
+            {
+                hasWhere = true;
+                buffer.append(" where author = ?");
+            }
 
-        if (log.isInfoEnabled())
-            log.info("Total sql: \"" + sql + "\"");
+            String sql = addScopeClause(buffer, scopeType, obj,
+                                        hasWhere ? "and" : "where")
+                .toString();
 
-        PreparedStatement statement = connection.prepareStatement(sql);
+            if (log.isInfoEnabled())
+                log.info("Total sql: \"" + sql + "\"");
 
-        // Bind the author value, if necessary
-        if (browseType == ITEMS_BY_AUTHOR_BROWSE)
-            statement.setString(1, (String) value);
+            statement = connection.prepareStatement(sql);
 
-        return statement;
+            if (browseType == ITEMS_BY_AUTHOR_BROWSE)
+                statement.setString(1, (String) value);
+
+            return getIntValue(statement);
+        }
+        finally
+        {
+            if (statement != null)
+                statement.close();
+        }
     }
 
     /**
-     * Format the SQL string according to BROWSETYPE.
+     * Format SQL according to BROWSETYPE.
+     *
+     * The different browses use different operators.
+     *
      */
     private static String formatSql(String sql,
         int browseType,
@@ -923,8 +856,8 @@ public class Browse
         // For authors, only equality is relevant
         if (browseType == ITEMS_BY_AUTHOR_BROWSE)
             afterOperator = "=";
-            // Subqueries add a clause which checks for the item specifically,
-            // so we do not check for equality here
+        // Subqueries add a clause which checks for the item specifically,
+        // so we do not check for equality here
         if (subqueryValue != null)
         {
             beforeOperator = "<";
@@ -953,9 +886,9 @@ public class Browse
         if (!ascending)
             order = before ? "" : " desc";
 
-            // Note that it's OK to have unused arguments in the array;
-            // see the javadoc of java.text.MessageFormat
-            // for the whole story.
+        // Note that it's OK to have unused arguments in the array;
+        // see the javadoc of java.text.MessageFormat
+        // for the whole story.
         List args = new ArrayList();
 
         args.add(before ? beforeSubqueryOperator : afterSubqueryOperator);
@@ -970,91 +903,181 @@ public class Browse
      * Bind PreparedStatement parameters
      */
     private static void bindParameters(PreparedStatement statement,
-        String value,
-        boolean searchFromStart,
-        boolean needsSubquery,
-        boolean isCount
+                                       String value,
+                                       boolean searchFromStart,
+                                       boolean needsSubquery
     )
         throws SQLException
     {
-        if (!searchFromStart)
+        if (searchFromStart)
+            return;
+
+        if (needsSubquery)
         {
-            if (needsSubquery)
-            {
-                if (log.isDebugEnabled())
-                    log.debug("Binding subquery value \"" + value + "\"");
+            if (log.isDebugEnabled())
+                log.debug("Binding subquery value \"" + value + "\"");
 
-                statement.setString(1, value);
-                statement.setString(2, value);
-            }
-            else
-            {
-                if (log.isDebugEnabled())
-                    log.debug("Binding value \"" + value + "\"");
-
-                statement.setString(1, (String) value);
-            }
+            statement.setString(1, value);
+            statement.setString(2, value);
         }
-    }
-
-    private static String doSubquery(Connection connection,
-        Object obj,
-        int scope,
-        int browseType,
-        Object value
-    )
-        throws SQLException
-    {
-        PreparedStatement statement = null;
-
-        String tablename = BrowseTables.getTable(scope, browseType);
-        String column = BrowseTables.getValueColumn(browseType);
-
-        ////////////////////
-        // Ids
-        ////////////////////
-        int communityId = (obj instanceof Community) ? ((Community) obj).getID() : -1;
-        int collectionId = (obj instanceof Collection) ? ((Collection) obj).getID() : -1;
-        int item_id = -1;
-
-        if (value instanceof Integer)
-            item_id = ((Integer) value).intValue();
-        else if (value instanceof Item)
-            item_id = ((Item) value).getID();
-
-        try
+        else
         {
-            String itemValueQuery = new StringBuffer().append("select ").append("max(").append(column).append(") from ").append(tablename).append(" where ").append(" item_id = ").append(item_id).append((scope == COLLECTION_SCOPE) ? " and collection_id = " : "").append((scope == COLLECTION_SCOPE) ? Integer.toString(collectionId) : "").append((scope == COMMUNITY_SCOPE) ? " and community_id  = " : "").append((scope == COMMUNITY_SCOPE) ? Integer.toString(communityId) : "").toString();
+            if (log.isDebugEnabled())
+                log.debug("Binding value \"" + value + "\"");
 
-            // Run the query
-            statement = connection.prepareStatement(itemValueQuery);
-            return getStringValue(statement);
-        }
-        finally
-        {
-            if (statement != null)
-                statement.close();
+            statement.setString(1, (String) value);
         }
     }
 
     /**
-     * Return a single String value from STATEMENT.
+     * Run a query to find a browse index value for item_id.
+     *
+     * In general, these queries look like this:
+     *   select max(date_issued) from ItemsByDate where item_id = 7;
+     *
+     * The max operator ensures that only one value is returned.
+     *
+     * If limiting to a community or collection, we add a clause like:
+     *    community_id = 7
+     *    collection_id = 201
      */
-    private static String getStringValue(PreparedStatement statement)
+    private static String doSubquery(Connection connection,
+        Object obj,
+        int scope,
+        int browseType,
+        int item_id
+    )
         throws SQLException
     {
+        PreparedStatement statement = null;
         ResultSet results = null;
 
         try
         {
+            String tablename = BrowseTables.getTable(scope, browseType);
+            String column = BrowseTables.getValueColumn(browseType);
+
+            StringBuffer buffer = new StringBuffer()
+                .append("select ")
+                .append("max(")
+                .append(column)
+                .append(") from ")
+                .append(tablename)
+                .append(" where ")
+                .append(" item_id = ")
+                .append(item_id);
+
+            String itemValueQuery = addScopeClause(buffer, scope, obj, "and")
+                .toString();
+
+            statement = connection.prepareStatement(itemValueQuery);
             results = statement.executeQuery();
             return results.next() ? results.getString(1) : null;
         }
         finally
         {
+            if (statement != null)
+                statement.close();
             if (results != null)
                 results.close();
         }
+    }
+
+    /**
+     * Write out a log4j message
+     */
+    private static void logInfo(BrowseInfo info)
+    {
+        if (! log.isInfoEnabled())
+            return;
+
+        log.info("Number of Results: " + info.getResultCount() +
+                 " Overall position: " + info.getOverallPosition() +
+                 " Total " + info.getTotal() +
+                 " Offset " + info.getOffset());
+        int lastIndex = (info.getOverallPosition() + info.getResultCount());
+        boolean noresults = (info.getTotal() == 0) || (info.getResultCount() == 0);
+
+        if (noresults)
+            log.info("Got no results");
+
+        log.info("Got results: " +
+                 info.getOverallPosition() +
+                 " to " +
+                 lastIndex +
+                 " out of " + info.getTotal());
+    }
+
+    /**
+     * Return the columns according to browseType.
+     */
+    private static String getTargetColumns(int browseType)
+    {
+        return (browseType == AUTHORS_BROWSE) ? "distinct author" : "*";
+    }
+
+    /**
+     * Return a subquery clause.
+     * The SQL looks like this:
+     *   or (sort_title = ? and item_id {0} 3)
+     */
+    private static String getSubqueryClause(String column, int item_id)
+    {
+        return new StringBuffer()
+            .append(" or ( ")
+            .append(column)
+            // Item id must be before or after the desired item
+            .append(" = ? and item_id {0}  ")
+            .append(item_id)
+            .append(")")
+            .toString();
+    }
+
+    /**
+     * Return the id from VALUE, which is either an Item or an Integer
+     */
+    static int getItemId(Object value)
+    {
+        if (value instanceof Integer)
+            return ((Integer) value).intValue();
+        else if (value instanceof Item)
+            return ((Item) value).getID();
+
+        throw new IllegalArgumentException("Value must be Integer or Item");
+    }
+
+    /**
+     * Add a scoping clause to BUFFER.
+     *
+     * If scope is ALLDSPACE_SCOPE, nothing is added.
+     *
+     * Otherwise, the SQL clause which is appended looks like:
+     *    PREFIX community_id = 7
+     *    PREFIX collection_id = 203
+     *
+     * PREFIX may be empty, or it may be a SQL keyword like "where", "and",
+     * and so forth.
+     */
+    static StringBuffer addScopeClause(StringBuffer buffer,
+                                       int scope,
+                                       Object obj,
+                                       String prefix)
+    {
+        if (scope == ALLDSPACE_SCOPE)
+            return buffer;
+
+        int id = (obj instanceof Community) ?
+            ((Community) obj).getID() : ((Collection) obj).getID();
+
+        String column = (scope == COMMUNITY_SCOPE) ?
+            "community_id" : "collection_id";
+
+        return buffer
+            .append(prefix)
+            .append(" ")
+            .append(column)
+            .append(" = ")
+            .append(id);
     }
 
     /**
@@ -1196,7 +1219,9 @@ class NormalizedTitle
             return title.substring(startAt);
 
         // Otherwise, return the substring with the stop word appended
-        return new StringBuffer(title.substring(startAt)).append(", ").append(stop).toString();
+        return new StringBuffer(title.substring(startAt))
+.append(", ")
+.append(stop).toString();
     }
 
     /**
@@ -1245,40 +1270,6 @@ class NormalizedTitle
         }
 
         return first;
-    }
-
-    /**
-     * Embedded test harness
-     *
-     * @param argv - Command-line arguments
-     */
-    public static void main(String[] argv)
-    {
-        String[] test_titles = new String[]
-            {
-                "A Test title",
-                "Title without stop words",
-                "Theater of the Absurd",
-                "Another Misleading Title",
-                "An Egg and a Bunny",
-                "   Leading whitespace",
-                "   An omlette",
-                "   The Missing Link",
-                "   Then Came You",
-                "   Leading and trailing whitespace    ",
-                "   The An And -- Very Common Words",
-                "The",
-                "  The",
-                "",
-                null
-            };
-
-        for (int i = 0; i < test_titles.length; i++)
-        {
-            System.out.println
-            ("Sorting title for \"" + test_titles[i] + "\"" +
-                " is " + "\"" + normalizeEnglish(test_titles[i]) + "\"");
-        }
     }
 }
 
@@ -1433,24 +1424,35 @@ class BrowseCache
     public static boolean indexHasChanged(BrowseKey key)
         throws SQLException
     {
-        int tableid  = BrowseTables.getTableId(key.scope, key.browseType);
+        Context context = null;
+        try
+        {
+            int tableid  = BrowseTables.getTableId(key.scope, key.browseType);
 
-        Context context = new Context();
-        TableRow results = countAndMax(context, key);
-        long count = results != null ? results.getLongColumn("count") : -1;
-        int max    = results != null ? results.getIntColumn("max")    : -1;
-        context.complete();
+            context = new Context();
+            TableRow results = countAndMax(context, key);
+            long count = results != null ? results.getLongColumn("count") : -1;
+            int max    = results != null ? results.getIntColumn("max")    : -1;
+            context.complete();
 
-        // Same?
-        if ((count == COUNT[tableid]) && (max == MAXIMUM[tableid]))
-            return false;
+            // Same?
+            if ((count == COUNT[tableid]) && (max == MAXIMUM[tableid]))
+                return false;
 
-        // Update the counts
-        MAXIMUM[tableid] = max;
-        COUNT[tableid]   = count;
+            // Update the counts
+            MAXIMUM[tableid] = max;
+            COUNT[tableid]   = count;
 
-        // The index has in fact changed
-        return true;
+            // The index has in fact changed
+            return true;
+        }
+        catch (SQLException sqle)
+        {
+            if (context != null)
+                context.abort();
+
+            throw sqle;
+        }
     }
 
     /**
@@ -1468,17 +1470,28 @@ class BrowseCache
     public static void updateIndexData(BrowseKey key)
         throws SQLException
     {
-        int tableid  = BrowseTables.getTableId(key.scope, key.browseType);
+        Context context = null;
 
-        Context context = new Context();
-        TableRow results = countAndMax(context, key);
-        long count = results != null ? results.getLongColumn("count") : -1;
-        int max    = results != null ? results.getIntColumn("max")    : -1;
-        context.complete();
+        try
+        {
+            int tableid  = BrowseTables.getTableId(key.scope, key.browseType);
 
-        // Update the counts
-        MAXIMUM[tableid] = max;
-        COUNT[tableid]   = count;
+            context = new Context();
+            TableRow results = countAndMax(context, key);
+            long count = results != null ? results.getLongColumn("count") : -1;
+            int max    = results != null ? results.getIntColumn("max")    : -1;
+            context.complete();
+
+            MAXIMUM[tableid] = max;
+            COUNT[tableid]   = count;
+        }
+        catch (Exception e)
+        {
+            if (context != null)
+                context.abort();
+
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -1497,18 +1510,11 @@ class BrowseCache
         // then some items may have been removed. We assume that
         // values never change.
 
-        int communityId = (obj instanceof Community)  ?
-            ((Community) obj).getID() : -1;
-        int collectionId = (obj instanceof Collection)  ?
-            ((Collection) obj).getID() : -1;
-
-        String sql = new StringBuffer()
+        StringBuffer buffer = new StringBuffer()
             .append("select count({0}) as count, max({0}) as max from ")
-            .append(BrowseTables.getTable(scope, browseType))
-            .append((scope == Browse.COLLECTION_SCOPE) ? " where collection_id = " : "")
-            .append((scope == Browse.COLLECTION_SCOPE) ? Integer.toString(collectionId) : "")
-            .append((scope == Browse.COMMUNITY_SCOPE)  ? " where community_id  = " : "")
-            .append((scope == Browse.COMMUNITY_SCOPE) ? Integer.toString(communityId) : "")
+            .append(BrowseTables.getTable(scope, browseType));
+
+        String sql = Browse.addScopeClause(buffer, scope, obj, "where")
             .toString();
 
         // Format it to use the correct columns
