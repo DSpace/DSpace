@@ -158,6 +158,8 @@
 
     <P align=center>Found <%= items.length == 0 ? "no" : String.valueOf(items.length) %> item<%= items.length != 1 ? "s" : "" %>.</P>
 
+<% if (items.length > 0) { %>
     <dspace:itemlist items="<%= items %>" />
+<% } %>
 </dspace:layout>
 

@@ -99,6 +99,12 @@ public class SimpleSearchServlet extends DSpaceServlet
         // Get the query
         String query = request.getParameter("query");
 
+        // Ensure the query is non-null
+        if (query == null)
+        {
+            query = "";
+        }
+
         // Get the location parameter, if any
         String location = request.getParameter("location");
         String newURL;
