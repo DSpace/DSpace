@@ -41,6 +41,8 @@
 package org.dspace.administer;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -168,6 +170,38 @@ public class DCType
         return new DCType(context, row);
     }
 
+
+    /**
+     * Grab the entire contents of the registry
+     *
+     * @param  context  DSpace context object
+     *
+     * @return  array of all DCTypes in the registry
+     */
+    public static DCType[] getAll(Context context)
+        throws SQLException
+    {
+        List allTypes = new ArrayList();
+
+        // Grab the table rows
+        TableRowIterator tri = DatabaseManager.query(context,
+            "dctyperegistry",
+            "SELECT * FROM dctyperegistry;");
+
+        // Make into DCType objects
+        while (tri.hasNext())
+        {
+            allTypes.add(new DCType(context, tri.next()));
+        }
+        
+        // Make an array out of the list
+        DCType[] typeArray = new DCType[allTypes.size()];
+        typeArray = (DCType[]) allTypes.toArray(typeArray);
+
+        // Return the array
+        return typeArray;
+    }
+    
 
     /**
      * Get the internal identifier of this bitstream format
