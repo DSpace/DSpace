@@ -62,10 +62,14 @@ public class DatabaseManager
     /** log4j category */
     private static Logger log = Logger.getLogger(DatabaseManager.class);
 
+    /** Configuration property which indicates the JDBC URL */
     private static final String JDBC_URL_PROPERTY = "db.url";
 
+    /** The JDBC URL */
     private static String jdbcUrl = ConfigurationManager.getProperty(JDBC_URL_PROPERTY);
+    /** The JDBC username */
     private static String jdbcUserName = ConfigurationManager.getProperty("db.username");
+    /** The JDBC password */
     private static String jdbcPassword = ConfigurationManager.getProperty("db.password");
 
     /** True if initialization has been done */
@@ -84,6 +88,12 @@ public class DatabaseManager
      * an array of ColumnInfo objects.
      */
     private static Map info = new HashMap();
+
+    /**
+     * Protected Constructor to prevent instantiation
+     * except by derived classes.
+     */
+    protected DatabaseManager () {}
 
     /**
      * Return an iterator with the results of the query.
