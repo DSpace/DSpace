@@ -203,7 +203,7 @@ public class BrowseServlet extends DSpaceServlet
             // Will need to highlight the focus
             highlight = true;
             
-            logInfo = "focus=" + focus;
+            logInfo = "focus=" + focus + ",";
   
             if (browseDates)
             {
@@ -218,7 +218,7 @@ public class BrowseServlet extends DSpaceServlet
             // ----------------------------------------------
             scope.setFocus(startsWith);
             highlight = true;
-            logInfo = "starts_with=" + startsWith;
+            logInfo = "starts_with=" + startsWith + ",";
 
             if (browseDates)
             {
@@ -270,7 +270,7 @@ public class BrowseServlet extends DSpaceServlet
             // 0 or 20 entries shown before it
             scope.setNumberBefore(isTop ? 0 : 20);
 
-            logInfo = (isTop ? "top" : "bottom") + "=" + val;
+            logInfo = (isTop ? "top" : "bottom") + "=" + val + ",";
 
             if (browseDates)
             {
@@ -289,21 +289,11 @@ public class BrowseServlet extends DSpaceServlet
                 }
             }
         }
-        else
-        {
-            // ----------------------------------------------
-            // No positioning parameters set - use start of index
-            // ----------------------------------------------
-            
-            // Don't need to do anything for most browses
-            if (browseDates && oldestFirst)
-            {
-                // For a browse by date starting with the most recent item,
-                // we need to start at the most recent, so we'll set the focus
-                // to be very high
-                scope.setFocus("9999");
-            }
-        }
+
+        // ----------------------------------------------
+        // If none of the above apply, no positioning parameters
+        // set - use start of index
+        // ----------------------------------------------
 
 
         // Are we in a community or collection?
@@ -312,12 +302,12 @@ public class BrowseServlet extends DSpaceServlet
 
         if (collection != null)
         {
-            logInfo = logInfo + ",collection_id=" + collection.getID();
+            logInfo = logInfo + ",collection_id=" + collection.getID() + ",";
             scope.setScope(collection);
         }
         else if (community != null)
         {
-            logInfo = logInfo + ",community_id=" + community.getID();
+            logInfo = logInfo + ",community_id=" + community.getID() + ",";
             scope.setScope(community);
         }
 
@@ -351,7 +341,7 @@ public class BrowseServlet extends DSpaceServlet
 
         log.info(LogManager.getHeader(context,
             "browse_" + what,
-            logInfo + ",results=" + browseInfo.getResultCount()));
+            logInfo + "results=" + browseInfo.getResultCount()));
 
         
         if (browseInfo.getResultCount() == 0)
@@ -400,8 +390,18 @@ public class BrowseServlet extends DSpaceServlet
                     s = HandleManager.findHandle(context, firstItem);
                 }
 
-                request.setAttribute("previous.query",
-                    "bottom=" + URLEncoder.encode(s));
+                if (browseDates && oldestFirst)
+                {
+                    // For browsing by date, oldest first, we need
+                    // to add the ordering parameter
+                    request.setAttribute("previous.query",
+                        "order=oldestfirst&bottom=" + URLEncoder.encode(s));
+                }
+                else
+                {
+                    request.setAttribute("previous.query",
+                        "bottom=" + URLEncoder.encode(s));
+                }
             }
             
             
@@ -424,8 +424,18 @@ public class BrowseServlet extends DSpaceServlet
                     s = HandleManager.findHandle(context, lastItem);
                 }
 
-                request.setAttribute("next.query",
-                    "top=" + URLEncoder.encode(s));
+                if (browseDates && oldestFirst)
+                {
+                    // For browsing by date, oldest first, we need
+                    // to add the ordering parameter
+                    request.setAttribute("next.query",
+                        "order=oldestfirst&top=" + URLEncoder.encode(s));
+                }
+                else
+                {
+                    request.setAttribute("next.query",
+                        "top=" + URLEncoder.encode(s));
+                }
             }
 
 
