@@ -219,11 +219,11 @@ public class DCType
 
         if (qualifier == null)
         {
-            sql = sql + " is null;";
+            sql = sql + " is null";
         }
         else
         {
-            sql = sql + " LIKE '" + qualifier + "';";
+            sql = sql + " LIKE '" + qualifier + "'";
         }
 
         TableRowIterator tri = DatabaseManager.query(context,
@@ -257,7 +257,7 @@ public class DCType
         // Get all the dctyperegistry rows
         TableRowIterator tri = DatabaseManager.query(context,
             "dctyperegistry",
-            "SELECT * FROM dctyperegistry ORDER BY element, qualifier;");
+            "SELECT * FROM dctyperegistry ORDER BY element, qualifier");
 
         // Make into DC Type objects
         while (tri.hasNext())
