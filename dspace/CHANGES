@@ -1,3 +1,6 @@
+(Larry Stone)
+- SF patch #1143570 Fix various bugs handling slash ("/") in bitstream names
+
 (Scott Phillips)
 - Patch for SF bug #1145527 Able to delete 'unknown' bitstream format
 
