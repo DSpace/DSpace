@@ -420,13 +420,13 @@ public class ItemTag extends TagSupport
         }
         else
         {   
-            // if item contains multiple non-license bundles, display bitstream description
-            boolean multiFile = (bundles.length > 2);
             boolean html = false;
             String handle = item.getHandle();
             Bitstream primaryBitstream = null;
             
             Bundle[] bunds = item.getBundles("ORIGINAL");
+            // if item contains multiple bitstreams, display bitstream description
+            boolean multiFile = bunds[0].getBitstreams().length > 1;
             Bundle[] thumbs= item.getBundles("THUMBNAIL");
             
             // check if primary bitstream is html
