@@ -191,6 +191,7 @@ CREATE TABLE DCValue
 );
 
 -- An index for dctypes
+DROP INDEX dcvalue_dc_type_id_idx;
 CREATE INDEX dcvalue_dc_type_id_idx  on DCValue(dc_type_id);
 
 -------------------------------------------------------
@@ -477,17 +478,14 @@ WHERE Item.item_id = DCValue.item_id
 -------------------------------------------------------
 --  ItemsByAuthor view
 -------------------------------------------------------
-DROP VIEW ItemsByAuthor;
+DROP TABLE ItemsByAuthor;
 
-CREATE VIEW ItemsByAuthor as
-SELECT DCResult.item_id, DCResult.text_value as Author
-FROM DCResult, DCTypeRegistry
-WHERE DCTypeRegistry.element   = 'contributor' 
-AND   DCTypeRegistry.qualifier = 'author'
-AND   DCTypeRegistry.dc_type_id = DCResult.dc_type_id
-AND   DCResult.in_archive = 't'
-ORDER BY Author, DCResult.item_id
-;
+CREATE TABLE ItemsByAuthor
+(
+   items_by_author_id INTEGER PRIMARY KEY,
+   item_id            INTEGER REFERENCES Item(item_id),
+   author             TEXT
+);
 
 -------------------------------------------------------
 --  CollectionItemsByAuthor view
@@ -498,7 +496,6 @@ CREATE VIEW CollectionItemsByAuthor as
 SELECT Collection2Item.collection_id, ItemsByAuthor.* 
 FROM ItemsByAuthor, Collection2Item
 WHERE ItemsByAuthor.item_id = Collection2Item.item_id
-ORDER BY Author, ItemsByAuthor.item_id
 ;
 
 -------------------------------------------------------
@@ -510,7 +507,6 @@ CREATE VIEW CommunityItemsByAuthor as
 SELECT Community2Item.community_id, ItemsByAuthor.* 
 FROM ItemsByAuthor, Community2Item
 WHERE ItemsByAuthor.item_id = Community2Item.item_id
-ORDER BY Author, ItemsByAuthor.item_id
 ;
 
 -------------------------------------------------------
@@ -557,19 +553,15 @@ end;
 -- ItemsByTitle view
 ----------------------------------------
 
-DROP VIEW ItemsByTitle;
+DROP TABLE ItemsByTitle;
 
-CREATE VIEW ItemsByTitle as
-SELECT DCResult.item_id, 
-       DCResult.text_value as Title,
-       sorttitle(DCResult.text_value) as SortTitle
-FROM DCResult, DCTypeRegistry
-WHERE DCTypeRegistry.element   = 'title'
-AND   DCTypeRegistry.qualifier is null
-AND   DCTypeRegistry.dc_type_id = DCResult.dc_type_id
-AND   DCResult.in_archive = 't'
-ORDER BY SortTitle, DCResult.item_id
-;
+CREATE TABLE ItemsByTitle
+(
+   items_by_title_id  INTEGER PRIMARY KEY,
+   item_id            INTEGER REFERENCES Item(item_id),
+   title              TEXT,
+   sort_title         TEXT
+);
 
 -------------------------------------------------------
 --  CollectionItemsByTitle view
@@ -580,7 +572,6 @@ CREATE VIEW CollectionItemsByTitle as
 SELECT Collection2Item.collection_id, ItemsByTitle.* 
 FROM ItemsByTitle, Collection2Item
 WHERE ItemsByTitle.item_id = Collection2Item.item_id
-ORDER BY Title, ItemsByTitle.item_id
 ;
 
 -------------------------------------------------------
@@ -592,23 +583,19 @@ CREATE VIEW CommunityItemsByTitle as
 SELECT Community2Item.community_id, ItemsByTitle.* 
 FROM ItemsByTitle, Community2Item
 WHERE ItemsByTitle.item_id = Community2Item.item_id
-ORDER BY Title, ItemsByTitle.item_id
 ;
 
 -------------------------------------------------------
---  ItemsByDate view
+--  ItemsByDate table
 -------------------------------------------------------
-DROP VIEW ItemsByDate;
+DROP TABLE ItemsByDate;
 
-CREATE VIEW ItemsByDate as
-SELECT DCResult.item_id, DCResult.text_value as DateIssued
-FROM DCResult, DCTypeRegistry
-WHERE DCTypeRegistry.element   = 'date' 
-AND   DCTypeRegistry.qualifier = 'issued'
-AND   DCTypeRegistry.dc_type_id = DCResult.dc_type_id
-AND   DCResult.in_archive = 't'
-ORDER BY DateIssued desc, DCResult.item_id
-;
+CREATE TABLE ItemsByDate
+(
+   items_by_date_id   INTEGER PRIMARY KEY,
+   item_id            INTEGER REFERENCES Item(item_id),
+   date_issued        TEXT
+);
 
 -------------------------------------------------------
 --  CollectionItemsByDate view
@@ -619,7 +606,6 @@ CREATE VIEW CollectionItemsByDate as
 SELECT Collection2Item.collection_id, ItemsByDate.* 
 FROM ItemsByDate, Collection2Item
 WHERE ItemsByDate.item_id = Collection2Item.item_id
-ORDER BY DateIssued desc, ItemsByDate.item_id
 ;
 
 -------------------------------------------------------
@@ -631,23 +617,19 @@ CREATE VIEW CommunityItemsByDate as
 SELECT Community2Item.community_id, ItemsByDate.* 
 FROM ItemsByDate, Community2Item
 WHERE ItemsByDate.item_id = Community2Item.item_id
-ORDER BY DateIssued desc, ItemsByDate.item_id
 ;
 
 -------------------------------------------------------
---  ItemsByDateAccessioned view
+--  ItemsByDateAccessioned table
 -------------------------------------------------------
-DROP VIEW ItemsByDateAccessioned;
+DROP TABLE ItemsByDateAccessioned;
 
-CREATE VIEW ItemsByDateAccessioned as
-SELECT DCResult.item_id, DCResult.text_value as DateAccessioned
-FROM DCResult, DCTypeRegistry
-WHERE DCTypeRegistry.element   = 'date' 
-AND   DCTypeRegistry.qualifier = 'accessioned'
-AND   DCTypeRegistry.dc_type_id = DCResult.dc_type_id
-AND   DCResult.in_archive = 't'
-ORDER BY DateAccessioned, DCResult.item_id
-;
+CREATE TABLE ItemsByDateAccessioned
+(
+   items_by_date_accessioned_id  INTEGER PRIMARY KEY,
+   item_id                       INTEGER REFERENCES Item(item_id),
+   date_accessioned              TEXT
+);
 
 -------------------------------------------------------
 --  CollectionItemsByDateAccessioned view
@@ -658,7 +640,6 @@ CREATE VIEW CollectionItemsByDateAccessioned as
 SELECT Collection2Item.collection_id, ItemsByDateAccessioned.* 
 FROM ItemsByDateAccessioned, Collection2Item
 WHERE ItemsByDateAccessioned.item_id = Collection2Item.item_id
-ORDER BY DateAccessioned desc, ItemsByDateAccessioned.item_id
 ;
 
 -------------------------------------------------------
@@ -670,6 +651,5 @@ CREATE VIEW CommunityItemsByDateAccessioned as
 SELECT Community2Item.community_id, ItemsByDateAccessioned.* 
 FROM ItemsByDateAccessioned, Community2Item
 WHERE ItemsByDateAccessioned.item_id = Community2Item.item_id
-ORDER BY DateAccessioned desc, ItemsByDateAccessioned.item_id
 ;
 
