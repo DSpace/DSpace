@@ -44,13 +44,14 @@ package org.dspace.authorize;
 //import org.dspace.db.generated.*;
 //import org.dspace.util.beans.BeanUtils;
 
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.core.Context;
+import org.dspace.core.Constants;
+import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.DSpaceTypes;
+//import org.dspace.core.DSpaceTypes;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.eperson.EPerson;
@@ -77,22 +78,22 @@ public class AuthorizeManager
         // now figure out the type and object id
         if( o instanceof Item )
         {
-            otype = DSpaceTypes.ITEM;
+            otype = Constants.ITEM;
             oid   = ((Item) o).getID();
         }
         else if( o instanceof Bitstream )
         {
-            otype = DSpaceTypes.BITSTREAM;
+            otype = Constants.BITSTREAM;
             oid   = ((Bitstream) o).getID();
         }		
         else if( o instanceof Collection )
         {
-            otype = DSpaceTypes.COLLECTION;
+            otype = Constants.COLLECTION;
             oid   = ((Collection) o).getID();
         }		
         else if( o instanceof Bundle )
         {
-            otype = DSpaceTypes.BUNDLE;
+            otype = Constants.BUNDLE;
             oid   = ((Bundle) o).getID();
         }
         else
@@ -106,7 +107,7 @@ public class AuthorizeManager
     /**
      * authorizeAction()is the authorize method that throws an AuthorizeException
 	 *
-     * @param resourcetype	constant from dspacetypes (collection, item, etc.)
+     * @param resourcetype	constant from core.Constants (collection, item, etc.)
      * @param resorceidID	of resource you're trying to do an authorize on
      * @param actionid		action to perform (read, write, etc) DSpaceActions
      * @param userid		who wants to perform the action?
@@ -123,7 +124,7 @@ public class AuthorizeManager
     /**
      * authorize() is the authorize method that returns a boolean
 	 *
-     * @param resourcetype - found inspacetypes (collection, item, etc.)
+     * @param resourcetype - found core.Constants (collection, item, etc.)
      * @param resorceidID of resource you're trying to do an authorize on
      * @param actionid - action to perform (read, write, etc)
      * @param userid - who wants to perform the action?
@@ -225,7 +226,7 @@ public class AuthorizeManager
         DatabaseBeanIterator item_policies = null;
         DatabaseBeanIterator collection_policies = null;
 */
-        if (resource_type == DSpaceTypes.BITSTREAM)
+        if (resource_type == Constants.BITSTREAM)
         {
             // if there are item specific policies, they have
             //  the highest priority - return them
@@ -238,7 +239,7 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + DSpaceTypes.ITEM +
+                    " AND resource_filter = " + Constants.ITEM +
                     " AND resource_filter_arg in " +
                     "(select item_id from Item2Bundle where bundle_id in" +
                     "(select bundle_id from Bundle2Bitstream where " +
@@ -257,7 +258,7 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + DSpaceTypes.COLLECTION +
+                    " AND resource_filter = " + Constants.COLLECTION +
                     " AND resource_filter_arg in " +
                     "(select collection_id from Collection2Item where" +
                     " item_id in " +
@@ -277,7 +278,7 @@ public class AuthorizeManager
 
         // bundles use the same permissions as bitstreams?
         // inheriting from items and collections
-        if (resource_type == DSpaceTypes.BUNDLE)
+        if (resource_type == Constants.BUNDLE)
         {
             if (specific_policies.hasNext())
             {
@@ -288,7 +289,7 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + DSpaceTypes.ITEM +
+                    " AND resource_filter = " + Constants.ITEM +
                     " AND resource_filter_arg in " +
                     "(select item_id from Item2Bundle where " +
                     " bundle_id = " + resource_id + ")";
@@ -306,7 +307,7 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + DSpaceTypes.COLLECTION +
+                    " AND resource_filter = " + Constants.COLLECTION +
                     " AND resource_filter_arg in " +
                     "(select collection_id from Collection2Item where" +
                     " item_id in " +
@@ -324,7 +325,7 @@ public class AuthorizeManager
         }
 
         // items just inherit from collections
-        if (resource_type == DSpaceTypes.ITEM)
+        if (resource_type == Constants.ITEM)
         {
             if (specific_policies.hasNext())
             {
@@ -334,7 +335,7 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + DSpaceTypes.COLLECTION +
+                    " AND resource_filter = " + Constants.COLLECTION +
                     " AND resource_filter_arg in " +
                     "(select collection_id from Collection2Item where" +
                     " item_id = " + resource_id + ")";
