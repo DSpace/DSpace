@@ -48,7 +48,6 @@ import java.io.InputStreamReader;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.storage.rdbms.DatabaseManager;
 
 
 /**
