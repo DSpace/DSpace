@@ -232,12 +232,12 @@ public class Utils
      */
     public static String addEntities(String value)
     {
-       
-        value = value.replaceAll("<", "&lt;");
-        value = value.replaceAll(">", "&gt;");  
         value = value.replaceAll("&", "&amp;");
         value = value.replaceAll("\"", "&quot;");
         value = value.replaceAll("'", "&apos;");
+        value = value.replaceAll("<", "&lt;");
+        value = value.replaceAll(">", "&gt;");  
+
         
         return value;
         
