@@ -63,16 +63,20 @@ public class InitializeBrowse
 
         try
         {
+            System.out.print("Indexing all Items in DSpace....");
+
             context = new Context();
             Browse.indexAll(context);
             context.complete();
+
+            System.out.println(" ... Done");
         }
         catch (SQLException sqle)
         {
             if (context != null)
                 context.abort();
 
-            System.out.println("Error: Browse index NOT created");
+            System.err.println("Error: Browse index NOT created");
             sqle.printStackTrace();
         }
     }
