@@ -231,7 +231,7 @@ public class Community extends DSpaceObject
     {
         TableRowIterator tri = DatabaseManager.query(context,
             "community",
-            "SELECT * FROM community ORDER BY name;");
+            "SELECT * FROM community ORDER BY name");
 
         List communities = new ArrayList();
 
@@ -275,7 +275,7 @@ public class Community extends DSpaceObject
             "community",
             "SELECT * FROM community WHERE NOT community_id IN " +
             "(SELECT child_comm_id FROM community2community) " +
-	    "ORDER BY name;" );        
+	    "ORDER BY name" );        
 
         List topCommunities = new ArrayList();
 
@@ -548,7 +548,7 @@ public class Community extends DSpaceObject
             "community",
             "SELECT community.* FROM community, community2community WHERE " +
                 "community2community.parent_comm_id=community.community_id " +
-                "AND community2community.child_comm_id=" + getID() + ";" );
+                "AND community2community.child_comm_id=" + getID() );
 
         // Make Community object
         if (tri.hasNext())
@@ -632,7 +632,7 @@ public class Community extends DSpaceObject
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "community2collection",
             "SELECT * FROM community2collection WHERE community_id=" +
-                getID() + " AND collection_id=" + c.getID() + ";");
+                getID() + " AND collection_id=" + c.getID() );
 
         if (!tri.hasNext())
         {
@@ -683,7 +683,7 @@ public class Community extends DSpaceObject
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "community2community",
             "SELECT * FROM community2community WHERE parent_comm_id=" +
-                getID() + " AND child_comm_id=" + c.getID() + ";");
+                getID() + " AND child_comm_id=" + c.getID() );
 
         if (!tri.hasNext())
         {
@@ -716,7 +716,7 @@ public class Community extends DSpaceObject
         // Remove any mappings
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM community2collection WHERE community_id=" +
-                getID() + " AND collection_id=" + c.getID() + ";");
+                getID() + " AND collection_id=" + c.getID() );
 
         // Is the community an orphan?
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -748,7 +748,7 @@ public class Community extends DSpaceObject
         // Remove any mappings
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM community2community WHERE parent_comm_id=" +
-                getID() + " AND child_comm_id=" + c.getID() + ";");
+                getID() + " AND child_comm_id=" + c.getID() );
 
         // Is the subcommunity an orphan?
         TableRowIterator tri = DatabaseManager.query(ourContext,
