@@ -102,7 +102,7 @@
 
   <servlet>
     <servlet-name>authorize</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.admin.AuthorizeEditServlet</servlet-class>
+    <servlet-class>org.dspace.app.webui.servlet.admin.AuthorizeAdminServlet</servlet-class>
   </servlet>
 
   <servlet>

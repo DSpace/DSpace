@@ -223,6 +223,44 @@
   </tag>
 
   <tag>
+    <name>communitylist</name>
+    <tagclass>org.dspace.app.webui.jsptag.CommunityListTag</tagclass>
+    <info>
+      Tag for displaying a list of communities.  "handles" must be an array of the
+      Handles corresponding to those communities.
+    </info>
+    <attribute>
+      <name>communities</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>handles</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <name>collectionlist</name>
+    <tagclass>org.dspace.app.webui.jsptag.CollectionListTag</tagclass>
+    <info>
+      Tag for displaying a list of collections.  "handles" must be an array of the
+      Handles corresponding to those collections.
+    </info>
+    <attribute>
+      <name>collections</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>handles</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
     <name>popup</name>
     <tagclass>org.dspace.app.webui.jsptag.PopupTag</tagclass>
     <info>

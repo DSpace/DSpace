@@ -54,7 +54,12 @@
   -                      array of the collections in the community to put in
   -                      the drop-down box
   -   items            - the results.  An array of Items, most relevant first
-  -   handles          - Handles corresponding to the results. (String[])
+  -   communities
+  -   collections
+  -   item_handles     - Handles corresponding to the results. (String[])
+  -   community_handles
+  -   collection_handles
+  -
   -   query            - The original query
   --%>
 
@@ -66,15 +71,18 @@
 
 <%
     // Get the attributes
-    Community community = (Community) request.getAttribute("community");
-    Collection collection = (Collection) request.getAttribute("collection");
-    Community[] communityArray = (Community[])
-        request.getAttribute("community.array");
-    Collection[] collectionArray = (Collection[])
-        request.getAttribute("collection.array");
+    Community   community  = (Community ) request.getAttribute("community" );
+    Collection  collection = (Collection) request.getAttribute("collection");
+    Community[] communityArray = (Community[]) request.getAttribute("community.array");
+    Collection[] collectionArray = (Collection[]) request.getAttribute("collection.array");
     
-    Item[] items = (Item[]) request.getAttribute("items");
-    String[] handles = (String[]) request.getAttribute("handles");
+    Item      [] items       = (Item[]      )request.getAttribute("items");
+    Community [] communities = (Community[] )request.getAttribute("communities");
+    Collection[] collections = (Collection[])request.getAttribute("collections");
+    
+    String[] itemHandles       = (String[]) request.getAttribute("item_handles");
+    String[] communityHandles  = (String[]) request.getAttribute("community_handles");
+    String[] collectionHandles = (String[]) request.getAttribute("collection_handles");
     
     String query = (String) request.getAttribute("query");
 %>
@@ -146,10 +154,18 @@
         </table>
     </form>
 
+<% if (communities.length > 0 ) { %>
+    <dspace:communitylist  communities="<%= communities %>" handles="<%=
+    communityHandles %>" />
+<% } %>
+
+<% if (collections.length > 0 ) { %>   
+    <dspace:collectionlist collections="<%= collections %>" handles="<%=
+    collectionHandles %>" />
+<% } %>
 
     <P align=center>Found <%= items.length == 0 ? "no" : String.valueOf(items.length) %> item<%= items.length != 1 ? "s" : "" %>.</P>
 
-    <dspace:itemlist items="<%= items %>" handles="<%= handles %>" />
-
+    <dspace:itemlist items="<%= items %>" handles="<%= itemHandles %>" />
 </dspace:layout>
 

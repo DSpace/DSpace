@@ -46,6 +46,7 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -114,17 +115,23 @@ public class SimpleSearchServlet extends DSpaceServlet
             return;
         }
 
-        // For the results
-        List handles;
-
         // Build log information
         String logInfo = "";
 
         // Get our location
-        Community community = UIUtil.getCommunityLocation(request);
+        Community community   = UIUtil.getCommunityLocation(request);
         Collection collection = UIUtil.getCollectionLocation(request);
 
-        Item[] items;
+        // handles for the search results or the results
+        List itemHandles       = null;
+        List communityHandles  = null;
+        List collectionHandles = null;
+
+        // 'de-handled' search results
+        Item[]       resultsItems;
+        Community[]  resultsCommunities;
+        Collection[] resultsCollections;
+        
 //        String[] handles;
 
         // Perform the search
@@ -136,7 +143,9 @@ public class SimpleSearchServlet extends DSpaceServlet
 
                 request.setAttribute("collection", collection);
                 request.setAttribute("community", community);
-                handles = DSQuery.getItemResults(DSQuery.doQuery(query, collection));
+
+                // we're in a collection, only display item results
+                itemHandles = DSQuery.getItemResults(DSQuery.doQuery(query, collection));
             }
             else if (community != null)
             {
@@ -147,7 +156,11 @@ public class SimpleSearchServlet extends DSpaceServlet
                 request.setAttribute("collection.array",
                     community.getCollections());
 
-                handles = DSQuery.getItemResults(DSQuery.doQuery(query, community));
+                HashMap results = DSQuery.doQuery(query, community);
+                
+                // we're in a community, display item and collection results
+                itemHandles       = DSQuery.getItemResults(results);
+                collectionHandles = DSQuery.getCollectionResults(results);
             }
             else
             {
@@ -155,37 +168,69 @@ public class SimpleSearchServlet extends DSpaceServlet
                 Community[] communities = Community.findAll(context);
                 request.setAttribute("community.array", communities);
 
-                handles = DSQuery.getItemResults(DSQuery.doQuery(query));
+                HashMap results = DSQuery.doQuery(query);
+                
+                // searching everything, return all results
+                itemHandles      = DSQuery.getItemResults(results);
+                communityHandles = DSQuery.getCommunityResults(results);
+                collectionHandles= DSQuery.getCollectionResults(results);
             }
 
 
-            // Make Item objects from the handles
-            items = new Item[handles.size()];
-//            ItemIDs = new String[itemHandles.size()];
-
-            for (int i = 0; i < handles.size(); i++)
+            // Make objects from the handles - make arrays, fill them out
+            resultsItems       = new Item      [itemHandles.size()      ];
+            resultsCommunities = new Community [communityHandles.size() ];
+            resultsCollections = new Collection[collectionHandles.size()];
+            
+            for (int i = 0; i < itemHandles.size(); i++)
             {
-                String myhandle = (String) handles.get(i);
+                String myhandle = (String) itemHandles.get(i);
                 
                 Object o = HandleManager.resolveToObject(context, myhandle);
                 
                 // for now all returned objects are items
-                items[i] = (Item)o;
-
-                if (items[i] == null)
+                resultsItems[i] = (Item)o;
+                if (resultsItems[i] == null)
                 {
                     throw new SQLException("Query \"" + query +
                         "\" returned unresolvable handle: " + myhandle);
                 }
+            }
 
-//                handles[i] = HandleManager.findHandle(context, items[i]);
+            for (int i = 0; i < collectionHandles.size(); i++)
+            {
+                String myhandle = (String) collectionHandles.get(i);
+                
+                Object o = HandleManager.resolveToObject(context, myhandle);
+                
+                // for now all returned objects are items
+                resultsCollections[i] = (Collection)o;
+                if (resultsCollections[i] == null)
+                {
+                    throw new SQLException("Query \"" + query +
+                        "\" returned unresolvable handle: " + myhandle);
+                }
+            }
+
+            for (int i = 0; i < communityHandles.size(); i++)
+            {
+                String myhandle = (String) communityHandles.get(i);
+                
+                Object o = HandleManager.resolveToObject(context, myhandle);
+                
+                // for now all returned objects are items
+                resultsCommunities[i] = (Community)o;
+                if (resultsCommunities[i] == null)
+                {
+                    throw new SQLException("Query \"" + query +
+                        "\" returned unresolvable handle: " + myhandle);
+                }
             }
 
             // Log
             log.info(LogManager.getHeader(context,
                 "search",
-                logInfo + "query=\"" + query + "\",results=" + items.length));
-
+                logInfo + "query=\"" + query + "\",results=(" + resultsCommunities.length + "," + resultsCollections.length + "," + resultsItems.length + ")"));
         }
         catch (ParseException pe)
         {
@@ -201,11 +246,16 @@ public class SimpleSearchServlet extends DSpaceServlet
                 pe);
 
             // Empty results
-            items   = new Item[0];
-            handles = (List)new ArrayList();
+            resultsItems       = new Item[0];
+            resultsCommunities = new Community[0];
+            resultsCollections = new Collection[0];
+            
+            itemHandles      = (List)new ArrayList();
+            communityHandles = (List)new ArrayList();
+            collectionHandles= (List)new ArrayList();
         }
-	catch (TokenMgrError tme)
-	{
+    	catch (TokenMgrError tme)
+	    {
             // Similar to parse exception
             log.warn(LogManager.getHeader(context,
                 "search_exception",
@@ -213,16 +263,31 @@ public class SimpleSearchServlet extends DSpaceServlet
                 tme);
 
             // Empty results
-            items   = new Item[0];
-            handles = (List)new ArrayList();
-	}
+            resultsItems       = new Item[0];
+            resultsCommunities = new Community[0];
+            resultsCollections = new Collection[0];
+            
+            itemHandles      = (List)new ArrayList();
+            communityHandles = (List)new ArrayList();
+            collectionHandles= (List)new ArrayList();
+	    }
 
-    String [] handlesarray = new String[handles.size()];
-    handlesarray = (String [])handles.toArray(handlesarray);
+        String [] itemHandlesArray       = new String[itemHandles.size()      ];
+        String [] collectionHandlesArray = new String[collectionHandles.size()];
+        String [] communityHandlesArray  = new String[communityHandles.size() ];
+        
+        itemHandlesArray       = (String [])itemHandles.toArray      (itemHandlesArray      );
+        communityHandlesArray  = (String [])communityHandles.toArray (communityHandlesArray );
+        collectionHandlesArray = (String [])collectionHandles.toArray(collectionHandlesArray);
 
         // Pass the results to the display JSP
-        request.setAttribute("items", items);
-        request.setAttribute("handles", handlesarray);
+        request.setAttribute("items",       resultsItems      );
+        request.setAttribute("communities", resultsCommunities);
+        request.setAttribute("collections", resultsCollections);
+        
+        request.setAttribute("item_handles",       itemHandlesArray      );
+        request.setAttribute("community_handles",  communityHandlesArray );
+        request.setAttribute("collection_handles", collectionHandlesArray);
 
         // And the original query string
         request.setAttribute("query", query);

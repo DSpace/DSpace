@@ -100,28 +100,36 @@ public class HandleManager
             String url = prefix + "/item/" + handle;
 
             if (log.isDebugEnabled())
+            {
                 log.debug("Resolved " + handle + " to " + url);
-
+            }
+            
             return url;
         }
+        else
         if (handletypeid == Constants.COLLECTION)
         {
             String prefix = ConfigurationManager.getProperty("dspace.url");
             String url = prefix + "/collection/" + handle;
 
             if (log.isDebugEnabled())
+            {
                 log.debug("Resolved " + handle + " to " + url);
-
+            }
+            
             return url;
         }
+        else
         if (handletypeid == Constants.COMMUNITY)
         {
             String prefix = ConfigurationManager.getProperty("dspace.url");
             String url = prefix + "/community/" + handle;
 
             if (log.isDebugEnabled())
+            {
                 log.debug("Resolved " + handle + " to " + url);
-
+            }
+            
             return url;
         }
 
@@ -229,6 +237,8 @@ public class HandleManager
             if (log.isDebugEnabled())
                 log.debug("Resolved handle " + handle + " to collection " +
                           (collection == null ? -1 : collection.getID()));
+
+            return collection;
         }
         else if (handletypeid == Constants.COMMUNITY)
         {
@@ -237,6 +247,8 @@ public class HandleManager
             if (log.isDebugEnabled())
                 log.debug("Resolved handle " + handle + " to community " +
                           (community == null ? -1 : community.getID()));
+
+            return community;
         }
 
         throw new IllegalStateException("Unsupported Handle Type " +
