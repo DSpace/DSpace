@@ -267,8 +267,10 @@ Common usage:
       <package name="org.dspace.core"/>
       <package name="org.dspace.eperson"/>
       <package name="org.dspace.handle"/>
+      <package name="org.dspace.ingest"/>
       <package name="org.dspace.storage.bitstore"/>
       <package name="org.dspace.storage.rdbms"/>
+      <package name="org.dspace.workflow"/>
     </javadoc>
   </target>
 
