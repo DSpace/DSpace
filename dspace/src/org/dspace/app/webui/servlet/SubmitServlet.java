@@ -48,13 +48,11 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.SubmissionInfo;
@@ -70,7 +68,6 @@ import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
@@ -574,9 +571,9 @@ public class SubmitServlet extends DSpaceServlet
         {
             // see if number of bitstreams in bundle[0] > 1
             // FIXME: Assumes multiple bundles, clean up someday...
-            Bundle[]    bundles    = subInfo.submission.getItem().getBundles();
+            Bundle[] bundles = subInfo.submission.getItem().getBundles();
 
-            if( bundles.length > 0 )
+            if (bundles.length > 0)
             {
                 Bitstream[] bitstreams = bundles[0].getBitstreams();
             
@@ -696,13 +693,17 @@ public class SubmitServlet extends DSpaceServlet
             // remove all but first bitstream from bundle[0]
             // FIXME: Assumes multiple bundles, clean up someday...
             // (only messes with the first bundle.)
-            Bundle[]    bundles    = item.getBundles();
-            Bitstream[] bitstreams = bundles[0].getBitstreams();
-            
-            // Remove all but the first bitstream
-            for (int i = 1; i < bitstreams.length; i++)
+            Bundle[] bundles = item.getBundles();
+
+            if (bundles.length > 0)
             {
-                bundles[0].removeBitstream(bitstreams[i]);
+            	Bitstream[] bitstreams = bundles[0].getBitstreams();
+
+	            // Remove all but the first bitstream
+	            for (int i = 1; i < bitstreams.length; i++)
+	            {
+	                bundles[0].removeBitstream(bitstreams[i]);
+	            }
             }
         }
 
@@ -1349,12 +1350,11 @@ public class SubmitServlet extends DSpaceServlet
 
             // remove bitstream from bundle..
             // delete bundle if it's now empty
-            // FIXME: Assumes: 1 bitstream in each bundle
             Bundle[] bundles = bitstream.getBundles();
             
             bundles[0].removeBitstream(bitstream);
             
-            Bitstream [] bitstreams = bundles[0].getBitstreams();
+            Bitstream[] bitstreams = bundles[0].getBitstreams();
             
             // remove bundle if it's now empty
             if( bitstreams.length < 1)
