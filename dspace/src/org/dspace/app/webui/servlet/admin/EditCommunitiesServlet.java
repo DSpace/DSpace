@@ -503,16 +503,20 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Forward to edit page for new template item
             Item i = collection.getTemplateItem();
+	    // have to update to avoid ref. integrity error
+	    collection.update();
+	    context.complete();
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/admin/edit_item?item_id=" +
+                request.getContextPath() + "/admin/edit-item?item_id=" +
                     i.getID()));
+	    return;
         }
         else if(button.equals("submit_edit_template"))
         {
             // Forward to edit page for template item
             Item i = collection.getTemplateItem();
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/admin/edit_item?item_id=" +
+                request.getContextPath() + "/admin/edit-item?item_id=" +
                     i.getID()));
         }
         else if(button.equals("submit_delete_template"))
@@ -529,8 +533,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         }
 
         // Commit changes to DB
-        collection.update();
-        context.complete();
+	collection.update();
+	context.complete();
     }
 
 
