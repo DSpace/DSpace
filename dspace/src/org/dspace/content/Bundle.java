@@ -194,7 +194,7 @@ public class Bundle extends DSpaceObject
     {
         // Create a table row
         TableRow row = DatabaseManager.create(context, "bundle");
-
+        
         log.info(LogManager.getHeader(context,
             "create_bundle",
             "bundle_id=" + row.getIntColumn("bundle_id")));
@@ -211,6 +211,30 @@ public class Bundle extends DSpaceObject
     public int getID()
     {
         return bundleRow.getIntColumn("bundle_id");
+    }
+
+
+    /**
+     * Get the name of the bundle
+     *
+     * @return name of the bundle (ORIGINAL, TEXT, THUMBNAIL)
+     *  or NULL if not set
+     */
+    public String getName()
+    {
+        return bundleRow.getStringColumn("name");
+    }
+
+
+    /**
+     * Set the name of the bundle
+     *
+     * @param name string name of the bundle (ORIGINAL, TEXT, THUMBNAIL)
+     *   are the values currently used
+     */
+    public void setName(String name)
+    {
+        bundleRow.setColumn("name", name);
     }
 
 
