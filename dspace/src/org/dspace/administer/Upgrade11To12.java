@@ -1,5 +1,5 @@
 /*
- * Upgrade11to12.java
+ * Upgrade11To12.java
  *
  * Version: $Revision$
  *
@@ -51,7 +51,7 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 
-public class Upgrade11to12
+public class Upgrade11To12
 {
     public static void main(String [] argv)
         throws Exception
