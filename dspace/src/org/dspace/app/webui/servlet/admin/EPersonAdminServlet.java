@@ -91,7 +91,9 @@ public class EPersonAdminServlet extends DSpaceServlet
         {
             // add an EPerson, then jump user to edit page
             EPerson e = EPerson.create(context);
-            
+
+            // create clever name and do update before continuing            
+            e.setEmail("newuser"+e.getID());
             e.update();
             
             //showEPeople(context, request, response);
