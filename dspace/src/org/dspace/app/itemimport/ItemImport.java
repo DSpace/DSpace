@@ -47,8 +47,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -71,7 +77,10 @@ import org.dspace.content.InstallItem;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.HandleManager;
+import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -80,10 +89,7 @@ issues
 
 javadocs - even though it's not an API
 allow re-importing
-begin export module thoughts
-rename to ItemLoader
-if no epersonID found, check for username?
-list of collections would be nice too
+list of collections to choose from would be nice too
 
 */
 
@@ -95,14 +101,56 @@ list of collections would be nice too
 
 public class ItemImport
 {
+        
     public static void main(String argv[])
+        throws Exception
     {
-        String usage = "Usage: ItemImport EPersonID collectionID directoryname";
+        String usage = "Itemimport has three modes of operation:\n" +
+                       "  add     = import contents of source_dir, and create mapfile\n" +
+                       "  replace = use mapfile from previously imported items and replace\n" +
+                       "  remove  = use mapfile from previously imported items and delete them\n" +
+                       "\n" +
+                       "ItemImport add EPersonID collectionID source_dir mapfile\n" +
+                       "ItemImport replace EPersonID collectionID source_dir mapfile\n" +
+                       "ItemImport remove mapfile\n";
+
         Context c = null;
 
         ItemImport myloader = new ItemImport();
 
+        int collectionID = -1;
+        int epersonID    = -1;
+        String sourceDir = null;
+        String mapFile   = null;
+        Collection mycollection = null;
+        
         if( argv.length < 3 )
+        {
+            System.out.println( usage );
+            System.exit( 1 );
+        }
+
+        // now get the args
+        if( argv[0].equals( "remove" ) && (argv.length == 3) )
+        {
+//            collectionID = Integer.parseInt( argv[1] );
+            mapFile      = argv[2];
+        }
+        else if( argv[0].equals( "add" ) && (argv.length == 5) )
+        {
+            epersonID    = Integer.parseInt( argv[1] );
+            collectionID = Integer.parseInt( argv[2] );
+            sourceDir    = argv[3];
+            mapFile      = argv[4];
+        }
+        else if( argv[0].equals( "replace" ) && (argv.length == 5) )
+        {
+            epersonID    = Integer.parseInt( argv[1] );
+            collectionID = Integer.parseInt( argv[2] );
+            sourceDir    = argv[3];
+            mapFile      = argv[4];
+        }
+        else
         {
             System.out.println( usage );
             System.exit( 1 );
@@ -110,23 +158,31 @@ public class ItemImport
 
         try
         {
-            // get a context, collectionID, dirname
-            int collectionID = Integer.parseInt( argv[1] );
-            int epersonID    = Integer.parseInt( argv[0] );
-
             c = new Context();
 
-            EPerson ep = EPerson.find(c, epersonID);
+            if( epersonID != -1 )
+            {
+                EPerson ep = EPerson.find(c, epersonID);
+                c.setCurrentUser( ep );
+            }
 
-            c.setCurrentUser( ep );
             c.setIgnoreAuthorization( true );
 
-            Collection mycollection = Collection.find( c, collectionID );
-
-            System.out.println("Importing directory " + argv[2]
-             + " to collection " + collectionID );
-
-            myloader.processDirectory( c, mycollection, argv[2] );
+            
+            if( argv[0].equals( "add" ) )
+            {
+                mycollection = Collection.find( c, collectionID );
+                myloader.addItems( c, mycollection, sourceDir, mapFile );
+            }
+            else if( argv[0].equals( "replace" ) )
+            {
+                mycollection = Collection.find( c, collectionID );
+                myloader.replaceItems( c, mycollection, sourceDir, mapFile );
+            }
+            else if( argv[0].equals( "remove" ) )
+            {
+                myloader.removeItems( c, mycollection, mapFile );
+            }
 
             // complete all transactions
             c.complete();
@@ -141,49 +197,197 @@ public class ItemImport
     }
 
     
-    private void processDirectory( Context c, Collection mycollection, String dirname )
+    private void addItems( Context c, Collection mycollection, String sourceDir, String mapFile )
+        throws Exception
     {
-        System.out.println( "Processing directory: " + dirname );
-
-        String [] dircontents = new java.io.File( dirname ).list();
+        System.out.println( "Adding items from directory: " + sourceDir );
+        System.out.println( "Generating mapfile: " + mapFile );
+        
+        // create the mapfile
+        File outFile = new File( mapFile );
+        PrintWriter mapOut = new PrintWriter( new FileWriter( outFile ) );
+        
+        // now process the source directory
+        String [] dircontents = new java.io.File( sourceDir ).list();
 
         for( int i = 0; i < dircontents.length; i++ )
         {
-            processItem( c, mycollection, dirname, dircontents[ i ] );
+            addItem( c, mycollection, sourceDir, dircontents[ i ], mapOut );
             System.out.println( i + " " + dircontents[ i ] );
         }
+        
+        mapOut.close();
     }
+
+
+    private void replaceItems( Context c, Collection mycollection, String sourceDir, String mapFile )
+        throws Exception
+    {
+        // read in HashMap first, to get list of handles & source dirs
+        HashMap myhash = readMapFile( mapFile );
+        
+        // for each handle, re-import the item, discard the new handle
+        // and re-assign the old handle
+        Iterator i = myhash.keySet().iterator();
+        ArrayList itemsToDelete = new ArrayList();
+        
+        while( i.hasNext() )
+        {
+            // get the old handle
+            String newItemName = (String)i.next();
+            String oldHandle   = (String)myhash.get(newItemName);
+
+            System.out.println("Replacing:  " + oldHandle);
+
+            // add new item, locate old one
+            Item oldItem = (Item)HandleManager.resolveToObject(c, oldHandle);
+            Item newItem = addItem(c, mycollection, sourceDir, newItemName, null);
+
+            String newHandle = HandleManager.findHandle(c, newItem);
+
+            // discard the new handle - FIXME: database hack
+            String myquery =
+                "DELETE FROM handle WHERE resource_type_id=" +
+                Constants.ITEM + " AND resource_id=" + newItem.getID();
+            DatabaseManager.updateQuery(c, myquery );
+
+            // re-assign the old handle one to the new item
+            myquery = "UPDATE handle set resource_id=" +
+                        newItem.getID() +
+                        " WHERE handle.handle LIKE '" + oldHandle + "'";
+            DatabaseManager.updateQuery(c, myquery );
+
+            // schedule item for demolition
+            itemsToDelete.add( oldItem );
+              
+        }
+                
+        // now run through again, deleting items (do this last to avoid disasters!)
+        // (this way deletes only happen if there have been no errors previously) 
+        i = itemsToDelete.iterator();
+        
+        while( i.hasNext() )
+        {
+            removeItem(c, (Item)i.next());
+        }
+    }
+
+
+    private void removeItems( Context c, Collection mycollection, String mapFile )
+        throws Exception
+    {
+        System.out.println( "Deleting items listed in mapfile: " + mapFile );
+        
+        // read in the mapfile
+        HashMap myhash = readMapFile( mapFile );
+
+        // now delete everything that appeared in the mapFile
+        Iterator i = myhash.keySet().iterator();
+        
+        while( i.hasNext() )
+        {
+            String myhandle = (String)myhash.get( i.next() );
+            System.out.println("Deleting item " + myhandle);
+            removeItem(c, myhandle);
+        }
+    }
+
 
 
     // item?  try and add it to the archive
-    private void processItem( Context c, Collection mycollection, String path, String itemname )
+    private Item addItem( Context c, Collection mycollection, String path, String itemname, PrintWriter mapOut )
+        throws Exception
     {
         Item myitem = null;
 
-        try
+        // create workspace item
+        WorkspaceItem wi = WorkspaceItem.create(c, mycollection, false);
+
+        myitem = wi.getItem();
+
+        // now fill out dublin core for item
+        loadDublinCore( c, myitem, path + "/" + itemname + "/" + "dublin_core.xml" );
+
+        // and the bitstreams from the contents file
+        // process contents file, add bistreams and bundles
+        processContentsFile( c, myitem, path + "/" + itemname, "contents" );
+
+        // put item in system
+        InstallItem.installItem(c, wi);
+
+        // now output line to the mapfile
+        String myhandle = HandleManager.findHandle(c, myitem);
+        
+        if(mapOut!=null)
         {
-            // create workspace item
-            WorkspaceItem wi = WorkspaceItem.create(c, mycollection, false);
-
-            myitem = wi.getItem();
-
-            // now fill out dublin core for item
-            loadDublinCore( c, myitem, path + "/" + itemname + "/" + "dublin_core.xml" );
-
-            // and the bitstreams from the contents file
-            // process contents file, add bistreams and bundles
-            processContentsFile( c, myitem, path + "/" + itemname, "contents" );
-
-            // put item in system
-            InstallItem.installItem(c, wi);
+            mapOut.println( itemname + " " + myhandle );       
         }
-        catch( Exception e )
+
+        return myitem;
+    }
+
+    // remove, given the actual item
+    private void removeItem( Context c, Item myitem )
+        throws Exception
+    {
+        Collection[] collections = myitem.getCollections();
+
+        // Remove item from all the collections it's in
+        for (int i = 0; i < collections.length; i++)
         {
-            e.printStackTrace();
-            System.out.println( e );
+           	collections[i].removeItem(myitem);
         }
     }
 
+    // remove, given a handle
+    private void removeItem( Context c, String myhandle )
+        throws Exception
+    {
+        // bit of a hack - to remove an item, you must remove it
+        // from all collections it's a part of, then it will be removed
+        Item myitem = (Item)HandleManager.resolveToObject(c, myhandle);
+
+        removeItem( c, myitem );
+    }
+
+    ////////////////////////////////////
+    // utility methods
+    ////////////////////////////////////
+
+    // read in the map file and generate a hashmap of (file,handle) pairs
+    private HashMap readMapFile( String filename )
+        throws Exception
+    {
+        HashMap myhash = new HashMap();
+
+        BufferedReader is = new BufferedReader( new FileReader( filename     ) );
+        String line;
+
+        while( ( line = is.readLine() ) != null )
+        {
+            String myfile;
+            String myhandle;
+            
+            // a line should be archive filename<whitespace>handle
+            StringTokenizer st = new StringTokenizer( line );
+            if( st.hasMoreTokens() )
+            {
+                myfile = st.nextToken();    
+            }
+            else throw new Exception("Bad mapfile line:\n" + line );
+            
+            if( st.hasMoreTokens() )
+            {
+                myhandle = st.nextToken();
+            }
+            else throw new Exception("Bad mapfile line:\n" + line );
+
+            myhash.put( myfile, myhandle );
+        }
+        is.close();
+
+        return myhash;
+    }
 
     private void loadDublinCore(Context c, Item myitem, String filename)
         throws SQLException, IOException, ParserConfigurationException,
