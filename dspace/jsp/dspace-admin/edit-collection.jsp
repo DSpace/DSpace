@@ -75,6 +75,9 @@
     wfGroups[1] = null;
     wfGroups[2] = null;
 
+    Group editors    = null;
+    Group submitters = null;
+
     Item template = null;
 
     Bitstream logo = null;
@@ -111,6 +114,9 @@
         wfGroups[0] = collection.getWorkflowGroup(1);
         wfGroups[1] = collection.getWorkflowGroup(2);
         wfGroups[2] = collection.getWorkflowGroup(3);
+
+        editors    = collection.getEditors();
+        submitters = collection.getSubmitters();
 
         template = collection.getTemplateItem();
 
@@ -215,6 +221,32 @@
                 </td>
             </tr>
 <%  } %>
+<%-- ===========================================================
+     Collection Submitters
+     =========================================================== --%>
+            <tr>
+                <td class="submitFormLabel">Submitters:</td>
+                <td>
+<%  if (submitters == null) {%>
+                    <input type="submit" name="submit_submitters_create" value="Create...">
+<%  } else { %>
+                    <input type="submit" name="submit_submitters_edit" value="Edit...">
+<%  } %>                    
+                </td>
+            </tr>   
+<%-- ===========================================================
+     Collection Editors
+     =========================================================== --%>
+            <tr>
+                <td class="submitFormLabel">Editors:</td>
+                <td>
+<%  if (editors == null) {%>
+                    <input type="submit" name="submit_editors_create" value="Create...">
+<%  } else { %>
+                    <input type="submit" name="submit_editors_edit" value="Edit...">
+<%  } %>                    
+                </td>
+            </tr>   
 <%-- ===========================================================
      Item template
      =========================================================== --%>

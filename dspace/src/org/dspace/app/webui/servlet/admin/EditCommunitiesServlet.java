@@ -493,6 +493,26 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 request.getContextPath() + "/tools/group-edit?group_id=" +
                     newGroup.getID()));
         }
+        else if(button.equals("submit_editors_create"))
+        {
+            // Create new group
+            Group newGroup = collection.createEditors();
+
+            // Forward to group edit page
+            response.sendRedirect(response.encodeRedirectURL(
+                request.getContextPath() + "/tools/group-edit?group_id=" +
+                    newGroup.getID()));
+        }
+        else if(button.equals("submit_submitters_create"))
+        {
+            // Create new group
+            Group newGroup = collection.createSubmitters();
+
+            // Forward to group edit page
+            response.sendRedirect(response.encodeRedirectURL(
+                request.getContextPath() + "/tools/group-edit?group_id=" +
+                    newGroup.getID()));
+        }
         else if(button.equals("submit_authorization_edit"))
         {
             // Forward to policy edit page
@@ -506,6 +526,22 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Edit workflow group
             Group g = collection.getWorkflowGroup(step);
+            response.sendRedirect(response.encodeRedirectURL(
+                request.getContextPath() + "/tools/group-edit?group_id=" +
+                    g.getID()));
+        }
+        else if(button.equals("submit_submitters_edit"))
+        {
+            // Edit submitters group
+            Group g = collection.getSubmitters();
+            response.sendRedirect(response.encodeRedirectURL(
+                request.getContextPath() + "/tools/group-edit?group_id=" +
+                    g.getID()));
+        }
+        else if(button.equals("submit_editors_edit"))
+        {
+            // Edit 'editors' group
+            Group g = collection.getEditors();
             response.sendRedirect(response.encodeRedirectURL(
                 request.getContextPath() + "/tools/group-edit?group_id=" +
                     g.getID()));
@@ -640,8 +676,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
             JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
         }
 
-		// Remove temp file
-		temp.delete();
+        // Remove temp file
+        temp.delete();
 
         // Update DB
         context.complete();
