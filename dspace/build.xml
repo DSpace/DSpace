@@ -122,24 +122,64 @@ Common usage:
 
   <target name="update"
           description="Update installed code (install without clobbering data)">
+    <mkdir dir="${dspace.dir}/config" />
+    <mkdir dir="${assetstore.dir}" />
+    <mkdir dir="${handle.dir}" />
+    <mkdir dir="${history.dir}" />
+    <mkdir dir="${search.dir}" />
+    <mkdir dir="${log.dir}" />
     <mkdir dir="${dspace.dir}/bin"/>
     <mkdir dir="${dspace.dir}/lib"/>
-    <mkdir dir="${dspace.dir}/jsp/WEB-INF/lib"/>
+    <mkdir dir="${dspace.dir}/jsp/WEB-INF"/>
+    <mkdir dir="${dspace.dir}/oai/WEB-INF"/>
+    <!-- Delete symlinks, otherwise ln -s commands below would create
+         extra symlinks, e.g. "WEB-INF/lib/lib".  Plus, we need to use
+         shell "rm" command, since ANT's delete task doesn't
+         understand symlinks. -->
+    <exec executable="rm">
+      <arg value="-f" />
+      <arg value="${dspace.dir}/jsp/WEB-INF/classes" />
+      <arg value="${dspace.dir}/jsp/WEB-INF/lib" />
+      <arg value="${dspace.dir}/oai/WEB-INF/classes" />
+      <arg value="${dspace.dir}/oai/WEB-INF/lib" />
+    </exec>
+    <!-- Symlink the Web UI and OAI webapps "classes" and "lib" directory
+      -  to dspace.dir/config and dspace.dir/lib respectively -->
+    <exec executable="ln">
+      <arg value="-s" />
+      <arg value="${dspace.dir}/config" />
+      <arg value="${dspace.dir}/jsp/WEB-INF/classes" />
+    </exec>
+    <exec executable="ln">
+      <arg value="-s" />
+      <arg value="${dspace.dir}/lib" />
+      <arg value="${dspace.dir}/jsp/WEB-INF/lib" />
+    </exec>
+    <exec executable="ln">
+      <arg value="-s" />
+      <arg value="${dspace.dir}/config" />
+      <arg value="${dspace.dir}/oai/WEB-INF/classes" />
+    </exec>
+    <exec executable="ln">
+      <arg value="-s" />
+      <arg value="${dspace.dir}/lib" />
+      <arg value="${dspace.dir}/oai/WEB-INF/lib" />
+    </exec>
     <copy todir="${dspace.dir}/bin">
       <fileset dir="bin"/>
     </copy>
     <exec executable="chmod">
       <arg value="-R" />
-      <arg value="a+x" />
+      <arg value="u+x" />
       <arg value="${dspace.dir}/bin" />
     </exec>
-    <copy todir="${dspace.dir}/jsp/WEB-INF/lib">
+    <copy todir="${dspace.dir}/lib">
       <fileset dir="lib"/>
     </copy>
     <copy todir="${dspace.dir}/jsp">
       <fileset dir="jsp"/>
     </copy>
-    <jar jarfile="${dspace.dir}/jsp/WEB-INF/lib/dspace.jar"
+    <jar jarfile="${dspace.dir}/lib/dspace.jar"
          basedir="${basedir}/build/classes" />
   </target>
   
@@ -155,22 +195,11 @@ Common usage:
   <target name="install_code"
           depends="update"
           description="Do a fresh install of the system, not touching database">
-    <mkdir dir="${dspace.dir}/config" />
-    <mkdir dir="${assetstore.dir}" />
-    <mkdir dir="${handle.dir}" />
-    <mkdir dir="${history.dir}" />
-    <mkdir dir="${search.dir}" />
-    <mkdir dir="${log.dir}" />
     <copy todir="${dspace.dir}/config">
       <fileset dir="${basedir}/config"/>
     </copy>
     <copy file="${basedir}/etc/log4j.build.properties"
           tofile="${dspace.dir}/config/log4j.properties"/>
-    <exec executable="ln">
-      <arg value="-s" />
-      <arg value="${dspace.dir}/config" />
-      <arg value="${dspace.dir}/jsp/WEB-INF/classes" />
-    </exec>
   </target>
 
 

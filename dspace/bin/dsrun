@@ -58,13 +58,13 @@ BINDIR=`dirname $0`
 DSPACEDIR=`cd "$BINDIR/.." ; pwd`
 
 # Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
-JARS=`echo $DSPACEDIR/jsp/WEB-INF/lib/*.jar | sed 's/ /\:/g'`
+JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
 
 # Class path for DSpace will be:
 #   Any existing classpath
 #   The JARs (WEB-INF/lib/*.jar)
 #   The WEB-INF/classes directory
-FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/jsp/WEB-INF/classes
+FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
 
 # Now invoke Java
 java -classpath $FULLPATH "$@"
