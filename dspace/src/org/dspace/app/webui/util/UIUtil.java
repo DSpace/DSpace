@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.app.webui.SiteAuthenticator;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -101,6 +102,15 @@ public class UIUtil
 
                 Authenticate.loggedIn(c, request, e);
             }
+
+            // Set any special groups - invoke the site authenticator
+            SiteAuthenticator siteAuth = Authenticate.getSiteAuth();
+            int[] groupIDs = siteAuth.getSpecialGroups(c, request);
+            for (int i = 0; i < groupIDs.length; i++)
+            {
+                c.setSpecialGroup(groupIDs[i]);
+            }
+
 
             // Set the session ID
             c.setExtraLogInfo("session_id=" + request.getSession().getId());

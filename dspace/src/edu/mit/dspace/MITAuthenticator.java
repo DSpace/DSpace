@@ -44,25 +44,35 @@ package edu.mit.dspace;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import org.dspace.app.webui.SiteAuthenticator;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 /**
  * MIT implementation of DSpace Web UI authentication.  This version detects
  * whether the user is an MIT user, and if so, the user is redirected to the
- * certificate login page.  Otherwise, the email/password page is used
+ * certificate login page.  Otherwise, the email/password page is used.
+ * <P>
+ * The special group at MIT is an "MIT Users" group.  Users who are on an
+ * MIT IP address, or have an e-mail ending in "mit.edu" are implictly
+ * members of this group.
  *
  * @author  Robert Tansley
  * @version $Revision$
  */
 public class MITAuthenticator implements SiteAuthenticator
 {
+    /** log4j category */
+    private static Logger log = Logger.getLogger(SiteAuthenticator.class);
+
     public void startAuthentication(Context context,
         HttpServletRequest request,
         HttpServletResponse response)
@@ -70,21 +80,6 @@ public class MITAuthenticator implements SiteAuthenticator
     {
         if (isMITUser(request))
         {
-            try
-            {
-                // add the user to the special group "MIT Users"
-                Group MITGroup = Group.findByName(context, "MIT Users");
-
-                if( MITGroup != null )
-                {
-                    context.setSpecialGroup( MITGroup.getID() );
-                }
-            }
-            catch(SQLException e)
-            {
-                // FIXME: quietly fail if we caught SQLException 
-            }
-        
             // Try and get a certificate by default
             response.sendRedirect(response.encodeRedirectURL(
                 request.getContextPath() + "/certificate-login"));
@@ -95,6 +90,37 @@ public class MITAuthenticator implements SiteAuthenticator
             response.sendRedirect(response.encodeRedirectURL(
                 request.getContextPath() + "/password-login"));
         }
+    }
+
+
+    public int[] getSpecialGroups(Context context,
+        HttpServletRequest request)
+        throws SQLException
+    {        
+        // Add user to "MIT Users" special group if they're an MIT user
+
+        EPerson user = context.getCurrentUser();
+        boolean hasMITEmail = (user != null &&
+            user.getEmail().toLowerCase().endsWith("@mit.edu"));
+
+        if (hasMITEmail || isMITUser(request))
+        {
+            // add the user to the special group "MIT Users"
+            Group mitGroup = Group.findByName(context, "MIT Users");
+
+            if (mitGroup == null)
+            {
+                // Oops - the group isn't there.
+                log.warn(LogManager.getHeader(context,
+                    "No MIT Group!!",
+                    ""));
+                return new int[0];
+            }
+
+            return new int[] {mitGroup.getID()};
+        }
+
+        return new int[0];
     }
 
 

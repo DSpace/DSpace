@@ -41,6 +41,7 @@
 package org.dspace.app.webui;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,4 +78,18 @@ public interface SiteAuthenticator
         HttpServletRequest request,
         HttpServletResponse response)
         throws ServletException, IOException;
+
+
+    /**
+     * Work out if the current user is implicitly a member of any groups.
+     * This may include checking an IP address etc.
+     *
+     * @param context   current DSpace context object
+     * @param request   the request leading up to authentication being required
+     *
+     * @return  the IDs of groups the user is implicitly in
+     */
+    public int[] getSpecialGroups(Context context,
+        HttpServletRequest request)
+        throws SQLException;
 }

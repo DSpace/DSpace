@@ -69,6 +69,53 @@ public class Authenticate
     private static Logger log = Logger.getLogger(Authenticate.class);
 
 
+    /** The site authenticator */
+    private static SiteAuthenticator siteAuth = null;
+
+
+    /**
+     * Get the site authenticator.  Reads the appropriate configuration
+     * property.
+     *
+     * @return   the implementation of the SiteAuthenticator interface to
+     *           use for this DSpace site.
+     */
+    public static SiteAuthenticator getSiteAuth()
+    {
+        if (siteAuth != null)
+        {
+            return siteAuth;
+        }
+
+        // Instantiate the site authenticator
+        String siteAuthClassName = ConfigurationManager.getProperty(
+            "webui.site.authenticator");
+
+        try
+        {
+            Class siteAuthClass = Class.forName(siteAuthClassName);
+            siteAuth = (SiteAuthenticator) siteAuthClass.newInstance();
+        }
+        catch(Exception e)
+        {
+            // Problem instantiating
+            if (siteAuthClassName == null)
+            {
+                siteAuthClassName = "null";
+            }
+
+            log.fatal(LogManager.getHeader(null,
+                    "no_site_authenticator",
+                    "webui.site.authenticator=" + siteAuthClassName),
+                e);
+                
+            throw new IllegalStateException(e.toString());
+        }
+
+        return siteAuth;
+    }
+    
+
     /**
      * Return the request that the system should be dealing with, given the
      * request that the browse just sent.  If the incoming request is from
@@ -180,34 +227,8 @@ public class Authenticate
         session.setAttribute("interrupted.request.url",
             UIUtil.getOriginalURL(request));
         
-        // Instantiate the site authenticator
-        String siteAuthClassName = ConfigurationManager.getProperty(
-            "webui.site.authenticator");
-        SiteAuthenticator siteAuth;
-
-        try
-        {
-            Class siteAuthClass = Class.forName(siteAuthClassName);
-            siteAuth = (SiteAuthenticator) siteAuthClass.newInstance();
-        }
-        catch(Exception e)
-        {
-            // Problem instantiating
-            if (siteAuthClassName == null)
-            {
-                siteAuthClassName = "null";
-            }
-
-            log.fatal(LogManager.getHeader(context,
-                    "no_site_authenticator",
-                    "webui.site.authenticator=" + siteAuthClassName),
-                e);
-                
-            throw new ServletException(e);
-        }
-
         // Start up the site authenticator
-        siteAuth.startAuthentication(context, request, response);
+        getSiteAuth().startAuthentication(context, request, response);
     }
 
 
