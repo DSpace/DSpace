@@ -113,7 +113,7 @@ public class BitstreamFormat
         extensions = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context,
-            "SELECT * FROM formatidentifier WHERE bitstream_format_id=" +
+            "SELECT * FROM fileextension WHERE bitstream_format_id=" +
             getID());
         
         while (tri.hasNext())
@@ -496,14 +496,14 @@ public class BitstreamFormat
 
         // Delete extensions
         DatabaseManager.updateQuery(bfContext,
-            "DELETE FROM formatidentifier WHERE bitstream_format_id=" +
+            "DELETE FROM fileextension WHERE bitstream_format_id=" +
             getID());
 
         // Rewrite extensions
         for (int i = 0; i < extensions.size(); i++)
         {
             String s = (String) extensions.get(i);
-            TableRow r = DatabaseManager.create(bfContext, "formatidentifier");
+            TableRow r = DatabaseManager.create(bfContext, "fileextension");
             r.setColumn("bitstream_format_id", getID());
             r.setColumn("extension", s);
             DatabaseManager.update(bfContext, r);
@@ -540,7 +540,7 @@ public class BitstreamFormat
 
         // Delete extensions
         DatabaseManager.updateQuery(bfContext,
-            "DELETE FROM formatidentifier WHERE bitstream_format_id=" +
+            "DELETE FROM fileextension WHERE bitstream_format_id=" +
             getID());
 
         // Delete this format from database

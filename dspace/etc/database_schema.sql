@@ -65,11 +65,11 @@ CREATE TABLE BitstreamFormatRegistry
 );
 
 -------------------------------------------------------
--- FormatIdentifier table
+-- FileExtension table
 -------------------------------------------------------
-DROP TABLE FormatIdentifier;
+DROP TABLE FileExtension;
 
-CREATE TABLE FormatIdentifier
+CREATE TABLE FileExtension
 (
   id                   INTEGER PRIMARY KEY,
   bitstream_format_id  INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),

@@ -103,12 +103,12 @@ public class FormatIdentifier
             return null;
         }
 
-        // See if the extension is in the FormatIdentifier table
+        // See if the extension is in the fileextension table
         TableRowIterator tri = DatabaseManager.query(context,
             "SELECT bitstreamformatregistry.* FROM bitstreamformatregistry, " +
-            "formatidentifier WHERE formatidentifier.extension LIKE '" +
+            "fileextension WHERE fileextension.extension LIKE '" +
             extension +"' AND bitstreamformatregistry.bitstream_format_id=" +
-            "formatidentifier.bitstream_format_id");
+            "fileextension.bitstream_format_id");
 
         if (tri.hasNext())
         {
