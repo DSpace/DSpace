@@ -118,7 +118,7 @@
 %>
             </tr>
             <tr>
-                <td class="evenRowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>/<%= java.net.URLEncoder.encode(bitstream.getName()) %>" target="_blank"><%= bitstream.getName() %></A></td>
+                <td class="evenRowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstream.getName()) %>" target="_blank"><%= bitstream.getName() %></A></td>
                 <td class="evenRowEvenCol"><%= bitstream.getSize() %> bytes</td>
                 <td class="evenRowOddCol">
 <%

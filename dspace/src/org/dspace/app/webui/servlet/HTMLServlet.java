@@ -73,6 +73,26 @@ public class HTMLServlet extends DSpaceServlet
     /** log4j category */
     private static Logger log = Logger.getLogger(HTMLServlet.class);
 
+    // Return bitstream whose name matches the target bitstream-name
+    // bsName, or null if there is no match.  Match must be exact.
+    // NOTE: This does not detect duplicate bitstream names, just returns first.
+    private static Bitstream getItemBitstreamByName(Item item, String bsName)
+    {
+        Bundle[] bundles = item.getBundles();
+
+        for (int i = 0; i < bundles.length; i++)
+        {
+            Bitstream[] bitstreams = bundles[i].getBitstreams();
+
+            for (int k = 0; k < bitstreams.length; k++)
+            {
+                if (bsName.equals(bitstreams[k].getName()))
+                    return bitstreams[k];
+            }
+        }
+        return null;
+    }
+
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -113,6 +133,23 @@ public class HTMLServlet extends DSpaceServlet
                 handle = handle.substring(0, slashIndex);
             }
 
+            /* Get entire relative path after handle, in case it
+             * is actually the bitstream name.  e.g. for item
+             * with handle 1234.56/13, the URL for an item could be:
+             * .../dspace/1234.56/13/sub1/sub2/foo.html
+             * so return relative path: "sub1/sub2/foo.html"
+             * Also translate any encoded slashes, etc. to match bitstream name.
+             */
+            String relPath = null;
+            slashIndex = idString.indexOf('/');
+            if (slashIndex != -1)
+            {
+                slashIndex = idString.indexOf('/', slashIndex + 1);
+                if (slashIndex != -1)
+                    relPath = URLDecoder.decode(idString.substring(slashIndex + 1),
+                                                Constants.DEFAULT_ENCODING);
+            }
+
             // Find the corresponding bitstream
             try
             {
@@ -149,24 +186,10 @@ public class HTMLServlet extends DSpaceServlet
                     return;
                 }
 
-                Bundle[] bundles = item.getBundles();
+                if (relPath == null ||
+                    (bitstream = getItemBitstreamByName(item, relPath)) == null)
+                    bitstream = getItemBitstreamByName(item, filename);
 
-                for (int i = 0; i < bundles.length; i++)
-                {
-                    Bitstream[] bitstreams = bundles[i].getBitstreams();
-
-                    if (!found)
-                    {
-                        for (int k = 0; k < bitstreams.length; k++)
-                        {
-                            if (filename.equals(bitstreams[k].getName()))
-                            {
-                                bitstream = bitstreams[k];
-                                found = true;
-                            }
-                        }
-                    }
-                }
             }
             catch (NumberFormatException nfe)
             {

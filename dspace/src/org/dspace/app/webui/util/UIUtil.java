@@ -44,6 +44,7 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Enumeration;
+import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,6 +54,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.eperson.EPerson;
@@ -531,5 +533,53 @@ public class UIUtil
             // Not much we can do here!
             log.warn("Unable to send email alert", e);
         }
-    }
+    }    
+    
+	/**
+	 * Encode a bitstream name for inclusion in a URL in an HTML document.
+	 * This differs from the usual URL-encoding, since we want pathname
+	 * separators to be passed through verbatim; this is required
+	 * so that relative paths in bitstream names and HTML references
+	 * work correctly.
+	 * <P>
+	 * If the link to a bitstream is generated with the pathname separators
+	 * escaped (e.g. "%2F" instead of "/") then the Web user agent perceives
+	 * it to be one pathname element, and relative URI paths within that
+	 * document containing ".." elements will be handled incorrectly.
+	 * <P>
+	 * @param stringIn
+	 *		  input string to encode
+	 * @param encoding
+	 *		  character encoding, e.g. UTF-8
+	 * @return the encoded string
+	 */
+	 public static String encodeBitstreamName(String stringIn, String encoding)
+	 throws java.io.UnsupportedEncodingException
+	 {
+		int curStart = 0;
+		int nextSlash = stringIn.indexOf("/");
+		String out = "";
+	
+		while (nextSlash != -1)
+		{
+		    out += URLEncoder.encode(stringIn.substring(curStart, nextSlash), encoding) +
+			   "/";
+		    curStart = nextSlash + 1;
+		    nextSlash = stringIn.indexOf("/", curStart);
+		}
+		out += URLEncoder.encode(stringIn.substring(curStart), encoding);
+		return out;
+	 }
+
+	/** Version of encodeBitstreamName with one parameter, uses default encoding
+	 * <P>
+	 * @param stringIn
+	 *		  input string to encode
+	 * @return the encoded string
+	 */
+	 public static String encodeBitstreamName(String stringIn)
+	 throws java.io.UnsupportedEncodingException
+	 {
+	 	return encodeBitstreamName(stringIn, Constants.DEFAULT_ENCODING);
+	 }
 }

@@ -157,7 +157,7 @@
 			   <%   }
 			      } %> >
 		</td>
-                <td class="<%= row %>RowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= java.net.URLEncoder.encode(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A></td>
+                <td class="<%= row %>RowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A></td>
                 <td class="<%= row %>RowEvenCol"><%= bitstreams[i].getSize() %> bytes</td>
                 <td class="<%= row %>RowOddCol">
                     <%= (bitstreams[i].getDescription() == null || bitstreams[i].getDescription().equals("")

@@ -85,29 +85,37 @@ public class BitstreamServlet extends DSpaceServlet
 
         if (idString != null)
         {
-            // Remove leading slash
+             // Parse 'handle' and 'sequence' (bitstream seq. number) out
+             // of remaining URL path, which is typically of the format:
+             //    {handle}/{sequence}/{bitstream-name}
+             // But since the bitstream name MAY have any number of "/"s in
+             // it, and the handle is guaranteed to have one slash, we
+             // scan from the start to pick out handle and sequence:
+
+             // Remove leading slash if any:
             if (idString.startsWith("/"))
             {
                 idString = idString.substring(1);
             }
 
-            // Remove last slash and filename after it
-            int slashIndex = idString.lastIndexOf('/');
-
+            // skip first slash within handle
+            int slashIndex = idString.indexOf('/');
             if (slashIndex != -1)
             {
-                idString = idString.substring(0, slashIndex);
+                slashIndex = idString.indexOf('/', slashIndex + 1);
+                if (slashIndex != -1)
+                {
+                    handle = idString.substring(0, slashIndex);
+                    int slash2 = idString.indexOf('/', slashIndex + 1);
+                    if (slash2 != -1)
+                        sequence = idString.substring(slashIndex+1,slash2);
+                    else
+                        sequence = idString.substring(slashIndex+1);
+                }
+                else
+                    handle = idString;
             }
-
-            // Get bitstream sequence ID
-            slashIndex = idString.lastIndexOf('/');
-
-            if (slashIndex != -1)
-            {
-                sequence = idString.substring(slashIndex + 1);
-                handle = idString.substring(0, slashIndex);
-            }
-
+            
             // Find the corresponding bitstream
             try
             {

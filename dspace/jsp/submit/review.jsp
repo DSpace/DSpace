@@ -288,7 +288,7 @@
             downloadLink = "html/db-id/" + item.getID();
         }
 %>
-                                            <A HREF="<%= request.getContextPath() %>/<%= downloadLink %>/<%= java.net.URLEncoder.encode(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A> - <%= bitstreams[i].getFormatDescription() %>
+                                            <A HREF="<%= request.getContextPath() %>/<%= downloadLink %>/<%= UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A> - <%= bitstreams[i].getFormatDescription() %>
 <%
         switch (format.getSupportLevel())
         {
