@@ -766,7 +766,7 @@ public class SubmitServlet extends DSpaceServlet
         readText(request, item, "title", null, false, "en");
 	// verify that a title has been entered
 	DCValue[] dcValues = item.getDC("title", null, "en");
-	subInfo.missing = dcValues.length == 0;
+	boolean titleMissing = dcValues.length == 0;
 
         if (subInfo.submission.hasMultipleTitles())
         {
@@ -810,9 +810,19 @@ public class SubmitServlet extends DSpaceServlet
             }
         }
 
+	boolean issueDateMissing = false;
         if (subInfo.submission.isPublishedBefore())
         {
             readDate(request, item, "date", "issued");
+	    // check that at least year has been entered - flag if not
+	    DCValue[] dateArray = item.getDC("date", "issued", Item.ANY);
+	    DCDate dateIssued = new DCDate(
+			  (dateArray.length > 0 ? dateArray[0].value : ""));
+	    if ( dateIssued.getYear() <= 0 )
+	    {
+		issueDateMissing = true;
+	    }
+
             // Careful that this happens AFTER identifier.* is blown away
             // above!!
             readText(request, item, "identifier", "citation", false, "en");
@@ -857,10 +867,11 @@ public class SubmitServlet extends DSpaceServlet
         }
         else if (buttonPressed.equals("submit_next"))
         {
-	    // return to edit metadata 1 if title missing
-	    if ( subInfo.missing )
+	    // return to edit metadata 1 if title or issue date missing
+	    if (titleMissing || issueDateMissing)
 	    {
-		subInfo.jumpToField = "title";
+		subInfo.missing = true;
+		subInfo.jumpToField = (titleMissing ? "title" : "date_issued_year");
 		nextStep = EDIT_METADATA_1;
 	    }
 	    else
