@@ -259,11 +259,11 @@ public class BrowseServlet extends DSpaceServlet
                 {
                     startsWith = startsWith + "-32";
                 }
-
-                scope.setFocus(startsWith);
-                highlight = true;
-                logInfo = "starts_with=" + startsWith + ",";
             }
+
+            scope.setFocus(startsWith);
+            highlight = true;
+            logInfo = "starts_with=" + startsWith + ",";
         }
         else if (top != null || bottom != null)
         {
