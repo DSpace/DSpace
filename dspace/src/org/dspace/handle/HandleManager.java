@@ -132,7 +132,7 @@ public class HandleManager
         throws SQLException
     {
         TableRow handle = DatabaseManager.create(context, "Handle");
-        String handleId = createId();
+        String handleId = createId(handle.getIntColumn("handle_id"));
 
         handle.setColumn("handle",           handleId);
         handle.setColumn("resource_type_id", Constants.ITEM);
@@ -283,14 +283,10 @@ public class HandleManager
      * @return A new handle id
      * @exception SQLException If a database error occurs
      */
-    private static String createId()
+    private static String createId(int id)
         throws SQLException
     {
         String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
-
-        // Use Handle PKs as locally unique ids
-        int id = DatabaseManager.getId("Handle");
-
         return new StringBuffer()
             .append(handlePrefix)
             .append(handlePrefix.endsWith("/") ? "" : "/")
