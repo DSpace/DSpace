@@ -106,6 +106,7 @@ public class DatabaseManager
      * @param query The SQL query
      * @return A TableRowIterator with the results of the query
      * @exception SQLException If a database error occurs
+     * @deprecated
      */
     public static TableRowIterator query(Context context,
                                          String table,
@@ -121,17 +122,38 @@ public class DatabaseManager
     }
 
     /**
+     * Return an iterator with the results of the query.
+     *
+     * @param context The context object
+     * @param query The SQL query
+     * @return A TableRowIterator with the results of the query
+     * @exception SQLException If a database error occurs
+     */
+    public static TableRowIterator query(Context context,
+                                         String query)
+        throws SQLException
+    {
+        if (log.isDebugEnabled())
+            log.debug("Running query \"" + query + "\"");
+
+        Statement statement = context.getDBConnection().createStatement();
+        return new TableRowIterator(statement.executeQuery(query));
+    }
+
+
+    /**
      * Return an iterator with the results of executing statement.
      * The table parameter indicates the type of result. If
      * table is null, the column names are read from the
      * ResultSetMetaData.
      * The context is that of the connection which was used to create
-     * STATEMENT.
+     * the statement.
      *
      * @param statement The prepared statement to execute.
      * @param table The name of the table which results
      * @return A TableRowIterator with the results of the query
      * @exception SQLException If a database error occurs
+     * @deprecated
      */
     public static TableRowIterator query(String table,
                                          PreparedStatement statement)
@@ -142,6 +164,39 @@ public class DatabaseManager
     }
 
     /**
+     * Return an iterator with the results of executing statement.
+     * The context is that of the connection which was used to create
+     * the statement.
+     *
+     * @param statement The prepared statement to execute.
+     * @return A TableRowIterator with the results of the query
+     * @exception SQLException If a database error occurs
+     */
+    public static TableRowIterator query(PreparedStatement statement)
+        throws SQLException
+    {
+        return new TableRowIterator(statement.executeQuery());
+    }
+
+    /**
+     * Return the single row result to this query, or null if no result.
+     * If more than one row results, only the first is returned.
+     *
+     * @param context Current DSpace context
+     * @param query The SQL query
+     * @return A TableRow object, or null if no result
+     * @exception SQLException If a database error occurs
+     */
+    public static TableRow querySingle( Context context,
+                                        String query )
+        throws SQLException
+    {
+        TableRowIterator iterator = query(context, query);
+        return (! iterator.hasNext()) ? null : iterator.next();
+    }
+
+
+    /**
      * Return the single row result to this query, or null if no result.
      * If more than one row results, only the first is returned.
      *
@@ -150,6 +205,7 @@ public class DatabaseManager
      * @param query The SQL query
      * @return A TableRow object, or null if no result
      * @exception SQLException If a database error occurs
+     * @deprecated
      */
     public static TableRow querySingle( Context context,
                                         String table,
