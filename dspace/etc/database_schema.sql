@@ -71,7 +71,7 @@ DROP TABLE FileExtension;
 
 CREATE TABLE FileExtension
 (
-  id                   INTEGER PRIMARY KEY,
+  file_extension_id    INTEGER PRIMARY KEY,
   bitstream_format_id  INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),
   extension            VARCHAR(16)
 );
