@@ -97,7 +97,7 @@ public class Constants
 
     /**
      * Action of deleting something.  Different from removing something
-     * from a container.
+     * from a container. (DELETE is now obsolete)
      * @see #REMOVE
      */
     public static final int DELETE          = 2;
@@ -128,6 +128,12 @@ public class Constants
     /** Action of performing a workflow */
     public static final int WORKFLOW_ABORT  = 8;
 
+    /** Default Read policies for Bitstreams submitted to container */
+    public static final int DEFAULT_BITSTREAM_READ = 9;
+
+    /** Default Read policies for Items submitted to container */
+    public static final int DEFAULT_ITEM_READ = 10;
+
 
     /**
      * lets you look up action names from the action IDs
@@ -136,13 +142,48 @@ public class Constants
     {
         "READ",
         "WRITE",
-        "DELETE",
+        "OBSOLETE (DELETE)",
         "ADD",
         "REMOVE",
         "WORKFLOW_STEP_1",
         "WORKFLOW_STEP_2",
         "WORKFLOW_STEP_3",
-        "WORKFLOW_ABORT"
+        "WORKFLOW_ABORT",
+        "DEFAULT_BITSTREAM_READ",
+        "DEFAULT_ITEM_READ"
+    };
+
+
+    /** constants for the relevance array
+     * generating dynamicallis is simple: just 1 << TYPE
+     */
+    public static final int RBITSTREAM = 1 << BITSTREAM;
+    public static final int RBUNDLE    = 1 << BUNDLE;
+    public static final int RITEM      = 1 << ITEM;
+    public static final int RCOLLECTION= 1 << COLLECTION;
+    public static final int RCOMMUNITY = 1 << COMMUNITY;
+
+
+    /** Array of relevances of actions to objects - used by the
+     *  UI to only display actions that are relevant to an object type
+     *  To see if an action is relevant to an object, just OR the
+     *  relevance type above with the value in actionTypeRelevance[]
+     *  (To see if READ is relevant to community, just test
+     *   actionTypeRelevance[READ] | RCOMMUNITY, 0 = irrelevant
+     */
+    public static final int [] actionTypeRelevance =
+    {
+        RBITSTREAM|RBUNDLE|RITEM|RCOLLECTION, // 0 - READ
+        RBITSTREAM|RBUNDLE|RITEM|RCOLLECTION, // 1 - WRITE
+        0,                                    // 2 - DELETE (obsolete)
+        RBUNDLE|RITEM|RCOLLECTION|RCOMMUNITY, // 3 - ADD
+        RBUNDLE|RITEM|RCOLLECTION|RCOMMUNITY, // 4 - REMOVE
+        0,           // 5  - WORKFLOW_STEP_1
+        0,           // 6  - WORKFLOW_STEP_2
+        0,           // 7  - WORKFLOW_STEP_3
+        0,           // 8  - WORKFLOW_ABORT
+        RCOLLECTION, // 9  - DEFAULT_BITSTREAM_READ
+        RCOLLECTION  // 10 - DEFAULT_ITEM_READ
     };
 
 
