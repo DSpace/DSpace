@@ -1218,7 +1218,8 @@ public class Item extends DSpaceObject
             ourContext.getExtraLogInfo());
         
         // Add to indicies
-        Browse.itemAdded(ourContext, this);
+        // Remove - update() already performs this
+        // Browse.itemAdded(ourContext, this);
         DSIndexer.indexContent(ourContext, this);
         
         // authorization policies
