@@ -58,15 +58,18 @@ import org.dspace.core.Context;
 public class BrowseRun
 {
     /**
-   * Embedded test harness
-   *
-   * @param argv - Command-line arguments
-   */
+     * Embedded test harness
+     *
+     * @param argv - Command-line arguments
+     */
     public static void main(String[] argv)
         throws Exception
     {
         Context context = new Context();
-        List last = Browse.getLastSubmitted(context, 5);
+        BrowseScope scope = new BrowseScope(context);
+        scope.setTotal(5);
+
+        List last = Browse.getLastSubmitted(scope);
         if (last.isEmpty())
         {
             System.out.println("No items submitted");
@@ -77,25 +80,36 @@ public class BrowseRun
             printItem(item, Item.ANY, Item.ANY, Item.ANY);
         }
 
-        BrowseInfo info = Browse.getAuthors(context, null, 4, 10);
+        scope.setNumberBefore(4);
+        scope.setTotal(10);
+        BrowseInfo info = Browse.getAuthors(scope);
         printResults(info);
-        info = Browse.getItemsByTitle(context, (String) null, 4, 40);
+
+        scope.setTotal(40);
+        info = Browse.getItemsByTitle(scope);
         printTitleResults(info);
-        info = Browse.getItemsByTitle(context, (String) null, 4, 40);
+
+        // Should hit browse cache
+        info = Browse.getItemsByTitle(scope);
         printTitleResults(info);
-        info = Browse.getItemsByTitle(context, (String) null, 4, 40);
-        printTitleResults(info);
-        info = Browse.getItemsByAuthor(context, (String) null, 6, false);
+
+        scope.setTotal(6);
+        info = Browse.getItemsByAuthor(scope, false);
         printAuthorResults(info);
-        info = Browse.getItemsByAuthor(context, (String) null, 6, false);
+        // Should hit browse cache
+        info = Browse.getItemsByAuthor(scope, false);
         printAuthorResults(info);
-        info = Browse.getItemsByAuthor(context, (String) null, 6, true);
+
+        info = Browse.getItemsByAuthor(scope, true);
         printAuthorResults(info);
-        info = Browse.getItemsByDate(context, (String) null, 4, 40, false);
+
+        scope.setTotal(40);
+        info = Browse.getItemsByDate(scope, false);
         printDateResults(info);
-        info = Browse.getItemsByDate(context, (String) null, 4, 40, true);
+        info = Browse.getItemsByDate(scope, true);
         printDateResults(info);
-        info = Browse.getItemsByDate(context, (String) null, 4, 40, true);
+        // Should hit browse cache
+        info = Browse.getItemsByDate(scope, true);
         printDateResults(info);
         context.complete();
     }
