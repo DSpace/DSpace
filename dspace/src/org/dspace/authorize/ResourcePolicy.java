@@ -208,6 +208,23 @@ public class ResourcePolicy
         return myRow.getIntColumn("action_id");
     }
 
+    /**
+     * @return action text or 'null' if action row empty
+     */
+    public String getActionText()
+    {
+        int myAction = myRow.getIntColumn("action_id");
+
+        if( myAction == -1 )
+        {
+            return "...";
+        }
+        else
+        {
+            return Constants.actionText[myAction];
+        }
+    }
+
 
     /**
      * set the action this policy authorizes

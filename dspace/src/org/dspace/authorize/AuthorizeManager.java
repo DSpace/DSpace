@@ -103,10 +103,16 @@ public class AuthorizeManager
             
             AuthorizeException j = new AuthorizeException("Denied");
             //j.printStackTrace();
+
+            // action can be -1 due to a null entry
+            String actionText;
+
+            if( action == -1 ) { actionText = "null"; }
+            else { actionText = Constants.actionText[action]; }
             
             throw new AuthorizeException(
                 "Authorization denied for action " +
-                Constants.actionText[action]       +
+                actionText                         +
                 " on " + Constants.typeText[otype] +
                 ":"    + oid + " by user " + userid,
                 o,
