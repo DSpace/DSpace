@@ -240,25 +240,41 @@ public class Group
      * @param groupid group ID to check
      * @param userid userid
      */
-    public static boolean isMember(Context c, int groupid, int userid)
+    public static boolean isMember(Context c, int groupid)
         throws SQLException
     {
         // special, everyone is member of group 0 (anonymous)
         if( groupid == 0 ) return true;
-    
-        TableRowIterator tri = DatabaseManager.query(c,
-            "eperson",
-            "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
-                "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
-                "epersongroup2eperson.eperson_group_id=" +
-                groupid +
-                " AND eperson.eperson_id=" +
-                userid );
 
-        if( tri.hasNext() )
-            return true;
-        else
-            return false;
+        EPerson currentuser = c.getCurrentUser();
+        
+        //  only test for membership if context contains a user
+        if( currentuser != null )
+        {
+            // first, check for membership if it's a special group
+            if( c.inSpecialGroup( groupid ) )
+            {
+                return true;
+            }           
+        
+            // not in special groups, try database
+            int userid = currentuser.getID();
+            
+            TableRowIterator tri = DatabaseManager.query(c,
+                "eperson",
+                "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
+                    "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
+                    "epersongroup2eperson.eperson_group_id=" +
+                    groupid +
+                    " AND eperson.eperson_id=" +
+                    userid );
+
+            if( tri.hasNext() )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -293,7 +309,7 @@ public class Group
 
 
     /**
-     * Find the group by its name - assumes name is unique - hmmm, problem?
+     * Find the group by its name - assumes name is unique
      *
      * @param context
      * @param name
@@ -305,7 +321,7 @@ public class Group
     {
         TableRow row = DatabaseManager.findByUnique( context, "epersongroup", "name", name );
 
-        if ( row == null )
+        if( row == null )
         {
             return null;
         }
@@ -314,9 +330,9 @@ public class Group
             // First check the cache
             Group fromCache = (Group) context.fromCache(
                 Group.class,
-                row.getIntColumn("eperson_group_id"));
+                row.getIntColumn("eperson_group_id")   );
 
-            if (fromCache != null)
+            if( fromCache != null )
             {
                 return fromCache;
             }
@@ -338,9 +354,11 @@ public class Group
             case ID:
                 s = "eperson_group_id";
                 break;
+                
             case NAME:
                 s = "name";
                 break;
+                
             default:
                 s = "name";
         }

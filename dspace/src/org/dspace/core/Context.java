@@ -83,6 +83,8 @@ public class Context
     /** Object cache for this context */
     private Map objectCache;
     
+    /** Group IDs of special groups user is a member of */
+    private Map specialGroups;
     
     /**
      * Construct a new context object.  A database connection is opened.
@@ -98,10 +100,12 @@ public class Context
         connection = DatabaseManager.getConnection();
         connection.setAutoCommit(false);
 
-        currentUser = null;
-        extraLogInfo = "";
-        ignoreAuth = false;
-        objectCache = new HashMap();
+        currentUser      = null;
+        extraLogInfo     = "";
+        ignoreAuth       = false;
+        
+        objectCache      = new HashMap();
+        specialGroups    = new HashMap();
     }
     
 
@@ -300,6 +304,32 @@ public class Context
         objectCache.remove(key);
     }
 
+
+    /**
+     * set membership in a special group
+     *
+     * @param groupid
+     */
+    public void setSpecialGroup(int groupID)
+    {
+        specialGroups.put(Integer.toString(groupID), "t");
+    }
+
+    /**
+     * test if member of special group
+     *
+     * @param groupid to test
+     * @returns true if member
+     */
+    public boolean inSpecialGroup(int groupID)
+    {
+        if( specialGroups.get( Integer.toString(groupID) ) != null )
+        {
+            return true;
+        }
+        
+        return false;
+    }
 
     protected void finalize()
     {

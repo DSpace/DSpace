@@ -90,7 +90,6 @@ public class AuthorizeManager
     public static void authorizeAction(Context c, DSpaceObject o, int action)
         throws AuthorizeException, SQLException
     {
-    
         if( !authorize(c, o, action, c.getCurrentUser()) )
         {
             // denied, assemble and throw exception
@@ -114,8 +113,6 @@ public class AuthorizeManager
                 action
                 );
         }
-        
-        // we made it this far, action is authorized
     }
 
 
@@ -170,7 +167,10 @@ public class AuthorizeManager
 
             // perform isadmin check since user 
             // is user part of admin group?
-            if( isAdmin( c, userid ) ) return true;
+            if( isAdmin(c) )
+            {
+                return true;
+            }
         }
 
         List policies = getPoliciesActionFilter(c, o, action);         
@@ -194,7 +194,7 @@ public class AuthorizeManager
                 }
                                 
                 if( (rp.getGroupID() != -1 )
-                    &&(Group.isMember(c, rp.getGroupID(), userid)) )
+                    &&( Group.isMember(c, rp.getGroupID() )) )
                 {
                     // group was set, and eperson is a member
                     // of that group
@@ -226,25 +226,14 @@ public class AuthorizeManager
 
         EPerson e = c.getCurrentUser();
 
-        if( e == null ) return false; // anonymous users can't be admins....
-
+        if( e == null )
+        {
+            return false; // anonymous users can't be admins....
+        }
         else
-            return isAdmin(c,e.getID());
-    }
-
-
-    /**
-     * check to see if the a given userid is an admin
-     * admin is group 1
-     */
-    public static boolean isAdmin(Context c,int userid)
-        throws SQLException
-    {
-        // group is hardcoded as 'admin', and admins can do everything
-        if( Group.isMember(c,1,userid) )
-            return true;
-        else
-            return false;
+        {
+            return Group.isMember(c,1);
+        }
     }
 
     
@@ -289,6 +278,7 @@ public class AuthorizeManager
 
     /**
      * Return a List of the policies for an object
+     *
      * @param context
      * @param dspace object
      */
@@ -321,16 +311,17 @@ public class AuthorizeManager
                 policies.add(new ResourcePolicy(c, row));
             }
         }
-        
-        //ResourcePolicy[] policyArray = new ResourcePolicy[policies.size()];        
-        //policyArray = (ResourcePolicy[])policies.toArray(policyArray);
-        
+                
         return policies;
     }
 
 
     /**
-     * Return a list of policies that match the action
+     * Return a list of policies for an object that match the action
+     *
+     * @param c context
+     * @param o DSpaceObject policies relate to
+     * @param actionID action (defined in class Constants)
      *
      */
     public static List getPoliciesActionFilter(Context c,
@@ -364,9 +355,6 @@ public class AuthorizeManager
                 policies.add(new ResourcePolicy(c, row));
             }
         }
-        
-        //ResourcePolicy[] policyArray = new ResourcePolicy[policies.size()];        
-        //policyArray = (ResourcePolicy[])policies.toArray(policyArray);
         
         return policies;
     }
@@ -412,7 +400,6 @@ public class AuthorizeManager
             
             // copy over values
             drp.setResource ( dest               );
-//            drp.setPublic   ( srp.isPublic()     );
             drp.setAction   ( srp.getAction()    );
             drp.setEPerson  ( srp.getEPerson()   );
             drp.setGroup    ( srp.getGroup()     );
