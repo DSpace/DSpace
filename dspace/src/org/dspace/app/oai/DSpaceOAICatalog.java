@@ -618,7 +618,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             {
 				String spec = "<set><setSpec>hdl_" +
 					allCols[i].getHandle().replace('/','_') +
-					" </setSpec><setName>" + allCols[i].getMetadata("name") +
+					"</setSpec><setName>" + allCols[i].getMetadata("name") +
                     "</setName></set>";
                 
                 sets.add(spec);
