@@ -158,7 +158,13 @@
         </table>
     </form>
 
-<% if( qResults.getHitCount() == 0 )
+<% if( qResults.getErrorMsg()!=null )
+{
+ %>
+    <P align=center class="submitFormWarn"><%= qResults.getErrorMsg() %></P>
+<%
+}
+else if( qResults.getHitCount() == 0 )
 {
  %>
     <P align=center>Search produced no results.</P>

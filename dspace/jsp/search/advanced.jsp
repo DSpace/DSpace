@@ -50,6 +50,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Community"   %>
+<%@ page import="org.dspace.search.QueryResults" %>
 
 <%
     Community [] communityArray = (Community[] )request.getAttribute("communities");
@@ -63,6 +64,8 @@
 
 	String conjunction1 	= request.getParameter("conjunction1") == null ? "AND" : request.getParameter("conjunction1");
 	String conjunction2 	= request.getParameter("conjunction2") == null ? "AND" : request.getParameter("conjunction1");
+
+        QueryResults qResults = (QueryResults)request.getAttribute("queryresults");
 
 %>
 
@@ -110,7 +113,7 @@
             <td align="left" valign="top" nowrap width="68%">
 
               	Search for: <br>
-                <input type="text" name="query1" value="<%= query1 %>" size="30">
+                <input type="text" name="query1" value='<%= query1 %>' size="30">
                 <br>
               </p>
             </td>
@@ -136,7 +139,7 @@
                   </select>
            </td>
             <td align="left" valign="top" nowrap width="68%">
-              <input type="text" name="query2" value="<%= query2 %>" size="30">
+              <input type="text" name="query2" value='<%= query2 %>' size="30">
             </td>
           </tr>
           <tr>
@@ -162,7 +165,7 @@
                   <br>
             </td>
             <td align="left" valign="top" nowrap width="68%">
-              <input type="text" name="query3" value="<%= query3 %>" size="30">
+              <input type="text" name="query3" value='<%= query3 %>' size="30">
             </td>
 
   </tr>
@@ -180,11 +183,17 @@
 </table>
 </form>
 
-<% if( request.getParameter("query") != null )
+<% if( request.getParameter("query") != null)
 {
- %>
-    <P align=center>Search produced no results.</P>
-<%
+    if( qResults.getErrorMsg()!=null )
+    {%>
+        <P align=center class="submitFormWarn"><%= qResults.getErrorMsg() %></P>
+     <% 
+    }else
+    { %>
+        <P align=center>Search produced no results.</P>
+     <%
+     }
 }
 %>
 
