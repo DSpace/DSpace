@@ -151,6 +151,36 @@ public class TableRow
     }
 
     /**
+     * Return the long value of column.
+     *
+     * If the column's type is not an long, or the column does not
+     * exist, an IllegalArgumentException is thrown.
+     *
+     * @param - The name of the column.
+     * @return - the long value of the column, or -1 if the column
+     * is an SQL null.
+     */
+    public long getLongColumn(String column)
+    {
+        if (! hasColumn(column))
+            throw new IllegalArgumentException("No such column " + column);
+
+        String name = canonicalize(column);
+
+        if (isColumnNull(name))
+            return -1;
+
+        Object value = data.get(name);
+
+        if (value == null)
+            throw new IllegalArgumentException("Column " + column + " not present");
+        if (!(value instanceof Long))
+            throw new IllegalArgumentException("Value is not an long");
+
+        return ((Long) value).longValue();
+    }
+
+    /**
      * Return the String value of column.
      *
      * If the column's type is not a string, or the column does not
@@ -302,6 +332,22 @@ public class TableRow
             throw new IllegalArgumentException("No such column " + column);
 
         data.put(canonicalize(column), new Integer(i));
+    }
+
+    /**
+     * Set COLUMN to the long l.
+     *
+     * If the column does not exist, an IllegalArgumentException is thrown.
+     *
+     * @param column - The name of the column.
+     * @param l - The long value
+     */
+    public void setColumn(String column, long l)
+    {
+        if (! hasColumn(column))
+            throw new IllegalArgumentException("No such column " + column);
+
+        data.put(canonicalize(column), new Long(l));
     }
 
     /**
