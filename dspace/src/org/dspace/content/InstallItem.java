@@ -80,7 +80,7 @@ public class InstallItem
         item.addDC("date", "available",   null, now.toString());
 
         // create issue date if not present
-        DCValue[] currentDateIssued = item.getDC("date", "issued", null);
+        DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
         
         if(currentDateIssued.length == 0)
         {
