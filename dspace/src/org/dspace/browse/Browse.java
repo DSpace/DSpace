@@ -94,9 +94,9 @@ public class Browse
      * Return distinct Authors in the given scope.
      * Results are returned in alphabetical order.
      *
-     * @param scope - The BrowseScope
-     * @return - A BrowseInfo object, the results of the browse
-     * @exception SQLException - If a database error occurs
+     * @param scope The BrowseScope
+     * @return A BrowseInfo object, the results of the browse
+     * @exception SQLException If a database error occurs
      */
     public static BrowseInfo getAuthors(BrowseScope scope)
         throws SQLException
@@ -107,9 +107,9 @@ public class Browse
     /**
      * Return Items indexed by title in the given scope.
      *
-     * @param scope - The BrowseScope
-     * @return - A BrowseInfo object, the results of the browse
-     * @exception SQLException - If a database error occurs
+     * @param scope The BrowseScope
+     * @return A BrowseInfo object, the results of the browse
+     * @exception SQLException If a database error occurs
      */
     public static BrowseInfo getItemsByTitle(BrowseScope scope)
         throws SQLException
@@ -125,9 +125,9 @@ public class Browse
      * Results will be ordered in increasing order (ie, earliest to
      * latest) if DATESAFTER is true; in decreasing order otherwise.
      *
-     * @param scope - The BrowseScope
-     * @return - A BrowseInfo object, the results of the browse
-     * @exception SQLException - If a database error occurs
+     * @param scope The BrowseScope
+     * @return A BrowseInfo object, the results of the browse
+     * @exception SQLException If a database error occurs
      */
     public static BrowseInfo getItemsByDate(BrowseScope scope,
                                             boolean datesAfter)
@@ -142,9 +142,9 @@ public class Browse
      * If SORTBYTITLE is true, then the returned items are sorted
      * by title; otherwise, they are sorted by date issued.
      *
-     * @param scope - The BrowseScope
-     * @return - A BrowseInfo object, the results of the browse
-     * @exception SQLException - If a database error occurs
+     * @param scope The BrowseScope
+     * @return A BrowseInfo object, the results of the browse
+     * @exception SQLException If a database error occurs
      */
     public static BrowseInfo getItemsByAuthor(BrowseScope scope,
                                               boolean sortByTitle)
@@ -161,9 +161,9 @@ public class Browse
      * Returns the last N items submitted through DSpace
      * If N is -1, returns ALL Items submitted.
      *
-     * @param n - Number of Items to return.
-     * @return - A List of Items
-     * @exception SQLException - If a database error occurs
+     * @param n Number of Items to return.
+     * @return A List of Items
+     * @exception SQLException If a database error occurs
      */
     public static List getLastSubmitted(BrowseScope scope)
         throws SQLException
@@ -187,9 +187,7 @@ public class Browse
         if (isCommunity && !(obj instanceof Community))
             throw new IllegalArgumentException("Not a Community");
 
-        // Choose the correct table
         String table = null;
-
         if (isCommunity)       table = "CommunityItemsByDateAccessioned";
         else if (isCollection) table = "CollectionItemsByDateAccessioned";
         else                   table = "ItemsByDateAccessioned";
