@@ -965,7 +965,7 @@ public class WorkflowManager
     // Record approval provenance statement
     private static void recordApproval(Context c,WorkflowItem wi,
             EPerson e)
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
         Item item = wi.getItem();
 
@@ -990,7 +990,7 @@ public class WorkflowManager
 
     // Create workflow start provenance message
     private static void recordStart(Context c, Item myitem)
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
         // Get non-internal format bitstreams
         Bitstream[] bitstreams = myitem.getNonInternalBitstreams();

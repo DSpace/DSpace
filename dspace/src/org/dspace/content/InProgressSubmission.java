@@ -74,7 +74,7 @@ public interface InProgressSubmission
      * Update the submission, including the unarchived item.
      */
     void update()
-        throws SQLException, AuthorizeException;
+        throws SQLException, IOException, AuthorizeException;
 
 
     /**

@@ -171,7 +171,7 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem create(Context c,
         Collection coll,
         boolean template)
-        throws AuthorizeException, SQLException
+        throws AuthorizeException, SQLException, IOException
     {
         // Check the user has permission to ADD to the collection
         AuthorizeManager.authorizeAction(c, coll, Constants.ADD);
@@ -403,7 +403,7 @@ public class WorkspaceItem implements InProgressSubmission
      * Update the workspace item, including the unarchived item.
      */
     public void update()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         // Authorisation is checked by the item.update() method below
     

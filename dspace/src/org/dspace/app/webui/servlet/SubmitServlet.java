@@ -2040,7 +2040,7 @@ public class SubmitServlet extends DSpaceServlet
      * @param step  the step the user has just reached
      */
     private void userHasReached(SubmissionInfo subInfo, int step)
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         if (!isWorkflow(subInfo))
         {

@@ -265,7 +265,7 @@ public class Item extends DSpaceObject
      * @return  the newly created item
      */
     static Item create(Context context)
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         TableRow row = DatabaseManager.create(context, "item");
         Item i = new Item(context, row);
@@ -1015,7 +1015,7 @@ public class Item extends DSpaceObject
      * database
      */
     public void update()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
@@ -1126,10 +1126,10 @@ public class Item extends DSpaceObject
 
         if (isArchived())
         {
-            // FIXME: Update search index
+          	// Update search index
+	        DSIndexer.reIndexContent(ourContext, this);
         }
     }
-
 
     /**
      * Withdraw the item from the archive.  It is kept in place, and the
