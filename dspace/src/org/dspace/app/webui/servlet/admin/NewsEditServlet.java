@@ -43,6 +43,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -89,16 +90,14 @@ public class NewsEditServlet extends DSpaceServlet
                     HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        
-        
+           
         //Get submit button
         String button = UIUtil.getSubmitButton(request, "submit");
      
         //construct path for news file name
-        //files should always be in /dspace/jsp/components
-        String fileName = ConfigurationManager.getProperty("dspace.dir") + File.separatorChar + 
-                "jsp" + File.separatorChar + "components" + File.separatorChar;
-        
+        //files should always be in the /components subdir
+        String fileName = request.getRealPath("/components") + File.separatorChar;
+                    
         String news = "";
        
         if( button.equals("submit_edit") )
@@ -129,20 +128,17 @@ public class NewsEditServlet extends DSpaceServlet
                     news += lineIn;
                 }
             
-                br.close();
+                br.close();            
             }
             catch(IOException e )
             {
                 log.warn(LogManager.getHeader(c,
-                "news edit", "could not read " + fileName));
+                "news_edit", e.getLocalizedMessage()));
             }
         
             //pass the existing news back to the JSP
             request.setAttribute("news", news);
-            
-            log.info(LogManager.getHeader(c,
-                "news edit", "news retrieved from " + fileName));
-           
+                  
             //show news edit page
              JSPManager.showJSP(request, response, "/dspace-admin/news-edit.jsp");
 
@@ -163,16 +159,25 @@ public class NewsEditServlet extends DSpaceServlet
             {
                 fileName += "news-side.html";
             }
-                  
-            //write the news out to the appropriate file
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));                 
-            PrintWriter out = new PrintWriter( bw );    
-            out.print(news);           
-            out.close();
             
-            log.info(LogManager.getHeader(c,
-                "news edit", "news written to " + fileName));
-           
+            try
+            {
+            
+                //write the news out to the appropriate file\
+                BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));                 
+                PrintWriter out = new PrintWriter( bw );    
+                out.print(news);           
+                out.close();
+                
+                log.info(LogManager.getHeader(c,
+                "news_edit", "news written to " + fileName));
+                
+            }catch(IOException e)
+            {
+                log.warn(LogManager.getHeader(c,
+                "news_edit", e.getLocalizedMessage()));
+            }
+                                 
             JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
         }
         else
