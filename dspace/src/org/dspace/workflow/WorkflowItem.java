@@ -211,7 +211,7 @@ public class WorkflowItem implements InProgressSubmission
             "SELECT workflowitem.* FROM workflowitem, item WHERE " +
                 "workflowitem.item_id=item.item_id AND " +
                 "item.submitter_id=" + ep.getID() +
-                " ORDER BY workflowitem.workflow_id;");
+                " ORDER BY workflowitem.workflow_id");
 
         while (tri.hasNext())
         {
