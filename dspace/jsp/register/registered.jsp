@@ -62,9 +62,8 @@
     
     <P>Thank you <%= eperson.getFirstName() %>,</P>
 
-    <P>You're now registered to use the DSpace system.  You can log into the
-    system, view areas of the site reserved for registered users, and start
-    submitting your work.</P>
+    <P>You're now registered to use the DSpace system.  You can subscribe to
+    collections to receive e-mail updates about new items.</P>
     
     <P><A HREF="<%= request.getContextPath() %>/">Return to DSpace Home</A></P>
 </dspace:layout>

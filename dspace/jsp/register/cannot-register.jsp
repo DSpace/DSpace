@@ -1,5 +1,5 @@
 <%--
-  - not-in-records.jsp
+  - cannot-register.jsp
   -
   - Version: $Revision$
   -
@@ -39,19 +39,16 @@
   --%>
 
 <%--
-  - Display message indicating that the user's certificate was valid
-  - but there is no EPerson record for them
+  - Message informing user they are not allowed to self-register.
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="No User Record Available">
-    <h1>No User Record Available</h1>
-
-    <P>You have a valid Web certficate, but the DSpace system does not have a
-    record of you.  You will need to <A HREF="<%= request.getContextPath() %>/register">
-    register with DSpace</A> before using those areas of the system that
-    require a user account.</P>
-
-    <P><A HREF="<%= request.getContextPath() %>/register">Register with DSpace</A></P>
+<dspace:layout title="Cannot Register">
+    <H1>Cannot Register</H1>
+    
+    <P>The configuration of this DSpace site does not allow you to register
+    yourself.  Please feel free to contact us with any queries.</P>
+    
+    <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

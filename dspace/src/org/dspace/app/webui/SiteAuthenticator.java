@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 
 
 /**
@@ -81,8 +82,45 @@ public interface SiteAuthenticator
 
 
     /**
-     * Register a new user in the system.  This is invoked when a user enters
-     * an e-mail address into the "register with DSpace" box.  This 
+     * Indicate whether or not a particular user can self-register, based
+     * on e-mail address.
+     *
+     * @param context   DSpace context
+     * @param request   HTTP request, in case anything in that is used to
+     *                  decide
+     * @param email     e-mail address of user attempting to register
+     */
+    public boolean canSelfRegister(Context context, HttpServletRequest request,
+        String email)
+        throws SQLException;
+
+    
+    /**
+     * Indicate whether or not a particular self-registering user can set
+     * themselves a password in the profile info form.
+     *
+     * @param context   DSpace context
+     * @param request   HTTP request, in case anything in that is used to
+     *                  decide
+     * @param email     e-mail address of user attempting to register
+     */
+    public boolean allowSetPassword(Context context, HttpServletRequest request,
+        String email)
+        throws SQLException;
+
+    
+    /**
+     * Initialise a new e-person record for a self-registered new user.
+     *
+     * @param context   DSpace context
+     * @param request   HTTP request, in case it's needed
+     * @param eperson   newly created EPerson record - email + information
+     *                  from the registration form will have been filled out.
+     */
+    public void initEPerson(Context context,
+        HttpServletRequest request,
+        EPerson eperson)
+        throws SQLException;
     
     
     /**

@@ -40,6 +40,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.core.ConfigurationManager" %>
+
 <%--
   - Invalid token sent message.
   --%>
@@ -61,7 +63,7 @@
         your special URL up into two lines, like this:
 
         <PRE>
-<%= request.getContextPath() %>/register?token=ABCDEFGHIJK
+<%= ConfigurationManager.getProperty("dspace.url") %>/register?token=ABCDEFGHIJK
 LMNOP
         </PRE>
 
@@ -71,7 +73,7 @@ LMNOP
         address bar should then contain something like:
 
         <PRE>
-<%= request.getContextPath() %>/register?token=ABCDEFGHIJKLMNOP
+<%= ConfigurationManager.getProperty("dspace.url") %>/register?token=ABCDEFGHIJKLMNOP
         </PRE>
 
         Then press return in the address bar, and the URL should work fine.</LI>

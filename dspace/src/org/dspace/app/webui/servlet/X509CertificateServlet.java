@@ -55,6 +55,7 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.X509Manager;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -67,8 +68,12 @@ import org.dspace.eperson.EPerson;
  * <li>If the certificate is valid, and corresponds to an eperson in the DB,
  *     the user is logged in.</li>
  * <li>If the certificate is valid, but there is no corresponding eperson in
- *     the DB, an error message is displayed explaining this.</li>
- * <li>If there is a certificate, but it is valid, the email/password form is
+ *     the DB, the "webui.cert.autoregister" configuration parameter is checked.
+ *     <ul><li>If it's true, a new EPerson record is created for the certificate,
+ *             and the user is logged in</li>
+ *         <li>If it's false, an error message is displayed explaining this.</li>
+ *    </ul></li>
+ * <li>If there is a certificate, but it is invalid, the email/password form is
  *     displayed with a suitable message.</li>
  * <li>If there's no certificate, the email/password form is displayed with
  *     a suitable message.<li>
@@ -128,7 +133,35 @@ public class X509CertificateServlet extends DSpaceServlet
                     // And it's valid - try and get an e-person
                     EPerson eperson = X509Manager.getUser(context, certs[0]);
 
-                    // Do we have an e-person?
+                    if (eperson == null)
+                    {
+                        // Cert is valid, but no record.
+                        if (ConfigurationManager.getBooleanProperty(
+                            "webui.cert.autoregister"))
+                        {
+                            // Register the new user automatically
+                            String email = X509Manager.getEmail(certs[0]);
+                            eperson = EPerson.create(context);
+                            eperson.setEmail(email);
+                            eperson.setCanLogIn(true);
+                            Authenticate.getSiteAuth().initEPerson(context,
+                                request, eperson);
+                            eperson.update();
+                            context.commit();
+                        }
+                        else
+                        {
+                             // No auto-registration for valid certs
+                            log.info(LogManager.getHeader(context,
+                                "failed_login",
+                                "type=cert_but_no_record"));
+                            JSPManager.showJSP(request, response,
+                                "/login/not-in-records.jsp");
+                            return;
+                        }
+                    }
+                    
+                    // Do we have an active e-person now?
                     if (eperson != null && eperson.canLogIn())
                     {
                         // Everything OK - log them in.
@@ -141,28 +174,16 @@ public class X509CertificateServlet extends DSpaceServlet
                         // resume previous request
                         Authenticate.resumeInterruptedRequest(request,
                             response);
-
                         return;
                     }
-                    else
-                    {
-                        // Valid certificate, but no e-person record
-		        log.info(LogManager.getHeader(context,
-                            "failed_login",
-                            "type=cert_but_no_record"));
-                        JSPManager.showJSP(request, response,
-                            "/login/not-in-records.jsp");
-                    }
                 }
-                else
-                {
-                    // Not a valid cert
-		    log.info(LogManager.getHeader(context,
-                        "failed_login",
-                        "type=x509certificate"));
-                    JSPManager.showJSP(request, response,
-                        "/login/no-valid-cert.jsp");
-                }
+
+                // If we get to here, no valid cert
+                log.info(LogManager.getHeader(context,
+                    "failed_login",
+                    "type=x509certificate"));
+                JSPManager.showJSP(request, response,
+                    "/login/no-valid-cert.jsp");
             }
             catch (CertificateException ce)
             {

@@ -90,7 +90,7 @@ public class X509Manager
      * @return - The email address found in certificate, or null if an
      *   email address cannot be found in the certificate.
      */
-    public static EPerson getUser(Context context, X509Certificate certificate)
+    public static String getEmail(X509Certificate certificate)
         throws AuthorizeException, SQLException
     {
         Principal principal = certificate.getSubjectDN();
@@ -117,14 +117,40 @@ public class X509Manager
                 if (token.length() <= len)
                     return null;
 
-                String email = token.substring(len).toLowerCase();
-                return EPerson.findByEmail(context, email);
+                return token.substring(len).toLowerCase();
+
             }
         }
 
         return null;
     }
 
+    
+    /**
+     * Return the eperson from CERTIFICATE, or null if the email in the
+     * certificate doesn't correspond to an eperson.
+     *
+     * Note that the certificate parsing has only been tested with
+     * certificates granted by the MIT Certification Authority,
+     * and may not work elsewhere.
+     *
+     * @param certificate - An X509 certificate object
+     * @return - The email address found in certificate, or null if an
+     *   email address cannot be found in the certificate.
+     */
+    public static EPerson getUser(Context context, X509Certificate certificate)
+        throws AuthorizeException, SQLException
+    {
+        String email = getEmail(certificate);
+        if (email != null)
+        {
+            return EPerson.findByEmail(context, email);
+        }
+        
+        return null;
+    }
+    
+    
     /**
      * Load the CA Public Key from a file
      * We assume that it does not come from a keystore

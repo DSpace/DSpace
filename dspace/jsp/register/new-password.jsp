@@ -46,7 +46,7 @@
   -
   - Attributes to pass in:
   -    eperson          - the eperson
-  -    key              - the token key associated with this password setting
+  -    token            - the token associated with this password setting
   -    password.problem - Boolean true if the user has already tried a password
   -                       which is for some reason unnacceptible
   --%>
@@ -58,7 +58,7 @@
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
-    String key = (String) request.getAttribute( "key" );
+    String token = (String) request.getAttribute("token");
     Boolean attr = (Boolean) request.getAttribute("password.problem");
 
     boolean passwordProblem = (attr != null && attr.booleanValue());
@@ -107,7 +107,7 @@
         </table>
 
         <input type=hidden name=step value="<%= RegisterServlet.NEW_PASSWORD_PAGE %>">
-        <input type=hidden name=key value="<%= key %>">
+        <input type=hidden name=token value="<%= token %>">
     </form>
     
 </dspace:layout>

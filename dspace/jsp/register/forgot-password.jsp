@@ -64,7 +64,7 @@
     if (retry)
     {
 %>
-    <P><strong>The e-mail address you entered was not recognised.  Please
+    <P><strong>The e-mail address you entered was not recognized.  Please
     try again.</strong></P>
 <%
     }

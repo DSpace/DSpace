@@ -60,6 +60,8 @@
 
             <H2 align=center>Non-MIT Users</H2>
 
+            <P><strong>New user?  <A HREF="<%= request.getContextPath() %>/register">Click here to register</A>.</strong></P>
+            
             <P>Please enter your e-mail address and password into the form below.</P>
 
             <form method=POST action="<%= request.getContextPath() %>/password-login">
@@ -80,8 +82,6 @@
                     </tr>
                 </table>
             </form>
-
-            <P>If you haven't used this system before, and don't have a password, you need to <A HREF="<%= request.getContextPath() %>/register">register with DSpace</A>.</P>
 
             <P>Have you <A HREF="<%= request.getContextPath() %>/forgot">forgotten your password</A>?</P>
         </td>

@@ -165,4 +165,65 @@ public class MITAuthenticator implements SiteAuthenticator
 
         return false;
     }
+    
+    /** Indicate whether or not a particular self-registering user can set
+     * themselves a password in the profile info form.
+     *
+     * @param context   DSpace context
+     * @param request   HTTP request, in case anything in that is used to
+     *                  decide
+     * @param email     e-mail address of user attempting to register
+     *
+     */
+    public boolean allowSetPassword(Context context, HttpServletRequest request,
+        String email)
+        throws SQLException
+    {
+        // Anyone whose email address ends with @mit.edu must use a Web cert
+        // to log in, so can't set a password
+        if (email.toLowerCase().trim().endsWith("@mit.edu"))
+        {
+            return false;
+        }
+        
+        // Anyone else can set themselves a password
+        return true;
+    }
+
+    
+    /** Indicate whether or not a particular user can self-register, based
+     * on e-mail address.
+     *
+     * @param context   DSpace context
+     * @param request   HTTP request, in case anything in that is used to
+     *                  decide
+     * @param email     e-mail address of user attempting to register
+     *
+     */
+    public boolean canSelfRegister(Context context, HttpServletRequest request,
+        String email) throws SQLException
+    {
+        // Anyone can register
+        return true;
+    }
+
+    
+    /** Initialise a new e-person record for a self-registered new user.
+     *
+     * @param context   DSpace context
+     * @param request   HTTP request, in case it's needed
+     * @param eperson   newly created EPerson record - email + information
+     *                  from the registration form will have been filled out.
+     *
+     */
+    public void initEPerson(Context context, HttpServletRequest request,
+        EPerson eperson) throws SQLException
+    {
+        // If an MIT user, they must use a certificate
+        if (eperson.getEmail().toLowerCase().trim().endsWith("@mit.edu"))
+        {
+            eperson.setRequireCertificate(true);
+        }
+    }
+    
 }

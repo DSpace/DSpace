@@ -47,7 +47,8 @@
   - Attributes to pass in:
   -
   -   eperson          - the EPerson who's registering
-  -   key              - the token key they've been given for registering
+  -   token            - the token key they've been given for registering
+  -   set.password     - if Boolean true, the user can set a password
   -   missing.fields   - if a Boolean true, the user hasn't entered enough
   -                      information on the form during a previous attempt
   -   password.problem - if a Boolean true, there's a problem with password
@@ -60,13 +61,16 @@
 
 <%
     EPerson eperson = (EPerson) request.getAttribute( "eperson" );
-    String key = (String) request.getAttribute( "key" );
+    String token = (String) request.getAttribute("token");
 
     Boolean attr = (Boolean) request.getAttribute("missing.fields");
     boolean missingFields = (attr != null && attr.booleanValue());
 
     attr = (Boolean) request.getAttribute("password.problem");
     boolean passwordProblem = (attr != null && attr.booleanValue());
+
+    attr = (Boolean) request.getAttribute("set.password");
+    boolean setPassword = (attr != null && attr.booleanValue());
 %>
 
 <dspace:layout title="Registration Information">
@@ -98,9 +102,8 @@
         <dspace:include page="/register/profile-form.jsp" />
     
 <%
-    // Only show password update section if the user doesn't use
-    // certificates
-    if (eperson.getRequireCertificate() == false)
+
+    if (setPassword)
     {
 %>
         <P>Please choose a password and enter it into the box below, and confirm it by typing it
@@ -127,7 +130,7 @@
 %>
 
         <input type=hidden name=step value="<%= RegisterServlet.PERSONAL_INFO_PAGE %>">
-        <input type=hidden name=key value="<%= key %>">
+        <input type=hidden name=token value="<%= token %>">
         
         <P align=center><input type=submit name=submit value="Complete Registration"></P>
     </form>

@@ -44,7 +44,8 @@
   - This isn't a full page, just the fields for entering a user's profile.
   -
   - Attributes to pass in:
-  -   eperson       - the EPerson to edit the profile for
+  -   eperson       - the EPerson to edit the profile for.  Can be null,
+  -                   in which case blank fields are displayed.
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -54,15 +55,22 @@
 <%
     EPerson epersonForm = (EPerson) request.getAttribute("eperson");
 
-    // Get non-null values
-    String lastName = epersonForm.getLastName();
-    if (lastName == null) lastName = "";
+    String lastName = "";
+    String firstName = "";
+    String phone = "";
 
-    String firstName = epersonForm.getFirstName();
-    if (firstName == null) firstName = "";
+    if (epersonForm != null)
+    {
+        // Get non-null values
+        lastName = epersonForm.getLastName();
+        if (lastName == null) lastName = "";
 
-    String phone = epersonForm.getMetadata("phone");
-    if (phone == null) phone = "";
+        firstName = epersonForm.getFirstName();
+        if (firstName == null) firstName = "";
+
+        phone = epersonForm.getMetadata("phone");
+        if (phone == null) phone = "";
+    }
 %>
 
 <table border=0 align=center cellpadding=5>
