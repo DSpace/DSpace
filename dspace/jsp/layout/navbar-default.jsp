@@ -98,7 +98,7 @@
           <tr>
             <td class="searchBoxLabelSmall" valign=middle nowrap>
               <input type=text name=query size=10><input type=image border=0 src="<%= request.getContextPath() %>/image/search-go.gif" name=submit alt="Go" value="Go">
-              <br><a href="<%= request.getContextPath() %>/search/advanced.jsp">Advanced Search</A>
+              <br><a href="<%= request.getContextPath() %>/advanced-search">Advanced Search</A>
             </td>
           </tr>
         </table>

@@ -49,6 +49,11 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.content.Community"   %>
+
+<%
+    Community [] communityArray = (Community[] )request.getAttribute("communities");
+%>
 
 <dspace:layout locbar="nolink" title="Advanced Search">
 
@@ -56,9 +61,24 @@
 <input type=hidden name=advanced value="true">
 <table class=miscTable align=center>
     <tr>
-      <td class="oddRowEvenCol">
-          <table cellspacing=2 border=0 width="80%">
-			<H3>Advanced Search</H3>
+      <td class="oddRowEvenCol" align=center>
+      	<p><strong>Search:</strong>&nbsp;
+		<select name="location">
+			<option selected value="/">All of DSpace</option>
+<%
+        for (int i = 0; i < communityArray.length; i++)
+        {
+%>
+			<option value="<%= communityArray[i].getHandle() %>"><%= communityArray[i].getMetadata("name") %></option>
+<%
+        }
+%>
+		</select>
+		</p>
+         <table cellspacing=2 border=1 width="80%">
+		  <tr>
+                <td class="evenRowEvenCol">
+                    <table border=0>
             <tr>
             <td width="12%" align="left" valign="top"></td>
               <td width="20%" align="left" valign="top" nowrap>
@@ -79,7 +99,7 @@
             <td align="left" valign="top" nowrap width="68%">
 
               	Search for: <br>
-                <input type="text" name="query1" size="15">
+                <input type="text" name="query1" size="30">
                 <br>
               </p>
             </td>
@@ -106,7 +126,7 @@
                   </select>
            </td>
             <td align="left" valign="top" nowrap width="68%">
-              <input type="text" name="query2" size="15">
+              <input type="text" name="query2" size="30">
             </td>
           </tr>
           <tr>
@@ -133,7 +153,7 @@
                   <br>
             </td>
             <td align="left" valign="top" nowrap width="68%">
-              <input type="text" name="query3" size="15">
+              <input type="text" name="query3" size="30">
             </td>
 
   </tr>

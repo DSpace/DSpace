@@ -101,6 +101,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>advanced-search</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.AdvancedSearchServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>browse-author</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
     <init-param>
@@ -261,6 +266,11 @@
   <servlet-mapping>
     <servlet-name>authorize</servlet-name>
     <url-pattern>/admin/authorize</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>advanced-search</servlet-name>
+    <url-pattern>/advanced-search</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
