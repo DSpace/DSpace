@@ -1136,9 +1136,8 @@ public class Item extends DSpaceObject
                 Constants.REMOVE);
         }
         
-        // Set withdrawn flag and time stamp
+        // Set withdrawn flag. timestamp will be set; last_modified in update()
         itemRow.setColumn("withdrawn", true);
-        itemRow.setColumn("withdrawal_date", timestamp);
 
         // in_archive flag is now false
         itemRow.setColumn("in_archive", false);
@@ -1195,9 +1194,8 @@ public class Item extends DSpaceObject
                 Constants.ADD);
         }
         
-        // Clear withdrawn flag and time stamp
+        // Clear withdrawn flag
         itemRow.setColumn("withdrawn", false);
-        itemRow.setColumnNull("withdrawal_date");
 
         // in_archive flag is now true
         itemRow.setColumn("in_archive", true);
