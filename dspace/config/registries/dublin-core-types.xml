@@ -36,6 +36,10 @@
     <date.created>$Date$</date.created>
     <description>
       $Log$
+      Revision 1.2  2002/10/21 09:29:31  rtansley
+      Updated DC type registry and submission UI to include "identifier.citation",
+      "publisher", and "type".  Simple item display also includes those fields.
+
       Revision 1.1  2002/05/16 20:11:57  rtansley
       Registries ported from DSpace early-adopters-2.
 
@@ -168,16 +172,12 @@
     to a local collection instead of unqualified form.</scope_note>
   </dc-type>
 
-<!--
-Move to element relation?  Excise entirely?  Tune in next week!
-
   <dc-type>
     <element>identifier</element>
     <qualifier>citation</qualifier>
     <scope_note>Human-readable, standard bibliographic citation 
     of non-DSpace format of this item</scope_note>
   </dc-type>
--->
 
   <dc-type>
     <element>identifier</element>

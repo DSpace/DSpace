@@ -92,9 +92,9 @@ title="Answers to Initial Questions Changed">
     {
 %>
     <P>You've indicated that your submission has not been published or publicly
-    distributed before, but you've already entered a date for this.  If you
-    proceed, the date you've entered will be removed, and DSpace will assign
-    a date.</P>
+    distributed before, but you've already entered an issue date, publisher
+    and/or citation.  If you proceed, this information will be removed, and
+    DSpace will assign an issue date.</P>
 <%
     }
     

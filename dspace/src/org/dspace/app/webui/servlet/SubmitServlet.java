@@ -562,8 +562,13 @@ public class SubmitServlet extends DSpaceServlet
         {
             DCValue[] dateIssued = subInfo.submission.getItem().getDC(
                 "date", "issued", Item.ANY);
+            DCValue[] citation = subInfo.submission.getItem().getDC(
+                "identifier", "citation", Item.ANY);
+            DCValue[] publisher = subInfo.submission.getItem().getDC(
+                "publisher", null, Item.ANY);
 
-            willRemoveDate = dateIssued.length > 0;
+            willRemoveDate = dateIssued.length > 0 || citation.length > 0 ||
+                publisher.length > 0;
         }
 
         if (multipleFiles == false)
@@ -666,21 +671,24 @@ public class SubmitServlet extends DSpaceServlet
         boolean multipleFiles = (isWorkflow(subInfo) ||
             UIUtil.getBoolParameter(request, "multiple_files"));
 
+        Item item = subInfo.submission.getItem();
+
         if (!multipleTitles)
         {
-            subInfo.submission.getItem().clearDC("title",
+            item.clearDC("title",
                 "alternative", Item.ANY);
         }
 
         if (publishedBefore == false)
         {
-            subInfo.submission.getItem().clearDC("date", "issued", Item.ANY);
+            item.clearDC("date", "issued", Item.ANY);
+            item.clearDC("identifier", "citation", Item.ANY);
+            item.clearDC("publisher", null, Item.ANY);
         }
 
         if (multipleFiles == false)
         {
             // FIXME: Assuming each bundle has but one bitstream in it
-            Item item = subInfo.submission.getItem();
             Bundle[] bundles = item.getBundles();
 
             // Remove all but the first bundle
@@ -762,12 +770,8 @@ public class SubmitServlet extends DSpaceServlet
             readText(request, item, "title", "alternative", true, "en");
         }
 
-        if (subInfo.submission.isPublishedBefore())
-        {
-            readDate(request, item, "date", "issued");
-        }
-
         readSeriesNumbers(request, item, "relation", "ispartofseries", true);
+        readText(request, item, "type", null, false, "en");
 
         // FIXME: Maybe should do integrity check using language object
         readText(request, item, "language", "iso", false, null);
@@ -791,6 +795,15 @@ public class SubmitServlet extends DSpaceServlet
             {
                 item.addDC("identifier", thisQual, null, thisVal);
             }
+        }
+
+        if (subInfo.submission.isPublishedBefore())
+        {
+            readDate(request, item, "date", "issued");
+            // Careful that this happens AFTER identifier.* is blown away
+            // above!!
+            readText(request, item, "identifier", "citation", false, "en");
+            readText(request, item, "publisher", null, false, "en");
         }
 
         int nextStep = -1;

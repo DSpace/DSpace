@@ -306,13 +306,13 @@ title="Describe Your Item">
     }
 %>
 
-<%-- ================================================ --%>
-<%--                 date.issued                      --%>
-<%-- ================================================ --%>
 <%
     if (si.submission.isPublishedBefore())
     {
 %>
+<%-- ================================================ --%>
+<%--                 date.issued                      --%>
+<%-- ================================================ --%>
                 <tr>
                     <td colspan=4 class="submitFormHelp">
                         Please give the date of previous publication or public distribution
@@ -348,6 +348,57 @@ title="Describe Your Item">
                     </td>
                 </tr>
 
+                <tr>
+                    <td colspan=4>&nbsp;</td>
+                </tr>
+
+<%-- ================================================ --%>
+<%--                 publisher                        --%>
+<%-- ================================================ --%>
+
+                <tr>
+                    <td colspan=4 class="submitFormHelp">
+                        Enter the name of the publisher of the previously issued instance of this item.
+                    </td>
+                </tr>
+<%
+    // FIXME: (Maybe) Assumes a single citation
+    DCValue[] pubArray = item.getDC("publisher", null, Item.ANY);
+    String publisher = (pubArray.length > 0 ? pubArray[0].value : "");
+%>
+                <tr>
+                    <td class="submitFormLabel">Publisher</td>
+                    <td colspan=2>
+                        <input type="text" name="publisher" size=<%= formWidth %> value="<%= publisher %>">
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan=4>&nbsp;</td>
+                </tr>
+
+
+<%-- ================================================ --%>
+<%--              identifier.citation                 --%>
+<%-- ================================================ --%>
+
+                <tr>
+                    <td colspan=4 class="submitFormHelp">
+                        Enter the standard citation for the previously issued instance of this item.
+                    </td>
+                </tr>
+<%
+    // FIXME: (Maybe) Assumes a single citation
+    DCValue[] citeArray = item.getDC("identifier", "citation", Item.ANY);
+    String citation = (citeArray.length > 0 ? citeArray[0].value : "");
+%>
+                <tr>
+                    <td class="submitFormLabel">Citation</td>
+                    <td colspan=2>
+                        <input type=text name="identifier_citation" size=<%= formWidth %> value="<%= citation %>">
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
                 <tr>
                     <td colspan=4>&nbsp;</td>
                 </tr>
@@ -496,14 +547,20 @@ title="Describe Your Item">
         {
             currentQual = identifiers[i].qualifier;
             currentValue = identifiers[i].value;
+
+            // Skip identifier.citation; handled elsewhere
+            if (currentQual.equals("citation"))
+            {
+                break;
+            }
         }
     
         if (i == 0)
         {
+            // Only put "Identifiers" label next to first input box
 %>
                 <tr>
-<%-- HACK: nowrap used since browsers do not act on "white-space" CSS property --%>
-                    <td nowrap class="submitFormLabel">Identifiers</td>
+                    <td class="submitFormLabel">Identifiers</td>
 <%
         }
         else
@@ -557,6 +614,48 @@ title="Describe Your Item">
 <%
     }
 %>
+                <tr>
+                    <td colspan=4>&nbsp;</td>
+                </tr>
+
+
+<%-- ================================================ --%>
+<%--                Type                              --%>
+<%-- ================================================ --%>
+                <tr>
+                    <td colspan=4 class="submitFormHelp">
+                        Select the type of content you are submitting.
+                    </td>
+                </tr>
+<%
+    String[] allTypes = {"Miscellaneous", "Dataset", "Preprint", "Reprint"};
+    DCValue[] typeArray = item.getDC("type", null, Item.ANY);
+    String type = (typeArray.length > 0 ? typeArray[0].value : "");
+%>
+                <tr>
+                    <td class="submitFormLabel">Type</td>
+                    <td colspan=2>
+                        <select name="type">
+<%
+    if (type.equals(""))
+    {
+%>
+                            <option selected value="">Select...</option>
+<%
+    }
+
+    for (int i = 0; i < allTypes.length; i++)
+    {
+%>
+                            <option value="<%= allTypes[i] %>"<%= (type.equals(allTypes[i]) ? " SELECTED" : "" ) %>><%= allTypes[i] %></option>
+<%
+    }
+%>
+                        </select>
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+
                 <tr>
                     <td colspan=4>&nbsp;</td>
                 </tr>

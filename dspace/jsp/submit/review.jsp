@@ -232,6 +232,50 @@ title="Verify Submission">
                                         </td>
                                     </tr>
 <%
+        DCValue[] publisher = item.getDC("publisher", null, Item.ANY);
+%>
+                                    <tr>
+                                        <td class=metadataFieldLabel>Publisher:</td>
+                                        <td class=metadataFieldValue>
+<%
+        if (publisher.length == 0)
+        {
+%>
+                                            <em>None</em>
+<%
+        }
+        else
+        {
+%>
+                                            <%= publisher[0].value %>
+<%
+        }
+%>
+                                        </td>
+                                    </tr>
+<%
+        DCValue[] citation = item.getDC("identifier", "citation", Item.ANY);
+%>
+                                    <tr>
+                                        <td class=metadataFieldLabel>Citation:</td>
+                                        <td class=metadataFieldValue>
+<%
+        if (citation.length == 0)
+        {
+%>
+                                            <em>None</em>
+<%
+        }
+        else
+        {
+%>
+                                            <%= citation[0].value %>
+<%
+        }
+%>
+                                        </td>
+                                    </tr>
+<%
     }
 %>                                    
                                     <tr>
@@ -265,11 +309,29 @@ title="Verify Submission">
 
     for (int i = 0; i < identifiers.length; i++)
     {
+        // Skip citation, handled above
+        if (!identifiers[i].qualifier.equals("citation"))
+        {
 %>
                         <%= identifierQualNames.get(identifiers[i].qualifier) %>: <%= identifiers[i].value %><br>
 <%
+        }
     }
 %>
+                                        </td>
+                                    </tr>
+<%
+    DCValue[] typeDC = item.getDC("type", null, Item.ANY);
+    String type = "<em>None</em>";
+    if (typeDC.length > 0)
+    {
+        title = typeDC[0].value;
+    }
+%>    
+                                    <tr>
+                                        <td class=metadataFieldLabel>Type:</td>
+                                        <td class=metadataFieldValue>
+                                            <%= title %>
                                         </td>
                                     </tr>
 <%

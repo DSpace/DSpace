@@ -254,6 +254,8 @@ public class ItemTag extends TagSupport
 
         fields.add(new String[] {"Issue Date", displayDate});
 
+        fields.add(new String[] {"Publisher", "publisher", null});
+        fields.add(new String[] {"Citation", "identifier", "citation"});
         fields.add(new String[] {"Series/Report no.", "relation", "ispartofseries"});
 
         // Truncate abstract
