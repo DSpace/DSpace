@@ -1,3 +1,7 @@
+(Filbert Minj)
+- Show community and collection strengths
+  SF patch #1151795.
+  
 (Robert Tansley)
 - Updated OAICat.jar, fixed DSpaceOAICatalog.java to suit.  New OAICat fixes
   SF bug #1123934.
@@ -10,7 +14,7 @@
 (Barry Gaskin)
 - Fix for Oracle too many cursors problem
 
-(Claudia Jürgen)
+(Claudia Jï¿½rgen)
 - Configurable number of index terms in Lucene for full-text indexing
 
 (Keiji Suzuki)
