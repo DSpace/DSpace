@@ -325,4 +325,26 @@ Common usage:
     </javadoc>
   </target>
 
+
+  <!-- ============================================================= -->
+  <!-- Create javadoc for everything                                 -->
+  <!-- ============================================================= -->
+
+  <target name="javadoc"
+          description="Create the DSpace public API documentation with javadoc">
+    <mkdir dir="${basedir}/build/javadoc" />
+    <javadoc destdir="${basedir}/build/javadoc"
+             author="true"
+             version="true"
+             doctitle="DSpace Source Javadoc"
+             windowtitle="DSpace Source Javadoc"
+             bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved."
+             overview="${basedir}/src/overview.html"
+             classpathref="build.class.path">
+      <packageset dir="${basedir}/src">
+        <include name="**" />
+      </packageset>
+    </javadoc>
+  </target>
+
 </project>
