@@ -170,6 +170,9 @@ CREATE TABLE EPerson
   phone	              VARCHAR(32)
 );
 
+-- index by email
+CREATE INDEX eperson_email_idx ON EPerson(email);
+
 -------------------------------------------------------
 -- EPersonGroup table
 -------------------------------------------------------
@@ -210,6 +213,9 @@ CREATE TABLE Item2Bundle
   bundle_id INTEGER REFERENCES Bundle(bundle_id)
 );
 
+-- index by item_id
+CREATE INDEX item2bundle_item_idx on Item2Bundle(item_id);
+
 -------------------------------------------------------
 -- Bundle2Bitstream table
 -------------------------------------------------------
@@ -219,6 +225,9 @@ CREATE TABLE Bundle2Bitstream
   bundle_id    INTEGER REFERENCES Bundle(bundle_id),
   bitstream_id INTEGER REFERENCES Bitstream(bitstream_id)
 );
+
+-- index by bundle_id
+CREATE INDEX bundle2bitstream_bundle_idx ON Bundle2Bitstream(bundle_id);
 
 -------------------------------------------------------
 -- DCTypeRegistry table
@@ -246,8 +255,10 @@ CREATE TABLE DCValue
   source_id  INTEGER
 );
 
--- An index for dctypes
-CREATE INDEX dcvalue_dc_type_id_idx  on DCValue(dc_type_id);
+-- An index for item_id - almost all access is based on
+-- instantiating the item object, which grabs all dcvalues
+-- related to that item
+CREATE INDEX dcvalue_item_idx on DCValue(item_id);
 
 -------------------------------------------------------
 -- Community table
@@ -303,6 +314,9 @@ CREATE TABLE Collection2Item
   item_id       INTEGER REFERENCES Item(item_id)
 );
 
+-- index by collection_id
+CREATE INDEX collection2item_collection_idx ON Collection2Item(collection_id);
+
 -------------------------------------------------------
 -- ResourcePolicy table
 -------------------------------------------------------
@@ -318,6 +332,10 @@ CREATE TABLE ResourcePolicy
   end_date             DATE
 );
 
+-- index by resource_type,resource_id - all queries by
+-- authorization manager are select type=x, id=y, action=z
+CREATE INDEX resourcepolicy_type_id_idx ON ResourcePolicy(resource_type_id,resource_id); 
+
 -------------------------------------------------------
 -- EPersonGroup2EPerson table
 -------------------------------------------------------
@@ -327,6 +345,10 @@ CREATE TABLE EPersonGroup2EPerson
   eperson_group_id INTEGER REFERENCES EPersonGroup(eperson_group_id),
   eperson_id       INTEGER REFERENCES EPerson(eperson_id)
 );
+
+-- Index by group ID (used heavily by AuthorizeManager)
+CREATE INDEX epersongroup2eperson_group_idx on EPersonGroup2EPerson(eperson_group_id);
+
 
 -------------------------------------------------------
 -- Handle table
@@ -338,6 +360,9 @@ CREATE TABLE Handle
   resource_type_id INTEGER,
   resource_id      INTEGER
 );
+
+-- index by handle, commonly looked up
+CREATE INDEX handle_handle_idx ON Handle(handle);
 
 -------------------------------------------------------
 --  WorkspaceItem table
@@ -454,6 +479,9 @@ CREATE TABLE ItemsByAuthor
    sort_author        TEXT
 );
 
+-- index by sort_author, of course!
+CREATE INDEX sort_author_idx on ItemsByAuthor(sort_author);
+
 -------------------------------------------------------
 --  CollectionItemsByAuthor view
 -------------------------------------------------------
@@ -483,6 +511,10 @@ CREATE TABLE ItemsByTitle
    sort_title         TEXT
 );
 
+-- index by the sort_title
+CREATE INDEX sort_title_idx on ItemsByTitle(sort_title);
+
+
 -------------------------------------------------------
 --  CollectionItemsByTitle view
 -------------------------------------------------------
@@ -510,6 +542,9 @@ CREATE TABLE ItemsByDate
    item_id            INTEGER REFERENCES Item(item_id),
    date_issued        TEXT
 );
+
+-- sort by date
+CREATE INDEX date_issued_idx on ItemsByDate(date_issued);
 
 -------------------------------------------------------
 --  CollectionItemsByDate view
