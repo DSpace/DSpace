@@ -45,10 +45,10 @@
 # This is a simple shell script for running a command-line DSpace tool.
 # It sets the CLASSPATH appropriately before invoking Java.
 
-USAGE="dsrun <classname> [arg1 [arg2 ...]"
+USAGE="dsrun <classname> [arg1 [arg2 ...]]"
 
 # Check we have at least one command-line argument
-if [ "$#" == "0" ]; then
+if [ "$#" = "0" ]; then
     echo $USAGE
     exit 1
 fi
