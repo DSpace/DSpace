@@ -394,7 +394,7 @@ public class ItemTag extends TagSupport
 
 
     /**
-     * List bitstreams in the collection
+     * List bitstreams in the item
      */
     private void listBitstreams()
         throws IOException
