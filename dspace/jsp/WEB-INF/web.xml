@@ -140,6 +140,11 @@
   <!-- Servlets -->
 
   <servlet>
+    <servlet-name>authorize</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.AuthorizeEditServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>browse-author</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
     <init-param>
@@ -189,6 +194,11 @@
   <servlet>
     <servlet-name>edit-communities</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EditCommunitiesServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>groups</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.GroupEditServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -288,6 +298,11 @@
   <!-- Servlet Mappings -->
 
   <servlet-mapping>
+    <servlet-name>authorize</servlet-name>
+    <url-pattern>/admin/authorize</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>browse-author</servlet-name>
     <url-pattern>/browse-author</url-pattern>
   </servlet-mapping>
@@ -330,6 +345,11 @@
   <servlet-mapping>
     <servlet-name>edit-epeople</servlet-name>
     <url-pattern>/admin/edit-epeople</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>groups</servlet-name>
+    <url-pattern>/admin/groups</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
