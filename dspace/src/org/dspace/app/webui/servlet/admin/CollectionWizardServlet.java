@@ -320,7 +320,9 @@ public class CollectionWizardServlet extends DSpaceServlet
 			
 			if (permission == PERM_READ)
 			{
-				AuthorizeManager.addPolicy(context, collection, Constants.READ, mitGroup);
+                                // assign default item and bitstream read to mitGroup
+				AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ,      mitGroup);
+				AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ, mitGroup);
 			}
 			else
 			{
@@ -338,10 +340,13 @@ public class CollectionWizardServlet extends DSpaceServlet
 		case PERM_READ:
 			// Actually need to create a group for this.
 			g = Group.create(context);
+                        
 			// Name it according to our conventions
-			g.setName("COLLECTION_" + collection.getID() + "_READ");
+			g.setName("COLLECTION_" + collection.getID() + "_DEFAULT__ITEM_READ");
+                        
 			// Give it the needed permission
-			AuthorizeManager.addPolicy(context, collection, Constants.READ, g);
+                        AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ,      g);
+                        AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ, g);
 			break;
 		
 		case PERM_SUBMIT:
