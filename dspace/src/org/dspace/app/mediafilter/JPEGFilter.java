@@ -46,11 +46,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+import java.lang.Integer;
+import java.lang.Float;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.Image;
 import java.awt.Graphics2D;
 
+import org.dspace.core.ConfigurationManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -121,16 +125,53 @@ public class JPEGFilter extends MediaFilter
         // read in bitstream's image
         BufferedImage buf = ImageIO.read(source);
 
-        // width, should be a configuration parameter
-        int xsize = 120;
+        // get config params
+        float xmax = (float)ConfigurationManager.getIntProperty("thumbnail.maxwidth" );
+        float ymax = (float)ConfigurationManager.getIntProperty("thumbnail.maxheight");
         
-        // now make a new one, but with a different size
+        Image thumb = null;
         
-        Image thumb = buf.getScaledInstance(xsize,-1,Image.SCALE_SMOOTH);
+        // now get the image dimensions
+        float xsize = (float)buf.getWidth (null);
+        float ysize = (float)buf.getHeight(null);
+        
+        System.out.println("original size: " + xsize + "," + ysize);
 
+        // scale by x first if needed
+        if( xsize > xmax )
+        {
+            // calculate scaling factor so that xsize * scale = new size (max)
+            float scale_factor = xmax/xsize;
+            
+            System.out.println("x scale factor: " + scale_factor);
+            
+            // now reduce x size
+            // and y size
+            xsize = xsize * scale_factor;
+            ysize = ysize * scale_factor;
+
+            System.out.println("new size: " + xsize + "," + ysize);
+
+        }
+        
+        // scale by y if needed
+        if( ysize > ymax )
+        {
+            float scale_factor = ymax/ysize;
+            
+            // now reduce x size
+            // and y size
+            xsize = xsize * scale_factor;
+            ysize = ysize * scale_factor;
+        }
+        
+        System.out.println("thumbnail size: " + xsize + ", " + ysize);
+        
+        thumb = buf.getScaledInstance( (int)xsize,(int)ysize,Image.SCALE_SMOOTH );
+        
         // create a BufferedImage to draw this image into...
         
-        BufferedImage thumbnail = new BufferedImage(thumb.getWidth(null), thumb.getHeight(null), buf.getType());
+        BufferedImage thumbnail = new BufferedImage(thumb.getWidth(null), thumb.getHeight(null), BufferedImage.TYPE_3BYTE_BGR);
         
         Graphics2D g2d = thumbnail.createGraphics();
         
