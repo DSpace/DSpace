@@ -300,17 +300,21 @@ private static synchronized void indexItems(Context c, Item target_item)
         DCValue [] authors = myitem.getDC( "contributor","author",  Item.ANY );
         DCValue [] titles  = myitem.getDC( "title",     Item.ANY,   Item.ANY );
         DCValue [] keywords= myitem.getDC( "subject",   Item.ANY,   Item.ANY );
+        DCValue [] abstracts= myitem.getDC( "description", "abstract",   Item.ANY );
+
 
         // put them all from an array of strings to one string for writing out
         int j = 0;
         String author_text = "";
         String title_text  = "";
         String keyword_text= "";
-
+        String abstract_text="";
+        
         // pack all of the arrays of DCValues into plain text strings for the indexer
         for(j=0; j<authors.length;  j++) author_text = new String(author_text  + authors [j].value + " ");
         for(j=0; j<titles.length;   j++) title_text  = new String(title_text   + titles  [j].value + " ");
         for(j=0; j<keywords.length; j++) keyword_text= new String(keyword_text + keywords[j].value + " ");
+        for(j=0; j<abstracts.length; j++) abstract_text= new String(abstract_text + abstracts[j].value + " ");
 
         // build a hash
         HashMap textvalues = new HashMap();
@@ -319,6 +323,8 @@ private static synchronized void indexItems(Context c, Item target_item)
         textvalues.put("title",     title_text   );
         textvalues.put("keyword",   keyword_text );
         textvalues.put("location",  location_text);
+//      delayed until we can assign relative weights
+//        textvalues.put("abstract",  abstract_text);
 
         // lastly, get the handle
         String itemhandle = HandleManager.findHandle(c, myitem);
