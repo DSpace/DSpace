@@ -933,4 +933,46 @@ public class Collection extends DSpaceObject
     {
         return Constants.COLLECTION;
     }
+    
+    
+    /**
+     * return an array of collections that user has a given permission on
+     *  (useful for trimming 'select to collection' list) or figuring out
+     *  which collections a person is an editor for.
+     * @param context
+     * @param community (optional) restrict search to a community, else null
+     * @param action ID fo the action
+     *
+     * @return Collection [] of collections with matching permissions
+     */
+    public static Collection [] findAuthorized(Context context, Community comm, int actionID)
+        throws java.sql.SQLException
+    {
+        List myResults = new ArrayList();
+        
+        Collection [] myCollections = null;
+        
+        if( comm!=null )
+        {
+            myCollections = comm.getCollections();
+        }
+        else
+        {
+            myCollections = Collection.findAll(context);
+        }
+        
+        // now build a list of collections you have authorization for
+        for(int i=0; i<myCollections.length; i++)
+        {
+            if( AuthorizeManager.authorizeActionBoolean(context, myCollections[i], actionID) )
+            {
+                myResults.add(myCollections[i]);
+            }
+        }
+        
+        myCollections = new Collection[myResults.size()];
+        myCollections = (Collection[])myResults.toArray(myCollections);
+        
+        return myCollections;
+    } 
 }
