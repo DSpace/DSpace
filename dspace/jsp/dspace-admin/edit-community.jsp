@@ -105,6 +105,19 @@
     {
 %>
     <H1>Edit Community <%= community.getHandle() %></H1>
+      <center>
+        <table width="70%">
+          <tr>
+            <td class="standard">
+              <form method=POST>
+                <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COMMUNITY %>">
+                <input type="hidden" name="community_id" value="<%= community.getID() %>">
+                <input type="submit" name="submit" value="Delete this Community...">
+              </form>
+            </td>
+          </tr>
+        </table>
+      </center>
 <%
     }
 %>
@@ -198,6 +211,11 @@
                         <input type="hidden" name="parent_community_id" value="<%= parentID %>">
                         <input type="hidden" name="create" value="true">
                         <input type="submit" name="submit" value="Create">
+                    </td>
+                    <td>
+                        <input type="hidden" name="parent_community_id" value="<%= parentID %>">
+                        <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_EDIT_COMMUNITY %>">
+                        <input type="submit" name="submit_cancel" value="Cancel">
 <%
     }
     else
@@ -206,14 +224,14 @@
                         <input type="hidden" name="community_id" value="<%= community.getID() %>">
                         <input type="hidden" name="create" value="false">
                         <input type="submit" name="submit" value="Update">
+                    </td>
+                    <td>
+                        <input type="hidden" name="community_id" value="<%= community.getID() %>">
+                        <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_EDIT_COMMUNITY %>">
+                        <input type="submit" name="submit_cancel" value="Cancel">
 <%
     }
 %>
-
-                    </td>
-                    <td>
-                        <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_EDIT_COMMUNITY %>">
-                        <input type="submit" name="submit_cancel" value="Cancel">
                     </td>
                 </tr>
             </table>
