@@ -308,6 +308,11 @@
     <location>/internal-error</location>
   </error-page>
 
+  <error-page>
+    <exception-type>java.lang.Exception</exception-type>
+    <location>/internal-error</location>
+  </error-page>
+
 
   <!-- DSpace JSP Tag Library -->
   <taglib>
