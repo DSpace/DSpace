@@ -475,4 +475,61 @@ public class AuthorizeManager
             "epersongroup_id="  + g.getID()
         );
     }
+    
+    
+    /**
+     * returns all groups authorized to perform and action on an object
+     * returns empty array if no matches
+     *
+     * @param context
+     * @param DSpaceObject
+     * @param actionID
+     */
+    public static Group [] getAuthorizedGroups(Context c, DSpaceObject o, int actionID)
+        throws java.sql.SQLException
+    {
+        // do query matching groups, actions, and objects
+        TableRowIterator tri = DatabaseManager.query(c,
+            "resourcepolicy",
+            "SELECT * FROM resourcepolicy WHERE " +
+            "resource_type_id=" + o.getType() + " AND " +
+            "resource_id="      + o.getID()   + " AND " +
+            "action_id="        + actionID
+            );
+        
+        List groups = new ArrayList();
+        
+        while( tri.hasNext() )
+        {
+            TableRow row = tri.next();
+            
+            // first check the cache (FIXME: is this right?)
+            ResourcePolicy cachepolicy = (ResourcePolicy)c.fromCache(
+                ResourcePolicy.class, row.getIntColumn("policy_id") );
+            
+            ResourcePolicy myPolicy = null;
+            
+            if( cachepolicy != null )
+            {
+                myPolicy=cachepolicy;
+            }
+            else
+            {
+                myPolicy=new ResourcePolicy(c,row);
+            }
+
+            // now do we have a group?
+            Group myGroup = myPolicy.getGroup();
+            
+            if( myGroup != null )
+            {
+                groups.add(myGroup);
+            }
+        }
+
+        Group [] groupArray = new Group[groups.size()];
+        groupArray = (Group[])groups.toArray(groupArray);
+        
+        return groupArray;
+    } 
 }
