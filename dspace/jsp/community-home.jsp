@@ -100,24 +100,23 @@
     </tr>
   </table>
 
-  <%= intro %>
 
-  <%-- Search --%>
-  <form action="simple-search" method=GET>
+  <%-- Search/Browse --%>
+  <form method=GET>
     <table class=miscTable align=center>
       <tr>
-        <td class="evenRowEvenCol">
+        <td class="evenRowEvenCol" colspan=2>
           <table>
             <tr>
-              <td>
-                <strong>Search:</strong>&nbsp;<select name="location">
-                  <option value="ALL">All of DSpace</option>
-                  <option selected value="<%= community.getID() %>"><%= name %></option>
+              <td class="standard">
+                <small><strong>In:</strong></small>&nbsp;<select name="location">
+                  <option value="/">All of DSpace</option>
+                  <option selected value="/communities/<%= community.getID() %>/"><%= name %></option>
 <%
     for (int i = 0; i < collections.length; i++)
     {
 %>    
-                  <option value="<%= community.getID() %>/<%= collections[i].getID() %>"><%= collections[i].getMetadata("name") %></option>
+                  <option value="/communities/<%= community.getID() %>/collections/<%= collections[i].getID() %>/"><%= collections[i].getMetadata("name") %></option>
 <%
     }
 %>
@@ -125,8 +124,13 @@
               </td>
             </tr>
             <tr>
-              <td align=center>
-                for&nbsp;<input type="text" name="query">&nbsp;<input type="submit" value="Go">
+              <td class="standard" align=center>
+                <small><strong>Search</strong>&nbsp;for&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="Go">
+              </td>
+            </tr>
+            <tr>
+              <td align=center class="standard">
+                <small>or&nbsp;<strong>browse</strong>&nbsp;</small><input type="submit" name="submit_titles" value="Titles">&nbsp;<input type="submit" name="submit_authors" value="Authors">&nbsp;<input type="submit" name="submit_dates" value="By Date">
               </td>
             </tr>
           </table>
@@ -134,9 +138,8 @@
       </tr>
     </table>
   </form>
-  
-  <P align=center><strong>Browse</strong> the community by <A HREF="browse-title">Title</A>,
-  <A HREF="browse-author">Author</A>, or <A HREF="browse-date">Date</A>.</P>
+
+  <%= intro %>
 
   <H2>Collections in this community</H2>
    
