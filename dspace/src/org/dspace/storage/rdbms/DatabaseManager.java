@@ -552,8 +552,8 @@ public class DatabaseManager
             if (endMarker == -1)
                 continue;
 
-            if (log.isInfoEnabled())
-                log.info("Running database query \"" + sql + "\"");
+            if (log.isDebugEnabled())
+                log.debug("Running database query \"" + sql + "\"");
 
             SQL = sql.toString();
 
@@ -565,8 +565,8 @@ public class DatabaseManager
             }
             catch (SQLWarning sqlw)
             {
-                if (log.isInfoEnabled())
-                    log.info("Got SQL Warning: " + sqlw, sqlw);
+                if (log.isDebugEnabled())
+                    log.debug("Got SQL Warning: " + sqlw, sqlw);
             }
             catch (SQLException sqle)
             {

@@ -41,13 +41,33 @@
 
 package org.dspace.core;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.log4j.Category;
 
+
+/**
+ * Class for reading the DSpace system configuration.  The main configuration
+ * is read in as properties from a standard properties file.  Email templates
+ * and configuration files for other tools are also be accessed via this class.
+ * <P>
+ * The main configuration is by default read from the <em>resource</em>
+ * <code>/dspace.cfg</code>.  To specify a different configuration, the
+ * system property <code>dspace.configuration</code> should be set to the
+ * <em>filename</em> of the configuration file.
+ *
+ * @author  Robert Tansley
+ * @version $Revision$
+ */
 public class ConfigurationManager
 {
+    /** log4j category */
+    private static Category log =
+        Category.getInstance(ConfigurationManager.class);
+
     /** The configuration properties */
     private static Properties properties = null;
 
@@ -99,8 +119,7 @@ public class ConfigurationManager
             }
             catch (NumberFormatException e)
             {
-                // FIXME: Should be logged properly
-                System.err.println("Warning: Number format error in property"
+                log.warn("Warning: Number format error in property: "
                     + property);
             }
         }            
@@ -168,20 +187,41 @@ public class ConfigurationManager
      */
     private static void loadProperties()
     {
+        InputStream is;
+
         if (properties != null) return;
     
         try
         {
-            InputStream is = ConfigurationManager.class.getResourceAsStream(
-                "/dspace.cfg");
-            properties = new Properties();
-            properties.load(is);
+            // Has the default configuration location been overridden?
+            String configProperty = System.getProperty("dspace.configuration");
+
+            if (configProperty != null)
+            {
+                // Load the overriding configuration
+                is = new FileInputStream(configProperty);
+            }
+            else
+            {
+                // Load configuration from default location
+                is = ConfigurationManager.class.getResourceAsStream(
+                    "/dspace.cfg");
+            }
+
+            if (is==null)
+            {
+                log.fatal("Cannot find dspace.cfg");
+                System.exit(1);
+            }
+            else
+            {
+                properties = new Properties();
+                properties.load(is);
+            }
         }
         catch (IOException e)
         {
-            // FIXME: Should be logged properly
-            System.err.println("Can't load configuration: " + e);
-            e.printStackTrace();
+            log.fatal("Can't load configuration", e);
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
             System.exit(1);

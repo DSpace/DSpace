@@ -55,17 +55,14 @@
   <!-- ============================================================= -->
     
   <!-- Default configuration to use.  This may be overridden. -->
-  <property file="${basedir}/config/dspace.cfg" />
-
-  <!-- Default configuration directory to use.  This may be overridden. -->
-  <!--<property name="config.dir" value="${basedir}/config" />-->
-
-  <!-- Include the main DSpace configuration -->
-  <!--<property file="${config.dir}/dspace.cfg" />-->
+  <property name="config" value="${basedir}/config/dspace.cfg" />
 
   <!-- Give user a chance to override without editing this file 
        (and without typing -D each time s/he compiles it) -->
   <property file="${user.home}/.dspace.properties" />
+
+  <!-- Load the configuration -->
+  <property file="${config}" />
 
 
   <!-- ============================================================= -->
@@ -75,6 +72,7 @@
   <!-- We will include the environment CLASSPATH -->
   <path id="build.class.path">
     <pathelement path="${env.CLASSPATH}"/>
+    <pathelement path="${basedir}/build/classes"/>
     <fileset dir="${basedir}/lib">
       <include name="**/*.jar"/>
     </fileset>
@@ -101,8 +99,6 @@
   <!-- Update the code, without clobbering existing data             -->
   <!-- ============================================================= -->
 
-  <!-- Copies classes, lib, jsp and bin -->
-  
   <target name="update"
           description="Update installed code (install without clobbering data)">
     <mkdir dir="${dspace.dir}/bin"/>
@@ -123,14 +119,13 @@
   
   
   <!-- ============================================================= -->
-  <!-- Do a fresh system install                                     -->
+  <!-- Do a fresh install of the code and configuration files        -->
   <!-- ============================================================= -->
   
-  <!-- FIXME: Add dependency on DB creation/initialisation target -->
   <!-- Installs code, then config, and symlinks WEB-INF/classes to config -->
-  <target name="fresh_install"
+  <target name="install_code"
           depends="update"
-          description="Do a fresh install of the system, overwriting any data">
+          description="Do a fresh install of the system, not touching database">
     <mkdir dir="${dspace.dir}/config" />
     <mkdir dir="${assetstore.dir}" />
     <mkdir dir="${history.dir}" />
@@ -142,6 +137,36 @@
       <arg value="${dspace.dir}/config" />
       <arg value="${dspace.dir}/jsp/WEB-INF/classes" />
     </exec>
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- Create the database tables, removing anything already there   -->
+  <!-- ============================================================= -->
+
+  <!-- We execute InitializeDatabase, passing in the simple log4j properties
+    -  file in etc/ and the DSpace configuration file using system
+    -  properties -->
+  <target name="setup_database"
+          description="Create database tables, removing existing data">
+    <java classname="org.dspace.storage.rdbms.InitializeDatabase"
+          classpathref="build.class.path"
+          fork="yes"
+          failonerror="yes">
+      <jvmarg value="-Dlog4j.configuration=file:${basedir}/etc/log4j.build.properties"/>
+      <jvmarg value="-Ddspace.configuration=${config}"/>
+      <arg value="${basedir}/etc/database_schema.sql"/>
+    </java>
+  </target>
+    
+
+  <!-- ============================================================= -->
+  <!-- Do a fresh system install                                     -->
+  <!-- ============================================================= -->
+  
+  <target name="fresh_install"
+          depends="install_code,setup_database"
+          description="Do a fresh install of the system, overwriting any data">
   </target>
 
 
