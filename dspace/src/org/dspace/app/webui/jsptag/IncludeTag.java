@@ -75,7 +75,7 @@ public class IncludeTag extends TagSupport
      *
      * @param s  the page to display
      */
-    public void setpage(String s)
+    public void setPage(String s)
     {
         page = s;
     }
