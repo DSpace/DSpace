@@ -174,6 +174,9 @@ public class InstallItem
         // create collection2item mapping
         is.getCollection().addItem(item);
 
+        // set owning collection
+        item.setOwningCollection(is.getCollection());
+
         // set in_archive=true
         item.setArchived(true);   
 
