@@ -109,6 +109,7 @@
     </table>
         
     <P align="center">
+        Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!<br><br>
         <form method=POST>
             <input type="submit" name="submit_add" value="Add New">
         </form>
