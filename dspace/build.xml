@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+
+<!--
+  - Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
+  - Institute of Technology.  All rights reserved.
+  - 
+  - Redistribution and use in source and binary forms, with or without
+  - modification, are permitted provided that the following conditions are
+  - met:
+  - 
+  - - Redistributions of source code must retain the above copyright
+  - notice, this list of conditions and the following disclaimer.
+  - 
+  - - Redistributions in binary form must reproduce the above copyright
+  - notice, this list of conditions and the following disclaimer in the
+  - documentation and/or other materials provided with the distribution.
+  - 
+  - - Neither the name of the Hewlett-Packard Company nor the name of the
+  - Massachusetts Institute of Technology nor the names of their
+  - contributors may be used to endorse or promote products derived from
+  - this software without specific prior written permission.
+  - 
+  - THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  - ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  - LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  - A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  - HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  - INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  - BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  - OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  - ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  - TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  - USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  - DAMAGE.
+  -->
+
+<!--
+  - DSpace build file
+  -
+  - Version:  $Revision$
+  - Date:     $Date$
+  -->
+
+<project name="DSpace" default="compile" basedir=".">
+
+  <!-- ============================================================= -->
+  <!-- Will be using various environment variables                   -->
+  <!-- ============================================================= -->
+
+  <property environment="env"/>
+
+
+  <!-- ============================================================= -->
+  <!-- Build parameters that are likely to need tweaking             -->
+  <!-- ============================================================= -->
+    
+  <!-- Default configuration to use.  This may be overridden. -->
+  <property file="${basedir}/config/dspace.cfg" />
+
+  <!-- Default configuration directory to use.  This may be overridden. -->
+  <!--<property name="config.dir" value="${basedir}/config" />-->
+
+  <!-- Include the main DSpace configuration -->
+  <!--<property file="${config.dir}/dspace.cfg" />-->
+
+  <!-- Give user a chance to override without editing this file 
+       (and without typing -D each time s/he compiles it) -->
+  <property file="${user.home}/.dspace.properties" />
+
+
+  <!-- ============================================================= -->
+  <!-- The DSpace class path for building                            -->
+  <!-- ============================================================= -->
+
+  <!-- We will include the environment CLASSPATH -->
+  <path id="class.path">
+    <pathelement path="${env.CLASSPATH}"/>
+    <fileset dir="${basedir}/lib">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  
+  <!-- ============================================================= -->
+  <!-- Compile the source code                                       -->
+  <!-- ============================================================= -->
+
+  <target name="compile"
+          description="Compile the source code">
+    <mkdir dir="${basedir}/build/classes"/>
+    <javac srcdir="${basedir}/src"
+           destdir="${basedir}/build/classes"
+           debug="on">
+       <include name="**/*.java"/>
+       <classpath refid="class.path"/>
+    </javac>
+  </target>
+  
+  
+  <!-- ============================================================= -->
+  <!-- Update the code, without clobbering existing data             -->
+  <!-- ============================================================= -->
+
+  <!-- Copies classes, lib, jsp and bin -->
+  
+  <target name="update"
+          description="Update installed code (install without clobbering data)">
+    <mkdir dir="${dspace.dir}/bin"/>
+    <mkdir dir="${dspace.dir}/lib"/>
+    <mkdir dir="${dspace.dir}/jsp/WEB-INF/lib"/>
+    <copy todir="${dspace.dir}/bin">
+      <fileset dir="bin"/>
+    </copy>
+    <copy todir="${dspace.dir}/jsp/WEB-INF/lib">
+      <fileset dir="lib"/>
+    </copy>
+    <copy todir="${dspace.dir}/jsp">
+      <fileset dir="jsp"/>
+    </copy>
+    <jar jarfile="${dspace.dir}/jsp/WEB-INF/lib/dspace.jar"
+         basedir="${basedir}/build/classes" />
+  </target>
+  
+  
+  <!-- ============================================================= -->
+  <!-- Do a fresh system install                                     -->
+  <!-- ============================================================= -->
+  
+  <!-- FIXME: Add dependency on DB creation/initialisation target -->
+  <!-- Installs code, then config, and symlinks WEB-INF/classes to config -->
+  <target name="fresh_install"
+          depends="update"
+          description="Do a fresh install of the system, overwriting any data">
+    <mkdir dir="${dspace.dir}/config" />
+    <mkdir dir="${assetstore.dir}" />
+    <mkdir dir="${history.dir}" />
+    <copy todir="${dspace.dir}/config">
+      <fileset dir="${basedir}/config"/>
+    </copy>
+    <exec executable="ln">
+      <arg value="-s" />
+      <arg value="${dspace.dir}/config" />
+      <arg value="${dspace.dir}/jsp/WEB-INF/classes" />
+    </exec>
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- Clean source code                                             -->
+  <!-- ============================================================= -->
+
+  <target name="clean"
+          description="Remove compiled files - does not affect installation">
+    <delete dir="${basedir}/build" />
+  </target>
+
+</project>
