@@ -75,6 +75,18 @@ import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
+/*
+issues
+
+javadocs - even though it's not an API
+allow re-importing
+begin export module thoughts
+rename to ItemLoader
+if no epersonID found, check for username?
+list of collections would be nice too
+
+*/
+
 
 /**
 * The Item importer does exactly that - imports items into
@@ -266,10 +278,6 @@ public class ItemImport
     {
         String fullpath = path + "/" + name;
 
-        // first, make sure we have an item
-        //if (item == null)
-        //  throw new DSpaceException("Item is null");
-
         // get an input stream
         BufferedInputStream bis = new BufferedInputStream( new FileInputStream( fullpath ) );
 
@@ -374,14 +382,3 @@ public class ItemImport
 }
 
 
-/*
-issues
-
-javadocs - even though it's not an API
-allow re-importing
-begin export module thoughts
-rename to ItemLoader
-if no epersonID found, check for username?
-list of collections would be nice too
-
-*/

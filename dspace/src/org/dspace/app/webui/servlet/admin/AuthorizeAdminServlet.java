@@ -289,9 +289,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             int group_id      = UIUtil.getIntParameter(request, "group_id"     );
             int collection_id = UIUtil.getIntParameter(request, "collection_id");
             int community_id  = UIUtil.getIntParameter(request, "community_id");
-
-//            boolean is_public = (request.getParameter("is_public")==null ? false: true );
-  
+ 
             Collection collection = null;
             Community  community  = null;
             String display_page   = null;

@@ -183,9 +183,11 @@ public class EPerson extends DSpaceObject
             case ID:
                 s = "eperson_id";
                 break;
+                
             case EMAIL:
                 s = "email";
                 break;
+                
             default:
                 s = "lastname";
         }

@@ -1,5 +1,5 @@
 /*
- * WorkflowAbort.java
+ * WorkflowAbortServlet.java
  */
 
 package org.dspace.app.webui.servlet.admin;

@@ -265,7 +265,7 @@ public class Group
             
             TableRowIterator tri = DatabaseManager.query(c,
                 "eperson",
-                "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
+                "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE "  +
                     "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
                     "epersongroup2eperson.eperson_group_id=" +
                     groupid +
