@@ -406,7 +406,7 @@ public class Bundle
 
         // Remove bundle-bitstream mappings
         DatabaseManager.updateQuery(ourContext,
-            "delete from bundle2bitstream where bitstream_id=" + getID());
+            "delete from bundle2bitstream where bundle_id=" + getID());
 
         // Remove ourself
         DatabaseManager.delete(ourContext, bundleRow);
