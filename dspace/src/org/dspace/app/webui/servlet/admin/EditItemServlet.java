@@ -65,6 +65,7 @@ import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -430,7 +431,8 @@ public class EditItemServlet extends DSpaceServlet
                     item.addDC(element, qualifier, language, value);
                 }
             }
-            else if (p.startsWith("bitstream_name"))
+            // only process bitstreams if admin
+            else if (p.startsWith("bitstream_name") && AuthorizeManager.isAdmin(context))
             {
                 // We have bitstream metadata
                 // First, get the bundle and bitstream ID
