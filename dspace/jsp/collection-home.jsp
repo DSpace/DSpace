@@ -183,16 +183,7 @@
               </td>
               <td class="standard">
                 <input type="submit" name="submit_subscribe" value="Subscribe">
-<%  }
-    if(submitters != null)
-    { %>
-        </td>
-        <td>
-          <small><a href="<%=request.getContextPath()%>/tools/group-edit?group=<%=submitters.getID()%></a></small>
-        
-<%  }
-
- %>
+<%  } %>
               </td>
             </tr>
           </table>
@@ -208,8 +199,8 @@
   <P class="copyrightText"><%= copyright %></P>
 
   <dspace:sidebar>
-    <% if(admin_button)  // admin edit button
-    { %>
+<% if (admin_button)  // admin edit button
+   { %>
     <table class=miscTable align=center>
 	  <tr>
 	    <td class="evenRowEvenCol" colspan=2>
@@ -228,11 +219,22 @@
                 </form>
               </td>
             </tr>
+<%		if(submitters != null)
+ 	    { %>
+			<tr>
+				<td class="standard" align="center">
+				  <form method=GET action="<%=request.getContextPath()%>/tools/group-edit">
+				    <input type=hidden name="group" value="<%=submitters.getID()%>">
+				    <input type="submit" value="Edit Submitters">
+				  </form>
+				</td>
+			</tr>
+<%  	} %>
 	 	  </table>
 	 	</td>
       </tr>
     </table>
-    <% } %>
+<%  } %>
 
 
     <H3>Recent&nbsp;Submissions</H3>
