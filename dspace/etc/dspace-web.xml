@@ -395,7 +395,7 @@
 
   <servlet-mapping>
     <servlet-name>groups</servlet-name>
-    <url-pattern>/dspace-admin/groups</url-pattern>
+    <url-pattern>/tools/groups</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

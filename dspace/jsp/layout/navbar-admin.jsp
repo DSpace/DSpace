@@ -59,7 +59,7 @@
     links.add("/dspace-admin/edit-epeople");
     
     labels.add("Groups");
-    links.add("/dspace-admin/groups");
+    links.add("/tools/groups");
     
     labels.add("Items");
     links.add("/tools/edit-item");
