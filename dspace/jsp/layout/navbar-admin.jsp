@@ -61,7 +61,7 @@
     labels.add("Groups");
     links.add("groups");
     
-    labels.add("Correct/<br>Expunge Item");
+    labels.add("Items");
     links.add("edit-item");
     
     labels.add("Dublin Core<br>Registry");

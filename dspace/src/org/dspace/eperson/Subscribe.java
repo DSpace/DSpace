@@ -319,7 +319,8 @@ public class Subscribe
                 startDate,
                 endDate,
                 true,   // Need item objects
-                false); // But not containers
+                false,  // But not containers
+                false); // Or withdrawals
                 
             // Only add to buffer if there are new items
             if (itemInfos.size() > 0)

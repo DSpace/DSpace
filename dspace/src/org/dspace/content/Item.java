@@ -62,6 +62,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.history.HistoryManager;
+import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -1063,8 +1064,155 @@ public class Item implements DSpaceObject
 
 
     /**
-     * Delete the item.  Bundles and bitstreams are also deleted if they are
-     * not also included in another item.  The Dublin Core metadata is deleted.
+     * Withdraw the item from the archive.  It is kept in place, and the
+     * content and metadata are not deleted, but it is not publicly
+     * accessible.
+     */
+    public void withdraw()
+        throws SQLException, AuthorizeException, IOException
+    {
+        String timestamp = DCDate.getCurrent().toString();
+        
+        // Check permission.  User must have REMOVE on all collections.
+        // Build some provenance data while we're at it.
+        String collectionProv = "";
+        Collection[] colls = getCollections();
+        for (int i = 0; i < colls.length; i++)
+        {
+            collectionProv = collectionProv + colls[i].getMetadata("name") +
+                " (ID: " + colls[i].getID() + ")\n";
+            AuthorizeManager.authorizeAction(ourContext, colls[i],
+                Constants.REMOVE);
+        }
+        
+        // Set withdrawn flag and time stamp
+        itemRow.setColumn("withdrawn", true);
+        itemRow.setColumn("withdrawal_date", timestamp);
+
+        // in_archive flag is now false
+        itemRow.setColumn("in_archive", false);
+        
+        // Add suitable provenance - includes user, date, collections +
+        // bitstream checksums
+        EPerson e = ourContext.getCurrentUser();
+        String prov = "Item withdrawn by " + e.getFullName() + " (" +
+            e.getEmail() + ") on " + timestamp + "\n" +
+            "Item was in collections:\n" + collectionProv +
+            InstallItem.getBitstreamProvenanceMessage(this);
+
+        addDC("description", "provenance", "en", prov);
+        
+        // Update item in DB
+        update();
+
+        // Invoke History system
+        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY, e,
+            ourContext.getExtraLogInfo());
+        
+        // Remove from indicies
+        Browse.itemRemoved(ourContext, getID());
+        DSIndexer.unIndexContent(ourContext, this);
+        
+        // and all of our authorization policies
+        // FIXME: not very "multiple-inclusion" friendly
+        AuthorizeManager.removeAllPolicies(ourContext, this);
+
+        // Write log
+        log.info(LogManager.getHeader(ourContext,
+            "withdraw_item",
+            "user=" + e.getEmail() + ",item_id=" + getID()));
+    }
+
+
+    /**
+     * Reinstate a withdrawn item
+     */
+    public void reinstate()
+            throws SQLException, AuthorizeException, IOException
+    {
+        String timestamp = DCDate.getCurrent().toString();
+        
+        // Check permission.  User must have ADD on all collections.
+        // Build some provenance data while we're at it.
+        String collectionProv = "";
+        Collection[] colls = getCollections();
+        for (int i = 0; i < colls.length; i++)
+        {
+            collectionProv = collectionProv + colls[i].getMetadata("name") +
+                " (ID: " + colls[i].getID() + ")\n";
+            AuthorizeManager.authorizeAction(ourContext, colls[i],
+                Constants.ADD);
+        }
+        
+        // Clear withdrawn flag and time stamp
+        itemRow.setColumn("withdrawn", false);
+        itemRow.setColumnNull("withdrawal_date");
+
+        // in_archive flag is now true
+        itemRow.setColumn("in_archive", true);
+        
+        // Add suitable provenance - includes user, date, collections +
+        // bitstream checksums
+        EPerson e = ourContext.getCurrentUser();
+        String prov = "Item reinstated by " + e.getFullName() + " (" +
+            e.getEmail() + ") on " + timestamp + "\n" +
+            "Item was in collections:\n" + collectionProv +
+            InstallItem.getBitstreamProvenanceMessage(this);
+
+        addDC("description", "provenance", "en", prov);
+        
+        // Update item in DB
+        update();
+
+        // Invoke History system
+        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY, e,
+            ourContext.getExtraLogInfo());
+        
+        // Add to indicies
+        Browse.itemAdded(ourContext, this);
+        DSIndexer.indexContent(ourContext, this);
+        
+        // authorization policies
+        if (colls.length > 0)
+        {
+            // FIXME: not multiple inclusion friendly - just apply access
+            // policies from first collection
+            List policies = AuthorizeManager.getPoliciesActionFilter(
+                ourContext, colls[0], Constants.READ );
+
+            replaceAllPolicies(policies);
+        }
+
+        // Write log
+        log.info(LogManager.getHeader(ourContext,
+            "reinstate_item",
+            "user=" + e.getEmail() + ",item_id=" + getID()));
+    }
+    
+    
+    /**
+     * Item is withdrawn?  If so, return the date it happened.
+     * <code>null</code> is returned if the item is not withdrawn.
+     *
+     * @return the date the item was withdrawn or <code<null</code>
+     */
+    public DCDate getWithdrawalDate()
+    {
+        if (itemRow.getBooleanColumn("withdrawn"))
+        {
+            return new DCDate(itemRow.getStringColumn("withdrawal_date"));
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    
+    /**
+     * Delete (expunge) the item.  Bundles and bitstreams are also deleted if
+     * they are not also included in another item.  The Dublin Core metadata is
+     * deleted.
      */
     void delete()
         throws SQLException, AuthorizeException, IOException
@@ -1087,8 +1235,7 @@ public class Item implements DSpaceObject
         {
             // Remove from Browse indices
             Browse.itemRemoved(ourContext, getID());
-
-            // FIXME: Remove from search index
+            DSIndexer.unIndexContent(ourContext, this);
         }
 
         // Delete the Dublin Core
@@ -1116,7 +1263,6 @@ public class Item implements DSpaceObject
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
-        
     }
 
 

@@ -50,6 +50,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="java.util.Date" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 
@@ -59,6 +60,7 @@
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
@@ -68,6 +70,8 @@
     String handle = (String) request.getAttribute("handle");
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     DCType[] dcTypes = (DCType[])  request.getAttribute("dc.types");
+
+    DCDate withdrawalDate = item.getWithdrawalDate();
 %>
 
 <dspace:layout title="Edit Item"
@@ -87,9 +91,32 @@
                 <td class="submitFormLabel">Item&nbsp;internal&nbsp;ID:</td>
                 <td class="standard"><%= item.getID() %></td>
                 <td class="standard" width="100%" align="right" rowspan=4>
-                    <form method=POST>
+<%
+    if (withdrawalDate == null)
+    {
+%>
+                    <form method=POST action="<%= request.getContextPath() %>/admin/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>">
-                        <input type="hidden" name="action" value="<%= EditItemServlet.CONFIRM_DELETE %>">
+                        <input type="hidden" name="action" value="<%= EditItemServlet.START_WITHDRAW %>">
+                        <input type="submit" name="submit" value="Withdraw...">
+                    </form>
+<%
+    }
+    else
+    {
+%>
+                    <form method=POST action="<%= request.getContextPath() %>/admin/edit-item">
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>">
+                        <input type="hidden" name="action" value="<%= EditItemServlet.REINSTATE %>">
+                        <input type="submit" name="submit" value="Reinstate">
+                    </form>
+<%
+    }
+%>
+                    <br>
+                    <form method=POST action="<%= request.getContextPath() %>/admin/edit-item">
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>">
+                        <input type="hidden" name="action" value="<%= EditItemServlet.START_DELETE %>">
                         <input type="submit" name="submit" value="Delete (Expunge)...">
                     </form>
                 </td>
@@ -121,7 +148,19 @@
         </table>
     </center>
 
+<%
+
+
+    if (withdrawalDate != null)
+    {
+%>
+    <P align=center><strong>This item was withdrawn from DSpace on
+    <dspace:date date="<%= withdrawalDate %>" /></strong></P>
+<%
+    }
+%>
     <P>&nbsp;</P>
+
 
     <form method=POST action="<%= request.getContextPath() %>/admin/edit-item">
         <table class="miscTable">

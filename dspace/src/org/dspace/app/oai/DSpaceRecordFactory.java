@@ -123,8 +123,8 @@ public class DSpaceRecordFactory extends RecordFactory
     
     protected boolean isDeleted(Object nativeItem)
     {
-        // FIXME: Our implentation doesn't know about deletes yet
-        return false;
+        HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
+        return hii.withdrawn;
     }
     
     

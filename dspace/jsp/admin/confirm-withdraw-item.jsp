@@ -1,5 +1,5 @@
 <%--
-  - confirm-delete-item.jsp
+  - confirm-withdraw-item.jsp
   -
   - Version: $Revision$
   -
@@ -39,10 +39,10 @@
   --%>
 
 <%--
-  - Confirm deletion of a item
+  - Confirm withdrawal of a item
   -
   - Attributes:
-  -    item   - item we may delete
+  -    item   - item we may withdraw
   --%>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
@@ -55,24 +55,23 @@
     Item item = (Item) request.getAttribute("item");
 %>
 
-<dspace:layout title="Delete Item" navbar="admin" locbar="link" parentlink="/admin" parenttitle="Administer">
+<dspace:layout title="Withdraw Item" navbar="admin" locbar="link" parentlink="/admin" parenttitle="Administer">
 
-    <H1>Delete Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1>
+    <H1>Withdraw Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1>
     
-    <P>Are you sure this item should be completely deleted?  Caution:
-    At present, no tombstone would be left.</P>
+    <P>Are you sure this item should be withdrawn from the archive?</P>
     
     <dspace:item item="<%= item %>" style="full" />
 
     <form method=POST>
         <input type="hidden" name="item_id" value="<%= item.getID() %>">
-        <input type="hidden" name="action" value="<%= EditItemServlet.CONFIRM_DELETE %>">
+        <input type="hidden" name="action" value="<%= EditItemServlet.CONFIRM_WITHDRAW %>">
 
         <center>
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit" value="Delete">
+                        <input type="submit" name="submit" value="Withdraw">
                     </td>
                     <td align="right">
                         <input type="submit" name="submit_cancel" value="Cancel">

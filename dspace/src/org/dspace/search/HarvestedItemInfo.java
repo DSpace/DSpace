@@ -75,4 +75,7 @@ public class HarvestedItemInfo
      * <code>containers[1][1]</code> - ID of collectionB <br>
      */
     public int[][] containers;
+    
+    /** True if this item has been withdrawn */
+    public boolean withdrawn;
 }

@@ -147,7 +147,14 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
         if (itemInfo == null)
         {
-            throw new IdDoesNotExistException(identifier);
+            if (itemInfo.withdrawn)
+            {
+                throw new NoMetadataFormatsException();
+            }
+            else
+            {
+                throw new IdDoesNotExistException(identifier);
+            }
         }
         else
         {
@@ -196,7 +203,8 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Get the relevant OAIItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until,
-                false, true); // No items, but we need to know containers
+                false, true, true);
+            // No items, but we need to know containers and withdrawn items
 
             // Build up lists of headers and identifiers
             Iterator i = itemInfos.iterator();
@@ -276,9 +284,15 @@ public class DSpaceOAICatalog extends AbstractCatalog
         // First get the item from the DB
         try
         {
-            context = new Context();
+            // Valid IDs start with hdl:
+            if (identifier.startsWith("hdl:"))
+            {
+                context = new Context();
 
-            itemInfo = Harvest.getSingle(context, identifier, false);
+                itemInfo = Harvest.getSingle(context,
+                    identifier.substring(4), // Strip "hdl:"
+                    true);
+            }
         }
         catch (SQLException se)
         {
@@ -354,7 +368,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Get the relevant HarvestedItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until,
-                true, true);  // Need items and containers
+                true, true, true);  // Need items, containers + withdrawals
 
             // Build list of XML records from item info objects
             Iterator i = itemInfos.iterator();

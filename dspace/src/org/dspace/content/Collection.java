@@ -288,7 +288,8 @@ public class Collection implements DSpaceObject
             "item",
             "SELECT item.* FROM item, collection2item WHERE " +
                 "item.item_id=collection2item.item_id AND " +
-                "collection2item.collection_id=" + getID() + ";");
+                "collection2item.collection_id=" + getID() +
+                " AND item.in_archive=true");
 
         return new ItemIterator(ourContext, rows);
     }

@@ -54,6 +54,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -97,6 +98,14 @@ public class DisplayItemServlet extends DSpaceServlet
         // If everything is OK, display the item
         if (item != null)
         {
+            // Tombstone?
+            DCDate withdrawalDate = item.getWithdrawalDate();
+            if (withdrawalDate != null)
+            {
+                JSPManager.showJSP(request, response, "tombstone.jsp");
+                return;
+            }
+            
             // Ensure the user has authorisation
             AuthorizeManager.authorizeAction(context, item, Constants.READ);
 

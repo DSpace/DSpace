@@ -94,6 +94,15 @@ public class EditItemServlet extends DSpaceServlet
     /** User updates item */
     public static final int UPDATE_ITEM = 3;
 
+    /** User starts withdrawal of item */
+    public static final int START_WITHDRAW = 4;
+
+    /** User confirms withdrawal of item */
+    public static final int CONFIRM_WITHDRAW = 5;
+    
+    /** User reinstates a withdrawn item */
+    public static final int REINSTATE = 6;
+
     /** Logger */
     private static Logger log = Logger.getLogger(EditCommunitiesServlet.class);
 
@@ -215,6 +224,26 @@ public class EditItemServlet extends DSpaceServlet
             processUpdateItem(context, request, response, item);
             break;
 
+       case START_WITHDRAW:
+            // Show "withdraw item" confirmation page
+            JSPManager.showJSP(request,
+                response,
+                "/admin/confirm-withdraw-item.jsp");
+            break;
+
+        case CONFIRM_WITHDRAW:
+            // Withdraw the item
+            item.withdraw();
+            JSPManager.showJSP(request, response, "/admin/get-item-id.jsp");
+            context.complete();
+            break;
+            
+        case REINSTATE:
+            item.reinstate();
+            JSPManager.showJSP(request, response, "/admin/get-item-id.jsp");
+            context.complete();
+            break;
+            
         default:
             // Erm... weird action value received.
             log.warn(LogManager.getHeader(context,

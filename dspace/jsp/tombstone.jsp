@@ -1,5 +1,5 @@
 <%--
-  - confirm-delete-item.jsp
+  - tombstone.jsp
   -
   - Version: $Revision$
   -
@@ -39,47 +39,23 @@
   --%>
 
 <%--
-  - Confirm deletion of a item
-  -
-  - Attributes:
-  -    item   - item we may delete
+  - Display a tombstone indicating that an item has been withdrawn.
   --%>
-
-<%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
-<%@ page import="org.dspace.content.Item" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%
-    String handle = (String) request.getAttribute("handle");
-    Item item = (Item) request.getAttribute("item");
-%>
 
-<dspace:layout title="Delete Item" navbar="admin" locbar="link" parentlink="/admin" parenttitle="Administer">
+<dspace:layout title="Item Withdrawn">
 
-    <H1>Delete Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1>
-    
-    <P>Are you sure this item should be completely deleted?  Caution:
-    At present, no tombstone would be left.</P>
-    
-    <dspace:item item="<%= item %>" style="full" />
+    <H1>Item Withdrawn</H1>
 
-    <form method=POST>
-        <input type="hidden" name="item_id" value="<%= item.getID() %>">
-        <input type="hidden" name="action" value="<%= EditItemServlet.CONFIRM_DELETE %>">
+    <P>The item you are trying to access has been withdrawn from DSpace.  If you
+    have any questions, please contact the administrators.</P>
 
-        <center>
-            <table width="70%">
-                <tr>
-                    <td align="left">
-                        <input type="submit" name="submit" value="Delete">
-                    </td>
-                    <td align="right">
-                        <input type="submit" name="submit_cancel" value="Cancel">
-                    </td>
-                </tr>
-            </table>
-        </center>
-    </form>
+    <dspace:include page="/components/contact-info.jsp" />
+
+    <P align=center>
+        <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>
+    </P>
+
 </dspace:layout>
-

@@ -49,6 +49,7 @@ import org.apache.log4j.Logger;
 import org.dspace.administer.DCType;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -93,6 +94,8 @@ public class Harvest
      * @param containers  if <code>true</code> the <code>containers</code>
      *                    field of each <code>HarvestedItemInfo</code> object
      *                    is filled out
+     * @param withdrawn   If <code>true</code>, information about withdrawn
+     *                    items is included
      * @return  List of <code>HarvestedItemInfo</code> objects
      */
     public static List harvest(Context context,
@@ -100,7 +103,8 @@ public class Harvest
         String startDate,
         String endDate,
         boolean items,
-        boolean containers)
+        boolean containers,
+        boolean withdrawn)
         throws SQLException
     {
         int dcTypeID = getDateAvailableTypeID(context);
@@ -110,7 +114,7 @@ public class Harvest
 
         // SQL to add to the WHERE clause of the query
         String scopeWhereSQL = "";
-
+                
         if (scope != null)
         {
             if (scope.getType() == Constants.COMMUNITY)
@@ -130,12 +134,12 @@ public class Harvest
             }
             // Theoretically, no other possibilities, won't bother to check
         }
-
+        
         // Put together our query
         String query = 
-            "SELECT handle.handle, handle.resource_id, dcvalue.text_value FROM handle, dcvalue" +
+            "SELECT handle.handle, handle.resource_id, dcvalue.text_value FROM handle, dcvalue, item" +
             scopeTableSQL + " WHERE handle.resource_type_id=" + Constants.ITEM +
-            " AND handle.resource_id=dcvalue.item_id AND dcvalue.dc_type_id=" +
+            " AND handle.resource_id=dcvalue.item_id  AND dcvalue.item_id=item.item_id AND item.withdrawn=false AND dcvalue.dc_type_id=" +
             dcTypeID + scopeWhereSQL;
         
         if (startDate != null)
@@ -165,12 +169,12 @@ public class Harvest
             itemInfo.handle = row.getStringColumn("handle");
             itemInfo.itemID = row.getIntColumn("resource_id");
             itemInfo.datestamp = row.getStringColumn("text_value");
+            itemInfo.withdrawn = false;
 
             if (containers)
             {
                 fillContainers(context, itemInfo);
             }
-
 
             if (items)
             {
@@ -180,7 +184,55 @@ public class Harvest
             
             infoObjects.add(itemInfo);
         }
-            
+
+        // Add information about deleted items if necessary
+        if (withdrawn)
+        {
+            // Put together our query
+            query = 
+                "SELECT handle.handle, handle.resource_id, item.withdrawal_date FROM handle, item" +
+                scopeTableSQL + " WHERE handle.resource_type_id=" + Constants.ITEM +
+                " AND handle.resource_id=item.item_id  AND item.withdrawn=true"
+                + scopeWhereSQL;
+
+            if (startDate != null)
+            {
+                query = query + " AND item.withdrawal_date >= '" + startDate + "'";
+            }
+
+            if (endDate != null)
+            {
+                query = query + " AND item.withdrawal_date <= '" + endDate + "'";
+            }
+
+            log.debug(LogManager.getHeader(context,
+                "harvest SQL (withdrawals)",
+                query));
+
+            // Execute
+            tri = DatabaseManager.query(context, query);
+
+            // Process results of query into HarvestedItemInfo objects
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+                HarvestedItemInfo itemInfo = new HarvestedItemInfo();
+
+                itemInfo.handle = row.getStringColumn("handle");
+                itemInfo.itemID = row.getIntColumn("resource_id");
+                itemInfo.datestamp = row.getStringColumn("withdrawal_date");
+                itemInfo.withdrawn = true;
+                
+                if (containers)
+                {
+                    fillContainers(context, itemInfo);
+                }
+
+                // Won't fill out item objects for withdrawn items
+                infoObjects.add(itemInfo);
+            }
+        }
+
         return infoObjects;
     }
 
@@ -216,10 +268,23 @@ public class Harvest
 
         itemInfo.item = i;
         itemInfo.handle = handle;
-        // FIXME: Assume data.available is there
-        DCValue[] dateAvail =
-            i.getDC("date", "available", Item.ANY);
-        itemInfo.datestamp = dateAvail[0].value;
+
+        DCDate withdrawalDate = i.getWithdrawalDate();
+
+        if (withdrawalDate == null)
+        {
+            // FIXME: Assume data.available is there
+            DCValue[] dateAvail =
+                i.getDC("date", "available", Item.ANY);
+            itemInfo.datestamp = dateAvail[0].value;
+            itemInfo.withdrawn = false;
+        }
+        else
+        {
+            itemInfo.datestamp = withdrawalDate.toString();
+            itemInfo.withdrawn = true;
+        }
+        
         itemInfo.itemID = i.getID();
 
         // Get the sets

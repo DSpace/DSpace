@@ -183,9 +183,11 @@ CREATE TABLE EPersonGroup
 -------------------------------------------------------
 CREATE TABLE Item
 (
-  item_id      INTEGER PRIMARY KEY,
-  submitter_id INTEGER REFERENCES EPerson(eperson_id),
-  in_archive   BOOL
+  item_id         INTEGER PRIMARY KEY,
+  submitter_id    INTEGER REFERENCES EPerson(eperson_id),
+  in_archive      BOOL,
+  withdrawn       BOOL,
+  withdrawal_date VARCHAR(21)
 );
 
 -------------------------------------------------------
