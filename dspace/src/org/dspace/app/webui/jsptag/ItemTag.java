@@ -259,10 +259,9 @@ public class ItemTag extends TagSupport
         // show edit link
         if(item.canEdit())
         {
-            String editLink = request.getContextPath() + "/tools/edit-item"
-                + "?item_id="+item.getID();
+            String editLink = request.getContextPath() + "/tools/edit-item";
                 
-            out.println("<a href=\""+editLink+"\">Edit</a>");
+            out.println("<form action=\""+editLink+"\"><input type=\"hidden\" name=\"item_id\" value=\""+item.getID()+"\">\n<input type=\"submit\" value=\"Edit\"></form>");
         }
         
         out.println("<center><table class=\"itemDisplayTable\">");
@@ -443,8 +442,10 @@ public class ItemTag extends TagSupport
             boolean html = false;
 	    Bitstream primaryBitstream = null;
 
-	    // check if primary bitstream is html
 	    Bundle[] bunds = item.getBundles("ORIGINAL");
+            Bundle[] thumbs= item.getBundles("THUMBNAIL");
+
+	    // check if primary bitstream is html
 	    if (bunds[0] != null)
 	    {
 		Bitstream[] bits = bunds[0].getBitstreams();
@@ -515,7 +516,26 @@ public class ItemTag extends TagSupport
 			    out.print("/retrieve/");
 			    out.print(bitstreams[k].getID() + "/");
 			    out.print(URLEncoder.encode(bitstreams[k].getName()));
-			    out.print("\">View/Open</A></td></tr>");
+			    out.print("\">");
+                            
+                            // is there a thumbnail bundle?
+                            if(thumbs.length > 0)
+                            {
+                                String tName = bitstreams[k].getName()+".jpg";
+                                Bitstream tb = thumbs[0].getBitstreamByName(tName);
+                            
+                                if( tb != null )
+                                {
+                                    String myPath = request.getContextPath() + "/retrieve/" + tb.getID()
+                                        + "/" + URLEncoder.encode(tb.getName());
+                                
+                                    //out.print(myPath);    
+                                    out.print("<img src=\""+ myPath + "\" ");
+                                    out.print("alt=\"" + tName + "\">");
+                                }
+                            }
+                            
+                            out.print("View/Open</A></td></tr>");
 			}
 		    }
 		}
