@@ -124,16 +124,16 @@ public class DCType
         String qualifier)
         throws SQLException
     {
-        String sql = "SELECT * FROM dctyperegistry WHERE element LIKE \"" +
-            element + "\" AND qualifier";
+        String sql = "SELECT * FROM dctyperegistry WHERE element LIKE '" +
+            element + "' AND qualifier";
         
-        if (qualifier==null)
+        if (qualifier == null)
         {
             sql = sql + "=null;";
         }
         else
         {
-            sql = sql + " LIKE \"" + qualifier + "\";";
+            sql = sql + " LIKE '" + qualifier + "';";
         }
 
         TableRowIterator tri = DatabaseManager.query(context,
