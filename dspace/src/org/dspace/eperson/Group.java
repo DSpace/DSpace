@@ -274,7 +274,7 @@ public class Group
      * @return Group
      */
     public static Group findByName(Context context, String name)
-        throws SQLException, AuthorizeException
+        throws SQLException
     {
         TableRow row = DatabaseManager.findByUnique( context, "epersongroup", "name", name );
 
