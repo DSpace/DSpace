@@ -47,7 +47,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.app.webui.servlet.admin.NewsEditServlet" %>
+<%@ page import="org.dspace.core.Constants" %>
 
 <%
     String news = (String)request.getAttribute("news");
@@ -73,7 +73,7 @@
             <tr>
                 <td class="oddRowOddCol">Top News</td>
                 <td class="oddRowEvenCol">
-                    <input type="hidden" name="location" value=<%= NewsEditServlet.NEWS_TOP %>>
+                    <input type="hidden" name="position" value=<%= Constants.NEWS_TOP %>>
                     <input type="submit" name="submit_edit" value="Edit...">
                 </td>
             </tr>
@@ -82,7 +82,7 @@
             <tr>
                 <td class="evenRowOddCol">Sidebar News</td>
                 <td class="evenRowEvenCol">
-                    <input type="hidden" name="location" value=<%= NewsEditServlet.NEWS_SIDE %>>
+                    <input type="hidden" name="position" value=<%= Constants.NEWS_SIDE %>>
                     <input type="submit" name="submit_edit" value="Edit...">
                 </td>
             </tr>
