@@ -148,7 +148,10 @@ Common usage:
   <!-- Do a fresh install of the code and configuration files        -->
   <!-- ============================================================= -->
   
-  <!-- Installs code, then config, and symlinks WEB-INF/classes to config -->
+  <!-- Installs code, then config, and symlinks WEB-INF/classes to config.
+       The "log4j.build.properties" file is copied to ${dspace.dir}/config
+       so there's a simple log4j.properties file present for the initial
+       run of "install-configs". -->
   <target name="install_code"
           depends="update"
           description="Do a fresh install of the system, not touching database">
@@ -160,6 +163,8 @@ Common usage:
     <copy todir="${dspace.dir}/config">
       <fileset dir="${basedir}/config"/>
     </copy>
+    <copy file="${basedir}/etc/log4j.build.properties"
+          tofile="${dspace.dir}/config/log4j.properties"/>
     <exec executable="ln">
       <arg value="-s" />
       <arg value="${dspace.dir}/config" />
