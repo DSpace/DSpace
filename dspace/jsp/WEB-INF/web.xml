@@ -72,6 +72,11 @@
     
   <filter-mapping>
     <filter-name>registered-only</filter-name>
+    <url-pattern>/profile</url-pattern>
+  </filter-mapping>
+    
+  <filter-mapping>
+    <filter-name>registered-only</filter-name>
     <url-pattern>/submit</url-pattern>
   </filter-mapping>
 
@@ -151,6 +156,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>profile</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.EditProfileServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>retrieve</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
   </servlet>
@@ -226,6 +236,11 @@
   <servlet-mapping>
     <servlet-name>password-login</servlet-name>
     <url-pattern>/password-login</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>profile</servlet-name>
+    <url-pattern>/profile</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
