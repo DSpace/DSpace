@@ -276,7 +276,7 @@
                     <input type="submit" name="submit_resume" value="Resume">
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <input type="submit" name="submit_delete" value="Remove">
+                    <input type="submit" name="submit_delete" value="Remove...">
                 </td>
             </tr>
         </form>
