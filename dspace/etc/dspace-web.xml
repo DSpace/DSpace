@@ -416,7 +416,7 @@
 
   <servlet-mapping>
     <servlet-name>groups</servlet-name>
-    <url-pattern>/tools/groups</url-pattern>
+    <url-pattern>/tools/group-edit</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
