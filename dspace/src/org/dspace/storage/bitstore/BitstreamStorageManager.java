@@ -43,9 +43,8 @@ package org.dspace.storage.bitstore;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -55,13 +54,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-
-import org.apache.log4j.Logger;
 
 /**
  * <P>Stores, retrieves and deletes bitstreams.</P>
@@ -221,7 +219,16 @@ public class BitstreamStorageManager
         fos.close();
         is.close();
 
-        bitstream.setColumn("size", (int) file.length());
+        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        {
+            bitstream.setColumn("size_bytes", (int) file.length());
+        }
+        else
+        {
+            // postgres default
+            bitstream.setColumn("size", (int) file.length());
+        }
+
         bitstream.setColumn("checksum",
                             Utils.toHex(dis.getMessageDigest().digest()));
         bitstream.setColumn("checksum_algorithm", "MD5");
@@ -269,15 +276,24 @@ public class BitstreamStorageManager
      *
      * @param context The current context
      * @param id The ID of the bitstream to delete
-     * @exception IOException If a problem occurs while deleting the bits
      * @exception SQLException If a problem occurs accessing the RDBMS
      */
     public static void delete(Context context, int id)
-        throws SQLException, IOException
+        throws SQLException
     {
-        DatabaseManager.updateQuery
-            (context,
-             "update Bitstream set deleted = 't' where bitstream_id = " + id);
+        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        {
+            // oracle uses 1 for true
+            DatabaseManager.updateQuery
+                (context,
+                "update Bitstream set deleted = 1 where bitstream_id = " + id);
+        }
+        else
+        {
+            DatabaseManager.updateQuery
+                (context,
+                "update Bitstream set deleted = 't' where bitstream_id = " + id);
+        }
     }
 
     /**
@@ -296,11 +312,23 @@ public class BitstreamStorageManager
         try
         {
             context = new Context();
+            String myQuery = null;
+            
+            if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+            {
+                myQuery = "select * from Bitstream where deleted = 1";
+            }
+            else
+            {
+                // postgres
+                myQuery = "select * from Bitstream where deleted = 't'";
+            }
+
 
             List storage = DatabaseManager.query
                 (context,
                  "Bitstream",
-                 "select * from Bitstream where deleted = 't'").toList();
+                 myQuery).toList();
 
             for (Iterator iterator = storage.iterator(); iterator.hasNext(); )
             {

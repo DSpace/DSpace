@@ -420,12 +420,21 @@ public class DatabaseManager
       String table = canonicalize(row.getTable());
 
       // Get an ID (primary key) for this row by using the "getnextid"
-      // SQL function
+      // SQL function in Postgres, or directly with sequences in Oracle
+      String myQuery = "SELECT getnextid('" + table + "') AS result";
+
+      if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+      {
+          myQuery = "SELECT " + table + "_seq" + ".nextval FROM dual";
+      }
+
       Statement statement = context.getDBConnection().createStatement();
-      ResultSet rs = statement.executeQuery("SELECT getnextid('" + table
-            + "') AS result");
+      ResultSet rs = statement.executeQuery( myQuery );
+
       rs.next();
+
       int newID = rs.getInt(1);
+
       statement.close();
 
       // Set the ID in the table row object
@@ -629,6 +638,13 @@ public class DatabaseManager
     */
    static String canonicalize(String table)
    {
+      // Oracle expects upper-case table names
+      if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+      {
+          return table == null ? null : table.toUpperCase();
+      }
+
+      // default database postgres wants lower-case table names
       return table == null ? null : table.toLowerCase();
    }
 
@@ -692,7 +708,7 @@ public class DatabaseManager
             // Empty line, skip
             if (input.trim().equals("")) continue;
             // Put it on the SQL buffer
-            sql.append(input);
+            sql.append(input.replace(';', ' ')); // remove all semicolons from sql file!
             // Add a space
             sql.append(" ");
             // More to come?
@@ -819,7 +835,7 @@ public class DatabaseManager
          {
             row.setColumn(name, results.getBoolean(i));
          }
-         else if (jdbctype == Types.INTEGER)
+         else if (jdbctype == Types.INTEGER || jdbctype == Types.NUMERIC || jdbctype == Types.DECIMAL)
          {
             row.setColumn(name, results.getInt(i));
          }
@@ -980,7 +996,7 @@ public class DatabaseManager
                statement.setBoolean(count, row.getBooleanColumn(column));
                continue;
             }
-            else if (jdbctype == Types.INTEGER)
+            else if (jdbctype == Types.INTEGER || jdbctype == Types.DECIMAL)
             {
                statement.setInt(count, row.getIntColumn(column));
                continue;
@@ -1163,10 +1179,18 @@ public class DatabaseManager
          // the "real" Connections created by the ConnectionFactory with
          // the classes that implement the pooling functionality.
          //
+         String validationQuery = "SELECT 1";
+
+         // Oracle has a slightly different validation query
+         if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+         {
+             validationQuery = "SELECT 1 FROM DUAL";
+         }
+
          PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(
                connectionFactory, connectionPool, null, // no preparedstatement
                                                         // pooling for now
-               "SELECT 1;", // validation query
+               validationQuery, // validation query
                false, // read only is not default for now
                false); // Autocommit defaults to none
 
