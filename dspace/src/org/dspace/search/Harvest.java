@@ -165,7 +165,7 @@ public class Harvest
             query = query + " AND item.last_modified <= '" + endDate + "'";
         }
 
-        if (withdrawn = false)
+        if (withdrawn == false)
         {
             // Exclude withdrawn items
             query = query + " AND withdrawn=false";
