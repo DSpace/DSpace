@@ -67,4 +67,4 @@ JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
 FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
 
 # Now invoke Java
-java -classpath $FULLPATH "$@"
+java -Xmx256m -classpath $FULLPATH "$@"
