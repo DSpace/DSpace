@@ -64,11 +64,11 @@ public class DatabaseManager
      */
     private static Category log = Category.getInstance(DatabaseManager.class);
 
-    private static final String JDBC_URL_PROPERTY = "jdbc.url";
+    private static final String JDBC_URL_PROPERTY = "db.url";
 
     private static String jdbcUrl = ConfigurationManager.getProperty(JDBC_URL_PROPERTY);
-    private static String jdbcUserName = ConfigurationManager.getProperty("jdbc.username");
-    private static String jdbcPassword = ConfigurationManager.getProperty("jdbc.password");
+    private static String jdbcUserName = ConfigurationManager.getProperty("db.username");
+    private static String jdbcPassword = ConfigurationManager.getProperty("db.password");
 
     /**
      * True if initialization has been done
