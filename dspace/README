@@ -1,14 +1,15 @@
-DSpace Version 1.1, released 08-May-2003
+DSpace Version 1.2 beta 1, 21-Apr-2004
 
 Installation instructions are included in the 'dspace-docs' download,
 available from:
 
 http://sourceforge.net/projects/dspace/
 
-These documents may be viewed online:
+Documentation may be viewed online at dspace.org, but these pertain to the
+most recent stable release; the installation instructions for this beta
+may be different so you are encouraged to download the dspace-docs
+package corresponding to this beta from the above SourceForge page.
 
-http://www.dspace.org/technology/system-docs/
 
-
-Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+Copyright (c) 2002-2004, Hewlett-Packard Company and Massachusetts
 Institute of Technology.  All rights reserved.
