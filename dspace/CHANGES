@@ -1,5 +1,7 @@
 1.3 branch (unreleased)
 =======================
+(Jozsef Martin)
+SF Patch #1173564 - add missing ContentType directive to some of the JSPs
 
 (Richard Jones)
 - Added new DSpace log file analysis tool, including command line analysis and
