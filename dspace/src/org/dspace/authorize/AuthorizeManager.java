@@ -40,6 +40,9 @@
 
 package org.dspace.authorize;
 
+import java.util.StringTokenizer;
+import java.sql.SQLException;
+
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -53,9 +56,7 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
-import java.util.StringTokenizer;
-import java.sql.SQLException;
-
+import org.dspace.history.HistoryManager;
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace.
@@ -137,7 +138,14 @@ public class AuthorizeManager
         if( e != null ) userid = e.getID();
 
         if (!authorize(c,otype,oid,myaction, userid))
-            throw new AuthorizeException("Authorization denied for action " + myaction + " by user " + userid);
+        {
+            System.out.println( HistoryManager.getStackTrace() );
+            
+            throw new AuthorizeException("Authorization denied for action "
+                                        + Constants.actiontext[myaction]
+                                        + "on " + Constants.typetext[otype]
+                                        + ":" + oid + " by user " + userid);
+        }
     }
 
 
@@ -162,9 +170,11 @@ public class AuthorizeManager
         return isauthorized;
     }
 
+
     /**
      * check to see if the current user is an admin,
-     *  or always return true if c.ignoreAuthorization is set
+     *  or always return true if c.ignoreAuthorization is set.
+     *  Anonymous users can't be Admins (EPerson set to NULL)
      */
     public static boolean isAdmin(Context c)
         throws SQLException
@@ -198,12 +208,13 @@ public class AuthorizeManager
     /**
      * authorize() is the authorize method that returns a boolean - always
      *  returns true if c.ignoreAuthorization is set
-	 *
+     *
      * @param resourcetype - found core.Constants (collection, item, etc.)
      * @param resorceidID of resource you're trying to do an authorize on
      * @param actionid - action to perform (read, write, etc)
      */
-    public static boolean authorize(Context c,int resourcetype, int resourceid, int actionid, int userid)
+    public static boolean authorize(Context c,int resourcetype, int resourceid, int actionid,
+                                    int userid)
         throws SQLException
     {
         // ignore authorization? if so, return true
@@ -216,7 +227,8 @@ public class AuthorizeManager
 
         // no policies?  notify admins and give 'false'
         if (!i.hasNext())
-        {//alert( "no policies for this object" );
+        {
+            //alert( "no policies for this object" );
         }
 
         while( i.hasNext() )
@@ -241,7 +253,8 @@ public class AuthorizeManager
                         uid = Integer.parseInt(t.substring(1));
                     }
                     catch (NumberFormatException e)
-                    {// eek! this should never happen
+                    {
+                        // eek! this should never happen
                     }
 
                     if ((uid != -1) && (uid == userid)) return true;
@@ -255,7 +268,8 @@ public class AuthorizeManager
                         gid = Integer.parseInt(t.substring(1));
                     }
                     catch (NumberFormatException e)
-                    {// once again, eek!
+                    {
+                        // once again, eek!
                     }
 
                     if (Group.isMember(c,gid, userid)) return true;
@@ -272,8 +286,9 @@ public class AuthorizeManager
         return false;  // default policy
     }
 
-	/**
-	 * Fetches policies that apply to an object and action pair
+
+    /**
+     * Fetches policies that apply to an object and action pair
      * looks for policies specific to that object, and if not
      * found, then looks for containers that may have policies
      * that apply (bitstreams look for containing items & collections,
@@ -284,8 +299,9 @@ public class AuthorizeManager
      * This override is done simply by ceasing to look for other
      * policies once a specific policy is found.
      *
-	 */
-    private static TableRowIterator policyLookup(Context c, int resource_type, int resource_id, int action_id)
+     */
+    private static TableRowIterator policyLookup(Context c, int resource_type, int resource_id,
+                                                int action_id)
         throws SQLException
     {
         String myquery = "";
@@ -298,19 +314,6 @@ public class AuthorizeManager
             " AND action_id=" + action_id +
             " AND resource_id=" + resource_id );
 
-/*
-        // find all policies specific to this object
-        String myquery = "SELECT * from ResourcePolicy where" +
-            " resource_type_id = " + resource_type +
-            " AND action_id = " + action_id +
-            " AND resource_id = " + resource_id;
-
-
-
-        DatabaseBeanIterator specific_policies = ResourcePolicy.query(myquery);
-        DatabaseBeanIterator item_policies = null;
-        DatabaseBeanIterator collection_policies = null;
-*/
         if (resource_type == Constants.BITSTREAM)
         {
             // if there are item specific policies, they have
@@ -324,8 +327,8 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + Constants.ITEM +
-                    " AND resource_filter_arg in " +
+                    " AND container_type_id = " + Constants.ITEM +
+                    " AND container_id in " +
                     "(select item_id from Item2Bundle where bundle_id in" +
                     "(select bundle_id from Bundle2Bitstream where " +
                     " bitstream_id = " + resource_id + "))";
@@ -343,8 +346,8 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + Constants.COLLECTION +
-                    " AND resource_filter_arg in " +
+                    " AND container_type_id = " + Constants.COLLECTION +
+                    " AND container_id in " +
                     "(select collection_id from Collection2Item where" +
                     " item_id in " +
                     "(select item_id from Item2Bundle where bundle_id in" +
@@ -374,8 +377,8 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + Constants.ITEM +
-                    " AND resource_filter_arg in " +
+                    " AND container_type_id = " + Constants.ITEM +
+                    " AND container_id in " +
                     "(select item_id from Item2Bundle where " +
                     " bundle_id = " + resource_id + ")";
 
@@ -392,8 +395,8 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + Constants.COLLECTION +
-                    " AND resource_filter_arg in " +
+                    " AND container_type_id = " + Constants.COLLECTION +
+                    " AND container_id in " +
                     "(select collection_id from Collection2Item where" +
                     " item_id in " +
                     "(select item_id from Item2Bundle where " +
@@ -409,7 +412,7 @@ public class AuthorizeManager
             }
         }
 
-        // items just inherit from collections
+        // items inherit policies from containing collections
         if (resource_type == Constants.ITEM)
         {
             if (specific_policies.hasNext())
@@ -420,8 +423,8 @@ public class AuthorizeManager
             myquery = "SELECT * from ResourcePolicy where" +
                     " resource_type_id = " + resource_type +
                     " AND action_id = " + action_id +
-                    " AND resource_filter = " + Constants.COLLECTION +
-                    " AND resource_filter_arg in " +
+                    " AND container_type_id = " + Constants.COLLECTION +
+                    " AND container_id in " +
                     "(select collection_id from Collection2Item where" +
                     " item_id = " + resource_id + ")";
 
@@ -435,8 +438,8 @@ public class AuthorizeManager
             }
         }
 
-        // end of special inheritance - handle any other
-        //  type
+        // end of inheritance check - handle any other
+        //  type (warning: may be an empty list of policies)
 
         return specific_policies;
     }
