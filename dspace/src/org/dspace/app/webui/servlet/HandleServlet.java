@@ -248,8 +248,7 @@ public class HandleServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Tombstone?
-        DCDate withdrawalDate = item.getWithdrawalDate();
-        if (withdrawalDate != null)
+        if (item.isWithdrawn())
         {
             JSPManager.showJSP(request, response, "tombstone.jsp");
             return;

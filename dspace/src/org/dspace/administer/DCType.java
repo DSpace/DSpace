@@ -74,7 +74,16 @@ public class DCType
     /** The row in the table representing this type */
     private TableRow typeRow;
 
+    /**
+     * For quick access in the system, an array of the elements in the
+     * registry
+     */
+    private static String[] elements = null;
+    
+    /** The qualifiers in the system */
+    private static String[] qualifiers = null;
 
+    
     /**
      * Class constructor for creating a BitstreamFormat object
      * based on the contents of a DB table row.
@@ -88,7 +97,67 @@ public class DCType
         typeRow = row;
     }
 
+    
+    /**
+     * Utility method for quick access to an element and qualifier
+     * given the type ID.
+     *
+     * @param context  context, in case DC types need to be read in from DB
+     * @param id   the DC type ID
+     * @return  a two-String array, string 0 is the element,
+     *          string 1 is the qualifier
+     */
+    public static String[] quickFind(Context context, int id)
+        throws SQLException
+    {
+        if (elements == null)
+        {
+            loadDC(context);
+        }
+        
+        // We use the ID to get the element and qualifier out of
+        // the relevant array.  But should 'sanity check' first.
+        if (id > elements.length || id < 0)
+        {
+            return null;
+        }
+        
+        String[] result = new String[2];
+        result[0] = elements[id];
+        result[1] = qualifiers[id];
+        return result;
+    }
+    
+    
+    /**
+     * Load in the DC type registry for quick access via quickFind.
+     *
+     * @param context  DSpace context object
+     */
+    public static void loadDC(Context context) throws SQLException
+    {
+        // First get the highest ID so we know how big to make the array
+        TableRow row = DatabaseManager.querySingle(context,
+            "SELECT MAX(dc_type_id) AS foo FROM dctyperegistry");
+        int numberFields = row.getIntColumn("foo") + 1;
 
+        elements = new String[numberFields];
+        qualifiers = new String[numberFields];
+        
+        // Grab rows from DB
+        TableRowIterator tri = DatabaseManager.query(context,
+            "SELECT * FROM dctyperegistry");
+
+        while (tri.hasNext())
+        {
+            row = tri.next();
+            int id = row.getIntColumn("dc_type_id");
+            elements[id] = row.getStringColumn("element");
+            qualifiers[id] = row.getStringColumn("qualifier");
+        }
+    }
+
+    
     /**
      * Get a bitstream format from the database.
      *

@@ -41,6 +41,7 @@
 package org.dspace.app.oai;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +54,7 @@ import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.LogManager;
@@ -101,7 +103,9 @@ public class DSpaceRecordFactory extends RecordFactory
     
     protected String getDatestamp(Object nativeItem)
     {
-        return ((HarvestedItemInfo) nativeItem).datestamp;
+        Date d = ((HarvestedItemInfo) nativeItem).datestamp;
+        // Return as ISO8601
+        return new DCDate(d).toString();
     }
 
 

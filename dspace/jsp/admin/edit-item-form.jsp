@@ -72,8 +72,6 @@
     String handle = (String) request.getAttribute("handle");
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     DCType[] dcTypes = (DCType[])  request.getAttribute("dc.types");
-
-    DCDate withdrawalDate = item.getWithdrawalDate();
 %>
 
 <dspace:layout title="Edit Item"
@@ -92,9 +90,9 @@
             <tr>
                 <td class="submitFormLabel">Item&nbsp;internal&nbsp;ID:</td>
                 <td class="standard"><%= item.getID() %></td>
-                <td class="standard" width="100%" align="right" rowspan=4>
+                <td class="standard" width="100%" align="right" rowspan=5>
 <%
-    if (withdrawalDate == null)
+    if (!item.isWithdrawn())
     {
 %>
                     <form method=POST action="<%= request.getContextPath() %>/admin/edit-item">
@@ -127,6 +125,9 @@
                 <td class="submitFormLabel">Handle:</td>
                 <td class="standard"><%= (handle == null ? "None" : handle) %></td>
             </tr>
+                <td class="submitFormLabel">Last modified:</td>
+                <td class="standard"><dspace:date date="<%= new DCDate(item.getLastModified()) %>" /></td>
+            </tr>
             <tr>
                 <td class="submitFormLabel">In Collections:</td>
                 <td class="standard">
@@ -153,11 +154,10 @@
 <%
 
 
-    if (withdrawalDate != null)
+    if (item.isWithdrawn())
     {
 %>
-    <P align=center><strong>This item was withdrawn from DSpace on
-    <dspace:date date="<%= withdrawalDate %>" /></strong></P>
+    <P align=center><strong>This item was withdrawn from DSpace</strong></P>
 <%
     }
 %>

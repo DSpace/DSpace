@@ -260,6 +260,21 @@ public class DCDate
 
 
     /**
+     * Get the date as a Java Date object
+     *
+     * @return a Date object
+     */
+    public Date toDate()
+    {
+        GregorianCalendar utcGC = new GregorianCalendar(
+                TimeZone.getTimeZone("UTC"));
+
+        utcGC.set(year, month - 1, day, hours, minutes, seconds);
+        return utcGC.getTime();
+    }
+
+    
+    /**
      * Set the date.  The date passed in is assumed to be in the current
      * time zone, and is adjusting to fit the current time zone.
      * Unknown values should be given as -1.

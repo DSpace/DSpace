@@ -47,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -91,7 +92,9 @@ public class DSpaceOAICatalog extends AbstractCatalog
         "http://www.openarchives.org/OAI/2.0/oai_dc/ " +
         "http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
     
-   
+    /** Maximum number of records returned by one request */
+    private final int MAX_RECORDS = 100;
+    
     public DSpaceOAICatalog(Properties properties)
     {
         // Don't need to do anything
@@ -113,6 +116,10 @@ public class DSpaceOAICatalog extends AbstractCatalog
     public Vector getSchemaLocations(String identifier)
         throws OAIInternalServerError, IdDoesNotExistException, NoMetadataFormatsException
     {
+        log.info(LogManager.getHeader(null,
+            "oai_request",
+            "verb=getSchemaLocations,identifier=" + (identifier == null ? "null" : identifier)));
+
         HarvestedItemInfo itemInfo = null;
         Context context = null;
 
@@ -191,6 +198,13 @@ public class DSpaceOAICatalog extends AbstractCatalog
         throws OAIInternalServerError, NoSetHierarchyException,
             NoItemsMatchException, CannotDisseminateFormatException
     {
+        log.info(LogManager.getHeader(null,
+            "oai_request",
+            "verb=listIdentifiers,from=" + (from == null ? "null" : from) +
+            ",until=" + (until == null ? "null" : until) +
+            ",set=" + (set == null ? "null" : set) +
+            ",metadataPrefix=" + (metadataPrefix == null ? "null" : metadataPrefix)));
+
         // We can produce oai_dc and simple DC for all items, so just return IDs
         Context context = null;
 
@@ -205,11 +219,15 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Get the relevant OAIItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until,
+                0, 0, // Everything for now
                 false, true, true);
             // No Item objects, but we need to know containers and withdrawn items
 
             if (itemInfos.size() == 0)
             {
+                log.info(LogManager.getHeader(null,
+                    "oai_error",
+                    "no_items_match"));
                 throw new NoItemsMatchException();
             }
             
@@ -269,7 +287,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         throw new BadResumptionTokenException();
     }
 
-        
+
     /**
      * Retrieve the specified metadata for the specified identifier
      *
@@ -285,6 +303,11 @@ public class DSpaceOAICatalog extends AbstractCatalog
         throws OAIInternalServerError, CannotDisseminateFormatException,
                IdDoesNotExistException
     {
+        log.info(LogManager.getHeader(null,
+            "oai_request",
+            "verb=getRecord,identifier=" + (identifier == null ? "null" : identifier) +
+            ",metadataPrefix=" + (metadataPrefix == null ? "null" : metadataPrefix)));
+
         Context context = null;
         HarvestedItemInfo itemInfo = null;
 
@@ -322,10 +345,16 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
         if (itemInfo == null)
         {
+            log.info(LogManager.getHeader(null,
+                "oai_error",
+                "id_does_not_exist"));
             throw new IdDoesNotExistException(identifier);
         }
         else if ((schemaURL = getCrosswalks().getSchemaURL(metadataPrefix)) == null)
         {
+            log.info(LogManager.getHeader(null,
+                "oai_error",
+                "cannot_disseminate_format"));
             throw new CannotDisseminateFormatException(metadataPrefix);
         }
 
@@ -358,12 +387,103 @@ public class DSpaceOAICatalog extends AbstractCatalog
         throws OAIInternalServerError, NoSetHierarchyException,
             CannotDisseminateFormatException, NoItemsMatchException
     {
+        log.info(LogManager.getHeader(null,
+            "oai_request",
+            "verb=listRecords,from=" + (from == null ? "null" : from) +
+            ",until=" + (until == null ? "null" : until) +
+            ",set=" + (set == null ? "null" : set) +
+            ",metadataPrefix=" + (metadataPrefix == null ? "null" : metadataPrefix)));
+
+        Map m = doRecordHarvest(from, until, set, metadataPrefix, 0);
+
+        // Null means bad metadata prefix was bad
+        if (m == null)
+        {
+            log.info(LogManager.getHeader(null,
+                "oai_error",
+                "cannot_disseminate_format"));
+            throw new CannotDisseminateFormatException(metadataPrefix);
+        }
+
+        // If there were zero results, return the appropriate error
+        Iterator i = (Iterator) m.get("records");
+
+        if (i == null || !i.hasNext())
+        {
+            log.info(LogManager.getHeader(null,
+                "oai_error",
+                "no_items_match"));
+            throw new NoItemsMatchException();
+        }
+
+        return m;
+    }
+
+
+    /**
+     * Retrieve the next set of records associated with the resumptionToken
+     *
+     * @param resumptionToken implementation-dependent format taken from the
+     * previous listRecords() Map result.
+     * @return a Map object containing entries for "headers" and "identifiers" Iterators
+     * (both containing Strings) as well as an optional "resumptionMap" Map.
+     * @exception OAIInternalServerError signals an http status code 500 problem
+     * @exception BadResumptionTokenException the value of the resumptionToken argument
+     * is invalid or expired.
+     */
+    public Map listRecords(String resumptionToken)
+        throws BadResumptionTokenException, OAIInternalServerError
+    {
+            log.info(LogManager.getHeader(null,
+                "oai_request",
+                "verb=listRecords,resumptionToken=" + resumptionToken));
+        /*
+         * FIXME: This may return zero records if the previous harvest
+         * returned a number of records that's an exact multiple of
+         * MAX_RECORDS.  I hope that's OK.
+         */
+        Object[] params = decodeResumptionToken(resumptionToken);
+        Integer offset = (Integer) params[4];
+
+        Map m = doRecordHarvest((String) params[0], (String) params[1],
+            (String) params[2], (String) params[3], offset.intValue());
+
+        // null result means bad prefix, which means bad resumption token
+        if (m == null)
+        {
+            log.info(LogManager.getHeader(null,
+                "oai_error",
+                "bad_resumption_token"));
+            throw new BadResumptionTokenException();
+        }
+        
+        return m;
+    }
+    
+
+    /**
+     * Method to do the actual harvest of records
+     *
+     * @param from            OAI 'from' parameter
+     * @param until           OAI 'until' parameter
+     * @param set             OAI 'set' parameter
+     * @param metadataPrefix  OAI 'metadataPrefix' parameter
+     * @param offset          where to start this harvest
+     *
+     * @return the Map for listRecords to return, or null if the metadataPrefix
+     *         is invalid
+     */
+    private Map doRecordHarvest(String from, String until, String set,
+        String metadataPrefix, int offset)
+        throws OAIInternalServerError
+    {
         Context context = null;
         String schemaURL = getCrosswalks().getSchemaURL(metadataPrefix);
+        Map results = new HashMap();
 
         if (schemaURL == null)
         {
-            throw new CannotDisseminateFormatException(metadataPrefix);
+            return null;
         }
 
         // List to put results in
@@ -376,12 +496,8 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Get the relevant HarvestedItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until,
-                true, true, true);  // Need items, containers + withdrawals
-
-            if (itemInfos.size() == 0)
-            {
-                throw new NoItemsMatchException();
-            }
+                offset, MAX_RECORDS, // Limit amount returned from one request
+                true, true, true);   // Need items, containers + withdrawals
 
             // Build list of XML records from item info objects
             Iterator i = itemInfos.iterator();
@@ -390,16 +506,52 @@ public class DSpaceOAICatalog extends AbstractCatalog
             {
                 HarvestedItemInfo itemInfo = (HarvestedItemInfo) i.next();
 
-                /*
-                 * FIXME: I've a feeling a "CannotDisseminateFormatException"
-                 * should be caught and discarded here - it's OK if some
-                 * records in the requested date range don't have the
-                 * requested metadata format available
-                 */
-                String recordXML = getRecordFactory().create(
-                    itemInfo, schemaURL, metadataPrefix);
+                try
+                {
+                    String recordXML = getRecordFactory().create(
+                        itemInfo, schemaURL, metadataPrefix);
+                    records.add(recordXML);
+                }
+                catch (CannotDisseminateFormatException cdfe)
+                {
+                    /*
+                     * FIXME: I've a feeling a "CannotDisseminateFormatException"
+                     * should be discarded here - it's OK if some
+                     * records in the requested date range don't have the
+                     * requested metadata format available.  I'll just log it for
+                     * now.
+                     */
+                     if (log.isDebugEnabled())
+                        log.debug(LogManager.getHeader(context,
+                            "oai_warning", "Couldn't disseminate " +
+                                metadataPrefix + " for " + itemInfo.handle));
+                }
+            }
+                    
+            // Put results in form needed to return
+            results.put("records", records.iterator());
 
-                records.add(recordXML);
+            log.info(LogManager.getHeader(context,
+                "oai_harvest",
+                "results=" + records.size()));
+                
+            // If we have MAX_RECORDS records, we need to provide a resumption
+            // token
+            if (records.size() >= MAX_RECORDS)
+            {
+                String resumptionToken = makeResumptionToken(
+                    from, until, set, metadataPrefix, offset + MAX_RECORDS);
+
+                if (log.isDebugEnabled())
+                {
+                    log.debug(LogManager.getHeader(context,
+                        "made_resumption_token",
+                        "token=" + resumptionToken));
+                }
+
+                results.put("resumptionMap",
+                    getResumptionMap(resumptionToken));
+                //results.put("resumptionToken", resumptionToken);
             }
         }
         catch (SQLException se)
@@ -418,33 +570,10 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 context.abort();
             }
         }
-        
-        // Put results in form needed to return
-        Map results = new HashMap();
-        results.put("records", records.iterator());
+
         return results;
     }
-
-
-    /**
-     * Retrieve the next set of records associated with the resumptionToken
-     *
-     * @param resumptionToken implementation-dependent format taken from the
-     * previous listRecords() Map result.
-     * @return a Map object containing entries for "headers" and "identifiers" Iterators
-     * (both containing Strings) as well as an optional "resumptionMap" Map.
-     * @exception OAIInternalServerError signals an http status code 500 problem
-     * @exception BadResumptionTokenException the value of the resumptionToken argument
-     * is invalid or expired.
-     */
-    public Map listRecords(String resumptionToken)
-        throws BadResumptionTokenException, OAIInternalServerError
-    {
-        // Resumption tokens not yet supported
-        throw new BadResumptionTokenException();
-    }
     
-
     /**
      * Retrieve a list of sets that satisfy the specified criteria
      *
@@ -456,6 +585,9 @@ public class DSpaceOAICatalog extends AbstractCatalog
     public Map listSets()
         throws NoSetHierarchyException, OAIInternalServerError
     {
+        log.info(LogManager.getHeader(null,
+            "oai_request",
+            "verb=listSets"));
         Context context = null;
 
         // List to put results in
@@ -581,5 +713,103 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Just a community ID
             return Community.find(context, Integer.parseInt(set));
         }
+    }
+
+
+    /**
+     * Create a resumption token.  The relevant parameters for the harvest
+     * are put in a 
+     *
+     * @param from    OAI 'from' parameter
+     * @param until   OAI 'until' parameter
+     * @param set     OAI 'set' parameter
+     * @param prefix  OAI 'metadataPrefix' parameter
+     * @param offset  where to start the next harvest
+     *
+     * @return  the appropriate resumption token
+     */
+    private String makeResumptionToken(String from, String until, String set,
+        String prefix, int offset)
+    {
+        StringBuffer token = new StringBuffer();
+        if (from != null)
+        {
+            token.append(from);
+        }
+        token.append("/");
+        if (until != null)
+        {
+            token.append(until);
+        }
+        token.append("/");
+        if (set != null)
+        {
+            token.append(set);
+        }
+        token.append("/");
+        if (prefix != null)
+        {
+            token.append(prefix);
+        }
+        token.append("/");
+        token.append(String.valueOf(offset));
+        
+        return (token.toString());
+     }
+
+
+     /**
+      * Get the information out of a resumption token
+      *
+      * @param   token  the resumption token
+      * @return  a 5-long array of Objects; 4 Strings (from, until, set, prefix)
+      *          and an Integer (the offset)
+      */
+    private Object[] decodeResumptionToken(String token)
+        throws BadResumptionTokenException
+    {
+        Object[] obj = new Object[5];
+        StringTokenizer st = new StringTokenizer(token, "/", true);
+        
+        // Extract from, until, set, prefix
+        for (int i = 0; i < 4; i++)
+        {
+            if (!st.hasMoreTokens())
+            {
+                throw new BadResumptionTokenException();
+            }
+
+            String s = st.nextToken();
+            // If this value is a delimiter /, we have no value for this part
+            // of the resumption token.
+            if (s.equals("/"))
+            {
+                obj[i] = null;
+            }
+            else
+            {
+                obj[i] = s;
+                // Skip the delimiter
+                st.nextToken();
+            }
+            log.debug("is: " + (String) obj[i]);
+        }
+        
+        if (!st.hasMoreTokens())
+        {
+            throw new BadResumptionTokenException();
+        }
+        
+        // Extract offset
+        try
+        {
+            obj[4] = new Integer(st.nextToken());
+        }
+        catch (NumberFormatException nfe)
+        {
+            throw new BadResumptionTokenException();
+        }
+        
+        return obj;
     }
 }

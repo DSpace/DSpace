@@ -40,6 +40,7 @@
 
 package org.dspace.search;
 
+import java.util.Date;
 import java.util.List;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -58,8 +59,8 @@ public class HarvestedItemInfo
     /** The Handle, with no prefix */
     public String handle;
 
-    /** The datestamp (ISO8601) */
-    public String datestamp;
+    /** The datestamp */
+    public Date datestamp;
     
     /** The item.  Only filled out if requested */
     public Item item;

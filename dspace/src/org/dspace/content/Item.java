@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -178,14 +179,13 @@ public class Item extends DSpaceObject
             TableRow resultRow = (TableRow) tri.next();
 
             // Get the Dublin Core type
-            TableRow typeRow = DatabaseManager.find(ourContext,
-                "dctyperegistry",
+            String[] dcType = DCType.quickFind(context,
                 resultRow.getIntColumn("dc_type_id"));
 
             // Make a DCValue object
             DCValue dcv = new DCValue();
-            dcv.element = typeRow.getStringColumn("element");
-            dcv.qualifier = typeRow.getStringColumn("qualifier");
+            dcv.element = dcType[0];
+            dcv.qualifier = dcType[1];
             dcv.value = resultRow.getStringColumn("text_value");
             dcv.language = resultRow.getStringColumn("text_lang");
 
@@ -319,7 +319,7 @@ public class Item extends DSpaceObject
         return new ItemIterator(context, rows);
     }
 
-
+    
     /**
      * Get the internal ID of this item.  In general, this shouldn't be
      * exposed to users
@@ -349,6 +349,28 @@ public class Item extends DSpaceObject
     }
 
 
+    /**
+     * Find out if the item has been withdrawn
+     *
+     * @return  true if the item has been withdrawn
+     */
+    public boolean isWithdrawn()
+    {
+        return itemRow.getBooleanColumn("withdrawn");
+    }
+
+    
+    /**
+     * Get the date the item was last modified.
+     *
+     * @return the date the item was last modified.
+     */
+    public Date getLastModified()
+    {
+        return itemRow.getDateColumn("last_modified");
+    }
+
+    
     /**
      * Set the "is_archived" flag.  This is public and only
      * <code>WorkflowItem.archive()</code> should set this.
@@ -991,6 +1013,9 @@ public class Item extends DSpaceObject
             "update_item",
             "item_id=" + getID()));
 
+        // Set the last modified date
+        itemRow.setColumn("last_modified", new Date());
+        
         // Make sure that withdrawn and in_archive are non-null
         if (itemRow.isColumnNull("in_archive"))
         {
@@ -1216,25 +1241,6 @@ public class Item extends DSpaceObject
     
     
     /**
-     * Item is withdrawn?  If so, return the date it happened.
-     * <code>null</code> is returned if the item is not withdrawn.
-     *
-     * @return the date the item was withdrawn or <code<null</code>
-     */
-    public DCDate getWithdrawalDate()
-    {
-        if (itemRow.getBooleanColumn("withdrawn"))
-        {
-            return new DCDate(itemRow.getStringColumn("withdrawal_date"));
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    
-    /**
      * Delete (expunge) the item.  Bundles and bitstreams are also deleted if
      * they are not also included in another item.  The Dublin Core metadata is
      * deleted.
@@ -1329,7 +1335,7 @@ public class Item extends DSpaceObject
         return Constants.ITEM;
     }
 
-
+    
     /**
      * remove all of the policies for item and replace them
      *  with a new list of policies

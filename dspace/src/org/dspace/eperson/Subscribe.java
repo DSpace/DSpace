@@ -318,6 +318,8 @@ public class Subscribe
                 c,
                 startDate,
                 endDate,
+                0,      // Limit and offset zero, get everything
+                0,
                 true,   // Need item objects
                 false,  // But not containers
                 false); // Or withdrawals

@@ -191,7 +191,7 @@ CREATE TABLE Item
   submitter_id    INTEGER REFERENCES EPerson(eperson_id),
   in_archive      BOOL,
   withdrawn       BOOL,
-  withdrawal_date VARCHAR(21)
+  last_modified   TIMESTAMP
 );
 
 -------------------------------------------------------

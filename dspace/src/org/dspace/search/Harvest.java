@@ -74,20 +74,26 @@ public class Harvest
     /** log4j logger */
     private static Logger log = Logger.getLogger(Harvest.class);
     
-    /** ID of the date.available DC type */
-    private static int dateAvailableDCTypeID = -1;
-    
     /**
      * Obtain information about items that have been created, modified or
-     * withdrawn within a given date range.
-     * FIXME: Assumes all in_archive items have date.available set,
-     * and have public metadata
+     * withdrawn within a given date range.  You can also specify 'offset'
+     * and 'limit' so that a big harvest can be split up into smaller sections.
+     * <P>
+     * Note that dates are passed in the standard ISO8601 format used by
+     * DSpace (and OAI-PMH).<P>
+     * FIXME: Assumes all in_archive items have public metadata
      *
      * @param context     DSpace context
      * @param scope       a Community or Collection, or <code>null</code>
      *                    indicating the scope is all of DSpace
      * @param startDate   start of date range, or <code>null</code>
      * @param endDate     end of date range, or <code>null</code>
+     * @param offset      for a partial harvest, the point in the overall list
+     *                    of matching items to start at.  0 means just start
+     *                    at the beginning.
+     * @param limit       the number of matching items to return in a partial
+     *                    harvest.  Specify 0 to return the whole list
+     *                    (or the rest of the list if an offset was specified.)
      * @param items       if <code>true</code> the <code>item</code> field of
      *                    each <code>HarvestedItemInfo</code> object is
      *                    filled out
@@ -102,13 +108,13 @@ public class Harvest
         DSpaceObject scope,
         String startDate,
         String endDate,
+        int offset,
+        int limit,
         boolean items,
         boolean containers,
         boolean withdrawn)
         throws SQLException
     {
-        int dcTypeID = getDateAvailableTypeID(context);
-        
         // SQL to add to the list of tables after the SELECT
         String scopeTableSQL = "";
 
@@ -135,23 +141,35 @@ public class Harvest
             // Theoretically, no other possibilities, won't bother to check
         }
         
-        // Put together our query
+        // Put together our query.  Note there is no need for an
+        // "in_archive=true" condition, we are using the existence of
+        // Handles as our 'existence criterion'.
         String query = 
-            "SELECT handle.handle, handle.resource_id, dcvalue.text_value FROM handle, dcvalue, item" +
+            "SELECT handle.handle, handle.resource_id, item.withdrawn, item.last_modified FROM handle, item" +
             scopeTableSQL + " WHERE handle.resource_type_id=" + Constants.ITEM +
-            " AND handle.resource_id=dcvalue.item_id  AND dcvalue.item_id=item.item_id AND item.withdrawn=false AND dcvalue.dc_type_id=" +
-            dcTypeID + scopeWhereSQL;
+            " AND handle.resource_id=item.item_id" + scopeWhereSQL;
         
         if (startDate != null)
         {
-            query = query + " AND dcvalue.text_value >= '" + startDate + "'";
+            query = query + " AND item.last_modified >= '" + startDate + "'";
         }
         
         if (endDate != null)
         {
-            query = query + " AND dcvalue.text_value <= '" + endDate + "'";
+            query = query + " AND item.last_modified <= '" + endDate + "'";
         }
 
+        if (withdrawn = false)
+        {
+            // Exclude withdrawn items
+            query = query + " AND withdrawn=false";
+        }
+        
+        // Order by item ID, so that for a given harvest the order will be
+        // consistent.  This is so that big harvests can be broken up into
+        // several smaller operations (e.g. for OAI resumption tokens.)
+        query = query + " ORDER BY handle.resource_id";
+        
         log.debug(LogManager.getHeader(context,
             "harvest SQL",
             query));
@@ -159,78 +177,43 @@ public class Harvest
         // Execute
         TableRowIterator tri = DatabaseManager.query(context, query);
         List infoObjects = new LinkedList();
+        int index = 0;
         
         // Process results of query into HarvestedItemInfo objects
         while (tri.hasNext())
         {
             TableRow row = tri.next();
-            HarvestedItemInfo itemInfo = new HarvestedItemInfo();
-            
-            itemInfo.handle = row.getStringColumn("handle");
-            itemInfo.itemID = row.getIntColumn("resource_id");
-            itemInfo.datestamp = row.getStringColumn("text_value");
-            itemInfo.withdrawn = false;
 
-            if (containers)
+            /*
+             * This conditional ensures that we only process items within
+             * any constraints specified by 'offset' and 'limit' parameters.
+             */
+            if (index >= offset &&
+               (limit == 0 || index < offset + limit))
             {
-                fillContainers(context, itemInfo);
-            }
-
-            if (items)
-            {
-                // Get the item
-                itemInfo.item = Item.find(context, itemInfo.itemID);
-            }
-            
-            infoObjects.add(itemInfo);
-        }
-
-        // Add information about deleted items if necessary
-        if (withdrawn)
-        {
-            // Put together our query
-            query = 
-                "SELECT handle.handle, handle.resource_id, item.withdrawal_date FROM handle, item" +
-                scopeTableSQL + " WHERE handle.resource_type_id=" + Constants.ITEM +
-                " AND handle.resource_id=item.item_id  AND item.withdrawn=true"
-                + scopeWhereSQL;
-
-            if (startDate != null)
-            {
-                query = query + " AND item.withdrawal_date >= '" + startDate + "'";
-            }
-
-            if (endDate != null)
-            {
-                query = query + " AND item.withdrawal_date <= '" + endDate + "'";
-            }
-
-            log.debug(LogManager.getHeader(context,
-                "harvest SQL (withdrawals)",
-                query));
-
-            // Execute
-            tri = DatabaseManager.query(context, query);
-
-            // Process results of query into HarvestedItemInfo objects
-            while (tri.hasNext())
-            {
-                TableRow row = tri.next();
                 HarvestedItemInfo itemInfo = new HarvestedItemInfo();
 
                 itemInfo.handle = row.getStringColumn("handle");
                 itemInfo.itemID = row.getIntColumn("resource_id");
-                itemInfo.datestamp = row.getStringColumn("withdrawal_date");
-                itemInfo.withdrawn = true;
-                
+                // Put datestamp in ISO8601
+                itemInfo.datestamp = row.getDateColumn("last_modified");
+                itemInfo.withdrawn = row.getBooleanColumn("withdrawn");
+
                 if (containers)
                 {
                     fillContainers(context, itemInfo);
                 }
 
-                // Won't fill out item objects for withdrawn items
+                if (items)
+                {
+                    // Get the item
+                    itemInfo.item = Item.find(context, itemInfo.itemID);
+                }
+
                 infoObjects.add(itemInfo);
             }
+
+            index++;
         }
 
         return infoObjects;
@@ -268,23 +251,8 @@ public class Harvest
 
         itemInfo.item = i;
         itemInfo.handle = handle;
-
-        DCDate withdrawalDate = i.getWithdrawalDate();
-
-        if (withdrawalDate == null)
-        {
-            // FIXME: Assume data.available is there
-            DCValue[] dateAvail =
-                i.getDC("date", "available", Item.ANY);
-            itemInfo.datestamp = dateAvail[0].value;
-            itemInfo.withdrawn = false;
-        }
-        else
-        {
-            itemInfo.datestamp = withdrawalDate.toString();
-            itemInfo.withdrawn = true;
-        }
-        
+        itemInfo.withdrawn = i.isWithdrawn();
+        itemInfo.datestamp = i.getLastModified();
         itemInfo.itemID = i.getID();
 
         // Get the sets
@@ -321,25 +289,5 @@ public class Harvest
             itemInfo.containers[i][0] = r.getIntColumn("community_id");
             itemInfo.containers[i][1] = r.getIntColumn("collection_id");
         }
-    }
-    
-    
-    /**
-     * Get the type ID of the "date.available" DC type.  This gets the ID
-     * once then stores it to avoid repeat queries.
-     *
-     * @param context  DSpace context
-     * @return  the ID of the date.available DC type.
-     */
-    private static int getDateAvailableTypeID(Context context)
-        throws SQLException
-    {
-        if (dateAvailableDCTypeID == -1)
-        {
-            DCType type = DCType.findByElement(context, "date", "available");
-            dateAvailableDCTypeID = type.getID();
-        }
-        
-        return dateAvailableDCTypeID;
     }
 }
