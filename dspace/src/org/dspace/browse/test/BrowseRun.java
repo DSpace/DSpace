@@ -50,7 +50,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
- * Run the Browse API
+ * Run the Browse API.
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -74,15 +74,22 @@ public class BrowseRun
         {
             System.out.println("No items submitted");
         }
-        for (Iterator iterator = last.iterator(); iterator.hasNext(); )
+        else
         {
-            Item item = (Item) iterator.next();
-            printItem(item, Item.ANY, Item.ANY, Item.ANY);
+            System.out.println("Last 5 Items submitted");
+            for (Iterator iterator = last.iterator(); iterator.hasNext(); )
+            {
+                Item item = (Item) iterator.next();
+                printItem(item, Item.ANY, Item.ANY, Item.ANY);
+            }
         }
 
         scope.setNumberBefore(4);
         scope.setTotal(10);
         BrowseInfo info = Browse.getAuthors(scope);
+        String author = null;
+        if (info.getResultCount() > 0)
+            author = (String) info.getResults().get(0);
         printResults(info);
 
         scope.setTotal(40);
@@ -94,16 +101,19 @@ public class BrowseRun
         printTitleResults(info);
 
         scope.setTotal(6);
+        System.out.println("Setting focus to author " + author);
+        scope.setFocus(author);
         info = Browse.getItemsByAuthor(scope, false);
-        printAuthorResults(info);
+        printItemsByAuthorResults(info, author);
         // Should hit browse cache
         info = Browse.getItemsByAuthor(scope, false);
-        printAuthorResults(info);
+        printItemsByAuthorResults(info, author);
 
         info = Browse.getItemsByAuthor(scope, true);
-        printAuthorResults(info);
+        printItemsByAuthorResults(info, author);
 
         scope.setTotal(40);
+        scope.noFocus();
         info = Browse.getItemsByDate(scope, false);
         printDateResults(info);
         info = Browse.getItemsByDate(scope, true);
@@ -136,6 +146,19 @@ public class BrowseRun
         printResults(info, "contributor", "author");
     }
 
+    private static void printItemsByAuthorResults(BrowseInfo info, String author)
+        throws Exception
+    {
+        System.out.println("Items by author " + author);
+        for (Iterator iterator = info.getResults().iterator();
+             iterator.hasNext();)
+        {
+            Item item  = (Item) iterator.next();
+            System.out.println("\tItem " + item.getID());
+        }
+    }
+
+
     private static void printResults(BrowseInfo info)
         throws Exception
     {
@@ -143,7 +166,8 @@ public class BrowseRun
     }
 
     private static void printResults(BrowseInfo info,
-        String element, String qualifier)
+                                     String element,
+                                     String qualifier)
         throws Exception
     {
         final String lang = "en";
