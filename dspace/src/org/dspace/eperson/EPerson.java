@@ -194,8 +194,9 @@ public class EPerson
     public String getFullName()
     {
         // FIXME: make this work.  ;-)
+        String t = myRow.getStringColumn("firstname") + " " + myRow.getStringColumn("lastname");
         
-        return "";
+        return t;
     }
 
 
