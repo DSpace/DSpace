@@ -322,6 +322,9 @@ public class DCType
             "dc_type_id=" + getID()));
 
         DatabaseManager.delete(ourContext, typeRow);
+
+        // Update in-memory cache of DC types
+        loadDC(ourContext);
     }
 
 
@@ -426,6 +429,8 @@ public class DCType
                         "qualifier="     + getQualifier()
                         )
                 );
-        
+
+        // Update in-memory cache of DC types
+        loadDC(ourContext);
     }
 }
