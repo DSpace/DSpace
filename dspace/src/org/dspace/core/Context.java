@@ -299,4 +299,17 @@ public class Context
         String key = o.getClass().getName() + id;
         objectCache.remove(key);
     }
+
+
+    protected void finalize()
+    {
+        /*
+         * If a context is garbage-collected, we roll back and free up
+         * the database connection if there is one.
+         */
+        if (connection != null)
+        {
+            abort();
+        }
+    }
 }
