@@ -1,4 +1,46 @@
-package org.dspace.itemexport;
+/*
+ * ItemExport.java
+ *
+ * $Id$
+ *
+ * Version: $Revision$
+ *
+ * Date: $Date$
+ *
+ * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Institute of Technology.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * - Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the Hewlett-Packard Company nor the name of the
+ * Massachusetts Institute of Technology nor the names of their
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ */
+
+package org.dspace.app.itemexport;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -146,6 +188,7 @@ public class ItemExport
                     // make it this far, now start exporting
                     writeMetadata  ( c, myItem, itemDir );
                     writeBitstreams( c, myItem, itemDir );
+                    writeHandle    ( c, myItem, itemDir );
                 }
                 else
                 {
@@ -178,9 +221,12 @@ public class ItemExport
             for(int j = 0; j < dcorevalues.length; j++)
             {
                 DCValue dcv = dcorevalues[j];
-            
+                String qualifier = dcv.qualifier;
+                
+                if( qualifier == null ) { qualifier = "none"; }
+                
                 String output = "  <dcvalue element=\"" + dcv.element + "\" " +
-                                "qualifier=\"" + dcv.qualifier + "\">" +
+                                "qualifier=\"" + qualifier + "\">" +
                                 dcv.value +
                                 "</dcvalue>";
             
@@ -194,8 +240,33 @@ public class ItemExport
             throw new Exception( "Cannot create dublin_core.xml in " + destDir );
         }
     }
+
     
-    // create both the bitstreams and the manifest file
+    // create the file 'handle' which contains the handle assigned to the item
+    private static void writeHandle( Context c, Item i, File destDir )
+        throws Exception
+    {
+        String filename = "handle";
+        
+        File outFile = new File( destDir, filename );
+        
+        if( outFile.createNewFile() )
+        {
+            PrintWriter out = new PrintWriter( new FileWriter( outFile ) );
+
+            out.println( i.getHandle() );        
+
+            // close the contents file
+            out.close();
+        }
+        else
+        {
+            throw new Exception( "Cannot create file " + filename + " in " + destDir );
+        }
+    }
+    
+    
+    // create both the bitstreams and the contents file
     private static void writeBitstreams( Context c, Item i, File destDir )
         throws Exception
     {
@@ -231,7 +302,7 @@ public class ItemExport
                 }
             }
             
-            // close the manifest file
+            // close the contents file
             out.close();
         } 
         else
