@@ -269,6 +269,8 @@ public class Item
      * Get all the items in the archive.  Only items with the "in archive"
      * flag set are included.  The order of the list is indeterminate.
      *
+     * @param  context  DSpace context object
+     *
      * @return  an iterator over the items in the archive.
      */
     public static ItemIterator findAll(Context context)
@@ -277,6 +279,27 @@ public class Item
         TableRowIterator rows = DatabaseManager.query(context,
             "item",
             "SELECT * FROM item WHERE in_archive=true;");
+
+        return new ItemIterator(context, rows);
+    }
+
+
+    /**
+     * Find all the items in the archive by a given submitter.  The order is
+     * indeterminate.  Only items with the "in archive" flag set are included.
+     *
+     * @param  context  DSpace context object
+     * @param  eperson  the submitter
+     *
+     * @return an iterator over the items submitted by eperson
+     */
+    public static ItemIterator findBySubmitter(Context context, EPerson eperson)
+        throws SQLException
+    {
+        TableRowIterator rows = DatabaseManager.query(context,
+            "item",
+            "SELECT * FROM item WHERE in_archive=true AND submitter_id=" +
+                eperson.getID() + ";");
 
         return new ItemIterator(context, rows);
     }

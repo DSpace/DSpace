@@ -63,6 +63,19 @@
   </filter>
 
 
+  <!-- Filter mappings -->
+  
+  <filter-mapping>
+    <filter-name>registered-only</filter-name>
+    <url-pattern>/mydspace</url-pattern>
+  </filter-mapping>
+    
+  <filter-mapping>
+    <filter-name>registered-only</filter-name>
+    <url-pattern>/submit</url-pattern>
+  </filter-mapping>
+
+
   <!-- Servlets -->
 
   <servlet>
@@ -125,6 +138,11 @@
   <servlet>
     <servlet-name>logout</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.LogoutServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>mydspace</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.MyDSpaceServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -198,6 +216,11 @@
   <servlet-mapping>
     <servlet-name>logout</servlet-name>
     <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>mydspace</servlet-name>
+    <url-pattern>/mydspace</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

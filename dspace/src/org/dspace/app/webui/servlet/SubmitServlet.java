@@ -196,7 +196,15 @@ public class SubmitServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         /*
-         * A GET on a submit servlet starts a new submission.  What happens
+         * Possible GET parameters:
+         *
+         *   resume=<workspace_item_id>
+         *         - Resumes submitting the given workspace item
+         *
+         *   workflow=<workflow_id>
+         *         - Starts editing the given workflow item in workflow mode
+         *
+         * With no parameters, A GET starts a new submission.  What happens
          * depends on the context of the user (where they are.)  If they're not
          * in a community or collection, they can choose any collection
          * from the list of all collections.  If they're in a community,
@@ -205,6 +213,58 @@ public class SubmitServlet extends DSpaceServlet
          * a collection, a new submission will be started in that collection.
          */
         
+        String workspaceID = request.getParameter("resume");
+        if (workspaceID != null)
+        {
+            try
+            {
+                WorkspaceItem wi = WorkspaceItem.find(context,
+                    Integer.parseInt(workspaceID));
+
+                SubmissionInfo si = new SubmissionInfo();
+                si.submission = wi;
+                doStep(context, request, response, si, INITIAL_QUESTIONS);
+            }
+            catch (NumberFormatException nfe)
+            {
+                log.warn(LogManager.getHeader(context,
+                    "bad_workspace_id", 
+                    "bad_id=" + workspaceID));
+                JSPManager.showInvalidIDError(request,
+                    response,
+                    workspaceID,
+                    -1);
+            }
+            return;
+        }
+                
+        String workflowID = request.getParameter("workflow");
+        if (workflowID != null)
+        {
+            try
+            {
+                WorkflowItem wi = WorkflowItem.find(context,
+                    Integer.parseInt(workflowID));
+
+                SubmissionInfo si = new SubmissionInfo();
+                si.submission = wi;
+                doStep(context, request, response, si, INITIAL_QUESTIONS);
+            }
+            catch (NumberFormatException nfe)
+            {
+                log.warn(LogManager.getHeader(context,
+                    "bad_workflow_id", 
+                    "bad_id=" + workflowID));
+                JSPManager.showInvalidIDError(request,
+                    response,
+                    workflowID,
+                    -1);
+            }
+            return;
+        }
+            
+        
+
         Community com = UIUtil.getCommunityLocation(request);
         Collection col = UIUtil.getCollectionLocation(request);
         

@@ -1,5 +1,5 @@
 /*
- * DSpaceTypes.java
+ * Constants.java
  *
  * Version: $Revision$
  *

@@ -41,6 +41,8 @@
 package org.dspace.workflow;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -53,6 +55,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
@@ -155,6 +158,51 @@ public class WorkflowItem implements InProgressSubmission
 
             return new WorkflowItem(context, row);
         }
+    }
+
+
+    /**
+     * Get all workflow items that were original submissions by a particular
+     * e-person.  These are ordered by workflow ID, since this should likely
+     * keep them in the order in which they were created.
+     *
+     * @param context   the context object
+     * @param ep        the eperson
+     *
+     * @return  the corresponding workflow items
+     */
+    public static WorkflowItem[] findByEPerson(Context context, EPerson ep)
+        throws SQLException
+    {
+        List wfItems = new ArrayList();
+
+        TableRowIterator tri = DatabaseManager.query(context,
+            "workflowitem",
+            "SELECT workflowitem.* FROM workflowitem, item WHERE " +
+                "workflowitem.item_id=item.item_id AND " +
+                "item.submitter_id=" + ep.getID() +
+                " ORDER BY workflowitem.workflow_id;");
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            
+            // Check the cache
+            WorkflowItem wi = (WorkflowItem) context.fromCache(
+                WorkflowItem.class, row.getIntColumn("workflow_item_id"));
+            
+            if (wi == null)
+            {
+                wi = new WorkflowItem(context, row);
+            }
+            
+            wfItems.add(wi);
+        }
+        
+        WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
+        wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
+
+        return wfArray;
     }
 
 
