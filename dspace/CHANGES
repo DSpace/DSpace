@@ -1,3 +1,6 @@
+(Robert Tansley)
+- Fixed bug whereby 'Submit to this Collection' button only appears if admin.
+
 (Larry Stone)
 - SF patch #1143570 Fix various bugs handling slash ("/") in bitstream names
 

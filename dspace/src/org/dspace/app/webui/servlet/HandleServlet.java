@@ -475,13 +475,21 @@ public class HandleServlet extends DSpaceServlet
                     {
                         request.setAttribute("submitters", group);
                     }
-                    if(AuthorizeManager.authorizeActionBoolean(context, collection, Constants.ADD))
-                    {
-                        request.setAttribute("can_submit_button", new Boolean(true));
-                        
-                    } else {
-                        request.setAttribute("can_submit_button", new Boolean(false));
-                    }
+                }
+
+                // can they submit to this collection?
+                if (AuthorizeManager.authorizeActionBoolean(context,
+                        collection, Constants.ADD))
+                {
+                    request
+                            .setAttribute("can_submit_button",
+                                    new Boolean(true));
+
+                }
+                else
+                {
+                    request.setAttribute("can_submit_button",
+                            new Boolean(false));
                 }
             }
 
