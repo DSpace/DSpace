@@ -52,7 +52,7 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <dspace:layout title="Select Item" navbar="admin" locbar="link" parentlink="/admin" parenttitle="Administer">
-    <H1>Edit or Delete Item</H1>
+    <H1>Select an Item</H1>
     
 <%
     if (request.getAttribute("invalid.id") != null) { %>
@@ -61,8 +61,7 @@
     <A HREF="<%= request.getContextPath() %>/admin/edit-communities">communities/collections admin page.</A></P>
 <%  } %>
 
-    <P>Enter the Handle or internal item ID of the item you want to edit or
-    delete:</P>
+    <P>Enter the Handle or internal item ID of the item you wish to select:</P>
     
     <form method=POST>
         <center>

@@ -83,7 +83,8 @@
     <h1>Advanced Policy Manager</h1>
     <p>Allows you to do wildcard additions to and clearing
        of policies for types of content contained in a collection.
-       Warning, a bit dangerous</p>
+       Warning, dangerous - removing READ permissions from
+       items will make them not viewable!</p>
 
     <form method=POST>
 

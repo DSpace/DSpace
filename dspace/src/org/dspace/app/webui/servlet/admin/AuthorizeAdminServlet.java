@@ -45,6 +45,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
@@ -55,6 +57,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.PolicySet;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -157,10 +160,8 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             else
             {
                 // show edit form!
-                List item_policies = AuthorizeManager.getPolicies(c, item);
-            
-                request.setAttribute("item", item);
-                request.setAttribute("item_policies", item_policies     );
+                prepItemEditForm(c, request, item);
+    
                 JSPManager.showJSP(request, response,
                     "/admin/authorize-item-edit.jsp" );
             }
@@ -190,6 +191,83 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             JSPManager.showJSP(request, response,
                 "/admin/authorize-policy-edit.jsp" );
         }
+        else if( button.equals("submit_item_edit_policy") )
+        {
+            // edit an item's policy - set up and call policy editor
+            Item item = Item.find(c,
+                            UIUtil.getIntParameter(request, "item_id"));
+            
+            int policy_id = UIUtil.getIntParameter(request, "policy_id");
+            ResourcePolicy policy = null;
+            
+            policy = ResourcePolicy.find(c, policy_id);
+            
+            Group   [] groups  = Group.findAll(c, Group.NAME);
+            EPerson [] epeople = EPerson.findAll(c, EPerson.EMAIL);
+            
+            // return to collection permission page
+            request.setAttribute( "edit_title", "Item " + item.getID() );
+            request.setAttribute( "policy",     policy     );
+            request.setAttribute( "groups",     groups     );
+            request.setAttribute( "epeople",    epeople    );
+            request.setAttribute( "id_name",    "item_id" );
+            request.setAttribute( "id",         "" + item.getID() );
+            JSPManager.showJSP(request, response, "/admin/authorize-policy-edit.jsp" );
+        }
+        else if( button.equals( "submit_bundle_add_policy") )
+        {
+            // want to add a policy, create an empty one and invoke editor
+            Item item     = Item.find(c,
+                                UIUtil.getIntParameter(request, "item_id"));
+            Bundle bundle = Bundle.find(
+                                c,UIUtil.getIntParameter(request, "bundle_id"));
+            
+            ResourcePolicy policy = ResourcePolicy.create(c);
+            policy.setResource( bundle );
+            policy.update();
+
+            Group   [] groups  = Group.findAll  (c, Group.NAME   );
+            EPerson [] epeople = EPerson.findAll(c, EPerson.EMAIL);
+            
+            // return to item permission page
+            request.setAttribute( "edit_title", "(Item, Bundle) = (" + item.getID() +
+                    "," + bundle.getID() + ")");
+            request.setAttribute( "policy",     policy     );
+            request.setAttribute( "groups",     groups     );
+            request.setAttribute( "epeople",    epeople    );
+            request.setAttribute( "id_name",    "item_id" );
+            request.setAttribute( "id",         "" + item.getID() );
+            
+            JSPManager.showJSP(request, response,
+                "/admin/authorize-policy-edit.jsp" );
+        }
+        else if( button.equals( "submit_bitstream_add_policy") )
+        {
+            // want to add a policy, create an empty one and invoke editor
+            Item item = Item.find(c,
+                            UIUtil.getIntParameter(request, "item_id"));
+            Bitstream bitstream = Bitstream.find(
+                                c,UIUtil.getIntParameter(request, "bitstream_id"));
+
+            ResourcePolicy policy = ResourcePolicy.create(c);
+            policy.setResource( bitstream );
+            policy.update();
+
+            Group   [] groups  = Group.findAll  (c, Group.NAME   );
+            EPerson [] epeople = EPerson.findAll(c, EPerson.EMAIL);
+            
+            // return to item permission page
+            request.setAttribute( "edit_title", "(Item,Bitstream) = (" +
+                item.getID() + "," + bitstream.getID() + ")" );
+            request.setAttribute( "policy",     policy     );
+            request.setAttribute( "groups",     groups     );
+            request.setAttribute( "epeople",    epeople    );
+            request.setAttribute( "id_name",    "item_id" );
+            request.setAttribute( "id",         "" + item.getID() );
+            
+            JSPManager.showJSP(request, response,
+                "/admin/authorize-policy-edit.jsp" );
+        }
         else if( button.equals("submit_item_delete_policy") )
         {
             // delete a permission from an item
@@ -199,12 +277,9 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             
             // do the remove
             policy.delete();
-            
-            // return to collection permission page
-            request.setAttribute("item", item );
 
-            List item_policies = AuthorizeManager.getPolicies(c, item);
-            request.setAttribute("item_policies", item_policies);
+            // show edit form!
+            prepItemEditForm(c, request, item);
 
             JSPManager.showJSP(request, response, "/admin/authorize-item-edit.jsp" );
         }
@@ -493,10 +568,9 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 policy.setGroup   ( group      );
                 policy.update();
 
-                // set up page attributes
-                request.setAttribute("item", item );
-                request.setAttribute("item_policies",
-                    AuthorizeManager.getPolicies( c, item ) );
+                // show edit form!
+                prepItemEditForm(c, request, item);
+
                 display_page = "/admin/authorize-item-edit.jsp";
             }
 
@@ -543,9 +617,9 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 // set up for return to item edit page
                 Item t = Item.find( c, item_id );
 
-                request.setAttribute("item", t );
-                request.setAttribute("item_policies",
-                    AuthorizeManager.getPolicies( c, t ) );
+                // show edit form!
+                prepItemEditForm(c, request, t);
+
                 display_page = "/admin/authorize-item-edit.jsp";
             }
 
@@ -616,6 +690,42 @@ public class AuthorizeAdminServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         JSPManager.showJSP(request, response, "/admin/authorize-main.jsp" );
+    }
+
+    void prepItemEditForm(Context c, HttpServletRequest request, Item item )
+        throws SQLException
+    {                
+        List item_policies = AuthorizeManager.getPolicies(c, item);
+
+        // Put bundle and bitstream policies in their own hashes
+        Map bundle_policies    = new HashMap();
+        Map bitstream_policies = new HashMap();
+                
+        Bundle [] bundles = item.getBundles();
+                
+        for(int i = 0; i < bundles.length; i++)
+        {
+            Bundle myBundle = bundles[i];
+            List myPolicies = AuthorizeManager.getPolicies(c, myBundle);
+                    
+            // add bundle's policies to bundle_policies map
+            bundle_policies.put(new Integer(myBundle.getID()), myPolicies);
+                    
+            // go through all bundle's bitstreams, add to bitstream map
+            Bitstream [] bitstreams = myBundle.getBitstreams();
+            for(int j = 0; j < bitstreams.length; j++)
+            {
+                Bitstream myBitstream = bitstreams[j];
+                myPolicies = AuthorizeManager.getPolicies(c, myBitstream);
+                bitstream_policies.put(new Integer(myBitstream.getID()), myPolicies);
+            }
+        }
+            
+        request.setAttribute("item",               item              );
+        request.setAttribute("item_policies",      item_policies     );
+        request.setAttribute("bundles",            bundles           );
+        request.setAttribute("bundle_policies",    bundle_policies   );
+        request.setAttribute("bitstream_policies", bitstream_policies);
     }
 }
 

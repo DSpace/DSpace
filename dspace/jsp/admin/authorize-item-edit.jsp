@@ -48,29 +48,32 @@
   - Attributes:
   -  item          - Item being modified
   -  item_policies - ResourcePolicy List of policies for the item
-  -  bitstreams             - List of bitstreams in item
-  -  bitstream_policy_lists - Lists of policies, one per bitstream
+  -  bundles            - [] of Bundle objects
+  -  bundle_policies    - Map of (ID, List of policies)
+  -  bitstream_policies - Map of (ID, List of policies)
   -
   - Returns:
-  -  submit value item_addpolicy         to add a policy
-  -  submit value item_editpolicy        to edit policy
-  -  submit value item_deletepolicy      to delete policy
+  -  submit value item_add_policy         to add a policy 
+  -  submit value item_edit_policy        to edit policy for item, bundle, or bitstream
+  -  submit value item_delete_policy      to delete policy for item, bundle, or bitstream
   -
-  -  submit value bitstream_addpolicy    to add a policy
-  -  submit value bitstream_editpolicy   to edit policy
-  -  submit value bitstream_deletepolicy to delete policy
+  -  submit value bundle_add_policy       add policy
+  -
+  -  submit value bitstream_add_policy    to add a policy
   -
   -  policy_id - ID of policy to edit, delete
-  -
+  -  item_id
+  -  bitstream_id
+  -  bundle_id
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="java.util.List"     %>
 <%@ page import="java.util.Iterator" %>
-
+<%@ page import="java.util.List"     %>
+<%@ page import="java.util.Map"      %>
 
 <%@ page import="org.dspace.authorize.ResourcePolicy" %>
 <%@ page import="org.dspace.content.Item"             %>
@@ -86,10 +89,10 @@
     List item_policies =
         (List) request.getAttribute("item_policies");
 
-    // get bitstreams and corresponding policy lists    
-//    List bitstreams = (List) request.getAttribute("bitstreams");
-//    List bitstream_policy_lists =
-//        (List) request.getAttribute("bitstream_policy_lists");    
+    // get bitstreams and corresponding policy lists
+    Bundle [] bundles      = (Bundle [])request.getAttribute("bundles");
+    Map bundle_policies    = (Map)request.getAttribute("bundle_policies"   );
+    Map bitstream_policies = (Map)request.getAttribute("bitstream_policies");
 %>
 
 <dspace:layout title="Edit item policies"
@@ -100,10 +103,22 @@
 
     <h1>Policies for Item <%= item.getHandle() %> (ID=<%= item.getID() %>)</h1>
 
+    <P>With this editor you can view and alter the policies of an item,
+    plus alter policies of individual item components:  bundles and bitstreams.
+    Briefly, an item is a container of bundles, and bundles, are containers
+    of bitstreams.  Containers usually have ADD/REMOVE/READ/WRITE policies,
+    while bitstreams only have READ/WRITE policies.
+    </P>
+    <P>You will notice an extra bundle and bitstream for each item, and those
+    contain the license text for the item.
+    </P>
+
+
+    <H3>Item Policies</H3>
     <P align="center">
         <form method=POST>
             <input type="hidden" name="item_id" value="<%=item.getID()%>" >
-            <input type="submit" name="submit_item_add_policy" value="Add New">
+            <input type="submit" name="submit_item_add_policy" value="Add New Policy">
         </form>
     </p>
 
@@ -165,5 +180,168 @@
     }
 %>
     </table>
+<%
+    for( int b = 0; b < bundles.length; b++ )
+    {
+        Bundle myBun = bundles[b];
+        List myPolicies = (List)bundle_policies.get(new Integer(myBun.getID()));
+
+        // display add policy
+        // display bundle header w/ID
+
+%>                
+        <H3>Bundle <%=myBun.getID()%> Policies</H3>
+
+        <P align="center">
+            <form method=POST>
+                <input type="hidden" name="item_id"   value="<%=item.getID()%>" >
+                <input type="hidden" name="bundle_id" value="<%=myBun.getID()%>" >
+                <input type="submit" name="submit_bundle_add_policy" value="Add New Policy">
+            </form>
+        </P>
+        
+
+    <table class="miscTable" align="center">
+        <tr>
+            <th class="oddRowOddCol"><strong>ID</strong></th>
+            <th class="oddRowEvenCol"><strong>Action</strong></th>
+            <th class="oddRowOddCol"><strong>Public</strong></th>
+            <th class="oddRowEvenCol"><strong>EPerson</strong></th>
+            <th class="oddRowOddCol"><strong>Group</strong></th>
+            <th class="oddRowEvenCol"><strong>StartDate</strong></th>
+            <th class="oddRowOddCol"><strong>EndDate</strong></th>
+            <th class="oddRowEvenCol">&nbsp;</th>
+            <th class="oddRowOddCol">&nbsp;</th>
+        </tr>
+
+<%
+    row = "even";
+    i = myPolicies.iterator();
+
+    while( i.hasNext() )
+    {
+        ResourcePolicy rp = (ResourcePolicy) i.next();
+%>
+        <form method=POST>
+            <tr>
+                <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
+                <td class="<%= row %>RowEvenCol">
+                    <%= Constants.actionText[rp.getAction()]%>
+                </td>
+                <td class="<%= row %>RowOddCol">
+                    ...  
+                </td>
+                <td class="<%= row %>RowEvenCol">
+                    <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
+                </td>
+                <td class="<%= row %>RowOddCol">
+                    <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
+                </td>
+                <td class="<%= row %>RowEvenCol">
+                    <%= (rp.getStartDate() == null ? "..." : "..." ) %>  
+                </td>
+                <td class="<%= row %>RowOddCol">
+                    <%= (rp.getEndDate() == null   ? "..." : "..." ) %>  
+                </td>
+                <td class="<%= row %>RowEvenCol">
+                    <input type="hidden" name="policy_id"     value="<%= rp.getID() %>">
+                    <input type="hidden" name="item_id"       value="<%= item.getID() %>">
+                    <input type="hidden" name="bundle_id"     value="<%= myBun.getID() %>">
+                    <input type="submit" name="submit_item_edit_policy" value="Edit">
+                </td>
+                <td class="<%= row %>RowEvenCol">
+                    <input type="submit" name="submit_item_delete_policy" value="Delete">
+                </td>
+            </tr>
+        </form>
+<%
+        row = (row.equals("odd") ? "even" : "odd");
+    }
+%>
+    </table>
+
+<%
+        Bitstream [] bitstreams = myBun.getBitstreams();
+                
+        for( int s = 0; s < bitstreams.length; s++ )
+        {
+            Bitstream myBits = bitstreams[s];
+            myPolicies  = (List)bitstream_policies.get(new Integer(myBits.getID()));
+
+            // display bitstream header w/ID, filename
+            // 'add policy'
+            // display bitstream's policies
+%>                        
+            <P>Bitstream <%=myBits.getID()%> (<%=myBits.getName()%>)</P>
+            <P align="center">
+                <FORM method=POST>
+                    <input type="hidden" name="item_id"      value="<%=item.getID()%>">
+                    <input type="hidden" name="bitstream_id" value="<%=myBits.getID()%>" >
+                    <input type="submit" name="submit_bitstream_add_policy" value="Add New Policy">
+                </FORM>
+            </P>
+            <table class="miscTable" align="center">
+            <tr>
+                <th class="oddRowOddCol"><strong>ID</strong></th>
+                <th class="oddRowEvenCol"><strong>Action</strong></th>
+                <th class="oddRowOddCol"><strong>Public</strong></th>
+                <th class="oddRowEvenCol"><strong>EPerson</strong></th>
+                <th class="oddRowOddCol"><strong>Group</strong></th>
+                <th class="oddRowEvenCol"><strong>StartDate</strong></th>
+                <th class="oddRowOddCol"><strong>EndDate</strong></th>
+                <th class="oddRowEvenCol">&nbsp;</th>
+                <th class="oddRowOddCol">&nbsp;</th>
+            </tr>
+
+<%
+    row = "even";
+    i = myPolicies.iterator();
+
+    while( i.hasNext() )
+    {
+        ResourcePolicy rp = (ResourcePolicy) i.next();
+%>
+        <form method=POST>
+            <tr>
+                <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
+                <td class="<%= row %>RowEvenCol">
+                    <%= Constants.actionText[rp.getAction()]%>
+                </td>
+                <td class="<%= row %>RowOddCol">
+                    ...  
+                </td>
+                <td class="<%= row %>RowEvenCol">
+                    <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
+                </td>
+                <td class="<%= row %>RowOddCol">
+                    <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
+                </td>
+                <td class="<%= row %>RowEvenCol">
+                    <%= (rp.getStartDate() == null ? "..." : "..." ) %>  
+                </td>
+                <td class="<%= row %>RowOddCol">
+                    <%= (rp.getEndDate() == null   ? "..." : "..." ) %>  
+                </td>
+                <td class="<%= row %>RowEvenCol">
+                    <input type="hidden" name="policy_id"     value="<%= rp.getID()     %>">
+                    <input type="hidden" name="item_id"       value="<%= item.getID()   %>">
+                    <input type="hidden" name="bitstream_id"  value="<%= myBits.getID() %>">
+                    <input type="submit" name="submit_item_edit_policy" value="Edit">
+                </td>
+                <td class="<%= row %>RowEvenCol">
+                    <input type="submit" name="submit_item_delete_policy" value="Delete">
+                </td>
+            </tr>
+        </form>
+<%
+                row = (row.equals("odd") ? "even" : "odd");
+            }
+%>
+    </table>
+<%
+
+        }
+    }
+%>
         
 </dspace:layout>

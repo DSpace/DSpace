@@ -67,7 +67,7 @@
                parenttitle="Administer">
 
     <h1>Administer Authorization Policies</h1>
-    <h3>Choose resource to manage policies for:</h3>
+    <h3>Choose a resource to manage policies for:</h3>
     
     <form method=POST>    
 
@@ -85,12 +85,12 @@
             </tr>
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_advanced" value="Advanced Policy Admin Tool">
+                    <input type="submit" name="submit_item" value="Manage An Item's Policies">
                 </td>
             </tr>
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_item" value="Individual Item">
+                    <input type="submit" name="submit_advanced" value="Advanced/Item Wildcard Policy Admin Tool">
                 </td>
             </tr>
         </table>
