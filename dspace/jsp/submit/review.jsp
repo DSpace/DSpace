@@ -58,6 +58,7 @@
 <%@ page import="org.dspace.content.DCLanguage" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -157,7 +158,7 @@
         for (int i = 0; i < authors.length; i++)
         {                                    
 %>
-                                            <%= authors[i].value %><br>
+                                            <%= Utils.addEntities(authors[i].value) %><br>
 <%
         }
     }
@@ -175,7 +176,7 @@
                                     <tr>
                                         <td class=metadataFieldLabel>Title:</td>
                                         <td class=metadataFieldValue>
-                                            <%= title %>
+                                            <%= Utils.addEntities(title) %>
                                         </td>
                                     </tr>
 <%
@@ -198,7 +199,7 @@
             for(int i = 0; i < altTitles.length ; i++)
             {
 %>
-                                            <%= altTitles[i].value %><br>
+                                            <%= Utils.addEntities(altTitles[i].value) %><br>
 <%
             }
         }
@@ -248,7 +249,7 @@
         else
         {
 %>
-                                            <%= publisher[0].value %>
+                                            <%= Utils.addEntities(publisher[0].value) %>
 <%
         }
 %>
@@ -270,7 +271,7 @@
         else
         {
 %>
-                                            <%= citation[0].value %>
+                                            <%= Utils.addEntities(citation[0].value) %>
 <%
         }
 %>
@@ -295,7 +296,7 @@
         for (int i = 0; i < seriesNumbers.length ; i++)
         {
 %>
-                                            <%= seriesNumbers[i].value %><br>
+                                            <%= Utils.addEntities(seriesNumbers[i].value) %><br>
 <%
         }
     }
@@ -314,7 +315,7 @@
         if (!identifiers[i].qualifier.equals("citation"))
         {
 %>
-                        <%= identifierQualNames.get(identifiers[i].qualifier) %>: <%= identifiers[i].value %><br>
+                        <%= identifierQualNames.get(identifiers[i].qualifier) %>: <%= Utils.addEntities(identifiers[i].value) %><br>
 <%
         }
     }
@@ -382,7 +383,7 @@
         for (int i = 0; i < keywords.length; i++)
         {
 %>
-<%= keywords[i].value %><br>
+<%= Utils.addEntities(keywords[i].value) %><br>
 <%
         }
     }
@@ -395,15 +396,15 @@
                                     </tr>                
                                     <tr>
                                         <td class=metadataFieldLabel>Abstract:</td>
-                                        <td class=metadataFieldValue><%= (abstr.length == 0 ? "<em>None</em>" : abstr[0].value) %></td>
+                                        <td class=metadataFieldValue><%= (abstr.length == 0 ? "<em>None</em>" : Utils.addEntities(abstr[0].value)) %></td>
                                     </tr>
                                     <tr>
                                         <td class=metadataFieldLabel>Sponsors:</td>
-                                        <td class=metadataFieldValue><%= (sponsors.length == 0 ? "<em>None</em>" : sponsors[0].value) %></td>
+                                        <td class=metadataFieldValue><%= (sponsors.length == 0 ? "<em>None</em>" : Utils.addEntities(sponsors[0].value)) %></td>
                                     </tr>
                                     <tr>
                                         <td class=metadataFieldLabel>Other&nbsp;Description:</td>
-                                        <td class=metadataFieldValue><%= (otherDesc.length == 0 ? "<em>None</em>" : otherDesc[0].value) %></td>
+                                        <td class=metadataFieldValue><%= (otherDesc.length == 0 ? "<em>None</em>" : Utils.addEntities(otherDesc[0].value)) %></td>
                                     </tr>
                                 </table>
                     </td>

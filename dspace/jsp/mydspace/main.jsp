@@ -61,6 +61,7 @@
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
+<%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
@@ -144,7 +145,7 @@
             }
 %>
                 </td>
-                <td class="<%= row %>RowEvenCol"><%= title %></td>
+                <td class="<%= row %>RowEvenCol"><%= Utils.addEntities(title) %></td>
                 <td class="<%= row %>RowOddCol"><%= owned[i].getCollection().getMetadata("name") %></td>
                 <td class="<%= row %>RowEvenCol"><A HREF="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></A></td>
                 <td class="<%= row %>RowOddCol">
@@ -209,7 +210,7 @@
             }
 %>
                 </td>
-                <td class="<%= row %>RowEvenCol"><%= title %></td>
+                <td class="<%= row %>RowEvenCol"><%= Utils.addEntities(title) %></td>
                 <td class="<%= row %>RowOddCol"><%= pooled[i].getCollection().getMetadata("name") %></td>
                 <td class="<%= row %>RowEvenCol"><A HREF="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></A></td>
                 <td class="<%= row %>RowOddCol">
@@ -272,7 +273,7 @@
             <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>">
             <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>">
             <tr>
-                <td class="<%= row %>RowOddCol"><%= title %></td>
+                <td class="<%= row %>RowOddCol"><%= Utils.addEntities(title) %></td>
                 <td class="<%= row %>RowEvenCol">
                     <%= workspaceItems[i].getCollection().getMetadata("name") %>
                 </td>
@@ -317,7 +318,7 @@
             <tr>
                 <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>">
                 <input type="hidden" name="workflow_id" value="<%= workflowItems[i].getID() %>">
-                <td class="<%= row %>RowOddCol"><%= title %></td>
+                <td class="<%= row %>RowOddCol"><%= Utils.addEntities(title) %></td>
                 <td class="<%= row %>RowEvenCol">
                     <%= workflowItems[i].getCollection().getMetadata("name") %>
                 </td>
