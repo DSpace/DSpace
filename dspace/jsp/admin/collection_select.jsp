@@ -32,14 +32,14 @@
                parentlink="/admin"
                parenttitle="Administer">
 
-    <h1>System Workflows</h1>
+    <h1>Collections:</h1>
 
     <form method=POST>
 
     <table class="miscTable" align="center">
         <tr>
             <td>
-                    <select name="collection_id">
+                    <select size="5" name="collection_id">
                         <%  for (int i = 0; i < collections.length; i++) { %>
                             <option value="<%= collections[i].getID()%>">
                                 <%= collections[i].getMetadata("name")%>

@@ -8,13 +8,15 @@
   -
   - Attributes:
   -   policy - a ResourcePolicy to be edited
-  -   collection_id = set if source was a collection
   -   groups - Group [] of groups to choose from
-  -   epeople - EPerson [] of epeople to choose from (ignore in first version)
+  -   epeople - EPerson [] of epeople to choose from (unused in first version)
+  -   edit_title - title of the page ("Collection 13", etc.
+  -   id_name - name of string to put in hidden arg (collection_id, etc.) 
+  -   id - ID of the object policy relates to (collection.getID(), etc.)
   - Returns:
   -   save_policy   - user wants to save a policy
   -   cancel_policy - user wants to cancel, and return to policy list
-  -   collection_id - set if source was a collection
+  -   "id_name"     - name/value passed in from id_name/id above
   -   group_id      - set if user selected a group
   -   eperson_id    - set if user selected an eperson
   -   start_date    - not set, unused
@@ -34,8 +36,9 @@
     ResourcePolicy policy = (ResourcePolicy) request.getAttribute("policy"    );
     Group   [] groups     = (Group []      ) request.getAttribute("groups"    );
     EPerson [] epeople    = (EPerson[]     ) request.getAttribute("epeople"   );
-    Collection collection = (Collection    ) request.getAttribute("collection");
     String edit_title     = (String        ) request.getAttribute("edit_title");
+    String id_name        = (String        ) request.getAttribute("id_name"   );
+    String id             = (String        ) request.getAttribute("id"        );
 %>
 
 <dspace:layout title="Edit Policy"
@@ -44,14 +47,13 @@
                parentlink="/admin"
                parenttitle="Administer">
 
-    <h1>Edit Policy for Collection: <%=collection.getID()%></h1>
+    <h1>Edit Policy for <%= edit_title %>:</h1>
 
     <form method=POST>
 
     <table class="miscTable" align="center">
         <tr><td>Action:</td>
-            <td><input type="hidden" name="collection_id" value="<%=
-                ((collection.getID() == -1) ? -1 : collection.getID() )%>">
+            <td><input type="hidden" name="<%=id_name%>" value="<%=id%>">
                 <input type="hidden" name="policy_id" value="<%=policy.getID()%>" >
                 <select name="action_id">
                     <%  for( int i = 0; i < Constants.actiontext.length; i++ ) { %>
@@ -64,20 +66,13 @@
             </td>
         </tr>
         
-        <tr>
-            <td>Public:</td>
-            <td><input type="checkbox" name="is_public" <%=
-                (policy.isPublic() ? "checked" : "")%>>       </td>
-        </tr>    
-
         <tr>     
             <td>Group:</td>
             <td>
-                <select name="group_id">
+                <select size="5" name="group_id">
                     <%  for(int i = 0; i < groups.length; i++ ) { %>
-                            <option value="<%= i %>"
-                             <%= (groups[i].getID() == policy.getGroupID() ? "selected" : "" ) %> >
-                                <%= groups[i].getName()%>
+                            <option value="<%= groups[i].getID() %>" <%= (groups[i].getID() == policy.getGroupID() ? "selected" : "" ) %> >
+                            <%= groups[i].getName()%>
                             </option>
                         <%  } %>
                 </select>

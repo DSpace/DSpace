@@ -41,9 +41,15 @@
         <table width="70%">
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_collection" value="Manage Collections' Policies">
+                    <input type="submit" name="submit_collection" value="Manage Collection's Policies">
                 </td>
             </tr>
+            <tr>
+                <td align="left">
+                    <input type="submit" name="submit_community" value="Manage a Community's Policies">
+                </td>
+            </tr>
+
         </table>
     </center>        
 

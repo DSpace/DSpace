@@ -57,6 +57,10 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="java.util.List"     %>
+<%@ page import="java.util.Iterator" %>
+
+
 <%@ page import="org.dspace.authorize.ResourcePolicy" %>
 <%@ page import="org.dspace.content.Collection"       %>
 <%@ page import="org.dspace.core.Constants"           %>
@@ -65,8 +69,8 @@
 
 <%
     Collection collection = (Collection) request.getAttribute("collection");
-    ResourcePolicy [] policies =
-        (ResourcePolicy []) request.getAttribute("policies");
+    List policies =
+        (List) request.getAttribute("policies");
 %>
 
 <dspace:layout title="Edit collection policies"
@@ -76,6 +80,14 @@
                parenttitle="Administer">
 
     <h1>Policies for collection <%= collection.getMetadata("name") %></h1>
+
+    <P align="center">
+        <form method=POST>
+            <input type="hidden" name="collection_id" value="<%=collection.getID()%>" >
+            <input type="submit" name="submit_collection_add_policy" value="Add New">
+        </form>
+    </p>
+
 
     <table class="miscTable" align="center">
         <tr>
@@ -92,32 +104,35 @@
 
 <%
     String row = "even";
-    for (int i = 0; i < policies.length; i++)
+    Iterator i = policies.iterator();
+
+    while( i.hasNext() )
     {
+        ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
         <form method=POST>
             <tr>
-                <td class="<%= row %>RowOddCol"><%= policies[i].getID() %></td>
+                <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= Constants.actiontext[policies[i].getAction()]%>
+                    <%= Constants.actiontext[rp.getAction()]%>
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    <%= (policies[i].isPublic() ? "yes" : "no" ) %>  
+                    ...  
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= (policies[i].getEPerson() == null ? "..." : policies[i].getEPerson().getEmail() ) %>  
+                    <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    <%= (policies[i].getGroup()   == null ? "..." : policies[i].getGroup().getName() ) %>  
+                    <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= (policies[i].getStartDate() == null ? "..." : "..." ) %>  
+                    <%= (rp.getStartDate() == null ? "..." : "..." ) %>  
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    <%= (policies[i].getEndDate() == null   ? "..." : "..." ) %>  
+                    <%= (rp.getEndDate() == null   ? "..." : "..." ) %>  
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <input type="hidden" name="policy_id"     value="<%= policies[i].getID() %>">
+                    <input type="hidden" name="policy_id"     value="<%= rp.getID() %>">
                     <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
                     <input type="submit" name="submit_collection_edit_policy" value="Edit">
                 </td>
@@ -132,10 +147,4 @@
 %>
     </table>
         
-    <P align="center">
-        <form method=POST>
-            <input type="hidden" name="collection_id" value="<%=collection.getID()%>" >
-            <input type="submit" name="submit_collection_add_policy" value="Add New">
-        </form>
-    </p>
 </dspace:layout>
