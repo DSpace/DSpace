@@ -79,10 +79,10 @@
                 <td>
                     <A HREF="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="DSpace" width=198 height=79 border=0></A></td>
                 <td class="tagLine" width="99%" cellpadding=10> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
-                    <A class="tagLineText" target=_blank href="http://www.dspace.org/">About DSpace</A>
+                    <A class="tagLineText" target=_blank href="http://www.dspace.org/">About DSpace Software</A>
                 </td>
                 <td nowrap valign=middle>
-                    &nbsp;&nbsp;&nbsp;<A HREF="http://libraries.mit.edu/"><img src="<%= request.getContextPath() %>/image/dome-bluewhite-smaller.gif" border=0 alt="MIT Libraries"></A>&nbsp;&nbsp;&nbsp;
+
                 </td>
             </tr>
             <tr class="stripe"> <%-- Blue stripe --%>
