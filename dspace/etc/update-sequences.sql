@@ -81,6 +81,7 @@ SELECT setval('registrationdata_seq', max(registrationdata_id)) FROM registratio
 SELECT setval('subscription_seq', max(subscription_id)) FROM subscription;
 SELECT setval('history_seq', max(history_id)) FROM history;
 SELECT setval('historystate_seq', max(history_state_id)) FROM historystate;
+SELECT setval('communities2item_seq', max(id)) FROM communities2item;
 SELECT setval('itemsbyauthor_seq', max(items_by_author_id)) FROM itemsbyauthor;
 SELECT setval('itemsbytitle_seq', max(items_by_title_id)) FROM itemsbytitle;
 SELECT setval('itemsbydate_seq', max(items_by_date_id)) FROM itemsbydate;
