@@ -516,7 +516,8 @@ public class EditItemServlet extends DSpaceServlet
     {
         // Wrap multipart request to get the submission info
 	FileUploadRequest wrapper = new FileUploadRequest(request);
-
+        Bitstream b = null;
+        
         Item item = Item.find(context,
             UIUtil.getIntParameter(wrapper, "item_id"));
 
@@ -526,7 +527,19 @@ public class EditItemServlet extends DSpaceServlet
         InputStream is = new BufferedInputStream(new FileInputStream(
             temp));
 
-        Bitstream b = item.createSingleBitstream(is);
+        // do we already have a bundle?    
+        Bundle [] bundles = item.getBundles();
+                  
+        if( bundles.length < 1)
+        {
+            // set bundle's name to ORIGINAL    
+            b = item.createSingleBitstream(is, "ORIGINAL");
+        }
+        else
+        {
+            // we have a bundle already, just add bitstream
+            b = bundles[0].createBitstream(is);
+        }
 
         // Strip all but the last filename.  It would be nice
         // to know which OS the file came from.
