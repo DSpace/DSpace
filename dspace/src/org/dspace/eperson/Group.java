@@ -246,16 +246,19 @@ public class Group
         // special, everyone is member of group 0 (anonymous)
         if( groupid == 0 ) return true;
 
+        // first, check for membership if it's a special group
+        // (special groups can be set even if person isn't authenticated)
+        if( c.inSpecialGroup( groupid ) )
+        {
+            return true;
+        }           
+
+
         EPerson currentuser = c.getCurrentUser();
         
         //  only test for membership if context contains a user
         if( currentuser != null )
         {
-            // first, check for membership if it's a special group
-            if( c.inSpecialGroup( groupid ) )
-            {
-                return true;
-            }           
         
             // not in special groups, try database
             int userid = currentuser.getID();

@@ -42,7 +42,9 @@ package org.dspace.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -84,7 +86,7 @@ public class Context
     private Map objectCache;
     
     /** Group IDs of special groups user is a member of */
-    private Map specialGroups;
+    private List specialGroups;
     
     /**
      * Construct a new context object.  A database connection is opened.
@@ -105,7 +107,7 @@ public class Context
         ignoreAuth       = false;
         
         objectCache      = new HashMap();
-        specialGroups    = new HashMap();
+        specialGroups    = new ArrayList();
     }
     
 
@@ -312,7 +314,8 @@ public class Context
      */
     public void setSpecialGroup(int groupID)
     {
-        specialGroups.put(Integer.toString(groupID), "t");
+        specialGroups.add( new Integer(groupID) );
+//        System.out.println("Added " + groupID);        
     }
 
     /**
@@ -323,8 +326,9 @@ public class Context
      */
     public boolean inSpecialGroup(int groupID)
     {
-        if( specialGroups.get( Integer.toString(groupID) ) != null )
+        if( specialGroups.contains( new Integer(groupID) ) )
         {
+//            System.out.println("Contains " + groupID);
             return true;
         }
         
