@@ -61,6 +61,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -190,6 +191,15 @@ public class WorkspaceItem implements InProgressSubmission
 
         // submitter can read item
         String mypolicy = "u"+context.getCurrentUser().getID();
+
+        // FIXME: icky hardcoded workflow steps
+        Group step1group = coll.getWorkflowGroup( 1 );
+        Group step2group = coll.getWorkflowGroup( 2 );
+        Group step3group = coll.getWorkflowGroup( 3 );
+
+        if(step1group != null) { mypolicy += ",g" + step1group.getID(); }
+        if(step2group != null) { mypolicy += ",g" + step2group.getID(); }
+        if(step3group != null) { mypolicy += ",g" + step3group.getID(); }
         
         ResourcePolicy rp = ResourcePolicy.create(context);
         rp.setResourceType(Constants.ITEM);
@@ -284,6 +294,9 @@ public class WorkspaceItem implements InProgressSubmission
         rp.setPolicy(mypolicy);
         rp.setActionID(Constants.DELETE);
         rp.update();
+
+        // workflow groups need access to the item
+        // and contents too.
 
 
         // Copy template if appropriate
