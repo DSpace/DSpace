@@ -78,7 +78,7 @@ import org.dspace.content.*;
  * @author  Peter Breton
  * @version $Revision$
  */
-public class BrowseScope
+public class BrowseScope implements Cloneable
 {
     /** The DSpace context */
     private Context context;
@@ -94,6 +94,15 @@ public class BrowseScope
 
     /** Maximum number of results previous to the focus */
     private int numberBefore;
+
+    // Internal variables used by Browse
+
+    /** The type of browse */
+    private int browseType;
+    /** Whether results should be ascending or descending */
+    private boolean ascending;
+    /** Whether results should be sorted */
+    private Boolean sort;
 
     /**
      * Create a browse scope with the given context.
@@ -117,19 +126,21 @@ public class BrowseScope
     }
 
     /**
-     * Constructor
+     * Clone this object
      */
-    public BrowseScope(Context context,
-                       Object scope,
-                       Object focus,
-                       int total,
-                       int numberBefore)
+    public Object clone()
     {
-        this.context      = context;
-        this.scope        = scope;
-        this.focus        = focus;
-        this.total        = total;
-        this.numberBefore = numberBefore;
+        BrowseScope clone = new BrowseScope(context);
+
+        clone.scope = scope;
+        clone.focus = focus;
+        clone.total = total;
+        clone.numberBefore = numberBefore;
+        clone.browseType = browseType;
+        clone.ascending = ascending;
+        clone.sort = sort;
+
+        return clone;
     }
 
     /**
@@ -302,6 +313,142 @@ public class BrowseScope
     }
 
     /**
+     * Return true if there is no limit on the number of matches
+     * returned, false otherwise.
+     */
+    public boolean hasNoLimit()
+    {
+        return total == -1;
+    }
+
+    /**
+     * Return true if there is a focus for the browse, false otherwise.
+     */
+    public boolean hasFocus()
+    {
+        return focus != null;
+    }
+
+    ////////////////////////////////////////
+    // Convenience methods at package scope
+    ////////////////////////////////////////
+
+    /**
+     * Return true if the focus is an Item.
+     */
+    boolean focusIsItem()
+    {
+        return (focus instanceof Item) || (focus instanceof Integer);
+    }
+
+    /**
+     * Return true if the focus is a String.
+     */
+    boolean focusIsString()
+    {
+        return (focus instanceof String);
+    }
+
+    /**
+     * Return the focus item id.
+     */
+    int getFocusItemId()
+    {
+        if (! focusIsItem())
+            throw new IllegalArgumentException("Focus is not an Item");
+
+        if (focus instanceof Integer)
+            return ((Integer) focus).intValue();
+
+        return ((Item) focus).getID();
+    }
+
+    /**
+     * Return the focus string value.
+     */
+    String getFocusValue()
+    {
+        return (String) focus;
+    }
+
+    /**
+     * True if the scope is that of a collection.
+     */
+    boolean isCollectionScope()
+    {
+        if (scope == null)
+            return false;
+
+        return scope instanceof Collection;
+    }
+
+    /**
+     * True if the scope is that of a community.
+     */
+    boolean isCommunityScope()
+    {
+        if (scope == null)
+            return false;
+
+        return scope instanceof Community;
+    }
+
+    /**
+     * True if the scope is all of DSpace.
+     */
+    boolean isAllDSpaceScope()
+    {
+        return scope == null;
+    }
+
+    ////////////////////////////////////////
+    // Internal browse fields
+    ////////////////////////////////////////
+
+    /**
+     * Return the type of browse (one of the constants
+     * in Browse).
+     */
+    int getBrowseType()
+    {
+        return browseType;
+    }
+
+    void setBrowseType(int type)
+    {
+        browseType = type;
+    }
+
+    /**
+     * If true, sort the results by title.
+     * If false, sort the results by date.
+     * If null, do no sorting at all.
+     */
+    Boolean getSortByTitle()
+    {
+        return sort;
+    }
+
+    void setSortByTitle(Boolean s)
+    {
+        this.sort = s;
+    }
+
+    /**
+     * If true, results are in ascending order.
+     * Otherwise, results are in descending order.
+     */
+    boolean getAscending()
+    {
+        return ascending;
+    }
+
+    void setAscending(boolean a)
+    {
+        this.ascending = a;
+    }
+
+    /**
      * Return true if this BrowseScope is equal to another object,
      * false otherwise.
      *
@@ -316,12 +463,41 @@ public class BrowseScope
 
         BrowseScope other = (BrowseScope) obj;
         return
-            (scope != null ? scope.equals(other.scope) :
-             other.scope == null) &&
-            (focus != null ? focus.equals(other.focus) :
-             other.focus == null) &&
+            _equals(scope, other.scope) &&
+            _equals(focus, other.focus) &&
+            _equals(sort,  other.sort) &&
             total        == other.total &&
+            browseType   == other.browseType &&
+            ascending    == other.ascending &&
             numberBefore == other.numberBefore
             ;
+    }
+
+    private boolean _equals(Object first, Object second)
+    {
+        if ((first == null) && (second == null))
+            return true;
+        if ((first != null) && (second == null))
+            return false;
+        if ((first == null) && (second != null))
+            return false;
+
+        return first.equals(second);
+    }
+
+    /*
+     * Return a hashCode for this object.
+     */
+    public int hashCode()
+    {
+        return new StringBuffer()
+            .append(scope)
+            .append(focus)
+            .append(total)
+            .append(numberBefore)
+            .append(browseType)
+            .append(ascending)
+            .append(sort)
+            .toString().hashCode();
     }
 }
