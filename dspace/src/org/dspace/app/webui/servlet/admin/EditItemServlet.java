@@ -72,6 +72,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
@@ -130,7 +131,7 @@ public class EditItemServlet extends DSpaceServlet
 
             showError = (itemToEdit == null);
         }
-            
+
         // Show edit form if appropriate
         if (itemToEdit != null)
         {
@@ -145,7 +146,7 @@ public class EditItemServlet extends DSpaceServlet
             JSPManager.showJSP(request, response, "/admin/get-item-id.jsp");
         }
     }
-    
+
 
     protected void doDSPost(Context context,
         HttpServletRequest request,
@@ -182,10 +183,10 @@ public class EditItemServlet extends DSpaceServlet
         Item item = Item.find(context,
             UIUtil.getIntParameter(request, "item_id"));
         String handle = HandleManager.findHandle(context, item);
-        
+
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);
-        
+
         switch (action)
         {
         case START_DELETE:
@@ -252,7 +253,7 @@ public class EditItemServlet extends DSpaceServlet
         request.setAttribute("handle", handle);
         request.setAttribute("collections", collections);
         request.setAttribute("dc.types", dcTypes);
-        
+
         JSPManager.showJSP(request, response, "/admin/edit-item-form.jsp");
     }
 
@@ -292,16 +293,16 @@ public class EditItemServlet extends DSpaceServlet
         {
             sortedParamNames.add(unsortedParamNames.nextElement());
         }
-        
+
         // Sort the list
         Collections.sort(sortedParamNames);
-        
+
         Iterator iterator = sortedParamNames.iterator();
-        
+
         while (iterator.hasNext())
         {
             String p = (String) iterator.next();
-            
+
             if (p.startsWith("value"))
             {
                 /*
@@ -311,7 +312,7 @@ public class EditItemServlet extends DSpaceServlet
                  * (the number being the sequence number)
                  * We use a StringTokenizer to extract these values
                  */
-                 
+
                 StringTokenizer st = new StringTokenizer(p, "_");
 
                 st.nextToken();   // Skip "value"
@@ -322,7 +323,7 @@ public class EditItemServlet extends DSpaceServlet
                 {
                     qualifier = st.nextToken();
                 }
-                
+
                 String sequenceNumber = st.nextToken();
 
                 // Get a string with "element" for unqualified or
@@ -332,7 +333,7 @@ public class EditItemServlet extends DSpaceServlet
                 {
                     key = element + "_" + qualifier;
                 }
-                
+
                 // Get the language
                 String language = request.getParameter(
                     "language_" + key + "_" + sequenceNumber);
@@ -361,18 +362,18 @@ public class EditItemServlet extends DSpaceServlet
                 // First, get the bundle and bitstream ID
                 // Parameter name is bitstream_name_(bundleID)_(bitstreamID)
                 StringTokenizer st = new StringTokenizer(p, "_");
-                
+
                 // Ignore "bitstream" and "name"
                 st.nextToken();
                 st.nextToken();
-                
+
                 // Bundle ID and bitstream ID next
                 int bundleID = Integer.parseInt(st.nextToken());
                 int bitstreamID = Integer.parseInt(st.nextToken());
-                
+
                 Bundle bundle = Bundle.find(context, bundleID);
                 Bitstream bitstream = Bitstream.find(context, bitstreamID);
-                
+
                 // Get the string "(bundleID)_(bitstreamID)" for finding other
                 // parameters related to this bitstream
                 String key = String.valueOf(bundleID) + "_" + bitstreamID;
@@ -382,7 +383,7 @@ public class EditItemServlet extends DSpaceServlet
                 {
                     // "delete" button pressed
                     bundle.removeBitstream(bitstream);
-                    
+
                     // Delete bundle too, if empty
                     if (bundle.getBitstreams().length == 0)
                     {
@@ -439,7 +440,7 @@ public class EditItemServlet extends DSpaceServlet
 
             // Empty language = null
             if (lang.equals("")) lang = null;
-            
+
             DCType dcType = DCType.find(context, dcTypeID);
             item.addDC(dcType.getElement(), dcType.getQualifier(), lang, value);
             item.update();
@@ -457,7 +458,7 @@ public class EditItemServlet extends DSpaceServlet
             // Show edit page again
             showEditForm(context, request, response, item);
         }
-        
+
         // Complete transaction
         context.complete();
     }
@@ -476,9 +477,9 @@ public class EditItemServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Wrap multipart request to get the submission info
-        // FIXME: /tmp hardcoded and platform-specific
-        MultipartWrapper wrapper = new MultipartWrapper(request, "/tmp");
-        
+		String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
+		MultipartWrapper wrapper = new MultipartWrapper(request, tempDir);
+
         Item item = Item.find(context,
             UIUtil.getIntParameter(wrapper, "item_id"));
 
@@ -516,6 +517,9 @@ public class EditItemServlet extends DSpaceServlet
 
         // Back to edit form
         showEditForm(context, request, response, item);
+
+		// Remove temp file
+		temp.delete();
 
         // Update DB
         context.complete();

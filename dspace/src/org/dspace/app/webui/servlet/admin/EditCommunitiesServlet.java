@@ -67,6 +67,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
@@ -195,7 +196,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Display the relevant "edit collection" page
             JSPManager.showJSP(request, response, "/admin/edit-collection.jsp");
             break;
-            
+
         case START_DELETE_COLLECTION:
             // Show "confirm delete" page
             JSPManager.showJSP(request, response,
@@ -211,35 +212,35 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Edit or creation of a community confirmed
             processConfirmEditCommunity(context, request, response, community);
             break;
-            
+
         case CONFIRM_DELETE_COMMUNITY:
             // Delete the community
             community.delete();
 
              // Show main control page
             showControls(context, request, response);
-            
+
             // Commit changes to DB
             context.complete();
             break;
-           
+
         case CONFIRM_EDIT_COLLECTION:
             // Edit or creation of a collection confirmed
             processConfirmEditCollection(
                 context, request, response, community, collection);
             break;
-            
+
         case CONFIRM_DELETE_COLLECTION:
             // Delete the collection
             community.removeCollection(collection);
 
              // Show main control page
             showControls(context, request, response);
-            
+
             // Commit changes to DB
             context.complete();
             break;
-            
+
         default:
             // Erm... weird action value received.
             log.warn(LogManager.getHeader(context,
@@ -282,11 +283,11 @@ public class EditCommunitiesServlet extends DSpaceServlet
         // Set attributes for JSP
         request.setAttribute("communities", communities);
         request.setAttribute("collections.map", communityIDToCollection);
-        
+
         JSPManager.showJSP(request, response, "/admin/list-communities.jsp");
     }
-    
-    
+
+
     /**
      * Create/update community metadata from a posted form
      *
@@ -336,13 +337,13 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
         // Which button was pressed?
         String button = UIUtil.getSubmitButton(request, "submit");
-        
+
         if (button.equals("submit_set_logo"))
         {
             // Change the logo - delete any that might be there first
             community.setLogo(null);
             community.update();
-            
+
             // Display "upload logo" page.  Necessary attributes already set by
             // doDSPost()
             JSPManager.showJSP(request, response, "/admin/upload-logo.jsp");
@@ -434,12 +435,12 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
         // Which button was pressed?
         String button = UIUtil.getSubmitButton(request, "submit");
-        
+
         if (button.equals("submit_set_logo"))
         {
             // Change the logo - delete any that might be there first
             collection.setLogo(null);
-            
+
             // Display "upload logo" page.  Necessary attributes already set by
             // doDSPost()
             JSPManager.showJSP(request, response, "/admin/upload-logo.jsp");
@@ -462,7 +463,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 step);
             newGroup.update();
             collection.setWorkflowGroup(step, newGroup);
-            
+
             // Forward to group edit page
             response.sendRedirect(response.encodeRedirectURL(
                 request.getContextPath() + "/admin/groups?group=" +
@@ -482,21 +483,21 @@ public class EditCommunitiesServlet extends DSpaceServlet
         {
             // Delete workflow group
             int step = Integer.parseInt(button.substring(17));
-            
+
             Group g = collection.getWorkflowGroup(step);
             collection.setWorkflowGroup(step, null);
             // Have to update to avoid ref. integrity error
-            collection.update();  
+            collection.update();
             g.delete();
 
             // Show edit page again - attributes set in doDSPost()
             JSPManager.showJSP(request, response, "/admin/edit-collection.jsp");
-        }            
+        }
         else if(button.equals("submit_create_template"))
         {
             // Create a template item
             collection.createTemplateItem();
-            
+
             // Forward to edit page for new template item
             Item i = collection.getTemplateItem();
             response.sendRedirect(response.encodeRedirectURL(
@@ -543,9 +544,10 @@ public class EditCommunitiesServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Wrap multipart request to get the submission info
-        // FIXME: /tmp hardcoded and platform-specific
-        MultipartWrapper wrapper = new MultipartWrapper(request, "/tmp");
-        
+		String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
+
+        MultipartWrapper wrapper = new MultipartWrapper(request, tempDir);
+
         Community community = Community.find(context,
             UIUtil.getIntParameter(wrapper, "community_id"));
         Collection collection = Collection.find(context,
@@ -566,7 +568,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
         {
             logoBS = collection.setLogo(is);
         }
-        
+
         // Strip all but the last filename.  It would be nice
         // to know which OS the file came from.
         String noPath = wrapper.getFilesystemName("file");
@@ -592,18 +594,21 @@ public class EditCommunitiesServlet extends DSpaceServlet
         if (community != null)
         {
             community.update();
-            
+
             // Show community edit page
             request.setAttribute("community", community);
             JSPManager.showJSP(request, response, "/admin/edit-community.jsp");
         }
         else
-        {            
+        {
             collection.update();
             // Show collection edit page
             request.setAttribute("collection", collection);
             JSPManager.showJSP(request, response, "/admin/edit-collection.jsp");
         }
+
+		// Remove temp file
+		temp.delete();
 
         // Update DB
         context.complete();
