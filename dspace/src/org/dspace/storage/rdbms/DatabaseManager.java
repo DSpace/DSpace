@@ -722,7 +722,7 @@ public class DatabaseManager
         String table = canonicalize(row.getTable());
         String pk = getPrimaryKeyColumn(table);
         Integer id = (Integer) ids.get(table);
-        int nid = id == null ? -1 : id.intValue() + 1;
+        int current_id = id == null ? -1 : id.intValue();
 
         if (id == null)
         {
@@ -735,7 +735,7 @@ public class DatabaseManager
             {
                 statement = getConnection().createStatement();
                 ResultSet results = statement.executeQuery(sql);
-                nid = results.next() ? results.getInt(1) : -1;
+                current_id = results.next() ? results.getInt(1): -1;
             }
             finally
             {
@@ -750,8 +750,9 @@ public class DatabaseManager
             }
         }
 
-        row.setColumn(pk, nid);
-        ids.put(table, new Integer(nid));
+        int new_id = current_id + 1;
+        row.setColumn(pk, new_id);
+        ids.put(table, new Integer(new_id));
     }
 
     /**
