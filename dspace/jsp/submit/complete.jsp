@@ -42,6 +42,10 @@
   - Submission complete message
   --%>
 
+<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
+
+<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
 <dspace:layout locbar="nolink" navbar="off" parenttitle="Submit"
 title="Submission Complete!">
 
