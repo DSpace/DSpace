@@ -67,6 +67,11 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
 import org.apache.xpath.XPathAPI;
+import org.apache.commons.cli.Options; 
+import org.apache.commons.cli.CommandLineParser; 
+import org.apache.commons.cli.CommandLine; 
+import org.apache.commons.cli.HelpFormatter; 
+import org.apache.commons.cli.PosixParser; 
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -101,88 +106,182 @@ list of collections to choose from would be nice too
 */
 
 public class ItemImport
-{        
+{
     public static void main(String argv[])
         throws Exception
     {
-        String usage = "Itemimport has three modes of operation:\n" +
-                       "  add     = import items from directories within items_dir, and create mapfile\n" +
-                       "  replace = use mapfile from previously imported items and replace\n" +
-                       "  remove  = use mapfile from previously imported items and delete them\n" +
-                       "\n" +
-                       "ItemImport add EPersonID collectionID items_dir mapfile\n" +
-                       "ItemImport replace EPersonID collectionID items_dir mapfile\n" +
-                       "ItemImport remove EPersonID mapfile\n\n" +
-                       "see DSpace documentation for format of item directories\n";
+        // create an options object and populate it
+        CommandLineParser parser = new PosixParser(); 
 
-        Context c = null;
+        Options options = new Options();
+
+        options.addOption( "a", "add",         false, "add items to DSpace");
+        options.addOption( "r", "replace",     false, "replace items in mapfile");
+        options.addOption( "R", "remove",      false, "remove items in mapfile");
+        options.addOption( "s", "source",      true, "source of items (directory)");
+        options.addOption( "c", "collection",  true, "destination collection databse ID");
+        options.addOption( "m", "mapfile",     true, "mapfile items in mapfile");
+        options.addOption( "e", "eperson",     true, "remove items in mapfile");
+        options.addOption( "h", "help",        false, "help");
+
+        CommandLine line = parser.parse( options, argv );
+
+        String command    = null;  // add replace remove, etc
+        String sourcedir  = null;
+        String mapfile    = null;
+        String eperson    = null;  // db ID or email
+        String [] collections = null; // db ID or handles
+
+        if( line.hasOption('h') )
+        {
+            HelpFormatter myhelp = new HelpFormatter();
+            myhelp.printHelp( "ItemImport\n", options );
+            System.out.println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
+            System.out.println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
+            System.out.println("removing items:  ItemImport -R -e eperson -m mapfile");
+
+            System.exit(0);
+        }
+
+        if( line.hasOption( 'a' ) ) { command = "add";    } 
+        if( line.hasOption( 'r' ) ) { command = "replace";}
+        if( line.hasOption( 'R' ) ) { command = "remove"; }
+       
+        if( line.hasOption( 's' ) ) // source
+        {
+            sourcedir = line.getOptionValue( 's' );    
+        }
+
+        if( line.hasOption( 'm' ) ) // mapfile
+        {
+            mapfile = line.getOptionValue( 'm' );    
+        }
+
+        if( line.hasOption( 'e' ) ) // eperson
+        {
+            eperson = line.getOptionValue( 'e' );    
+        }
+
+        if( line.hasOption( 'c' ) ) // collections
+        {
+            collections = line.getOptionValues( 'c' );    
+        }
+
+        // now validate
+        // must have a command set
+        if( command == null )
+        {
+            System.out.println("Error - must run with either add, replace, or remove (run with -h flag for details)");
+                System.exit(1);
+        }
+        else if( command.equals("add") || command.equals("replace") )
+        {
+            if( sourcedir == null )
+            {
+                System.out.println("Error - a source directory containing items must be set (run with -h flag for details)"); 
+                System.exit(1);
+            }
+            if( mapfile == null )
+            {
+                System.out.println("Error - a map file to hold importing results must be specified (run with -h flag for details)");
+                System.exit(1);
+            }
+            if( eperson == null )
+            {
+                System.out.println("Error - an eperson to do the importing must be specified (run with -h flag for details)");
+                System.exit(1);
+            }
+            if( collections == null )
+            {
+                System.out.println("Error - at least one destination collection must be specified (run with -h flag for details)");
+                System.exit(1);
+            }
+
+        }
+        else if( command.equals("remove") )
+        {
+            if( eperson == null )
+            {
+                System.out.println("Error - an eperson to do the importing must be specified");
+                System.exit(1);
+            }
+            if( mapfile == null )
+            {
+                System.out.println("Error - a map file must be specified");
+                System.exit(1);
+            }
+        } 
+
 
         ItemImport myloader = new ItemImport();
 
-        int collectionID = -1;
-        int epersonID    = -1;
-        String sourceDir = null;
-        String mapFile   = null;
-        Collection mycollection = null;
-        
-        if( argv.length < 3 )
-        {
-            System.out.println( usage );
-            System.exit( 1 );
-        }
+        // create a context
+        Context c = new Context();
 
-        // now get the args
-        if( argv[0].equals( "remove" ) && (argv.length == 3) )
+        // find the EPerson, assign to context
+        EPerson myEPerson = null;
+	if( eperson.indexOf('@') != -1)
         {
-            epersonID    = Integer.parseInt( argv[1] );
-            mapFile      = argv[2];
-        }
-        else if( argv[0].equals( "add" ) && (argv.length == 5) )
-        {
-            epersonID    = Integer.parseInt( argv[1] );
-            collectionID = Integer.parseInt( argv[2] );
-            sourceDir    = argv[3];
-            mapFile      = argv[4];
-        }
-        else if( argv[0].equals( "replace" ) && (argv.length == 5) )
-        {
-            epersonID    = Integer.parseInt( argv[1] );
-            collectionID = Integer.parseInt( argv[2] );
-            sourceDir    = argv[3];
-            mapFile      = argv[4];
+            // @ sign, must be an email
+            myEPerson = EPerson.findByEmail( c, eperson );
         }
         else
         {
-            System.out.println( usage );
-            System.exit( 1 );
+            myEPerson = EPerson.find( c, Integer.parseInt( eperson ) ); 
         }
 
+        if( myEPerson == null )
+        {
+            System.out.println( "Error, eperson cannot be found: " + eperson );
+            System.exit(1);
+        }
+
+        c.setCurrentUser( myEPerson );
+
+        // find collections
+        Collection mycollection = null;
+
+        // dont' need to validate collections set if command is "remove"
+        if( !command.equals("remove") )
+        {
+            if( collections[0].indexOf('/') != -1 )
+            {
+                // has a / must be a handle
+                mycollection = (Collection)HandleManager.resolveToObject( c, collections[0] );
+
+                // ensure it's a collection
+                if( (mycollection == null) || (mycollection.getType() != Constants.COLLECTION) )
+                {
+                    mycollection = null;
+                } 
+            } 
+            else if( collections != null )
+            {
+                mycollection = Collection.find( c, Integer.parseInt( collections[0] ) );
+            }
+
+            if( mycollection == null )
+            {
+                System.out.println( "Error, collection cannot be found: " + collections[0] );
+                System.exit(1);
+            }
+        } // end of validating collections
+        
         try
         {
-            c = new Context();
-
-            if( epersonID != -1 )
-            {
-                EPerson ep = EPerson.find(c, epersonID);
-                c.setCurrentUser( ep );
-            }
-
             c.setIgnoreAuthorization( true );
 
-            
-            if( argv[0].equals( "add" ) )
+            if( command.equals( "add" ) )
             {
-                mycollection = Collection.find( c, collectionID );
-                myloader.addItems( c, mycollection, sourceDir, mapFile );
+                myloader.addItems( c, mycollection, sourcedir, mapfile );
             }
-            else if( argv[0].equals( "replace" ) )
+            else if( command.equals( "replace" ) )
             {
-                mycollection = Collection.find( c, collectionID );
-                myloader.replaceItems( c, mycollection, sourceDir, mapFile );
+                myloader.replaceItems( c, mycollection, sourcedir, mapfile );
             }
-            else if( argv[0].equals( "remove" ) )
+            else if( command.equals( "remove" ) )
             {
-                myloader.removeItems( c, mycollection, mapFile );
+                myloader.removeItems( c, mapfile );
             }
 
             // complete all transactions
@@ -209,7 +308,15 @@ public class ItemImport
         PrintWriter mapOut = new PrintWriter( new FileWriter( outFile ) );
         
         // now process the source directory
-        String [] dircontents = new java.io.File( sourceDir ).list();
+        File d = new java.io.File( sourceDir );
+
+        if( d == null )
+        {
+            System.out.println("Error, cannot open source directory " + sourceDir);
+            System.exit(1);
+        }
+
+        String [] dircontents = d.list();
 
         for( int i = 0; i < dircontents.length; i++ )
         {
@@ -224,6 +331,15 @@ public class ItemImport
     private void replaceItems( Context c, Collection mycollection, String sourceDir, String mapFile )
         throws Exception
     {
+        // verify the source directory
+        File d = new java.io.File( sourceDir );
+
+        if( d == null )
+        {
+            System.out.println("Error, cannot open source directory " + sourceDir);
+            System.exit(1);
+        }
+
         // read in HashMap first, to get list of handles & source dirs
         HashMap myhash = readMapFile( mapFile );
         
@@ -244,24 +360,8 @@ public class ItemImport
             Item oldItem = (Item)HandleManager.resolveToObject(c, oldHandle);
             Item newItem = addItem(c, mycollection, sourceDir, newItemName, oldHandle, null);
 
-/*   obsolete - but commented out until I'm sure it's useless....
-            String newHandle = HandleManager.findHandle(c, newItem);
-
-            // discard the new handle - FIXME: database hack
-            String myquery =
-                "DELETE FROM handle WHERE resource_type_id=" +
-                Constants.ITEM + " AND resource_id=" + newItem.getID();
-            DatabaseManager.updateQuery(c, myquery );
-
-            // re-assign the old handle to the new item
-            myquery = "UPDATE handle set resource_id=" +
-                        newItem.getID() +
-                        " WHERE handle.handle LIKE '" + oldHandle + "'";
-            DatabaseManager.updateQuery(c, myquery );
-*/
             // schedule item for demolition
             itemsToDelete.add( oldItem );
-              
         }
                 
         // now run through again, deleting items (do this last to avoid disasters!)
@@ -275,7 +375,7 @@ public class ItemImport
     }
 
 
-    private void removeItems( Context c, Collection mycollection, String mapFile )
+    private void removeItems( Context c, String mapFile )
         throws Exception
     {
         System.out.println( "Deleting items listed in mapfile: " + mapFile );
@@ -360,6 +460,11 @@ public class ItemImport
         // bit of a hack - to remove an item, you must remove it
         // from all collections it's a part of, then it will be removed
         Item myitem = (Item)HandleManager.resolveToObject(c, myhandle);
+
+        if( myitem == null )
+        {
+            System.out.println("Error - cannot locate item - already deleted?");
+        }
 
         removeItem( c, myitem );
     }
@@ -497,7 +602,7 @@ public class ItemImport
         catch( Exception e )
         {
             // probably no handle file, just return null
-            System.out.println( "It appears there is no handle file" );
+            System.out.println( "It appears there is no handle file -- generating one" );
         }
         
         return result;
