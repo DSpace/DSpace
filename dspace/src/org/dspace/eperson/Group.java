@@ -309,7 +309,7 @@ public class Group
             // First check the cache
             Group fromCache = (Group) context.fromCache(
                 Group.class,
-                row.getIntColumn("group_id"));
+                row.getIntColumn("eperson_group_id"));
 
             if (fromCache != null)
             {
