@@ -146,7 +146,7 @@ incoming submissions, but will not be able to reject them.</P>
 				<tr>
 					<td width="40%"></td>
 					<td class="submitFormHelp">
-						Click on the 'Add E-people' button to start adding to the list.</td>
+						Click on the 'Choose E-people' button to choose e-people to add to the list.</td>
 					<td width="40%"></td>
 				</tr>
 				<tr>
@@ -159,7 +159,7 @@ incoming submissions, but will not be able to reject them.</P>
 				<tr>
 					<td></td>
 					<td align=center>
-						<input type=button value="Add E-people" onclick="javascript:eperson_window();">
+						<input type=button value="Choose E-people" onclick="javascript:eperson_window();">
 						<input type=button value="Remove Selected" onclick="javascript:removeSelected(epersonList);">
 					</td>
 				</tr>

@@ -114,17 +114,6 @@
       <td width=100%>
         <H1><%= name %></H1>
         <H3>Collection home page</H3>
-
-    <% if(admin_button)  // admin edit button
-    { %>
-    <form method=POST action=<%=request.getContextPath()%>/dspace-admin/edit-communities>
-      <input type="hidden" name="collection_id" value="<%=collection.getID()%>">
-      <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COLLECTION%>">
-      <input type="submit" value="Edit">
-    </form>
-    <% } %>
-
-
       </td>
       <td valign=top>
 <%  if (logo != null) { %>
@@ -219,6 +208,33 @@
   <P class="copyrightText"><%= copyright %></P>
 
   <dspace:sidebar>
+    <% if(admin_button)  // admin edit button
+    { %>
+    <table class=miscTable align=center>
+	  <tr>
+	    <td class="evenRowEvenCol" colspan=2>
+	      <table>
+            <tr>
+              <th class="standard">
+                 <strong>Admin Tools</strong>
+              </th>
+            </tr>
+            <tr>
+              <td class="standard" align="center">
+	            <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+                  <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
+                  <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
+                  <input type="submit" value="Edit...">
+                </form>
+              </td>
+            </tr>
+	 	  </table>
+	 	</td>
+      </tr>
+    </table>
+    <% } %>
+
+
     <H3>Recent&nbsp;Submissions</H3>
 <%
     for (int i = 0; i < lastSubmittedTitles.length; i++)

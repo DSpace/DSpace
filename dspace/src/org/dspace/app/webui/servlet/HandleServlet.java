@@ -272,6 +272,13 @@ public class HandleServlet extends DSpaceServlet
             "view_item",
             "handle=" + handle));
 
+        // show edit link
+        if(item.canEdit())
+        {
+            // set a variable to create an edit button
+            request.setAttribute("admin_button", new Boolean(true));
+        }
+        
         // Get the collections
         Collection[] collections = item.getCollections();
 

@@ -52,6 +52,7 @@
   -                  a mapping between the item and collection might not
   -                  appear yet.  If this is omitted, the item display won't
   -                  display any collections.
+  -    admin_button - Boolean, show admin 'edit' button
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -71,7 +72,9 @@
     boolean displayAll = (displayAllBoolean != null && displayAllBoolean.booleanValue());
     Item item = (Item) request.getAttribute("item");
     Collection[] collections = (Collection[]) request.getAttribute("collections");
-
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    
     String handle = item.getHandle();
 
     // Full title needs to be put into a string to use as tag argument
@@ -90,6 +93,16 @@
                 <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>
             </td>
+<%
+        if (admin_button)  // admin edit button
+        { %>
+			<td class=evenRowEvenCol align="center"
+				<form method=GET action="<%= request.getContextPath() %>/tools/edit-item">
+					<input type="hidden" name="item_id" value="<%= item.getID() %>">
+				    <input type="submit" name="submit" value="Edit...">
+				</form>
+			</td>
+<%      } %>
         </tr>
     </table>
     <br>
