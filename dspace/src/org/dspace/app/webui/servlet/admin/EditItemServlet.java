@@ -476,6 +476,8 @@ public class EditItemServlet extends DSpaceServlet
                         "bitstream_format_id_" + key);
                     String userFormatDesc = request.getParameter(
                         "bitstream_user_format_description_" + key);
+		    int primaryBitstreamID = UIUtil.getIntParameter(request,
+			bundleID + "_primary_bitstream_id");
 
                     // Empty strings become non-null
                     if (source.equals("")) source = null;
@@ -487,6 +489,7 @@ public class EditItemServlet extends DSpaceServlet
                     bitstream.setDescription(desc);
                     bitstream.setFormat(
                         BitstreamFormat.find(context, formatID));
+		    bundle.setPrimaryBitstreamID(primaryBitstreamID);
 
                     if (userFormatDesc != null)
                     {
@@ -494,6 +497,7 @@ public class EditItemServlet extends DSpaceServlet
                     }
 
                     bitstream.update();
+		    bundle.update();
                 }
             }
         }

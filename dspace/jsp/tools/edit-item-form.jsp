@@ -262,6 +262,7 @@
 
         <table class="miscTable">
             <tr>
+		<th class="oddRowEvenCol"><strong>Primary<br>Bitstream</strong></th>
                 <th class="oddRowOddCol"><strong>Name</strong></th>
                 <th class="oddRowEvenCol"><strong>Source</strong></th>
                 <th class="oddRowOddCol"><strong>Description</strong></th>
@@ -284,6 +285,17 @@
             BitstreamFormat bf = bitstreams[j].getFormat();
 %>
             <tr>
+		<% if (bundles[i].getName().equals("ORIGINAL"))
+		   { %>
+                     <td class="<%= row %>RowEvenCol" align="center">
+                       <input type="radio" name="<%= bundles[i].getID() %>_primary_bitstream_id" value=<%= bitstreams[j].getID() %>
+                           <% if (bundles[i].getPrimaryBitstreamID() == bitstreams[j].getID()) { %>
+                                  <%="checked" %>
+                           <% } %> >
+                   </td>
+		<% } else { %>
+		     <td> </td>
+		<% } %>
                 <td class="<%= row %>RowOddCol">
                     <input type="text" name="bitstream_name_<%= key %>" value="<%= (bitstreams[j].getName() == null ? "" : bitstreams[j].getName()) %>">
                 </td>
