@@ -39,7 +39,7 @@
  */
 
 
-package org.dspace.handles.test;
+package org.dspace.handle.test;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -50,7 +50,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.content.*;
 import org.dspace.eperson.EPerson;
-import org.dspace.handles.HandleManager;
+import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.*;
 
 /**
