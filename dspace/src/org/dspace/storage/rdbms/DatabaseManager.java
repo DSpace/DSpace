@@ -69,15 +69,6 @@ public class DatabaseManager
     /** log4j category */
     private static Logger log = Logger.getLogger(DatabaseManager.class);
 
-    /** The JDBC URL */
-    private static String jdbcUrl = ConfigurationManager.getProperty("db.url");
-    /** The JDCB Driver */
-    private static String jdbcDriver = ConfigurationManager.getProperty("db.driver");
-    /** The JDBC username */
-    private static String jdbcUserName = ConfigurationManager.getProperty("db.username");
-    /** The JDBC password */
-    private static String jdbcPassword = ConfigurationManager.getProperty("db.password");
-
     /** True if initialization has been done */
     private static boolean initialized = false;
 
@@ -1105,15 +1096,40 @@ public class DatabaseManager
         if (initialized)
             return;
 
-        if (jdbcUrl == null)
-            throw new IllegalStateException("Configuration property \"db.url\" not found");
-
         try
         {
             // Register basic JDBC driver
-            Class driverClass = Class.forName(jdbcDriver);
+            Class driverClass =
+            	Class.forName(ConfigurationManager.getProperty("db.driver"));
             Driver basicDriver = (Driver) driverClass.newInstance();
             DriverManager.registerDriver(basicDriver);            
+
+            // Read pool configuration parameter or use defaults
+            // Note we check to see if property is null; getIntProperty returns
+            // '0' if the property is not set OR if it is actually set to zero.
+            // But 0 is a valid option...
+
+            int maxConnections =
+            	ConfigurationManager.getIntProperty("db.maxconnections");
+            if (ConfigurationManager.getProperty("db.maxconnections") == null)
+            {
+            	maxConnections = 30;
+            }
+
+            int maxWait =
+            	ConfigurationManager.getIntProperty("db.maxwait");
+            if (ConfigurationManager.getProperty("db.maxwait") == null)
+            {
+            	maxWait = 5000;
+            }
+            
+            int maxIdle =
+            	ConfigurationManager.getIntProperty("db.maxidle");
+            if (ConfigurationManager.getProperty("db.maxidle") == null)
+            {
+            	maxIdle = 30;
+            }
+
 
             // Create object pool
             ObjectPool connectionPool = new GenericObjectPool(
@@ -1128,9 +1144,10 @@ public class DatabaseManager
 
             // ConnectionFactory the pool will use to create connections.
             ConnectionFactory connectionFactory =
-                new DriverManagerConnectionFactory(jdbcUrl,
-                    jdbcUserName,
-                    jdbcPassword);
+                new DriverManagerConnectionFactory(
+                	ConfigurationManager.getProperty("db.url"),
+                	ConfigurationManager.getProperty("db.username"),
+                	ConfigurationManager.getProperty("db.password"));
 
             //
             // Now we'll create the PoolableConnectionFactory, which wraps
