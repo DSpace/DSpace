@@ -90,6 +90,7 @@ public class DSQuery
         throws IOException
     {
         querystring = checkEmptyQuery( querystring );
+        querystring = querystring.toLowerCase();
                         
         ArrayList resultlist= new ArrayList();
         ArrayList itemlist 	= new ArrayList();
