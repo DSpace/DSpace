@@ -52,7 +52,7 @@ import net.handle.util.StreamTable;
 import org.apache.log4j.Category;
 
 import org.dspace.core.Context;
-import org.dspace.handles.HandleManager;
+import org.dspace.handle.HandleManager;
 
 
 /**
