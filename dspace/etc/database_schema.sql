@@ -389,7 +389,7 @@ CREATE TABLE TasklistItem
 CREATE TABLE RegistrationData
 (
   registrationdata_id   INTEGER PRIMARY KEY,
-  eperson_id            INTEGER REFERENCES EPerson(eperson_id),
+  email                 VARCHAR(64) UNIQUE,
   token                 VARCHAR(48),
   expires		TIMESTAMP
 );

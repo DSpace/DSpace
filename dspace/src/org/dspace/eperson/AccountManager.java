@@ -80,7 +80,6 @@ public class AccountManager
      * Email registration info to the given email address.
      *
      * Potential error conditions:
-     *   No EPerson with that email (returns null)
      *   Cannot create registration data in database (throws SQLException)
      *   Error sending email (throws MessagingException)
      *   Error reading email template (throws IOException)
@@ -129,6 +128,29 @@ public class AccountManager
      */
     public static EPerson getEPerson(Context context,
                                      String token)
+        throws SQLException, AuthorizeException
+    {
+        String email = getEmail(context, token);
+        
+        if (email == null)
+        {
+            return null;
+        }
+
+        EPerson ep = EPerson.findByEmail(context, email);
+        return ep;
+    }
+
+
+    /**
+     * Return the e-mail address referred to by a token
+     *
+     * @param context DSpace context
+     * @param token Account token
+     * @return The email address corresponding to token, or null.
+     */
+    public static String getEmail(Context context,
+                                  String token)
         throws SQLException
     {
         TableRow rd = DatabaseManager.findByUnique(context,
@@ -146,19 +168,10 @@ public class AccountManager
                 return null;
         }
 
-        if (rd.isColumnNull("eperson_id"))
-            throw new IllegalStateException("Eperson id not specified");
-
-        // This could conceivably happen if someone deleted the EPerson
-        // without removing the token.
-        EPerson ep = EPerson.find(context, rd.getIntColumn("eperson_id"));
-
-        if (ep == null)
-            return null;
-
-        return ep;
+        return rd.getStringColumn("email");
     }
 
+    
     /**
      * Delete the callback for token.
      *
@@ -203,15 +216,10 @@ public class AccountManager
                                        boolean send)
         throws SQLException, IOException, MessagingException, AuthorizeException
     {
-        EPerson ep = EPerson.findByEmail(context, email);
-
-        if (ep == null)
-            return null;
-
         TableRow rd = DatabaseManager.create(context, "RegistrationData");
         rd.setColumn("token",      Utils.generateHexKey());
         rd.setColumn("expires",    getDefaultExpirationDate());
-        rd.setColumn("eperson_id", ep.getID());
+        rd.setColumn("email",      email);
         DatabaseManager.update(context, rd);
 
         // This is a potential problem -- if we create the callback
@@ -222,7 +230,6 @@ public class AccountManager
             log.debug("Created callback " +
                       rd.getIntColumn("registrationdata_id") +
                       " with token " + rd.getStringColumn("token") +
-                      " for eperson " + ep.getID() +
                       " with email \"" + email + "\"");
 
         if (send)

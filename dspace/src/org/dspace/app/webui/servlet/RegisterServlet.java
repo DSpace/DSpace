@@ -53,6 +53,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.AccountManager;
@@ -114,6 +115,8 @@ public class RegisterServlet extends DSpaceServlet
         * password" page as appropriate.
         */
 
+        boolean updated = false;
+        
         // Get the key
         String key = request.getParameter("token");
 
@@ -136,7 +139,40 @@ public class RegisterServlet extends DSpaceServlet
         else
         {
             // Find out who the key is for
+            String email = AccountManager.getEmail(context, key);
             EPerson eperson = AccountManager.getEPerson(context, key);
+            
+            if (eperson == null &&
+                email != null &&
+                ConfigurationManager.getBooleanProperty("webui.self.register") &&
+                registering)
+            {
+                /*
+                 * The token relates to a user who is trying to register
+                 * themselves, and the site configuration allows this.
+                 * FIXME: Obviously the user has no real authorisation to
+                 * create an e-person record, so we switch off authorisation
+                 * TEMPORARILY
+                 */
+                context.setIgnoreAuthorization(true);
+                EPerson e = EPerson.create(context);
+                context.setCurrentUser(e);
+                context.setIgnoreAuthorization(false);
+
+                // Fill out what we know
+                e.setEmail(email);
+                e.setFirstName("");  // Avoid NullPointer nastiness
+                e.setLastName("");
+                e.setSelfRegistered(true);
+                e.setCanLogIn(false); // they don't have a password yet
+                e.setRequireCertificate(false); // FIXME: Maybe site policy
+                // should be able to require certs in this case
+                e.update();
+
+                eperson = e;    // Remainder of code displays "profile" page
+                updated = true;
+            }
+
 
             /* Display an error if it's:
              *  An invalid token
@@ -175,6 +211,12 @@ public class RegisterServlet extends DSpaceServlet
                     response,
                     "/register/new-password.jsp");
             }
+        }
+
+        if (updated)
+        {
+            // New e-person record created during self-registration
+            context.complete();
         }
     }
 
@@ -229,7 +271,7 @@ public class RegisterServlet extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        String email = request.getParameter("email");
+        String email = request.getParameter("email").toLowerCase();
 
         EPerson eperson = EPerson.findByEmail(context, email);
         
@@ -299,6 +341,35 @@ public class RegisterServlet extends DSpaceServlet
                         response,
                         "/register/password-token-sent.jsp");
                 }
+
+                // Context needs completing to write registration data
+                context.complete();
+            }
+            catch (MessagingException me)
+            {
+                log.info(LogManager.getHeader(context,
+                    "error_emailing",
+                    "email=" + email),
+                    me);
+
+                JSPManager.showInternalError(request, response);
+            }
+        }
+        else if (registering &&
+            ConfigurationManager.getBooleanProperty("webui.self.register"))
+        {
+            try
+            {
+                // Unrecognised e-mail address, so assume a new user and send
+                // initial registration email.
+                log.info(LogManager.getHeader(context,
+                    "sendtoken_newuser",
+                    "email=" + email));
+
+                AccountManager.sendRegistrationInfo(context, email);
+                JSPManager.showJSP(request,
+                    response,
+                    "/register/registration-sent.jsp");
 
                 // Context needs completing to write registration data
                 context.complete();

@@ -50,6 +50,6 @@
 
     <P>You have been sent an e-mail containing a special URL, or "token".  When
     you visit this URL, you will need to fill out some simple information.
-    After that,	you'll be ready to submit your work to DSpace!</P>
+    After that,	you'll be ready to log into DSpace!</P>
 
 </dspace:layout>
