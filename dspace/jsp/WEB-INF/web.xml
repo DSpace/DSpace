@@ -207,6 +207,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>openURL</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.OpenURLServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>password-login</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.PasswordServlet</servlet-class>
   </servlet>
@@ -346,6 +351,11 @@
   <servlet-mapping>
     <servlet-name>mydspace</servlet-name>
     <url-pattern>/mydspace</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>openURL</servlet-name>
+    <url-pattern>/openURL</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
