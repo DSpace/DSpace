@@ -368,6 +368,11 @@ public class RegisterServlet extends DSpaceServlet
             return;
         }
 		
+        // If the token is valid, we set the current user of the context
+        // to the user associated with the token, so they can update their
+        // info
+        context.setCurrentUser(eperson);
+
         // Set the user profile info
         boolean infoOK = EditProfileServlet.updateUserProfile(eperson, request);
 
@@ -401,7 +406,7 @@ public class RegisterServlet extends DSpaceServlet
             // delete the token
             AccountManager.deleteToken(context, key);
 			
-            // Set the user as active and update
+            // Set the user as active
             eperson.setActive(true);
             eperson.update();
 			
@@ -451,6 +456,11 @@ public class RegisterServlet extends DSpaceServlet
             return;
         }
 		
+        // If the token is valid, we set the current user of the context
+        // to the user associated with the token, so they can update their
+        // info
+        context.setCurrentUser(eperson);
+
         // Confirm and set the password
         boolean passwordOK = EditProfileServlet.confirmAndSetPassword(
             eperson, request);
