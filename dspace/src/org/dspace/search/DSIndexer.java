@@ -40,25 +40,27 @@
 
 package org.dspace.search;
 
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
 
-//import org.dspace.administer.DCType;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexWriter;
 
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexWriter;
-
-import java.sql.SQLException;
-import java.io.IOException;
 
 // issues:
 //   need to use in_archive field
@@ -68,28 +70,64 @@ public class DSIndexer
 {
     /** IndexItem() adds a single item to the index
      */
-
     public static void indexItem(Context c, Item myitem)
+        throws SQLException, IOException
     {
-        indexItems(c, myitem);
+        IndexWriter writer = openIndex(c, false);
+
+        writeItemIndex(c, writer, myitem);
+
+        closeIndex(c, writer);
     }
 
-    /** createIndex() creates an entirely new index in /tmp
-     */
 
+    /**
+     * create full index - wiping old index
+     */
     public static void createIndex(Context c)
+        throws SQLException, IOException
     {
-//        System.out.println("Beginning indexing");
-        indexItems(c, null);
+        IndexWriter writer = openIndex(c, true);
+
+//        indexAllCommunities(c, writer);
+//        indexAllCollections(c, writer);
+        indexAllItems(c, writer);
+
+        closeIndex(c, writer);
     }
 
 
-    /** indexItems() does the actual database query to generate the metadata
-     *  file for freeWAIS to index
-     * @param item_id if -1 means generate a full index
+    /** prepare index, opening writer, and wiping out existing index
+     * if necessary
      */
+    private static IndexWriter openIndex(Context c, boolean wipe_existing)
+        throws IOException
+    {
+        IndexWriter writer;
 
-    private static synchronized void indexItems(Context c, Item target_item)
+        String index_directory = ConfigurationManager.getProperty("search.dir");
+
+        writer = new IndexWriter(index_directory, new DSAnalyzer(), wipe_existing);
+
+        return writer;
+    }
+
+
+    /** close up the indexing engine
+     */
+    private static void closeIndex(Context c, IndexWriter writer)
+        throws IOException
+    {
+        writer.close();
+    }
+
+
+//    /** indexItems() does the actual database query to generate the metadata
+//     *  file for freeWAIS to index
+//     * @param item_id if -1 means generate a full index
+//     */
+/* now obsolete, but keep around until new code is trusted.
+private static synchronized void indexItems(Context c, Item target_item)
     {
         // actually create the index
 
@@ -103,12 +141,12 @@ public class DSIndexer
             if (target_item != null)
             {
                 // does not clear the index (target_item is set)
-    	        writer = new IndexWriter(index_directory, new DSAnalyzer(), false);
+                writer = new IndexWriter(index_directory, new DSAnalyzer(), false);
             }
             else
             {
                 // create an entirely new index
-	            writer = new IndexWriter(index_directory, new DSAnalyzer(), true);
+                writer = new IndexWriter(index_directory, new DSAnalyzer(), true);
             }
 
             if( target_item != null )
@@ -140,8 +178,9 @@ public class DSIndexer
             System.out.println(e);
         }
     }
+*/
 
-    private static String buildLocationString(Context c, Item myitem)
+    private static String buildItemLocationString(Context c, Item myitem)
         throws SQLException
     {
         // build list of community ids
@@ -161,17 +200,106 @@ public class DSIndexer
     }
 
 
-    private static void indexSingleItem(Context c, IndexWriter writer, Item myitem )
+    /**
+     * iterate through the communities, and index each one
+     */
+    private static void indexAllCommunities(Context c, IndexWriter writer)
+        throws SQLException, IOException
+    {
+        Community [] targets = Community.findAll(c);
+
+        int i;
+
+        for(i=0; i<targets.length; i++)
+            writeCommunityIndex(c, writer, targets[i]);
+    }
+
+
+    /**
+     * iterate through collections, indexing each one
+     */
+    private static void indexAllCollections(Context c, IndexWriter writer)
+        throws SQLException, IOException
+    {
+        Collection [] targets = Collection.findAll(c);
+
+        int i;
+
+        for(i=0; i<targets.length; i++)
+            writeCollectionIndex(c, writer, targets[i]);
+    }
+
+
+    /**
+     * iterate through all items, indexing each one
+     */
+    private static void indexAllItems(Context c, IndexWriter writer)
+        throws SQLException, IOException
+    {
+        ItemIterator i = Item.findAll(c);
+
+        while(i.hasNext())
+        {
+            Item target = (Item)i.next();
+
+            writeItemIndex(c, writer, target);
+        }
+    }
+
+
+    /**
+     * write index record for a community
+     */
+    private static void writeCommunityIndex(Context c, IndexWriter writer, Community target)
+        throws SQLException, IOException
+    {
+        // build a hash for the metadata
+        HashMap textvalues = new HashMap();
+
+        // and populate it
+
+
+        // get the handle
+        String myhandle = HandleManager.findHandle(c, target);
+
+        writeIndexRecord(writer, Constants.COMMUNITY, target.getID(), myhandle, textvalues);
+    }
+
+
+    /**
+     * write an index record for a collection
+     */
+    private static void writeCollectionIndex(Context c, IndexWriter writer, Collection target)
+        throws SQLException, IOException
+    {
+        // build a hash for the metadata
+        HashMap textvalues = new HashMap();
+
+        // and populate it
+
+
+        // get the handle
+        String myhandle = HandleManager.findHandle(c, target);
+
+        writeIndexRecord(writer, Constants.COLLECTION, target.getID(), myhandle, textvalues);
+    }
+
+
+    /**
+     * writes an index record - the index record is a set of name/value
+     * hashes, which are sent to Lucene.
+     */
+    private static void writeItemIndex(Context c, IndexWriter writer, Item myitem )
         throws SQLException, IOException
     {
 
         // get the location string (for searching by collection & community)
-        String location_text = buildLocationString(c, myitem);
+        String location_text = buildItemLocationString(c, myitem);
 
         // extract metadata (ANY is wildcard from Item class)
-        DCValue [] authors = myitem.getDC( "contributor","author", Item.ANY );
-        DCValue [] titles  = myitem.getDC( "title",      Item.ANY,     Item.ANY );
-        DCValue [] keywords= myitem.getDC( "subject",    Item.ANY,     Item.ANY );
+        DCValue [] authors = myitem.getDC( "contributor","author",  Item.ANY );
+        DCValue [] titles  = myitem.getDC( "title",     Item.ANY,   Item.ANY );
+        DCValue [] keywords= myitem.getDC( "subject",   Item.ANY,   Item.ANY );
 
         // put them all from an array of strings to one string for writing out
         int j = 0;
@@ -180,37 +308,61 @@ public class DSIndexer
         String keyword_text= "";
 
         // pack all of the arrays of DCValues into plain text strings for the indexer
-        for(j=0; j<authors.length;  j++ ) author_text = new String( author_text  + authors [j].value + " " );
-        for(j=0; j<titles.length;   j++ ) title_text  = new String( title_text   + titles  [j].value + " " );
-        for(j=0; j<keywords.length; j++ ) keyword_text= new String( keyword_text + keywords[j].value + " " );
+        for(j=0; j<authors.length;  j++) author_text = new String(author_text  + authors [j].value + " ");
+        for(j=0; j<titles.length;   j++) title_text  = new String(title_text   + titles  [j].value + " ");
+        for(j=0; j<keywords.length; j++) keyword_text= new String(keyword_text + keywords[j].value + " ");
 
-        // write out the metatdata (for scalability, should probably be a hash instead of single strings)
-        writeIndexRecord(writer, myitem.getID(), title_text, author_text, keyword_text, location_text);
+        // build a hash
+        HashMap textvalues = new HashMap();
+
+        textvalues.put("author",    author_text  );
+        textvalues.put("title",     title_text   );
+        textvalues.put("keyword",   keyword_text );
+        textvalues.put("location",  location_text);
+
+        // lastly, get the handle
+        String itemhandle = HandleManager.findHandle(c, myitem);
+
+        // write out the metatdata (for scalability, using hash instead of individual strings)
+        writeIndexRecord(writer, Constants.ITEM, myitem.getID(), itemhandle, textvalues);
     }
 
 
     /** writeIndexRecord() creates a document from its args
      *  and writes it out to the index that is opened
      */
-
-    private static void writeIndexRecord(IndexWriter iw, int id,
-        String title, String authors, String keywords, String location)
+    private static void writeIndexRecord(IndexWriter iw, int type, int id, String handle,
+                                            HashMap textvalues )
         throws IOException
     {
-
         Document doc = new Document();
-        Integer  ti  = new Integer(id);
+        Integer ti = new Integer(id);
+        Integer ty = new Integer(type);
+        String fulltext = "";
 
-        String defaulttext = authors + " " + title + " " + keywords;
+        // do id, type, handle first
+        doc.add(Field.UnIndexed("id",       ti.toString() ));
+        doc.add(Field.UnIndexed("type",     ti.toString() ));
+        doc.add(Field.UnIndexed("handle",   handle        ));
 
-        doc.add(Field.UnIndexed("id", ti.toString()));
+        // now iterate through the hash, building full text string
+        // and index all values
+        Iterator i = textvalues.keySet().iterator();
 
-        if(authors  != null)    doc.add(Field.Text("author",   authors  ));
-        if(title    != null)    doc.add(Field.Text("title",    title    ));
-        if(keywords != null)    doc.add(Field.Text("keyword",  keywords ));
-        if(location != null)    doc.add(Field.Text("location", location ));
-        if(defaulttext != null) doc.add(Field.Text("default",  defaulttext));
+        while(i.hasNext())
+        {
+            String key = (String)i.next();
+            String value = (String)textvalues.get(key);
 
+            fulltext = fulltext + " " + value;
+
+            doc.add(Field.Text(key, value));
+        }
+
+        // add the full text
+        doc.add( Field.Text("default", fulltext) );
+
+        // index the document
         iw.addDocument(doc);
     }
 
@@ -224,7 +376,45 @@ public class DSIndexer
     {
         Context c = new Context();
         c.setIgnoreAuthorization(true);
+
         createIndex(c);
+
         System.out.println("Done with indexing");
     }
 }
+
+/* to-do
+
+-allow indexing of different types
+-allow list of fields to index, along with different types
+-index handles too
+
+
+Constants.ITEM
+Constants.COLLECTION
+Constants.COMMUNITY
+
+new key: type_id
+
+fixed fields:
+id
+type
+handle
+
+item
+  author
+  title
+  keyword
+  location (collection & community info)
+  default (simple search combination of authors + title + keywords)
+
+collection
+  ??
+
+community
+  ??
+
+
+
+*/
+
