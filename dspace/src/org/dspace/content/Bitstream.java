@@ -40,16 +40,16 @@
 
 package org.dspace.content;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -88,6 +88,7 @@ public class Bitstream extends DSpaceObject
      *
      * @param context  the context this object exists in
      * @param row      the corresponding row in the table
+     * @throws SQLException
      */
     Bitstream(Context context, TableRow row)
         throws SQLException
@@ -124,6 +125,7 @@ public class Bitstream extends DSpaceObject
      * @param  id       ID of the bitstream
      *   
      * @return  the bitstream, or null if the ID is invalid.
+     * @throws SQLException
      */
     public static Bitstream find(Context context, int id)
         throws SQLException
@@ -152,17 +154,16 @@ public class Bitstream extends DSpaceObject
 
             return null;
         }
-        else
+        
+        // not null, return Bitstream
+        if (log.isDebugEnabled())
         {
-            if (log.isDebugEnabled())
-            {
-                log.debug(LogManager.getHeader(context,
-                    "find_bitstream",
-                    "bitstream_id=" + id));
-            }
-
-            return new Bitstream(context, row);
+            log.debug(LogManager.getHeader(context,
+                "find_bitstream",
+                "bitstream_id=" + id));
         }
+
+        return new Bitstream(context, row);
     }
     
 
@@ -177,6 +178,8 @@ public class Bitstream extends DSpaceObject
      * @param  is        the bits to put in the bitstream
      *
      * @return  the newly created bitstream
+     * @throws IOException
+     * @throws SQLException
      */
     static Bitstream create(Context context, InputStream is)
         throws IOException, SQLException
@@ -335,6 +338,12 @@ public class Bitstream extends DSpaceObject
      */
     public int getSize()
     {
+        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        {
+            return bRow.getIntColumn("size_bytes");
+        }
+
+        // default is column "size" for postgres
         return bRow.getIntColumn("size");
     }
 
@@ -344,6 +353,7 @@ public class Bitstream extends DSpaceObject
      * bitstream is uncertain, and the format is set to "unknown."
      *
      * @param desc   the user's description of the format
+     * @throws SQLException
      */
     public void setUserFormatDescription(String desc)
         throws SQLException
@@ -384,15 +394,12 @@ public class Bitstream extends DSpaceObject
             {
                 return "Unknown";
             }
-            else
-            {
-                return desc;
-            }
+
+            return desc;
         }
-        else
-        {
-            return bitstreamFormat.getShortDescription();
-        }
+        
+        // not null or Unknown
+        return bitstreamFormat.getShortDescription();
     }
     
 
@@ -414,6 +421,7 @@ public class Bitstream extends DSpaceObject
      *
      * @param  f  the format of this bitstream, or <code>null</code> for
      *            unknown
+     * @throws SQLException
      */
     public void setFormat(BitstreamFormat f)
         throws SQLException
@@ -441,6 +449,8 @@ public class Bitstream extends DSpaceObject
     /**
      * Update the bitstream metadata.  Note that the content of the bitstream
      * cannot be changed - for that you need to create a new bitstream.
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public void update()
         throws SQLException, AuthorizeException
@@ -458,9 +468,10 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Delete the bitstream, including any mappings to bundles
+     * @throws SQLException
      */
     void delete()
-        throws SQLException, IOException, AuthorizeException
+        throws SQLException
     {
         // changed to a check on remove
         // Check authorisation
@@ -486,6 +497,9 @@ public class Bitstream extends DSpaceObject
      * Retrieve the contents of the bitstream
      *
      * @return   a stream from which the bitstream can be read.
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public InputStream retrieve()
         throws IOException, SQLException, AuthorizeException
@@ -503,6 +517,7 @@ public class Bitstream extends DSpaceObject
      *
      * @return  array of <code>Bundle</code>s this bitstream
      *          appears in
+     * @throws SQLException
      */
     public Bundle[] getBundles()
         throws SQLException
@@ -513,14 +528,14 @@ public class Bitstream extends DSpaceObject
             "SELECT bundle.* FROM bundle, bundle2bitstream WHERE " +
                 "bundle.bundle_id=bundle2bitstream.bundle_id AND " +
                 "bundle2bitstream.bitstream_id=" +
-                bRow.getIntColumn("bitstream_id") + ";");
+                bRow.getIntColumn("bitstream_id") );
 
         // Build a list of Bundle objects
         List bundles = new ArrayList();
         
         while (tri.hasNext())
         {
-            TableRow r = (TableRow) tri.next();
+            TableRow r = tri.next();
 
             // First check the cache
             Bundle fromCache = (Bundle) bContext.fromCache(
@@ -544,6 +559,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * return type found in Constants
+     * @return int Constants.BITSTREAM
      */
     public int getType()
     {
