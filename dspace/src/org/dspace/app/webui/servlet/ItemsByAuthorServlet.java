@@ -1,5 +1,5 @@
 /*
- * BrowseItemsByAuthorServlet.java
+ * ItemsByAuthorServlet.java
  *
  * Version: $Revision$
  *
@@ -124,6 +124,11 @@ public class ItemsByAuthorServlet extends DSpaceServlet
             scope.setScope(community);
         }
         
+        // Ensure author is non-null
+        if (author == null)
+        {
+            author = "";
+        }
         
         // Do the browse
         scope.setFocus(author);
