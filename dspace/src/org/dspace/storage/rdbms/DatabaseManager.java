@@ -48,6 +48,13 @@ import java.util.*;
 
 import org.apache.log4j.*;
 
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.PoolingDriver;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
@@ -62,6 +69,10 @@ public class DatabaseManager
     /** log4j category */
     private static Logger log = Logger.getLogger(DatabaseManager.class);
 
+    /** The JDBC URL */
+    private static String jdbcUrl = ConfigurationManager.getProperty("db.url");
+    /** The JDCB Driver */
+    private static String jdbcDriver = ConfigurationManager.getProperty("db.driver");
     /** The JDBC username */
     private static String jdbcUserName = ConfigurationManager.getProperty("db.username");
     /** The JDBC password */
@@ -363,8 +374,7 @@ public class DatabaseManager
     {
         initialize();
         return DriverManager.getConnection(
-            "jdbc:simplepool://localhost",
-            jdbcUserName, jdbcPassword);
+            "jdbc:apache:commons:dbcp:dspacepool");
     }
 
     /**
@@ -1089,10 +1099,58 @@ public class DatabaseManager
         if (initialized)
             return;
 
+        if (jdbcUrl == null)
+            throw new IllegalStateException("Configuration property \"db.url\" not found");
+
         try
         {
+            // Register basic JDBC driver
+            Class driverClass = Class.forName(jdbcDriver);
+            Driver basicDriver = (Driver) driverClass.newInstance();
+            DriverManager.registerDriver(basicDriver);            
+
+            // Create object pool
+            ObjectPool connectionPool = new GenericObjectPool(
+                null, // PoolableObjectFactory - set below
+                30,   // max connections
+                GenericObjectPool.WHEN_EXHAUSTED_BLOCK,
+                5000, // don't block more than 5 seconds
+                -1,   // max idle connections (unlimited)
+                true, // validate when we borrow connections from pool
+                false // don't bother validation returned connections
+                );
+
+            // ConnectionFactory the pool will use to create connections.
+            ConnectionFactory connectionFactory =
+                new DriverManagerConnectionFactory(jdbcUrl,
+                    jdbcUserName,
+                    jdbcPassword);
+
+            //
+            // Now we'll create the PoolableConnectionFactory, which wraps
+            // the "real" Connections created by the ConnectionFactory with
+            // the classes that implement the pooling functionality.
+            //
+            PoolableConnectionFactory poolableConnectionFactory =
+                new PoolableConnectionFactory(connectionFactory,
+                    connectionPool,
+                    null,    // no preparedstatement pooling for now
+                    "SELECT 1;",    // validation query
+                    false,   // read only is not default for now
+                    false);  // Autocommit defaults to none
+
+            //
+            // Finally, we create the PoolingDriver itself...
+            //
+            PoolingDriver driver = new PoolingDriver();
+
+            //
+            // ...and register our pool with it.
+            //
+            driver.registerPool("dspacepool", connectionPool);        
+
             // Old SimplePool init
-            DriverManager.registerDriver(new SimplePool());
+            //DriverManager.registerDriver(new SimplePool());
 
             initialized = true;
         }
