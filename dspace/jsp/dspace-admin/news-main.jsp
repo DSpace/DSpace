@@ -66,7 +66,17 @@
                parenttitle="Administer"
                nocache="true">
 
-    <h1>News Editor</h1>
+    
+  <table width=95%>
+    <tr>
+      <td align=left>
+        <h1>News Editor</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#editnews">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
 
     <table class="miscTable" align="center">
         <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="POST">
