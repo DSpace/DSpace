@@ -263,11 +263,15 @@ public class Item extends DSpaceObject
      * @return  the newly created item
      */
     static Item create(Context context)
-        throws SQLException
+        throws SQLException, AuthorizeException
     {
         TableRow row = DatabaseManager.create(context, "item");
         Item i = new Item(context, row);
-
+        
+        // Call update to give the item a last modified date.  OK this isn't
+        // amazingly efficient but creates don't happen that often.
+        i.update();
+        
         HistoryManager.saveHistory(context,
             i,
             HistoryManager.CREATE,
