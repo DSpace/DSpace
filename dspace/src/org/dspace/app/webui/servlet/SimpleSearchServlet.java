@@ -181,148 +181,114 @@ public class SimpleSearchServlet extends DSpaceServlet
         qArgs.setStart( start );
                 
         // Perform the search
-        try
+        if (collection != null)
         {
-            if (collection != null)
-            {
-                logInfo = "collection_id=" + collection.getID() + ",";
+            logInfo = "collection_id=" + collection.getID() + ",";
 
-                // Values for drop-down box
-                request.setAttribute("community",  community );
-                request.setAttribute("collection", collection);
+            // Values for drop-down box
+            request.setAttribute("community",  community );
+            request.setAttribute("collection", collection);
 
-                qResults = DSQuery.doQuery(context, qArgs, collection);
-            }
-            else if (community != null)
-            {
-                logInfo = "community_id=" + community.getID() + ",";
-
-                request.setAttribute("community", community);
-                // Get the collections within the community for the dropdown box
-                request.setAttribute("collection.array",
-                    community.getCollections());
-
-                qResults = DSQuery.doQuery(context, qArgs, community);
-            }
-            else
-            {
-                // Get all communities for dropdown box
-                Community[] communities = Community.findAll(context);
-                request.setAttribute("community.array", communities);
-
-                qResults = DSQuery.doQuery(context, qArgs);
-            }
-
-            // now instantiate the results and put them in their buckets
-            for( int i = 0; i < qResults.getHitHandles().size(); i++ )
-            {
-                String myHandle = (String )qResults.getHitHandles().get(i);
-                Integer myType  = (Integer)qResults.getHitTypes().get(i);
-                
-                // add the handle to the appropriate lists
-                switch( myType.intValue() )
-                {
-                    case Constants.ITEM:
-                        itemHandles.add( myHandle );
-                        break;
-                        
-                    case Constants.COLLECTION:
-                        collectionHandles.add( myHandle );
-                        break;
-                        
-                    case Constants.COMMUNITY:
-                        communityHandles.add( myHandle );
-                        break;
-                }
-            }
-            
-            int numCommunities = communityHandles.size();
-            int numCollections = collectionHandles.size();
-            int numItems       = itemHandles.size();
-            
-            // Make objects from the handles - make arrays, fill them out
-            resultsCommunities = new Community [numCommunities];
-            resultsCollections = new Collection[numCollections];
-            resultsItems       = new Item      [numItems      ];
-            
-            for (int i = 0; i < numItems; i++)
-            {
-                String myhandle = (String) itemHandles.get(i);
-                
-                Object o = HandleManager.resolveToObject(context, myhandle);
-                
-                resultsItems[i] = (Item)o;
-                if (resultsItems[i] == null)
-                {
-                    throw new SQLException("Query \"" + query +
-                        "\" returned unresolvable handle: " + myhandle);
-                }
-            }
-
-            for (int i = 0; i < collectionHandles.size(); i++)
-            {
-                String myhandle = (String) collectionHandles.get(i);
-                
-                Object o = HandleManager.resolveToObject(context, myhandle);
-                
-                resultsCollections[i] = (Collection)o;
-                if (resultsCollections[i] == null)
-                {
-                    throw new SQLException("Query \"" + query +
-                        "\" returned unresolvable handle: " + myhandle);
-                }
-            }
-
-            for (int i = 0; i < communityHandles.size(); i++)
-            {
-                String myhandle = (String) communityHandles.get(i);
-                
-                Object o = HandleManager.resolveToObject(context, myhandle);
-                
-                resultsCommunities[i] = (Community)o;
-                if (resultsCommunities[i] == null)
-                {
-                    throw new SQLException("Query \"" + query +
-                        "\" returned unresolvable handle: " + myhandle);
-                }
-            }
-
-            // Log
-            log.info(LogManager.getHeader(context,
-                "search",
-                logInfo + "query=\"" + query + "\",results=(" + resultsCommunities.length + "," + resultsCollections.length + "," + resultsItems.length + ")"));
+            qResults = DSQuery.doQuery(context, qArgs, collection);
         }
-        catch (ParseException pe)
+        else if (community != null)
         {
-            /*
-             * A parse exception means there were some weird characters in
-             * the query we couldn't resolve.  We'll pretend the search went
-             * OK but with no results for the user, but log the error, since
-             * this shouldn't really happen.
-             */
-            log.warn(LogManager.getHeader(context,
-                "search_exception",
-                logInfo + "query=\"" + query + "\""),
-                pe);
+            logInfo = "community_id=" + community.getID() + ",";
 
-            // Empty results
-            resultsItems       = new Item      [0];
-            resultsCommunities = new Community [0];
-            resultsCollections = new Collection[0];
+            request.setAttribute("community", community);
+            // Get the collections within the community for the dropdown box
+            request.setAttribute("collection.array",
+                community.getCollections());
+
+            qResults = DSQuery.doQuery(context, qArgs, community);
         }
-    	catch (TokenMgrError tme)
+        else
         {
-            // Similar to parse exception
-            log.warn(LogManager.getHeader(context,
-                "search_exception",
-                logInfo + "query=\"" + query + "\""),
-                tme);
+            // Get all communities for dropdown box
+            Community[] communities = Community.findAll(context);
+            request.setAttribute("community.array", communities);
 
-            // Empty results
-            resultsItems       = new Item      [0];
-            resultsCommunities = new Community [0];
-            resultsCollections = new Collection[0];
+            qResults = DSQuery.doQuery(context, qArgs);
         }
+
+        // now instantiate the results and put them in their buckets
+        for( int i = 0; i < qResults.getHitHandles().size(); i++ )
+        {
+            String myHandle = (String )qResults.getHitHandles().get(i);
+            Integer myType  = (Integer)qResults.getHitTypes().get(i);
+
+            // add the handle to the appropriate lists
+            switch( myType.intValue() )
+            {
+                case Constants.ITEM:
+                    itemHandles.add( myHandle );
+                    break;
+
+                case Constants.COLLECTION:
+                    collectionHandles.add( myHandle );
+                    break;
+
+                case Constants.COMMUNITY:
+                    communityHandles.add( myHandle );
+                    break;
+            }
+        }
+
+        int numCommunities = communityHandles.size();
+        int numCollections = collectionHandles.size();
+        int numItems       = itemHandles.size();
+
+        // Make objects from the handles - make arrays, fill them out
+        resultsCommunities = new Community [numCommunities];
+        resultsCollections = new Collection[numCollections];
+        resultsItems       = new Item      [numItems      ];
+
+        for (int i = 0; i < numItems; i++)
+        {
+            String myhandle = (String) itemHandles.get(i);
+
+            Object o = HandleManager.resolveToObject(context, myhandle);
+
+            resultsItems[i] = (Item)o;
+            if (resultsItems[i] == null)
+            {
+                throw new SQLException("Query \"" + query +
+                    "\" returned unresolvable handle: " + myhandle);
+            }
+        }
+
+        for (int i = 0; i < collectionHandles.size(); i++)
+        {
+            String myhandle = (String) collectionHandles.get(i);
+
+            Object o = HandleManager.resolveToObject(context, myhandle);
+
+            resultsCollections[i] = (Collection)o;
+            if (resultsCollections[i] == null)
+            {
+                throw new SQLException("Query \"" + query +
+                    "\" returned unresolvable handle: " + myhandle);
+            }
+        }
+
+        for (int i = 0; i < communityHandles.size(); i++)
+        {
+            String myhandle = (String) communityHandles.get(i);
+
+            Object o = HandleManager.resolveToObject(context, myhandle);
+
+            resultsCommunities[i] = (Community)o;
+            if (resultsCommunities[i] == null)
+            {
+                throw new SQLException("Query \"" + query +
+                    "\" returned unresolvable handle: " + myhandle);
+            }
+        }
+
+        // Log
+        log.info(LogManager.getHeader(context,
+            "search",
+            logInfo + "query=\"" + query + "\",results=(" + resultsCommunities.length + "," + resultsCollections.length + "," + resultsItems.length + ")"));
 
         // Pass in some page qualities
         
@@ -360,18 +326,22 @@ public class SimpleSearchServlet extends DSpaceServlet
         	request.setAttribute("communities", communities);
         	request.setAttribute("no_results", "yes");
 
-			queryHash = qArgs.buildQueryHash(request);
-        	Iterator i = queryHash.keySet().iterator();
-        	while(i.hasNext())
+		queryHash = qArgs.buildQueryHash(request);
+        	
+                Iterator i = queryHash.keySet().iterator();
+        	
+                while(i.hasNext())
         	{
-            	String key   = (String)i.next();
-            	String value = (String)queryHash.get(key);
-            	
-            	request.setAttribute(key, value);
-            }
+                    String key   = (String)i.next();
+                    String value = (String)queryHash.get(key);
+
+                    request.setAttribute(key, value);
+                
+                }
 
         	JSPManager.showJSP(request, response, "/search/advanced.jsp");
-        } else {
+        } else 
+        {
         	JSPManager.showJSP(request, response, "/search/results.jsp");
         }
     }
