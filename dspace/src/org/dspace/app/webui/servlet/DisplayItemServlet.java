@@ -51,6 +51,7 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -96,6 +97,9 @@ public class DisplayItemServlet extends DSpaceServlet
         // If everything is OK, display the item
         if (item != null)
         {
+            // Ensure the user has authorisation
+            AuthorizeManager.authorizeAction(context, item, Constants.READ);
+
             log.info(LogManager.getHeader(context,
                 "view_item",
                 "handle=" + handle));
