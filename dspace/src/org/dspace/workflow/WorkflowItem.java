@@ -267,12 +267,7 @@ public class WorkflowItem implements InProgressSubmission
         DatabaseManager.update(ourContext, wfRow);
     }
 
-    /**
-     * Delete workflow only, not the item
-     *
-     * @param context Context object
-     */
-    public void delete()
+    public void deleteWrapper()
         throws SQLException, IOException, AuthorizeException
     {
         // Remove from cache

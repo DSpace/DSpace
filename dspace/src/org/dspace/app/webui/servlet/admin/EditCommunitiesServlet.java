@@ -214,7 +214,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             
         case CONFIRM_DELETE_COMMUNITY:
             // Delete the community
-            community.deleteWithContents();
+            community.delete();
 
              // Show main control page
             showControls(context, request, response);
@@ -231,7 +231,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             
         case CONFIRM_DELETE_COLLECTION:
             // Delete the collection
-            collection.deleteWithContents();
+            community.removeCollection(collection);
 
              // Show main control page
             showControls(context, request, response);

@@ -161,7 +161,7 @@ public class WorkflowManager
 
 
         // remove the WorkspaceItem
-        wsi.delete();
+        wsi.deleteWrapper();
 
         // now get the worflow started
         doState(c, wfi, WFSTATE_STEP1POOL, null);

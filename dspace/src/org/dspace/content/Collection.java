@@ -601,7 +601,7 @@ public class Collection
                 "collection_id=" + getID() +
                     ",template_item_id=" + template.getID()));
 
-            template.deleteWithContents();
+            template.delete();
             template = null;
         }
     }
@@ -637,14 +637,12 @@ public class Collection
 
 
     /**
-     * Remove an item.  Does not delete the item, just the
-     * relationship.  Has instant effect; <code>update</code> need not be
-     * called.
+     * Remove an item.  If the item is then orphaned, it is deleted.
      *
      * @param item  item to remove
      */
     public void removeItem(Item item)
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException,IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
@@ -656,6 +654,17 @@ public class Collection
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM collection2item WHERE collection_id=" + getID() +
             " AND item_id=" + item.getID() + ";");
+
+        // Is the item an orphan?
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "SELECT * FROM collection2item WHERE item_id=" +
+                item.getID());
+
+        if (!tri.hasNext())
+        {
+            // Orphan; delete it
+            item.delete();
+        }
     }
 
 
@@ -678,18 +687,14 @@ public class Collection
 
 
     /**
-     * Delete the collection, including the metadata and logo.  Items
-     * are merely disassociated, they are NOT deleted.  If this collection
-     * is contained in any communities, the association with those communities
-     * is removed.  Groups associated with this collection (workflow
+     * Delete the collection, including the metadata and logo.  Items that
+     * are then orphans are deleted.
+     * Groups associated with this collection (workflow
      * participants and submitters) are NOT deleted.
      */
-    public void delete()
+    void delete()
         throws SQLException, AuthorizeException, IOException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
-
         log.info(LogManager.getHeader(ourContext,
             "delete_collection",
             "collection_id=" + getID()));
@@ -697,14 +702,13 @@ public class Collection
         // Remove from cache
         ourContext.removeCached(this, getID());
 
-        // Delete community-collection mappings
-        DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM community2collection WHERE collection_id=" + getID() +
-                ";");
-
-        // Delete collection-item mappings
-        DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM collection2item WHERE collection_id=" + getID() + ";");
+        // Remove items
+        ItemIterator items = getItems();
+        
+        while (items.hasNext())
+        {
+            removeItem(items.next());
+        }
 
         // Delete bitstream logo
         setLogo(null);
@@ -713,49 +717,6 @@ public class Collection
         DatabaseManager.delete(ourContext, collectionRow);
 
         // FIXME: Groups?
-    }
-
-
-    /**
-     * Delete the collection, and recursively the items in the collection.
-     * Items or other objects that are multiply contained (e.g. an item also
-     * in another collection) are NOT deleted.  If this collection
-     * is contained in any communities, the association with those communities
-     * is removed.  Associated Groups are NOT deleted at present.
-     */
-    public void deleteWithContents()
-        throws SQLException, AuthorizeException, IOException
-    {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
-
-        // FIXME: Groups?
-        DatabaseManager.updateQuery(ourContext,
-                                    "DELETE FROM WorkspaceItem WHERE collection_id = " + getID());
-
-        // Get items - we'll need to work out whether to delete them in a sec
-        TableRowIterator items = DatabaseManager.query(ourContext,
-            "item",
-            "SELECT item.* FROM item, collection2item WHERE " +
-                "collection2item.item_id=item.item_id AND " +
-                "collection2item.collection_id=" + getID() + ";");
-
-        // Delete ourselves
-        delete();
-
-        // Delete items if they aren't contained within other collections
-        while (items.hasNext())
-        {
-            Item i = new Item(ourContext, items.next());
-
-            Collection[] collections = i.getCollections();
-
-            if (collections.length == 0)
-            {
-                // Orphaned item; delete
-                i.deleteWithContents();
-            }
-        }
     }
 
 

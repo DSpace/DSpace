@@ -430,7 +430,7 @@ public class Bitstream
     /**
      * Delete the bitstream, including any mappings to bundles
      */
-    public void delete()
+    void delete()
         throws SQLException, IOException, AuthorizeException
     {
         // Check authorisation
@@ -442,10 +442,6 @@ public class Bitstream
 
         // Remove from cache
         bContext.removeCached(this, getID());
-
-        // Remove mappings
-        DatabaseManager.updateQuery(bContext,
-            "DELETE FROM bundle2bitstream WHERE bitstream_id=" + getID() + ";");
 
         // Remove bitstream itself
         BitstreamStorageManager.delete(bContext,

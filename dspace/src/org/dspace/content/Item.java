@@ -249,7 +249,7 @@ public class Item
      *
      * @return  the newly created item
      */
-    public static Item create(Context context)
+    static Item create(Context context)
         throws SQLException
     {
         TableRow row = DatabaseManager.create(context, "item");
@@ -770,13 +770,13 @@ public class Item
 
 
     /**
-     * Remove a bundle.  Only the mapping between the item and the bundle is
-     * removed.  The bundle itself is not deleted from the database.
+     * Remove a bundle.  This may result in the bundle being deleted, if the
+     * bundle is orphaned.
      *
      * @param b  the bundle to remove
      */
     public void removeBundle(Bundle b)
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
@@ -786,8 +786,8 @@ public class Item
             "item_id=" + getID() +
                 ",bundle_id=" + b.getID()));
 
+        // Remove from internal list of bundles
         ListIterator li = bundles.listIterator();
-
         while (li.hasNext())
         {
             Bundle existing = (Bundle) li.next();
@@ -799,10 +799,21 @@ public class Item
             }
         }
 
-        // Remove mappings from DB
+        // Remove mapping from DB
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM item2bundle WHERE item_id=" + getID() +
                 " AND bundle_id=" + b.getID());
+
+        // If the bundle is orphaned, it's removed
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "SELECT * FROM item2bundle WHERE bundle_id=" +
+                b.getID());
+
+        if (!tri.hasNext())
+        {
+            // The bundle is an orphan, delete it
+            b.delete();
+        }
     }
 
 
@@ -822,6 +833,8 @@ public class Item
         Bitstream bitstream = bnd.createBitstream(is);
         bnd.update();
         addBundle(bnd);
+
+        // FIXME: Create permissions for new bundle + bitstream
 
         return bitstream;
     }
@@ -896,7 +909,6 @@ public class Item
 
     /**
      * Remove all licenses from an item - it was rejected
-     *
      */
     public void removeLicenses()
         throws SQLException, IOException, AuthorizeException
@@ -909,7 +921,7 @@ public class Item
         // search through bundles, looking for bitstream type license
         Bundle[] buns = getBundles();
         
-        for(int i=0; i<buns.length; i++)
+        for(int i = 0; i < buns.length; i++)
         {
             boolean removethisbundle = false;
             
@@ -927,7 +939,6 @@ public class Item
             // probably serious troubles with Authorizations
             // fix by telling system not to check authorization?            
             removeBundle(buns[i]);
-            buns[i].deleteWithContents();
         }    
     }
 
@@ -1036,17 +1047,16 @@ public class Item
 
     /**
      * Delete the item.  Bundles and bitstreams are also deleted if they are
-     * not also included in another item.  The Dublin Core metadata is deleted,
-     * as are any associations with collections.
+     * not also included in another item.  The Dublin Core metadata is deleted.
      */
-    public void deleteWithContents()
+    void delete()
         throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
 
         log.info(LogManager.getHeader(ourContext,
-            "update_item",
+            "delete_item",
             "item_id=" + getID()));
 
         // Remove from cache
@@ -1064,31 +1074,13 @@ public class Item
         // Delete the Dublin Core
         removeDCFromDatabase();
 
-        // Remove all item -> bundle mappings
-        DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM item2bundle WHERE item_id=" + getID() + ";");
+        // Remove bundles
+        Bundle[] bundles = getBundles();
 
-        // Work out which Bundles are "orphans"
-        Iterator i = bundles.iterator();
-
-        while (i.hasNext())
+        for (int i = 0; i < bundles.length; i++)
         {
-            Bundle b = (Bundle) i.next();
-
-            TableRowIterator mappings = DatabaseManager.query(ourContext,
-                "item2bundle",
-                "SELECT * FROM item2bundle WHERE bundle_id=" + b.getID() + ";");
-
-            if (!mappings.hasNext())
-            {
-                // No mapping between bundle b and another item; remove it
-                b.deleteWithContents();
-            }
+            removeBundle(bundles[i]);
         }
-
-        // Remove collection -> item mappings
-        DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM collection2item WHERE item_id=" + getID() + ";");
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);

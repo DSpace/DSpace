@@ -527,7 +527,7 @@ public class SubmitServlet extends DSpaceServlet
         if (isThesis)
         {
             WorkspaceItem wi = (WorkspaceItem) subInfo.submission;
-            wi.delete();
+            wi.deleteAll();
             
             // Remember that we've removed a thesis in the session
             request.getSession().setAttribute(
@@ -677,12 +677,13 @@ public class SubmitServlet extends DSpaceServlet
         if (multipleFiles == false)
         {
             // FIXME: Assuming each bundle has but one bitstream in it
-            Bundle[] bundles = subInfo.submission.getItem().getBundles();
+            Item item = subInfo.submission.getItem();
+            Bundle[] bundles = item.getBundles();
             
             // Remove all but the first bundle
             for (int i = 1; i < bundles.length; i++)
             {
-                bundles[i].deleteWithContents();
+                item.removeBundle(bundles[i]);
             }
         }
 
@@ -1243,7 +1244,6 @@ public class SubmitServlet extends DSpaceServlet
             // FIXME: Assumes: 1 bitstream in each bundle
             Bundle[] bundles = bitstream.getBundles();
             item.removeBundle(bundles[0]);
-            bundles[0].deleteWithContents();
             item.update();
 
             showFirstUploadPage(context,request, response, subInfo);
@@ -1384,7 +1384,7 @@ public class SubmitServlet extends DSpaceServlet
             // Cancellation page only applies to workspace items
             WorkspaceItem wi = (WorkspaceItem) subInfo.submission;
             
-            wi.delete();
+            wi.deleteAll();
 
             JSPManager.showJSP(request, response,
                 "/submit/cancelled-removed.jsp");

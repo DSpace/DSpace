@@ -508,11 +508,23 @@ public class WorkspaceItem implements InProgressSubmission
      * unarchived item and its contents are all removed (multiple inclusion
      * notwithstanding.)
      */
-    public void delete_all()
+    public void deleteAll()
         throws SQLException, AuthorizeException, IOException
     {
-        // Check authorisation.  We check permissions on the enclosed item.
-        AuthorizeManager.authorizeAction(ourContext, item, Constants.DELETE);
+        /*
+         * Authorisation is a special case.  The submitter won't have REMOVE
+         * permission on the collection, so our policy is this:
+         * Only the original submitter or an administrator can delete a
+         * workspace item.
+         */
+        if (!AuthorizeManager.isAdmin(ourContext) &&
+                (ourContext.getCurrentUser() == null || 
+                 ourContext.getCurrentUser().getID() != item.getSubmitter().getID()))
+        {
+            // Not an admit, not the submitter
+            throw new AuthorizeException("Must be an administrator or the " +
+                "original submitter to delete a workspace item");
+        }
     
         log.info(LogManager.getHeader(ourContext,
             "delete_workspace_item",
@@ -530,14 +542,11 @@ public class WorkspaceItem implements InProgressSubmission
         DatabaseManager.delete(ourContext, wiRow);
         
         // Delete item
-        item.deleteWithContents();
+        item.delete();
     }
 
 
-    /**
-     * Delete just the workspace item, not the item.
-     */
-    public void delete()
+    public void deleteWrapper()
         throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation.  We check permissions on the enclosed item.

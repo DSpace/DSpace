@@ -444,13 +444,12 @@ public class Community
 
 
     /**
-     * Remove a collection.  Does not delete the collection, just the
-     * relationship.
+     * Remove a collection.  Any items then orphaned are deleted.
      *
      * @param c  collection to remove
      */
     public void removeCollection(Collection c)
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
@@ -463,12 +462,23 @@ public class Community
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM community2collection WHERE community_id=" +
                 getID() + " AND collection_id=" + c.getID() + ";");
+
+        // Is the community an orphan?
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "SELECT * FROM community2collection WHERE collection_id=" +
+                c.getID());
+
+        if (!tri.hasNext())
+        {
+            // Orphan; delete it
+            c.delete();
+        }
     }
 
 
     /**
      * Delete the community, including the metadata and logo.  Collections
-     * are merely disassociated, they are NOT deleted.
+     * that are then orphans are deleted.
      */
     public void delete()
         throws SQLException, AuthorizeException, IOException
@@ -483,47 +493,19 @@ public class Community
         // Remove from cache
         ourContext.removeCached(this, getID());
 
-        // Remove any community-collection mappings
-        DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM community2collection WHERE community_id=" +
-                getID() + ";");
+        // Remove collections
+        Collection[] cols = getCollections();
+        
+        for (int i = 0; i < cols.length; i++)
+        {
+            removeCollection(cols[i]);
+        }
 
         // Remove the logo
         setLogo(null);
 
         // Delete community row
         DatabaseManager.delete(ourContext, communityRow);
-    }
-
-
-    /**
-     * Delete the community, and recursively the collections in the community
-     * and the contents of those collections.  Collections, items or other
-     * objects that are multiply contained (e.g. a collection also in another
-     * community) are NOT deleted.
-     */
-    public void deleteWithContents()
-        throws SQLException, AuthorizeException, IOException
-    {
-        // Authorisation checked by methods below (e.g. delete())
-
-        // First get collections
-        Collection[] collections = getCollections();
-
-        // Delete ourselves
-        delete();
-
-        // Delete collections if they aren't contained in other communities
-        for (int i = 0; i < collections.length; i++)
-        {
-            Community[] communities = collections[i].getCommunities();
-
-            if (communities.length == 0)
-            {
-                // "Orphaned" collection - delete
-                collections[i].deleteWithContents();
-            }
-        }
     }
 
 

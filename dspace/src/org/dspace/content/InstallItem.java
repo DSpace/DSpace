@@ -131,7 +131,7 @@ public class InstallItem
         Browse.itemAdded(c, item);
         
         // remove in-progress submission
-        is.delete();
+        is.deleteWrapper();
         
         return item;
     }

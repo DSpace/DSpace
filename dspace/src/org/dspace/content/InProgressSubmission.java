@@ -65,9 +65,9 @@ public interface InProgressSubmission
 
 
     /**
-     * Delete submission wrapper, doesn't delete item contents
+     * Deletes submission wrapper, doesn't delete item contents
      */
-    void delete()
+    void deleteWrapper()
         throws SQLException, IOException, AuthorizeException;
 
     /**

@@ -286,6 +286,9 @@ public class Bundle
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         Bitstream b = Bitstream.create(ourContext, is);
+
+        // FIXME: Set permissions for bitstream
+
         addBitstream(b);
         return b;
     }
@@ -335,7 +338,7 @@ public class Bundle
      * @param b  the bitstream to remove
      */
     public void removeBitstream(Bitstream b)
-        throws AuthorizeException, SQLException
+        throws AuthorizeException, SQLException, IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
@@ -344,6 +347,7 @@ public class Bundle
             "remove_bitstream",
             "bundle_id=" + getID() + ",bitstream_id=" + b.getID()));
 
+        // Remove from internal list of bitstreams
         ListIterator li = bitstreams.listIterator();
 
         while (li.hasNext())
@@ -354,13 +358,24 @@ public class Bundle
             {
                 // We've found the bitstream to remove
                 li.remove();               
-
-                // Delete the mapping row
-                DatabaseManager.updateQuery(ourContext,
-                    "DELETE FROM bundle2bitstream WHERE bundle_id=" + getID() +
-                        " AND bitstream_id=" + b.getID());
-
             }
+        }
+
+        // Delete the mapping row
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM bundle2bitstream WHERE bundle_id=" + getID() +
+                " AND bitstream_id=" + b.getID());
+
+
+        // If the bitstream is orphaned, it's removed
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "SELECT * FROM bundle2bitstream WHERE bitstream_id=" +
+                b.getID());
+
+        if (!tri.hasNext())
+        {
+            // The bitstream is an orphan, delete it
+            b.delete();
         }
     }
 
@@ -383,16 +398,13 @@ public class Bundle
 
 
     /**
-     * Delete the bundle.  Any association between the bundle and bitstreams
-     * or items are removed.  The bitstreams contained in the bundle are
-     * NOT removed.
+     * Delete the bundle.  Bitstreams contained by the bundle are removed
+     * first; this may result in their deletion, if deleting this bundle
+     * leaves them as orphans.
      */
-    public void delete()
-        throws SQLException, AuthorizeException
+    void delete()
+        throws SQLException, AuthorizeException, IOException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
-
         log.info(LogManager.getHeader(ourContext,
             "delete_bundle",
             "bundle_id=" + getID()));
@@ -400,51 +412,15 @@ public class Bundle
         // Remove from cache
         ourContext.removeCached(this, getID());
 
-        // Remove item-bundle mappings
-        DatabaseManager.updateQuery(ourContext,
-            "delete from item2bundle where bundle_id=" + getID());
+        // Remove bitstreams
+        Bitstream[] bs = getBitstreams();
 
-        // Remove bundle-bitstream mappings
-        DatabaseManager.updateQuery(ourContext,
-            "delete from bundle2bitstream where bundle_id=" + getID());
+        for (int i = 0; i < bs.length; i++)
+        {
+            removeBitstream(bs[i]);
+        }
 
         // Remove ourself
         DatabaseManager.delete(ourContext, bundleRow);
-    }
-
-
-    /**
-     * Delete the bundle, and any bitstreams it contains.  Any associations
-     * with items are deleted.  However, bitstreams that are also contained
-     * in other bundles are NOT deleted.
-     */
-    public void deleteWithContents()
-        throws SQLException, AuthorizeException, IOException
-    {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
-
-        // First delete ourselves
-        delete();
-        
-        // Now see if any of our bitstreams were in other bundles
-        Iterator i = bitstreams.iterator();
-
-        while (i.hasNext())
-        {
-            Bitstream b = (Bitstream) i.next();
-            
-            // Try and find any mapping rows pertaining to the bitstream
-            TableRowIterator tri = DatabaseManager.query(ourContext,
-                "bundle2bitstream",
-                "select * from bundle2bitstream where bitstream_id=" +
-                    b.getID());
-            
-            if (!tri.hasNext())
-            {
-                // The bitstream is not in any other bundle, so delete it
-                b.delete();
-            }
-        }
     }
 }
