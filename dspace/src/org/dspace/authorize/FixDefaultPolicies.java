@@ -57,7 +57,6 @@ import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.storage.rdbms.DatabaseManager;
 
 
 /**
