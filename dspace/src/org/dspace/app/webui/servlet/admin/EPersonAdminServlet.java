@@ -73,8 +73,10 @@ public class EPersonAdminServlet extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
+        doDSPost(context, request, response);
+
         // GET just displays the list of e-people
-        showMain(context, request, response);
+        //showMain(context, request, response);
     }
     
     
@@ -176,8 +178,21 @@ public class EPersonAdminServlet extends DSpaceServlet
             
             String pageRequest = request.getParameter("page_request");
             int pageIndex = UIUtil.getIntParameter(request, "page_index");
+            String sortby = request.getParameter("sortby");
             int sortField = EPerson.EMAIL; // default
             int pageSize = 50;
+
+            if (sortby == null)
+            {
+            }
+            else if (sortby.equals("lastname"))
+            {
+                sortField = EPerson.LASTNAME;
+            }
+            else if (sortby.equals("id"))
+            {
+                sortField = EPerson.ID;
+            }
 
             if (pageIndex == -1)
             {
