@@ -672,8 +672,7 @@ public class Browse
 
             StringBuffer buffer = new StringBuffer()
                 .append("select count(")
-		.append((getTargetColumns(scope) == "*") ? "*" : "distinct sort_author")
-               // .append(getTargetColumns(scope))
+                .append(getTargetColumns(scope))
                 .append(") from ")
                 .append(table);
 
@@ -857,7 +856,7 @@ public class Browse
         StringBuffer sqlb = new StringBuffer()
             .append("select ")
             .append(isCount ? "count(" : "")
-            .append((getTargetColumns(scope) == "*") ? "*" : "distinct sort_author")
+            .append(getTargetColumns(scope))
             .append(isCount ? ")" : "")
             .append(" from ")
             .append(tablename);
@@ -1021,7 +1020,7 @@ public class Browse
     private static String getTargetColumns(BrowseScope scope)
     {
         int browseType = scope.getBrowseType();
-        return (browseType == AUTHORS_BROWSE) ? "distinct sort_author, author" : "*";
+        return (browseType == AUTHORS_BROWSE) ? "distinct sort_author" : "*";
     }
 
     /**
