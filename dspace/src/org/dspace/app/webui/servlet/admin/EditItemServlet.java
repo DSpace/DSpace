@@ -59,10 +59,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.oreilly.servlet.MultipartWrapper;
-
 import org.dspace.administer.DCType;
 import org.dspace.app.webui.servlet.DSpaceServlet;
+import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -477,8 +476,7 @@ public class EditItemServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Wrap multipart request to get the submission info
-		String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
-		MultipartWrapper wrapper = new MultipartWrapper(request, tempDir);
+	FileUploadRequest wrapper = new FileUploadRequest(request);
 
         Item item = Item.find(context,
             UIUtil.getIntParameter(wrapper, "item_id"));

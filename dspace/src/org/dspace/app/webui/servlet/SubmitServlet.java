@@ -54,9 +54,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.oreilly.servlet.MultipartWrapper;
-
 import org.dspace.app.webui.util.Authenticate;
+import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.SubmissionInfo;
 import org.dspace.app.webui.util.UIUtil;
@@ -942,11 +941,8 @@ public class SubmitServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Wrap multipart request to get the submission info
-        // FIXME: Ensure this works with large files (no small limit)
-		String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
-		File temp = null;
-
-        MultipartWrapper wrapper = new MultipartWrapper(request, tempDir);
+        File temp = null;
+        FileUploadRequest wrapper = new FileUploadRequest(request);
         SubmissionInfo subInfo = getSubmissionInfo(context, wrapper);
         String buttonPressed = UIUtil.getSubmitButton(wrapper, "submit_next");
 
