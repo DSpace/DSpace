@@ -49,6 +49,7 @@
   -    logged.in  - Boolean, true if a user is logged in
   -    subscribed - Boolean, true if user is subscribed to this collection
   -    admin_button - Boolean, show admin 'edit' button
+  -    editor_button - Boolean, show collection editor (edit submitters, item mapping) buttons
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -80,6 +81,9 @@
         ((Boolean) request.getAttribute("subscribed")).booleanValue();
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+
+    Boolean editor_b      = (Boolean)request.getAttribute("editor_button");
+    boolean editor_button = (editor_b == null ? false : editor_b.booleanValue());
 
 
 
@@ -200,8 +204,7 @@
   <P class="copyrightText"><%= copyright %></P>
 
   <dspace:sidebar>
-<% if (admin_button)  // admin edit button
-   { %>
+<% if(admin_button || editor_button ) { %>
     <table class=miscTable align=center>
 	  <tr>
 	    <td class="evenRowEvenCol" colspan=2>
@@ -211,6 +214,8 @@
                  <strong>Admin Tools</strong>
               </th>
             </tr>
+
+<% if( admin_button ) { %>
             <tr>
               <td class="standard" align="center">
                  <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
@@ -220,6 +225,9 @@
                 </form>
               </td>
             </tr>
+<% } %>
+
+<% if( editor_button ) { %>
             <tr>
               <td class="standard" align="center">
                  <form method=POST action="<%=request.getContextPath()%>/tools/itemmap">
@@ -228,20 +236,21 @@
                 </form>
               </td>
             </tr>
-<%		if(submitters != null)
- 	    { %>
+<% if(submitters != null) { %>
 			<tr>
 				<td class="standard" align="center">
 				  <form method=GET action="<%=request.getContextPath()%>/tools/group-edit">
 				    <input type=hidden name="group_id" value="<%=submitters.getID()%>">
-				    <input type="submit" name="submit_edit" value="Edit Submitters">
+				    <input type=submit name="submit_edit" value="Edit Submitters">
 				  </form>
 				</td>
 			</tr>
-<%  	} %>
+<% } %>
 	 	  </table>
 	 	</td>
       </tr>
+<% } %>
+
     </table>
 <%  } %>
 

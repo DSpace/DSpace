@@ -448,6 +448,8 @@ public class HandleServlet extends DSpaceServlet
                 // is the user a COLLECTION_EDITOR?
                 if(AuthorizeManager.authorizeActionBoolean(context, collection, Constants.COLLECTION_EDITOR))
                 {
+                    request.setAttribute("editor_button", new Boolean(true));
+                    
                     // give them a button to manage submitter list
                     // what group is the submitter?
                     Group group = collection.getSubmitters();
