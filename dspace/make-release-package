@@ -1,11 +1,19 @@
 #!/bin/sh
 
-USAGE="$0 cvs-tag version"
+USAGE="$0 [-d <doc-cvs-tag>] cvs-tag version"
 
 # Just in case you need to 'socksify' etc
 CVS_COMMAND="cvs"
 
-# Check we have command-line arguments
+DOC_CVSTAG="no"
+
+# Check for doc CVS tag
+if [ "$1" = "-d" ]; then
+	DOC_CVSTAG=$2
+	shift;shift
+fi
+
+# Check we have required command-line arguments
 if [ "$#" != "2" ]; then
         echo $USAGE
         exit 1
@@ -18,13 +26,28 @@ mkdir tmp
 cd tmp
 
 echo "Checking out core code..."
-$CVS_COMMAND -q export -r $1 dspace
+$CVS_COMMAND -Q export -r $1 dspace
 
 # Don't need to include this script!
 rm -f dspace/make-release-package
 
 # Or silly cvsignore files
 rm -f `find dspace -name .cvsignore`
+
+# Check out docs if appropriate
+if [ "$DOC_CVSTAG" != "no" ]; then
+	
+	echo "Checking out docs..."
+	cd dspace
+	$CVS_COMMAND -Q export -r $DOC_CVSTAG docs
+	
+	# Remove unwanted stuff
+	rm -f docs/.cvsignore
+	rm -rf docs/originals
+	rm -f docs/make-doc-package
+	
+	cd ..
+fi
 
 echo "Creating tarball..."
 mv dspace $FILENAME
