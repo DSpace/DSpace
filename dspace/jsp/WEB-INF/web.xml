@@ -93,6 +93,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>certificate-login</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.X509CertificateServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>community-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.CommunityListServlet</servlet-class>
   </servlet>
@@ -158,6 +163,11 @@
   <servlet-mapping>
     <servlet-name>browse-title</servlet-name>
     <url-pattern>/browse-title</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>certificate-login</servlet-name>
+    <url-pattern>/certificate-login</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

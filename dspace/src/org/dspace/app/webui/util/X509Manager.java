@@ -126,7 +126,7 @@ public class X509Manager
     }
 
     /**
-     * Load the CA Public Key from a Java resource.
+     * Load the CA Public Key from a file
      * We assume that it does not come from a keystore
      *
      * @exception CertificateException - If an error occurs
@@ -134,14 +134,23 @@ public class X509Manager
     private static void initialize()
         throws CertificateException
     {
-        String resource = ConfigurationManager.getProperty("ca.certificate");
+        String cert = ConfigurationManager.getProperty("webui.cert.ca");
 
-        if (resource == null)
+        if (cert == null)
         {
-            throw new CertificateException("Unable to initialize CA certificate: configuration property \"ca.certificate\" is not set");
+            throw new CertificateException("Unable to initialize CA certificate: configuration property \"webui.cert.ca\" is not set");
         }
 
-        caPublicKey = getPublicKey(X509Manager.class.getResourceAsStream(resource));
+        try
+        {
+            InputStream is = new BufferedInputStream(new FileInputStream(cert));
+
+            caPublicKey = getPublicKey(is);
+        }
+        catch (IOException e)
+        {
+            throw new CertificateException("Unable to initialize CA certificate: " + e);
+        }
     }
 
     /**
@@ -162,18 +171,6 @@ public class X509Manager
         return caPublicKey;
     }
 
-    /**
-     * Convert the String containing certificate to an X509 certificate object.
-     *
-     * @param certificate - A string containing an X509 certificate
-     * @return - An X509 certificate object.
-     * @exception CertificateException - If an error occurs
-     */
-    private static X509Certificate loadCertificate(String certificate)
-        throws CertificateException
-    {
-        return loadCertificate(new StringBufferInputStream(certificate));
-    }
 
     /**
      * Convert the stream containing certificate to an X509 certificate object.

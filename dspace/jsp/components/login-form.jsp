@@ -46,7 +46,7 @@
     <tr>
         <td class="evenRowEvenCol">
             <H2 align=center>MIT Users</H2>
-            <P align=center><strong><A HREF="<%= request.getContextPath() %>/certificate-login">Click here if you are an MIT user</A></strong>.</P>
+            <P align=center><strong><A HREF="<%= request.getContextPath() %>/certificate-login?from_form=true">Click here if you are an MIT user</A></strong>.</P>
             <P align=center>MIT users must have a valid MIT Personal Certificate to log in.    Please see the <A HREF="http://web.mit.edu/is/cert/">MIT Information Systems certificate information page</A>.</P>
         </td>
     </tr>
