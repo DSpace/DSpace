@@ -86,14 +86,16 @@ public class DatabaseManager
     private static Map info = new HashMap();
 
     /**
-     * Return an iterator with the results of QUERY.
-     * The type of result is given by TABLE.
+     * Return an iterator with the results of the query.
+     * The table parameter indicates the type of result. If
+     * table is null, the column names are read from the
+     * ResultSetMetaData.
      *
-     * @param context - The context object
-     * @param table - The name of the table which results
-     * @param query - The SQL query
-     * @return - A TableRowIterator with the results of the query
-     * @exception SQLException - If a database error occurs
+     * @param context The context object
+     * @param table The name of the table which results
+     * @param query The SQL query
+     * @return A TableRowIterator with the results of the query
+     * @exception SQLException If a database error occurs
      */
     public static TableRowIterator query(Context context,
                                          String table,
@@ -109,15 +111,17 @@ public class DatabaseManager
     }
 
     /**
-     * Return an iterator with the results of executing STATEMENT.
-     * The type of result is given by TABLE.
+     * Return an iterator with the results of executing statement.
+     * The table parameter indicates the type of result. If
+     * table is null, the column names are read from the
+     * ResultSetMetaData.
      * The context is that of the connection which was used to create
      * STATEMENT.
      *
-     * @param statement - The prepared statement
-     * @param table - The name of the table which results
-     * @return - A TableRowIterator with the results of the query
-     * @exception SQLException - If a database error occurs
+     * @param statement The prepared statement to execute.
+     * @param table The name of the table which results
+     * @return A TableRowIterator with the results of the query
+     * @exception SQLException If a database error occurs
      */
     public static TableRowIterator query(String table,
                                          PreparedStatement statement)
@@ -128,14 +132,14 @@ public class DatabaseManager
     }
 
     /**
-     * Return the single row result to this query, null if no result.
+     * Return the single row result to this query, or null if no result.
      * If more than one row results, only the first is returned.
      *
-     * @param context - The context object
-     * @param table - The name of the table which results
-     * @param query - The SQL query
-     * @return - A TableRow object, or null if no result
-     * @exception SQLException - If a database error occurs
+     * @param context Current DSpace context
+     * @param table The name of the table which results
+     * @param query The SQL query
+     * @return A TableRow object, or null if no result
+     * @exception SQLException If a database error occurs
      */
     public static TableRow querySingle( Context context,
                                         String table,
@@ -147,13 +151,13 @@ public class DatabaseManager
     }
 
     /**
-     * Perform an update, insert or delete query - returns the number of rows
-     * affected.
+     * Execute an update, insert or delete query. Returns the number
+     * of rows affected by the query.
      *
-     * @param context - The context object
-     * @param query - The SQL query
-     * @return - The number of rows affected.
-     * @exception SQLException - If a database error occurs
+     * @param context Current DSpace context
+     * @param query The SQL query to execute
+     * @return The number of rows affected by the query.
+     * @exception SQLException If a database error occurs
      */
     public static int updateQuery( Context context, String query )
         throws SQLException
@@ -182,26 +186,32 @@ public class DatabaseManager
     }
 
     /**
-     * Create a new row in the given table.  An ID is assigned
+     * Create a new row in the given table, and assigns a unique id.
+     *
+     * @param context Current DSpace context
+     * @param table The RDBMS table in which to create the new row
+     * @return The newly created row
      */
     public static TableRow create( Context context, String table )
         throws SQLException
     {
         TableRow row = new TableRow(canonicalize(table),
-                                    getNonPrimaryKeyColumnNames(table));
+                                    getColumnNames(table));
         assignId(row);
         insert(context, row);
         return row;
     }
 
     /**
-     * Find a table row by its primary key
+     * Find a table row by its primary key. Returns the row, or null
+     * if no row with that primary key value exists.
      *
-     * @param context - The context object
-     * @param table - The table in which to find the row
-     * @param id - The primary key value
-     * @return - The row resulting from the query, or null
-     * @exception SQLException - If a database error occurs
+     * @param context Current DSpace context
+     * @param table The table in which to find the row
+     * @param id The primary key value
+     * @return The row resulting from the query, or null if no row
+     *   with that primary key value exists.
+     * @exception SQLException If a database error occurs
      */
     public static TableRow find( Context context, String table, int id )
         throws SQLException
@@ -214,14 +224,17 @@ public class DatabaseManager
     }
 
     /**
-     * Find a table row by a unique value
+     * Find a table row by a unique value. Returns the row, or null
+     * if no row with that primary key value exists. If multiple
+     * rows with the value exist, one is returned.
      *
-     * @param context - The context object
-     * @param table - The table to use to find the object
-     * @param column - The name of the unique column
-     * @param value - The value of the unique column
-     * @return - The row resulting from the query, or null
-     * @exception SQLException - If a database error occurs
+     * @param context Current DSpace context
+     * @param table The table to use to find the object
+     * @param column The name of the unique column
+     * @param value The value of the unique column
+     * @return The row resulting from the query, or null if no row
+     * with that value exists.
+     * @exception SQLException If a database error occurs
      */
     public static TableRow findByUnique( Context context,
                                          String table,
@@ -241,13 +254,14 @@ public class DatabaseManager
     }
 
     /**
-     * Delete by primary key
+     * Delete a table row via its primary key. Returns the number
+     * of rows deleted.
      *
-     * @param context - The context object
-     * @param table - The table to delete from
-     * @param id - The primary key value
-     * @return - The number of rows deleted
-     * @exception SQLException - If a database error occurs
+     * @param context Current DSpace context
+     * @param table The table to delete from
+     * @param id The primary key value
+     * @return The number of rows deleted
+     * @exception SQLException If a database error occurs
      */
     public static int delete( Context context, String table, int id )
         throws SQLException
@@ -260,14 +274,15 @@ public class DatabaseManager
     }
 
     /**
-     * Delete a table row by a value (best if it's unique!!)
+     * Delete all table rows with the given value. Returns the number
+     * of rows deleted.
      *
-     * @param context - The context object
-     * @param table - The table to delete from
-     * @param column - The name of the (unique) column
-     * @param value - The value of the (unique) column
-     * @return - The number of rows deleted
-     * @exception SQLException - If a database error occurs
+     * @param context Current DSpace context
+     * @param table The table to delete from
+     * @param column The name of the column
+     * @param value The value of the column
+     * @return The number of rows deleted
+     * @exception SQLException If a database error occurs
      */
     public static int deleteByValue( Context context,
                                       String table,
@@ -287,7 +302,11 @@ public class DatabaseManager
     }
 
     /**
-     * Obtain an RDBMS connection
+     * Obtain an RDBMS connection.
+     *
+     * @return A new database connection.
+     * @exception SQLException If a database error occurs, or a connection
+     * cannot be obtained.
      */
     public static Connection getConnection()
         throws SQLException
@@ -298,6 +317,8 @@ public class DatabaseManager
 
     /**
      * Release resources associated with this connection.
+     *
+     * @param c The connection to release
      */
     public static void freeConnection( Connection c )
     {
@@ -310,11 +331,11 @@ public class DatabaseManager
     }
 
     /**
-     * Insert ROW into the RDBMS
+     * Insert a table row into the RDBMS.
      *
-     * @param context - The context object
-     * @param row - The row to insert
-     * @exception SQLException - If a database error occurs
+     * @param context Current DSpace context
+     * @param row The row to insert
+     * @exception SQLException If a database error occurs
      */
     public static void insert(Context context, TableRow row)
         throws SQLException
@@ -351,14 +372,15 @@ public class DatabaseManager
     }
 
     /**
-     * Update changes to the RDBMS
+     * Update changes to the RDBMS. Note that if the update fails,
+     * the values in the row will NOT be reverted.
      *
-     * @param context - The context object
-     * @param row - The row to update
-     * @return - The number of rows affected (1 or 0)
-     * @exception SQLException - If a database error occurs
+     * @param context Current DSpace context
+     * @param row The row to update
+     * @return The number of rows affected (1 or 0)
+     * @exception SQLException If a database error occurs
      */
-    public static void update(Context context, TableRow row)
+    public static int update(Context context, TableRow row)
         throws SQLException
     {
         String table = canonicalize(row.getTable());
@@ -386,37 +408,36 @@ public class DatabaseManager
         columns.addAll(Arrays.asList(info));
         columns.add(pk);
 
-        execute(context.getDBConnection(),
-                sql.toString(),
-                columns,
-                row);
+        return execute(context.getDBConnection(),
+                       sql.toString(),
+                       columns,
+                       row);
     }
 
     /**
-     * Delete ROW from the RDBMS
+     * Delete row from the RDBMS.
      *
-     * @param context - The context object
-     * @param row - The row to delete
-     * @return - The number of rows affected (1 or 0)
-     * @exception SQLException - If a database error occurs
+     * @param context Current DSpace context
+     * @param row The row to delete
+     * @return The number of rows affected (1 or 0)
+     * @exception SQLException If a database error occurs
      */
-    public static void delete(Context context, TableRow row)
+    public static int delete(Context context, TableRow row)
         throws SQLException
     {
         String pk = getPrimaryKeyColumn(row);
         if (row.isColumnNull(pk))
             throw new IllegalArgumentException("Primary key value is null");
 
-        delete(context, row.getTable(), row.getIntColumn(pk));
+        return delete(context, row.getTable(), row.getIntColumn(pk));
     }
 
     /**
-     * Return metadata about a table
+     * Return metadata about a table.
      *
-     * @param context - The context object
-     * @param table - The name of the table
-     * @return - An array of ColumnInfo objects
-     * @exception SQLException - If a database error occurs
+     * @param table The name of the table
+     * @return An array of ColumnInfo objects
+     * @exception SQLException If a database error occurs
      */
     static ColumnInfo[] getColumnInfo( String table )
         throws SQLException
@@ -430,7 +451,12 @@ public class DatabaseManager
     }
 
     /**
-     * Return info about COLUMN in TABLE.
+     * Return info about column in table.
+     *
+     * @param table The name of the table
+     * @param column The name of the column
+     * @return Information about the column
+     * @exception SQLException If a database error occurs
      */
     static ColumnInfo getColumnInfo( String table, String column)
         throws SQLException
@@ -440,12 +466,12 @@ public class DatabaseManager
     }
 
     /**
-     * Return all the columns which are not primary keys
+     * Return all the columns which are not primary keys.
      *
-     * @param context - The context object
-     * @param table - The name of the table
-     * @return - An array of ColumnInfo objects
-     * @exception SQLException - If a database error occurs
+     * @param table The name of the table
+     * @return All the columns which are not primary keys, as an array
+     * of ColumnInfo objects
+     * @exception SQLException If a database error occurs
      */
     static ColumnInfo[] getNonPrimaryKeyColumns ( String table )
         throws SQLException
@@ -464,9 +490,14 @@ public class DatabaseManager
     }
 
     /**
-     * Return a list of all the columns which are not primary keys
+     * Return the names of all the columns of the given table.
+     *
+     * @param table The name of the table
+     * @return The names of all the columns of the given table,
+     * as a List. Each element of the list is a String.
+     * @exception SQLException If a database error occurs
      */
-    protected static List getNonPrimaryKeyColumnNames ( String table )
+    protected static List getColumnNames ( String table )
         throws SQLException
     {
         List results = new ArrayList();
@@ -480,9 +511,14 @@ public class DatabaseManager
     }
 
     /**
-     * Return a list of all the columns which are not primary keys
+     * Return the names of all the columns of the ResultSet.
+     *
+     * @param table The ResultSetMetaData
+     * @return The names of all the columns of the given table,
+     * as a List. Each element of the list is a String.
+     * @exception SQLException If a database error occurs
      */
-    protected static List getNonPrimaryKeyColumnNames ( ResultSetMetaData meta)
+    protected static List getColumnNames ( ResultSetMetaData meta)
         throws SQLException
     {
         List results = new ArrayList();
@@ -497,10 +533,10 @@ public class DatabaseManager
     }
 
     /**
-     * Return the canonical name for TABLE.
+     * Return the canonical name for a table.
      *
-     * @param table - The name of the table.
-     * @return - The canonical name of the table.
+     * @param table The name of the table.
+     * @return The canonical name of the table.
      */
     static String canonicalize(String table)
     {
@@ -513,6 +549,9 @@ public class DatabaseManager
 
     /**
      * Load SQL into the RDBMS.
+     *
+     * @param sql The SQL to load.
+     * @param SQLException If a database error occurs
      */
     public static void loadSql(String sql)
         throws SQLException
@@ -527,7 +566,11 @@ public class DatabaseManager
     }
 
     /**
-     * Load SQL from READER into the RDBMS.
+     * Load SQL from a reader into the RDBMS.
+     *
+     * @param reader The Reader from which to read the SQL.
+     * @param SQLException If a database error occurs
+     * @param IOException If an error occurs obtaining data from the reader
      */
     public static void loadSql(Reader r)
         throws SQLException, IOException
@@ -662,7 +705,7 @@ public class DatabaseManager
     ////////////////////////////////////////
 
     /**
-     * Convert the current row from RESULTS into a TableRow object.
+     * Convert the current row given by results into a TableRow object.
      */
     static TableRow process (ResultSet results, String table)
         throws SQLException
@@ -671,8 +714,7 @@ public class DatabaseManager
         int columns = meta.getColumnCount() + 1;
 
         List columnNames = table == null ?
-            getNonPrimaryKeyColumnNames(meta) :
-            getNonPrimaryKeyColumnNames(table);
+            getColumnNames(meta) : getColumnNames(table);
 
         TableRow row = new TableRow(canonicalize(table), columnNames);
 
@@ -749,7 +791,7 @@ public class DatabaseManager
     }
 
     /**
-     * Return the name of the primary key column.
+     * Return column information for the primary key column.
      * We assume there's only one!
      */
     static ColumnInfo getPrimaryKeyColumnInfo(String table)
@@ -767,7 +809,7 @@ public class DatabaseManager
     }
 
     /**
-     * Assign an ID to row
+     * Assign an ID to row.
      */
     private static synchronized void assignId (TableRow row)
         throws SQLException
@@ -778,7 +820,7 @@ public class DatabaseManager
     }
 
     /**
-     * Get the next id for TABLE.
+     * Get the next id for table.
      */
     public static synchronized int getId (String table)
         throws SQLException
@@ -916,11 +958,11 @@ public class DatabaseManager
     }
 
     /**
-     * Return metadata about a table
+     * Return metadata about a table.
      *
-     * @param table - The name of the table
-     * @return - An map of info
-     * @exception SQLException - If a database error occurs
+     * @param table The name of the table
+     * @return An map of info.
+     * @exception SQLException If a database error occurs
      */
     private static Map getColumnInfoInternal( String table )
         throws SQLException
@@ -937,7 +979,7 @@ public class DatabaseManager
     }
 
     /**
-     * Read metadata about a table from the database
+     * Read metadata about a table from the database.
      */
     private static Map retrieveColumnInfo ( String table )
         throws SQLException
@@ -994,7 +1036,9 @@ public class DatabaseManager
     }
 }
 
-// Simple representation of column information
+/**
+ * Simple representation of column information
+ */
 class ColumnInfo
 {
     /** The name of the column */
@@ -1061,8 +1105,8 @@ class ColumnInfo
     }
 
     /**
-     * Get the value of isPrimaryKey.
-     * @return Value of isPrimaryKey.
+     * Return true if this column is a primary key.
+     * @return True if this column is a primary key.
      */
     public boolean isPrimaryKey()
     {
@@ -1079,7 +1123,7 @@ class ColumnInfo
     }
 
     /*
-     * Return true if this object is equal to OTHER, false otherwise
+     * Return true if this object is equal to other, false otherwise
      */
     public boolean equals(Object other)
     {
