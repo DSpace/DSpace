@@ -512,7 +512,7 @@ public class WorkflowManager
                 notifyOfArchive(c, myitem, mycollection);
 
                 // index the item
-                DSIndexer.indexItem(c, myitem);
+//                DSIndexer.indexItem(c, myitem);
 
 //                SubmitServlet.installItem(connection, wi);
 
