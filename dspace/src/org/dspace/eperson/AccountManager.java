@@ -65,6 +65,8 @@ import org.dspace.storage.rdbms.*;
  * AccountManager can use the token to determine the identity of the
  * eperson.
  *
+ * *NEW* now ignores expiration dates so that tokens never expire
+ *
  * @author  Peter Breton
  * @version $Revision$
  */
@@ -118,7 +120,7 @@ public class AccountManager
      * to the person by either the sendRegistrationInfo or
      * sendForgotPasswordInfo methods.</p>
      *
-     * <p>If the token is not found or has expired, return null.</p>
+     * <p>If the token is not found return null.</p>
      *
      * @param context DSpace context
      * @param token Account token
@@ -143,7 +145,8 @@ public class AccountManager
 
 
     /**
-     * Return the e-mail address referred to by a token
+     * Return the e-mail address referred to by a token, or null if email address can't be found
+     *  ignores expiration of token
      *
      * @param context DSpace context
      * @param token Account token
@@ -161,19 +164,20 @@ public class AccountManager
         if (rd == null)
             return null;
 
+/* ignore the expiration date on tokens
         Date expires = rd.getDateColumn("expires");
         if (expires != null)
         {
             if ((new java.util.Date()).after(expires))
                 return null;
         }
-
+*/
         return rd.getStringColumn("email");
     }
 
     
     /**
-     * Delete the callback for token.
+     * Delete token.
      *
      * @param context DSpace context
      * @param token The token to delete
@@ -227,7 +231,8 @@ public class AccountManager
         {
             rd = DatabaseManager.create(context, "RegistrationData");
             rd.setColumn("token",      Utils.generateHexKey());
-            rd.setColumn("expires",    getDefaultExpirationDate());
+// don't set expiration date any more	    
+//            rd.setColumn("expires",    getDefaultExpirationDate());
             rd.setColumn("email",      email);
             DatabaseManager.update(context, rd);
 
@@ -301,8 +306,8 @@ public class AccountManager
         Calendar calendar = Calendar.getInstance();
 
         calendar.setTime(new java.util.Date());
-        // Add 2 weeks to today
-        calendar.add(Calendar.WEEK_OF_YEAR, 2);
+        // Add 1 year from today
+        calendar.add(Calendar.WEEK_OF_YEAR, 52);
         return new java.sql.Timestamp(calendar.getTime().getTime());
     }
 }
