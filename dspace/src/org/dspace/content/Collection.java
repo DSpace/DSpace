@@ -158,6 +158,10 @@ public class Collection extends DSpaceObject
         submitters = Group.findByName(ourContext,
             "COLLECTION_" + getID() + "_SUBMIT");
 
+        // default editors group
+        editors = Group.findByName(ourContext,
+            "COLLECTION_" + getID() + "_EDITOR");
+
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
 
@@ -536,6 +540,8 @@ public class Collection extends DSpaceObject
             submitters.update();
         }
 
+        AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, submitters);
+
         return submitters;
     }
 
@@ -576,6 +582,8 @@ public class Collection extends DSpaceObject
             editors.setName("COLLECTION_" + getID() + "_EDITOR");
             editors.update();
         }
+
+        AuthorizeManager.addPolicy(ourContext, this, Constants.COLLECTION_EDITOR, editors);
 
         // editors also get ADD on the submitter group
         if( submitters != null )
