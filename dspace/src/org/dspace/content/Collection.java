@@ -893,7 +893,8 @@ public class Collection extends DSpaceObject
         	}
 		}
     	
-    	AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+    	AuthorizeManager.authorizeAnyOf(ourContext, this, new int[] {
+                Constants.WRITE, Constants.COLLECTION_ADMIN });
     }
 
 

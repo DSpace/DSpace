@@ -78,6 +78,25 @@ import org.dspace.history.HistoryManager;
 public class AuthorizeManager
 {
     /**
+     * Authorizes for each of the actions in turn, but only throws the first
+     * AuthorizeException if all the authorizations fail.
+     */
+    public static void authorizeAnyOf(Context c, DSpaceObject o, int[] actions)
+            throws AuthorizeException, SQLException {
+        AuthorizeException ex = null;
+        for (int i = 0; i < actions.length; i++) {
+            try {
+                authorizeAction(c, o, actions[i]);
+                return;
+            } catch (AuthorizeException e) {
+                if (ex == null)
+                    ex = e;
+            }
+        }
+        throw ex;
+    }
+    
+    /**
      * primary authorization interface, assumes user is the context's
      *  currentuser, and throws an exception
      *
