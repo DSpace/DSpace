@@ -45,14 +45,21 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
+<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
+<%
+    SubmissionInfo si =
+        (SubmissionInfo) request.getAttribute("submission.info");
+%>
 
 <dspace:layout locbar="off" navbar="off" title="Submission Complete!">
 
     <jsp:include page="/submit/progressbar.jsp">
         <jsp:param name="current_stage" value="<%= SubmitServlet.SUBMISSION_COMPLETE %>"/>
         <jsp:param name="stage_reached" value="<%= SubmitServlet.SUBMISSION_COMPLETE %>"/>
+        <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
     </jsp:include>
 
 

@@ -47,12 +47,16 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
+import org.dspace.app.webui.util.DCInputsReader;
+import org.dspace.app.webui.util.DCInput;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.SubmissionInfo;
@@ -133,31 +137,36 @@ public class SubmitServlet extends DSpaceServlet
     /** Ask initial questions about the submission step */
     public static final int INITIAL_QUESTIONS = 1;
 
-    /** Edit DC metadata page 1 step */
+    /** Edit DC metadata first page step */
     public static final int EDIT_METADATA_1 = 2;
 
-    /** Edit DC metadata page 2 step */
-    public static final int EDIT_METADATA_2 = 3;
+    /** Edit DC metadata last page step 
+     * Current value allows up to 6 distinct pages.
+     * If more are needed, renumber this value and those 
+     * that follow it (up to SUBMISSION_COMPLETE), but
+     * note that the progress bar will stretch badly beyond 6.
+     */
+    public static final int EDIT_METADATA_2 = 7;
 
     /**
      * Upload files step. Note this doesn't correspond to an actual page, since
      * the upload file step consists of a number of pages with no definite
      * order. This is just used for the progress bar.
      */
-    public static final int UPLOAD_FILES = 4;
+    public static final int UPLOAD_FILES = 8;
 
     /** Review submission step */
-    public static final int REVIEW_SUBMISSION = 5;
+    public static final int REVIEW_SUBMISSION = 9;
 
     /** optional CC license step */
-    public static final int CC_LICENSE = 6;
+    public static final int CC_LICENSE = 10;
 
     /** Grant (deposit) license step */
-    public static final int GRANT_LICENSE = 7;
+    public static final int GRANT_LICENSE = 11;
 
     /** Submission completed step */
-    public static final int SUBMISSION_COMPLETE = 8;
-
+    public static final int SUBMISSION_COMPLETE = 12;
+    
     // Steps which aren't part of the main sequence, but rather
     // short "diversions" are given high step numbers. The main sequence
     // is defined as being steps 0 to SUBMISSION_COMPLETE.
@@ -188,6 +197,16 @@ public class SubmitServlet extends DSpaceServlet
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(SubmitServlet.class);
+    
+    /** hash of all submission forms details */
+    private DCInputsReader inputsReader;
+    
+    public SubmitServlet()
+    	throws ServletException
+    {
+	// read configurable submissions forms data
+	inputsReader = new DCInputsReader();
+    }
 
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -357,6 +376,12 @@ public class SubmitServlet extends DSpaceServlet
                 step = -1;
             }
         }
+        
+        if (step >= EDIT_METADATA_1 && step <= EDIT_METADATA_2)
+        {
+        	processEditMetadata(context, request, response, subInfo, step);
+        	return;
+        }
 
         switch (step)
         {
@@ -364,17 +389,7 @@ public class SubmitServlet extends DSpaceServlet
             processInitialQuestions(context, request, response, subInfo);
 
             break;
-
-        case EDIT_METADATA_1:
-            processEditMetadataOne(context, request, response, subInfo);
-
-            break;
-
-        case EDIT_METADATA_2:
-            processEditMetadataTwo(context, request, response, subInfo);
-
-            break;
-
+  
         case GET_FILE_FORMAT:
             processGetFileFormat(context, request, response, subInfo);
 
@@ -756,7 +771,7 @@ public class SubmitServlet extends DSpaceServlet
     }
 
     /**
-     * process input from edit-metadata-1.jsp
+     * process input from edit-metadata.jsp
      * 
      * @param context
      *            current DSpace context
@@ -766,231 +781,180 @@ public class SubmitServlet extends DSpaceServlet
      *            current servlet response object
      * @param subInfo
      *            submission info object
+     * @param curStep
+     *            page number in edit sequence, starting at zero
      */
-    private void processEditMetadataOne(Context context,
-            HttpServletRequest request, HttpServletResponse response,
-            SubmissionInfo subInfo) throws ServletException, IOException,
-            SQLException, AuthorizeException
+    private void processEditMetadata(Context context,
+        HttpServletRequest request,
+        HttpServletResponse response,
+        SubmissionInfo subInfo,
+		int curStep)
+        throws ServletException, IOException, SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
 
         // Firstly, check for a click of the cancel button.
         if (buttonPressed.equals("submit_cancel"))
         {
-            doCancellation(request, response, subInfo, EDIT_METADATA_1,
-                    EDIT_METADATA_1);
-
+            doCancellation(request, response, subInfo, curStep, curStep);
             return;
         }
 
         Item item = subInfo.submission.getItem();
-
-        // Update the item metadata.
-        readNames(request, item, "contributor", "author", true);
-        readText(request, item, "title", null, false, "en");
-
-        // verify that a title has been entered
-        DCValue[] dcValues = item.getDC("title", null, "en");
-        boolean titleMissing = dcValues.length == 0;
-
-        if (subInfo.submission.hasMultipleTitles())
+        
+        // lookup applicable inputs
+        Collection c = subInfo.submission.getCollection();
+        DCInput[] inputs = inputsReader.getInputs(c.getHandle()).getPageRows(curStep - EDIT_METADATA_1,
+									 subInfo.submission.hasMultipleTitles(),
+									 subInfo.submission.isPublishedBefore());
+ 
+        // clear out all item metadata defined for this collection and page
+        for (int i = 0; i < inputs.length; i++)
         {
-            readText(request, item, "title", "alternative", true, "en");
+        	String dcQualifier = inputs[i].getQualifier();
+        	if (dcQualifier == null && inputs[i].getInputType().equals("qualdrop_value"))
+        	{
+        		dcQualifier = Item.ANY;
+        	}
+        	item.clearDC(inputs[i].getElement(), dcQualifier, Item.ANY);
         }
 
-        readSeriesNumbers(request, item, "relation", "ispartofseries", true);
+        // now update the item metadata.
+      	String fieldName;
+        boolean moreInput = false;
+    	for (int j = 0; j < inputs.length; j++)
+    	{
+    	   String dcElement = inputs[j].getElement();
+           String dcQualifier = inputs[j].getQualifier();
+    	   if (dcQualifier != null && ! dcQualifier.equals(Item.ANY))
+    	   {
+    	   		fieldName = dcElement + '_' + dcQualifier;
+    	   }
+    	   else
+    	   {
+    	   		fieldName = dcElement;
+    	   }
 
-        // Type
-        item.clearDC("type", null, Item.ANY);
+    	   String inputType = inputs[j].getInputType();
+    	   if (inputType.equals("name"))
+    	   {
+    	   		readNames(request, item, dcElement, dcQualifier, 
+    	   				  inputs[j].getRepeatable());
+    	   }
+    	   else if (inputType.equals("date"))
+    	   {
+    	   		readDate(request, item, dcElement, dcQualifier);
+    	   }
+    	   else if (inputType.equals("series"))
+    	   {
+    	   		readSeriesNumbers(request, item, dcElement, dcQualifier, 
+    	   						  inputs[j].getRepeatable());
+    	   }
+    	   else if (inputType.equals("qualdrop_value"))
+    	   {
+    	      List quals = getRepeatedParameter(request, dcElement + "_qualifier");
+    	      List vals = getRepeatedParameter(request, dcElement + "_value");
+    	      for (int z = 0; z < vals.size(); z++)
+    	      {
+    	      		String thisQual = (String)quals.get(z);
+    	      		String thisVal = (String)vals.get(z);
+    	      		if (! buttonPressed.equals("submit_" + dcElement + "_remove_" + z) &&
+    	      			! thisVal.equals(""))
+    	      		{
+    	      			item.addDC(dcElement, thisQual, null, thisVal);
+    	      		}
+    	      }
+    	   }
+    	   else if (inputType.equals("dropdown"))
+    	   {
+    	      String[] vals = request.getParameterValues(fieldName);
+    	      if (vals != null)
+    	      {
+    	      	for (int z = 0; z < vals.length; z++)
+    	      	{
+    	      		item.addDC(dcElement, dcQualifier, "en", vals[z]);
+    	      	}
+    	      }
+    	   }
+    	   else if ((inputType.equals("onebox")) || (inputType.equals("twobox")) || 
+    	   			(inputType.equals("textarea")))
+    	   {
+    	   		readText(request, item, dcElement, dcQualifier, 
+    	   				 inputs[j].getRepeatable(), "en");
+    	   }
+    	   else 
+    	   {
+    	       throw new ServletException("Field "+ fieldName + 
+    	       		                      " has an unknown input type: " + inputType);
+    	   }
 
-        String[] types = request.getParameterValues("type");
-
-        if (types != null)
-        {
-            for (int i = 0; i < types.length; i++)
-            {
-                item.addDC("type", null, "en", types[i]);
-            }
-        }
-
-        // FIXME: Maybe should do integrity check using language object
-        readText(request, item, "language", "iso", false, null);
-
-        // Identifiers - A special case so do this here
-        // First, remove existing identifiers.
-        subInfo.submission.getItem().clearDC("identifier", Item.ANY, Item.ANY);
-
-        // Get qualifiers and values
-        List quals = getRepeatedParameter(request, "identifier_qualifier");
-        List vals = getRepeatedParameter(request, "identifier_value");
-
-        // Add to item DC
-        for (int i = 0; i < vals.size(); i++)
-        {
-            String thisQual = (String) quals.get(i);
-            String thisVal = (String) vals.get(i);
-
-            if (!buttonPressed.equals("submit_identifier_remove_" + i)
-                    && !thisVal.equals(""))
-            {
-                item.addDC("identifier", thisQual, null, thisVal);
-            }
-        }
-
-        boolean issueDateMissing = false;
-
-        if (subInfo.submission.isPublishedBefore())
-        {
-            readDate(request, item, "date", "issued");
-
-            // check that at least year has been entered - flag if not
-            DCValue[] dateArray = item.getDC("date", "issued", Item.ANY);
-            DCDate dateIssued = new DCDate(
-                    ((dateArray.length > 0) ? dateArray[0].value : ""));
-
-            if (dateIssued.getYear() <= 0)
-            {
-                issueDateMissing = true;
-            }
-
-            // Careful that this happens AFTER identifier.* is blown away
-            // above!!
-            readText(request, item, "identifier", "citation", false, "en");
-            readText(request, item, "publisher", null, false, "en");
-        }
-
+           // Proceed according to button pressed
+    	   if (! moreInput && buttonPressed.equals("submit_" + fieldName + "_more"))
+    	   {
+    	      subInfo.moreBoxesFor = fieldName;
+    	      subInfo.jumpToField = fieldName;
+    	      moreInput = true;
+    	   }
+    	}
+    	
         int nextStep = -1;
-
-        // Proceed according to button pressed
-        if (buttonPressed.equals("submit_contributor_author_more"))
+        if ( moreInput )
         {
-            // "Add more" clicked for authors
-            subInfo.moreBoxesFor = "contributor_author";
-            subInfo.jumpToField = "contributor_author";
-            nextStep = EDIT_METADATA_1;
+        	nextStep = curStep;
         }
-        else if (subInfo.submission.hasMultipleTitles()
-                && buttonPressed.equals("submit_title_alternative_more"))
+    	
+        if (buttonPressed.equals("submit_prev"))
         {
-            // "Add more" clicked for alternative titles
-            subInfo.moreBoxesFor = "title_alternative";
-            subInfo.jumpToField = "title_alternative";
-            nextStep = EDIT_METADATA_1;
-        }
-        else if (buttonPressed.equals("submit_relation_ispartofseries_more"))
-        {
-            // "Add more" clicked for series/number
-            subInfo.moreBoxesFor = "relation_ispartofseries";
-            subInfo.jumpToField = "relation_ispartofseries";
-            nextStep = EDIT_METADATA_1;
-        }
-        else if (buttonPressed.equals("submit_identifier_more"))
-        {
-            // "Add more" clicked for identifier
-            subInfo.moreBoxesFor = "identifier";
-            subInfo.jumpToField = "identifier";
-            nextStep = EDIT_METADATA_1;
-        }
-        else if (buttonPressed.equals("submit_prev"))
-        {
-            nextStep = INITIAL_QUESTIONS;
+            // NB: code here assumes steps are sequentially numbered!
+            nextStep = curStep-1;
         }
         else if (buttonPressed.equals("submit_next"))
         {
-            // return to edit metadata 1 if title or issue date missing
-            if (titleMissing || issueDateMissing)
-            {
-                subInfo.missing = true;
-                subInfo.jumpToField = (titleMissing ? "title"
-                        : "date_issued_year");
-                nextStep = EDIT_METADATA_1;
-            }
-            else
-            {
-                userHasReached(subInfo, EDIT_METADATA_2);
-                nextStep = EDIT_METADATA_2;
-            }
+        	// scan for missing fields
+        	String gotoField = null;
+        	subInfo.missingFields = new ArrayList();
+        	//subInfo.missingRowNums = new Vector();
+        	for (int i = 0; i < inputs.length; i++)
+        	{
+        	    String element = inputs[i].getElement();
+        	    String qual = inputs[i].getQualifier();
+        	    DCValue[] valArray = item.getDC(element, qual, Item.ANY);
+        	    boolean isEmpty = (valArray.length == 0);
+        	    if (inputs[i].isRequired() && isEmpty)
+        	    {
+        	    	subInfo.missingFields.add( new Integer(i) );
+        	    	if (qual != null && !qual.equals("*"))
+        	    	{
+        	    		gotoField = element + '_' + qual;
+        	    	}
+        	    	else
+        	    	{
+        	    		gotoField = element;
+        	    	}
+        	    }
+        	}
+        	// return to current edit metadata screen if any fields missing
+        	if (subInfo.missingFields.size() > 0 )
+        	{
+        		subInfo.jumpToField = gotoField;
+        		nextStep = curStep;
+        	}
+        	else
+        	{
+        		// determine next step - skipping unused MD pages
+        		int lastMDPage = EDIT_METADATA_1 + inputsReader.getNumberInputPages(c.getHandle()) - 1;
+        		if ( curStep == lastMDPage )
+        		{
+        		    curStep = EDIT_METADATA_2;
+        		}
+        		userHasReached(subInfo, curStep+1);
+        		nextStep = curStep+1;
+        	}
         }
         else if (buttonPressed.indexOf("remove") > -1)
         {
             // Remove button pressed - stay with same form
-            nextStep = EDIT_METADATA_1;
-        }
-
-        // Write changes to database
-        subInfo.submission.update();
-
-        if (nextStep != -1)
-        {
-            doStep(context, request, response, subInfo, nextStep);
-        }
-        else
-        {
-            doStepJump(context, request, response, subInfo);
-        }
-
-        context.complete();
-    }
-
-    /**
-     * process input from edit-metadata-2.jsp
-     * 
-     * @param context
-     *            current DSpace context
-     * @param request
-     *            current servlet request object
-     * @param response
-     *            current servlet response object
-     * @param subInfo
-     *            submission info object
-     */
-    private void processEditMetadataTwo(Context context,
-            HttpServletRequest request, HttpServletResponse response,
-            SubmissionInfo subInfo) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {
-        String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
-
-        // Firstly, check for a click of the cancel button.
-        if (buttonPressed.equals("submit_cancel"))
-        {
-            doCancellation(request, response, subInfo, EDIT_METADATA_2,
-                    EDIT_METADATA_2);
-
-            return;
-        }
-
-        Item item = subInfo.submission.getItem();
-
-        // Update object from form values
-        readText(request, item, "subject", null, true, "en");
-        readText(request, item, "description", "abstract", false, "en");
-        readText(request, item, "description", "sponsorship", false, "en");
-        readText(request, item, "description", null, false, "en");
-
-        // Proceed according to button pressed
-        int nextStep = -1;
-
-        if (buttonPressed.equals("submit_subject_more"))
-        {
-            // "Add more" clicked for subject keywords
-            subInfo.moreBoxesFor = "subject";
-            subInfo.jumpToField = "subject";
-            nextStep = EDIT_METADATA_2;
-        }
-        else if (buttonPressed.equals("submit_prev"))
-        {
-            nextStep = EDIT_METADATA_1;
-        }
-        else if (buttonPressed.equals("submit_next"))
-        {
-            userHasReached(subInfo, UPLOAD_FILES);
-            nextStep = UPLOAD_FILES;
-        }
-        else if (buttonPressed.indexOf("remove") > -1)
-        {
-            // Remove button pressed - stay with same form
-            nextStep = EDIT_METADATA_2;
+            nextStep = curStep;
         }
 
         // Write changes to database
@@ -1132,8 +1096,11 @@ public class SubmitServlet extends DSpaceServlet
             }
             else
             {
-                // No files, go back to edit metadata 2
-                doStep(context, request, response, subInfo, EDIT_METADATA_2);
+                // No files, go back to last edit metadata page
+            	Collection c = subInfo.submission.getCollection();
+            	int lastPage = EDIT_METADATA_1 + 
+				               inputsReader.getNumberInputPages( c.getHandle() ) - 1;
+                doStep(context, request, response, subInfo, lastPage);
             }
         }
         else if (buttonPressed.equals("submit_next"))
@@ -1159,9 +1126,8 @@ public class SubmitServlet extends DSpaceServlet
             {
                 // If we get here, there was a problem uploading, but we
                 // still know which submission we're dealing with
-                request.setAttribute("submission.info", subInfo);
-                JSPManager.showJSP(request, response,
-                        "/submit/upload-error.jsp");
+            	showProgressAwareJSP(request, response,	subInfo,
+            	 	  	     "/submit/upload-error.jsp");
             }
         }
         else
@@ -1262,8 +1228,11 @@ public class SubmitServlet extends DSpaceServlet
         {
             // In some cases, this might be expected to go back
             // to the "choose file" page, but that doesn't make
-            // a great deal of sense, so go back to edit metadata 2.
-            doStep(context, request, response, subInfo, EDIT_METADATA_2);
+            // a great deal of sense, so go back to last edit metadata page.
+        	Collection c = subInfo.submission.getCollection();
+        	int lastPage = EDIT_METADATA_1 + 
+			               inputsReader.getNumberInputPages( c.getHandle() ) - 1;
+            doStep(context, request, response, subInfo, lastPage);
         }
         else if (buttonPressed.equals("submit_next"))
         {
@@ -1295,8 +1264,7 @@ public class SubmitServlet extends DSpaceServlet
             }
 
             // Upload another file
-            request.setAttribute("submission.info", subInfo);
-            JSPManager.showJSP(request, response, "/submit/choose-file.jsp");
+            showProgressAwareJSP(request, response, subInfo, "/submit/choose-file.jsp");
         }
         else if (buttonPressed.equals("submit_show_checksums"))
         {
@@ -1331,9 +1299,8 @@ public class SubmitServlet extends DSpaceServlet
 
             // Display the form letting them change the description
             subInfo.bitstream = bitstream;
-            request.setAttribute("submission.info", subInfo);
-            JSPManager.showJSP(request, response,
-                    "/submit/change-file-description.jsp");
+            showProgressAwareJSP(request, response, subInfo,
+                		 "/submit/change-file-description.jsp");
         }
         else if (buttonPressed.startsWith("submit_remove_"))
         {
@@ -1436,8 +1403,8 @@ public class SubmitServlet extends DSpaceServlet
         // no real options on the page, just retry!
         if (buttonPressed.equals("submit"))
         {
-            request.setAttribute("submission.info", subInfo);
-            JSPManager.showJSP(request, response, "/submit/choose-file.jsp");
+            showProgressAwareJSP(request, response, subInfo,
+            		             "/submit/choose-file.jsp");
         }
         else
         {
@@ -1633,8 +1600,7 @@ public class SubmitServlet extends DSpaceServlet
             WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
 
             // FIXME: pass in more information about what happens next?
-            JSPManager.showJSP(request, response, "/submit/complete.jsp");
-
+            showProgressAwareJSP(request, response, subInfo, "/submit/complete.jsp");
             context.complete();
         }
         else if (request.getParameter("submit_reject") != null)
@@ -1705,7 +1671,6 @@ public class SubmitServlet extends DSpaceServlet
             // RLR hack - need to distinguish between progress bar real
             // submission
             String ccLicenseUrl = request.getParameter("cc_license_url");
-
             if ((ccLicenseUrl != null) && (ccLicenseUrl.length() > 0))
             {
                 Item item = subInfo.submission.getItem();
@@ -1826,71 +1791,71 @@ public class SubmitServlet extends DSpaceServlet
             HttpServletResponse response, SubmissionInfo subInfo, int step)
             throws ServletException, IOException, SQLException
     {
-        // All steps require the submitforminfo
-        request.setAttribute("submission.info", subInfo);
+        // determine collection
+        Collection c = subInfo.submission.getCollection();
+        
+        if ( step >= EDIT_METADATA_1 && step <= EDIT_METADATA_2 )
+        {
+        	// requires configurable form info per collection
+        	request.setAttribute( "submission.inputs", inputsReader.getInputs(c.getHandle()));
+        	// also indicate page
+           	request.setAttribute( "submission.page", new Integer(step) );
+		showProgressAwareJSP(request, response, subInfo,
+                  		     "/submit/edit-metadata.jsp");
+            return;
+        }
 
         switch (step)
         {
         case INITIAL_QUESTIONS:
-            JSPManager.showJSP(request, response,
-                    "/submit/initial-questions.jsp");
-
+            // requires configurable form info per collection
+            request.setAttribute( "submission.inputs", inputsReader.getInputs(c.getHandle()));
+            showProgressAwareJSP(request, response, subInfo,
+                		 "/submit/initial-questions.jsp");
             break;
-
-        case EDIT_METADATA_1:
-            JSPManager
-                    .showJSP(request, response, "/submit/edit-metadata-1.jsp");
-
-            break;
-
-        case EDIT_METADATA_2:
-            JSPManager
-                    .showJSP(request, response, "/submit/edit-metadata-2.jsp");
-
-            break;
-
+            
+        /* EDIT_METADATA cases handled above */
+            
         case UPLOAD_FILES:
             showFirstUploadPage(context, request, response, subInfo);
 
             break;
 
         case CHOOSE_FILE:
-            JSPManager.showJSP(request, response, "/submit/choose-file.jsp");
-
+            showProgressAwareJSP(request, response, subInfo,
+            		         "/submit/choose-file.jsp");
             break;
 
         case FILE_LIST:
             showUploadFileList(request, response, subInfo, false, false);
-
             break;
 
         case REVIEW_SUBMISSION:
-            JSPManager.showJSP(request, response, "/submit/review.jsp");
-
+            // requires configurable form info per collection
+            request.setAttribute( "submission.inputs", inputsReader.getInputs(c.getHandle()));
+            showProgressAwareJSP(request, response, subInfo,
+            		         "/submit/review.jsp");
             break;
 
         case GRANT_LICENSE:
-
-            Collection c = subInfo.submission.getCollection();
             request.setAttribute("license", c.getLicense());
-            JSPManager.showJSP(request, response, "/submit/show-license.jsp");
-
+            showProgressAwareJSP(request, response, subInfo,
+            		         "/submit/show-license.jsp");
             break;
 
         case CC_LICENSE:
 
             // Do we already have a CC license?
             Item item = subInfo.submission.getItem();
-            boolean exists = CreativeCommons.hasLicense(context, item);
-            request.setAttribute("cclicense.exists", new Boolean(exists));
-            JSPManager.showJSP(request, response,
-                    "/submit/creative-commons.jsp");
-
+            boolean exists =  CreativeCommons.hasLicense(context, item);
+            request.setAttribute("cclicense.exists", new Boolean(exists) );
+            showProgressAwareJSP(request, response, subInfo,
+            		         "/submit/creative-commons.jsp");
             break;
 
         case SUBMISSION_COMPLETE:
-            JSPManager.showJSP(request, response, "/submit/complete.jsp");
-
+            showProgressAwareJSP(request, response, subInfo,
+            		         "/submit/complete.jsp");
             break;
 
         default:
@@ -1927,10 +1892,9 @@ public class SubmitServlet extends DSpaceServlet
         }
         else
         {
-            request.setAttribute("submission.info", subInfo);
             request.setAttribute("step", String.valueOf(step));
             request.setAttribute("display.step", String.valueOf(displayStep));
-            JSPManager.showJSP(request, response, "/submit/cancel.jsp");
+            showProgressAwareJSP(request, response, subInfo, "/submit/cancel.jsp");
         }
     }
 
@@ -1987,21 +1951,20 @@ public class SubmitServlet extends DSpaceServlet
             ServletException, IOException
     {
         // Set required attributes
-        request.setAttribute("submission.info", subInfo);
         request.setAttribute("just.uploaded", new Boolean(justUploaded));
         request.setAttribute("show.checksums", new Boolean(showChecksums));
 
         // Always go to advanced view in workflow mode
         if (isWorkflow(subInfo) || subInfo.submission.hasMultipleFiles())
         {
-            JSPManager.showJSP(request, response,
-                    "/submit/upload-file-list.jsp");
+            showProgressAwareJSP(request, response, subInfo,
+       				 "/submit/upload-file-list.jsp");
         }
         else
         {
             // FIXME: Assume one and only one bitstream
-            JSPManager.showJSP(request, response,
-                    "/submit/show-uploaded-file.jsp");
+            showProgressAwareJSP(request, response, subInfo,
+       				 "/submit/show-uploaded-file.jsp");
         }
     }
 
@@ -2028,16 +1991,16 @@ public class SubmitServlet extends DSpaceServlet
 
         subInfo.bitstream = bitstream;
 
-        request.setAttribute("submission.info", subInfo);
         request.setAttribute("bitstream.formats", formats);
-
+ 
         // What does the system think it is?
         BitstreamFormat guess = FormatIdentifier
                 .guessFormat(context, bitstream);
 
         request.setAttribute("guessed.format", guess);
 
-        JSPManager.showJSP(request, response, "/submit/get-file-format.jsp");
+        showProgressAwareJSP(request, response, subInfo,
+       		             "/submit/get-file-format.jsp");
     }
 
     //****************************************************************
@@ -2045,6 +2008,29 @@ public class SubmitServlet extends DSpaceServlet
     //             MISCELLANEOUS CONVENIENCE METHODS
     //****************************************************************
     //****************************************************************
+    
+    /**
+     * Show a JSP after setting attributes needed by progress bar
+     * @param request	the request object
+     * @param response  the response object
+     * @param subInfo   the SubmissionInfo object
+     * @param jspPath	relative path to JSP
+     */
+     private void showProgressAwareJSP(
+            HttpServletRequest request,
+	        HttpServletResponse response,
+	        SubmissionInfo subInfo,
+			String jspPath)
+     		throws ServletException, IOException
+     {
+     	// all JSPs displaying the progress bar need to know the
+     	// number of metadata edit pages
+        subInfo.numMetadataPages =
+        	inputsReader.getNumberInputPages(subInfo.submission.getCollection().getHandle());
+        request.setAttribute("submission.info", subInfo);
+        
+        JSPManager.showJSP(request, response, jspPath);
+     }
 
     /**
      * Get a filled-out submission info object from the parameters in the
