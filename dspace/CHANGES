@@ -1,6 +1,9 @@
 1.3 branch (unreleased)
 =======================
-(Jozsef Martin)
+(Larry Stone)
+SF Patch #1175158 - Add POST handler to HTMLServlet
+
+(Jozsef Marton)
 SF Patch #1173564 - add missing ContentType directive to some of the JSPs
 
 (Richard Jones)

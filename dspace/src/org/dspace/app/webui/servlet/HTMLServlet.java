@@ -93,6 +93,16 @@ public class HTMLServlet extends DSpaceServlet
         return null;
     }
 
+    // On the surface it doesn't make much sense for this servlet to
+    // handle POST requests, but in practice some HTML pages which
+    // are actually JSP get called on with a POST, so it's needed.
+    protected void doDSPost(Context context, HttpServletRequest request,
+                HttpServletResponse response)
+        throws ServletException, IOException, SQLException, AuthorizeException
+    {
+        doDSGet(context, request, response);
+    }
+
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
