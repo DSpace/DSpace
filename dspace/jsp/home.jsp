@@ -54,7 +54,7 @@
     Community[] communities = (Community[]) request.getAttribute("communities");
 %>
 
-<dspace:layout style="home" locbar="nolink" title="Home">
+<dspace:layout locbar="nolink" title="Home">
 
     <table class="miscTable" width="95%" align="center">
         <tr>
