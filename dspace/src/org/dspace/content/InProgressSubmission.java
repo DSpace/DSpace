@@ -40,6 +40,7 @@
 
 package org.dspace.content;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
@@ -62,6 +63,12 @@ public interface InProgressSubmission
      */
     int getID();
 
+
+    /**
+     * Delete submission wrapper, doesn't delete item contents
+     */
+    void delete()
+        throws SQLException, IOException, AuthorizeException;
 
     /**
      * Update the submission, including the unarchived item.
