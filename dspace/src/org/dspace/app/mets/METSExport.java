@@ -87,7 +87,7 @@ import org.dspace.handle.HandleManager;
  */
 public class METSExport
 {
-    private static int licenseFormat;
+    private static int licenseFormat = -1;
 
     private static Properties dcToMODS;
 
@@ -200,6 +200,9 @@ public class METSExport
     private static void init(Context context)
         throws SQLException, IOException
     {
+        // Don't init again if initialised already
+        if (licenseFormat != -1) return;
+        
         // Find the License format
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(
                 context, "License");
@@ -240,7 +243,49 @@ public class METSExport
             // Couldn't make the directory for some reason
             throw new IOException("Couldn't create " + aipDir.toString());
         }
+
+        Mets mets = createMETS(context, item);
         
+        // Write the METS file
+        FileOutputStream out = new FileOutputStream(
+                aipDir.toString() + java.io.File.separator + "mets.xml");
+        mets.write(new MetsWriter(out));
+        out.close();
+        
+        // Write bitstreams
+        Bundle[] bundles = item.getBundles();
+        for (int i = 0; i < bundles.length; i++)
+        {
+            Bitstream[] bitstreams = bundles[i].getBitstreams();
+            
+            for (int b = 0; b < bitstreams.length; b++)
+            {
+                // Skip license bitstream
+                if (bitstreams[b].getFormat().getID() != licenseFormat)
+                {
+                    out = new FileOutputStream(aipDir.toString() +
+                            java.io.File.separator + bitstreams[b].getChecksum());
+                    InputStream in = bitstreams[b].retrieve();
+                    Utils.bufferedCopy(in, out);
+                    out.close();
+                    in.close();
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * 
+     * @param context  DSpace context
+     * @param item     DSpace item to create METS object for
+     * @return  METS object for DSpace item
+     */
+    public static Mets createMETS(Context context, Item item)
+        throws SQLException, IOException, AuthorizeException, MetsException
+    {
+        init(context);
+
         // Create the METS file
         Mets mets = new Mets();
         
@@ -325,7 +370,7 @@ public class METSExport
                 continue;
             
             // Create a fileGrp
-            FileGrp fileGrp = new FileGrp();			
+            FileGrp fileGrp = new FileGrp();            
             // Bundle name for USE attribute
             if (bundles[i].getName() != null && !bundles[i].getName().equals(""))
             {
@@ -403,32 +448,7 @@ public class METSExport
         
         mets.validate(new MetsValidator());
         
-        // Write the METS file
-        FileOutputStream out = new FileOutputStream(
-                aipDir.toString() + java.io.File.separator + "mets.xml");
-        mets.write(new MetsWriter(out));
-        out.close();
-        
-        // Write bitstreams
-        bundles = item.getBundles();
-        for (int i = 0; i < bundles.length; i++)
-        {
-            Bitstream[] bitstreams = bundles[i].getBitstreams();
-            
-            for (int b = 0; b < bitstreams.length; b++)
-            {
-                // Skip license bitstream
-                if (bitstreams[b].getFormat().getID() != licenseFormat)
-                {
-                    out = new FileOutputStream(aipDir.toString() +
-                            java.io.File.separator + bitstreams[b].getChecksum());
-                    InputStream in = bitstreams[b].retrieve();
-                    Utils.bufferedCopy(in, out);
-                    out.close();
-                    in.close();
-                }
-            }
-        }
+        return mets;
     }
     
     
