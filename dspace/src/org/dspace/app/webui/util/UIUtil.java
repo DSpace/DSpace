@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DCDate;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -199,5 +200,88 @@ public class UIUtil
         }
 
         return newString.toString();
+    }
+
+
+    /**
+     * Write a human-readable version of a DCDate.
+     *
+     * @param  d  the date
+     * @param time  if true, display the time with the date
+     * @param localTime  if true, adjust for local timezone, otherwise GMT
+     *
+     * @return  the date in a human-readable form.
+     */
+    public static String displayDate(DCDate d,
+        boolean time,
+        boolean localTime)
+    {
+        StringBuffer sb = new StringBuffer();
+		
+        if (d != null)
+        {
+            int year, month, day, hour, minute, second;
+
+            if (localTime)
+            {
+                year = d.getYear();
+                month = d.getMonth();
+                day = d.getDay();
+                hour = d.getHour();
+                minute = d.getMinute();
+                second = d.getSecond();
+            }
+            else
+            {
+                year = d.getYearGMT();
+                month = d.getMonthGMT();
+                day = d.getDayGMT();
+                hour = d.getHourGMT();
+                minute = d.getMinuteGMT();
+                second = d.getSecondGMT();
+            }			
+	
+            if (year > -1)
+            {
+                if (month > -1)
+                {
+                    if (day > -1)
+                    {
+                        sb.append(day + "-");
+                    }
+                    sb.append(DCDate.getMonthName(month).substring(0, 3) + "-");
+                }
+                sb.append(year + " ");
+            }
+
+            if (time && hour > -1)
+            {
+                String hr = String.valueOf(hour);
+
+                while (hr.length() < 2)
+                {
+                    hr = "0" + hr;
+                }
+                String mn = String.valueOf(minute);
+
+                while (mn.length() < 2)
+                {
+                    mn = "0" + mn;
+                }
+                String sc = String.valueOf(second);	
+
+                while (sc.length() < 2)
+                {
+                    sc = "0" + sc;
+                }
+                sb.append(hr + ":" + mn + ":" + sc + " ");
+            }
+        }
+        else
+        {
+            sb.append("Unset");
+        }
+		
+        return (sb.toString());
     }
 }

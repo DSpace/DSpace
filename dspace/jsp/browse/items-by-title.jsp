@@ -1,5 +1,5 @@
 <%--
-  - authors.jsp
+  - items-by-title.jsp
   -
   - Version: $Revision$
   -
@@ -39,25 +39,23 @@
   --%>
 
 <%--
-  - Display the results of browsing the author index
+  - Display the results of browsing title index
   -
   - Attributes to pass in:
   -   community      - pass in if the scope of the browse is a community, or
   -                    a collection within this community
   -   collection     - pass in if the scope of the browse is a collection
-  -   browse.info    - the BrowseInfo containing the authors to display
+  -   browse.info    - the BrowseInfo containing the items to display
+  -   handles        - String[] of Handles corresponding to the browse results
   -   highlight      - Boolean.  If true, the focus point of the browse
   -                    is highlighted
   -   previous.query - The query string to pass to the servlet to get the
-  -                    previous page of authors
+  -                    previous page of items
   -   next.query     - The query string to pass to the servlet to get the next
-  -                    page of aitjprs
+  -                    page of items
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.util.List" %>
 
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.content.Community" %>
@@ -72,6 +70,7 @@
     Community community = (Community) request.getAttribute("community");
 
     BrowseInfo browseInfo = (BrowseInfo) request.getAttribute("browse.info");
+    String[] handles = (String[]) request.getAttribute("handles");
 
     boolean highlight = ((Boolean) request.getAttribute("highlight")).booleanValue();
 
@@ -90,13 +89,20 @@
     }
 %>
 
-<dspace:layout title="Browse by Author">
+<dspace:layout title="Browse by Title">
 
-    <H2>Browsing <%= scopeName %> by Author</H2>
+<pre>
+Test:  result count = <%= browseInfo.getResultCount() %>
+       overall position = <%= browseInfo.getOverallPosition() %>
+       offset = <%= browseInfo.getOffset() %>
+       total = <%= browseInfo.getTotal() %>
+       isFirst = <%= browseInfo.isFirst() ? "true" : "false" %>
+       isLast = <%= browseInfo.isLast() ? "true" : "false" %>
+</pre>
+    <H2>Browsing <%= scopeName %> by Title</H2>
 
-    <form action="browse-author" method=GET>
-
-        <%-- Browse controls --%>
+    <%-- Title browse controls table --%>
+    <form action="browse-title" method=GET>
         <table align=center border=0 bgcolor="#CCCCCC" cellpadding=0>
             <tr>
                 <td>
@@ -104,12 +110,12 @@
                         <tr>
                             <td class="browseBar">
                                 <span class="browseBarLabel">Jump&nbsp;to:&nbsp;</span>
-                                <A HREF="browse-author?starts_with=0">0-9</A>
+                                <A HREF="browse-title?starts_with=0">0-9</A>
 <%
     for (char c = 'A'; c <= 'Z'; c++)
     {
 %>
-                                <A HREF="browse-author?starts_with=<%= c %>"><%= c %></A>
+                                <A HREF="browse-title?starts_with=<%= c %>"><%= c %></A>
 <%
     }
 %>
@@ -118,95 +124,82 @@
                         <tr>
                             <td class="browseBar" align=center>
                                 <span class="browseBarLabel">or enter first few letters:&nbsp;</span>
-                                <input type="text" name="starts_with">&nbsp;<input type="submit" value="Go!">
+                                <input type="text" name="starts_with"/>&nbsp;<input type="submit" value="Go!">
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
         </table>
-
-        <BR />
-
-        <P align=center>Showing authors <%= browseInfo.getOverallPosition() + 1 %>-<%= browseInfo.getOverallPosition() + browseInfo.getResultCount() %> of <%= browseInfo.getTotal() %>.</P>
-
-        <%-- Previous page/Next page --%>
-        <table align=center border=0 width=70%>
-            <tr>
-                <td class=standard align=left>
-<%
-    if (prevQuery != null)
-    {
-%>
-                    <A HREF="browse-author?<%= prevQuery %>">Previous page</A>
-<%
-    }
-%>
-                </td>
-                <td class=standard align=right>
-<%
-    if (nextQuery != null)
-    {
-%>
-                    <A HREF="browse-author?<%= nextQuery %>">Next page</A>
-<%
-    }
-%>
-                </td>
-            </tr>
-        </table>
-
-
-        <%-- The authors --%>
-        <table align=center class="miscTable">
-<%
-    // Row: toggles between Odd and Even
-    String row = "odd";
-    List results = browseInfo.getResults();
-
-    for (int i = 0; i < results.size(); i++)
-    {
-        String name = (String) results.get(i);
-%>
-            <tr>
-                <td class="<%= highlight && i==browseInfo.getOffset() ? "highlight" : row %>RowOddCol">
-                    <A HREF="items-by-author?author=<%= URLEncoder.encode(name) %>"><%= name %></A>
-                </td>
-            </tr>
-<%
-        row = ( row.equals( "odd" ) ? "even" : "odd" );
-    }
-%>
-        </table>
-
-
-        <%-- Previous page/Next page --%>
-        <table align=center border=0 width=70%>
-            <tr>
-                <td class=standard align=left>
-<%
-    if (prevQuery != null)
-    {
-%>
-                    <A HREF="browse-author?<%= prevQuery %>">Previous page</A>
-<%
-    }
-%>
-                </td>
-                <td class=standard align=right>
-<%
-    if (nextQuery != null)
-    {
-%>
-                    <A HREF="browse-author?<%= nextQuery %>">Next page</A>
-<%
-    }
-%>
-                </td>
-            </tr>
-        </table>
-
-
     </form>
+
+    <BR>
+
+    <P align=center>
+        Showing items <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %>
+        of <%= browseInfo.getTotal() %>.
+    </P>
+
+    <%-- Previous page/Next page --%>
+    <table align=center border=0 width=70%>
+        <tr>
+            <td class=standard align=left>
+<%
+    if (prevQuery != null)
+    {
+%>
+                <A HREF="browse-title?<%= prevQuery %>">Previous page</A>
+<%
+    }
+%>
+            </td>
+            <td class=standard align=right>
+<%
+    if (nextQuery != null)
+    {
+%>
+                <A HREF="browse-title?<%= nextQuery %>">Next page</A>
+<%
+    }
+%>
+            </td>
+        </tr>
+    </table>
+
+<%
+    String highlightAttribute = "-1";
+    if (highlight)
+    {
+        highlightAttribute = String.valueOf(browseInfo.getOffset());
+    }    
+%>
+    <dspace:itemlist items="<%= browseInfo.getResults() %>" handles="<%= handles %>" emphcolumn="title" highlightrow="<%= highlightAttribute %>" />
+
+
+    <%-- Previous page/Next page --%>
+    <table align=center border=0 width=70%>
+        <tr>
+            <td class=standard align=left>
+<%
+    if (prevQuery != null)
+    {
+%>
+                <A HREF="browse-title?<%= prevQuery %>">Previous page</A>
+<%
+    }
+%>
+            </td>
+            <td class=standard align=right>
+<%
+    if (nextQuery != null)
+    {
+%>
+                <A HREF="browse-title?<%= nextQuery %>">Next page</A>
+<%
+    }
+%>
+            </td>
+        </tr>
+    </table>
 
 </dspace:layout>

@@ -60,14 +60,21 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.handle.HandleManager" %>
 
 <%
-    // Don't need to extract all attributes - most are used by
-    // item display component
+    // Attributes
     Boolean displayAllBoolean = (Boolean) request.getAttribute("display.all");
     boolean displayAll = (displayAllBoolean != null && displayAllBoolean.booleanValue());
     String handle = (String) request.getAttribute("handle");
+    Item item = (Item) request.getAttribute("item");
+    Collection[] collections = (Collection[]) request.getAttribute("collections");
+    Community[] communities = (Community[]) request.getAttribute("communities");
+
+    // Full title needs to be put into a string to use as tag argument
     String title = "Item " + handle;
 %>
 
@@ -89,24 +96,28 @@
 <%
     }
 
+    String displayStyle = (displayAll ? "full" : "default");
+%>
+    <dspace:item item="<%= item %>" communities="<%= communities %>" collections="<%= collections %>" style="<%= displayStyle %>" />
+
+<%
     if (displayAll)
     {
 %>
-    <%@ include file="/components/item-full.jsp" %>
-
     <P align=center><A HREF="?mode=simple">Show simple item record</A></P>
 <%
     }
     else
     {
 %>
-    <%@ include file="/components/item-simple.jsp" %>
     <P align=center><A HREF="?mode=full">Show full item record</A></P>
 <%
     }
 %>
 
     <%-- SFX Link --%>
-    <%@ include file="/components/sfx-query.jsp" %>
+    <P align=center>
+        <A HREF="<dspace:sfxlink item="<%= item %>" />">SFX Query</A>
+    </P>
 
 </dspace:layout>

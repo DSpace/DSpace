@@ -1,5 +1,5 @@
 /*
- * Layout.java
+ * LayoutTag.java
  *
  * Version: $Revision$
  *
@@ -60,8 +60,8 @@ import org.dspace.core.ConfigurationManager;
 /**
  * Tag for HTML page layout ("skin").
  * <P>
- * This tag sets request attributes that should be used by the header and
- * footer to render the page appropriately:
+ * This tag <em>sets</em> request attributes that should be used by the header
+ * and footer to render the page appropriately:
  * <P><UL>
  * <LI><code>dspace.layout.title</code> - title of page</LI>
  * <LI><code>dspace.layout.locbar</code> - value will Boolean true or false</LI>

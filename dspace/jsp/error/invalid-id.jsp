@@ -87,7 +87,7 @@
     <P>If you're having problems, or you expected the ID to work, feel free to
     contact the site administrators.</P>
 
-    <%@ include file="/contact-info.jsp" %>
+    <%@ include file="/components/contact-info.jsp" %>
 
     <P align=center>
         <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>

@@ -122,6 +122,6 @@
   </form>
 
   <dspace:sidebar>
-    <%@ include file="news.jsp" %>
+    <%@ include file="/components/news.jsp" %>
   </dspace:sidebar>
 </dspace:layout>

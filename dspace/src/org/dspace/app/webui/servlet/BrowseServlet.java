@@ -40,7 +40,6 @@
 
 package org.dspace.app.webui.servlet;
 
-import java.io.InputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
@@ -72,7 +71,7 @@ import org.dspace.handle.HandleManager;
 /**
  * Servlet for browsing through indices.  This can be used to browse authors,
  * items by date, or items by title.  In the deployment description, the
- * parameter "browse" should be set to one of these values:
+ * initial parameter "browse" should be set to one of these values:
  * <P>
  * <UL>
  * <LI><code>titles</code> - for browsing items by title (the default)</LI>
@@ -443,17 +442,15 @@ public class BrowseServlet extends DSpaceServlet
             }
             else if (browseDates)
             {
-                request.setAttribute("browse.dates", new Boolean(true));
                 request.setAttribute("oldest.first", new Boolean(oldestFirst));
                 request.setAttribute("flip.ordering.query", flipOrderingQuery);
                 JSPManager.showJSP(request, response,
-                    "/browse/items.jsp");
+                    "/browse/items-by-date.jsp");
             }
             else
             {
-                request.setAttribute("browse.dates", new Boolean(false));
                 JSPManager.showJSP(request, response,
-                    "/browse/items.jsp");
+                    "/browse/items-by-title.jsp");
             }
         }
     }

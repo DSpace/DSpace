@@ -143,4 +143,86 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
+
+  <tag>
+    <name>item</name>
+    <tagclass>org.dspace.app.webui.jsptag.ItemTag</tagclass>
+    <info>
+      Tag for displaying an item.  "item" must always be an
+      org.dspace.content.Item.  "style" should be "default" or "full", or can
+      be omitted to use "default".  "collections" should be the array of
+      collections the item is in, worked out beforehand to avoid the chance
+      of an error occurring during display.  If collections is null, the
+      collections the item is in aren't listed.  If collections is specified,
+      "communities" must also be specified, such that collections[n] is
+      contained in communities[n].
+    </info>
+    <attribute>
+      <name>item</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>style</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>communities</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>collections</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+
+  <tag>
+    <name>itemlist</name>
+    <tagclass>org.dspace.app.webui.jsptag.ItemListTag</tagclass>
+    <info>
+      Tag for displaying a list of items.  "handles" must be an array of the
+      Handles corresponding to those items.  Specify highlightrow (starting
+      from zero) if a row should be highlit.  Specify an emphcolumn of
+      "date" or "title" to emphasise the contents of a column.
+    </info>
+    <attribute>
+      <name>items</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>handles</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>highlightrow</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>emphcolumn</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <name>sfxlink</name>
+    <tagclass>org.dspace.app.webui.jsptag.SFXLinkTag</tagclass>
+    <info>
+      Tag to display an SFX query for a particular item.  This just gives the
+      query URL, it does not render an actual link.
+    </info>
+    <attribute>
+      <name>item</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
 </taglib>
