@@ -64,8 +64,10 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.authorize.AuthorizeManager;
 
 /**
  * Tag for display a list of items
@@ -195,8 +197,6 @@ public class ItemListTag extends TagSupport
                 }
                 
                 out.print("<A HREF=\"");
-//                HttpServletRequest hrq = (HttpServletRequest)
-//                    pageContext.getRequest();
                 out.print(hrq.getContextPath());
                 out.print("/handle/");
                 out.print(items[i].getHandle());
@@ -367,6 +367,8 @@ public class ItemListTag extends TagSupport
     		InputStream is = BitstreamStorageManager.retrieve(c,
     			bitstream.getID());
     		
+    		//AuthorizeManager.authorizeAction(bContext, this, Constants.READ);
+    		
     		// 	read in bitstream's image    		
     		buf = ImageIO.read(is);
 		}
@@ -440,49 +442,49 @@ public class ItemListTag extends TagSupport
     	// then show the thumbnail
     	if (thumbs.length > 0 && !html)
         {
-    		Bitstream thumbnailBitstream;
-    		
-    		if (original[0].getBitstreams().length > 1 &&
-    			original[0].getPrimaryBitstreamID() > -1)
-    		{
-    			try
-				{
-    				Context c = UIUtil.obtainContext(hrq);
-    				thumbnailBitstream = thumbs[0].getBitstreamByName(Bitstream.find(c, original[0].getPrimaryBitstreamID()).getName() + ".jpg");
-				}
-    			catch (SQLException sqle)
-				{
-    				throw new JspException(sqle.getMessage());
-				}
-    		}
-    		else
-    		{
-    	  		thumbnailBitstream = thumbs[0].getBitstreams()[0];    	  		
-    		}	              		
+    		try
+			{
+				Context c = UIUtil.obtainContext(hrq);
 
-    		if (thumbnailBitstream != null)
-    		{
-        		StringBuffer thumbLink = new StringBuffer("<br/><a target=_blank href=\"")
-						.append(hrq.getContextPath())
-						.append("/handle/")
-						.append(item.getHandle())
-						.append("\"><img src=\"")
-						.append(hrq.getContextPath())
-						.append("/bitstream/")
-						.append(item.getHandle())
-						.append("/")
-						.append(thumbnailBitstream.getSequenceID())
-						.append("/")
-   						.append(URLEncoder.encode(thumbnailBitstream.getName()))
-						.append("\" alt=")
-						.append(thumbnailBitstream.getName())
-						.append("\" ")
-						.append(getScalingAttr(hrq, thumbnailBitstream))
-						.append("/></a>");
-        		
-        		return thumbLink.toString();
-    		}
-        }
+				Bitstream thumbnailBitstream;
+    		
+	    		if (original[0].getBitstreams().length > 1 &&
+	    			original[0].getPrimaryBitstreamID() > -1)
+	    		{
+	    			thumbnailBitstream = thumbs[0].getBitstreamByName(Bitstream.find(c, original[0].getPrimaryBitstreamID()).getName() + ".jpg");
+	    		}
+	    		else
+	    		{
+	    	  		thumbnailBitstream = thumbs[0].getBitstreams()[0];    	  		
+	    		}	              		
+	
+	    		if ((thumbnailBitstream != null) &&
+	    			(AuthorizeManager.authorizeActionBoolean(c, thumbnailBitstream, Constants.READ)))  
+	    		{
+	        		StringBuffer thumbLink = new StringBuffer("<br/><a target=_blank href=\"")
+							.append(hrq.getContextPath())
+							.append("/handle/")
+							.append(item.getHandle())
+							.append("\"><img src=\"")
+							.append(hrq.getContextPath())
+							.append("/retrieve/")
+							.append(thumbnailBitstream.getID())
+							.append("/")
+	   						.append(URLEncoder.encode(thumbnailBitstream.getName()))
+							.append("\" alt=")
+							.append(thumbnailBitstream.getName())
+							.append("\" ")
+							.append(getScalingAttr(hrq, thumbnailBitstream))
+							.append("/></a>");
+	        		
+	        		return thumbLink.toString();
+	    		}
+			}
+    		catch (SQLException sqle)
+			{
+    			throw new JspException(sqle.getMessage());
+			}
+	    }
     	return "";
     }
 }
