@@ -275,7 +275,7 @@ public class DatabaseManagerTest extends TestCase
             // Get all the rows
             context = new Context();
             TableRowIterator iterator = DatabaseManager.query
-                (context, TABLENAME, "select * from TestTable order by id");
+                (context, "select * from TestTable order by id");
 
             // Loop through all entries
             int test = start;
@@ -291,7 +291,7 @@ public class DatabaseManagerTest extends TestCase
 
             // The same thing in reverse order
             iterator = DatabaseManager.query
-                (context, TABLENAME, "select * from TestTable order by id desc");
+                (context, "select * from TestTable order by id desc");
 
             // Loop through all entries
             test = max - 1;
