@@ -2,6 +2,12 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <!--
+  - REMEMBER: ONLY UPDATE THE VERSION IN dspace/config/templates
+  - AND THEN RUN dspace/bin/install-configs!
+  - DO NOT EDIT THE 'LIVE' VERSION!
+  -->
+
+<!--
  - web.xml
  -
  - Version: $Revision$
@@ -43,7 +49,17 @@
 
 <!--
   - The is the servlet deployment descriptor for Tomcat 4.0, for the OAI
-  - Web application
+  - Web application.
+  - OAICat Configuration file - see OAICat documentation for details
+  -
+  - Text surrounded by two '@' symbols is replaced with the corresponding
+  - property from dspace.cfg.  For example:
+  -
+  - @@dspace.url@@
+  -
+  - would be replaced with the dspace.url property in dspace.cfg.
+  - When /dspace/bin/install-configs is run, this file will be installed in the
+  - location specified by the property: config.template.oai-web.xml
   -->
 
 <web-app>
