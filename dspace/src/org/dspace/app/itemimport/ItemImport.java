@@ -168,7 +168,7 @@ public class ItemImport
             myitem = wi.getItem();
 
             // now fill out dublin core for item
-            loadDublinCore( c, myitem, path + "/" + itemname + "/" + "dspace_meta.xml" );
+            loadDublinCore( c, myitem, path + "/" + itemname + "/" + "dublin_core.xml" );
 
             // and the bitstreams from the contents file
             // process contents file, add bistreams and bundles
@@ -193,7 +193,7 @@ public class ItemImport
 
         // Get the nodes corresponding to formats
         NodeList dcNodes = XPathAPI.selectNodeList(document,
-            "/barton_record/dcvalue");
+            "/dublin_core/dcvalue");
 
         System.out.println("Nodelist has # elements: " + dcNodes.getLength() );
 
