@@ -1,5 +1,5 @@
 <%--
-  - home.jsp
+  - header-home.jsp
   -
   - Version: $Revision$
   -

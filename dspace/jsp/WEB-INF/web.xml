@@ -103,6 +103,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>feedback</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.FeedbackServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>items-by-author</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ItemsByAuthorServlet</servlet-class>
   </servlet>
@@ -166,6 +171,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>feedback</servlet-name>
+    <url-pattern>/feedback</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>items-by-author</servlet-name>
     <url-pattern>/items-by-author</url-pattern>
   </servlet-mapping>
@@ -199,6 +209,13 @@
     <servlet-name>submit</servlet-name>
     <url-pattern>/submit</url-pattern>
   </servlet-mapping>
+
+
+  <!-- Error pages -->
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error/404.jsp</location>
+  </error-page>
 
 
   <!-- DSpace JSP Tag Library -->

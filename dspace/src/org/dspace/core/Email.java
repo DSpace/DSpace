@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.Message;
@@ -123,6 +124,9 @@ public class Email
     /** The recipients */
     private List recipients;
 
+    /** Reply to field, if any */
+    private String replyTo;
+
     /**
      * Create a new email message.
      */
@@ -132,6 +136,7 @@ public class Email
         recipients = new ArrayList();
         subject = "";
         content = "";
+        replyTo = null;
     }
 
 
@@ -172,6 +177,17 @@ public class Email
 
 
     /**
+     * Set the reply-to email address
+     *
+     * @param  email   the reply-to email address
+     */
+    public void setReplyTo(String email)
+    {
+        replyTo = email;
+    }
+
+
+    /**
      * Fill out the next argument in the template
      *
      * @param  arg   the value for the next argument
@@ -190,6 +206,7 @@ public class Email
     {
         arguments = new ArrayList();
         recipients = new ArrayList();
+        replyTo = null;
     }
 
 
@@ -204,6 +221,7 @@ public class Email
         // Get the mail configuration properties
         String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
+
 
         // Set up properties for mail session
         Properties props = System.getProperties();
@@ -230,6 +248,13 @@ public class Email
         message.setFrom(new InternetAddress(from));
         message.setSubject(subject);
         message.setText(fullMessage);
+        
+        if (replyTo != null)
+        {
+            Address[] replyToAddr = new Address[1];
+            replyToAddr[0] = new InternetAddress(replyTo);
+            message.setReplyTo(replyToAddr);
+        }
 
         Transport.send(message);
     }
