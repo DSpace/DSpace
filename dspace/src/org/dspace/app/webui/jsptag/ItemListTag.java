@@ -100,7 +100,6 @@ public class ItemListTag extends TagSupport
 
         try
         {
-System.err.println("HIGHLIGHT ROW: " + highlightRow);
             out.println("<table align=center class=\"miscTable\">");
 
             // Row: toggles between Odd and Even
@@ -262,8 +261,6 @@ System.err.println("HIGHLIGHT ROW: " + highlightRow);
      */
     public void setHighlightrow(String highlightRowIn)
     {
-System.err.println("HIGHLIGHT ROW IN: " + highlightRowIn);
-
         if (highlightRowIn == null || highlightRowIn.equals(""))
         {
             highlightRow = -1;
