@@ -46,6 +46,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.TokenMgrError;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -59,8 +60,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
 // issues
-//   need to filter query string for security
-//   cmd line query needs to process args correctly (seems to split them up)
+// need to filter query string for security
+// cmd line query needs to process args correctly (seems to split them up)
 public class DSQuery
 {
     // Result types
@@ -79,6 +80,16 @@ public class DSQuery
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(DSQuery.class);
+
+    static
+    {
+        String maxClauses = ConfigurationManager
+                .getProperty("search.max-clauses");
+        if (maxClauses != null)
+        {
+            BooleanQuery.setMaxClauseCount(Integer.parseInt(maxClauses));
+        }
+    }
 
     /**
      * Do a query, returning a List of DSpace Handles to objects matching the
@@ -106,13 +117,13 @@ public class DSQuery
 
         // massage the query string a bit
         querystring = checkEmptyQuery(querystring); // change nulls to an empty
-                                                    // string
+        // string
         querystring = workAroundLuceneBug(querystring); // logicals changed to
-                                                        // && ||, etc.
+        // && ||, etc.
         querystring = stripHandles(querystring); // remove handles from query
-                                                 // string
+        // string
         querystring = stripAsterisk(querystring); // remove asterisk from
-                                                  // beginning of string
+        // beginning of string
 
         try
         {
@@ -121,7 +132,7 @@ public class DSQuery
                     .getProperty("search.dir"));
 
             QueryParser qp = new QueryParser("default", new DSAnalyzer());
-
+            log.info("Final query string: " + querystring);
             Query myquery = qp.parse(querystring);
             Hits hits = searcher.search(myquery);
 
@@ -192,6 +203,11 @@ public class DSQuery
                             + tme));
 
             qr.setErrorMsg("Invalid search string");
+        }
+        catch(BooleanQuery.TooManyClauses e)
+        {
+            log.warn(LogManager.getHeader(c, "Query too broad", e.toString()));
+            qr.setErrorMsg("Your query was too broad. Try a narrower query.");
         }
 
         return qr;
