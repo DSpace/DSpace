@@ -266,6 +266,7 @@ Common usage:
       <package name="org.dspace.content"/>
       <package name="org.dspace.core"/>
       <package name="org.dspace.eperson"/>
+      <package name="org.dspace.handles"/>
       <package name="org.dspace.storage.bitstore"/>
       <package name="org.dspace.storage.rdbms"/>
     </javadoc>
