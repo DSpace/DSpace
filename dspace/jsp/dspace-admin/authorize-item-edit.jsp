@@ -155,18 +155,9 @@
                     ...  
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
-                </td>
-                <td class="<%= row %>RowOddCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
                 </td>
-                <td class="<%= row %>RowEvenCol">
-                    <%= (rp.getStartDate() == null ? "..." : "..." ) %>  
-                </td>
                 <td class="<%= row %>RowOddCol">
-                    <%= (rp.getEndDate() == null   ? "..." : "..." ) %>  
-                </td>
-                <td class="<%= row %>RowEvenCol">
                     <input type="hidden" name="policy_id"     value="<%= rp.getID() %>">
                     <input type="hidden" name="item_id"       value="<%= item.getID() %>">
                     <input type="submit" name="submit_item_edit_policy" value="Edit">
