@@ -119,11 +119,11 @@ public class GroupEditServlet extends DSpaceServlet
 
                 int [] eperson_ids = UIUtil.getIntParameters(request,"eperson_id");
 
+                // now get members, and add new ones and remove missing ones
+                EPerson [] members = group.getMembers();
+
                 if( eperson_ids != null )
                 {
-                    // now get members, and add new ones and remove missing ones
-                    EPerson [] members = group.getMembers();
-
                     for(int x=0; x<eperson_ids.length; x++)
                     {
                         // look for this ID in the EPerson array
@@ -161,8 +161,18 @@ public class GroupEditServlet extends DSpaceServlet
                         }
                     }
 
-                    group.update();
                 }
+                else
+                {
+                    // no members found (ids == null), remove them all!
+                    for(int y=0; y<members.length; y++)
+                    {
+                        group.removeMember(members[y]);
+                    }
+                }
+
+                group.update();
+
                         
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
