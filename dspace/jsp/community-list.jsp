@@ -54,6 +54,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.Map" %>
+<%@ page import="java.io.IOException" %>
+<%@ page import="java.sql.SQLException" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
@@ -66,6 +68,51 @@
     Map subcommunityMap = (Map) request.getAttribute("subcommunities.map");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    boolean showAll = true;
+%>
+
+<%!
+    JspWriter out = null;
+    HttpServletRequest request = null;
+
+    void setContext(JspWriter out, HttpServletRequest request)
+    { 
+        this.out = out;
+        this.request = request;
+    }
+
+    void showCommunity(Community c) throws IOException, SQLException
+    {
+        out.println( "<LI class=\"communityLink\">" );
+        out.println( "<strong><A HREF=\"" + request.getContextPath() + "/handle/" + c.getHandle() + "\">" + c.getMetadata("name") + "</A></strong>");
+
+        // Get the collections in this community
+        Collection[] cols = c.getCollections();
+        if (cols.length > 0)
+        {
+            out.println("<UL>");
+            for (int j = 0; j < cols.length; j++)
+            {
+                out.println("<LI class=\"collectionListItem\">");
+                out.println("<A HREF=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</A></LI>");
+            }
+            out.println("</UL>");
+        }
+
+        // Get the sub-communities in this community
+        Community[] comms = c.getSubcommunities();
+        if (comms.length > 0)
+        {
+            out.println("<UL>");
+            for (int k = 0; k < comms.length; k++)
+            {
+               showCommunity(comms[k]);
+            }
+            out.println("</UL>");
+ 
+        }
+        out.println("<BR>");
+    }
 %>
 
 <dspace:layout title="Communities and Collections">
@@ -125,48 +172,58 @@
 <%
     }
 %>
-  
     <UL>
 <%
-    for (int i = 0; i < communities.length; i++)
+    if (showAll)
     {
+        setContext(out, request);
+        for (int i = 0; i < communities.length; i++)
+        {
+            showCommunity(communities[i]);
+        }
+     }
+     else
+     {
+        for (int i = 0; i < communities.length; i++)
+        {
 %>		
-        <LI class="communityLink">
+            <LI class="communityLink">
             <%-- HACK: <strong> tags here for broken Netscape 4.x CSS support --%>
             <strong><A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></A></strong>
 	    <UL>
 <%
-        // Get the collections in this community from the map
-        Collection[] cols = (Collection[]) collectionMap.get(
-            new Integer(communities[i].getID()));
+            // Get the collections in this community from the map
+            Collection[] cols = (Collection[]) collectionMap.get(
+                new Integer(communities[i].getID()));
 
-        for (int j = 0; j < cols.length; j++)
-        {
+            for (int j = 0; j < cols.length; j++)
+            {
 %>
-            <LI class="collectionListItem">
+                <LI class="collectionListItem">
                 <A HREF="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></A></LI>
 <%
-        }
+            }
 %>
             </UL>
 	    <UL>
 <%
-        // Get the sub-communities in this community from the map
-        Community[] comms = (Community[]) subcommunityMap.get(
-            new Integer(communities[i].getID()));
+            // Get the sub-communities in this community from the map
+            Community[] comms = (Community[]) subcommunityMap.get(
+                new Integer(communities[i].getID()));
 
-        for (int k = 0; k < comms.length; k++)
-        {
+            for (int k = 0; k < comms.length; k++)
+            {
 %>
                 <LI class="communityLink">
-                    <A HREF="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></A></LI>
+                <A HREF="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></A></LI>
 <%
-        }
+            }
 %>
             </UL>
             <BR>
         </LI>
 <%
+        }
     }
 %>
     </UL>
