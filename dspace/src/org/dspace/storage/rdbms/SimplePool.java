@@ -194,7 +194,7 @@ public class SimplePool implements java.sql.Driver
     }
 
     // Simple info class
-    public static class SimplePoolInfo
+    static class SimplePoolInfo
     {
 
         /**
