@@ -42,7 +42,8 @@
 
 package org.dspace.administer;
 
-import java.io.DataInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -71,12 +72,12 @@ public class CreateAdministrator
     public static void main(String argv[])
     {
         Context context = null;
-        DataInputStream input = null;
+        BufferedReader input = null;
 
         try
         {
             // For easier reading of typing
-            input = new DataInputStream(System.in);
+            input = new BufferedReader(new InputStreamReader(System.in));
 
             context = new Context();
 
