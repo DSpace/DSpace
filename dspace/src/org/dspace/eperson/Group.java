@@ -69,7 +69,7 @@ public class Group
     private TableRow myRow;
 
     /** list of epeople in the group */
-    private ArrayList epeople = new ArrayList();
+    private List epeople = new ArrayList();
 
     /** epeople list needs to be written out again */
     private boolean epeoplechanged = false;
@@ -414,6 +414,9 @@ public class Group
         // Remove from cache
         myContext.removeCached(this, getID());
 
+        // Remove any ResourcePolicies that reference this group
+        AuthorizeManager.removeGroupPolicies(myContext, getID());        
+
         // Remove any group memberships first
         DatabaseManager.updateQuery(myContext,
             "DELETE FROM EPersonGroup2EPerson WHERE eperson_group_id=" +
@@ -429,7 +432,6 @@ public class Group
                     "delete_group",
                     "group_id=" + getID() )
                 );
-
     }
 
 
@@ -442,6 +444,16 @@ public class Group
         myArray = (EPerson[]) epeople.toArray(myArray);
 
         return myArray;
+    }
+
+
+    /**
+     * Return true if group has no members
+     */
+    public boolean isEmpty()
+    {
+        if( epeople.size() == 0 ) return true;
+        else return false;
     }
 
 
