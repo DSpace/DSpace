@@ -56,7 +56,14 @@ import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.*;
 
 /**
- * Methods for registration and forgot-password
+ * Methods for handling registration by email and forgotten passwords.
+ * When someone registers as a user, or forgets their password, the
+ * sendRegistrationInfo or sendForgotPasswordInfo methods can be
+ * used to send an email to the user. The email contains a special
+ * token, a long string which is randomly generated and thus hard to
+ * guess. When the user presents the token back to the system, the
+ * AccountManager can use the token to determine the identity of the
+ * eperson.
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -66,8 +73,11 @@ public class AccountManager
     /** log4j log */
     private static Logger log = Logger.getLogger(AccountManager.class);
 
+    /** Private Constructor */
+    private AccountManager () {}
+
     /**
-     * Send registration info to the EPerson with the given email address.
+     * Email registration info to the given email address.
      *
      * Potential error conditions:
      *   No EPerson with that email (returns null)
@@ -76,8 +86,8 @@ public class AccountManager
      *   Error reading email template (throws IOException)
      *   Authorization error (throws AuthorizeException)
      *
-     * @param context - DSpace context
-     * @param email - Email address to send the registration email to
+     * @param context DSpace context
+     * @param email Email address to send the registration email to
      */
     public static void sendRegistrationInfo(Context context, String email)
         throws SQLException, IOException, MessagingException, AuthorizeException
@@ -85,8 +95,8 @@ public class AccountManager
         sendInfo(context, email, true, true);
     }
 
-    /*
-     * Send forgot password info to the EPerson with the given email address.
+    /**
+     * Email forgot password info to the given email address.
      *
      * Potential error conditions:
      *   No EPerson with that email (returns null)
@@ -95,8 +105,8 @@ public class AccountManager
      *   Error reading email template (throws IOException)
      *   Authorization error (throws AuthorizeException)
      *
-     * @param context - DSpace context
-     * @param email - Email address to send the forgot-password email to
+     * @param context DSpace context
+     * @param email Email address to send the forgot-password email to
      */
     public static void sendForgotPasswordInfo(Context context, String email)
         throws SQLException, IOException, MessagingException, AuthorizeException
@@ -105,21 +115,21 @@ public class AccountManager
     }
 
     /**
-     * Returns the EPerson corresponding to TOKEN, where TOKEN was emailed
+     * <p>Return the EPerson corresponding to token, where token was emailed
      * to the person by either the sendRegistrationInfo or
-     * sendForgotPasswordInfo methods.
+     * sendForgotPasswordInfo methods.</p>
      *
-     * If the TOKEN is not found or has expired, return null.
+     * <p>If the token is not found or has expired, return null.</p>
      *
-     * Potential error conditions:
-     *   Cannot retrieve registration data from database (throws SQLException)
-     *
-     * @param context - DSpace context
-     * @param token - account token
+     * @param context DSpace context
+     * @param token Account token
+     * @return The EPerson corresponding to token, or null.
+     * @exception SQLException If the token or eperson cannot be retrieved
+     *  from the database.
      */
     public static EPerson getEPerson(Context context,
                                      String token)
-        throws SQLException, IOException
+        throws SQLException
     {
         TableRow rd = DatabaseManager.findByUnique(context,
                                                    "RegistrationData",
@@ -150,13 +160,11 @@ public class AccountManager
     }
 
     /**
-     * Delete the callback for TOKEN.
+     * Delete the callback for token.
      *
-     * Throws a SQLException if there is a database error.
-     *
-     * @param context - RDBMS context
-     * @param token - The token to delete
-     * @exception SQLException - If a database error occurs
+     * @param context DSpace context
+     * @param token The token to delete
+     * @exception SQLException If a database error occurs
      */
     public static void deleteToken(Context context, String token)
         throws SQLException
@@ -183,11 +191,11 @@ public class AccountManager
      *   Error reading email template (throws IOException)
      *   Authorization error (throws AuthorizeException)
      *
-     * @param context - DSpace context
-     * @param email - Email address to send the forgot-password email to
-     * @param isRegister - If true, this is for registration; otherwise,
+     * @param context DSpace context
+     * @param email Email address to send the forgot-password email to
+     * @param isRegister If true, this is for registration; otherwise,
      *   it is for forgot-password
-     * @param send - If true, send email; otherwise do not send any email
+     * @param send If true, send email; otherwise do not send any email
      */
     protected static TableRow sendInfo(Context context,
                                        String email,
@@ -224,10 +232,18 @@ public class AccountManager
     }
 
     /**
-     * Send a DSpace message to EMAIL.
+     * Send a DSpace message to the given email address.
      *
-     * If isRegister is TRUE, this is registration email; otherwise, it
-     * is a forgot-password email.
+     * If isRegister is <code>true</code>, this is registration email;
+     * otherwise, it is a forgot-password email.
+     *
+     * @param email The email address to mail to
+     * @param isRegister If true, this is registration email; otherwise
+     * it is forgot-password email.
+     * @param rd The RDBMS row representing the registration data.
+     * @exception MessagingException If an error occurs while sending email
+     * @exception IOException If an error occurs while reading the email
+     *   template.
      */
     private static void sendEmail(String email,
                                   boolean isRegister,
@@ -260,6 +276,8 @@ public class AccountManager
 
     /**
      * Return the date on which registrations expire.
+     *
+     * @return - The date on which registrations expire
      */
     private static Timestamp getDefaultExpirationDate()
     {
