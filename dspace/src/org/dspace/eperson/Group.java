@@ -40,18 +40,307 @@
 
 package org.dspace.eperson;
 
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+
+import java.util.ListIterator;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import java.sql.SQLException;
+
 /**
- * Class representing a group of e-people.  Currently just a placeholder.
+ * Class representing a group of e-people.
  *
- * @author Robert Tansley
+ * @author David Stuve
  * @version $Revision$
  */
 public class Group
 {
+    /** Our context */
+    private Context myContext;
+
+    /** The row in the table representing this object */
+    private TableRow myRow;
+
+    /** list of epeople in the group */
+    private ArrayList epeople = new ArrayList();
+
+    /** epeople list needs to be written out again */
+    private boolean epeoplechanged = false;
+
+
     /**
-     * Construct a Group
+     * Construct a Group from a given context and tablerow
+     * @param context
+     * @param tablerow
      */
-    public Group()
+    Group(Context context, TableRow row)
+        throws SQLException
     {
+        myContext = context;
+        myRow = row;
+
+        // get epeople objects
+        TableRowIterator tri = DatabaseManager.query(myContext,
+            "eperson",
+            "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
+                "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
+                "epersongroup2eperson.epersongroup_id=" +
+                myRow.getIntColumn("eperson_id") + ";");
+
+        while (tri.hasNext())
+        {
+            TableRow r = (TableRow) tri.next();
+            epeople.add(new EPerson(myContext, r));
+        }
+    }
+
+
+    /**
+     * Create a new group
+     *
+     * @param  context  DSpace context object
+     */
+    public static Group create(Context context)
+        throws SQLException, AuthorizeException
+    {
+        // FIXME: Check authorisation
+
+        // Create a table row
+        TableRow row = DatabaseManager.create(context, "group");
+        return new Group(context, row);
+    }
+
+
+    /**
+    * get the ID of the group object
+    *
+    * @return id
+    */
+    public int getID()
+    {
+        return myRow.getIntColumn("epersongroup_id");
+    }
+
+
+    /**
+    * get name of group
+    *
+    * @return name
+    */
+    public String getName()
+    {
+        return myRow.getStringColumn("name");
+    }
+
+
+    /**
+    * set name of group
+    *
+    * @param name new group name
+    */
+    public void setName(String name)
+    {
+        myRow.setColumn("name", name);
+    }
+
+
+    /**
+     * add an eperson member
+     *
+     * @param e eperson
+     */
+    public void addMember(EPerson e)
+    {
+        // flag epeople list as changed
+        epeoplechanged = true;
+
+        // ensure only a single entry
+        removeMember( e );
+
+        // now do the add
+        epeople.add(e);
+    }
+
+
+    /**
+     * remove an eperson from a group
+     *
+     * @param e eperson
+     */
+    public void removeMember(EPerson e)
+    {
+        ListIterator i = epeople.listIterator();
+
+        // find and remove the eperson
+        while(i.hasNext())
+        {
+            EPerson e2 = (EPerson)i.next();
+
+            if( e.getID() == e2.getID() )
+            {
+                // match, remove, and set epeople changed flag
+                i.remove();
+                epeoplechanged = true;
+            }
+        }        
+    }
+
+
+    /**
+     * check to see if an eperson is a member
+     *
+     * @param e eperson to check membership
+     */
+    public boolean isMember(EPerson e)
+    {
+        // this is slow, should have a fast static db-check version
+        Iterator i = epeople.iterator();
+
+        while(i.hasNext())
+        {
+            EPerson e2 = (EPerson)i.next();
+            
+            if(e2.getID() == e.getID())
+                return true;
+        }
+
+        // if we made it through the loop, must be false
+        return false; 
+    }
+
+
+    /**
+     * fast check to see if an eperson is a member
+     *  called with eperson id, does database lookup
+     *  without instantiating all of the epeople objects
+     *  and is thus a static method
+     *
+     * @param c context
+     * @param groupid group ID to check
+     * @param userid userid
+     */
+    public static boolean isMember(Context c, int groupid, int userid)
+    {
+        return false;
+    }
+
+
+    
+    /**
+     * find the group by its ID
+     *
+     * @param context
+     * @param id
+     */
+    public static Group find(Context context, int id)
+        throws SQLException
+    {
+        TableRow row = DatabaseManager.find( context, "epersongroup", id );
+
+        if ( row == null )
+        {
+            return null;
+        }
+        else
+        {
+            return new Group( context, row );
+        }
+    }
+
+
+    /**
+     * Find the group by its name - assumes name is unique - hmmm, problem?
+     *
+     * @param context
+     * @param name
+     *
+     * @return Group
+     */
+    public static Group findByName(Context context, String name)
+        throws SQLException, AuthorizeException
+    {
+        TableRow row = DatabaseManager.findByUnique( context, "epersongroup", "name", name );
+
+        if ( row == null )
+        {
+            return null;
+        }
+        else
+        {
+            return new Group( context, row );
+        }
+    }
+    
+
+    /**
+     * Delete a group 
+     *
+     */
+    public void delete()
+        throws SQLException
+    {
+        // FIXME: authorizations
+
+        // Remove any group memberships first
+        DatabaseManager.updateQuery(myContext,
+            "DELETE FROM EPersonGroup2EPerson WHERE eperson_group_id=" +
+                getID() );
+
+        // Remove ourself
+        DatabaseManager.delete(myContext, myRow);
+    }
+
+
+    /**
+     * Return EPerson members of a group
+     */
+    public EPerson[] getMembers()
+    {
+        EPerson[] myArray = new EPerson[epeople.size()];
+        myArray = (EPerson[]) epeople.toArray(myArray);
+
+        return myArray;
+    }    
+
+
+    /**
+     * Update the group - writing out group object
+     *  and EPerson list if necessary
+     */
+    public void update()
+        throws SQLException, AuthorizeException
+    {
+        // FIXME: Check authorisation
+
+        DatabaseManager.update(myContext, myRow);
+
+        // Redo eperson mappings if they've changed
+        if(epeoplechanged)
+        {
+            // Remove any existing mappings
+            DatabaseManager.updateQuery(myContext,
+                "delete from epersongroup2eperson where epersongroup_id=" + getID());
+
+            // Add new mappings
+            Iterator i = epeople.iterator();
+
+            while (i.hasNext())
+            {
+                EPerson e = (EPerson) i.next();
+
+                TableRow mappingRow = DatabaseManager.create(myContext,
+                    "epersongroup2eperson");
+                mappingRow.setColumn("eperson_id", e.getID());
+                mappingRow.setColumn("epersongroup_id", getID());
+                DatabaseManager.update(myContext, mappingRow);
+            }
+
+            epeoplechanged = false;
+        }
     }
 }
