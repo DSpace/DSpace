@@ -133,7 +133,7 @@ chomp $logdir;
 my $line_count = 0;
 
 # Okay, get on with it
-my @warnings;
+my $warnings = 0;
 my @logins;
 my @submissions;
 my @installations;
@@ -141,7 +141,7 @@ my %item_views;
 my @searches;
 my %all_events;
 
-foreach $logfile (<$logdir/dspace.log.*>)
+foreach $logfile (<$logdir/dspace.log*>)
 {
         open (IN, $logfile);
 
@@ -153,12 +153,6 @@ foreach $logfile (<$logdir/dspace.log.*>)
 
                 # Sample log line:
                 # 2002-09-12 15:20:39,549 INFO  org.dspace.content.Item @ rtansley@mit.edu:session_id=4C1D7E8E5C132788A87BD76C683C5CA2:update_item:item_id=2
-
-                # record warnings - sometimes these don't have the full header
-                if ($_ =~ /^(\d\d\d\d-\d\d\-\d\d) \d\d:\d\d:\d\d,\d\d\d WARN/)
-                {
-                        push (@warnings, $line_count);
-                }
 
                 #                                                            Java class     session ID     parameters
                 #                                                                +             +              +
@@ -199,6 +193,12 @@ foreach $logfile (<$logdir/dspace.log.*>)
 
 
                 # consider adding current record into the summary
+
+                # record warnings
+                if ($level eq "WARN")
+                {
+                        $warnings++;
+                }
 
                 # record logins
                 if ($action eq "login")
@@ -379,17 +379,7 @@ $summary .= "\n\n";
 
 
 # summarize warnings
-if (@warnings > 0)
-{
-	my $warning;
-
-        $summary .= "Warnings (" . @warnings . " total):\n\n";
-        foreach $warning (@warnings)
-        {
-                $summary .= "line $warning\n";
-        }
-        $summary .= "\n\n";
-}
+$summary .= "Warnings: " . $warnings . "\n\n";
 
 
 # summarize all events
