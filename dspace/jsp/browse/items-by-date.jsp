@@ -135,7 +135,7 @@
                                 <select name=year>
                                     <option selected value="-1">(Choose year)</option>
 <%
-    int thisYear = new DCDate().getYear();
+    int thisYear = DCDate.getCurrent().getYear();
     for (int i = thisYear; i >= 1990; i--)
     {
 %>
