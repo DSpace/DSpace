@@ -37,10 +37,10 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.core;
 
 import org.dspace.eperson.EPerson;
+
 
 /**
  * Class for generating standard log header
@@ -61,7 +61,7 @@ public class LogManager
      * @return  the filled out log header
      */
     public static String getHeader(Context context, String action,
-        String extrainfo)
+                                   String extrainfo)
     {
         String email = "anonymous";
         String contextExtraInfo;
@@ -76,14 +76,13 @@ public class LogManager
             }
 
             contextExtraInfo = context.getExtraLogInfo();
-        }
-        else
+        } else
         {
             contextExtraInfo = "no_context";
         }
 
-        String result = new String(email + ":" + contextExtraInfo +
-            ":" + action + ":" + extrainfo);
+        String result = new String(email + ":" + contextExtraInfo + ":" +
+                                   action + ":" + extrainfo);
 
         return result;
     }

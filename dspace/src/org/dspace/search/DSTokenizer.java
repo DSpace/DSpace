@@ -39,12 +39,12 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.search;
 
 import java.io.Reader;
-import org.apache.lucene.analysis.*;
-import org.apache.lucene.analysis.standard.*;
+
+import org.apache.lucene.analysis.CharTokenizer;
+
 
 /**
 * Customized Lucene Tokenizer, since the standard one
@@ -52,31 +52,29 @@ import org.apache.lucene.analysis.standard.*;
 */
 public final class DSTokenizer extends CharTokenizer
 {
-	/**
-     * Construct a new LowerCaseTokenizer.
-     */
-	public DSTokenizer(Reader in)
+    /**
+    * Construct a new LowerCaseTokenizer.
+    */
+    public DSTokenizer(Reader in)
     {
-		super(in);
-	}
+        super(in);
+    }
 
-
-	/** 
-     * Collects only characters which satisfy
-	 * {@link Character#isLetter(char)}.
-     */
-	protected char normalize(char c)
+    /**
+    * Collects only characters which satisfy
+     * {@link Character#isLetter(char)}.
+    */
+    protected char normalize(char c)
     {
-		return Character.toLowerCase(c);
-	}
+        return Character.toLowerCase(c);
+    }
 
-
-	/**
-     * Collects only characters which do not satisfy
-	 * {@link Character#isWhitespace(char)}.
-     */
-	protected boolean isTokenChar(char c)
+    /**
+    * Collects only characters which do not satisfy
+     * {@link Character#isWhitespace(char)}.
+    */
+    protected boolean isTokenChar(char c)
     {
-		return Character.isLetterOrDigit(c);
-	}
+        return Character.isLetterOrDigit(c);
+    }
 }

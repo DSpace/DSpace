@@ -39,24 +39,18 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 
-import org.dspace.browse.Browse;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.storage.rdbms.DatabaseManager;
+
 
 /**
  * Support to install item in the archive
@@ -72,9 +66,10 @@ public class InstallItem
      * @param InProgressSubmission
      */
     public static Item installItem(Context c, InProgressSubmission is)
-        throws SQLException, IOException, AuthorizeException
+                            throws SQLException, IOException, 
+                                   AuthorizeException
     {
-        return installItem(c, is, c.getCurrentUser() );
+        return installItem(c, is, c.getCurrentUser());
     }
 
     /**
@@ -84,58 +79,57 @@ public class InstallItem
      * @param handle to assign instead of creating new one
      */
     public static Item installItem(Context c, InProgressSubmission is,
-            String handle)
-        throws SQLException, IOException, AuthorizeException
+                                   String handle)
+                            throws SQLException, IOException, 
+                                   AuthorizeException
     {
         return installItem(c, is, c.getCurrentUser(), handle);
     }
-
 
     /**
      *  Take an InProgressSubmission and turn it into a fully-archived Item.
      *  @param Context
      *  @param InProgressSubmission
      *  @param EPerson (unused, should be removed from API)
-     *  @param previous handle 
+     *  @param previous handle
      */
-    public static Item installItem(Context c, InProgressSubmission is, EPerson e2,
-            String suppliedHandle)
-        throws SQLException, IOException, AuthorizeException
+    public static Item installItem(Context c, InProgressSubmission is,
+                                   EPerson e2, String suppliedHandle)
+                            throws SQLException, IOException, 
+                                   AuthorizeException
     {
         Item item = is.getItem();
         String handle;
 
         // set the language to default if it's not set already
         DCValue[] dc = item.getDC("language", "iso", Item.ANY);
-            
-        if( dc.length < 1 )
+
+        if (dc.length < 1)
         {
             // Just set default language
-            item.addDC("language", "iso", null, 
-                ConfigurationManager.getProperty("default.language"));
+            item.addDC("language", "iso", null,
+                       ConfigurationManager.getProperty("default.language"));
         }
 
-        
         // create accession date
         DCDate now = DCDate.getCurrent();
         item.addDC("date", "accessioned", null, now.toString());
-        item.addDC("date", "available",   null, now.toString());
+        item.addDC("date", "available", null, now.toString());
 
         // create issue date if not present
         DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
-        
-        if(currentDateIssued.length == 0)
+
+        if (currentDateIssued.length == 0)
         {
             item.addDC("date", "issued", null, now.toString());
         }
-        
+
         // if no previous handle supplied, create one
-        if(suppliedHandle == null)
+        if (suppliedHandle == null)
         {
             // create handle
             handle = HandleManager.createHandle(c, item);
-        }
-        else
+        } else
         {
             handle = HandleManager.createHandle(c, item, suppliedHandle);
         }
@@ -147,25 +141,24 @@ public class InstallItem
 
         // Add format.mimetype and format.extent DC values
         Bitstream[] bitstreams = item.getNonInternalBitstreams();
-        
+
         for (int i = 0; i < bitstreams.length; i++)
         {
             BitstreamFormat bf = bitstreams[i].getFormat();
-            item.addDC("format",
-                "extent",
-                null,
-                String.valueOf(bitstreams[i].getSize()) + " bytes");
+            item.addDC("format", "extent", null,
+                       String.valueOf(bitstreams[i].getSize()) + " bytes");
             item.addDC("format", "mimetype", null, bf.getMIMEType());
         }
 
         String provDescription = "Made available in DSpace on " + now +
-            " (GMT). " + getBitstreamProvenanceMessage(item);
+                                 " (GMT). " +
+                                 getBitstreamProvenanceMessage(item);
 
         if (currentDateIssued.length != 0)
         {
             DCDate d = new DCDate(currentDateIssued[0].value);
             provDescription = provDescription + "  Previous issue date: " +
-                d.toString();
+                              d.toString();
         }
 
         // Add provenance description
@@ -178,24 +171,23 @@ public class InstallItem
         item.setOwningCollection(is.getCollection());
 
         // set in_archive=true
-        item.setArchived(true);   
+        item.setArchived(true);
 
         // save changes ;-)
         item.update();
 
         // add item to search and browse indices
         DSIndexer.indexContent(c, item);
-        
+
         // remove in-progress submission
         is.deleteWrapper();
 
         // remove the item's policies and replace them with
         // the defaults from the collection
-        item.inheritCollectionDefaultPolicies( is.getCollection() );
-        
+        item.inheritCollectionDefaultPolicies(is.getCollection());
+
         return item;
     }
-
 
     /**
      *  Take an InProgressSubmission and turn it into a fully-archived Item,
@@ -204,12 +196,13 @@ public class InstallItem
      *  @param InProgressSubmission
      *  @param EPerson (unused, should be removed from API)
      */
-    public static Item installItem(Context c, InProgressSubmission is, EPerson e2)
-        throws SQLException, IOException, AuthorizeException
+    public static Item installItem(Context c, InProgressSubmission is,
+                                   EPerson e2)
+                            throws SQLException, IOException, 
+                                   AuthorizeException
     {
         return installItem(c, is, e2, null);
     }
-
 
     /** generate provenance-worthy description of the bitstreams
      * contained in an item
@@ -227,11 +220,11 @@ public class InstallItem
         for (int j = 0; j < bitstreams.length; j++)
         {
             mymessage = mymessage + bitstreams[j].getName() + ": " +
-                bitstreams[j].getSize() + " bytes, checksum: " +
-                bitstreams[j].getChecksum() + " (" + 
-                bitstreams[j].getChecksumAlgorithm() + ")\n";
+                        bitstreams[j].getSize() + " bytes, checksum: " +
+                        bitstreams[j].getChecksum() + " (" +
+                        bitstreams[j].getChecksumAlgorithm() + ")\n";
         }
-        
+
         return mymessage;
     }
 }

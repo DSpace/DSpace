@@ -37,17 +37,17 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.oai;
 
 import java.util.Properties;
 
-import ORG.oclc.oai.server.crosswalk.Crosswalk;
-import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
-
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.search.HarvestedItemInfo;
+
+import ORG.oclc.oai.server.crosswalk.Crosswalk;
+import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
+
 
 /**
  * An OAICat Crosswalk implementation that extracts unqualified Dublin Core
@@ -60,88 +60,79 @@ public class OAIDCCrosswalk extends Crosswalk
 {
     public OAIDCCrosswalk(Properties properties)
     {
-	super("http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
+        super("http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
     }
-    
-    
+
     public boolean isAvailableFor(Object nativeItem)
     {
         // We have DC for everything
         return true;
     }
-    
-    
+
     public String createMetadata(Object nativeItem)
-        throws CannotDisseminateFormatException
+                          throws CannotDisseminateFormatException
     {
         Item item = ((HarvestedItemInfo) nativeItem).item;
-        
+
         // Get all the DC
         DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
-        
+
         StringBuffer metadata = new StringBuffer();
-        
+
         metadata.append("<oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" ")
-            .append("xmlns:dc=\"http://purl.org/dc/elements/1.1/\" ")
-            .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
-            .append("xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">");
-        
+                .append("xmlns:dc=\"http://purl.org/dc/elements/1.1/\" ")
+                .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
+                .append("xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">");
+
         for (int i = 0; i < allDC.length; i++)
         {
             // Do not include description.provenance
             boolean description = allDC[i].element.equals("description");
-            boolean provenance = allDC[i].qualifier != null &&
+            boolean provenance = (allDC[i].qualifier != null) &&
                                  allDC[i].qualifier.equals("provenance");
 
             if (!(description && provenance))
             {
-            	String element = allDC[i].element;
+                String element = allDC[i].element;
 
-            	// contributor.author exposed as 'creator'
-            	if (allDC[i].element.equals("contributor") &&
-            			allDC[i].qualifier != null &&
-						allDC[i].qualifier.equals("author"))
-				{
-            		element = "creator";
-            	}
-            	
-            	// Escape XML chars <, > and &
+                // contributor.author exposed as 'creator'
+                if (allDC[i].element.equals("contributor") &&
+                        (allDC[i].qualifier != null) &&
+                        allDC[i].qualifier.equals("author"))
+                {
+                    element = "creator";
+                }
+
+                // Escape XML chars <, > and &
                 String value = allDC[i].value;
 
                 // First do &'s - need to be careful not to replace the
                 // & in "&amp;" again!
                 int c = -1;
+
                 while ((c = value.indexOf("&", c + 1)) > -1)
                 {
-                    value = value.substring(0, c) +
-                        "&amp;" +
-                        value.substring(c + 1);
+                    value = value.substring(0, c) + "&amp;" +
+                            value.substring(c + 1);
                 }
 
                 while ((c = value.indexOf("<")) > -1)
                 {
-                    value = value.substring(0, c) +
-                        "&lt;" +
-                        value.substring(c + 1);
-                }
-                
-                while ((c = value.indexOf(">")) > -1)
-                {
-                    value = value.substring(0, c) +
-                        "&gt;" +
-                        value.substring(c + 1);
+                    value = value.substring(0, c) + "&lt;" +
+                            value.substring(c + 1);
                 }
 
-                metadata.append("<dc:")
-                    .append(element)
-                    .append(">")
-                    .append(value)
-                    .append("</dc:")
-                    .append(element)
-                    .append(">");
+                while ((c = value.indexOf(">")) > -1)
+                {
+                    value = value.substring(0, c) + "&gt;" +
+                            value.substring(c + 1);
+                }
+
+                metadata.append("<dc:").append(element).append(">").append(value)
+                        .append("</dc:").append(element).append(">");
             }
         }
-        
+
         metadata.append("</oai_dc:dc>");
 
         return metadata.toString();

@@ -37,23 +37,19 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.util;
 
-import java.io.File;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
+
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+
 
 /**
  * Methods for displaying UI pages to the user.
@@ -81,22 +77,18 @@ public class JSPManager
      *                  directory
      */
     public static void showJSP(HttpServletRequest request,
-        HttpServletResponse response,
-        String jsp )
-        throws ServletException, IOException
+                               HttpServletResponse response, String jsp)
+                        throws ServletException, IOException
     {
         if (log.isDebugEnabled())
         {
-            log.debug(LogManager.getHeader(
-                (Context) request.getAttribute("dspace.context"),
-                "view_jsp",
-                jsp));
+            log.debug(LogManager.getHeader((Context) request.getAttribute("dspace.context"),
+                                           "view_jsp", jsp));
         }
 
         // For the moment, a simple forward
         request.getRequestDispatcher(jsp).forward(request, response);
     }
-        
 
     /**
      * Display an internal server error message - for example, a database
@@ -106,12 +98,11 @@ public class JSPManager
      * @param response  the HTTP response
      */
     public static void showInternalError(HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException
+                                         HttpServletResponse response)
+                                  throws ServletException, IOException
     {
         showJSP(request, response, "/error/internal.jsp");
     }
-
 
     /**
      * Display an integrity error message.  Use when the POSTed data from a
@@ -121,12 +112,11 @@ public class JSPManager
      * @param response  the HTTP response
      */
     public static void showIntegrityError(HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException
+                                          HttpServletResponse response)
+                                   throws ServletException, IOException
     {
         showJSP(request, response, "/error/integrity.jsp");
     }
-
 
     /**
      * Display an authorization failed error message.  The exception should be
@@ -138,14 +128,13 @@ public class JSPManager
      *                   in <code>null</code> will display default error message
      */
     public static void showAuthorizeError(HttpServletRequest request,
-        HttpServletResponse response,
-        AuthorizeException exception)
-        throws ServletException, IOException
+                                          HttpServletResponse response,
+                                          AuthorizeException exception)
+                                   throws ServletException, IOException
     {
         // FIXME: Need to work out which error message to display?
         showJSP(request, response, "/error/authorize.jsp");
     }
-
 
     /**
      * Display an "invalid ID" error message.  Passing in information about the
@@ -160,17 +149,17 @@ public class JSPManager
      *                   <code>-1</code> for a default message
      */
     public static void showInvalidIDError(HttpServletRequest request,
-        HttpServletResponse response,
-        String badID,
-        int type)
-        throws ServletException, IOException
+                                          HttpServletResponse response,
+                                          String badID, int type)
+                                   throws ServletException, IOException
     {
         request.setAttribute("bad.id", badID);
+
         if (type != -1)
         {
             request.setAttribute("bad.type", new Integer(type));
         }
-        
+
         showJSP(request, response, "/error/invalid-id.jsp");
     }
 }

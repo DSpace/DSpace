@@ -37,11 +37,10 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,7 +48,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
@@ -58,6 +56,7 @@ import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+
 
 
 /**
@@ -81,7 +80,7 @@ public class Bundle extends DSpaceObject
 
     /** The table row corresponding to this bundle */
     private TableRow bundleRow;
-    
+
     /** The bitstreams in this bundle */
     private List bitstreams;
 
@@ -91,34 +90,31 @@ public class Bundle extends DSpaceObject
      * @param context  the context this object exists in
      * @param row      the corresponding row in the table
      */
-    Bundle(Context context, TableRow row)
-        throws SQLException
+    Bundle(Context context, TableRow row) throws SQLException
     {
         ourContext = context;
         bundleRow = row;
         bitstreams = new ArrayList();
-        
+
         // Get bitstreams
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-            "bitstream",
-            "SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE " +
-                "bundle2bitstream.bitstream_id=bitstream.bitstream_id AND " +
-                "bundle2bitstream.bundle_id=" +
-                bundleRow.getIntColumn("bundle_id") );
+        TableRowIterator tri = DatabaseManager.query(ourContext, "bitstream",
+                                                     "SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE " +
+                                                     "bundle2bitstream.bitstream_id=bitstream.bitstream_id AND " +
+                                                     "bundle2bitstream.bundle_id=" +
+                                                     bundleRow.getIntColumn("bundle_id"));
 
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
 
             // First check the cache
-            Bitstream fromCache = (Bitstream) context.fromCache(
-                Bitstream.class, r.getIntColumn("bitstream_id"));
+            Bitstream fromCache = (Bitstream) context.fromCache(Bitstream.class,
+                                                                r.getIntColumn("bitstream_id"));
 
             if (fromCache != null)
             {
                 bitstreams.add(fromCache);
-            }
-            else
+            } else
             {
                 bitstreams.add(new Bitstream(ourContext, r));
             }
@@ -128,55 +124,48 @@ public class Bundle extends DSpaceObject
         context.cache(this, row.getIntColumn("bundle_id"));
     }
 
-    
     /**
      * Get a bundle from the database.  The bundle and bitstream metadata are
      * all loaded into memory.
      *
      * @param  context  DSpace context object
      * @param  id       ID of the bundle
-     *   
+     *
      * @return  the bundle, or null if the ID is invalid.
      */
     public static Bundle find(Context context, int id)
-        throws SQLException
+                       throws SQLException
     {
         // First check the cache
         Bundle fromCache = (Bundle) context.fromCache(Bundle.class, id);
-            
+
         if (fromCache != null)
         {
             return fromCache;
         }
 
-        TableRow row = DatabaseManager.find(context,
-            "bundle",
-            id);
+        TableRow row = DatabaseManager.find(context, "bundle", id);
 
         if (row == null)
         {
             if (log.isDebugEnabled())
             {
-                log.debug(LogManager.getHeader(context,
-                    "find_bundle",
-                    "not_found,bundle_id=" + id));
+                log.debug(LogManager.getHeader(context, "find_bundle",
+                                               "not_found,bundle_id=" + id));
             }
 
             return null;
-        }
-        else
+        } else
         {
             if (log.isDebugEnabled())
             {
-                log.debug(LogManager.getHeader(context,
-                    "find_bundle",
-                    "bundle_id=" + id));
+                log.debug(LogManager.getHeader(context, "find_bundle",
+                                               "bundle_id=" + id));
             }
 
             return new Bundle(context, row);
         }
     }
-    
 
     /**
      * Create a new bundle, with a new ID.  This method is not public, since
@@ -188,19 +177,17 @@ public class Bundle extends DSpaceObject
      *
      * @return  the newly created bundle
      */
-    static Bundle create(Context context)
-        throws SQLException
+    static Bundle create(Context context) throws SQLException
     {
         // Create a table row
         TableRow row = DatabaseManager.create(context, "bundle");
-        
-        log.info(LogManager.getHeader(context,
-            "create_bundle",
-            "bundle_id=" + row.getIntColumn("bundle_id")));
+
+        log.info(LogManager.getHeader(context, "create_bundle",
+                                      "bundle_id=" +
+                                      row.getIntColumn("bundle_id")));
 
         return new Bundle(context, row);
     }
-
 
     /**
      * Get the internal identifier of this bundle
@@ -211,7 +198,6 @@ public class Bundle extends DSpaceObject
     {
         return bundleRow.getIntColumn("bundle_id");
     }
-
 
     /**
      * Get the name of the bundle
@@ -224,7 +210,6 @@ public class Bundle extends DSpaceObject
         return bundleRow.getStringColumn("name");
     }
 
-
     /**
      * Set the name of the bundle
      *
@@ -236,7 +221,6 @@ public class Bundle extends DSpaceObject
         bundleRow.setColumn("name", name);
     }
 
-
     /**
      * Get the primary bitstream ID of the bundle
      *
@@ -245,9 +229,8 @@ public class Bundle extends DSpaceObject
      */
     public int getPrimaryBitstreamID()
     {
-	return bundleRow.getIntColumn("primary_bitstream_id");
+        return bundleRow.getIntColumn("primary_bitstream_id");
     }
-
 
     /**
      * Set the primary bitstream ID of the bundle
@@ -257,16 +240,14 @@ public class Bundle extends DSpaceObject
      */
     public void setPrimaryBitstreamID(int bitstreamID)
     {
-	bundleRow.setColumn("primary_bitstream_id", bitstreamID);
+        bundleRow.setColumn("primary_bitstream_id", bitstreamID);
     }
-
 
     public String getHandle()
     {
         // No Handles for bundles
         return null;
     }
-
 
     /**
      * @param name name of the bitstream you're looking for
@@ -278,22 +259,21 @@ public class Bundle extends DSpaceObject
         Bitstream target = null;
 
         Iterator i = bitstreams.iterator();
-        
-        while(i.hasNext())
+
+        while (i.hasNext())
         {
-            Bitstream b = (Bitstream)i.next();
-            
-            if( name.equals(b.getName()) )
+            Bitstream b = (Bitstream) i.next();
+
+            if (name.equals(b.getName()))
             {
                 target = b;
+
                 break;
             }
-        }        
-        
+        }
+
         return target;
     }
-
-
 
     /**
      * Get the bitstreams in this bundle
@@ -304,10 +284,9 @@ public class Bundle extends DSpaceObject
     {
         Bitstream[] bitstreamArray = new Bitstream[bitstreams.size()];
         bitstreamArray = (Bitstream[]) bitstreams.toArray(bitstreamArray);
-        
+
         return bitstreamArray;
     }
-    
 
     /**
      * Get the items this bundle appears in
@@ -315,43 +294,39 @@ public class Bundle extends DSpaceObject
      * @return array of <code>Item</code>s this bundle appears
      *         in
      */
-    public Item[] getItems()
-        throws SQLException
+    public Item[] getItems() throws SQLException
     {
         List items = new ArrayList();
 
         // Get items
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-            "item",
-            "SELECT item.* FROM item, item2bundle WHERE " +
-                "item2bundle.item_id=item.item_id AND " +
-                "item2bundle.bundle_id=" +
-                bundleRow.getIntColumn("bundle_id") );
+        TableRowIterator tri = DatabaseManager.query(ourContext, "item",
+                                                     "SELECT item.* FROM item, item2bundle WHERE " +
+                                                     "item2bundle.item_id=item.item_id AND " +
+                                                     "item2bundle.bundle_id=" +
+                                                     bundleRow.getIntColumn("bundle_id"));
 
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
 
             // Used cached copy if there is one
-            Item fromCache = (Item) ourContext.fromCache(
-                Item.class, r.getIntColumn("item_id"));
+            Item fromCache = (Item) ourContext.fromCache(Item.class,
+                                                         r.getIntColumn("item_id"));
 
             if (fromCache != null)
             {
                 items.add(fromCache);
-            }
-            else
+            } else
             {
                 items.add(new Item(ourContext, r));
             }
         }
-        
+
         Item[] itemArray = new Item[items.size()];
         itemArray = (Item[]) items.toArray(itemArray);
-        
+
         return itemArray;
     }
-    
 
     /**
      * Create a new bitstream in this bundle.
@@ -361,7 +336,8 @@ public class Bundle extends DSpaceObject
      * @return  the newly created bitstream
      */
     public Bitstream createBitstream(InputStream is)
-        throws AuthorizeException, IOException, SQLException
+                              throws AuthorizeException, IOException, 
+                                     SQLException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
@@ -369,11 +345,10 @@ public class Bundle extends DSpaceObject
         Bitstream b = Bitstream.create(ourContext, is);
 
         // FIXME: Set permissions for bitstream
-
         addBitstream(b);
+
         return b;
     }
-
 
     /**
      * Add an existing bitstream to this bundle
@@ -381,26 +356,27 @@ public class Bundle extends DSpaceObject
      * @param b  the bitstream to add
      */
     public void addBitstream(Bitstream b)
-        throws SQLException, AuthorizeException
+                      throws SQLException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
-        log.info(LogManager.getHeader(ourContext,
-            "add_bitstream",
-            "bundle_id=" + getID() + ",bitstream_id=" + b.getID()));
+        log.info(LogManager.getHeader(ourContext, "add_bitstream",
+                                      "bundle_id=" + getID() +
+                                      ",bitstream_id=" + b.getID()));
 
         // First check that the bitstream isn't already in the list
         for (int i = 0; i < bitstreams.size(); i++)
         {
             Bitstream existing = (Bitstream) bitstreams.get(i);
+
             if (b.getID() == existing.getID())
             {
                 // Bitstream is already there; no change
                 return;
             }
         }
-        
+
         // Add the bitstream object
         bitstreams.add(b);
 
@@ -410,12 +386,11 @@ public class Bundle extends DSpaceObject
 
         // Add the mapping row to the database
         TableRow mappingRow = DatabaseManager.create(ourContext,
-            "bundle2bitstream");
+                                                     "bundle2bitstream");
         mappingRow.setColumn("bundle_id", getID());
         mappingRow.setColumn("bitstream_id", b.getID());
         DatabaseManager.update(ourContext, mappingRow);
     }
-    
 
     /**
      * Remove a bitstream from this bundle - the bitstream is only deleted
@@ -424,14 +399,14 @@ public class Bundle extends DSpaceObject
      * @param b  the bitstream to remove
      */
     public void removeBitstream(Bitstream b)
-        throws AuthorizeException, SQLException, IOException
+                         throws AuthorizeException, SQLException, IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        log.info(LogManager.getHeader(ourContext,
-            "remove_bitstream",
-            "bundle_id=" + getID() + ",bitstream_id=" + b.getID()));
+        log.info(LogManager.getHeader(ourContext, "remove_bitstream",
+                                      "bundle_id=" + getID() +
+                                      ",bitstream_id=" + b.getID()));
 
         // Remove from internal list of bitstreams
         ListIterator li = bitstreams.listIterator();
@@ -443,20 +418,19 @@ public class Bundle extends DSpaceObject
             if (b.getID() == existing.getID())
             {
                 // We've found the bitstream to remove
-                li.remove();               
+                li.remove();
             }
         }
 
         // Delete the mapping row
         DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM bundle2bitstream WHERE bundle_id=" + getID() +
-                " AND bitstream_id=" + b.getID());
-
+                                    "DELETE FROM bundle2bitstream WHERE bundle_id=" +
+                                    getID() + " AND bitstream_id=" + b.getID());
 
         // If the bitstream is orphaned, it's removed
         TableRowIterator tri = DatabaseManager.query(ourContext,
-            "SELECT * FROM bundle2bitstream WHERE bitstream_id=" +
-                b.getID());
+                                                     "SELECT * FROM bundle2bitstream WHERE bitstream_id=" +
+                                                     b.getID());
 
         if (!tri.hasNext())
         {
@@ -465,35 +439,28 @@ public class Bundle extends DSpaceObject
         }
     }
 
-
     /**
      * Update the bundle metadata
      */
-    public void update()
-        throws SQLException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         //AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
-
-        log.info(LogManager.getHeader(ourContext,
-            "update_bundle",
-            "bundle_id=" + getID()));
+        log.info(LogManager.getHeader(ourContext, "update_bundle",
+                                      "bundle_id=" + getID()));
 
         DatabaseManager.update(ourContext, bundleRow);
     }
-
 
     /**
      * Delete the bundle.  Bitstreams contained by the bundle are removed
      * first; this may result in their deletion, if deleting this bundle
      * leaves them as orphans.
      */
-    void delete()
-        throws SQLException, AuthorizeException, IOException
+    void delete() throws SQLException, AuthorizeException, IOException
     {
-        log.info(LogManager.getHeader(ourContext,
-            "delete_bundle",
-            "bundle_id=" + getID()));
+        log.info(LogManager.getHeader(ourContext, "delete_bundle",
+                                      "bundle_id=" + getID()));
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -520,5 +487,4 @@ public class Bundle extends DSpaceObject
     {
         return Constants.BUNDLE;
     }
-
 }

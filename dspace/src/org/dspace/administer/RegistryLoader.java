@@ -37,33 +37,27 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.administer;
-
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.traversal.NodeIterator;
-import org.xml.sax.SAXException;
 import org.apache.xpath.XPathAPI;
-
-import org.dspace.administer.DCType;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -89,11 +83,10 @@ public class RegistryLoader
      *
      * @param argv  command-line arguments
      */
-    public static void main(String argv[])
-        throws Exception
+    public static void main(String[] argv) throws Exception
     {
         String usage = "Usage: " + RegistryLoader.class.getName() +
-            " (-bitstream | -dc) registry-file.xml";
+                       " (-bitstream | -dc) registry-file.xml";
 
         Context context = null;
 
@@ -109,12 +102,10 @@ public class RegistryLoader
             if (argv[0].equalsIgnoreCase("-bitstream"))
             {
                 RegistryLoader.loadBitstreamFormats(context, argv[1]);
-            }
-            else if(argv[0].equalsIgnoreCase("-dc"))
+            } else if (argv[0].equalsIgnoreCase("-dc"))
             {
                 loadDublinCoreTypes(context, argv[1]);
-            }
-            else
+            } else
             {
                 System.err.println(usage);
             }
@@ -122,8 +113,7 @@ public class RegistryLoader
             context.complete();
 
             System.exit(0);
-        }
-        catch (ArrayIndexOutOfBoundsException ae)
+        } catch (ArrayIndexOutOfBoundsException ae)
         {
             System.err.println(usage);
 
@@ -133,11 +123,10 @@ public class RegistryLoader
             }
 
             System.exit(1);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
-            log.fatal(LogManager.getHeader(context,
-                "error_loading_registries", ""), e);
+            log.fatal(LogManager.getHeader(context, "error_loading_registries",
+                                           ""), e);
 
             if (context != null)
             {
@@ -148,7 +137,6 @@ public class RegistryLoader
         }
     }
 
-
     /**
      * Load Bitstream Format metadata
      *
@@ -156,26 +144,27 @@ public class RegistryLoader
      * @param filename   the filename of the XML file to load
      */
     public static void loadBitstreamFormats(Context context, String filename)
-        throws SQLException, IOException, ParserConfigurationException,
-            SAXException, TransformerException, AuthorizeException
+                                     throws SQLException, IOException, 
+                                            ParserConfigurationException, 
+                                            SAXException, TransformerException, 
+                                            AuthorizeException
     {
         Document document = loadXML(filename);
 
         // Get the nodes corresponding to formats
         NodeList typeNodes = XPathAPI.selectNodeList(document,
-            "dspace-bitstream-types/bitstream-type");
+                                                     "dspace-bitstream-types/bitstream-type");
 
         // Add each one as a new format to the registry
-        for (int i=0; i < typeNodes.getLength(); i++)
+        for (int i = 0; i < typeNodes.getLength(); i++)
         {
             Node n = typeNodes.item(i);
             loadFormat(context, n);
         }
 
         log.info(LogManager.getHeader(context, "load_bitstream_formats",
-            "number_loaded=" + typeNodes.getLength()));
+                                      "number_loaded=" + typeNodes.getLength()));
     }
-
 
     /**
      * Process a node in the bitstream format registry XML file.  The node
@@ -185,8 +174,8 @@ public class RegistryLoader
      * @param node      the node in the DOM tree
      */
     private static void loadFormat(Context context, Node node)
-        throws SQLException, IOException, TransformerException,
-            AuthorizeException
+                            throws SQLException, IOException, 
+                                   TransformerException, AuthorizeException
     {
         // Get the values
         String mimeType = getElementData(node, "mimetype");
@@ -214,10 +203,7 @@ public class RegistryLoader
 
         // Write to database
         format.update();
-
-        
     }
-
 
     /**
      * Load Dublin Core types
@@ -226,26 +212,27 @@ public class RegistryLoader
      * @param filename   the filename of the XML file to load
      */
     public static void loadDublinCoreTypes(Context context, String filename)
-        throws SQLException, IOException, ParserConfigurationException,
-            SAXException, TransformerException, AuthorizeException
+                                    throws SQLException, IOException, 
+                                           ParserConfigurationException, 
+                                           SAXException, TransformerException, 
+                                           AuthorizeException
     {
         Document document = loadXML(filename);
 
         // Get the nodes corresponding to formats
         NodeList typeNodes = XPathAPI.selectNodeList(document,
-            "/dspace-dc-types/dc-type");
+                                                     "/dspace-dc-types/dc-type");
 
         // Add each one as a new format to the registry
-        for (int i=0; i < typeNodes.getLength(); i++)
+        for (int i = 0; i < typeNodes.getLength(); i++)
         {
             Node n = typeNodes.item(i);
             loadDCType(context, n);
         }
 
         log.info(LogManager.getHeader(context, "load_dublin_core_types",
-            "number_loaded=" + typeNodes.getLength()));
+                                      "number_loaded=" + typeNodes.getLength()));
     }
-
 
     /**
      * Process a node in the bitstream format registry XML file.  The node
@@ -255,8 +242,8 @@ public class RegistryLoader
      * @param node      the node in the DOM tree
      */
     private static void loadDCType(Context context, Node node)
-        throws SQLException, IOException, TransformerException,
-            AuthorizeException
+                            throws SQLException, IOException, 
+                                   TransformerException, AuthorizeException
     {
         // Get the values
         String element = getElementData(node, "element");
@@ -270,8 +257,6 @@ public class RegistryLoader
         newType.update();
     }
 
-
-
     // ===================== XML Utility Methods =========================
 
     /**
@@ -282,14 +267,14 @@ public class RegistryLoader
      * @return  the DOM representation of the XML file
      */
     private static Document loadXML(String filename)
-        throws IOException, ParserConfigurationException, SAXException
+                             throws IOException, ParserConfigurationException, 
+                                    SAXException
     {
-        DocumentBuilder builder =
-            DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance()
+                                                        .newDocumentBuilder();
 
         return builder.parse(new File(filename));
     }
-
 
     /**
      * Get the CDATA of a particular element.  For example, if the XML document
@@ -309,11 +294,10 @@ public class RegistryLoader
      * @return  the CDATA as a <code>String</code>
      */
     private static String getElementData(Node parentElement, String childName)
-        throws TransformerException
+                                  throws TransformerException
     {
         // Grab the child node
-        Node childNode = XPathAPI.selectSingleNode(parentElement,
-            childName);
+        Node childNode = XPathAPI.selectSingleNode(parentElement, childName);
 
         if (childNode == null)
         {
@@ -324,18 +308,16 @@ public class RegistryLoader
         // Get the #text
         Node dataNode = childNode.getFirstChild();
 
-        if (dataNode==null)
+        if (dataNode == null)
         {
             return null;
         }
-
 
         // Get the data
         String value = dataNode.getNodeValue().trim();
 
         return value;
     }
-
 
     /**
      * Get repeated CDATA for a particular element.  For example, if the XML
@@ -357,16 +339,15 @@ public class RegistryLoader
      *
      * @return  the CDATA as a <code>String</code>
      */
-    private static String[] getRepeatedElementData(
-        Node parentElement, String childName)
-        throws TransformerException
+    private static String[] getRepeatedElementData(Node parentElement,
+                                                   String childName)
+                                            throws TransformerException
     {
         // Grab the child node
-        NodeList childNodes = XPathAPI.selectNodeList(parentElement,
-            childName);
+        NodeList childNodes = XPathAPI.selectNodeList(parentElement, childName);
 
         String[] data = new String[childNodes.getLength()];
-        
+
         for (int i = 0; i < childNodes.getLength(); i++)
         {
             // Get the #text node
@@ -375,7 +356,7 @@ public class RegistryLoader
             // Get the data
             data[i] = dataNode.getNodeValue().trim();
         }
-        
+
         return data;
     }
 }

@@ -39,27 +39,19 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.mediafilter;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import java.lang.Integer;
-import java.lang.Float;
-
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.Image;
-import java.awt.Graphics2D;
 
 import org.dspace.core.ConfigurationManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
-import org.dspace.core.Context;
+
 
 /*
 
@@ -70,8 +62,6 @@ to do:
         - bitstream format doesn't exist
 
  */
-
-
 public class JPEGFilter extends MediaFilter
 {
     /**
@@ -84,7 +74,6 @@ public class JPEGFilter extends MediaFilter
         return oldFilename + ".jpg";
     }
 
-
     /**
      * @return String bundle name
      *
@@ -93,7 +82,6 @@ public class JPEGFilter extends MediaFilter
     {
         return "THUMBNAIL";
     }
-    
 
     /**
      * @return String bitstreamformat
@@ -103,7 +91,6 @@ public class JPEGFilter extends MediaFilter
         return "JPEG";
     }
 
-
     /**
      * @return String description
      */
@@ -112,49 +99,47 @@ public class JPEGFilter extends MediaFilter
         return "Generated Thumbnail";
     }
 
-
     /**
      * @param source source input stream
      *
      * @return InputStream the resulting input stream
      */
-    
     public InputStream getDestinationStream(InputStream source)
-        throws Exception
+                                     throws Exception
     {
         // read in bitstream's image
         BufferedImage buf = ImageIO.read(source);
 
         // get config params
-        float xmax = (float)ConfigurationManager.getIntProperty("thumbnail.maxwidth" );
-        float ymax = (float)ConfigurationManager.getIntProperty("thumbnail.maxheight");
-        
+        float xmax = (float) ConfigurationManager.getIntProperty("thumbnail.maxwidth");
+        float ymax = (float) ConfigurationManager.getIntProperty("thumbnail.maxheight");
+
         Image thumb = null;
-        
+
         // now get the image dimensions
-        float xsize = (float)buf.getWidth (null);
-        float ysize = (float)buf.getHeight(null);
+        float xsize = (float) buf.getWidth(null);
+        float ysize = (float) buf.getHeight(null);
 
         // if verbose flag is set, print out dimensions
         // to STDOUT
-        if( MediaFilterManager.isVerbose )
-       	{
-        	System.out.println("original size: " + xsize + "," + ysize);
-       	}
-        	
+        if (MediaFilterManager.isVerbose)
+        {
+            System.out.println("original size: " + xsize + "," + ysize);
+        }
+
         // scale by x first if needed
-        if( xsize > xmax )
+        if (xsize > xmax)
         {
             // calculate scaling factor so that xsize * scale = new size (max)
-            float scale_factor = xmax/xsize;
-         
+            float scale_factor = xmax / xsize;
+
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if( MediaFilterManager.isVerbose )
-           	{   
-            	System.out.println("x scale factor: " + scale_factor);
-           	}
-            
+            if (MediaFilterManager.isVerbose)
+            {
+                System.out.println("x scale factor: " + scale_factor);
+            }
+
             // now reduce x size
             // and y size
             xsize = xsize * scale_factor;
@@ -162,17 +147,17 @@ public class JPEGFilter extends MediaFilter
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if( MediaFilterManager.isVerbose )
-           	{
-            	System.out.println("new size: " + xsize + "," + ysize);
-           	}
+            if (MediaFilterManager.isVerbose)
+            {
+                System.out.println("new size: " + xsize + "," + ysize);
+            }
         }
-        
+
         // scale by y if needed
-        if( ysize > ymax )
+        if (ysize > ymax)
         {
-            float scale_factor = ymax/ysize;
-            
+            float scale_factor = ymax / ysize;
+
             // now reduce x size
             // and y size
             xsize = xsize * scale_factor;
@@ -180,31 +165,33 @@ public class JPEGFilter extends MediaFilter
         }
 
         // if verbose flag is set, print details to STDOUT
-        if( MediaFilterManager.isVerbose )
-       	{
-        	System.out.println("thumbnail size: " + xsize + ", " + ysize);
-       	}
-        
-        thumb = buf.getScaledInstance( (int)xsize,(int)ysize,Image.SCALE_SMOOTH );
-        
+        if (MediaFilterManager.isVerbose)
+        {
+            System.out.println("thumbnail size: " + xsize + ", " + ysize);
+        }
+
+        thumb = buf.getScaledInstance((int) xsize, (int) ysize,
+                                      Image.SCALE_SMOOTH);
+
         // create a BufferedImage to draw this image into...
-        
-        BufferedImage thumbnail = new BufferedImage(thumb.getWidth(null), thumb.getHeight(null), BufferedImage.TYPE_3BYTE_BGR);
-        
+        BufferedImage thumbnail = new BufferedImage(thumb.getWidth(null),
+                                                    thumb.getHeight(null),
+                                                    BufferedImage.TYPE_3BYTE_BGR);
+
         Graphics2D g2d = thumbnail.createGraphics();
-        
+
         // draw thumb into thumbnail
         g2d.drawImage(thumb, null, null);
 
         // now create an input stream and return it
         // there has got to be a better way than this!
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         ImageIO.write(thumbnail, "jpeg", baos);
 
         // now get the array
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        
-        return bais;  // will this work? or will the byte array be out of scope?
+
+        return bais; // will this work? or will the byte array be out of scope?
     }
 }

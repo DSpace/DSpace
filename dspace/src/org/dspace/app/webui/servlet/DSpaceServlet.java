@@ -37,24 +37,24 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+
 
 
 /**
@@ -65,7 +65,7 @@ import org.dspace.core.LogManager;
  * Unlike regular servlets, DSpace servlets should override the
  * <code>doDSGet</code> and <code>doDSPost</code> methods, which provide
  * a DSpace context to work with, and handle the common exceptions
- * <code>SQLException</code> and <code>AuthorizeException</code>.  
+ * <code>SQLException</code> and <code>AuthorizeException</code>.
  * <code>doGet</code> and <code>doPost</code> should be overridden only in
  * special circumstances.
  * <P>
@@ -96,20 +96,18 @@ public class DSpaceServlet extends HttpServlet
     private static Logger log = Logger.getLogger(DSpaceServlet.class);
 
     protected void doGet(HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException
-    {
-        processRequest(request, response);
-    }
-    
-    
-    protected void doPost(HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException
+                         HttpServletResponse response)
+                  throws ServletException, IOException
     {
         processRequest(request, response);
     }
 
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
+                   throws ServletException, IOException
+    {
+        processRequest(request, response);
+    }
 
     /**
      * Process an incoming request
@@ -118,12 +116,12 @@ public class DSpaceServlet extends HttpServlet
      * @param response   the response object
      */
     private void processRequest(HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException
+                                HttpServletResponse response)
+                         throws ServletException, IOException
     {
         Context context = null;
 
-	// set all incoming encoding to UTF-8
+        // set all incoming encoding to UTF-8
         request.setCharacterEncoding("UTF-8");
 
         // Get the URL from the request immediately, since forwarding
@@ -135,44 +133,39 @@ public class DSpaceServlet extends HttpServlet
             // Obtain a context - either create one, or get the one created by
             // an authentication filter
             context = UIUtil.obtainContext(request);
-        
+
             // Are we resuming a previous request that was interrupted for
             // authentication?
             request = Authenticate.getRealRequest(request);
 
             if (log.isDebugEnabled())
             {
-                log.debug(LogManager.getHeader(context,
-                    "http_request",
-                    UIUtil.getRequestLogInfo(request)));
+                log.debug(LogManager.getHeader(context, "http_request",
+                                               UIUtil.getRequestLogInfo(request)));
             }
 
             // Invoke the servlet code
             if (request.getMethod().equals("POST"))
             {
                 doDSPost(context, request, response);
-            }
-            else
+            } else
             {
                 doDSGet(context, request, response);
             }
-        }
-        catch (SQLException se)
+        } catch (SQLException se)
         {
             // For database errors, we log the exception and show a suitably
             // apologetic error
-            log.warn(LogManager.getHeader(context,
-                "database_error",
-                se.toString()), se);
+            log.warn(LogManager.getHeader(context, "database_error",
+                                          se.toString()), se);
 
             // Also email an alert
             UIUtil.sendAlert(request, se);
 
             JSPManager.showInternalError(request, response);
-        }
-        catch (AuthorizeException ae)
+        } catch (AuthorizeException ae)
         {
-            /* 
+            /*
              *If no user is logged in, we will start authentication, since if
              * they authenticate, they might be allowed to do what they tried
              * to do.  If someone IS logged in, and we got this exception, we
@@ -182,44 +175,37 @@ public class DSpaceServlet extends HttpServlet
             if (context.getCurrentUser() == null)
             {
                 Authenticate.startAuthentication(context, request, response);
-            }
-            else
+            } else
             {
                 // FIXME: Log the right info?
                 // Log the error
-                log.info(LogManager.getHeader(context,
-                    "authorize_error",
-                    ae.toString()));
+                log.info(LogManager.getHeader(context, "authorize_error",
+                                              ae.toString()));
 
                 JSPManager.showAuthorizeError(request, response, ae);
             }
-        }
-        catch (RuntimeException e)
+        } catch (RuntimeException e)
         {
             // Catch and re-throw to ensure context aborted (via "finally")
             throw e;
-        }
-        catch (IOException ioe)
+        } catch (IOException ioe)
         {
             // Catch and re-throw to ensure context aborted (via "finally")
             throw ioe;
-        }
-        catch (ServletException sve)
+        } catch (ServletException sve)
         {
             // Catch and re-throw to ensure context aborted (via "finally")
             throw sve;
-        }
-        finally
+        } finally
         {
             // Abort the context if it's still valid
-            if (context != null && context.isValid())
+            if ((context != null) && context.isValid())
             {
                 context.abort();
             }
         }
     }
-    
-    
+
     /**
      * Process an incoming HTTP GET.  If an exception is thrown, or for some
      * other reason the passed in context is not completed, it will be aborted
@@ -232,17 +218,16 @@ public class DSpaceServlet extends HttpServlet
      * @throws SQLException  if a database error occurs
      * @throws AuthorizeException  if some authorization error occurs
      */
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         // If this is not overridden, we invoke the raw HttpServlet "doGet" to
         // indicate that GET is not supported by this servlet.
         super.doGet(request, response);
     }
-    
-    
+
     /**
      * Process an incoming HTTP POST.  If an exception is thrown, or for some
      * other reason the passed in context is not completed, it will be aborted
@@ -255,10 +240,10 @@ public class DSpaceServlet extends HttpServlet
      * @throws SQLException  if a database error occurs
      * @throws AuthorizeException  if some authorization error occurs
      */
-    protected void doDSPost(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSPost(Context context, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         // If this is not overridden, we invoke the raw HttpServlet "doGet" to
         // indicate that POST is not supported by this servlet.

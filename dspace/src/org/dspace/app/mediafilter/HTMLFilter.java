@@ -39,24 +39,14 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
- 
 package org.dspace.app.mediafilter;
-
-import org.textmining.text.extraction.WordExtractor;
-
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.ChangedCharSetException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
-import org.dspace.core.Context;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
+
 
 /*
 
@@ -67,8 +57,6 @@ to do:
         - bitstream format doesn't exist
 
  */
-
-
 public class HTMLFilter extends MediaFilter
 {
     /**
@@ -81,7 +69,6 @@ public class HTMLFilter extends MediaFilter
         return oldFilename + ".txt";
     }
 
-
     /**
      * @return String bundle name
      *
@@ -90,7 +77,6 @@ public class HTMLFilter extends MediaFilter
     {
         return "TEXT";
     }
-    
 
     /**
      * @return String bitstreamformat
@@ -100,7 +86,6 @@ public class HTMLFilter extends MediaFilter
         return "Text";
     }
 
-
     /**
      * @return String description
      */
@@ -109,32 +94,29 @@ public class HTMLFilter extends MediaFilter
         return "Extracted text";
     }
 
-        
     /**
      * @param source source input stream
      *
      * @return InputStream the resulting input stream
      */
-    
     public InputStream getDestinationStream(InputStream source)
-        throws Exception
+                                     throws Exception
     {
         // try and read the document - set to ignore character set directive,
         // assuming that the input stream is already set properly (I hope)
-
         HTMLEditorKit kit = new HTMLEditorKit();
         Document doc = kit.createDefaultDocument();
 
         doc.putProperty("IgnoreCharsetDirective", new Boolean(true));
 
         kit.read(source, doc, 0);
- 
+
         String extractedText = doc.getText(0, doc.getLength());
 
         // generate an input stream with the extracted text
         byte[] textBytes = extractedText.getBytes();
         ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);
 
-        return bais;  // will this work? or will the byte array be out of scope?
+        return bais; // will this work? or will the byte array be out of scope?
     }
 }

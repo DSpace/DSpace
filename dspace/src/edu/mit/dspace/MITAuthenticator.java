@@ -39,22 +39,22 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package edu.mit.dspace;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.SiteAuthenticator;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+
 
 /**
  * MIT implementation of DSpace Web UI authentication.  This version detects
@@ -74,34 +74,30 @@ public class MITAuthenticator implements SiteAuthenticator
     private static Logger log = Logger.getLogger(SiteAuthenticator.class);
 
     public void startAuthentication(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException
+                                    HttpServletRequest request,
+                                    HttpServletResponse response)
+                             throws ServletException, IOException
     {
         if (isMITUser(request))
         {
             // Try and get a certificate by default
-            response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/certificate-login"));
-        }
-        else
+            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
+                                                             "/certificate-login"));
+        } else
         {
             // Present the username/password screen (with cert option)
-            response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/password-login"));
+            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
+                                                             "/password-login"));
         }
     }
 
-
-    public int[] getSpecialGroups(Context context,
-        HttpServletRequest request)
-        throws SQLException
-    {        
+    public int[] getSpecialGroups(Context context, HttpServletRequest request)
+                           throws SQLException
+    {
         // Add user to "MIT Users" special group if they're an MIT user
-
         EPerson user = context.getCurrentUser();
-        boolean hasMITEmail = (user != null &&
-            user.getEmail().toLowerCase().endsWith("@mit.edu"));
+        boolean hasMITEmail = ((user != null) &&
+                              user.getEmail().toLowerCase().endsWith("@mit.edu"));
 
         if (hasMITEmail || isMITUser(request))
         {
@@ -112,17 +108,17 @@ public class MITAuthenticator implements SiteAuthenticator
             {
                 // Oops - the group isn't there.
                 log.warn(LogManager.getHeader(context,
-                    "No MIT Group found!! Admin needs to create one!",
-                    ""));
+                                              "No MIT Group found!! Admin needs to create one!",
+                                              ""));
+
                 return new int[0];
             }
 
-            return new int[] {mitGroup.getID()};
+            return new int[] { mitGroup.getID() };
         }
 
         return new int[0];
     }
-
 
     /**
      * Check to see if the user is an MIT user.  At present, it just
@@ -138,22 +134,21 @@ public class MITAuthenticator implements SiteAuthenticator
     {
         String addr = request.getRemoteAddr();
 
-        final String[] mitIPs =
-        {
-            "18.",
-            "128.52.",       // AI
-            "129.55.",       // Lincoln
-            "192.52.65.",    // Haystack
-            "192.52.61.",    // Haystack
-            "198.125.160.",  // Physicists/ESnet ranges purchased
-            "198.125.161.",  // ...
-            "198.125.162.",  // ...
-            "198.125.163.",  // ...
-            "198.125.176.",  // ...
-            "198.125.177.",  // ...
-            "198.125.178.",  // ...
-            "198.125.179."   // ...
-        };
+        final String[] mitIPs = 
+                                {
+                                    "18.", "128.52.", // AI
+        "129.55.", // Lincoln
+        "192.52.65.", // Haystack
+        "192.52.61.", // Haystack
+        "198.125.160.", // Physicists/ESnet ranges purchased
+        "198.125.161.", // ...
+        "198.125.162.", // ...
+        "198.125.163.", // ...
+        "198.125.176.", // ...
+        "198.125.177.", // ...
+        "198.125.178.", // ...
+        "198.125.179." // ...
+                                };
 
         for (int i = 0; i < mitIPs.length; i++)
         {
@@ -165,7 +160,7 @@ public class MITAuthenticator implements SiteAuthenticator
 
         return false;
     }
-    
+
     /** Indicate whether or not a particular self-registering user can set
      * themselves a password in the profile info form.
      *
@@ -175,9 +170,9 @@ public class MITAuthenticator implements SiteAuthenticator
      * @param email     e-mail address of user attempting to register
      *
      */
-    public boolean allowSetPassword(Context context, HttpServletRequest request,
-        String email)
-        throws SQLException
+    public boolean allowSetPassword(Context context,
+                                    HttpServletRequest request, String email)
+                             throws SQLException
     {
         // Anyone whose email address ends with @mit.edu must use a Web cert
         // to log in, so can't set a password
@@ -185,12 +180,11 @@ public class MITAuthenticator implements SiteAuthenticator
         {
             return false;
         }
-        
+
         // Anyone else can set themselves a password
         return true;
     }
 
-    
     /** Indicate whether or not a particular user can self-register, based
      * on e-mail address.
      *
@@ -201,13 +195,12 @@ public class MITAuthenticator implements SiteAuthenticator
      *
      */
     public boolean canSelfRegister(Context context, HttpServletRequest request,
-        String email) throws SQLException
+                                   String email) throws SQLException
     {
         // Anyone can register
         return true;
     }
 
-    
     /** Initialise a new e-person record for a self-registered new user.
      *
      * @param context   DSpace context
@@ -217,7 +210,7 @@ public class MITAuthenticator implements SiteAuthenticator
      *
      */
     public void initEPerson(Context context, HttpServletRequest request,
-        EPerson eperson) throws SQLException
+                            EPerson eperson) throws SQLException
     {
         // If an MIT user, they must use a certificate
         if (eperson.getEmail().toLowerCase().trim().endsWith("@mit.edu"))
@@ -225,5 +218,4 @@ public class MITAuthenticator implements SiteAuthenticator
             eperson.setRequireCertificate(true);
         }
     }
-    
 }

@@ -35,29 +35,22 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.authorize;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
-import java.util.StringTokenizer;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.history.HistoryManager;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace.
@@ -82,20 +75,29 @@ public class AuthorizeManager
      * AuthorizeException if all the authorizations fail.
      */
     public static void authorizeAnyOf(Context c, DSpaceObject o, int[] actions)
-            throws AuthorizeException, SQLException {
+                               throws AuthorizeException, SQLException
+    {
         AuthorizeException ex = null;
-        for (int i = 0; i < actions.length; i++) {
-            try {
+
+        for (int i = 0; i < actions.length; i++)
+        {
+            try
+            {
                 authorizeAction(c, o, actions[i]);
+
                 return;
-            } catch (AuthorizeException e) {
+            } catch (AuthorizeException e)
+            {
                 if (ex == null)
+                {
                     ex = e;
+                }
             }
         }
+
         throw ex;
     }
-    
+
     /**
      * primary authorization interface, assumes user is the context's
      *  currentuser, and throws an exception
@@ -107,55 +109,71 @@ public class AuthorizeManager
      * @throws AuthorizeException if the user is denied
      */
     public static void authorizeAction(Context c, DSpaceObject o, int action)
-        throws AuthorizeException, SQLException
+                                throws AuthorizeException, SQLException
     {
-        if( o == null )
+        if (o == null)
         {
             // action can be -1 due to a null entry
             String actionText;
 
-            if( action == -1 ) { actionText = "null"; }
-            else { actionText = Constants.actionText[action]; }
+            if (action == -1)
+            {
+                actionText = "null";
+            } else
+            {
+                actionText = Constants.actionText[action];
+            }
 
             EPerson e = c.getCurrentUser();
             int userid;
-            
-            if( e == null ) { userid = 0;         }
-            else            { userid = e.getID(); }
 
-            throw new AuthorizeException( "Authorization attempted on null DSpace object " + actionText + " by user " + userid);
+            if (e == null)
+            {
+                userid = 0;
+            } else
+            {
+                userid = e.getID();
+            }
+
+            throw new AuthorizeException("Authorization attempted on null DSpace object " +
+                                         actionText + " by user " + userid);
         }
-        if( !authorize(c, o, action, c.getCurrentUser()) )
+
+        if (!authorize(c, o, action, c.getCurrentUser()))
         {
             // denied, assemble and throw exception
             int otype = o.getType();
-            int oid   = o.getID();
+            int oid = o.getID();
             int userid;
             EPerson e = c.getCurrentUser();
-            
-            if( e == null ) { userid = 0;         }
-            else            { userid = e.getID(); }
-            
-//            AuthorizeException j = new AuthorizeException("Denied");
-//            j.printStackTrace();
 
+            if (e == null)
+            {
+                userid = 0;
+            } else
+            {
+                userid = e.getID();
+            }
+
+            //            AuthorizeException j = new AuthorizeException("Denied");
+            //            j.printStackTrace();
             // action can be -1 due to a null entry
             String actionText;
 
-            if( action == -1 ) { actionText = "null"; }
-            else { actionText = Constants.actionText[action]; }
-            
-            throw new AuthorizeException(
-                "Authorization denied for action " +
-                actionText                         +
-                " on " + Constants.typeText[otype] +
-                ":"    + oid + " by user " + userid,
-                o,
-                action
-                );
+            if (action == -1)
+            {
+                actionText = "null";
+            } else
+            {
+                actionText = Constants.actionText[action];
+            }
+
+            throw new AuthorizeException("Authorization denied for action " +
+                                         actionText + " on " +
+                                         Constants.typeText[otype] + ":" + oid +
+                                         " by user " + userid, o, action);
         }
     }
-
 
     /**
      * same authorize, returns boolean for those who don't want to deal with
@@ -165,25 +183,26 @@ public class AuthorizeManager
      * @param action
      */
     public static boolean authorizeActionBoolean(Context c, DSpaceObject o,
-                                                    int a)
-        throws SQLException
+                                                 int a)
+                                          throws SQLException
     {
         boolean isAuthorized = true;
 
-        if( o == null ) return false;
-        
+        if (o == null)
+        {
+            return false;
+        }
+
         try
         {
-            authorizeAction(c,o,a);
-        }
-        catch( AuthorizeException e )
+            authorizeAction(c, o, a);
+        } catch (AuthorizeException e)
         {
             isAuthorized = false;
         }
 
         return isAuthorized;
     }
-
 
     /**
      * authorize() is the authorize method that returns a boolean - always
@@ -193,53 +212,56 @@ public class AuthorizeManager
      * @param resorceidID of resource you're trying to do an authorize on
      * @param actionid - action to perform (read, write, etc)
      */
-    private static boolean authorize(Context c,
-            DSpaceObject o, int action, EPerson e)
-        throws SQLException
+    private static boolean authorize(Context c, DSpaceObject o, int action,
+                                     EPerson e) throws SQLException
     {
         int userid;
 
         // return FALSE if there is no DSpaceObject
-        if( o == null ) return false;
+        if (o == null)
+        {
+            return false;
+        }
 
         // is authorization disabled for this context?
-        if( c.ignoreAuthorization() ) return true;
+        if (c.ignoreAuthorization())
+        {
+            return true;
+        }
 
         // is eperson set?  if not, userid = 0 (anonymous)
-        if( e == null )
+        if (e == null)
         {
             userid = 0;
-        }
-        else
+        } else
         {
             userid = e.getID();
 
             // perform isadmin check since user 
             // is user part of admin group?
-            if( isAdmin(c) )
+            if (isAdmin(c))
             {
                 return true;
             }
         }
 
-        List policies = getPoliciesActionFilter(c, o, action);         
-        Iterator i    = policies.iterator();
-                
-        while( i.hasNext() )
+        List policies = getPoliciesActionFilter(c, o, action);
+        Iterator i = policies.iterator();
+
+        while (i.hasNext())
         {
-            ResourcePolicy rp = (ResourcePolicy)i.next();
-            
+            ResourcePolicy rp = (ResourcePolicy) i.next();
+
             // check policies for date validity
-            if( rp.isDateValid() )
+            if (rp.isDateValid())
             {
-                if( (rp.getEPersonID() != -1)
-                    &&(rp.getEPersonID() == userid) )
+                if ((rp.getEPersonID() != -1) && (rp.getEPersonID() == userid))
                 {
                     return true; // match
                 }
-                                
-                if( (rp.getGroupID() != -1 )
-                    &&( Group.isMember(c, rp.getGroupID() )) )
+
+                if ((rp.getGroupID() != -1) &&
+                        (Group.isMember(c, rp.getGroupID())))
                 {
                     // group was set, and eperson is a member
                     // of that group
@@ -247,45 +269,42 @@ public class AuthorizeManager
                 }
             }
         }
-        
+
         // default authorization is denial
         return false;
     }
 
-
     ///////////////////////////////////////////////
     // admin check methods 
     ///////////////////////////////////////////////
-
 
     /**
      * check to see if the current user is an admin,
      *  or always return true if c.ignoreAuthorization is set.
      *  Anonymous users can't be Admins (EPerson set to NULL)
      */
-    public static boolean isAdmin(Context c)
-        throws SQLException
+    public static boolean isAdmin(Context c) throws SQLException
     {
         // if we're ignoring authorization, user is member of admin
-        if(c.ignoreAuthorization()) return true;
+        if (c.ignoreAuthorization())
+        {
+            return true;
+        }
 
         EPerson e = c.getCurrentUser();
 
-        if( e == null )
+        if (e == null)
         {
             return false; // anonymous users can't be admins....
-        }
-        else
+        } else
         {
-            return Group.isMember(c,1);
+            return Group.isMember(c, 1);
         }
     }
 
-    
     ///////////////////////////////////////////////
     // policy manipulation methods
     ///////////////////////////////////////////////
-
 
     /**
      * add a policy for an eperson
@@ -295,19 +314,18 @@ public class AuthorizeManager
      * @param Eperson who can perform the action
      */
     public static void addPolicy(Context c, DSpaceObject o, int actionID,
-            EPerson e)
-        throws SQLException, AuthorizeException
+                                 EPerson e)
+                          throws SQLException, AuthorizeException
     {
         ResourcePolicy rp = ResourcePolicy.create(c);
-        
-        rp.setResource(o       );
-        rp.setAction  (actionID);
-        rp.setEPerson (e       );
-        
+
+        rp.setResource(o);
+        rp.setAction(actionID);
+        rp.setEPerson(e);
+
         rp.update();
     }
 
-    
     /**
      * add a policy for a group
      * @param context
@@ -316,18 +334,17 @@ public class AuthorizeManager
      * @param Group that can perform the action
      */
     public static void addPolicy(Context c, DSpaceObject o, int actionID,
-            Group g)
-        throws SQLException, AuthorizeException
+                                 Group g)
+                          throws SQLException, AuthorizeException
     {
         ResourcePolicy rp = ResourcePolicy.create(c);
-        
-        rp.setResource(o       );
-        rp.setAction  (actionID);
-        rp.setGroup   (g       );
-        
+
+        rp.setResource(o);
+        rp.setAction(actionID);
+        rp.setGroup(g);
+
         rp.update();
     }
-
 
     /**
      * Return a List of the policies for an object
@@ -336,38 +353,36 @@ public class AuthorizeManager
      * @param dspace object
      */
     public static List getPolicies(Context c, DSpaceObject o)
-        throws SQLException
+                            throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.query(c,
-            "resourcepolicy",
-            "SELECT * FROM resourcepolicy WHERE " +
-            "resource_type_id=" + o.getType() + " AND " +
-            "resource_id="      + o.getID()
-            );
-        
+        TableRowIterator tri = DatabaseManager.query(c, "resourcepolicy",
+                                                     "SELECT * FROM resourcepolicy WHERE " +
+                                                     "resource_type_id=" +
+                                                     o.getType() + " AND " +
+                                                     "resource_id=" +
+                                                     o.getID());
+
         List policies = new ArrayList();
-        
-        while( tri.hasNext() )
+
+        while (tri.hasNext())
         {
             TableRow row = tri.next();
-            
+
             // first check the cache (FIXME: is this right?)
-            ResourcePolicy cachepolicy = (ResourcePolicy)c.fromCache(
-                ResourcePolicy.class, row.getIntColumn("policy_id") );
-            
-            if( cachepolicy != null )
+            ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(ResourcePolicy.class,
+                                                                      row.getIntColumn("policy_id"));
+
+            if (cachepolicy != null)
             {
                 policies.add(cachepolicy);
-            }
-            else
+            } else
             {
                 policies.add(new ResourcePolicy(c, row));
             }
         }
-                
+
         return policies;
     }
-
 
     /**
      * Return a list of policies for an object that match the action
@@ -377,41 +392,39 @@ public class AuthorizeManager
      * @param actionID action (defined in class Constants)
      *
      */
-    public static List getPoliciesActionFilter(Context c,
-            DSpaceObject o, int actionID)
-        throws SQLException
+    public static List getPoliciesActionFilter(Context c, DSpaceObject o,
+                                               int actionID)
+                                        throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.query(c,
-            "resourcepolicy",
-            "SELECT * FROM resourcepolicy WHERE " +
-            "resource_type_id=" + o.getType() + " AND " +
-            "resource_id="      + o.getID()   + " AND " +
-            "action_id="        + actionID
-            );
-        
+        TableRowIterator tri = DatabaseManager.query(c, "resourcepolicy",
+                                                     "SELECT * FROM resourcepolicy WHERE " +
+                                                     "resource_type_id=" +
+                                                     o.getType() + " AND " +
+                                                     "resource_id=" +
+                                                     o.getID() + " AND " +
+                                                     "action_id=" + actionID);
+
         List policies = new ArrayList();
-        
-        while( tri.hasNext() )
+
+        while (tri.hasNext())
         {
             TableRow row = tri.next();
-            
+
             // first check the cache (FIXME: is this right?)
-            ResourcePolicy cachepolicy = (ResourcePolicy)c.fromCache(
-                ResourcePolicy.class, row.getIntColumn("policy_id") );
-            
-            if( cachepolicy != null )
+            ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(ResourcePolicy.class,
+                                                                      row.getIntColumn("policy_id"));
+
+            if (cachepolicy != null)
             {
                 policies.add(cachepolicy);
-            }
-            else
+            } else
             {
                 policies.add(new ResourcePolicy(c, row));
             }
         }
-        
+
         return policies;
     }
-
 
     /**
      * add policies to an object to match those from
@@ -420,17 +433,16 @@ public class AuthorizeManager
      * @param DSpaceObject source of policies
      * @param DSpaceObject destination of inherited policies
      */
-    public static void inheritPolicies(Context c,
-                    DSpaceObject src, DSpaceObject dest )
-        throws SQLException, AuthorizeException
+    public static void inheritPolicies(Context c, DSpaceObject src,
+                                       DSpaceObject dest)
+                                throws SQLException, AuthorizeException
     {
         // find all policies for the source object
         List policies = getPolicies(c, src);
-        
+
         addPolicies(c, policies, dest);
-    }                            
-    
-    
+    }
+
     /** adds List of policies to a DSpacObject.  The
     * list is copied
     *
@@ -441,32 +453,30 @@ public class AuthorizeManager
     * @throws SQLException
     * @throws AuthorizeException
     */
-    public static void addPolicies(Context c, List policies,
-            DSpaceObject dest)
-        throws SQLException, AuthorizeException
+    public static void addPolicies(Context c, List policies, DSpaceObject dest)
+                            throws SQLException, AuthorizeException
     {
         Iterator i = policies.iterator();
-        
+
         // now add them to the destination object
-        while( i.hasNext() )
+        while (i.hasNext())
         {
-            ResourcePolicy srp = (ResourcePolicy)i.next();
-            
+            ResourcePolicy srp = (ResourcePolicy) i.next();
+
             ResourcePolicy drp = ResourcePolicy.create(c);
-            
+
             // copy over values
-            drp.setResource ( dest               );
-            drp.setAction   ( srp.getAction()    );
-            drp.setEPerson  ( srp.getEPerson()   );
-            drp.setGroup    ( srp.getGroup()     );
-            drp.setStartDate( srp.getStartDate() );
-            drp.setEndDate  ( srp.getEndDate()   );
-            
+            drp.setResource(dest);
+            drp.setAction(srp.getAction());
+            drp.setEPerson(srp.getEPerson());
+            drp.setGroup(srp.getGroup());
+            drp.setStartDate(srp.getStartDate());
+            drp.setEndDate(srp.getEndDate());
+
             // and write out new policy
             drp.update();
         }
     }
-    
 
     /**
      * removes ALL policies for an object
@@ -474,15 +484,14 @@ public class AuthorizeManager
      * @param dspace object
      */
     public static void removeAllPolicies(Context c, DSpaceObject o)
-        throws SQLException
+                                  throws SQLException
     {
         // FIXME: authorization check?
         DatabaseManager.updateQuery(c,
-            "DELETE FROM resourcepolicy WHERE " +
-            "resource_type_id=" + o.getType()   + " AND " +
-            "resource_id="      + o.getID()   );
+                                    "DELETE FROM resourcepolicy WHERE " +
+                                    "resource_type_id=" + o.getType() +
+                                    " AND " + "resource_id=" + o.getID());
     }
-
 
     /**
      * Remove all policies from an object that match a given action
@@ -491,38 +500,36 @@ public class AuthorizeManager
      * @param dso    DSpaceObject affected object
      * @param action to match, or -1=all
      */
-    public static void removePoliciesActionFilter(Context context, DSpaceObject dso, int actionID)
-        throws SQLException
+    public static void removePoliciesActionFilter(Context context,
+                                                  DSpaceObject dso, int actionID)
+                                           throws SQLException
     {
-        if( actionID == -1)
+        if (actionID == -1)
         {
             // remove all policies from object
             removeAllPolicies(context, dso);
-        }
-        else
+        } else
         {
             DatabaseManager.updateQuery(context,
-                "DELETE FROM resourcepolicy WHERE " +
-                "resource_type_id=" + dso.getType()   + " AND " +
-                "resource_id="      + dso.getID()     + " AND " +
-                "action_id="        + actionID );
+                                        "DELETE FROM resourcepolicy WHERE " +
+                                        "resource_type_id=" + dso.getType() +
+                                        " AND " + "resource_id=" + dso.getID() +
+                                        " AND " + "action_id=" + actionID);
         }
     }
-    
-    
+
     /**
      * removes all policies relating to a group
      * @param context
      * @param groupID
      */
-    public static void removeGroupPolicies(Context c, int groupID )
-        throws SQLException
+    public static void removeGroupPolicies(Context c, int groupID)
+                                    throws SQLException
     {
         DatabaseManager.updateQuery(c,
-            "DELETE FROM resourcepolicy WHERE " +
-            "epersongroup_id=" + groupID );
-    }    
-
+                                    "DELETE FROM resourcepolicy WHERE " +
+                                    "epersongroup_id=" + groupID);
+    }
 
     /**
      * removes all policies for an object that belong to a Group
@@ -532,17 +539,15 @@ public class AuthorizeManager
      *
      */
     public static void removeGroupPolicies(Context c, DSpaceObject o, Group g)
-        throws SQLException
+                                    throws SQLException
     {
         DatabaseManager.updateQuery(c,
-            "DELETE FROM resourcepolicy WHERE " +
-            "resource_type_id=" + o.getType()   + " AND " +
-            "resource_id="      + o.getID()     + " AND " +
-            "epersongroup_id="  + g.getID()
-        );
+                                    "DELETE FROM resourcepolicy WHERE " +
+                                    "resource_type_id=" + o.getType() +
+                                    " AND " + "resource_id=" + o.getID() +
+                                    " AND " + "epersongroup_id=" + g.getID());
     }
-    
-    
+
     /**
      * returns all groups authorized to perform and action on an object
      * returns empty array if no matches
@@ -551,51 +556,51 @@ public class AuthorizeManager
      * @param DSpaceObject
      * @param actionID
      */
-    public static Group [] getAuthorizedGroups(Context c, DSpaceObject o, int actionID)
-        throws java.sql.SQLException
+    public static Group[] getAuthorizedGroups(Context c, DSpaceObject o,
+                                              int actionID)
+                                       throws java.sql.SQLException
     {
         // do query matching groups, actions, and objects
-        TableRowIterator tri = DatabaseManager.query(c,
-            "resourcepolicy",
-            "SELECT * FROM resourcepolicy WHERE " +
-            "resource_type_id=" + o.getType() + " AND " +
-            "resource_id="      + o.getID()   + " AND " +
-            "action_id="        + actionID
-            );
-        
+        TableRowIterator tri = DatabaseManager.query(c, "resourcepolicy",
+                                                     "SELECT * FROM resourcepolicy WHERE " +
+                                                     "resource_type_id=" +
+                                                     o.getType() + " AND " +
+                                                     "resource_id=" +
+                                                     o.getID() + " AND " +
+                                                     "action_id=" + actionID);
+
         List groups = new ArrayList();
-        
-        while( tri.hasNext() )
+
+        while (tri.hasNext())
         {
             TableRow row = tri.next();
-            
+
             // first check the cache (FIXME: is this right?)
-            ResourcePolicy cachepolicy = (ResourcePolicy)c.fromCache(
-                ResourcePolicy.class, row.getIntColumn("policy_id") );
-            
+            ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(ResourcePolicy.class,
+                                                                      row.getIntColumn("policy_id"));
+
             ResourcePolicy myPolicy = null;
-            
-            if( cachepolicy != null )
+
+            if (cachepolicy != null)
             {
-                myPolicy=cachepolicy;
-            }
-            else
+                myPolicy = cachepolicy;
+            } else
             {
-                myPolicy=new ResourcePolicy(c,row);
+                myPolicy = new ResourcePolicy(c, row);
             }
 
             // now do we have a group?
             Group myGroup = myPolicy.getGroup();
-            
-            if( myGroup != null )
+
+            if (myGroup != null)
             {
                 groups.add(myGroup);
             }
         }
 
-        Group [] groupArray = new Group[groups.size()];
-        groupArray = (Group[])groups.toArray(groupArray);
-        
+        Group[] groupArray = new Group[groups.size()];
+        groupArray = (Group[]) groups.toArray(groupArray);
+
         return groupArray;
-    } 
+    }
 }

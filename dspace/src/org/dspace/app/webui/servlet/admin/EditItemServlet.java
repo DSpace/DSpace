@@ -37,30 +37,26 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet.admin;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.administer.DCType;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
@@ -68,20 +64,16 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 
@@ -108,18 +100,17 @@ public class EditItemServlet extends DSpaceServlet
 
     /** User confirms withdrawal of item */
     public static final int CONFIRM_WITHDRAW = 5;
-    
+
     /** User reinstates a withdrawn item */
     public static final int REINSTATE = 6;
 
     /** Logger */
     private static Logger log = Logger.getLogger(EditCommunitiesServlet.class);
 
-
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         /*
          * GET with no parameters displays "find by handle/id" form
@@ -140,19 +131,17 @@ public class EditItemServlet extends DSpaceServlet
             itemToEdit = Item.find(context, internalID);
 
             showError = (itemToEdit == null);
-        }
-        else if (handle != null && !handle.equals(""))
+        } else if ((handle != null) && !handle.equals(""))
         {
             // resolve handle
             DSpaceObject dso = HandleManager.resolveToObject(context, handle);
 
             // make sure it's an ITEM
-            if (dso != null && dso.getType() == Constants.ITEM)
+            if ((dso != null) && (dso.getType() == Constants.ITEM))
             {
                 itemToEdit = (Item) dso;
                 showError = false;
-            }
-            else
+            } else
             {
                 showError = true;
             }
@@ -165,35 +154,31 @@ public class EditItemServlet extends DSpaceServlet
             checkEditAuthorization(context, itemToEdit);
 
             showEditForm(context, request, response, itemToEdit);
-
-        }
-        else
+        } else
         {
             if (showError)
             {
                 request.setAttribute("invalid.id", new Boolean(true));
             }
+
             JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
         }
     }
 
-
-
-
-
-    protected void doDSPost(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSPost(Context context, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         // First, see if we have a multipart request (uploading a new bitstream)
         String contentType = request.getContentType();
 
-        if (contentType != null &&
-            contentType.indexOf("multipart/form-data") != -1)
+        if ((contentType != null) &&
+                (contentType.indexOf("multipart/form-data") != -1))
         {
             // This is a multipart request, so it's a file upload
             processUploadBitstream(context, request, response);
+
             return;
         }
 
@@ -204,6 +189,7 @@ public class EditItemServlet extends DSpaceServlet
         if (request.getParameter("submit_cancel") != null)
         {
             JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+
             return;
         }
 
@@ -214,7 +200,7 @@ public class EditItemServlet extends DSpaceServlet
         int action = UIUtil.getIntParameter(request, "action");
 
         Item item = Item.find(context,
-            UIUtil.getIntParameter(request, "item_id"));
+                              UIUtil.getIntParameter(request, "item_id"));
         String handle = HandleManager.findHandle(context, item);
 
         // now check to see if person can edit item
@@ -225,62 +211,69 @@ public class EditItemServlet extends DSpaceServlet
 
         switch (action)
         {
-        case START_DELETE:
-            // Show "delete item" confirmation page
-            JSPManager.showJSP(request,
-                response,
-                "/tools/confirm-delete-item.jsp");
-            break;
+            case START_DELETE:
 
-        case CONFIRM_DELETE:
-            // Delete the item - if "cancel" was pressed this would be
-            // picked up above
-            // FIXME: Don't know if this does all it should - remove Handle?
-            Collection[] collections = item.getCollections();
+                // Show "delete item" confirmation page
+                JSPManager.showJSP(request, response,
+                                   "/tools/confirm-delete-item.jsp");
 
-            // Remove item from all the collections it's in
-            for (int i = 0; i < collections.length; i++)
-            {
-                collections[i].removeItem(item);
-            }
+                break;
 
-            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
-            context.complete();
-            break;
+            case CONFIRM_DELETE:
 
-        case UPDATE_ITEM:
-            processUpdateItem(context, request, response, item);
-            break;
+                // Delete the item - if "cancel" was pressed this would be
+                // picked up above
+                // FIXME: Don't know if this does all it should - remove Handle?
+                Collection[] collections = item.getCollections();
 
-       case START_WITHDRAW:
-            // Show "withdraw item" confirmation page
-            JSPManager.showJSP(request,
-                response,
-                "/tools/confirm-withdraw-item.jsp");
-            break;
+                // Remove item from all the collections it's in
+                for (int i = 0; i < collections.length; i++)
+                {
+                    collections[i].removeItem(item);
+                }
 
-        case CONFIRM_WITHDRAW:
-            // Withdraw the item
-            item.withdraw();
-            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
-            context.complete();
-            break;
-            
-        case REINSTATE:
-            item.reinstate();
-            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
-            context.complete();
-            break;
-            
-        default:
-            // Erm... weird action value received.
-            log.warn(LogManager.getHeader(context,
-                "integrity_error",
-                UIUtil.getRequestLogInfo(request)));
-            JSPManager.showIntegrityError(request, response);
+                JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+                context.complete();
+
+                break;
+
+            case UPDATE_ITEM:
+                processUpdateItem(context, request, response, item);
+
+                break;
+
+            case START_WITHDRAW:
+
+                // Show "withdraw item" confirmation page
+                JSPManager.showJSP(request, response,
+                                   "/tools/confirm-withdraw-item.jsp");
+
+                break;
+
+            case CONFIRM_WITHDRAW:
+
+                // Withdraw the item
+                item.withdraw();
+                JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+                context.complete();
+
+                break;
+
+            case REINSTATE:
+                item.reinstate();
+                JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+                context.complete();
+
+                break;
+
+            default:
+
+                // Erm... weird action value received.
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                                              UIUtil.getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
         }
     }
-
 
     /**
      * Throw an exception if user isn't authorized to edit this item
@@ -288,24 +281,25 @@ public class EditItemServlet extends DSpaceServlet
      * @param item
      */
     private void checkEditAuthorization(Context c, Item item)
-        throws AuthorizeException, java.sql.SQLException
+                                 throws AuthorizeException, 
+                                        java.sql.SQLException
     {
-        if(!item.canEdit())
+        if (!item.canEdit())
         {
             int userID = 0;
-            
+
             // first, check if userid is set
-            if(c.getCurrentUser() != null)
+            if (c.getCurrentUser() != null)
             {
                 userID = c.getCurrentUser().getID();
             }
-            
+
             // show an error or throw an authorization exception
-            throw new AuthorizeException("EditItemServlet: User " + userID
-                            + " not authorized to edit item " + item.getID());
+            throw new AuthorizeException("EditItemServlet: User " + userID +
+                                         " not authorized to edit item " +
+                                         item.getID());
         }
     }
-
 
     /**
      * Show the item edit form for a particular item
@@ -315,11 +309,10 @@ public class EditItemServlet extends DSpaceServlet
      * @param response  the HTTP response
      * @param item      the item
      */
-    private void showEditForm(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        Item item)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    private void showEditForm(Context context, HttpServletRequest request,
+                              HttpServletResponse response, Item item)
+                       throws ServletException, IOException, SQLException, 
+                              AuthorizeException
     {
         // Get the handle, if any
         String handle = HandleManager.findHandle(context, item);
@@ -338,7 +331,6 @@ public class EditItemServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/tools/edit-item-form.jsp");
     }
 
-
     /**
      * Process input from the edit item form
      *
@@ -347,11 +339,10 @@ public class EditItemServlet extends DSpaceServlet
      * @param response  the HTTP response
      * @param item      the item
      */
-    private void processUpdateItem(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        Item item)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    private void processUpdateItem(Context context, HttpServletRequest request,
+                                   HttpServletResponse response, Item item)
+                            throws ServletException, IOException, SQLException, 
+                                   AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit");
 
@@ -364,12 +355,12 @@ public class EditItemServlet extends DSpaceServlet
 
         // We'll sort the parameters by name.  This ensures that DC fields
         // of the same element/qualifier are added in the correct sequence.
-
         // Get the parameters names
         Enumeration unsortedParamNames = request.getParameterNames();
 
         // Put them in a list
         List sortedParamNames = new LinkedList();
+
         while (unsortedParamNames.hasMoreElements())
         {
             sortedParamNames.add(unsortedParamNames.nextElement());
@@ -393,13 +384,14 @@ public class EditItemServlet extends DSpaceServlet
                  * (the number being the sequence number)
                  * We use a StringTokenizer to extract these values
                  */
-
                 StringTokenizer st = new StringTokenizer(p, "_");
 
-                st.nextToken();   // Skip "value"
+                st.nextToken(); // Skip "value"
+
                 String element = st.nextToken();
 
                 String qualifier = null;
+
                 if (st.countTokens() == 2)
                 {
                     qualifier = st.nextToken();
@@ -410,17 +402,18 @@ public class EditItemServlet extends DSpaceServlet
                 // Get a string with "element" for unqualified or
                 // "element_qualifier"
                 String key = element;
+
                 if (qualifier != null)
                 {
                     key = element + "_" + qualifier;
                 }
 
                 // Get the language
-                String language = request.getParameter(
-                    "language_" + key + "_" + sequenceNumber);
+                String language = request.getParameter("language_" + key + "_" +
+                                                       sequenceNumber);
 
                 // Empty string language = null
-                if (language != null && language.equals(""))
+                if ((language != null) && language.equals(""))
                 {
                     language = null;
                 }
@@ -431,14 +424,16 @@ public class EditItemServlet extends DSpaceServlet
                 // If remove button pressed for this value, we don't add it
                 // back to the item.  We also don't add empty values.
                 if (value.equals("") ||
-                    !button.equals("submit_remove_" + key + "_" + sequenceNumber))
+                        !button.equals("submit_remove_" + key + "_" +
+                                           sequenceNumber))
                 {
                     // Value is empty, or remove button for this wasn't pressed
                     item.addDC(element, qualifier, language, value);
                 }
             }
             // only process bitstreams if admin
-            else if (p.startsWith("bitstream_name") && AuthorizeManager.isAdmin(context))
+            else if (p.startsWith("bitstream_name") &&
+                         AuthorizeManager.isAdmin(context))
             {
                 // We have bitstream metadata
                 // First, get the bundle and bitstream ID
@@ -471,43 +466,56 @@ public class EditItemServlet extends DSpaceServlet
                     {
                         item.removeBundle(bundle);
                     }
-                }
-                else
+                } else
                 {
                     // Update the bitstream metadata
                     String name = request.getParameter(p);
-                    String source =
-                        request.getParameter("bitstream_source_" + key);
-                    String desc =
-                        request.getParameter("bitstream_description_" + key);
+                    String source = request.getParameter("bitstream_source_" +
+                                                         key);
+                    String desc = request.getParameter("bitstream_description_" +
+                                                       key);
                     int formatID = UIUtil.getIntParameter(request,
-                        "bitstream_format_id_" + key);
-                    String userFormatDesc = request.getParameter(
-                        "bitstream_user_format_description_" + key);
-		    int primaryBitstreamID = UIUtil.getIntParameter(request,
-			bundleID + "_primary_bitstream_id");
+                                                          "bitstream_format_id_" +
+                                                          key);
+                    String userFormatDesc = request.getParameter("bitstream_user_format_description_" +
+                                                                 key);
+                    int primaryBitstreamID = UIUtil.getIntParameter(request,
+                                                                    bundleID +
+                                                                    "_primary_bitstream_id");
 
                     // Empty strings become non-null
-                    if (source.equals("")) source = null;
-                    if (desc.equals("")) desc = null;
-                    if (userFormatDesc.equals("")) userFormatDesc = null;
+                    if (source.equals(""))
+                    {
+                        source = null;
+                    }
+
+                    if (desc.equals(""))
+                    {
+                        desc = null;
+                    }
+
+                    if (userFormatDesc.equals(""))
+                    {
+                        userFormatDesc = null;
+                    }
 
                     bitstream.setName(name);
                     bitstream.setSource(source);
                     bitstream.setDescription(desc);
-                    bitstream.setFormat(
-                        BitstreamFormat.find(context, formatID));
-		    if (primaryBitstreamID > 0)
-		    {
-			bundle.setPrimaryBitstreamID(primaryBitstreamID);
-		    }
+                    bitstream.setFormat(BitstreamFormat.find(context, formatID));
+
+                    if (primaryBitstreamID > 0)
+                    {
+                        bundle.setPrimaryBitstreamID(primaryBitstreamID);
+                    }
+
                     if (userFormatDesc != null)
                     {
                         bitstream.setUserFormatDescription(userFormatDesc);
                     }
 
                     bitstream.update();
-		    bundle.update();
+                    bundle.update();
                 }
             }
         }
@@ -518,7 +526,6 @@ public class EditItemServlet extends DSpaceServlet
          * Now respond to button presses, other than "Remove" or "Delete"
          * button presses which were dealt with in the above loop.
          */
-
         if (button.equals("submit_addfield"))
         {
             // Adding a metadata field
@@ -527,7 +534,10 @@ public class EditItemServlet extends DSpaceServlet
             String lang = request.getParameter("addfield_language");
 
             // Empty language = null
-            if (lang.equals("")) lang = null;
+            if (lang.equals(""))
+            {
+                lang = null;
+            }
 
             DCType dcType = DCType.find(context, dcTypeID);
             item.addDC(dcType.getElement(), dcType.getQualifier(), lang, value);
@@ -538,10 +548,8 @@ public class EditItemServlet extends DSpaceServlet
         {
             // Show upload bitstream page
             request.setAttribute("item", item);
-            JSPManager.showJSP(request, response,
-                "/tools/upload-bitstream.jsp");
-        }
-        else
+            JSPManager.showJSP(request, response, "/tools/upload-bitstream.jsp");
+        } else
         {
             // Show edit page again
             showEditForm(context, request, response, item);
@@ -554,7 +562,6 @@ public class EditItemServlet extends DSpaceServlet
         context.complete();
     }
 
-
     /**
      * Process the input from the upload bitstream page
      *
@@ -563,35 +570,34 @@ public class EditItemServlet extends DSpaceServlet
      * @param response  current servlet response object
      */
     private void processUploadBitstream(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+                                        HttpServletRequest request,
+                                        HttpServletResponse response)
+                                 throws ServletException, IOException, 
+                                        SQLException, AuthorizeException
     {
         // Wrap multipart request to get the submission info
-	FileUploadRequest wrapper = new FileUploadRequest(request);
+        FileUploadRequest wrapper = new FileUploadRequest(request);
         Bitstream b = null;
-        
+
         Item item = Item.find(context,
-            UIUtil.getIntParameter(wrapper, "item_id"));
+                              UIUtil.getIntParameter(wrapper, "item_id"));
 
         File temp = wrapper.getFile("file");
 
         // Read the temp file as logo
-        InputStream is = new BufferedInputStream(new FileInputStream(
-            temp));
+        InputStream is = new BufferedInputStream(new FileInputStream(temp));
 
         // now check to see if person can edit item
         checkEditAuthorization(context, item);
 
         // do we already have an ORIGINAL bundle?    
-        Bundle [] bundles = item.getBundles("ORIGINAL");
-                  
-        if( bundles.length < 1)
+        Bundle[] bundles = item.getBundles("ORIGINAL");
+
+        if (bundles.length < 1)
         {
             // set bundle's name to ORIGINAL    
             b = item.createSingleBitstream(is, "ORIGINAL");
-        }
-        else
+        } else
         {
             // we have a bundle already, just add bitstream
             b = bundles[0].createBitstream(is);
@@ -600,15 +606,15 @@ public class EditItemServlet extends DSpaceServlet
         // Strip all but the last filename.  It would be nice
         // to know which OS the file came from.
         String noPath = wrapper.getFilesystemName("file");
+
         while (noPath.indexOf('/') > -1)
         {
-            noPath = noPath.substring(
-                        noPath.indexOf('/') + 1);
+            noPath = noPath.substring(noPath.indexOf('/') + 1);
         }
+
         while (noPath.indexOf('\\') > -1)
         {
-            noPath = noPath.substring(
-                        noPath.indexOf('\\') + 1);
+            noPath = noPath.substring(noPath.indexOf('\\') + 1);
         }
 
         b.setName(noPath);
@@ -624,8 +630,8 @@ public class EditItemServlet extends DSpaceServlet
         // Back to edit form
         showEditForm(context, request, response, item);
 
-		// Remove temp file
-		temp.delete();
+        // Remove temp file
+        temp.delete();
 
         // Update DB
         context.complete();

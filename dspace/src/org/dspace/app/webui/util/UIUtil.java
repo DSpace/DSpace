@@ -37,19 +37,17 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.util;
-
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Enumeration;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.SiteAuthenticator;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -68,7 +66,6 @@ import org.dspace.eperson.EPerson;
  */
 public class UIUtil
 {
-
     /** log4j category */
     private static Logger log = Logger.getLogger(UIUtil.class);
 
@@ -83,18 +80,17 @@ public class UIUtil
      * @return a context object
      */
     public static Context obtainContext(HttpServletRequest request)
-        throws SQLException
+                                 throws SQLException
     {
         Context c = (Context) request.getAttribute("dspace.context");
-        
+
         if (c == null)
         {
             // No context for this request yet
             c = new Context();
-            
+
             // See if a user has authentication
-            Integer userID = (Integer)
-                request.getSession().getAttribute("dspace.current.user.id");
+            Integer userID = (Integer) request.getSession().getAttribute("dspace.current.user.id");
 
             if (userID != null)
             {
@@ -106,11 +102,11 @@ public class UIUtil
             // Set any special groups - invoke the site authenticator
             SiteAuthenticator siteAuth = Authenticate.getSiteAuth();
             int[] groupIDs = siteAuth.getSpecialGroups(c, request);
+
             for (int i = 0; i < groupIDs.length; i++)
             {
                 c.setSpecialGroup(groupIDs[i]);
             }
-
 
             // Set the session ID
             c.setExtraLogInfo("session_id=" + request.getSession().getId());
@@ -118,7 +114,7 @@ public class UIUtil
             // Store the context in the request
             request.setAttribute("dspace.context", c);
         }
-        
+
         return c;
     }
 
@@ -174,7 +170,7 @@ public class UIUtil
             request.setAttribute("dspace.original.url", fullURL);
         }
     }
-    
+
     /**
      * Get the original request URL.
      *
@@ -188,7 +184,7 @@ public class UIUtil
         storeOriginalURL(request);
 
         return ((String) request.getAttribute("dspace.original.url"));
-    }        
+    }
 
     /**
      * Utility method to convert spaces in a string to HTML non-break space
@@ -209,8 +205,7 @@ public class UIUtil
             if (ch == ' ')
             {
                 newString.append("&nbsp;");
-            }
-            else
+            } else
             {
                 newString.append(ch);
             }
@@ -228,15 +223,18 @@ public class UIUtil
      *
      * @return  the date in a human-readable form.
      */
-    public static String displayDate(DCDate d,
-        boolean time,
-        boolean localTime)
+    public static String displayDate(DCDate d, boolean time, boolean localTime)
     {
         StringBuffer sb = new StringBuffer();
-		
+
         if (d != null)
         {
-            int year, month, day, hour, minute, second;
+            int year;
+            int month;
+            int day;
+            int hour;
+            int minute;
+            int second;
 
             if (localTime)
             {
@@ -246,8 +244,7 @@ public class UIUtil
                 hour = d.getHour();
                 minute = d.getMinute();
                 second = d.getSecond();
-            }
-            else
+            } else
             {
                 year = d.getYearGMT();
                 month = d.getMonthGMT();
@@ -255,8 +252,8 @@ public class UIUtil
                 hour = d.getHourGMT();
                 minute = d.getMinuteGMT();
                 second = d.getSecondGMT();
-            }			
-	
+            }
+
             if (year > -1)
             {
                 if (month > -1)
@@ -265,12 +262,14 @@ public class UIUtil
                     {
                         sb.append(day + "-");
                     }
+
                     sb.append(DCDate.getMonthName(month).substring(0, 3) + "-");
                 }
+
                 sb.append(year + " ");
             }
 
-            if (time && hour > -1)
+            if (time && (hour > -1))
             {
                 String hr = String.valueOf(hour);
 
@@ -278,26 +277,28 @@ public class UIUtil
                 {
                     hr = "0" + hr;
                 }
+
                 String mn = String.valueOf(minute);
 
                 while (mn.length() < 2)
                 {
                     mn = "0" + mn;
                 }
-                String sc = String.valueOf(second);	
+
+                String sc = String.valueOf(second);
 
                 while (sc.length() < 2)
                 {
                     sc = "0" + sc;
                 }
+
                 sb.append(hr + ":" + mn + ":" + sc + " ");
             }
-        }
-        else
+        } else
         {
             sb.append("Unset");
         }
-		
+
         return (sb.toString());
     }
 
@@ -318,6 +319,7 @@ public class UIUtil
 
         // First write the parameters we had
         report = report + "-- Parameters were:\n";
+
         Enumeration e = request.getParameterNames();
 
         while (e.hasMoreElements())
@@ -329,16 +331,15 @@ public class UIUtil
                 // We don't want to write a clear text password
                 // to the log, even if it's wrong!
                 report = report + "-- " + name + ": *not logged*\n";
-            }
-            else
+            } else
             {
-                report = report + "-- " + name + ": \"" + request.getParameter(name) + "\"\n";
+                report = report + "-- " + name + ": \"" +
+                         request.getParameter(name) + "\"\n";
             }
         }
-		
+
         return report;
     }
-
 
     /**
      * Obtain a parameter from the given request as an int.  <code>-1</code>
@@ -352,18 +353,16 @@ public class UIUtil
     public static int getIntParameter(HttpServletRequest request, String param)
     {
         String val = request.getParameter(param);
-        
+
         try
         {
             return Integer.parseInt(val);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             // Problem with parameter
             return -1;
         }
     }
-
 
     /**
      * Obtain an array of int parameters from the given request as an int.
@@ -375,30 +374,32 @@ public class UIUtil
      *
      * @return  array of integers or null
      */
-    public static int [] getIntParameters(HttpServletRequest request, String param)
+    public static int[] getIntParameters(HttpServletRequest request,
+                                         String param)
     {
-        String [] request_values = request.getParameterValues(param);
-        
-        if( request_values == null ) return null;
+        String[] request_values = request.getParameterValues(param);
 
-        int [] return_values = new int[request_values.length];
-        
-        for( int x = 0; x < return_values.length; x++ )
-        {        
+        if (request_values == null)
+        {
+            return null;
+        }
+
+        int[] return_values = new int[request_values.length];
+
+        for (int x = 0; x < return_values.length; x++)
+        {
             try
             {
                 return_values[x] = Integer.parseInt(request_values[x]);
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 // Problem with parameter, stuff -1 in this slot
                 return_values[x] = -1;
             }
         }
-        
+
         return return_values;
     }
-
 
     /**
      * Obtain a parameter from the given request as a boolean.
@@ -411,12 +412,11 @@ public class UIUtil
      * @return  the integer value of the parameter, or -1
      */
     public static boolean getBoolParameter(HttpServletRequest request,
-        String param)
+                                           String param)
     {
-        return (request.getParameter(param) != null &&
-            request.getParameter(param).equals("true"));
+        return ((request.getParameter(param) != null) &&
+               request.getParameter(param).equals("true"));
     }
-
 
     /**
      * Get the button the user pressed on a submitted form.  All buttons
@@ -442,10 +442,9 @@ public class UIUtil
                 return parameterName;
             }
         }
-        
+
         return def;
     }
-
 
     /**
      * Send an alert to the designated "alert recipient" - that is, when a
@@ -463,29 +462,26 @@ public class UIUtil
      * @param  request    the HTTP request leading to the error
      * @param  exception  the exception causing the error, or null
      */
-    public static void sendAlert(HttpServletRequest request,
-        Exception exception)
+    public static void sendAlert(HttpServletRequest request, Exception exception)
     {
         String logInfo = UIUtil.getRequestLogInfo(request);
 
         try
         {
-            String recipient =
-                ConfigurationManager.getProperty("alert.recipient");
+            String recipient = ConfigurationManager.getProperty("alert.recipient");
 
             if (recipient != null)
             {
                 Email email = ConfigurationManager.getEmail("internal_error");
 
                 email.addRecipient(recipient);
-                email.addArgument(
-                    ConfigurationManager.getProperty("dspace.url"));
+                email.addArgument(ConfigurationManager.getProperty("dspace.url"));
                 email.addArgument(new Date());
                 email.addArgument(request.getSession().getId());
                 email.addArgument(logInfo);
-                
+
                 String stackTrace;
-                
+
                 if (exception != null)
                 {
                     StringWriter sw = new StringWriter();
@@ -493,21 +489,18 @@ public class UIUtil
                     exception.printStackTrace(pw);
                     pw.flush();
                     stackTrace = sw.toString();
-                }
-                else
+                } else
                 {
                     stackTrace = "No exception";
                 }
-                
+
                 email.addArgument(stackTrace);
                 email.send();
             }
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             // Not much we can do here!
             log.warn("Unable to send email alert", e);
         }
     }
-
 }

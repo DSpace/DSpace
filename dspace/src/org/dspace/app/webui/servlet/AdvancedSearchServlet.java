@@ -37,30 +37,26 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+
 
 /**
  * Servlet for constructing the advanced search form
  *
- * @author  gam
+ * @author gam
  * @version $Revision$
  */
 public class AdvancedSearchServlet extends DSpaceServlet
@@ -68,19 +64,16 @@ public class AdvancedSearchServlet extends DSpaceServlet
     /** Logger */
     private static Logger log = Logger.getLogger(SubscribeServlet.class);
 
-
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         // just build a list of top-level communities and pass along to the jsp
         Community[] communities = Community.findAllTop(context);
-        
+
         request.setAttribute("communities", communities);
-        
+
         JSPManager.showJSP(request, response, "/search/advanced.jsp");
     }
 }
-
-

@@ -39,8 +39,8 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
+
 
 /**
  * Abstract base class for DSpace objects
@@ -53,7 +53,7 @@ public abstract class DSpaceObject
      * @return type of the object
      */
     public abstract int getType();
-    
+
     /**
      * Get the internal ID (database primary key) of this object
      *

@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.core;
 
 import java.text.MessageFormat;
@@ -45,13 +44,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+
 import javax.mail.Address;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
@@ -78,7 +80,7 @@ import javax.mail.Transport;
  * #
  * # Parameters:   {0}  is a person's name
  * #               {1}  is the name of a submission
- * # 
+ * #
  * Subject: Example e-mail
  *
  * Dear {0},
@@ -95,7 +97,7 @@ import javax.mail.Transport;
  * </pre><P>
  * Note that parameters like <code>{0}</code> cannot be placed in the subject
  * of the e-mail; they won't get filled out.
- * 
+ *
  *
  * @author Robert Tansley
  * @version $Revision$
@@ -139,7 +141,6 @@ public class Email
         replyTo = null;
     }
 
-
     /**
      * Add a recipient
      *
@@ -149,12 +150,11 @@ public class Email
     {
         recipients.add(email);
     }
-    
-    
+
     /**
      * Set the content of the message.  Setting this "resets" the message
      * formatting - <code>addArgument</code> will start.  Comments and any
-     * "Subject:" line must be stripped. 
+     * "Subject:" line must be stripped.
      *
      * @param  cnt   the content of the message
      */
@@ -163,7 +163,6 @@ public class Email
         content = cnt;
         arguments = new ArrayList();
     }
-    
 
     /**
      * Set the subject of the message
@@ -175,7 +174,6 @@ public class Email
         subject = s;
     }
 
-
     /**
      * Set the reply-to email address
      *
@@ -186,7 +184,6 @@ public class Email
         replyTo = email;
     }
 
-
     /**
      * Fill out the next argument in the template
      *
@@ -196,7 +193,6 @@ public class Email
     {
         arguments.add(arg);
     }
-
 
     /**
      * "Reset" the message.  Clears the arguments and recipients, but leaves
@@ -209,46 +205,44 @@ public class Email
         replyTo = null;
     }
 
-
     /**
      * Sends the email.
      *
      * @throws MessagingException  if there was a problem sending the mail.
      */
-    public void send()
-        throws MessagingException
+    public void send() throws MessagingException
     {
         // Get the mail configuration properties
         String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
 
-
         // Set up properties for mail session
         Properties props = System.getProperties();
         props.put("mail.smtp.host", server);
-        
+
         // Get session
         Session session = Session.getDefaultInstance(props, null);
-        
+
         // Create message
         MimeMessage message = new MimeMessage(session);
 
         // Set the recipients of the message
         Iterator i = recipients.iterator();
+
         while (i.hasNext())
         {
             message.addRecipient(Message.RecipientType.TO,
-                new InternetAddress((String) i.next()));
+                                 new InternetAddress((String) i.next()));
         }
 
         // Format the mail message
         Object[] args = arguments.toArray();
         String fullMessage = MessageFormat.format(content, args);
-        
+
         message.setFrom(new InternetAddress(from));
         message.setSubject(subject);
         message.setText(fullMessage);
-        
+
         if (replyTo != null)
         {
             Address[] replyToAddr = new Address[1];

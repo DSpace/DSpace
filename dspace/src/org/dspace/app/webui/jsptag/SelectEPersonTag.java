@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
@@ -48,6 +47,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.dspace.eperson.EPerson;
+
 
 /**
  * <P>Tag for producing an e-person select widget in a form.  Somewhat
@@ -69,113 +69,107 @@ import org.dspace.eperson.EPerson;
  */
 public class SelectEPersonTag extends TagSupport
 {
-	/** Multiple e-people? */
-	private boolean multiple;
-	
-	/** Which eperson/epeople are initially in the list? */
-	private EPerson[] epeople; 
+    /** Multiple e-people? */
+    private boolean multiple;
 
+    /** Which eperson/epeople are initially in the list? */
+    private EPerson[] epeople;
 
-	public SelectEPersonTag()
-	{
-		super();
-	}
+    public SelectEPersonTag()
+    {
+        super();
+    }
 
-	
-	/**
-	 * Setter for multiple attribute
-	 * 
-	 * @param s  attribute from JSP
-	 */
-	public void setMultiple(String s)
-	{
-		if (s != null && (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true")))
-		{
-			multiple = true;
-		}
-		else
-		{
-			multiple = false;
-		}
-	}
+    /**
+     * Setter for multiple attribute
+     *
+     * @param s  attribute from JSP
+     */
+    public void setMultiple(String s)
+    {
+        if ((s != null) &&
+                (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true")))
+        {
+            multiple = true;
+        } else
+        {
+            multiple = false;
+        }
+    }
 
-	/**
-	 * Setter for e-people in list
-	 * 
-	 * @param e  attribute from JSP
-	 */
-	public void setSelected(Object e)
-	{
-		if (e instanceof EPerson)
-		{
-			epeople = new EPerson[1];
-			epeople[0] = (EPerson) e;
-		}
-		else if(e instanceof EPerson[])
-		{
-			epeople = (EPerson[]) e;
-		}
-	}
+    /**
+     * Setter for e-people in list
+     *
+     * @param e  attribute from JSP
+     */
+    public void setSelected(Object e)
+    {
+        if (e instanceof EPerson)
+        {
+            epeople = new EPerson[1];
+            epeople[0] = (EPerson) e;
+        } else if (e instanceof EPerson[])
+        {
+            epeople = (EPerson[]) e;
+        }
+    }
 
-	
-	public void release()
-	{
-		multiple = false;
-		epeople = null;
-	}
+    public void release()
+    {
+        multiple = false;
+        epeople = null;
+    }
 
+    public int doStartTag() throws JspException
+    {
+        try
+        {
+            JspWriter out = pageContext.getOut();
+            HttpServletRequest req = (HttpServletRequest) pageContext.getRequest();
 
-	public int doStartTag()
-		throws JspException
-	{
-		try
-		{
-			JspWriter out = pageContext.getOut();
-			HttpServletRequest req = (HttpServletRequest) pageContext.getRequest();
-			
-			out.print("<table><tr><td colspan=2><select multiple name=\"eperson_id\" SIZE=");
-			out.print(multiple ? "10" : "1");
-			out.println(">");
-			
-			if (epeople != null)
-			{
-				for (int i = 0; i < epeople.length; i++)
-				{
-					out.print("<OPTION VALUE=\"" + epeople[i].getID() + "\">");
-					out.print(epeople[i].getFullName() + " (" + epeople[i].getEmail() + ")");
-					out.println("</OPTION>");
-				}
-			}
-			
-			out.print("</SELECT></TD>");
-			
-			if (multiple)
-			{
-				out.print("</TR><TR><TD width=\"50%\" align=\"center\">");
-			}
-			else
-			{
-				out.print("<TD>");
-			}
-			
-			String p = (multiple ? "people" : "person");
-			out.print("<input type=\"button\" value=\"Select E-" + p + "...\" onclick=\"javascript:popup_window('" +
-				req.getContextPath() + "/tools/eperson-list?multiple=" + multiple +
-				"', 'eperson_popup');\">");
-			
-			if (multiple)
-			{
-				out.print("</TD><TD width=\"50%\" align=\"center\">");
-				out.print("<input type=\"button\" value=\"Remove Selected\" onclick=\"javascript:removeSelected(window.document.forms[0].eperson_id);\">");
-			}
+            out.print("<table><tr><td colspan=2><select multiple name=\"eperson_id\" SIZE=");
+            out.print(multiple ? "10" : "1");
+            out.println(">");
 
-			out.println("</TD></TR></TABLE>");
-		}
-		catch (IOException ie)
-		{
-			throw new JspException(ie);
-		}			
-		
-		return SKIP_BODY;
-	}
+            if (epeople != null)
+            {
+                for (int i = 0; i < epeople.length; i++)
+                {
+                    out.print("<OPTION VALUE=\"" + epeople[i].getID() + "\">");
+                    out.print(epeople[i].getFullName() + " (" +
+                              epeople[i].getEmail() + ")");
+                    out.println("</OPTION>");
+                }
+            }
+
+            out.print("</SELECT></TD>");
+
+            if (multiple)
+            {
+                out.print("</TR><TR><TD width=\"50%\" align=\"center\">");
+            } else
+            {
+                out.print("<TD>");
+            }
+
+            String p = (multiple ? "people" : "person");
+            out.print("<input type=\"button\" value=\"Select E-" + p +
+                      "...\" onclick=\"javascript:popup_window('" +
+                      req.getContextPath() + "/tools/eperson-list?multiple=" +
+                      multiple + "', 'eperson_popup');\">");
+
+            if (multiple)
+            {
+                out.print("</TD><TD width=\"50%\" align=\"center\">");
+                out.print("<input type=\"button\" value=\"Remove Selected\" onclick=\"javascript:removeSelected(window.document.forms[0].eperson_id);\">");
+            }
+
+            out.println("</TD></TR></TABLE>");
+        } catch (IOException ie)
+        {
+            throw new JspException(ie);
+        }
+
+        return SKIP_BODY;
+    }
 }

@@ -37,14 +37,12 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.jsptag;
 
-
 import java.io.IOException;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
-import javax.servlet.jsp.tagext.BodyTagSupport;
 
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.DCDate;
@@ -66,7 +64,6 @@ public class DateTag extends TagSupport
     /** Display the time? */
     private boolean displayTime = true;
 
-
     /**
      * Get the date
      *
@@ -77,7 +74,6 @@ public class DateTag extends TagSupport
         return date;
     }
 
-	
     /**
      * Set the date
      *
@@ -87,7 +83,6 @@ public class DateTag extends TagSupport
     {
         date = d;
     }
-
 
     /**
      * Get the "don't display the time" flag
@@ -100,7 +95,6 @@ public class DateTag extends TagSupport
         return (displayTime ? "false" : "true");
     }
 
-
     /**
      * Set the "don't display the time" flag
      *
@@ -111,20 +105,18 @@ public class DateTag extends TagSupport
         displayTime = false;
     }
 
-
-    public int doStartTag()
-        throws JspException
+    public int doStartTag() throws JspException
     {
         String toDisplay = UIUtil.displayDate(date, displayTime, true);
-		
+
         try
         {
             pageContext.getOut().print(toDisplay);
-        }
-        catch (IOException ie)
+        } catch (IOException ie)
         {
             throw new JspException(ie);
         }
+
         return SKIP_BODY;
     }
 }

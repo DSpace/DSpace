@@ -37,11 +37,11 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,7 +67,7 @@ public interface SiteAuthenticator
      * data in the request has already been stored in the session when this
      * is invoked, so this method can either redirect the user to a login
      * screen, or if some other form of authentication is used, the user in
-     * the context can be set, and 
+     * the context can be set, and
      * <code>org.dspace.app.webui.util.UIUtil.resumeOriginalRequest<code> can
      * be invoked to continue the original operation.
      *
@@ -76,10 +76,9 @@ public interface SiteAuthenticator
      * @param response  the associated HTTP response
      */
     public void startAuthentication(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException;
-
+                                    HttpServletRequest request,
+                                    HttpServletResponse response)
+                             throws ServletException, IOException;
 
     /**
      * Indicate whether or not a particular user can self-register, based
@@ -91,10 +90,8 @@ public interface SiteAuthenticator
      * @param email     e-mail address of user attempting to register
      */
     public boolean canSelfRegister(Context context, HttpServletRequest request,
-        String email)
-        throws SQLException;
+                                   String email) throws SQLException;
 
-    
     /**
      * Indicate whether or not a particular self-registering user can set
      * themselves a password in the profile info form.
@@ -104,11 +101,10 @@ public interface SiteAuthenticator
      *                  decide
      * @param email     e-mail address of user attempting to register
      */
-    public boolean allowSetPassword(Context context, HttpServletRequest request,
-        String email)
-        throws SQLException;
+    public boolean allowSetPassword(Context context,
+                                    HttpServletRequest request, String email)
+                             throws SQLException;
 
-    
     /**
      * Initialise a new e-person record for a self-registered new user.
      *
@@ -117,12 +113,9 @@ public interface SiteAuthenticator
      * @param eperson   newly created EPerson record - email + information
      *                  from the registration form will have been filled out.
      */
-    public void initEPerson(Context context,
-        HttpServletRequest request,
-        EPerson eperson)
-        throws SQLException;
-    
-    
+    public void initEPerson(Context context, HttpServletRequest request,
+                            EPerson eperson) throws SQLException;
+
     /**
      * Work out if the current user is implicitly a member of any groups.
      * This may include checking an IP address etc.
@@ -132,7 +125,6 @@ public interface SiteAuthenticator
      *
      * @return  the IDs of groups the user is implicitly in
      */
-    public int[] getSpecialGroups(Context context,
-        HttpServletRequest request)
-        throws SQLException;
+    public int[] getSpecialGroups(Context context, HttpServletRequest request)
+                           throws SQLException;
 }

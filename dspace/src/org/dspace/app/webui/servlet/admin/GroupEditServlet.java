@@ -39,28 +39,25 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
 
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+
 
 /**
  * Servlet for editing groups
@@ -69,16 +66,18 @@ import org.dspace.eperson.Group;
  */
 public class GroupEditServlet extends DSpaceServlet
 {
-    protected void doDSGet(Context c,
-                    HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context c, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         doDSPost(c, request, response);
     }
-    
-    protected void doDSPost(Context c,
-                    HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+
+    protected void doDSPost(Context c, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         // Find out if there's a group parameter
         int groupID = UIUtil.getIntParameter(request, "group_id");
@@ -98,55 +97,57 @@ public class GroupEditServlet extends DSpaceServlet
             boolean submit_edit = (request.getParameter("submit_edit") != null);
             boolean submit_group_update = (request.getParameter("submit_group_update") != null);
             boolean submit_group_delete = (request.getParameter("submit_group_delete") != null);
-        
+
             // just chosen a group to edit - get group and pass it to group-edit.jsp
-            if( submit_edit && !submit_group_update && !submit_group_delete )
+            if (submit_edit && !submit_group_update && !submit_group_delete)
             {
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
-            
-                JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
+
+                JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
             }
             // update the members of the group
-            else if( submit_group_update )
+            else if (submit_group_update)
             {
                 // first off, did we change the group name?
                 String newName = request.getParameter("group_name");
 
-                if( !newName.equals(group.getName()) )
+                if (!newName.equals(group.getName()))
                 {
-                    group.setName( newName );
+                    group.setName(newName);
                     group.update();
-                } 
+                }
 
-                int [] eperson_ids = UIUtil.getIntParameters(request,"eperson_id");
+                int[] eperson_ids = UIUtil.getIntParameters(request,
+                                                            "eperson_id");
 
                 // now get members, and add new ones and remove missing ones
-                EPerson [] members = group.getMembers();
+                EPerson[] members = group.getMembers();
 
-                if( eperson_ids != null )
+                if (eperson_ids != null)
                 {
-                    for(int x=0; x<eperson_ids.length; x++)
+                    for (int x = 0; x < eperson_ids.length; x++)
                     {
                         // look for this ID in the EPerson array
                         int foundIndex = -1;
 
-                        for(int y=0; y<members.length; y++)
+                        for (int y = 0; y < members.length; y++)
                         {
-                            if((members[y]!=null) && (members[y].getID() == eperson_ids[x]))
+                            if ((members[y] != null) &&
+                                    (members[y].getID() == eperson_ids[x]))
                             {
                                 foundIndex = y;
+
                                 break;
                             }
                         }
 
-                        if(foundIndex == -1)
+                        if (foundIndex == -1)
                         {
                             // didn't find it, add eperson 
-                            EPerson e   = EPerson.find(c, eperson_ids[x]);            
-                            group.addMember( e );
-                        }
-                        else
+                            EPerson e = EPerson.find(c, eperson_ids[x]);
+                            group.addMember(e);
+                        } else
                         {
                             // found it, clear entry in members table
                             members[foundIndex] = null;
@@ -155,19 +156,17 @@ public class GroupEditServlet extends DSpaceServlet
 
                     // now go through the members array, and any that
                     // weren't set to NULL are no longer members, so remove them
-                    for(int y=0; y<members.length; y++)
+                    for (int y = 0; y < members.length; y++)
                     {
-                        if(members[y] != null)
+                        if (members[y] != null)
                         {
                             group.removeMember(members[y]);
                         }
                     }
-
-                }
-                else
+                } else
                 {
                     // no members found (ids == null), remove them all!
-                    for(int y=0; y<members.length; y++)
+                    for (int y = 0; y < members.length; y++)
                     {
                         group.removeMember(members[y]);
                     }
@@ -175,68 +174,63 @@ public class GroupEditServlet extends DSpaceServlet
 
                 group.update();
 
-                        
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
-                JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
+                JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
                 c.complete();
-            }
-            else if( submit_group_delete )
+            } else if (submit_group_delete)
             {
                 // bogus authorize, only admins can do this
                 AuthorizeManager.authorizeAction(c, group, Constants.WRITE);
 
                 // delete group, return to group-list.jsp
                 group.delete();
-            
+
                 showMainPage(c, request, response);
                 c.complete();
-            }
-            else
+            } else
             {
                 // unknown action, show edit page
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
-                JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
+                JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
             }
-        }
-        else  // no group set
+        } else // no group set
         {
             // want to add a group - create a blank one, and pass to group_edit.jsp
             String button = UIUtil.getSubmitButton(request, "submit");
-            if( button.equals( "submit_add" ) )
+
+            if (button.equals("submit_add"))
             {
                 group = Group.create(c);
-            
-                group.setName("new group"+group.getID());
+
+                group.setName("new group" + group.getID());
                 group.update();
-            
+
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
-                JSPManager.showJSP(request, response, "/tools/group-edit.jsp" );
+                JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
                 c.complete();
-            }
-            else
+            } else
             {
                 // show the main page (select groups)
                 showMainPage(c, request, response);
             }
         }
     }
-    
-    private void showMainPage(Context c,
-                    HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+
+    private void showMainPage(Context c, HttpServletRequest request,
+                              HttpServletResponse response)
+                       throws ServletException, IOException, SQLException, 
+                              AuthorizeException
     {
-        Group [] groups = Group.findAll(c, Group.NAME);
-        
-//        if( groups == null ) { System.out.println("groups are null"); }
-//        else System.out.println("# of groups: " + groups.length);
+        Group[] groups = Group.findAll(c, Group.NAME);
 
+        //        if( groups == null ) { System.out.println("groups are null"); }
+        //        else System.out.println("# of groups: " + groups.length);
         request.setAttribute("groups", groups);
-        
-        JSPManager.showJSP(request, response, "/tools/group-list.jsp" );
-        c.complete();
-    }   
-}
 
+        JSPManager.showJSP(request, response, "/tools/group-list.jsp");
+        c.complete();
+    }
+}

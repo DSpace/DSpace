@@ -37,15 +37,14 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
+
+import javax.servlet.ServletException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
-import javax.servlet.ServletException;
 
-import org.dspace.app.webui.util.JSPManager;
 
 /**
  * Simple include tag that can include locally-modified JSPs
@@ -58,7 +57,6 @@ public class IncludeTag extends TagSupport
     /** Path of default JSP version */
     private String page;
 
-
     /**
      * Get the JSP to display (default version)
      *
@@ -69,7 +67,6 @@ public class IncludeTag extends TagSupport
         return page;
     }
 
-	
     /**
      * Set the JSP to display (default version)
      *
@@ -80,22 +77,19 @@ public class IncludeTag extends TagSupport
         page = s;
     }
 
-
-    public int doStartTag()
-        throws JspException
+    public int doStartTag() throws JspException
     {
         try
         {
             pageContext.include(page);
-        }
-        catch (IOException ie)
+        } catch (IOException ie)
         {
             throw new JspException(ie);
-        }
-        catch (ServletException se)
+        } catch (ServletException se)
         {
             throw new JspException(se);
         }
+
         return SKIP_BODY;
     }
 }

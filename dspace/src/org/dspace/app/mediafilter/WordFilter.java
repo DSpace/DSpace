@@ -39,19 +39,13 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.mediafilter;
-
-import org.textmining.text.extraction.WordExtractor;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
-import org.dspace.core.Context;
+import org.textmining.text.extraction.WordExtractor;
+
 
 /*
 
@@ -62,8 +56,6 @@ to do:
         - bitstream format doesn't exist
 
  */
-
-
 public class WordFilter extends MediaFilter
 {
     /**
@@ -76,7 +68,6 @@ public class WordFilter extends MediaFilter
         return oldFilename + ".txt";
     }
 
-
     /**
      * @return String bundle name
      *
@@ -85,7 +76,6 @@ public class WordFilter extends MediaFilter
     {
         return "TEXT";
     }
-    
 
     /**
      * @return String bitstreamformat
@@ -95,7 +85,6 @@ public class WordFilter extends MediaFilter
         return "Text";
     }
 
-
     /**
      * @return String description
      */
@@ -104,15 +93,13 @@ public class WordFilter extends MediaFilter
         return "Extracted text";
     }
 
-
     /**
      * @param source source input stream
      *
      * @return InputStream the resulting input stream
      */
-    
     public InputStream getDestinationStream(InputStream source)
-        throws Exception
+                                     throws Exception
     {
         // get input stream from bitstream
         // pass to filter, get string back
@@ -121,17 +108,15 @@ public class WordFilter extends MediaFilter
 
         // if verbose flag is set, print out extracted text
         // to STDOUT
-        if( MediaFilterManager.isVerbose )
-       	{
-        	System.out.println(extractedText);
-       	}
-        
+        if (MediaFilterManager.isVerbose)
+        {
+            System.out.println(extractedText);
+        }
+
         // generate an input stream with the extracted text
         byte[] textBytes = extractedText.getBytes();
         ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);
 
-        return bais;  // will this work? or will the byte array be out of scope?
+        return bais; // will this work? or will the byte array be out of scope?
     }
-
-
 }

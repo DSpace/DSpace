@@ -37,21 +37,17 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.LinkedList;
-import javax.servlet.ServletException;
-import javax.servlet.jsp.tagext.TagSupport;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import org.dspace.content.Community;
+
 
 /**
  * Tag for display a list of communities
@@ -63,16 +59,13 @@ public class CommunityListTag extends TagSupport
 {
     /** Communities to display */
     private Community[] communities;
-    
 
     public CommunityListTag()
     {
         super();
     }
-    
 
-    public int doStartTag()
-        throws JspException
+    public int doStartTag() throws JspException
     {
         JspWriter out = pageContext.getOut();
 
@@ -81,9 +74,8 @@ public class CommunityListTag extends TagSupport
             out.println("<table align=center class=\"miscTable\">");
 
             // Write column headings
-            out.print("<tr><th class=\"oddRowOddCol\">" +
-                "Community Name" +
-                "</th></tr>");
+            out.print("<tr><th class=\"oddRowOddCol\">" + "Community Name" +
+                      "</th></tr>");
 
             // Row: toggles between Odd and Even
             String row = "even";
@@ -92,33 +84,31 @@ public class CommunityListTag extends TagSupport
             {
                 // name
                 String name = communities[i].getMetadata("name");
-                
+
                 // first and only column is 'name'
                 out.print("</td><td class=\"" + row + "RowEvenCol\">");
                 out.print("<A HREF=\"");
-                HttpServletRequest hrq = (HttpServletRequest)
-                    pageContext.getRequest();
+
+                HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
                 out.print(hrq.getContextPath() + "/handle/");
                 out.print(communities[i].getHandle());
                 out.print("\">");
                 out.print(name);
                 out.print("</A>");
-                
+
                 out.println("</td></tr>");
 
                 row = (row.equals("odd") ? "even" : "odd");
             }
-            
+
             out.println("</table>");
-        }
-        catch (IOException ie)
+        } catch (IOException ie)
         {
             throw new JspException(ie);
         }
 
         return SKIP_BODY;
-    }        
-
+    }
 
     /**
      * Get the communities to list
@@ -129,11 +119,10 @@ public class CommunityListTag extends TagSupport
     {
         return communities;
     }
-    
 
     /**
      * Set the communities to list
-     * 
+     *
      * @param  communitiesIn  the communities
      */
     public void setCommunities(Community[] communitiesIn)
@@ -141,9 +130,8 @@ public class CommunityListTag extends TagSupport
         communities = communitiesIn;
     }
 
-    
     public void release()
     {
-        communities  = null;
+        communities = null;
     }
 }

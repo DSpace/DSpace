@@ -37,28 +37,25 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
-import org.dspace.content.FormatIdentifier;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+
 
 /**
  * Servlet for editing the bitstream format registry
@@ -73,7 +70,7 @@ public class BitstreamFormatRegistry extends DSpaceServlet
 
     /** User wants to delete a format */
     public static final int START_DELETE = 2;
-    
+
     /** User confirms edit of a format */
     public static final int CONFIRM_EDIT = 3;
 
@@ -86,21 +83,19 @@ public class BitstreamFormatRegistry extends DSpaceServlet
     /** Logger */
     private static Logger log = Logger.getLogger(BitstreamFormatRegistry.class);
 
-
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         // GET just displays the list of formats
         showFormats(context, request, response);
     }
-    
-    
-    protected void doDSPost(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+
+    protected void doDSPost(Context context, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit");
 
@@ -108,14 +103,14 @@ public class BitstreamFormatRegistry extends DSpaceServlet
         {
             // Update the metadata for a bitstream format
             BitstreamFormat bf = BitstreamFormat.find(context,
-                UIUtil.getIntParameter(request, "format_id"));
+                                                      UIUtil.getIntParameter(request,
+                                                                             "format_id"));
 
             bf.setMIMEType(request.getParameter("mimetype"));
             bf.setShortDescription(request.getParameter("short_description"));
             bf.setDescription(request.getParameter("description"));
-            bf.setSupportLevel(
-                UIUtil.getIntParameter(request, "support_level"));
-            bf.setInternal(request.getParameter("internal") != null &&
+            bf.setSupportLevel(UIUtil.getIntParameter(request, "support_level"));
+            bf.setInternal((request.getParameter("internal") != null) &&
                            request.getParameter("internal").equals("true"));
 
             // Separate comma-separated extensions
@@ -125,12 +120,12 @@ public class BitstreamFormatRegistry extends DSpaceServlet
             while (extParam.length() > 0)
             {
                 int c = extParam.indexOf(',');
+
                 if (c > 0)
                 {
                     extensions.add(extParam.substring(0, c).trim());
-                    extParam = extParam.substring(c+1).trim();
-                }
-                else
+                    extParam = extParam.substring(c + 1).trim();
+                } else
                 {
                     if (extParam.trim().length() > 0)
                     {
@@ -141,55 +136,51 @@ public class BitstreamFormatRegistry extends DSpaceServlet
             }
 
             // Set extensions in the format - convert to array
-            String[] extArray =
-                (String[]) extensions.toArray(new String[extensions.size()]);
+            String[] extArray = (String[]) extensions.toArray(new String[extensions.size()]);
             bf.setExtensions(extArray);
 
             bf.update();
-            
+
             showFormats(context, request, response);
             context.complete();
-        }
-        else if (button.equals("submit_add"))
+        } else if (button.equals("submit_add"))
         {
             // Add a new bitstream - simply add to the list, and let the user
             // edit with the main form
             BitstreamFormat bf = BitstreamFormat.create(context);
-            
+
             // We set the "internal" flag to true, so that the empty bitstream
             // format doesn't show up in the submission UI yet
             bf.setInternal(true);
             bf.update();
-            
+
             showFormats(context, request, response);
             context.complete();
-        }
-        else if (button.equals("submit_delete"))
+        } else if (button.equals("submit_delete"))
         {
             // Start delete process - go through verification step
             BitstreamFormat bf = BitstreamFormat.find(context,
-                UIUtil.getIntParameter(request, "format_id"));
+                                                      UIUtil.getIntParameter(request,
+                                                                             "format_id"));
             request.setAttribute("format", bf);
             JSPManager.showJSP(request, response,
-                "/dspace-admin/confirm-delete-format.jsp");
-        }
-        else if (button.equals("submit_confirm_delete"))
+                               "/dspace-admin/confirm-delete-format.jsp");
+        } else if (button.equals("submit_confirm_delete"))
         {
             // User confirms deletion of format
             BitstreamFormat bf = BitstreamFormat.find(context,
-                UIUtil.getIntParameter(request, "format_id"));
+                                                      UIUtil.getIntParameter(request,
+                                                                             "format_id"));
             bf.delete();
-            
+
             showFormats(context, request, response);
             context.complete();
-        }            
-        else
+        } else
         {
             // Cancel etc. pressed - show list again
             showFormats(context, request, response);
         }
     }
-
 
     /**
      * Show list of bitstream formats
@@ -198,13 +189,13 @@ public class BitstreamFormatRegistry extends DSpaceServlet
      * @param request   Current HTTP request
      * @param response  Current HTTP response
      */
-    private void showFormats(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    private void showFormats(Context context, HttpServletRequest request,
+                             HttpServletResponse response)
+                      throws ServletException, IOException, SQLException, 
+                             AuthorizeException
     {
         BitstreamFormat[] formats = BitstreamFormat.findAll(context);
-        
+
         request.setAttribute("formats", formats);
         JSPManager.showJSP(request, response, "/dspace-admin/list-formats.jsp");
     }

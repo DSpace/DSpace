@@ -37,18 +37,12 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
 import java.sql.SQLException;
-import java.util.List;
-
-import org.apache.log4j.Logger;
 
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
 
@@ -72,8 +66,8 @@ public class FormatIdentifier
      * @return  a format from the bitstream format registry, or null
      */
     public static BitstreamFormat guessFormat(Context context,
-        Bitstream bitstream)
-        throws SQLException
+                                              Bitstream bitstream)
+                                       throws SQLException
     {
         // FIXME: Just setting format to first guess
         // For now just get the file name
@@ -89,7 +83,7 @@ public class FormatIdentifier
         // bitstream, get the extension, and see if we know the type.
         String extension = filename;
         int lastDot = filename.lastIndexOf('.');
-        
+
         if (lastDot != -1)
         {
             extension = filename.substring(lastDot + 1);
@@ -105,19 +99,19 @@ public class FormatIdentifier
 
         // See if the extension is in the fileextension table
         TableRowIterator tri = DatabaseManager.query(context,
-            "SELECT bitstreamformatregistry.* FROM bitstreamformatregistry, " +
-            "fileextension WHERE fileextension.extension LIKE '" +
-            extension +"' AND bitstreamformatregistry.bitstream_format_id=" +
-            "fileextension.bitstream_format_id");
+                                                     "SELECT bitstreamformatregistry.* FROM bitstreamformatregistry, " +
+                                                     "fileextension WHERE fileextension.extension LIKE '" +
+                                                     extension +
+                                                     "' AND bitstreamformatregistry.bitstream_format_id=" +
+                                                     "fileextension.bitstream_format_id");
 
         if (tri.hasNext())
         {
             // Return first match
             return new BitstreamFormat(context, tri.next());
-        }
-        else
+        } else
         {
             return null;
-        }            
+        }
     }
 }

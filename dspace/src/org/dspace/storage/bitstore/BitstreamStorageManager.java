@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.storage.bitstore;
 
 import java.io.File;
@@ -61,6 +60,7 @@ import org.dspace.core.Utils;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
+
 /**
  * <P>Stores, retrieves and deletes bitstreams.</P>
  *
@@ -81,10 +81,10 @@ public class BitstreamStorageManager
 
     /** The asset store locations */
     private static File[] assetStores;
-    
+
     /** The asset store to use for new bitstreams */
     private static int incoming;
-    
+
     // These settings control the way an identifier is hashed into
     // directory and file names
     //
@@ -108,23 +108,23 @@ public class BitstreamStorageManager
 
         // Read in assetstore.dir.1, assetstore.dir.2....
         for (int i = 1;
-             ConfigurationManager.getProperty("assetstore.dir." + i) != null;
-             i++)
+                 ConfigurationManager.getProperty("assetstore.dir." + i) != null;
+                 i++)
         {
             stores.add(ConfigurationManager.getProperty("assetstore.dir." + i));
         }
-        
+
         // Now make that list an array of Files.
         assetStores = new File[stores.size()];
+
         for (int i = 0; i < stores.size(); i++)
         {
             assetStores[i] = new File((String) stores.get(i));
         }
-        
+
         // Read asset store to put new files in.  Default is 0.
         incoming = ConfigurationManager.getIntProperty("assetstore.incoming");
     }
-
 
     /**
      * Store a stream of bits.
@@ -156,7 +156,7 @@ public class BitstreamStorageManager
      * @return The ID of the stored bitstream
      */
     public static int store(Context context, InputStream is)
-        throws SQLException, IOException
+                     throws SQLException, IOException
     {
         // Create internal ID
         String id = Utils.generateKey();
@@ -183,11 +183,12 @@ public class BitstreamStorageManager
             DatabaseManager.update(tempContext, bitstream);
 
             tempContext.complete();
-        }
-        catch (SQLException sqle)
+        } catch (SQLException sqle)
         {
             if (tempContext != null)
+            {
                 tempContext.abort();
+            }
 
             throw sqle;
         }
@@ -197,14 +198,20 @@ public class BitstreamStorageManager
 
         // Make the parent dirs if necessary
         File parent = file.getParentFile();
-        if (!parent.exists()) parent.mkdirs();
+
+        if (!parent.exists())
+        {
+            parent.mkdirs();
+        }
 
         //Create the corresponding file and open it
         file.createNewFile();
+
         FileOutputStream fos = new FileOutputStream(file);
 
         // Read through a digest input stream that will work out the MD5
         DigestInputStream dis = null;
+
         try
         {
             dis = new DigestInputStream(is, MessageDigest.getInstance("MD5"));
@@ -219,11 +226,10 @@ public class BitstreamStorageManager
         fos.close();
         is.close();
 
-        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             bitstream.setColumn("size_bytes", (int) file.length());
-        }
-        else
+        } else
         {
             // postgres default
             bitstream.setColumn("size", (int) file.length());
@@ -238,13 +244,14 @@ public class BitstreamStorageManager
         int bitstream_id = bitstream.getIntColumn("bitstream_id");
 
         if (log.isDebugEnabled())
+        {
             log.debug("Stored bitstream " + bitstream_id + " in file " +
                       file.getAbsolutePath());
+        }
 
         return bitstream_id;
     }
 
-    
     /**
      * Retrieve the bits for the bitstream with ID. If the bitstream
      * does not exist, or is marked deleted, returns null.
@@ -257,14 +264,14 @@ public class BitstreamStorageManager
      * @return The stream of bits, or null
      */
     public static InputStream retrieve(Context context, int id)
-        throws SQLException, IOException
+                                throws SQLException, IOException
     {
         TableRow bitstream = DatabaseManager.find(context, "bitstream", id);
         File file = getFile(bitstream);
+
         return (file != null) ? new FileInputStream(file) : null;
     }
 
-    
     /**
      * <p>Remove a bitstream from the asset store. This method does
      * not delete any bits, but simply marks the bitstreams as deleted
@@ -279,20 +286,19 @@ public class BitstreamStorageManager
      * @exception SQLException If a problem occurs accessing the RDBMS
      */
     public static void delete(Context context, int id)
-        throws SQLException
+                       throws SQLException
     {
-        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             // oracle uses 1 for true
-            DatabaseManager.updateQuery
-                (context,
-                "update Bitstream set deleted = 1 where bitstream_id = " + id);
-        }
-        else
+            DatabaseManager.updateQuery(context,
+                                        "update Bitstream set deleted = 1 where bitstream_id = " +
+                                        id);
+        } else
         {
-            DatabaseManager.updateQuery
-                (context,
-                "update Bitstream set deleted = 't' where bitstream_id = " + id);
+            DatabaseManager.updateQuery(context,
+                                        "update Bitstream set deleted = 't' where bitstream_id = " +
+                                        id);
         }
     }
 
@@ -304,33 +310,29 @@ public class BitstreamStorageManager
      * @exception IOException If a problem occurs while cleaning up
      * @exception SQLException If a problem occurs accessing the RDBMS
      */
-    public static void cleanup()
-        throws SQLException, IOException
+    public static void cleanup() throws SQLException, IOException
     {
         Context context = null;
 
         try
         {
             context = new Context();
+
             String myQuery = null;
-            
-            if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
                 myQuery = "select * from Bitstream where deleted = 1";
-            }
-            else
+            } else
             {
                 // postgres
                 myQuery = "select * from Bitstream where deleted = 't'";
             }
 
+            List storage = DatabaseManager.query(context, "Bitstream", myQuery)
+                                          .toList();
 
-            List storage = DatabaseManager.query
-                (context,
-                 "Bitstream",
-                 myQuery).toList();
-
-            for (Iterator iterator = storage.iterator(); iterator.hasNext(); )
+            for (Iterator iterator = storage.iterator(); iterator.hasNext();)
             {
                 TableRow row = (TableRow) iterator.next();
                 int bid = row.getIntColumn("bitstream_id");
@@ -340,23 +342,29 @@ public class BitstreamStorageManager
                 if (file == null)
                 {
                     DatabaseManager.delete(context, "Bitstream", bid);
+
                     continue;
                 }
 
                 // This is a small chance that this is a file which is
                 // being stored -- get it next time.
-                 if (isRecent(file))
-                     continue;
+                if (isRecent(file))
+                {
+                    continue;
+                }
 
-                 DatabaseManager.delete(context, "Bitstream", bid);
-                 boolean success = file.delete();
+                DatabaseManager.delete(context, "Bitstream", bid);
 
-                 if (log.isDebugEnabled())
-                     log.debug("Deleted bitstream " + bid +
-                               " (file " + file.getAbsolutePath() +
-                               ") with result " + success);
+                boolean success = file.delete();
 
-                 deleteParents(file);
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Deleted bitstream " + bid + " (file " +
+                              file.getAbsolutePath() + ") with result " +
+                              success);
+                }
+
+                deleteParents(file);
             }
 
             context.complete();
@@ -368,8 +376,7 @@ public class BitstreamStorageManager
         {
             context.abort();
             throw sqle;
-        }
-        catch (IOException ioe)
+        } catch (IOException ioe)
         {
             context.abort();
             throw ioe;
@@ -379,7 +386,6 @@ public class BitstreamStorageManager
     ////////////////////////////////////////
     // Internal methods
     ////////////////////////////////////////
-
 
     /**
      * Return true if this file is too recent to be deleted,
@@ -394,10 +400,12 @@ public class BitstreamStorageManager
         long now = new java.util.Date().getTime();
 
         if (lastmod >= now)
+        {
             return true;
+        }
 
         // Less than one hour old
-        return now - lastmod < (1 * 60 * 1000);
+        return (now - lastmod) < (1 * 60 * 1000);
     }
 
     /**
@@ -408,7 +416,9 @@ public class BitstreamStorageManager
     private synchronized static void deleteParents(File file)
     {
         if (file == null)
+        {
             return;
+        }
 
         File tmp = file;
 
@@ -419,13 +429,14 @@ public class BitstreamStorageManager
 
             // Only delete empty directories
             if (files.length != 0)
+            {
                 break;
+            }
 
             directory.delete();
             tmp = directory;
         }
     }
-
 
     /**
      * Return the file corresponding to a bitstream.  It's safe to pass in
@@ -438,26 +449,25 @@ public class BitstreamStorageManager
      *
      * @exception IOException If a problem occurs while determining the file
      */
-    private static File getFile(TableRow bitstream)
-        throws IOException
+    private static File getFile(TableRow bitstream) throws IOException
     {
         // Check that bitstream is not null
         if (bitstream == null)
         {
             return null;
         }
-        
+
         // Get the store to use
         int storeNumber = bitstream.getIntColumn("store_number");
-        
+
         // Default to zero ('assetstore.dir') for backwards compatibility
         if (storeNumber == -1)
         {
             storeNumber = 0;
         }
-        
+
         File store = assetStores[storeNumber];
-        
+
         // Turn the internal ID into a file path relative to the asset store
         // directory
         String id = bitstream.getStringColumn("internal_id");
@@ -470,13 +480,17 @@ public class BitstreamStorageManager
         {
             int digits = i * digitsPerLevel;
 
-            result.append(File.separator).append(id.substring(digits, digits + digitsPerLevel));
+            result.append(File.separator).append(id.substring(digits,
+                                                              digits +
+                                                              digitsPerLevel));
         }
 
         String theName = result.append(File.separator).append(id).toString();
 
         if (log.isDebugEnabled())
+        {
             log.debug("Filename for " + id + " is " + theName);
+        }
 
         return new File(theName);
     }

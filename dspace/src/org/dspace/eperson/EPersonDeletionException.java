@@ -34,13 +34,10 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.eperson;
 
 import java.util.Vector;
-import java.util.Iterator;
 
-import org.dspace.content.DSpaceObject;
 
 /**
  * Exception indicating that an EPerson may not be deleted due to the
@@ -57,11 +54,10 @@ public class EPersonDeletionException extends Exception
      */
     public EPersonDeletionException()
     {
-        super();  
+        super();
         myTableList = null;
     }
-    
-     
+
     /**
      * Create an EPersonDeletionException
      *
@@ -73,13 +69,15 @@ public class EPersonDeletionException extends Exception
     {
         super();
         myTableList = tableList;
-        
     }
-    
+
     /**
      * Return the list of offending tables.
      *
-     * @return  The tables in which the eperson ID exists. 
+     * @return  The tables in which the eperson ID exists.
      */
-    public Vector getTables(){return myTableList;}        
+    public Vector getTables()
+    {
+        return myTableList;
+    }
 }

@@ -37,20 +37,18 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
+
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -72,13 +70,12 @@ public class FeedbackServlet extends DSpaceServlet
     /** log4j category */
     private static Logger log = Logger.getLogger(FeedbackServlet.class);
 
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         // Obtain information from request
-
         // The page where the user came from
         String fromPage = request.getParameter("fromPage");
 
@@ -94,7 +91,7 @@ public class FeedbackServlet extends DSpaceServlet
         // User email from context
         EPerson currentUser = context.getCurrentUser();
         String authEmail = null;
-        
+
         if (currentUser != null)
         {
             authEmail = currentUser.getEmail();
@@ -106,14 +103,14 @@ public class FeedbackServlet extends DSpaceServlet
             String feedback = request.getParameter("feedback");
 
             // Check all data is there
-            if (formEmail == null || formEmail.equals("") ||
-                feedback == null || feedback.equals(""))
+            if ((formEmail == null) || formEmail.equals("") ||
+                    (feedback == null) || feedback.equals(""))
             {
-                log.info(LogManager.getHeader(context,
-                    "show_feedback_form",
-                    "problem=true"));
+                log.info(LogManager.getHeader(context, "show_feedback_form",
+                                              "problem=true"));
                 request.setAttribute("feedback.problem", new Boolean(true));
                 JSPManager.showJSP(request, response, "/feedback/form.jsp");
+
                 return;
             }
 
@@ -121,55 +118,47 @@ public class FeedbackServlet extends DSpaceServlet
             try
             {
                 Email email = ConfigurationManager.getEmail("feedback");
-                email.addRecipient(
-                    ConfigurationManager.getProperty("feedback.recipient"));
+                email.addRecipient(ConfigurationManager.getProperty("feedback.recipient"));
 
-                email.addArgument(new Date());  // Date
-                email.addArgument(formEmail);   // Email
-                email.addArgument(authEmail);   // Logged in as
-                email.addArgument(fromPage);    // Referring page
-                email.addArgument(userAgent);   // User agent
-                email.addArgument(sessionID);   // Session ID
-                email.addArgument(feedback);    // The feedback itself
+                email.addArgument(new Date()); // Date
+                email.addArgument(formEmail); // Email
+                email.addArgument(authEmail); // Logged in as
+                email.addArgument(fromPage); // Referring page
+                email.addArgument(userAgent); // User agent
+                email.addArgument(sessionID); // Session ID
+                email.addArgument(feedback); // The feedback itself
 
                 // Replying to feedback will reply to email on form
                 email.setReplyTo(formEmail);
 
                 email.send();
 
-                log.info(LogManager.getHeader(context,
-                    "sent_feedback",
-                    "from=" + formEmail));
+                log.info(LogManager.getHeader(context, "sent_feedback",
+                                              "from=" + formEmail));
 
                 JSPManager.showJSP(request, response,
-                    "/feedback/acknowledge.jsp");
-            }
-            catch (MessagingException me)
+                                   "/feedback/acknowledge.jsp");
+            } catch (MessagingException me)
             {
                 log.warn(LogManager.getHeader(context,
-                    "error_mailing_feedback",
-                    ""),
-                    me);
+                                              "error_mailing_feedback", ""), me);
 
                 JSPManager.showInternalError(request, response);
             }
-        }
-        else
+        } else
         {
             // Display feedback form
-            log.info(LogManager.getHeader(context,
-                "show_feedback_form",
-                "problem=false"));
+            log.info(LogManager.getHeader(context, "show_feedback_form",
+                                          "problem=false"));
             request.setAttribute("authenticated.email", authEmail);
             JSPManager.showJSP(request, response, "/feedback/form.jsp");
         }
-   }
+    }
 
-
-    protected void doDSPost(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSPost(Context context, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         // Treat as a GET
         doDSGet(context, request, response);

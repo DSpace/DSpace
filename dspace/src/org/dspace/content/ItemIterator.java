@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
 import java.sql.SQLException;
@@ -61,13 +60,12 @@ public class ItemIterator
     /*
      * This class basically wraps a TableRowIterator.
      */
-    
+
     /** Our context */
     private Context ourContext;
 
     /** The table row iterator of Item rows */
     private TableRowIterator itemRows;
-
 
     /**
      * Construct an item iterator.  This is not a public method, since this
@@ -82,48 +80,42 @@ public class ItemIterator
         ourContext = context;
         itemRows = rows;
     }
-    
-    
+
     /**
      * Find out if there are any more items to iterate over
      *
      * @return  <code>true</code> if there are more items
      */
-    public boolean hasNext()
-        throws SQLException
+    public boolean hasNext() throws SQLException
     {
         return itemRows.hasNext();
     }
-    
-    
+
     /**
      * Get the next item in the iterator.  Returns <code>null</code> if there
      * are no more items.
      *
      * @return  the next item, or <code>null</code>
      */
-    public Item next()
-        throws SQLException
+    public Item next() throws SQLException
     {
         if (itemRows.hasNext())
         {
             // Convert the row into an Item object
             TableRow row = itemRows.next();
-            
+
             // Check cache
-            Item fromCache = (Item) ourContext.fromCache(
-                Item.class, row.getIntColumn("item_id"));
+            Item fromCache = (Item) ourContext.fromCache(Item.class,
+                                                         row.getIntColumn("item_id"));
 
             if (fromCache != null)
             {
                 return fromCache;
-            }
-            else
+            } else
             {
                 return new Item(ourContext, row);
             }
-        }
-        else
+        } else
         {
             return null;
         }

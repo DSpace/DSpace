@@ -36,30 +36,18 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.authorize;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.dspace.browse.Browse;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
-import org.dspace.core.Context;
 import org.dspace.core.Constants;
-import org.dspace.eperson.EPerson;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.dspace.handle.HandleManager;
-import org.dspace.search.DSIndexer;
-import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
@@ -78,64 +66,62 @@ public class PolicySet
      * @param collection
      */
     public static void syncCollection_obsolete(Context c, Collection collection)
-        throws SQLException, AuthorizeException
+                                        throws SQLException, AuthorizeException
     {
-/*        // find all items in a collection, and clone the collection's read policy
-        ItemIterator items = collection.getItems();
+        /*        // find all items in a collection, and clone the collection's read policy
+                ItemIterator items = collection.getItems();
 
-        int mycount = 0;
+                int mycount = 0;
 
-        List policies = AuthorizeManager.getPoliciesActionFilter(
-            c, collection, Constants.READ);
-        
-        if( policies.isEmpty() )
-        {
-            System.out.println( "Error: collection has no READ policies" );
-            return;
-        }       
-                        
-        while( items.hasNext() )
-        {
-            mycount++;
+                List policies = AuthorizeManager.getPoliciesActionFilter(
+                    c, collection, Constants.READ);
 
-            Item i = items.next();
-	        System.out.println(mycount + ": Replacing policies for item " + i.getID() );
+                if( policies.isEmpty() )
+                {
+                    System.out.println( "Error: collection has no READ policies" );
+                    return;
+                }
 
-            i.replaceAllPolicies(policies);
-        }
+                while( items.hasNext() )
+                {
+                    mycount++;
 
-        // now do the logo bitstream also (great variable name :-)
-        Bitstream bs = collection.getLogo();
-        AuthorizeManager.removeAllPolicies(c, bs);
-        AuthorizeManager.addPolicies(c, policies, bs);
-*/
+                    Item i = items.next();
+                        System.out.println(mycount + ": Replacing policies for item " + i.getID() );
+
+                    i.replaceAllPolicies(policies);
+                }
+
+                // now do the logo bitstream also (great variable name :-)
+                Bitstream bs = collection.getLogo();
+                AuthorizeManager.removeAllPolicies(c, bs);
+                AuthorizeManager.addPolicies(c, policies, bs);
+        */
     }
-
-
 
     /**
      * Command line interface to setPolicies - run to see arguments
      */
-    public static void main( String [] argv )
-        throws Exception
+    public static void main(String[] argv) throws Exception
     {
-        if( argv.length < 6 )
+        if (argv.length < 6)
         {
             System.out.println("Args: containerType containerID contentType actionID groupID command");
             System.out.println("container=COLLECTION command = ADD|REPLACE");
+
             return;
         }
 
-        int containertype= Integer.parseInt(argv[0]);
-        int containerID  = Integer.parseInt(argv[1]);
-        int contenttype  = Integer.parseInt(argv[2]);
-        int actionID     = Integer.parseInt(argv[3]);
-        int groupID      = Integer.parseInt(argv[4]);
-        
-        boolean isReplace = false;
-        String command   = argv[5];
+        int containertype = Integer.parseInt(argv[0]);
+        int containerID = Integer.parseInt(argv[1]);
+        int contenttype = Integer.parseInt(argv[2]);
+        int actionID = Integer.parseInt(argv[3]);
+        int groupID = Integer.parseInt(argv[4]);
 
-        if( command.equals("REPLACE") )
+        boolean isReplace = false;
+        String command = argv[5];
+
+        if (command.equals("REPLACE"))
         {
             isReplace = true;
         }
@@ -148,12 +134,11 @@ public class PolicySet
         //////////////////////
         // carnage begins here
         //////////////////////
+        setPolicies(c, containertype, containerID, contenttype, actionID,
+                    groupID, isReplace, false);
 
-        setPolicies(c, containertype, containerID, contenttype, actionID, groupID, isReplace, false);
- 
         c.complete();
     }
-
 
     /**
      * Useful policy wildcard tool.  Can set entire collections' contents'
@@ -165,117 +150,113 @@ public class PolicySet
      * @param replace, removing old policies, or just add to existing policies
      * @param just delete all policies for matching objects
      */
-    public static void setPolicies(Context c, int containerType, int containerID,
-                             int contentType, int actionID, int groupID,
-                             boolean isReplace, boolean clearOnly)
-        throws SQLException, AuthorizeException
+    public static void setPolicies(Context c, int containerType,
+                                   int containerID, int contentType,
+                                   int actionID, int groupID,
+                                   boolean isReplace, boolean clearOnly)
+                            throws SQLException, AuthorizeException
     {
-        if( containerType == Constants.COLLECTION )
+        if (containerType == Constants.COLLECTION)
         {
             Collection collection = Collection.find(c, containerID);
             Group group = Group.find(c, groupID);
-            
+
             ItemIterator i = collection.getItems();
-            
-            if( contentType == Constants.ITEM )
+
+            if (contentType == Constants.ITEM)
             {
                 // build list of all items in a collection
-                while( i.hasNext() )
+                while (i.hasNext())
                 {
                     Item myitem = i.next();
-                    
+
                     // is this a replace? delete policies first
-                    if( isReplace || clearOnly )
+                    if (isReplace || clearOnly)
                     {
-                         AuthorizeManager.removeAllPolicies(c, myitem);
+                        AuthorizeManager.removeAllPolicies(c, myitem);
                     }
-                   
-                    if( !clearOnly )
-                    { 
+
+                    if (!clearOnly)
+                    {
                         // now add the policy
                         ResourcePolicy rp = ResourcePolicy.create(c);
-                        
-                        rp.setResource( myitem   );
-                        rp.setAction  ( actionID );
-                        rp.setGroup   ( group    );
-                        
+
+                        rp.setResource(myitem);
+                        rp.setAction(actionID);
+                        rp.setGroup(group);
+
                         rp.update();
                     }
                 }
-            }
-            else if( contentType == Constants.BUNDLE    )
+            } else if (contentType == Constants.BUNDLE)
             {
                 // build list of all items in a collection
                 // build list of all bundles in those items
-                
-                while( i.hasNext() )
+                while (i.hasNext())
                 {
                     Item myitem = i.next();
-                    
+
                     Bundle[] bundles = myitem.getBundles();
-                    
-                    for( int j = 0; j < bundles.length; j++ )
+
+                    for (int j = 0; j < bundles.length; j++)
                     {
                         Bundle t = bundles[j]; // t for target
-                        
+
                         // is this a replace? delete policies first
-                        if( isReplace || clearOnly )
+                        if (isReplace || clearOnly)
                         {
                             AuthorizeManager.removeAllPolicies(c, t);
                         }
 
-                        if( !clearOnly )
-                        { 
+                        if (!clearOnly)
+                        {
                             // now add the policy
                             ResourcePolicy rp = ResourcePolicy.create(c);
-                        
-                            rp.setResource( t        );
-                            rp.setAction  ( actionID );
-                            rp.setGroup   ( group    );
-                        
+
+                            rp.setResource(t);
+                            rp.setAction(actionID);
+                            rp.setGroup(group);
+
                             rp.update();
                         }
                     }
                 }
-                
-
-            }
-            else if( contentType == Constants.BITSTREAM )
+            } else if (contentType == Constants.BITSTREAM)
             {
                 // build list of all bitstreams in a collection
                 // iterate over items, bundles, get bitstreams
-                while( i.hasNext() )
+                while (i.hasNext())
                 {
                     Item myitem = i.next();
-                    System.out.println("Item " + myitem.getID() );
-                    
-                    Bundle[] bundles = myitem.getBundles();
-                    
-                    for( int j = 0; j < bundles.length; j++ )
-                    {
-                       System.out.println("Bundle " + bundles[j].getID() );
+                    System.out.println("Item " + myitem.getID());
 
-                        Bitstream [] bitstreams = bundles[j].getBitstreams();
-                        
-                        for(int k = 0; k < bitstreams.length; k++ )
+                    Bundle[] bundles = myitem.getBundles();
+
+                    for (int j = 0; j < bundles.length; j++)
+                    {
+                        System.out.println("Bundle " + bundles[j].getID());
+
+                        Bitstream[] bitstreams = bundles[j].getBitstreams();
+
+                        for (int k = 0; k < bitstreams.length; k++)
                         {
-                            Bitstream t = bitstreams[k];  // t for target
-                            
+                            Bitstream t = bitstreams[k]; // t for target
+
                             // is this a replace? delete policies first
-                            if( isReplace || clearOnly )
+                            if (isReplace || clearOnly)
                             {
                                 AuthorizeManager.removeAllPolicies(c, t);
                             }
-                       
-                            if( !clearOnly ) 
+
+                            if (!clearOnly)
                             {
                                 // now add the policy
                                 ResourcePolicy rp = ResourcePolicy.create(c);
-                        
-                                rp.setResource( t        );
-                                rp.setAction  ( actionID );
-                                rp.setGroup   ( group    );
-                        
+
+                                rp.setResource(t);
+                                rp.setAction(actionID);
+                                rp.setGroup(group);
+
                                 rp.update();
                             }
                         }

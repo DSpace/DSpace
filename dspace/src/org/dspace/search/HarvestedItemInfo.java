@@ -37,12 +37,13 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.search;
 
 import java.util.Date;
 import java.util.List;
+
 import org.dspace.content.Item;
+
 
 /**
  * Simple container class containing information about a harvested DSpace item.
@@ -60,17 +61,17 @@ public class HarvestedItemInfo
 
     /** The datestamp */
     public Date datestamp;
-    
+
     /** The item.  Only filled out if requested */
     public Item item;
-    
+
     /**
      * A List of Strings.  The Handles of collections this item is in.  Only filled
      * out if originally requested when invoking <code>Harvest</code>
      * (N.B. not Collection objects)
      */
     public List collectionHandles;
-    
+
     /** True if this item has been withdrawn */
     public boolean withdrawn;
 }

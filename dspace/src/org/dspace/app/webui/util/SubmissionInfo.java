@@ -37,12 +37,12 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.util;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
+
 
 /**
  * Information about an item being editing with the submission UI
@@ -57,10 +57,10 @@ public class SubmissionInfo
 
     /** The step reached in the submission process (where the user can jump) */
     public int stepReached;
-    
+
     /** The element or element_qualifier to show more input boxes for */
     public String moreBoxesFor;
-    
+
     /** The element or element_qualifier to scroll to initially using anchor */
     public String jumpToField;
 
@@ -69,7 +69,7 @@ public class SubmissionInfo
 
     /** Specific bundle we're dealing with */
     public Bundle bundle;
-    
+
     /** Specific bitstream we're dealing with */
     public Bitstream bitstream;
 }

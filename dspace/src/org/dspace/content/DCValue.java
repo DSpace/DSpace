@@ -37,8 +37,8 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
+
 
 /**
  * Simple data structure-like class representing a Dublin Core value.
@@ -51,10 +51,13 @@ public class DCValue
 {
     /** The DC element */
     public String element;
+
     /** The DC qualifier, or <code>null</code> if unqualified*/
     public String qualifier;
+
     /** The value of the field */
     public String value;
+
     /** The language of the field, may be <code>null</code> */
     public String language;
 }

@@ -37,12 +37,12 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
-
 package org.dspace.browse;
 
 import java.sql.SQLException;
+
 import org.dspace.core.Context;
+
 
 /**
  * Command-line tool to create Browse indexes.
@@ -53,7 +53,9 @@ import org.dspace.core.Context;
 public class InitializeBrowse
 {
     /** Private Constructor */
-    private InitializeBrowse () {}
+    private InitializeBrowse()
+    {
+    }
 
     /**
      * Creates Browse indexes, destroying the old ones.
@@ -73,15 +75,15 @@ public class InitializeBrowse
             context.complete();
 
             System.out.println(" ... Done");
-        }
-        catch (SQLException sqle)
+        } catch (SQLException sqle)
         {
             if (context != null)
+            {
                 context.abort();
+            }
 
             System.err.println("Error: Browse index NOT created");
             sqle.printStackTrace();
         }
     }
-
 }

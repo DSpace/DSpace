@@ -37,16 +37,15 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
-import org.dspace.app.webui.util.JSPManager;
 
 /**
  * Tag for producing a popup window link.  Takes advantage of Javascript
@@ -57,7 +56,7 @@ import org.dspace.app.webui.util.JSPManager;
  *
  * Additionally, this will link to the "local" version of the URL, if a
  * locally modified version exists.
- *     
+ *
  * FIXME: Currently supports a single popup window at a hardcoded size; extra
  * attributes could be added at a later date (e.g. name, width, height)
  *
@@ -69,12 +68,10 @@ public class PopupTag extends BodyTagSupport
     /** Path of default JSP version */
     private String page;
 
-
     public PopupTag()
     {
         super();
     }
-
 
     /**
      * Get the JSP to display (default version)
@@ -86,7 +83,6 @@ public class PopupTag extends BodyTagSupport
         return page;
     }
 
-	
     /**
      * Set the JSP to display (default version)
      *
@@ -97,13 +93,11 @@ public class PopupTag extends BodyTagSupport
         page = s;
     }
 
-
-    public int doAfterBody()
-        throws JspException
+    public int doAfterBody() throws JspException
     {
         /*
          * The output is the following, with PAGE and TEXT replaced appropriately:
-         * 
+         *
          * <SCRIPT TYPE="text/javascript">
          * <!--
          * document.write('<A HREF="#" onClick="var popupwin = window.open(\'PAGE\',\'dspacepopup\',\'height=600,width=550,resizable,scrollbars\');popupwin.focus();return false;">TEXT<\/a>');
@@ -120,25 +114,24 @@ public class PopupTag extends BodyTagSupport
         BodyContent bc = getBodyContent();
         String linkText = bc.getString();
         bc.clearBody();
-        
+
         HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
         String actualPage = hrq.getContextPath() + page;
 
         String html = "<SCRIPT TYPE=\"text/javascript\">\n" +
-            "<!-- Javascript starts here\n" +
-            "document.write('<A HREF=\"#\" onClick=\"var popupwin = window.open(\\'" +
-            actualPage +
-            "\\',\\'dspacepopup\\',\\'height=600,width=550,resizable,scrollbars\\');popupwin.focus();return false;\">" +
-            linkText + "<\\/a>');\n" +
-            "// -->\n" +
-            "</SCRIPT><NOSCRIPT><A HREF=\"" + actualPage + "\" TARGET=\"dspacepopup\">" +
-            linkText + "</A></NOSCRIPT>";
-        
+                      "<!-- Javascript starts here\n" +
+                      "document.write('<A HREF=\"#\" onClick=\"var popupwin = window.open(\\'" +
+                      actualPage +
+                      "\\',\\'dspacepopup\\',\\'height=600,width=550,resizable,scrollbars\\');popupwin.focus();return false;\">" +
+                      linkText + "<\\/a>');\n" + "// -->\n" +
+                      "</SCRIPT><NOSCRIPT><A HREF=\"" + actualPage +
+                      "\" TARGET=\"dspacepopup\">" + linkText +
+                      "</A></NOSCRIPT>";
+
         try
         {
             getPreviousOut().print(html);
-        }
-        catch (IOException ie)
+        } catch (IOException ie)
         {
             throw new JspException(ie);
         }

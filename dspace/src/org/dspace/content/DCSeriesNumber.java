@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
 
@@ -51,17 +50,17 @@ public class DCSeriesNumber
 {
     /** Series */
     private String series;
-	
+
     /** Number */
     private String number;
-	
+
     /** Construct clean series number */
     public DCSeriesNumber()
     {
         series = null;
         number = null;
     }
-	
+
     /**
      * Construct from raw DC value
      *
@@ -70,22 +69,24 @@ public class DCSeriesNumber
     public DCSeriesNumber(String value)
     {
         this();
-		
+
         int semicolon = -1;
-		
-        if (value != null) semicolon = value.indexOf(';');
+
+        if (value != null)
+        {
+            semicolon = value.indexOf(';');
+        }
 
         if (semicolon >= 0)
         {
             series = value.substring(0, semicolon);
             number = value.substring(semicolon + 1);
-        }
-        else
+        } else
         {
             series = value;
         }
     }
-	
+
     /**
      * Construct from given values
      *
@@ -97,7 +98,7 @@ public class DCSeriesNumber
         series = s;
         number = n;
     }
-	
+
     /**
      * Write as raw DC value
      *
@@ -108,12 +109,10 @@ public class DCSeriesNumber
         if (series == null)
         {
             return (null);
-        }
-        else if (number == null)
+        } else if (number == null)
         {
             return (series);
-        }
-        else
+        } else
         {
             return (series + ";" + number);
         }
@@ -124,7 +123,7 @@ public class DCSeriesNumber
      */
     public String getSeries()
     {
-        return (series == null ? "" : series);
+        return ((series == null) ? "" : series);
     }
 
     /**
@@ -132,6 +131,6 @@ public class DCSeriesNumber
      */
     public String getNumber()
     {
-        return (number == null ? "" : number);
+        return ((number == null) ? "" : number);
     }
 }

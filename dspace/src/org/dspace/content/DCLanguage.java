@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
 import java.util.Locale;
@@ -51,13 +50,12 @@ import java.util.Locale;
  */
 public class DCLanguage
 {
-
     /** The country code */
     private String country;
 
     /** The language code. Special values: "" and "other". */
     private String language;
-	
+
     /**
      * Construct a language object from a database entry
      *
@@ -67,7 +65,7 @@ public class DCLanguage
     {
         setLanguage(l);
     }
-	
+
     /**
      * Write the language out to the database
      *
@@ -78,40 +76,35 @@ public class DCLanguage
         if (language.equals(""))
         {
             return "";
-        }
-        else if (country.equals(""))
+        } else if (country.equals(""))
         {
             return language;
-        }
-        else
+        } else
         {
             return country + "_" + language;
         }
     }
-	
+
     /**
      * Set the language and country
      *
      * @param l  The language and country code, e.g. "en_US" or "fr"
      */
     public void setLanguage(String l)
-    {	
+    {
         if (l.equals("other"))
         {
             language = "other";
             country = "";
-        }
-        else if (l.length() == 2)
+        } else if (l.length() == 2)
         {
             language = l;
             country = "";
-        }
-        else if (l.length() == 5)
+        } else if (l.length() == 5)
         {
             language = l.substring(0, 2);
             country = l.substring(3);
-        }
-        else
+        } else
         {
             language = "";
             country = "";
@@ -130,16 +123,14 @@ public class DCLanguage
         if (language.equals("other"))
         {
             return "(Other)";
-        }
-        else if (language.equals(""))
+        } else if (language.equals(""))
         {
             return "N/A";
-        }
-        else
+        } else
         {
             locale = new Locale(language, country);
+
             return locale.getDisplayName();
         }
     }
-		
 }

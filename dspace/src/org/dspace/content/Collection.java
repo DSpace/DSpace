@@ -37,17 +37,15 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -63,6 +61,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.workflow.WorkflowItem;
+
 
 
 /**
@@ -99,7 +98,6 @@ public class Collection extends DSpaceObject
     /** Our Handle */
     private String handle;
 
-
     /**
      * Groups corresponding to workflow steps - NOTE these start from one,
      * so workflowGroups[0] corresponds to workflow_step_1.
@@ -111,7 +109,7 @@ public class Collection extends DSpaceObject
 
     /** The default group of administrators */
     private Group admins;
-    
+
     /**
      * Construct a collection with the given table row
      *
@@ -119,8 +117,7 @@ public class Collection extends DSpaceObject
      * @param row      the corresponding row in the table
      * @throws SQLException
      */
-    Collection(Context context, TableRow row)
-        throws SQLException
+    Collection(Context context, TableRow row) throws SQLException
     {
         ourContext = context;
         collectionRow = row;
@@ -129,22 +126,20 @@ public class Collection extends DSpaceObject
         if (collectionRow.isColumnNull("logo_bitstream_id"))
         {
             logo = null;
-        }
-        else
+        } else
         {
             logo = Bitstream.find(ourContext,
-                collectionRow.getIntColumn("logo_bitstream_id"));
+                                  collectionRow.getIntColumn("logo_bitstream_id"));
         }
 
         // Get the template item
         if (collectionRow.isColumnNull("template_item_id"))
         {
             template = null;
-        }
-        else
+        } else
         {
             template = Item.find(ourContext,
-                collectionRow.getIntColumn("template_item_id"));
+                                 collectionRow.getIntColumn("template_item_id"));
         }
 
         // Get the relevant groups
@@ -157,11 +152,11 @@ public class Collection extends DSpaceObject
         // Default submitters are in a group called "COLLECTION_XX_SUBMIT"
         // where XX is the ID of this collection
         submitters = Group.findByName(ourContext,
-            "COLLECTION_" + getID() + "_SUBMIT");
+                                      "COLLECTION_" + getID() + "_SUBMIT");
 
         // default administrator group
-        admins = Group.findByName(ourContext,
-            "COLLECTION_" + getID() + "_ADMIN");
+        admins = Group.findByName(ourContext, "COLLECTION_" + getID() +
+                                  "_ADMIN");
 
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
@@ -169,7 +164,6 @@ public class Collection extends DSpaceObject
         // Cache ourselves
         context.cache(this, row.getIntColumn("collection_id"));
     }
-
 
     /**
      * Get a collection from the database.  Loads in the metadata
@@ -181,28 +175,25 @@ public class Collection extends DSpaceObject
      * @throws SQLException
      */
     public static Collection find(Context context, int id)
-        throws SQLException
+                           throws SQLException
     {
         // First check the cache
-        Collection fromCache =
-            (Collection) context.fromCache(Collection.class, id);
-            
+        Collection fromCache = (Collection) context.fromCache(Collection.class,
+                                                              id);
+
         if (fromCache != null)
         {
             return fromCache;
         }
 
-        TableRow row = DatabaseManager.find(context,
-            "collection",
-            id);
+        TableRow row = DatabaseManager.find(context, "collection", id);
 
         if (row == null)
         {
             if (log.isDebugEnabled())
             {
-                log.debug(LogManager.getHeader(context,
-                    "find_collection",
-                    "not_found,collection_id=" + id));
+                log.debug(LogManager.getHeader(context, "find_collection",
+                                               "not_found,collection_id=" + id));
             }
 
             return null;
@@ -211,14 +202,12 @@ public class Collection extends DSpaceObject
         // not null, return Collection
         if (log.isDebugEnabled())
         {
-            log.debug(LogManager.getHeader(context,
-                "find_collection",
-                "collection_id=" + id));
+            log.debug(LogManager.getHeader(context, "find_collection",
+                                           "collection_id=" + id));
         }
 
         return new Collection(context, row);
     }
-
 
     /**
      * Create a new collection, with a new ID.  This method is not public,
@@ -231,7 +220,7 @@ public class Collection extends DSpaceObject
     * @throws AuthorizeException
      */
     static Collection create(Context context)
-        throws SQLException, AuthorizeException
+                      throws SQLException, AuthorizeException
     {
         TableRow row = DatabaseManager.create(context, "collection");
         Collection c = new Collection(context, row);
@@ -242,39 +231,35 @@ public class Collection extends DSpaceObject
         Group anonymousGroup = Group.find(context, 0);
 
         ResourcePolicy myPolicy = ResourcePolicy.create(context);
-        myPolicy.setResource( c );
-        myPolicy.setAction  ( Constants.READ );
-        myPolicy.setGroup   ( anonymousGroup );
+        myPolicy.setResource(c);
+        myPolicy.setAction(Constants.READ);
+        myPolicy.setGroup(anonymousGroup);
         myPolicy.update();
 
         // now create the default policies for submitted items
         myPolicy = ResourcePolicy.create(context);
-        myPolicy.setResource( c );
-        myPolicy.setAction  ( Constants.DEFAULT_ITEM_READ );
-        myPolicy.setGroup   ( anonymousGroup );
+        myPolicy.setResource(c);
+        myPolicy.setAction(Constants.DEFAULT_ITEM_READ);
+        myPolicy.setGroup(anonymousGroup);
         myPolicy.update();
-        
+
         myPolicy = ResourcePolicy.create(context);
-        myPolicy.setResource( c );
-        myPolicy.setAction  ( Constants.DEFAULT_BITSTREAM_READ );
-        myPolicy.setGroup   ( anonymousGroup );
+        myPolicy.setResource(c);
+        myPolicy.setAction(Constants.DEFAULT_BITSTREAM_READ);
+        myPolicy.setGroup(anonymousGroup);
         myPolicy.update();
 
-        
-        HistoryManager.saveHistory(context,
-            c,
-            HistoryManager.CREATE,
-            context.getCurrentUser(),
-            context.getExtraLogInfo());
+        HistoryManager.saveHistory(context, c, HistoryManager.CREATE,
+                                   context.getCurrentUser(),
+                                   context.getExtraLogInfo());
 
-        log.info(LogManager.getHeader(context,
-            "create_collection",
-            "collection_id=" + row.getIntColumn("collection_id")) +
-            ",handle=" + c.handle);
+        log.info(LogManager.getHeader(context, "create_collection",
+                                      "collection_id=" +
+                                      row.getIntColumn("collection_id")) +
+                 ",handle=" + c.handle);
 
         return c;
     }
-
 
     /**
      * Get all collections in the system.  These are alphabetically
@@ -286,11 +271,10 @@ public class Collection extends DSpaceObject
      * @throws SQLException
      */
     public static Collection[] findAll(Context context)
-        throws SQLException
+                                throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.query(context,
-            "collection",
-            "SELECT * FROM collection ORDER BY name");
+        TableRowIterator tri = DatabaseManager.query(context, "collection",
+                                                     "SELECT * FROM collection ORDER BY name");
 
         List collections = new ArrayList();
 
@@ -299,14 +283,13 @@ public class Collection extends DSpaceObject
             TableRow row = tri.next();
 
             // First check the cache
-            Collection fromCache = (Collection) context.fromCache(
-                Collection.class, row.getIntColumn("collection_id"));
+            Collection fromCache = (Collection) context.fromCache(Collection.class,
+                                                                  row.getIntColumn("collection_id"));
 
             if (fromCache != null)
             {
                 collections.add(fromCache);
-            }
-            else
+            } else
             {
                 collections.add(new Collection(context, row));
             }
@@ -318,40 +301,36 @@ public class Collection extends DSpaceObject
         return collectionArray;
     }
 
-
     /**
      * Get all the items in this collection.  The order is indeterminate.
      *
      * @return  an iterator over the items in the collection.
      * @throws SQLException
      */
-    public ItemIterator getItems()
-        throws SQLException
+    public ItemIterator getItems() throws SQLException
     {
         String myQuery = null;
-        
-        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             myQuery = "SELECT item.* FROM item, collection2item WHERE " +
-                "item.item_id=collection2item.item_id AND " +
-                "collection2item.collection_id=" + getID() +
-                " AND item.in_archive=1";
-        }
-        else
+                      "item.item_id=collection2item.item_id AND " +
+                      "collection2item.collection_id=" + getID() +
+                      " AND item.in_archive=1";
+        } else
         {
             // default postgres, use boolean
             myQuery = "SELECT item.* FROM item, collection2item WHERE " +
-                "item.item_id=collection2item.item_id AND " +
-                "collection2item.collection_id=" + getID() +
-                " AND item.in_archive=true";
+                      "item.item_id=collection2item.item_id AND " +
+                      "collection2item.collection_id=" + getID() +
+                      " AND item.in_archive=true";
         }
-        
-        TableRowIterator rows = DatabaseManager.query(ourContext,
-            "item", myQuery );
+
+        TableRowIterator rows = DatabaseManager.query(ourContext, "item",
+                                                      myQuery);
 
         return new ItemIterator(ourContext, rows);
     }
-
 
     /**
      * Get the internal ID of this collection
@@ -363,12 +342,10 @@ public class Collection extends DSpaceObject
         return collectionRow.getIntColumn("collection_id");
     }
 
-
     public String getHandle()
     {
         return handle;
     }
-
 
     /**
      * Get the value of a metadata field
@@ -385,7 +362,6 @@ public class Collection extends DSpaceObject
         return collectionRow.getStringColumn(field);
     }
 
-
     /**
      * Set a metadata value
      *
@@ -400,7 +376,6 @@ public class Collection extends DSpaceObject
         collectionRow.setColumn(field, value);
     }
 
-
     /**
      * Get the logo for the collection.  <code>null</code> is return if the
      * collection does not have a logo.
@@ -411,7 +386,6 @@ public class Collection extends DSpaceObject
     {
         return logo;
     }
-
 
     /**
      * Give the collection a logo.  Passing in <code>null</code> removes any
@@ -430,14 +404,17 @@ public class Collection extends DSpaceObject
      * @throws SQLException
      */
     public Bitstream setLogo(InputStream is)
-        throws AuthorizeException, IOException, SQLException
+                      throws AuthorizeException, IOException, SQLException
     {
-    	// Check authorisation
-    	// authorized to remove the logo when DELETE rights
-    	// authorized when canEdit
-    	if (! (is == null && AuthorizeManager.authorizeActionBoolean(ourContext, this, Constants.DELETE)) ) {
-    		canEdit();
-    	}
+        // Check authorisation
+        // authorized to remove the logo when DELETE rights
+        // authorized when canEdit
+        if (!((is == null) &&
+                AuthorizeManager.authorizeActionBoolean(ourContext, this,
+                                                            Constants.DELETE)))
+        {
+            canEdit();
+        }
 
         // First, delete any existing logo
         if (!collectionRow.isColumnNull("logo_bitstream_id"))
@@ -450,11 +427,9 @@ public class Collection extends DSpaceObject
             collectionRow.setColumnNull("logo_bitstream_id");
             logo = null;
 
-            log.info(LogManager.getHeader(ourContext,
-                "remove_logo",
-                "collection_id=" + getID()));
-        }
-        else
+            log.info(LogManager.getHeader(ourContext, "remove_logo",
+                                          "collection_id=" + getID()));
+        } else
         {
             Bitstream newLogo = Bitstream.create(ourContext, is);
             collectionRow.setColumn("logo_bitstream_id", newLogo.getID());
@@ -463,19 +438,18 @@ public class Collection extends DSpaceObject
             // now create policy for logo bitstream
             // to match our READ policy
             List policies = AuthorizeManager.getPoliciesActionFilter(ourContext,
-                                                 this, Constants.READ);
-            AuthorizeManager.addPolicies(ourContext, policies, newLogo );
+                                                                     this,
+                                                                     Constants.READ);
+            AuthorizeManager.addPolicies(ourContext, policies, newLogo);
 
-
-            log.info(LogManager.getHeader(ourContext,
-                "set_logo",
-                "collection_id=" + getID() +
-                    "logo_bitstream_id=" + newLogo.getID()));
+            log.info(LogManager.getHeader(ourContext, "set_logo",
+                                          "collection_id=" + getID() +
+                                          "logo_bitstream_id=" +
+                                          newLogo.getID()));
         }
 
         return logo;
     }
-
 
     /**
      * Create a workflow group for the given step if one does not already exist.
@@ -492,24 +466,23 @@ public class Collection extends DSpaceObject
      * @throws AuthorizeException
      */
     public Group createWorkflowGroup(int step)
-        throws SQLException, AuthorizeException
+                              throws SQLException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
-        if (workflowGroup[step-1] == null)
+        if (workflowGroup[step - 1] == null)
         {
-        	Group g = Group.create(ourContext);
-        	g.setName("COLLECTION_" + getID() + "_WORKFLOW_STEP_" + step);
-        	g.update();
-        	setWorkflowGroup(step, g);
+            Group g = Group.create(ourContext);
+            g.setName("COLLECTION_" + getID() + "_WORKFLOW_STEP_" + step);
+            g.update();
+            setWorkflowGroup(step, g);
 
-                AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, g);
+            AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, g);
         }
 
-        return workflowGroup[step-1];
+        return workflowGroup[step - 1];
     }
-
 
     /**
      * Set the workflow group corresponding to a particular workflow step.
@@ -521,18 +494,16 @@ public class Collection extends DSpaceObject
      */
     public void setWorkflowGroup(int step, Group g)
     {
-        workflowGroup[step-1] = g;
-        
+        workflowGroup[step - 1] = g;
+
         if (g == null)
         {
             collectionRow.setColumnNull("workflow_step_" + step);
-        }
-        else
+        } else
         {
             collectionRow.setColumn("workflow_step_" + step, g.getID());
         }
     }
-
 
     /**
      * Get the the workflow group corresponding to a particular workflow step.
@@ -545,9 +516,8 @@ public class Collection extends DSpaceObject
      */
     public Group getWorkflowGroup(int step)
     {
-        return workflowGroup[step-1];
+        return workflowGroup[step - 1];
     }
-
 
     /**
      * Create a default submitters group if one does not already exist.
@@ -559,8 +529,7 @@ public class Collection extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public Group createSubmitters()
-        throws SQLException, AuthorizeException
+    public Group createSubmitters() throws SQLException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
@@ -576,7 +545,6 @@ public class Collection extends DSpaceObject
 
         return submitters;
     }
-
 
     /**
      * Get the default group of submitters, if there is one.  Note that the
@@ -594,7 +562,6 @@ public class Collection extends DSpaceObject
         return submitters;
     }
 
-
     /**
      * Create a default administrators group if one does not already exist.
      * Returns either the newly created group or the previously existing one.
@@ -604,30 +571,30 @@ public class Collection extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public Group createAdministrators()
-        throws SQLException, AuthorizeException
+    public Group createAdministrators() throws SQLException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
-        if( admins == null)
+        if (admins == null)
         {
             admins = Group.create(ourContext);
             admins.setName("COLLECTION_" + getID() + "_ADMIN");
             admins.update();
         }
 
-        AuthorizeManager.addPolicy(ourContext, this, Constants.COLLECTION_ADMIN, admins);
+        AuthorizeManager.addPolicy(ourContext, this,
+                                   Constants.COLLECTION_ADMIN, admins);
 
         // administrators also get ADD on the submitter group
-        if( submitters != null )
+        if (submitters != null)
         {
-            AuthorizeManager.addPolicy(ourContext, submitters, Constants.ADD, admins);
+            AuthorizeManager.addPolicy(ourContext, submitters, Constants.ADD,
+                                       admins);
         }
 
         return admins;
     }
-
 
     /**
      * Get the default group of administrators, if there is one.  Note that the
@@ -644,7 +611,6 @@ public class Collection extends DSpaceObject
         return admins;
     }
 
-
     /**
      * Get the license that users must grant before submitting to this
      * collection.  If the collection does not have a specific license,
@@ -656,7 +622,7 @@ public class Collection extends DSpaceObject
     {
         String license = collectionRow.getStringColumn("license");
 
-        if (license == null || license.equals(""))
+        if ((license == null) || license.equals(""))
         {
             // Fallback to site-wide default
             license = ConfigurationManager.getDefaultSubmissionLicense();
@@ -664,7 +630,6 @@ public class Collection extends DSpaceObject
 
         return license;
     }
-
 
     /**
      * Find out if the collection has a custom license
@@ -675,9 +640,8 @@ public class Collection extends DSpaceObject
     {
         String license = collectionRow.getStringColumn("license");
 
-        return (license != null && !license.equals(""));
+        return ((license != null) && !license.equals(""));
     }
-
 
     /**
      * Set the license for this collection.  Passing in <code>null</code>
@@ -690,13 +654,11 @@ public class Collection extends DSpaceObject
         if (license == null)
         {
             collectionRow.setColumnNull("license");
-        }
-        else
+        } else
         {
             collectionRow.setColumn("license", license);
         }
     }
-
 
     /**
      * Get the template item for this collection.  <code>null</code> is returned
@@ -706,12 +668,10 @@ public class Collection extends DSpaceObject
      *
      * @return  the item template, or <code>null</code>
      */
-    public Item getTemplateItem()
-        throws SQLException
+    public Item getTemplateItem() throws SQLException
     {
         return template;
     }
-
 
     /**
      * Create an empty template item for this collection.  If one already
@@ -721,8 +681,7 @@ public class Collection extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void createTemplateItem()
-        throws SQLException, AuthorizeException
+    public void createTemplateItem() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit();
@@ -732,13 +691,12 @@ public class Collection extends DSpaceObject
             template = Item.create(ourContext);
             collectionRow.setColumn("template_item_id", template.getID());
 
-            log.info(LogManager.getHeader(ourContext,
-                "create_template_item",
-                "collection_id=" + getID() +
-                    ",template_item_id=" + template.getID()));
+            log.info(LogManager.getHeader(ourContext, "create_template_item",
+                                          "collection_id=" + getID() +
+                                          ",template_item_id=" +
+                                          template.getID()));
         }
     }
-
 
     /**
      * Remove the template item for this collection, if there is one.  Note
@@ -751,7 +709,8 @@ public class Collection extends DSpaceObject
      * @throws IOException
      */
     public void removeTemplateItem()
-        throws SQLException, AuthorizeException, IOException
+                            throws SQLException, AuthorizeException, 
+                                   IOException
     {
         // Check authorisation
         canEdit();
@@ -761,16 +720,15 @@ public class Collection extends DSpaceObject
 
         if (template != null)
         {
-            log.info(LogManager.getHeader(ourContext,
-                "remove_template_item",
-                "collection_id=" + getID() +
-                    ",template_item_id=" + template.getID()));
+            log.info(LogManager.getHeader(ourContext, "remove_template_item",
+                                          "collection_id=" + getID() +
+                                          ",template_item_id=" +
+                                          template.getID()));
 
             template.delete();
             template = null;
         }
     }
-
 
     /**
      * Add an item to the collection.  This simply adds a relationship between
@@ -782,16 +740,14 @@ public class Collection extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void addItem(Item item)
-        throws SQLException, AuthorizeException
+    public void addItem(Item item) throws SQLException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
-        log.info(LogManager.getHeader(ourContext,
-            "add_item",
-            "collection_id=" + getID() +
-                ",item_id=" + item.getID()));
+        log.info(LogManager.getHeader(ourContext, "add_item",
+                                      "collection_id=" + getID() + ",item_id=" +
+                                      item.getID()));
 
         // Create mapping
         TableRow row = DatabaseManager.create(ourContext, "collection2item");
@@ -802,7 +758,6 @@ public class Collection extends DSpaceObject
         DatabaseManager.update(ourContext, row);
     }
 
-
     /**
      * Remove an item.  If the item is then orphaned, it is deleted.
      *
@@ -812,37 +767,39 @@ public class Collection extends DSpaceObject
      * @throws IOException
      */
     public void removeItem(Item item)
-        throws SQLException, AuthorizeException,IOException
+                    throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        log.info(LogManager.getHeader(ourContext,
-            "remove_item",
-            "collection_id=" + getID() + ",item_id=" + item.getID()));
+        log.info(LogManager.getHeader(ourContext, "remove_item",
+                                      "collection_id=" + getID() + ",item_id=" +
+                                      item.getID()));
 
         DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM collection2item WHERE collection_id=" + getID() +
-            " AND item_id=" + item.getID() );
+                                    "DELETE FROM collection2item WHERE collection_id=" +
+                                    getID() + " AND item_id=" + item.getID());
 
         // Is the item an orphan?
         TableRowIterator tri = DatabaseManager.query(ourContext,
-            "SELECT * FROM collection2item WHERE item_id=" +
-                item.getID());
+                                                     "SELECT * FROM collection2item WHERE item_id=" +
+                                                     item.getID());
 
         if (!tri.hasNext())
         {
             //make the right to remove the item explicit because the implicit relation
-        	//has been removed. This only has to concern the currentUser because
-        	//he started the removal process and he will end it too.
-        	//also add right to remove from the item to remove it's bundles.
-        	AuthorizeManager.addPolicy(ourContext, item, Constants.DELETE, ourContext.getCurrentUser());
-        	AuthorizeManager.addPolicy(ourContext, item, Constants.REMOVE, ourContext.getCurrentUser());
+            //has been removed. This only has to concern the currentUser because
+            //he started the removal process and he will end it too.
+            //also add right to remove from the item to remove it's bundles.
+            AuthorizeManager.addPolicy(ourContext, item, Constants.DELETE,
+                                       ourContext.getCurrentUser());
+            AuthorizeManager.addPolicy(ourContext, item, Constants.REMOVE,
+                                       ourContext.getCurrentUser());
+
             // Orphan; delete it
             item.delete();
         }
     }
-
 
     /**
      * Update the collection metadata (including logo, and workflow groups)
@@ -851,52 +808,63 @@ public class Collection extends DSpaceObject
      * @throws IOException
      * @throws AuthorizeException
      */
-    public void update()
-        throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, IOException, AuthorizeException
     {
         // Check authorisation
         canEdit();
 
-        HistoryManager.saveHistory(ourContext,
-            this,
-            HistoryManager.MODIFY,
-            ourContext.getCurrentUser(),
-            ourContext.getExtraLogInfo());
+        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY,
+                                   ourContext.getCurrentUser(),
+                                   ourContext.getExtraLogInfo());
 
-        log.info(LogManager.getHeader(ourContext,
-            "update_collection",
-            "collection_id=" + getID()));
+        log.info(LogManager.getHeader(ourContext, "update_collection",
+                                      "collection_id=" + getID()));
 
         DatabaseManager.update(ourContext, collectionRow);
 
         // reindex this collection (could be smarter, to only do when name changes)
         DSIndexer.reIndexContent(ourContext, this);
     }
-    
-    public boolean canEditBoolean() throws java.sql.SQLException {
-    	try {
-    		canEdit();
-    		return true;
-    	} catch (AuthorizeException e) {
-    		return false;
-    	}
-    }
-    
-    public void canEdit() throws AuthorizeException, SQLException {
-    	Community[] parents = getCommunities();
-    	for (int i = 0; i < parents.length; i++) {
-    		if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i], Constants.WRITE)) {
-        		return;
-        	}
-    		if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i], Constants.ADD)) {
-        		return;
-        	}
-		}
-    	
-    	AuthorizeManager.authorizeAnyOf(ourContext, this, new int[] {
-                Constants.WRITE, Constants.COLLECTION_ADMIN });
+
+    public boolean canEditBoolean() throws java.sql.SQLException
+    {
+        try
+        {
+            canEdit();
+
+            return true;
+        } catch (AuthorizeException e)
+        {
+            return false;
+        }
     }
 
+    public void canEdit() throws AuthorizeException, SQLException
+    {
+        Community[] parents = getCommunities();
+
+        for (int i = 0; i < parents.length; i++)
+        {
+            if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i],
+                                                            Constants.WRITE))
+            {
+                return;
+            }
+
+            if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i],
+                                                            Constants.ADD))
+            {
+                return;
+            }
+        }
+
+        AuthorizeManager.authorizeAnyOf(ourContext, this,
+                                        new int[]
+                                        {
+                                            Constants.WRITE,
+                                            Constants.COLLECTION_ADMIN
+                                        });
+    }
 
     /**
      * Delete the collection, including the metadata and logo.  Items that
@@ -907,12 +875,10 @@ public class Collection extends DSpaceObject
      * @throws AuthorizeException
      * @throws IOException
      */
-    void delete()
-        throws SQLException, AuthorizeException, IOException
+    void delete() throws SQLException, AuthorizeException, IOException
     {
-        log.info(LogManager.getHeader(ourContext,
-            "delete_collection",
-            "collection_id=" + getID()));
+        log.info(LogManager.getHeader(ourContext, "delete_collection",
+                                      "collection_id=" + getID()));
 
         // remove from index
         DSIndexer.unIndexContent(ourContext, this);
@@ -920,20 +886,18 @@ public class Collection extends DSpaceObject
         // Remove from cache
         ourContext.removeCached(this, getID());
 
-        HistoryManager.saveHistory(ourContext,
-            this,
-            HistoryManager.REMOVE,
-            ourContext.getCurrentUser(),
-            ourContext.getExtraLogInfo());
+        HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
+                                   ourContext.getCurrentUser(),
+                                   ourContext.getExtraLogInfo());
 
         // remove subscriptions - hmm, should this be in Subscription.java?
         DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM subscription WHERE " +
-            "collection_id=" + getID() );
+                                    "DELETE FROM subscription WHERE " +
+                                    "collection_id=" + getID());
 
         // Remove items
         ItemIterator items = getItems();
-        
+
         while (items.hasNext())
         {
             removeItem(items.next());
@@ -942,44 +906,72 @@ public class Collection extends DSpaceObject
         // Delete bitstream logo
         setLogo(null);
 
-
         // Remove all authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
         // Remove any WorkflowItems
-        WorkflowItem [] wfarray = WorkflowItem.findByCollection(ourContext, this);
-        for( int x = 0; x < wfarray.length; x++ )
+        WorkflowItem[] wfarray = WorkflowItem.findByCollection(ourContext, this);
+
+        for (int x = 0; x < wfarray.length; x++)
         {
             // remove the workflowitem first, then the item
             Item myItem = wfarray[x].getItem();
             wfarray[x].deleteWrapper();
             myItem.delete();
         }
-        
+
         // Remove any WorkspaceItems
-        WorkspaceItem [] wsarray = WorkspaceItem.findByCollection(ourContext, this);
-        for( int x = 0; x < wsarray.length; x++ )
+        WorkspaceItem[] wsarray = WorkspaceItem.findByCollection(ourContext,
+                                                                 this);
+
+        for (int x = 0; x < wsarray.length; x++)
         {
             wsarray[x].deleteAll();
         }
 
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);
-        
+
         // Remove any workflow groups - must happen after deleting collection
         Group g = null;
-        
-        g = getWorkflowGroup(1);  if( g != null ) { g.delete(); }
-        g = getWorkflowGroup(2);  if( g != null ) { g.delete(); }
-        g = getWorkflowGroup(3);  if( g != null ) { g.delete(); }
+
+        g = getWorkflowGroup(1);
+
+        if (g != null)
+        {
+            g.delete();
+        }
+
+        g = getWorkflowGroup(2);
+
+        if (g != null)
+        {
+            g.delete();
+        }
+
+        g = getWorkflowGroup(3);
+
+        if (g != null)
+        {
+            g.delete();
+        }
 
         // Remove default administrators group
-        g = getAdministrators(); if( g!=null ) { g.delete(); }        
-        
-        // Remove default submitters group
-        g = getSubmitters(); if( g!=null ) { g.delete(); }        
-    }
+        g = getAdministrators();
 
+        if (g != null)
+        {
+            g.delete();
+        }
+
+        // Remove default submitters group
+        g = getSubmitters();
+
+        if (g != null)
+        {
+            g.delete();
+        }
+    }
 
     /**
      * Get the communities this collection appears in
@@ -987,16 +979,14 @@ public class Collection extends DSpaceObject
      * @return   array of <code>Community</code> objects
      * @throws SQLException
      */
-    public Community[] getCommunities()
-        throws SQLException
+    public Community[] getCommunities() throws SQLException
     {
         // Get the bundle table rows
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-            "community",
-            "SELECT community.* FROM community, community2collection WHERE " +
-                "community.community_id=community2collection.community_id " +
-                "AND community2collection.collection_id=" +
-                getID() );
+        TableRowIterator tri = DatabaseManager.query(ourContext, "community",
+                                                     "SELECT community.* FROM community, community2collection WHERE " +
+                                                     "community.community_id=community2collection.community_id " +
+                                                     "AND community2collection.collection_id=" +
+                                                     getID());
 
         // Build a list of Community objects
         List communities = new ArrayList();
@@ -1006,20 +996,23 @@ public class Collection extends DSpaceObject
             TableRow row = tri.next();
 
             // First check the cache
-            Community owner = (Community) ourContext.fromCache(
-                Community.class, row.getIntColumn("community_id"));
+            Community owner = (Community) ourContext.fromCache(Community.class,
+                                                               row.getIntColumn("community_id"));
 
             if (owner == null)
-	    {
-		owner = new Community(ourContext, row);
-	    }
+            {
+                owner = new Community(ourContext, row);
+            }
+
             communities.add(owner);
+
             // now add any parent communities
             Community[] parents = owner.getAllParents();
+
             for (int i = 0; i < parents.length; i++)
-	    {
-		communities.add(parents[i]);
-	    }
+            {
+                communities.add(parents[i]);
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
@@ -1027,7 +1020,6 @@ public class Collection extends DSpaceObject
 
         return communityArray;
     }
-
 
     /**
      * Return <code>true</code> if <code>other</code> is the same Collection as
@@ -1048,7 +1040,6 @@ public class Collection extends DSpaceObject
         return (getID() == ((Collection) other).getID());
     }
 
-
     /**
      * Utility method for reading in a group from a group ID in a column.
      * If the column is null, null is returned.
@@ -1057,9 +1048,7 @@ public class Collection extends DSpaceObject
      * @return    the group referred to by that column, or null
      * @throws SQLException
      */
-
-    private Group groupFromColumn(String col)
-        throws SQLException
+    private Group groupFromColumn(String col) throws SQLException
     {
         if (collectionRow.isColumnNull(col))
         {
@@ -1068,7 +1057,7 @@ public class Collection extends DSpaceObject
 
         return Group.find(ourContext, collectionRow.getIntColumn(col));
     }
-    
+
     /**
      * return type found in Constants
      * @return int Constants.COLLECTION
@@ -1077,8 +1066,7 @@ public class Collection extends DSpaceObject
     {
         return Constants.COLLECTION;
     }
-    
-    
+
     /**
      * return an array of collections that user has a given permission on
      *  (useful for trimming 'select to collection' list) or figuring out
@@ -1090,34 +1078,36 @@ public class Collection extends DSpaceObject
      * @return Collection [] of collections with matching permissions
      * @throws SQLException
      */
-    public static Collection [] findAuthorized(Context context, Community comm, int actionID)
-        throws java.sql.SQLException
+    public static Collection[] findAuthorized(Context context, Community comm,
+                                              int actionID)
+                                       throws java.sql.SQLException
     {
         List myResults = new ArrayList();
-        
-        Collection [] myCollections = null;
-        
-        if( comm!=null )
+
+        Collection[] myCollections = null;
+
+        if (comm != null)
         {
             myCollections = comm.getCollections();
-        }
-        else
+        } else
         {
             myCollections = Collection.findAll(context);
         }
-        
+
         // now build a list of collections you have authorization for
-        for(int i=0; i<myCollections.length; i++)
+        for (int i = 0; i < myCollections.length; i++)
         {
-            if( AuthorizeManager.authorizeActionBoolean(context, myCollections[i], actionID) )
+            if (AuthorizeManager.authorizeActionBoolean(context,
+                                                            myCollections[i],
+                                                            actionID))
             {
                 myResults.add(myCollections[i]);
             }
         }
-        
+
         myCollections = new Collection[myResults.size()];
-        myCollections = (Collection[])myResults.toArray(myCollections);
-        
+        myCollections = (Collection[]) myResults.toArray(myCollections);
+
         return myCollections;
-    } 
+    }
 }

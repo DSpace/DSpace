@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
 import java.io.ByteArrayInputStream;
@@ -119,7 +118,6 @@ public class Item extends DSpaceObject
      */
     private boolean dublinCoreChanged;
 
-
     /**
      * Construct an item with the given table row
      *
@@ -127,8 +125,7 @@ public class Item extends DSpaceObject
      * @param row      the corresponding row in the table
      * @throws SQLException
      */
-    Item(Context context, TableRow row)
-        throws SQLException
+    Item(Context context, TableRow row) throws SQLException
     {
         ourContext = context;
         itemRow = row;
@@ -138,33 +135,32 @@ public class Item extends DSpaceObject
 
         // Get the submitter
         submitter = null;
+
         if (!itemRow.isColumnNull("submitter_id"))
         {
             submitter = EPerson.find(ourContext,
-                itemRow.getIntColumn("submitter_id"));
+                                     itemRow.getIntColumn("submitter_id"));
         }
 
         // Get bundles
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-            "bundle",
-            "SELECT bundle.* FROM bundle, item2bundle WHERE " +
-                "item2bundle.bundle_id=bundle.bundle_id AND " +
-                "item2bundle.item_id=" +
-                itemRow.getIntColumn("item_id") );
+        TableRowIterator tri = DatabaseManager.query(ourContext, "bundle",
+                                                     "SELECT bundle.* FROM bundle, item2bundle WHERE " +
+                                                     "item2bundle.bundle_id=bundle.bundle_id AND " +
+                                                     "item2bundle.item_id=" +
+                                                     itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
         {
             TableRow r = tri.next();
 
             // First check the cache
-            Bundle fromCache = (Bundle) context.fromCache(
-                Bundle.class, r.getIntColumn("bundle_id"));
+            Bundle fromCache = (Bundle) context.fromCache(Bundle.class,
+                                                          r.getIntColumn("bundle_id"));
 
             if (fromCache != null)
             {
                 bundles.add(fromCache);
-            }
-            else
+            } else
             {
                 bundles.add(new Bundle(ourContext, r));
             }
@@ -172,9 +168,9 @@ public class Item extends DSpaceObject
 
         // Get Dublin Core metadata
         tri = DatabaseManager.query(ourContext, "dcvalue",
-            "SELECT * FROM dcvalue WHERE item_id=" +
-                itemRow.getIntColumn("item_id") +
-                " ORDER BY dc_type_id, place");
+                                    "SELECT * FROM dcvalue WHERE item_id=" +
+                                    itemRow.getIntColumn("item_id") +
+                                    " ORDER BY dc_type_id, place");
 
         while (tri.hasNext())
         {
@@ -182,7 +178,7 @@ public class Item extends DSpaceObject
 
             // Get the Dublin Core type
             String[] dcType = DCType.quickFind(context,
-                resultRow.getIntColumn("dc_type_id"));
+                                               resultRow.getIntColumn("dc_type_id"));
 
             // Make a DCValue object
             DCValue dcv = new DCValue();
@@ -198,14 +194,12 @@ public class Item extends DSpaceObject
         // commented out - this belongs in the create() method, not the constructor
         // Set the last modified date
         //itemRow.setColumn("last_modified", new Date());
-
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("item_id"));
     }
-
 
     /**
      * Get an item from the database.  The item, its Dublin Core metadata,
@@ -217,44 +211,38 @@ public class Item extends DSpaceObject
      * @return  the item, or null if the internal ID is invalid.
      * @throws SQLException
      */
-    public static Item find(Context context, int id)
-        throws SQLException
+    public static Item find(Context context, int id) throws SQLException
     {
         // First check the cache
         Item fromCache = (Item) context.fromCache(Item.class, id);
-            
+
         if (fromCache != null)
         {
             return fromCache;
         }
 
-        TableRow row = DatabaseManager.find(context,
-            "item",
-            id);
+        TableRow row = DatabaseManager.find(context, "item", id);
 
         if (row == null)
         {
             if (log.isDebugEnabled())
             {
-                log.debug(LogManager.getHeader(context,
-                    "find_item",
-                    "not_found,item_id=" + id));
+                log.debug(LogManager.getHeader(context, "find_item",
+                                               "not_found,item_id=" + id));
             }
 
             return null;
         }
-        
+
         // not null, return item
         if (log.isDebugEnabled())
         {
-            log.debug(LogManager.getHeader(context,
-                "find_item",
-                "item_id=" + id));
+            log.debug(LogManager.getHeader(context, "find_item", "item_id=" +
+                                           id));
         }
 
         return new Item(context, row);
     }
-
 
     /**
      * Create a new item, with a new internal ID.  This method is not public,
@@ -267,32 +255,26 @@ public class Item extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    static Item create(Context context)
-        throws SQLException, AuthorizeException
+    static Item create(Context context) throws SQLException, AuthorizeException
     {
         TableRow row = DatabaseManager.create(context, "item");
         Item i = new Item(context, row);
-        
+
         // Call update to give the item a last modified date.  OK this isn't
         // amazingly efficient but creates don't happen that often.
         context.setIgnoreAuthorization(true);
         i.update();
         context.setIgnoreAuthorization(false);
-        
-        HistoryManager.saveHistory(context,
-            i,
-            HistoryManager.CREATE,
-            context.getCurrentUser(),
-            context.getExtraLogInfo());
 
-        log.info(LogManager.getHeader(context,
-            "create_item",
-            "item_id=" + row.getIntColumn("item_id")));
+        HistoryManager.saveHistory(context, i, HistoryManager.CREATE,
+                                   context.getCurrentUser(),
+                                   context.getExtraLogInfo());
 
+        log.info(LogManager.getHeader(context, "create_item",
+                                      "item_id=" + row.getIntColumn("item_id")));
 
         return i;
     }
-
 
     /**
      * Get all the items in the archive.  Only items with the "in archive"
@@ -304,25 +286,23 @@ public class Item extends DSpaceObject
      * @throws SQLException
      */
     public static ItemIterator findAll(Context context)
-        throws SQLException
+                                throws SQLException
     {
         String myQuery = null;
-        
-        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             myQuery = "SELECT * FROM item WHERE in_archive=1";
-        }
-        else
+        } else
         {
             // default postgres
             myQuery = "SELECT * FROM item WHERE in_archive=true";
         }
 
-        TableRowIterator rows = DatabaseManager.query(context, "item", myQuery );
+        TableRowIterator rows = DatabaseManager.query(context, "item", myQuery);
 
         return new ItemIterator(context, rows);
     }
-
 
     /**
      * Find all the items in the archive by a given submitter.  The order is
@@ -335,26 +315,26 @@ public class Item extends DSpaceObject
      * @throws SQLException
      */
     public static ItemIterator findBySubmitter(Context context, EPerson eperson)
-        throws SQLException
+                                        throws SQLException
     {
         String myQuery = null;
-        
-        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
-            myQuery = "SELECT * FROM item WHERE in_archive=1 AND submitter_id=" + eperson.getID();
-        }
-        else
+            myQuery = "SELECT * FROM item WHERE in_archive=1 AND submitter_id=" +
+                      eperson.getID();
+        } else
         {
             // default postgres
-            myQuery = "SELECT * FROM item WHERE in_archive=true AND submitter_id=" + eperson.getID();
+            myQuery = "SELECT * FROM item WHERE in_archive=true AND submitter_id=" +
+                      eperson.getID();
         }
-        
-        TableRowIterator rows = DatabaseManager.query(context, "item", myQuery );
+
+        TableRowIterator rows = DatabaseManager.query(context, "item", myQuery);
 
         return new ItemIterator(context, rows);
     }
 
-    
     /**
      * Get the internal ID of this item.  In general, this shouldn't be
      * exposed to users
@@ -366,12 +346,10 @@ public class Item extends DSpaceObject
         return itemRow.getIntColumn("item_id");
     }
 
-
     public String getHandle()
     {
         return handle;
     }
-
 
     /**
      * Find out if the item is part of the main archive
@@ -383,7 +361,6 @@ public class Item extends DSpaceObject
         return itemRow.getBooleanColumn("in_archive");
     }
 
-
     /**
      * Find out if the item has been withdrawn
      *
@@ -394,7 +371,6 @@ public class Item extends DSpaceObject
         return itemRow.getBooleanColumn("withdrawn");
     }
 
-    
     /**
      * Get the date the item was last modified, or the current date
      *  if last_modified is null
@@ -405,13 +381,15 @@ public class Item extends DSpaceObject
     public Date getLastModified()
     {
         Date myDate = itemRow.getDateColumn("last_modified");
- 
-        if( myDate == null ) { myDate = new Date(); } 
+
+        if (myDate == null)
+        {
+            myDate = new Date();
+        }
 
         return myDate;
     }
 
-    
     /**
      * Set the "is_archived" flag.  This is public and only
      * <code>WorkflowItem.archive()</code> should set this.
@@ -423,7 +401,6 @@ public class Item extends DSpaceObject
         itemRow.setColumn("in_archive", isArchived);
     }
 
-
     /**
      * Set the owning Collection for the item
      *
@@ -434,26 +411,22 @@ public class Item extends DSpaceObject
         itemRow.setColumn("owning_collection", c.getID());
     }
 
-
     /**
      * Get the owning Collection for the item
      * @return Collection that is the owner of the item
      * @throws SQLException
-     */    
-    public Collection getOwningCollection()
-        throws java.sql.SQLException
+     */
+    public Collection getOwningCollection() throws java.sql.SQLException
     {
         Collection myCollection = null;
 
         // get the collection ID
         int cid = itemRow.getIntColumn("owning_collection");
-        
+
         myCollection = Collection.find(ourContext, cid);
 
         return myCollection;
     }
-
-
 
     /**
      * Get Dublin Core metadata for the item.  Passing in a <code>null</code>
@@ -521,7 +494,6 @@ public class Item extends DSpaceObject
         return valueArray;
     }
 
-
     /**
      * Add Dublin Core metadata fields.  These are appended to existing values.
      * Use <code>clearDC</code> to remove values.  The ordering of values
@@ -536,20 +508,18 @@ public class Item extends DSpaceObject
      *                    (for example, a date).
      * @param  values     the values to add.
      */
-    public void addDC(String element,
-                      String qualifier,
-                      String lang,
+    public void addDC(String element, String qualifier, String lang,
                       String[] values)
     {
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         for (int i = 0; i < values.length; i++)
         {
-            DCValue dcv  = new DCValue();
-            dcv.element  = element;
-            dcv.qualifier= qualifier;
+            DCValue dcv = new DCValue();
+            dcv.element = element;
+            dcv.qualifier = qualifier;
             dcv.language = lang;
-            dcv.value    = values[i].trim();
+            dcv.value = values[i].trim();
             dublinCore.add(dcv);
         }
 
@@ -558,7 +528,6 @@ public class Item extends DSpaceObject
             dublinCoreChanged = true;
         }
     }
-
 
     /**
      * Add a single Dublin Core metadata field.  This is appended to existing
@@ -573,9 +542,7 @@ public class Item extends DSpaceObject
      *                    (for example, a date).
      * @param  value      the value to add.
      */
-    public void addDC(String element,
-                      String qualifier,
-                      String lang,
+    public void addDC(String element, String qualifier, String lang,
                       String value)
     {
         String[] valArray = new String[1];
@@ -583,7 +550,6 @@ public class Item extends DSpaceObject
 
         addDC(element, qualifier, lang, valArray);
     }
-
 
     /**
      * Clear Dublin Core metadata values.  As with <code>addDC</code> above,
@@ -625,7 +591,6 @@ public class Item extends DSpaceObject
         dublinCoreChanged = true;
     }
 
-
     /**
      * Utility method for pattern-matching Dublin Core.  This method will
      * return <code>true</code> if the element, qualifier and language passed
@@ -641,16 +606,14 @@ public class Item extends DSpaceObject
      * @return  <code>true</code> if there is a match
      */
     private boolean match(String element, String qualifier, String language,
-        DCValue dcv)
+                          DCValue dcv)
     {
         // We will attempt to disprove a match - if we can't we have a match
-
         if (!element.equals(Item.ANY) && !element.equals(dcv.element))
         {
             // Elements do not match, no wildcard
             return false;
         }
-
 
         if (qualifier == null)
         {
@@ -660,8 +623,7 @@ public class Item extends DSpaceObject
                 // Value is qualified, so no match
                 return false;
             }
-        }
-        else if (!qualifier.equals(Item.ANY))
+        } else if (!qualifier.equals(Item.ANY))
         {
             // Not a wildcard, so qualifier must match exactly
             if (!qualifier.equals(dcv.qualifier))
@@ -669,7 +631,6 @@ public class Item extends DSpaceObject
                 return false;
             }
         }
-
 
         if (language == null)
         {
@@ -679,8 +640,7 @@ public class Item extends DSpaceObject
                 // Value is qualified, so no match
                 return false;
             }
-        }
-        else if (!language.equals(Item.ANY))
+        } else if (!language.equals(Item.ANY))
         {
             // Not a wildcard, so language must match exactly
             if (!language.equals(dcv.language))
@@ -693,7 +653,6 @@ public class Item extends DSpaceObject
         return true;
     }
 
-
     /**
      * Get the e-person that originally submitted this item
      *
@@ -703,7 +662,6 @@ public class Item extends DSpaceObject
     {
         return submitter;
     }
-
 
     /**
      * Set the e-person that originally submitted this item.  This is a
@@ -720,13 +678,11 @@ public class Item extends DSpaceObject
         if (submitter != null)
         {
             itemRow.setColumn("submitter_id", submitter.getID());
-        }
-        else
+        } else
         {
             itemRow.setColumnNull("submitter_id");
         }
     }
-
 
     /**
      * Get the collections this item is in.  The order is indeterminate.
@@ -734,32 +690,29 @@ public class Item extends DSpaceObject
      * @return the collections this item is in, if any.
      * @throws SQLException
      */
-    public Collection[] getCollections()
-        throws SQLException
+    public Collection[] getCollections() throws SQLException
     {
         List collections = new ArrayList();
 
         // Get collection table rows
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-            "collection",
-            "SELECT collection.* FROM collection, collection2item WHERE " +
-                "collection2item.collection_id=collection.collection_id AND " +
-                "collection2item.item_id=" +
-                itemRow.getIntColumn("item_id") );
+        TableRowIterator tri = DatabaseManager.query(ourContext, "collection",
+                                                     "SELECT collection.* FROM collection, collection2item WHERE " +
+                                                     "collection2item.collection_id=collection.collection_id AND " +
+                                                     "collection2item.item_id=" +
+                                                     itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
         {
             TableRow row = tri.next();
 
             // First check the cache
-            Collection fromCache = (Collection) ourContext.fromCache(
-                Collection.class, row.getIntColumn("collection_id"));
+            Collection fromCache = (Collection) ourContext.fromCache(Collection.class,
+                                                                     row.getIntColumn("collection_id"));
 
             if (fromCache != null)
             {
                 collections.add(fromCache);
-            }
-            else
+            } else
             {
                 collections.add(new Collection(ourContext, row));
             }
@@ -771,7 +724,6 @@ public class Item extends DSpaceObject
         return collectionArray;
     }
 
-
     /**
      * Get the communities this item is in.  Returns an unordered array of
      * the communities that house the collections this item is in, including
@@ -780,38 +732,39 @@ public class Item extends DSpaceObject
      * @return  the communities this item is in.
      * @throws SQLException
      */
-    public Community[] getCommunities()
-        throws SQLException
+    public Community[] getCommunities() throws SQLException
     {
         List communities = new ArrayList();
 
         // Get community table rows
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-            "community",
-            "SELECT community.* FROM community, community2item " +
-                "WHERE community2item.community_id=community.community_id " +
-                "AND community2item.item_id=" +
-                itemRow.getIntColumn("item_id") );
+        TableRowIterator tri = DatabaseManager.query(ourContext, "community",
+                                                     "SELECT community.* FROM community, community2item " +
+                                                     "WHERE community2item.community_id=community.community_id " +
+                                                     "AND community2item.item_id=" +
+                                                     itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
         {
             TableRow row = tri.next();
 
             // First check the cache
-            Community owner = (Community) ourContext.fromCache(
-                Community.class, row.getIntColumn("community_id"));
+            Community owner = (Community) ourContext.fromCache(Community.class,
+                                                               row.getIntColumn("community_id"));
 
             if (owner == null)
-	    {
-		owner = new Community(ourContext, row);
-	    }
+            {
+                owner = new Community(ourContext, row);
+            }
+
             communities.add(owner);
+
             // now add any parent communities
             Community[] parents = owner.getAllParents();
+
             for (int i = 0; i < parents.length; i++)
-	    {
-		communities.add(parents[i]);
-	    }
+            {
+                communities.add(parents[i]);
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
@@ -819,7 +772,6 @@ public class Item extends DSpaceObject
 
         return communityArray;
     }
-
 
     /**
      * Get the bundles in this item.
@@ -834,7 +786,6 @@ public class Item extends DSpaceObject
         return bundleArray;
     }
 
-
     /**
      * Get the bundles matching a bundle name
      *  (name corresponds roughly to type)
@@ -847,27 +798,25 @@ public class Item extends DSpaceObject
     public Bundle[] getBundles(String name)
     {
         List matchingBundles = new ArrayList();
-        
+
         Iterator i = bundles.iterator();
-        
+
         // now only keep bundles with matching names
-        while(i.hasNext())
+        while (i.hasNext())
         {
-            Bundle b = (Bundle)i.next();
-            
-            if(name.equals(b.getName() ))
+            Bundle b = (Bundle) i.next();
+
+            if (name.equals(b.getName()))
             {
                 matchingBundles.add(b);
             }
         }
-        
-        Bundle [] bundleArray = new Bundle[matchingBundles.size()];
-        bundleArray = (Bundle[])matchingBundles.toArray(bundleArray);
-        
+
+        Bundle[] bundleArray = new Bundle[matchingBundles.size()];
+        bundleArray = (Bundle[]) matchingBundles.toArray(bundleArray);
+
         return bundleArray;
     }
-
-
 
     /**
      * Create a bundle in this item, with immediate effect
@@ -879,24 +828,24 @@ public class Item extends DSpaceObject
      * @throws AuthorizeException
      */
     public Bundle createBundle(String name)
-        throws SQLException, AuthorizeException
+                        throws SQLException, AuthorizeException
     {
-        if(name == null || "".equals(name))
+        if ((name == null) || "".equals(name))
         {
             throw new SQLException("Bundle must be created with non-null name");
         }
-        
+
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         Bundle b = Bundle.create(ourContext);
         b.setName(name);
         b.update();
-        
+
         addBundle(b);
+
         return b;
     }
-
 
     /**
      * Add an existing bundle to this item.  This has immediate effect.
@@ -905,21 +854,20 @@ public class Item extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void addBundle(Bundle b)
-        throws SQLException, AuthorizeException
+    public void addBundle(Bundle b) throws SQLException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
-        log.info(LogManager.getHeader(ourContext,
-            "add_bundle",
-            "item_id=" + getID() +
-                ",bundle_id=" + b.getID()));
+        log.info(LogManager.getHeader(ourContext, "add_bundle",
+                                      "item_id=" + getID() + ",bundle_id=" +
+                                      b.getID()));
 
         // Check it's not already there
         for (int i = 0; i < bundles.size(); i++)
         {
             Bundle existing = (Bundle) bundles.get(i);
+
             if (b.getID() == existing.getID())
             {
                 // Bundle is already there; no change
@@ -941,7 +889,6 @@ public class Item extends DSpaceObject
         DatabaseManager.update(ourContext, mappingRow);
     }
 
-
     /**
      * Remove a bundle.  This may result in the bundle being deleted, if the
      * bundle is orphaned.
@@ -951,18 +898,18 @@ public class Item extends DSpaceObject
      * @throws AuthorizeException
      */
     public void removeBundle(Bundle b)
-        throws SQLException, AuthorizeException, IOException
+                      throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        log.info(LogManager.getHeader(ourContext,
-            "remove_bundle",
-            "item_id=" + getID() +
-                ",bundle_id=" + b.getID()));
+        log.info(LogManager.getHeader(ourContext, "remove_bundle",
+                                      "item_id=" + getID() + ",bundle_id=" +
+                                      b.getID()));
 
         // Remove from internal list of bundles
         ListIterator li = bundles.listIterator();
+
         while (li.hasNext())
         {
             Bundle existing = (Bundle) li.next();
@@ -976,27 +923,29 @@ public class Item extends DSpaceObject
 
         // Remove mapping from DB
         DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM item2bundle WHERE item_id=" + getID() +
-                " AND bundle_id=" + b.getID());
+                                    "DELETE FROM item2bundle WHERE item_id=" +
+                                    getID() + " AND bundle_id=" + b.getID());
 
         // If the bundle is orphaned, it's removed
         TableRowIterator tri = DatabaseManager.query(ourContext,
-            "SELECT * FROM item2bundle WHERE bundle_id=" +
-                b.getID());
+                                                     "SELECT * FROM item2bundle WHERE bundle_id=" +
+                                                     b.getID());
 
         if (!tri.hasNext())
         {
             //make the right to remove the bundle explicit because the implicit relation
-        	//has been removed. This only has to concern the currentUser because
-        	//he started the removal process and he will end it too.
-        	//also add right to remove from the bundle to remove it's bitstreams.
-        	AuthorizeManager.addPolicy(ourContext, b, Constants.DELETE, ourContext.getCurrentUser());
-        	AuthorizeManager.addPolicy(ourContext, b, Constants.REMOVE, ourContext.getCurrentUser());
+            //has been removed. This only has to concern the currentUser because
+            //he started the removal process and he will end it too.
+            //also add right to remove from the bundle to remove it's bitstreams.
+            AuthorizeManager.addPolicy(ourContext, b, Constants.DELETE,
+                                       ourContext.getCurrentUser());
+            AuthorizeManager.addPolicy(ourContext, b, Constants.REMOVE,
+                                       ourContext.getCurrentUser());
+
             // The bundle is an orphan, delete it
             b.delete();
         }
     }
-
 
     /**
      * Create a single bitstream in a new bundle.  Provided as a convenience
@@ -1010,17 +959,16 @@ public class Item extends DSpaceObject
      * @throws SQLException
      */
     public Bitstream createSingleBitstream(InputStream is, String name)
-        throws AuthorizeException, IOException, SQLException
+                                    throws AuthorizeException, IOException, 
+                                           SQLException
     {
         // Authorisation is checked by methods below
-
         // Create a bundle
         Bundle bnd = createBundle(name);
         Bitstream bitstream = bnd.createBitstream(is);
         addBundle(bnd);
 
         // FIXME: Create permissions for new bundle + bitstream
-
         return bitstream;
     }
 
@@ -1034,11 +982,11 @@ public class Item extends DSpaceObject
      * @throws SQLException
      */
     public Bitstream createSingleBitstream(InputStream is)
-    	throws AuthorizeException, IOException, SQLException
+                                    throws AuthorizeException, IOException, 
+                                           SQLException
     {
-    	return createSingleBitstream(is, "ORIGINAL");
+        return createSingleBitstream(is, "ORIGINAL");
     }
-    
 
     /**
      * Get all non-internal bitstreams in the item.  This is mainly used
@@ -1054,6 +1002,7 @@ public class Item extends DSpaceObject
         // Go through the bundles and bitstreams picking out ones which aren't
         // of internal formats
         Bundle[] bundles = getBundles();
+
         for (int i = 0; i < bundles.length; i++)
         {
             Bitstream[] bitstreams = bundles[i].getBitstreams();
@@ -1074,7 +1023,6 @@ public class Item extends DSpaceObject
         return bsArray;
     }
 
-
     /**
      * Store a copy of the license a user granted in this item.
      *
@@ -1085,12 +1033,13 @@ public class Item extends DSpaceObject
      * @throws AuthorizeException
      */
     public void licenseGranted(String license, EPerson eperson)
-        throws SQLException, IOException, AuthorizeException
+                        throws SQLException, IOException, AuthorizeException
     {
         // Put together text to store
-        String licenseText = "License granted by " +
-            eperson.getFullName() + " (" + eperson.getEmail() + ") on " +
-            DCDate.getCurrent().toString() + " (GMT):\n\n" + license;
+        String licenseText = "License granted by " + eperson.getFullName() +
+                             " (" + eperson.getEmail() + ") on " +
+                             DCDate.getCurrent().toString() + " (GMT):\n\n" +
+                             license;
 
         // Store text as a bitstream
         byte[] licenseBytes = licenseText.getBytes();
@@ -1102,13 +1051,12 @@ public class Item extends DSpaceObject
         b.setSource("Written by org.dspace.content.Item");
 
         // Find the License format
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(
-            ourContext, "License");
+        BitstreamFormat bf = BitstreamFormat.findByShortDescription(ourContext,
+                                                                    "License");
         b.setFormat(bf);
-        
+
         b.update();
     }
-
 
     /**
      * Remove all licenses from an item - it was rejected
@@ -1116,26 +1064,27 @@ public class Item extends DSpaceObject
      * @throws AuthorizeException
      */
     public void removeLicenses()
-        throws SQLException, AuthorizeException, IOException
+                        throws SQLException, AuthorizeException, IOException
     {
         // Find the License format
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(
-            ourContext, "License");
+        BitstreamFormat bf = BitstreamFormat.findByShortDescription(ourContext,
+                                                                    "License");
         int licensetype = bf.getID();
 
         // search through bundles, looking for bitstream type license
         Bundle[] buns = getBundles();
-        
-        for(int i = 0; i < buns.length; i++)
+
+        for (int i = 0; i < buns.length; i++)
         {
             boolean removethisbundle = false;
-            
-            Bitstream [] bits = buns[i].getBitstreams();
-            
-            for(int j=0; j<bits.length; j++)
+
+            Bitstream[] bits = buns[i].getBitstreams();
+
+            for (int j = 0; j < bits.length; j++)
             {
                 BitstreamFormat bft = bits[j].getFormat();
-                if(bft.getID() == licensetype)
+
+                if (bft.getID() == licensetype)
                 {
                     removethisbundle = true;
                 }
@@ -1150,69 +1099,66 @@ public class Item extends DSpaceObject
         }
     }
 
-
     /**
      * Update the item "in archive" flag and Dublin Core metadata in the
      * database
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void update()
-        throws SQLException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
-        
         // only do write authorization if user is not an editor
-        if( !canEdit() )
+        if (!canEdit())
         {
             AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         }
-        
-        HistoryManager.saveHistory(ourContext,
-            this,
-            HistoryManager.MODIFY,
-            ourContext.getCurrentUser(),
-            ourContext.getExtraLogInfo());
 
-        log.info(LogManager.getHeader(ourContext,
-            "update_item",
-            "item_id=" + getID()));
+        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY,
+                                   ourContext.getCurrentUser(),
+                                   ourContext.getExtraLogInfo());
+
+        log.info(LogManager.getHeader(ourContext, "update_item",
+                                      "item_id=" + getID()));
 
         // Set the last modified date
         itemRow.setColumn("last_modified", new Date());
-        
-	// Set sequence IDs for bitstreams in item
-	int sequence = 0;
-	Bundle[] bunds = getBundles();
 
-	// find the highest current sequence number
-	for (int i = 0; i < bunds.length; i++)
-	{
-	    Bitstream[] streams = bunds[i].getBitstreams();
-	    for (int k = 0; k < streams.length; k++)
-	    {
-		if (streams[k].getSequenceID() > sequence)
-		{
-		    sequence = streams[k].getSequenceID();
-		}
-	    }
-	}
+        // Set sequence IDs for bitstreams in item
+        int sequence = 0;
+        Bundle[] bunds = getBundles();
 
-	// start sequencing bitstreams without sequence IDs
-	sequence++;
-	for (int i = 0; i < bunds.length; i++)
-	{
-	    Bitstream[] streams = bunds[i].getBitstreams();
-	    for (int k = 0; k < streams.length; k++)
-	    {
-		if (streams[k].getSequenceID() < 0)
-		{
-		    streams[k].setSequenceID(sequence);
-		    sequence++;
-		    streams[k].update();
-		}
-	    }
-	}
+        // find the highest current sequence number
+        for (int i = 0; i < bunds.length; i++)
+        {
+            Bitstream[] streams = bunds[i].getBitstreams();
+
+            for (int k = 0; k < streams.length; k++)
+            {
+                if (streams[k].getSequenceID() > sequence)
+                {
+                    sequence = streams[k].getSequenceID();
+                }
+            }
+        }
+
+        // start sequencing bitstreams without sequence IDs
+        sequence++;
+
+        for (int i = 0; i < bunds.length; i++)
+        {
+            Bitstream[] streams = bunds[i].getBitstreams();
+
+            for (int k = 0; k < streams.length; k++)
+            {
+                if (streams[k].getSequenceID() < 0)
+                {
+                    streams[k].setSequenceID(sequence);
+                    sequence++;
+                    streams[k].update();
+                }
+            }
+        }
 
         // Make sure that withdrawn and in_archive are non-null
         if (itemRow.isColumnNull("in_archive"))
@@ -1224,7 +1170,7 @@ public class Item extends DSpaceObject
         {
             itemRow.setColumn("withdrawn", false);
         }
-        
+
         // Map counting number of values for each element/qualifier.
         // Keys are Strings: "element" or "element.qualifier"
         // Values are Integers indicating number of values written for a
@@ -1247,53 +1193,55 @@ public class Item extends DSpaceObject
                 DCValue dcv = (DCValue) i.next();
 
                 // Get the DC Type
-                DCType dcType = DCType.findByElement(ourContext,
-                    dcv.element,
-                    dcv.qualifier);
+                DCType dcType = DCType.findByElement(ourContext, dcv.element,
+                                                     dcv.qualifier);
 
                 if (dcType == null)
                 {
                     // Bad DC field, log and throw exception
-                    log.warn(LogManager.getHeader(ourContext,
-                        "bad_dc",
-                        "Bad DC field.  element: \"" +
-                            (dcv.element == null ? "null" : dcv.element) +
-                            "\" qualifier: \"" +
-                            (dcv.qualifier == null ? "null" : dcv.qualifier) +
-                            "\" value: \"" +
-                            (dcv.value == null ? "null" : dcv.value) + "\""));
+                    log.warn(LogManager.getHeader(ourContext, "bad_dc",
+                                                  "Bad DC field.  element: \"" +
+                                                  ((dcv.element == null)
+                                                   ? "null" : dcv.element) +
+                                                  "\" qualifier: \"" +
+                                                  ((dcv.qualifier == null)
+                                                   ? "null" : dcv.qualifier) +
+                                                  "\" value: \"" +
+                                                  ((dcv.value == null) ? "null"
+                                                                       : dcv.value) +
+                                                  "\""));
 
-                    throw new SQLException( "bad_dublin_core " + dcv.element
-                                + " " + dcv.qualifier );
+                    throw new SQLException("bad_dublin_core " + dcv.element +
+                                           " " + dcv.qualifier);
                 }
 
                 // Work out the place number for ordering
                 int current = 0;
-                
+
                 // Key into map is "element" or "element.qualifier"
                 String key = dcv.element +
-					(dcv.qualifier == null ? "" : "." + dcv.qualifier);
-                
+                             ((dcv.qualifier == null) ? "" : ("." +
+                                                      dcv.qualifier));
+
                 Integer currentInteger = (Integer) elementCount.get(key);
-                
+
                 if (currentInteger != null)
                 {
-                	current = currentInteger.intValue();
+                    current = currentInteger.intValue();
                 }
-                
+
                 current++;
                 elementCount.put(key, new Integer(current));
-                
+
                 // Write DCValue
-                TableRow valueRow = DatabaseManager.create(ourContext,
-                	"dcvalue");
-                
+                TableRow valueRow = DatabaseManager.create(ourContext, "dcvalue");
+
                 valueRow.setColumn("item_id", getID());
                 valueRow.setColumn("dc_type_id", dcType.getID());
                 valueRow.setColumn("text_value", dcv.value);
                 valueRow.setColumn("text_lang", dcv.language);
                 valueRow.setColumn("place", current);
-                
+
                 DatabaseManager.update(ourContext, valueRow);
             }
 
@@ -1312,73 +1260,71 @@ public class Item extends DSpaceObject
      * @throws AuthorizeException
      * @throws IOException
      */
-    public void withdraw()
-        throws SQLException, AuthorizeException, IOException
+    public void withdraw() throws SQLException, AuthorizeException, IOException
     {
         String timestamp = DCDate.getCurrent().toString();
-        
 
         // Build some provenance data while we're at it.
         String collectionProv = "";
         Collection[] colls = getCollections();
+
         for (int i = 0; i < colls.length; i++)
         {
             collectionProv = collectionProv + colls[i].getMetadata("name") +
-                " (ID: " + colls[i].getID() + ")\n";
+                             " (ID: " + colls[i].getID() + ")\n";
         }
 
         // Check permission.  User either has to have REMOVE on owning collection
         // or be COLLECTION_EDITOR of owning collection
-
-        if( AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(),
-                Constants.COLLECTION_ADMIN) ||
-            AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(),
-                Constants.REMOVE))
+        if (AuthorizeManager.authorizeActionBoolean(ourContext,
+                                                        getOwningCollection(),
+                                                        Constants.COLLECTION_ADMIN) ||
+                AuthorizeManager.authorizeActionBoolean(ourContext,
+                                                            getOwningCollection(),
+                                                            Constants.REMOVE))
         {
-           // authorized
-        }
-        else
+            // authorized
+        } else
         {
             throw new AuthorizeException("To withdraw item must be COLLECTION_ADMIN or have REMOVE authorization on owning Collection");
         }
-        
+
         // Set withdrawn flag. timestamp will be set; last_modified in update()
         itemRow.setColumn("withdrawn", true);
 
         // in_archive flag is now false
         itemRow.setColumn("in_archive", false);
-        
+
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
         EPerson e = ourContext.getCurrentUser();
         String prov = "Item withdrawn by " + e.getFullName() + " (" +
-            e.getEmail() + ") on " + timestamp + "\n" +
-            "Item was in collections:\n" + collectionProv +
-            InstallItem.getBitstreamProvenanceMessage(this);
+                      e.getEmail() + ") on " + timestamp + "\n" +
+                      "Item was in collections:\n" + collectionProv +
+                      InstallItem.getBitstreamProvenanceMessage(this);
 
         addDC("description", "provenance", "en", prov);
-        
+
         // Update item in DB
         update();
 
         // Invoke History system
         HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY, e,
-            ourContext.getExtraLogInfo());
-        
+                                   ourContext.getExtraLogInfo());
+
         // Remove from indicies
         Browse.itemRemoved(ourContext, getID());
         DSIndexer.unIndexContent(ourContext, this);
-        
+
         // and all of our authorization policies
         // FIXME: not very "multiple-inclusion" friendly
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
         // Write log
-        log.info(LogManager.getHeader(ourContext,
-            "withdraw_item",
-            "user=" + e.getEmail() + ",item_id=" + getID()));
+        log.info(LogManager.getHeader(ourContext, "withdraw_item",
+                                      "user=" + e.getEmail() + ",item_id=" +
+                                      getID()));
     }
-
 
     /**
      * Reinstate a withdrawn item
@@ -1387,50 +1333,50 @@ public class Item extends DSpaceObject
      * @throws IOException
      */
     public void reinstate()
-            throws SQLException, AuthorizeException, IOException
+                   throws SQLException, AuthorizeException, IOException
     {
         String timestamp = DCDate.getCurrent().toString();
-        
+
         // Check permission.  User must have ADD on all collections.
         // Build some provenance data while we're at it.
         String collectionProv = "";
         Collection[] colls = getCollections();
+
         for (int i = 0; i < colls.length; i++)
         {
             collectionProv = collectionProv + colls[i].getMetadata("name") +
-                " (ID: " + colls[i].getID() + ")\n";
-            AuthorizeManager.authorizeAction(ourContext, colls[i],
-                Constants.ADD);
+                             " (ID: " + colls[i].getID() + ")\n";
+            AuthorizeManager.authorizeAction(ourContext, colls[i], Constants.ADD);
         }
-        
+
         // Clear withdrawn flag
         itemRow.setColumn("withdrawn", false);
 
         // in_archive flag is now true
         itemRow.setColumn("in_archive", true);
-        
+
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
         EPerson e = ourContext.getCurrentUser();
         String prov = "Item reinstated by " + e.getFullName() + " (" +
-            e.getEmail() + ") on " + timestamp + "\n" +
-            "Item was in collections:\n" + collectionProv +
-            InstallItem.getBitstreamProvenanceMessage(this);
+                      e.getEmail() + ") on " + timestamp + "\n" +
+                      "Item was in collections:\n" + collectionProv +
+                      InstallItem.getBitstreamProvenanceMessage(this);
 
         addDC("description", "provenance", "en", prov);
-        
+
         // Update item in DB
         update();
 
         // Invoke History system
         HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY, e,
-            ourContext.getExtraLogInfo());
-        
+                                   ourContext.getExtraLogInfo());
+
         // Add to indicies
         // Remove - update() already performs this
         // Browse.itemAdded(ourContext, this);
         DSIndexer.indexContent(ourContext, this);
-        
+
         // authorization policies
         if (colls.length > 0)
         {
@@ -1438,16 +1384,15 @@ public class Item extends DSpaceObject
             // policies from first collection
             // remove the item's policies and replace them with
             // the defaults from the collection
-            inheritCollectionDefaultPolicies( colls[0] );
+            inheritCollectionDefaultPolicies(colls[0]);
         }
 
         // Write log
-        log.info(LogManager.getHeader(ourContext,
-            "reinstate_item",
-            "user=" + e.getEmail() + ",item_id=" + getID()));
+        log.info(LogManager.getHeader(ourContext, "reinstate_item",
+                                      "user=" + e.getEmail() + ",item_id=" +
+                                      getID()));
     }
-    
-    
+
     /**
      * Delete (expunge) the item.  Bundles and bitstreams are also deleted if
      * they are not also included in another item.  The Dublin Core metadata is
@@ -1456,18 +1401,14 @@ public class Item extends DSpaceObject
      * @throws AuthorizeException
      * @throws IOException
      */
-    void delete()
-        throws SQLException, AuthorizeException, IOException
+    void delete() throws SQLException, AuthorizeException, IOException
     {
-        HistoryManager.saveHistory(ourContext,
-            this,
-            HistoryManager.REMOVE,
-            ourContext.getCurrentUser(),
-            ourContext.getExtraLogInfo());
+        HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
+                                   ourContext.getCurrentUser(),
+                                   ourContext.getExtraLogInfo());
 
-        log.info(LogManager.getHeader(ourContext,
-            "delete_item",
-            "item_id=" + getID()));
+        log.info(LogManager.getHeader(ourContext, "delete_item",
+                                      "item_id=" + getID()));
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -1499,13 +1440,13 @@ public class Item extends DSpaceObject
         // a way of doing this.  Plus, deleting a Handle may have ramifications
         // that need considering.
         DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM handle WHERE resource_type_id=" +
-                Constants.ITEM + " AND resource_id=" + getID());
+                                    "DELETE FROM handle WHERE resource_type_id=" +
+                                    Constants.ITEM + " AND resource_id=" +
+                                    getID());
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
     }
-
 
     /**
      * Return <code>true</code> if <code>other</code> is the same Item as
@@ -1518,13 +1459,16 @@ public class Item extends DSpaceObject
      */
     public boolean equals(DSpaceObject other)
     {
-        if( this.getType() == other.getType() )
-            if( this.getID() == other.getID() )
+        if (this.getType() == other.getType())
+        {
+            if (this.getID() == other.getID())
+            {
                 return true;
-        
+            }
+        }
+
         return false;
     }
-
 
     /**
      * Return true if this Collection 'owns' this item
@@ -1537,26 +1481,27 @@ public class Item extends DSpaceObject
     public boolean isOwningCollection(Collection c)
     {
         int owner_id = itemRow.getIntColumn("owning_collection");
-        
-        if(c.getID() == owner_id) return true;
-        
+
+        if (c.getID() == owner_id)
+        {
+            return true;
+        }
+
         // not the owner
         return false;
     }
-
 
     /**
      * Utility method to remove all Dublin Core associated with the item
      * from the database (regardless of in-memory version)
      * @throws SQLException
      */
-    private void removeDCFromDatabase()
-        throws SQLException
+    private void removeDCFromDatabase() throws SQLException
     {
         DatabaseManager.updateQuery(ourContext,
-            "DELETE FROM dcvalue WHERE item_id=" + getID() );
+                                    "DELETE FROM dcvalue WHERE item_id=" +
+                                    getID());
     }
-
 
     /**
      * return type found in Constants
@@ -1567,7 +1512,6 @@ public class Item extends DSpaceObject
         return Constants.ITEM;
     }
 
-    
     /**
      * remove all of the policies for item and replace them
      *  with a new list of policies
@@ -1575,15 +1519,15 @@ public class Item extends DSpaceObject
      * @param newpolicies - this will be all of the new policies for
      *   the item and its contents
      * @throws SQLException
-     */      
-    public void replaceAllItemPolicies( List newpolicies )
-        throws SQLException, AuthorizeException
+     */
+    public void replaceAllItemPolicies(List newpolicies)
+                                throws SQLException, AuthorizeException
     {
         // remove all our policies, add new ones
         AuthorizeManager.removeAllPolicies(ourContext, this);
         AuthorizeManager.addPolicies(ourContext, newpolicies, this);
     }
-    
+
     /**
      * remove all of the policies for item's bitstreams and bundles
      *  and replace them with a new list of policies
@@ -1591,9 +1535,9 @@ public class Item extends DSpaceObject
      * @param newpolicies - this will be all of the new policies for
      *   the bundle and bitstream contents
      * @throws SQLException
-     */      
-    public void replaceAllBitstreamPolicies( List newpolicies )
-        throws SQLException, AuthorizeException
+     */
+    public void replaceAllBitstreamPolicies(List newpolicies)
+                                     throws SQLException, AuthorizeException
     {
         // remove all policies from bundles, add new ones
         // Remove bundles
@@ -1602,10 +1546,10 @@ public class Item extends DSpaceObject
         for (int i = 0; i < bundles.length; i++)
         {
             Bundle mybundle = bundles[i];
-            
+
             Bitstream[] bs = mybundle.getBitstreams();
-            
-            for(int j = 0; j < bs.length; j++ )
+
+            for (int j = 0; j < bs.length; j++)
             {
                 Bitstream mybitstream = bs[j];
 
@@ -1619,16 +1563,15 @@ public class Item extends DSpaceObject
             AuthorizeManager.addPolicies(ourContext, newpolicies, mybundle);
         }
     }
-    
+
     /**
      * remove all of the policies for item's bitstreams and bundles
-     *    that belong to a given Group 
+     *    that belong to a given Group
      *
      * @param g Group referenced by policies that needs to be removed
      * @throws SQLException
-     */      
-    public void removeGroupPolicies( Group g )
-        throws SQLException
+     */
+    public void removeGroupPolicies(Group g) throws SQLException
     {
         // remove Group's policies from Item
         AuthorizeManager.removeGroupPolicies(ourContext, this, g);
@@ -1639,10 +1582,10 @@ public class Item extends DSpaceObject
         for (int i = 0; i < bundles.length; i++)
         {
             Bundle mybundle = bundles[i];
-            
+
             Bitstream[] bs = mybundle.getBitstreams();
-            
-            for(int j = 0; j < bs.length; j++ )
+
+            for (int j = 0; j < bs.length; j++)
             {
                 Bitstream mybitstream = bs[j];
 
@@ -1655,7 +1598,6 @@ public class Item extends DSpaceObject
         }
     }
 
-    
     /**
      * remove all policies on an item and its contents, and
      *  replace them with the DEFAULT_ITEM_READ and DEFAULT_BITSTREAM_READ
@@ -1666,83 +1608,85 @@ public class Item extends DSpaceObject
      * @throws java.sql.SQLException if an SQL error or if no default policies found.
      *   It's a bit draconian, but default policies must be enforced.
      */
-    public void inheritCollectionDefaultPolicies( Collection c )
-        throws java.sql.SQLException, AuthorizeException
+    public void inheritCollectionDefaultPolicies(Collection c)
+                                          throws java.sql.SQLException, 
+                                                 AuthorizeException
     {
         // remove the submit authorization policies
         // and replace them with the collection's default READ policies
-        List policies = AuthorizeManager.getPoliciesActionFilter(ourContext,
-                c, Constants.DEFAULT_ITEM_READ );
+        List policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
+                                                                 Constants.DEFAULT_ITEM_READ);
 
         // change the action to just READ
         // just don't call update on the resourcepolicies!!!
         Iterator i = policies.iterator();
 
         // MUST have default policies
-        if( !i.hasNext() )
+        if (!i.hasNext())
         {
-            throw new java.sql.SQLException( "Collection " + c.getID() + " has no default item READ policies");
+            throw new java.sql.SQLException("Collection " + c.getID() +
+                                            " has no default item READ policies");
         }
-                
-        while( i.hasNext() )
+
+        while (i.hasNext())
         {
-            ResourcePolicy rp = (ResourcePolicy)i.next();
-            rp.setAction( Constants.READ );
+            ResourcePolicy rp = (ResourcePolicy) i.next();
+            rp.setAction(Constants.READ);
         }
-            
+
         replaceAllItemPolicies(policies);
 
-        policies = AuthorizeManager.getPoliciesActionFilter(ourContext,
-                c, Constants.DEFAULT_BITSTREAM_READ );
+        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
+                                                            Constants.DEFAULT_BITSTREAM_READ);
 
         // change the action to just READ
         // just don't call update on the resourcepolicies!!!
         i = policies.iterator();
 
-        if( !i.hasNext() )
+        if (!i.hasNext())
         {
-            throw new java.sql.SQLException( "Collection " + c.getID() + " has no default bitstream READ policies");
+            throw new java.sql.SQLException("Collection " + c.getID() +
+                                            " has no default bitstream READ policies");
         }
-                
-        while( i.hasNext() )
+
+        while (i.hasNext())
         {
-            ResourcePolicy rp = (ResourcePolicy)i.next();
-            rp.setAction( Constants.READ );
+            ResourcePolicy rp = (ResourcePolicy) i.next();
+            rp.setAction(Constants.READ);
         }
 
         replaceAllBitstreamPolicies(policies);
     }
-    
-    
-    
+
     /**
      * return TRUE if context's user can edit item, false otherwise
      *
      * @return boolean true = current user can edit item
      * @throws SQLException
      */
-    public boolean canEdit()
-        throws java.sql.SQLException
+    public boolean canEdit() throws java.sql.SQLException
     {
         // can this person write to the item?
-        if( AuthorizeManager.authorizeActionBoolean(ourContext, this, Constants.WRITE) )
+        if (AuthorizeManager.authorizeActionBoolean(ourContext, this,
+                                                        Constants.WRITE))
         {
             return true;
         }
-        
+
         // is this person an COLLECTION_EDITOR for the owning collection?
-        if( getOwningCollection().canEditBoolean())
+        if (getOwningCollection().canEditBoolean())
         {
             return true;
-        }    
-        
+        }
+
         // is this person an COLLECTION_EDITOR for the owning collection?
-        if( AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(),
-                Constants.COLLECTION_ADMIN))
+        if (AuthorizeManager.authorizeActionBoolean(ourContext,
+                                                        getOwningCollection(),
+                                                        Constants.COLLECTION_ADMIN))
         {
             return true;
-        }        
-        
+        }
+
         return false;
     }
 }

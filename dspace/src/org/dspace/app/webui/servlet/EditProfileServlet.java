@@ -37,19 +37,16 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
-
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -68,38 +65,34 @@ public class EditProfileServlet extends DSpaceServlet
     /** Logger */
     private static Logger log = Logger.getLogger(EditProfileServlet.class);
 
-
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         // A GET displays the edit profile form.  We assume the authentication
         // filter means we have a user.
-        log.info(LogManager.getHeader(context,
-            "view_profile",
-            ""));
+        log.info(LogManager.getHeader(context, "view_profile", ""));
 
         request.setAttribute("eperson", context.getCurrentUser());
 
         JSPManager.showJSP(request, response, "/register/edit-profile.jsp");
     }
 
-
-    protected void doDSPost(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSPost(Context context, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         // Get the user - authentication should have happened
         EPerson eperson = context.getCurrentUser();
-			
+
         // Find out if they're trying to set a new password
         boolean settingPassword = false;
 
-        if (eperson.getRequireCertificate() == false &&
-            request.getParameter("password") != null &&
-            !request.getParameter("password").equals(""))
+        if ((eperson.getRequireCertificate() == false) &&
+                (request.getParameter("password") != null) &&
+                !request.getParameter("password").equals(""))
         {
             settingPassword = true;
         }
@@ -124,39 +117,32 @@ public class EditProfileServlet extends DSpaceServlet
                 request.setAttribute("password.problem", new Boolean(true));
             }
         }
-        
-        
+
         if (ok)
         {
             // Update the DB
-            log.info(LogManager.getHeader(context,
-                    "edit_profile",
-                    "password_changed=" + settingPassword));
+            log.info(LogManager.getHeader(context, "edit_profile",
+                                          "password_changed=" +
+                                          settingPassword));
             eperson.update();
 
             // Show confirmation
             request.setAttribute("password.updated",
-                new Boolean(settingPassword));
-            JSPManager.showJSP(request,
-                response,
-                "/register/profile-updated.jsp");
+                                 new Boolean(settingPassword));
+            JSPManager.showJSP(request, response,
+                               "/register/profile-updated.jsp");
 
             context.complete();
-        }
-        else
+        } else
         {
-            log.info(LogManager.getHeader(context,
-                "view_profile",
-                "problem=true"));
+            log.info(LogManager.getHeader(context, "view_profile",
+                                          "problem=true"));
 
             request.setAttribute("eperson", eperson);
 
-            JSPManager.showJSP(request,
-                response,
-                "/register/edit-profile.jsp");
+            JSPManager.showJSP(request, response, "/register/edit-profile.jsp");
         }
     }
-	 
 
     /**
      * Update a user's profile information with the information in
@@ -171,30 +157,28 @@ public class EditProfileServlet extends DSpaceServlet
      *          false if they left something out.
      */
     public static boolean updateUserProfile(EPerson eperson,
-        HttpServletRequest request)
+                                            HttpServletRequest request)
     {
         // Get the parameters from the form
         String lastName = request.getParameter("last_name");
         String firstName = request.getParameter("first_name");
         String phone = request.getParameter("phone");
-		
+
         // Update the eperson
         eperson.setFirstName(firstName);
         eperson.setLastName(lastName);
         eperson.setMetadata("phone", phone);
 
         // Check all required fields are there
-        if (lastName == null || lastName.equals("") ||
-            firstName == null || firstName.equals(""))
+        if ((lastName == null) || lastName.equals("") || (firstName == null) ||
+                firstName.equals(""))
         {
             return false;
-        }
-        else
+        } else
         {
             return true;
         }
     }
-
 
     /**
      * Set an eperson's password, if the passwords they typed match and
@@ -202,19 +186,19 @@ public class EditProfileServlet extends DSpaceServlet
      * is returned.  Otherwise the problem is returned as a String.
      *
      * @param eperson  the eperson to set the new password for
-     * @param request  the request containing the new password  
+     * @param request  the request containing the new password
      *
      * @return  true if everything went OK, or false
      */
     public static boolean confirmAndSetPassword(EPerson eperson,
-        HttpServletRequest request)
+                                                HttpServletRequest request)
     {
         // Get the passwords
         String password = request.getParameter("password");
         String passwordConfirm = request.getParameter("password_confirm");
-		
+
         // Check it's there and long enough
-        if (password == null || password.length() < 6)
+        if ((password == null) || (password.length() < 6))
         {
             return false;
         }
@@ -224,7 +208,7 @@ public class EditProfileServlet extends DSpaceServlet
         {
             return false;
         }
-		
+
         // Everything OK so far, change the password
         eperson.setPassword(password);
 

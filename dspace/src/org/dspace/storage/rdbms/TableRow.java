@@ -37,10 +37,7 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
-
 package org.dspace.storage.rdbms;
-
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,8 +45,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.dspace.core.ConfigurationManager;
-
-
 /**
  * Represents a database row.
  *
@@ -58,7 +53,6 @@ import org.dspace.core.ConfigurationManager;
  */
 public class TableRow
 {
-
     /** Marker object to indicate NULLs. */
     private static final Object NULL_OBJECT = new Object();
 
@@ -105,7 +99,7 @@ public class TableRow
      * @param column The column name (case-insensitive)
      * @return True if this row contains a column with this name.
      */
-    public boolean hasColumn (String column)
+    public boolean hasColumn(String column)
     {
         return data.get(canonicalize(column)) != null;
     }
@@ -118,8 +112,10 @@ public class TableRow
      */
     public boolean isColumnNull(String column)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
         return data.get(canonicalize(column)) == NULL_OBJECT;
     }
@@ -136,20 +132,31 @@ public class TableRow
      */
     public int getIntColumn(String column)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
         String name = canonicalize(column);
 
         if (isColumnNull(name))
+        {
             return -1;
+        }
 
         Object value = data.get(name);
 
         if (value == null)
-            throw new IllegalArgumentException("Column " + column + " not present");
+        {
+            throw new IllegalArgumentException("Column " + column +
+                                               " not present");
+        }
+
         if (!(value instanceof Integer))
-            throw new IllegalArgumentException("Value for " + column + " is not an integer");
+        {
+            throw new IllegalArgumentException("Value for " + column +
+                                               " is not an integer");
+        }
 
         return ((Integer) value).intValue();
     }
@@ -166,20 +173,30 @@ public class TableRow
      */
     public long getLongColumn(String column)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
         String name = canonicalize(column);
 
         if (isColumnNull(name))
+        {
             return -1;
+        }
 
         Object value = data.get(name);
 
         if (value == null)
-            throw new IllegalArgumentException("Column " + column + " not present");
+        {
+            throw new IllegalArgumentException("Column " + column +
+                                               " not present");
+        }
+
         if (!(value instanceof Long))
+        {
             throw new IllegalArgumentException("Value is not an long");
+        }
 
         return ((Long) value).longValue();
     }
@@ -196,20 +213,30 @@ public class TableRow
      */
     public String getStringColumn(String column)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
         String name = canonicalize(column);
 
         if (isColumnNull(name))
+        {
             return null;
+        }
 
         Object value = data.get(name);
 
         if (value == null)
-            throw new IllegalArgumentException("Column " + column + " not present");
+        {
+            throw new IllegalArgumentException("Column " + column +
+                                               " not present");
+        }
+
         if (!(value instanceof String))
+        {
             throw new IllegalArgumentException("Value is not an string");
+        }
 
         return (String) value;
     }
@@ -226,34 +253,44 @@ public class TableRow
      */
     public boolean getBooleanColumn(String column)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
         String name = canonicalize(column);
 
         if (isColumnNull(name))
+        {
             return false;
+        }
 
         Object value = data.get(name);
 
         // make sure that we tolerate integers or booleans
         if (value == null)
-            throw new IllegalArgumentException("Column " + column + " not present");
+        {
+            throw new IllegalArgumentException("Column " + column +
+                                               " not present");
+        }
 
         if ((value instanceof Boolean))
         {
-            return((Boolean)value).booleanValue();
-        }
-        else if( (value instanceof Integer) )
+            return ((Boolean) value).booleanValue();
+        } else if ((value instanceof Integer))
         {
-            int i = ((Integer)value).intValue();
-            
-            if( i == 0 ) return false;  // 0 is false
-            
-            return true;           // nonzero is true
-        }
-        else
+            int i = ((Integer) value).intValue();
+
+            if (i == 0)
+            {
+                return false; // 0 is false
+            }
+
+            return true; // nonzero is true
+        } else
+        {
             throw new IllegalArgumentException("Value is not a boolean or an integer");
+        }
     }
 
     /**
@@ -268,20 +305,30 @@ public class TableRow
      */
     public java.util.Date getDateColumn(String column)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
         String name = canonicalize(column);
 
         if (isColumnNull(name))
+        {
             return null;
+        }
 
         Object value = data.get(name);
 
         if (value == null)
-            throw new IllegalArgumentException("Column " + column + " not present");
+        {
+            throw new IllegalArgumentException("Column " + column +
+                                               " not present");
+        }
+
         if (!(value instanceof java.util.Date))
+        {
             throw new IllegalArgumentException("Value is not a Date");
+        }
 
         return (java.util.Date) value;
     }
@@ -295,8 +342,10 @@ public class TableRow
      */
     public void setColumnNull(String column)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
         setColumnNullInternal(canonicalize(column));
     }
@@ -311,15 +360,16 @@ public class TableRow
      */
     public void setColumn(String column, boolean b)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
-        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             // if oracle, use 1 or 0 for true/false
             data.put(canonicalize(column), b ? new Integer(1) : new Integer(0));
-        }
-        else
+        } else
         {
             // default to postgres true/false
             data.put(canonicalize(column), b ? Boolean.TRUE : Boolean.FALSE);
@@ -337,10 +387,12 @@ public class TableRow
      */
     public void setColumn(String column, String s)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
-        data.put(canonicalize(column), s == null ? NULL_OBJECT : s);
+        data.put(canonicalize(column), (s == null) ? NULL_OBJECT : s);
     }
 
     /**
@@ -353,10 +405,12 @@ public class TableRow
      */
     public void setColumn(String column, int i)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
-	data.put(canonicalize(column), new Integer(i));
+        data.put(canonicalize(column), new Integer(i));
     }
 
     /**
@@ -369,8 +423,10 @@ public class TableRow
      */
     public void setColumn(String column, long l)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
         data.put(canonicalize(column), new Long(l));
     }
@@ -386,15 +442,17 @@ public class TableRow
      */
     public void setColumn(String column, java.util.Date d)
     {
-        if (! hasColumn(column))
+        if (!hasColumn(column))
+        {
             throw new IllegalArgumentException("No such column " + column);
+        }
 
         if (d == null)
         {
             setColumnNull(canonicalize(column));
+
             return;
         }
-
 
         data.put(canonicalize(column), d);
     }
@@ -411,17 +469,13 @@ public class TableRow
     {
         final String NEWLINE = System.getProperty("line.separator");
         StringBuffer result = new StringBuffer(table).append(NEWLINE);
-        for (Iterator iterator = data.keySet().iterator();
-             iterator.hasNext(); )
+
+        for (Iterator iterator = data.keySet().iterator(); iterator.hasNext();)
         {
             String column = (String) iterator.next();
-            result
-                .append("\t")
-                .append(column)
-                .append(" = ")
-                .append(isColumnNull(column) ? "NULL" : data.get(column))
-                .append(NEWLINE)
-                ;
+            result.append("\t").append(column).append(" = ")
+                  .append(isColumnNull(column) ? "NULL" : data.get(column))
+                  .append(NEWLINE);
         }
 
         return result.toString();
@@ -443,8 +497,10 @@ public class TableRow
      */
     public boolean equals(Object obj)
     {
-        if (! (obj instanceof TableRow))
+        if (!(obj instanceof TableRow))
+        {
             return false;
+        }
 
         return data.equals(((TableRow) obj).data);
     }
@@ -457,7 +513,7 @@ public class TableRow
      */
     static String canonicalize(String column)
     {
-        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             // oracle requires uppercase
             return column.toUpperCase();
@@ -475,7 +531,7 @@ public class TableRow
      */
     private void nullColumns(List columns)
     {
-        for (Iterator iterator = columns.iterator(); iterator.hasNext(); )
+        for (Iterator iterator = columns.iterator(); iterator.hasNext();)
         {
             setColumnNullInternal((String) iterator.next());
         }

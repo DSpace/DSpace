@@ -37,24 +37,21 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
@@ -91,52 +88,54 @@ public class MyDSpaceServlet extends DSpaceServlet
     /** The "reason for rejection" page */
     public static final int REJECT_REASON_PAGE = 4;
 
-
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         // GET displays the main page - everthing else is a POST
         showMainPage(context, request, response);
     }
 
-
-    protected void doDSPost(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSPost(Context context, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         // First get the step
         int step = UIUtil.getIntParameter(request, "step");
 
         switch (step)
         {
-        case MAIN_PAGE:
-            processMainPage(context, request, response);
-            break;
+            case MAIN_PAGE:
+                processMainPage(context, request, response);
 
-        case REMOVE_ITEM_PAGE:
-            processRemoveItem(context, request, response);
-            break;
+                break;
 
-        case PREVIEW_TASK_PAGE:
-            processPreviewTask(context, request, response);
-            break;
+            case REMOVE_ITEM_PAGE:
+                processRemoveItem(context, request, response);
 
-        case PERFORM_TASK_PAGE:
-            processPerformTask(context, request, response);
-            break;
+                break;
 
-        case REJECT_REASON_PAGE:
-            processRejectReason(context, request, response);
-            break;
+            case PREVIEW_TASK_PAGE:
+                processPreviewTask(context, request, response);
 
-        default:
-            log.warn(LogManager.getHeader(context,
-                "integrity_error",
-                UIUtil.getRequestLogInfo(request)));
-            JSPManager.showIntegrityError(request, response);
+                break;
+
+            case PERFORM_TASK_PAGE:
+                processPerformTask(context, request, response);
+
+                break;
+
+            case REJECT_REASON_PAGE:
+                processRejectReason(context, request, response);
+
+                break;
+
+            default:
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                                              UIUtil.getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
         }
     }
 
@@ -145,38 +144,36 @@ public class MyDSpaceServlet extends DSpaceServlet
     //             METHODS FOR PROCESSING POSTED FORMS
     //****************************************************************
     //****************************************************************
-
-    protected void processMainPage(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void processMainPage(Context context, HttpServletRequest request,
+                                   HttpServletResponse response)
+                            throws ServletException, IOException, SQLException, 
+                                   AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_own");
-    
+
         // Get workspace item, if any
         WorkspaceItem workspaceItem;
+
         try
         {
             int wsID = Integer.parseInt(request.getParameter("workspace_id"));
             workspaceItem = WorkspaceItem.find(context, wsID);
-        }
-        catch (NumberFormatException nfe)
+        } catch (NumberFormatException nfe)
         {
             workspaceItem = null;
         }
 
         // Get workflow item specified, if any
         WorkflowItem workflowItem;
+
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
             workflowItem = WorkflowItem.find(context, wfID);
-        }
-        catch (NumberFormatException nfe)
+        } catch (NumberFormatException nfe)
         {
             workflowItem = null;
         }
-            
 
         // Respond to button press
         boolean ok = false;
@@ -184,91 +181,81 @@ public class MyDSpaceServlet extends DSpaceServlet
         if (buttonPressed.equals("submit_new"))
         {
             // New submission: Redirect to submit
-            response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/submit"));
+            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
+                                                             "/submit"));
             ok = true;
-        }
-        else if (buttonPressed.equals("submit_own"))
+        } else if (buttonPressed.equals("submit_own"))
         {
             // Review own submissions
             showPreviousSubmissions(context, request, response);
             ok = true;
-        }
-        else if (buttonPressed.equals("submit_resume"))
+        } else if (buttonPressed.equals("submit_resume"))
         {
             // User clicked on a "Resume" button for a workspace item.
             String wsID = request.getParameter("workspace_id");
-            response.sendRedirect(response.encodeRedirectURL(
-                    request.getContextPath() + "/submit?resume=" + wsID));
+            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
+                                                             "/submit?resume=" +
+                                                             wsID));
             ok = true;
-        }
-        else if (buttonPressed.equals("submit_delete"))
+        } else if (buttonPressed.equals("submit_delete"))
         {
             // User clicked on a "Remove" button for a workspace item
             if (workspaceItem != null)
             {
-                log.info(LogManager.getHeader(context,
-                    "confirm_removal",
-                    "workspace_item_id=" + workspaceItem.getID()));
+                log.info(LogManager.getHeader(context, "confirm_removal",
+                                              "workspace_item_id=" +
+                                              workspaceItem.getID()));
 
                 request.setAttribute("workspace.item", workspaceItem);
-                JSPManager.showJSP(request,
-                    response,
-                    "/mydspace/remove-item.jsp");
-            }
-            else
+                JSPManager.showJSP(request, response,
+                                   "/mydspace/remove-item.jsp");
+            } else
             {
-                log.warn(LogManager.getHeader(context,
-                    "integrity_error",
-                    UIUtil.getRequestLogInfo(request)));
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                                              UIUtil.getRequestLogInfo(request)));
                 JSPManager.showIntegrityError(request, response);
             }
+
             ok = true;
-        }
-        else if (buttonPressed.equals("submit_claim"))
+        } else if (buttonPressed.equals("submit_claim"))
         {
             // User clicked "take task" button on workflow task
             if (workflowItem != null)
             {
-                log.info(LogManager.getHeader(context,
-                    "view_workflow",
-                    "workflow_id=" + workflowItem.getID()));
+                log.info(LogManager.getHeader(context, "view_workflow",
+                                              "workflow_id=" +
+                                              workflowItem.getID()));
 
                 request.setAttribute("workflow.item", workflowItem);
-                JSPManager.showJSP(request,
-                    response,
-                    "/mydspace/preview-task.jsp");
+                JSPManager.showJSP(request, response,
+                                   "/mydspace/preview-task.jsp");
                 ok = true;
             }
-        }
-        else if (buttonPressed.equals("submit_perform"))
+        } else if (buttonPressed.equals("submit_perform"))
         {
             // User clicked "Do This Task" button on workflow task
             if (workflowItem != null)
             {
-                log.info(LogManager.getHeader(context,
-                    "view_workflow",
-                    "workflow_id=" + workflowItem.getID()));
+                log.info(LogManager.getHeader(context, "view_workflow",
+                                              "workflow_id=" +
+                                              workflowItem.getID()));
 
                 request.setAttribute("workflow.item", workflowItem);
-                JSPManager.showJSP(request,
-                    response,
-                    "/mydspace/perform-task.jsp");
+                JSPManager.showJSP(request, response,
+                                   "/mydspace/perform-task.jsp");
                 ok = true;
             }
-        }
-        else if (buttonPressed.equals("submit_return"))
+        } else if (buttonPressed.equals("submit_return"))
         {
             // User clicked "Return to pool" button on workflow task
             if (workflowItem != null)
             {
-                log.info(LogManager.getHeader(context,
-                    "unclaim_workflow",
-                    "workflow_id=" + workflowItem.getID()));
+                log.info(LogManager.getHeader(context, "unclaim_workflow",
+                                              "workflow_id=" +
+                                              workflowItem.getID()));
 
-                WorkflowManager.unclaim(context,
-                    workflowItem,
-                    context.getCurrentUser());
+                WorkflowManager.unclaim(context, workflowItem,
+                                        context.getCurrentUser());
 
                 showMainPage(context, request, response);
                 context.complete();
@@ -278,13 +265,11 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         if (ok == false)
         {
-            log.warn(LogManager.getHeader(context,
-                "integrity_error",
-                UIUtil.getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                                          UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
         }
     }
-
 
     /**
      * Process input from remove item page
@@ -293,10 +278,10 @@ public class MyDSpaceServlet extends DSpaceServlet
      * @param request   current servlet request object
      * @param response  current servlet response object
      */
-    private void processRemoveItem(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    private void processRemoveItem(Context context, HttpServletRequest request,
+                                   HttpServletResponse response)
+                            throws ServletException, IOException, SQLException, 
+                                   AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_cancel");
 
@@ -307,40 +292,37 @@ public class MyDSpaceServlet extends DSpaceServlet
         {
             int wsID = Integer.parseInt(request.getParameter("workspace_id"));
             workspaceItem = WorkspaceItem.find(context, wsID);
-        }
-        catch (NumberFormatException nfe)
+        } catch (NumberFormatException nfe)
         {
             workspaceItem = null;
         }
 
         if (workspaceItem == null)
         {
-            log.warn(LogManager.getHeader(context,
-                "integrity_error",
-                UIUtil.getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                                          UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
+
             return;
         }
-        
+
         // We have a workspace item
         if (buttonPressed.equals("submit_delete"))
         {
             // User has clicked on "delete"
-            log.info(LogManager.getHeader(context,
-                "remove_submission",
-                "workspace_item_id=" + workspaceItem.getID() +
-                ",item_id=" + workspaceItem.getItem().getID()));
+            log.info(LogManager.getHeader(context, "remove_submission",
+                                          "workspace_item_id=" +
+                                          workspaceItem.getID() + ",item_id=" +
+                                          workspaceItem.getItem().getID()));
             workspaceItem.deleteAll();
             showMainPage(context, request, response);
             context.complete();
-        }
-        else
+        } else
         {
             // User has cancelled.  Back to main page.
             showMainPage(context, request, response);
         }
     }
-
 
     /**
      * Process input from preview task page
@@ -350,55 +332,50 @@ public class MyDSpaceServlet extends DSpaceServlet
      * @param response  current servlet response object
      */
     private void processPreviewTask(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+                                    HttpServletRequest request,
+                                    HttpServletResponse response)
+                             throws ServletException, IOException, SQLException, 
+                                    AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_cancel");
 
         // Get workflow item
         WorkflowItem workflowItem;
+
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
             workflowItem = WorkflowItem.find(context, wfID);
-        }
-        catch (NumberFormatException nfe)
+        } catch (NumberFormatException nfe)
         {
             workflowItem = null;
         }
 
         if (workflowItem == null)
         {
-            log.warn(LogManager.getHeader(context,
-                "integrity_error",
-                UIUtil.getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                                          UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
+
             return;
         }
-            
 
         if (buttonPressed.equals("submit_start"))
         {
             // User clicked "start" button to claim the task
-            WorkflowManager.claim(context,
-                workflowItem,
-                context.getCurrentUser());
+            WorkflowManager.claim(context, workflowItem,
+                                  context.getCurrentUser());
 
             // Display "perform task" page
             request.setAttribute("workflow.item", workflowItem);
-            JSPManager.showJSP(request,
-                response,
-                "/mydspace/perform-task.jsp");
+            JSPManager.showJSP(request, response, "/mydspace/perform-task.jsp");
             context.complete();
-        }
-        else
+        } else
         {
             // Return them to main page
             showMainPage(context, request, response);
         }
     }
-
 
     /**
      * Process input from perform task page
@@ -408,42 +385,41 @@ public class MyDSpaceServlet extends DSpaceServlet
      * @param response  current servlet response object
      */
     private void processPerformTask(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+                                    HttpServletRequest request,
+                                    HttpServletResponse response)
+                             throws ServletException, IOException, SQLException, 
+                                    AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_cancel");
 
         // Get workflow item
         WorkflowItem workflowItem;
+
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
             workflowItem = WorkflowItem.find(context, wfID);
-        }
-        catch (NumberFormatException nfe)
+        } catch (NumberFormatException nfe)
         {
             workflowItem = null;
         }
 
         if (workflowItem == null)
         {
-            log.warn(LogManager.getHeader(context,
-                "integrity_error",
-                UIUtil.getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                                          UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
+
             return;
         }
-        
 
         if (buttonPressed.equals("submit_approve"))
         {
             Item item = workflowItem.getItem();
 
             // Advance the item along the workflow
-            WorkflowManager.advance(context,
-                workflowItem,
-                context.getCurrentUser());
+            WorkflowManager.advance(context, workflowItem,
+                                    context.getCurrentUser());
 
             // FIXME: This should be a return value from advance()
             // See if that gave the item a Handle.  If it did,
@@ -456,59 +432,51 @@ public class MyDSpaceServlet extends DSpaceServlet
                 String displayHandle = HandleManager.getCanonicalForm(handle);
 
                 request.setAttribute("handle", displayHandle);
-                JSPManager.showJSP(request, response,
-                    "/mydspace/in-archive.jsp");
-            }
-            else
+                JSPManager.showJSP(request, response, "/mydspace/in-archive.jsp");
+            } else
             {
                 JSPManager.showJSP(request, response,
-                    "/mydspace/task-complete.jsp");
+                                   "/mydspace/task-complete.jsp");
             }
+
             context.complete();
-        }
-        else if (buttonPressed.equals("submit_reject"))
+        } else if (buttonPressed.equals("submit_reject"))
         {
             // Submission rejected.  Ask the user for a reason
-            log.info(LogManager.getHeader(context,
-                "get_reject_reason",
-                "workflow_id=" + workflowItem.getID() + ",item_id=" +
-                workflowItem.getItem().getID()));
+            log.info(LogManager.getHeader(context, "get_reject_reason",
+                                          "workflow_id=" +
+                                          workflowItem.getID() + ",item_id=" +
+                                          workflowItem.getItem().getID()));
 
             request.setAttribute("workflow.item", workflowItem);
-            JSPManager.showJSP(request, response,
-                "/mydspace/reject-reason.jsp");
-        }
-        else if (buttonPressed.equals("submit_edit"))
+            JSPManager.showJSP(request, response, "/mydspace/reject-reason.jsp");
+        } else if (buttonPressed.equals("submit_edit"))
         {
             // FIXME: Check auth
-            log.info(LogManager.getHeader(context,
-                "edit_workflow_item",
-                "workflow_id=" + workflowItem.getID() + ",item_id=" +
-                workflowItem.getItem().getID()));
+            log.info(LogManager.getHeader(context, "edit_workflow_item",
+                                          "workflow_id=" +
+                                          workflowItem.getID() + ",item_id=" +
+                                          workflowItem.getItem().getID()));
 
             // Forward control to the submission interface
             // with the relevant item
-            response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/submit?workflow=" +
-                    workflowItem.getID()));
-        }
-        else if (buttonPressed.equals("submit_pool"))
+            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
+                                                             "/submit?workflow=" +
+                                                             workflowItem.getID()));
+        } else if (buttonPressed.equals("submit_pool"))
         {
             // Return task to pool
-            WorkflowManager.unclaim(context,
-                workflowItem,
-                context.getCurrentUser());
+            WorkflowManager.unclaim(context, workflowItem,
+                                    context.getCurrentUser());
             showMainPage(context, request, response);
             context.complete();
-        }
-        else
+        } else
         {
             // Cancelled.  The user hasn't taken the task.
             // Just return to the main My DSpace page.
             showMainPage(context, request, response);
         }
     }
-
 
     /**
      * Process input from "reason for rejection" page
@@ -518,62 +486,56 @@ public class MyDSpaceServlet extends DSpaceServlet
      * @param response  current servlet response object
      */
     private void processRejectReason(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+                                     HttpServletRequest request,
+                                     HttpServletResponse response)
+                              throws ServletException, IOException, 
+                                     SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_cancel");
 
         // Get workflow item
         WorkflowItem workflowItem;
+
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
             workflowItem = WorkflowItem.find(context, wfID);
-        }
-        catch (NumberFormatException nfe)
+        } catch (NumberFormatException nfe)
         {
             workflowItem = null;
         }
 
         if (workflowItem == null)
         {
-            log.warn(LogManager.getHeader(context,
-                "integrity_error",
-                UIUtil.getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                                          UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
+
             return;
         }
-        
-		
+
         if (buttonPressed.equals("submit_send"))
         {
             String reason = request.getParameter("reason");
 
-            WorkspaceItem wsi = WorkflowManager.reject(context,
-                workflowItem,
-                context.getCurrentUser(),
-                reason);
+            WorkspaceItem wsi = WorkflowManager.reject(context, workflowItem,
+                                                       context.getCurrentUser(),
+                                                       reason);
 
             // Set the "stage_reached" column on the returned workspace item
             // to the "verify" stage
             wsi.setStageReached(SubmitServlet.REVIEW_SUBMISSION);
             wsi.update();
 
-            JSPManager.showJSP(request, response,
-                "/mydspace/task-complete.jsp");
+            JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
             context.complete();
-        }
-        else
+        } else
         {
             request.setAttribute("workflow.item", workflowItem);
-            JSPManager.showJSP(request,
-                response,
-                "/mydspace/perform-task.jsp");
+            JSPManager.showJSP(request, response, "/mydspace/perform-task.jsp");
         }
     }
 
-	
     //****************************************************************
     //****************************************************************
     //             METHODS FOR SHOWING FORMS
@@ -587,35 +549,33 @@ public class MyDSpaceServlet extends DSpaceServlet
      * @param request   current servlet request object
      * @param response  current servlet response object
      */
-    private void showMainPage(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    private void showMainPage(Context context, HttpServletRequest request,
+                              HttpServletResponse response)
+                       throws ServletException, IOException, SQLException, 
+                              AuthorizeException
     {
-        log.info(LogManager.getHeader(context,
-            "view_mydspace",
-            ""));
+        log.info(LogManager.getHeader(context, "view_mydspace", ""));
 
         // FIXME: WorkflowManager should return arrays
         List ownedList = WorkflowManager.getOwnedTasks(context,
-            context.getCurrentUser());
+                                                       context.getCurrentUser());
         WorkflowItem[] owned = new WorkflowItem[ownedList.size()];
         owned = (WorkflowItem[]) ownedList.toArray(owned);
 
         // Pooled workflow items
         List pooledList = WorkflowManager.getPooledTasks(context,
-            context.getCurrentUser());
+                                                         context.getCurrentUser());
         WorkflowItem[] pooled = new WorkflowItem[pooledList.size()];
         pooled = (WorkflowItem[]) pooledList.toArray(pooled);
 
         // User's WorkflowItems
         WorkflowItem[] workflowItems = WorkflowItem.findByEPerson(context,
-            context.getCurrentUser());
+                                                                  context.getCurrentUser());
 
         // User's PersonalWorkspace
         WorkspaceItem[] workspaceItems = WorkspaceItem.findByEPerson(context,
-            context.getCurrentUser());
-        
+                                                                     context.getCurrentUser());
+
         // Set attributes
         request.setAttribute("mydspace.user", context.getCurrentUser());
         request.setAttribute("workspace.items", workspaceItems);
@@ -627,7 +587,6 @@ public class MyDSpaceServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/mydspace/main.jsp");
     }
 
-
     /**
      * Show the user's previous submissions.
      *
@@ -636,36 +595,35 @@ public class MyDSpaceServlet extends DSpaceServlet
      * @param response  current servlet response object
      */
     private void showPreviousSubmissions(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+                                         HttpServletRequest request,
+                                         HttpServletResponse response)
+                                  throws ServletException, IOException, 
+                                         SQLException, AuthorizeException
     {
         ItemIterator subs = Item.findBySubmitter(context,
-            context.getCurrentUser());
+                                                 context.getCurrentUser());
 
         // Turn the iterator into a list
         List subList = new LinkedList();
+
         while (subs.hasNext())
         {
             subList.add(subs.next());
         }
-        
+
         Item[] items = new Item[subList.size()];
-        
+
         for (int i = 0; i < subList.size(); i++)
         {
             items[i] = (Item) subList.get(i);
         }
 
-        log.info(LogManager.getHeader(context,
-            "view_own_submissions",
-            "count=" + items.length));
+        log.info(LogManager.getHeader(context, "view_own_submissions",
+                                      "count=" + items.length));
 
         request.setAttribute("user", context.getCurrentUser());
         request.setAttribute("items", items);
 
-        JSPManager.showJSP(request,
-            response,
-            "/mydspace/own-submissions.jsp");
+        JSPManager.showJSP(request, response, "/mydspace/own-submissions.jsp");
     }
 }

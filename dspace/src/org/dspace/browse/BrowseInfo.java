@@ -37,12 +37,13 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.browse;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 import org.dspace.content.Item;
+
 
 /**
  * The results of a Browse method call.
@@ -63,10 +64,8 @@ import org.dspace.content.Item;
  * <p>offset is the position of the requested object within the results.
  * This position is also 0-based.</p>
  */
-
 public class BrowseInfo
 {
-
     /**
      * The results of the browse.
      */
@@ -104,14 +103,12 @@ public class BrowseInfo
      * @param offset The position of the requested item in the set of
      * results
      */
-    public BrowseInfo (List results,
-        int overallPosition,
-        int total,
-        int offset
-    )
+    public BrowseInfo(List results, int overallPosition, int total, int offset)
     {
         if (results == null)
+        {
             throw new IllegalArgumentException("Null result list not allowed");
+        }
 
         this.results = Collections.unmodifiableList(results);
         this.overallPosition = overallPosition;
@@ -211,7 +208,7 @@ public class BrowseInfo
      */
     public boolean isLast()
     {
-        return overallPosition + getResultCount() == total;
+        return (overallPosition + getResultCount()) == total;
     }
 
     /**

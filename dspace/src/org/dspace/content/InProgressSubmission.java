@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
 import java.io.IOException;
@@ -45,6 +44,7 @@ import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
+
 
 
 /**
@@ -63,19 +63,15 @@ public interface InProgressSubmission
      */
     int getID();
 
-
     /**
      * Deletes submission wrapper, doesn't delete item contents
      */
-    void deleteWrapper()
-        throws SQLException, IOException, AuthorizeException;
+    void deleteWrapper() throws SQLException, IOException, AuthorizeException;
 
     /**
      * Update the submission, including the unarchived item.
      */
-    void update()
-        throws SQLException, IOException, AuthorizeException;
-
+    void update() throws SQLException, IOException, AuthorizeException;
 
     /**
      * Get the incomplete item object
@@ -83,7 +79,6 @@ public interface InProgressSubmission
      * @return  the item
      */
     Item getItem();
-    
 
     /**
      * Get the collection being submitted to
@@ -92,14 +87,12 @@ public interface InProgressSubmission
      */
     Collection getCollection();
 
-    
     /**
      * Get the submitter
      *
      * @return  the submitting e-person
      */
     EPerson getSubmitter();
-    
 
     /**
      * Find out if the submission has (or is intended to have) more than
@@ -109,7 +102,6 @@ public interface InProgressSubmission
      */
     boolean hasMultipleFiles();
 
-    
     /**
      * Indicate whether the submission is intended to have more than one
      * file.
@@ -117,7 +109,6 @@ public interface InProgressSubmission
      * @param b  if <code>true</code>, submission may have more than one file.
      */
     void setMultipleFiles(boolean b);
-    
 
     /**
      * Find out if the submission has (or is intended to have) more than
@@ -126,7 +117,7 @@ public interface InProgressSubmission
      * @return  <code>true</code> if there is to be more than one file.
      */
     boolean hasMultipleTitles();
-    
+
     /**
      * Indicate whether the submission is intended to have more than one
      * title.
@@ -134,7 +125,6 @@ public interface InProgressSubmission
      * @param b  if <code>true</code>, submission may have more than one title.
      */
     void setMultipleTitles(boolean b);
-
 
     /**
      * Find out if the submission has been published or publicly
@@ -144,7 +134,6 @@ public interface InProgressSubmission
      */
     boolean isPublishedBefore();
 
-    
     /**
      * Indicate whether the submission has been published or publicly
      * distributed before

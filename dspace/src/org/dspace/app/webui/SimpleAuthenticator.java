@@ -39,22 +39,19 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.app.webui.SiteAuthenticator;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
+
 
 /**
  * MIT implementation of DSpace Web UI authentication.  This version detects
@@ -74,20 +71,18 @@ public class SimpleAuthenticator implements SiteAuthenticator
     private static Logger log = Logger.getLogger(SiteAuthenticator.class);
 
     public void startAuthentication(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException
+                                    HttpServletRequest request,
+                                    HttpServletResponse response)
+                             throws ServletException, IOException
     {
         // Present the username/password screen
-        response.sendRedirect(response.encodeRedirectURL(
-            request.getContextPath() + "/password-login"));
+        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
+                                                         "/password-login"));
     }
 
-
-    public int[] getSpecialGroups(Context context,
-        HttpServletRequest request)
-        throws SQLException
-    {        
+    public int[] getSpecialGroups(Context context, HttpServletRequest request)
+                           throws SQLException
+    {
         // Return a list of special group IDs.
         return new int[0];
     }
@@ -101,15 +96,14 @@ public class SimpleAuthenticator implements SiteAuthenticator
      * @param email     e-mail address of user attempting to register
      *
      */
-    public boolean allowSetPassword(Context context, HttpServletRequest request,
-        String email)
-        throws SQLException
+    public boolean allowSetPassword(Context context,
+                                    HttpServletRequest request, String email)
+                             throws SQLException
     {
         // Anyone can set themselves a password
         return true;
     }
 
-    
     /** Indicate whether or not a particular user can self-register, based
      * on e-mail address.
      *
@@ -120,13 +114,12 @@ public class SimpleAuthenticator implements SiteAuthenticator
      *
      */
     public boolean canSelfRegister(Context context, HttpServletRequest request,
-        String email) throws SQLException
+                                   String email) throws SQLException
     {
         // Anyone can register
         return true;
     }
 
-    
     /** Initialise a new e-person record for a self-registered new user.
      *
      * @param context   DSpace context
@@ -136,7 +129,7 @@ public class SimpleAuthenticator implements SiteAuthenticator
      *
      */
     public void initEPerson(Context context, HttpServletRequest request,
-        EPerson eperson) throws SQLException
+                            EPerson eperson) throws SQLException
     {
         // Any default fields set in an e-person record would be set here
     }

@@ -1,3 +1,13 @@
+1.2.1-beta3
+===========
+(Jim Downing)
+- Merged patch for community permissions bug and fixed collection admin permissions bug
+- Auto formatted code to DSpace house style
+- Sorted imports in all source
+- Updated references to deprecated methods
+- Cleaned up some potential bugs spotted by findbugs
+
+
 1.2.1-beta1
 ===========
 (Scott Yeadon)

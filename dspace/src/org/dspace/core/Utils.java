@@ -37,16 +37,18 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
-
 package org.dspace.core;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.rmi.dgc.VMID;
-import java.security.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
-
 /**
  * Utility functions for DSpace.
  *
@@ -60,7 +62,9 @@ public class Utils
     private static VMID vmid = new VMID();
 
     /** Private Constructor */
-    private Utils () {}
+    private Utils()
+    {
+    }
 
     /**
      * Return an MD5 checksum for data in hex format.
@@ -97,9 +101,9 @@ public class Utils
             MessageDigest digest = MessageDigest.getInstance("MD5");
 
             return digest.digest(data);
+        } catch (NoSuchAlgorithmException nsae)
+        {
         }
-        catch (NoSuchAlgorithmException nsae)
-        {}
 
         // Should never happen
         return null;
@@ -114,14 +118,16 @@ public class Utils
     public static String toHex(byte[] data)
     {
         if ((data == null) || (data.length == 0))
+        {
             return null;
+        }
 
         StringBuffer result = new StringBuffer();
 
         // This is far from the most efficient way to do things...
         for (int i = 0; i < data.length; i++)
         {
-            int low =  (int) (data[i] & 0x0F);
+            int low = (int) (data[i] & 0x0F);
             int high = (int) (data[i] & 0xF0);
 
             result.append(Integer.toHexString(high).substring(0, 1));
@@ -164,7 +170,10 @@ public class Utils
 
         random.nextBytes(junk);
 
-        String input = new StringBuffer().append(vmid).append(new java.util.Date()).append(junk).append(counter++).toString();
+        String input = new StringBuffer().append(vmid)
+                                         .append(new java.util.Date())
+                                         .append(junk).append(counter++)
+                                         .toString();
 
         return getMD5Bytes(input.getBytes());
     }
@@ -180,19 +189,23 @@ public class Utils
      * @param input The InputStream to obtain data from.
      * @param output The OutputStream to copy data to.
      */
-    public static void copy( final InputStream input, final OutputStream output )
-        throws IOException
+    public static void copy(final InputStream input, final OutputStream output)
+                     throws IOException
     {
         final int BUFFER_SIZE = 1024 * 4;
-        final byte[] buffer = new byte[ BUFFER_SIZE ];
+        final byte[] buffer = new byte[BUFFER_SIZE];
 
-        while( true )
+        while (true)
         {
-            final int count = input.read( buffer, 0, BUFFER_SIZE );
-            if( -1 == count ) break;
+            final int count = input.read(buffer, 0, BUFFER_SIZE);
+
+            if (-1 == count)
+            {
+                break;
+            }
 
             // write out those same bytes
-            output.write( buffer, 0, count );
+            output.write(buffer, 0, count);
         }
 
         //needed to flush cache
@@ -209,39 +222,39 @@ public class Utils
      * @param source The InputStream to obtain data from.
      * @param destination The OutputStream to copy data to.
      */
-    public static void bufferedCopy( final InputStream source, final OutputStream destination )
-        throws IOException
+    public static void bufferedCopy(final InputStream source,
+                                    final OutputStream destination)
+                             throws IOException
     {
-        final BufferedInputStream input = new BufferedInputStream( source );
-        final BufferedOutputStream output = new BufferedOutputStream( destination );
-        copy( input, output );
+        final BufferedInputStream input = new BufferedInputStream(source);
+        final BufferedOutputStream output = new BufferedOutputStream(destination);
+        copy(input, output);
         output.flush();
     }
-    
-     /**
-     * Replace characters that could be interpreted as HTML codes with symbolic
-     * references (entities). This function should be called before displaying any metadata
-     * fields that could contain the characters "<", ">", "&", "'", and 
-     * double quotation marks.
-     * This will effectively disable HTML links in metadata.
-     *
-     * @param value     the metadata value to be scrubbed for display
-     *
-     * @return      the passed-in string, with html special characters replaced 
-     * with entities.
-     */
+
+    /**
+    * Replace characters that could be interpreted as HTML codes with symbolic
+    * references (entities). This function should be called before displaying any metadata
+    * fields that could contain the characters "<", ">", "&", "'", and
+    * double quotation marks.
+    * This will effectively disable HTML links in metadata.
+    *
+    * @param value     the metadata value to be scrubbed for display
+    *
+    * @return      the passed-in string, with html special characters replaced
+    * with entities.
+    */
     public static String addEntities(String value)
     {
         value = value.replaceAll("&", "&amp;");
         value = value.replaceAll("\"", "&quot;");
-	// actually, &apos; is an XML entity, not in HTML.
-	// that's why it's commented out.
+
+        // actually, &apos; is an XML entity, not in HTML.
+        // that's why it's commented out.
         //value = value.replaceAll("'", "&apos;");
         value = value.replaceAll("<", "&lt;");
-        value = value.replaceAll(">", "&gt;");  
+        value = value.replaceAll(">", "&gt;");
 
-        
         return value;
-        
     }
 }

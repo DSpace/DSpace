@@ -35,14 +35,17 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.search;
 
-import java.util.Hashtable;
 import java.io.Reader;
+import java.util.Hashtable;
 
-import org.apache.lucene.analysis.*;
-import org.apache.lucene.analysis.standard.*;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.LowerCaseFilter;
+import org.apache.lucene.analysis.PorterStemFilter;
+import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.standard.StandardFilter;
 
 
 /**
@@ -50,42 +53,37 @@ import org.apache.lucene.analysis.standard.*;
  *  standard filter, lowercase filter, stemming
  *  and stopword filters.
  */
-
 public class DSAnalyzer extends Analyzer
 {
     /*
      * An array containing some common words that
      * are not usually useful for searching.
      */
-    private static final String[] STOP_WORDS =
-    {
-
-            // new stopwords (per MargretB)
-            "a", "am", "and", "are", "as",
-            "at", "be", "but", "by",
-            "for", "if", "in", "into",
-            "is", "it", "no", "not",
-            "of", "on", "or", "the",
-            "to", "was"
-
-            // old stopwords (Lucene default)
-            /*		"a",	"and",	"are",	"as",
-             "at",	"be",	"but",	"by",
-             "for",	"if",	"in",	"into",
-             "is",	"it",	"no",	"not",
-             "of",	"on",	"or",	"s",
-             "such",	"t",	"that",	"the",
-             "their","then", "there","these",
-             "they",	"this", "to",	"was",
-             "will",	"with"
-             */
+    private static final String[] STOP_WORDS = 
+                                               {
+                                                   
+    // new stopwords (per MargretB)
+    "a", "am", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in",
+                                                   "into", "is", "it", "no",
+                                                   "not", "of", "on", "or",
+                                                   "the", "to", "was"
+                                               // old stopwords (Lucene default)
+    /*                "a",        "and",        "are",        "as",
+     "at",        "be",        "but",        "by",
+     "for",        "if",        "in",        "into",
+     "is",        "it",        "no",        "not",
+     "of",        "on",        "or",        "s",
+     "such",        "t",        "that",        "the",
+     "their","then", "there","these",
+     "they",        "this", "to",        "was",
+     "will",        "with"
+     */
     };
 
     /*
      * Stop table
      */
-    final static private Hashtable stopTable =
-            StopFilter.makeStopTable(STOP_WORDS);
+    final static private Hashtable stopTable = StopFilter.makeStopTable(STOP_WORDS);
 
     /*
      * Create a token stream for this analyzer.
@@ -94,9 +92,9 @@ public class DSAnalyzer extends Analyzer
     {
         TokenStream result = new DSTokenizer(reader);
 
-        result = new StandardFilter  (result);
-        result = new LowerCaseFilter (result);
-        result = new StopFilter      (result, stopTable);
+        result = new StandardFilter(result);
+        result = new LowerCaseFilter(result);
+        result = new StopFilter(result, stopTable);
         result = new PorterStemFilter(result);
 
         return result;

@@ -37,38 +37,24 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.license;
-
-/**
- * Class representing configuration and basic things for 
- * Creative Commons Licenses. Eventually this will do caching 
- * of such information instead of querying the CC site all the time.
- * <p>
- * This contains mostly static methods (we could build an object model, but
- * there's really no point in that for such simple things).
- *
- * @author   Ben Adida (ben@mit.edu)
- * @version  $Revision$
- */
-
-import org.dspace.content.Item;
-import org.dspace.content.Bundle;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.core.Utils;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.core.Context;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.SQLException;
-import java.net.*;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.Utils;
+
 
 public class CreativeCommons
 {
@@ -84,164 +70,187 @@ public class CreativeCommons
     private static final String BSN_LICENSE_URL = "license_url";
     private static final String BSN_LICENSE_TEXT = "license_text";
     private static final String BSN_LICENSE_RDF = "license_rdf";
-
     private static boolean enabled_p;
 
-    static {
-	// we only check the property once
-	enabled_p = ConfigurationManager.getBooleanProperty("webui.submit.enable-cc");
+    static
+    {
+        // we only check the property once
+        enabled_p = ConfigurationManager.getBooleanProperty("webui.submit.enable-cc");
+
         if (enabled_p)
-	{
+        {
             // if defined, set a proxy server for http requests to Creative Commons site
             String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
             String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
-            if ( proxyHost != null && proxyPort != null )
-	    {
-		System.setProperty("http.proxyHost", proxyHost);
+
+            if ((proxyHost != null) && (proxyPort != null))
+            {
+                System.setProperty("http.proxyHost", proxyHost);
                 System.setProperty("http.proxyPort", proxyPort);
             }
         }
     }
 
     /**
-     * Simple accessor for enabling of CC 
+     * Simple accessor for enabling of CC
      **/
-    public static boolean isEnabled() {
-	return enabled_p;
+    public static boolean isEnabled()
+    {
+        return enabled_p;
     }
-    
+
     /**
      * This is a bit of the "do-the-right-thing" method
      * for CC stuff in an item
      */
-    public static void setLicense(Context context, 
-				    Item item, String cc_license_url) 
-	throws SQLException, IOException, AuthorizeException 
+    public static void setLicense(Context context, Item item,
+                                  String cc_license_url)
+                           throws SQLException, IOException, AuthorizeException
     {
-	// only if CC is enabled
-	if (!CreativeCommons.isEnabled())
-	    return;
+        // only if CC is enabled
+        if (!CreativeCommons.isEnabled())
+        {
+            return;
+        }
 
-	// create the CC bundle if it doesn't exist
+        // create the CC bundle if it doesn't exist
         // If it does, remove it and create a new one.
         Bundle[] bundles = item.getBundles(CC_BUNDLE_NAME);
-        if (bundles.length > 0 && bundles[0] != null)
-	{
+
+        if ((bundles.length > 0) && (bundles[0] != null))
+        {
             item.removeBundle(bundles[0]);
         }
-	Bundle bundle = item.createBundle(CC_BUNDLE_NAME);
 
-	// get some more information
-	String license_text = fetchLicenseText(cc_license_url);
-	String license_rdf = fetchLicenseRDF(cc_license_url);
+        Bundle bundle = item.createBundle(CC_BUNDLE_NAME);
 
-	// here we need to transform the license_rdf into a document_rdf
-	// first we find the beginning of "<License"
-	int license_start = license_rdf.indexOf("<License");
-	// the 10 is the length of the license closing tag.
-	int license_end = license_rdf.indexOf("</License>") + 10;
-	String document_rdf = "<rdf:RDF xmlns=\"http://web.resource.org/cc/\"\n" + 
-	    "   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n" + 
-	    "   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" + 
-	    "<Work rdf:about=\"\">\n" +
-	    "<license rdf:resource=\"" + cc_license_url + "\">\n" + 
-	    "</Work>\n\n" +
-	    license_rdf.substring(license_start,license_end) +
-	    "\n\n</rdf:RDF>";
+        // get some more information
+        String license_text = fetchLicenseText(cc_license_url);
+        String license_rdf = fetchLicenseRDF(cc_license_url);
 
-	// set the format
-        BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(
-            context, "License");
+        // here we need to transform the license_rdf into a document_rdf
+        // first we find the beginning of "<License"
+        int license_start = license_rdf.indexOf("<License");
 
-	// set the URL bitstream
-	setBitstreamFromBytes(item, bundle, BSN_LICENSE_URL, bs_format, cc_license_url.getBytes());
+        // the 10 is the length of the license closing tag.
+        int license_end = license_rdf.indexOf("</License>") + 10;
+        String document_rdf = "<rdf:RDF xmlns=\"http://web.resource.org/cc/\"\n" +
+                              "   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n" +
+                              "   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
+                              "<Work rdf:about=\"\">\n" +
+                              "<license rdf:resource=\"" + cc_license_url +
+                              "\">\n" + "</Work>\n\n" +
+                              license_rdf.substring(license_start, license_end) +
+                              "\n\n</rdf:RDF>";
 
-	// set the license text bitstream
-	setBitstreamFromBytes(item, bundle, BSN_LICENSE_TEXT, bs_format, license_text.getBytes());
-	
-	// set the RDF bitstream
-	setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_format, document_rdf.getBytes());
+        // set the format
+        BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(context,
+                                                                           "License");
+
+        // set the URL bitstream
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_URL, bs_format,
+                              cc_license_url.getBytes());
+
+        // set the license text bitstream
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_TEXT, bs_format,
+                              license_text.getBytes());
+
+        // set the RDF bitstream
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_format,
+                              document_rdf.getBytes());
     }
 
-    public static void removeLicense(Context context, Item item) 
-	throws SQLException, IOException, AuthorizeException 
+    public static void removeLicense(Context context, Item item)
+                              throws SQLException, IOException, 
+                                     AuthorizeException
     {
-	// only if CC is enabled
-	if (!CreativeCommons.isEnabled())
-	    return;
+        // only if CC is enabled
+        if (!CreativeCommons.isEnabled())
+        {
+            return;
+        }
 
-	// remove CC license bundle if one exists
+        // remove CC license bundle if one exists
         Bundle[] bundles = item.getBundles(CC_BUNDLE_NAME);
-        if (bundles.length > 0 && bundles[0] != null )
-	{
+
+        if ((bundles.length > 0) && (bundles[0] != null))
+        {
             item.removeBundle(bundles[0]);
         }
     }
 
     public static boolean hasLicense(Context context, Item item)
-        throws SQLException, IOException
+                              throws SQLException, IOException
     {
-	// only if CC is enabled
-	if (!CreativeCommons.isEnabled())
-	    return false;
-
-	// try to find CC license bundle
-        Bundle[] bundles = item.getBundles(CC_BUNDLE_NAME);
-        if (bundles.length == 0)
-	{
+        // only if CC is enabled
+        if (!CreativeCommons.isEnabled())
+        {
             return false;
         }
-       
+
+        // try to find CC license bundle
+        Bundle[] bundles = item.getBundles(CC_BUNDLE_NAME);
+
+        if (bundles.length == 0)
+        {
+            return false;
+        }
+
         // verify it has correct contents
         try
-	{
-          if (getLicenseURL(item) == null ||
-              getLicenseText(item) == null ||
-              getLicenseRDF(item) == null)
-	  {
-	      return false;
-          }
-        }
-        catch (AuthorizeException ae)
-	{
+        {
+            if ((getLicenseURL(item) == null) ||
+                    (getLicenseText(item) == null) ||
+                    (getLicenseRDF(item) == null))
+            {
+                return false;
+            }
+        } catch (AuthorizeException ae)
+        {
             return false;
         }
-     
-        return true; 
+
+        return true;
     }
 
     public static String getLicenseURL(Item item)
-        throws SQLException, IOException, AuthorizeException
+                                throws SQLException, IOException, 
+                                       AuthorizeException
     {
-	return getStringFromBitstream(item, BSN_LICENSE_URL);
+        return getStringFromBitstream(item, BSN_LICENSE_URL);
     }
 
     public static String getLicenseText(Item item)
-	throws SQLException, IOException, AuthorizeException
+                                 throws SQLException, IOException, 
+                                        AuthorizeException
     {
-	return getStringFromBitstream(item, BSN_LICENSE_TEXT);
+        return getStringFromBitstream(item, BSN_LICENSE_TEXT);
     }
 
     public static String getLicenseRDF(Item item)
-	throws SQLException, IOException, AuthorizeException
+                                throws SQLException, IOException, 
+                                       AuthorizeException
     {
-	return getStringFromBitstream(item, BSN_LICENSE_RDF);
+        return getStringFromBitstream(item, BSN_LICENSE_RDF);
     }
 
     /**
      * Get a few license-specific properties. We expect these to
      * be cached at least per server run.
      */
-
-    public static String fetchLicenseText(String license_url) {
-	String text_url = license_url;
+    public static String fetchLicenseText(String license_url)
+    {
+        String text_url = license_url;
         byte[] urlBytes = fetchURL(text_url);
+
         return (urlBytes != null) ? new String(urlBytes) : "";
     }
 
-    public static String fetchLicenseRDF(String license_url) {
-	String rdf_url = license_url + "rdf";
+    public static String fetchLicenseRDF(String license_url)
+    {
+        String rdf_url = license_url + "rdf";
         byte[] urlBytes = fetchURL(rdf_url);
+
         return (urlBytes != null) ? new String(urlBytes) : "";
     }
 
@@ -253,40 +262,47 @@ public class CreativeCommons
      * takes some bytes and stores them as a bitstream
      * for an item, under the CC bundle, with the given bitstream name
      **/
-    private static void setBitstreamFromBytes(Item item, Bundle bundle, String bitstream_name, BitstreamFormat format, byte[] bytes) 
-	throws SQLException, IOException, AuthorizeException    
+    private static void setBitstreamFromBytes(Item item, Bundle bundle,
+                                              String bitstream_name,
+                                              BitstreamFormat format,
+                                              byte[] bytes)
+                                       throws SQLException, IOException, 
+                                              AuthorizeException
     {
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        Bitstream bs = bundle.createBitstream(bais);
 
-	ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-	Bitstream bs = bundle.createBitstream(bais);
-
-	bs.setName(bitstream_name);
-	bs.setSource(CC_BS_SOURCE);
+        bs.setName(bitstream_name);
+        bs.setSource(CC_BS_SOURCE);
 
         bs.setFormat(format);
 
-	// commit everything
-	bs.update();
-
+        // commit everything
+        bs.update();
     }
 
     /**
      * This helper method wraps a String around a byte array
      * returned from the bitstream method further down
      **/
-    private static String getStringFromBitstream(Item item, String bitstream_name) 
-	throws SQLException, IOException, AuthorizeException
+    private static String getStringFromBitstream(Item item,
+                                                 String bitstream_name)
+                                          throws SQLException, IOException, 
+                                                 AuthorizeException
     {
-	if (!CreativeCommons.isEnabled())
-	    return null;
+        if (!CreativeCommons.isEnabled())
+        {
+            return null;
+        }
 
-	byte[] bytes = getBytesFromBitstream(item, bitstream_name);
+        byte[] bytes = getBytesFromBitstream(item, bitstream_name);
 
-	if (bytes == null) {
-	    return null;
-	}
+        if (bytes == null)
+        {
+            return null;
+        }
 
-	return new String(bytes);
+        return new String(bytes);
     }
 
     /**
@@ -294,62 +310,78 @@ public class CreativeCommons
      * retrieves the bytes of a bitstream for an item under the CC bundle,
      * with the given bitstream name
      **/
-    private static byte[] getBytesFromBitstream(Item item, String bitstream_name) 
-	throws SQLException, IOException, AuthorizeException
+    private static byte[] getBytesFromBitstream(Item item, String bitstream_name)
+                                         throws SQLException, IOException, 
+                                                AuthorizeException
     {
-	Bundle cc_bundle = null;
+        Bundle cc_bundle = null;
 
-	// look for the CC bundle
-	try {
+        // look for the CC bundle
+        try
+        {
             Bundle[] bundles = item.getBundles(CC_BUNDLE_NAME);
-            if (bundles != null && bundles.length > 0)
-	    {
-	        cc_bundle = bundles[0];
-            }
-            else
-	    {
+
+            if ((bundles != null) && (bundles.length > 0))
+            {
+                cc_bundle = bundles[0];
+            } else
+            {
                 return null;
             }
-	} catch (Exception exc) {
-	    // this exception catching is a bit generic,
-	    // but basically it happens if there is no CC bundle
-	    return null;
-	}
+        } catch (Exception exc)
+        {
+            // this exception catching is a bit generic,
+            // but basically it happens if there is no CC bundle
+            return null;
+        }
 
-	Bitstream bs = cc_bundle.getBitstreamByName(bitstream_name);
+        Bitstream bs = cc_bundle.getBitstreamByName(bitstream_name);
 
-	// no such bitstream
-	if (bs == null) {
-	    return null;
-	}
+        // no such bitstream
+        if (bs == null)
+        {
+            return null;
+        }
 
-	// create a ByteArrayOutputStream
-	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	Utils.copy(bs.retrieve(), baos);
-	return baos.toByteArray();
+        // create a ByteArrayOutputStream
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Utils.copy(bs.retrieve(), baos);
+
+        return baos.toByteArray();
     }
-
 
     /**
      * Fetch the contents of a URL
      **/
-    private static byte[] fetchURL(String url_string) {
-	try {
-	    URL url = new URL(url_string);
-	    URLConnection connection = url.openConnection();
-	    byte[] bytes = new byte[connection.getContentLength()];
-	    // loop and read the data until it's done
-	    int offset = 0;
-	    while (true) {
-		int len = connection.getInputStream().read(bytes, offset, bytes.length - offset);
-		if (len == -1)
-		    break;
-		offset += len;
-	    }		
+    private static byte[] fetchURL(String url_string)
+    {
+        try
+        {
+            URL url = new URL(url_string);
+            URLConnection connection = url.openConnection();
+            byte[] bytes = new byte[connection.getContentLength()];
 
-	    return bytes;
-	} catch (Exception exc) {
-	    return null;
-	}
+            // loop and read the data until it's done
+            int offset = 0;
+
+            while (true)
+            {
+                int len = connection.getInputStream().read(bytes, offset,
+                                                           bytes.length -
+                                                           offset);
+
+                if (len == -1)
+                {
+                    break;
+                }
+
+                offset += len;
+            }
+
+            return bytes;
+        } catch (Exception exc)
+        {
+            return null;
+        }
     }
 }

@@ -35,7 +35,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.search;
 
 import java.io.IOException;
@@ -65,611 +64,634 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
+
 /**
  * DSIndexer contains the methods that index Items and their metadata,
  * collections, communities, etc. It is meant to either be invoked from the
  * command line (see dspace/bin/index-all) or via the indexContent() methods
  * within DSpace.
  */
-
 public class DSIndexer
 {
-   private static final Logger log = Logger.getLogger(DSIndexer.class);
+    private static final Logger log = Logger.getLogger(DSIndexer.class);
 
-   /**
-    * IndexItem() adds a single item to the index
-    */
-   public static void indexContent(Context c, DSpaceObject dso)
-         throws SQLException, IOException
-   {
-      IndexWriter writer = openIndex(c, false);
-      try
-      {
-         switch (dso.getType())
-         {
-         case Constants.ITEM:
-            writeItemIndex(c, writer, (Item) dso);
-            break;
+    /**
+     * IndexItem() adds a single item to the index
+     */
+    public static void indexContent(Context c, DSpaceObject dso)
+                             throws SQLException, IOException
+    {
+        IndexWriter writer = openIndex(c, false);
 
-         case Constants.COLLECTION:
-            writeCollectionIndex(c, writer, (Collection) dso);
-            break;
+        try
+        {
+            switch (dso.getType())
+            {
+                case Constants.ITEM:
+                    writeItemIndex(c, writer, (Item) dso);
 
-         case Constants.COMMUNITY:
-            writeCommunityIndex(c, writer, (Community) dso);
-            break;
-         // FIXME: should probably default unknown type exception
-         }
-      }
-      finally
-      {
-         closeIndex(c, writer);
-      }
-   }
+                    break;
 
-   /**
-    * unIndex removes an Item, Collection, or Community only works if the
-    * DSpaceObject has a handle (uses the handle for its unique ID)
-    * 
-    * @param dso
-    *           DSpace Object, can be Community, Item, or Collection
-    */
-   public static void unIndexContent(Context c, DSpaceObject dso)
-         throws SQLException, IOException
-   {
-      String h = HandleManager.findHandle(c, dso);
+                case Constants.COLLECTION:
+                    writeCollectionIndex(c, writer, (Collection) dso);
 
-      unIndexContent(c, h);
-   }
+                    break;
 
-   public static void unIndexContent(Context c, String myhandle)
-         throws SQLException, IOException
-   {
-      String index_directory = ConfigurationManager.getProperty("search.dir");
-      IndexReader ir = IndexReader.open(index_directory);
-      try
-      {
-         if (myhandle != null)
-         {
-            // we have a handle (our unique ID, so remove)
-            Term t = new Term("handle", myhandle);
-            ir.delete(t);
-         }
-         else
-         {
-            log.warn("unindex of content with null handle attempted");
-            // FIXME: no handle, fail quietly - should log failure
-            //System.out.println("Error in unIndexContent: Object had no
-            // handle!");
-         }
-      }
-      finally
-      {
-         ir.close();
-      }
+                case Constants.COMMUNITY:
+                    writeCommunityIndex(c, writer, (Community) dso);
 
-   }
+                    break;
 
-   /**
-    * reIndexContent removes something from the index, then re-indexes it
-    * 
-    * @param context
-    * @param DSpaceObject
-    */
-   public static void reIndexContent(Context c, DSpaceObject dso)
-         throws SQLException, IOException
-   {
-      unIndexContent(c, dso);
-      indexContent(c, dso);
-   }
+                // FIXME: should probably default unknown type exception
+            }
+        } finally
+        {
+            closeIndex(c, writer);
+        }
+    }
 
-   /**
-    * create full index - wiping old index
-    * 
-    * @param context
-    */
-   public static void createIndex(Context c) throws SQLException, IOException
-   {
-      IndexWriter writer = openIndex(c, true);
-      try
-      {
-         indexAllCommunities(c, writer);
-         indexAllCollections(c, writer);
-         indexAllItems(c, writer);
+    /**
+     * unIndex removes an Item, Collection, or Community only works if the
+     * DSpaceObject has a handle (uses the handle for its unique ID)
+     *
+     * @param dso
+     *           DSpace Object, can be Community, Item, or Collection
+     */
+    public static void unIndexContent(Context c, DSpaceObject dso)
+                               throws SQLException, IOException
+    {
+        String h = HandleManager.findHandle(c, dso);
 
-         // optimize the index - important to do regularly to reduce filehandle
-         // usage
-         // and keep performance fast!
-         writer.optimize();
-      }
-      finally
-      {
-         closeIndex(c, writer);
-      }
-   }
+        unIndexContent(c, h);
+    }
 
-   /**
-    * When invoked as a command-line tool, (re)-builds the whole index
-    * 
-    * @param args
-    *           the command-line arguments, none used
-    */
-   public static void main(String[] args) throws Exception
-   {
-      Context c = new Context();
+    public static void unIndexContent(Context c, String myhandle)
+                               throws SQLException, IOException
+    {
+        String index_directory = ConfigurationManager.getProperty("search.dir");
+        IndexReader ir = IndexReader.open(index_directory);
 
-      // for testing, pass in a handle of something to remove...
-      if ((args.length == 2) && (args[0].equals("remove")))
-      {
-         unIndexContent(c, args[1]);
-      }
-      else
-      {
-         c.setIgnoreAuthorization(true);
+        try
+        {
+            if (myhandle != null)
+            {
+                // we have a handle (our unique ID, so remove)
+                Term t = new Term("handle", myhandle);
+                ir.delete(t);
+            } else
+            {
+                log.warn("unindex of content with null handle attempted");
 
-         createIndex(c);
+                // FIXME: no handle, fail quietly - should log failure
+                //System.out.println("Error in unIndexContent: Object had no
+                // handle!");
+            }
+        } finally
+        {
+            ir.close();
+        }
+    }
 
-         System.out.println("Done with indexing");
-      }
-   }
+    /**
+     * reIndexContent removes something from the index, then re-indexes it
+     *
+     * @param context
+     * @param DSpaceObject
+     */
+    public static void reIndexContent(Context c, DSpaceObject dso)
+                               throws SQLException, IOException
+    {
+        unIndexContent(c, dso);
+        indexContent(c, dso);
+    }
 
-   ////////////////////////////////////
-   //      Private
-   ////////////////////////////////////
+    /**
+     * create full index - wiping old index
+     *
+     * @param context
+     */
+    public static void createIndex(Context c) throws SQLException, IOException
+    {
+        IndexWriter writer = openIndex(c, true);
 
-   /**
-    * prepare index, opening writer, and wiping out existing index if necessary
-    */
-   private static IndexWriter openIndex(Context c, boolean wipe_existing)
-         throws IOException
-   {
-      IndexWriter writer;
+        try
+        {
+            indexAllCommunities(c, writer);
+            indexAllCollections(c, writer);
+            indexAllItems(c, writer);
 
-      String index_directory = ConfigurationManager.getProperty("search.dir");
+            // optimize the index - important to do regularly to reduce filehandle
+            // usage
+            // and keep performance fast!
+            writer.optimize();
+        } finally
+        {
+            closeIndex(c, writer);
+        }
+    }
 
-      writer = new IndexWriter(index_directory, new DSAnalyzer(), wipe_existing);
-      // Potential improvement for large indices to avoid TooManyFiles
-      // exception.
-      //writer.setUseCompoundFile(true);
-      return writer;
-   }
+    /**
+     * When invoked as a command-line tool, (re)-builds the whole index
+     *
+     * @param args
+     *           the command-line arguments, none used
+     */
+    public static void main(String[] args) throws Exception
+    {
+        Context c = new Context();
 
-   /**
-    * close up the indexing engine
-    */
-   private static void closeIndex(Context c, IndexWriter writer)
-         throws IOException
-   {
-      if (writer != null) writer.close();
-   }
+        // for testing, pass in a handle of something to remove...
+        if ((args.length == 2) && (args[0].equals("remove")))
+        {
+            unIndexContent(c, args[1]);
+        } else
+        {
+            c.setIgnoreAuthorization(true);
 
-   private static String buildItemLocationString(Context c, Item myitem)
-         throws SQLException
-   {
-      // build list of community ids
-      Community[] communities = myitem.getCommunities();
+            createIndex(c);
 
-      // build list of collection ids
-      Collection[] collections = myitem.getCollections();
+            System.out.println("Done with indexing");
+        }
+    }
 
-      // now put those into strings
-      String location = "";
-      int i = 0;
+    ////////////////////////////////////
+    //      Private
+    ////////////////////////////////////
 
-      for (i = 0; i < communities.length; i++)
-         location = new String(location + " m" + communities[i].getID());
-      for (i = 0; i < collections.length; i++)
-         location = new String(location + " l" + collections[i].getID());
+    /**
+     * prepare index, opening writer, and wiping out existing index if necessary
+     */
+    private static IndexWriter openIndex(Context c, boolean wipe_existing)
+                                  throws IOException
+    {
+        IndexWriter writer;
 
-      return location;
-   }
+        String index_directory = ConfigurationManager.getProperty("search.dir");
 
-   private static String buildCollectionLocationString(Context c,
-         Collection target) throws SQLException
-   {
-      // build list of community ids
-      Community[] communities = target.getCommunities();
+        writer = new IndexWriter(index_directory, new DSAnalyzer(),
+                                 wipe_existing);
 
-      // now put those into strings
-      String location = "";
-      int i = 0;
+        // Potential improvement for large indices to avoid TooManyFiles
+        // exception.
+        //writer.setUseCompoundFile(true);
+        return writer;
+    }
 
-      for (i = 0; i < communities.length; i++)
-         location = new String(location + " m" + communities[i].getID());
+    /**
+     * close up the indexing engine
+     */
+    private static void closeIndex(Context c, IndexWriter writer)
+                            throws IOException
+    {
+        if (writer != null)
+        {
+            writer.close();
+        }
+    }
 
-      return location;
-   }
+    private static String buildItemLocationString(Context c, Item myitem)
+                                           throws SQLException
+    {
+        // build list of community ids
+        Community[] communities = myitem.getCommunities();
 
-   /**
-    * iterate through the communities, and index each one
-    */
-   private static void indexAllCommunities(Context c, IndexWriter writer)
-         throws SQLException, IOException
-   {
-      Community[] targets = Community.findAll(c);
+        // build list of collection ids
+        Collection[] collections = myitem.getCollections();
 
-      int i;
+        // now put those into strings
+        String location = "";
+        int i = 0;
 
-      for (i = 0; i < targets.length; i++)
-         writeCommunityIndex(c, writer, targets[i]);
-   }
+        for (i = 0; i < communities.length; i++)
+            location = new String(location + " m" + communities[i].getID());
 
-   /**
-    * iterate through collections, indexing each one
-    */
-   private static void indexAllCollections(Context c, IndexWriter writer)
-         throws SQLException, IOException
-   {
-      Collection[] targets = Collection.findAll(c);
+        for (i = 0; i < collections.length; i++)
+            location = new String(location + " l" + collections[i].getID());
 
-      int i;
+        return location;
+    }
 
-      for (i = 0; i < targets.length; i++)
-         writeCollectionIndex(c, writer, targets[i]);
-   }
+    private static String buildCollectionLocationString(Context c,
+                                                        Collection target)
+                                                 throws SQLException
+    {
+        // build list of community ids
+        Community[] communities = target.getCommunities();
 
-   /**
-    * iterate through all items, indexing each one
-    */
-   private static void indexAllItems(Context c, IndexWriter writer)
-         throws SQLException, IOException
-   {
-      ItemIterator i = Item.findAll(c);
+        // now put those into strings
+        String location = "";
+        int i = 0;
 
-      while (i.hasNext())
-      {
-         Item target = (Item) i.next();
+        for (i = 0; i < communities.length; i++)
+            location = new String(location + " m" + communities[i].getID());
 
-         writeItemIndex(c, writer, target);
-      }
-   }
+        return location;
+    }
 
-   /**
-    * write index record for a community
-    */
-   private static void writeCommunityIndex(Context c, IndexWriter writer,
-         Community target) throws SQLException, IOException
-   {
-      // build a hash for the metadata
-      HashMap textvalues = new HashMap();
+    /**
+     * iterate through the communities, and index each one
+     */
+    private static void indexAllCommunities(Context c, IndexWriter writer)
+                                     throws SQLException, IOException
+    {
+        Community[] targets = Community.findAll(c);
 
-      // get the handle
-      String myhandle = HandleManager.findHandle(c, target);
+        int i;
 
-      // and populate it
-      String name = target.getMetadata("name");
-      //        String description = target.getMetadata("short_description");
-      //        String intro_text = target.getMetadata("introductory_text");
+        for (i = 0; i < targets.length; i++)
+            writeCommunityIndex(c, writer, targets[i]);
+    }
 
-      textvalues.put("name", name);
-      //        textvalues.put("description", description);
-      //        textvalues.put("intro_text", intro_text );
-      textvalues.put("handletext", myhandle);
+    /**
+     * iterate through collections, indexing each one
+     */
+    private static void indexAllCollections(Context c, IndexWriter writer)
+                                     throws SQLException, IOException
+    {
+        Collection[] targets = Collection.findAll(c);
 
-      writeIndexRecord(writer, Constants.COMMUNITY, myhandle, textvalues, "");
-   }
+        int i;
 
-   /**
-    * write an index record for a collection
-    */
-   private static void writeCollectionIndex(Context c, IndexWriter writer,
-         Collection target) throws SQLException, IOException
-   {
-      String location_text = buildCollectionLocationString(c, target);
+        for (i = 0; i < targets.length; i++)
+            writeCollectionIndex(c, writer, targets[i]);
+    }
 
-      // get the handle
-      String myhandle = HandleManager.findHandle(c, target);
+    /**
+     * iterate through all items, indexing each one
+     */
+    private static void indexAllItems(Context c, IndexWriter writer)
+                               throws SQLException, IOException
+    {
+        ItemIterator i = Item.findAll(c);
 
-      // build a hash for the metadata
-      HashMap textvalues = new HashMap();
+        while (i.hasNext())
+        {
+            Item target = (Item) i.next();
 
-      // and populate it
-      String name = target.getMetadata("name");
-      //        String description = target.getMetadata("short_description");
-      //        String intro_text = target.getMetadata("introductory_text");
+            writeItemIndex(c, writer, target);
+        }
+    }
 
-      textvalues.put("name", name);
-      //        textvalues.put("description",description );
-      //        textvalues.put("intro_text", intro_text );
-      textvalues.put("location", location_text);
-      textvalues.put("handletext", myhandle);
+    /**
+     * write index record for a community
+     */
+    private static void writeCommunityIndex(Context c, IndexWriter writer,
+                                            Community target)
+                                     throws SQLException, IOException
+    {
+        // build a hash for the metadata
+        HashMap textvalues = new HashMap();
 
-      writeIndexRecord(writer, Constants.COLLECTION, myhandle, textvalues, "");
-   }
+        // get the handle
+        String myhandle = HandleManager.findHandle(c, target);
 
-   /**
-    * writes an index record - the index record is a set of name/value hashes,
-    * which are sent to Lucene.
-    */
-   private static void writeItemIndex(Context c, IndexWriter writer, Item myitem)
-         throws SQLException, IOException
-   {
-      // get the location string (for searching by collection & community)
-      String location_text = buildItemLocationString(c, myitem);
+        // and populate it
+        String name = target.getMetadata("name");
 
-      // read in indexes from the config
-      ArrayList indexes = new ArrayList();
+        //        String description = target.getMetadata("short_description");
+        //        String intro_text = target.getMetadata("introductory_text");
+        textvalues.put("name", name);
 
-      // read in search.index.1, search.index.2....
-      for (int i = 1; ConfigurationManager.getProperty("search.index." + i) != null; i++)
-      {
-         indexes.add(ConfigurationManager.getProperty("search.index." + i));
-      }
+        //        textvalues.put("description", description);
+        //        textvalues.put("intro_text", intro_text );
+        textvalues.put("handletext", myhandle);
 
-      int j, k = 0;
+        writeIndexRecord(writer, Constants.COMMUNITY, myhandle, textvalues, "");
+    }
 
-      // initialize hash to be built
-      HashMap textvalues = new HashMap();
+    /**
+     * write an index record for a collection
+     */
+    private static void writeCollectionIndex(Context c, IndexWriter writer,
+                                             Collection target)
+                                      throws SQLException, IOException
+    {
+        String location_text = buildCollectionLocationString(c, target);
 
-      if (indexes.size() > 0)
-      {
-         ArrayList fields = new ArrayList();
-         ArrayList content = new ArrayList();
-         DCValue[] mydc;
+        // get the handle
+        String myhandle = HandleManager.findHandle(c, target);
 
-         for (int i = 0; i < indexes.size(); i++)
-         {
-            String index = (String) indexes.get(i);
+        // build a hash for the metadata
+        HashMap textvalues = new HashMap();
 
-            String dc[] = index.split(":");
-            String myindex = dc[0];
+        // and populate it
+        String name = target.getMetadata("name");
 
-            String elements[] = dc[1].split("\\.");
-            String element = elements[0];
-            String qualifier = elements[1];
+        //        String description = target.getMetadata("short_description");
+        //        String intro_text = target.getMetadata("introductory_text");
+        textvalues.put("name", name);
 
+        //        textvalues.put("description",description );
+        //        textvalues.put("intro_text", intro_text );
+        textvalues.put("location", location_text);
+        textvalues.put("handletext", myhandle);
+
+        writeIndexRecord(writer, Constants.COLLECTION, myhandle, textvalues, "");
+    }
+
+    /**
+     * writes an index record - the index record is a set of name/value hashes,
+     * which are sent to Lucene.
+     */
+    private static void writeItemIndex(Context c, IndexWriter writer,
+                                       Item myitem)
+                                throws SQLException, IOException
+    {
+        // get the location string (for searching by collection & community)
+        String location_text = buildItemLocationString(c, myitem);
+
+        // read in indexes from the config
+        ArrayList indexes = new ArrayList();
+
+        // read in search.index.1, search.index.2....
+        for (int i = 1;
+                 ConfigurationManager.getProperty("search.index." + i) != null;
+                 i++)
+        {
+            indexes.add(ConfigurationManager.getProperty("search.index." + i));
+        }
+
+        int j;
+        int k = 0;
+
+        // initialize hash to be built
+        HashMap textvalues = new HashMap();
+
+        if (indexes.size() > 0)
+        {
+            ArrayList fields = new ArrayList();
+            ArrayList content = new ArrayList();
+            DCValue[] mydc;
+
+            for (int i = 0; i < indexes.size(); i++)
+            {
+                String index = (String) indexes.get(i);
+
+                String[] dc = index.split(":");
+                String myindex = dc[0];
+
+                String[] elements = dc[1].split("\\.");
+                String element = elements[0];
+                String qualifier = elements[1];
+
+                // extract metadata (ANY is wildcard from Item class)
+                if (qualifier.equals("*"))
+                {
+                    mydc = myitem.getDC(element, Item.ANY, Item.ANY);
+                } else
+                {
+                    mydc = myitem.getDC(element, qualifier, Item.ANY);
+                }
+
+                // put them all from an array of strings to one string for writing
+                // out
+                // pack all of the arrays of DCValues into plain text strings for
+                // the indexer
+                String content_text = "";
+
+                for (j = 0; j < mydc.length; j++)
+                {
+                    content_text = new String(content_text + mydc[j].value +
+                                              " ");
+                }
+
+                // arranges content with fields in ArrayLists with same index to put
+                // into hash later
+                k = fields.indexOf(myindex);
+
+                if (k < 0)
+                {
+                    fields.add(myindex);
+                    content.add(content_text);
+                } else
+                {
+                    content_text = new String(content_text +
+                                              (String) content.get(k) + " ");
+                    content.set(k, content_text);
+                }
+            }
+
+            // build the hash
+            for (int i = 0; i < fields.size(); i++)
+            {
+                textvalues.put((String) fields.get(i), (String) content.get(i));
+            }
+
+            textvalues.put("location", location_text);
+        } else // if no search indexes found in cfg file, for backward compatibility
+        {
             // extract metadata (ANY is wildcard from Item class)
-            if (qualifier.equals("*"))
+            DCValue[] authors = myitem.getDC("contributor", Item.ANY, Item.ANY);
+            DCValue[] creators = myitem.getDC("creator", Item.ANY, Item.ANY);
+            DCValue[] titles = myitem.getDC("title", Item.ANY, Item.ANY);
+            DCValue[] keywords = myitem.getDC("subject", Item.ANY, Item.ANY);
+
+            DCValue[] abstracts = myitem.getDC("description", "abstract",
+                                               Item.ANY);
+            DCValue[] sors = myitem.getDC("description",
+                                          "statementofresponsibility", Item.ANY);
+            DCValue[] series = myitem.getDC("relation", "ispartofseries",
+                                            Item.ANY);
+            DCValue[] tocs = myitem.getDC("description", "tableofcontents",
+                                          Item.ANY);
+            DCValue[] mimetypes = myitem.getDC("format", "mimetype", Item.ANY);
+            DCValue[] sponsors = myitem.getDC("description", "sponsorship",
+                                              Item.ANY);
+            DCValue[] identifiers = myitem.getDC("identifier", Item.ANY,
+                                                 Item.ANY);
+
+            // put them all from an array of strings to one string for writing out
+            String author_text = "";
+            String title_text = "";
+            String keyword_text = "";
+
+            String abstract_text = "";
+            String sor_text = "";
+            String series_text = "";
+            String mime_text = "";
+            String sponsor_text = "";
+            String id_text = "";
+
+            // pack all of the arrays of DCValues into plain text strings for the
+            // indexer
+            for (j = 0; j < authors.length; j++)
             {
-               mydc = myitem.getDC(element, Item.ANY, Item.ANY);
+                author_text = new String(author_text + authors[j].value + " ");
             }
-            else
+
+            for (j = 0; j < creators.length; j++) //also authors
             {
-               mydc = myitem.getDC(element, qualifier, Item.ANY);
+                author_text = new String(author_text + creators[j].value + " ");
             }
 
-            // put them all from an array of strings to one string for writing
-            // out
-            // pack all of the arrays of DCValues into plain text strings for
-            // the indexer
-            String content_text = "";
-            for (j = 0; j < mydc.length; j++)
+            for (j = 0; j < sors.length; j++) //also authors
             {
-               content_text = new String(content_text + mydc[j].value + " ");
+                author_text = new String(author_text + sors[j].value + " ");
             }
 
-            // arranges content with fields in ArrayLists with same index to put
-            // into hash later
-            k = fields.indexOf(myindex);
-            if (k < 0)
+            for (j = 0; j < titles.length; j++)
             {
-               fields.add(myindex);
-               content.add(content_text);
+                title_text = new String(title_text + titles[j].value + " ");
             }
-            else
+
+            for (j = 0; j < keywords.length; j++)
             {
-               content_text = new String(content_text + (String) content.get(k)
-                     + " ");
-               content.set(k, content_text);
+                keyword_text = new String(keyword_text + keywords[j].value +
+                                          " ");
             }
-         }
 
-         // build the hash
-         for (int i = 0; i < fields.size(); i++)
-         {
-            textvalues.put((String) fields.get(i), (String) content.get(i));
-         }
-         
-         textvalues.put("location", location_text);
-      }
-      else
-      // if no search indexes found in cfg file, for backward compatibility
-      {
-
-         // extract metadata (ANY is wildcard from Item class)
-         DCValue[] authors = myitem.getDC("contributor", Item.ANY, Item.ANY);
-         DCValue[] creators = myitem.getDC("creator", Item.ANY, Item.ANY);
-         DCValue[] titles = myitem.getDC("title", Item.ANY, Item.ANY);
-         DCValue[] keywords = myitem.getDC("subject", Item.ANY, Item.ANY);
-
-         DCValue[] abstracts = myitem
-               .getDC("description", "abstract", Item.ANY);
-         DCValue[] sors = myitem.getDC("description",
-               "statementofresponsibility", Item.ANY);
-         DCValue[] series = myitem
-               .getDC("relation", "ispartofseries", Item.ANY);
-         DCValue[] tocs = myitem.getDC("description", "tableofcontents",
-               Item.ANY);
-         DCValue[] mimetypes = myitem.getDC("format", "mimetype", Item.ANY);
-         DCValue[] sponsors = myitem.getDC("description", "sponsorship",
-               Item.ANY);
-         DCValue[] identifiers = myitem.getDC("identifier", Item.ANY, Item.ANY);
-
-         // put them all from an array of strings to one string for writing out
-         String author_text = "";
-         String title_text = "";
-         String keyword_text = "";
-
-         String abstract_text = "";
-         String sor_text = "";
-         String series_text = "";
-         String mime_text = "";
-         String sponsor_text = "";
-         String id_text = "";
-
-         // pack all of the arrays of DCValues into plain text strings for the
-         // indexer
-         for (j = 0; j < authors.length; j++)
-         {
-            author_text = new String(author_text + authors[j].value + " ");
-         }
-
-         for (j = 0; j < creators.length; j++) //also authors
-         {
-            author_text = new String(author_text + creators[j].value + " ");
-         }
-
-         for (j = 0; j < sors.length; j++) //also authors
-         {
-            author_text = new String(author_text + sors[j].value + " ");
-         }
-
-         for (j = 0; j < titles.length; j++)
-         {
-            title_text = new String(title_text + titles[j].value + " ");
-         }
-
-         for (j = 0; j < keywords.length; j++)
-         {
-            keyword_text = new String(keyword_text + keywords[j].value + " ");
-         }
-
-         for (j = 0; j < abstracts.length; j++)
-         {
-            abstract_text = new String(abstract_text + abstracts[j].value + " ");
-         }
-
-         for (j = 0; j < tocs.length; j++)
-         {
-            abstract_text = new String(abstract_text + tocs[j].value + " ");
-         }
-
-         for (j = 0; j < series.length; j++)
-         {
-            series_text = new String(series_text + series[j].value + " ");
-         }
-
-         for (j = 0; j < mimetypes.length; j++)
-         {
-            mime_text = new String(mime_text + mimetypes[j].value + " ");
-         }
-
-         for (j = 0; j < sponsors.length; j++)
-         {
-            sponsor_text = new String(sponsor_text + sponsors[j].value + " ");
-         }
-
-         for (j = 0; j < identifiers.length; j++)
-         {
-            id_text = new String(id_text + identifiers[j].value + " ");
-         }
-
-         // build the hash
-         textvalues.put("author", author_text);
-         textvalues.put("title", title_text);
-         textvalues.put("keyword", keyword_text);
-         textvalues.put("location", location_text);
-         textvalues.put("abstract", abstract_text);
-
-         textvalues.put("series", series_text);
-         textvalues.put("mimetype", mime_text);
-         textvalues.put("sponsor", sponsor_text);
-         textvalues.put("identifier", id_text);
-      }
-
-      // now get full text of any bitstreams in the TEXT bundle
-      String extractedText = "";
-
-      // trundle through the bundles
-      Bundle[] myBundles = myitem.getBundles();
-
-      for (int i = 0; i < myBundles.length; i++)
-      {
-         if (myBundles[i].getName() != null
-               && myBundles[i].getName().equals("TEXT"))
-         {
-            // a-ha! grab the text out of the bitstreams
-            Bitstream[] myBitstreams = myBundles[i].getBitstreams();
-            for (j = 0; j < myBitstreams.length; j++)
+            for (j = 0; j < abstracts.length; j++)
             {
-               try
-               {
-                  InputStreamReader is = new InputStreamReader(myBitstreams[j]
-                        .retrieve()); // get input stream
-                  StringBuffer sb = new StringBuffer();
-                  char[] charBuffer = new char[1024];
-
-                  while (true)
-                  {
-                     int bytesIn = is.read(charBuffer);
-                     if (bytesIn == -1) break;
-
-                     if (bytesIn > 0)
-                     {
-                        sb.append(charBuffer, 0, bytesIn);
-                     }
-                  }
-
-                  // now sb has the full text - tack on to fullText string
-                  extractedText = extractedText.concat(new String(sb));
-
-                  //                        System.out.println("Found extracted text!\n" + new
-                  // String(sb));
-               }
-               catch (AuthorizeException e)
-               {
-                  // this will never happen, but compiler is now happy.
-               }
+                abstract_text = new String(abstract_text + abstracts[j].value +
+                                           " ");
             }
-         }
-      }
 
-      // lastly, get the handle
-      String itemhandle = HandleManager.findHandle(c, myitem);
-      textvalues.put("handletext", itemhandle);
+            for (j = 0; j < tocs.length; j++)
+            {
+                abstract_text = new String(abstract_text + tocs[j].value + " ");
+            }
 
-      // write out the metatdata (for scalability, using hash instead of
-      // individual strings)
-      writeIndexRecord(writer, Constants.ITEM, itemhandle, textvalues,
-            extractedText);
-   }
+            for (j = 0; j < series.length; j++)
+            {
+                series_text = new String(series_text + series[j].value + " ");
+            }
 
-   /**
-    * writeIndexRecord() creates a document from its args and writes it out to
-    * the index that is opened
-    */
-   private static void writeIndexRecord(IndexWriter iw, int type,
-         String handle, HashMap textvalues, String extractedText)
-         throws IOException
-   {
-      Document doc = new Document();
-      Integer ty = new Integer(type);
-      String fulltext = "";
+            for (j = 0; j < mimetypes.length; j++)
+            {
+                mime_text = new String(mime_text + mimetypes[j].value + " ");
+            }
 
-      // do id, type, handle first
-      doc.add(Field.UnIndexed("type", ty.toString()));
+            for (j = 0; j < sponsors.length; j++)
+            {
+                sponsor_text = new String(sponsor_text + sponsors[j].value +
+                                          " ");
+            }
 
-      // want to be able to search for handle, so use keyword
-      // (not tokenized, but it is indexed)
-      if (handle != null)
-      {
-         doc.add(Field.Keyword("handle", handle));
-      }
-      // now iterate through the hash, building full text string
-      // and index all values
-      Iterator i = textvalues.keySet().iterator();
+            for (j = 0; j < identifiers.length; j++)
+            {
+                id_text = new String(id_text + identifiers[j].value + " ");
+            }
 
-      while (i.hasNext())
-      {
-         String key = (String) i.next();
-         String value = (String) textvalues.get(key);
+            // build the hash
+            textvalues.put("author", author_text);
+            textvalues.put("title", title_text);
+            textvalues.put("keyword", keyword_text);
+            textvalues.put("location", location_text);
+            textvalues.put("abstract", abstract_text);
 
-         fulltext = fulltext + " " + value;
+            textvalues.put("series", series_text);
+            textvalues.put("mimetype", mime_text);
+            textvalues.put("sponsor", sponsor_text);
+            textvalues.put("identifier", id_text);
+        }
 
-         if (value != null)
-         {
-            doc.add(Field.Text(key, value));
-         }
-      }
+        // now get full text of any bitstreams in the TEXT bundle
+        String extractedText = "";
 
-      fulltext = fulltext.concat(extractedText);
+        // trundle through the bundles
+        Bundle[] myBundles = myitem.getBundles();
 
-      //        System.out.println("Full Text:\n" + fulltext + "------------\n\n");
+        for (int i = 0; i < myBundles.length; i++)
+        {
+            if ((myBundles[i].getName() != null) &&
+                    myBundles[i].getName().equals("TEXT"))
+            {
+                // a-ha! grab the text out of the bitstreams
+                Bitstream[] myBitstreams = myBundles[i].getBitstreams();
 
-      // add the full text
-      doc.add(Field.Text("default", fulltext));
+                for (j = 0; j < myBitstreams.length; j++)
+                {
+                    try
+                    {
+                        InputStreamReader is = new InputStreamReader(myBitstreams[j].retrieve()); // get input stream
+                        StringBuffer sb = new StringBuffer();
+                        char[] charBuffer = new char[1024];
 
-      // index the document
-      iw.addDocument(doc);
-   }
+                        while (true)
+                        {
+                            int bytesIn = is.read(charBuffer);
+
+                            if (bytesIn == -1)
+                            {
+                                break;
+                            }
+
+                            if (bytesIn > 0)
+                            {
+                                sb.append(charBuffer, 0, bytesIn);
+                            }
+                        }
+
+                        // now sb has the full text - tack on to fullText string
+                        extractedText = extractedText.concat(new String(sb));
+
+                        //                        System.out.println("Found extracted text!\n" + new
+                        // String(sb));
+                    } catch (AuthorizeException e)
+                    {
+                        // this will never happen, but compiler is now happy.
+                    }
+                }
+            }
+        }
+
+        // lastly, get the handle
+        String itemhandle = HandleManager.findHandle(c, myitem);
+        textvalues.put("handletext", itemhandle);
+
+        // write out the metatdata (for scalability, using hash instead of
+        // individual strings)
+        writeIndexRecord(writer, Constants.ITEM, itemhandle, textvalues,
+                         extractedText);
+    }
+
+    /**
+     * writeIndexRecord() creates a document from its args and writes it out to
+     * the index that is opened
+     */
+    private static void writeIndexRecord(IndexWriter iw, int type,
+                                         String handle, HashMap textvalues,
+                                         String extractedText)
+                                  throws IOException
+    {
+        Document doc = new Document();
+        Integer ty = new Integer(type);
+        String fulltext = "";
+
+        // do id, type, handle first
+        doc.add(Field.UnIndexed("type", ty.toString()));
+
+        // want to be able to search for handle, so use keyword
+        // (not tokenized, but it is indexed)
+        if (handle != null)
+        {
+            doc.add(Field.Keyword("handle", handle));
+        }
+
+        // now iterate through the hash, building full text string
+        // and index all values
+        Iterator i = textvalues.keySet().iterator();
+
+        while (i.hasNext())
+        {
+            String key = (String) i.next();
+            String value = (String) textvalues.get(key);
+
+            fulltext = fulltext + " " + value;
+
+            if (value != null)
+            {
+                doc.add(Field.Text(key, value));
+            }
+        }
+
+        fulltext = fulltext.concat(extractedText);
+
+        //        System.out.println("Full Text:\n" + fulltext + "------------\n\n");
+        // add the full text
+        doc.add(Field.Text("default", fulltext));
+
+        // index the document
+        iw.addDocument(doc);
+    }
 }

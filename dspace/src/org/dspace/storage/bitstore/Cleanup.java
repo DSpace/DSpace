@@ -37,11 +37,10 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
-
 package org.dspace.storage.bitstore;
 
 import org.apache.log4j.Logger;
+
 
 /**
  * Cleans up asset store.
@@ -68,12 +67,10 @@ public class Cleanup
             BitstreamStorageManager.cleanup();
 
             System.exit(0);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             log.fatal("Caught exception:", e);
             System.exit(1);
         }
     }
-
 }

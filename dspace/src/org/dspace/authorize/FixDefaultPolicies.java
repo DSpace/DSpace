@@ -37,26 +37,20 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.authorize;
 
-import java.io.IOException;
+
+//import org.dspace.browse.Browse;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-//import org.dspace.browse.Browse;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
@@ -72,8 +66,7 @@ public class FixDefaultPolicies
     /**
      * Command line interface to setPolicies - run to see arguments
      */
-    public static void main( String [] argv )
-        throws Exception
+    public static void main(String[] argv) throws Exception
     {
         Context c = new Context();
 
@@ -83,102 +76,95 @@ public class FixDefaultPolicies
         //////////////////////
         // carnage begins here
         //////////////////////
+        Collection[] collections = Collection.findAll(c);
 
-        Collection [] collections = Collection.findAll(c);
-        
-        for( int i = 0; i < collections.length; i++ )
+        for (int i = 0; i < collections.length; i++)
         {
             Collection t = collections[i];
-            
-            System.out.println("Collection " + t + " " + t.getMetadata( "name" ) );
+
+            System.out.println("Collection " + t + " " + t.getMetadata("name"));
 
             // check for READ
-            if( checkForPolicy(c, t, Constants.READ ) )
+            if (checkForPolicy(c, t, Constants.READ))
             {
-                System.out.println( "\tFound READ policies!" );
-            }
-            else
+                System.out.println("\tFound READ policies!");
+            } else
             {
-                System.out.println( "\tNo READ policy found, adding anonymous.");
-                addAnonymousPolicy(c, t, Constants.READ );
-            }
-           
-            if( checkForPolicy(c, t, Constants.DEFAULT_ITEM_READ ) )
-            {
-                System.out.println( "\tFound DEFAULT_ITEM_READ policies!" );
-            }
-            else
-            {
-                System.out.println( "\tNo DEFAULT_ITEM_READ policy found, adding anonymous.");
-                addAnonymousPolicy(c, t, Constants.DEFAULT_ITEM_READ );
+                System.out.println("\tNo READ policy found, adding anonymous.");
+                addAnonymousPolicy(c, t, Constants.READ);
             }
 
-            if( checkForPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ ) )
+            if (checkForPolicy(c, t, Constants.DEFAULT_ITEM_READ))
             {
-                System.out.println( "\tFound DEFAULT_BITSTREAM_READ policies!" );
+                System.out.println("\tFound DEFAULT_ITEM_READ policies!");
+            } else
+            {
+                System.out.println("\tNo DEFAULT_ITEM_READ policy found, adding anonymous.");
+                addAnonymousPolicy(c, t, Constants.DEFAULT_ITEM_READ);
             }
-            else
+
+            if (checkForPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ))
             {
-                System.out.println( "\tNo DEFAULT_BITSTREAM_READ policy found, adding anonymous.");
-                addAnonymousPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ );
+                System.out.println("\tFound DEFAULT_BITSTREAM_READ policies!");
+            } else
+            {
+                System.out.println("\tNo DEFAULT_BITSTREAM_READ policy found, adding anonymous.");
+                addAnonymousPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ);
             }
         }
 
         // now ensure communities have READ policies
+        Community[] communities = Community.findAll(c);
 
-        Community [] communities = Community.findAll(c);
-
-        for( int i = 0; i < communities.length; i++ )
+        for (int i = 0; i < communities.length; i++)
         {
             Community t = communities[i];
-            
-            System.out.println("Community " + t + " " + t.getMetadata( "name" ) );
+
+            System.out.println("Community " + t + " " + t.getMetadata("name"));
 
             // check for READ
-            if( checkForPolicy(c, t, Constants.READ ) )
+            if (checkForPolicy(c, t, Constants.READ))
             {
-                System.out.println( "\tFound READ policies!" );
-            }
-            else
+                System.out.println("\tFound READ policies!");
+            } else
             {
-                System.out.println( "\tNo READ policy found, adding anonymous.");
-                addAnonymousPolicy(c, t, Constants.READ );
+                System.out.println("\tNo READ policy found, adding anonymous.");
+                addAnonymousPolicy(c, t, Constants.READ);
             }
-        }        
-      
- 
+        }
+
         c.complete();
     }
-
 
     /**
      * check to see if a collection has any policies for a given action
      */
-    private static boolean checkForPolicy(Context c, DSpaceObject t, int myaction)
-        throws SQLException
+    private static boolean checkForPolicy(Context c, DSpaceObject t,
+                                          int myaction)
+                                   throws SQLException
     {
         // check to see if any policies exist for this action
-        List policies = AuthorizeManager.getPoliciesActionFilter(c, t, myaction );
+        List policies = AuthorizeManager.getPoliciesActionFilter(c, t, myaction);
         Iterator i = policies.iterator();
-        
+
         return i.hasNext();
     }
-
 
     /**
      * add an anonymous group permission policy to the collection for this action
      */
-    private static void addAnonymousPolicy(Context c, DSpaceObject t, int myaction)
-        throws SQLException, AuthorizeException
+    private static void addAnonymousPolicy(Context c, DSpaceObject t,
+                                           int myaction)
+                                    throws SQLException, AuthorizeException
     {
         // group 0 is the anonymous group!
         Group anonymousGroup = Group.find(c, 0);
 
         // now create the default policies for submitted items
         ResourcePolicy myPolicy = ResourcePolicy.create(c);
-        myPolicy.setResource( t );
-        myPolicy.setAction  ( myaction );
-        myPolicy.setGroup   ( anonymousGroup );
+        myPolicy.setResource(t);
+        myPolicy.setAction(myaction);
+        myPolicy.setGroup(anonymousGroup);
         myPolicy.update();
     }
 }

@@ -37,28 +37,25 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.search;
 
-
-// java classes
-import java.io.*;
-import java.util.*;
-import java.sql.*;
-
-// lucene search engine classes
-import org.apache.lucene.index.*;
-import org.apache.lucene.document.*;
-import org.apache.lucene.queryParser.*;
-import org.apache.lucene.search.*;
-import org.apache.lucene.analysis.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-
-//Jakarta-ORO classes (regular expressions)
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.TokenMgrError;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Searcher;
 import org.apache.oro.text.perl.Perl5Util;
-
-// dspace classes
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
@@ -70,24 +67,21 @@ import org.dspace.core.LogManager;
 // issues
 //   need to filter query string for security
 //   cmd line query needs to process args correctly (seems to split them up)
-
 public class DSQuery
 {
     // Result types
-    static final String ALL		    = "999";
-    static final String ITEM		= "" + Constants.ITEM;
-    static final String COLLECTION	= "" + Constants.COLLECTION;
-    static final String COMMUNITY	= "" + Constants.COMMUNITY;
+    static final String ALL = "999";
+    static final String ITEM = "" + Constants.ITEM;
+    static final String COLLECTION = "" + Constants.COLLECTION;
+    static final String COMMUNITY = "" + Constants.COMMUNITY;
 
     // cache a Lucene IndexSearcher for more efficient searches
     private static Searcher searcher;
     private static long lastModified;
-    
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(DSQuery.class);
-    
-    
+
     /** Do a query, returning a List of DSpace Handles to objects matching the query.
      *  @param query string in Lucene query syntax
      *
@@ -95,160 +89,143 @@ public class DSQuery
      *        (keys are strings from Constants.ITEM, Constants.COLLECTION, etc.
      */
     public static QueryResults doQuery(Context c, QueryArgs args)
-        throws IOException
+                                throws IOException
     {
         String querystring = args.getQuery();
-        QueryResults qr    = new QueryResults();
-        List hitHandles    = new ArrayList();
-        List hitTypes      = new ArrayList();
-        
+        QueryResults qr = new QueryResults();
+        List hitHandles = new ArrayList();
+        List hitTypes = new ArrayList();
+
         // set up the QueryResults object
-        qr.setHitHandles( hitHandles );
-        qr.setHitTypes( hitTypes );
-        qr.setStart( args.getStart() );
-        qr.setPageSize( args.getPageSize() );        
+        qr.setHitHandles(hitHandles);
+        qr.setHitTypes(hitTypes);
+        qr.setStart(args.getStart());
+        qr.setPageSize(args.getPageSize());
 
         // massage the query string a bit                    
-        querystring = checkEmptyQuery    ( querystring );  // change nulls to an empty string
-        querystring = workAroundLuceneBug( querystring );  // logicals changed to && ||, etc.
-        querystring = stripHandles       ( querystring );  // remove handles from query string
-        querystring = stripAsterisk      ( querystring );  // remove asterisk from beginning of string
+        querystring = checkEmptyQuery(querystring); // change nulls to an empty string
+        querystring = workAroundLuceneBug(querystring); // logicals changed to && ||, etc.
+        querystring = stripHandles(querystring); // remove handles from query string
+        querystring = stripAsterisk(querystring); // remove asterisk from beginning of string
 
         try
         {
             // grab a searcher, and do the search
-            Searcher searcher = getSearcher( ConfigurationManager.getProperty("search.dir") );
-            
+            Searcher searcher = getSearcher(ConfigurationManager.getProperty("search.dir"));
+
             QueryParser qp = new QueryParser("default", new DSAnalyzer());
 
             Query myquery = qp.parse(querystring);
-            Hits hits     = searcher.search(myquery);
-            
+            Hits hits = searcher.search(myquery);
+
             // set total number of hits
-            qr.setHitCount( hits.length() );
+            qr.setHitCount(hits.length());
 
             // We now have a bunch of hits - snip out a 'window'
             // defined in start, count and return the handles
             // from that window
-            
             // first, are there enough hits?
-            if( args.getStart() < hits.length() )
+            if (args.getStart() < hits.length())
             {
                 // get as many as we can, up to the window size
-                
                 // how many are available after snipping off at offset 'start'?
-                int hitsRemaining = hits.length() - args.getStart(); 
-                
-                int hitsToProcess = ( hitsRemaining < args.getPageSize() )
-                                ? hitsRemaining : args.getPageSize();
-                                
-                for( int i = args.getStart(); i < args.getStart() + hitsToProcess; i++ )
+                int hitsRemaining = hits.length() - args.getStart();
+
+                int hitsToProcess = (hitsRemaining < args.getPageSize())
+                                    ? hitsRemaining : args.getPageSize();
+
+                for (int i = args.getStart();
+                         i < (args.getStart() + hitsToProcess); i++)
                 {
                     Document d = hits.doc(i);
 
                     String handleText = d.get("handle");
-                    String handletype = d.get("type"  );
-                
+                    String handletype = d.get("type");
+
                     hitHandles.add(handleText);
-                    
-                    if( handletype.equals( "" + Constants.ITEM ) )
+
+                    if (handletype.equals("" + Constants.ITEM))
                     {
-                        hitTypes.add( new Integer( Constants.ITEM ) );
-                    }
-                    else if( handletype.equals( "" + Constants.COLLECTION ) )
+                        hitTypes.add(new Integer(Constants.ITEM));
+                    } else if (handletype.equals("" + Constants.COLLECTION))
                     {
-                        hitTypes.add( new Integer( Constants.COLLECTION ) );
-                    }
-                    else if( handletype.equals( "" + Constants.COMMUNITY ) )
+                        hitTypes.add(new Integer(Constants.COLLECTION));
+                    } else if (handletype.equals("" + Constants.COMMUNITY))
                     {
-                        hitTypes.add( new Integer( Constants.COMMUNITY ) );
-                    }
-                    else
+                        hitTypes.add(new Integer(Constants.COMMUNITY));
+                    } else
                     {
                         // error!  unknown type!
                     }
                 }
             }
-        }
-        catch (NumberFormatException e)
+        } catch (NumberFormatException e)
         {
-            
-            log.warn(LogManager.getHeader(c,
-                "Number format exception",
-                "" + e));
-            
+            log.warn(LogManager.getHeader(c, "Number format exception", "" + e));
+
             qr.setErrorMsg("Number format exception");
-        }
-        catch (ParseException e)
+        } catch (ParseException e)
         {
             // a parse exception - log and return null results
-            log.warn(LogManager.getHeader(c,
-                "Invalid search string",
-                "" + e));
-            
+            log.warn(LogManager.getHeader(c, "Invalid search string", "" + e));
+
             qr.setErrorMsg("Invalid search string");
-        }
-        catch (TokenMgrError tme)
+        } catch (TokenMgrError tme)
         {
             // Similar to parse exception
-            log.warn(LogManager.getHeader(c,
-                "Invalid search string", "" + tme));
-            
-            qr.setErrorMsg("Invalid search string");
+            log.warn(LogManager.getHeader(c, "Invalid search string", "" + tme));
 
+            qr.setErrorMsg("Invalid search string");
         }
 
         return qr;
     }
 
-    static String checkEmptyQuery( String myquery )
+    static String checkEmptyQuery(String myquery)
     {
-        if( myquery.equals("") )
+        if (myquery.equals(""))
         {
             myquery = "empty_query_string";
         }
-        
+
         return myquery;
     }
-    
-    static String workAroundLuceneBug( String myquery )
+
+    static String workAroundLuceneBug(String myquery)
     {
-		// Lucene currently has a bug which breaks wildcard
-		// searching when you have uppercase characters.
-		// Here we substitute the boolean operators -- which 
-		// have to be uppercase -- before tranforming the 
-		// query string to lowercase.
-        
+        // Lucene currently has a bug which breaks wildcard
+        // searching when you have uppercase characters.
+        // Here we substitute the boolean operators -- which 
+        // have to be uppercase -- before tranforming the 
+        // query string to lowercase.
         Perl5Util util = new Perl5Util();
-        
+
         myquery = util.substitute("s/ AND / && /g", myquery);
         myquery = util.substitute("s/ OR / || /g", myquery);
         myquery = util.substitute("s/ NOT / ! /g", myquery);
-        
+
         myquery = myquery.toLowerCase();
 
         return myquery;
     }
-    
 
-    static String stripHandles( String myquery )
+    static String stripHandles(String myquery)
     {
-		// Drop beginning pieces of full handle strings
-        
+        // Drop beginning pieces of full handle strings
         Perl5Util util = new Perl5Util();
-        
-        myquery = util.substitute("s|^(\\s+)?http://hdl\\.handle\\.net/||", myquery);
+
+        myquery = util.substitute("s|^(\\s+)?http://hdl\\.handle\\.net/||",
+                                  myquery);
         myquery = util.substitute("s|^(\\s+)?hdl:||", myquery);
 
         return myquery;
     }
-    
-    static String stripAsterisk( String myquery )
+
+    static String stripAsterisk(String myquery)
     {
-		// query strings (or words) begining with "*" cause a null pointer error 
-        
+        // query strings (or words) begining with "*" cause a null pointer error 
         Perl5Util util = new Perl5Util();
-        
+
         myquery = util.substitute("s/^\\*//", myquery);
         myquery = util.substitute("s| \\*| |", myquery);
         myquery = util.substitute("s|\\(\\*|\\(|", myquery);
@@ -257,29 +234,29 @@ public class DSQuery
         return myquery;
     }
 
-
     /** Do a query, restricted to a collection
      * @param query
      * @param collection
      *
      * @return QueryResults same results as doQuery, restricted to a collection
      */
-    public static QueryResults doQuery(Context c, QueryArgs args, Collection coll)
-        throws IOException
+    public static QueryResults doQuery(Context c, QueryArgs args,
+                                       Collection coll)
+                                throws IOException
     {
         String querystring = args.getQuery();
-        
-        querystring = checkEmptyQuery( querystring );
-    
+
+        querystring = checkEmptyQuery(querystring);
+
         String location = "l" + (coll.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\"" + location + "\"");
+        String newquery = new String("+(" + querystring + ") +location:\"" +
+                                     location + "\"");
 
-        args.setQuery( newquery );
+        args.setQuery(newquery);
 
         return doQuery(c, args);
     }
-
 
     /** Do a query, restricted to a community
      * @param querystring
@@ -288,17 +265,18 @@ public class DSQuery
      * @return HashMap results, same as full doQuery, only hits in a Community
      */
     public static QueryResults doQuery(Context c, QueryArgs args, Community comm)
-        throws IOException
+                                throws IOException
     {
         String querystring = args.getQuery();
-        
-        querystring = checkEmptyQuery( querystring );
+
+        querystring = checkEmptyQuery(querystring);
 
         String location = "m" + (comm.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\"" + location + "\"");
+        String newquery = new String("+(" + querystring + ") +location:\"" +
+                                     location + "\"");
 
-        args.setQuery( newquery );
+        args.setQuery(newquery);
 
         return doQuery(c, args);
     }
@@ -310,9 +288,8 @@ public class DSQuery
      */
     public static List getResults(HashMap results)
     {
-    	return ((List)results.get(ALL));
+        return ((List) results.get(ALL));
     }
-
 
     /** return just the items from a query
      * @param results hashmap from doQuery
@@ -321,9 +298,8 @@ public class DSQuery
      */
     public static List getItemResults(HashMap results)
     {
-    	return ((List)results.get(ITEM));
+        return ((List) results.get(ITEM));
     }
-
 
     /** return just the collections from a query
      * @param results hashmap from doQuery
@@ -332,9 +308,8 @@ public class DSQuery
      */
     public static List getCollectionResults(HashMap results)
     {
-    	return ((List)results.get(COLLECTION));
+        return ((List) results.get(COLLECTION));
     }
-
 
     /** return just the communities from a query
      * @param results hashmap from doQuery
@@ -343,9 +318,8 @@ public class DSQuery
      */
     public static List getCommunityResults(HashMap results)
     {
-    	return ((List)results.get(COMMUNITY));
+        return ((List) results.get(COMMUNITY));
     }
-
 
     /** returns true if anything found
      * @param results hashmap from doQuery
@@ -354,9 +328,10 @@ public class DSQuery
      */
     public static boolean resultsFound(HashMap results)
     {
-		List thislist = getResults(results);
-		return (!thislist.isEmpty());
-	}
+        List thislist = getResults(results);
+
+        return (!thislist.isEmpty());
+    }
 
     /** returns true if items found
      * @param results hashmap from doQuery
@@ -365,9 +340,10 @@ public class DSQuery
      */
     public static boolean itemsFound(HashMap results)
     {
-		List thislist = getItemResults(results);
-		return (!thislist.isEmpty());
-	}
+        List thislist = getItemResults(results);
+
+        return (!thislist.isEmpty());
+    }
 
     /** returns true if collections found
      * @param results hashmap from doQuery
@@ -376,9 +352,10 @@ public class DSQuery
      */
     public static boolean collectionsFound(HashMap results)
     {
-		List thislist = getCollectionResults(results);
-		return (!thislist.isEmpty());
-	}
+        List thislist = getCollectionResults(results);
+
+        return (!thislist.isEmpty());
+    }
 
     /** returns true if communities found
      * @param results hashmap from doQuery
@@ -387,9 +364,10 @@ public class DSQuery
      */
     public static boolean communitiesFound(HashMap results)
     {
-		List thislist = getCommunityResults(results);
-		return (!thislist.isEmpty());
-	}
+        List thislist = getCommunityResults(results);
+
+        return (!thislist.isEmpty());
+    }
 
     /** Do a query, printing results to stdout
      *  largely for testing, but it is useful
@@ -398,7 +376,7 @@ public class DSQuery
     {
         System.out.println("Command line query: " + query);
         System.out.println("Only reporting default-sized results list");
-        
+
         try
         {
             Context c = new Context();
@@ -410,64 +388,51 @@ public class DSQuery
 
             Iterator i = results.getHitHandles().iterator();
             Iterator j = results.getHitTypes().iterator();
-            
-            while( i.hasNext() )
+
+            while (i.hasNext())
             {
-                String thisHandle  = (String)i.next();
-                Integer thisType   = (Integer)j.next();
+                String thisHandle = (String) i.next();
+                Integer thisType = (Integer) j.next();
                 String type = Constants.typeText[thisType.intValue()];
-                
+
                 // also look up type
-                System.out.println( type + "\t" + thisHandle );
+                System.out.println(type + "\t" + thisHandle);
             }
-            
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             System.out.println("Exception caught: " + e);
         }
     }
 
-
     public static void main(String[] args)
     {
-        DSQuery q = new DSQuery();
-
         if (args.length > 0)
         {
-            q.doCMDLineQuery(args[0]);
+            DSQuery.doCMDLineQuery(args[0]);
         }
     }
 
-
     /*---------  private methods ----------*/
-    
+
     /**
      * get an IndexSearcher, hopefully a cached one
      *  (gives much better performance.) checks to see
      *  if the index has been modified - if so, it
      *  creates a new IndexSearcher
      */
-    private static synchronized Searcher getSearcher( String indexDir )
-        throws IOException
+    private static synchronized Searcher getSearcher(String indexDir)
+                                              throws IOException
     {
-        if( lastModified != IndexReader.lastModified( indexDir ) )
+        if (lastModified != IndexReader.getCurrentVersion(indexDir))
         {
             // there's a new index, open it
-            lastModified = IndexReader.lastModified( indexDir );
-            searcher = new IndexSearcher( indexDir );
+            lastModified = IndexReader.getCurrentVersion(indexDir);
+            searcher = new IndexSearcher(indexDir);
         }
-        
+
         return searcher;
     }
 }
 
-
-
-
-
-
- 
 // it's now up to the display page to do the right thing displaying
 // items & communities & collections
-

@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
 import java.sql.SQLException;
@@ -53,6 +52,7 @@ import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+
 
 
 /**
@@ -74,13 +74,13 @@ public class BitstreamFormat
      * to the system
      */
     public static final int UNKNOWN = 0;
-    
+
     /**
      * The "known" support level - for bitstream formats that are known to
      * the system, but not fully supported
      */
     public static final int KNOWN = 1;
-    
+
     /**
      * The "supported" support level - for bitstream formats known to the
      * system and fully supported.
@@ -96,7 +96,6 @@ public class BitstreamFormat
     /** File extensions for this format */
     private List extensions;
 
-
     /**
      * Class constructor for creating a BitstreamFormat object
      * based on the contents of a DB table row.
@@ -105,17 +104,16 @@ public class BitstreamFormat
      * @param row      the corresponding row in the table
      * @throws SQLException
      */
-    BitstreamFormat(Context context, TableRow row)
-        throws SQLException
+    BitstreamFormat(Context context, TableRow row) throws SQLException
     {
         bfContext = context;
         bfRow = row;
         extensions = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context,
-            "SELECT * FROM fileextension WHERE bitstream_format_id=" +
-            getID());
-        
+                                                     "SELECT * FROM fileextension WHERE bitstream_format_id=" +
+                                                     getID());
+
         while (tri.hasNext())
         {
             extensions.add(tri.next().getStringColumn("extension"));
@@ -125,39 +123,38 @@ public class BitstreamFormat
         context.cache(this, row.getIntColumn("bitstream_format_id"));
     }
 
-
     /**
      * Get a bitstream format from the database.
      *
      * @param  context  DSpace context object
      * @param  id       ID of the bitstream format
-     *   
+     *
      * @return  the bitstream format, or null if the ID is invalid.
      * @throws SQLException
      */
     public static BitstreamFormat find(Context context, int id)
-        throws SQLException
+                                throws SQLException
     {
         // First check the cache
-        BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
-            BitstreamFormat.class, id);
-            
+        BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(BitstreamFormat.class,
+                                                                        id);
+
         if (fromCache != null)
         {
             return fromCache;
         }
 
-        TableRow row = DatabaseManager.find(context,
-            "bitstreamformatregistry",
-            id);
+        TableRow row = DatabaseManager.find(context, "bitstreamformatregistry",
+                                            id);
 
         if (row == null)
         {
             if (log.isDebugEnabled())
             {
                 log.debug(LogManager.getHeader(context,
-                    "find_bitstream_format",
-                    "not_found,bitstream_format_id=" + id));
+                                               "find_bitstream_format",
+                                               "not_found,bitstream_format_id=" +
+                                               id));
             }
 
             return null;
@@ -166,50 +163,48 @@ public class BitstreamFormat
         // not null, return format object
         if (log.isDebugEnabled())
         {
-            log.debug(LogManager.getHeader(context,
-                "find_bitstream",
-                "bitstream_format_id=" + id));
+            log.debug(LogManager.getHeader(context, "find_bitstream",
+                                           "bitstream_format_id=" + id));
         }
 
         return new BitstreamFormat(context, row);
     }
 
-    
     /**
      * Find a bitstream format by its (unique) short description
      *
      * @param  context  DSpace context object
      * @param  desc     the short description
-     *   
+     *
      * @return  the corresponding bitstream format, or <code>null</code> if
      *          there's no bitstream format with the given short description
      * @throws SQLException
      */
     public static BitstreamFormat findByShortDescription(Context context,
-        String desc)
-        throws SQLException
+                                                         String desc)
+                                                  throws SQLException
     {
         TableRow formatRow = DatabaseManager.findByUnique(context,
-            "bitstreamformatregistry", "short_description", desc);
+                                                          "bitstreamformatregistry",
+                                                          "short_description",
+                                                          desc);
 
         if (formatRow == null)
         {
             return null;
         }
-        
+
         // not null
         if (log.isDebugEnabled())
         {
-            log.debug(LogManager.getHeader(context,
-                "find_bitstream",
-                "bitstream_format_id=" + formatRow.getIntColumn(
-                "bitstream_format_id")));
+            log.debug(LogManager.getHeader(context, "find_bitstream",
+                                           "bitstream_format_id=" +
+                                           formatRow.getIntColumn("bitstream_format_id")));
         }
 
         // From cache?
-        BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
-            BitstreamFormat.class,
-            formatRow.getIntColumn("bitstream_format_id"));
+        BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(BitstreamFormat.class,
+                                                                        formatRow.getIntColumn("bitstream_format_id"));
 
         if (fromCache != null)
         {
@@ -219,64 +214,59 @@ public class BitstreamFormat
         return new BitstreamFormat(context, formatRow);
     }
 
-
     /**
      * Get the generic "unknown" bitstream format.
      *
      * @param  context  DSpace context object
-     *   
+     *
      * @return  the "unknown" bitstream format.
      * @throws SQLException
      *
-     * @throws IllegalStateException  
+     * @throws IllegalStateException
      *               if the "unknown" bitstream format couldn't be found
      */
     public static BitstreamFormat findUnknown(Context context)
-        throws SQLException
+                                       throws SQLException
     {
         BitstreamFormat bf = findByShortDescription(context, "Unknown");
 
         if (bf == null)
         {
-            throw new IllegalStateException(
-                "No `Unknown' bitstream format in registry");
+            throw new IllegalStateException("No `Unknown' bitstream format in registry");
         }
 
         return bf;
     }
-        
 
     /**
      * Retrieve all bitstream formats from the registry, ordered by ID
      *
      * @param  context  DSpace context object
-     *   
+     *
      * @return  the bitstream formats.
      * @throws SQLException
      */
     public static BitstreamFormat[] findAll(Context context)
-        throws SQLException
+                                     throws SQLException
     {
         List formats = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context,
-            "bitstreamformatregistry",
-            "SELECT * FROM bitstreamformatregistry ORDER BY bitstream_format_id");
+                                                     "bitstreamformatregistry",
+                                                     "SELECT * FROM bitstreamformatregistry ORDER BY bitstream_format_id");
 
         while (tri.hasNext())
         {
             TableRow row = tri.next();
 
             // From cache?
-            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
-                BitstreamFormat.class,
-                row.getIntColumn("bitstream_format_id"));
+            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(BitstreamFormat.class,
+                                                                            row.getIntColumn("bitstream_format_id"));
 
             if (fromCache != null)
             {
                 formats.add(fromCache);
-            }
-            else
+            } else
             {
                 formats.add(new BitstreamFormat(context, row));
             }
@@ -288,7 +278,6 @@ public class BitstreamFormat
 
         return formatArray;
     }
-
 
     /**
      * Retrieve all non-internal bitstream formats from the registry.  The
@@ -296,49 +285,46 @@ public class BitstreamFormat
      * support level (highest first) first then short description.
      *
      * @param  context  DSpace context object
-     *   
+     *
      * @return  the bitstream formats.
      * @throws SQLException
      */
     public static BitstreamFormat[] findNonInternal(Context context)
-        throws SQLException
+                                             throws SQLException
     {
         List formats = new ArrayList();
 
         String myQuery = null;
 
-        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             myQuery = "SELECT * FROM bitstreamformatregistry WHERE internal=0 " +
-                "AND short_description NOT LIKE 'Unknown' " +
-                "ORDER BY support_level DESC, short_description";
-        }
-        else
+                      "AND short_description NOT LIKE 'Unknown' " +
+                      "ORDER BY support_level DESC, short_description";
+        } else
         {
             // default postgres, use boolean
             myQuery = "SELECT * FROM bitstreamformatregistry WHERE internal=false " +
-                "AND short_description NOT LIKE 'Unknown' " +
-                "ORDER BY support_level DESC, short_description";
+                      "AND short_description NOT LIKE 'Unknown' " +
+                      "ORDER BY support_level DESC, short_description";
         }
 
         TableRowIterator tri = DatabaseManager.query(context,
-            "bitstreamformatregistry", myQuery );
-
+                                                     "bitstreamformatregistry",
+                                                     myQuery);
 
         while (tri.hasNext())
         {
             TableRow row = tri.next();
 
             // From cache?
-            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
-                BitstreamFormat.class,
-                row.getIntColumn("bitstream_format_id"));
+            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(BitstreamFormat.class,
+                                                                            row.getIntColumn("bitstream_format_id"));
 
             if (fromCache != null)
             {
                 formats.add(fromCache);
-            }
-            else
+            } else
             {
                 formats.add(new BitstreamFormat(context, row));
             }
@@ -351,7 +337,6 @@ public class BitstreamFormat
         return formatArray;
     }
 
-    
     /**
      * Create a new bitstream format
      *
@@ -361,26 +346,23 @@ public class BitstreamFormat
      * @throws AuthorizeException
      */
     public static BitstreamFormat create(Context context)
-        throws SQLException, AuthorizeException
+                                  throws SQLException, AuthorizeException
     {
         // Check authorisation - only administrators can create new formats
         if (!AuthorizeManager.isAdmin(context))
         {
-            throw new AuthorizeException(
-                "Only administrators can create bitstream formats");
+            throw new AuthorizeException("Only administrators can create bitstream formats");
         }
-        
-        // Create a table row
-        TableRow row = DatabaseManager.create(context,
-            "bitstreamformatregistry");
 
-        log.info(LogManager.getHeader(context,
-            "create_bitstream_format",
-            "bitstream_format_id=" + row.getIntColumn("bitstream_format_id")));
+        // Create a table row
+        TableRow row = DatabaseManager.create(context, "bitstreamformatregistry");
+
+        log.info(LogManager.getHeader(context, "create_bitstream_format",
+                                      "bitstream_format_id=" +
+                                      row.getIntColumn("bitstream_format_id")));
 
         return new BitstreamFormat(context, row);
     }
-
 
     /**
      * Get the internal identifier of this bitstream format
@@ -392,7 +374,6 @@ public class BitstreamFormat
         return bfRow.getIntColumn("bitstream_format_id");
     }
 
-
     /**
      * Get a short (one or two word) description of this bitstream format
      *
@@ -403,7 +384,6 @@ public class BitstreamFormat
         return bfRow.getStringColumn("short_description");
     }
 
-
     /**
      * Set the short description of the bitstream format
      *
@@ -413,7 +393,6 @@ public class BitstreamFormat
     {
         bfRow.setColumn("short_description", s);
     }
-
 
     /**
      * Get a description of this bitstream format, including full application
@@ -426,7 +405,6 @@ public class BitstreamFormat
         return bfRow.getStringColumn("description");
     }
 
-
     /**
      * Set the description of the bitstream format
      *
@@ -436,7 +414,6 @@ public class BitstreamFormat
     {
         bfRow.setColumn("description", s);
     }
-
 
     /**
      * Get the MIME type of this bitstream format, for example
@@ -449,7 +426,6 @@ public class BitstreamFormat
         return bfRow.getStringColumn("mimetype");
     }
 
-
     /**
      * Set the MIME type of the bitstream format
      *
@@ -459,7 +435,6 @@ public class BitstreamFormat
     {
         bfRow.setColumn("mimetype", s);
     }
-
 
     /**
      * Get the support level for this bitstream format - one of
@@ -472,7 +447,6 @@ public class BitstreamFormat
         return bfRow.getIntColumn("support_level");
     }
 
-
     /**
      * Set the support level for this bitstream format - one of
      * <code>UNKNOWN</code>, <code>KNOWN</code> or <code>SUPPORTED</code>.
@@ -482,14 +456,13 @@ public class BitstreamFormat
     public void setSupportLevel(int sl)
     {
         // Sanity check
-        if (sl < 0 || sl > 2)
+        if ((sl < 0) || (sl > 2))
         {
             throw new IllegalArgumentException("Invalid support level");
         }
 
         bfRow.setColumn("support_level", sl);
     }
-
 
     /**
      * Find out if the bitstream format is an internal format - that is,
@@ -504,7 +477,6 @@ public class BitstreamFormat
         return bfRow.getBooleanColumn("internal");
     }
 
-
     /**
      * Set whether the bitstream format is an internal format
      *
@@ -516,30 +488,26 @@ public class BitstreamFormat
         bfRow.setColumn("internal", b);
     }
 
-
     /**
      * Update the bitstream format metadata
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void update()
-        throws SQLException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation - only administrators can change formats
         if (!AuthorizeManager.isAdmin(bfContext))
         {
-            throw new AuthorizeException(
-                "Only administrators can modify bitstream formats");
+            throw new AuthorizeException("Only administrators can modify bitstream formats");
         }
 
-        log.info(LogManager.getHeader(bfContext,
-            "update_bitstream_format",
-            "bitstream_format_id=" + getID()));
+        log.info(LogManager.getHeader(bfContext, "update_bitstream_format",
+                                      "bitstream_format_id=" + getID()));
 
         // Delete extensions
         DatabaseManager.updateQuery(bfContext,
-            "DELETE FROM fileextension WHERE bitstream_format_id=" +
-            getID());
+                                    "DELETE FROM fileextension WHERE bitstream_format_id=" +
+                                    getID());
 
         // Rewrite extensions
         for (int i = 0; i < extensions.size(); i++)
@@ -554,21 +522,18 @@ public class BitstreamFormat
         DatabaseManager.update(bfContext, bfRow);
     }
 
-
     /**
      * Delete this bitstream format.  This converts the types of any bitstreams
      * that may have this type to "unknown".  Use this with care!
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void delete()
-        throws SQLException, AuthorizeException
+    public void delete() throws SQLException, AuthorizeException
     {
         // Check authorisation - only administrators can delete formats
         if (!AuthorizeManager.isAdmin(bfContext))
         {
-            throw new AuthorizeException(
-                "Only administrators can delete bitstream formats");
+            throw new AuthorizeException("Only administrators can delete bitstream formats");
         }
 
         // Remove from cache
@@ -579,23 +544,23 @@ public class BitstreamFormat
 
         // Set bitstreams with this format to "unknown"
         int numberChanged = DatabaseManager.updateQuery(bfContext,
-            "UPDATE bitstream SET bitstream_format_id=" + unknown.getID() +
-                " WHERE bitstream_format_id=" + getID());
+                                                        "UPDATE bitstream SET bitstream_format_id=" +
+                                                        unknown.getID() +
+                                                        " WHERE bitstream_format_id=" +
+                                                        getID());
 
         // Delete extensions
         DatabaseManager.updateQuery(bfContext,
-            "DELETE FROM fileextension WHERE bitstream_format_id=" +
-            getID());
+                                    "DELETE FROM fileextension WHERE bitstream_format_id=" +
+                                    getID());
 
         // Delete this format from database
         DatabaseManager.delete(bfContext, bfRow);
 
-        log.info(LogManager.getHeader(bfContext,
-            "delete_bitstream_format",
-            "bitstream_format_id=" + getID() + ",bitstreams_changed=" +
-                numberChanged));
+        log.info(LogManager.getHeader(bfContext, "delete_bitstream_format",
+                                      "bitstream_format_id=" + getID() +
+                                      ",bitstreams_changed=" + numberChanged));
     }
-
 
     /**
      * Get the filename extensions associated with this format
@@ -606,9 +571,9 @@ public class BitstreamFormat
     {
         String[] exts = new String[extensions.size()];
         exts = (String[]) extensions.toArray(exts);
+
         return exts;
     }
-
 
     /**
      * Set the filename extensions associated with this format
@@ -618,6 +583,7 @@ public class BitstreamFormat
     public void setExtensions(String[] exts)
     {
         extensions = new ArrayList();
+
         for (int i = 0; i < exts.length; i++)
         {
             extensions.add(exts[i]);

@@ -37,30 +37,45 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.history;
 
-
-import java.io.*;
-import java.sql.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.NumberFormat;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.content.*;
-import org.dspace.core.*;
-import org.dspace.eperson.*;
-import org.dspace.storage.rdbms.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.Utils;
+import org.dspace.eperson.EPerson;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.dspace.workflow.WorkflowItem;
 
-import com.hp.hpl.mesa.rdf.jena.common.*;
-import com.hp.hpl.mesa.rdf.jena.mem.*;
-import com.hp.hpl.mesa.rdf.jena.model.*;
+import com.hp.hpl.mesa.rdf.jena.mem.ModelMem;
+import com.hp.hpl.mesa.rdf.jena.model.Model;
+import com.hp.hpl.mesa.rdf.jena.model.Property;
+import com.hp.hpl.mesa.rdf.jena.model.RDFException;
+import com.hp.hpl.mesa.rdf.jena.model.Resource;
 
 
 /**
@@ -79,24 +94,21 @@ public class HistoryManager
     public static final int CREATE = 1;
     public static final int MODIFY = 2;
     public static final int REMOVE = 3;
-
-    private static final String uriPrefixConfig =
-        ConfigurationManager.getProperty("history.uri.prefix");
+    private static final String uriPrefixConfig = ConfigurationManager.getProperty("history.uri.prefix");
 
     /** URI prefix */
-    private static final String uriPrefix = uriPrefixConfig != null ?
-        uriPrefixConfig : "http://www.dspace.org";
+    private static final String uriPrefix = (uriPrefixConfig != null)
+                                            ? uriPrefixConfig
+                                            : "http://www.dspace.org";
 
     /** Handle prefix */
-    private static String handlePrefix =
-        ConfigurationManager.getProperty("handle.prefix");
+    private static String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
 
     /** log4j category */
     private static Logger log = Logger.getLogger(HistoryManager.class);
 
     /** Directory for history serialization */
-    private static String historyDirectory =
-        ConfigurationManager.getProperty("history.dir");
+    private static String historyDirectory = ConfigurationManager.getProperty("history.dir");
 
     // These settings control the way an identifier is hashed into
     // directory and file names
@@ -106,18 +118,17 @@ public class HistoryManager
     private static int directoryLevels = 3;
 
     /** Identifier for the generator */
-    private static final String ID = new StringBuffer()
-    .append(HistoryManager.class.getName())
-    .append(" ")
-    .append("$Revision$")
-    .toString();
+    private static final String ID = new StringBuffer().append(HistoryManager.class.getName())
+                                                       .append(" ")
+                                                       .append("$Revision$")
+                                                       .toString();
 
     /**
      * Private Constructor
      */
-    private HistoryManager ()
-    {}
-
+    private HistoryManager()
+    {
+    }
 
     /**
      * Save history information about this object.
@@ -130,20 +141,18 @@ public class HistoryManager
      * @param tool A description of the tool that was used to effect
      * the action.
      */
-    public static void saveHistory(Context context,
-                                   Object obj,
-                                   int flag,
-                                   EPerson user,
-                                   String tool)
+    public static void saveHistory(Context context, Object obj, int flag,
+                                   EPerson user, String tool)
     {
         try
         {
             createHarmonyData(context, obj, flag, user, tool);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             if (log.isDebugEnabled())
+            {
                 log.debug("Exception while saving history", e);
+            }
         }
     }
 
@@ -157,19 +166,20 @@ public class HistoryManager
      * @param tool A description of the tool that was used to effect
      * the action.
      */
-    private static void createHarmonyData(Context context,
-                                          Object historyObj,
-                                          int flag,
-                                          EPerson theUser,
+    private static void createHarmonyData(Context context, Object historyObj,
+                                          int flag, EPerson theUser,
                                           String theTool)
-        throws SQLException, RDFException, IOException
+                                   throws SQLException, RDFException, 
+                                          IOException
     {
-        String id = (flag == REMOVE) ?
-            getUniqueId(historyObj) : doSerialize(context, historyObj);
+        String id = (flag == REMOVE) ? getUniqueId(historyObj)
+                                     : doSerialize(context, historyObj);
 
         // Figure out the tool used
         if (theTool == null)
+        {
             theTool = getTool();
+        }
 
         String eventId = getUniqueId(getShortName(historyObj), flag);
 
@@ -192,21 +202,29 @@ public class HistoryManager
 
         // This is the object that we're making statements about....
         Resource obj = model.createResource(id);
+
         // This is the event
         Resource event = model.createResource(eventId);
+
         //  States
-        Resource outputState = (flag == REMOVE) ? null : model.createResource(stateId.toString());
-        Resource inputState = (flag == CREATE) ? null : model.createResource(inputStateId);
+        Resource outputState = (flag == REMOVE) ? null
+                                                : model.createResource(stateId.toString());
+        Resource inputState = (flag == CREATE) ? null
+                                               : model.createResource(inputStateId);
+
         //  FIXME The action (also typed??)
         Resource action = model.createResource(getUniqueId("action", NONE));
+
         //  The user
-        Resource user = (theUser != null) ? model.createResource(getUniqueId(theUser)) : null;
+        Resource user = (theUser != null)
+                        ? model.createResource(getUniqueId(theUser)) : null;
 
         // These verbs are essentially constant
         Property atTime = model.createProperty(getHarmonyId("atTime"));
         Property hasInput = model.createProperty(getHarmonyId("hasInput"));
         Property hasOutput = model.createProperty(getHarmonyId("hasOutput"));
         Property inState = model.createProperty(getHarmonyId("inState"));
+
         //Property contains  = model.createProperty(getHarmonyId("contains"));
         Property hasAction = model.createProperty(getHarmonyId("hasAction"));
         Property usesTool = model.createProperty(getHarmonyId("usesTool"));
@@ -215,24 +233,34 @@ public class HistoryManager
 
         // Choose the correct operation
         if (flag == CREATE)
+        {
             operation = model.createProperty(getHarmonyId("creates"));
-        else if (flag == REMOVE)
+        } else if (flag == REMOVE)
+        {
             operation = model.createProperty(getHarmonyId("destroys"));
-        else if (flag == MODIFY)
+        } else if (flag == MODIFY)
+        {
             operation = model.createProperty(getHarmonyId("transforms"));
-        else
-            throw new IllegalArgumentException("Unknown value for flag: " + flag);
+        } else
+        {
+            throw new IllegalArgumentException("Unknown value for flag: " +
+                                               flag);
+        }
 
         // Creation events do not have input states, but everything
         // else does
         if (flag != CREATE)
+        {
             model.add(event, hasInput, inputState);
+        }
+
         // Removal events do not have output states, nor is the object
         // in a state upon completion
         if (flag != REMOVE)
         {
             model.add(event, hasOutput, outputState);
             model.add(obj, inState, outputState);
+
             //model.add(outputState,  contains,  obj);
         }
 
@@ -242,10 +270,14 @@ public class HistoryManager
         model.add(action, operation, obj);
         model.add(event, hasAction, action);
         model.add(action, usesTool, theTool);
+
         if (theUser != null)
+        {
             model.add(action, hasAgent, user);
-        else
+        } else
+        {
             model.add(action, hasAgent, model.createLiteral("Unknown User"));
+        }
 
         //  FIXME Strictly speaking, this is NOT a property of the
         //  object itself, but of the resulting serialization!
@@ -266,6 +298,7 @@ public class HistoryManager
 
         model.write(swdata);
         swdata.close();
+
         String data = swdata.toString();
 
         TableRow h = DatabaseManager.create(context, "History");
@@ -295,27 +328,35 @@ public class HistoryManager
     private static String getUniqueId(Object obj)
     {
         if (obj == null)
+        {
             return null;
+        }
 
         int id = -1;
+
         //  FIXME This would be easier there were a ContentObject
         //  interface/base class
         if (obj instanceof Community)
+        {
             id = ((Community) obj).getID();
-        else if (obj instanceof Collection)
+        } else if (obj instanceof Collection)
+        {
             id = ((Collection) obj).getID();
-        else if (obj instanceof Item)
+        } else if (obj instanceof Item)
+        {
             id = ((Item) obj).getID();
-        else if (obj instanceof EPerson)
+        } else if (obj instanceof EPerson)
+        {
             id = ((EPerson) obj).getID();
-        else if (obj instanceof WorkspaceItem)
+        } else if (obj instanceof WorkspaceItem)
+        {
             id = ((WorkspaceItem) obj).getID();
-        else if (obj instanceof WorkflowItem)
+        } else if (obj instanceof WorkflowItem)
+        {
             id = ((WorkflowItem) obj).getID();
+        }
 
-        return getUniqueIdInternal(uriPrefix,
-                                   handlePrefix,
-                                   getShortName(obj),
+        return getUniqueIdInternal(uriPrefix, handlePrefix, getShortName(obj),
                                    Integer.toString(id));
     }
 
@@ -328,17 +369,16 @@ public class HistoryManager
      */
     private static String getUniqueId(String name, int flag)
     {
-        String objname = new StringBuffer("harmony")
-            .append("/")
-            .append(name)
-            .append(flag == CREATE ? "create" : "")
-            .append(flag == MODIFY ? "modify" : "")
-            .append(flag == REMOVE ? "remove" : "")
-            .toString();
+        String objname = new StringBuffer("harmony").append("/").append(name)
+                                                    .append((flag == CREATE)
+                                                            ? "create" : "")
+                                                    .append((flag == MODIFY)
+                                                            ? "modify" : "")
+                                                    .append((flag == REMOVE)
+                                                            ? "remove" : "")
+                                                    .toString();
 
-        return getUniqueIdInternal(uriPrefix,
-                                   null,
-                                   objname,
+        return getUniqueIdInternal(uriPrefix, null, objname,
                                    Utils.generateHexKey());
     }
 
@@ -351,11 +391,7 @@ public class HistoryManager
      */
     private static String getPropertyId(String objname, String property)
     {
-        return getUniqueIdInternal
-            (uriPrefix,
-             null,
-             objname,
-             property);
+        return getUniqueIdInternal(uriPrefix, null, objname, property);
     }
 
     /**
@@ -366,11 +402,7 @@ public class HistoryManager
      */
     private static String getHarmonyId(String property)
     {
-        return getUniqueIdInternal
-            (uriPrefix,
-             null,
-             "harmony",
-             property);
+        return getUniqueIdInternal(uriPrefix, null, "harmony", property);
     }
 
     /**
@@ -384,21 +416,20 @@ public class HistoryManager
      */
     private static String getUniqueIdInternal(String uriPrefix,
                                               String handlePrefix,
-                                              String objname,
-                                              String objid)
+                                              String objname, String objid)
     {
         final String SLASH = "/";
 
-        return new StringBuffer()
-            .append(uriPrefix)
-            .append(uriPrefix.endsWith(SLASH) ? "" : SLASH)
-            .append(objname)
-            .append(objname.endsWith(SLASH) ? "" : SLASH)
-            .append(handlePrefix == null ? "" : handlePrefix)
-            .append((handlePrefix == null) || (handlePrefix.endsWith(SLASH))
-                ? "" : SLASH)
-            .append(objid)
-            .toString();
+        return new StringBuffer().append(uriPrefix)
+                                 .append(uriPrefix.endsWith(SLASH) ? "" : SLASH)
+                                 .append(objname)
+                                 .append(objname.endsWith(SLASH) ? "" : SLASH)
+                                 .append((handlePrefix == null) ? ""
+                                                                : handlePrefix)
+                                 .append(((handlePrefix == null) ||
+                                         (handlePrefix.endsWith(SLASH))) ? ""
+                                                                         : SLASH)
+                                 .append(objid).toString();
     }
 
     ////////////////////////////////////////
@@ -417,10 +448,12 @@ public class HistoryManager
      * the database
      */
     private static String serialize(Context context, Object obj)
-        throws RDFException, SQLException
+                             throws RDFException, SQLException
     {
         if (obj == null)
+        {
             return null;
+        }
 
         Model model = new ModelMem();
 
@@ -430,12 +463,14 @@ public class HistoryManager
         StringWriter data = new StringWriter();
 
         model.write(data);
+
         // Since this is all in-memory, IOExceptions should never happen
         try
         {
             data.close();
+        } catch (IOException ioe)
+        {
         }
-        catch (IOException ioe) {}
 
         return data.toString();
     }
@@ -451,13 +486,14 @@ public class HistoryManager
      * @exception SQLException If an error occurs while accessing
      * the database
      */
-    private static void serializeInternal(Context context,
-                                          Object obj,
+    private static void serializeInternal(Context context, Object obj,
                                           Model model)
-        throws RDFException, SQLException
+                                   throws RDFException, SQLException
     {
         if (obj == null)
+        {
             return;
+        }
 
         String id = getUniqueId(obj);
         Resource res = model.createResource(id);
@@ -469,17 +505,24 @@ public class HistoryManager
         model.add(res, generatorId, ID);
 
         if (obj instanceof Community)
+        {
             addData(context, (Community) obj, res, model);
-        else if (obj instanceof Collection)
+        } else if (obj instanceof Collection)
+        {
             addData(context, (Collection) obj, res, model);
-        else if (obj instanceof Item)
+        } else if (obj instanceof Item)
+        {
             addData(context, (Item) obj, res, model);
-        else if (obj instanceof WorkspaceItem)
+        } else if (obj instanceof WorkspaceItem)
+        {
             addData(context, (WorkspaceItem) obj, res, model);
-        else if (obj instanceof WorkflowItem)
+        } else if (obj instanceof WorkflowItem)
+        {
             addData(context, (WorkflowItem) obj, res, model);
-        else if (obj instanceof EPerson)
+        } else if (obj instanceof EPerson)
+        {
             addData(context, (EPerson) obj, res, model);
+        }
     }
 
     /**
@@ -496,10 +539,12 @@ public class HistoryManager
      * the database
      */
     private static String doSerialize(Context context, Object obj)
-        throws SQLException, IOException, RDFException
+                               throws SQLException, IOException, RDFException
     {
         if (obj == null)
+        {
             return null;
+        }
 
         String id = getUniqueId(obj);
         String serialization = serialize(context, obj);
@@ -519,19 +564,18 @@ public class HistoryManager
      * @exception SQLException If an error occurs while accessing
      * the database
      */
-    private static void store(Context context,
-                              String serialization)
-        throws SQLException, IOException
+    private static void store(Context context, String serialization)
+                       throws SQLException, IOException
     {
         String checksum = Utils.getMD5(serialization);
-        TableRow row = DatabaseManager.findByUnique(context,
-                                                    "history",
-                                                    "checksum",
-                                                    checksum);
+        TableRow row = DatabaseManager.findByUnique(context, "history",
+                                                    "checksum", checksum);
 
         // Already stored
         if (row != null)
+        {
             return;
+        }
 
         TableRow h = DatabaseManager.create(context, "History");
         int hid = h.getIntColumn("history_id");
@@ -542,7 +586,7 @@ public class HistoryManager
         fw.write(serialization);
         fw.close();
 
-        h.setColumn("checksum",      checksum);
+        h.setColumn("checksum", checksum);
         h.setColumn("creation_date", nowAsTimeStamp());
         DatabaseManager.update(context, h);
     }
@@ -555,7 +599,7 @@ public class HistoryManager
      * the database
      */
     private static String findPreviousState(String id)
-        throws SQLException
+                                     throws SQLException
     {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -567,15 +611,21 @@ public class HistoryManager
             connection = DatabaseManager.getConnection();
             statement = connection.prepareStatement(sql);
             statement.setString(1, id);
+
             ResultSet results = statement.executeQuery();
+
             return results.next() ? results.getString(1) : null;
-        }
-        finally
+        } finally
         {
             if (statement != null)
+            {
                 statement.close();
+            }
+
             if (connection != null)
+            {
                 connection.close();
+            }
         }
     }
 
@@ -595,34 +645,32 @@ public class HistoryManager
      * @exception SQLException If an error occurs while accessing
      * the database
      */
-    private static void addData(Context context,
-                                Community community,
-                                Resource res,
-                                Model model)
-        throws RDFException, SQLException
+    private static void addData(Context context, Community community,
+                                Resource res, Model model)
+                         throws RDFException, SQLException
     {
         String shortname = getShortName(community);
-        model.add(res,
-                  model.createProperty(getPropertyId(shortname, "ID")),
+        model.add(res, model.createProperty(getPropertyId(shortname, "ID")),
                   community.getID());
 
         String[] metadata = new String[]
-        {"name", "short_description", "introductory_text",
-         "copyright_text", "side_bar_text"};
-        for (int i = 0; i < metadata.length; i++ )
+                            {
+                                "name", "short_description", "introductory_text",
+                                "copyright_text", "side_bar_text"
+                            };
+
+        for (int i = 0; i < metadata.length; i++)
         {
             String meta = metadata[i];
-            addMetadata(model, res, shortname, meta,
-                        community.getMetadata(meta));
+            addMetadata(model, res, shortname, meta, community.getMetadata(meta));
         }
 
         Property hasPart = model.createProperty(getHarmonyId("hasPart"));
         Collection[] collections = community.getCollections();
 
-        for (int i = 0; i < collections.length; i++ )
+        for (int i = 0; i < collections.length; i++)
         {
             model.add(res, hasPart, getUniqueId(collections[i]));
-
         }
     }
 
@@ -638,25 +686,26 @@ public class HistoryManager
      * @exception SQLException If an error occurs while accessing
      * the database
      */
-    private static void addData(Context context,
-                                Collection collection,
-                                Resource res,
-                                Model model)
-        throws SQLException, RDFException
+    private static void addData(Context context, Collection collection,
+                                Resource res, Model model)
+                         throws SQLException, RDFException
     {
         String shortname = getShortName(collection);
 
-        model.add(res,
-                  model.createProperty(getPropertyId(shortname, "ID")),
+        model.add(res, model.createProperty(getPropertyId(shortname, "ID")),
                   collection.getID());
         model.add(res,
                   model.createProperty(getPropertyId(shortname, "license")),
                   collection.getLicense());
 
         String[] metadata = new String[]
-        {"name", "short_description", "introductory_text",
-         "copyright_text", "side_bar_text", "provenance_description"};
-        for (int i = 0; i < metadata.length; i++ )
+                            {
+                                "name", "short_description", "introductory_text",
+                                "copyright_text", "side_bar_text",
+                                "provenance_description"
+                            };
+
+        for (int i = 0; i < metadata.length; i++)
         {
             String meta = metadata[i];
             addMetadata(model, res, shortname, meta,
@@ -686,26 +735,25 @@ public class HistoryManager
      * @exception SQLException If an error occurs while accessing
      * the database
      */
-    private static void addData(Context context,
-                                Item item,
-                                Resource res,
-                                Model model)
-        throws RDFException, SQLException
+    private static void addData(Context context, Item item, Resource res,
+                                Model model) throws RDFException, SQLException
     {
         DCValue[] dcfields = item.getDC(Item.ANY, Item.ANY, Item.ANY);
 
-        for (int i = 0; i < dcfields.length; i++ )
+        for (int i = 0; i < dcfields.length; i++)
         {
             DCValue dc = dcfields[i];
             String element = dc.element;
             String qualifier = dc.qualifier;
 
             String type = new StringBuffer().append(element)
-                .append(qualifier == null ? "" : ".")
-                .append(qualifier == null ? "" : qualifier)
-                .toString();
+                                            .append((qualifier == null) ? "" : ".")
+                                            .append((qualifier == null) ? ""
+                                                                        : qualifier)
+                                            .toString();
 
-            Property p = model.createProperty(uriPrefix + "/dublincore/" + type);
+            Property p = model.createProperty(uriPrefix + "/dublincore/" +
+                                              type);
             model.add(res, p, dc.value);
         }
 
@@ -713,19 +761,20 @@ public class HistoryManager
         //  bitstreams in the Early Adopters release.
         //  When Bundles have their own metadata, they should be recorded
         Property hasPart = model.createProperty(getHarmonyId("hasPart"));
+
         //  FIXME Not clear that we should ignore the internal bitstreams
         Bitstream[] bitstreams = item.getNonInternalBitstreams();
 
-        for (int i = 0; i < bitstreams.length; i++ )
+        for (int i = 0; i < bitstreams.length; i++)
         {
             Bitstream bitstream = bitstreams[i];
 
             model.add(res, hasPart, getUniqueId(bitstream));
+
             // Serialize the bitstream's metadata
             serializeInternal(context, bitstream, model);
         }
     }
-
 
     /**
      * Add workspace-item-specific data to the model.
@@ -739,11 +788,9 @@ public class HistoryManager
      * @exception RDFException If an error occurs adding RDF statements
      * to the model
      */
-    private static void addData(Context context,
-                                WorkspaceItem wi,
-                                Resource res,
-                                Model model)
-        throws SQLException, RDFException
+    private static void addData(Context context, WorkspaceItem wi,
+                                Resource res, Model model)
+                         throws SQLException, RDFException
     {
         Item item = Item.find(context, wi.getItem().getID());
 
@@ -762,11 +809,8 @@ public class HistoryManager
      * @exception RDFException If an error occurs adding RDF statements
      * to the model
      */
-    private static void addData(Context context,
-                                WorkflowItem wi,
-                                Resource res,
-                                Model model)
-        throws SQLException, RDFException
+    private static void addData(Context context, WorkflowItem wi, Resource res,
+                                Model model) throws SQLException, RDFException
     {
         Item item = Item.find(context, wi.getItem().getID());
 
@@ -785,18 +829,13 @@ public class HistoryManager
      * @exception RDFException If an error occurs adding RDF statements
      * to the model
      */
-    private static void addData(Context context,
-                                EPerson eperson,
-                                Resource res,
-                                Model model)
-        throws SQLException, RDFException
+    private static void addData(Context context, EPerson eperson, Resource res,
+                                Model model) throws SQLException, RDFException
     {
         String shortname = getShortName(eperson);
-        model.add(res,
-                  model.createProperty(getPropertyId(shortname, "ID")),
+        model.add(res, model.createProperty(getPropertyId(shortname, "ID")),
                   eperson.getID());
-        model.add(res,
-                  model.createProperty(getPropertyId(shortname, "email")),
+        model.add(res, model.createProperty(getPropertyId(shortname, "email")),
                   eperson.getEmail());
         model.add(res,
                   model.createProperty(getPropertyId(shortname, "firstname")),
@@ -808,15 +847,16 @@ public class HistoryManager
                   model.createProperty(getPropertyId(shortname, "active")),
                   eperson.canLogIn());
         model.add(res,
-                  model.createProperty(getPropertyId(shortname, "require_certificate")),
+                  model.createProperty(getPropertyId(shortname,
+                                                     "require_certificate")),
                   eperson.getRequireCertificate());
 
-        String[] metadata = new String[] {"phone"};
-        for (int i = 0; i < metadata.length; i++ )
+        String[] metadata = new String[] { "phone" };
+
+        for (int i = 0; i < metadata.length; i++)
         {
             String meta = metadata[i];
-            addMetadata(model, res, shortname, meta,
-                        eperson.getMetadata(meta));
+            addMetadata(model, res, shortname, meta, eperson.getMetadata(meta));
         }
     }
 
@@ -831,18 +871,16 @@ public class HistoryManager
      * @exception RDFException If an error occurs while constructing
      * an RDF graph
      */
-    private static void addMetadata(Model model,
-                                    Resource res,
-                                    String object,
-                                    String property,
-                                    String value)
-        throws RDFException
+    private static void addMetadata(Model model, Resource res, String object,
+                                    String property, String value)
+                             throws RDFException
     {
         if (value == null)
+        {
             return;
+        }
 
-        model.add(res,
-                  model.createProperty(getPropertyId(object, property)),
+        model.add(res, model.createProperty(getPropertyId(object, property)),
                   value);
     }
 
@@ -860,20 +898,23 @@ public class HistoryManager
      * @exception IOException If a filesystem error occurs while
      * determining the corresponding file.
      */
-    private static File forId(int id, boolean create)
-        throws IOException
+    private static File forId(int id, boolean create) throws IOException
     {
         File file = new File(id2Filename(id));
 
         if (!file.exists())
         {
             if (!create)
+            {
                 return null;
+            }
 
             File parent = file.getParentFile();
 
             if (!parent.exists())
+            {
                 parent.mkdirs();
+            }
 
             file.createNewFile();
         }
@@ -889,15 +930,16 @@ public class HistoryManager
      * @exception IOException If a filesystem error occurs while
      * determining the name.
      */
-    private static String id2Filename(int id)
-        throws IOException
+    private static String id2Filename(int id) throws IOException
     {
         NumberFormat nf = NumberFormat.getInstance();
 
         // Do not use commas to separate digits
         nf.setGroupingUsed(false);
+
         // Ensure numbers are at least 8 digits
         nf.setMinimumIntegerDigits(8);
+
         String ID = nf.format(new Integer(id));
 
         // Start with the root directory
@@ -908,14 +950,18 @@ public class HistoryManager
         {
             int digits = i * digitsPerLevel;
 
-            result.append(File.separator).append(ID.substring(digits, digits + digitsPerLevel));
+            result.append(File.separator).append(ID.substring(digits,
+                                                              digits +
+                                                              digitsPerLevel));
         }
 
         // Lastly, add the id itself
         String theName = result.append(File.separator).append(id).toString();
 
         if (log.isDebugEnabled())
+        {
             log.debug("Filename for " + id + " is " + theName);
+        }
 
         return theName;
     }
@@ -943,11 +989,13 @@ public class HistoryManager
             while ((line = reader.readLine()) != null)
             {
                 if (line.indexOf("org.dspace") != -1)
+                {
                     match = line.trim();
+                }
             }
 
             // If nothing matched, maybe the stacktrace will give a clue
-            return match == null ? stacktrace : match;
+            return (match == null) ? stacktrace : match;
         }
         // Should never get here -- no real I/O
         catch (Exception e)
@@ -966,6 +1014,7 @@ public class HistoryManager
         StringWriter writer = new StringWriter();
 
         new Throwable().printStackTrace(new PrintWriter(writer));
+
         return writer.toString();
     }
 
@@ -978,11 +1027,14 @@ public class HistoryManager
     private static String getShortName(Object obj)
     {
         if (obj == null)
+        {
             return null;
+        }
 
         String classname = obj.getClass().getName();
         int index = classname.lastIndexOf(".");
-        return index == -1 ? classname : classname.substring(index + 1);
+
+        return (index == -1) ? classname : classname.substring(index + 1);
     }
 
     /**
@@ -1011,6 +1063,7 @@ public class HistoryManager
         try
         {
             context = new Context();
+
             Community c = Community.find(context, 1);
 
             if (c != null)
@@ -1032,8 +1085,11 @@ public class HistoryManager
             // New eperson
             String email = "historytestuser@HistoryManager";
             EPerson nep = EPerson.findByEmail(context, email);
+
             if (nep == null)
+            {
                 nep = EPerson.create(context);
+            }
 
             nep.setFirstName("History");
             nep.setEmail(email);
@@ -1056,15 +1112,15 @@ public class HistoryManager
             }
 
             System.exit(0);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             e.printStackTrace();
-        }
-        finally
+        } finally
         {
             if (context != null)
+            {
                 context.abort();
+            }
         }
     }
 }

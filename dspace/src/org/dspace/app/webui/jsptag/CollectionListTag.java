@@ -37,21 +37,17 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.LinkedList;
-import javax.servlet.ServletException;
-import javax.servlet.jsp.tagext.TagSupport;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import org.dspace.content.Collection;
+
 
 /**
  * Tag for display a list of collections
@@ -64,15 +60,12 @@ public class CollectionListTag extends TagSupport
     /** Collections to display */
     private Collection[] collections;
 
-
     public CollectionListTag()
     {
         super();
     }
-    
 
-    public int doStartTag()
-        throws JspException
+    public int doStartTag() throws JspException
     {
         JspWriter out = pageContext.getOut();
 
@@ -81,9 +74,8 @@ public class CollectionListTag extends TagSupport
             out.println("<table align=center class=\"miscTable\">");
 
             // Write column headings
-            out.print("<tr><th class=\"oddRowOddCol\">" +
-                "Collection Name" +
-                "</th></tr>");
+            out.print("<tr><th class=\"oddRowOddCol\">" + "Collection Name" +
+                      "</th></tr>");
 
             // Row: toggles between Odd and Even
             String row = "even";
@@ -92,33 +84,31 @@ public class CollectionListTag extends TagSupport
             {
                 // name
                 String name = collections[i].getMetadata("name");
-                
+
                 // first and only column is 'name'
                 out.print("</td><td class=\"" + row + "RowEvenCol\">");
                 out.print("<A HREF=\"");
-                HttpServletRequest hrq = (HttpServletRequest)
-                    pageContext.getRequest();
+
+                HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
                 out.print(hrq.getContextPath() + "/handle/");
                 out.print(collections[i].getHandle());
                 out.print("\">");
                 out.print(name);
                 out.print("</A>");
-                
+
                 out.println("</td></tr>");
 
                 row = (row.equals("odd") ? "even" : "odd");
             }
-            
+
             out.println("</table>");
-        }
-        catch (IOException ie)
+        } catch (IOException ie)
         {
             throw new JspException(ie);
         }
 
         return SKIP_BODY;
-    }        
-
+    }
 
     /**
      * Get the collections to list
@@ -129,11 +119,10 @@ public class CollectionListTag extends TagSupport
     {
         return collections;
     }
-    
 
     /**
      * Set the collections to list
-     * 
+     *
      * @param  collectionsIn  the collections
      */
     public void setCollections(Collection[] collectionsIn)
@@ -141,9 +130,8 @@ public class CollectionListTag extends TagSupport
         collections = collectionsIn;
     }
 
-
     public void release()
     {
-        collections  = null;
+        collections = null;
     }
 }

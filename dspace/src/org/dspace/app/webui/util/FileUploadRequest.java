@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.util;
 
 import java.io.File;
@@ -45,12 +44,14 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.dspace.core.ConfigurationManager;
+
 import com.oreilly.servlet.MultipartRequest;
 
-import org.dspace.core.ConfigurationManager;
 
 /**
  * Based on the com.oreilly.servlet.MultipartWrapper object, this is an
@@ -68,22 +69,21 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
     /** Original request */
     private HttpServletRequest original = null;
-    
+
     /**
      * Wraps a multipart request and extracts the files
      *
      * @param req   the original request
      */
-    public FileUploadRequest(HttpServletRequest req)
-        throws IOException
+    public FileUploadRequest(HttpServletRequest req) throws IOException
     {
         super(req);
 
         original = req;
-        
+
         String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
         int maxSize = ConfigurationManager.getIntProperty("upload.max");
-        
+
         mreq = new MultipartRequest(req, tempDir, maxSize, "UTF-8");
     }
 
@@ -102,16 +102,18 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     {
         return mreq.getParameterValues(name);
     }
-  
+
     public Map getParameterMap()
     {
         Map map = new HashMap();
         Enumeration eNum = getParameterNames();
+
         while (eNum.hasMoreElements())
         {
             String name = (String) eNum.nextElement();
             map.put(name, mreq.getParameterValues(name));
         }
+
         return map;
     }
 
@@ -120,17 +122,17 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     {
         return mreq.getFileNames();
     }
-  
+
     public String getFilesystemName(String name)
     {
         return mreq.getFilesystemName(name);
     }
-  
+
     public String getContentType(String name)
     {
         return mreq.getContentType(name);
     }
-  
+
     public File getFile(String name)
     {
         return mreq.getFile(name);

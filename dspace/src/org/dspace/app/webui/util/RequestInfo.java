@@ -37,15 +37,16 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.util;
 
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+
 
 /**
  * Stores information about an HTTP request.  This is used so that the request
@@ -59,13 +60,12 @@ public class RequestInfo
 {
     /** The original parameters */
     private Map originalParameterMap;
-        
+
     /** The original method */
     private String originalMethod;
-        
+
     /** The original query */
     private String originalQueryString;
-        
 
     /**
      * Construct a request info object storing information about the given
@@ -79,7 +79,6 @@ public class RequestInfo
         originalMethod = request.getMethod();
         originalQueryString = request.getQueryString();
     }
-
 
     /**
      * Wrap an incoming request to make it look like the request that the
@@ -95,7 +94,6 @@ public class RequestInfo
         return new MyWrapper(request);
     }
 
-
     /**
      * Our own flavour of HTTP request wrapper, that uses information from=
      * this RequestInfo object
@@ -108,7 +106,6 @@ public class RequestInfo
         }
 
         // ====== Methods below here are the wrapped methods ======
-
         public String getParameter(String name)
         {
             String[] vals = (String[]) originalParameterMap.get(name);
@@ -118,8 +115,7 @@ public class RequestInfo
                 // Delegate to wrapped object
                 // FIXME: This is possibly a bug in Tomcat
                 return super.getParameter(name);
-            }
-            else
+            } else
             {
                 return vals[0];
             }
@@ -152,10 +148,9 @@ public class RequestInfo
             return originalQueryString;
         }
 
-
         /**
          * This class converts an interator into an enumerator.  This is done
-         * because we have the parameters as a Map (JDK 1.2 style), but for 
+         * because we have the parameters as a Map (JDK 1.2 style), but for
          * some weird reason the HttpServletRequest interface returns an
          * Enumeration from getParameterNames() (JDK1.0 style.)  JDK apparently
          * offers no way of simply changing between the new styles.

@@ -33,35 +33,22 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet.admin;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.LogManager;
+import org.dspace.core.Context;
 
 
 /**
@@ -71,65 +58,57 @@ import org.dspace.core.LogManager;
 public class NewsEditServlet extends DSpaceServlet
 {
     private static Logger log = Logger.getLogger(NewsEditServlet.class);
-         
-    protected void doDSGet(Context c,
-                    HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+
+    protected void doDSGet(Context c, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         //always go first to news-main.jsp
         JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
-        
     }
-    
-      
-   protected void doDSPost(Context c,
-                    HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+
+    protected void doDSPost(Context c, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
-           
         //Get submit button
         String button = UIUtil.getSubmitButton(request, "submit");
- 
+
         String news = "";
-        
+
         //Are we editing the top news or the sidebar news?
         int position = UIUtil.getIntParameter(request, "position");
-            
-       
-        if( button.equals("submit_edit") )
+
+        if (button.equals("submit_edit"))
         {
             //get the existing text from the file
             news = ConfigurationManager.readNewsFile(position);
-            
+
             //pass the position back to the JSP
             request.setAttribute("position", new Integer(position));
-            
-             //pass the existing news back to the JSP
-            request.setAttribute("news", news);
-                  
-            //show news edit page
-             JSPManager.showJSP(request, response, "/dspace-admin/news-edit.jsp");
 
-        }
-        else if( button.equals("submit_save") )
-        {       
+            //pass the existing news back to the JSP
+            request.setAttribute("news", news);
+
+            //show news edit page
+            JSPManager.showJSP(request, response, "/dspace-admin/news-edit.jsp");
+        } else if (button.equals("submit_save"))
+        {
             //get text string from form
             news = (String) request.getParameter("news");
-            
+
             //write the string out to file
             ConfigurationManager.writeNewsFile(position, news);
-            
+
             JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
-        }
-        else
+        } else
         {
             //the user hit cancel, so return to the main news edit page
-           JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
         }
-    
+
         c.complete();
-
     }
-      
 }
-

@@ -37,21 +37,16 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
-
 package org.dspace.content;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.dspace.browse.Browse;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
+
 
 /**
  * Compare two Items by their DCValues.
@@ -68,10 +63,13 @@ public class ItemComparator implements Comparator
 {
     /** Dublin Core element */
     private String element;
+
     /** Dublin Core qualifier */
     private String qualifier;
+
     /** Language */
     private String language;
+
     /** Whether maximum or minimum value will be used */
     private boolean max;
 
@@ -85,15 +83,13 @@ public class ItemComparator implements Comparator
      * element, qualifier and language, then use the maximum value
      * lexicographically; otherwise use the minimum value.
      */
-    public ItemComparator (String element,
-                           String qualifier,
-                           String language,
-                           boolean max)
+    public ItemComparator(String element, String qualifier, String language,
+                          boolean max)
     {
         this.element = element;
         this.qualifier = qualifier;
         this.language = language;
-        this.max      = max;
+        this.max = max;
     }
 
     /**
@@ -116,20 +112,29 @@ public class ItemComparator implements Comparator
      */
     public int compare(Object first, Object second)
     {
-        if ((! (first  instanceof Item)) ||
-            (! (second instanceof Item)))
+        if ((!(first instanceof Item)) || (!(second instanceof Item)))
+        {
             throw new IllegalArgumentException("Arguments must be Items");
+        }
 
         // Retrieve a chosen value from the array for comparison
         String firstValue = getValue((Item) first);
         String secondValue = getValue((Item) second);
 
         if ((firstValue == null) && (secondValue == null))
+        {
             return 0;
+        }
+
         if ((firstValue != null) && (secondValue == null))
+        {
             return 1;
+        }
+
         if ((firstValue == null) && (secondValue != null))
+        {
             return -1;
+        }
 
         // See the javadoc for java.lang.String for an explanation
         // of the return value.
@@ -147,17 +152,16 @@ public class ItemComparator implements Comparator
      */
     public boolean equals(Object obj)
     {
-        if (! (obj instanceof ItemComparator))
+        if (!(obj instanceof ItemComparator))
+        {
             return false;
+        }
 
         ItemComparator other = (ItemComparator) obj;
 
-        return
-            _equals(element,   other.element) &&
-            _equals(qualifier, other.qualifier) &&
-            _equals(language,  other.language) &&
-            max == other.max
-            ;
+        return _equals(element, other.element) &&
+               _equals(qualifier, other.qualifier) &&
+               _equals(language, other.language) && (max == other.max);
     }
 
     /**
@@ -167,11 +171,19 @@ public class ItemComparator implements Comparator
     private boolean _equals(String first, String second)
     {
         if ((first == null) && (second == null))
+        {
             return true;
+        }
+
         if ((first != null) && (second == null))
+        {
             return false;
+        }
+
         if ((first == null) && (second != null))
+        {
             return false;
+        }
 
         return first.equals(second);
     }
@@ -192,28 +204,40 @@ public class ItemComparator implements Comparator
         DCValue[] dcvalues = item.getDC(element, qualifier, language);
 
         if (dcvalues.length == 0)
+        {
             return null;
+        }
+
         if (dcvalues.length == 1)
+        {
             return normalizeTitle(dcvalues[0]);
+        }
 
         // We want to sort using Strings, but also keep track of
         // which DCValue the value came from.
         Map values = new HashMap();
-        for (int i = 0; i < dcvalues.length; i++ )
+
+        for (int i = 0; i < dcvalues.length; i++)
         {
             String value = dcvalues[i].value;
+
             if (value != null)
+            {
                 values.put(value, new Integer(i));
+            }
         }
 
         if (values.size() == 0)
+        {
             return null;
+        }
 
         Set valueSet = values.keySet();
-        String chosen = max ? (String) Collections.max(valueSet) :
-            (String) Collections.min(valueSet);
+        String chosen = max ? (String) Collections.max(valueSet)
+                            : (String) Collections.min(valueSet);
 
         int index = ((Integer) values.get(chosen)).intValue();
+
         return normalizeTitle(dcvalues[index]);
     }
 
@@ -222,8 +246,10 @@ public class ItemComparator implements Comparator
      */
     private String normalizeTitle(DCValue value)
     {
-        if (! "title".equals(element))
+        if (!"title".equals(element))
+        {
             return value.value;
+        }
 
         return Browse.getNormalizedTitle(value.value, value.language);
     }

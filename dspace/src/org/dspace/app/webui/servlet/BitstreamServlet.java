@@ -37,22 +37,19 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -75,19 +72,18 @@ public class BitstreamServlet extends DSpaceServlet
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(RetrieveServlet.class);
-    
-    
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         Bitstream bitstream = null;
-    
+
         // Get the ID from the URL
         String idString = request.getPathInfo();
-	String handle = "";
-	String sequence = "";
+        String handle = "";
+        String sequence = "";
 
         if (idString != null)
         {
@@ -97,92 +93,88 @@ public class BitstreamServlet extends DSpaceServlet
                 idString = idString.substring(1);
             }
 
-	    // Remove last slash and filename after it
+            // Remove last slash and filename after it
             int slashIndex = idString.lastIndexOf('/');
+
             if (slashIndex != -1)
             {
                 idString = idString.substring(0, slashIndex);
             }
 
-	    // Get bitstream sequence ID
-	    slashIndex = idString.lastIndexOf('/');
-	    if (slashIndex != -1)
-	    {
-		sequence = idString.substring(slashIndex + 1);
-		handle = idString.substring(0, slashIndex);
-	    }
+            // Get bitstream sequence ID
+            slashIndex = idString.lastIndexOf('/');
 
-        
+            if (slashIndex != -1)
+            {
+                sequence = idString.substring(slashIndex + 1);
+                handle = idString.substring(0, slashIndex);
+            }
+
             // Find the corresponding bitstream
             try
             {
-
                 Item item = (Item) HandleManager.resolveToObject(context, handle);
 
                 if (item == null)
-		{
-		    log.info(LogManager.getHeader(context,
-						  "invalid_id",
-						  "path=" + handle));
-		    JSPManager.showInvalidIDError(request, response, handle, -1);
-		    return;
-		}
+                {
+                    log.info(LogManager.getHeader(context, "invalid_id",
+                                                  "path=" + handle));
+                    JSPManager.showInvalidIDError(request, response, handle, -1);
 
-		int sid = Integer.parseInt(sequence);
-		boolean found = false;
+                    return;
+                }
+
+                int sid = Integer.parseInt(sequence);
+                boolean found = false;
 
                 Bundle[] bundles = item.getBundles();
-                for (int i = 0; i < bundles.length && !found; i++)
-		{
+
+                for (int i = 0; (i < bundles.length) && !found; i++)
+                {
                     Bitstream[] bitstreams = bundles[i].getBitstreams();
-		    for (int k = 0; k < bitstreams.length && !found; k++)
-		    {
-			if (sid == bitstreams[k].getSequenceID())
-			{
-			    bitstream = bitstreams[k];
-			    found = true;
-			}
-		    }
+
+                    for (int k = 0; (k < bitstreams.length) && !found; k++)
+                    {
+                        if (sid == bitstreams[k].getSequenceID())
+                        {
+                            bitstream = bitstreams[k];
+                            found = true;
+                        }
+                    }
                 }
-            }
-            catch (NumberFormatException nfe)
+            } catch (NumberFormatException nfe)
             {
                 // Invalid ID - this will be dealt with below
             }
         }
-        
+
         // Did we get a bitstream?
         if (bitstream != null)
         {
-            log.info(LogManager.getHeader(context,
-                "view_bitstream",
-                "bitstream_id=" + bitstream.getID()));
-            
+            log.info(LogManager.getHeader(context, "view_bitstream",
+                                          "bitstream_id=" + bitstream.getID()));
+
             // Set the response MIME type
             response.setContentType(bitstream.getFormat().getMIMEType());
-            
+
             // Response length
             response.setHeader("Content-Length",
-                String.valueOf(bitstream.getSize()));
-            
+                               String.valueOf(bitstream.getSize()));
+
             // Pipe the bits
             InputStream is = bitstream.retrieve();
-            
+
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();
             response.getOutputStream().flush();
-        }
-        else
+        } else
         {
             // No bitstream - we got an invalid ID
-            log.info(LogManager.getHeader(context,
-                "view_bitstream",
-                "invalid_bitstream_id=" + idString));
-            
-            JSPManager.showInvalidIDError(request,
-                response,
-                idString,
-                Constants.BITSTREAM);
+            log.info(LogManager.getHeader(context, "view_bitstream",
+                                          "invalid_bitstream_id=" + idString));
+
+            JSPManager.showInvalidIDError(request, response, idString,
+                                          Constants.BITSTREAM);
         }
     }
 }

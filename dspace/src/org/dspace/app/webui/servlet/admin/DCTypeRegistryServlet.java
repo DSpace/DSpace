@@ -37,25 +37,23 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.administer.DCType;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+
 
 /**
  * Servlet for editing the Dublin Core registry
@@ -68,21 +66,19 @@ public class DCTypeRegistryServlet extends DSpaceServlet
     /** Logger */
     private static Logger log = Logger.getLogger(DCTypeRegistryServlet.class);
 
-
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         // GET just displays the list of type
         showTypes(context, request, response);
     }
-    
-    
-    protected void doDSPost(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+
+    protected void doDSPost(Context context, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit");
 
@@ -90,61 +86,58 @@ public class DCTypeRegistryServlet extends DSpaceServlet
         {
             // Update the metadata for a DC type
             DCType dc = DCType.find(context,
-                UIUtil.getIntParameter(request, "dc_type_id"));
+                                    UIUtil.getIntParameter(request, "dc_type_id"));
 
             dc.setElement(request.getParameter("element"));
-            
+
             String qual = request.getParameter("qualifier");
+
             if (qual.equals(""))
             {
                 qual = null;
             }
+
             dc.setQualifier(qual);
-            
+
             dc.setScopeNote(request.getParameter("scope_note"));
 
             dc.update();
-            
+
             showTypes(context, request, response);
             context.complete();
-        }
-        else if (button.equals("submit_add"))
+        } else if (button.equals("submit_add"))
         {
             // Add a new DC type - simply add to the list, and let the user
             // edit with the main form
             DCType dc = DCType.create(context);
-            
+
             dc.update();
-            
+
             showTypes(context, request, response);
             context.complete();
-        }
-        else if (button.equals("submit_delete"))
+        } else if (button.equals("submit_delete"))
         {
             // Start delete process - go through verification step
             DCType dc = DCType.find(context,
-                UIUtil.getIntParameter(request, "dc_type_id"));
+                                    UIUtil.getIntParameter(request, "dc_type_id"));
             request.setAttribute("type", dc);
             JSPManager.showJSP(request, response,
-                "/dspace-admin/confirm-delete-dctype.jsp");
-        }
-        else if (button.equals("submit_confirm_delete"))
+                               "/dspace-admin/confirm-delete-dctype.jsp");
+        } else if (button.equals("submit_confirm_delete"))
         {
             // User confirms deletion of type
             DCType dc = DCType.find(context,
-                UIUtil.getIntParameter(request, "dc_type_id"));
+                                    UIUtil.getIntParameter(request, "dc_type_id"));
             dc.delete();
-            
+
             showTypes(context, request, response);
             context.complete();
-        }            
-        else
+        } else
         {
             // Cancel etc. pressed - show list again
             showTypes(context, request, response);
         }
     }
-
 
     /**
      * Show list of DC type
@@ -153,13 +146,13 @@ public class DCTypeRegistryServlet extends DSpaceServlet
      * @param request   Current HTTP request
      * @param response  Current HTTP response
      */
-    private void showTypes(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    private void showTypes(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         DCType[] types = DCType.findAll(context);
-        
+
         request.setAttribute("types", types);
         JSPManager.showJSP(request, response, "/dspace-admin/list-dc-types.jsp");
     }

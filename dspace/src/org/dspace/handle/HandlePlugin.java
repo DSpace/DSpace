@@ -37,18 +37,24 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.handle;
 
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import java.sql.*;
-import java.util.*;
-
-import net.handle.hdllib.*;
+import net.handle.hdllib.Encoder;
+import net.handle.hdllib.HandleException;
+import net.handle.hdllib.HandleStorage;
+import net.handle.hdllib.HandleValue;
+import net.handle.hdllib.ScanCallback;
+import net.handle.hdllib.Util;
 import net.handle.util.StreamTable;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
@@ -76,7 +82,9 @@ public class HandlePlugin implements HandleStorage
     /**
      * Constructor
      */
-    public HandlePlugin () {}
+    public HandlePlugin()
+    {
+    }
 
     ////////////////////////////////////////
     // Non-Resolving methods -- unimplemented
@@ -85,45 +93,52 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
-    public void init(StreamTable st)
-        throws Exception
+    public void init(StreamTable st) throws Exception
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called init (not implemented)");
+        }
     }
 
     /**
      * HandleStorage interface method - not implemented.
      */
     public void setHaveNA(byte[] theHandle, boolean haveit)
-        throws HandleException
+                   throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called setHaveNA (not implemented)");
+        }
     }
 
     /**
      * HandleStorage interface method - not implemented.
      */
     public void createHandle(byte[] theHandle, HandleValue[] values)
-        throws HandleException
+                      throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called createHandle (not implemented)");
+        }
     }
 
     /**
      * HandleStorage interface method - not implemented.
      */
-    public boolean deleteHandle(byte[] theHandle)
-        throws HandleException
+    public boolean deleteHandle(byte[] theHandle) throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called deleteHandle (not implemented)");
+        }
+
         return false;
     }
 
@@ -131,33 +146,37 @@ public class HandlePlugin implements HandleStorage
      * HandleStorage interface method - not implemented.
      */
     public void updateValue(byte[] theHandle, HandleValue[] values)
-        throws HandleException
+                     throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called updateValue (not implemented)");
+        }
     }
 
     /**
      * HandleStorage interface method - not implemented.
      */
-    public void deleteAllRecords()
-        throws HandleException
+    public void deleteAllRecords() throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called deleteAllRecords (not implemented)");
+        }
     }
 
     /**
      * HandleStorage interface method - not implemented.
      */
-    public void checkpointDatabase()
-        throws HandleException
+    public void checkpointDatabase() throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called checkpointDatabase (not implemented)");
+        }
     }
 
     /**
@@ -167,29 +186,33 @@ public class HandlePlugin implements HandleStorage
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called shutdown (not implemented)");
+        }
     }
 
     /**
      * HandleStorage interface method - not implemented.
      */
-    public void scanHandles(ScanCallback callback)
-        throws HandleException
+    public void scanHandles(ScanCallback callback) throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called scanHandles (not implemented)");
+        }
     }
 
     /**
      * HandleStorage interface method - not implemented.
      */
-    public void scanNAs(ScanCallback callback)
-        throws HandleException
+    public void scanNAs(ScanCallback callback) throws HandleException
     {
         // Not implemented
         if (log.isInfoEnabled())
+        {
             log.info("Called scanNAs (not implemented)");
+        }
     }
 
     ////////////////////////////////////////
@@ -208,27 +231,34 @@ public class HandlePlugin implements HandleStorage
      * @exception HandleException If an error occurs while calling the
      * Handle API.
      */
-    public byte[][] getRawHandleValues(byte[] theHandle,
-        int[] indexList,
-        byte[][] typeList)
-        throws HandleException
+    public byte[][] getRawHandleValues(byte[] theHandle, int[] indexList,
+                                       byte[][] typeList)
+                                throws HandleException
     {
         if (log.isInfoEnabled())
+        {
             log.info("Called getRawHandleValues");
+        }
 
         Context context = null;
 
         try
         {
             if (theHandle == null)
+            {
                 throw new HandleException(HandleException.INTERNAL_ERROR);
+            }
 
             String handle = Util.decodeString(theHandle);
 
             context = new Context();
+
             String url = HandleManager.resolveToURL(context, handle);
+
             if (url == null)
+            {
                 throw new HandleException(HandleException.HANDLE_DOES_NOT_EXIST);
+            }
 
             HandleValue value = new HandleValue();
 
@@ -248,7 +278,7 @@ public class HandlePlugin implements HandleStorage
 
             values.add(value);
 
-            byte rawValues[][] = new byte[values.size()][];
+            byte[][] rawValues = new byte[values.size()][];
 
             for (int i = 0; i < values.size(); i++)
             {
@@ -259,26 +289,28 @@ public class HandlePlugin implements HandleStorage
             }
 
             return rawValues;
-        }
-        catch (HandleException he)
+        } catch (HandleException he)
         {
             throw he;
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             if (log.isDebugEnabled())
+            {
                 log.debug("Exception in getRawHandleValues", e);
+            }
 
             throw new HandleException(HandleException.INTERNAL_ERROR);
-        }
-        finally
+        } finally
         {
             if (context != null)
+            {
                 try
                 {
                     context.complete();
+                } catch (SQLException sqle)
+                {
                 }
-                catch (SQLException sqle) {}
+            }
         }
     }
 
@@ -290,11 +322,12 @@ public class HandlePlugin implements HandleStorage
      * @exception HandleException If an error occurs while calling the
      * Handle API.
      */
-    public boolean haveNA(byte[] theHandle)
-        throws HandleException
+    public boolean haveNA(byte[] theHandle) throws HandleException
     {
         if (log.isInfoEnabled())
+        {
             log.info("Called haveNA");
+        }
 
         /*
          * Naming authority Handles are in the form: 0.NA/1721.1234
@@ -309,7 +342,8 @@ public class HandlePlugin implements HandleStorage
 
         // First, construct a string representating the naming authority Handle
         // we'd expect.
-        String expected = "0.NA/" + ConfigurationManager.getProperty("handle.prefix");
+        String expected = "0.NA/" +
+                          ConfigurationManager.getProperty("handle.prefix");
 
         // Which authority does the request pertain to?
         String received = Util.decodeString(theHandle);
@@ -317,7 +351,6 @@ public class HandlePlugin implements HandleStorage
         // Return true if they match
         return expected.equals(received);
     }
-
 
     /**
      * Return all handles in local storage which start with the naming
@@ -331,47 +364,52 @@ public class HandlePlugin implements HandleStorage
      * Handle API.
      */
     public Enumeration getHandlesForNA(byte[] theNAHandle)
-        throws HandleException
+                                throws HandleException
     {
         String naHandle = Util.decodeString(theNAHandle);
 
         if (log.isInfoEnabled())
+        {
             log.info("Called getHandlesForNA for NA " + naHandle);
+        }
 
         Context context = null;
 
         try
         {
             context = new Context();
+
             List handles = HandleManager.getHandlesForPrefix(context, naHandle);
             List results = new LinkedList();
 
-            for (Iterator iterator = handles.iterator();
-                 iterator.hasNext(); )
+            for (Iterator iterator = handles.iterator(); iterator.hasNext();)
             {
                 String handle = (String) iterator.next();
+
                 // Transforms to byte array
                 results.add(Util.encodeString(handle));
             }
 
             return Collections.enumeration(results);
-        }
-        catch (SQLException sqle)
+        } catch (SQLException sqle)
         {
             if (log.isDebugEnabled())
+            {
                 log.debug("Exception in getHandlesForNA", sqle);
+            }
 
             throw new HandleException(HandleException.INTERNAL_ERROR);
-        }
-        finally
+        } finally
         {
             if (context != null)
+            {
                 try
                 {
                     context.complete();
+                } catch (SQLException sqle)
+                {
                 }
-                catch (SQLException sqle) {}
+            }
         }
     }
-
 }

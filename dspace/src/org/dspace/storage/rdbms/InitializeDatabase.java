@@ -37,14 +37,12 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
-
 package org.dspace.storage.rdbms;
 
-import java.io.File;
 import java.io.FileReader;
 
 import org.apache.log4j.Logger;
+
 
 /**
  * Command-line executed class for initializing the DSpace database.  This
@@ -57,10 +55,9 @@ import org.apache.log4j.Logger;
 public class InitializeDatabase
 {
     /** log4j category */
-    private static Logger log =
-        Logger.getLogger(InitializeDatabase.class);
+    private static Logger log = Logger.getLogger(InitializeDatabase.class);
 
-    public static void main(String argv[])
+    public static void main(String[] argv)
     {
         // Usage checks
         if (argv.length != 1)
@@ -75,8 +72,7 @@ public class InitializeDatabase
         {
             DatabaseManager.loadSql(new FileReader(argv[0]));
             System.exit(0);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             log.fatal("Caught exception:", e);
             System.exit(1);

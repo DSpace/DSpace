@@ -37,10 +37,10 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.authorize;
 
 import org.dspace.content.DSpaceObject;
+
 
 /**
  * Exception indicating the current user of the context does not have
@@ -51,8 +51,8 @@ import org.dspace.content.DSpaceObject;
  */
 public class AuthorizeException extends Exception
 {
-    private int myaction;           // action attempted, or -1
-    private DSpaceObject myobject;  // object action attempted on or null
+    private int myaction; // action attempted, or -1
+    private DSpaceObject myobject; // object action attempted on or null
 
     /**
      * Create an empty authorize exception
@@ -60,7 +60,7 @@ public class AuthorizeException extends Exception
     public AuthorizeException()
     {
         super();
-        
+
         myaction = -1;
         myobject = null;
     }
@@ -82,14 +82,21 @@ public class AuthorizeException extends Exception
      *
      * @param message  the message
      */
-    public AuthorizeException(String message, DSpaceObject o, int a )
+    public AuthorizeException(String message, DSpaceObject o, int a)
     {
         super(message);
 
         myobject = o;
         myaction = a;
     }
-    
-    public int getAction()          { return myaction; }
-    public DSpaceObject getObject() { return myobject; }
+
+    public int getAction()
+    {
+        return myaction;
+    }
+
+    public DSpaceObject getObject()
+    {
+        return myobject;
+    }
 }

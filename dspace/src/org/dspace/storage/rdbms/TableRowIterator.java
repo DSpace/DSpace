@@ -37,12 +37,13 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
-
 package org.dspace.storage.rdbms;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Represents the results of a database query
@@ -77,7 +78,7 @@ public class TableRowIterator
      *
      * @param results - A JDBC ResultSet
      */
-    TableRowIterator (ResultSet results)
+    TableRowIterator(ResultSet results)
     {
         this(results, null);
     }
@@ -88,10 +89,10 @@ public class TableRowIterator
      * @param results - A JDBC ResultSet
      * @param table - The name of the table
      */
-    TableRowIterator (ResultSet results, String table)
+    TableRowIterator(ResultSet results, String table)
     {
         this.results = results;
-        this.table   = table;
+        this.table = table;
     }
 
     /**
@@ -102,7 +103,6 @@ public class TableRowIterator
         close();
     }
 
-
     /**
      * Advance to the next row and return it.
      * Returns null if there are no more rows.
@@ -111,16 +111,20 @@ public class TableRowIterator
      * @exception SQLException - If a database error occurs while fetching
      * values
      */
-    public TableRow next()
-        throws SQLException
+    public TableRow next() throws SQLException
     {
         if (results == null)
+        {
             return null;
+        }
 
         if (!hasNext())
+        {
             return null;
+        }
 
         hasAdvanced = false;
+
         return DatabaseManager.process(results, table);
     }
 
@@ -131,20 +135,26 @@ public class TableRowIterator
      * @exception SQLException - If a database error occurs while fetching
      * values
      */
-    public boolean hasNext()
-        throws SQLException
+    public boolean hasNext() throws SQLException
     {
         if (results == null)
+        {
             return false;
+        }
 
         if (hasAdvanced)
+        {
             return hasNext;
+        }
 
         hasAdvanced = true;
         hasNext = results.next();
+
         // No more results
-        if (! hasNext)
+        if (!hasNext)
+        {
             close();
+        }
 
         return hasNext;
     }
@@ -156,10 +166,10 @@ public class TableRowIterator
      * @exception SQLException - If a database error occurs while fetching
      * values
      */
-    public List toList()
-        throws SQLException
+    public List toList() throws SQLException
     {
         List resultsList = new ArrayList();
+
         while (hasNext())
         {
             resultsList.add(next());
@@ -177,7 +187,8 @@ public class TableRowIterator
         {
             results.close();
             results = null;
+        } catch (SQLException sqle)
+        {
         }
-        catch (SQLException sqle) {}
     }
 }

@@ -37,26 +37,26 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
-import javax.servlet.ServletException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspException;
-import javax.servlet.RequestDispatcher;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
+
 
 /**
  * Tag for HTML page layout ("skin").
@@ -72,7 +72,7 @@ import org.dspace.core.ConfigurationManager;
  * <LI><code>dspace.layout.parentlinks</code> - a <code>List</code> of
  * <code>String</code>s corresponding with links to put in the location bar.
  * Empty strings mean no link.  Will only be set if
- * <code>dspace.layout.locbar</code> is true.</LI> 
+ * <code>dspace.layout.locbar</code> is true.</LI>
  * <LI><code>dspace.layout.navbar</code> - value will be "off", or the
  * navigation bar to include, e.g. "/layout/navbar_default.jsp"</LI>
  * <LI><code>dspace.layout.sidebar</code> - contents of the sidebar</LI>
@@ -90,16 +90,16 @@ public class LayoutTag extends TagSupport
 
     /** layout style name */
     private String style;
-    
+
     /** title */
     private String title;
-    
+
     /** Navigation bar type, null means none */
     private String navbar;
-    
+
     /** Location bar type */
     private String locbar;
-    
+
     /** Name of "parent" page */
     private String parentTitle;
 
@@ -110,23 +110,20 @@ public class LayoutTag extends TagSupport
     private String sidebar;
 
     /** Whether to add headers to prevent browsers caching the page */
-    private String noCache; 
+    private String noCache;
 
-    
     public LayoutTag()
     {
         super();
     }
 
-
-    public int doStartTag()
-        throws JspException
+    public int doStartTag() throws JspException
     {
         ServletRequest request = pageContext.getRequest();
 
         // header file
         String header = "/layout/header-default.jsp";
-        
+
         // Choose default style unless one is specified
         if (style != null)
         {
@@ -148,8 +145,7 @@ public class LayoutTag extends TagSupport
         {
             // No location bar
             request.setAttribute("dspace.layout.locbar", new Boolean(false));
-        }
-        else
+        } else
         {
             // We'll always add "DSpace Home" to the a location bar
             parents.add(ConfigurationManager.getProperty("dspace.name"));
@@ -157,12 +153,11 @@ public class LayoutTag extends TagSupport
             if (locbar.equalsIgnoreCase("nolink"))
             {
                 parentLinks.add("");
-            }
-            else
+            } else
             {
                 parentLinks.add("/");
             }
-            
+
             // Add other relevant components to the location bar
             if (locbar.equalsIgnoreCase("link"))
             {
@@ -173,22 +168,20 @@ public class LayoutTag extends TagSupport
                     parents.add(parentTitle);
                     parentLinks.add(parentLink);
                 }
-            }
-            else if (locbar.equalsIgnoreCase("commLink"))
-	    {
+            } else if (locbar.equalsIgnoreCase("commLink"))
+            {
                 // "commLink" mode - show all parent communities
-                Community[] comms = (Community[])
-                    request.getAttribute("dspace.communities");
+                Community[] comms = (Community[]) request.getAttribute("dspace.communities");
+
                 if (comms != null)
-		{
+                {
                     for (int i = 0; i < comms.length; i++)
-		    {
+                    {
                         parents.add(comms[i].getMetadata("name"));
                         parentLinks.add("/handle/" + comms[i].getHandle());
                     }
-		}
-            }
-            else if (locbar.equalsIgnoreCase("nolink"))
+                }
+            } else if (locbar.equalsIgnoreCase("nolink"))
             {
                 // "nolink" mode - next thing in location bar is taken from
                 // parameters of tag, with no link
@@ -197,23 +190,21 @@ public class LayoutTag extends TagSupport
                     parents.add(parentTitle);
                     parentLinks.add("");
                 }
-            }
-            else
+            } else
             {
                 // Grab parents from the URL - these should have been picked up
                 // by the HandleServlet
-                Collection col = (Collection)
-                    request.getAttribute("dspace.collection");
-                Community[] comms = (Community[])
-                    request.getAttribute("dspace.communities");
+                Collection col = (Collection) request.getAttribute("dspace.collection");
+                Community[] comms = (Community[]) request.getAttribute("dspace.communities");
 
                 if (comms != null)
-		{
+                {
                     for (int i = 0; i < comms.length; i++)
-		    {
+                    {
                         parents.add(comms[i].getMetadata("name"));
                         parentLinks.add("/handle/" + comms[i].getHandle());
                     }
+
                     if (col != null)
                     {
                         parents.add(col.getMetadata("name"));
@@ -227,7 +218,7 @@ public class LayoutTag extends TagSupport
 
         request.setAttribute("dspace.layout.parenttitles", parents);
         request.setAttribute("dspace.layout.parentlinks", parentLinks);
-        
+
         // Navigation bar: "default" is default :)
         if (navbar == null)
         {
@@ -237,11 +228,10 @@ public class LayoutTag extends TagSupport
         if (navbar.equals("off"))
         {
             request.setAttribute("dspace.layout.navbar", "off");
-        }
-        else
+        } else
         {
             request.setAttribute("dspace.layout.navbar",
-                "/layout/navbar-" + navbar + ".jsp");
+                                 "/layout/navbar-" + navbar + ".jsp");
         }
 
         // Set title
@@ -250,29 +240,26 @@ public class LayoutTag extends TagSupport
         // Now include the header
         try
         {
-            HttpServletResponse response =
-            	(HttpServletResponse) pageContext.getResponse();
+            HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
 
             // Set headers to prevent browser caching, if appropriate
-            if (noCache != null && noCache.equalsIgnoreCase("true"))
-            {	
-            	response.addDateHeader("expires", 1);
-            	response.addHeader("Pragma", "no-cache");
-            	response.addHeader("Cache-control", "no-store");
+            if ((noCache != null) && noCache.equalsIgnoreCase("true"))
+            {
+                response.addDateHeader("expires", 1);
+                response.addHeader("Pragma", "no-cache");
+                response.addHeader("Cache-control", "no-store");
             }
-            
+
             ServletConfig config = pageContext.getServletConfig();
 
-            RequestDispatcher rd =
-                config.getServletContext().getRequestDispatcher(header);
-            
+            RequestDispatcher rd = config.getServletContext()
+                                         .getRequestDispatcher(header);
+
             rd.include(request, response);
-        }
-        catch (IOException ioe)
+        } catch (IOException ioe)
         {
             throw new JspException("Got IOException: " + ioe);
-        }
-        catch (ServletException se)
+        } catch (ServletException se)
         {
             log.warn("Exception", se.getRootCause());
             throw new JspException("Got ServletException: " + se);
@@ -281,9 +268,7 @@ public class LayoutTag extends TagSupport
         return EVAL_BODY_INCLUDE;
     }
 
-
-    public int doEndTag()
-        throws JspException
+    public int doEndTag() throws JspException
     {
         // Footer file to use
         String footer = "/layout/footer-default.jsp";
@@ -309,23 +294,20 @@ public class LayoutTag extends TagSupport
                 request.setAttribute("dspace.layout.sidebar", sidebar);
             }
 
-            RequestDispatcher rd =
-                config.getServletContext().getRequestDispatcher(footer);
-            
+            RequestDispatcher rd = config.getServletContext()
+                                         .getRequestDispatcher(footer);
+
             rd.include(request, response);
-        }
-        catch (ServletException se)
+        } catch (ServletException se)
         {
             throw new JspException("Got ServletException: " + se);
-        }
-        catch (IOException ioe)
+        } catch (IOException ioe)
         {
             throw new JspException("Got IOException: " + ioe);
         }
 
         return EVAL_PAGE;
     }
-
 
     /**
      * Get the value of title.
@@ -340,7 +322,7 @@ public class LayoutTag extends TagSupport
      * Set the value of title.
      * @param v  Value to assign to title.
      */
-    public void setTitle(String  v)
+    public void setTitle(String v)
     {
         this.title = v;
     }
@@ -358,7 +340,7 @@ public class LayoutTag extends TagSupport
      * Set the value of navbar.
      * @param v  Value to assign to navbar.
      */
-    public void setNavbar(String  v)
+    public void setNavbar(String v)
     {
         this.navbar = v;
     }
@@ -376,7 +358,7 @@ public class LayoutTag extends TagSupport
      * Set the value of locbar.
      * @param v  Value to assign to locbar.
      */
-    public void setLocbar(String  v)
+    public void setLocbar(String v)
     {
         this.locbar = v;
     }
@@ -394,7 +376,7 @@ public class LayoutTag extends TagSupport
      * Set the value of parent.
      * @param v  Value to assign to parent.
      */
-    public void setParenttitle(String  v)
+    public void setParenttitle(String v)
     {
         this.parentTitle = v;
     }
@@ -412,7 +394,7 @@ public class LayoutTag extends TagSupport
      * Set the value of parentlink.
      * @param v  Value to assign to parentlink.
      */
-    public void setParentlink(String  v)
+    public void setParentlink(String v)
     {
         this.parentLink = v;
     }
@@ -430,11 +412,10 @@ public class LayoutTag extends TagSupport
      * Set the value of style.
      * @param v  Value to assign to style.
      */
-    public void setStyle(String  v)
+    public void setStyle(String v)
     {
         this.style = v;
     }
-
 
     /**
      * Get the value of sidebar.
@@ -449,7 +430,7 @@ public class LayoutTag extends TagSupport
      * Set the value of sidebar.
      * @param v  Value to assign to sidebar.
      */
-    public void setSidebar(String  v)
+    public void setSidebar(String v)
     {
         this.sidebar = v;
     }
@@ -459,19 +440,18 @@ public class LayoutTag extends TagSupport
      * @return Value of sidebar.
      */
     public String getNocache()
-	{
-    	return noCache;
+    {
+        return noCache;
     }
 
     /**
      * Set the value of sidebar.
      * @param v  Value to assign to sidebar.
      */
-    public void setNocache(String  v)
-	{
-    	this.noCache = v;
+    public void setNocache(String v)
+    {
+        this.noCache = v;
     }
-    
 
     public void release()
     {

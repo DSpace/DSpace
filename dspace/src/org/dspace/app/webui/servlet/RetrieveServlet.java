@@ -37,22 +37,19 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -72,15 +69,14 @@ public class RetrieveServlet extends DSpaceServlet
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(RetrieveServlet.class);
-    
-    
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         Bitstream bitstream = null;
-    
+
         // Get the ID from the URL
         String idString = request.getPathInfo();
 
@@ -91,59 +87,54 @@ public class RetrieveServlet extends DSpaceServlet
             {
                 idString = idString.substring(1);
             }
-            
+
             // If there's a second slash, remove it and anything after it,
             // it might be a filename
             int slashIndex = idString.indexOf('/');
+
             if (slashIndex != -1)
             {
                 idString = idString.substring(0, slashIndex);
             }
-        
+
             // Find the corresponding bitstream
             try
             {
                 int id = Integer.parseInt(idString);
                 bitstream = Bitstream.find(context, id);
-            }
-            catch (NumberFormatException nfe)
+            } catch (NumberFormatException nfe)
             {
                 // Invalid ID - this will be dealt with below
             }
         }
-        
+
         // Did we get a bitstream?
         if (bitstream != null)
         {
-            log.info(LogManager.getHeader(context,
-                "view_bitstream",
-                "bitstream_id=" + bitstream.getID()));
-            
+            log.info(LogManager.getHeader(context, "view_bitstream",
+                                          "bitstream_id=" + bitstream.getID()));
+
             // Set the response MIME type
             response.setContentType(bitstream.getFormat().getMIMEType());
-            
+
             // Response length
             response.setHeader("Content-Length",
-                String.valueOf(bitstream.getSize()));
-            
+                               String.valueOf(bitstream.getSize()));
+
             // Pipe the bits
             InputStream is = bitstream.retrieve();
-            
+
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();
             response.getOutputStream().flush();
-        }
-        else
+        } else
         {
             // No bitstream - we got an invalid ID
-            log.info(LogManager.getHeader(context,
-                "view_bitstream",
-                "invalid_bitstream_id=" + idString));
-            
-            JSPManager.showInvalidIDError(request,
-                response,
-                idString,
-                Constants.BITSTREAM);
+            log.info(LogManager.getHeader(context, "view_bitstream",
+                                          "invalid_bitstream_id=" + idString));
+
+            JSPManager.showInvalidIDError(request, response, idString,
+                                          Constants.BITSTREAM);
         }
     }
 }

@@ -39,7 +39,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.administer;
 
 import java.io.BufferedReader;
@@ -56,7 +55,7 @@ import org.dspace.eperson.Group;
  * password from standard input.  An administrator group is then created and
  * the data passed in used to create an e-person in that group.
  * <P>
- * Takes no arguments. 
+ * Takes no arguments.
  *
  * @author   Robert Tansley
  * @version  $Revision$
@@ -68,7 +67,7 @@ public class CreateAdministrator
      *
      * @param argv  command-line arguments
      */
-    public static void main(String argv[])
+    public static void main(String[] argv)
     {
         Context context = null;
         BufferedReader input = null;
@@ -87,10 +86,10 @@ public class CreateAdministrator
             System.out.println("Creating an initial administrator account");
 
             boolean dataOK = false;
-            
-            String email     = null;
+
+            String email = null;
             String firstName = null;
-            String lastName  = null;
+            String lastName = null;
             String password1 = null;
             String password2 = null;
 
@@ -127,20 +126,19 @@ public class CreateAdministrator
                     // password OK
                     System.out.print("Is the above data correct? (y or n): ");
                     System.out.flush();
-                    
+
                     String s = input.readLine().trim();
-                    
+
                     if (s.toLowerCase().startsWith("y"))
                     {
                         dataOK = true;
                     }
-                }
-                else
+                } else
                 {
                     System.out.println("Passwords don't match");
                 }
             }
-            
+
             // Find administrator group
             Group admins = Group.find(context, 1);
 
@@ -152,30 +150,29 @@ public class CreateAdministrator
 
             // Create the administrator e-person
             EPerson eperson = EPerson.create(context);
-            
-            eperson.setEmail    (email    );
-            eperson.setLastName (lastName );
+
+            eperson.setEmail(email);
+            eperson.setLastName(lastName);
             eperson.setFirstName(firstName);
-            eperson.setPassword (password1);
-            eperson.setCanLogIn (true     );
+            eperson.setPassword(password1);
+            eperson.setCanLogIn(true);
             eperson.setRequireCertificate(false);
             eperson.setSelfRegistered(false);
             eperson.update();
-            
+
             admins.addMember(eperson);
             admins.update();
-            
+
             context.complete();
 
             System.out.println("Administrator account created");
 
             System.exit(0);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             System.err.println("Exception occurred:" + e);
             e.printStackTrace();
-            
+
             if (context != null)
             {
                 context.abort();

@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.content;
 
 
@@ -58,16 +57,16 @@ public class DCPersonName
 {
     /** The person's last name */
     private String lastName;
-	
+
     /** The person's first name(s) */
     private String firstNames;
-	
+
     /** Construct a blank name */
     public DCPersonName()
     {
         lastName = null;
         firstNames = null;
-    }		
+    }
 
     /**
      * Construct a name from a raw DC value
@@ -79,9 +78,9 @@ public class DCPersonName
         // Null by default (representing noone)
         lastName = null;
         firstNames = null;
-		
+
         // Check we've actually been passed a name
-        if (rawValue != null && !rawValue.equals(""))
+        if ((rawValue != null) && !rawValue.equals(""))
         {
             // Extract the last name and first name components
             int commaIndex = rawValue.indexOf(',');
@@ -89,17 +88,17 @@ public class DCPersonName
             // Just in case there's no comma, assume whole thing is
             // last name
             if (commaIndex == -1)
+            {
                 commaIndex = rawValue.length();
-			
+            }
+
             lastName = rawValue.substring(0, commaIndex);
 
             // Just in case the first name is blank
-            if (rawValue.length() > commaIndex + 2)
+            if (rawValue.length() > (commaIndex + 2))
             {
-                firstNames = rawValue.substring(
-                            commaIndex + 2);
-            }
-            else
+                firstNames = rawValue.substring(commaIndex + 2);
+            } else
             {
                 // Since we have a name, we don't want to
                 // leave the last name as null
@@ -119,7 +118,7 @@ public class DCPersonName
         lastName = lastNameIn;
         firstNames = firstNamesIn;
     }
-	
+
     /**
      * Return a string for writing the name to the database
      *
@@ -128,20 +127,20 @@ public class DCPersonName
     public String toString()
     {
         StringBuffer out = new StringBuffer();
-		
+
         if (lastName != null)
         {
             out.append(lastName);
-			
-            if (firstNames != null && !firstNames.equals(""))
+
+            if ((firstNames != null) && !firstNames.equals(""))
             {
                 out.append(", ").append(firstNames);
             }
         }
-		
+
         return (out.toString());
     }
-	
+
     /**
      * Get the first name(s).  Guaranteed non-null.
      *
@@ -149,9 +148,9 @@ public class DCPersonName
      */
     public String getFirstNames()
     {
-        return (firstNames == null ? "" : firstNames);
+        return ((firstNames == null) ? "" : firstNames);
     }
-	
+
     /**
      * Get the last name.  Guaranteed non-null.
      *
@@ -159,6 +158,6 @@ public class DCPersonName
      */
     public String getLastName()
     {
-        return (lastName == null ? "" : lastName);
+        return ((lastName == null) ? "" : lastName);
     }
 }

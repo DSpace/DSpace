@@ -37,17 +37,14 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.File;
+
 import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.PropertyConfigurator;
-
 import org.dspace.core.ConfigurationManager;
-
-
 /**
  * Simple servlet to load in DSpace and log4j configurations.  Should always
  * be started up before other servlets (use <loadOnStartup>)
@@ -57,18 +54,19 @@ import org.dspace.core.ConfigurationManager;
  */
 public class LoadDSpaceConfig extends HttpServlet
 {
-	public void init()
-	{
-		// Get config parameter
-		String config = getServletContext().getInitParameter("dspace-config");
+    public void init()
+    {
+        // Get config parameter
+        String config = getServletContext().getInitParameter("dspace-config");
 
-		// Load in DSpace config
-		ConfigurationManager.loadConfig(config);
-		
-		// Load in log4j config
-		String log4jConf = ConfigurationManager.getProperty("dspace.dir") +
-			File.separator + "config" + File.separator + "log4j.properties";
-		
-		PropertyConfigurator.configure(log4jConf);
-	}
+        // Load in DSpace config
+        ConfigurationManager.loadConfig(config);
+
+        // Load in log4j config
+        String log4jConf = ConfigurationManager.getProperty("dspace.dir") +
+                           File.separator + "config" + File.separator +
+                           "log4j.properties";
+
+        PropertyConfigurator.configure(log4jConf);
+    }
 }

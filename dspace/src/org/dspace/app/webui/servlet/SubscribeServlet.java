@@ -37,28 +37,24 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Community;
 import org.dspace.content.Collection;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscribe;
+
 
 /**
  * Servlet for constructing the components of the "My DSpace" page
@@ -71,21 +67,19 @@ public class SubscribeServlet extends DSpaceServlet
     /** Logger */
     private static Logger log = Logger.getLogger(SubscribeServlet.class);
 
-
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         // Simply show list of subscriptions
         showSubscriptions(context, request, response, false);
     }
 
-
-    protected void doDSPost(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSPost(Context context, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         /*
          * Parameters:
@@ -95,7 +89,7 @@ public class SubscribeServlet extends DSpaceServlet
          */
         String submit = UIUtil.getSubmitButton(request, "submit");
         EPerson e = context.getCurrentUser();
-        
+
         if (submit.equals("submit_clear"))
         {
             // unsubscribe user from everything
@@ -105,12 +99,11 @@ public class SubscribeServlet extends DSpaceServlet
             showSubscriptions(context, request, response, true);
 
             context.complete();
-        }
-        else if (submit.equals("submit_unsubscribe"))
+        } else if (submit.equals("submit_unsubscribe"))
         {
             int collID = UIUtil.getIntParameter(request, "collection");
             Collection c = Collection.find(context, collID);
-                
+
             // Sanity check - ignore duff values
             if (c != null)
             {
@@ -121,15 +114,13 @@ public class SubscribeServlet extends DSpaceServlet
             showSubscriptions(context, request, response, true);
 
             context.complete();
-        }
-        else
+        } else
         {
             // Back to "My DSpace"
-            response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/mydspace"));
+            response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
+                                                             "/mydspace"));
         }
     }
-
 
     /**
      * Show the list of subscriptions
@@ -140,19 +131,17 @@ public class SubscribeServlet extends DSpaceServlet
      * @param updated   if <code>true</code>, write a message indicating that
      *                  updated subscriptions have been stored
      */
-    private void showSubscriptions(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        boolean updated)
-        throws ServletException, IOException, SQLException
+    private void showSubscriptions(Context context, HttpServletRequest request,
+                                   HttpServletResponse response, boolean updated)
+                            throws ServletException, IOException, SQLException
     {
         // Subscribed collections
         Collection[] subs = Subscribe.getSubscriptions(context,
-            context.getCurrentUser());
-        
+                                                       context.getCurrentUser());
+
         request.setAttribute("subscriptions", subs);
         request.setAttribute("updated", new Boolean(updated));
-        
+
         JSPManager.showJSP(request, response, "/mydspace/subscriptions.jsp");
     }
 }

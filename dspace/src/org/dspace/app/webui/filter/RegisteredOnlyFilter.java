@@ -37,27 +37,27 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.filter;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.ServletException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+
 
 /**
  * DSpace filter that only allows requests from individual authenticated users
@@ -71,17 +71,14 @@ public class RegisteredOnlyFilter implements Filter
     /** log4j category */
     private static Logger log = Logger.getLogger(RegisteredOnlyFilter.class);
 
-
     public void init(FilterConfig config)
     {
         // Do nothing
     }
 
-
-    public void doFilter(ServletRequest request,
-        ServletResponse response,
-        FilterChain chain)
-            throws ServletException, IOException
+    public void doFilter(ServletRequest request, ServletResponse response,
+                         FilterChain chain)
+                  throws ServletException, IOException
     {
         Context context = null;
 
@@ -93,33 +90,29 @@ public class RegisteredOnlyFilter implements Filter
         {
             // Obtain a context
             context = UIUtil.obtainContext(hrequest);
-            
+
             // If there is no current user, they must log in
             if (context.getCurrentUser() == null)
             {
                 Authenticate.startAuthentication(context, hrequest, hresponse);
-            }
-            else
+            } else
             {
                 // Allow request to proceed
                 chain.doFilter(hrequest, hresponse);
             }
-        }
-        catch (SQLException se)
+        } catch (SQLException se)
         {
-            log.warn(LogManager.getHeader(context,
-                "database_error",
-                se.toString()), se);
+            log.warn(LogManager.getHeader(context, "database_error",
+                                          se.toString()), se);
             JSPManager.showInternalError(hrequest, hresponse);
         }
 
         // Abort the context if it's still valid
-        if (context != null && context.isValid())
+        if ((context != null) && context.isValid())
         {
             context.abort();
         }
     }
-
 
     public void destroy()
     {

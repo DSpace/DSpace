@@ -37,14 +37,11 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.jsptag;
 
-import java.io.IOException;
-
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.tagext.BodyTagSupport;
+import javax.servlet.jsp.tagext.TagSupport;
 
 
 /**
@@ -61,19 +58,16 @@ public class SidebarTag extends BodyTagSupport
         super();
     }
 
-
-    public int doAfterBody()
-        throws JspException
+    public int doAfterBody() throws JspException
     {
         LayoutTag tag = (LayoutTag) TagSupport.findAncestorWithClass(this,
-            LayoutTag.class);
+                                                                     LayoutTag.class);
 
         if (tag == null)
         {
-            throw new JspException(
-                "Sidebar tag must be in an enclosing Layout tag");
+            throw new JspException("Sidebar tag must be in an enclosing Layout tag");
         }
-        
+
         tag.setSidebar(getBodyContent().getString());
 
         return SKIP_BODY;

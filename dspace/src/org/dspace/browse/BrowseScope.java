@@ -37,11 +37,13 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.browse;
 
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.content.*;
+
 
 /**
  * Object which describes the desired parameters for a browse.
@@ -99,8 +101,10 @@ public class BrowseScope implements Cloneable
 
     /** The type of browse */
     private int browseType;
+
     /** Whether results should be ascending or descending */
     private boolean ascending;
+
     /** Whether results should be sorted */
     private Boolean sort;
 
@@ -156,7 +160,7 @@ public class BrowseScope implements Cloneable
      *
      * @param community The community to browse.
      */
-   public void setScope(Community community)
+    public void setScope(Community community)
     {
         scope = community;
     }
@@ -166,7 +170,7 @@ public class BrowseScope implements Cloneable
      *
      * @param collection The collection to browse.
      */
-   public void setScope(Collection collection)
+    public void setScope(Collection collection)
     {
         scope = collection;
     }
@@ -354,11 +358,15 @@ public class BrowseScope implements Cloneable
      */
     int getFocusItemId()
     {
-        if (! focusIsItem())
+        if (!focusIsItem())
+        {
             throw new IllegalArgumentException("Focus is not an Item");
+        }
 
         if (focus instanceof Integer)
+        {
             return ((Integer) focus).intValue();
+        }
 
         return ((Item) focus).getID();
     }
@@ -377,7 +385,9 @@ public class BrowseScope implements Cloneable
     boolean isCollectionScope()
     {
         if (scope == null)
+        {
             return false;
+        }
 
         return scope instanceof Collection;
     }
@@ -388,7 +398,9 @@ public class BrowseScope implements Cloneable
     boolean isCommunityScope()
     {
         if (scope == null)
+        {
             return false;
+        }
 
         return scope instanceof Community;
     }
@@ -458,29 +470,36 @@ public class BrowseScope implements Cloneable
      */
     public boolean equals(Object obj)
     {
-        if (! (obj instanceof BrowseScope))
+        if (!(obj instanceof BrowseScope))
+        {
             return false;
+        }
 
         BrowseScope other = (BrowseScope) obj;
-        return
-            _equals(scope, other.scope) &&
-            _equals(focus, other.focus) &&
-            _equals(sort,  other.sort) &&
-            total        == other.total &&
-            browseType   == other.browseType &&
-            ascending    == other.ascending &&
-            numberBefore == other.numberBefore
-            ;
+
+        return _equals(scope, other.scope) && _equals(focus, other.focus) &&
+               _equals(sort, other.sort) && (total == other.total) &&
+               (browseType == other.browseType) &&
+               (ascending == other.ascending) &&
+               (numberBefore == other.numberBefore);
     }
 
     private boolean _equals(Object first, Object second)
     {
         if ((first == null) && (second == null))
+        {
             return true;
+        }
+
         if ((first != null) && (second == null))
+        {
             return false;
+        }
+
         if ((first == null) && (second != null))
+        {
             return false;
+        }
 
         return first.equals(second);
     }
@@ -490,14 +509,9 @@ public class BrowseScope implements Cloneable
      */
     public int hashCode()
     {
-        return new StringBuffer()
-            .append(scope)
-            .append(focus)
-            .append(total)
-            .append(numberBefore)
-            .append(browseType)
-            .append(ascending)
-            .append(sort)
-            .toString().hashCode();
+        return new StringBuffer().append(scope).append(focus).append(total)
+                                 .append(numberBefore).append(browseType)
+                                 .append(ascending).append(sort).toString()
+                                 .hashCode();
     }
 }

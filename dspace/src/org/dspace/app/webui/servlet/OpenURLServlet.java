@@ -37,21 +37,20 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+
 
 /**
  * Simple servlet for open URL support.  Presently, simply extracts terms from
@@ -65,11 +64,10 @@ public class OpenURLServlet extends DSpaceServlet
     /** Logger */
     private static Logger log = Logger.getLogger(OpenURLServlet.class);
 
-    
-    protected void doDSGet(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request,
+                           HttpServletResponse response)
+                    throws ServletException, IOException, SQLException, 
+                           AuthorizeException
     {
         String query = "";
 
@@ -79,7 +77,7 @@ public class OpenURLServlet extends DSpaceServlet
         String authorLast = request.getParameter("aulast");
 
         String logInfo = "";
-        
+
         if (title != null)
         {
             query = query + " " + title;
@@ -91,27 +89,25 @@ public class OpenURLServlet extends DSpaceServlet
             query = query + " " + authorFirst;
             logInfo = logInfo + "aufirst=\"" + authorFirst + "\",";
         }
-        
-        
+
         if (authorLast != null)
         {
             query = query + " " + authorLast;
             logInfo = logInfo + "aulast=\"" + authorLast + "\",";
         }
 
-        log.info(LogManager.getHeader(context,
-            "openURL",
-            logInfo + "dspacequery=" + query));
-        
-        response.sendRedirect(response.encodeRedirectURL(
-            request.getContextPath()+"/simple-search?query=" + query));
+        log.info(LogManager.getHeader(context, "openURL",
+                                      logInfo + "dspacequery=" + query));
+
+        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() +
+                                                         "/simple-search?query=" +
+                                                         query));
     }
 
-
-    protected void doDSPost(Context context,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSPost(Context context, HttpServletRequest request,
+                            HttpServletResponse response)
+                     throws ServletException, IOException, SQLException, 
+                            AuthorizeException
     {
         // Same as a GET
         doDSGet(context, request, response);

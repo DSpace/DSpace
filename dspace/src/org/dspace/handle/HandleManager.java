@@ -39,20 +39,24 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.handle;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.core.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.Item;
 import org.dspace.content.DSpaceObject;
-import org.dspace.storage.rdbms.*;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+
 
 /**
  * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
@@ -71,7 +75,9 @@ public class HandleManager
     private static Logger log = Logger.getLogger(HandleManager.class);
 
     /** Private Constructor  */
-    private HandleManager () {}
+    private HandleManager()
+    {
+    }
 
     /**
      * Return the local URL for handle, or null if handle cannot be found.
@@ -85,18 +91,22 @@ public class HandleManager
      * @exception SQLException If a database error occurs
      */
     public static String resolveToURL(Context context, String handle)
-        throws SQLException
+                               throws SQLException
     {
         TableRow dbhandle = findHandleInternal(context, handle);
 
         if (dbhandle == null)
+        {
             return null;
+        }
 
         String url = ConfigurationManager.getProperty("dspace.url") +
-            "/handle/" + handle;
+                     "/handle/" + handle;
 
         if (log.isDebugEnabled())
+        {
             log.debug("Resolved " + handle + " to " + url);
+        }
 
         return url;
     }
@@ -111,10 +121,9 @@ public class HandleManager
      */
     public static String getCanonicalForm(String handle)
     {
-//        return "hdl:" + handle;
+        //        return "hdl:" + handle;
         return "http://hdl.handle.net/" + handle;
     }
-
 
     /**
      * Returns displayable string of the handle's 'temporary' URL
@@ -125,11 +134,11 @@ public class HandleManager
      * @param handle The handle
      * @return The canonical form
      */
-//    public static String getURLForm(String handle)
-//    {
-//        return "http://hdl.handle.net/" + handle;
-//    }
 
+    //    public static String getURLForm(String handle)
+    //    {
+    //        return "http://hdl.handle.net/" + handle;
+    //    }
 
     /**
      * Creates a new handle in the database.
@@ -140,23 +149,24 @@ public class HandleManager
      * @exception SQLException If a database error occurs
      */
     public static String createHandle(Context context, DSpaceObject dso)
-        throws SQLException
+                               throws SQLException
     {
         TableRow handle = DatabaseManager.create(context, "Handle");
         String handleId = createId(handle.getIntColumn("handle_id"));
 
-        handle.setColumn("handle",           handleId     );
+        handle.setColumn("handle", handleId);
         handle.setColumn("resource_type_id", dso.getType());
-        handle.setColumn("resource_id",      dso.getID()  );
+        handle.setColumn("resource_id", dso.getID());
         DatabaseManager.update(context, handle);
 
         if (log.isDebugEnabled())
-            log.debug("Created new handle for " + Constants.typeText[dso.getType()] + " "
-             + handleId);
+        {
+            log.debug("Created new handle for " +
+                      Constants.typeText[dso.getType()] + " " + handleId);
+        }
 
         return handleId;
     }
-
 
     /**
      * Creates a handle entry, but with a handle supplied by the caller
@@ -165,25 +175,26 @@ public class HandleManager
      * @param dso DSpaceObject
      * @param supppliedHandle
      */
-    public static String createHandle(Context context, DSpaceObject dso, String
-                suppliedHandle)
-        throws SQLException
+    public static String createHandle(Context context, DSpaceObject dso,
+                                      String suppliedHandle)
+                               throws SQLException
     {
         TableRow handle = DatabaseManager.create(context, "Handle");
         String handleId = suppliedHandle;
 
-        handle.setColumn("handle",           handleId     );
+        handle.setColumn("handle", handleId);
         handle.setColumn("resource_type_id", dso.getType());
-        handle.setColumn("resource_id",      dso.getID()  );
+        handle.setColumn("resource_id", dso.getID());
         DatabaseManager.update(context, handle);
 
         if (log.isDebugEnabled())
-            log.debug("Created new handle for " + Constants.typeText[dso.getType()] + " "
-             + handleId);
+        {
+            log.debug("Created new handle for " +
+                      Constants.typeText[dso.getType()] + " " + handleId);
+        }
 
         return handleId;
     }
-    
 
     /**
      * Return the object which handle maps to, or null.
@@ -196,54 +207,62 @@ public class HandleManager
      * @exception SQLException If a database error occurs
      */
     public static DSpaceObject resolveToObject(Context context, String handle)
-        throws SQLException
+                                        throws SQLException
     {
         TableRow dbhandle = findHandleInternal(context, handle);
 
         if (dbhandle == null)
+        {
             return null;
+        }
 
         if ((dbhandle.isColumnNull("resource_type_id")) ||
-            (dbhandle.isColumnNull("resource_id")))
+                (dbhandle.isColumnNull("resource_id")))
+        {
             throw new IllegalStateException("No associated resource type");
+        }
 
         // What are we looking at here?
         int handletypeid = dbhandle.getIntColumn("resource_type_id");
-        int resourceID   = dbhandle.getIntColumn("resource_id"     );
-        
+        int resourceID = dbhandle.getIntColumn("resource_id");
+
         if (handletypeid == Constants.ITEM)
         {
             Item item = Item.find(context, resourceID);
 
             if (log.isDebugEnabled())
+            {
                 log.debug("Resolved handle " + handle + " to item " +
-                          (item == null ? -1 : item.getID()));
+                          ((item == null) ? (-1) : item.getID()));
+            }
 
             return item;
-        }
-        else if (handletypeid == Constants.COLLECTION)
+        } else if (handletypeid == Constants.COLLECTION)
         {
             Collection collection = Collection.find(context, resourceID);
-            
+
             if (log.isDebugEnabled())
+            {
                 log.debug("Resolved handle " + handle + " to collection " +
-                          (collection == null ? -1 : collection.getID()));
+                          ((collection == null) ? (-1) : collection.getID()));
+            }
 
             return collection;
-        }
-        else if (handletypeid == Constants.COMMUNITY)
+        } else if (handletypeid == Constants.COMMUNITY)
         {
             Community community = Community.find(context, resourceID);
-            
+
             if (log.isDebugEnabled())
+            {
                 log.debug("Resolved handle " + handle + " to community " +
-                          (community == null ? -1 : community.getID()));
+                          ((community == null) ? (-1) : community.getID()));
+            }
 
             return community;
         }
 
         throw new IllegalStateException("Unsupported Handle Type " +
-            Constants.typeText[handletypeid]);
+                                        Constants.typeText[handletypeid]);
     }
 
     /**
@@ -256,13 +275,11 @@ public class HandleManager
      * @exception SQLException If a database error occurs
      */
     public static String findHandle(Context context, DSpaceObject dso)
-        throws SQLException
+                             throws SQLException
     {
-//        if (!(obj instanceof Item))
-//            return null;
-
-//        Item item = (Item) obj;
-
+        //        if (!(obj instanceof Item))
+        //            return null;
+        //        Item item = (Item) obj;
         return getHandleInternal(context, dso.getType(), dso.getID());
     }
 
@@ -276,13 +293,14 @@ public class HandleManager
      * is a String.
      * @exception SQLException If a database error occurs
      */
-    static List getHandlesForPrefix(Context context,
-                                           String prefix)
-        throws SQLException
+    static List getHandlesForPrefix(Context context, String prefix)
+                             throws SQLException
     {
-        String sql = "SELECT handle FROM handle WHERE handle LIKE " + prefix + "%";
+        String sql = "SELECT handle FROM handle WHERE handle LIKE " + prefix +
+                     "%";
         TableRowIterator iterator = DatabaseManager.query(context, null, sql);
         List results = new ArrayList();
+
         while (iterator.hasNext())
         {
             TableRow row = (TableRow) iterator.next();
@@ -307,17 +325,16 @@ public class HandleManager
      * @exception SQLException If a database error occurs
      */
     private static String getHandleInternal(Context context, int type, int id)
-        throws SQLException
+                                     throws SQLException
     {
-        String sql = new StringBuffer()
-            .append("SELECT handle FROM Handle WHERE resource_type_id = ")
-            .append(type)
-            .append(" AND resource_id = ")
-            .append(id)
-            .toString();
+        String sql = new StringBuffer().append("SELECT handle FROM Handle WHERE resource_type_id = ")
+                                       .append(type)
+                                       .append(" AND resource_id = ").append(id)
+                                       .toString();
 
         TableRow row = DatabaseManager.querySingle(context, null, sql);
-        return row == null ? null : row.getStringColumn("handle");
+
+        return (row == null) ? null : row.getStringColumn("handle");
     }
 
     /**
@@ -329,15 +346,14 @@ public class HandleManager
      * @exception SQLException If a database error occurs
      */
     private static TableRow findHandleInternal(Context context, String handle)
-        throws SQLException
+                                        throws SQLException
     {
         if (handle == null)
+        {
             throw new IllegalArgumentException("Handle is null");
+        }
 
-        return DatabaseManager.findByUnique(context,
-                                            "Handle",
-                                            "handle",
-                                            handle);
+        return DatabaseManager.findByUnique(context, "Handle", "handle", handle);
     }
 
     /**
@@ -347,14 +363,12 @@ public class HandleManager
      * @return A new handle id
      * @exception SQLException If a database error occurs
      */
-    private static String createId(int id)
-        throws SQLException
+    private static String createId(int id) throws SQLException
     {
         String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
-        return new StringBuffer()
-            .append(handlePrefix)
-            .append(handlePrefix.endsWith("/") ? "" : "/")
-            .append(id)
-            .toString();
+
+        return new StringBuffer().append(handlePrefix)
+                                 .append(handlePrefix.endsWith("/") ? "" : "/")
+                                 .append(id).toString();
     }
 }

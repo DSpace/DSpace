@@ -37,7 +37,6 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.app.oai;
 
 import java.util.Date;
@@ -47,12 +46,12 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.DCDate;
+import org.dspace.search.HarvestedItemInfo;
 
 import ORG.oclc.oai.server.catalog.RecordFactory;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 
-import org.dspace.content.DCDate;
-import org.dspace.search.HarvestedItemInfo;
 
 /**
  * Implementation of the OAICat RecordFactory base class for DSpace items.
@@ -71,64 +70,61 @@ public class DSpaceRecordFactory extends RecordFactory
         super(properties);
     }
 
-
     protected String fromOAIIdentifier(String identifier)
     {
         // Our local identifier is actually the same as the OAI one (the Handle)
         return identifier;
     }
-    
 
     public String quickCreate(Object nativeItem, String schemaURL,
-        String metadataPrefix)
-	throws IllegalArgumentException, CannotDisseminateFormatException
+                              String metadataPrefix)
+                       throws IllegalArgumentException, 
+                              CannotDisseminateFormatException
     {
         // Not supported
         return null;
     }
 
-
     protected String getOAIIdentifier(Object nativeItem)
     {
         String h = DSpaceOAICatalog.OAI_ID_PREFIX +
-            ((HarvestedItemInfo) nativeItem).handle;
+                   ((HarvestedItemInfo) nativeItem).handle;
+
         return h;
     }
-    
-    
+
     protected String getDatestamp(Object nativeItem)
     {
         Date d = ((HarvestedItemInfo) nativeItem).datestamp;
+
         // Return as ISO8601
         return new DCDate(d).toString();
     }
-
 
     protected Iterator getSetSpecs(Object nativeItem)
     {
         HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
         Iterator i = hii.collectionHandles.iterator();
         List setSpecs = new LinkedList();
-        
+
         // Convert the DB Handle string 123.456/789 to the OAI-friendly
         // hdl_123.456/789
         while (i.hasNext())
         {
-        	String handle = "hdl_" + (String) i.next();
-        	setSpecs.add(handle.replace('/', '_'));
+            String handle = "hdl_" + (String) i.next();
+            setSpecs.add(handle.replace('/', '_'));
         }
-        
+
         return setSpecs.iterator();
     }
-
 
     protected boolean isDeleted(Object nativeItem)
     {
         HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
+
         return hii.withdrawn;
     }
-    
-    
+
     protected Iterator getAbouts(Object nativeItem)
     {
         // Nothing in the about section for now
