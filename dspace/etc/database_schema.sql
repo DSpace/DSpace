@@ -194,7 +194,7 @@ CREATE TABLE Item
   submitter_id    INTEGER REFERENCES EPerson(eperson_id),
   in_archive      BOOL,
   withdrawn       BOOL,
-  last_modified   TIMESTAMP,
+  last_modified   TIMESTAMP WITH TIME ZONE,
   owning_collection INTEGER
 );
 

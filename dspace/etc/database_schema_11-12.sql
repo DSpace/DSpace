@@ -9,7 +9,25 @@ CREATE SEQUENCE community2community_seq;
 CREATE SEQUENCE communities2item_seq;
 
 ALTER TABLE Bitstream ADD sequence_id INTEGER;
+
 ALTER TABLE Item ADD owning_collection INTEGER;
+
+-- The following changes the last_modified column from a TIMESTAMP to a
+-- TIMESTAMP WITH TIME ZONE.  It copies over existing values of last_modified.
+-- 
+-- CAUTION:  This assumes that the values of the original 'last_modified'
+-- column were in the *local time zone*.
+--
+-- If you find that the original values in 'last_modified' are in *UTC*,
+-- (and this is not your local time zone), you will need to convert the
+-- values of your last_modified column to your local time zone in order
+-- for the following code to work.
+
+ALTER TABLE Item ADD COLUMN last_modified2 TIMESTAMP WITH TIME ZONE;
+UPDATE Item SET last_modified2 = last_modified;
+ALTER TABLE Item DROP COLUMN last_modified;
+ALTER TABLE Item RENAME last_modified2 TO last_modified;
+
 ALTER TABLE Bundle ADD name VARCHAR(16);
 ALTER TABLE Bundle ADD primary_bitstream_id INTEGER;
 ALTER TABLE Bundle ADD CONSTRAINT primary_bitstream_id_fk FOREIGN KEY (primary_bitstream_id) REFERENCES Bitstream(bitstream_id);
