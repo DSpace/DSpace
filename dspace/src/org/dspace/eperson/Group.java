@@ -102,7 +102,7 @@ public class Group extends DSpaceObject
             "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
                 "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
                 "epersongroup2eperson.eperson_group_id=" +
-                myRow.getIntColumn("eperson_group_id") + ";");
+                myRow.getIntColumn("eperson_group_id") );
 
         while (tri.hasNext())
         {
