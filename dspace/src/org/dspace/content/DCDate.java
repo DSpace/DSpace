@@ -70,8 +70,7 @@ import java.util.TimeZone;
 public class DCDate
 {
     /** Logger */
-    private static Category cat = Category.getInstance(
-            "org.dspace.util.DSpaceDate");
+    private static Category cat = Category.getInstance(DCDate.class);
 
     /** The year, or -1 if none */
     private int year;
@@ -239,7 +238,7 @@ public class DCDate
         {
             sb.append('-').append(fleshOut(month));
         }
-        
+
         if (day > 0)
         {
             sb.append('-').append(fleshOut(day));
