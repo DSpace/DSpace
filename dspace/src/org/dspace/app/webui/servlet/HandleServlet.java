@@ -117,30 +117,35 @@ public class HandleServlet extends DSpaceServlet
 
         // Original path info, of the form "1721.x/1234"
         // or "1721.x/1234/extra/stuff"
-        // substring(1) is to remove initial '/'
-        String path = request.getPathInfo().substring(1);
-        
-        try
+        String path = request.getPathInfo();
+
+        if (path != null)
         {
-            // Extract the Handle
-            int firstSlash = path.indexOf('/');
-            int secondSlash = path.indexOf('/', firstSlash + 1);
-            
-            if (secondSlash != -1)
+            // substring(1) is to remove initial '/'
+            path = path.substring(1);
+
+            try
             {
-                // We have extra path info
-                handle = path.substring(0, secondSlash);
-                extraPathInfo = path.substring(secondSlash);
+                // Extract the Handle
+                int firstSlash = path.indexOf('/');
+                int secondSlash = path.indexOf('/', firstSlash + 1);
+
+                if (secondSlash != -1)
+                {
+                    // We have extra path info
+                    handle = path.substring(0, secondSlash);
+                    extraPathInfo = path.substring(secondSlash);
+                }
+                else
+                {
+                    // The path is just the Handle
+                    handle = path;
+                }
             }
-            else
+            catch (NumberFormatException nfe)
             {
-                // The path is just the Handle
-                handle = path;
+                // Leave handle as null
             }
-        }
-        catch (NumberFormatException nfe)
-        {
-            // Leave handle as null
         }
         
         // Find out what the handle relates to
