@@ -812,7 +812,7 @@ public class Item
         {
             Bitstream[] bitstreams = bundles[i].getBitstreams();
 
-            for (int j = 0; j < bundles.length; j++)
+            for (int j = 0; j < bitstreams.length; j++)
             {
                 if (!bitstreams[j].getFormat().isInternal())
                 {

@@ -40,7 +40,9 @@
 
 package org.dspace.app.webui.util;
 
+
 import java.sql.SQLException;
+import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -60,6 +62,7 @@ import org.dspace.eperson.EPerson;
  */
 public class UIUtil
 {
+
     /** log4j category */
     private static Logger log = Logger.getLogger(UIUtil.class);
 
@@ -90,6 +93,7 @@ public class UIUtil
             if (userID != null)
             {
                 EPerson e = EPerson.find(c, userID.intValue());
+
                 Authenticate.loggedIn(c, request, e);
             }
 
@@ -102,7 +106,6 @@ public class UIUtil
         
         return c;
     }
-
 
     /**
      * Get the current community location, that is, where the user "is".
@@ -118,7 +121,6 @@ public class UIUtil
         return ((Community) request.getAttribute("dspace.community"));
     }
 
-
     /**
      * Get the current collection location, that is, where the user "is".
      * This returns null if there is no collection location, i.e. the
@@ -132,7 +134,6 @@ public class UIUtil
     {
         return ((Collection) request.getAttribute("dspace.collection"));
     }
-
 
     /**
      * Put the original request URL into the request object as an attribute
@@ -149,6 +150,7 @@ public class UIUtil
         if (orig == null)
         {
             String fullURL = request.getServletPath();
+
             if (request.getQueryString() != null)
             {
                 fullURL = fullURL + "?" + request.getQueryString();
@@ -157,7 +159,6 @@ public class UIUtil
             request.setAttribute("dspace.original.url", fullURL);
         }
     }
-    
     
     /**
      * Get the original request URL.
@@ -174,8 +175,6 @@ public class UIUtil
         return ((String) request.getAttribute("dspace.original.url"));
     }        
 
-
-
     /**
      * Utility method to convert spaces in a string to HTML non-break space
      * elements.
@@ -191,6 +190,7 @@ public class UIUtil
         for (int i = 0; i < s.length(); i++)
         {
             char ch = s.charAt(i);
+
             if (ch == ' ')
             {
                 newString.append("&nbsp;");
@@ -203,7 +203,6 @@ public class UIUtil
 
         return newString.toString();
     }
-
 
     /**
      * Write a human-readable version of a DCDate.
@@ -285,5 +284,115 @@ public class UIUtil
         }
 		
         return (sb.toString());
+    }
+
+    /**
+     * Return a string for logging, containing useful information about the
+     * current request - the URL, the method and parameters.
+     *
+     * @param request   the request object.
+     * @return  a multi-line string containing information about
+     *          the request.
+     */
+    public static String getRequestLogInfo(HttpServletRequest request)
+    {
+        String report;
+
+        report = "-- URL Was: " + getOriginalURL(request) + "\n";
+        report = report + "-- Method: " + request.getMethod() + "\n";
+
+        // First write the parameters we had
+        report = report + "-- Parameters were:\n";
+        Enumeration e = request.getParameterNames();
+
+        while (e.hasMoreElements())
+        {
+            String name = (String) e.nextElement();
+
+            if (name.equals("login_password"))
+            {
+                // We don't want to write a clear text password
+                // to the log, even if it's wrong!
+                report = report + "-- " + name + ": *not logged*\n";
+            }
+            else
+            {
+                report = report + "-- " + name + ": \"" + request.getParameter(name) + "\"\n";
+            }
+        }
+		
+        return report;
+    }
+
+
+    /**
+     * Obtain a parameter from the given request as an int.  <code>-1</code>
+     * is returned if the parameter is garbled or does not exist.
+     *
+     * @param request   the HTTP request
+     * @param param     the name of the parameter
+     *
+     * @return  the integer value of the parameter, or -1
+     */
+    public static int getIntParameter(HttpServletRequest request, String param)
+    {
+        String val = request.getParameter(param);
+        
+        try
+        {
+            return Integer.parseInt(val);
+        }
+        catch (Exception e)
+        {
+            // Problem with parameter
+            return -1;
+        }
+    }
+
+
+    /**
+     * Obtain a parameter from the given request as a boolean.
+     * <code>false</code> is returned if the parameter is garbled or does not
+     * exist.
+     *
+     * @param request   the HTTP request
+     * @param param     the name of the parameter
+     *
+     * @return  the integer value of the parameter, or -1
+     */
+    public static boolean getBoolParameter(HttpServletRequest request,
+        String param)
+    {
+        return (request.getParameter(param) != null &&
+            request.getParameter(param).equals("true"));
+    }
+
+
+    /**
+     * Get the button the user pressed on a submitted form.  All buttons
+     * should start with the text <code>submit</code> for this to work.
+     * A default should be supplied, since often the browser will submit a form
+     * with no submit button pressed if the user presses enter.
+     *
+     * @param request   the HTTP request
+     * @param def       the default button
+     *
+     * @return  the button pressed
+     */
+    public static String getSubmitButton(HttpServletRequest request, String def)
+    {
+        Enumeration e = request.getParameterNames();
+
+        while (e.hasMoreElements())
+        {
+            String parameterName = (String) e.nextElement();
+
+            if (parameterName.startsWith("submit"))
+            {
+                return parameterName;
+            }
+        }
+        
+        return def;
     }
 }

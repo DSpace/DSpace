@@ -1,5 +1,5 @@
 <%--
-  - home.jsp
+  - header-default.jsp
   -
   - Version: $Revision$
   -
@@ -103,10 +103,16 @@
             <tr valign=top>
 
             <%-- Navigation bar --%>
+<%
+    if (!navbar.equals("off"))
+    {
+%>
             <td class="navigationBar">
                 <jsp:include page="<%= navbar %>" flush="true" />
             </td>
-
+<%
+    }
+%>
             <%-- Page Content --%>
 
             <%-- HACK: width specified here for non-CSS compliant Netscape 4.x --%>

@@ -1,9 +1,16 @@
 <%
     String sidebar = (String) request.getAttribute("dspace.layout.sidebar");
-    int overallColSpan = 3;
+    String navbar = (String) request.getAttribute("dspace.layout.navbar");
+    int overallColSpan = 1;
+
     if (sidebar == null)
     {
-        overallColSpan = 2;
+        overallColSpan++;
+    }
+    
+    if (!navbar.equals("off"))
+    {
+        overallColSpan++;
     }
 %>
                     <%-- End of page content --%>

@@ -307,7 +307,7 @@ public class ConfigurationManager
 
             while ((lineIn = br.readLine()) != null)
             {
-                license = license + lineIn;
+                license = license + lineIn + '\n';
             }
             
             is.close();

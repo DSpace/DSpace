@@ -48,8 +48,6 @@
 <web-app>
 
   <display-name>DSpace</display-name>
-  
-  <description>@@dspace.name@@ running at @@dspace.hostname@@</description>
 
 
   <!-- Filters -->
@@ -134,6 +132,10 @@
     <servlet-class>org.dspace.app.webui.servlet.SimpleSearchServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>submit</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.SubmitServlet</servlet-class>
+  </servlet>
 
 
   <!-- Servlet Mappings -->
@@ -191,6 +193,11 @@
   <servlet-mapping>
     <servlet-name>simple-search</servlet-name>
     <url-pattern>/simple-search</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>submit</servlet-name>
+    <url-pattern>/submit</url-pattern>
   </servlet-mapping>
 
 

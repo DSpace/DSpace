@@ -55,11 +55,6 @@
   <info>DSpace JSP tags</info>
 
   <!--
-    - dspace:config tag for retrieving DSpace configuration values.
-    - e.g.:   <dspace:config property="url.base" />
-    -->
-
-  <!--
     - dspace:page tag - main tag for laying out pages.  If you specify a
     - that you want a "link" or "nolink" location bar, you can specify a
     - "parent" page using "parent" and "parentlink".  Otherwise, the page is

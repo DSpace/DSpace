@@ -65,6 +65,18 @@ CREATE TABLE BitstreamFormatRegistry
 );
 
 -------------------------------------------------------
+-- FormatIdentifier table
+-------------------------------------------------------
+DROP TABLE FormatIdentifier;
+
+CREATE TABLE FormatIdentifier
+(
+  id                   INTEGER PRIMARY KEY,
+  bitstream_format_id  INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),
+  extension            VARCHAR(16)
+);
+
+-------------------------------------------------------
 -- Bitstream table
 -------------------------------------------------------
 DROP TABLE Bitstream;
