@@ -431,7 +431,7 @@
     {
         BitstreamFormat format = bitstreams[i].getFormat();
 %>
-                                            <A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>" target="_blank"><%= bitstreams[i].getName() %></A> - <%= bitstreams[i].getFormatDescription() %>
+                                            <A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= java.net.URLEncoder.encode(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A> - <%= bitstreams[i].getFormatDescription() %>
 <%
         switch (format.getSupportLevel())
         {

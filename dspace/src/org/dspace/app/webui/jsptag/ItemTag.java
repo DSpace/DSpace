@@ -41,6 +41,7 @@
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
@@ -429,7 +430,8 @@ public class ItemTag extends TagSupport
                         out.print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
                         out.print(request.getContextPath());
                         out.print("/retrieve/");
-                        out.print(bitstreams[k].getID());
+                        out.print(bitstreams[k].getID() + "/");
+                        out.print(URLEncoder.encode(bitstreams[k].getName()));
                         out.print("\">View/Open</A></td></tr>");
                     }
                 }

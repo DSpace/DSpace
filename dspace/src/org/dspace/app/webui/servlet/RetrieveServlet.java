@@ -91,6 +91,14 @@ public class RetrieveServlet extends DSpaceServlet
             {
                 idString = idString.substring(1);
             }
+            
+            // If there's a second slash, remove it and anything after it,
+            // it might be a filename
+            int slashIndex = idString.indexOf('/');
+            if (slashIndex != -1)
+            {
+                idString = idString.substring(0, slashIndex);
+            }
         
             // Find the corresponding bitstream
             try
