@@ -50,17 +50,12 @@ import java.util.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-//import org.dspace.content.Bitstream;
-//import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-//import org.dspace.content.Item;
-//import org.dspace.content.ItemIterator;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
-//import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-//import org.dspace.handle.HandleManager;
-//import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.DatabaseManager;
 
@@ -129,6 +124,29 @@ public class FixDefaultPolicies
                 addAnonymousPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ );
             }
         }
+
+        // now ensure communities have READ policies
+
+        Community [] communities = Community.findAll(c);
+
+        for( int i = 0; i < collections.length; i++ )
+        {
+            Community t = communities[i];
+            
+            System.out.println("Community " + t + " " + t.getMetadata( "name" ) );
+
+            // check for READ
+            if( checkForPolicy(c, t, Constants.READ ) )
+            {
+                System.out.println( "\tFound READ policies!" );
+            }
+            else
+            {
+                System.out.println( "\tNo READ policy found, adding anonymous.");
+                addAnonymousPolicy(c, t, Constants.READ );
+            }
+        }        
+      
  
         c.complete();
     }
@@ -137,10 +155,10 @@ public class FixDefaultPolicies
     /**
      * check to see if a collection has any policies for a given action
      */
-    private static boolean checkForPolicy(Context c, Collection t, int myaction)
+    private static boolean checkForPolicy(Context c, DSpaceObject t, int myaction)
         throws SQLException
     {
-        // check for item_read
+        // check to see if any policies exist for this action
         List policies = AuthorizeManager.getPoliciesActionFilter(c, t, myaction );
         Iterator i = policies.iterator();
         
@@ -151,7 +169,7 @@ public class FixDefaultPolicies
     /**
      * add an anonymous group permission policy to the collection for this action
      */
-    private static void addAnonymousPolicy(Context c, Collection t, int myaction)
+    private static void addAnonymousPolicy(Context c, DSpaceObject t, int myaction)
         throws SQLException, AuthorizeException
     {
         // group 0 is the anonymous group!
