@@ -203,8 +203,10 @@ public class EditCommunitiesServlet extends DSpaceServlet
             break;
 
         case START_CREATE_COLLECTION:
-            // Display edit collection page with empty fields + create button
-            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
+            // Forward to collection creation wizard
+            response.sendRedirect(response.encodeRedirectURL(
+                request.getContextPath() + "/dspace-admin/collection-wizard?community_id=" +
+                    community.getID()));
             break;
 
         case CONFIRM_EDIT_COMMUNITY:
@@ -533,7 +535,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 	    collection.update();
 	    context.complete();
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/dspace-admin/edit-item?item_id=" +
+                request.getContextPath() + "/tools/edit-item?item_id=" +
                     i.getID()));
 	    return;
         }
@@ -542,7 +544,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Forward to edit page for template item
             Item i = collection.getTemplateItem();
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/dspace-admin/edit-item?item_id=" +
+                request.getContextPath() + "/tools/edit-item?item_id=" +
                     i.getID()));
         }
         else if(button.equals("submit_delete_template"))

@@ -114,6 +114,19 @@ public class CollectionWizardServlet extends DSpaceServlet
 	private static Logger log = Logger.getLogger(CollectionWizardServlet.class);
 
 
+    protected void doDSGet(Context context,
+            HttpServletRequest request,
+            HttpServletResponse response)
+    throws ServletException, IOException, SQLException, AuthorizeException
+    {
+        /*
+         * For GET, all we should really get is a community_id parameter
+         * (DB ID of community to add collection to).  doDSPost handles this
+         */
+        doDSPost(context, request,response);
+    }
+    
+    
 	protected void doDSPost(Context context,
 			HttpServletRequest request,
 			HttpServletResponse response)
