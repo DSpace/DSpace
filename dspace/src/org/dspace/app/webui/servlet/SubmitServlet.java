@@ -573,10 +573,16 @@ public class SubmitServlet extends DSpaceServlet
 
         if (multipleFiles == false)
         {
-            // FIXME: Assuming each bundle has but one bitstream in it
-            Bundle[] bundles = subInfo.submission.getItem().getBundles();
+            // see if number of bitstreams in bundle[0] > 1
+            // FIXME: Assumes multiple bundles, clean up someday...
+            Bundle[]    bundles    = subInfo.submission.getItem().getBundles();
 
-            willRemoveFiles = bundles.length > 1;
+            if( bundles.length > 0 )
+            {
+                Bitstream[] bitstreams = bundles[0].getBitstreams();
+            
+                willRemoveFiles = bitstreams.length > 1;
+            }
         }
 
         // If anything is going to be removed from the item as a result
@@ -688,13 +694,16 @@ public class SubmitServlet extends DSpaceServlet
 
         if (multipleFiles == false)
         {
-            // FIXME: Assuming each bundle has but one bitstream in it
-            Bundle[] bundles = item.getBundles();
-
-            // Remove all but the first bundle
-            for (int i = 1; i < bundles.length; i++)
+            // remove all but first bitstream from bundle[0]
+            // FIXME: Assumes multiple bundles, clean up someday...
+            // (only messes with the first bundle.)
+            Bundle[]    bundles    = item.getBundles();
+            Bitstream[] bitstreams = bundles[0].getBitstreams();
+            
+            // Remove all but the first bitstream
+            for (int i = 1; i < bitstreams.length; i++)
             {
-                item.removeBundle(bundles[i]);
+                bundles[0].removeBitstream(bitstreams[i]);
             }
         }
 
@@ -1024,8 +1033,20 @@ public class SubmitServlet extends DSpaceServlet
                     // Read the temp file into a bitstream
                     InputStream is = new BufferedInputStream(
                         new FileInputStream(temp));
-                    b = item.createSingleBitstream(is);
-
+                    
+                    // do we already have a bundle?    
+                    Bundle [] bundles = item.getBundles();
+                    
+                    if( bundles.length < 1)
+                    {    
+                        b = item.createSingleBitstream(is);
+                    }
+                    else
+                    {
+                        // we have a bundle already, just add bitstream
+                        b = bundles[0].createBitstream(is);
+                    }
+                    
                     // Strip all but the last filename.  It would be nice
                     // to know which OS the file came from.
                     String noPath = wrapper.getFilesystemName("file");
@@ -1308,10 +1329,21 @@ public class SubmitServlet extends DSpaceServlet
                 return;
             }
 
+            // remove bitstream from bundle..
+            // delete bundle if it's now empty
             // FIXME: Assumes: 1 bitstream in each bundle
             Bundle[] bundles = bitstream.getBundles();
-            item.removeBundle(bundles[0]);
-            item.update();
+            
+            bundles[0].removeBitstream(bitstream);
+            
+            Bitstream [] bitstreams = bundles[0].getBitstreams();
+            
+            // remove bundle if it's now empty
+            if( bitstreams.length < 1)
+            {
+                item.removeBundle(bundles[0]);
+                item.update();
+            }
 
             showFirstUploadPage(context,request, response, subInfo);
             context.complete();
