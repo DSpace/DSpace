@@ -177,34 +177,34 @@ public class EditCommunitiesServlet extends DSpaceServlet
         {
         case START_EDIT_COMMUNITY:
             // Display the relevant "edit community" page
-            JSPManager.showJSP(request, response, "/admin/edit-community.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-community.jsp");
             break;
 
         case START_DELETE_COMMUNITY:
             // Show "confirm delete" page
             JSPManager.showJSP(request, response,
-                "/admin/confirm-delete-community.jsp");
+                "/dspace-admin/confirm-delete-community.jsp");
             break;
 
         case START_CREATE_COMMUNITY:
             // Display edit community page with empty fields + create button
-            JSPManager.showJSP(request, response, "/admin/edit-community.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-community.jsp");
             break;
 
         case START_EDIT_COLLECTION:
             // Display the relevant "edit collection" page
-            JSPManager.showJSP(request, response, "/admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
             break;
 
         case START_DELETE_COLLECTION:
             // Show "confirm delete" page
             JSPManager.showJSP(request, response,
-                "/admin/confirm-delete-collection.jsp");
+                "/dspace-admin/confirm-delete-collection.jsp");
             break;
 
         case START_CREATE_COLLECTION:
             // Display edit collection page with empty fields + create button
-            JSPManager.showJSP(request, response, "/admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
             break;
 
         case CONFIRM_EDIT_COMMUNITY:
@@ -283,7 +283,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
         request.setAttribute("communities", communities);
         request.setAttribute("collections.map", communityIDToCollection);
 
-        JSPManager.showJSP(request, response, "/admin/list-communities.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/list-communities.jsp");
     }
 
 
@@ -348,7 +348,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Display "upload logo" page.  Necessary attributes already set by
             // doDSPost()
-            JSPManager.showJSP(request, response, "/admin/upload-logo.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/upload-logo.jsp");
         }
         else if(button.equals("submit_delete_logo"))
         {
@@ -357,13 +357,13 @@ public class EditCommunitiesServlet extends DSpaceServlet
             community.update();
 
             // Show edit page again - attributes set in doDSPost()
-            JSPManager.showJSP(request, response, "/admin/edit-community.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-community.jsp");
         }
         else if(button.equals("submit_authorization_edit"))
         {
             // Forward to policy edit page
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/admin/authorize?community_id=" +
+                request.getContextPath() + "/dspace-admin/authorize?community_id=" +
                     community.getID() + "&submit_community_select=1"));
         }
         else
@@ -452,7 +452,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Display "upload logo" page.  Necessary attributes already set by
             // doDSPost()
-            JSPManager.showJSP(request, response, "/admin/upload-logo.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/upload-logo.jsp");
         }
         else if(button.equals("submit_delete_logo"))
         {
@@ -460,7 +460,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             collection.setLogo(null);
 
             // Show edit page again - attributes set in doDSPost()
-            JSPManager.showJSP(request, response, "/admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
         }
         else if(button.startsWith("submit_wf_create_"))
         {
@@ -476,14 +476,14 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Forward to group edit page
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/admin/groups?group=" +
+                request.getContextPath() + "/dspace-admin/groups?group=" +
                     newGroup.getID()));
         }
         else if(button.equals("submit_authorization_edit"))
         {
             // Forward to policy edit page
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/admin/authorize?collection_id=" +
+                request.getContextPath() + "/dspace-admin/authorize?collection_id=" +
                     collection.getID() + "&submit_collection_select=1"));
         }
         else if(button.startsWith("submit_wf_edit_"))
@@ -493,7 +493,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Edit workflow group
             Group g = collection.getWorkflowGroup(step);
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/admin/groups?group=" +
+                request.getContextPath() + "/dspace-admin/groups?group=" +
                     g.getID()));
         }
         else if(button.startsWith("submit_wf_delete_"))
@@ -508,7 +508,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             g.delete();
 
             // Show edit page again - attributes set in doDSPost()
-            JSPManager.showJSP(request, response, "/admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
         }
         else if(button.equals("submit_create_template"))
         {
@@ -521,7 +521,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 	    collection.update();
 	    context.complete();
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/admin/edit-item?item_id=" +
+                request.getContextPath() + "/dspace-admin/edit-item?item_id=" +
                     i.getID()));
 	    return;
         }
@@ -530,7 +530,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Forward to edit page for template item
             Item i = collection.getTemplateItem();
             response.sendRedirect(response.encodeRedirectURL(
-                request.getContextPath() + "/admin/edit-item?item_id=" +
+                request.getContextPath() + "/dspace-admin/edit-item?item_id=" +
                     i.getID()));
         }
         else if(button.equals("submit_delete_template"))
@@ -538,7 +538,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             collection.removeTemplateItem();
 
             // Show edit page again - attributes set in doDSPost()
-            JSPManager.showJSP(request, response, "/admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
         }
         else
         {
@@ -616,14 +616,14 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Show community edit page
             request.setAttribute("community", community);
-            JSPManager.showJSP(request, response, "/admin/edit-community.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-community.jsp");
         }
         else
         {
             collection.update();
             // Show collection edit page
             request.setAttribute("collection", collection);
-            JSPManager.showJSP(request, response, "/admin/edit-collection.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
         }
 
 		// Remove temp file

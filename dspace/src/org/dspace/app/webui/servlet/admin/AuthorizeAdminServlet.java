@@ -98,7 +98,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             Collection [] collections = Collection.findAll(c);
         
             request.setAttribute("collections", collections);
-            JSPManager.showJSP(request, response, "/admin/collection-select.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/collection-select.jsp" );
         }
         else if( button.equals("submit_community") )
         {
@@ -106,7 +106,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             Community [] communities = Community.findAll(c);
             
             request.setAttribute("communities", communities);
-            JSPManager.showJSP(request, response, "/admin/community-select.jsp" );            
+            JSPManager.showJSP(request, response, "/dspace-admin/community-select.jsp" );            
         }
         else if( button.equals("submit_advanced") )
         {
@@ -117,12 +117,12 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute("collections", collections);
             request.setAttribute("groups",      groups     );
 
-            JSPManager.showJSP(request, response, "/admin/authorize-advanced.jsp" );            
+            JSPManager.showJSP(request, response, "/dspace-admin/authorize-advanced.jsp" );            
         }
         else if( button.equals("submit_item") )
         {
             // select an item to work on
-            JSPManager.showJSP(request, response, "/admin/item-select.jsp" );            
+            JSPManager.showJSP(request, response, "/dspace-admin/item-select.jsp" );            
         }
 
         // ITEMS ////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             if( item == null )
             {
                 request.setAttribute("invalid.id", new Boolean(true));
-                JSPManager.showJSP(request, response, "/admin/item-select.jsp");
+                JSPManager.showJSP(request, response, "/dspace-admin/item-select.jsp");
             }
             else
             {
@@ -163,7 +163,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 prepItemEditForm(c, request, item);
     
                 JSPManager.showJSP(request, response,
-                    "/admin/authorize-item-edit.jsp" );
+                    "/dspace-admin/authorize-item-edit.jsp" );
             }
         }
         else if( button.equals( "submit_item_add_policy") )
@@ -189,7 +189,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "id",         "" + item.getID() );
             
             JSPManager.showJSP(request, response,
-                "/admin/authorize-policy-edit.jsp" );
+                "/dspace-admin/authorize-policy-edit.jsp" );
         }
         else if( button.equals("submit_item_edit_policy") )
         {
@@ -212,7 +212,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "epeople",    epeople    );
             request.setAttribute( "id_name",    "item_id" );
             request.setAttribute( "id",         "" + item.getID() );
-            JSPManager.showJSP(request, response, "/admin/authorize-policy-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/authorize-policy-edit.jsp" );
         }
         else if( button.equals( "submit_bundle_add_policy") )
         {
@@ -239,7 +239,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "id",         "" + item.getID() );
             
             JSPManager.showJSP(request, response,
-                "/admin/authorize-policy-edit.jsp" );
+                "/dspace-admin/authorize-policy-edit.jsp" );
         }
         else if( button.equals( "submit_bitstream_add_policy") )
         {
@@ -266,7 +266,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "id",         "" + item.getID() );
             
             JSPManager.showJSP(request, response,
-                "/admin/authorize-policy-edit.jsp" );
+                "/dspace-admin/authorize-policy-edit.jsp" );
         }
         else if( button.equals("submit_item_delete_policy") )
         {
@@ -281,7 +281,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             // show edit form!
             prepItemEditForm(c, request, item);
 
-            JSPManager.showJSP(request, response, "/admin/authorize-item-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/authorize-item-edit.jsp" );
         }
         
         // COLLECTIONS ////////////////////////////////////////////////////////
@@ -309,7 +309,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "id",         "" + collection.getID() );
             
             JSPManager.showJSP(request, response,
-                "/admin/authorize-policy-edit.jsp" );
+                "/dspace-admin/authorize-policy-edit.jsp" );
         }
         else if( button.equals("submit_community_select") )
         {
@@ -321,7 +321,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute("community", target );
             request.setAttribute("policies", policies     );
             JSPManager.showJSP(request, response,
-                "/admin/authorize-community-edit.jsp" );
+                "/dspace-admin/authorize-community-edit.jsp" );
         }
         else if( button.equals("submit_collection_delete_policy") )
         {
@@ -338,7 +338,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             List policies = AuthorizeManager.getPolicies(c, collection);
             request.setAttribute("policies", policies);
 
-            JSPManager.showJSP(request, response, "/admin/authorize-collection-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/authorize-collection-edit.jsp" );
         }
         else if( button.equals("submit_community_delete_policy") )
         {
@@ -358,7 +358,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute("policies", policies);
 
             JSPManager.showJSP(request, response,
-                "/admin/authorize-community-edit.jsp" );
+                "/dspace-admin/authorize-community-edit.jsp" );
         }
         else if( button.equals("submit_collection_edit_policy") )
         {
@@ -390,7 +390,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "epeople",    epeople    );
             request.setAttribute( "id_name",    "collection_id" );
             request.setAttribute( "id",         "" + collection.getID() );
-            JSPManager.showJSP(request, response, "/admin/authorize-policy-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/authorize-policy-edit.jsp" );
         }
         else if( button.equals("submit_community_edit_policy") )
         {
@@ -423,7 +423,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "epeople",    epeople    );
             request.setAttribute( "id_name",    "community_id" );
             request.setAttribute( "id",         "" + community.getID() );
-            JSPManager.showJSP(request, response, "/admin/authorize-policy-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/authorize-policy-edit.jsp" );
         }
         else if( button.equals( "submit_collection_add_policy") )
         {
@@ -448,7 +448,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "id",         "" + collection.getID() );
             
             JSPManager.showJSP(request, response,
-                "/admin/authorize-policy-edit.jsp" );
+                "/dspace-admin/authorize-policy-edit.jsp" );
         }
         else if( button.equals( "submit_community_add_policy") )
         {
@@ -473,7 +473,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "id",         "" + community.getID() );
             
             JSPManager.showJSP(request, response,
-                "/admin/authorize-policy-edit.jsp" );
+                "/dspace-admin/authorize-policy-edit.jsp" );
         }
 
         else if( button.equals( "submit_save_policy" ) )
@@ -524,7 +524,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 request.setAttribute("collection", collection );
                 request.setAttribute("policies",
                     AuthorizeManager.getPolicies( c, collection ) );
-                display_page = "/admin/authorize-collection-edit.jsp";
+                display_page = "/dspace-admin/authorize-collection-edit.jsp";
             }
             
             else if( community_id != -1 )
@@ -557,7 +557,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 request.setAttribute("community", community );
                 request.setAttribute("policies",
                     AuthorizeManager.getPolicies( c, community ) );
-                display_page = "/admin/authorize-community-edit.jsp";
+                display_page = "/dspace-admin/authorize-community-edit.jsp";
             }
             else if( item_id != -1 )
             {
@@ -571,7 +571,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 // show edit form!
                 prepItemEditForm(c, request, item);
 
-                display_page = "/admin/authorize-item-edit.jsp";
+                display_page = "/dspace-admin/authorize-item-edit.jsp";
             }
 
 
@@ -599,7 +599,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 request.setAttribute("collection", t );
                 request.setAttribute("policies",
                     AuthorizeManager.getPolicies( c, t ) );
-                display_page = "/admin/authorize-collection-edit.jsp";
+                display_page = "/dspace-admin/authorize-collection-edit.jsp";
             }
             else if( community_id != -1 )
             {
@@ -609,7 +609,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 request.setAttribute("community", t );
                 request.setAttribute("policies",
                     AuthorizeManager.getPolicies( c, t ) );
-                display_page = "/admin/authorize-community-edit.jsp";
+                display_page = "/dspace-admin/authorize-community-edit.jsp";
                 
             }
             else if( item_id != -1 )
@@ -620,7 +620,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 // show edit form!
                 prepItemEditForm(c, request, t);
 
-                display_page = "/admin/authorize-item-edit.jsp";
+                display_page = "/dspace-admin/authorize-item-edit.jsp";
             }
 
             JSPManager.showJSP(request, response, display_page );
@@ -674,7 +674,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute("collection", collection );
             request.setAttribute("policies", policies     );
             JSPManager.showJSP(request, response,
-                "/admin/authorize-collection-edit.jsp" );
+                "/dspace-admin/authorize-collection-edit.jsp" );
         }
         else
         {
@@ -689,7 +689,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                     HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        JSPManager.showJSP(request, response, "/admin/authorize-main.jsp" );
+        JSPManager.showJSP(request, response, "/dspace-admin/authorize-main.jsp" );
     }
 
     void prepItemEditForm(Context c, HttpServletRequest request, Item item )

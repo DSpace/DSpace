@@ -49,7 +49,7 @@ public class GroupEditServlet extends DSpaceServlet
             request.setAttribute("group", g);
             request.setAttribute("members", g.getMembers());
             
-            JSPManager.showJSP(request, response, "/admin/group-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/group-edit.jsp" );
         }
         else
         {
@@ -72,7 +72,7 @@ public class GroupEditServlet extends DSpaceServlet
             request.setAttribute("group", group);
             request.setAttribute("members", group.getMembers());
             
-            JSPManager.showJSP(request, response, "/admin/group-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/group-edit.jsp" );
         }
         else if( button.equals( "submit_add" ) )
         {
@@ -84,7 +84,7 @@ public class GroupEditServlet extends DSpaceServlet
             
             request.setAttribute("group", group);
             request.setAttribute("members", group.getMembers());
-            JSPManager.showJSP(request, response, "/admin/group-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/group-edit.jsp" );
         }
         else if( button.equals("submit_change_name") )
         {
@@ -96,7 +96,7 @@ public class GroupEditServlet extends DSpaceServlet
             
             request.setAttribute("group", group);
             request.setAttribute("members", group.getMembers());
-            JSPManager.showJSP(request, response, "/admin/group-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/group-edit.jsp" );
         }
         else if( button.equals("submit_add_eperson_add") )
         {
@@ -109,7 +109,7 @@ public class GroupEditServlet extends DSpaceServlet
             
             request.setAttribute("group", group);
             request.setAttribute("members", group.getMembers());
-            JSPManager.showJSP(request, response, "/admin/group-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/group-edit.jsp" );
         }
         else if( button.equals( "submit_add_eperson") )
         {
@@ -119,7 +119,7 @@ public class GroupEditServlet extends DSpaceServlet
             
             request.setAttribute("group",   group  );
             request.setAttribute("epeople", epeople);
-            JSPManager.showJSP(request, response, "/admin/group-eperson-select.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/group-eperson-select.jsp" );
         }
         else if( button.equals( "submit_remove_eperson" ) )
         {
@@ -132,7 +132,7 @@ public class GroupEditServlet extends DSpaceServlet
             
             request.setAttribute("group", group);
             request.setAttribute("members", group.getMembers());
-            JSPManager.showJSP(request, response, "/admin/group-edit.jsp" );
+            JSPManager.showJSP(request, response, "/dspace-admin/group-edit.jsp" );
         }
         else if( button.equals( "submit_group_delete" ) )
         {
@@ -164,7 +164,7 @@ public class GroupEditServlet extends DSpaceServlet
 
         request.setAttribute("groups", groups);
         
-        JSPManager.showJSP(request, response, "/admin/group-list.jsp" );
+        JSPManager.showJSP(request, response, "/dspace-admin/group-list.jsp" );
     }   
 }
 

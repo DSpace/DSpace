@@ -140,7 +140,7 @@ public class EditEPersonServlet extends DSpaceServlet
             request.setAttribute("eperson", e);
 
             JSPManager.showJSP(request, response,
-                "/admin/confirm-delete-eperson.jsp");
+                "/dspace-admin/confirm-delete-eperson.jsp");
         }
         else if (button.equals("submit_confirm_delete"))
         {
@@ -189,6 +189,6 @@ public class EditEPersonServlet extends DSpaceServlet
         EPerson[] epeople = EPerson.findAll(context, sortField);
         
         request.setAttribute("epeople", epeople);
-        JSPManager.showJSP(request, response, "/admin/list-epeople.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/list-epeople.jsp");
     }
 }

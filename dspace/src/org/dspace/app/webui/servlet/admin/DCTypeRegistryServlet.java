@@ -126,7 +126,7 @@ public class DCTypeRegistryServlet extends DSpaceServlet
                 UIUtil.getIntParameter(request, "dc_type_id"));
             request.setAttribute("type", dc);
             JSPManager.showJSP(request, response,
-                "/admin/confirm-delete-dctype.jsp");
+                "/dspace-admin/confirm-delete-dctype.jsp");
         }
         else if (button.equals("submit_confirm_delete"))
         {
@@ -161,6 +161,6 @@ public class DCTypeRegistryServlet extends DSpaceServlet
         DCType[] types = DCType.findAll(context);
         
         request.setAttribute("types", types);
-        JSPManager.showJSP(request, response, "/admin/list-dc-types.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/list-dc-types.jsp");
     }
 }

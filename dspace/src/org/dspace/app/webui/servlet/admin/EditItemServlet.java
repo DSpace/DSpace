@@ -161,7 +161,7 @@ public class EditItemServlet extends DSpaceServlet
             {
                 request.setAttribute("invalid.id", new Boolean(true));
             }
-            JSPManager.showJSP(request, response, "/admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
         }
     }
 
@@ -188,7 +188,7 @@ public class EditItemServlet extends DSpaceServlet
          */
         if (request.getParameter("submit_cancel") != null)
         {
-            JSPManager.showJSP(request, response, "/admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
             return;
         }
 
@@ -211,7 +211,7 @@ public class EditItemServlet extends DSpaceServlet
             // Show "delete item" confirmation page
             JSPManager.showJSP(request,
                 response,
-                "/admin/confirm-delete-item.jsp");
+                "/dspace-admin/confirm-delete-item.jsp");
             break;
 
         case CONFIRM_DELETE:
@@ -226,7 +226,7 @@ public class EditItemServlet extends DSpaceServlet
                 collections[i].removeItem(item);
             }
 
-            JSPManager.showJSP(request, response, "/admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
             context.complete();
             break;
 
@@ -238,19 +238,19 @@ public class EditItemServlet extends DSpaceServlet
             // Show "withdraw item" confirmation page
             JSPManager.showJSP(request,
                 response,
-                "/admin/confirm-withdraw-item.jsp");
+                "/dspace-admin/confirm-withdraw-item.jsp");
             break;
 
         case CONFIRM_WITHDRAW:
             // Withdraw the item
             item.withdraw();
-            JSPManager.showJSP(request, response, "/admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
             context.complete();
             break;
             
         case REINSTATE:
             item.reinstate();
-            JSPManager.showJSP(request, response, "/admin/get-item-id.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/get-item-id.jsp");
             context.complete();
             break;
             
@@ -292,7 +292,7 @@ public class EditItemServlet extends DSpaceServlet
         request.setAttribute("collections", collections);
         request.setAttribute("dc.types", dcTypes);
 
-        JSPManager.showJSP(request, response, "/admin/edit-item-form.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/edit-item-form.jsp");
     }
 
 
@@ -489,7 +489,7 @@ public class EditItemServlet extends DSpaceServlet
             // Show upload bitstream page
             request.setAttribute("item", item);
             JSPManager.showJSP(request, response,
-                "/admin/upload-bitstream.jsp");
+                "/dspace-admin/upload-bitstream.jsp");
         }
         else
         {

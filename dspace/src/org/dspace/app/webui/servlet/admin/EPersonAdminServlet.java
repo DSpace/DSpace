@@ -103,7 +103,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             request.setAttribute("eperson", e);
 
             JSPManager.showJSP(request, response,
-                "/admin/eperson-edit.jsp");
+                "/dspace-admin/eperson-edit.jsp");
 
             context.complete();
         }
@@ -116,7 +116,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             request.setAttribute("eperson", e);
 
             JSPManager.showJSP(request, response,
-                "/admin/eperson-edit.jsp");
+                "/dspace-admin/eperson-edit.jsp");
 
             context.complete();
         }
@@ -172,7 +172,7 @@ public class EPersonAdminServlet extends DSpaceServlet
                     request.setAttribute("error_message", "That EMail is in use by another EPerson.  Emails  must be unique.");
 
                     JSPManager.showJSP(request, response,
-                        "/admin/eperson-edit.jsp");
+                        "/dspace-admin/eperson-edit.jsp");
 
                     context.complete();
                 }
@@ -216,7 +216,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             request.setAttribute("eperson", e);
 
             JSPManager.showJSP(request, response,
-                "/admin/eperson-confirm-delete.jsp");
+                "/dspace-admin/eperson-confirm-delete.jsp");
         }
         else if (button.equals("submit_confirm_delete"))
         {
@@ -279,7 +279,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             request.setAttribute("page_count", new Integer(pageCount));
             request.setAttribute("page_index", new Integer(pageIndex));
             
-            JSPManager.showJSP(request, response, "/admin/eperson-browse.jsp");            
+            JSPManager.showJSP(request, response, "/dspace-admin/eperson-browse.jsp");            
         }
         else
         {
@@ -317,7 +317,7 @@ public class EPersonAdminServlet extends DSpaceServlet
         EPerson[] epeople = EPerson.findAll(context, sortField);
         
         request.setAttribute("epeople", epeople);
-        JSPManager.showJSP(request, response, "/admin/list-epeople.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/list-epeople.jsp");
     }
     
     
@@ -325,6 +325,6 @@ public class EPersonAdminServlet extends DSpaceServlet
                     HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        JSPManager.showJSP(request, response, "/admin/eperson-main.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/eperson-main.jsp");
     }
 }

@@ -171,7 +171,7 @@ public class BitstreamFormatRegistry extends DSpaceServlet
                 UIUtil.getIntParameter(request, "format_id"));
             request.setAttribute("format", bf);
             JSPManager.showJSP(request, response,
-                "/admin/confirm-delete-format.jsp");
+                "/dspace-admin/confirm-delete-format.jsp");
         }
         else if (button.equals("submit_confirm_delete"))
         {
@@ -206,6 +206,6 @@ public class BitstreamFormatRegistry extends DSpaceServlet
         BitstreamFormat[] formats = BitstreamFormat.findAll(context);
         
         request.setAttribute("formats", formats);
-        JSPManager.showJSP(request, response, "/admin/list-formats.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/list-formats.jsp");
     }
 }
