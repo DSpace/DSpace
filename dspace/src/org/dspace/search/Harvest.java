@@ -45,9 +45,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -98,6 +98,7 @@ public class Harvest
      * @param withdrawn   If <code>true</code>, information about withdrawn
      *                    items is included
      * @return  List of <code>HarvestedItemInfo</code> objects
+     * @throws SQLException
      */
     public static List harvest(Context context,
         Collection scope,
@@ -168,7 +169,15 @@ public class Harvest
         if (withdrawn == false)
         {
             // Exclude withdrawn items
-            query = query + " AND withdrawn=false";
+            if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+            {
+                query = query + " AND withdrawn=0";
+            }
+            else
+            {
+                // postgres uses booleans
+                query = query + " AND withdrawn=false";
+            }
         }
         
         // Order by item ID, so that for a given harvest the order will be
@@ -238,6 +247,7 @@ public class Harvest
      *
      * @return  <code>HarvestedItemInfo</code> object for the single item, or
      *          <code>null</code>
+     * @throws SQLException
      */
     public static HarvestedItemInfo getSingle(Context context,
         String handle,
@@ -276,6 +286,7 @@ public class Harvest
      *
      * @param context  DSpace context
      * @param itemInfo HarvestedItemInfo object to fill out
+     * @throws SQLException
      */
     private static void fillCollections(Context context,
         HarvestedItemInfo itemInfo)
