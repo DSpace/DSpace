@@ -433,7 +433,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
         collection.setMetadata("copyright_text", copy);
         collection.setMetadata("side_bar_text", side);
         collection.setMetadata("license", license);
-        collection.setMetadata("provenance_description", license);
+        collection.setMetadata("provenance_description", provenance);
 
         // Which button was pressed?
         String button = UIUtil.getSubmitButton(request, "submit");
