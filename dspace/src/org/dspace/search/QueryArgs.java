@@ -41,10 +41,13 @@
  */
 package org.dspace.search;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import javax.servlet.http.HttpServletRequest;
+
+import org.dspace.core.Constants;
 
 import org.apache.oro.text.perl.Perl5Util;
 
@@ -215,6 +218,7 @@ public class QueryArgs
     }
 
     public String buildHTTPQuery(HttpServletRequest request)
+            throws UnsupportedEncodingException
     {
         String querystring = "";
         HashMap queryHash = buildQueryHash(request);
@@ -226,7 +230,8 @@ public class QueryArgs
             String key = (String) i.next();
             String value = (String) queryHash.get(key);
 
-            querystring = querystring + "&" + key + "=" + value;
+            querystring = querystring + "&" + key + "="
+                    + URLEncoder.encode(value, Constants.DEFAULT_ENCODING);
         }
 
         return (querystring);
