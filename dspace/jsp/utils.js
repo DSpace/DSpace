@@ -74,7 +74,11 @@ function addEPerson(id, email, name)
 function finishEPerson()
 {
     selectAll(window.document.forms[0].eperson_id);
-    popupWindow.close();
+
+	if (popupWindow != null)
+	{
+		popupWindow.close();
+	}
 }
 
 
