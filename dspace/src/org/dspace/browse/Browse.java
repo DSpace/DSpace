@@ -683,28 +683,32 @@ public class Browse
             {
                 log.info("Number of Results: " + theResults.size() +
                     " Overall position: " + overallPosition +
-                    " Total " + total +
+                    " Total " + theTotal +
                     " Offset " + offset);
                 int lastIndex = (overallPosition + resultSize);
-                boolean noresults = (total == 0) || (resultSize == 0);
+                boolean noresults = (theTotal == 0) || (resultSize == 0);
 
-                log.info("Got results: " + (noresults ? 0 : overallPosition) +
-                    " to " + (noresults ? 0 : lastIndex) + " out of " + total);
+                log.info("Got results: " +
+                         (noresults ? 0 : overallPosition) +
+                         " to " +
+                         (noresults ? 0 : lastIndex) +
+                         " out of " + theTotal);
             }
 
             BrowseInfo info = null;
             if (sort == null)
             {
-                info = new BrowseInfo(theResults, overallPosition, total, offset);
+                info = new BrowseInfo(theResults, overallPosition, theTotal, offset);
             }
             else
             {
                 String element   = sort.booleanValue() ? "title" : "date";
                 String qualifier = sort.booleanValue() ? null    : "issued";
 
+                //  FIXME
                 info = new BrowseInfo
-                    (theResults, element, qualifier, overallPosition,
-                     total, offset);
+                    (theResults, overallPosition,
+                     theTotal, offset);
             }
 
             BrowseCache.add(key, info);
@@ -1526,7 +1530,7 @@ class BrowseCache
     {
         // Don't bother caching browses with no results, they are
         // fairly cheap to calculate
-        if (info.getResultSize() == 0)
+        if (info.getResultCount() == 0)
             return;
 
         // Add the info to the cache
