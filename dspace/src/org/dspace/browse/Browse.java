@@ -209,6 +209,7 @@ public class Browse
         scope.setBrowseType(ITEMS_BY_AUTHOR_BROWSE);
         scope.setAscending(true);
         scope.setSortByTitle(sortByTitle ? Boolean.TRUE : Boolean.FALSE);
+        scope.setTotalAll();
 
         return doBrowse(scope);
     }
