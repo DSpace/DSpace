@@ -365,6 +365,15 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              text-decoration: none;
              background: #cccccc }
 
+.miscTableNoColor { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+             font-size: 12pt;
+             font-style: normal;
+             font-weight: normal;
+             color: #000000;
+             vertical-align: middle;
+             text-decoration: none;
+             background: #ffffff }
+
 <%-- The padding element breaks Netscape 4 - it puts a big gap at the top
   -- of the browse tables if it's present.  So, we decide here which
   -- padding elements to use. --%>
