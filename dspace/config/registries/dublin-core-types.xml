@@ -36,6 +36,11 @@
     <date.created>$Date$</date.created>
     <description>
       $Log$
+      Revision 1.3  2002/11/01 13:28:47  rtansley
+      Added new bitstream formats.
+      Added comments indicating which formats and DC types are needed by the system
+      to function.
+
       Revision 1.2  2002/10/21 09:29:31  rtansley
       Updated DC type registry and submission UI to include "identifier.citation",
       "publisher", and "type".  Simple item display also includes those fields.
@@ -80,6 +85,7 @@
     <scope_note>Use primarily for thesis advisor.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>contributor</element>
     <qualifier>author</qualifier>
@@ -128,12 +134,14 @@
     <scope_note>Use qualified form if possible.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>date</element>
     <qualifier>accessioned</qualifier>
     <scope_note>Date DSpace takes possession of item.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>date</element>
     <qualifier>available</qualifier>
@@ -152,6 +160,7 @@
     <scope_note>Date of creation or manufacture of intellectual content if different from date.issued.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>date</element>
     <qualifier>issued</qualifier>
@@ -172,6 +181,7 @@
     to a local collection instead of unqualified form.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>identifier</element>
     <qualifier>citation</qualifier>
@@ -179,18 +189,21 @@
     of non-DSpace format of this item</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>identifier</element>
     <qualifier>govdoc</qualifier>
     <scope_note>A government document number</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>identifier</element>
     <qualifier>isbn</qualifier>
     <scope_note>International Standard Book Number</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>identifier</element>
     <qualifier>issn</qualifier>
@@ -203,42 +216,49 @@
     <scope_note>Serial Item and Contribution Identifier</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>identifier</element>
     <qualifier>ismn</qualifier>
     <scope_note>International Standard Music Number</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>identifier</element>
     <qualifier>other</qualifier>
     <scope_note>A known identifier type common to a local collection.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>identifier</element>
     <qualifier>uri</qualifier>
     <scope_note>Uniform Resource Identifier</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>description</element>
     <!-- unqualified -->
     <scope_note>Catch-all for any description not defined by qualifiers.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>description</element>
     <qualifier>abstract</qualifier>
     <scope_note>Abstract or summary.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>description</element>
     <qualifier>provenance</qualifier>
     <scope_note>The history of custody of the item since its creation, including any changes successive custodians made to it.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>description</element>
     <qualifier>sponsorship</qualifier>
@@ -265,12 +285,14 @@
     this item.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>format</element>
     <!-- unqualified -->
     <scope_note>Catch-all for any format information not defined by qualifiers.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>format</element>
     <qualifier>extent</qualifier>
@@ -283,6 +305,7 @@
     <scope_note>Physical medium.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>format</element>
     <qualifier>mimetype</qualifier>
@@ -296,12 +319,14 @@
     item, accommodating harvested values.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>language</element>
     <qualifier>iso</qualifier>
     <scope_note>Current ISO standard for language of intellectual content, including country codes (e.g. "en_US").</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>publisher</element>
     <!-- unqualified -->
@@ -326,6 +351,7 @@
     <scope_note>References physically or logically containing item.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>relation</element>
     <qualifier>ispartofseries</qualifier>
@@ -411,6 +437,7 @@
     <scope_note>Do not use; only for harvested metadata.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>subject</element>
     <!-- unqualified -->
@@ -454,12 +481,14 @@
     <scope_note>Local controlled vocabulary; global vocabularies will receive specific qualifier.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>title</element>
     <!-- unqualified -->
     <scope_note>Title statement/title proper.</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>title</element>
     <qualifier>alternative</qualifier>
@@ -467,6 +496,7 @@
     e.g. abbreviation or translation</scope_note>
   </dc-type>
 
+  <!-- Used by system: do not remove -->
   <dc-type>
     <element>type</element>
     <!-- unqualified -->
