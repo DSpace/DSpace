@@ -201,6 +201,8 @@ public class Browse
     {
         if (! scope.hasFocus())
             throw new IllegalArgumentException("Must specify an author for getItemsByAuthor");
+        if (! (scope.getFocus() instanceof String))
+            throw new IllegalArgumentException("The focus for getItemsByAuthor must be a String");
 
         scope.setBrowseType(ITEMS_BY_AUTHOR_BROWSE);
         scope.setAscending(true);
