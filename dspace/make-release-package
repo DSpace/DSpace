@@ -20,7 +20,7 @@ rm -f dspace/make-release-package
 echo "Creating tarball..."
 mv dspace $2
 
-tar -cf $2.tar.gz | gzip -c > $2
+tar -cf - $2 | gzip -c > $2.tar.gz
 
 echo "Cleaning up..."
 
