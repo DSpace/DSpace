@@ -23,11 +23,8 @@ $CVS_COMMAND -q export -r $1 dspace
 # Don't need to include this script!
 rm -f dspace/make-release-package
 
-# Or silly cvsignore file
-rm -f dspace/.cvsignore
-
-# get rid of silly GPL'd METS stuff
-#rm -f dspace/src/org/dspace/app/mets/METSExport.java
+# Or silly cvsignore files
+rm -f `find dspace -name .cvsignore`
 
 echo "Creating tarball..."
 mv dspace $FILENAME
