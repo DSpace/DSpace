@@ -63,7 +63,11 @@ import org.dspace.core.ConfigurationManager;
  */
 public class FileUploadRequest extends HttpServletRequestWrapper
 {
+    /** Multipart request */
     private MultipartRequest mreq = null;
+
+    /** Original request */
+    private HttpServletRequest original = null;
     
     /**
      * Wraps a multipart request and extracts the files
@@ -75,6 +79,8 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     {
         super(req);
 
+        original = req;
+        
 	String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
         int maxSize = ConfigurationManager.getIntProperty("upload.max");
         
@@ -128,5 +134,15 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     public File getFile(String name)
     {
         return mreq.getFile(name);
+    }
+
+    /**
+     * Get back the original HTTP request object
+     *
+     * @return the original HTTP request
+     */
+    public HttpServletRequest getOriginalRequest()
+    {
+        return original;
     }
 }

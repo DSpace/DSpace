@@ -1122,7 +1122,7 @@ public class SubmitServlet extends DSpaceServlet
         }
         else
         {
-            doStepJump(context, request, response, subInfo);
+            doStepJump(context, wrapper, response, subInfo);
         }
 
 	// Remove temp file if it's still around
@@ -1601,6 +1601,15 @@ public class SubmitServlet extends DSpaceServlet
         // "submit_jump_".
         String buttonPressed = UIUtil.getSubmitButton(request, "");
 
+        // Now, if the request was a multi-part (file upload), we need to
+        // get the original request back out, as the wrapper causes problems
+        // further down the line.
+        if (request instanceof FileUploadRequest)
+        {
+            FileUploadRequest fur = (FileUploadRequest) request;
+            request = fur.getOriginalRequest();
+        }
+        
         int nextStep = -1;
 
         if (buttonPressed.startsWith("submit_jump_"))
