@@ -109,8 +109,13 @@ public class AuthorizeManager
     
         if( !authorize(c, otype, oid, action, c.getCurrentUser()) )
         {
-            int userid = c.getCurrentUser().getID();
-            AuthorizeException j = new AuthorizeException("test");
+            int userid;
+            EPerson e = c.getCurrentUser();
+            
+            if( e == null ) { userid = 0;         }
+            else            { userid = e.getID(); }
+            
+            AuthorizeException j = new AuthorizeException("Denied");
             j.printStackTrace();
             
             throw new AuthorizeException(
@@ -388,11 +393,18 @@ public class AuthorizeManager
             int action, EPerson e)
         throws SQLException
     {
+        int userid;
+
         // is authorization disabled for this context?
         if( c.ignoreAuthorization() ) return true;
 
+        // is eperson set?  if not, userid = -1
+        if( e == null ) { userid = -1;        }
+        else            { userid = e.getID(); }
+
+
         // is user part of admin group?
-        if( isAdmin( c,e.getID() ) ) return true;
+        if( isAdmin( c, userid ) ) return true;
 
         // get policies for this object and action
         TableRowIterator tri = DatabaseManager.query(c,
@@ -416,13 +428,13 @@ public class AuthorizeManager
                 if( rp.isPublic() ) { return true; }
             
                 if( (rp.getEPersonID() != -1)
-                    &&(rp.getEPersonID() == e.getID()) )
+                    &&(rp.getEPersonID() == userid) )
                 {
                     return true; // match
                 }
                                 
                 if( (rp.getGroupID() != -1 )
-                    &&(Group.isMember(c, rp.getGroupID(), e.getID())) )
+                    &&(Group.isMember(c, rp.getGroupID(), userid)) )
                 {
                     // group was set, and eperson is a member
                     // of that group
