@@ -41,26 +41,40 @@
 package org.dspace.core;
 
 /**
- * Class with constants and matching strings, for DSpace types
+ * Class with constants and matching strings, for DSpace types.  These numbers
+ * must never be changed!!
  *
- * @author dstuve
+ * @author  David Stuve
  * @version $Revision$
  */
-
 public class Constants
 {
+    /** Type of bitstream objects */
     public static final int BITSTREAM   = 0;
+
+    /** Type of bundle objects */
     public static final int BUNDLE      = 1;
+
+    /** Type of item objects */
     public static final int ITEM        = 2;
+
+    /** Type of collection objects */
     public static final int COLLECTION  = 3;
+
+    /** Type of community objects */
     public static final int COMMUNITY   = 4;
+
+    /** DSpace site type */
     public static final int SITE        = 5;
-    public static final int EGROUPS     = 6;
+
+    /** Type of eperson groups */
+    public static final int GROUP       = 6;
+
+    /** Type of individual eperson objects */
     public static final int EPERSON     = 7;
-    public static final int WORKFLOW    = 8;
 
     /**
-     * typetext lets you look up type names from the type IDs
+     * lets you look up type names from the type IDs
      */
     public static final String[] typetext =
     {
@@ -70,21 +84,54 @@ public class Constants
         "COLLECTION",
         "COMMUNITY",
         "SITE",
-        "EGROUPS",
+        "GROUP",
         "EPERSON",
-        "WORKFLOW"
     };
 
-    public static final int READ            = 0;
-    public static final int WRITE           = 1;
-    public static final int DELETE          = 2;
-    public static final int ADD             = 3;
-    public static final int REMOVE          = 4;
-    public static final int SUBMIT_REVIEW   = 5; // workflow
-    public static final int SUBMIT_ADMIN    = 6; // workflow
-    public static final int SUBMIT_EDIT	    = 7; // workflow
-    public static final int SUBMIT_ABORT    = 8; // workflow
 
+    /** Action of reading, viewing or downloading something */
+    public static final int READ            = 0;
+
+    /** Action of modifying something */
+    public static final int WRITE           = 1;
+
+    /**
+     * Action of deleting something.  Different from removing something
+     * from a container.
+     * @see #REMOVE
+     */
+    public static final int DELETE          = 2;
+
+    /**
+     * Action of adding something to a container.  For example, to add
+     * an item to a collection, a user must have <code>ADD</code> permission
+     * on the collection.
+    */
+    public static final int ADD             = 3;
+
+    /**
+     * Action of removing something from a container.  Different from
+     * deletion.
+     * @see #DELETE
+     */
+    public static final int REMOVE          = 4;
+
+    /** Action of performing workflow step 1 */
+    public static final int WORKFLOW_STEP_1 = 5;
+
+    /** Action of performing workflow step 2 */
+    public static final int WORKFLOW_STEP_2 = 6;
+
+    /** Action of performing workflow step 3 */
+    public static final int WORKFLOW_STEP_3 = 7;
+
+    /** Action of performing a workflow */
+    public static final int WORKFLOW_ABORT  = 8;
+
+
+    /**
+     * lets you look up action names from the action IDs
+     */
     public static final String[] actiontext =
     {
         "READ",
@@ -92,25 +139,29 @@ public class Constants
         "DELETE",
         "ADD",
         "REMOVE",
-        "SUBMIT_REVIEW",
-        "SUBMIT_ADMIN",
-        "SUBMIT_EDIT",
-        "SUBMIT_ABORT"
+        "WORKFLOW_STEP_1",
+        "WORKFLOW_STEP_2",
+        "WORKFLOW_STEP_3",
+        "WORKFLOW_ABORT"
     };
 
 
     /**
-     * If you know the string, look up the corresponding type ID constant,
-     * or -1 if no match found.
+     * If you know the type string, look up the corresponding type ID constant.
      *
      * @param type  String with the name of the type (must be exact match)
+     *
+     * @return  the corresponding type ID, or <code>-1</code> if the type
+     *          string is unknown
      */
     public static int getTypeNumber(String type)
     {
         for (int i = 0; i < typetext.length; i++)
         {
             if (typetext[i].equals(type))
+            {
                 return i;
+            }
         }
 
         return -1;
@@ -118,16 +169,22 @@ public class Constants
 
 
     /**
-     * Return the constant corresponding to ACTION, or -1
-     * if no match is found.
+     * If you know the action string, look up the corresponding type ID
+     * constant.
+     *
+     * @param type  String with the name of the action (must be exact match)
+     *
+     * @return  the corresponding action ID, or <code>-1</code> if the action
+     *          string is unknown
      */
-     
     public static int getActionNumber(String action)
     {
         for (int i = 0; i < actiontext.length; i++)
         {
             if (actiontext[i].equals(action))
+            {
                 return i;
+            }
         }
 
         return -1;
