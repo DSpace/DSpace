@@ -643,7 +643,7 @@ public class ItemTag extends TagSupport
                         out.print(request.getContextPath());
                         out.print("/retrieve/");
                         out.print(bitstreams[k].getID() + "/");
-                        out.print(URLEncoder.encode(bitstreams[k].getName(), 
+                        out.print(UIUtil.encodeBitstreamName(bitstreams[k].getName(), 
                                                 Constants.DEFAULT_ENCODING));
                         out.print("\">View Licence</A></td></tr>");
                     }
