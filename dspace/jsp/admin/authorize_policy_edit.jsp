@@ -84,7 +84,7 @@
         <table width="70%">
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_save_policy" value="Save">
+                    <input type="submit" name="submit_save_policy" value="Save Policy">
                 </td>
                 <td align="right">
                     <input type="submit" name="submit_cancel_policy" value="Cancel">
