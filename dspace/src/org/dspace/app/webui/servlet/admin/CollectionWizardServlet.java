@@ -258,9 +258,6 @@ public class CollectionWizardServlet extends DSpaceServlet
 		{
 			// Create submitters group
 			Group g = collection.createSubmitters();
-			
-			// Give them ADD permission
-			AuthorizeManager.addPolicy(context, collection, Constants.ADD, g);
 		}
 
 		// Check for the workflow steps
@@ -270,10 +267,6 @@ public class CollectionWizardServlet extends DSpaceServlet
 			{
 				// should have workflow step i
 				Group g = collection.createWorkflowGroup(i);
-
-        			AuthorizeManager.addPolicy(context, collection, Constants.ADD, g);
-			
-				// FIXME: Might need to do some more authorisation stuff?  
 			}
 		}
 		
