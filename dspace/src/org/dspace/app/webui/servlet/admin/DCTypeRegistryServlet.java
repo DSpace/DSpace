@@ -65,21 +65,6 @@ import org.dspace.core.LogManager;
  */
 public class DCTypeRegistryServlet extends DSpaceServlet
 {
-    /** User wants to edit a format */
-    public static final int START_EDIT = 1;
-
-    /** User wants to delete a format */
-    public static final int START_DELETE = 2;
-    
-    /** User confirms edit of a format */
-    public static final int CONFIRM_EDIT = 3;
-
-    /** User confirms delete of a format */
-    public static final int CONFIRM_DELETE = 4;
-
-    /** User wants to create a new format */
-    public static final int CREATE = 4;
-
     /** Logger */
     private static Logger log = Logger.getLogger(DCTypeRegistryServlet.class);
 
