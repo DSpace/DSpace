@@ -216,18 +216,14 @@ public class SupervisedItem extends WorkspaceItem
     /**
      * Get items being supervised by given EPerson
      *
-     * @param ep the eperson who's items to supervise we want
+     * @param   ep          the eperson who's items to supervise we want
+     * @param   context     the dspace context
      *
      * @return the items eperson is supervising in an array
      */
-    public static SupervisedItem[] findbyEperson(EPerson ep)
+    public static SupervisedItem[] findbyEPerson(Context context, EPerson ep)
         throws SQLException
     {
-        //Note that we start our own context as this method is called from a
-        //JSP, which has no access to a context to pass us.
-        Context context = new Context();
-        context.setCurrentUser(ep);
-        
         List sItems = new ArrayList();
         String query = "SELECT DISTINCT workspaceitem.* " +
                         "FROM workspaceitem, epersongroup2workspaceitem, " +
