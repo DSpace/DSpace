@@ -46,6 +46,7 @@ import java.util.List;
 import org.dspace.content.Bundle;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
@@ -59,8 +60,39 @@ public class CombineBundles
 
         // ve are superuser!
         c.setIgnoreAuthorization(true);
+
+
+        ItemIterator ii = null;
+
+        // first set owning Collections
+        Collection [] collections = Collection.findAll(c);
+
+
+        System.out.println("Setting item owningCollection fields in database");
+        for(int q=0; q<collections.length; q++)
+        {
+            ii = collections[q].getItems();
+            
+            while(ii.hasNext())
+            {
+                Item myItem = ii.next();
                 
-        ItemIterator ii = Item.findAll(c);
+                // set it if it's not already set
+                if(myItem.getOwningCollection()==null)
+                {
+                    myItem.setOwningCollection(collections[q]);
+                    myItem.update();
+                    System.out.println("Set owner of item " + myItem.getID() + " to collection " + collections[q].getID());
+                }
+            }
+        }
+
+        // commit pending transactions before continuing
+        c.commit();
+
+
+        // now combine some bundles        
+        ii = Item.findAll(c);
         
         while(ii.hasNext())
         {
@@ -72,13 +104,20 @@ public class CombineBundles
 
             System.out.println("Processing item #: " + myItem.getID());
 
-
             Bundle [] myBundles = myItem.getBundles();
             
             // look for bundles with multiple bitstreams
             // (if any found, we'll skip this item)
             for( int i = 0; i < myBundles.length; i++ )
             {
+                // skip if bundle is already named
+                if(myBundles[i].getName() != null)
+                {
+                    System.out.println("Skipping this item - named bundles already found");
+                    skipItem = true;
+                    break;
+                }
+            
                 Bitstream [] bitstreams = myBundles[i].getBitstreams();
 
                 // skip this item if we already have bundles combined in this item
