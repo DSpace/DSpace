@@ -30,14 +30,13 @@
 
 <p>
 <center>
-<a href="#formats">Currently supported formats</a> |
-<a href="#policy">The DSpace Format Support Policy</a> |
-<a href="#notlisted">What to do if your format isn't listed</a>
-</center>
+    <p align="left"><a href="#formats">Currently supported formats</a> |</p>
+    <p align="left"><a href="#policy">The DSpace Format Support Policy</a> </p>
+    <p align="left"><a href="#notlisted">What to do if your format isn't listed</a> 
+    </p>
+  </center>
 </p>
-
-
-<a name="formats">
+<div align="left"><a name="formats"></a> </div>
 <h3>Currently supported formats</h3>
 
 <p>
@@ -54,18 +53,18 @@ be recognized as XML.
 
 <dl>
 <p>
-<a name="supported">
+<a name="supported"></a>
 <dd><b class="defs">supported</b>: we fully support the format</dd>
-</p>
+<p></p>
 <p>
-<a name="known">
+<a name="known"></a>
 <dd><b class="defs">known</b>: we can recognize the format, but cannot guarantee full support</dd>
-</p>
+<p></p>
 <p>
-<a name="unsupported">
+<a name="unsupported"></a>
 <dd><b class="defs">unsupported</b>: we cannot recognize a format; these will be
 listed as "application/octet-stream", aka Unknown</dd>
-</p>
+<p></p>
 </dl>
 
 <p>
@@ -76,104 +75,154 @@ a complete explanation of these terms.
 
 <table align="center" border="0" 
  cellspacing="5" cellpadding="5" width="95%">
-
-<tr>
-<th align="left">MIME type</th>
-<th align="left">Description</th>
-<th align="left">Extensions</th>
-<th align="left">Level</th>
-</tr>
-
-<tr>
-<td>application/marc</td>
-<td>MARC</td>
-<td>marc, mrc</td>
-<td><a href="#supported">supported</a></td>
-</tr>
-
-<tr>
-<td>application/msword</td>
-<td>Microsoft Word</td>
-<td>doc</td>
-<td><a href="#known">known</a></td>
-</tr>
-
-<tr>
-<td>application/octet-stream</td>
-<td>Unknown</td>
-<td>(anything not listed)</td>
-<td><a href="#unsupported">unsupported</a></td>
-</tr>
-
-<tr>
-<td>application/pdf</td>
-<td>Adobe PDF</td>
-<td>pdf</td>
-<td><a href="#supported">supported</a></td>
-</tr>
-
-<tr>
-<td>application/vnd.ms-excel</td>
-<td>Microsoft Excel</td>
-<td>xls</td>
-<td><a href="#known">known</a></td>
-</tr>
-
-<tr>
-<td>application/vnd.ms-powerpint</td>
-<td>Microsoft Powerpoint</td>
-<td>ppt</td>
-<td><a href="#known">known</a></td>
-</tr>
-
-<tr>
-<td>image/gif</td>
-<td>GIF</td>
-<td>gif</td>
-<td><a href="#supported">supported</a></td>
-</tr>
-
-<tr>
-<td>image/jpeg</td>
-<td>JPEG</td>
-<td>jpeg, jpg</td>
-<td><a href="#supported">supported</a></td>
-</tr>
-
-<tr>
-<td>image/png</td>
-<td>PNG</td>
-<td>png</td>
-<td><a href="#supported">supported</a></td>
-</tr>
-
-<tr>
-<td>text/html</td>
-<td>HTML</td>
-<td>html, htm</td>
-<td><a href="#supported">supported</a></td>
-</tr>
-
-<tr>
-<td>text/plain</td>
-<td>Text</td>
-<td>txt</td>
-<td><a href="#supported">supported</a></td>
-</tr>
-
-<tr>
-<td>text/xml</td>
-<td>XML</td>
-<td>xml</td>
-<td><a href="#supported">supported</a></td>
-</tr>
-
-
-
+  <tr> 
+    <th align="left">MIME type</th>
+    <th align="left">Description</th>
+    <th align="left">Extensions</th>
+    <th align="left">Level</th>
+  </tr>
+  <tr> 
+    <td>application/marc</td>
+    <td>MARC</td>
+    <td>marc, mrc</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>application/msword</td>
+    <td>Microsoft Word</td>
+    <td>doc</td>
+    <td><a href="#known">known</a></td>
+  </tr>
+  <tr> 
+    <td>application/octet-stream</td>
+    <td>Unknown</td>
+    <td>(anything not listed)</td>
+    <td><a href="#unsupported">unsupported</a></td>
+  </tr>
+  <tr> 
+    <td>application/pdf</td>
+    <td>Adobe PDF</td>
+    <td>pdf</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>application/vnd.ms-excel</td>
+    <td>Microsoft Excel</td>
+    <td>xls</td>
+    <td><a href="#known">known</a></td>
+  </tr>
+  <tr> 
+    <td>application/vnd.ms-powerpint</td>
+    <td>Microsoft Powerpoint</td>
+    <td>ppt</td>
+    <td><a href="#known">known</a></td>
+  </tr>
+  <tr> 
+    <td>image/gif</td>
+    <td>GIF</td>
+    <td>gif</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>image/jpeg</td>
+    <td>JPEG</td>
+    <td>jpeg, jpg</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>image/png</td>
+    <td>PNG</td>
+    <td>png</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>text/html</td>
+    <td>HTML</td>
+    <td>html, htm</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>text/plain</td>
+    <td>Text</td>
+    <td>txt</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>text/xml</td>
+    <td>XML</td>
+    <td>xml</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>image/tiff</td>
+    <td>TIFF</td>
+    <td>tiff, tif</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>audio/x-aiff</td>
+    <td>AIFF</td>
+    <td>aiff, aif, aifc</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>audio/basic</td>
+    <td>audio/basic</td>
+    <td>au, snd</td>
+    <td><a href="#known">known</a></td>
+  </tr>
+  <tr> 
+    <td>audio/x-wav</td>
+    <td>WAV</td>
+    <td>wav</td>
+    <td><a href="#known">known</a></td>
+  </tr>
+  <tr> 
+    <td>video/mpeg</td>
+    <td>MPEG</td>
+    <td>mpeg, mpg, mpe</td>
+    <td><a href="#known">known</a></td>
+  </tr>
+  <tr> 
+    <td>text/rich text</td>
+    <td>Rich Text Format</td>
+    <td>rtg</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>application/visio</td>
+    <td>Microsoft Visio</td>
+    <td>vsd</td>
+    <td><a href="#known">known</a></td>
+  </tr>
+  <tr> 
+    <td>application/filemaker </td>
+    <td>Filemaker Pro</td>
+    <td>fm</td>
+    <td><a href="#known">known</a></td>
+  </tr>
+  <tr> 
+    <td>image/bitmap</td>
+    <td>Bitmap</td>
+    <td>bmp</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
+  <tr> 
+    <td>application/x-photoshop</td>
+    <td>Photoshop</td>
+    <td>psd, pdd</td>
+    <td><a href="#known">known</a></td>
+  </tr>
+  <tr> 
+    <td>application/postscript</td>
+    <td>Postscript</td>
+    <td>ps</td>
+    <td><a href="#supported">supported</a></td>
+  </tr>
 </table>
 
 
-<a name="policy">
+<a name="policy"></a>
 <h3>DSpace Format Support Policy</h3>
 <p>
 We want to provide support for as many file formats as
@@ -225,7 +274,7 @@ information about the formats, so we will still list these
 formats as "known", not "supported".
 </p>
 
-<a name="notlisted">
+<a name="notlisted"></a>
 <h3>What to do if your format isn't listed</h3>
 
 <p>

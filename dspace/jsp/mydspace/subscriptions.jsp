@@ -63,7 +63,17 @@
                parentlink="/mydspace "
                title="Your Subscriptions">
 
-    <H1>Your Subscriptions</H1>
+    <table width="100%" border=0>
+        <tr>
+            <td align=left>
+                <H1>Your Subscriptions</H1>
+            </td>
+            <td align=right class=standard>
+                <dspace:popup page="/help/index.html#subscribe">Help...</dspace:popup>
+            </td>
+        <tr>
+    </table>
+ 
 <%
     if (updated)
     {
