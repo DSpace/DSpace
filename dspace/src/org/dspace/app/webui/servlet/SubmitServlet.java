@@ -75,6 +75,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.license.CC;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -152,8 +153,11 @@ public class SubmitServlet extends DSpaceServlet
     /** Grant license step */
     public static final int GRANT_LICENSE = 6;
 
+    /** CC license step */
+    public static final int CC_LICENSE = 7;
+
     /** Submission completed step */
-    public static final int SUBMISSION_COMPLETE = 7;
+    public static final int SUBMISSION_COMPLETE = 8;
 
     // Steps which aren't part of the main sequence, but rather
     // short "diversions" are given high step numbers.  The main sequence
@@ -400,6 +404,10 @@ public class SubmitServlet extends DSpaceServlet
 
         case GRANT_LICENSE:
             processLicense(context, request, response, subInfo);
+            break;
+
+        case CC_LICENSE:
+            processCC(context, request, response, subInfo);
             break;
 
         case SUBMISSION_CANCELLED:
@@ -693,6 +701,7 @@ public class SubmitServlet extends DSpaceServlet
             // remove all but first bitstream from bundle[0]
             // FIXME: Assumes multiple bundles, clean up someday...
             // (only messes with the first bundle.)
+
             Bundle[] bundles = item.getBundles();
 
             if (bundles.length > 0)
@@ -1350,6 +1359,7 @@ public class SubmitServlet extends DSpaceServlet
 
             // remove bitstream from bundle..
             // delete bundle if it's now empty
+
             Bundle[] bundles = bitstream.getBundles();
             
             bundles[0].removeBitstream(bitstream);
@@ -1610,10 +1620,22 @@ public class SubmitServlet extends DSpaceServlet
             item.licenseGranted(license, submitter);
 
             // Start the workflow
-            WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
+            //WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
 
             // FIXME: pass in more information about what happens next?
-            JSPManager.showJSP(request, response, "/submit/complete.jsp");
+            //JSPManager.showJSP(request, response, "/submit/complete.jsp");
+            
+            // are we using Creative Commons?
+            int next_step = CC.isEnabled() ? CC_LICENSE : SUBMISSION_COMPLETE;
+
+            if (next_step == SUBMISSION_COMPLETE)
+	    {
+		// Start the workflow
+                WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
+	    }
+
+            userHasReached(subInfo, next_step);
+            doStep(context, request, response, subInfo, next_step);
 
             context.complete();
         }
@@ -1635,6 +1657,51 @@ public class SubmitServlet extends DSpaceServlet
         }
     }
 
+    /**
+     * Process the input from the CC license page
+     *
+     * @param context   current DSpace context
+     * @param request   current servlet request object
+     * @param response  current servlet response object
+     * @param subInfo   submission info object
+     */
+    private void processCC(Context context,
+			   HttpServletRequest request,
+                           HttpServletResponse response,
+                           SubmissionInfo subInfo)
+	throws ServletException, IOException, SQLException, AuthorizeException
+    {
+        String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
+        // Firstly, check for a click of the cancel button.
+        if (buttonPressed.equals("submit_cancel"))
+        {
+             doCancellation(request,
+                 response,
+                 subInfo,
+                 CC_LICENSE,
+                 CC_LICENSE);
+             return;
+         }
+ 
+ 	// Secondly, check if the person wants CC, and if so, set it
+ 	if (!buttonPressed.equals("submit_no_cc"))
+        {    
+ 	    Item item = subInfo.submission.getItem();
+ 	
+ 	    // set the CC license
+ 	    CC.setLicense(context, item, request.getParameter("cc_license_url"));
+ 
+ 	}
+ 	
+ 	// Start the workflow
+ 	WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
+ 
+ 	// we're done!
+ 	userHasReached(subInfo, SUBMISSION_COMPLETE);
+ 	doStep(context, request, response, subInfo, SUBMISSION_COMPLETE);
+ 
+ 	context.complete();
+     }
 
     //****************************************************************
     //****************************************************************
@@ -1782,6 +1849,10 @@ public class SubmitServlet extends DSpaceServlet
             Collection c = subInfo.submission.getCollection();
             request.setAttribute("license", c.getLicense());
             JSPManager.showJSP(request, response, "/submit/show-license.jsp");
+            break;
+
+        case CC_LICENSE:
+            JSPManager.showJSP(request, response, "/submit/cc.jsp");
             break;
 
         case SUBMISSION_COMPLETE:
