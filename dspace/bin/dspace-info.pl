@@ -63,7 +63,19 @@ my $dspace_dir = "/dspace";
 #where is the DATA for the database tables stored?
 my $database_dir = "/dspace/database";
 
+# find DSpace directories ###################
 
+my $assetstore_dir = GetConfigParameter( "assetstore.dir" );
+my $search_dir     = GetConfigParameter( "search.dir"     );
+my $history_dir    = GetConfigParameter( "history.dir"    );
+my $logs_dir       = GetConfigParameter( "log.dir"        );
+
+# directories in this array are to be checked for ownership by
+# the dspace user
+my @dspace_ownership_dirs = ( $assetstore_dir, "$dspace_dir/jsp" );
+
+# directories in this array are to be checked for zero-length files
+my @zerolength_dirs = ( $assetstore_dir );
 
 # error out if cannot locate above directories
 die "Cannot find dspace directory tree $dspace_dir - edit dspace-info.pl 'dspace_dir' variable with correct path"     if( ! -d $dspace_dir   );
@@ -73,14 +85,6 @@ die "Cannot find database data directory $database_dir - edit dspace-info.pl 'da
 #############################################
 # Begin statistics ##########################
 #############################################
-
-
-# find DSpace directories ###################
-
-my $assetstore_dir = GetConfigParameter( "assetstore.dir" );
-my $search_dir     = GetConfigParameter( "search.dir"     );
-my $history_dir    = GetConfigParameter( "history.dir"    );
-my $logs_dir       = GetConfigParameter( "log.dir"        );
 
 
 # count DSpace objects ######################
@@ -262,9 +266,14 @@ if( $#bitstreams_without_policies >= 0 )
 # check ownership - check the jsp and asset store directories
 #  for ownership issues - be sure to run this script as the dspace user
 
-my @dspace_ownership = ( $assetstore_dir, "$dspace_dir/jsp" );
 
-find( \&CheckOwnership, @dspace_ownership );
+find( \&CheckOwnership, @dspace_ownership_dirs );
+
+# check for zero-length files
+# (big deal in asset store)
+
+find( \&CheckZeroLength, @zerolength_dirs );
+
 
 ################################################
 # subroutines ##################################
@@ -276,6 +285,16 @@ sub CheckOwnership
     my $filename = $File::Find::name;
 
     if( ! -o $filename ) { print "Warning! DSpace user isn't owner of: $filename\n"; }
+}
+
+sub CheckZeroLength
+{
+    my $filename = $File::Find::name;
+
+    # skip if not a file
+    next if( ! -f $filename );
+
+    if( -z $filename ) { print "Warning! Zero-length file: $filename\n"; }
 }
 
 
