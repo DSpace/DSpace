@@ -62,7 +62,7 @@ import org.dspace.eperson.EPerson;
 /**
  * Servlet for editing and creating e-people
  *
- * @author  Robert Tansley
+ * @author  David Stuve
  * @version $Revision$
  */
 public class EPersonAdminServlet extends DSpaceServlet
@@ -133,7 +133,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             
             if( !newEmail.equals( oldEmail ) )
             {
-                // change, now see if it's unique
+                // change to email, now see if it's unique
                 if( EPerson.findByEmail( context, newEmail ) == null )
                 {
                     // it's unique - proceed!
@@ -176,6 +176,35 @@ public class EPersonAdminServlet extends DSpaceServlet
 
                     context.complete();
                 }
+            }
+            else
+            {
+                // no change to email
+                e.setFirstName(request.getParameter("firstname").equals("")
+                    ? null
+                    : request.getParameter("firstname"));
+
+                e.setLastName(request.getParameter("lastname").equals("")
+                    ? null
+                    : request.getParameter("lastname"));
+            
+                // FIXME: More data-driven?
+                e.setMetadata("phone",
+                request.getParameter("phone").equals("")
+                    ? null
+                    : request.getParameter("phone"));
+
+                e.setCanLogIn(request.getParameter("can_log_in") != null &&
+                    request.getParameter("can_log_in").equals("true"));
+            
+                e.setRequireCertificate(
+                    request.getParameter("require_certificate") != null &&
+                    request.getParameter("require_certificate").equals("true"));
+
+                e.update();
+            
+                showMain(context, request, response);
+                context.complete();
             }
         }
         else if (button.equals("submit_delete"))
