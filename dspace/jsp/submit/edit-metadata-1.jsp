@@ -546,6 +546,26 @@
     identifierQualNames.put("other", "Other");
 
     DCValue[] identifiers = item.getDC("identifier", Item.ANY, Item.ANY);
+
+    // Remove any identifier.citation.
+    // FIXME: (Maybe) assumes there will only be one?
+    for (int i = 0; i < identifiers.length; i++)
+    {
+        if (identifiers[i].qualifier.equals("citation"))
+        {
+            DCValue[] newIDs = new DCValue[identifiers.length - 1];
+            for (int j = 0; j < i; j++)
+            {
+                newIDs[j] = identifiers[j];
+            }
+            for (int j = i + 1; j < identifiers.length; j++)
+            {
+                newIDs[j-1] = identifiers[j];
+            }
+            identifiers = newIDs;
+            break;
+        }
+    }
 %>
                 <tr>
                     <td colspan=4 class="submitFormHelp">
@@ -562,6 +582,7 @@
                     </td>
                 </tr>
 <%
+    // Work out how many input boxes to display
     int identifierFieldCount = identifiers.length + 1;
 
     if (si.moreBoxesFor != null && si.moreBoxesFor.equals("identifier"))
@@ -569,6 +590,7 @@
         identifierFieldCount += 2;
     }
 
+    // Display the input boxes
     for (int i = 0; i < identifierFieldCount; i++)
     {
         String currentQual = "";
@@ -578,12 +600,6 @@
         {
             currentQual = identifiers[i].qualifier;
             currentValue = identifiers[i].value;
-
-            // Skip identifier.citation; handled elsewhere
-            if (currentQual.equals("citation"))
-            {
-                break;
-            }
         }
     
         if (i == 0)
