@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>DSpace Supported Formats</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+
+  body 
+    { 
+      background-color: White;
+      padding: 10px;
+    }
+
+  .defs
+    {
+      text-decoration: underline;
+    }
+			
+</style>
+
+</head>
+
+
+<body bgcolor="#FFFFFF">
+
+<!-- $Revision -->
+
+<h2 align="center">DSpace Supported Formats</h2>
+
+<p>
+<center>
+<a href="#formats">Currently supported formats</a> |
+<a href="#policy">The DSpace Format Support Policy</a> |
+<a href="#notlisted">What to do if your format isn't listed</a>
+</center>
+</p>
+
+
+<a name="formats">
+<h3>Currently supported formats</h3>
+
+<p>
+In the table below, <b>MIME type</b> is the Multipurpose Internet Mail
+Extensions (MIME) type identifier; for more
+information on MIME, see the <a href="http://www.nacs.uci.edu/indiv/ehood/MIME/MIME.html">MIME RFCs</a> or the <a href="http://www.faqs.org/faqs/mail/mime-faq/">MIME FAQ</a>.
+<b>Description</b> is what most people use as the name for the format.
+<b>Extensions</b> are typical file name extensions (the part after the
+dot, e.g. the extension for "index.html" is "html").  These are not
+case-sensitive in DSpace, so either "sample.XML" or "sample.xml" will
+be recognized as XML.
+<b>Level</b> is DSpace's support level for each format:  
+</p>
+
+<dl>
+<p>
+<a name="supported">
+<dd><b class="defs">supported</b>: we fully support the format</dd>
+</p>
+<p>
+<a name="known">
+<dd><b class="defs">known</b>: we can recognize the format, but cannot guarantee full support</dd>
+</p>
+<p>
+<a name="unsupported">
+<dd><b class="defs">unsupported</b>: we cannot recognize a format; these will be
+listed as "application/octet-stream", aka Unknown</dd>
+</p>
+</dl>
+
+<p>
+Please see the full <a href="#policy">format policy</a> below for
+a complete explanation of these terms.
+</p>
+
+
+<table align="center" border="0" 
+ cellspacing="5" cellpadding="5" width="95%">
+
+<tr>
+<th align="left">MIME type</th>
+<th align="left">Description</th>
+<th align="left">Extensions</th>
+<th align="left">Level</th>
+</tr>
+
+<tr>
+<td>application/marc</td>
+<td>MARC</td>
+<td>marc, mrc</td>
+<td><a href="#supported">supported</a></td>
+</tr>
+
+<tr>
+<td>application/msword</td>
+<td>Microsoft Word</td>
+<td>doc</td>
+<td><a href="#known">known</a></td>
+</tr>
+
+<tr>
+<td>application/octet-stream</td>
+<td>Unknown</td>
+<td>(anything not listed)</td>
+<td><a href="#unsupported">unsupported</a></td>
+</tr>
+
+<tr>
+<td>application/pdf</td>
+<td>Adobe PDF</td>
+<td>pdf</td>
+<td><a href="#supported">supported</a></td>
+</tr>
+
+<tr>
+<td>application/vnd.ms-excel</td>
+<td>Microsoft Excel</td>
+<td>xls</td>
+<td><a href="#known">known</a></td>
+</tr>
+
+<tr>
+<td>application/vnd.ms-powerpint</td>
+<td>Microsoft Powerpoint</td>
+<td>ppt</td>
+<td><a href="#known">known</a></td>
+</tr>
+
+<tr>
+<td>image/gif</td>
+<td>GIF</td>
+<td>gif</td>
+<td><a href="#supported">supported</a></td>
+</tr>
+
+<tr>
+<td>image/jpeg</td>
+<td>JPEG</td>
+<td>jpeg, jpg</td>
+<td><a href="#supported">supported</a></td>
+</tr>
+
+<tr>
+<td>image/png</td>
+<td>PNG</td>
+<td>png</td>
+<td><a href="#supported">supported</a></td>
+</tr>
+
+<tr>
+<td>text/html</td>
+<td>HTML</td>
+<td>html, htm</td>
+<td><a href="#supported">supported</a></td>
+</tr>
+
+<tr>
+<td>text/plain</td>
+<td>Text</td>
+<td>txt</td>
+<td><a href="#supported">supported</a></td>
+</tr>
+
+<tr>
+<td>text/xml</td>
+<td>XML</td>
+<td>xml</td>
+<td><a href="#supported">supported</a></td>
+</tr>
+
+
+
+</table>
+
+
+<a name="policy">
+<h3>DSpace Format Support Policy</h3>
+<p>
+We want to provide support for as many file formats as
+possible.  Over time, items stored in DSpace will be preserved
+as is, using a combination of time-honored techniques for data
+management and best practices for digital preservation.  As for
+specific formats, however, the proprietary nature of many file
+types makes it impossible to guarantee much more than this.  Put
+simply, our policy for file formats is:
+</p>
+
+<ul>
+<li>everything put in will be retrievable</li>
+<li>we will recognize as many files' formats as possible</li>
+<li>we will support as many known file formats as possible</li>
+</ul>
+
+<p>
+By "support", we mean "make useable in the future, using whatever 
+combination of techniques (such as migration, emulation, etc.) is
+appropriate given the context of need".  For supported
+formats, we might choose to bulk-transform files from a current
+format version to a future one, for instance.  But we can't predict
+which services will be necessary down the road, so we'll continually
+monitor formats and techniques to ensure we can accomodate needs
+as they arise.
+</p>
+
+<p>
+In the meantime, we can choose to "support" a format if we
+can gather enough documentation to capture how the format
+works.  In particular, we collect file specifications,
+descriptions, and code samples, and make those available in the
+<!-- FIXME: Make a link! <a href="submit_guide.html#info">-->
+DSpace Format Reference Collection<!-- FIXME </a>-->. 
+Unfortunately, this
+means that proprietary formats for which these materials are not
+publicly available cannot be supported in DSpace.  We will still
+preserve these files, and in cases where those formats are
+native to tools supported by MIT Information Systems, we will
+provide you with guidance on converting your files into formats
+we do support.  It is also likely that for extremely popular but
+proprietary formats (such as Microsoft .doc, .xls, and .ppt), 
+we will be able to help make files in those
+formats more useful in the future simply because their
+prevalence makes it likely tools will be available.  Even so, we
+cannot guarantee this level of service without also having more
+information about the formats, so we will still list these
+formats as "known", not "supported".
+</p>
+
+<a name="notlisted">
+<h3>What to do if your format isn't listed</h3>
+
+<p>
+We understand that there are always more formats to consider, and we would 
+appreciate your help in identifying and studying the suitability of
+support for formats you care about.  If we can't identify a format,
+DSpace will record it as "unknown", aka "application/octet-stream",
+but we would like to keep the percentage of supported format
+materials in DSpace as high as possible.  Don't hesitate to <a
+href="index.html#help">contact us</a> if you have any questions or concerns.
+</p>
+
+
+
+</body>
+</html>
