@@ -296,7 +296,9 @@ CREATE TABLE Collection
   side_bar_text     TEXT,
   workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id )
+  workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  submitter         INTEGER,
+  admin             INTEGER
 );
 
 -------------------------------------------------------

@@ -58,3 +58,11 @@ CREATE TABLE epersongroup2workspaceitem
   workspace_item_id integer,
   CONSTRAINT epersongroup2item_pkey PRIMARY KEY (id)
 );
+
+-------------------------------------------------------------------------------
+-- modification to collection table to support being able to change the
+-- submitter and collection admin group names
+-------------------------------------------------------------------------------
+ALTER TABLE collection ADD submitter INTEGER;
+
+ALTER TABLE collection ADD admin INTEGER;

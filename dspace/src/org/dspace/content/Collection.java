@@ -151,15 +151,9 @@ public class Collection extends DSpaceObject
         workflowGroup[1] = groupFromColumn("workflow_step_2");
         workflowGroup[2] = groupFromColumn("workflow_step_3");
 
-        // Default submitters are in a group called "COLLECTION_XX_SUBMIT"
-        // where XX is the ID of this collection
-        submitters = Group.findByName(ourContext, "COLLECTION_" + getID()
-                + "_SUBMIT");
-
-        // default administrator group
-        admins = Group.findByName(ourContext, "COLLECTION_" + getID()
-                + "_ADMIN");
-
+        submitters = groupFromColumn("submitter");
+        admins = groupFromColumn("admin");
+        
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
 
@@ -552,6 +546,9 @@ public class Collection extends DSpaceObject
             submitters.update();
         }
 
+        // register this as the submitter group
+        collectionRow.setColumn("submitter", submitters.getID());
+        
         AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, submitters);
 
         return submitters;
@@ -597,6 +594,9 @@ public class Collection extends DSpaceObject
         AuthorizeManager.addPolicy(ourContext, this,
                 Constants.COLLECTION_ADMIN, admins);
 
+        // register this as the admin group
+        collectionRow.setColumn("admin", admins.getID());
+        
         // administrators also get ADD on the submitter group
         if (submitters != null)
         {
