@@ -38,7 +38,7 @@
  * DAMAGE.
  */
 
-package org.dspace.handles;
+package org.dspace.handle;
 
 import java.security.Security;
 import java.sql.*;
