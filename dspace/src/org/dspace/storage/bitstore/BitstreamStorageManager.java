@@ -64,7 +64,14 @@ import org.dspace.storage.rdbms.TableRow;
 import org.apache.log4j.Logger;
 
 /**
- * Stores, retrieves and deletes bitstreams.
+ * <P>Stores, retrieves and deletes bitstreams.</P>
+ *
+ * <P>Presently, asset stores are specified in <code>dspace.cfg</code>.  Since
+ * Java does not offer a way of detecting free disk space, the asset store to
+ * use for new bitstreams is also specified in a configuration property.  The
+ * drawbacks to this are that the administrators are responsible for monitoring
+ * available space in the asset stores, and DSpace (Tomcat) has to be restarted
+ * when the asset store for new ('incoming') bitstreams is changed.</P>
  *
  * @author  Peter Breton, Robert Tansley
  * @version $Revision$
@@ -74,7 +81,7 @@ public class BitstreamStorageManager
     /** log4j log */
     private static Logger log = Logger.getLogger(BitstreamStorageManager.class);
 
-    /** The asset stores locations*/
+    /** The asset store locations */
     private static File[] assetStores;
     
     /** The asset store to use for new bitstreams */
@@ -167,8 +174,14 @@ public class BitstreamStorageManager
             bitstream = DatabaseManager.create(tempContext, "Bitstream");
             bitstream.setColumn("deleted", true);
             bitstream.setColumn("internal_id", id);
-            // Set the store number of the new bitstream
+
+            /*
+             * Set the store number of the new bitstream
+             * If you want to use some other method of working out where to
+             * put a new bitstream, here's where it should go
+             */
             bitstream.setColumn("store_number", incoming);
+
             DatabaseManager.update(tempContext, bitstream);
 
             tempContext.complete();
@@ -387,15 +400,25 @@ public class BitstreamStorageManager
 
 
     /**
-     * Return the file corresponding to ID, or null.
+     * Return the file corresponding to a bitstream.  It's safe to pass in
+     * <code>null</code>.
      *
-     * @param bitstream  the table row for the bitstream
-     * @return The file corresponding to ID, or null
+     * @param bitstream  the database table row for the bitstream.
+     *                   Can be <code>null</code>
+     *
+     * @return  The corresponding file in the file system, or <code>null</code>
+     *
      * @exception IOException If a problem occurs while determining the file
      */
     private static File getFile(TableRow bitstream)
         throws IOException
     {
+        // Check that bitstream is not null
+        if (bitstream == null)
+        {
+            return null;
+        }
+        
         // Get the store to use
         int storeNumber = bitstream.getIntColumn("store_number");
         
