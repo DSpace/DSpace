@@ -782,7 +782,7 @@ public class Browse
         {
             TableRow row = (TableRow) iterator.next();
             Object theValue = (isAuthorsBrowse) ?
-                (Object) row.getStringColumn("sort_author") :
+                (Object) row.getStringColumn("author") :
                 (Object) new Integer(row.getIntColumn("item_id"));
 
             // Should not happen
@@ -852,14 +852,26 @@ public class Browse
     {
         String tablename = BrowseTables.getTable(scope);
         String column = BrowseTables.getValueColumn(scope);
-
-        StringBuffer sqlb = new StringBuffer()
-            .append("select ")
-            .append(isCount ? "count(" : "")
-            .append(getTargetColumns(scope))
-            .append(isCount ? ")" : "")
-            .append(" from ")
-            .append(tablename);
+        
+        int browseType = scope.getBrowseType();
+        
+        StringBuffer sqlb = new StringBuffer();
+        sqlb.append("select ");
+        sqlb.append(isCount ? "count(" : "");
+       	sqlb.append(getTargetColumns(scope));
+       	sqlb.append(isCount ? ")" : "");
+       	
+       	/** 
+       	 * This next bit adds another column to the query, so 
+       	 * authors don't show up lower-case
+       	 **/
+        if (browseType == AUTHORS_BROWSE && !isCount)
+	{
+		sqlb.append(",author");
+	}
+	
+        sqlb.append(" from ");
+        sqlb.append(tablename);
 
         // If the browse uses items (or item ids) instead of String values
         // make a subquery.
@@ -906,12 +918,11 @@ public class Browse
             return sqlb.toString();
 
         // Add an order by clause -- a parameter
-        sqlb.append(" order by ").append(column).append("{2}")
-        // If an item, make sure it's ordered by item_id as well
-        .append((scope.focusIsString() ||
-                 (scope.getBrowseType() == AUTHORS_BROWSE))
-            ? "" : ", item_id");
-
+	sqlb.append(" order by ").append(column).append("{2}")
+       	// If an item, make sure it's ordered by item_id as well
+       	.append((scope.focusIsString() ||
+  	    (scope.getBrowseType() == AUTHORS_BROWSE))
+       	    ? "" : ", item_id");
         // A limit on the total returned (Postgres extension)
         if (! scope.hasNoLimit())
             sqlb.append(" LIMIT {3} ");
