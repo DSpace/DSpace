@@ -355,7 +355,7 @@ public class Browse
         table2dc.put("ItemsByTitle",
                      item.getDC("title", null, Item.ANY));
         table2dc.put("ItemsByAuthor",
-                     item.getDC("contributor", "author", Item.ANY));
+                     item.getDC("contributor", Item.ANY, Item.ANY));
         table2dc.put("ItemsByDate",
                      item.getDC("date", "issued", Item.ANY));
         table2dc.put("ItemsByDateAccessioned",
