@@ -65,6 +65,7 @@ import ORG.oclc.oai.server.verb.OAIInternalServerError;
 
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
@@ -93,6 +94,11 @@ public class DSpaceOAICatalog extends AbstractCatalog
     
     /** Maximum number of records returned by one request */
     private final int MAX_RECORDS = 100;
+
+    /** Prefix that all our OAI identifiers have */
+    public final static String oaiIDPrefix = "oai:" +
+        ConfigurationManager.getProperty("dspace.hostname") + ":";
+    
     
     public DSpaceOAICatalog(Properties properties)
     {
@@ -127,11 +133,12 @@ public class DSpaceOAICatalog extends AbstractCatalog
         {
             context = new Context();
 
-            // Valid identifiers all have prefix "hdl:"
-            if (identifier.startsWith("hdl:"))
+            // Valid identifiers all have prefix "oai:hostname:"
+            
+            if (identifier.startsWith(oaiIDPrefix))
             {
                 itemInfo = Harvest.getSingle(context,
-                    identifier.substring(4),  // Remove "hdl:"
+                    identifier.substring(oaiIDPrefix.length()), // Strip prefix to get raw handle
                     false);
             }
         }
@@ -314,13 +321,13 @@ public class DSpaceOAICatalog extends AbstractCatalog
         // First get the item from the DB
         try
         {
-            // Valid IDs start with hdl:
-            if (identifier.startsWith("hdl:"))
+            // Valid IDs start with oai:hostname:
+            if (identifier.startsWith(oaiIDPrefix))
             {
                 context = new Context();
 
                 itemInfo = Harvest.getSingle(context,
-                    identifier.substring(4), // Strip "hdl:"
+                    identifier.substring(oaiIDPrefix.length()), // Strip prefix to get raw handle
                     true);
             }
         }
@@ -454,7 +461,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
 		 * bad == bad resumption token.   
          */
         try
-		{
+        {
         	m = doRecordHarvest((String) params[0], (String) params[1],
         			(String) params[2], (String) params[3], offset.intValue());
         }
