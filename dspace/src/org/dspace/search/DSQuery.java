@@ -112,6 +112,7 @@ public class DSQuery
         querystring = checkEmptyQuery    ( querystring );  // change nulls to an empty string
         querystring = workAroundLuceneBug( querystring );  // logicals changed to && ||, etc.
         querystring = stripHandles       ( querystring );  // remove handles from query string
+        querystring = stripAsterisk      ( querystring );  // remove asterisk from beginning of string
 
         try
         {
@@ -228,6 +229,19 @@ public class DSQuery
 
         return myquery;
     }
+    
+    static String stripAsterisk( String myquery )
+    {
+		// query strings (or words) begining with "*" cause a null pointer error 
+        
+        Perl5Util util = new Perl5Util();
+        
+        myquery = util.substitute("s/^\\*//", myquery);
+        myquery = util.substitute("s| \\*| |", myquery);
+
+        return myquery;
+    }
+
 
     /** Do a query, restricted to a collection
      * @param query
