@@ -225,6 +225,22 @@ public class Context
     
 
     /**
+     * Commit any transaction that is currently in progress, but do not
+     * close the context.
+     *
+     * @exception SQLException
+     *     if there was an error completing the database transaction or closing
+     *     the connection
+     */
+    public void commit()
+        throws SQLException
+    {
+        // Commit any changes made as part of the transaction
+       connection.commit();
+    }
+    
+    
+    /**
      * Close the context, without committing any of the changes performed using
      * this context.  The database connection is freed.  No exception is thrown
      * if there is an error freeing the database connection, since this method
