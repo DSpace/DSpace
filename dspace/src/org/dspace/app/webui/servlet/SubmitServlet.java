@@ -520,6 +520,9 @@ public class SubmitServlet extends DSpaceServlet
         {
             // Thesis question does not appear in workflow mode..
             isThesis = false;
+            // Pretend "multiple files" is true in workflow mode
+            // (There will always be the license file)
+            multipleFiles = true;
         }
 
         // First and foremost - if it's a thesis, reject the submission
