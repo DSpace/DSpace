@@ -299,7 +299,7 @@ public class Item
      *
      * @return  values of the Dublin Core fields that match the parameters.
      */
-    public String[] getDC(String element, String qualifier, String lang)
+    public DCValue[] getDC(String element, String qualifier, String lang)
     {
         // Build up list of matching values
         List values = new ArrayList();
@@ -311,13 +311,20 @@ public class Item
             
             if (match(element, qualifier, lang, dcv))
             {
-                values.add(dcv.value);
+                // We will return a copy of the object in case it is altered
+                DCValue copy = new DCValue();
+                copy.element = dcv.element;
+                copy.qualifier = dcv.qualifier;
+                copy.value = dcv.value;
+                copy.language = dcv.language;
+
+                values.add(copy);
             }
         }
 
         // Create an array of matching values
-        String[] valueArray = new String[values.size()];
-        valueArray = (String[]) values.toArray(valueArray);
+        DCValue[] valueArray = new DCValue[values.size()];
+        valueArray = (DCValue[]) values.toArray(valueArray);
 
         return valueArray;
     }
@@ -865,22 +872,6 @@ public class Item
     }
 
 
-    /**
-     * Class representing a Dublin Core value
-     */
-    private class DCValue
-    {
-        /** The DC element */
-        String element;
-        /** The DC qualifier */
-        String qualifier;
-        /** The value of the field */
-        String value;
-        /** The language of the field */
-        String language;
-    }
-
-    
     /**
      * Utility method to remove all Dublin Core associated with the item
      * from the database (regardless of in-memory version)

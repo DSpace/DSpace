@@ -227,7 +227,7 @@ public class WorkflowItem implements InProgressSubmission
         // Assign issue date, if none exists, and build up provenance
         DCDate now = DCDate.getCurrent();
 
-        String currentDateIssued[] = item.getDC("date",
+        DCValue[] currentDateIssued = item.getDC("date",
             "issued",
             null);
 
@@ -240,7 +240,7 @@ public class WorkflowItem implements InProgressSubmission
         }
         else
         {
-            DCDate d = new DCDate(currentDateIssued[0]);
+            DCDate d = new DCDate(currentDateIssued[0].value);
             provDescription = provDescription + "  Previous issue date: " +
                 d.toString();
         }

@@ -42,6 +42,7 @@
 package org.dspace.content.test;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -336,40 +337,46 @@ public class ContentTest extends TestCase
             item = Item.find(context, id);
 
             // Retrieve titles
-            String[] titles = item.getDC("title", null, LANG);
+            DCValue[] titles = item.getDC("title", null, LANG);
             assertNotNull("Retrieved titles", titles);
             assertEquals("Got correct number of titles",
                          titles.length,
                          TITLES.size() + 1);
 
+            List expectedTitles = new ArrayList();            
+            expectedTitles.add(TITLES.get(0));
+            expectedTitles.add(TITLES.get(1));
+            expectedTitles.add(TITLES.get(2));
+            expectedTitles.add(TITLES.get(0));
+
             assertTrue("Got correct titles",
-                       containsAll(titles, TITLES));
+                       dcValuesMatch(titles, expectedTitles));
 
             // Retrieve alternative titles
-            String[] alt = item.getDC("title", "alternative", LANG);
+            DCValue[] alt = item.getDC("title", "alternative", LANG);
             assertNotNull("Retrieved titles", alt);
             assertEquals("Got correct number of titles",
                          alt.length,
                          ALTERNATIVE_TITLES.size());
             assertTrue("Got correct titles",
-                       containsAll(alt, ALTERNATIVE_TITLES));
+                       dcValuesMatch(alt, ALTERNATIVE_TITLES));
 
             // Retrieve dates
-            String[] dates = item.getDC("date", "accessioned", null);
+            DCValue[] dates = item.getDC("date", "accessioned", null);
             assertNotNull("Retrieved dates", dates);
             assertEquals("Got correct number of dates",
                          dates.length, 1);
-            assertEquals("Got correct date", now, dates[0]);
+            assertEquals("Got correct date", now, dates[0].value);
 
             // Retrieve wildcard
-            String[] all = item.getDC(Item.ANY, Item.ANY, Item.ANY);
+            DCValue[] all = item.getDC(Item.ANY, Item.ANY, Item.ANY);
             assertNotNull("Got values", all);
             assertEquals("Got correct number of values",
                          all.length,
                          TITLES.size() + ALTERNATIVE_TITLES.size() + 1 + 1);
 
             // Retrieve wildcarded titles
-            String[] all_titles = item.getDC("title", Item.ANY, Item.ANY);
+            DCValue[] all_titles = item.getDC("title", Item.ANY, Item.ANY);
             assertNotNull("Got values", all_titles);
             assertEquals("Got correct number of values",
                          all_titles.length,
@@ -426,25 +433,34 @@ public class ContentTest extends TestCase
     }
 
     /**
-     * True if every member of LIST is in ARRAY.
+     * Find out if the <code>List</code> of <code>Strings</code> matches the
+     * values in the array of <code>DCValue</code> objects.
+     *
+     * @param array   the DC values
+     * @param list    list of <code>String</code>s
+     *
+     * @return  <code>true</code> if the values match
      */
-    private static boolean containsAll(Object[] array, List list)
+    private static boolean dcValuesMatch(DCValue[] array, List list)
     {
-    LIST:
-        for (Iterator iterator = list.iterator(); iterator.hasNext(); )
+        if (array.length != list.size())
         {
-            Object obj = (Object) iterator.next();
-            for (int i = 0; i < array.length; i++ )
-            {
-                if (obj.equals(array[i]))
-                    continue LIST;
-            }
-
             return false;
         }
-
+        
+        for (int i = 0; i < array.length; i++)
+        {
+            String s = (String) list.get(i);
+            
+            if (!s.equals(array[i].value))
+            {
+                return false;
+            }
+        }
+        
         return true;
     }
+
 
     /**
      * Convert list to String array.
