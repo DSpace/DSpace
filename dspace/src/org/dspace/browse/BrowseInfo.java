@@ -40,9 +40,9 @@
 
 package org.dspace.browse;
 
-
 import java.util.*;
 
+import org.dspace.content.Item;
 
 /**
  * The results of a Browse method call.
@@ -132,6 +132,26 @@ public class BrowseInfo
     }
 
     /**
+     * Return the results of the Browse as a String array.
+     *
+     * @return The results of the Browse as a String array.
+     */
+    public String[] getStringResults()
+    {
+        return (String[]) results.toArray(new String[results.size()]);
+    }
+
+    /**
+     * Return the results of the Browse as an Item array.
+     *
+     * @return The results of the Browse as an Item array.
+     */
+    public Item[] getItemResults()
+    {
+        return (Item[]) results.toArray(new Item[results.size()]);
+    }
+
+    /**
      * Return the number of results.
      *
      * @return The number of results.
@@ -191,7 +211,7 @@ public class BrowseInfo
      */
     public boolean isLast()
     {
-        return overallPosition + results.size() == total;
+        return overallPosition + getResultCount() == total;
     }
 
     /**
