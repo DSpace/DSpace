@@ -270,7 +270,9 @@ public class Item extends DSpaceObject
         
         // Call update to give the item a last modified date.  OK this isn't
         // amazingly efficient but creates don't happen that often.
+        context.setIgnoreAuthorization(true);
         i.update();
+        context.setIgnoreAuthorization(false);
         
         HistoryManager.saveHistory(context,
             i,
