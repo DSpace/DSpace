@@ -628,6 +628,24 @@ public class WorkflowManager
         // notify that it's been rejected
         notifyOfReject(c, wi, e, rejection_message);
 
+        // rejection provenance
+        Item myitem = wi.getItem();
+
+        // Get current date
+        String now = DCDate.getCurrent().toString();
+
+        // Get user's name + email address
+        String usersName = getEPersonName( e );
+
+        // Here's what happened
+        String provDescription = "Rejected by " + usersName
+            + ", reason: " + rejection_message
+            + " on " + now + " (GMT) ";
+            
+        // Add to item as a DC field
+        myitem.addDC("description", "provenance", null, provDescription);
+        myitem.update();
+
         // convert into personal workspace
         WorkspaceItem wsi = returnToWorkspace(c, wi);
 
