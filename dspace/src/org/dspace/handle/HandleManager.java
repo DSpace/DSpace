@@ -1,6 +1,8 @@
 /*
  * HandleManager.java
  *
+ * $Id$
+ *
  * Version: $Revision$
  *
  * Date: $Date$
@@ -46,7 +48,10 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 import org.dspace.core.*;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.DSpaceObject;
 import org.dspace.storage.rdbms.*;
 
 /**
@@ -99,8 +104,30 @@ public class HandleManager
 
             return url;
         }
+        if (handletypeid == Constants.COLLECTION)
+        {
+            String prefix = ConfigurationManager.getProperty("dspace.url");
+            String url = prefix + "/collection/" + handle;
 
-        throw new IllegalArgumentException("Only Item handles are currently supported");
+            if (log.isDebugEnabled())
+                log.debug("Resolved " + handle + " to " + url);
+
+            return url;
+        }
+        if (handletypeid == Constants.COMMUNITY)
+        {
+            String prefix = ConfigurationManager.getProperty("dspace.url");
+            String url = prefix + "/community/" + handle;
+
+            if (log.isDebugEnabled())
+                log.debug("Resolved " + handle + " to " + url);
+
+            return url;
+        }
+
+
+        throw new IllegalArgumentException("Unsupported handle type" +
+            Constants.typetext[handletypeid]);
     }
 
     /**
@@ -137,23 +164,24 @@ public class HandleManager
      * Creates a new handle in the database.
      *
      * @param context DSpace context
-     * @param item The item to create a handle for
+     * @param dso The DSpaceObject to create a handle for
      * @return The newly created handle
      * @exception SQLException If a database error occurs
      */
-    public static String createHandle(Context context, Item item)
+    public static String createHandle(Context context, DSpaceObject dso)
         throws SQLException
     {
         TableRow handle = DatabaseManager.create(context, "Handle");
         String handleId = createId(handle.getIntColumn("handle_id"));
 
-        handle.setColumn("handle",           handleId);
-        handle.setColumn("resource_type_id", Constants.ITEM);
-        handle.setColumn("resource_id",      item.getID());
+        handle.setColumn("handle",           handleId     );
+        handle.setColumn("resource_type_id", dso.getType());
+        handle.setColumn("resource_id",      dso.getID()  );
         DatabaseManager.update(context, handle);
 
         if (log.isDebugEnabled())
-            log.debug("Created new handle " + handleId);
+            log.debug("Created new handle for " + Constants.typetext[dso.getType()] + " "
+             + handleId);
 
         return handleId;
     }
@@ -168,7 +196,7 @@ public class HandleManager
      * is not mapped to any object.
      * @exception SQLException If a database error occurs
      */
-    public static Object resolveToObject(Context context, String handle)
+    public static DSpaceObject resolveToObject(Context context, String handle)
         throws SQLException
     {
         TableRow dbhandle = findHandleInternal(context, handle);
@@ -180,11 +208,13 @@ public class HandleManager
             (dbhandle.isColumnNull("resource_id")))
             throw new IllegalStateException("No associated resource type");
 
-        // Only ITEMs are supported for now
+        // What are we looking at here?
         int handletypeid = dbhandle.getIntColumn("resource_type_id");
+        int resourceID   = dbhandle.getIntColumn("resource_id"     );
+        
         if (handletypeid == Constants.ITEM)
         {
-            Item item = Item.find(context, dbhandle.getIntColumn("resource_id"));
+            Item item = Item.find(context, resourceID);
 
             if (log.isDebugEnabled())
                 log.debug("Resolved handle " + handle + " to item " +
@@ -192,8 +222,25 @@ public class HandleManager
 
             return item;
         }
+        else if (handletypeid == Constants.COLLECTION)
+        {
+            Collection collection = Collection.find(context, resourceID);
+            
+            if (log.isDebugEnabled())
+                log.debug("Resolved handle " + handle + " to collection " +
+                          (collection == null ? -1 : collection.getID()));
+        }
+        else if (handletypeid == Constants.COMMUNITY)
+        {
+            Community community = Community.find(context, resourceID);
+            
+            if (log.isDebugEnabled())
+                log.debug("Resolved handle " + handle + " to community " +
+                          (community == null ? -1 : community.getID()));
+        }
 
-        throw new IllegalStateException("Only Item Handles are supported");
+        throw new IllegalStateException("Unsupported Handle Type " +
+            Constants.typetext[handletypeid]);
     }
 
     /**
@@ -205,14 +252,15 @@ public class HandleManager
      * @return The handle for object, or null if the object has no handle.
      * @exception SQLException If a database error occurs
      */
-    public static String findHandle(Context context, Object obj)
+    public static String findHandle(Context context, DSpaceObject dso)
         throws SQLException
     {
-        if (!(obj instanceof Item))
-            return null;
+//        if (!(obj instanceof Item))
+//            return null;
 
-        Item item = (Item) obj;
-        return getHandleInternal(context, Constants.ITEM, item.getID());
+//        Item item = (Item) obj;
+
+        return getHandleInternal(context, dso.getType(), dso.getID());
     }
 
     /**

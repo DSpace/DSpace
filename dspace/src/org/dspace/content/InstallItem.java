@@ -133,7 +133,7 @@ public class InstallItem
 
 
         // add item to search and browse indices
-        DSIndexer.indexItem(c, item);
+        DSIndexer.indexContent(c, item);
         // item.update() above adds item to browse indices
         //Browse.itemChanged(c, item);
         

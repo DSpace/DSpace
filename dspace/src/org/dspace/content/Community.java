@@ -53,7 +53,9 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.handle.HandleManager;
 import org.dspace.history.HistoryManager;
+import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -179,6 +181,7 @@ public class Community implements DSpaceObject
 
         TableRow row = DatabaseManager.create(context, "community");
         Community c = new Community(context, row);
+        String handle= HandleManager.createHandle(context, c);
 
         HistoryManager.saveHistory(context,
             c,
@@ -188,7 +191,8 @@ public class Community implements DSpaceObject
 
         log.info(LogManager.getHeader(context,
             "create_community",
-            "community_id=" + row.getIntColumn("community_id")));
+            "community_id=" + row.getIntColumn("community_id")) +
+            " handle=" + handle);
 
         return c;
     }
@@ -346,7 +350,7 @@ public class Community implements DSpaceObject
      * Update the community metadata (including logo) to the database.
      */
     public void update()
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
@@ -362,6 +366,9 @@ public class Community implements DSpaceObject
             "community_id=" + getID()));
 
         DatabaseManager.update(ourContext, communityRow);
+
+        // now re-index this Community
+        DSIndexer.reIndexContent(ourContext, this);
     }
 
 
@@ -510,6 +517,9 @@ public class Community implements DSpaceObject
         log.info(LogManager.getHeader(ourContext,
             "delete_community",
             "community_id=" + getID()));
+
+        // remove from the search index
+        DSIndexer.unIndexContent(ourContext, this);
 
         HistoryManager.saveHistory(ourContext,
             this,

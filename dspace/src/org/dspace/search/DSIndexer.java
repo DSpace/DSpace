@@ -46,11 +46,14 @@ import java.util.Iterator;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -68,27 +71,82 @@ public class DSIndexer
 {
     /** IndexItem() adds a single item to the index
      */
-    public static void indexItem(Context c, Item myitem)
+    public static void indexContent(Context c, DSpaceObject dso)
         throws SQLException, IOException
     {
         IndexWriter writer = openIndex(c, false);
 
-        writeItemIndex(c, writer, myitem);
+        switch( dso.getType() )
+        {
+            case Constants.ITEM:
+                writeItemIndex(c, writer, (Item)dso);
+                break;
+
+            case Constants.COLLECTION:
+                writeCollectionIndex(c, writer, (Collection)dso);
+                break;
+
+            case Constants.COMMUNITY:
+                writeCommunityIndex(c, writer, (Community)dso);
+                break;
+            // FIXME: should probably default unknown type exception
+        }
 
         closeIndex(c, writer);
     }
 
 
+    /** unIndex removes an Item, Collection, or Community
+     *  only works if the DSpaceObject has a handle
+     *  (uses the handle for its unique ID)
+     *
+     * @param dso DSpace Object, can be Community, Item, or Collection
+     */
+    public static void unIndexContent(Context c, DSpaceObject dso)
+        throws SQLException, IOException
+    {
+        String index_directory = ConfigurationManager.getProperty("search.dir");
+        IndexReader ir = IndexReader.open(index_directory);
+
+        String h = HandleManager.findHandle(c, dso);
+
+        if( h != null )
+        {
+            // we have a handle (our unique ID, so remove)
+            Term t = new Term("handle", h);
+            ir.delete(t);
+            ir.close();
+        }
+        else
+        {
+            // FIXME: no handle, fail quietly
+        }
+    }
+
+
+    /** reIndexContent removes something from the index, then re-indexes it
+     * @param context
+     * @param DSpaceObject
+     */
+    public static void reIndexContent(Context c, DSpaceObject dso)
+        throws SQLException, IOException
+    {
+        unIndexContent(c, dso);
+        indexContent(c, dso);   
+    }
+
+
     /**
      * create full index - wiping old index
+     * @param context
      */
     public static void createIndex(Context c)
         throws SQLException, IOException
     {
         IndexWriter writer = openIndex(c, true);
 
-//        indexAllCommunities(c, writer);
-//        indexAllCollections(c, writer);
+        indexAllCommunities(c, writer);
+        indexAllCollections(c, writer);
         indexAllItems(c, writer);
 
         closeIndex(c, writer);
@@ -217,7 +275,13 @@ public class DSIndexer
         HashMap textvalues = new HashMap();
 
         // and populate it
+        String name        = target.getMetadata("name");
+        String description = target.getMetadata("short_description");
+        String intro_text  = target.getMetadata("introductory_text");
 
+        textvalues.put("name",        name       );
+        textvalues.put("description", description);
+        textvalues.put("intro_text",  intro_text );
 
         // get the handle
         String myhandle = HandleManager.findHandle(c, target);
@@ -236,7 +300,13 @@ public class DSIndexer
         HashMap textvalues = new HashMap();
 
         // and populate it
+        String name        = target.getMetadata("name");
+        String description = target.getMetadata("short_description");
+        String intro_text  = target.getMetadata("introductory_text");
 
+        textvalues.put("name",        name       );
+        textvalues.put("description", description);
+        textvalues.put("intro_text",  intro_text );
 
         // get the handle
         String myhandle = HandleManager.findHandle(c, target);
@@ -257,10 +327,10 @@ public class DSIndexer
         String location_text = buildItemLocationString(c, myitem);
 
         // extract metadata (ANY is wildcard from Item class)
-        DCValue [] authors = myitem.getDC( "contributor", Item.ANY,  Item.ANY );
-        DCValue [] titles  = myitem.getDC( "title",     Item.ANY,   Item.ANY );
-        DCValue [] keywords= myitem.getDC( "subject",   Item.ANY,   Item.ANY );
-        DCValue [] abstracts= myitem.getDC( "description", "abstract",   Item.ANY );
+        DCValue [] authors  = myitem.getDC( "contributor", Item.ANY,   Item.ANY );
+        DCValue [] titles   = myitem.getDC( "title",       Item.ANY,   Item.ANY );
+        DCValue [] keywords = myitem.getDC( "subject",     Item.ANY,   Item.ANY );
+        DCValue [] abstracts= myitem.getDC( "description", "abstract", Item.ANY );
 
 
         // put them all from an array of strings to one string for writing out
@@ -295,6 +365,7 @@ public class DSIndexer
         textvalues.put("title",     title_text   );
         textvalues.put("keyword",   keyword_text );
         textvalues.put("location",  location_text);
+
 //      delayed until we can assign relative weights
 //        textvalues.put("abstract",  abstract_text);
 
@@ -313,10 +384,10 @@ public class DSIndexer
                                             HashMap textvalues )
         throws IOException
     {
-        Document doc = new Document();
-        Integer ti = new Integer(id);
-        Integer ty = new Integer(type);
-        String fulltext = "";
+        Document doc     = new Document();
+        Integer  ti      = new Integer(id);
+        Integer  ty      = new Integer(type);
+        String   fulltext= "";
 
         // do id, type, handle first
         doc.add(Field.UnIndexed("id",       ti.toString() ));
@@ -329,7 +400,7 @@ public class DSIndexer
 
         while(i.hasNext())
         {
-            String key = (String)i.next();
+            String key   = (String)i.next();
             String value = (String)textvalues.get(key);
 
             fulltext = fulltext + " " + value;

@@ -55,7 +55,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
 import org.dspace.history.HistoryManager;
+import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -215,7 +217,8 @@ public class Collection implements DSpaceObject
     {
         TableRow row = DatabaseManager.create(context, "collection");
         Collection c = new Collection(context, row);
-
+        String handle= HandleManager.createHandle(context, c);
+        
         HistoryManager.saveHistory(context,
             c,
             HistoryManager.CREATE,
@@ -224,7 +227,8 @@ public class Collection implements DSpaceObject
 
         log.info(LogManager.getHeader(context,
             "create_collection",
-            "collection_id=" + row.getIntColumn("collection_id")));
+            "collection_id=" + row.getIntColumn("collection_id")) +
+            " handle=" + handle);
 
         return c;
     }
@@ -698,7 +702,7 @@ public class Collection implements DSpaceObject
      * to the database.  Inserts if this is a new collection.
      */
     public void update()
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
@@ -714,6 +718,9 @@ public class Collection implements DSpaceObject
             "collection_id=" + getID()));
 
         DatabaseManager.update(ourContext, collectionRow);
+
+        // reindex this collection (could be smarter, to only do when name changes)
+        DSIndexer.reIndexContent(ourContext, this);
     }
 
 
@@ -729,6 +736,9 @@ public class Collection implements DSpaceObject
         log.info(LogManager.getHeader(ourContext,
             "delete_collection",
             "collection_id=" + getID()));
+
+        // remove from index
+        DSIndexer.unIndexContent(ourContext, this);
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -754,6 +764,7 @@ public class Collection implements DSpaceObject
         DatabaseManager.delete(ourContext, collectionRow);
 
         // FIXME: Groups?
+
     }
 
 
