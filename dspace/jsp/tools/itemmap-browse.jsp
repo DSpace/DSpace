@@ -49,9 +49,6 @@
   -   collections    - Map of Collections, keyed by collection_id
   -   browsetext     - text to display at the top
 
-    <input type="hidden" name="cid" value="<%=collection.getID()%>">
-    <input type="submit" name="submit" value="Return">
-
   --%>
   
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -79,7 +76,7 @@
 
     <form method=POST action="<%= request.getContextPath() %>/tools/itemmap">
         <input type="hidden" name="cid" value="<%=collection.getID()%>">
-        <input type="submit" name="submit" value="Return">
+        <input type="submit" name="submit" value="Cancel">
 
         <table class="miscTable" align="center">
         <tr>
