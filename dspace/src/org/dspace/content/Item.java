@@ -976,6 +976,17 @@ public class Item implements DSpaceObject
             "update_item",
             "item_id=" + getID()));
 
+        // Make sure that withdrawn and in_archive are non-null
+        if (itemRow.isColumnNull("in_archive"))
+        {
+            itemRow.setColumn("in_archive", false);
+        }
+
+        if (itemRow.isColumnNull("withdrawn"))
+        {
+            itemRow.setColumn("withdrawn", false);
+        }
+        
         // Map counting number of values for each element/qualifier.
         // Keys are Strings: "element" or "element.qualifier"
         // Values are Integers indicating number of values written for a
