@@ -39,6 +39,7 @@
 package org.dspace.search;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,7 +50,10 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -324,7 +328,7 @@ public class DSIndexer
         textvalues.put("handletext", myhandle     );
 
 
-        writeIndexRecord(writer, Constants.COMMUNITY, target.getID(), myhandle, textvalues);
+        writeIndexRecord(writer, Constants.COMMUNITY, target.getID(), myhandle, textvalues, "");
     }
 
 
@@ -353,7 +357,7 @@ public class DSIndexer
         textvalues.put("location",   location_text);
         textvalues.put("handletext", myhandle     );
 
-        writeIndexRecord(writer, Constants.COLLECTION, target.getID(), myhandle, textvalues);
+        writeIndexRecord(writer, Constants.COLLECTION, target.getID(), myhandle, textvalues, "");
     }
 
 
@@ -453,6 +457,49 @@ public class DSIndexer
             id_text= new String(id_text + identifiers[j].value + " ");
         }
 
+        // now get full text of any bitstreams in the TEXT bundle
+        String extractedText = "";
+        
+        // trundle through the bundles
+        Bundle [] myBundles = myitem.getBundles();
+        
+        for(int i = 0; i<myBundles.length; i++)
+        {
+            if(myBundles[i].getName().equals("TEXT"))
+            {
+                // a-ha! grab the text out of the bitstreams
+                Bitstream [] myBitstreams = myBundles[i].getBitstreams();
+                for(j=0; j<myBitstreams.length; j++)
+                {
+                    try
+                    {
+                        InputStreamReader is = new InputStreamReader(myBitstreams[j].retrieve()); // get input stream
+                        StringBuffer sb = new StringBuffer();
+                        char [] charBuffer = new char[1024];
+                    
+                        while(true)
+                        {
+                            int bytesIn = is.read(charBuffer);
+                            if( bytesIn == -1 ) break;
+                        
+                            if( bytesIn > 0 ) { sb.append(charBuffer, 0, bytesIn); }
+                        }
+                    
+                    
+                        // now sb has the full text - tack on to fullText string
+                        extractedText = extractedText.concat(new String(sb));
+                        
+//                        System.out.println("Found extracted text!\n" + new String(sb));
+                    }
+                    catch(AuthorizeException e)
+                    {
+                        // this will never happen, but compiler is now happy.
+                    }
+                }
+            }
+        }
+
+
         // lastly, get the handle
         String itemhandle = HandleManager.findHandle(c, myitem);
 
@@ -471,8 +518,8 @@ public class DSIndexer
         textvalues.put("sponsor",   sponsor_text );
         textvalues.put("identifier",id_text    	 );
         
-      // write out the metatdata (for scalability, using hash instead of individual strings)
-        writeIndexRecord(writer, Constants.ITEM, myitem.getID(), itemhandle, textvalues);
+        // write out the metatdata (for scalability, using hash instead of individual strings)
+        writeIndexRecord(writer, Constants.ITEM, myitem.getID(), itemhandle, textvalues, extractedText);
     }
 
 
@@ -480,7 +527,7 @@ public class DSIndexer
      *  and writes it out to the index that is opened
      */
     private static void writeIndexRecord(IndexWriter iw, int type, int id, String handle,
-                                            HashMap textvalues )
+                                            HashMap textvalues, String extractedText )
         throws IOException
     {
         Document doc     = new Document();
@@ -510,8 +557,12 @@ public class DSIndexer
             doc.add(Field.Text(key, value));
         }
 
+        fulltext = fulltext.concat(extractedText);
+        
+        System.out.println("Full Text:\n" + fulltext + "------------\n\n");
+
         // add the full text
-        doc.add( Field.Text("default", fulltext) );
+        doc.add( Field.Text("default", fulltext));
 
         // index the document
         iw.addDocument(doc);
