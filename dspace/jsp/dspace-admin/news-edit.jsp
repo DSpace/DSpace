@@ -44,19 +44,20 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.NewsEditServlet" %>
+<%@ page import="org.dspace.core.Constants" %>
 
 <%
-    Integer location = (Integer)request.getAttribute("location");
-    String locationStr = "";
+    Integer position = (Integer)request.getAttribute("position");
+    String positionStr = "";
 
     //determine which news block we're working on
-    if(location.intValue() == NewsEditServlet.NEWS_TOP)
+    if(position.intValue() == Constants.NEWS_TOP)
     {
-        locationStr = "top box";
+        positionStr = "top box";
     }
     else
     {
-        locationStr = "sidebar";
+        positionStr = "sidebar";
     }
     
     //get the existing news 
@@ -78,7 +79,7 @@
     <H1>News Editor</H1>
     
     <p>Add or edit text in the box below to have it appear
-    in the <strong><%= locationStr%></strong> of the DSpace home page.</p>
+    in the <strong><%= positionStr%></strong> of the DSpace home page.</p>
 
     <p>You may format the text using HTML tags, but please note that the HTML will not be validated here.</p>
     
@@ -91,7 +92,7 @@
                 </tr>
                 <tr>
                     <td colspan="2" align="center">
-                    <input type="HIDDEN" name="location" value='<%= location.intValue()%>'>
+                    <input type="HIDDEN" name="position" value='<%= position.intValue()%>'>
                     <input type="SUBMIT" name="submit_save" value="Save">
                     <input type="SUBMIT" name="cancel" value="Cancel">
                     </td>
