@@ -106,8 +106,8 @@ public class AuthorizeManager
             
             throw new AuthorizeException(
                 "Authorization denied for action " +
-                Constants.actiontext[action]       +
-                " on " + Constants.typetext[otype] +
+                Constants.actionText[action]       +
+                " on " + Constants.typeText[otype] +
                 ":"    + oid + " by user " + userid,
                 o,
                 action
@@ -119,6 +119,9 @@ public class AuthorizeManager
     /**
      * same authorize, returns boolean for those who don't want to deal with
      *  catching exceptions.
+     * @param context
+     * @param object, a DSpaceObject
+     * @param action
      */
     public static boolean authorizeActionBoolean(Context c, DSpaceObject o,
                                                     int a)
@@ -183,10 +186,6 @@ public class AuthorizeManager
             // check policies for date validity
             if( rp.isDateValid() )
             {
-                // if public flag is set, action is authorize
-                //  for everyone (even anonymous use)
-                //if( rp.isPublic() ) { return true; }
-            
                 if( (rp.getEPersonID() != -1)
                     &&(rp.getEPersonID() == userid) )
                 {
@@ -244,6 +243,10 @@ public class AuthorizeManager
 
     /**
      * add a policy for an eperson
+     * @param context
+     * @param DSpaceObject to add policy to
+     * @param actionID
+     * @param Eperson who can perform the action
      */
     public static void addPolicy(Context c, DSpaceObject o, int actionID,
             EPerson e)
@@ -261,6 +264,10 @@ public class AuthorizeManager
     
     /**
      * add a policy for a group
+     * @param context
+     * @param DSpaceObject to add policy to
+     * @param actionID
+     * @param Group that can perform the action
      */
     public static void addPolicy(Context c, DSpaceObject o, int actionID,
             Group g)
@@ -363,6 +370,9 @@ public class AuthorizeManager
     /**
      * add policies to an object to match those from
      *  a previous object
+     * @param context
+     * @param DSpaceObject source of policies
+     * @param DSpaceObject destination of inherited policies
      */
     public static void inheritPolicies(Context c,
                     DSpaceObject src, DSpaceObject dest )

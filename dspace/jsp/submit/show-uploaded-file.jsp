@@ -132,7 +132,10 @@
         supportLevel = "unsupported";
     }
 %>
-                    <%= description %> <dspace:popup page="/help/formats.html#<%= supportLevel %>">(<%= supportLevel %>)</dspace:popup>
+                    <%= description %>
+                    <%--
+                    <dspace:popup page="/help/formats.html#<%= supportLevel %>">(<%= supportLevel %>)</dspace:popup>
+                    --%>
                 </td>
 <%
     if (showChecksums)

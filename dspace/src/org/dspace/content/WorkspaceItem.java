@@ -50,12 +50,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-//import org.dspace.content.DCDate;
-//import org.dspace.content.DCValue;
-//import org.dspace.content.Item;
-//import org.dspace.content.Bitstream;
-//import org.dspace.content.Collection;
-//import org.dspace.content.InProgressSubmission;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -366,71 +360,6 @@ public class WorkspaceItem implements InProgressSubmission
     }
 
 
-//    /**
-//     * Start the relevant workflow for this workspace item.  The entry in
-//     * workspaceitem is removed, a workflow item is created, and the
-//     * relevant workflow initiated.  If there is no workflow, i.e. the
-//     * item goes straight into the archive, <code>null</code> is returned.
-//     * <P>
-//     * An accession date is assigned and a provenance description added.
-//     * NO license is added.
-//     *
-//     * @return   the workflow item, or <code>null</code> if the item went
-//     *           straight into the main archive
-//     */
-/*    public WorkflowItem startWorkflow()
-        throws SQLException, AuthorizeException
-    {
-        // FIXME Check auth  (this code is being moved to WorkflowManager
-
-        log.info(LogManager.getHeader(ourContext,
-            "start_workflow",
-            "workspace_item_id=" + getID() +
-                "item_id=" + item.getID() +
-                "collection_id=" + collection.getID()));
-
-        // Set accession date
-        DCDate d = DCDate.getCurrent();
-        item.addDC("date", "accessioned", null, d.toString());
-
-        // Get non-internal format bitstreams
-        Bitstream[] bitstreams = item.getNonInternalBitstreams();
-
-        String provMessage = "";
-
-        // Create provenance description
-        if( item.getSubmitter() != null )
-        {
-            provMessage = "Submitted by" + 
-            item.getSubmitter().getFullName() + " (" +
-            item.getSubmitter().getEmail() + ").  DSpace accession date:" +
-            d.toString() + "\n Submission has " + bitstreams.length +
-            " bitstreams:\n";
-        }
-        else // null submitter
-        {
-            provMessage = "Submitted by unknown (probably automated)" + 
-                          "  DSpace accession date:" +
-            d.toString() + "\n Submission has " + bitstreams.length +
-            " bitstreams:\n";            
-        }
-        
-        // Add sizes and checksums of bitstreams
-        for (int j = 0; j < bitstreams.length; j++)
-        {
-            provMessage = provMessage + bitstreams[j].getName() + ": " +
-                bitstreams[j].getSize() + " bytes, checksum: " +
-                bitstreams[j].getChecksum() + " (" + 
-                bitstreams[j].getChecksumAlgorithm() + ")\n";
-        }
-                    
-        // Add message to the DC
-        item.addDC("description", "provenance", "en", provMessage);
-
-        return null;
-    }
-*/    
-
     /**
      * Update the workspace item, including the unarchived item.
      */
@@ -534,28 +463,8 @@ public class WorkspaceItem implements InProgressSubmission
         DatabaseManager.delete(ourContext, wiRow);
     }
 
-    /**
-     * Lots of temporary permissions/policies are created
-     *  with the workspace.  Remove them.
-     *  FIXME - is this needed any more?  Or is the item delete
-     *   going to do this?
-     */
-
-/* obsolete
-    private void deleteSubmitPermissions()
-        throws SQLException
-    {
-//    rethink this - hopefully item policies will do this
-    
-        // all policies specifically for the item
-        String myrequest = "DELETE FROM resourcepolicy WHERE "
-            + "resource_type_id=" + Constants.ITEM
-            + " AND id="          + item.getID();
-    }
-*/
 
     // InProgressSubmission methods
-
     public Item getItem()
     {
         return item;

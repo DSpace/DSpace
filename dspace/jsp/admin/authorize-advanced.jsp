@@ -124,9 +124,9 @@
         <tr><td>Action:</td>
             <td>
                 <select name="action_id">
-                    <%  for( int i = 0; i < Constants.actiontext.length; i++ ) { %>
+                    <%  for( int i = 0; i < Constants.actionText.length; i++ ) { %>
                         <option value="<%= i %>">
-                            <%= Constants.actiontext[i]%>
+                            <%= Constants.actionText[i]%>
                         </option>
                     <%  } %>
                 </select>

@@ -1,6 +1,8 @@
 /*
  * InstallItem.java
  *
+ * $Id$
+ *
  * Version: $Revision$
  *
  * Date: $Date$
@@ -63,13 +65,25 @@ import org.dspace.storage.rdbms.DatabaseManager;
  */
 public class InstallItem
 {
+    /**
+     * Take an InProgressSubmission and turn it into a fully-archived Item.
+     * @param Context
+     * @param InProgressSubmission
+     */
     public static Item installItem(Context c, InProgressSubmission is)
         throws SQLException, IOException, AuthorizeException
     {
         return installItem(c, is, c.getCurrentUser());
     }
 
-    public static Item installItem(Context c, InProgressSubmission is, EPerson e)
+
+    /**
+     *  Take an InProgressSubmission and turn it into a fully-archived Item.
+     *  @param Context
+     *  @param InProgressSubmission
+     *  @param EPerson (unused, should be removed from API) 
+     */
+    public static Item installItem(Context c, InProgressSubmission is, EPerson e2)
         throws SQLException, IOException, AuthorizeException
     {
         Item item = is.getItem();
@@ -123,19 +137,14 @@ public class InstallItem
         // create collection2item mapping
         is.getCollection().addItem(item);
 
-        // create date.available
-
         // set in_archive=true
-        item.setArchived(true);
+        item.setArchived(true);   
 
         // save changes ;-)
         item.update();
 
-
         // add item to search and browse indices
         DSIndexer.indexContent(c, item);
-        // item.update() above adds item to browse indices
-        //Browse.itemChanged(c, item);
         
         // remove in-progress submission
         is.deleteWrapper();
@@ -155,6 +164,7 @@ public class InstallItem
 
     /** generate provenance-worthy description of the bitstreams
      * contained in an item
+     * @param item
      */
     public static String getBitstreamProvenanceMessage(Item myitem)
     {

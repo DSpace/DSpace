@@ -112,7 +112,7 @@
             <tr>
                 <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= Constants.actiontext[rp.getAction()]%>
+                    <%= Constants.actionText[rp.getAction()]%>
                 </td>
                 <td class="<%= row %>RowOddCol">
                     ...  

@@ -69,10 +69,10 @@
             <td><input type="hidden" name="<%=id_name%>" value="<%=id%>">
                 <input type="hidden" name="policy_id" value="<%=policy.getID()%>" >
                 <select name="action_id">
-                    <%  for( int i = 0; i < Constants.actiontext.length; i++ ) { %>
+                    <%  for( int i = 0; i < Constants.actionText.length; i++ ) { %>
                         <option value="<%= i %>"
                             <%=(policy.getAction() == i ? "selected" : "")%>>
-                            <%= Constants.actiontext[i]%>
+                            <%= Constants.actionText[i]%>
                         </option>
                     <%  } %>
                 </select>

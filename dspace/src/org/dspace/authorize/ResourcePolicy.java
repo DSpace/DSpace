@@ -201,7 +201,7 @@ public class ResourcePolicy
 
 
     /**
-     * get the action this policy authorizes
+     * @return get the action this policy authorizes
      */
     public int getAction()
     {
@@ -221,7 +221,7 @@ public class ResourcePolicy
 
 
     /**
-     * get EPersonID, or -1 if EPerson not set
+     * @return get EPersonID, or -1 if EPerson not set
      */
     public int getEPersonID()
     {
@@ -247,6 +247,7 @@ public class ResourcePolicy
 
     /**
      * assign an EPerson to this policy
+     * @param EPerson
      */    
     public void setEPerson( EPerson e )
     {
@@ -289,6 +290,7 @@ public class ResourcePolicy
 
     /**
      * set Group for this policy
+     * @param group
      */    
     public void setGroup( Group g )
     {

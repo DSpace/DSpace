@@ -66,7 +66,7 @@
     String typeString = "object";
     if (type != null)
     {
-        typeString = Constants.typetext[type.intValue()].toLowerCase();
+        typeString = Constants.typeText[type.intValue()].toLowerCase();
     }
 %>
 
