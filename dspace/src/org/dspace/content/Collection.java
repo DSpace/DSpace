@@ -283,6 +283,7 @@ public class Collection implements DSpaceObject
         TableRowIterator rows = DatabaseManager.query(ourContext,
             "item",
             "SELECT item.* FROM item, collection2item WHERE " +
+                "item.item_id=collection2item.item_id AND " +
                 "collection2item.collection_id=" + getID() + ";");
 
         return new ItemIterator(ourContext, rows);
