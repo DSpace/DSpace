@@ -48,7 +48,7 @@ import java.security.*;
 import java.util.Random;
 
 /**
- * Utility functions for DSpace
+ * Utility functions for DSpace.
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -60,7 +60,10 @@ public class Utils
     private static VMID vmid = new VMID();
 
     /**
-     * Return an MD5 checksum for DATA in hex format.
+     * Return an MD5 checksum for data in hex format.
+     *
+     * @param data The data to checksum.
+     * @return MD5 checksum for the data in hex format.
      */
     public static String getMD5(String data)
     {
@@ -68,7 +71,10 @@ public class Utils
     }
 
     /**
-     * Return an MD5 checksum for DATA in hex format.
+     * Return an MD5 checksum for data in hex format.
+     *
+     * @param data The data to checksum.
+     * @return MD5 checksum for the data in hex format.
      */
     public static String getMD5(byte[] data)
     {
@@ -76,7 +82,10 @@ public class Utils
     }
 
     /**
-     * Return an MD5 checksum for DATA in as a byte array.
+     * Return an MD5 checksum for data as a byte array.
+     *
+     * @param data The data to checksum.
+     * @return MD5 checksum for the data as a byte array.
      */
     public static byte[] getMD5Bytes(byte[] data)
     {
@@ -95,19 +104,22 @@ public class Utils
 
     /**
      * Return a hex representation of the byte array
+     *
+     * @param data The data to transform.
+     * @return A hex representation of the data.
      */
-    public static String toHex(byte[] hex)
+    public static String toHex(byte[] data)
     {
-        if ((hex == null) || (hex.length == 0))
+        if ((data == null) || (data.length == 0))
             return null;
 
         StringBuffer result = new StringBuffer();
 
         // This is far from the most efficient way to do things...
-        for (int i = 0; i < hex.length; i++)
+        for (int i = 0; i < data.length; i++)
         {
-            int low = (int) (hex[i] & 0x0F);
-            int high = (int) (hex[i] & 0xF0);
+            int low =  (int) (data[i] & 0x0F);
+            int high = (int) (data[i] & 0xF0);
 
             result.append(Integer.toHexString(high).substring(0, 1));
             result.append(Integer.toHexString(low));
@@ -119,6 +131,8 @@ public class Utils
     /**
      * Generate a unique key.
      * The key is a long (length 38 to 40) sequence of digits.
+     *
+     * @return A unique key as a long sequence of base-10 digits.
      */
     public static String generateKey()
     {
@@ -126,8 +140,10 @@ public class Utils
     }
 
     /**
-     * Generate a unique key
+     * Generate a unique key.
      * The key is a 32-character long sequence of hex digits.
+     *
+     * @return A unique key as a long sequence of hex digits.
      */
     public static String generateHexKey()
     {
@@ -135,7 +151,9 @@ public class Utils
     }
 
     /**
-     * Generate a unique key
+     * Generate a unique key as a byte array.
+     *
+     * @return A unique key as a byte array.
      */
     public static synchronized byte[] generateBytesKey()
     {
@@ -148,11 +166,16 @@ public class Utils
         return getMD5Bytes(input.getBytes());
     }
 
+    // The following two methods are taken from the Jakarta IOUtil class.
+
     /**
      * Copy stream-data from source to destination. This method does not
      * buffer, flush or close the streams, as to do so would require making
      * non-portable assumptions about the streams' origin and further use. If
      * you wish to perform a buffered copy, use {@link #bufferedCopy}.
+     *
+     * @param input The InputStream to obtain data from.
+     * @param output The OutputStream to copy data to.
      */
     public static void copy( final InputStream input, final OutputStream output )
         throws IOException
@@ -179,6 +202,9 @@ public class Utils
      * <code>java.io.BufferedInputStream</code> and
      * <code>java.io.BufferedOuputStream</code> to {@link #copy}, and flushing
      * the output stream afterwards. The streams are not closed after the copy.
+     *
+     * @param source The InputStream to obtain data from.
+     * @param destination The OutputStream to copy data to.
      */
     public static void bufferedCopy( final InputStream source, final OutputStream destination )
         throws IOException
