@@ -151,7 +151,7 @@
     if (cc_url != null)
     {
 %>
-    <P class="submitFormHelp">This item is licensed inder a <a href="<%= cc_url %>">Creative Commons License</a><br/>
+    <P class="submitFormHelp">This item is licensed under a <a href="<%= cc_url %>">Creative Commons License</a><br/>
     <a href="<%= cc_url %>"><img src="<%= request.getContextPath() %>/image/cc-somerights.gif" border="0" ALT="Creative Commons" /></a>
     </P>
     <!--
