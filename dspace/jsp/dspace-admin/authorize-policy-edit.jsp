@@ -44,6 +44,7 @@
   -   edit_title - title of the page ("Collection 13", etc.
   -   id_name - name of string to put in hidden arg (collection_id, etc.) 
   -   id - ID of the object policy relates to (collection.getID(), etc.)
+  -   newpolicy - set to some string value if this is a new policy
   - Returns:
   -   save_policy   - user wants to save a policy
   -   cancel_policy - user wants to cancel, and return to policy list
@@ -53,6 +54,7 @@
   -   start_date    - not set, unused
   -   end_date      - not set, unused
   -   action_id     - set to whatever user chose
+  -   (new policy)  - set to a the string passed in above if policy is a new one
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -72,7 +74,8 @@
     String edit_title     = (String        ) request.getAttribute("edit_title");
     String id_name        = (String        ) request.getAttribute("id_name"   );
     String id             = (String        ) request.getAttribute("id"        );
-
+    String newpolicy      = (String        ) request.getAttribute("newpolicy" );
+    
     // calculate the resource type and its relevance ID
     // to check what actions to present
     int resourceType      = policy.getResourceType();
@@ -123,6 +126,8 @@
             </td>
         </tr>
     </table>
+
+    <% if( newpolicy != null ) { %> <input name="newpolicy" type=hidden value="<%=newpolicy%>"> <% } %>
     
     <center>
         <table width="70%">

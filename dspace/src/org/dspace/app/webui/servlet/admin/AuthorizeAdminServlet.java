@@ -187,6 +187,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "epeople",    epeople    );
             request.setAttribute( "id_name",    "item_id" );
             request.setAttribute( "id",         "" + item.getID() );
+            request.setAttribute( "newpolicy",  "true"     );
             
             JSPManager.showJSP(request, response,
                 "/dspace-admin/authorize-policy-edit.jsp" );
@@ -237,6 +238,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "epeople",    epeople    );
             request.setAttribute( "id_name",    "item_id" );
             request.setAttribute( "id",         "" + item.getID() );
+            request.setAttribute( "newpolicy",  "true"     );
             
             JSPManager.showJSP(request, response,
                 "/dspace-admin/authorize-policy-edit.jsp" );
@@ -264,6 +266,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "epeople",    epeople    );
             request.setAttribute( "id_name",    "item_id" );
             request.setAttribute( "id",         "" + item.getID() );
+            request.setAttribute( "newpolicy",  "true"     );
             
             JSPManager.showJSP(request, response,
                 "/dspace-admin/authorize-policy-edit.jsp" );
@@ -307,6 +310,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "epeople",    epeople    );
             request.setAttribute( "id_name",    "collection_id" );
             request.setAttribute( "id",         "" + collection.getID() );
+            request.setAttribute( "newpolicy",  "true"     );
             
             JSPManager.showJSP(request, response,
                 "/dspace-admin/authorize-policy-edit.jsp" );
@@ -446,6 +450,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "epeople",    epeople    );
             request.setAttribute( "id_name",    "collection_id" );
             request.setAttribute( "id",         "" + collection.getID() );
+            request.setAttribute( "newpolicy",  "true"     );
             
             JSPManager.showJSP(request, response,
                 "/dspace-admin/authorize-policy-edit.jsp" );
@@ -471,6 +476,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             request.setAttribute( "epeople",    epeople    );
             request.setAttribute( "id_name",    "community_id" );
             request.setAttribute( "id",         "" + community.getID() );
+            request.setAttribute( "newpolicy",  "true"     );
             
             JSPManager.showJSP(request, response,
                 "/dspace-admin/authorize-policy-edit.jsp" );
@@ -580,11 +586,14 @@ public class AuthorizeAdminServlet extends DSpaceServlet
         }
         else if( button.equals("submit_cancel_policy") )
         {
-            // delete the policy that we created
-            int policy_id     =UIUtil.getIntParameter(request, "policy_id"    );
-            ResourcePolicy rp = ResourcePolicy.find(c, policy_id);
-            rp.delete();            
-
+            // delete the policy that we created if it's a new one
+            if( (request.getParameter("newpolicy") != null) )
+            {
+                int policy_id     =UIUtil.getIntParameter(request, "policy_id"    );
+                ResourcePolicy rp = ResourcePolicy.find(c, policy_id);
+                rp.delete();            
+            }
+            
             // return to the previous page
             int collection_id =UIUtil.getIntParameter(request, "collection_id");
             int community_id  =UIUtil.getIntParameter(request, "community_id" );
