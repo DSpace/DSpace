@@ -117,6 +117,7 @@ public class Collection extends DSpaceObject
      *
      * @param context  the context this object exists in
      * @param row      the corresponding row in the table
+     * @throws SQLException
      */
     Collection(Context context, TableRow row)
         throws SQLException
@@ -177,6 +178,7 @@ public class Collection extends DSpaceObject
      * @param  id       ID of the collection
      *
      * @return  the collection, or null if the ID is invalid.
+     * @throws SQLException
      */
     public static Collection find(Context context, int id)
         throws SQLException
@@ -206,11 +208,12 @@ public class Collection extends DSpaceObject
             return null;
         }
 
+        // not null, return Collection
         if (log.isDebugEnabled())
         {
-        	log.debug(LogManager.getHeader(context,
-                    "find_collection",
-                    "collection_id=" + id));
+            log.debug(LogManager.getHeader(context,
+                "find_collection",
+                "collection_id=" + id));
         }
 
         return new Collection(context, row);
@@ -224,9 +227,10 @@ public class Collection extends DSpaceObject
      * @param  context  DSpace context object
      *
      * @return  the newly created collection
+     * @throws SQLException
      */
     static Collection create(Context context)
-        throws SQLException, AuthorizeException
+        throws SQLException
     {
         TableRow row = DatabaseManager.create(context, "collection");
         Collection c = new Collection(context, row);
@@ -278,13 +282,14 @@ public class Collection extends DSpaceObject
      * @param  context  DSpace context object
      *
      * @return  the collections in the system
+     * @throws SQLException
      */
     public static Collection[] findAll(Context context)
         throws SQLException
     {
         TableRowIterator tri = DatabaseManager.query(context,
             "collection",
-            "SELECT * FROM collection ORDER BY name;");
+            "SELECT * FROM collection ORDER BY name");
 
         List collections = new ArrayList();
 
@@ -317,16 +322,31 @@ public class Collection extends DSpaceObject
      * Get all the items in this collection.  The order is indeterminate.
      *
      * @return  an iterator over the items in the collection.
+     * @throws SQLException
      */
     public ItemIterator getItems()
         throws SQLException
     {
-        TableRowIterator rows = DatabaseManager.query(ourContext,
-            "item",
-            "SELECT item.* FROM item, collection2item WHERE " +
+        String myQuery = null;
+        
+        if( "oracle".equals(ConfigurationManager.getProperty("db.name")) )
+        {
+            myQuery = "SELECT item.* FROM item, collection2item WHERE " +
                 "item.item_id=collection2item.item_id AND " +
                 "collection2item.collection_id=" + getID() +
-                " AND item.in_archive=true");
+                " AND item.in_archive=1";
+        }
+        else
+        {
+            // default postgres, use boolean
+            myQuery = "SELECT item.* FROM item, collection2item WHERE " +
+                "item.item_id=collection2item.item_id AND " +
+                "collection2item.collection_id=" + getID() +
+                " AND item.in_archive=true";
+        }
+        
+        TableRowIterator rows = DatabaseManager.query(ourContext,
+            "item", myQuery );
 
         return new ItemIterator(ourContext, rows);
     }
@@ -404,6 +424,9 @@ public class Collection extends DSpaceObject
      *
      * @return   the new logo bitstream, or <code>null</code> if there is no
      *           logo (<code>null</code> was passed in)
+     * @throws AuthorizeException
+     * @throws IOException
+     * @throws SQLException
      */
     public Bitstream setLogo(InputStream is)
         throws AuthorizeException, IOException, SQLException
@@ -460,6 +483,8 @@ public class Collection extends DSpaceObject
      *                for
      *
      * @return  the workflow group associated with this collection
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public Group createWorkflowGroup(int step)
         throws SQLException, AuthorizeException
@@ -526,6 +551,8 @@ public class Collection extends DSpaceObject
      * by the authorization system.
      *
      * @return  the default group of submitters associated with this collection
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public Group createSubmitters()
         throws SQLException, AuthorizeException
@@ -569,6 +596,8 @@ public class Collection extends DSpaceObject
      * Note that other groups may also be administrators.
      *
      * @return  the default group of editors associated with this collection
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public Group createAdministrators()
         throws SQLException, AuthorizeException
@@ -684,9 +713,11 @@ public class Collection extends DSpaceObject
      * exists, no action is taken.  Caution:  Make sure you call
      * <code>update</code> on the collection after doing this, or the item
      * will have been created but the collection record will not refer to it.
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public void createTemplateItem()
-        throws SQLException, AuthorizeException, IOException
+        throws SQLException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
@@ -710,6 +741,9 @@ public class Collection extends DSpaceObject
      * collection record in the database, the colletion record will be changed,
      * including any other changes made; in other words, this method does
      * an <code>update</code>.
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void removeTemplateItem()
         throws SQLException, AuthorizeException, IOException
@@ -740,6 +774,8 @@ public class Collection extends DSpaceObject
      * <code>update</code> need not be called.
      *
      * @param item  item to add
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     public void addItem(Item item)
         throws SQLException, AuthorizeException
@@ -766,6 +802,9 @@ public class Collection extends DSpaceObject
      * Remove an item.  If the item is then orphaned, it is deleted.
      *
      * @param item  item to remove
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void removeItem(Item item)
         throws SQLException, AuthorizeException,IOException
@@ -779,7 +818,7 @@ public class Collection extends DSpaceObject
 
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM collection2item WHERE collection_id=" + getID() +
-            " AND item_id=" + item.getID() + ";");
+            " AND item_id=" + item.getID() );
 
         // Is the item an orphan?
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -797,6 +836,9 @@ public class Collection extends DSpaceObject
     /**
      * Update the collection metadata (including logo, and workflow groups)
      * to the database.  Inserts if this is a new collection.
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
      */
     public void update()
         throws SQLException, IOException, AuthorizeException
@@ -826,6 +868,9 @@ public class Collection extends DSpaceObject
      * are then orphans are deleted.
      * Groups associated with this collection (workflow
      * participants and submitters) are NOT deleted.
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     void delete()
         throws SQLException, AuthorizeException, IOException
@@ -905,6 +950,7 @@ public class Collection extends DSpaceObject
      * Get the communities this collection appears in
      *
      * @return   array of <code>Community</code> objects
+     * @throws SQLException
      */
     public Community[] getCommunities()
         throws SQLException
@@ -915,7 +961,7 @@ public class Collection extends DSpaceObject
             "SELECT community.* FROM community, community2collection WHERE " +
                 "community.community_id=community2collection.community_id " +
                 "AND community2collection.collection_id=" +
-                getID() + ";");
+                getID() );
 
         // Build a list of Community objects
         List communities = new ArrayList();
@@ -974,6 +1020,7 @@ public class Collection extends DSpaceObject
      *
      * @param col    the column name to read
      * @return    the group referred to by that column, or null
+     * @throws SQLException
      */
 
     private Group groupFromColumn(String col)
@@ -983,14 +1030,13 @@ public class Collection extends DSpaceObject
         {
             return null;
         }
-        else
-        {
-            return Group.find(ourContext, collectionRow.getIntColumn(col));
-        }
+
+        return Group.find(ourContext, collectionRow.getIntColumn(col));
     }
     
     /**
      * return type found in Constants
+     * @return int Constants.COLLECTION
      */
     public int getType()
     {
@@ -1003,10 +1049,11 @@ public class Collection extends DSpaceObject
      *  (useful for trimming 'select to collection' list) or figuring out
      *  which collections a person is an editor for.
      * @param context
-     * @param community (optional) restrict search to a community, else null
-     * @param action ID fo the action
+     * @param comm (optional) restrict search to a community, else null
+     * @param actionID fo the action
      *
      * @return Collection [] of collections with matching permissions
+     * @throws SQLException
      */
     public static Collection [] findAuthorized(Context context, Community comm, int actionID)
         throws java.sql.SQLException
