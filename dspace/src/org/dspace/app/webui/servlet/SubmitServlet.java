@@ -150,11 +150,11 @@ public class SubmitServlet extends DSpaceServlet
     /** Review submission step */
     public static final int REVIEW_SUBMISSION = 5;
 
-    /** Grant license step */
-    public static final int GRANT_LICENSE = 6;
+    /** optional CC license step */
+    public static final int CC_LICENSE = 6;
 
-    /** CC license step */
-    public static final int CC_LICENSE = 7;
+    /** Grant (deposit) license step */
+    public static final int GRANT_LICENSE = 7;
 
     /** Submission completed step */
     public static final int SUBMISSION_COMPLETE = 8;
@@ -402,12 +402,12 @@ public class SubmitServlet extends DSpaceServlet
             processReview(context, request, response, subInfo);
             break;
 
-        case GRANT_LICENSE:
-            processLicense(context, request, response, subInfo);
-            break;
-
         case CC_LICENSE:
             processCC(context, request, response, subInfo);
+            break;
+
+        case GRANT_LICENSE:
+            processLicense(context, request, response, subInfo);
             break;
 
         case SUBMISSION_CANCELLED:
@@ -1561,8 +1561,10 @@ public class SubmitServlet extends DSpaceServlet
             // of an item, we go to the grant license stage
             if (!isWorkflow(subInfo))
             {
-                userHasReached(subInfo, GRANT_LICENSE);
-                doStep(context, request, response, subInfo, GRANT_LICENSE);
+		// proceed to next step conditional on CC
+                int nextStep = CC.isEnabled() ? CC_LICENSE : GRANT_LICENSE;
+                userHasReached(subInfo, nextStep);
+                doStep(context, request, response, subInfo, nextStep);
                 context.complete();
             }
             else
@@ -1620,23 +1622,11 @@ public class SubmitServlet extends DSpaceServlet
             item.licenseGranted(license, submitter);
 
             // Start the workflow
-            //WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
+            WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
 
             // FIXME: pass in more information about what happens next?
-            //JSPManager.showJSP(request, response, "/submit/complete.jsp");
+            JSPManager.showJSP(request, response, "/submit/complete.jsp");
             
-            // are we using Creative Commons?
-            int next_step = CC.isEnabled() ? CC_LICENSE : SUBMISSION_COMPLETE;
-
-            if (next_step == SUBMISSION_COMPLETE)
-	    {
-		// Start the workflow
-                WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
-	    }
-
-            userHasReached(subInfo, next_step);
-            doStep(context, request, response, subInfo, next_step);
-
             context.complete();
         }
         else if (request.getParameter("submit_reject") != null)
@@ -1680,27 +1670,39 @@ public class SubmitServlet extends DSpaceServlet
                  subInfo,
                  CC_LICENSE,
                  CC_LICENSE);
-             return;
-         }
- 
- 	// Secondly, check if the person wants CC, and if so, set it
- 	if (!buttonPressed.equals("submit_no_cc"))
-        {    
- 	    Item item = subInfo.submission.getItem();
+        }
+        else if (buttonPressed.equals("submit_prev"))
+	{
+            // Back to review submission
+            doStep(context, request, response, subInfo, REVIEW_SUBMISSION);
+        }
+        else if (buttonPressed.equals("submit_no_cc"))
+	{
+            // Skipping the CC license
+            userHasReached(subInfo, GRANT_LICENSE);
+            doStep(context, request, response, subInfo, GRANT_LICENSE);
+        }
+ 	else
+        {
+            // RLR hack - need to distinguish between progress bar real submission
+            String ccLicenseUrl = request.getParameter("cc_license_url");
+            if (ccLicenseUrl != null && ccLicenseUrl.length() > 0 )
+	    {
+ 	        Item item = subInfo.submission.getItem();
  	
- 	    // set the CC license
- 	    CC.setLicense(context, item, request.getParameter("cc_license_url"));
- 
- 	}
+ 	        // set the CC license
+ 	        CC.setLicense(context, item, request.getParameter("cc_license_url"));
+
+                userHasReached(subInfo, GRANT_LICENSE);
+                doStep(context, request, response, subInfo, GRANT_LICENSE);
+ 	        context.complete();
+ 	    }
+            else
+	    {
+                doStepJump(context, request, response, subInfo);
+            }
+        }
  	
- 	// Start the workflow
- 	WorkflowManager.start(context, (WorkspaceItem) subInfo.submission);
- 
- 	// we're done!
- 	userHasReached(subInfo, SUBMISSION_COMPLETE);
- 	doStep(context, request, response, subInfo, SUBMISSION_COMPLETE);
- 
- 	context.complete();
      }
 
     //****************************************************************
