@@ -231,8 +231,11 @@ public class MediaFilterManager
 
          try
          {
-            myFilter.processBitstream(c, myItem, myBitstream);
-            myItem.update(); // Make sure new bitstream has a sequence number
+             // only update item if bitstream not skipped
+	     if (myFilter.processBitstream(c, myItem, myBitstream))
+	     {
+                 myItem.update(); // Make sure new bitstream has a sequence number
+             }
          }
          catch (Exception e)
          {
