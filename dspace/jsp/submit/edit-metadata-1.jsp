@@ -195,8 +195,38 @@
 <%-- ================================================ --%>
 
                 <tr>
+<%
+    if (si.missing)
+    {
+%>
+                    <td colspan=4 class="submitFormWarn">
+<%
+    }
+    else
+    {
+%>
                     <td colspan=4 class="submitFormHelp">
+<%
+    }
+    if (si.jumpToField != null && si.jumpToField.equals("title"))
+    {
+%>
+                        <a name="field"></a>
+<%
+    }
+    if (si.missing)
+    {
+%>
+			You must enter a main title for the item.
+<%
+    }
+    else
+    {
+%>
                         Enter the main title of the item.
+<%
+    }
+%>
                     </td>
                 </tr>
 <%
