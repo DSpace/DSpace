@@ -129,7 +129,7 @@ public class FixDefaultPolicies
 
         Community [] communities = Community.findAll(c);
 
-        for( int i = 0; i < collections.length; i++ )
+        for( int i = 0; i < communities.length; i++ )
         {
             Community t = communities[i];
             
