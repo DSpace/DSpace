@@ -74,7 +74,7 @@
     if (admin_button)
     {
 %>
-      <table class=miscTable align=center>
+      <table class=miscTableNoColor align=center>
         <tr>
         <td>
             <H1>Communities and Collections</H1>
@@ -100,13 +100,13 @@
                                 </form>
                             </td>
                         </tr>
+                        <tr>
+                            <td class="standard" align="center">
+                            <dspace:popup page="/help/site-admin.html">Admin Help...</dspace:popup>
+                            </td>
+                        </tr>
 	 	    </table>
 	 	</td>
-            </tr>
-            <tr>
-              <td class="standard" align="center">
-                 <dspace:popup page="/help/site-admin.html">Admin Help...</dspace:popup>
-              </td>
             </tr>
         </table>
         </td>
