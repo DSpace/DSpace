@@ -131,7 +131,8 @@ public class InstallItem
 
         // add item to search and browse indices
         DSIndexer.indexItem(c, item);
-        Browse.itemAdded(c, item);
+        // item.update() above adds item to browse indices
+        //Browse.itemChanged(c, item);
         
         // remove in-progress submission
         is.deleteWrapper();
