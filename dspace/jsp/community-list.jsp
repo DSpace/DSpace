@@ -73,8 +73,8 @@
 %>		
         <LI class="communityLink">
             <%-- HACK: <strong> tags here for broken Netscape 4.x CSS support --%>
-            <strong><A HREF="<%= request.getContextPath() %>/communities/<%= communities[i].getID() %>/"><%= communities[i].getName() %></A></strong>
-            <P class="communityDescription"><%= communities[i].getShortDescription()%></P>
+            <strong><A HREF="<%= request.getContextPath() %>/communities/<%= communities[i].getID() %>/"><%= communities[i].getMetadata("name") %></A></strong>
+            <P class="communityDescription"><%= communities[i].getMetadata("short_description") %></P>
 	    <UL>
 <%
         // Get the collections in this community from the map
@@ -84,7 +84,7 @@
         for (int j = 0; j < cols.length; j++)
         {
 %>
-                <LI class="collectionListItem"><A HREF="<%= request.getContextPath() %>/communities/<%= communities[i].getID() %>/collections/<%= cols[j].getID() %>/"><%= cols[j].getName() %></A></LI>
+                <LI class="collectionListItem"><A HREF="<%= request.getContextPath() %>/communities/<%= communities[i].getID() %>/collections/<%= cols[j].getID() %>/"><%= cols[j].getMetadata("name") %></A></LI>
 <%
         }
 %>

@@ -89,7 +89,7 @@ public class CommunityListServlet extends DSpaceServlet
         }
         
         request.setAttribute("communities", communities);
-        request.setAttribute("collection.map", colMap);
+        request.setAttribute("collections.map", colMap);
         JSPManager.showJSP(request, response, "/community-list.jsp");
     }
 }

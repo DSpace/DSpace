@@ -150,6 +150,7 @@ Common usage:
     <mkdir dir="${dspace.dir}/config" />
     <mkdir dir="${assetstore.dir}" />
     <mkdir dir="${history.dir}" />
+    <mkdir dir="${dspace.dir}/log" />
     <copy todir="${dspace.dir}/config">
       <fileset dir="${basedir}/config"/>
     </copy>
