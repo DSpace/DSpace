@@ -64,14 +64,17 @@ public class HistorySubmission
     /** log4j category */
     private static Logger log = Logger.getLogger(HistorySubmission.class);
 
-    /**
-     * Private Constructor
-     */
+    /** Private Constructor */
     private HistorySubmission () {}
 
     /**
-     * Record the fact that user accepted the license for a WorkspaceItem
-     * using tool.
+     * Record the fact that user accepted the license for a
+     * WorkspaceItem using tool.
+     *
+     * @param context Current DSpace context
+     * @param item The WorkspaceItem
+     * @param user The user who accepted the license
+     * @param tool The tool used to accept the license
      */
     public static void userAcceptsLicense(Context context,
                                           WorkspaceItem item,
@@ -88,6 +91,10 @@ public class HistorySubmission
     /**
      * Record the fact that reviewer approved the submission of
      * WorkflowItem using tool.
+     *
+     * @param item The WorkspaceItem
+     * @param reviewer The reviewer who accepted the submission
+     * @param tool The tool used to accept the submission
      */
     public static void reviewerAccepts(WorkflowItem item,
         EPerson reviewer,
@@ -103,6 +110,10 @@ public class HistorySubmission
     /**
      * Record the fact that reviewer rejected the submission of WorkflowItem
      * using tool.
+     *
+     * @param item The WorkspaceItem
+     * @param reviewer The reviewer who rejected the submission
+     * @param tool The tool used to reject the submission
      */
     public static void reviewerRejects(WorkflowItem item,
         EPerson reviewer,
@@ -118,6 +129,10 @@ public class HistorySubmission
     /**
      * Record the fact that admin accepted the submission of WorkflowItem
      * using tool.
+     *
+     * @param item The WorkspaceItem
+     * @param admin The admin who accepted the submission
+     * @param tool The tool used to accept the submission
      */
     public static void adminAccepts(WorkflowItem item,
         EPerson admin,
@@ -133,6 +148,10 @@ public class HistorySubmission
     /**
      * Record the fact that admin rejected the submission of WorkflowItem
      * using tool.
+     *
+     * @param item The WorkspaceItem
+     * @param admin The admin who rejected the submission
+     * @param tool The tool used to reject the submission
      */
     public static void adminRejects(WorkflowItem item,
         EPerson admin,
@@ -148,10 +167,15 @@ public class HistorySubmission
     /**
      * Record the fact that editor commits the submission of WorkflowItem
      * using tool.
+     *
+     * @param context Current DSpace context
+     * @param item The WorkspaceItem
+     * @param editor The editor who committed the submission
+     * @param tool The tool used to commit the submission
      */
     public static void editorCommits(Context context,
                                      WorkflowItem item,
-                                     EPerson approver,
+                                     EPerson editor,
                                      String tool)
     {
 //         HistoryManager.saveHistory
@@ -166,6 +190,11 @@ public class HistorySubmission
      * The tool parameter should refer to the instrument used to complete
      * the submission, not the instrument(s) used in earlier stages
      * of the submission.
+     *
+     * @param context Current DSpace context
+     * @param item The Item
+     * @param installer The user who installed the item
+     * @param tool The tool used to install the item
      */
     public static void itemInstalled(Context context,
                                      Item item,
