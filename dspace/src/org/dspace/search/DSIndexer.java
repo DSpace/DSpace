@@ -62,7 +62,6 @@ import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
 
@@ -109,9 +108,7 @@ public class DSIndexer
     public static void unIndexContent(Context c, DSpaceObject dso)
         throws SQLException, IOException
     {
-        String h = HandleManager.findHandle(c, dso);
-
-        unIndexContent(c, h);
+        unIndexContent(c, dso.getHandle());
     }
 
     public static void unIndexContent(Context c, String myhandle)
@@ -315,7 +312,7 @@ public class DSIndexer
         HashMap textvalues = new HashMap();
 
         // get the handle
-        String myhandle = HandleManager.findHandle(c, target);
+        String myhandle = target.getHandle();
 
         // and populate it
         String name        = target.getMetadata("name");
@@ -341,7 +338,7 @@ public class DSIndexer
         String location_text = buildCollectionLocationString(c, target);
 
         // get the handle
-        String myhandle = HandleManager.findHandle(c, target);
+        String myhandle = target.getHandle();
 
         // build a hash for the metadata
         HashMap textvalues = new HashMap();
@@ -501,7 +498,7 @@ public class DSIndexer
 
 
         // lastly, get the handle
-        String itemhandle = HandleManager.findHandle(c, myitem);
+        String itemhandle = myitem.getHandle();
 
         // build a hash
         HashMap textvalues = new HashMap();
