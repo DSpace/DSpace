@@ -269,6 +269,33 @@ public class Bundle extends DSpaceObject
 
 
     /**
+     * @param name name of the bitstream you're looking for
+     *
+     * @return the bitstream or null if not found
+     */
+    public Bitstream getBitstreamByName(String name)
+    {
+        Bitstream target = null;
+
+        Iterator i = bitstreams.iterator();
+        
+        while(i.hasNext())
+        {
+            Bitstream b = (Bitstream)i.next();
+            
+            if( name.equals(b.getName()) )
+            {
+                target = b;
+                break;
+            }
+        }        
+        
+        return target;
+    }
+
+
+
+    /**
      * Get the bitstreams in this bundle
      *
      * @return the bitstreams
