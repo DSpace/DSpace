@@ -280,7 +280,7 @@ public class Item
      */
     public boolean isArchived()
     {
-        return itemRow.getBooleanColumn("is_archived");
+        return itemRow.getBooleanColumn("in_archive");
     }
 
 
@@ -292,7 +292,7 @@ public class Item
      */
     public void setArchived(boolean isArchived)
     {
-        itemRow.setColumn("is_archived", isArchived);
+        itemRow.setColumn("in_archive", isArchived);
     }
 
 
@@ -881,7 +881,7 @@ public class Item
         {
             // Update browse indices
             Browse.itemChanged(ourContext, this);
-            
+
             // FIXME: Update search index
         }
     }
@@ -907,7 +907,7 @@ public class Item
         {
             // Remove from Browse indices
             Browse.itemRemoved(ourContext, getID());
-            
+
             // FIXME: Remove from search index
         }
 
