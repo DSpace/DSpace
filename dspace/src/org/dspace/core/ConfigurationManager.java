@@ -100,7 +100,7 @@ public class ConfigurationManager
     {
         if (properties == null)
         {
-            loadProperties();
+            loadConfig(null);
         }
 
         return properties.getProperty(property);
@@ -121,7 +121,7 @@ public class ConfigurationManager
     {
         if (properties == null)
         {
-            loadProperties();
+            loadConfig(null);
         }
 
         String stringValue = properties.getProperty(property);
@@ -160,7 +160,7 @@ public class ConfigurationManager
     {
         if (properties == null)
         {
-            loadProperties();
+            loadConfig(null);
         }
 
         String stringValue = properties.getProperty(property);
@@ -250,7 +250,7 @@ public class ConfigurationManager
     {
         if (properties == null)
         {
-            loadProperties();
+            loadConfig(null);
         }
 
         return license;
@@ -258,9 +258,14 @@ public class ConfigurationManager
 
 
     /**
-     * Load the properties if they aren't already loaded
+     * Load the DSpace configuration properties.  Only does anything if properties
+     * are not already loaded.  Properties are loaded in from the specified file,
+     * or default locations. 
+     *
+     * @param configFile  The <code>dspace.cfg</code> configuration file to use,
+     *                    or <code>null</code> to try default locations 
      */
-    private static void loadProperties()
+    public static void loadConfig(String configFile)
     {
         InputStream is;
 
@@ -269,12 +274,16 @@ public class ConfigurationManager
             return;
         }
     
+        String configProperty = System.getProperty("dspace.configuration");
+        
         try
         {
-            // Has the default configuration location been overridden?
-            String configProperty = System.getProperty("dspace.configuration");
-
-            if (configProperty != null)
+        	if (configFile != null)
+        	{
+        		is = new FileInputStream(configFile);
+        	}
+        	// Has the default configuration location been overridden?
+        	else if (configProperty != null)
             {
                 // Load the overriding configuration
                 is = new FileInputStream(configProperty);

@@ -2,12 +2,6 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <!--
-  - REMEMBER: ONLY UPDATE THE VERSION IN dspace/config/templates
-  - AND THEN RUN dspace/bin/install-configs!
-  - DO NOT EDIT THE 'LIVE' VERSION!
-  -->
-
-<!--
  - web.xml
  -
  - Version: $Revision$
@@ -52,18 +46,20 @@
   - Web application.
   - OAICat Configuration file - see OAICat documentation for details
   -
-  - Text surrounded by two '@' symbols is replaced with the corresponding
-  - property from dspace.cfg.  For example:
-  -
-  - @@dspace.url@@
-  -
-  - would be replaced with the dspace.url property in dspace.cfg.
-  - When /dspace/bin/install-configs is run, this file will be installed in the
-  - location specified by the property: config.template.oai-web.xml
+  - '@@dspace.dir@@' will be replaced with the directory where DSpace is installed
   -->
 
 <web-app>
   <display-name>DSpace OAI-PMH 2.0</display-name>
+
+  <!-- DSpace configuration information -->
+  <context-param>
+    <param-name>dspace-config</param-name>
+    <param-value>@@dspace.dir@@/config/dspace.cfg</param-value>
+    <description>
+      The location of the main DSpace configuration file
+    </description>
+  </context-param>
 
   <context-param>
     <param-name>properties</param-name>
@@ -73,6 +69,14 @@
       datapairs used to initialize the OAI repository software.
     </description>
   </context-param>
+
+  <!-- DSpace configuration initialisation.  This needs to be loaded before
+       other servlets. -->
+  <servlet>
+    <servlet-name>load-dspace-config</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.LoadDSpaceConfig</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
 
   <servlet>
     <servlet-name>oai-handler</servlet-name>

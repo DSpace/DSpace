@@ -41,27 +41,24 @@
   - Date:     $Date$
   -->
 
-<project name="DSpace" default="compile" basedir=".">
+<project name="DSpace" default="compile">
 
   <!-- ============================================================= -->
   <!-- Description                                                   -->
   <!-- ============================================================= -->
 
   <description>
-===================== DSpace platform build file =====================
+====================== DSpace platform build file ======================
 
 Common usage:
 
   Fresh install, including database setup and registry loading:
-    % ant ; ant fresh_install
+    % ant fresh_install
   
-  Upgrade existing installation, leaving code, data and configuration
-    % ant ; ant -Dconfig=/installdir/config/dspace.cfg update
-  
-  The following target require that the system is installed:
-    load_registries
+  Update existing installation, leaving data and configuration intact:
+    % ant -Dconfig=/installdir/config/dspace.cfg update
 
-======================================================================
+========================================================================
   </description>
 
   <!-- ============================================================= -->
@@ -76,7 +73,7 @@ Common usage:
   <!-- ============================================================= -->
     
   <!-- Default configuration to use.  This may be overridden. -->
-  <property name="config" value="${basedir}/config/dspace.cfg" />
+  <property name="config" value="config/dspace.cfg" />
 
   <!-- Give user a chance to override without editing this file 
        (and without typing -D each time s/he compiles it) -->
@@ -93,35 +90,92 @@ Common usage:
   <!-- We will include the environment CLASSPATH -->
   <path id="build.class.path">
     <pathelement path="${env.CLASSPATH}"/>
-    <pathelement path="${basedir}/build/classes"/>
-    <fileset dir="${basedir}/lib">
+    <pathelement path="build/classes"/>
+    <fileset dir="lib">
       <include name="**/*.jar"/>
     </fileset>
   </path>
 
   
   <!-- ============================================================= -->
-  <!-- Compile the source code                                       -->
+  <!-- Compile the source code and build WARs                        -->
   <!-- ============================================================= -->
 
   <target name="compile"
-          description="Compile the source code">
-    <mkdir dir="${basedir}/build/classes"/>
-    <javac srcdir="${basedir}/src"
-           destdir="${basedir}/build/classes"
+          description="Compile the source code and build .war files">
+    <mkdir dir="build/classes"/>
+    <javac srcdir="src"
+           destdir="build/classes"
            debug="on">
       <include name="**/*.java"/>
       <classpath refid="build.class.path"/>
     </javac>
+    <!-- Build DSpace UI .war -->
+    <copy file="etc/dspace-web.xml"
+          tofile="build/dspace-web.xml"
+          preservelastmodified="true"/>
+    <replace file="build/dspace-web.xml"
+             token="@@dspace.dir@@"
+             value="${dspace.dir}" />
+    <war destfile="build/dspace.war"
+         webxml="build/dspace-web.xml">
+       <fileset dir="jsp" />
+       <lib dir="lib">
+         <exclude name="servlet.jar" />
+       </lib>
+       <classes dir="build/classes" />
+    </war>
+    <!-- Build DSpace OAI-PMH .war -->
+    <copy file="etc/oai-web.xml"
+          tofile="build/oai-web.xml"
+          preservelastmodified="true"/>
+    <replace file="build/oai-web.xml"
+             token="@@dspace.dir@@"
+             value="${dspace.dir}" />
+    <war destfile="build/dspace-oai.war"
+         webxml="build/oai-web.xml">
+       <lib dir="lib">
+         <exclude name="servlet.jar" />
+       </lib>
+       <classes dir="build/classes" />
+    </war>
   </target>
   
   
   <!-- ============================================================= -->
-  <!-- Update the code, without clobbering existing data             -->
+  <!-- Update an installation (except database)                      -->
   <!-- ============================================================= -->
 
   <target name="update"
-          description="Update installed code (install without clobbering data)">
+          depends="install_code"
+          description="Update installed code (without clobbering data/config)">
+    <echo>
+====================================================================
+ Updated Web application (.war) files are in the 'build' directory.
+
+ * Stop your Web servlet container (Tomcat, Jetty, Resin etc.)
+ 
+ * If you're using Tomcat, you need delete the directories
+   corresponding to the old .war files.  For example, if dspace.war
+   is installed in CATALINA_HOME/webapps/dspace.war, you should
+   delete the CATALINA_HOME/webapps/dspace directory.  Otherwise,
+   Tomcat will continue to use the old code in that directory.
+
+ * Copy the new dspace.war and dspace-oai.war from the 'build'
+   directory over the old ones
+
+ * Start up your Web servlet container again.
+====================================================================
+    </echo>
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- Install or update DSpace code (except database)               -->
+  <!-- ============================================================= -->
+
+  <target name="install_code"
+          depends="compile">
     <mkdir dir="${dspace.dir}/config" />
     <mkdir dir="${assetstore.dir}" />
     <mkdir dir="${handle.dir}" />
@@ -131,42 +185,6 @@ Common usage:
     <mkdir dir="${upload.temp.dir}" />
     <mkdir dir="${dspace.dir}/bin"/>
     <mkdir dir="${dspace.dir}/lib"/>
-    <mkdir dir="${dspace.dir}/jsp/local"/>
-    <mkdir dir="${dspace.dir}/jsp/WEB-INF"/>
-    <mkdir dir="${dspace.dir}/oai/WEB-INF"/>
-    <!-- Delete symlinks, otherwise ln -s commands below would create
-         extra symlinks, e.g. "WEB-INF/lib/lib".  Plus, we need to use
-         shell "rm" command, since ANT's delete task doesn't
-         understand symlinks. -->
-    <exec executable="rm">
-      <arg value="-f" />
-      <arg value="${dspace.dir}/jsp/WEB-INF/classes" />
-      <arg value="${dspace.dir}/jsp/WEB-INF/lib" />
-      <arg value="${dspace.dir}/oai/WEB-INF/classes" />
-      <arg value="${dspace.dir}/oai/WEB-INF/lib" />
-    </exec>
-    <!-- Symlink the Web UI and OAI webapps "classes" and "lib" directory
-      -  to dspace.dir/config and dspace.dir/lib respectively -->
-    <exec executable="ln">
-      <arg value="-s" />
-      <arg value="${dspace.dir}/config" />
-      <arg value="${dspace.dir}/jsp/WEB-INF/classes" />
-    </exec>
-    <exec executable="ln">
-      <arg value="-s" />
-      <arg value="${dspace.dir}/lib" />
-      <arg value="${dspace.dir}/jsp/WEB-INF/lib" />
-    </exec>
-    <exec executable="ln">
-      <arg value="-s" />
-      <arg value="${dspace.dir}/config" />
-      <arg value="${dspace.dir}/oai/WEB-INF/classes" />
-    </exec>
-    <exec executable="ln">
-      <arg value="-s" />
-      <arg value="${dspace.dir}/lib" />
-      <arg value="${dspace.dir}/oai/WEB-INF/lib" />
-    </exec>
     <copy todir="${dspace.dir}/bin" preservelastmodified="true">
       <fileset dir="bin"/>
     </copy>
@@ -176,31 +194,26 @@ Common usage:
       <arg value="${dspace.dir}/bin" />
     </exec>
     <copy todir="${dspace.dir}/lib" preservelastmodified="true">
-      <fileset dir="lib" excludesfile="lib/servlet.jar" />
-    </copy>
-    <copy todir="${dspace.dir}/jsp" preservelastmodified="true">
-      <fileset dir="jsp"/>
+      <fileset dir="lib" />
     </copy>
     <jar jarfile="${dspace.dir}/lib/dspace.jar"
-         basedir="${basedir}/build/classes" />
+         basedir="build/classes" />
   </target>
   
   
   <!-- ============================================================= -->
-  <!-- Do a fresh install of the code and configuration files        -->
+  <!-- Fresh install of config files                                 -->
   <!-- ============================================================= -->
   
-  <!-- Installs code, then config, and symlinks WEB-INF/classes to config.
-       The "log4j.build.properties" file is copied to ${dspace.dir}/config
-       so there's a simple log4j.properties file present for the initial
-       run of "install-configs". -->
-  <target name="install_code"
-          depends="update"
-          description="Do a fresh install of the system, not touching database">
+  <!-- Writes the configuration files to ${dspace.dir}/config.  It does *not*
+       run the install-configs script.  The "log4j.build.properties" file is
+       copied to ${dspace.dir}/config so there's a simple log4j.properties
+       file present for the initial run of "install-configs". -->
+  <target name="init_configs">
     <copy todir="${dspace.dir}/config" preservelastmodified="true">
-      <fileset dir="${basedir}/config"/>
+      <fileset dir="config"/>
     </copy>
-    <copy file="${basedir}/etc/log4j.build.properties"
+    <copy file="etc/log4j.build.properties"
           tofile="${dspace.dir}/config/log4j.properties"
           preservelastmodified="true"/>
   </target>
@@ -214,14 +227,15 @@ Common usage:
     -  file in etc/ and the DSpace configuration file using system
     -  properties -->
   <target name="setup_database"
+          depends="compile"
           description="Create database tables">
     <java classname="org.dspace.storage.rdbms.InitializeDatabase"
           classpathref="build.class.path"
           fork="yes"
           failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
       <sysproperty key="dspace.configuration" value="${config}"/>
-      <arg value="${basedir}/etc/database_schema.sql"/>
+      <arg value="etc/database_schema.sql"/>
     </java>
   </target>
 
@@ -234,14 +248,15 @@ Common usage:
     -  file in etc/ and the DSpace configuration file using system
     -  properties -->
   <target name="clean_database"
+          depends="compile"
           description="Removes DSpace database tables, destroying data">
     <java classname="org.dspace.storage.rdbms.InitializeDatabase"
           classpathref="build.class.path"
           fork="yes"
           failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
       <sysproperty key="dspace.configuration" value="${config}"/>
-      <arg value="${basedir}/etc/clean-database.sql"/>
+      <arg value="etc/clean-database.sql"/>
     </java>
   </target>
 
@@ -252,12 +267,13 @@ Common usage:
 
   <!-- Loads bitstream format and Dublin Core type registries -->
   <target name="load_registries"
+          depends="compile"
           description="Load initial contents of registries">
     <java classname="org.dspace.administer.RegistryLoader"
           classpathref="build.class.path"
           fork="yes"
           failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
       <sysproperty key="dspace.configuration" value="${config}"/>
       <arg value="-bitstream"/>
       <arg value="${dspace.dir}/config/registries/bitstream-formats.xml"/>
@@ -266,7 +282,7 @@ Common usage:
           classpathref="build.class.path"
           fork="yes"
           failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
       <sysproperty key="dspace.configuration" value="${config}"/>
       <arg value="-dc"/>
       <arg value="${dspace.dir}/config/registries/dublin-core-types.xml"/>
@@ -279,8 +295,55 @@ Common usage:
   <!-- ============================================================= -->
   
   <target name="fresh_install"
-          depends="install_code,setup_database,load_registries"
+          depends="install_code,init_configs,setup_database,load_registries"
           description="Do a fresh install of the system, overwriting any data">
+    <java classname="org.dspace.core.ConfigurationManager"
+          classpathref="build.class.path"
+          fork="yes"
+          failonerror="yes">
+      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
+      <sysproperty key="dspace.configuration" value="${config}"/>
+      <arg value="-installTemplates"/>
+    </java>    
+    <java classname="org.dspace.browse.InitializeBrowse"
+          classpathref="build.class.path"
+          fork="yes"
+          failonerror="yes">
+      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
+      <sysproperty key="dspace.configuration" value="${config}"/>
+    </java>
+    <java classname="org.dspace.search.DSIndexer"
+          classpathref="build.class.path"
+          fork="yes"
+          failonerror="yes">
+      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
+      <sysproperty key="dspace.configuration" value="${config}"/>
+    </java>
+    <echo>
+====================================================================
+ The DSpace code has been installed, and the database initialized.
+ 
+ To complete installation, you should do the following:
+ 
+ * Install the DSpace UI (dspace.war) and OAI-PMH (dspace-oai.war)
+   Web applications from the 'build' directory in the appropriate
+   place for your servlet container.  e.g. '/opt/tomcat/webapps'
+
+ * Make an initial administrator account (an e-person) in DSpace:
+ 
+   ${dspace.dir}/bin/create-administrator
+   
+ * Start up your servlet container (Tomcat etc.)
+
+ You should then be able to access your DSpace's 'home page':
+ 
+   ${dspace.url}
+ 
+ You should also be able to access the administrator UI:
+ 
+   ${dspace.url}/dspace-admin
+====================================================================
+    </echo>
   </target>
 
 
@@ -290,7 +353,7 @@ Common usage:
 
   <target name="clean"
           description="Remove compiled files - does not affect installation">
-    <delete dir="${basedir}/build" />
+    <delete dir="build" />
   </target>
 
 
@@ -300,16 +363,16 @@ Common usage:
 	
   <target name="public_api"
           description="Create the DSpace public API documentation with javadoc">
-    <mkdir dir="${basedir}/build/public-api" />
-    <javadoc sourcepath="${basedir}/src"
-             destdir="${basedir}/build/public-api"
+    <mkdir dir="build/public-api" />
+    <javadoc sourcepath="src"
+             destdir="build/public-api"
              author="true"
              version="true"
              access="public"
              doctitle="DSpace Public API"
              windowtitle="DSpace Public API"
              bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved."
-             overview="${basedir}/src/overview.html"
+             overview="src/overview.html"
              classpathref="build.class.path">
       <package name="org.dspace.administer"/>
       <package name="org.dspace.authorize"/>
@@ -333,16 +396,16 @@ Common usage:
 
   <target name="javadoc"
           description="Create the DSpace public API documentation with javadoc">
-    <mkdir dir="${basedir}/build/javadoc" />
-    <javadoc destdir="${basedir}/build/javadoc"
+    <mkdir dir="build/javadoc" />
+    <javadoc destdir="build/javadoc"
              author="true"
              version="true"
              doctitle="DSpace Source Javadoc"
              windowtitle="DSpace Source Javadoc"
              bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved."
-             overview="${basedir}/src/overview.html"
+             overview="src/overview.html"
              classpathref="build.class.path">
-      <packageset dir="${basedir}/src">
+      <packageset dir="src">
         <include name="**" />
       </packageset>
     </javadoc>
