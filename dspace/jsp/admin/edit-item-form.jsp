@@ -123,7 +123,7 @@
 
     <P>&nbsp;</P>
 
-    <form method=POST>
+    <form method=POST action="<%= request.getContextPath() %>/admin/edit-item">
         <table class="miscTable">
             <tr>
                 <th class="oddRowOddCol"><strong>Element</strong></th>
