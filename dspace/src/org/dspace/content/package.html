@@ -109,7 +109,7 @@ try
     item = Item.find(context, 1234);
     
     // Remove it from its old collections
-    Collection[] colls = item.getCollections[];
+    Collection[] colls = item.getCollections();
     colls[0].removeItem(item);
     
     // Add it to my new collection
