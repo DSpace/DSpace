@@ -1,4 +1,7 @@
-Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
+DSpace source code license:
+
+
+Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
 Institute of Technology.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,3 +32,230 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGE.
+
+
+
+------------------------------------------------------------------------------
+OCLC OAICat framework (oaicat.jar) license:
+
+Copyright (c) 2000-2002 OCLC Online Computer Library Center, Inc. and other 
+contributors. All rights reserved.
+
+OAICat source code available from:
+http://www.oclc.org/research/software/oai/cat.shtm
+
+
+------------------------------------------------------------------------------
+O'Reilly com.oreilly.servlet (cos.jar) license:
+
+Copyright (C) 2001-2002 by Jason Hunter, jhunter_AT_servlets.com.
+All rights reserved. 
+The source code, object code, and documentation in the com.oreilly.servlet
+package is copyright and owned by Jason Hunter. 
+
+USE RIGHTS 
+
+Permission is granted to use the com.oreilly.servlet.* packages in the
+development of any non-commercial project. For this use you are granted a
+non-exclusive, non-transferable limited license at no cost. 
+
+For a commercial project, permission is granted to use the
+com.oreilly.servlet.* packages provided that every person on the
+development team for that project owns a copy of the book Java Servlet
+Programming (O'Reilly) in its most recent edition. The most recent edition
+is currently the 2nd Edition, available in association with Amazon.com at
+http://www.amazon.com/exec/obidos/ASIN/0596000405/jasonhunter. 
+
+Other (sometimes cheaper) license terms are available upon request; please
+write to jhunter_AT_servlets.com for more information. 
+
+REDISTRIBUTION RIGHTS 
+
+Commercial redistribution rights of the com.oreilly.servlet.* packages are
+available by writing jhunter_AT_servlets.com. 
+
+Non-commercial redistribution is permitted provided that: 
+
+1. You redistribute the package in object code form only (as Java .class
+   files or a .jar file containing the .class files) and only as part of a
+   product that uses the classes as part of its primary functionality.
+
+2. The product containing the package is non-commercial in nature.
+
+3. The public interface to the classes in the package, and the public
+   interface to any classes with similar functionality, is hidden from end
+   users when engaged in normal use of the product.
+
+4. The distribution is not part of a software development kit, operating
+   system, other library, or a development tool without written permission
+   from the copyright holder.
+
+5. The distribution includes copyright notice as follows: "The source code,
+   object code, and documentation in the com.oreilly.servlet package is
+   copyright and owned by Jason Hunter." in the documentation and/or other
+   materials provided with the distribution.
+
+6. You reproduce the above copyright notice, this list of conditions, and the
+   following disclaimer in the documentation and/or other materials provided
+   with the distribution.
+
+7. Licensor retains title to and ownership of the Software and all
+   enhancements, modifications, and updates to the Software.
+
+Note that the com.oreilly.servlet package is provided "as is" and the author
+will not be liable for any damages suffered as a result of your use.
+Furthermore, you understand the package comes without any technical support. 
+
+You can always find the latest version of the com.oreilly.servlet package at
+http://www.servlets.com. 
+
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+Thanks,
+Jason Hunter
+jhunter_AT_servlets.com 
+
+
+
+------------------------------------------------------------------------------
+Apache software license (commons-collections.jar, commons-dbcp.jar, 
+commons-pool.jar, log4j.jar, lucene.jar, xalan.jar, xerces.jar)
+
+/*
+ * The Apache Software License, Version 1.1
+ *
+ *
+ * Copyright (c) 1999-2000 The Apache Software Foundation.  All rights 
+ * reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer. 
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. The end-user documentation included with the redistribution,
+ *    if any, must include the following acknowledgment:  
+ *       "This product includes software developed by the
+ *        Apache Software Foundation (http://www.apache.org/)."
+ *    Alternately, this acknowledgment may appear in the software itself,
+ *    if and wherever such third-party acknowledgments normally appear.
+ *
+ * 4. The names "Xerces" and "Apache Software Foundation" must
+ *    not be used to endorse or promote products derived from this
+ *    software without prior written permission. For written 
+ *    permission, please contact apache@apache.org.
+ *
+ * 5. Products derived from this software may not be called "Apache",
+ *    nor may "Apache" appear in their name, without prior written
+ *    permission of the Apache Software Foundation.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation and was
+ * originally based on software copyright (c) 1999, International
+ * Business Machines, Inc., http://www.ibm.com.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ */
+
+
+------------------------------------------------------------------------------
+HP Labs's Jena RDF toolkit (jena.jar):
+
+/*
+ *  (c) Copyright Hewlett-Packard Company 2000 - 2002
+ *  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * This product includes software developed by the
+ * Apache Software Foundation (http://www.apache.org/).
+ */
+
+
+------------------------------------------------------------------------------
+CNRI Handle System Server software (handle.jar):
+
+/* Handle System Server, Java version 5.2 is made available subject to the 
+ * terms and conditions in CNRI's License Agreement. This Agreement may be 
+ * located on the Internet using the following handle: 4263537/4058. The 
+ * License may also be obtained from a proxy server using the following URL: 
+ * http://hdl.handle.net/4263537/4058
+ */
+
+
+------------------------------------------------------------------------------
+PostgreSQL JDBC Drivers (postgresql.jar):
+
+/* PostgreSQL Data Base Management System
+ *
+ * Portions copyright (c) 1996-2002, PostgreSQL Global Development Group 
+ * Portions Copyright (c) 1994-6 Regents of the University of California
+ *
+ * Permission to use, copy, modify, and distribute this software and its 
+ * documentation for any purpose, without fee, and without a written agreement 
+ * is hereby granted, provided that the above copyright notice and this 
+ * paragraph and the following two paragraphs appear in all copies.
+ *
+ * IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR 
+ * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING 
+ * LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, 
+ * EVEN IF THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF 
+ * SUCH DAMAGE.
+ *
+ * THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, 
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND 
+ * FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN 
+ * "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO 
+ * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ */
