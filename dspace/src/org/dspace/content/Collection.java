@@ -407,7 +407,7 @@ public class Collection
         {
             workflowGroup[step-1] = Group.create(ourContext);
             workflowGroup[step-1].setName(
-                "COLLECTION_100_WORKFLOW_STEP_" + step);
+                "COLLECTION_" + getID() + "_WORKFLOW_STEP_" + step);
             workflowGroup[step-1].update();
         }
 
