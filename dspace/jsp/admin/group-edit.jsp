@@ -77,21 +77,36 @@
         </form>
     </p>
 
+
+    <p>
+    <br>
+    </p>
     <P align="center">
         <form method=POST>
             <input type="hidden" name="group_id" value="<%=group.getID()%>">
-            <input type="submit" name="submit_add_eperson" value="Add New EPerson">
+            <input type="submit" name="submit_add_eperson" value="Add EPerson to Group">
         </form>
     </p>
 
+
+    <center><h3>Current Group Members</h3></center>
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
             <th class="oddRowEvenCol"><strong>EMail</strong></th>
+            <th class="oddRowOddCol"><strong>Last Name</strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
 
 <%
+    if (epeople.length == 0)
+    {
+%>
+    <tr><td>This group currently has no members.</td></tr>
+<%        
+    }
+    else
+    {
     String row = "even";
     for (int i = 0; i < epeople.length; i++)
     {
@@ -101,8 +116,9 @@
                 <td class="<%= row %>RowOddCol">
                 <%= epeople[i].getID() %></td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= epeople[i].getEmail() %>
-                </td>
+                    <%= epeople[i].getEmail() %></td>
+                <td class="<%= row %>RowOddCol">
+                <%= epeople[i].getLastName() %></td>
                 <td class="<%= row %>RowOddCol">
                     <input type="hidden" name="group_id" value="<%=group.getID()%>">
                     <input type="hidden" name="eperson_id" value="<%= epeople[i].getID() %>">
@@ -112,6 +128,7 @@
         </form>
 <%
         row = (row.equals("odd") ? "even" : "odd");
+    }
     }
 %>
     </table>
