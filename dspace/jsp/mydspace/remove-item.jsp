@@ -48,7 +48,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
-<%@ page import="org.dspace.ingest.WorkspaceItem" %>
+<%@ page import="org.dspace.content.WorkspaceItem" %>
 
 <%
     WorkspaceItem wi = (WorkspaceItem) request.getAttribute("workspace.item");

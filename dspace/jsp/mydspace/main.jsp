@@ -58,8 +58,8 @@
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
-<%@ page import="org.dspace.ingest.WorkspaceItem" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
 
