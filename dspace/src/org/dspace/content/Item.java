@@ -1584,4 +1584,30 @@ public class Item extends DSpaceObject
 
         replaceAllBitstreamPolicies(policies);
     }
+    
+    
+    
+    /**
+     * return TRUE if context's user can edit item, false otherwise
+     *
+     * @return boolean true = current user can edit item
+     */
+    public boolean canEdit()
+        throws java.sql.SQLException
+    {
+        // can this person write to the item?
+        if( AuthorizeManager.authorizeActionBoolean(ourContext, this, Constants.WRITE) )
+        {
+            return true;
+        }
+        
+        // is this person an COLLECTION_EDITOR for the owning collection?
+        if( AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(),
+                Constants.COLLECTION_EDITOR))
+        {
+            return true;
+        }        
+        
+        return false;
+    }
 }
