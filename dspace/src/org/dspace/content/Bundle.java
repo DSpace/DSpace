@@ -104,7 +104,7 @@ public class Bundle extends DSpaceObject
             "SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE " +
                 "bundle2bitstream.bitstream_id=bitstream.bitstream_id AND " +
                 "bundle2bitstream.bundle_id=" +
-                bundleRow.getIntColumn("bundle_id") + ";");
+                bundleRow.getIntColumn("bundle_id") );
 
         while (tri.hasNext())
         {
@@ -326,7 +326,7 @@ public class Bundle extends DSpaceObject
             "SELECT item.* FROM item, item2bundle WHERE " +
                 "item2bundle.item_id=item.item_id AND " +
                 "item2bundle.bundle_id=" +
-                bundleRow.getIntColumn("bundle_id") + ";");
+                bundleRow.getIntColumn("bundle_id") );
 
         while (tri.hasNext())
         {
