@@ -76,20 +76,21 @@ public class InstallItem
         
         // create accession date
         DCDate now = DCDate.getCurrent();
-        item.addDC("date", "accessioned", null, now.toString());
-        item.addDC("date", "available",   null, now.toString());
+        item.addDC("date", "accessioned", null, now.toString() + "Z");
+        item.addDC("date", "available",   null, now.toString() + "Z");
 
         // create issue date if not present
         DCValue[] currentDateIssued = item.getDC("date", "issued", null);
         
         if(currentDateIssued.length == 0)
         {
-            item.addDC("date", "issued", null, now.toString());
+            item.addDC("date", "issued", null, now.toString() + "Z");
         }
         
         // create handle
-        String handle = HandleManager.createHandle(c, item);
-
+        String handle    = HandleManager.createHandle(c, item);
+        String handleref = HandleManager.getCanonicalForm(handle);
+        
         // Add handle as identifier.uri DC value
         item.addDC("identifier", "uri", null, handle);
 
