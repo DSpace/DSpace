@@ -56,6 +56,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.Harvest;
 import org.dspace.search.HarvestedItemInfo;
@@ -659,7 +660,8 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 String spec = "<set><setSpec>hdl_"
                         + allCols[i].getHandle().replace('/', '_')
                         + "</setSpec><setName>"
-                        + allCols[i].getMetadata("name") + "</setName></set>";
+                        + Utils.addEntities(allCols[i].getMetadata("name"))
+                        + "</setName></set>";
 
                 sets.add(spec);
             }

@@ -1,4 +1,8 @@
 (Robert Tansley)
+- OAI-PMH set names now XML-encoded (e.g. &, <, >) (Collection names with such
+characters previously caused bad XML in OAI-PMH ListSets responses)
+
+(Robert Tansley)
 - Fixed bug whereby 'Submit to this Collection' button only appears if admin.
 
 (Larry Stone)
