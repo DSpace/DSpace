@@ -61,22 +61,6 @@
     {
         currentPage = currentPage.substring( 0, c );
     }
-
-    // Find out what URL to put in front of "location-sensitive" options
-    // like search and browse
-    String userLocation = "";
-
-    Community comm = UIUtil.getCommunityLocation(request);
-    Collection coll = UIUtil.getCollectionLocation(request);
-  
-    if (coll != null)
-    {
-        userLocation = "/communities/"+comm.getID()+"/collections/"+coll.getID();
-    }
-    else if (comm != null)
-    {
-        userLocation = "/communities/"+comm.getID();
-    }
 %>
 
 <%-- Search Box --%>
@@ -85,7 +69,7 @@
   <table width="100%" class="searchBox">
     <tr>
       <td>
-        <table width=100% border=0 cellspacing=0 padding=2>
+        <table width="100%" border=0 cellspacing=0 padding=2>
           <tr>
             <td class="searchBoxLabel">Search&nbsp;DSpace:</td>
           </tr>
@@ -122,7 +106,7 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/browse-title" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %><%= userLocation %>/browse-title">Titles</a>
+      <a href="<%= request.getContextPath() %>/browse-title">Titles</a>
     </td>
   </tr>
 
@@ -131,7 +115,7 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/browse-author" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %><%= userLocation %>/browse-author">Authors</a>
+      <a href="<%= request.getContextPath() %>/browse-author">Authors</a>
     </td>
   </tr>
 
@@ -140,7 +124,7 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/browse-date" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %><%= userLocation %>/browse-date">By Date</a>
+      <a href="<%= request.getContextPath() %>/browse-date">By Date</a>
     </td>
   </tr>
 
@@ -157,7 +141,7 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/submit" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %><%= userLocation %>/submit">Submit</a>
+      <a href="<%= request.getContextPath() %>/submit">Submit</a>
     </td>
   </tr>
 
