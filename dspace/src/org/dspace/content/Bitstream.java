@@ -49,6 +49,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
@@ -405,7 +407,8 @@ public class Bitstream
     public void update()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation
+        // Check authorisation
+        AuthorizeManager.authorizeAction(bContext, this, Constants.WRITE);
 
         log.info(LogManager.getHeader(bContext,
             "update_bitstream",
@@ -421,7 +424,8 @@ public class Bitstream
     public void delete()
         throws SQLException, IOException, AuthorizeException
     {
-        // FIXME: Check authorisation
+        // Check authorisation
+        AuthorizeManager.authorizeAction(bContext, this, Constants.DELETE);
 
         log.info(LogManager.getHeader(bContext,
             "delete_bitstream",
@@ -438,8 +442,11 @@ public class Bitstream
      * @return   a stream from which the bitstream can be read.
      */
     public InputStream retrieve()
-        throws IOException, SQLException
+        throws IOException, SQLException, AuthorizeException
     {
+        // Maybe should return AuthorizeException??
+        AuthorizeManager.authorizeAction(bContext, this, Constants.READ);
+
         return BitstreamStorageManager.retrieve(bContext,
             bRow.getIntColumn("bitstream_id"));
     }

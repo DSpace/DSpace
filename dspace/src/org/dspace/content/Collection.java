@@ -49,7 +49,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
@@ -300,7 +302,8 @@ public class Collection
     public Bitstream setLogo(InputStream is)
         throws AuthorizeException, IOException, SQLException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
         // First, delete any existing logo
         if (!collectionRow.isColumnNull("logo_bitstream_id"))
@@ -348,7 +351,8 @@ public class Collection
     public Group createWorkflowGroup(int step)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
     
         if (workflowGroup[step-1] == null)
         {
@@ -372,8 +376,6 @@ public class Collection
      */
     public void setWorkflowGroup(int step, Group g)
     {
-        // FIXME: Auth
-
         workflowGroup[step-1] = g;
     }
 
@@ -404,7 +406,8 @@ public class Collection
     public Group createSubmitters()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
         if (submitters == null)
         {
@@ -498,7 +501,8 @@ public class Collection
     public void createTemplateItem()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
         if (template == null)
         {
@@ -522,7 +526,8 @@ public class Collection
     public void removeTemplateItem()
         throws SQLException, AuthorizeException, IOException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
         collectionRow.setColumnNull("template_item_id");
         DatabaseManager.update(ourContext, collectionRow);
@@ -551,7 +556,8 @@ public class Collection
     public void addItem(Item item)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         log.info(LogManager.getHeader(ourContext,
             "add_item",
@@ -578,7 +584,8 @@ public class Collection
     public void removeItem(Item item)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
         log.info(LogManager.getHeader(ourContext,
             "remove_item",
@@ -597,7 +604,8 @@ public class Collection
     public void update()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
         log.info(LogManager.getHeader(ourContext,
             "update_collection",
@@ -616,7 +624,8 @@ public class Collection
     public void delete()
         throws SQLException, AuthorizeException, IOException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
 
         log.info(LogManager.getHeader(ourContext,
             "delete_collection",
@@ -651,7 +660,9 @@ public class Collection
     public void deleteWithContents()
         throws SQLException, AuthorizeException, IOException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
+
         // FIXME: Groups?
 
         // Get items - we'll need to work out whether to delete them in a sec

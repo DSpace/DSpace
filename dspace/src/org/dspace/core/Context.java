@@ -66,12 +66,16 @@ public class Context
     /** Database connection */
     private Connection connection;
     
-    /** Current user */
+    /** Current user - null means anonymous access */
     private EPerson currentUser;
 
     /** Extra log info */
     private String extraLogInfo;
 
+    /** Indicates whether authorisation subsystem should be ignored */
+    private boolean ignoreAuth;
+   
+    
     /**
      * Construct a new context object.  A database connection is opened.
      * No user is authenticated.
@@ -88,6 +92,7 @@ public class Context
 
         currentUser = null;
         extraLogInfo = "";
+        ignoreAuth = false;
     }
     
 
@@ -101,6 +106,7 @@ public class Context
         return connection;
     }
     
+    
     /**
      * Set the current user.  Authentication must have been performed by the
      * caller - this call does not attempt any authentication.
@@ -113,6 +119,7 @@ public class Context
         currentUser = user;
     }
 
+
     /**
      * Get the current (authenticated) user
      *
@@ -124,6 +131,33 @@ public class Context
         return currentUser;
     }
     
+    
+    /**
+     * Find out if the authorisation system should be ignored for this
+     * context.
+     *
+     * @return <code>true</code> if authorisation should be ignored
+     *            for this session.
+     */
+    public boolean ignoreAuthorization()
+    {
+        return ignoreAuth;
+    }
+
+
+    /**
+     * Specify whether the authorisation system should be ignored for this
+     * context.
+     *
+     * @param  b  if <code>true</code>, authorisation should be ignored
+     *            for this session.
+     */
+    public void setIgnoreAuthorization(boolean b)
+    {
+        ignoreAuth = true;
+    }
+
+
     /**
      * Set extra information that should be added to any message logged in the
      * scope of this context.  An example of this might be the session ID
@@ -137,6 +171,7 @@ public class Context
     {
         extraLogInfo = info;
     }
+
     
     /**
      * Get extra information to be logged with message logged in the scope of
@@ -148,6 +183,7 @@ public class Context
     {
         return extraLogInfo;
     }
+
 
     /**
      * Close the context object after all of the operations performed in the
@@ -172,6 +208,7 @@ public class Context
        connection = null;
     }
     
+
     /**
      * Close the context, without committing any of the changes performed using
      * this context.  The database connection is freed.  No exception is thrown

@@ -49,6 +49,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -152,7 +154,12 @@ public class Community
     public static Community create(Context context)
         throws SQLException, AuthorizeException
     {
-        // FIXME Check authorisation
+        // Only administrators can create communities
+        if (!AuthorizeManager.isAdmin(context))
+        {
+            throw new AuthorizeException(
+                "Only administrators can create communities");
+        }
 
         TableRow row = DatabaseManager.create(context, "community");
 
@@ -264,7 +271,8 @@ public class Community
     public Bitstream setLogo(InputStream is)
         throws AuthorizeException, IOException, SQLException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
         // First, delete any existing logo
         if (logo != null)
@@ -298,7 +306,8 @@ public class Community
     public void update()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
         log.info(LogManager.getHeader(ourContext,
             "update_community",
@@ -349,7 +358,8 @@ public class Community
     public Collection createCollection()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         Collection c = Collection.create(ourContext);
         addCollection(c);
@@ -365,7 +375,8 @@ public class Community
     public void addCollection(Collection c)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         log.info(LogManager.getHeader(ourContext,
             "add_collection",
@@ -400,7 +411,8 @@ public class Community
     public void removeCollection(Collection c)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
         log.info(LogManager.getHeader(ourContext,
             "remove_collection",
@@ -420,7 +432,8 @@ public class Community
     public void delete()
         throws SQLException, AuthorizeException, IOException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
 
         log.info(LogManager.getHeader(ourContext,
             "delete_community",
@@ -448,7 +461,7 @@ public class Community
     public void deleteWithContents()
         throws SQLException, AuthorizeException, IOException
     {
-        // FIXME: Check auth
+        // Authorisation checked by methods below (e.g. delete())
 
         // First get collections
         Collection[] collections = getCollections();

@@ -47,6 +47,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -219,7 +221,12 @@ public class BitstreamFormat
     public static BitstreamFormat create(Context context)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation 
+        // Check authorisation - only administrators can create new formats
+        if (!AuthorizeManager.isAdmin(context))
+        {
+            throw new AuthorizeException(
+                "Only administrators can create bitstream formats");
+        }
         
         // Create a table row
         TableRow row = DatabaseManager.create(context,
@@ -376,7 +383,12 @@ public class BitstreamFormat
     public void update()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation
+        // Check authorisation - only administrators can change formats
+        if (!AuthorizeManager.isAdmin(bfContext))
+        {
+            throw new AuthorizeException(
+                "Only administrators can modify bitstream formats");
+        }
 
         log.info(LogManager.getHeader(bfContext,
             "update_bitstream_format",
@@ -393,7 +405,12 @@ public class BitstreamFormat
     public void delete()
         throws SQLException, AuthorizeException
     {
-        // FIXME Check auth
+        // Check authorisation - only administrators can delete formats
+        if (!AuthorizeManager.isAdmin(bfContext))
+        {
+            throw new AuthorizeException(
+                "Only administrators can delete bitstream formats");
+        }
 
         // Find "unknown" type
         BitstreamFormat unknown = findUnknown(bfContext);

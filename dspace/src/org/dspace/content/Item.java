@@ -54,6 +54,8 @@ import org.apache.log4j.Logger;
 
 import org.dspace.administer.DCType;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -579,7 +581,8 @@ public class Item
     public Bundle createBundle()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
         
         Bundle b = Bundle.create(ourContext);
         addBundle(b);
@@ -593,9 +596,10 @@ public class Item
      * @param b  the bundle to add
      */
     public void addBundle(Bundle b)
-        throws AuthorizeException
+        throws SQLException, AuthorizeException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         log.info(LogManager.getHeader(ourContext,
             "add_bundle",
@@ -626,9 +630,10 @@ public class Item
      * @param b  the bundle to remove
      */
     public void removeBundle(Bundle b)
-        throws AuthorizeException
+        throws SQLException, AuthorizeException
     {
-        // FIXME Check authorisation
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
         log.info(LogManager.getHeader(ourContext,
             "remove_bundle",
@@ -717,7 +722,8 @@ public class Item
     public void update()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         
         log.info(LogManager.getHeader(ourContext,
             "update_item",
@@ -834,6 +840,9 @@ public class Item
     public void deleteWithContents()
         throws SQLException, AuthorizeException, IOException
     {
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
+
         log.info(LogManager.getHeader(ourContext,
             "update_item",
             "item_id=" + getID()));

@@ -100,7 +100,11 @@ public class RegistryLoader
 
         try
         {
-           context = new Context();
+            context = new Context();
+           
+            // Can't update registries anonymously, so we need to turn off
+            // authorisation
+            context.setIgnoreAuthorization(true);
 
             // Work out what we're loading
             if (argv[0].equalsIgnoreCase("-bitstream"))

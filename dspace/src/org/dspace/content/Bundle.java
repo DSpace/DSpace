@@ -51,6 +51,8 @@ import java.util.ListIterator;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -249,7 +251,8 @@ public class Bundle
     public Bitstream createBitstream(InputStream is)
         throws AuthorizeException, IOException, SQLException
     {
-        // FIXME: Check auth
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         Bitstream b = Bitstream.create(ourContext, is);
         addBitstream(b);
@@ -263,9 +266,10 @@ public class Bundle
      * @param b  the bitstream to add
      */
     public void addBitstream(Bitstream b)
-        throws AuthorizeException
+        throws SQLException, AuthorizeException
     {
-        // FIXME Check authorisation
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         log.info(LogManager.getHeader(ourContext,
             "add_bitstream",
@@ -294,9 +298,10 @@ public class Bundle
      * @param b  the bitstream to remove
      */
     public void removeBitstream(Bitstream b)
-        throws AuthorizeException
+        throws AuthorizeException, SQLException
     {
-        // FIXME Check authorisation
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
         log.info(LogManager.getHeader(ourContext,
             "remove_bitstream",
@@ -324,7 +329,8 @@ public class Bundle
     public void update()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
         log.info(LogManager.getHeader(ourContext,
             "update_bundle",
@@ -366,7 +372,8 @@ public class Bundle
     public void delete()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
 
         log.info(LogManager.getHeader(ourContext,
             "delete_bundle",
@@ -393,7 +400,8 @@ public class Bundle
     public void deleteWithContents()
         throws SQLException, AuthorizeException, IOException
     {
-        // FIXME: Check authorisation
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
 
         // First delete ourselves
         delete();
