@@ -81,14 +81,11 @@ public class Collection
     /** The item template */
     private Item template;
 
-    /** The group of reviewers */
-    private Group reviewers;
-
-    /** The group of workflow admins */
-    private Group workflowAdmins;
-
-    /** The group of editors */
-    private Group editors;
+    /**
+     * Groups corresponding to workflow steps - NOTE these start from one,
+     * so workflowGroups[0] corresponds to workflow_step_1. 
+     */
+    private Group[] workflowGroup;
 
     /** The default group of submitters */
     private Group submitters;
@@ -128,8 +125,17 @@ public class Collection
                 collectionRow.getIntColumn("template_item_id"));
         }
 
+        // Get the relevant groups
+        workflowGroup = new Group[3];
 
-        // FIXME: Groups
+        workflowGroup[0] = groupFromColumn("workflow_step_1");
+        workflowGroup[1] = groupFromColumn("workflow_step_2");
+        workflowGroup[2] = groupFromColumn("workflow_step_3");
+        
+        // Default submitters are in a group called "COLLECTION_XX_SUBMIT"
+        // where XX is the ID of this collection
+        submitters = Group.findByName(ourContext,
+            "COLLECTION_" + getID() + "_SUBMIT");
     }
 
 
@@ -328,80 +334,99 @@ public class Collection
 
 
     /**
-     * Set the workflow reviewers
+     * Create a workflow group for the given step if one does not already exist.
+     * Returns either the newly created group or the previously existing one.
+     * Note that while the new group is created in
+     * the database, the association between the group and the collection
+     * is not written until <code>update</code> is called.
      *
-     * @param   g  the group of reviewers
+     * @param   step  the step (1-3) of the workflow to create or get the group
+     *                for
+     *
+     * @return  the workflow group associated with this collection
      */
-    public void setReviewers(Group g)
+    public Group createWorkflowGroup(int step)
+        throws SQLException, AuthorizeException
     {
-        reviewers = g;
+        // FIXME: Auth
+    
+        if (workflowGroup[step-1] == null)
+        {
+            workflowGroup[step-1] = Group.create(ourContext);
+            workflowGroup[step-1].setName(
+                "COLLECTION_100_WORKFLOW_STEP_" + step);
+            workflowGroup[step-1].update();
+        }
+        
+        return workflowGroup[step-1];
+    }
+        
+
+    /**
+     * Set the workflow group corresponding to a particular workflow step.
+     * <code>null</code> can be passed in if there should be no associated
+     * group for that workflow step; any existing group is NOT deleted.
+     *
+     * @param   step   the workflow step (1-3)
+     * @param   g      the new workflow group, or <code>null</code> 
+     */
+    public void setWorkflowGroup(int step, Group g)
+    {
+        // FIXME: Auth
+
+        workflowGroup[step-1] = g;
     }
 
 
     /**
-     * Get the workflow reviewers.
+     * Get the the workflow group corresponding to a particular workflow step.
+     * This returns <code>null</code> if there is no group associated with this
+     * collection for the given step.
      *
-     * @return  the group of reviewers
+     * @param   step   the workflow step (1-3)
+     *
+     * @return  the group of reviewers or <code>null</code>
      */
-    public Group getReviewers()
+    public Group getWorkflowGroup(int step)
     {
-        return reviewers;
+        return workflowGroup[step-1];
     }
 
 
     /**
-     * Set the workflow administrators
+     * Create a default submitters group if one does not already exist.
+     * Returns either the newly created group or the previously existing one.
+     * Note that other groups may also be allowed to submit to this collection
+     * by the authorization system.
      *
-     * @param   g  the group of workflow administrators
+     * @return  the default group of submitters associated with this collection
      */
-    public void setWorkflowAdministrators(Group g)
+    public Group createSubmitters()
+        throws SQLException, AuthorizeException
     {
-        workflowAdmins = g;
+        // FIXME: Auth
+
+        if (submitters == null)
+        {
+            submitters = Group.create(ourContext);
+            submitters.setName("COLLECTION_100_SUBMIT");
+            submitters.update();
+        }
+        
+        return submitters;
     }
 
 
     /**
-     * Get the workflow administrators.
-     *
-     * @return the group of workflow administrators
-     */
-    public Group getWorkflowAdministrators()
-    {
-        return workflowAdmins;
-    }
-
-
-    /**
-     * Set the workflow editors
-     *
-     * @param   g  the group of workflow editors
-     */
-    public void setEditors(Group g)
-    {
-        editors = g;
-    }
-
-
-    /**
-     * Get the workflow editors.
-     *
-     * @return  the group of workflow editors
-     */
-    public Group getEditors()
-    {
-        return editors;
-    }
-
-
-    /**
-     * Get the default group of submitters.  Note that the authorization
-     * system may allow others to submit to the collection, so this is not
-     * necessarily a definitive list of potential submitters.
+     * Get the default group of submitters, if there is one.  Note that the
+     * authorization system may allow others to submit to the collection, so
+     * this is not necessarily a definitive list of potential submitters.
      * <P>
      * The default group of submitters for collection 100 is the one called
      * <code>collection_100_submit</code>.
      *
-     * @return  the default group of submitters.
+     * @return  the default group of submitters, or <code>null</code> if
+     *          there is no default group.
      */
     public Group getSubmitters()
     {
@@ -703,5 +728,27 @@ public class Collection
         }
 
         return (getID() == ((Collection) other).getID());
+    }
+
+
+    /**
+     * Utility method for reading in a group from a group ID in a column.
+     * If the column is null, null is returned.
+     *
+     * @param col    the column name to read
+     * @return    the group referred to by that column, or null
+     */
+
+    private Group groupFromColumn(String col)
+        throws SQLException
+    {
+        if (collectionRow.isColumnNull(col))
+        {
+            return null;
+        }
+        else
+        {
+            return Group.find(ourContext, collectionRow.getIntColumn(col));
+        }
     }
 }
