@@ -492,7 +492,7 @@ public class ItemListTag extends TagSupport
 	    			}
 	    			else
 	    			{
-		        		thumbLink = new StringBuffer("<br/><a target=_blank href=\"")
+		        		thumbLink = new StringBuffer("<br/><a href=\"")
 							.append(hrq.getContextPath())
 							.append("/handle/")
 							.append(item.getHandle());
