@@ -169,6 +169,50 @@ public class Constants
 
 
     /**
+     * return the constant for the type of a given object
+     * @return type or -1 if unknown
+     */
+/* obsolete now?
+    public static int getObjectType(Object myobject)
+    {
+        int otype = -1;
+        
+        // now figure out the type and object id
+        if( myobject instanceof Bitstream )
+        {
+            otype = Constants.BITSTREAM;
+        }
+        else if( myobject instanceof Bundle )
+        {
+            otype = Constants.BUNDLE;
+        }
+        else if( myobject instanceof Item )
+        {
+            otype = Constants.ITEM;
+        }
+        else if( myobject instanceof Collection )
+        {
+            otype = Constants.COLLECTION;
+        }
+        else if( myobject instanceof Community )
+        {
+            otype = Constants.COMMUNITY;
+        }
+        else if( myobject instanceof Group )
+        {
+            otype = Constants.GROUP;
+        }
+        else if( myobject instanceof EPerson )
+        {
+            otype = Constants.EPERSON;
+        }   
+    
+        return otype;
+    }
+*/
+
+
+    /**
      * If you know the action string, look up the corresponding type ID
      * constant.
      *

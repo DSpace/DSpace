@@ -40,12 +40,18 @@
 
 package org.dspace.eperson;
 
+import org.apache.log4j.Logger;
+
 import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.core.Constants;
 import org.dspace.core.Utils;
+import org.dspace.core.LogManager;
 import org.dspace.history.HistoryManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -57,7 +63,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author David Stuve
  * @version $Revision$
  */
-public class EPerson
+public class EPerson implements DSpaceObject
 {
     /** The e-mail field (for sorting) */
     public static final int EMAIL = 1;
@@ -73,6 +79,9 @@ public class EPerson
 
     /** The row in the table representing this eperson */
     private TableRow myRow;
+
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(EPerson.class);
 
 
     /**
@@ -171,14 +180,14 @@ public class EPerson
         
         switch (sortField)
         {
-        case ID:
-            s = "eperson_id";
-            break;
-        case EMAIL:
-            s = "email";
-            break;
-        default:
-            s = "lastname";
+            case ID:
+                s = "eperson_id";
+                break;
+            case EMAIL:
+                s = "email";
+                break;
+            default:
+                s = "lastname";
         }
         
         TableRowIterator rows = DatabaseManager.query(context,
@@ -219,11 +228,23 @@ public class EPerson
     public static EPerson create(Context context)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation
-
+        // authorized?
+        if( !AuthorizeManager.isAdmin(context) )
+        {
+            throw new AuthorizeException(
+                "You must be an admin to create an EPerson");
+        }
+        
         // Create a table row
         TableRow row = DatabaseManager.create(context, "eperson");
+
         EPerson e = new EPerson(context, row);
+
+        log.info(
+                    LogManager.getHeader(context,
+                    "create_eperson",
+                    "eperson_id=" + e.getID() )
+                );
 
         HistoryManager.saveHistory(context,
             e,
@@ -240,9 +261,14 @@ public class EPerson
      *
      */
     public void delete()
-        throws SQLException
+        throws SQLException, AuthorizeException
     {
-        // FIXME: authorizations
+        // authorized?
+        if( !AuthorizeManager.isAdmin(myContext) )
+        {
+            throw new AuthorizeException(
+                "You must be an admin to delete an EPerson");
+        }
 
         HistoryManager.saveHistory(myContext,
             this,
@@ -260,6 +286,12 @@ public class EPerson
 
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
+
+        log.info(
+                    LogManager.getHeader(myContext,
+                    "delete_eperson",
+                    "eperson_id=" + getID() )
+                );
     }
 
 
@@ -305,7 +337,8 @@ public class EPerson
     public String getFullName()
     {
         // FIXME: make this work.  ;-)
-        String t = myRow.getStringColumn("firstname") + " " + myRow.getStringColumn("lastname");
+        String t = myRow.getStringColumn("firstname") +
+                   " " + myRow.getStringColumn("lastname");
 
         return t;
     }
@@ -466,15 +499,26 @@ public class EPerson
     public void update()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation
+        // Check authorisation - if you're not the eperson
+        // see if the authorization system says you can
+        if(  !( getID() == myContext.getCurrentUser().getID() ) )
+        {
+            AuthorizeManager.authorizeAction(myContext, this, Constants.WRITE);
+        }
+        
+        DatabaseManager.update(myContext, myRow);
+
+        log.info(
+                    LogManager.getHeader(myContext,
+                    "update_eperson",
+                    "eperson_id=" + getID() )
+                );
 
         HistoryManager.saveHistory(myContext,
             this,
             HistoryManager.MODIFY,
             myContext.getCurrentUser(),
             myContext.getExtraLogInfo());
-
-        DatabaseManager.update(myContext, myRow);
     }
 
     /**
@@ -486,7 +530,7 @@ public class EPerson
      * @return  <code>true</code> if object passed in represents the same
      *          eperson as this object
      */
-    public boolean equals(Object other)
+    public boolean obsolete_equals(Object other)
     {
         if (!(other instanceof EPerson))
         {
@@ -494,5 +538,14 @@ public class EPerson
         }
 
         return (getID() == ((EPerson) other).getID());
+    }
+
+
+    /**
+     * return type found in Constants
+     */
+    public int getType()
+    {
+        return Constants.EPERSON;
     }
 }

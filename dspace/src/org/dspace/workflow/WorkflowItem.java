@@ -164,6 +164,32 @@ public class WorkflowItem implements InProgressSubmission
 
 
     /**
+     * return all workflowitems
+     */
+    public static WorkflowItem[] findAll(Context c)
+        throws SQLException
+    {
+        List wfItems = new ArrayList();
+        TableRowIterator tri = DatabaseManager.query(c,
+            "workflowitem",
+            "SELECT * FROM workflowitem");
+        
+        // make a list of workflow items
+        while( tri.hasNext() )
+        {
+            TableRow row = tri.next();
+            WorkflowItem wi = new WorkflowItem(c, row);
+            wfItems.add( wi );
+        }
+        
+        WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
+        wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
+
+        return wfArray;
+    }
+
+
+    /**
      * Get all workflow items that were original submissions by a particular
      * e-person.  These are ordered by workflow ID, since this should likely
      * keep them in the order in which they were created.

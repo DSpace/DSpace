@@ -42,12 +42,16 @@ package org.dspace.authorize;
 
 import org.dspace.core.Context;
 
+import org.dspace.content.DSpaceObject;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.core.Constants;
 //import org.dspace.authorize.AuthorizeException;
 
 import java.sql.SQLException;
-
+import java.util.Date;
 
 /**
  * Class representing a ResourcePolicy
@@ -74,6 +78,7 @@ public class ResourcePolicy
         myContext = context;
         myRow = row;
     }
+
 
     /**
      * Get an ResourcePolicy from the database.
@@ -138,55 +143,40 @@ public class ResourcePolicy
     {
         return myRow.getIntColumn("policy_id");
     }
-
-
-    /**
-     * Get the ResourcePolicy's policy statement.
-     *
-     * @return statement
-     */
-    public String getPolicy()
-    {
-        return myRow.getStringColumn("policy_statement");
-    }
-
-
-    /**
-     * Set the ResourcePolicy's policy statement
-     *
-     * @param statement the policy statement
-     */
-    public void setPolicy(String policy)
-    {
-        myRow.setColumn("policy_statement", policy);
-    }
-
-
-// resource_type_id, resource_id, container_type_id, container_id
-// action_id, policy_statement, priority, notes, owner_eperson_id
-// doing nothing for priority, notes, owner_eperson_id
+    
 
     /**
      * Get the type of the objects referred to by policy
      *
      * @return type of object/resource
      */
-
     public int getResourceType()
     {
         return myRow.getIntColumn("resource_type_id");
     }
+
+ 
+    /**
+     * set both type and id of resource referred to by policy
+     *
+     */
+    public void setResource(DSpaceObject o)
+    {
+        setResourceType(o.getType());
+        setResourceID(o.getID());
+    }
+ 
     
     /**
      * Set the type of the resource referred to by the policy
      *
      * @param mytype type of the resource 
      */
-
     public void setResourceType( int mytype )
     {
         myRow.setColumn("resource_type_id", mytype );
     }
+
 
     /**
      * Get the ID of a resource pointed to by the policy
@@ -194,11 +184,11 @@ public class ResourcePolicy
      *
      * @return resource_id 
      */
-
     public int getResourceID()
     {
         return myRow.getIntColumn("resource_id");
     }
+
 
     /**
      * If the policy refers to a single resource, this
@@ -206,65 +196,16 @@ public class ResourcePolicy
      *
      * @param resource_id
      */
-
     public void setResourceID( int myid )
     {
         myRow.setColumn("resource_id", myid);
-    }
-
-    /**
-     * Get the type of the container, if the policy refers to
-     * a container full of objects. 
-     * 
-     */
-
-    public int getContainerType()
-    {
-        return myRow.getIntColumn("container_type_id");
-    }
-
-    /**
-     * Set the type of the container, if policy refers
-     * to a container full of objects
-     *
-     * @param container type
-     */
-
-    public void setContainerType( int mytype )
-    {
-        myRow.setColumn("container_type_id" ,mytype);
-    }
-    
-    /**
-     * Get the ID of the container
-     *
-     * @return container ID 
-     */
-
-    public int getContainerID()
-    {
-        return myRow.getIntColumn("container_id");
-    }
-
-    /**
-     * Set the ID of the container, if the policy refers to
-     *  the contents of a container.  Combined with container type,
-     *  you can determine exactly what the container is.
-     *
-     * @param myid container id
-     */
-
-    public void setContainerID( int myid )
-    {
-        myRow.setColumn("container_id" ,myid);
     }
 
 
     /**
      * get the action this policy authorizes
      */
-
-    public int getActionID()
+    public int getAction()
     {
         return myRow.getIntColumn("action_id");
     }
@@ -275,10 +216,197 @@ public class ResourcePolicy
      *
      * @param id
      */
-
-    public void setActionID( int myid )
+    public void setAction( int myid )
     {
         myRow.setColumn("action_id",myid);
+    }
+
+
+    /**
+     * is this action public?  open to all?
+     *  even anonymous use?
+     *
+     * @return true if action is authorized to all
+     */
+    public boolean isPublic()
+    {
+        return myRow.getBooleanColumn("is_public");
+    }
+    
+    
+    /**
+     * modify public flag
+     *
+     * @param true if authorized to all, false if not
+     *  if true, overrides others (epeople, groups)
+     */
+     public void setPublic( boolean isPublic )
+     {
+        myRow.setColumn("is_public", isPublic);
+     }
+    
+
+    /**
+     * get EPersonID, or -1 if EPerson not set
+     */
+    public int getEPersonID()
+    {
+        return myRow.getIntColumn("eperson_id");
+    }
+
+
+    /**
+     * get EPerson this policy relates to
+     *
+     * @return EPerson, or null
+     */
+    public EPerson getEPerson()
+        throws SQLException
+    {
+        int eid = myRow.getIntColumn("eperson_id");
+        
+        if( eid == -1 ) return null;
+        
+        return EPerson.find( myContext, eid );
+    }
+
+
+    /**
+     * assign an EPerson to this policy
+     */    
+    public void setEPerson( EPerson e )
+    {
+        if( e != null )
+        {
+            myRow.setColumn("eperson_id", e.getID());
+        }
+        else
+        {
+            myRow.setColumnNull("epersongroup_id");
+        }
+    }
+
+
+    /**
+     * gets ID for Group referred to by this policy
+     *
+     * @return groupID, or -1 if no group set
+     */
+    public int getGroupID()
+    {
+        return myRow.getIntColumn("epersongroup_id");
+    }
+
+
+    /**
+     * gets Group for this policy
+     *
+     * @return Group, or -1 if no group set
+     */
+    public Group getGroup()
+        throws SQLException
+    {
+        int gid = myRow.getIntColumn("epersongroup_id");
+        
+        if( gid == -1 ) return null;
+        else return Group.find( myContext, gid );
+    }
+
+
+    /**
+     * set Group for this policy
+     */    
+    public void setGroup( Group g )
+    {
+        if( g != null )
+        {
+            myRow.setColumn("epersongroup_id", g.getID());
+        }
+        else
+        {
+            myRow.setColumnNull("epersongroup_id");
+        }
+    }
+
+
+    /**
+     * figures out if the date is valid for the policy
+     *
+     * @return true if policy has begun and hasn't expired yet
+     *   (or no dates are set)
+     */
+    public boolean isDateValid()
+    {
+        Date sd = getStartDate();
+        Date ed = getEndDate();
+
+        // if no dates set, return true (most common case)
+        if( (sd == null) && (ed == null) ) return true;
+        
+        // one is set, now need to do some date math
+        Date now = new Date();
+
+        // check start date first        
+        if( sd != null )
+        {
+            // start date is set, return false if we're before it
+            if( now.before( sd ) ) return false;
+        }
+        
+        // now expiration date
+        if( ed != null )
+        {
+            // end date is set, return false if we're after it
+            if( now.after( sd ) ) return false;
+        }
+        
+        // if we made it this far, start < now < end
+        return true;  // date must be okay
+    }
+
+
+    /**
+     * Get the start date of the policy
+     *
+     * @return start date, or null if there is no start date set
+     *   (probably most common case)
+     */
+    public java.util.Date getStartDate()
+    {
+        return myRow.getDateColumn("start_date");
+    }
+
+
+    /**
+     * Set the start date for the policy
+     *
+     * @param date, or null for no start date
+     */
+    public void setStartDate( java.util.Date d )
+    {
+        myRow.setColumn("start_date", d);
+    }
+
+    
+    /**
+     * Get end date for the policy
+     *
+     * @return end date or null for no end date
+     */
+    public java.util.Date getEndDate()
+    {
+        return myRow.getDateColumn("end_date");
+    }
+
+
+    /**
+     * Set end date for the policy
+     *
+     * @param end date, or null
+     */
+    public void setEndDate( java.util.Date d )
+    {
+        myRow.setColumn("end_date", d);
     }
 
 
@@ -286,7 +414,7 @@ public class ResourcePolicy
      * Update the ResourcePolicy
      */
     public void update()
-        throws SQLException, AuthorizeException
+        throws SQLException
     {
         // FIXME: Check authorisation
 

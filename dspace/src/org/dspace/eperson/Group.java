@@ -40,16 +40,21 @@
 
 package org.dspace.eperson;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Iterator;
+import java.sql.SQLException;
+
+import org.apache.log4j.Logger;
+
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import java.sql.SQLException;
 
 /**
  * Class representing a group of e-people.
@@ -71,6 +76,13 @@ public class Group
     /** epeople list needs to be written out again */
     private boolean epeoplechanged = false;
 
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(Group.class);
+
+    // findAll sortby types
+    public static final int ID   = 0;   // sort by ID
+    public static final int NAME = 1;   // sort by NAME (default)
+    
 
     /**
      * Construct a Group from a given context and tablerow
@@ -122,11 +134,26 @@ public class Group
     public static Group create(Context context)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation
+        // FIXME - authorization?
+        if( !AuthorizeManager.isAdmin(context) )
+        {
+            throw new AuthorizeException(
+                "You must be an admin to create an EPerson Group");
+        }
 
         // Create a table row
         TableRow row = DatabaseManager.create(context, "epersongroup");
-        return new Group(context, row);
+        
+        Group g = new Group(context, row);
+        
+        log.info(
+                    LogManager.getHeader(context,
+                    "create_group",
+                    "group_id=" + g.getID() )
+                );
+
+        return g;
+        
     }
 
 
@@ -296,6 +323,53 @@ public class Group
     }
 
 
+    public static Group[] findAll(Context context, int sortField)
+        throws SQLException
+    {
+        String s;
+        
+        switch (sortField)
+        {
+            case ID:
+                s = "eperson_group_id";
+                break;
+            case NAME:
+                s = "name";
+                break;
+            default:
+                s = "name";
+        }
+        
+        TableRowIterator rows = DatabaseManager.query(context,
+            "SELECT * FROM epersongroup ORDER BY " + s);
+
+        List gRows = rows.toList();
+        
+        Group[] groups = new Group[gRows.size()];
+        
+        for (int i = 0; i < gRows.size(); i++)
+        {
+            TableRow row = (TableRow) gRows.get(i);
+
+            // First check the cache
+            Group fromCache = (Group) context.fromCache(
+                Group.class,
+                row.getIntColumn("eperson_group_id"));
+
+            if (fromCache != null)
+            {
+                groups[i] = fromCache;
+            }
+            else
+            {
+                groups[i] = new Group(context, row);
+            }
+        }
+
+        return groups;
+    }        
+
+
     /**
      * Delete a group
      *
@@ -317,6 +391,13 @@ public class Group
         DatabaseManager.delete(myContext, myRow);
 
         epeople.clear();
+
+        log.info(
+                    LogManager.getHeader(myContext,
+                    "delete_group",
+                    "group_id=" + getID() )
+                );
+
     }
 
 
@@ -366,6 +447,12 @@ public class Group
 
             epeoplechanged = false;
         }
+
+        log.info(
+                    LogManager.getHeader(myContext,
+                    "update_group",
+                    "group_id=" + getID() )
+                );
     }
 
     /**

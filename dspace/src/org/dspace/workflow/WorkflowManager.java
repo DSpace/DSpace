@@ -49,6 +49,7 @@ import javax.mail.MessagingException;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -110,9 +111,6 @@ be added to do this, but it isn't strictly necessary.
 
 public class WorkflowManager
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(WorkflowManager.class);
-
 	// states to store in WorkflowItem for the GUI to report on
 	// fits our current set of workflow states (stored in WorkflowItem.state)
 	public static final int WFSTATE_SUBMIT		= 0; // hmm, probably don't need
@@ -123,6 +121,9 @@ public class WorkflowManager
 	public static final int WFSTATE_STEP3POOL	= 5; // waiting for an editor to claim it
 	public static final int WFSTATE_STEP3		= 6; // task - editor has claimed the item
 	public static final int WFSTATE_ARCHIVE		= 7; // probably don't need this one either
+
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(WorkflowManager.class);
 
 	/** startWorkflow() begins a workflow - in a single transaction
 	 *   do away with the PersonalWorkspace entry and turn it into
@@ -211,7 +212,8 @@ public class WorkflowManager
     {
         ArrayList mylist = new ArrayList();
 
-        String myquery = "SELECT workflowitem.* FROM workflowitem, TaskListItem"
+        String myquery =
+            "SELECT workflowitem.* FROM workflowitem, TaskListItem"
             + " WHERE tasklistitem.eperson_id=" + e.getID()
             + " AND tasklistitem.workflow_id=workflowitem.workflow_id";
             
@@ -255,6 +257,16 @@ public class WorkflowManager
             // if we got here, we weren't pooled... error?
             // FIXME - log the error?
         }
+        log.info(LogManager.getHeader(c,
+                    "claim_task",
+                    "workflow_item_id="  + wi.getID()                 +
+                        "item_id="       + wi.getItem().getID()       +
+                        "collection_id=" + wi.getCollection().getID() +
+                        "newowner_id="   + wi.getOwner().getID()      +
+                        "old_state="     + taskstate                  +
+                        "new_state="     + wi.getState()
+                        )
+                );
     }
 
 	/** approveAction() sends an item forward in the workflow (reviewers, approvers, and
@@ -297,6 +309,17 @@ public class WorkflowManager
 
                 // error handling?  shouldn't get here
         }
+        log.info(LogManager.getHeader(c,
+                    "advance_workflow",
+                    "workflow_item_id="  + wi.getID()                 +
+                        "item_id="       + wi.getItem().getID()       +
+                        "collection_id=" + wi.getCollection().getID() +
+                        "eperson_id="    + wi.getOwner().getID()      +
+                        "old_state="     + taskstate                  +
+                        "new_state="     + wi.getState()
+                        )
+                );
+
     }
     
     
@@ -331,6 +354,17 @@ public class WorkflowManager
                 // error handling?  shouldn't get here
                 // FIXME - what to do with error - log it?
         }
+
+        log.info(LogManager.getHeader(c,
+                    "unclaim_workflow",
+                    "workflow_item_id="  + wi.getID()                 +
+                        "item_id="       + wi.getItem().getID()       +
+                        "collection_id=" + wi.getCollection().getID() +
+                        "eperson_id="    + wi.getOwner().getID()      +
+                        "old_state="     + taskstate                  +
+                        "new_state="     + wi.getState()
+                        )
+                );
     }
 
 
@@ -346,47 +380,64 @@ public class WorkflowManager
         throws SQLException, AuthorizeException, IOException
     {
         // authorize a DSpaceActions.ABORT
+        if( !AuthorizeManager.isAdmin(c) )
+        {
+            throw new AuthorizeException(
+                "You must be an admin to abort a workflow" );
+        }
 
         // stop workflow regardless of its state
-        // do a reject
-        reject(c, wi, e, "This item's submission has been aborted by an admin.");
+        deleteTasks(c, wi);
+
+        log.info(LogManager.getHeader(c,
+                    "abort_workflow",
+                    "workflow_item_id="  + wi.getID()                 +
+                        "item_id="       + wi.getItem().getID()       +
+                        "collection_id=" + wi.getCollection().getID() +
+                        "eperson_id="    + e.getID()
+                        )
+                );
+
+        // convert into personal workspace
+        WorkspaceItem wsi = returnToWorkspace(c, wi);
     }
 
+    // returns true if archived
 
-    private static void doState(Context c,WorkflowItem wi, int newstate, EPerson newowner)
+    private static boolean doState(Context c,WorkflowItem wi, int newstate, EPerson newowner)
         throws SQLException, IOException, AuthorizeException
     {
         Collection mycollection = wi.getCollection();
         Group mygroup = null;
-        
+        boolean archived = false;
+                
         wi.setState(newstate);
 
         switch (newstate)
         {
-        case WFSTATE_STEP1POOL:
-            // any reviewers?
-            // if so, add them to the tasklist
-            wi.setOwner( null );
-            //wi.update();
+            case WFSTATE_STEP1POOL:
+                // any reviewers?
+                // if so, add them to the tasklist
+                wi.setOwner( null );
 
-            // get reviewers (group 1 )
-            mygroup = mycollection.getWorkflowGroup( 1 );
-            if (mygroup != null )
-            {
-                // there were reviewers, change the state
-                //  and add them to the list
-                createTasks(c, wi, mygroup);
-                wi.update();
+                // get reviewers (group 1 )
+                mygroup = mycollection.getWorkflowGroup( 1 );
+                if (mygroup != null )
+                {
+                    // there were reviewers, change the state
+                    //  and add them to the list
+                    createTasks(c, wi, mygroup);
+                    wi.update();
 
-                // email notification
-                notifyGroupOfTask(c, mygroup, wi);
-            }
-            else
-            {
-                // no reviewers, skip ahead
-                doState(c, wi, WFSTATE_STEP2POOL, null);
-            }
-            break;
+                    // email notification
+                    notifyGroupOfTask(c, mygroup, wi);
+                }
+                else
+                {
+                    // no reviewers, skip ahead
+                    archived = doState(c, wi, WFSTATE_STEP2POOL, null);
+                }
+                break;
 
         case WFSTATE_STEP1:
             // remove reviewers from tasklist
@@ -416,7 +467,7 @@ public class WorkflowManager
             else
             {
                 // no reviewers, skip ahead
-                doState(c, wi, WFSTATE_STEP3POOL, null);
+                archived = doState(c, wi, WFSTATE_STEP3POOL, null);
             }
             break;
 
@@ -446,7 +497,7 @@ public class WorkflowManager
             else
             {
                 // no editors, skip ahead
-                doState(c, wi, WFSTATE_ARCHIVE, newowner);
+                archived = doState(c, wi, WFSTATE_ARCHIVE, newowner);
             }
             break;
 
@@ -469,6 +520,7 @@ public class WorkflowManager
 
                 // now email notification
                 notifyOfArchive(c, myitem, mycollection);
+                archived = true;
             }
             catch(IOException e)
             {
@@ -484,7 +536,9 @@ public class WorkflowManager
             break;
         }
 
-        if (wi != null) wi.update();
+        if( (wi != null) && !archived ) wi.update();
+        
+        return archived;
     }
 
 
@@ -517,7 +571,8 @@ public class WorkflowManager
             c,
             "install_item",
             "workflow_id=" + wfi.getID() + ", item_id=" + item.getID() +
-            "handle=FIXME"));
+            "handle=FIXME")
+        );
 
         return item;
     }   
@@ -557,9 +612,11 @@ public class WorkflowManager
         catch( MessagingException e )
         {
             log.warn(LogManager.getHeader(c,
-                "notifyOfArchive",
-                "cannot email user"
-                + " item_id=" + i.getID()));
+                        "notifyOfArchive",
+                        "cannot email user"
+                            + " item_id=" + i.getID()
+                        )
+                    );
         }
     }
 
@@ -591,8 +648,8 @@ public class WorkflowManager
 
         int wsi_id = row.getIntColumn("workspace_item_id");
         WorkspaceItem wi = WorkspaceItem.find(c, wsi_id);
-        wi.setMultipleFiles(wfi.hasMultipleFiles());
-        wi.setMultipleTitles(wfi.hasMultipleTitles());
+        wi.setMultipleFiles  (wfi.hasMultipleFiles() );
+        wi.setMultipleTitles (wfi.hasMultipleTitles());
         wi.setPublishedBefore(wfi.isPublishedBefore());
         wi.update();
 
@@ -632,8 +689,6 @@ public class WorkflowManager
         // stop workflow
         deleteTasks(c, wi);
 
-        // notify that it's been rejected
-        notifyOfReject(c, wi, e, rejection_message);
 
         // rejection provenance
         Item myitem = wi.getItem();
@@ -656,6 +711,19 @@ public class WorkflowManager
         // convert into personal workspace
         WorkspaceItem wsi = returnToWorkspace(c, wi);
 
+        // notify that it's been rejected
+        notifyOfReject(c, wi, e, rejection_message);
+
+        log.info(LogManager.getHeader(c,
+                    "reject_workflow",
+                    "workflow_item_id="  + wi.getID()                 +
+                        "item_id="       + wi.getItem().getID()       +
+                        "collection_id=" + wi.getCollection().getID() +
+                        "eperson_id="    + e.getID()
+                        )
+                );
+
+
         return wsi;
     }
     
@@ -675,8 +743,8 @@ public class WorkflowManager
             // can we get away without creating a tasklistitem class?
             // do we want to?
             TableRow tr = DatabaseManager.create(c, "tasklistitem");
-            tr.setColumn( "eperson_id", epa[i].getID() );
-            tr.setColumn( "workflow_id", wi.getID() );
+            tr.setColumn( "eperson_id",  epa[i].getID() );
+            tr.setColumn( "workflow_id", wi.getID()     );
             DatabaseManager.update( c, tr );
         }
     }
@@ -803,12 +871,19 @@ public class WorkflowManager
         }
         catch( Exception ex )
         {
-            // FIXME: should log this email error
+            // log this email error
+            log.warn(LogManager.getHeader(c,
+                "notify_of_reject",
+                "cannot email user"
+                + " eperson_id"       + e.getID()
+                + " eperson_email"    + e.getEmail()
+                + " workflow_item_id" + wi.getID() ));
+
         }
     }
 
 
-    // FIXME - still needed?
+    // FIXME - are the following methods still needed?
     private static EPerson getSubmitterEPerson(WorkflowItem wi)
         throws SQLException
     {
@@ -816,6 +891,7 @@ public class WorkflowManager
 
         return e;
     }
+
 
     private static String getItemTitle(WorkflowItem wi)
         throws SQLException
@@ -838,6 +914,7 @@ public class WorkflowManager
 
         return getEPersonName( e );
     }
+
 
     private static String getEPersonName(EPerson e)
         throws SQLException
@@ -864,8 +941,8 @@ public class WorkflowManager
         String now = DCDate.getCurrent().toString();
 
         // Here's what happened
-        String provDescription = "Approved for entry into archive by " + usersName +
-            " on " + now + " (GMT) ";
+        String provDescription = "Approved for entry into archive by " +
+            usersName + " on " + now + " (GMT) ";
             
         // add bitstream descriptions (name, size, checksums)
         provDescription += InstallItem.getBitstreamProvenanceMessage(item);    
