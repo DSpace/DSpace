@@ -147,17 +147,20 @@ public class EditCommunitiesServlet extends DSpaceServlet
         int action = UIUtil.getIntParameter(request, "action");
 
         /*
-         * Most of the forms supply one or both of these values.  Since we just
+         * Most of the forms supply one or more of these values.  Since we just
          * get null if we try and find something with ID -1, we'll just try
          * and find both here to save hassle later on
          */
         Community community = Community.find(context,
             UIUtil.getIntParameter(request, "community_id"));
+        Community parentCommunity = Community.find(context,
+            UIUtil.getIntParameter(request, "parent_community_id"));
         Collection collection = Collection.find(context,
             UIUtil.getIntParameter(request, "collection_id"));
 
         // Just about every JSP will need the values we received
         request.setAttribute("community", community);
+        request.setAttribute("parent", parentCommunity);
         request.setAttribute("collection", collection);
 
         /*
@@ -213,11 +216,24 @@ public class EditCommunitiesServlet extends DSpaceServlet
             break;
 
         case CONFIRM_DELETE_COMMUNITY:
+            // remember the parent community, if any
+            Community parent = community.getParentCommunity();
             // Delete the community
             community.delete();
 
+            // if community was top-level, redirect to community-list page
+            if (parent == null)
+	    {
+                response.sendRedirect(response.encodeRedirectURL(
+                     request.getContextPath() + "/community-list"));
+            }
+            else // redirect to parent community page
+	    {
+                response.sendRedirect(response.encodeRedirectURL(
+                     request.getContextPath() + "/handle/" + parent.getHandle() ));
+            }
              // Show main control page
-            showControls(context, request, response);
+            //showControls(context, request, response);
 
             // Commit changes to DB
             context.complete();
@@ -251,7 +267,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
 
     /**
-     * Show list of communities and collections with controls
+     * Show community home page with admin controls
      *
      * @param context   Current DSpace context
      * @param request   Current HTTP request
@@ -262,28 +278,31 @@ public class EditCommunitiesServlet extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        Community[] communities = Community.findAll(context);
-
-        // Build up a map in which the keys are community IDs and the
-        // values are collections - this is so the JSP doesn't have to do
-        // the work
-        Map communityIDToCollection = new HashMap();
-
-        for (int i = 0; i < communities.length; i++)
-        {
-            communityIDToCollection.put(new Integer(communities[i].getID()),
-                communities[i].getCollections());
+        // new approach - eliminate the 'list-communities' page in favor of the
+        // community home page, enhanced with admin controls. If no community,
+        // or no parent community, just fall back to the community-list page
+	Community community = (Community)request.getAttribute("community");
+        if (community != null)
+	{
+            response.sendRedirect(response.encodeRedirectURL(
+                request.getContextPath() + "/handle/" + community.getHandle() ));
         }
-
-        log.info(LogManager.getHeader(context,
-            "view_editcommunities",
-            ""));
-
-        // Set attributes for JSP
-        request.setAttribute("communities", communities);
-        request.setAttribute("collections.map", communityIDToCollection);
-
-        JSPManager.showJSP(request, response, "/dspace-admin/list-communities.jsp");
+        else
+	{
+            // see if a parent community was specified
+            Community parent = (Community)request.getAttribute("parent");
+            if (parent != null)
+	    {
+                response.sendRedirect(response.encodeRedirectURL(
+                    request.getContextPath() + "/handle/" + parent.getHandle() ));
+            }
+            else
+	    {
+                // fall back on community-list page
+                response.sendRedirect(response.encodeRedirectURL(
+                    request.getContextPath() + "/community-list"));
+            }
+        }
     }
 
 
