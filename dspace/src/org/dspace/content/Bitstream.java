@@ -43,11 +43,15 @@ package org.dspace.content;
 import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-
+import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Class representing bitstreams stored in the DSpace system
@@ -57,6 +61,49 @@ import org.dspace.core.Context;
  */
 public class Bitstream
 {
+    /** Our context */
+    private Context bContext;
+
+    /** The row in the table representing this bitstream */
+    private TableRow bRow;
+
+    /** The bitstream format corresponding to this bitstream */
+    private BitstreamFormat bitstreamFormat;
+
+    /**
+     * Private constructor for creating a Bitstream object
+     * based on the contents of a DB table row.
+     *
+     * @param context  the context this object exists in
+     * @param row      the corresponding row in the table
+     */
+    Bitstream(Context context, TableRow row)
+        throws SQLException
+    {
+        bContext = context;
+        bRow = row;
+
+        // Get the bitstream format
+        int bfID = row.getIntColumn("bitstream_type_id");
+
+        TableRow formatRow = DatabaseManager.find(context,
+            "bitstreamtyperegistry", bfID);
+        
+        if (formatRow==null)
+        {
+            // No format: use "Unknown"
+            formatRow = DatabaseManager.findByUnique(context,
+                "bitstreamtyperegistry", "short_description", "Unknown");
+
+            // Panic if we can't find it
+            if (formatRow==null)
+                throw new IllegalStateException("No Unknown bitsream format");
+        }
+
+        bitstreamFormat = new BitstreamFormat(context, formatRow);
+    }
+
+
     /**
      * Get a bitstream from the database.  The bitstream metadata is
      * loaded into memory.
@@ -69,7 +116,18 @@ public class Bitstream
     public static Bitstream find(Context context, int id)
         throws SQLException
     {
-        return null;
+        TableRow row = DatabaseManager.find(context,
+            "bitstream",
+            id);
+
+        if (row==null )
+        {
+            return null;
+        }
+        else
+        {
+            return new Bitstream(context, row);
+        }
     }
     
 
@@ -80,12 +138,25 @@ public class Bitstream
      * @param  context   DSpace context object
      * @param  is        the bits to put in the bitstream
      *
-     * @return  the newly created bundle
+     * @return  the newly created bitstream
      */
     public static Bitstream create(Context context, InputStream is)
-        throws AuthorizeException, IOException
+        throws AuthorizeException, IOException, SQLException
     {
-        return null;
+        int bitstreamID = BitstreamStorageManager.store(context, is);
+
+        return find(context, bitstreamID);
+    }
+
+
+    /**
+     * Get the internal identifier of this bitstream
+     *
+     * @return the internal identifier
+     */
+    public int getID()
+    {
+        return bRow.getIntColumn("bitstream_id");
     }
 
 
@@ -97,7 +168,7 @@ public class Bitstream
      */
     public String getName()
     {
-        return null;
+        return bRow.getStringColumn("name");
     }
 
 
@@ -108,6 +179,7 @@ public class Bitstream
      */
     public void setName(String n)
     {
+        bRow.setColumn("name", n);
     }
 
 
@@ -120,7 +192,7 @@ public class Bitstream
      */
     public String getSource()
     {
-        return null;
+        return bRow.getStringColumn("source");
     }
 
 
@@ -131,6 +203,7 @@ public class Bitstream
      */
     public void setSource(String n)
     {
+        bRow.setColumn("source", n);
     }
 
 
@@ -142,7 +215,7 @@ public class Bitstream
      */
     public String getDescription()
     {
-        return null;
+        return bRow.getStringColumn("description");
     }
 
 
@@ -153,6 +226,7 @@ public class Bitstream
      */
     public void setDescription(String n)
     {
+        bRow.setColumn("description", n);
     }
 
     
@@ -163,7 +237,7 @@ public class Bitstream
      */
     public String getChecksum()
     {
-        return null;
+        return bRow.getStringColumn("checksum");
     }
 
     
@@ -174,10 +248,21 @@ public class Bitstream
      */
     public String getChecksumAlgorithm()
     {
-        return null;
+        return bRow.getStringColumn("checksum_algorithm");
     }
 
     
+    /**
+     * Get the size of the bitstream
+     *
+     * @return  the size in bytes
+     */
+    public int getSize()
+    {
+        return bRow.getIntColumn("size");
+    }
+
+
     /**
      * Set the user's format description.  This implies that the format of the
      * bitstream is uncertain, and the format is set to "unknown."
@@ -185,7 +270,12 @@ public class Bitstream
      * @param desc   the user's description of the format
      */
     public void setUserFormatDescription(String desc)
+        throws SQLException
     {
+        // FIXME: Would be better if this didn't throw an SQLException,
+        // but we need to find the unknown format!
+        setFormat(null);
+        bRow.setColumn("user_type_description", desc);
     }
 
 
@@ -197,7 +287,7 @@ public class Bitstream
      */
     public String getUserFormatDescription()
     {
-        return null;
+        return bRow.getStringColumn("user_type_description");
     }
     
 
@@ -209,9 +299,27 @@ public class Bitstream
      */
     public String getFormatDescription()
     {
-        return null;
+        if (bitstreamFormat.getShortDescription().equals("Unknown"))
+        {
+            return bRow.getStringColumn("user_type_description");
+        }
+        else
+        {
+            return bitstreamFormat.getShortDescription();
+        }
     }
     
+
+    /**
+     * Get the format of the bitstream
+     *
+     * @return   the format of this bitstream
+     */
+    public BitstreamFormat getFormat()
+    {
+        return bitstreamFormat;
+    }
+
 
     /**
      * Set the format of the bitstream.  If the user has supplied a type
@@ -222,7 +330,27 @@ public class Bitstream
      *            unknown
      */
     public void setFormat(BitstreamFormat f)
+        throws SQLException
     {
+        // FIXME: Would be better if this didn't throw an SQLException,
+        // but we need to find the unknown format!
+        if (f==null)
+        {
+            // Use "Unknown" format
+            TableRow formatRow = DatabaseManager.findByUnique(bContext,
+                "bitstreamtyperegistry", "short_description", "Unknown");
+            bitstreamFormat = new BitstreamFormat(bContext, formatRow);
+        }
+        else
+        {
+            bitstreamFormat = f;
+        }
+
+        // Remove user type description
+        bRow.setColumnNull("user_type_description");
+
+        // Update the ID in the table row
+        bRow.setColumn("bitstream_type_id", bitstreamFormat.getID());
     }
 
 
@@ -245,6 +373,9 @@ public class Bitstream
     public void update()
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check authorisation
+
+        DatabaseManager.update(bContext, bRow);
     }
 
 
@@ -252,8 +383,12 @@ public class Bitstream
      * Delete the bitstream.
      */
     public void delete()
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
+        // FIXME: Check authorisation
+
+        BitstreamStorageManager.delete(bContext,
+            bRow.getIntColumn("bitstream_id"));
     }
     
 
@@ -263,9 +398,10 @@ public class Bitstream
      * @return   a stream from which the bitstream can be read.
      */
     public InputStream retrieve()
-        throws IOException
+        throws IOException, SQLException
     {
-        return null;
+        return BitstreamStorageManager.retrieve(bContext,
+            bRow.getIntColumn("bitstream_id"));
     }
 
 
@@ -275,8 +411,28 @@ public class Bitstream
      * @return  <code>List</code> of <code>Bundle</code>s this bitstream
      *          appears in
      */
-    public List getBundles()
+    public Bundle[] getBundles()
+        throws SQLException
     {
-        return null;
+        // Get the bundle table rows
+        TableRowIterator tri = DatabaseManager.query(bContext,
+            "bundle",
+            "SELECT bundle.* FROM bundle, bundle2bitstream WHERE " +
+                "bundle.bundle_id=bundle2bitstream.bundle_id AND " +
+                "bundle2bitstream.bitstream_id=" +
+                bRow.getIntColumn("bitstream_id") + ";" );
+
+        // Build a list of Bundle objects
+        List bundles = new ArrayList();
+        
+        while (tri.hasNext())
+        {
+            bundles.add(new Bundle(bContext, tri.next()));
+        }
+
+        Bundle[] bundleArray = new Bundle[bundles.size()];
+        bundleArray = (Bundle[]) bundles.toArray(bundleArray);
+
+        return bundleArray;
     }
 }

@@ -40,12 +40,19 @@
 
 package org.dspace.content;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Category;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
@@ -56,6 +63,40 @@ import org.dspace.eperson.EPerson;
  */
 public class WorkspaceItem implements InProgressSubmission
 {
+    /** log4j category */
+    private static Category log = Category.getInstance(WorkspaceItem.class);
+
+    /** The item this workspace object pertains to */
+    private Item item;
+    
+    /** Our context */
+    private Context ourContext;
+
+    /** The table row corresponding to this workspace item */
+    private TableRow pwRow;
+
+    /** The collection the item is being submitted to */
+    private Collection collection;
+
+
+    /**
+     * Construct a workspace item corresponding to the given database row
+     *
+     * @param context  the context this object exists in
+     * @param row      the database row
+     */
+    WorkspaceItem(Context context, TableRow row)
+        throws SQLException
+    {
+        ourContext = context;
+        pwRow = row;
+
+        item = Item.find(context, pwRow.getIntColumn("item_id"));
+        collection = Collection.find(context,
+            pwRow.getIntColumn("collection_id"));
+    }
+
+
     /**
      * Get a workspace item from the database.  The item, collection and
      * submitter are loaded into memory.
@@ -68,7 +109,18 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem find(Context context, int id)
         throws SQLException
     {
-        return null;
+        TableRow row = DatabaseManager.find(context,
+            "personalworkspace",
+            id);
+
+        if (row==null )
+        {
+            return null;
+        }
+        else
+        {
+            return new WorkspaceItem(context, row);
+        }
     }
     
 
@@ -85,9 +137,52 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem create(Context context,
                                        Collection coll,
                                        EPerson sub )
-        throws AuthorizeException
+        throws AuthorizeException, SQLException
     {
-        return null;
+        // FIXME Check authorisation
+
+        // Create an item
+        Item i = Item.create(context);
+        i.setSubmitter(sub);
+        
+        // Create the personal workspace row
+        TableRow row = DatabaseManager.create(context, "personalworkspace");
+
+        row.setColumn("item_id", i.getID());
+        row.setColumn("collection_id", coll.getID());
+
+        return new WorkspaceItem(context, row);
+    }
+
+
+    /**
+     * Get all workspace items for a particular e-person
+     *
+     * @param context   the context object
+     * @param ep        the eperson
+     */
+    public static WorkspaceItem[] findByEPerson(Context context, EPerson ep)
+        throws SQLException
+    {
+        List wsItems = new ArrayList();
+
+        TableRowIterator tri = DatabaseManager.query(context,
+            "personalworkspace",
+            "SELECT personalworkspace.* FROM personalworkspace, item WHERE " +
+                "personalworkspace.item_id=item.item_id AND " +
+                "item.submitter_id=" + ep.getID() + ";");
+
+        while(tri.hasNext())
+        {
+            TableRow row = tri.next();
+            WorkspaceItem wi = new WorkspaceItem(context, row);
+            wsItems.add(wi);
+        }
+        
+        WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
+        wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
+
+        return wsArray;
     }
 
 
@@ -96,6 +191,9 @@ public class WorkspaceItem implements InProgressSubmission
      * PersonalWorkspace is removed, a workflow item is created, and the
      * relevant workflow initiated.  If there is no workflow, i.e. the
      * item goes straight into the archive, <code>null</code> is returned.
+     * <P>
+     * An accession date is assigned and a provenance description added.
+     * NO license is added.
      *
      * @return   the workflow item, or <code>null</code> if the item went
      *           straight into the main archive
@@ -103,6 +201,33 @@ public class WorkspaceItem implements InProgressSubmission
     public WorkflowItem startWorkflow()
         throws SQLException, AuthorizeException
     {
+        // FIXME Check auth
+
+        // Set accession date
+        DCDate d = DCDate.getCurrent();
+        item.addDC("date", "accessioned", null, d.toString());
+
+        // Get non-internal format bitstreams
+        Bitstream[] bitstreams = item.getNonInternalBitstreams();
+
+        // Create provenance description
+        String provMessage = "Submitted by" + item.getSubmitter().getFullName() +
+            " (" + item.getSubmitter().getEmail() +
+            ").  DSpace accession date:" + d.toString() +
+            "\n Submission has " + bitstreams.length + " bitstreams:\n";
+
+        // Add sizes and checksums of bitstreams
+        for (int j=0; j < bitstreams.length; j++)
+        {
+            provMessage = provMessage + bitstreams[j].getName() + ": " +
+                bitstreams[j].getSize() + " bytes, checksum: " +
+                bitstreams[j].getChecksum() + " (" + 
+                bitstreams[j].getChecksumAlgorithm()+ ")\n";
+        }
+                    
+        // Add message to the DC
+        item.addDC("description", "provenance", "en", provMessage);
+
         return null;
     }
     
@@ -114,6 +239,13 @@ public class WorkspaceItem implements InProgressSubmission
     public void update()
         throws SQLException, AuthorizeException
     {
+        // FIXME check auth
+    
+        // Update the item
+        item.update();
+        
+        // Update ourselves
+        DatabaseManager.update(ourContext, pwRow);
     }
 
 
@@ -123,8 +255,16 @@ public class WorkspaceItem implements InProgressSubmission
      * notwithstanding.)
      */
     public void delete()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
+        // FIXME Check auth
+    
+        // Need to delete the personalworkspace row first since it refers
+        // to item ID
+        DatabaseManager.delete(ourContext, pwRow);
+        
+        // Delete item
+        item.deleteWithContents();
     }
 
 
@@ -132,54 +272,54 @@ public class WorkspaceItem implements InProgressSubmission
 
     public Item getItem()
     {
-        return null;
+        return item;
     }
     
 
     public Collection getCollection()
     {
-        return null;
+        return collection;
     }
 
     
     public EPerson getSubmitter()
     {
-        return null;
+        return item.getSubmitter();
     }
     
 
     public boolean hasMultipleFiles()
     {
-        return false;
+        return pwRow.getBooleanColumn("multiple_files");
     }
 
     
     public void setMultipleFiles(boolean b)
-        throws AuthorizeException
     {
+        pwRow.setColumn("multiple_files", b);
     }
     
 
     public boolean hasMultipleTitles()
     {
-        return false;
+        return pwRow.getBooleanColumn("multiple_titles");
     }
     
 
     public void setMultipleTitles(boolean b)
-        throws AuthorizeException
     {
+        pwRow.setColumn("multiple_titles", b);
     }
 
 
     public boolean isPublishedBefore()
     {
-        return false;
+        return pwRow.getBooleanColumn("published_before");
     }
 
     
     public void setPublishedBefore(boolean b)
-        throws AuthorizeException
     {
+        pwRow.setColumn("published_before", b);
     }
 }

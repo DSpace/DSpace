@@ -43,10 +43,16 @@ package org.dspace.content;
 import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Category;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 // NOTES/ISSUES:
 //         Transactionally allocate IDs?  I can see a concurrency problem
@@ -61,8 +67,46 @@ import org.dspace.core.Context;
  */
 public class Community
 {
+    /** log4j category */
+    private static Category log = Category.getInstance(Community.class);
+
+    /** Our context */
+    private Context ourContext;
+
+    /** The table row corresponding to this item */
+    private TableRow communityRow;
+
+    /** The logo bitstream */
+    private Bitstream logo;
+
+
     /**
-     * Get a community from the database.  Loads in the metadata 
+     * Construct a community object from a database row.
+     *
+     * @param context  the context this object exists in
+     * @param row      the corresponding row in the table
+     */
+    Community(Context context, TableRow row)
+        throws SQLException
+    {
+        ourContext = context;
+        communityRow = row;
+        
+        // Get the logo bitstream
+        if (communityRow.isColumnNull("logo_bitstream_id"))
+        {
+            logo = null;
+        }
+        else
+        {
+            logo = Bitstream.find(ourContext,
+                communityRow.getIntColumn("logo_bitstream_id"));
+        }
+    }
+
+
+    /**
+     * Get a community from the database.  Loads in the metadata
      *
      * @param  context  DSpace context object
      * @param  id       ID of the community
@@ -72,7 +116,18 @@ public class Community
     public static Community find(Context context, int id)
         throws SQLException
     {
-        return null;
+        TableRow row = DatabaseManager.find(context,
+            "community",
+            id);
+
+        if (row==null )
+        {
+            return null;
+        }
+        else
+        {
+            return new Community(context, row);
+        }
     }
     
 
@@ -86,24 +141,54 @@ public class Community
     public static Community create(Context context)
         throws SQLException, AuthorizeException
     {
-        return null;
+        // FIXME Check authorisation
+
+        TableRow row = DatabaseManager.create(context, "community");
+        return new Community(context, row);
     }
 
     
     /**
-     * Get a list of all communities in the system
+     * Get a list of all communities in the system.  These are alphabetically
+     * sorted by community name.
      *
      * @param  context  DSpace context object
      *
      * @return  the communities in the system
      */
-    public static List getAllCommunities(Context context)
+    public static Community[] getAllCommunities(Context context)
         throws SQLException
     {
-        return null;
+        TableRowIterator tri = DatabaseManager.query(context,
+            "community",
+            "SELECT * FROM community ORDER BY name;");
+        
+        List communities = new ArrayList();
+        
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            communities.add(new Community(context, row));
+        }
+
+        Community[] communityArray = new Community[communities.size()];
+        communityArray = (Community[]) communities.toArray(communityArray);
+        
+        return communityArray;
     }
     
     
+    /**
+     * Get the internal ID of this collection
+     *
+     * @return the internal identifier
+     */
+    public int getID()
+    {
+        return communityRow.getIntColumn("community_id");
+    }
+
+
     /**
      * Get the value of a metadata field
      *
@@ -116,7 +201,7 @@ public class Community
      */
     public String getMetadata(String field)
     {
-        return null;
+        return communityRow.getStringColumn(field);
     }
 
 
@@ -131,6 +216,7 @@ public class Community
      */
     public void setMetadata(String field, String value)
     {
+        communityRow.setColumn(field, value);
     }
 
 
@@ -142,27 +228,52 @@ public class Community
      */
     public Bitstream getLogo()
     {
-        return null;
+        return logo;
     }
 
     
     /**
-     * Give the community a logo.  
+     * Give the community a logo.  Passing in <code>null</code> removes any
+     * existing logo.  Note that <code>update(/code> will need to be called
+     * for the change to take effect.  Setting a logo and not calling
+     * <code>update</code> later may result in a previous logo lying around
+     * as an "orphaned" bitstream.
      *
-     * @param is  stream of a JPEG logo, or <code>null</code> for no logo
+     * @param  newLogo   the bitstream to use as the new logo
      */
-    public void setLogo(InputStream is)
+    public void setLogo(Bitstream newLogo)
+        throws AuthorizeException, IOException, SQLException
     {
+        // FIXME: Check auth
+
+        // First, delete any existing logo
+        if (!communityRow.isColumnNull("logo_bitstream_id"))
+        {
+            logo.delete();
+        }
+
+        if (newLogo==null)
+        {
+            communityRow.setColumnNull("logo_bitstream_id");
+        }
+        else
+        {
+            communityRow.setColumn("logo_bitstream_id", newLogo.getID());
+        }
+
+        logo = newLogo;
     }
     
 
     /**
      * Update the community metadata (including logo) to the database.
-     * Inserts if this is a new community.
      */
     public void update()
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check auth
+
+        DatabaseManager.update(ourContext, communityRow);
     }
 
 
@@ -172,10 +283,29 @@ public class Community
      *
      * @return  List of Collection objects
      */
-    public List getCollections()
+    public Collection[] getCollections()
         throws SQLException
     {
-        return null;
+        List collections = new ArrayList();
+
+        // Get the table rows
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "collection",
+            "SELECT collection.* FROM collection, community2collection WHERE " +
+                "community2collection.collection_id=collection.collection_id AND " +
+                "community2collection.community_id=" + getID() + ";");
+
+        // Make Collection objects
+        while (tri.hasNext())
+        {
+            collections.add(new Collection(ourContext, tri.next()));
+        }
+
+        // Put them in an array
+        Collection[] collectionArray = new Collection[collections.size()];
+        collectionArray = (Collection[]) collections.toArray(collectionArray);
+        
+        return collectionArray;
     }
 
 
@@ -187,7 +317,25 @@ public class Community
     public void addCollection(Collection c)
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check auth
 
+        // Find out if mapping exists
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "community2collection",
+            "SELECT * FROM community2collection WHERE community_id=" +
+                getID() + " AND collection_id=" + c.getID() + ";");
+
+        if (!tri.hasNext())
+        {
+            // No existing mapping, so add one
+            TableRow mappingRow = DatabaseManager.create(ourContext,
+                "community2collection");
+
+            mappingRow.setColumn("community_id", getID());
+            mappingRow.setColumn("collection_id", c.getID());
+
+            DatabaseManager.update(ourContext, mappingRow);
+        }
     }
 
 
@@ -200,6 +348,12 @@ public class Community
     public void removeCollection(Collection c)
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check auth
+
+        // Remove any mappings
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM community2collection WHERE community_id=" +
+                getID() + " AND collection_id=" + c.getID() + ";");
     }
 
 
@@ -208,8 +362,20 @@ public class Community
      * are merely disassociated, they are NOT deleted.
      */
     public void delete()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
+        // FIXME: Check auth
+
+        // Remove any community-collection mappings
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM community2collection WHERE community_id=" +
+                getID() + ";");
+
+        // Remove the logo
+        setLogo(null);
+
+        // Delete community row
+        DatabaseManager.delete(ourContext, communityRow);
     }
 
 
@@ -220,8 +386,27 @@ public class Community
      * community) are NOT deleted.
      */
     public void deleteWithContents()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
+        // FIXME: Check auth
+
+        // First get collections
+        Collection[] collections = getCollections();
+        
+        // Delete ourselves
+        delete();
+
+        // Delete collections if they aren't contained in other collections
+        for (int i=0; i<collections.length; i++)
+        {
+            Community[] communities = collections[i].getCommunities();
+            
+            if (communities.length == 0)
+            {
+                // "Orphaned" collection - delete
+                collections[i].deleteWithContents();
+            }
+        }
     }
 
 

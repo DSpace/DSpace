@@ -55,12 +55,35 @@ public class EPerson
     {
     }
 
+
+    /**
+     * Get the e-person's internal identifier
+     *
+     * @return the internal identifier
+     */
+    public int getID()
+    {
+        return -1;
+    }
+
+
     /**
      * Get the e-person's email address
      *
      * @return  their email address
      */
     public String getEmail()
+    {
+        return "";
+    }
+
+
+    /**
+     * Get the e-person's full name
+     *
+     * @return  their full name
+     */
+    public String getFullName()
     {
         return "";
     }

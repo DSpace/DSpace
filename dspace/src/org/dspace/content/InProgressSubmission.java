@@ -92,8 +92,7 @@ public interface InProgressSubmission
      *
      * @param b  if <code>true</code>, submission may have more than one file.
      */
-    public void setMultipleFiles(boolean b)
-        throws AuthorizeException;
+    public void setMultipleFiles(boolean b);
     
 
     /**
@@ -110,8 +109,7 @@ public interface InProgressSubmission
      *
      * @param b  if <code>true</code>, submission may have more than one title.
      */
-    public void setMultipleTitles(boolean b)
-        throws AuthorizeException;
+    public void setMultipleTitles(boolean b);
 
 
     /**
@@ -129,6 +127,5 @@ public interface InProgressSubmission
      *
      * @param  b  <code>true</code> if it has been published before
      */
-    public void setPublishedBefore(boolean b)
-        throws AuthorizeException;
+    public void setPublishedBefore(boolean b);
 }

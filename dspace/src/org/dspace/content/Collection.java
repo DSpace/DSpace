@@ -43,18 +43,19 @@ package org.dspace.content;
 import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Category;
+
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-
-
-// NOTES/ISSUES:
-//         Transactionally allocate IDs?  I can see a concurrency problem
-//         Throw AuthorizeException at create() or just update()?
-//         Create empty groups for reviewers, editors, wfadmins?
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
@@ -65,6 +66,73 @@ import org.dspace.eperson.Group;
  */
 public class Collection
 {
+    /** log4j category */
+    private static Category log = Category.getInstance(Collection.class);
+
+    /** Our context */
+    private Context ourContext;
+
+    /** The table row corresponding to this item */
+    private TableRow collectionRow;
+
+    /** The logo bitstream */
+    private Bitstream logo;
+    
+    /** The item template */
+    private Item template;
+
+    /** The group of reviewers */
+    private Group reviewers;
+
+    /** The group of workflow admins */
+    private Group workflowAdmins;
+
+    /** The group of editors */
+    private Group editors;
+
+    /** The default group of submitters */
+    private Group submitters;
+
+
+    /**
+     * Construct a collection with the given table row
+     *
+     * @param context  the context this object exists in
+     * @param row      the corresponding row in the table
+     */
+    Collection(Context context, TableRow row)
+        throws SQLException
+    {
+        ourContext = context;
+        collectionRow = row;
+        
+        // Get the logo bitstream
+        if (collectionRow.isColumnNull("logo_bitstream_id"))
+        {
+            logo = null;
+        }
+        else
+        {
+            logo = Bitstream.find(ourContext,
+                collectionRow.getIntColumn("logo_bitstream_id"));
+        }
+
+        // Get the template item
+        if (collectionRow.isColumnNull("template_item_id"))
+        {
+            template = null;
+        }
+        else
+        {
+            template = Item.find(ourContext,
+                collectionRow.getIntColumn("template_item_id"));
+        }
+
+
+        // FIXME: Groups
+    }
+    
+
     /**
      * Get a collection from the database.  Loads in the metadata 
      *
@@ -76,7 +144,18 @@ public class Collection
     public static Collection find(Context context, int id)
         throws SQLException
     {
-        return null;
+        TableRow row = DatabaseManager.find(context,
+            "collection",
+            id);
+
+        if (row==null )
+        {
+            return null;
+        }
+        else
+        {
+            return new Collection(context, row);
+        }
     }
     
     
@@ -88,26 +167,56 @@ public class Collection
      * @return  the newly created collection
      */
     public static Collection create(Context context)
-        throws AuthorizeException
+        throws AuthorizeException, SQLException
     {
-        return null;
+        // FIXME Check authorisation
+
+        TableRow row = DatabaseManager.create(context, "collection");
+        return new Collection(context, row);
     }
 
     
     /**
-     * Get a list of all collections in the system
+     * Get all collections in the system.  These are alphabetically
+     * sorted by collection name.
      *
      * @param  context  DSpace context object
      *
      * @return  the collections in the system
      */
-    public static List getAllCollections(Context context)
+    public static Collection[] getAllCollections(Context context)
         throws SQLException
     {
-        return null;
+        TableRowIterator tri = DatabaseManager.query(context,
+            "collection",
+            "SELECT * FROM collection ORDER BY name;");
+        
+        List collections = new ArrayList();
+        
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            collections.add(new Collection(context, row));
+        }
+
+        Collection[] collectionArray = new Collection[collections.size()];
+        collectionArray = (Collection[]) collections.toArray(collectionArray);
+        
+        return collectionArray;
     }
 
     
+    /**
+     * Get the internal ID of this collection
+     *
+     * @return the internal identifier
+     */
+    public int getID()
+    {
+        return collectionRow.getIntColumn("collection_id");
+    }
+
+
     /**
      * Get the value of a metadata field
      *
@@ -120,7 +229,7 @@ public class Collection
      */
     public String getMetadata(String field)
     {
-        return null;
+        return collectionRow.getStringColumn(field);
     }
 
 
@@ -135,6 +244,7 @@ public class Collection
      */
     public void setMetadata(String field, String value)
     {
+        collectionRow.setColumn(field, value);
     }
 
 
@@ -146,18 +256,40 @@ public class Collection
      */
     public Bitstream getLogo()
     {
-        return null;
+        return logo;
     }
 
     
     /**
-     * Give the collection a logo.  
+     * Give the collection a logo.  Passing in <code>null</code> removes any
+     * existing logo.  Note that <code>update(/code> will need to be called
+     * for the change to take effect.  Setting a logo and not calling
+     * <code>update</code> later may result in a previous logo lying around
+     * as an "orphaned" bitstream.
      *
-     * @param is  stream of a JPEG logo, or <code>null</code> for no logo
+     * @param  newLogo   the bitstream to use as the new logo
      */
-    public void setLogo(InputStream is)
-        throws AuthorizeException, IOException
+    public void setLogo(Bitstream newLogo)
+        throws AuthorizeException, IOException, SQLException
     {
+        // FIXME: Check auth
+
+        // First, delete any existing logo
+        if (!collectionRow.isColumnNull("logo_bitstream_id"))
+        {
+            logo.delete();
+        }
+
+        if (newLogo==null)
+        {
+            collectionRow.setColumnNull("logo_bitstream_id");
+        }
+        else
+        {
+            collectionRow.setColumn("logo_bitstream_id", newLogo.getID());
+        }
+
+        logo = newLogo;
     }
     
     
@@ -168,6 +300,7 @@ public class Collection
      */
     public void setReviewers(Group g)
     {
+        reviewers = g;
     }
 
 
@@ -178,7 +311,7 @@ public class Collection
      */
     public Group getReviewers()
     {
-        return null;
+        return reviewers;
     }
 
 
@@ -189,6 +322,7 @@ public class Collection
      */
     public void setWorkflowAdministrators(Group g)
     {
+        workflowAdmins = g;
     }
 
 
@@ -199,7 +333,7 @@ public class Collection
      */
     public Group getWorkflowAdministrators()
     {
-        return null;
+        return workflowAdmins;
     }
 
 
@@ -210,6 +344,7 @@ public class Collection
      */
     public void setEditors(Group g)
     {
+        editors = g;
     }
 
 
@@ -220,7 +355,7 @@ public class Collection
      */
     public Group getEditors()
     {
-        return null;
+        return editors;
     }
 
 
@@ -236,7 +371,7 @@ public class Collection
      */
     public Group getSubmitters()
     {
-        return null;
+        return submitters;
     }
 
 
@@ -249,7 +384,15 @@ public class Collection
      */
     public String getLicense()
     {
-        return null;
+        String license = collectionRow.getStringColumn("license");
+        
+        if (license == null)
+        {
+            // Fallback to site-wide default
+            license = ConfigurationManager.getDefaultSubmissionLicense();
+        }
+
+        return license;
     }
 
 
@@ -261,6 +404,14 @@ public class Collection
      */
     public void setLicense(String license)
     {
+        if (license==null)
+        {
+            collectionRow.setColumnNull("license");
+        }
+        else
+        {
+            collectionRow.setColumn("license", license);
+        }
     }
 
 
@@ -275,51 +426,89 @@ public class Collection
     public Item getTemplateItem()
         throws SQLException
     {
-        return null;
+        return template;
     }
     
     
     /**
      * Create an empty template item for this collection.  If one already
-     * exists, no action is taken.
+     * exists, no action is taken.  Caution:  Make sure you call
+     * <code>update</code> on the collection after doing this, or the item
+     * will have been created but the collection record will not refer to it.
      */
     public void createTemplateItem()
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check auth
+
+        if (template==null)
+        {
+            template = Item.create(ourContext);
+        }
     }
 
 
     /**
-     * Remove the template item for this collection, if there is one
+     * Remove the template item for this collection, if there is one.  Note
+     * that since this has to remove the old template item ID from the
+     * collection record in the database, the colletion record will be changed,
+     * including any other changes made; in other words, this method does
+     * an <code>update</code>.
      */
     public void removeTemplateItem()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
+        // FIXME: Check auth
+        
+        collectionRow.setColumnNull("template_item_id");
+        DatabaseManager.update(ourContext, collectionRow);
+        
+        if (template!=null)
+        {
+            template.deleteWithContents();
+            template = null;
+        }
     }
 
 
     /**
      * Add an item to the collection.  This simply adds a relationship between
      * the item and the collection - it does nothing like set an issue date,
-     * remove a personal workspace item etc.
+     * remove a personal workspace item etc.  This has instant effect;
+     * <code>update</code> need not be called.
      *
      * @param item  item to add
      */
     public void addItem(Item item)
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check auth
+        
+        // Create mapping
+        TableRow row = DatabaseManager.create(ourContext, "collection2item");
+
+        row.setColumn("collection_id", getID());
+        row.setColumn("item_id", item.getID());
+
+        DatabaseManager.update(ourContext, row);
     }
 
 
     /**
      * Remove an item.  Does not delete the item, just the
-     * relationship.
+     * relationship.  Has instant effect; <code>update</code> need not be
+     * called.
      *
      * @param item  item to remove
      */
     public void removeItem(Item item)
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check auth
+
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM collection2item WHERE collection_id=" + getID() +
+            " AND item_id=" + item.getID() + ";");
     }
 
 
@@ -330,6 +519,9 @@ public class Collection
     public void update()
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check auth
+
+        DatabaseManager.update(ourContext, collectionRow);
     }
 
 
@@ -340,8 +532,21 @@ public class Collection
      * is removed.
      */
     public void delete()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
+        // FIXME: Check auth
+
+        // Delete collection-item mappings
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM collection2item WHERE collection_id=" + getID() + ";");
+
+        // Delete bitstream logo
+        setLogo(null);
+        
+        // Delete collection row
+        DatabaseManager.delete(ourContext, collectionRow);
+
+        // FIXME: Groups?
     }
 
 
@@ -353,8 +558,43 @@ public class Collection
      * is removed.
      */
     public void deleteWithContents()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
+        // FIXME: Check auth
+
+        // Get items
+        TableRowIterator items = DatabaseManager.query(ourContext,
+            "item",
+            "SELECT item.* FROM item, collection2item WHERE " +
+                "collection2item.item_id=item.item_id AND " +
+                "collection2item.collection_id=" + getID() + ";");
+                
+
+        // Delete collection-item mappings
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM collection2item WHERE collection_id=" + getID() + ";");
+
+        // Delete community-collection mappings
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM community2collection WHERE collection_id=" + getID() +
+                ";");
+        
+
+        // Delete items if they aren't contained within other collections
+        while (items.hasNext())
+        {
+            Item i = new Item(ourContext, items.next());
+
+            Collection[] collections = i.getCollections();
+
+            if (collections.length == 0)
+            {
+                // Orphaned item; delete
+                i.deleteWithContents();
+            }
+        }
+
+        // FIXME: Groups?
     }
 
 
@@ -368,6 +608,7 @@ public class Collection
     public List getRecentAdditions(int n)
         throws SQLException
     {
+        // FIXME: Use browse code
         return null;
     }
 
@@ -377,9 +618,29 @@ public class Collection
      *
      * @return   a <code>List</code> of <code>Community</code> objects
      */
-    public List getCommunities()
+    public Community[] getCommunities()
         throws SQLException
     {
-        return null;
+        // Get the bundle table rows
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "community",
+            "SELECT community.* FROM community, community2collection WHERE " +
+                "community.community_id=community2collection.community_id AND " +
+                "community2collection.collection_id=" +
+                getID() + ";" );
+
+        // Build a list of Community objects
+        List communities = new ArrayList();
+        
+        while (tri.hasNext())
+        {
+            // FIXME
+            //communities.add(new Community(ourContext, tri.next()));
+        }
+
+        Community[] communityArray = new Community[communities.size()];
+        communityArray = (Community[]) communities.toArray(communityArray);
+
+        return communityArray;
     }
 }

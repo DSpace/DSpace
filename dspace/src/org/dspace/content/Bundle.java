@@ -40,11 +40,18 @@
 
 package org.dspace.content;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
@@ -55,6 +62,52 @@ import org.dspace.core.Context;
  */
 public class Bundle
 {
+    /** Our context */
+    private Context ourContext;
+
+    /** The table row corresponding to this bundle */
+    private TableRow bundleRow;
+    
+    /** The bitstreams in this bundle */
+    private List bitstreams;
+
+    /**
+     * True if the bitstreams have changed since reading from the DB
+     * or the last update()
+     */
+    private boolean bitstreamsChanged;
+
+
+    /**
+     * Construct a bundle object with the given table row
+     *
+     * @param context  the context this object exists in
+     * @param row      the corresponding row in the table
+     */
+    Bundle(Context context, TableRow row)
+        throws SQLException
+    {
+        ourContext = context;
+        bundleRow = row;
+        bitstreamsChanged = false;
+        bitstreams = new ArrayList();
+        
+        // Get bitstreams
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "bitstream",
+            "SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE " +
+                "bundle2bitstream.bitstream_id=bitstream.bitstream_id AND " +
+                "bundle2bitstream.bundle_id=" +
+                bundleRow.getIntColumn("bundle_id") + ";");
+
+        while (tri.hasNext())
+        {
+            TableRow r = (TableRow) tri.next();
+            bitstreams.add(new Bitstream(ourContext,r));
+        }
+    }
+
+    
     /**
      * Get a bundle from the database.  The bundle and bitstream metadata are
      * all loaded into memory.
@@ -67,9 +120,21 @@ public class Bundle
     static Bundle find(Context context, int id)
         throws SQLException
     {
-        return null;
+        TableRow row = DatabaseManager.find(context,
+            "bundle",
+            id);
+
+        if (row==null )
+        {
+            return null;
+        }
+        else
+        {
+            return new Bundle(context, row);
+        }
     }
     
+
     /**
      * Create a new bundle, with a new ID.  Not inserted in database.
      *
@@ -78,9 +143,24 @@ public class Bundle
      * @return  the newly created bundle
      */
     public static Bundle create(Context context)
-        throws AuthorizeException
+        throws AuthorizeException, SQLException
     {
-        return null;
+        // FIXME: Check authorisation 
+        
+        // Create a table row
+        TableRow row = DatabaseManager.create(context, "bundle");
+        return new Bundle(context, row);
+    }
+
+
+    /**
+     * Get the internal identifier of this bundle
+     *
+     * @return the internal identifier
+     */
+    public int getID()
+    {
+        return bundleRow.getIntColumn("bundle_id");
     }
 
 
@@ -89,9 +169,12 @@ public class Bundle
      *
      * @return the bitstreams
      */
-    public List getBitstreams()
+    public Bitstream[] getBitstreams()
     {
-        return null;
+        Bitstream[] bitstreamArray = new Bitstream[bitstreams.size()];
+        bitstreamArray = (Bitstream[]) bitstreams.toArray(bitstreamArray);
+        
+        return bitstreamArray;
     }
     
 
@@ -101,9 +184,29 @@ public class Bundle
      * @return <code>List<code> of <code>Item</code>s this bundle appears
      *         in
      */
-    public List getItems()
+    public Item[] getItems()
+        throws SQLException
     {
-        return null;
+        List items = new ArrayList();
+
+        // Get items
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "item",
+            "select item.* from item, item2bundle where " +
+                "item2bundle.item_id=item.item_id AND " +
+                "item2bundle.bundle_id=" +
+                bundleRow.getIntColumn("bundle_id") + ";");
+
+        while (tri.hasNext())
+        {
+            TableRow r = (TableRow) tri.next();
+            items.add(new Item(ourContext,r));
+        }
+        
+        Item[] itemArray = new Item[items.size()];
+        itemArray = (Item[]) items.toArray(itemArray);
+        
+        return itemArray;
     }
     
 
@@ -112,20 +215,51 @@ public class Bundle
      *
      * @param b  the bitstream to add
      */
-    public void addBitstream( Bitstream b )
+    public void addBitstream(Bitstream b)
         throws AuthorizeException
     {
+        // FIXME Check authorisation
+
+        // First check that the bitstream isn't already in the list
+        for (int i=0; i<bitstreams.size(); i++)
+        {
+            Bitstream existing = (Bitstream) bitstreams.get(i);
+            if (b.getID()==existing.getID())
+            {
+                // Bitstream is already there; no change
+                return;
+            }
+        }
+        
+        // Add the bitstream
+        bitstreams.add(b);
+        bitstreamsChanged = true;
     }
     
 
     /**
-     * Remove a bitstream
+     * Remove a bitstream from this bundle - the bitstream is not deleted
      *
      * @param b  the bitstream to remove
      */
-    public void removeBitstream( Bitstream b )
+    public void removeBitstream(Bitstream b)
         throws AuthorizeException
     {
+        // FIXME Check authorisation
+
+        ListIterator li = bitstreams.listIterator();
+
+        while (li.hasNext())
+        {
+            Bitstream existing = (Bitstream) li.next();
+
+            if (b.getID()==existing.getID())
+            {
+                // We've found the bitstream to remove
+                li.remove();               
+                bitstreamsChanged = true;
+            }
+        }
     }
 
 
@@ -135,6 +269,33 @@ public class Bundle
     public void update()
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check authorisation
+
+        DatabaseManager.update(ourContext, bundleRow);
+        
+        // Redo bitstream mappings if they've changed
+        if (bitstreamsChanged)
+        {
+            // Remove any existing mappings
+            DatabaseManager.updateQuery(ourContext,
+                "delete from bundle2bitstream where bundle_id=" + getID());
+
+            // Add new mappings
+            Iterator i = bitstreams.iterator();
+
+            while (i.hasNext())
+            {
+                Bitstream b = (Bitstream) i.next();
+
+                TableRow mappingRow = DatabaseManager.create(ourContext,
+                    "bundle2bitstream");
+                mappingRow.setColumn("bundle_id", getID());
+                mappingRow.setColumn("bitstream_id", b.getID());
+                DatabaseManager.update(ourContext,mappingRow);
+            }
+
+            bitstreamsChanged = false;
+        }
     }
 
 
@@ -146,6 +307,18 @@ public class Bundle
     public void delete()
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check authorisation
+
+        // Remove item-bundle mappings
+        DatabaseManager.updateQuery(ourContext,
+            "delete from item2bundle where bundle_id="+getID());
+
+        // Remove bundle-bitstream mappings
+        DatabaseManager.updateQuery(ourContext,
+            "delete from bundle2bitstream where bitstream_id="+getID());
+
+        // Remove ourself
+        DatabaseManager.delete(ourContext, bundleRow);
     }
 
 
@@ -155,7 +328,31 @@ public class Bundle
      * in other bundles are NOT deleted.
      */
     public void deleteWithContents()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
+        // FIXME: Check authorisation
+
+        // First delete ourselves
+        delete();
+        
+        // Now see if any of our bitstreams were in other bundles
+        Iterator i = bitstreams.iterator();
+
+        while (i.hasNext())
+        {
+            Bitstream b = (Bitstream) i.next();
+            
+            // Try and find any mapping rows pertaining to the bitstream
+            TableRowIterator tri = DatabaseManager.query(ourContext,
+                "bundle2bitstream",
+                "select * from bundle2bitstream where bitstream_id=" +
+                    b.getID());
+            
+            if (tri.toList().size()==0)
+            {
+                // The bitstream is not in any other bundle, so delete it
+                b.delete();
+            }
+        }
     }
 }

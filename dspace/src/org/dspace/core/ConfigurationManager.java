@@ -41,6 +41,9 @@
 
 package org.dspace.core;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
@@ -70,6 +73,9 @@ public class ConfigurationManager
 
     /** The configuration properties */
     private static Properties properties = null;
+
+    /** The default license */
+    private static String license;
 
 
     /**
@@ -183,6 +189,22 @@ public class ConfigurationManager
 
 
     /**
+     * Get the site-wide default license that submitters need to grant
+     *
+     * @return  the default license
+     */
+    public static String getDefaultSubmissionLicense()
+    {
+        if (properties==null)
+        {
+            loadProperties();
+        }
+
+        return license;
+    }
+
+
+    /**
      * Load the properties if they aren't already loaded
      */
     private static void loadProperties()
@@ -218,6 +240,21 @@ public class ConfigurationManager
                 properties = new Properties();
                 properties.load(is);
             }
+
+            // Load in default license
+            String licenseFile = getProperty("dspace.dir") + File.separator + 
+                "config" + File.separator + "default.license";
+
+            BufferedReader br = new BufferedReader(new FileReader(licenseFile));
+            String lineIn;            
+            license = "";
+
+            while ((lineIn = br.readLine()) != null)
+            {
+                license = license + lineIn;
+            }
+            
+            is.close();
         }
         catch (IOException e)
         {

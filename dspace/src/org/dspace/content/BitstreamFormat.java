@@ -44,6 +44,8 @@ import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 
 
 /**
@@ -60,19 +62,37 @@ public class BitstreamFormat
      */
     public static final int UNKNOWN = 0;
     
-
     /**
      * The "known" support level - for bitstream formats that are known to
      * the system, but not fully supported
      */
     public static final int KNOWN = 1;
     
-
     /**
      * The "supported" support level - for bitstream formats known to the
      * system and fully supported.
      */
     public static final int SUPPORTED = 2;
+
+    /** Our context */
+    private Context bfContext;
+
+    /** The row in the table representing this format */
+    private TableRow bfRow;
+
+
+    /**
+     * Class constructor for creating a BitstreamFormat object
+     * based on the contents of a DB table row.
+     *
+     * @param context  the context this object exists in
+     * @param row      the corresponding row in the table
+     */
+    BitstreamFormat(Context context, TableRow row)
+    {
+        bfContext = context;
+        bfRow = row;
+    }
 
 
     /**
@@ -86,7 +106,18 @@ public class BitstreamFormat
     public static BitstreamFormat find(Context context, int id)
         throws SQLException
     {
-        return null;
+        TableRow row = DatabaseManager.find(context,
+            "bitstreamtyperegistry",
+            id);
+
+        if (row==null )
+        {
+            return null;
+        }
+        else
+        {
+            return new BitstreamFormat(context, row);
+        }
     }
 
     
@@ -98,7 +129,22 @@ public class BitstreamFormat
     public static BitstreamFormat create(Context context)
         throws SQLException, AuthorizeException
     {
-        return null;
+        // FIXME: Check authorisation 
+        
+        // Create a table row
+        TableRow row = DatabaseManager.create(context, "bitstreamtyperegistry");        
+        return new BitstreamFormat(context, row);
+    }
+
+
+    /**
+     * Get the internal identifier of this bitstream format
+     *
+     * @return the internal identifier
+     */
+    public int getID()
+    {
+        return bfRow.getIntColumn("bitstream_type_id");
     }
 
 
@@ -109,7 +155,7 @@ public class BitstreamFormat
      */
     public String getShortDescription()
     {
-        return null;
+        return bfRow.getStringColumn("short_description");
     }
 
 
@@ -120,6 +166,7 @@ public class BitstreamFormat
      */
     public void setShortDescription(String s)
     {
+        bfRow.setColumn("short_description", s);
     }
 
 
@@ -131,7 +178,7 @@ public class BitstreamFormat
      */
     public String getDescription()
     {
-        return null;
+        return bfRow.getStringColumn("description");
     }
 
 
@@ -142,6 +189,7 @@ public class BitstreamFormat
      */
     public void setDescription(String s)
     {
+        bfRow.setColumn("description", s);
     }
 
 
@@ -153,7 +201,7 @@ public class BitstreamFormat
      */
     public String getMIMEType()
     {
-        return null;
+        return bfRow.getStringColumn("mimetype");
     }
 
 
@@ -164,6 +212,7 @@ public class BitstreamFormat
      */
     public void setMIMEType(String s)
     {
+        bfRow.setColumn("mimetype", s);
     }
 
 
@@ -175,7 +224,7 @@ public class BitstreamFormat
      */
     public int getSupportLevel()
     {
-        return UNKNOWN;
+        return bfRow.getIntColumn("support_level");
     }
 
 
@@ -187,6 +236,15 @@ public class BitstreamFormat
      */
     public void setSupportLevel(int sl)
     {
+        // Sanity check
+        if (sl < 0 || sl > 2 )
+        {
+            throw new IllegalArgumentException("Invalid support level");
+        }
+        else
+        {
+            bfRow.setColumn("support_level", sl);
+        }
     }
 
 
@@ -200,7 +258,7 @@ public class BitstreamFormat
      */
     public boolean isInternal()
     {
-        return false;
+        return bfRow.getBooleanColumn("internal");
     }
 
 
@@ -212,6 +270,7 @@ public class BitstreamFormat
      */
     public void setInternal(boolean b)
     {
+        bfRow.setColumn("internal", b);
     }
 
 
@@ -221,5 +280,8 @@ public class BitstreamFormat
     public void update()
         throws SQLException, AuthorizeException
     {
+        // FIXME: Check authorisation
+
+        DatabaseManager.update(bfContext, bfRow);
     }
 }

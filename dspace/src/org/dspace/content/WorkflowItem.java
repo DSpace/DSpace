@@ -43,9 +43,14 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.log4j.Category;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 
 
 /**
@@ -56,6 +61,40 @@ import org.dspace.eperson.EPerson;
  */
 public class WorkflowItem implements InProgressSubmission
 {
+    /** log4j category */
+    private static Category log = Category.getInstance(WorkflowItem.class);
+
+    /** The item this workflow object pertains to */
+    private Item item;
+    
+    /** Our context */
+    private Context ourContext;
+
+    /** The table row corresponding to this workflow item */
+    private TableRow wfRow;
+
+    /** The collection the item is being submitted to */
+    private Collection collection;
+
+
+    /**
+     * Construct a workspace item corresponding to the given database row
+     *
+     * @param context  the context this object exists in
+     * @param row      the database row
+     */
+    WorkflowItem(Context context, TableRow row)
+        throws SQLException
+    {
+        ourContext = context;
+        wfRow = row;
+
+        item = Item.find(context, wfRow.getIntColumn("item_id"));
+        collection = Collection.find(context,
+            wfRow.getIntColumn("collection_id"));
+    }
+
+
     /**
      * Get a workflow item from the database.  The item, collection and
      * submitter are loaded into memory.
@@ -68,7 +107,29 @@ public class WorkflowItem implements InProgressSubmission
     public static WorkflowItem find(Context context, int id)
         throws SQLException
     {
-        return null;
+        TableRow row = DatabaseManager.find(context,
+            "workflowitem",
+            id);
+
+        if (row==null )
+        {
+            return null;
+        }
+        else
+        {
+            return new WorkflowItem(context, row);
+        }
+    }
+
+
+    /**
+     * Get the internal ID of this workflow item
+     *
+     * @return the internal identifier
+     */
+    public int getID()
+    {
+        return wfRow.getIntColumn("workflow_id");
     }
 
 
@@ -81,7 +142,29 @@ public class WorkflowItem implements InProgressSubmission
     public WorkspaceItem returnToWorkspace()
         throws SQLException, AuthorizeException
     {
-        return null;
+        // FIXME: How should this interact with the workflow system?
+        // FIXME: Remove license
+        // FIXME: Provenance statement?
+        
+        // Remove accession date
+        item.clearDC("date", "accessioned", Item.ANY);
+        item.update();
+
+        // Create the new personal workspace row
+        TableRow row = DatabaseManager.create(ourContext, "personalworkspace");
+        row.setColumn("item_id", item.getID());
+        row.setColumn("collection_id", collection.getID());
+
+        WorkspaceItem wi = new WorkspaceItem(ourContext, row);
+        wi.setMultipleFiles(hasMultipleFiles());
+        wi.setMultipleTitles(hasMultipleTitles());
+        wi.setPublishedBefore(isPublishedBefore());
+        wi.update();
+        
+        // Now remove the workflow object
+        DatabaseManager.delete(ourContext, wfRow);
+
+        return wi;
     }
 
     
@@ -95,7 +178,66 @@ public class WorkflowItem implements InProgressSubmission
     public Item archive()
         throws SQLException, AuthorizeException
     {
-        return null;
+        // FIXME: Check auth
+
+        // Remove workflow item
+        DatabaseManager.delete(ourContext, wfRow);
+
+        // Add item to collection
+        collection.addItem(item);
+
+        // FIXME: Assign handle
+        // FIXME: Add handle as identifier.uri DC value
+
+        // Add format.mimetype and format.extent DC values
+        Bitstream[] bitstreams = item.getNonInternalBitstreams();
+        
+        for (int i=0; i < bitstreams.length; i++)
+        {
+            BitstreamFormat bf = bitstreams[i].getFormat();
+            item.addDC("format",
+                "extent",
+                null,
+                String.valueOf(bitstreams[i].getSize()));
+            item.addDC("format", "mimetype", null, bf.getMIMEType());
+        }
+
+        // Assign issue date, if none exists, and build up provenance
+        DCDate now = DCDate.getCurrent();
+
+        String currentDateIssued[] = item.getDC("date",
+            "issued",
+            null);
+
+        String provDescription = "Made available in DSpace on " + now +
+            " (GMT).";
+
+        if (currentDateIssued.length == 0)
+        {
+            item.addDC("date", "issued", null, now.toString());
+        }
+        else
+        {
+            DCDate d = new DCDate(currentDateIssued[0]);
+            provDescription = provDescription + "  Previous issue date: " +
+                d.toString();
+        }
+
+        // Add provenance description
+        item.addDC("description", "provenance", "en", provDescription);
+
+        // Set in_archive bit
+        item.setArchived(true);
+        item.update();
+        
+        // Log the event
+        log.info(LogManager.getHeader(
+            ourContext,
+            "install_item",
+            "workflow_id=" + getID() + ", item_id=" + item.getID() +
+            "handle=FIXME"));
+
+        return item;
     }
 
 
@@ -103,54 +245,54 @@ public class WorkflowItem implements InProgressSubmission
 
     public Item getItem()
     {
-        return null;
+        return item;
     }
     
 
     public Collection getCollection()
     {
-        return null;
+        return collection;
     }
 
     
     public EPerson getSubmitter()
     {
-        return null;
+        return item.getSubmitter();
     }
     
 
     public boolean hasMultipleFiles()
     {
-        return false;
+        return wfRow.getBooleanColumn("multiple_files");
     }
 
     
     public void setMultipleFiles(boolean b)
-        throws AuthorizeException
     {
+        wfRow.setColumn("multiple_files", b);
     }
     
 
     public boolean hasMultipleTitles()
     {
-        return false;
+        return wfRow.getBooleanColumn("multiple_titles");
     }
     
 
     public void setMultipleTitles(boolean b)
-        throws AuthorizeException
     {
+        wfRow.setColumn("multiple_titles", b);
     }
 
 
     public boolean isPublishedBefore()
     {
-        return false;
+        return wfRow.getBooleanColumn("published_before");
     }
 
     
     public void setPublishedBefore(boolean b)
-        throws AuthorizeException
     {
+        wfRow.setColumn("published_before", b);
     }
 }
