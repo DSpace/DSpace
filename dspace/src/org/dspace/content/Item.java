@@ -451,11 +451,11 @@ public class Item extends DSpaceObject
         // until update() is called.
         for (int i = 0; i < values.length; i++)
         {
-            DCValue dcv = new DCValue();
-            dcv.element = element;
-            dcv.qualifier = qualifier;
+            DCValue dcv  = new DCValue();
+            dcv.element  = element;
+            dcv.qualifier= qualifier;
             dcv.language = lang;
-            dcv.value = values[i].trim();
+            dcv.value    = values[i].trim();
             dublinCore.add(dcv);
         }
 
@@ -1274,8 +1274,7 @@ public class Item extends DSpaceObject
             removeBundle(bundles[i]);
         }
 
-        // and all of our authorization policies
-        // FIXME: not very "multiple-inclusion" friendly
+        // remove all of our authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
         // Remove any Handle
