@@ -947,8 +947,11 @@ public class Item implements DSpaceObject
 
             // probably serious troubles with Authorizations
             // fix by telling system not to check authorization?            
-            removeBundle(buns[i]);
-        }    
+            if (removethisbundle)
+            {
+                removeBundle(buns[i]);
+            }
+        }
     }
 
 
