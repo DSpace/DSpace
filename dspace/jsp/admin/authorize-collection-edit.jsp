@@ -86,7 +86,8 @@
     <h1>Policies for collection <%= collection.getMetadata("name") %> (ID=<%= collection.getID() %>)</h1>
 
     <P align="center">
-        <form method=POST>
+
+        <form action="<%= request.getContextPath() %>/admin/authorize" method=POST>
             <input type="hidden" name="collection_id" value="<%=collection.getID()%>" >
             <input type="submit" name="submit_collection_add_policy" value="Add New">
         </form>

@@ -224,6 +224,17 @@
 <%  } %>                    
                 </td>
             </tr>   
+<%-- ===========================================================
+     Edit collection's policies
+     =========================================================== --%>
+            <tr>
+                <td class="submitFormLabel">Collection's Authorizations:</td>
+                <td>
+                    <input type="submit" name="submit_authorization_edit" value="Edit...">
+                </td>
+            </tr>   
+
+
         </table>
         
         <P>&nbsp;</P>

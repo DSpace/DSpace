@@ -77,8 +77,10 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                     HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
+        // handle gets and posts with the post method
+        doDSPost(c, request, response);
         // show the main page (select communities, collections, items, etc)
-        showMainPage(c, request, response);
+//        showMainPage(c, request, response);
     }
     
     protected void doDSPost(Context c,
@@ -86,7 +88,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit");
-        
+
         if( button.equals("submit_collection") )
         {
             // select a collection to work on
@@ -118,18 +120,6 @@ public class AuthorizeAdminServlet extends DSpaceServlet
         {
             // select an item to work on
             JSPManager.showJSP(request, response, "/admin/item-select.jsp" );            
-        }
-        else if( button.equals("submit_collection_select") )
-        {
-            // edit the collection's permissions
-            Collection collection      = Collection.find(c,
-                UIUtil.getIntParameter(request, "collection_id"));
-            List policies = AuthorizeManager.getPolicies(c, collection);
-            
-            request.setAttribute("collection", collection );
-            request.setAttribute("policies", policies     );
-            JSPManager.showJSP(request, response,
-                "/admin/authorize-collection-edit.jsp" );
         }
 
         // ITEMS ////////////////////////////////////////////////////
@@ -584,6 +574,18 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             // return to the main page
             showMainPage(c, request, response);
 
+        }
+        else if( button.equals("submit_collection_select") )
+        {
+            // edit the collection's permissions
+            Collection collection      = Collection.find(c,
+                UIUtil.getIntParameter(request, "collection_id"));
+            List policies = AuthorizeManager.getPolicies(c, collection);
+            
+            request.setAttribute("collection", collection );
+            request.setAttribute("policies", policies     );
+            JSPManager.showJSP(request, response,
+                "/admin/authorize-collection-edit.jsp" );
         }
         else
         {

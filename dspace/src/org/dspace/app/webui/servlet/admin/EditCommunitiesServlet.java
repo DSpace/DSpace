@@ -359,6 +359,13 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Show edit page again - attributes set in doDSPost()
             JSPManager.showJSP(request, response, "/admin/edit-community.jsp");
         }
+        else if(button.equals("submit_authorization_edit"))
+        {
+            // Forward to policy edit page
+            response.sendRedirect(response.encodeRedirectURL(
+                request.getContextPath() + "/admin/authorize?community_id=" +
+                    community.getID() + "&submit_community_select=1"));
+        }
         else
         {
             // Button at bottom clicked - show main control page
@@ -471,6 +478,13 @@ public class EditCommunitiesServlet extends DSpaceServlet
             response.sendRedirect(response.encodeRedirectURL(
                 request.getContextPath() + "/admin/groups?group=" +
                     newGroup.getID()));
+        }
+        else if(button.equals("submit_authorization_edit"))
+        {
+            // Forward to policy edit page
+            response.sendRedirect(response.encodeRedirectURL(
+                request.getContextPath() + "/admin/authorize?collection_id=" +
+                    collection.getID() + "&submit_collection_select=1"));
         }
         else if(button.startsWith("submit_wf_edit_"))
         {

@@ -86,8 +86,7 @@
                parenttitle="Administer">
 
     <h1>Edit Policy for <%= edit_title %>:</h1>
-
-    <form method=POST>
+    <form action="<%= request.getContextPath() %>/admin/authorize" method=POST>
 
     <table class="miscTable" align="center">
         <tr>     

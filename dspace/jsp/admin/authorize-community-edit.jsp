@@ -82,7 +82,7 @@
     <h1>Policies for community <%= community.getMetadata("name") %> (ID=<%=community.getID()%>)</h1>
 
     <P align="center">
-        <form method=POST>
+        <form action="<%= request.getContextPath() %>/admin/authorize" method=POST>
             <input type="hidden" name="community_id" value="<%=community.getID()%>" >
             <input type="submit" name="submit_community_add_policy" value="Add New">
         </form>

@@ -160,6 +160,17 @@
 <%  } %>
                 </td>
             </tr>
+<%-- ===========================================================
+     Edit community's policies
+     =========================================================== --%>
+            <tr>
+                <td class="submitFormLabel">Community's Authorizations:</td>
+                <td>
+                    <input type="submit" name="submit_authorization_edit" value="Edit...">
+                </td>
+            </tr>   
+
+
         </table>
 
         <P>&nbsp;</P>
