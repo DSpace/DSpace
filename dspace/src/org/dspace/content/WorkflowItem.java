@@ -42,7 +42,7 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -61,7 +61,7 @@ import org.dspace.storage.rdbms.TableRow;
 public class WorkflowItem implements InProgressSubmission
 {
     /** log4j category */
-    private static Category log = Category.getInstance(WorkflowItem.class);
+    private static Logger log = Logger.getLogger(WorkflowItem.class);
 
     /** The item this workflow object pertains to */
     private Item item;
@@ -112,10 +112,24 @@ public class WorkflowItem implements InProgressSubmission
 
         if (row == null)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_workflow_item",
+                    "not_found,workflow_item_id=" + id));
+            }
+
             return null;
         }
         else
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_workflow_item",
+                    "workflow_item_id=" + id));
+            }
+
             return new WorkflowItem(context, row);
         }
     }
@@ -160,6 +174,10 @@ public class WorkflowItem implements InProgressSubmission
         wi.setPublishedBefore(isPublishedBefore());
         wi.update();
         
+        log.info(LogManager.getHeader(ourContext,
+            "return_to_workspace",
+            "workflow_item_id=" + getID() + "workspace_id=" + wi.getID()));
+
         // Now remove the workflow object
         DatabaseManager.delete(ourContext, wfRow);
 
@@ -178,6 +196,11 @@ public class WorkflowItem implements InProgressSubmission
         throws SQLException, AuthorizeException
     {
         // FIXME: Check auth
+
+        log.info(LogManager.getHeader(ourContext,
+            "archive_item",
+            "workflow_item_id=" + getID() + "item_id=" + item.getID() +
+                "collection_id=" + collection.getID()));
 
         // Remove workflow item
         DatabaseManager.delete(ourContext, wfRow);
@@ -237,6 +260,26 @@ public class WorkflowItem implements InProgressSubmission
             "handle=FIXME"));
 
         return item;
+    }
+
+
+    /**
+     * Update the workflow item, including the unarchived item.
+     */
+    public void update()
+        throws SQLException, AuthorizeException
+    {
+        // FIXME check auth
+    
+        log.info(LogManager.getHeader(ourContext,
+            "update_workflow_item",
+            "workflow_item_id=" + getID()));
+
+        // Update the item
+        item.update();
+        
+        // Update ourselves
+        DatabaseManager.update(ourContext, wfRow);
     }
 
 

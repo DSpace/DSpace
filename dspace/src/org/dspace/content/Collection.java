@@ -40,16 +40,18 @@
 
 package org.dspace.content;
 
+import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -65,7 +67,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class Collection
 {
     /** log4j category */
-    private static Category log = Category.getInstance(Collection.class);
+    private static Logger log = Logger.getLogger(Collection.class);
 
     /** Our context */
     private Context ourContext;
@@ -148,28 +150,46 @@ public class Collection
 
         if (row == null)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_collection",
+                    "not_found,collection_id=" + id));
+            }
+
             return null;
         }
         else
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_collection",
+                    "collection_id=" + id));
+            }
+
             return new Collection(context, row);
         }
     }
 
 
     /**
-     * Create a new collection, with a new ID.  Not inserted in database.
+     * Create a new collection, with a new ID.  This method is not public,
+     * and does not check authorisation.
      *
      * @param  context  DSpace context object
      *
      * @return  the newly created collection
      */
-    public static Collection create(Context context)
-        throws AuthorizeException, SQLException
+    static Collection create(Context context)
+        throws SQLException
     {
-        // FIXME Check authorisation
-
         TableRow row = DatabaseManager.create(context, "collection");
+
+        log.info(LogManager.getHeader(context,
+            "create_collection",
+            "collection_id=" + row.getIntColumn("collection_id")));
+
         return new Collection(context, row);
     }
 
@@ -260,14 +280,18 @@ public class Collection
 
     /**
      * Give the collection a logo.  Passing in <code>null</code> removes any
-     * existing logo.  Note that <code>update(/code> will need to be called
-     * for the change to take effect.  Setting a logo and not calling
-     * <code>update</code> later may result in a previous logo lying around
-     * as an "orphaned" bitstream.
+     * existing logo.  You will need to set the format of the new logo
+     * bitstream before it will work, for example to "JPEG".  Note that
+     * <code>update(/code> will need to be called for the change to take
+     * effect.  Setting a logo and not calling <code>update</code> later may
+     * result in a previous logo lying around as an "orphaned" bitstream.
      *
-     * @param  newLogo   the bitstream to use as the new logo
+     * @param  is   the stream to use as the new logo
+     *
+     * @return   the new logo bitstream, or <code>null</code> if there is no
+     *           logo (<code>null</code> was passed in)
      */
-    public void setLogo(Bitstream newLogo)
+    public Bitstream setLogo(InputStream is)
         throws AuthorizeException, IOException, SQLException
     {
         // FIXME: Check auth
@@ -278,16 +302,28 @@ public class Collection
             logo.delete();
         }
 
-        if (newLogo == null)
+        if (is == null)
         {
             collectionRow.setColumnNull("logo_bitstream_id");
+            logo = null;
+
+            log.info(LogManager.getHeader(ourContext,
+                "remove_logo",
+                "collection_id=" + getID()));
         }
         else
         {
+            Bitstream newLogo = Bitstream.create(ourContext, is);
             collectionRow.setColumn("logo_bitstream_id", newLogo.getID());
-        }
+            logo = newLogo;
 
-        logo = newLogo;
+            log.info(LogManager.getHeader(ourContext,
+                "set_logo",
+                "collection_id=" + getID() +
+                    "logo_bitstream_id=" + newLogo.getID()));
+        }
+        
+        return logo;
     }
 
 
@@ -442,6 +478,11 @@ public class Collection
         if (template == null)
         {
             template = Item.create(ourContext);
+
+            log.info(LogManager.getHeader(ourContext,
+                "create_template_item",
+                "collection_id=" + getID() +
+                    ",template_item_id=" + template.getID()));
         }
     }
 
@@ -463,6 +504,11 @@ public class Collection
 
         if (template != null)
         {
+            log.info(LogManager.getHeader(ourContext,
+                "remove_template_item",
+                "collection_id=" + getID() +
+                    ",template_item_id=" + template.getID()));
+
             template.deleteWithContents();
             template = null;
         }
@@ -481,6 +527,11 @@ public class Collection
         throws SQLException, AuthorizeException
     {
         // FIXME: Check auth
+
+        log.info(LogManager.getHeader(ourContext,
+            "add_item",
+            "collection_id=" + getID() +
+                ",item_id=" + item.getID()));
 
         // Create mapping
         TableRow row = DatabaseManager.create(ourContext, "collection2item");
@@ -504,6 +555,10 @@ public class Collection
     {
         // FIXME: Check auth
 
+        log.info(LogManager.getHeader(ourContext,
+            "remove_item",
+            "collection_id=" + getID() + ",item_id=" + item.getID()));
+
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM collection2item WHERE collection_id=" + getID() +
             " AND item_id=" + item.getID() + ";");
@@ -519,6 +574,10 @@ public class Collection
     {
         // FIXME: Check auth
 
+        log.info(LogManager.getHeader(ourContext,
+            "update_collection",
+            "collection_id=" + getID()));
+
         DatabaseManager.update(ourContext, collectionRow);
     }
 
@@ -533,6 +592,10 @@ public class Collection
         throws SQLException, AuthorizeException, IOException
     {
         // FIXME: Check auth
+
+        log.info(LogManager.getHeader(ourContext,
+            "delete_collection",
+            "collection_id=" + getID()));
 
         // Delete collection-item mappings
         DatabaseManager.updateQuery(ourContext,
@@ -617,7 +680,6 @@ public class Collection
 
         while (tri.hasNext())
         {
-            // FIXME
             communities.add(new Community(ourContext, tri.next()));
         }
 
@@ -627,16 +689,23 @@ public class Collection
         return communityArray;
     }
 
+
     /**
-     * Return true if OTHER is the same Collection as this object,
-     * false otherwise
+     * Return <code>true</code> if <code>other</code> is the same Collection as
+     * this object, <code>false</code> otherwise
+     *
+     * @param other   object to compare to
+     *
+     * @return  <code>true</code> if object passed in represents the same
+     *          collection as this object
      */
     public boolean equals(Object other)
     {
-        if (! (other instanceof Collection))
+        if (!(other instanceof Collection))
+        {
             return false;
+        }
 
-        return getID() == ((Collection) other).getID();
+        return (getID() == ((Collection) other).getID());
     }
-
 }

@@ -40,23 +40,21 @@
 
 package org.dspace.content;
 
+import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-// NOTES/ISSUES:
-//         Transactionally allocate IDs?  I can see a concurrency problem
-//         Throw AuthorizeException at create() or just update()?
-//         Load all collections into memory?
 
 /**
  * Class representing a community
@@ -67,7 +65,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class Community
 {
     /** log4j category */
-    private static Category log = Category.getInstance(Community.class);
+    private static Logger log = Logger.getLogger(Community.class);
 
     /** Our context */
     private Context ourContext;
@@ -121,17 +119,31 @@ public class Community
 
         if (row == null)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_community",
+                    "not_found,community_id=" + id));
+            }
+
             return null;
         }
         else
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_community",
+                    "community_id=" + id));
+            }
+
             return new Community(context, row);
         }
     }
 
 
     /**
-     * Create a new community, with a new ID.  Not inserted in database.
+     * Create a new community, with a new ID.
      *
      * @param  context  DSpace context object
      *
@@ -143,6 +155,11 @@ public class Community
         // FIXME Check authorisation
 
         TableRow row = DatabaseManager.create(context, "community");
+
+        log.info(LogManager.getHeader(context,
+            "create_community",
+            "community_id=" + row.getIntColumn("community_id")));
+
         return new Community(context, row);
     }
 
@@ -233,14 +250,18 @@ public class Community
 
     /**
      * Give the community a logo.  Passing in <code>null</code> removes any
-     * existing logo.  Note that <code>update(/code> will need to be called
-     * for the change to take effect.  Setting a logo and not calling
-     * <code>update</code> later may result in a previous logo lying around
-     * as an "orphaned" bitstream.
+     * existing logo.  You will need to set the format of the new logo
+     * bitstream before it will work, for example to "JPEG".  Note that
+     * <code>update(/code> will need to be called for the change to take
+     * effect.  Setting a logo and not calling <code>update</code> later may
+     * result in a previous logo lying around as an "orphaned" bitstream.
      *
-     * @param  newLogo   the bitstream to use as the new logo
+     * @param  is   the stream to use as the new logo
+     *
+     * @return   the new logo bitstream, or <code>null</code> if there is no
+     *           logo (<code>null</code> was passed in)
      */
-    public void setLogo(Bitstream newLogo)
+    public Bitstream setLogo(InputStream is)
         throws AuthorizeException, IOException, SQLException
     {
         // FIXME: Check auth
@@ -251,16 +272,28 @@ public class Community
             logo.delete();
         }
 
-        if (newLogo == null)
+        if (is == null)
         {
             communityRow.setColumnNull("logo_bitstream_id");
+            logo = null;
+
+            log.info(LogManager.getHeader(ourContext,
+                "remove_logo",
+                "community_id=" + getID()));
         }
         else
         {
+            Bitstream newLogo = Bitstream.create(ourContext, is);
             communityRow.setColumn("logo_bitstream_id", newLogo.getID());
-        }
+            logo = newLogo;
 
-        logo = newLogo;
+            log.info(LogManager.getHeader(ourContext,
+                "set_logo",
+                "community_id=" + getID() +
+                    "logo_bitstream_id=" + newLogo.getID()));
+        }
+        
+        return logo;
     }
 
 
@@ -271,6 +304,10 @@ public class Community
         throws SQLException, AuthorizeException
     {
         // FIXME: Check auth
+
+        log.info(LogManager.getHeader(ourContext,
+            "update_community",
+            "community_id=" + getID()));
 
         DatabaseManager.update(ourContext, communityRow);
     }
@@ -309,7 +346,23 @@ public class Community
 
 
     /**
-     * Add a collection to the community
+     * Create a new collection within this community
+     *
+     * @return  the new collection
+     */
+    public Collection createCollection()
+        throws SQLException, AuthorizeException
+    {
+        // FIXME: Check auth
+
+        Collection c = Collection.create(ourContext);
+        addCollection(c);
+        return c;
+    }
+
+
+    /**
+     * Add an exisiting collection to the community
      *
      * @param c  collection to add
      */
@@ -317,6 +370,10 @@ public class Community
         throws SQLException, AuthorizeException
     {
         // FIXME: Check auth
+
+        log.info(LogManager.getHeader(ourContext,
+            "add_collection",
+            "community_id=" + getID() + ",collection_id=" + c.getID()));
 
         // Find out if mapping exists
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -349,6 +406,10 @@ public class Community
     {
         // FIXME: Check auth
 
+        log.info(LogManager.getHeader(ourContext,
+            "remove_collection",
+            "community_id=" + getID() + ",collection_id=" + c.getID()));
+
         // Remove any mappings
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM community2collection WHERE community_id=" +
@@ -364,6 +425,10 @@ public class Community
         throws SQLException, AuthorizeException, IOException
     {
         // FIXME: Check auth
+
+        log.info(LogManager.getHeader(ourContext,
+            "delete_community",
+            "community_id=" + getID()));
 
         // Remove any community-collection mappings
         DatabaseManager.updateQuery(ourContext,
@@ -395,7 +460,7 @@ public class Community
         // Delete ourselves
         delete();
 
-        // Delete collections if they aren't contained in other collections
+        // Delete collections if they aren't contained in other communities
         for (int i = 0; i < collections.length; i++)
         {
             Community[] communities = collections[i].getCommunities();
@@ -408,15 +473,23 @@ public class Community
         }
     }
 
+
     /**
-     * Return true if OTHER is the same Community as this object,
-     * false otherwise
+     * Return <code>true</code> if <code>other</code> is the same Community as
+     * this object, <code>false</code> otherwise
+     *
+     * @param other   object to compare to
+     *
+     * @return  <code>true</code> if object passed in represents the same
+     *          community as this object
      */
     public boolean equals(Object other)
     {
-        if (! (other instanceof Community))
+        if (!(other instanceof Community))
+        {
             return false;
+        }
 
-        return getID() == ((Community) other).getID();
+        return (getID() == ((Community) other).getID());
     }
 }

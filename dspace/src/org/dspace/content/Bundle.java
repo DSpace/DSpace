@@ -40,6 +40,7 @@
 
 package org.dspace.content;
 
+import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -47,8 +48,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.log4j.Logger;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -62,6 +66,9 @@ import org.dspace.storage.rdbms.TableRowIterator;
  */
 public class Bundle
 {
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(Bundle.class);
+
     /** Our context */
     private Context ourContext;
 
@@ -126,29 +133,49 @@ public class Bundle
 
         if (row == null)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_bundle",
+                    "not_found,bundle_id=" + id));
+            }
+
             return null;
         }
         else
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_bundle",
+                    "bundle_id=" + id));
+            }
+
             return new Bundle(context, row);
         }
     }
     
 
     /**
-     * Create a new bundle, with a new ID.  Not inserted in database.
+     * Create a new bundle, with a new ID.  This method is not public, since
+     * bundles need to be created within the context of an item.  For this
+     * reason, authorisation is also not checked; that is the responsibility
+     * of the caller.
      *
      * @param  context  DSpace context object
      *
      * @return  the newly created bundle
      */
-    public static Bundle create(Context context)
-        throws AuthorizeException, SQLException
+    static Bundle create(Context context)
+        throws SQLException
     {
-        // FIXME: Check authorisation 
-        
         // Create a table row
         TableRow row = DatabaseManager.create(context, "bundle");
+
+        log.info(LogManager.getHeader(context,
+            "create_bundle",
+            "bundle_id=" + row.getIntColumn("bundle_id")));
+
         return new Bundle(context, row);
     }
 
@@ -211,7 +238,27 @@ public class Bundle
     
 
     /**
-     * Add a bitstream
+     * Create a new bitstream in this bundle.  The bitstream is added to the
+     * database immediately, but the bundle-bitstream mapping isn't added
+     * until <code>update</code> is called.
+     *
+     * @param is   the stream to read the new bitstream from
+     *
+     * @return  the newly created bitstream
+     */
+    public Bitstream createBitstream(InputStream is)
+        throws AuthorizeException, IOException, SQLException
+    {
+        // FIXME: Check auth
+
+        Bitstream b = Bitstream.create(ourContext, is);
+        addBitstream(b);
+        return b;
+    }
+
+
+    /**
+     * Add an existing bitstream to this bundle
      *
      * @param b  the bitstream to add
      */
@@ -219,6 +266,10 @@ public class Bundle
         throws AuthorizeException
     {
         // FIXME Check authorisation
+
+        log.info(LogManager.getHeader(ourContext,
+            "add_bitstream",
+            "bundle_id=" + getID() + ",bitstream_id=" + b.getID()));
 
         // First check that the bitstream isn't already in the list
         for (int i = 0; i < bitstreams.size(); i++)
@@ -247,6 +298,10 @@ public class Bundle
     {
         // FIXME Check authorisation
 
+        log.info(LogManager.getHeader(ourContext,
+            "remove_bitstream",
+            "bundle_id=" + getID() + ",bitstream_id=" + b.getID()));
+
         ListIterator li = bitstreams.listIterator();
 
         while (li.hasNext())
@@ -270,6 +325,10 @@ public class Bundle
         throws SQLException, AuthorizeException
     {
         // FIXME: Check authorisation
+
+        log.info(LogManager.getHeader(ourContext,
+            "update_bundle",
+            "bundle_id=" + getID()));
 
         DatabaseManager.update(ourContext, bundleRow);
         
@@ -308,6 +367,10 @@ public class Bundle
         throws SQLException, AuthorizeException
     {
         // FIXME: Check authorisation
+
+        log.info(LogManager.getHeader(ourContext,
+            "delete_bundle",
+            "bundle_id=" + getID()));
 
         // Remove item-bundle mappings
         DatabaseManager.updateQuery(ourContext,

@@ -41,11 +41,17 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 
 /**
@@ -56,6 +62,9 @@ import org.dspace.storage.rdbms.TableRow;
  */
 public class BitstreamFormat
 {
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(BitstreamFormat.class);
+
     /**
      * The "unknown" support level - for bitstream formats that are unknown
      * to the system
@@ -112,12 +121,92 @@ public class BitstreamFormat
 
         if (row == null)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_bitstream_format",
+                    "not_found,bitstream_type_id=" + id));
+            }
+
             return null;
         }
         else
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_bitstream",
+                    "bitstream_type_id=" + id));
+            }
+
             return new BitstreamFormat(context, row);
         }
+    }
+
+    
+    /**
+     * Get the generic "unknown" bitstream format.
+     *
+     * @param  context  DSpace context object
+     *   
+     * @return  the "unknown" bitstream format.
+     *
+     * @throws IllegalStateException  
+     *               if the "unknown" bitstream format couldn't be found
+     */
+    public static BitstreamFormat findUnknown(Context context)
+        throws SQLException
+    {
+        TableRow formatRow = DatabaseManager.findByUnique(context,
+            "bitstreamtyperegistry", "short_description", "Unknown");
+
+        if (formatRow == null)
+        {
+            throw new IllegalStateException(
+                "No `Unknown' bitstream format in registry");
+        }
+        else
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_bitstream",
+                    "bitstream_type_id=" + formatRow.getIntColumn(
+                        "bitstream_type_id")));
+            }
+
+            return new BitstreamFormat(context, formatRow);
+        }
+    }
+        
+
+
+    /**
+     * Retrieve all bitstream formats from the registry.
+     *
+     * @param  context  DSpace context object
+     *   
+     * @return  the bitstream formats.
+     */
+    public static BitstreamFormat[] findAll(Context context)
+        throws SQLException
+    {
+        List formats = new ArrayList();
+
+        TableRowIterator tri = DatabaseManager.query(context,
+            "bitstreamtyperegistry",
+            "SELECT * FROM bitstreamtyperegistry;");
+
+        while (tri.hasNext())
+        {
+            formats.add(new BitstreamFormat(context, tri.next()));
+        }
+
+        // Return the formats as an array
+        BitstreamFormat[] formatArray = new BitstreamFormat[formats.size()];
+        formatArray = (BitstreamFormat[]) formats.toArray(formatArray);
+
+        return formatArray;
     }
 
     
@@ -134,6 +223,11 @@ public class BitstreamFormat
         
         // Create a table row
         TableRow row = DatabaseManager.create(context, "bitstreamtyperegistry");
+
+        log.info(LogManager.getHeader(context,
+            "create_bitstream_format",
+            "bitstream_type_id=" + row.getIntColumn("bitstream_type_id")));
+
         return new BitstreamFormat(context, row);
     }
 
@@ -283,6 +377,38 @@ public class BitstreamFormat
     {
         // FIXME: Check authorisation
 
+        log.info(LogManager.getHeader(bfContext,
+            "update_bitstream_format",
+            "bitstream_type_id=" + getID()));
+
         DatabaseManager.update(bfContext, bfRow);
     }
+
+
+    /**
+     * Delete this bitstream format.  This converts the types of any bitstreams
+     * that may have this type to "unknown".  Use this with care!
+     */
+    public void delete()
+        throws SQLException, AuthorizeException
+    {
+        // FIXME Check auth
+
+        // Find "unknown" type
+        BitstreamFormat unknown = findUnknown(bfContext);
+
+        // Set bitstreams with this format to "unknown"
+        int numberChanged = DatabaseManager.updateQuery(bfContext,
+            "UPDATE bitstreams SET bitstream_type_id=" + unknown.getID() +
+                " WHERE bitstream_type_id=" + getID());
+
+        // Delete this format from database
+        DatabaseManager.delete(bfContext, bfRow);
+
+        log.info(LogManager.getHeader(bfContext,
+            "delete_bitstream_format",
+            "bitstream_type_id=" + getID() + ",bitstreams_changed=" +
+                numberChanged));
+    }
+        
 }

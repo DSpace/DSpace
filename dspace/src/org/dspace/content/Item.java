@@ -40,6 +40,7 @@
 
 package org.dspace.content;
 
+import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.administer.DCType;
 import org.dspace.authorize.AuthorizeException;
@@ -75,7 +76,7 @@ public class Item
     public final static String ANY = "*";
 
     /** log4j category */
-    private static Category log = Category.getInstance(Item.class);
+    private static Logger log = Logger.getLogger(Item.class);
 
     /** Our context */
     private Context ourContext;
@@ -174,7 +175,7 @@ public class Item
      * @param  context  DSpace context object
      * @param  id       Internal ID of the item
      *   
-     * @return  the item, or null if the Handle is invalid.
+     * @return  the item, or null if the internal ID is invalid.
      */
     public static Item find(Context context, int id)
         throws SQLException
@@ -185,45 +186,51 @@ public class Item
 
         if (row == null)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_item",
+                    "not_found,item_id=" + id));
+            }
+
             return null;
         }
         else
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_item",
+                    "item_id=" + id));
+            }
+
             return new Item(context, row);
         }
     }
 
 
     /**
-     * Get an item from the database.  The item, its Dublin Core metadata,
-     * and the bundle and bitstream metadata are all loaded into memory.
-     *
-     * @param  context  DSpace context object
-     * @param  handle   Handle of the item
-     *   
-     * @return  the item, or null if the Handle is invalid.
-     */
-    public static Item find(Context context, String handle)
-        throws SQLException
-    {
-        // FIXME: Need handle manager!
-        return null;
-    }
-
-    
-    /**
-     * Create a new item, with a new internal ID.  Not inserted in database.
+     * Create a new item, with a new internal ID.  This method is not public,
+     * since items need to be created as workspace items.  Authorisation is
+     * the responsibility of the caller.
      *
      * @param  context  DSpace context object
      *
      * @return  the newly created item
      */
     static Item create(Context context)
-        throws AuthorizeException, SQLException
+        throws SQLException
     {
-        // FIXME Check authorisation
-        
         TableRow row = DatabaseManager.create(context, "item");
+
+        if (log.isDebugEnabled())
+        {
+            log.debug(LogManager.getHeader(context,
+                "create_item",
+                "item_id=" + row.getIntColumn("item_id")));
+        }
+
+
         return new Item(context, row);
     }
 
@@ -484,19 +491,6 @@ public class Item
 
 
     /**
-     * Get the handle of this item.  Returns <code>null</code> if no handle has
-     * been assigned.
-     *
-     * @return  the handle
-     */
-    public String getHandle()
-    {
-        // FIXME
-        return null;
-    }
-    
-
-    /**
      * Get the e-person that originally submitted this item
      *
      * @return  the submitter
@@ -565,7 +559,23 @@ public class Item
     
 
     /**
-     * Add a bundle
+     * Create a bundle in this item
+     *
+     * @return  the newly created bundle
+     */
+    public Bundle createBundle()
+        throws SQLException, AuthorizeException
+    {
+        // FIXME: Check auth
+        
+        Bundle b = Bundle.create(ourContext);
+        addBundle(b);
+        return b;
+    }
+
+
+    /**
+     * Add an existing bundle to this item
      *
      * @param b  the bundle to add
      */
@@ -573,6 +583,11 @@ public class Item
         throws AuthorizeException
     {
         // FIXME: Check auth
+
+        log.info(LogManager.getHeader(ourContext,
+            "add_bundle",
+            "item_id=" + getID() +
+                ",bundle_id=" + b.getID()));
 
         // Check it's not already there
         for (int i = 0; i < bundles.size(); i++)
@@ -602,6 +617,11 @@ public class Item
     {
         // FIXME Check authorisation
 
+        log.info(LogManager.getHeader(ourContext,
+            "remove_bundle",
+            "item_id=" + getID() +
+                ",bundle_id=" + b.getID()));
+
         ListIterator li = bundles.listIterator();
 
         while (li.hasNext())
@@ -619,22 +639,25 @@ public class Item
     
 
     /**
-     * Add a single bitstream in a new bundle.  A bundle is created, and the
-     * bitstream passed in made the single bitstream.  The bundle and
+     * Create a single bitstream in a new bundle.  A bundle is created, and the
      * bundle-bitstream mapping are added to the database immediately, but
      * the item-bundle mapping won't be written until <code>update</code> is
      * called.
      *
-     * @param bitstream  the bitstream to add
+     * @param is   the stream to create the new bitstream from
      */
-    public void addSingleBitstream(Bitstream bitstream)
-        throws AuthorizeException, SQLException
+    public Bitstream createSingleBitstream(InputStream is)
+        throws AuthorizeException, IOException, SQLException
     {
+        // Authorisation is checked by methods below
+
         // Create a bundle
-        Bundle bnd = Bundle.create(ourContext);
-        bnd.addBitstream(bitstream);
+        Bundle bnd = createBundle();
+        Bitstream bitstream = bnd.createBitstream(is);
         bnd.update();
         addBundle(bnd);
+
+        return bitstream;
     }
 
 
@@ -683,6 +706,10 @@ public class Item
     {
         // FIXME: Check authorisation
         
+        log.info(LogManager.getHeader(ourContext,
+            "update_item",
+            "item_id=" + getID()));
+
         // Map counting number of values for each element/qualifier.
         // Keys are Strings: "element" or "element.qualifier"
         // Values are Integers indicating number of values written for a
@@ -793,6 +820,10 @@ public class Item
     public void deleteWithContents()
         throws SQLException, AuthorizeException, IOException
     {
+        log.info(LogManager.getHeader(ourContext,
+            "update_item",
+            "item_id=" + getID()));
+
         // Delete the Dublin Core
         removeDCFromDatabase();
         
@@ -817,6 +848,13 @@ public class Item
                 b.deleteWithContents();
             }
         }
+
+        // Remove collection -> item mappings
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM collection2item WHERE item_id=" + getID() + ";");
+        
+        // Finally remove item row
+        DatabaseManager.delete(ourContext, itemRow);
     }
 
 

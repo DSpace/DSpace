@@ -46,8 +46,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -61,6 +64,9 @@ import org.dspace.storage.rdbms.TableRowIterator;
  */
 public class Bitstream
 {
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(Bitstream.class);
+
     /** Our context */
     private Context bContext;
 
@@ -124,10 +130,24 @@ public class Bitstream
 
         if (row == null)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_bitstream",
+                    "not_found,bitstream_id=" + id));
+            }
+
             return null;
         }
         else
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_bitstream",
+                    "bitstream_id=" + id));
+            }
+
             return new Bitstream(context, row);
         }
     }
@@ -135,19 +155,31 @@ public class Bitstream
 
     /**
      * Create a new bitstream, with a new ID.  The checksum and file size
-     * are calculated.
+     * are calculated.  This method is not public, and does not check
+     * authorisation; other methods such as Bundle.createBitstream() will
+     * check authorisation.  The newly created bitstream has the "unknown"
+     * format.
      *
      * @param  context   DSpace context object
      * @param  is        the bits to put in the bitstream
      *
      * @return  the newly created bitstream
      */
-    public static Bitstream create(Context context, InputStream is)
-        throws AuthorizeException, IOException, SQLException
+    static Bitstream create(Context context, InputStream is)
+        throws IOException, SQLException
     {
+        // Store the bits
         int bitstreamID = BitstreamStorageManager.store(context, is);
 
-        return find(context, bitstreamID);
+        log.info(LogManager.getHeader(context,
+            "create_bitstream",
+            "bitstream_id=" + bitstreamID));
+
+        // Set the format to "unknown"
+        Bitstream bitstream = find(context, bitstreamID);
+        bitstream.setFormat(null);
+
+        return bitstream;
     }
 
 
@@ -339,9 +371,7 @@ public class Bitstream
         if (f == null)
         {
             // Use "Unknown" format
-            TableRow formatRow = DatabaseManager.findByUnique(bContext,
-                "bitstreamtyperegistry", "short_description", "Unknown");
-            bitstreamFormat = new BitstreamFormat(bContext, formatRow);
+            bitstreamFormat = BitstreamFormat.findUnknown(bContext);
         }
         else
         {
@@ -377,6 +407,10 @@ public class Bitstream
     {
         // FIXME: Check authorisation
 
+        log.info(LogManager.getHeader(bContext,
+            "update_bitstream",
+            "bitstream_id=" + getID()));
+
         DatabaseManager.update(bContext, bRow);
     }
 
@@ -388,6 +422,10 @@ public class Bitstream
         throws SQLException, IOException, AuthorizeException
     {
         // FIXME: Check authorisation
+
+        log.info(LogManager.getHeader(bContext,
+            "delete_bitstream",
+            "bitstream_id=" + getID()));
 
         BitstreamStorageManager.delete(bContext,
             bRow.getIntColumn("bitstream_id"));

@@ -45,10 +45,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -64,7 +65,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class WorkspaceItem implements InProgressSubmission
 {
     /** log4j category */
-    private static Category log = Category.getInstance(WorkspaceItem.class);
+    private static Logger log = Logger.getLogger(WorkspaceItem.class);
 
     /** The item this workspace object pertains to */
     private Item item;
@@ -115,10 +116,24 @@ public class WorkspaceItem implements InProgressSubmission
 
         if (row == null)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_workspace_item",
+                    "not_found,workspace_item_id=" + id));
+            }
+
             return null;
         }
         else
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context,
+                    "find_workspace_item",
+                    "workspace_item_id=" + id));
+            }
+
             return new WorkspaceItem(context, row);
         }
     }
@@ -126,7 +141,7 @@ public class WorkspaceItem implements InProgressSubmission
 
     /**
      * Create a new workspace item, with a new ID.  An Item is also
-     * created.  Nothing is inserted in database yet.
+     * created
      *
      * @param  context  DSpace context object
      * @param  coll     Collection being submitted to
@@ -150,6 +165,11 @@ public class WorkspaceItem implements InProgressSubmission
 
         row.setColumn("item_id", i.getID());
         row.setColumn("collection_id", coll.getID());
+
+        log.info(LogManager.getHeader(context,
+            "create_workspace_item",
+            "workspace_item_id=" + row.getIntColumn("personal_workspace_id") +
+                "item_id=" + i.getID() + "collection_id=" + coll.getID()));
 
         return new WorkspaceItem(context, row);
     }
@@ -189,6 +209,17 @@ public class WorkspaceItem implements InProgressSubmission
 
 
     /**
+     * Get the internal ID of this workspace item
+     *
+     * @return the internal identifier
+     */
+    public int getID()
+    {
+        return pwRow.getIntColumn("workspace_id");
+    }
+
+
+    /**
      * Start the relevant workflow for this workspace item.  The entry in
      * PersonalWorkspace is removed, a workflow item is created, and the
      * relevant workflow initiated.  If there is no workflow, i.e. the
@@ -204,6 +235,12 @@ public class WorkspaceItem implements InProgressSubmission
         throws SQLException, AuthorizeException
     {
         // FIXME Check auth
+
+        log.info(LogManager.getHeader(ourContext,
+            "start_workflow",
+            "workspace_item_id=" + getID() +
+                "item_id=" + item.getID() +
+                "collection_id=" + collection.getID()));
 
         // Set accession date
         DCDate d = DCDate.getCurrent();
@@ -236,14 +273,17 @@ public class WorkspaceItem implements InProgressSubmission
     
 
     /**
-     * Update the workflow item, including the unarchived item.  Inserts if
-     * this is a new item.
+     * Update the workspace item, including the unarchived item.
      */
     public void update()
         throws SQLException, AuthorizeException
     {
         // FIXME check auth
     
+        log.info(LogManager.getHeader(ourContext,
+            "update_workspace_item",
+            "workspace_item_id=" + getID()));
+
         // Update the item
         item.update();
         
@@ -262,6 +302,12 @@ public class WorkspaceItem implements InProgressSubmission
     {
         // FIXME Check auth
     
+        log.info(LogManager.getHeader(ourContext,
+            "delete_workspace_item",
+            "workspace_item_id=" + getID() +
+                "item_id=" + item.getID() +
+                "collection_id=" + collection.getID()));
+
         // Need to delete the personalworkspace row first since it refers
         // to item ID
         DatabaseManager.delete(ourContext, pwRow);
