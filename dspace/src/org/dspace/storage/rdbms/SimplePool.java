@@ -58,10 +58,34 @@ import org.dspace.core.ConfigurationManager;
  */
 public class SimplePool implements java.sql.Driver
 {
-    /**
-     * Log4j category
-     */
+    /** Log4j category */
     private static Logger log = Logger.getLogger(SimplePool.class);
+
+    /** The pooled connections */
+    private static List pool = new ArrayList();
+
+    /** The underlying driver */
+    private Driver driver;
+
+    /**
+     * Config settings
+     */
+    private static String DRIVER_CLASS =
+        ConfigurationManager.getProperty("simplepool.driver");
+    private static String DRIVER_URL =
+        ConfigurationManager.getProperty("simplepool.url");
+    private static int max_connections =
+        ConfigurationManager.getIntProperty("simplepool.max.connections");
+
+    // Time to wait, in milliseconds
+    // If a connection is not available, the request will wait for
+    // this length of time before trying again
+    private static long WAIT_TIME = 1000;
+
+    /**
+     * After this many connection attempts, an SQLException will be thrown
+     */
+    private static int MAX_ATTEMPTS = 5;
 
     /**
      * Constructor
@@ -193,14 +217,92 @@ public class SimplePool implements java.sql.Driver
         }
     }
 
-    // Simple info class
+    /**
+     * Set the maximum size for the pool.
+     *
+     * This setting is NOT persistent.
+     *
+     * Note that this method does not close any open connections.
+     * So, if you have a max of 10 connections and you resize to
+     * 15, you now have 5 extra connections; but if you have 10
+     * connections and you set the size to 5, you may still have
+     * 10 connections in use.
+     */
+    public static synchronized void setPoolMaximumSize(int size)
+    {
+        max_connections = size;
+    }
+
+    /**
+     * Return information about current pool usage. Note that this
+     * information is only guaranteed to be correct at the time of
+     * the call.
+     */
+    public static synchronized SimplePoolInfo getInfo()
+    {
+        int free = 0;
+
+        for (Iterator iterator = pool.iterator(); iterator.hasNext();)
+        {
+            PooledConnection pc = (PooledConnection) iterator.next();
+
+            if (pc.isAvailable())
+                free++;
+        }
+
+        return new SimplePoolInfo(pool.size(), free, max_connections);
+    }
+
+    /**
+     * Return true if this driver accepts the URL.
+     */
+    public boolean acceptsURL(String s)
+        throws SQLException
+    {
+        if (log.isDebugEnabled())
+            log.debug("Called acceptsURL with " + s);
+
+        return s.startsWith("jdbc:simplepool:");
+    }
+
+    public DriverPropertyInfo[] getPropertyInfo(String s, Properties p)
+        throws SQLException
+    {
+        return driver.getPropertyInfo(s, p);
+    }
+
+    public int getMajorVersion()
+    {
+        return 0;
+    }
+
+    public int getMinorVersion()
+    {
+        return 1;
+    }
+
+    public boolean jdbcCompliant()
+    {
+        // We are as compliant as the underlying driver
+        return driver.jdbcCompliant();
+    }
+
+    /**
+     * Information about pool usage. This includes the current size
+     * of the pool, the number of connections free and in-use, and
+     * the maximum size of the pool.
+     */
     public static class SimplePoolInfo
     {
 
         /**
          * Constructor
+         *
+         * @param size The current size of the pool
+         * @param free The number of free connections.
+         * @param max The maximum size of the pool.
          */
-        public SimplePoolInfo (int size, int free, int max)
+        SimplePoolInfo (int size, int free, int max)
         {
             this.size = size;
             this.free = free;
@@ -234,120 +336,6 @@ public class SimplePool implements java.sql.Driver
         private int free;
         private int used;
         private int max;
-    }
-
-    /**
-     * Set the maximum size for the pool.
-     *
-     * This setting is NOT persistent.
-     *
-     * Note that this method does not close any open connections.
-     * So, if you have a max of 10 connections and you resize to
-     * 15, you now have 5 extra connections; but if you have 10
-     * connections and you set the size to 5, you may still have
-     * 10 connections in use.
-     */
-    public static synchronized void setPoolMaximumSize(int size)
-    {
-        max_connections = size;
-    }
-
-    /**
-     * Return info about the Pool
-     */
-    public static synchronized SimplePoolInfo getInfo()
-    {
-        int free = 0;
-
-        for (Iterator iterator = pool.iterator(); iterator.hasNext();)
-        {
-            PooledConnection pc = (PooledConnection) iterator.next();
-
-            if (pc.isAvailable())
-                free++;
-        }
-
-        return new SimplePoolInfo(pool.size(), free, max_connections);
-    }
-
-    public boolean acceptsURL(String s)
-        throws SQLException
-    {
-        if (log.isDebugEnabled())
-            log.debug("Called acceptsURL with " + s);
-
-        return s.startsWith("jdbc:simplepool:");
-    }
-
-    public DriverPropertyInfo[] getPropertyInfo(String s, Properties p)
-        throws SQLException
-    {
-        return driver.getPropertyInfo(s, p);
-    }
-
-    public int getMajorVersion()
-    {
-        return 0;
-    }
-
-    public int getMinorVersion()
-    {
-        return 1;
-    }
-
-    public boolean jdbcCompliant()
-    {
-        // We are as compliant as the underlying driver
-        return driver.jdbcCompliant();
-    }
-
-    /**
-     * The pooled connections
-     */
-    private static List pool = new ArrayList();
-
-    /**
-     * The underlying driver
-     */
-    private Driver driver;
-
-    /**
-     * Config settings
-     */
-    private static String DRIVER_CLASS =
-        ConfigurationManager.getProperty("simplepool.driver");
-    private static String DRIVER_URL =
-        ConfigurationManager.getProperty("simplepool.url");
-    private static String MAX_CONNECTIONS =
-        ConfigurationManager.getProperty("simplepool.max.connections");
-    // Default
-    private static int max_connections = 15;
-
-    // Time to wait, in milliseconds
-    // If a connection is not available, the request will wait for
-    // this length of time before trying again
-    private static long WAIT_TIME = 1000;
-
-    /**
-     * After this many connection attempts, an SQLException will be thrown
-     */
-    private static int MAX_ATTEMPTS = 5;
-
-    static
-    {
-        try
-        {
-            if (MAX_CONNECTIONS != null)
-            {
-                int tmp = Integer.parseInt(MAX_CONNECTIONS);
-
-                max_connections = tmp;
-            }
-        }
-        catch (NumberFormatException nfe)
-        {
-            nfe.printStackTrace();
-        }
     }
 }
 
