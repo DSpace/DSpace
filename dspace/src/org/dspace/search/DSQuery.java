@@ -53,11 +53,15 @@ import org.apache.lucene.queryParser.*;
 import org.apache.lucene.search.*;
 import org.apache.lucene.analysis.*;
 
+import org.apache.log4j.Logger;
+
 // dspace classes
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 
 
 // issues
@@ -72,21 +76,32 @@ public class DSQuery
     static final String COLLECTION	= "" + Constants.COLLECTION;
     static final String COMMUNITY	= "" + Constants.COMMUNITY;
 
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(DSQuery.class);
+    
+
     /** Do a query, returning a List of DSpace Handles to objects matching the query.
      *  @param query string in Lucene query syntax
      *
      *  @return HashMap with lists for items, communities, and collections
      *        (keys are strings from Constants.ITEM, Constants.COLLECTION, etc.
      */
-    public static synchronized HashMap doQuery(String querystring)
-        throws ParseException, IOException
+    public static synchronized HashMap doQuery(Context c, String querystring)
+        throws IOException
     {
+        querystring = checkEmptyQuery( querystring );
                         
         ArrayList resultlist= new ArrayList();
         ArrayList itemlist 	= new ArrayList();
         ArrayList commlist 	= new ArrayList();
         ArrayList colllist 	= new ArrayList();
         HashMap   metahash 	= new HashMap();
+
+        // initial results are empty
+        metahash.put(ALL,       resultlist);
+        metahash.put(ITEM,      itemlist  );
+        metahash.put(COLLECTION,colllist  );
+        metahash.put(COMMUNITY, commlist  );
 
         try
         {
@@ -137,8 +152,26 @@ public class DSQuery
             //   throw new SQLException( "Error parsing search results: " + e );
             // ?? quit?
         }
+        catch (ParseException e)
+        {
+            // a parse exception - log and return null results
+            log.warn(LogManager.getHeader(c,
+                "Lucene Parse Exception",
+                "" + e));
+
+        }
 
         return metahash;
+    }
+
+    static String checkEmptyQuery( String myquery )
+    {
+        if( myquery.equals("") )
+        {
+            myquery = "empty_query_string";
+        }
+        
+        return myquery;
     }
 
 
@@ -148,14 +181,16 @@ public class DSQuery
      *
      * @return HashMap same results as doQuery, restricted to a collection
      */
-    public static HashMap doQuery(String querystring, Collection coll)
+    public static HashMap doQuery(Context c, String querystring, Collection coll)
         throws IOException, ParseException
     {
+        querystring = checkEmptyQuery( querystring );
+    
         String location = "l" + (coll.getID());
 
         String newquery = new String("+(" + querystring + ") +location:\"" + location + "\"");
 
-        return doQuery(newquery);
+        return doQuery(c, newquery);
     }
 
 
@@ -165,14 +200,16 @@ public class DSQuery
      *
      * @return HashMap results, same as full doQuery, only hits in a Community
      */
-    public static HashMap doQuery(String querystring, Community comm)
+    public static HashMap doQuery(Context c, String querystring, Community comm)
         throws IOException, ParseException
     {
+        querystring = checkEmptyQuery( querystring );
+
         String location = "m" + (comm.getID());
 
         String newquery = new String("+(" + querystring + ") +location:\"" + location + "\"");
 
-        return doQuery(newquery);
+        return doQuery(c, newquery);
     }
 
     /** return everything from a query
@@ -268,7 +305,8 @@ public class DSQuery
 
         try
         {
-            HashMap results = doQuery(query);
+            Context c = new Context();
+            HashMap results = doQuery(c, query);
             
             List itemlist = getItemResults(results);
             List colllist = getCollectionResults(results);

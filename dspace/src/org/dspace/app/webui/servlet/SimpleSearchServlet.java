@@ -160,7 +160,10 @@ public class SimpleSearchServlet extends DSpaceServlet
                 request.setAttribute("collection", collection);
 
                 // we're in a collection, only display item results
-                itemHandles = DSQuery.getItemResults(DSQuery.doQuery(query, collection));
+                itemHandles = DSQuery.getItemResults(
+                            DSQuery.doQuery(context, query, collection)
+                        );
+                        
                 collectionHandles = new ArrayList();
                 communityHandles = new ArrayList();
             }
@@ -173,7 +176,7 @@ public class SimpleSearchServlet extends DSpaceServlet
                 request.setAttribute("collection.array",
                     community.getCollections());
 
-                HashMap results = DSQuery.doQuery(query, community);
+                HashMap results = DSQuery.doQuery(context, query, community);
                 
                 // we're in a community, display item and collection results
                 itemHandles       = DSQuery.getItemResults(results);
@@ -186,7 +189,7 @@ public class SimpleSearchServlet extends DSpaceServlet
                 Community[] communities = Community.findAll(context);
                 request.setAttribute("community.array", communities);
 
-                HashMap results = DSQuery.doQuery(query);
+                HashMap results = DSQuery.doQuery(context, query);
                 
                 // searching everything, return all results
                 itemHandles      = DSQuery.getItemResults(results);
