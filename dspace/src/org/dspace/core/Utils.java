@@ -59,6 +59,9 @@ public class Utils
     private static Random random = new Random();
     private static VMID vmid = new VMID();
 
+    /** Private Constructor */
+    private Utils () {}
+
     /**
      * Return an MD5 checksum for data in hex format.
      *
