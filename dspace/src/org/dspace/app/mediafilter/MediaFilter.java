@@ -69,6 +69,13 @@ public abstract class MediaFilter
      * @return name of the format returned by this filter
      */
     public abstract String getFormatString();
+
+
+    /**
+     * @return string to put in Bitstream's description
+     */
+    public abstract String getDescription();
+    
     
     /**
      * @param source input stream
@@ -139,6 +146,7 @@ public abstract class MediaFilter
         // Now set the format and name of the bitstream
         b.setName(newName);
         b.setSource("Written by MediaFilter " + this.getClass().getName() );  // or obj.getClass().getName();
+        b.setDescription(getDescription());
         
         // Find the proper format
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(

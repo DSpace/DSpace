@@ -98,6 +98,15 @@ public class HTMLFilter extends MediaFilter
         return "Text";
     }
 
+
+    /**
+     * @return String description
+     */
+    public String getDescription()
+    {
+        return "Extracted text";
+    }
+
         
     /**
      * @param source source input stream
