@@ -66,7 +66,7 @@
     String firstName = eperson.getFirstName();
     String lastName  = eperson.getLastName();
     String phone     = eperson.getMetadata("phone");
-    String errorMessage  = (String) request.getAttribute("error_message");
+    String errorMessage  = (String)request.getAttribute("error_message");
 %>
 
 <dspace:layout title="Edit EPerson"
