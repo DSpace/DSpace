@@ -548,7 +548,7 @@
     // FIXME: (Maybe) assumes there will only be one?
     for (int i = 0; i < identifiers.length; i++)
     {
-        if (identifiers[i].qualifier.equals("citation"))
+        if ("citation".equals(identifiers[i].qualifier))
         {
             DCValue[] newIDs = new DCValue[identifiers.length - 1];
             for (int j = 0; j < i; j++)
