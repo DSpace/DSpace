@@ -85,14 +85,26 @@ public class Authenticate
     
         if (session.getAttribute("resuming.request") != null)
         {
-log.info("RESUMING AN INTERRUPTED REQUEST");
-
             // Get info about the interrupted request
             RequestInfo requestInfo = (RequestInfo)
                 session.getAttribute("interrupted.request.info");
 
-            // Wrap the current request to make it look like the interruped one
-            HttpServletRequest actualRequest = requestInfo.wrapRequest(request);
+            HttpServletRequest actualRequest;
+
+            if (requestInfo == null)
+            {
+                // Can't find the wrapped request information.
+                // FIXME: Proceed with current request - correct?
+                actualRequest = request;
+            }
+            else
+            {
+                /*
+                 * Wrap the current request to make it look like the
+                 * interruped one
+                 */
+                actualRequest = requestInfo.wrapRequest(request);
+            }
 
             // Remove the info from the session so it isn't resumed twice
             session.removeAttribute("resuming.request");
