@@ -1,3 +1,17 @@
+1.3 (?) beta 1
+==============
+(Barry Gaskin)
+- Fix for Oracle too many cursors problem
+
+(Claudia Jürgen)
+- Configurable number of index terms in Lucene for full-text indexing
+
+(Keiji Suzuki)
+- Fix for UTF-8 encoded searches in advanced search
+
+(David Stuve)
+- Improved scalability in media filter (manager + JPEG)
+
 1.2.1
 =====
 (Jim Downing)
