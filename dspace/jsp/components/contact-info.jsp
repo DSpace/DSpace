@@ -46,12 +46,12 @@
 
 <center>
     <P><%= ConfigurationManager.getProperty("dspace.name") %> administration
-    contact details:</P>
+    contact details:</p>
 
     <table>
         <tr>
             <td class="standard">By e-mail:</td>
-            <td class="standard"><a href="mailto:dspace-help@myu.edu">dspace-help@myu.edu</a></td>
+            <td class="standard"><a href="mailto:<%= ConfigurationManager.getProperty("mail.admin") %>"><%= ConfigurationManager.getProperty("mail.admin") %></a></td>
         </tr>
         <tr>
             <td class="standard">Or telephone:</td>
