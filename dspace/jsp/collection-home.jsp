@@ -59,6 +59,7 @@
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection"%>
+<%@ page import="org.dspace.core.Utils"%>
 <%@ page import="org.dspace.eperson.Group"     %>
 
 
@@ -242,7 +243,7 @@
     for (int i = 0; i < lastSubmittedTitles.length; i++)
     {
 %>
-    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= lastSubmittedTitles[i] %></A></P>
+    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i]%>"><%= Utils.addEntities(lastSubmittedTitles[i]) %></A></P>
 <%
   }
 %>
