@@ -18,14 +18,16 @@
       </font></a></b></font></td>
     <td width="48%"> 
       <blockquote> 
-        <p align="right"><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><SCRIPT TYPE="text/javascript">
+        <p align="right"><font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+          <SCRIPT TYPE="text/javascript">
 <!-- Javascript starts here
 document.write('<A HREF="#" onClick="window.close();">Close this window<\/a>');
 // -->
-</SCRIPT><NOSCRIPT><A HREF="/">Back to DSpace Home</A></NOSCRIPT>
-<!-- FIXME: assumes DSpace is at root of server - should use dspace.cfg property
+</SCRIPT>
+          <NOSCRIPT><A HREF="/">Back to DSpace Home</A></NOSCRIPT> 
+          <!-- FIXME: assumes DSpace is at root of server - should use dspace.cfg property
 or context path -->
-</font></p>
+          </font></p>
       </blockquote>
     </td>
   </tr>
@@ -35,6 +37,11 @@ or context path -->
   </tr>
   <tr> 
     <td width="52%"><font face="Verdana, Arial, Helvetica, sans-serif"><b><font size="-1"><a href="#search">Search</a></font></b></font></td>
+    <td width="48%">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="52%"><font face="Verdana, Arial, Helvetica, sans-serif" size="-1"><b><font color="#FFFFFF"><a href="#advanced">Advanced 
+      Search</a></font></b></font></td>
     <td width="48%">&nbsp;</td>
   </tr>
   <tr> 
@@ -69,7 +76,7 @@ or context path -->
       Profile</a></font></b></font></td>
     <td width="48%" height="24">&nbsp;</td>
   </tr>
-  <tr>
+  <tr> 
     <td width="52%" height="24"><font face="Verdana, Arial, Helvetica, sans-serif"><b><font size="-1"><a href="#subscribe">Subscribe 
       to E-mail alerts</a></font></b></font></td>
     <td width="48%" height="24">&nbsp;</td>
@@ -93,17 +100,22 @@ or context path -->
   takes you through the communities in alphabetical order and allows you to see 
   the collections within each community.</font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Browse by Title</b> allows 
-  you to move through an alphabical list of titles of all items in DSpace in alphabetical 
-  order.</font></p>
+  you to move through an alphabetical list of all titles of items in DSpace.</font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Browse by Author</b> 
   allows you to move through an alphabetical list of all authors of items in DSpace.</font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Browse by Date </b>allows 
   you to move through a list of all items in DSpace in reverse chronological order.</font></p>
-<p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Members</b> are currently 
-  those people who either have authorization to submit items to DSpace or who 
-  have some capacity to work with the submissions within a community or collection. 
-  In the future there will be another membership category offering services such 
-  as e-mail notification when new items are added to a collection or community.</font></p>
+<p><font face="Verdana, Arial, Helvetica, sans-serif"><b>You may sign on to the 
+  system if you:</b> </font></p>
+<ul>
+  <li><font face="Verdana, Arial, Helvetica, sans-serif">wish to subscribe to 
+    a collection and receive e-mail updates when new items are added</font></li>
+  <li><font face="Verdana, Arial, Helvetica, sans-serif">wish to go to the &quot;My 
+    DSpace&quot; page that tracks your subscriptions and other interactions with 
+    DSpace requiring authorization (if you are a submitter for a collection, for 
+    instance.)</font></li>
+  <li><font face="Verdana, Arial, Helvetica, sans-serif">wish to edit your profile</font></li>
+</ul>
 <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Submit</b> is the DSpace 
   function that enables MIT users to add an item to DSpace. The process of submission 
   includes filling out information about the item on a metadata form and uploading 
@@ -135,13 +147,15 @@ or context path -->
 <p><font face="Verdana, Arial, Helvetica, sans-serif">DSpace uses the<b> Jakarta 
   Lucene </b>search engine. Here are some search hints:</font></p>
 <blockquote> 
-  <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>What is searched<br>
+  <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>What is searched in 
+    the general keyword search (yellow box)<br>
     </b>The word(s) you enter in the search box will be searched against the title, 
-    author, keyword and abstract fields of each item's record. </font></p>
+    author, subject abstract, series, sponsor and identifier fields of each item's 
+    record. </font></p>
   <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>What is not searched 
     - Stop Words<br>
-    </b>The<b> </b>search engine ignores certain words that occur frequently 
-    in English, but do not add value to the search. These are: </font></p>
+    </b>The<b> </b>search engine ignores certain words that occur frequently in 
+    English, but do not add value to the search. These are: </font></p>
   <p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif">"a", "and" 
     , "are" , "as" , "at" , "be" , "but" , "by" , "for" , "if" , "in" , "into", 
     </font></p>
@@ -212,7 +226,23 @@ or context path -->
     be applied to the whole set, e.g.</font></p>
   <p><font face="Verdana, Arial, Helvetica, sans-serif"><img src="search7.jpg" width="340" height="28"> 
     </font></p>
+  <hr>
 </blockquote>
+<p><a name="advanced"></a><b><font face="Verdana, Arial, Helvetica, sans-serif">ADVANCED 
+  SEARCH</font></b></p>
+<p><font face="Verdana, Arial, Helvetica, sans-serif">The advanced search page 
+  allows you to specify the fields you wish to search, and to combine these searches 
+  with the Boolean &quot;and&quot;, &quot;or&quot; or &quot;not&quot;. </font></p>
+<p><font face="Verdana, Arial, Helvetica, sans-serif">You can restrict your search 
+  to a community by clicking on the arrow to the right of the top box. If you 
+  want your search to encompass all of DSpace, leave that box in the default position.</font></p>
+<p><font face="Verdana, Arial, Helvetica, sans-serif">Then select the field to 
+  search in the left hand column and enter the word or phrase you are searching 
+  in the right hand column. You can select the Boolean operator to combine searches 
+  by clicking on the arrow to the right of the &quot;AND&quot; box. </font></p>
+<p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Note: You must use the 
+  input boxes in order. If you leave the first one blank your search will not 
+  work. </b></font></p>
 <hr>
 <font face="Verdana, Arial, Helvetica, sans-serif"><b><a name="communities"></a>COMMUNITIES</b> 
 </font>
@@ -220,7 +250,7 @@ or context path -->
   around Communities which correspond to MIT administrative entities such as schools, 
   departments, labs and research centers. Within each community there can be an 
   unlimited number of collections. Within each collection there can be an unlimited 
-  number of items. This organization gives DSpace the flexibility to accomodate 
+  number of items. This organization gives DSpace the flexibility to accommodate 
   differing needs of communities by allowing them to </font></p>
 <ul>
   <li><font face="Verdana, Arial, Helvetica, sans-serif">Decide on policies such 
@@ -299,8 +329,8 @@ href="http://web.mit.edu/is/cert/">MIT Information Systems Web Certificates at
   already entered will be stored until you come back to the submission, and you 
   will be reminded on your &quot;My DSpace&quot; page that you have a submission 
   in process. If somehow you accidentally exit from the submit process, you can 
-  can always resume from your &quot;My DSpace&quot; page. You can also cancel 
-  your submission at any point. </font></p>
+  always resume from your &quot;My DSpace&quot; page. You can also cancel your 
+  submission at any point. </font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif"><a name="choosecollection"></a><b>Choose 
   Collection</b></font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif">Progress Bar - Oval Buttons 
@@ -343,7 +373,8 @@ href="http://web.mit.edu/is/cert/">MIT Information Systems Web Certificates at
     New items that have NOT been previously published or distributed will be assigned 
     an issue date by the system upon DSpace distribution. If you are entering 
     older items that have already been distributed or published, click in the 
-    "yes" box. </font></p>
+    "yes" box. You will receive a form prompting you for several pieces of information 
+    relating to publication.</font></p>
   <p><font face="Verdana, Arial, Helvetica, sans-serif">* Multiple files - An 
     item can consist of more than one file in DSpace. An example of this would 
     be an article containing a text file and a video simulation and a data file. 
@@ -416,7 +447,10 @@ href="http://web.mit.edu/is/cert/">MIT Information Systems Web Certificates at
     item has been previously published or distributed.) </font></p>
   <p><font face="Verdana, Arial, Helvetica, sans-serif">Enter citation information 
     for this item if it was a journal article or part of a larger work, such as 
-    a book chapter.</font></p>
+    a book chapter. For <b>journal articles</b>, include the journal title, volume 
+    number, date and paging.<br>
+    For <b>book chapters</b>, include the book title, place of publication, publisher 
+    name, date and paging.</font></p>
   <hr>
   <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Series/Report No.:</b></font></p>
   <p><font face="Verdana, Arial, Helvetica, sans-serif">Some of the collections 
@@ -430,15 +464,15 @@ href="http://web.mit.edu/is/cert/">MIT Information Systems Web Certificates at
   <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Identifiers: </b></font></p>
   <p><font face="Verdana, Arial, Helvetica, sans-serif">If you know of a unique 
     number or code that identifies this item in some system, please enter it here. 
-    Click on the down area next to the input box, and select one of the choices 
-    in the drop down menu. The choices refer to:</font></p>
+    Click on the arrow to the right of the input box, and select from one of the 
+    choices in the drop down menu. The choices refer to:</font></p>
   <blockquote> 
     <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Govt.doc # </b>- 
-      Government Document Number - eg. NASA SP 8084<br>
-      <b>ISBN</b> - International Standard Book Number - eg. 0-1234-5678-9<br>
-      <b>ISSN</b> - International Standard Serial Number - eg. 1234-5678<br>
-      <b>ISMN</b> - International Standard Music Number - eg. M-53001-001-3<br>
-      <b>URI</b> - Universal Resource Identifier - eg. http://www.dspace.org/help/submit.html<br>
+      Government Document Number - e.g. NASA SP 8084<br>
+      <b>ISBN</b> - International Standard Book Number - e.g. 0-1234-5678-9<br>
+      <b>ISSN</b> - International Standard Serial Number - e.g. 1234-5678<br>
+      <b>ISMN</b> - International Standard Music Number - e.g. M-53001-001-3<br>
+      <b>URI</b> - Universal Resource Identifier - e.g.. http://www.dspace.org/help/submit.html<br>
       <b>Other </b>- An unique identifier assigned to the item using a system 
       other than the above</font></p>
   </blockquote>
@@ -452,8 +486,8 @@ href="http://web.mit.edu/is/cert/">MIT Information Systems Web Certificates at
   <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif">Select the 
     language of the intellectual content of your item. If the default (English 
     - United States) is not appropriate, click on the arrow on the right of the 
-    drop down box to see a list of languages commonly used forMIT publications, 
-    eg. </font></p>
+    drop down box to see a list of languages commonly used for MIT publications, 
+    e.g.</font></p>
   <p align="center"><font face="Verdana, Arial, Helvetica, sans-serif"><img src="finalLanguage1.jpg" width="284" height="40"></font></p>
   <p><font face="Verdana, Arial, Helvetica, sans-serif">If your item is not a 
     text document and language is not applicable as description, then select the 
@@ -486,7 +520,7 @@ href="http://web.mit.edu/is/cert/">MIT Information Systems Web Certificates at
 <p><font face="Verdana, Arial, Helvetica, sans-serif"><b>Sponsors:</b></font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif">If your item is the product 
   of sponsored research, you can provide information about the sponsor(s) here. 
-  This is a free-form field where you can enter any note you like. Example:</font></p>
+  This is a freeform field where you can enter any note you like. Example:</font></p>
 <p align="center"><font face="Verdana, Arial, Helvetica, sans-serif"><img src="sponsor.gif" width="542" height="110"></font></p>
 <p>&nbsp;</p>
 <hr>
@@ -552,8 +586,8 @@ href="http://web.mit.edu/is/cert/">MIT Information Systems Web Certificates at
   this item, you will see an input box marked &quot;<b>File Description</b>&quot;. 
   The information you provide here will help users to understand what information 
   is in each file, for instance, &quot;main article&quot; or &quot;images&quot; 
-  or &quot;computer program&quot; or &quot;data set&quot;. Once this information 
-  is entered, click on the &quot;next&quot; button to proceed.</font></p>
+  or &quot;computer program&quot; or &quot;data set&quot;. Enter file descriptions 
+  for each item, and click on the &quot;next&quot; button to proceed.</font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif"><b><a name="formats"></a>File 
   Formats</b></font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif">To properly archive and 
@@ -600,7 +634,7 @@ href="http://web.mit.edu/is/cert/">MIT Information Systems Web Certificates at
   every file we've received from you will show to the right of the filename.</font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif">You will need to use a local 
   program to generate your own checksum for these files, and verify that your 
-  results match ours. On most UNIX-like systems (including athena and Mac OS X), 
+  results match ours. On most UNIX-like systems (including Athena and Mac OS X), 
   use md5sum. For instance, type "md5sum MYFILE" for every file you want to check; 
   the summary should print on your screen.</font></p>
 <p><font face="Verdana, Arial, Helvetica, sans-serif">For Windows machines, MD5 
@@ -710,3 +744,4 @@ href="http://web.mit.edu/is/cert/">MIT Information Systems Web Certificates at
   or call 617-452-3485.</font></p>
 </body>
 </html>
+
