@@ -113,7 +113,8 @@ public class HandleManager
      */
     public static String getCanonicalForm(String handle)
     {
-        return "hdl:" + handle;
+//        return "hdl:" + handle;
+        return "http://hdl.handle.net/" + handle;
     }
 
 
@@ -126,10 +127,10 @@ public class HandleManager
      * @param handle The handle
      * @return The canonical form
      */
-    public static String getURLForm(String handle)
-    {
-        return "http://hdl.handle.net/" + handle;
-    }
+//    public static String getURLForm(String handle)
+//    {
+//        return "http://hdl.handle.net/" + handle;
+//    }
 
 
     /**
