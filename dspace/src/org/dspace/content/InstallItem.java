@@ -92,7 +92,7 @@ public class InstallItem
         String handleref = HandleManager.getCanonicalForm(handle);
         
         // Add handle as identifier.uri DC value
-        item.addDC("identifier", "uri", null, handle);
+        item.addDC("identifier", "uri", null, handleref);
 
         // Add format.mimetype and format.extent DC values
         Bitstream[] bitstreams = item.getNonInternalBitstreams();
