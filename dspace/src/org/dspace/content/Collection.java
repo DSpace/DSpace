@@ -475,6 +475,8 @@ public class Collection extends DSpaceObject
         	g.setName("COLLECTION_" + getID() + "_WORKFLOW_STEP_" + step);
         	g.update();
         	setWorkflowGroup(step, g);
+
+                AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, g);
         }
 
         return workflowGroup[step-1];
