@@ -100,7 +100,7 @@ public class ItemExport
 
         options.addOption( "t", "type",   true, "type: COLLECTION or ITEM");
         options.addOption( "i", "id",     true, "ID or handle of thing to export");
-        options.addOption( "d", "dest",   true, "remove items in mapfile");
+        options.addOption( "d", "dest",   true, "destination where you want items to go");
         options.addOption( "n", "number", true, "sequence number to begin exporting items with");
         options.addOption( "h", "help",   false, "help");
 
@@ -383,35 +383,43 @@ public class ItemExport
             
             for( int j = 0; j < bundles.length; j++ )
             {
-                // currently one bitstream per bundle!
-                Bitstream b   = (bundles[j].getBitstreams())[0];
-                String myName = b.getName();
-                String oldName = myName;
-                int myPrefix = 1;    // only used with name conflict
-                                
-                InputStream is = b.retrieve();
+                // bundles can have multiple bitstreams now...
+                Bitstream [] bitstreams = bundles[j].getBitstreams();
                 
-                boolean isDone = false;  // done when bitstream is finally written
+                String bundleName = bundles[j].getName();
                 
-                while( !isDone )
+                for( int k = 0; k<bitstreams.length; k++)
                 {
+                    Bitstream b = bitstreams[k];
                     
-                    File fout = new File( destDir, myName );
+                    String myName  = b.getName();
+                    String oldName = myName;
+                    int myPrefix   = 1;    // only used with name conflict
+                                
+                    InputStream is = b.retrieve();
                 
-                    if( fout.createNewFile() )
+                    boolean isDone = false;  // done when bitstream is finally written
+                
+                    while( !isDone )
                     {
-                        FileOutputStream fos = new FileOutputStream(fout);
-                        Utils.bufferedCopy( is, fos );
+                    
+                        File fout = new File( destDir, myName );
+                
+                        if( fout.createNewFile() )
+                        {
+                            FileOutputStream fos = new FileOutputStream(fout);
+                            Utils.bufferedCopy( is, fos );
 
-                        // write the manifest file entry
-                        out.println( myName );
+                            // write the manifest file entry
+                            out.println( myName + "\tbundle:" + bundleName );
 
-                        isDone = true;
-                    }
-                    else
-                    {
-                        myName = myPrefix + "_" + oldName; // keep appending numbers to the filename until unique
-                        myPrefix++; 
+                            isDone = true;
+                        }
+                        else
+                        {
+                            myName = myPrefix + "_" + oldName; // keep appending numbers to the filename until unique
+                            myPrefix++; 
+                        }
                     }
                 }
 

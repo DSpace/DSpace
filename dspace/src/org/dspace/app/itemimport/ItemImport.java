@@ -668,49 +668,78 @@ public class ItemImport
         BufferedReader is = new BufferedReader( new FileReader( contentspath ) );
         while( ( line = is.readLine() ) != null )
         {
-            System.out.println( "\tBitstream: " + line );
-            processContentFileEntry( c, i, path, line );
+            // look for a bundle name
+            String bundleMarker = "\tbundle:";
+            
+            int markerIndex = line.indexOf(bundleMarker);
+            
+            if( markerIndex == -1 )
+            {
+                // no bundle found
+                processContentFileEntry( c, i, path, line, null );
+                System.out.println( "\tBitstream: " + line );
+            }
+            else
+            {
+                // found bundle
+                String bundleName    = line.substring(markerIndex+bundleMarker.length());
+                String bitstreamName = line.substring(0, markerIndex);
+                
+                processContentFileEntry( c, i, path, bitstreamName, bundleName );
+                System.out.println( "\tBitstream: " + bitstreamName + "\tBundle: " + bundleName );
+            }
+        
         }
         is.close();
     }
 
 
     // each entry represents a bitstream....
-    public void processContentFileEntry( Context c, Item i, String path, String name)
+    public void processContentFileEntry( Context c, Item i, String path, String fileName, String bundleName )
         throws SQLException, IOException, AuthorizeException
     {
-        String fullpath = path + File.separatorChar + name;
+        String fullpath = path + File.separatorChar + fileName;
 
         // get an input stream
         BufferedInputStream bis = new BufferedInputStream( new FileInputStream( fullpath ) );
 
         Bitstream bs = null;
-
-        if(name.equals("license.txt"))
+        String newBundleName = bundleName;
+        
+        if( bundleName == null )
         {
-            bs = i.createSingleBitstream(bis, "LICENSE");
-        }
-        else
-        {
-            // add it to the item in a bundle
-
-            // do we already have a bundle?    
-            Bundle [] bundles = i.getBundles();
-                    
-            if( bundles.length < 1)
+            // is it license.txt?
+            if( fileName.equals("license.txt") )
             {
-                // set bundle's name to ORIGINAL    
-                bs = i.createSingleBitstream(bis, "ORIGINAL");
+                newBundleName = "LICENSE";
             }
             else
             {
-                // we have a bundle already, just add bitstream
-                bs = bundles[0].createBitstream(bis);
+                // call it ORIGINAL
+                newBundleName = "ORIGINAL";
             }
         }
+        
+        
+        // find the bundle
+        Bundle [] bundles = i.getBundles( newBundleName );
+        Bundle targetBundle = null;
+            
+        if( bundles.length < 1 )
+        {
+            // not found, create a new one
+            targetBundle = i.createBundle( newBundleName );
+        }
+        else
+        {
+            // put bitstreams into first bundle
+            targetBundle = bundles[0];
+        }
 
+        // now add the bitstream
+        bs = targetBundle.createBitstream( bis );
 
-        bs.setName( name );
+        bs.setName( fileName );
 
         // Identify the format
         // FIXME - guessing format guesses license.txt incorrectly as a text file format!
