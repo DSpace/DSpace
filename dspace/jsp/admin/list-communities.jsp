@@ -79,7 +79,8 @@
 %>
         <tr class="evenRowEvenCol">
             <td>
-                <strong><A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %> (<%= communities[i].getHandle() %>)(<%= communities[i].getID()%>)</A></strong>
+                <strong><A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></A></strong>
+                <small><%= communities[i].getHandle() %> (DB ID: <%= communities[i].getID()%>)</small>
             </td>
             <form method=POST>
                 <td>
@@ -112,7 +113,8 @@
 %>
         <tr class="oddRowOddCol">
             <td>
-                &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= collections[j].getMetadata("name") %> (<%= collections[j].getHandle() %>) (<%=collections[j].getID()%>)</A>
+                &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>"><%= collections[j].getMetadata("name") %></A>
+                <small><%= collections[i].getHandle() %> (DB ID: <%= collections[i].getID()%>)</small>
             </td>
             <form method=POST>
                 <td>
