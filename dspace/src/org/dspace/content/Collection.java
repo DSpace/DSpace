@@ -109,8 +109,8 @@ public class Collection extends DSpaceObject
     /** The default group of submitters */
     private Group submitters;
 
-    /** The default group of editors */
-    private Group editors;
+    /** The default group of administrators */
+    private Group admins;
     
     /**
      * Construct a collection with the given table row
@@ -158,9 +158,9 @@ public class Collection extends DSpaceObject
         submitters = Group.findByName(ourContext,
             "COLLECTION_" + getID() + "_SUBMIT");
 
-        // default editors group
-        editors = Group.findByName(ourContext,
-            "COLLECTION_" + getID() + "_EDITOR");
+        // default administrator group
+        admins = Group.findByName(ourContext,
+            "COLLECTION_" + getID() + "_ADMIN");
 
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
@@ -566,50 +566,50 @@ public class Collection extends DSpaceObject
 
 
     /**
-     * Create a default editors group if one does not already exist.
+     * Create a default administrators group if one does not already exist.
      * Returns either the newly created group or the previously existing one.
-     * Note that other groups may also be editors.
+     * Note that other groups may also be administrators.
      *
      * @return  the default group of editors associated with this collection
      */
-    public Group createEditors()
+    public Group createAdministrators()
         throws SQLException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
-        if( editors == null)
+        if( admins == null)
         {
-            editors = Group.create(ourContext);
-            editors.setName("COLLECTION_" + getID() + "_EDITOR");
-            editors.update();
+            admins = Group.create(ourContext);
+            admins.setName("COLLECTION_" + getID() + "_ADMIN");
+            admins.update();
         }
 
-        AuthorizeManager.addPolicy(ourContext, this, Constants.COLLECTION_EDITOR, editors);
+        AuthorizeManager.addPolicy(ourContext, this, Constants.COLLECTION_EDITOR, admins);
 
-        // editors also get ADD on the submitter group
+        // administrators also get ADD on the submitter group
         if( submitters != null )
         {
-            AuthorizeManager.addPolicy(ourContext, submitters, Constants.ADD, editors);
+            AuthorizeManager.addPolicy(ourContext, submitters, Constants.ADD, admins);
         }
 
-        return editors;
+        return admins;
     }
 
 
     /**
-     * Get the default group of editors, if there is one.  Note that the
-     * authorization system may allow others to be editors for the collection.
+     * Get the default group of administrators, if there is one.  Note that the
+     * authorization system may allow others to be administrators for the collection.
      * <P>
-     * The default group of submitters for collection 100 is the one called
-     * <code>collection_100_editor</code>.
+     * The default group of administrators for collection 100 is the one called
+     * <code>collection_100_admin</code>.
      *
-     * @return  group of editors, or <code>null</code> if
+     * @return  group of administrators, or <code>null</code> if
      *          there is no default group.
      */
-    public Group getEditors()
+    public Group getAdministrators()
     {
-        return editors;
+        return admins;
     }
 
 
@@ -895,8 +895,8 @@ public class Collection extends DSpaceObject
         g = getWorkflowGroup(2);  if( g != null ) { g.delete(); }
         g = getWorkflowGroup(3);  if( g != null ) { g.delete(); }
 
-        // Remove default editors group
-        g = getEditors(); if( g!=null ) { g.delete(); }        
+        // Remove default administrators group
+        g = getAdministrators(); if( g!=null ) { g.delete(); }        
         
         // Remove default submitters group
         g = getSubmitters(); if( g!=null ) { g.delete(); }        

@@ -49,7 +49,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -66,7 +65,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
@@ -493,10 +491,10 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 request.getContextPath() + "/tools/group-edit?group_id=" +
                     newGroup.getID()));
         }
-        else if(button.equals("submit_editors_create"))
+        else if(button.equals("submit_admins_create"))
         {
             // Create new group
-            Group newGroup = collection.createEditors();
+            Group newGroup = collection.createAdministrators();
 
             // Forward to group edit page
             response.sendRedirect(response.encodeRedirectURL(
@@ -538,10 +536,10 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 request.getContextPath() + "/tools/group-edit?group_id=" +
                     g.getID()));
         }
-        else if(button.equals("submit_editors_edit"))
+        else if(button.equals("submit_admins_edit"))
         {
-            // Edit 'editors' group
-            Group g = collection.getEditors();
+            // Edit 'collection administrators' group
+            Group g = collection.getAdministrators();
             response.sendRedirect(response.encodeRedirectURL(
                 request.getContextPath() + "/tools/group-edit?group_id=" +
                     g.getID()));

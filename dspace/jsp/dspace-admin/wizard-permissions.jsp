@@ -56,8 +56,8 @@
 
 <%
     Collection collection = (Collection) request.getAttribute("collection");
-	int perm = ((Integer) request.getAttribute("permission")).intValue();
-	boolean mitGroup = (request.getAttribute("mitgroup") != null);
+    int perm = ((Integer) request.getAttribute("permission")).intValue();
+    boolean mitGroup = (request.getAttribute("mitgroup") != null);
 %>
 
 <dspace:layout locbar="off" navbar="off" title="Collection Authorization" nocache="true">
@@ -83,36 +83,40 @@
 	
 	case CollectionWizardServlet.PERM_WF1:
 %>
-	<H1>Workflow Reviewers</H1>
+	<H1>Submission Workflow Accept/Reject Step</H1>
 	
-	<P>Who are the workflow reviews for this collection?  They will be able to accept or reject
-incoming submissions.  They will not be able to edit item metadata, however.</P>
+	<P>Who is responsible for performing the <strong>accept/reject</strong> step?
+	They will be able to accept or reject incoming submissions.  They will not be
+	able to edit the submission's metadata, however.  Only one of the group need perform the step
+	for each submission.</P>
 <%
 	break;
 
 	case CollectionWizardServlet.PERM_WF2:
 %>
-	<H1>Workflow Approvers</H1>
+	<H1>Submission Workflow Accept/Reject/Edit Metadata Step</H1>
 	
-	<P>Who are the workflow approvers for this collection?  They will be able to accept or reject
-incoming submissions, and edit item metadata.</P>
+	<P>Who is responsible for performing the <strong>accept/reject/edit metadata</strong> step?
+	They will be able to edit the metadata of incoming submissions, and then accept
+	or reject them.  Only one of the group need perform the step for each submission.</P>
 <%
 	break;
 
 	case CollectionWizardServlet.PERM_WF3:
 %>
-	<H1>Workflow Metadata Editors</H1>
+	<H1>Submission Workflow Edit Metadata Step</H1>
 	
-	<P>Who are the workflow metadata editors for this collection?  They will be able to edit item metadata of
-incoming submissions, but will not be able to reject them.</P>
+	<P>Who is responsible for performing the <strong>edit metadata</strong> step?
+	They will be able to edit the metadata of incoming submissions, but will not
+	be able to reject them.</P>
 <%
 	break;
 
-	case CollectionWizardServlet.PERM_EDITOR:
+	case CollectionWizardServlet.PERM_ADMIN:
 %>
-	<H1>Collection Editors (Administrators)</H1>
+	<H1>Delegated Collection Administrators</H1>
 
-	<P>Who are the collection editors for this collection?  They will be able to decide who can submit items
+	<P>Who are the collection administrators for this collection?  They will be able to decide who can submit items
 to the collection, withdraw items, edit item metadata (after submission), and add (map) existing items from
 other collections to this collection (subject to authorization from that collection).</P>
 <%

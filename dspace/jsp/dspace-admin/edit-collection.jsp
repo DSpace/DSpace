@@ -75,7 +75,7 @@
     wfGroups[1] = null;
     wfGroups[2] = null;
 
-    Group editors    = null;
+    Group admins     = null;
     Group submitters = null;
 
     Item template = null;
@@ -115,7 +115,7 @@
         wfGroups[1] = collection.getWorkflowGroup(2);
         wfGroups[2] = collection.getWorkflowGroup(3);
 
-        editors    = collection.getEditors();
+        admins     = collection.getAdministrators();
         submitters = collection.getSubmitters();
 
         template = collection.getTemplateItem();
@@ -205,22 +205,10 @@
 <%  } %>
                 </td>
             </tr>
-<%-- ===========================================================
-     Workflow groups
-     =========================================================== --%>
-<%  for (int i = 0; i<3; i++) { %>
-            <tr>
-                <td class="submitFormLabel">Workflow step <%= i + 1 %> group:</td>
-                <td>
-<%      if (wfGroups[i] == null) { %>
-                    <input type="submit" name="submit_wf_create_<%= i + 1 %>" value="Create...">
-<%      } else { %>
-                    <input type="submit" name="submit_wf_edit_<%= i + 1 %>" value="Edit...">
-                    <input type="submit" name="submit_wf_delete_<%= i + 1 %>" value="Delete">
-<%      } %>
-                </td>
-            </tr>
-<%  } %>
+            
+            <tr><td>&nbsp;</td></tr>
+            <tr><td colspan=2><center><h3>Submission Workflow</h3></center></td></tr>
+
 <%-- ===========================================================
      Collection Submitters
      =========================================================== --%>
@@ -234,16 +222,38 @@
 <%  } %>                    
                 </td>
             </tr>   
+            
 <%-- ===========================================================
-     Collection Editors
+     Workflow groups
+     =========================================================== --%>
+<%
+    String[] roleTexts = {"Accept/Reject", "Accept/Reject/Edit Metadata", "Edit Metadata"};
+    for (int i = 0; i<3; i++) { %>
+            <tr>
+                <td class="submitFormLabel"><em><%= roleTexts[i] %></em> Step:</td>
+                <td>
+<%      if (wfGroups[i] == null) { %>
+                    <input type="submit" name="submit_wf_create_<%= i + 1 %>" value="Create...">
+<%      } else { %>
+                    <input type="submit" name="submit_wf_edit_<%= i + 1 %>" value="Edit...">
+                    <input type="submit" name="submit_wf_delete_<%= i + 1 %>" value="Delete">
+<%      } %>
+                </td>
+            </tr>
+<%  } %>
+
+            <tr><td>&nbsp;</td></tr>
+
+<%-- ===========================================================
+     Collection Administrators
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Editors:</td>
+                <td class="submitFormLabel">Collection Administrators:</td>
                 <td>
-<%  if (editors == null) {%>
-                    <input type="submit" name="submit_editors_create" value="Create...">
+<%  if (admins == null) {%>
+                    <input type="submit" name="submit_admins_create" value="Create...">
 <%  } else { %>
-                    <input type="submit" name="submit_editors_edit" value="Edit...">
+                    <input type="submit" name="submit_admins_edit" value="Edit...">
 <%  } %>                    
                 </td>
             </tr>   
