@@ -243,7 +243,8 @@ public class Browse
 
         StringBuffer buffer = new StringBuffer("select * from ")
             .append(table)
-            .append(getScopeClause(scope, "where"));
+            .append(getScopeClause(scope, "where"))
+            .append(" ORDER BY date_accessioned DESC");
 
         // NOTE: Postgres-specific function
         if (! scope.hasNoLimit())
