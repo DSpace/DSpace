@@ -7,7 +7,6 @@ commons-pool.jar:    Jakarta Commons object pooling API (v1.0)
 cos.jar:             com.oreilly.servlet - multipart HTTP requests. 27May2002
 handle.jar:          CNRI Handle Server (version 5.2.0)
 jena.jar:            The Jena RDF framework (version 1.4.0)
-junit.jar:           JUnit Test Framework, for automatic system tests
 log4j.jar:           Log4j, for system logging (version 1.2.1)
 lucene.jar:          Lucene search engine (version 1.2)
 mail.jar:            JavaMail, used for sending e-mail
