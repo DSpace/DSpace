@@ -55,7 +55,7 @@
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.content.Collection" %>
-
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     WorkflowItem[] workflows =
@@ -95,7 +95,7 @@
                     <%= WorkflowManager.getSubmitterName(workflows[i])   %>
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= WorkflowManager.getItemTitle(workflows[i])       %>
+                    <%= Utils.addEntities(WorkflowManager.getItemTitle(workflows[i]))       %>
                 </td>
                 <td class="<%= row %>RowOddCol">
                     <input type="hidden" name="workflow_id" value="<%= workflows[i].getID() %>">
