@@ -341,7 +341,8 @@ public class Community
 
 
     /**
-     * Create a new collection within this community
+     * Create a new collection within this community.  The collection is
+     * created without any workflow groups or default submitter group.
      *
      * @return  the new collection
      */
