@@ -749,7 +749,8 @@ public class Item extends DSpaceObject
 
     /**
      * Get the communities this item is in.  Returns an unordered array of
-     * the communities that house the collections this item is in.
+     * the communities that house the collections this item is in, including
+     * parent communities of the owning collections.
      *
      * @return  the communities this item is in.
      */
@@ -771,17 +772,20 @@ public class Item extends DSpaceObject
             TableRow row = tri.next();
 
             // First check the cache
-            Community fromCache = (Community) ourContext.fromCache(
+            Community owner = (Community) ourContext.fromCache(
                 Community.class, row.getIntColumn("community_id"));
 
-            if (fromCache != null)
-            {
-                communities.add(fromCache);
-            }
-            else
-            {
-                communities.add(new Community(ourContext, row));
-            }
+            if (owner == null)
+	    {
+		owner = new Community(ourContext, row);
+	    }
+            communities.add(owner);
+            // now add any parent communities
+            Community[] parents = owner.getAllParents();
+            for (int i = 0; i < parents.length; i++)
+	    {
+		communities.add(parents[i]);
+	    }
         }
 
         Community[] communityArray = new Community[communities.size()];
