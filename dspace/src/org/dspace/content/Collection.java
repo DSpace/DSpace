@@ -210,7 +210,7 @@ public class Collection
      *
      * @return  the collections in the system
      */
-    public static Collection[] getAllCollections(Context context)
+    public static Collection[] findAll(Context context)
         throws SQLException
     {
         TableRowIterator tri = DatabaseManager.query(context,
@@ -231,6 +231,23 @@ public class Collection
         return collectionArray;
     }
 
+
+    /**
+     * Get all the items in this collection.  The order is indeterminate.
+     *
+     * @return  an iterator over the items in the collection.
+     */
+    public ItemIterator getItems()
+        throws SQLException
+    {
+        TableRowIterator rows = DatabaseManager.query(ourContext,
+            "item",
+            "SELECT item.* FROM item, collection2item WHERE " +
+                "collection2item.collection_id=" + getID() + ";");
+
+        return new ItemIterator(ourContext, rows);
+    }        
+    
 
     /**
      * Get the internal ID of this collection

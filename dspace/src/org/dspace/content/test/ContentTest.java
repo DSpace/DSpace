@@ -176,8 +176,8 @@ public class ContentTest extends TestCase
                           Collection.find(context, collectionID));
             assertTrue("Community includes this collection",
                        contains(collection.getCommunities(), c1));
-            assertTrue("Collection is present in getAllCollections ",
-                       contains(Collection.getAllCollections(context),
+            assertTrue("Collection is present in Collections.findAll",
+                       contains(Collection.findAll(context),
                                 collection));
             Community c2 = Community.create(context);
 
@@ -255,7 +255,7 @@ public class ContentTest extends TestCase
             assertEquals("Found collection has correct name",
                          c2.getMetadata("name"), TEST_NAME_1);
             assertTrue("Found collection in getAllCollections array",
-                       contains(Collection.getAllCollections(context), c2));
+                       contains(Collection.findAll(context), c2));
             c2.delete();
             Collection c3 = Collection.find (context, collID);
             assertNull("Did not find deleted collection", c3);

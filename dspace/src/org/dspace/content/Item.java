@@ -238,6 +238,23 @@ public class Item
 
 
     /**
+     * Get all the items in the archive.  Only items with the "in archive"
+     * flag set are included.  The order of the list is indeterminate.
+     *
+     * @return  an iterator over the items in the archive.
+     */
+    public static ItemIterator findAll(Context context)
+        throws SQLException
+    {
+        TableRowIterator rows = DatabaseManager.query(context,
+            "item",
+            "SELECT * FROM item WHERE in_archive=true;");
+
+        return new ItemIterator(context, rows);
+    }
+
+
+    /**
      * Get the internal ID of this item.  In general, this shouldn't be
      * exposed to users
      *
@@ -541,7 +558,7 @@ public class Item
         // Get collection table rows
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "collection",
-            "select collection.* from collection, collection2item where " +
+            "SELECT collection.* FROM collection, collection2item WHERE " +
                 "collection2item.collection_id=collection.collection_id AND " +
                 "collection2item.item_id=" +
                 itemRow.getIntColumn("item_id") + ";");
@@ -558,6 +575,37 @@ public class Item
         return collectionArray;
     }
     
+
+    /**
+     * Get the communities this item is in.  Provided for convenience.
+     *
+     * @return  the communities this item is in.
+     */
+    public Community[] getCommunities()
+        throws SQLException
+    {
+        List communities = new ArrayList();
+
+        // Get community table rows
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+            "community",
+            "SELECT community.* FROM community, community2collection, " +
+                "collection2item WHERE community2collection.collection_id=" +
+                "collection2item.collection_id AND collection2item.item_id=" +
+                itemRow.getIntColumn("item_id") + ";");
+
+        while (tri.hasNext())
+        {
+            TableRow r = (TableRow) tri.next();
+            communities.add(new Item(ourContext, r));
+        }
+        
+        Community[] communityArray = new Community[communities.size()];
+        communityArray = (Community[]) communities.toArray(communityArray);
+        
+        return communityArray;
+    }        
+
 
     /**
      * Get the bundles in this item
