@@ -313,7 +313,7 @@ public class ContentTest extends TestCase
             Community community = Community.create(context);
             Collection collection = community.createCollection();
 
-            WorkspaceItem wi = WorkspaceItem.create(context, collection, null);
+            WorkspaceItem wi = WorkspaceItem.create(context, collection);
 
             int w_id = wi.getID();
             Item item = wi.getItem();

@@ -48,6 +48,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -141,24 +143,23 @@ public class WorkspaceItem implements InProgressSubmission
 
     /**
      * Create a new workspace item, with a new ID.  An Item is also
-     * created
+     * created.  The submitter is the current user in the context.
      *
      * @param  context  DSpace context object
      * @param  coll     Collection being submitted to
-     * @param  sub      The submitting e-person  
      *
      * @return  the newly created workspace item
      */
     public static WorkspaceItem create(Context context,
-                                       Collection coll,
-                                       EPerson sub)
+                                       Collection coll)
         throws AuthorizeException, SQLException
     {
-        // FIXME Check authorisation
+        // Check the user has permission to ADD to the collection
+        AuthorizeManager.authorizeAction(context, coll, Constants.ADD);
 
         // Create an item
         Item i = Item.create(context);
-        i.setSubmitter(sub);
+        i.setSubmitter(context.getCurrentUser());
         i.update();
         
         // Create the workspace item row
@@ -240,7 +241,7 @@ public class WorkspaceItem implements InProgressSubmission
     public WorkflowItem startWorkflow()
         throws SQLException, AuthorizeException
     {
-        // FIXME Check auth
+        // FIXME Check auth  (this code is being moved to WorkflowManager
 
         log.info(LogManager.getHeader(ourContext,
             "start_workflow",
@@ -284,7 +285,8 @@ public class WorkspaceItem implements InProgressSubmission
     public void update()
         throws SQLException, AuthorizeException
     {
-        // FIXME check auth
+        // Check auth
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
     
         log.info(LogManager.getHeader(ourContext,
             "update_workspace_item",
@@ -306,7 +308,8 @@ public class WorkspaceItem implements InProgressSubmission
     public void delete()
         throws SQLException, AuthorizeException, IOException
     {
-        // FIXME Check auth
+        // Check auth
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
     
         log.info(LogManager.getHeader(ourContext,
             "delete_workspace_item",

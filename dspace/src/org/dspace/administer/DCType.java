@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -193,7 +194,12 @@ public class DCType
     public static DCType create(Context context)
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation 
+        // Check authorisation: Only admins may create DC types
+        if (!AuthorizeManager.isAdmin(context))
+        {
+            throw new AuthorizeException(
+                "Only administrators may modiffy the Dublin Core registry");
+        }
         
         // Create a table row
         TableRow row = DatabaseManager.create(context, "dctyperegistry");
@@ -286,7 +292,12 @@ public class DCType
     public void update()
         throws SQLException, AuthorizeException
     {
-        // FIXME: Check authorisation
+        // Check authorisation: Only admins may update DC types
+        if (!AuthorizeManager.isAdmin(ourContext))
+        {
+            throw new AuthorizeException(
+                "Only administrators may modiffy the Dublin Core registry");
+        }
 
         DatabaseManager.update(ourContext, typeRow);
     }

@@ -636,7 +636,8 @@ public class Collection
      * Delete the collection, including the metadata and logo.  Items
      * are merely disassociated, they are NOT deleted.  If this collection
      * is contained in any communities, the association with those communities
-     * is removed.
+     * is removed.  Groups associated with this collection (workflow
+     * participants and submitters) are NOT deleted.
      */
     public void delete()
         throws SQLException, AuthorizeException, IOException
@@ -672,7 +673,7 @@ public class Collection
      * Items or other objects that are multiply contained (e.g. an item also
      * in another collection) are NOT deleted.  If this collection
      * is contained in any communities, the association with those communities
-     * is removed.
+     * is removed.  Associated Groups are NOT deleted at present.
      */
     public void deleteWithContents()
         throws SQLException, AuthorizeException, IOException
