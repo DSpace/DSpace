@@ -199,7 +199,7 @@
     for (int i = 0; i < lastSubmittedTitles.length; i++)
     {
 %>
-    <P class="recentItem"><A HREF="<%= lastSubmittedURLs[i] %>"><%= lastSubmittedTitles[i] %></A></P>
+    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= lastSubmittedTitles[i] %></A></P>
 <%
   }
 %>
