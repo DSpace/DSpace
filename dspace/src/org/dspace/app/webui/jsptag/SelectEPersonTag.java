@@ -104,7 +104,7 @@ public class SelectEPersonTag extends TagSupport
 	 * 
 	 * @param e  attribute from JSP
 	 */
-	public void setMultiple(Object e)
+	public void setSelected(Object e)
 	{
 		if (e instanceof EPerson)
 		{
