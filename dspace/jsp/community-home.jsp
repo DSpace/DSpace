@@ -46,12 +46,14 @@
   -    collections           - array of Collections in this community
   -    last.submitted.titles - String[] of titles of recently submitted items
   -    last.submitted.urls   - String[] of URLs of recently submitted items
+  -    admin_button - Boolean, show admin 'edit' button
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
@@ -67,6 +69,8 @@
         request.getAttribute("last.submitted.titles");
     String[] lastSubmittedURLs = (String[])
         request.getAttribute("last.submitted.urls");
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
 
 
     // Put the metadata values into guaranteed non-null variables
@@ -95,6 +99,19 @@
       <td width=100%>
         <H1><%= name %></H1>
         <H3>Community home page</H3>
+
+    <% if(admin_button)  // admin edit button
+    { %>
+    <form method=POST action=<%=request.getContextPath()%>/dspace-admin/edit-communities>
+      <input type="hidden" name="community_id"
+     
+value="<%=community.getID()%>
+                                                                                       ">
+      <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COMMUNITY%>">
+      <input type="submit" value="Edit">
+    </form>
+    <% } %>
+
       </td>
       <td valign=top>
 <%  if (logo != null) { %>

@@ -48,22 +48,26 @@
   -    last.submitted.urls   - String[], corresponding URLs
   -    logged.in  - Boolean, true if a user is logged in
   -    subscribed - Boolean, true if user is subscribed to this collection
+  -    admin_button - Boolean, show admin 'edit' button
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.Collection"%>
+<%@ page import="org.dspace.eperson.Group"     %>
 
 
 <%
     // Retrieve attributes
     Collection collection = (Collection) request.getAttribute("collection");
-    Community community = (Community) request.getAttribute("community");
-
+    Community  community  = (Community) request.getAttribute("community");
+    Group      submitters = (Group) request.getAttribute("submitters");
+       
     String[] lastSubmittedTitles = (String[])
         request.getAttribute("last.submitted.titles");
     String[] lastSubmittedURLs = (String[])
@@ -73,6 +77,10 @@
         ((Boolean) request.getAttribute("logged.in")).booleanValue();
     boolean subscribed =
         ((Boolean) request.getAttribute("subscribed")).booleanValue();
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+
+
 
     // Put the metadata values into guaranteed non-null variables
     String name = collection.getMetadata("name");
@@ -109,6 +117,17 @@
       <td width=100%>
         <H1><%= name %></H1>
         <H3>Collection home page</H3>
+
+    <% if(admin_button)  // admin edit button
+    { %>
+    <form method=POST action=<%=request.getContextPath()%>/dspace-admin/edit-communities>
+      <input type="hidden" name="collection_id" value="<%=collection.getID()%>">
+      <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COLLECTION%>">
+      <input type="submit" value="Edit">
+    </form>
+    <% } %>
+
+
       </td>
       <td valign=top>
 <%  if (logo != null) { %>
@@ -178,7 +197,16 @@
               </td>
               <td class="standard">
                 <input type="submit" name="submit_subscribe" value="Subscribe">
-<% } %>
+<%  }
+    if(submitters != null)
+    { %>
+        </td>
+        <td>
+          <small><a href="<%=request.getContextPath()%>/tools/group-edit?group=<%=submitters.getID()%></a></small>
+        
+<%  }
+
+ %>
               </td>
             </tr>
           </table>
