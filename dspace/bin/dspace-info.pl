@@ -53,21 +53,21 @@ use strict;
 use File::Find;
 
 
-###############################################
-# CONFIGURE THESE VARIABLES! ##################
-###############################################
+##################################################
+# CONFIGURE THESE VARIABLES TO MATCH YOUR SETUP! #
+##################################################
 
 # where is DSpace installed?
 my $dspace_dir = "/dspace";
 
 #where is the DATA for the database tables stored?
-my $database_dir = "/dspace/database/data";
+my $database_dir = "/dspace/database";
 
 
 
 # error out if cannot locate above directories
-die "Cannot find dspace directory tree $dspace_dir"     if( ! -d $dspace_dir   );
-die "Cannot find database data directory $database_dir" if( ! -d $database_dir );
+die "Cannot find dspace directory tree $dspace_dir - edit dspace-info.pl 'dspace_dir' variable with correct path"     if( ! -d $dspace_dir   );
+die "Cannot find database data directory $database_dir - edit dspace-info.pl 'database_dir' variable with correct path" if( ! -d $database_dir );
 
 
 #############################################
@@ -181,6 +181,22 @@ sub NumberReport
     print "\t".FormatText($string).FormatNumber($number)."\n";
 }
 
+print "Collection sizes:\n";
+# sorted, of course
+foreach( sort { (split/\|/,$b)[1] <=> (split/\|/,$a)[1] } @collection_sizes )
+{
+    my ($name, $size) = split /\|/;
+
+    # spruce up the strings a bit
+    $size = FormatSize( $size );
+
+    # pad length of name string to right w/spaces
+    $name = FormatText( $name );  
+    
+    print "\t$name\t$size\n";
+}
+print "\n";
+
 # only show problems if they exist! ######
 
 if( $deleted_bitstreams[0] > 0 )
@@ -228,21 +244,6 @@ if( $#empty_groups >= 0 )
     print "\n";
 }
 
-print "Collection sizes:\n";
-# sorted, of course
-foreach( sort { (split/\|/,$b)[1] <=> (split/\|/,$a)[1] } @collection_sizes )
-{
-    my ($name, $size) = split /\|/;
-
-    # spruce up the strings a bit
-    $size = FormatSize( $size );
-
-    # pad length of name string to right w/spaces
-    $name = FormatText( $name );  
-    
-    print "\t$name\t$size\n";
-}
-print "\n";
 
 if( $#bitstreams_without_policies >= 0 )
 {
@@ -258,9 +259,24 @@ if( $#bitstreams_without_policies >= 0 )
 }
 
 
+# check ownership - check the jsp and asset store directories
+#  for ownership issues - be sure to run this script as the dspace user
+
+my @dspace_ownership = ( $assetstore_dir, "$dspace_dir/jsp" );
+
+find( \&CheckOwnership, @dspace_ownership );
+
 ################################################
 # subroutines ##################################
 ################################################
+
+
+sub CheckOwnership
+{
+    my $filename = $File::Find::name;
+
+    if( ! -o $filename ) { print "Warning! DSpace user isn't owner of: $filename\n"; }
+}
 
 
 sub CountRows
