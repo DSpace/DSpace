@@ -59,6 +59,7 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%
     // Retrieve attributes
@@ -181,6 +182,14 @@
 	    <td>
 	      <A HREF="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>">
 	      <%= collections[i].getMetadata("name") %></A>
+<%
+            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            {
+%>
+                [<%= collections[i].countItems() %>]
+<%
+            }
+%>
 	    </td>
 	    <% if (remove_button) { %>
 	    <td>
@@ -222,6 +231,14 @@
 			    <td>
 	                <A HREF="<%= request.getContextPath() %>/handle/<%= subcommunities[j].getHandle() %>">
 	                <%= subcommunities[j].getMetadata("name") %></A>
+<%
+                if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+                {
+%>
+                    [<%= subcommunities[j].countItems() %>]
+<%
+                }
+%>
 			    </td>
 	    		<% if (remove_button) { %>
 			    <td>

@@ -97,6 +97,15 @@
 %>                  <tr>
                         <td class="standard">
                             <A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></A>
+<%
+        if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+        {
+%>
+            [<%= communities[i].countItems() %>]
+<%
+        }
+
+%>
                         </td>
                     </tr>
 <%

@@ -928,4 +928,35 @@ public class Community extends DSpaceObject
 
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
     }
+
+	/**
+     * counts items in this community
+     *
+     * @return  total items
+     */
+    public int countItems()
+        throws SQLException
+    {
+        /** item count in a collection */
+        int collitems = 0;
+
+        /** item count in a community */
+        int commitems = 0;
+
+        Collection[] cols = getCollections();
+
+        if ( cols.length > 0 )
+        {
+            for (int j = 0; j < cols.length; j++)
+            {
+                // Get total items of a collection
+                collitems = cols[j].countItems();
+
+                commitems += collitems;
+
+            }
+        }
+
+        return commitems;
+    }
 }

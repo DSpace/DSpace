@@ -41,7 +41,7 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1133,4 +1133,27 @@ public class Collection extends DSpaceObject
 
         return myCollections;
     }
+
+	/**
+     * counts items in this collection
+     *
+     * @return  total items
+     */
+     public int countItems()
+        throws SQLException
+     {
+        Statement statement = ourContext.getDBConnection().createStatement();
+        ResultSet rs = statement.executeQuery(
+			 	"SELECT count(*) FROM collection2item, item WHERE "
+				+ "collection2item.collection_id = " + getID() 
+				+ " AND collection2item.item_id = item.item_id "
+				+ "AND in_archive ='t' AND item.withdrawn='f'");
+        int itemcount = 0;
+        rs.next();
+        itemcount = rs.getInt(1);
+
+        statement.close();
+
+        return itemcount;
+     }
 }

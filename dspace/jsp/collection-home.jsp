@@ -61,6 +61,7 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection"%>
 <%@ page import="org.dspace.core.Utils"%>
+<%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.eperson.Group"     %>
 
 
@@ -119,7 +120,16 @@
   <table border=0 cellpadding=5 width=100%>
     <tr>
       <td width=100%>
-        <H1><%= name %></H1>
+        <H1><%= name %>
+<%
+            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            {
+%>
+                : [<%= collection.countItems() %>]
+<%
+            }
+%>
+		</H1>
         <H3>Collection home page</H3>
       </td>
       <td valign=top>

@@ -59,6 +59,7 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -94,7 +95,13 @@
             for (int j = 0; j < cols.length; j++)
             {
                 out.println("<LI class=\"collectionListItem\">");
-                out.println("<A HREF=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</A></LI>");
+                out.println("<A HREF=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</A>");
+				if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+                {
+                    out.println(" [" + cols[j].countItems() + "]");
+                }
+
+                out.println("</LI>");
             }
             out.println("</UL>");
         }
@@ -200,7 +207,17 @@
             {
 %>
                 <LI class="collectionListItem">
-                <A HREF="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></A></LI>
+                <A HREF="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></A>
+<%
+                if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+                {
+%>
+                    [<%= cols[j].countItems() %>]
+<%
+                }
+%>
+
+				</LI>
 <%
             }
 %>
@@ -215,7 +232,16 @@
             {
 %>
                 <LI class="communityLink">
-                <A HREF="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></A></LI>
+                <A HREF="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></A>
+<%
+                if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+                {
+%>
+                    [<%= comms[k].countItems() %>]
+<%
+                }
+%>
+				</LI>
 <%
             }
 %>
