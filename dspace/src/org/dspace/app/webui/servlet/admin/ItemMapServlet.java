@@ -327,19 +327,26 @@ public class ItemMapServlet extends DSpaceServlet
             String [] itemIDs = request.getParameterValues("item_ids");
             String message = "";
 
-            for( int j = 0; j < itemIDs.length; j++ )
+            if( itemIDs == null )
             {
-                int i = Integer.parseInt(itemIDs[j]);
-
-                Item myItem = Item.find(context, i);
-
-                if( AuthorizeManager.authorizeActionBoolean(context, myItem, Constants.READ) )
+                message = "No items selected, none added.";
+            }
+            else
+            {
+                for( int j = 0; j < itemIDs.length; j++ )
                 {
-                    // make sure item doesn't belong to this collection
-                    if( !myItem.isOwningCollection(myCollection) )
+                    int i = Integer.parseInt(itemIDs[j]);
+
+                    Item myItem = Item.find(context, i);
+
+                    if( AuthorizeManager.authorizeActionBoolean(context, myItem, Constants.READ) )
                     {
-                        myCollection.addItem(myItem);
-                        message += "<br>Added item " + i;
+                        // make sure item doesn't belong to this collection
+                        if( !myItem.isOwningCollection(myCollection) )
+                        {
+                            myCollection.addItem(myItem);
+                            message += "<br>Added item " + i;
+                        }
                     }
                 }
             }
