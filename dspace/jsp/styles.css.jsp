@@ -522,10 +522,13 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 .help table{margin-left:8px;
             width:90%;}
 
+.help table.formats{font-size:10pt;}
+
 .help ul {font-size:10pt;}
 
 .help p.bottomLinks {font-size:10pt;
                     font-weight:bold;}
 
 .help td.leftAlign{font-size:10pt;}
-.help td.rightAlign{text-align:right;}
+.help td.rightAlign{text-align:right;
+                    font-size:10pt;}
