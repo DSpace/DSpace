@@ -895,6 +895,45 @@ public class Item
 
 
     /**
+     * Remove all licenses from an item - it was rejected
+     *
+     */
+    public void removeLicenses()
+        throws SQLException, IOException, AuthorizeException
+    {
+        // Find the License format
+        BitstreamFormat bf = BitstreamFormat.findByShortDescription(
+            ourContext, "License");
+        int licensetype = bf.getID();
+
+        // search through bundles, looking for bitstream type license
+        Bundle[] buns = getBundles();
+        
+        for(int i=0; i<buns.length; i++)
+        {
+            boolean removethisbundle = false;
+            
+            Bitstream [] bits = buns[i].getBitstreams();
+            
+            for(int j=0; j<bits.length; j++)
+            {
+                BitstreamFormat bft = bits[j].getFormat();
+                if(bft.getID() == licensetype)
+                {
+                    removethisbundle = true;
+                }
+            }
+
+            // probably serious troubles with Authorizations
+            // fix by telling system not to check authorization?            
+            removeBundle(buns[i]);
+            buns[i].deleteWithContents();
+        }    
+    }
+
+
+
+    /**
      * Update the item "in archive" flag and Dublin Core metadata in the
      * database
      */

@@ -336,7 +336,7 @@ public class WorkflowManager
 	 * @param e  EPerson doing the operation
 	 */
     public static void abort(Context c,WorkflowItem wi, EPerson e)
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         // authorize a DSpaceActions.ABORT
 
@@ -567,7 +567,7 @@ public class WorkflowManager
      */
     private static WorkspaceItem returnToWorkspace(Context c,
              WorkflowItem wfi)
-        throws SQLException, AuthorizeException
+        throws SQLException, IOException, AuthorizeException
     {
         Item myitem = wfi.getItem();
         Collection mycollection = wfi.getCollection();
@@ -588,6 +588,10 @@ public class WorkflowManager
         wi.setMultipleTitles(wfi.hasMultipleTitles());
         wi.setPublishedBefore(wfi.isPublishedBefore());
         wi.update();
+
+        // remove any licenses that the item may have been given
+        myitem.removeLicenses();
+        //myitem.update();
         
         log.info(LogManager.getHeader(c,
             "return_to_workspace",
@@ -614,7 +618,7 @@ public class WorkflowManager
 	 */
     public static WorkspaceItem reject(Context c,WorkflowItem wi, EPerson e,
              String rejection_message)
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         // authorize a DSpaceActions.REJECT
 
@@ -743,7 +747,7 @@ public class WorkflowManager
 
     private static String getMyDSpaceLink()
     {
-        return ConfigurationManager.getProperty( "dspace.url" ) + "mydspace";
+        return ConfigurationManager.getProperty( "dspace.url" ) + "/mydspace";
     }
 
     
