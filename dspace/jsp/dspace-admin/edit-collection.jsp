@@ -131,11 +131,27 @@
                parenttitle="Administer"
                nocache="true">
 
-
-<%  if (collection == null) { %>
+<%
+    if (collection == null)
+    {
+%>
     <H1>Create Collection</H1>
 <% } else { %>
     <H1>Edit Collection <%= collection.getHandle() %></H1>
+      <center>
+        <table width="70%">
+          <tr>
+            <td class="standard">
+              <form method=POST>
+                <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>">
+                <input type="hidden" name="community_id" value="<%= community.getID() %>">
+                <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
+                <input type="submit" name="submit" value="Delete this Collection...">
+              </form>
+            </td>
+          </tr>
+        </table>
+      </center>
 <% } %>
 
     <form method=POST action="<%= request.getContextPath() %>/dspace-admin/edit-communities">
@@ -303,6 +319,7 @@
     else
     {
 %>
+                        <input type="hidden" name="community_id" value="<%= community.getID() %>">
                         <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
                         <input type="hidden" name="create" value="false">
                         <input type="submit" name="submit" value="Update">
@@ -311,6 +328,7 @@
 %>
                     </td>
                     <td>
+                        <input type="hidden" name="community_id" value="<%= community.getID() %>">
                         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_EDIT_COLLECTION %>">
                         <input type="submit" name="submit_cancel" value="Cancel">
                     </td>
