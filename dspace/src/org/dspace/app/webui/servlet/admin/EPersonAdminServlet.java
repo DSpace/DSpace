@@ -66,7 +66,7 @@ import org.dspace.eperson.EPerson;
 public class EPersonAdminServlet extends DSpaceServlet
 {
     /** Logger */
-    private static Logger log = Logger.getLogger(EditEPersonServlet.class);
+    private static Logger log = Logger.getLogger(EPersonAdminServlet.class);
 
     protected void doDSGet(Context context,
         HttpServletRequest request,
