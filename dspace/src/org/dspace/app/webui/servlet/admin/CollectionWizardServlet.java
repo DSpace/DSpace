@@ -442,9 +442,9 @@ public class CollectionWizardServlet extends DSpaceServlet
 		// Need to be more careful about license -- make sure it's null if
 		// nothing was entered
 		String license = wrapper.getParameter("license");
-		if (license != null)
+		if (license != null || license.equals(""))
 		{
-			collection.setLicense(null);
+			collection.setLicense(license);
 		}
 		
 		File temp = wrapper.getFile("file");
