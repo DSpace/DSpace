@@ -227,10 +227,11 @@ public class Collection extends DSpaceObject
      * @param  context  DSpace context object
      *
      * @return  the newly created collection
-     * @throws SQLException
+    * @throws SQLException
+    * @throws AuthorizeException
      */
     static Collection create(Context context)
-        throws SQLException
+        throws SQLException, AuthorizeException
     {
         TableRow row = DatabaseManager.create(context, "collection");
         Collection c = new Collection(context, row);

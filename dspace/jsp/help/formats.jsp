@@ -83,6 +83,9 @@
 
         JSPManager.showInternalError(request, response);
     }
+    finally {
+        context.abort();
+    }
 %>
 <html>
 <head>

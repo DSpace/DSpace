@@ -590,7 +590,7 @@ public class Browse
                 .append(tablename)
                 .append(" where ")
                 .append(" item_id = ")
-                .append(scope.getFocusItemID())
+                .append(scope.getFocusItemId())
                 .append(getScopeClause(scope, "and"))
                 .toString();
 
@@ -955,7 +955,7 @@ public class Browse
                     .append(column)
                     // Item id must be before or after the desired item
                     .append(" = ? and item_id {0}  ")
-                    .append(scope.getFocusItemID())
+                    .append(scope.getFocusItemId())
                     .append(")")
                     .toString();
 
