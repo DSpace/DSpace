@@ -1,6 +1,8 @@
 /*
  * MITAuthenticator.java
  *
+ * $Id$
+ *
  * Version: $Revision$
  *
  * Date: $Date$
@@ -41,12 +43,15 @@
 package edu.mit.dspace;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.webui.SiteAuthenticator;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 
 /**
  * MIT implementation of DSpace Web UI authentication.  This version detects
@@ -65,6 +70,21 @@ public class MITAuthenticator implements SiteAuthenticator
     {
         if (isMITUser(request))
         {
+            try
+            {
+                // add the user to the special group "MIT Users"
+                Group MITGroup = Group.findByName(context, "MIT Users");
+
+                if( MITGroup != null )
+                {
+                    context.setSpecialGroup( MITGroup.getID() );
+                }
+            }
+            catch(SQLException e)
+            {
+                // FIXME: quietly fail if we caught SQLException 
+            }
+        
             // Try and get a certificate by default
             response.sendRedirect(response.encodeRedirectURL(
                 request.getContextPath() + "/certificate-login"));
