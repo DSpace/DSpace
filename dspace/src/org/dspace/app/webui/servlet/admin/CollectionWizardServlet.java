@@ -634,6 +634,13 @@ public class CollectionWizardServlet extends DSpaceServlet
             
         case DEFAULT_ITEM:
             // Next page is 'summary page (the last page)
+            // sort of a hack to pass the community ID to the edit collection page,
+            // which needs it in other contexts
+	    if (collection != null)
+	    {
+                Community[] communities = collection.getCommunities();
+                request.setAttribute("community", communities[0]);
+	    }
             JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
             break;				
         }
