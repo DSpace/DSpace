@@ -54,6 +54,9 @@
 
 <%  Collection collection = (Collection) request.getAttribute("collection"); %>
 
+<%  Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue()); %>
+
 <dspace:layout locbar="off" navbar="off" title="Describe the Collection" nocache="true">
 
     <H1>Describe the Collection</H1>
@@ -69,7 +72,13 @@
                     <td class="oddRowOddCol" align="left">
                         <table border=0>
                             <tr>
-                                <td valign=top><input type=checkbox name="public_read" value="true" CHECKED></td>
+                                <td valign=top>
+                                <% if(!admin_button ) { %> <input type=hidden name="public_read" value="true" >
+                                <input type=checkbox name="public_read" value="true" disabled CHECKED>
+                                <% } else { %>
+                                <input type=checkbox name="public_read" value="true" CHECKED>
+                                <% } %>
+                                </td>
                                 <td class="submitFormLabel" nowrap>New items should be publicly readable</td>
                             </tr>
                         </table>
@@ -79,7 +88,13 @@
                     <td class="evenRowOddCol" align="left">
                         <table border=0>
                             <tr>
-                                <td valign=top><input type=checkbox name="submitters" value="true" CHECKED></td>
+                                <td valign=top>
+                                <% if(!admin_button ) { %> <input type=hidden name="submitters" value="false" >
+                                <input type=checkbox name="submitters" value="true" disabled>
+                                <% } else { %>
+                                <input type=checkbox name="submitters" value="true" CHECKED>
+                                <% } %>
+                                </td>
                                 <td class="submitFormLabel" nowrap>Some users will be able to submit to this collection</td>
                             </tr>
                         </table>
@@ -89,7 +104,13 @@
                     <td class="oddRowOddCol" align="left">
                         <table border=0>
                             <tr>
-                                <td valign=top><input type=checkbox name="workflow1" value="true"></td>
+                                <td valign=top>
+                                <% if(!admin_button ) { %> <input type=hidden name="workflow1" value="false" >
+                                <input type=checkbox name="workflow1" value="true" disabled>
+                                <% } else { %>
+                                <input type=checkbox name="workflow1" value="true">
+                                <% } %>
+                                </td>
                                 <td class="submitFormLabel" nowrap>The submission workflow will include an <em>accept/reject</em> step</td>
                             </tr>
                         </table>
@@ -99,7 +120,13 @@
                     <td class="evenRowOddCol" align="left">
                         <table border=0>
                             <tr>
-                                <td valign=top><input type=checkbox name="workflow2" value="true"></td>
+                                <td valign=top>
+                                <% if(!admin_button ) { %> <input type=hidden name="workflow2" value="false" >
+                                <input type=checkbox name="workflow2" value="true" disabled>
+                                <% } else { %>
+                                <input type=checkbox name="workflow2" value="true">
+                                <% } %>
+                                </td>
                                 <td class="submitFormLabel" nowrap>The submission workflow will include an <em>accept/reject/edit metadata</em> step</td>
                             </tr>
                         </table>
@@ -109,7 +136,13 @@
                     <td class="oddRowOddCol" align="left">
                         <table border=0>
                             <tr>
-                                <td valign=top><input type=checkbox name="workflow3" value="true"></td>
+                                <td valign=top>
+                                <% if(!admin_button ) { %> <input type=hidden name="workflow3" value="false" >
+                                <input type=checkbox name="workflow3" value="true" disabled>
+                                <% } else { %>
+                                <input type=checkbox name="workflow3" value="true">
+                                <% } %>
+                                </td>
                                 <td class="submitFormLabel" nowrap>The submission workflow will include an <em>edit metadata</em> step</td>
                             </tr>
                         </table>
@@ -119,7 +152,13 @@
                     <td class="evenRowOddCol" align="left">
                         <table border=0>
                             <tr>
-                                <td valign=top><input type=checkbox name="admins" value="true"></td>
+                                <td valign=top>
+                                <% if(!admin_button ) { %> <input type=hidden name="admins" value="false" >
+                                <input type=checkbox name="admins" value="true" disabled>
+                                <% } else { %>
+                                <input type=checkbox name="admins" value="true">
+                                <% } %>
+                                </td>
                                 <td class="submitFormLabel" nowrap>This collection will have delegated collection administrators</td>
                             </tr>
                         </table>

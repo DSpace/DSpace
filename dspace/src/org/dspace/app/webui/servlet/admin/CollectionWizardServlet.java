@@ -173,6 +173,11 @@ public class CollectionWizardServlet extends DSpaceServlet
             // Create the collection
             Collection newCollection = c.createCollection();
             request.setAttribute("collection", newCollection);
+            if (AuthorizeManager.isAdmin(context))
+            {
+                // set a variable to show all buttons
+                request.setAttribute("admin_button", new Boolean(true));
+            }
             JSPManager.showJSP(request, response,
                     "/dspace-admin/wizard-questions.jsp");
             context.complete();

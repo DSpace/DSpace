@@ -1735,6 +1735,12 @@ public class Item extends DSpaceObject
             return true;
         }
 
+        // is this collection not yet created, and an item template is created
+        if (getOwningCollection() == null)
+        {
+            return true;
+        }
+
         // is this person an COLLECTION_EDITOR for the owning collection?
         if (getOwningCollection().canEditBoolean())
         {

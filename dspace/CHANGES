@@ -1,3 +1,7 @@
+(Ben Bosman)
+- Internal error no longer occurs when COLLECTION_ADMIN is editing collection template values
+  SF patch #1120716, fixes SF bug #1088692.
+
 (Filbert Minj)
 - Show community and collection strengths
   SF patch #1151795.
