@@ -214,7 +214,7 @@ public class MyDSpaceServlet extends DSpaceServlet
                 request.setAttribute("workspace.item", workspaceItem);
                 JSPManager.showJSP(request,
                     response,
-                    "/mydspace/confirm-removal.jsp");
+                    "/mydspace/remove-item.jsp");
             }
             else
             {

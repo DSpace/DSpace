@@ -97,7 +97,7 @@
     }
 %>
     
-    <dspace:displayitem item="<%= item %>" />
+    <dspace:item item="<%= item %>" />
 
     <P>&nbsp;</P>
 

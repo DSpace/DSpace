@@ -90,7 +90,7 @@
     }
 %>
     
-    <dspace:displayitem item="<%= item %>" />
+    <dspace:item item="<%= item %>" />
 
     <form action="<%= request.getContextPath() %>/mydspace" method=POST>
         <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>">
