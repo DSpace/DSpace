@@ -174,8 +174,8 @@
              access="public"
              doctitle="DSpace Public API"
              windowtitle="DSpace Public API"
-             bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved.">
-    </javadoc>
+             bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved."
+             classpathref="build.class.path" />
   </target>
 
 </project>

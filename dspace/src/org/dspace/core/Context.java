@@ -43,6 +43,7 @@ package org.dspace.core;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -81,7 +82,10 @@ public class Context
     public Context()
         throws SQLException
     {
-        // FIXME: Open a connection
+        // Obtain a non-auto-committing connection
+        connection = DatabaseManager.getConnection();
+        connection.setAutoCommit(false);
+
         currentUser = null;
         extraLogInfo = "";
     }
@@ -157,7 +161,15 @@ public class Context
     public void complete()
         throws SQLException
     {
-        // FIXME: Commit and close DB connection
+        // FIXME: Might be good not to do a commit() if nothing has actually
+        // been written using this connection
+
+        // Commit any changes made as part of the transaction
+       connection.commit();
+
+       // Free the connection
+       DatabaseManager.freeConnection(connection);
+       connection = null;
     }
     
     /**
@@ -169,6 +181,19 @@ public class Context
      */
     public void abort()
     {
-        // FIXME: Roll back and close DB connection
+        try
+        {
+            connection.rollback();
+        }
+        catch(SQLException se)
+        {
+            // Do nothing; we may be here when a database error has already
+            // occurred.  In any case, nothing will be written.
+        }
+        finally
+        {
+            DatabaseManager.freeConnection(connection);
+            connection = null;
+        }
     }
 }
