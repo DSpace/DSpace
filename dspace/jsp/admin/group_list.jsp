@@ -63,6 +63,9 @@
 
     <h1>Group Editor</h1>
 
+    <P>Note that you do not need to manually add users to the "anonymous"
+    group - all users are members implicitly.</P>
+
     <P>Warning - if you try to delete a group that is referred to by an
     authorization policy or is a workflow group you will get an internal
     server error.</P>
