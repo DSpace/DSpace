@@ -145,7 +145,7 @@
         }
 
         // Full param to dspace:popup must be single variable
-        String supportLevelLink = "/help/formats.html#" + supportLevel;
+        String supportLevelLink = "/help/formats.jsp#" + supportLevel;
 %>
             <tr>
 		<td class="<%= row %>RowEvenCol" align="center">
