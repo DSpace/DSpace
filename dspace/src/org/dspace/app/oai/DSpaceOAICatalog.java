@@ -53,7 +53,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 
 import ORG.oclc.oai.server.catalog.AbstractCatalog;
-import ORG.oclc.oai.server.catalog.RecordFactory;
+import ORG.oclc.oai.server.verb.BadArgumentException;
 import ORG.oclc.oai.server.verb.BadResumptionTokenException;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 import ORG.oclc.oai.server.verb.IdDoesNotExistException;
@@ -62,13 +62,8 @@ import ORG.oclc.oai.server.verb.NoMetadataFormatsException;
 import ORG.oclc.oai.server.verb.NoSetHierarchyException;
 import ORG.oclc.oai.server.verb.OAIInternalServerError;
 
-import org.dspace.administer.DCType;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
@@ -78,6 +73,9 @@ import org.dspace.search.HarvestedItemInfo;
 /**
  * This is class extends OAICat's AbstractCatalog base class to allow
  * metadata harvesting of the metadata in DSpace via OAI-PMH 2.0.
+ *
+ * FIXME: Some CNRI Handle-specific stuff in here.  Anyone wanting to
+ * use something else will need to update this code too.  Sorry about that.
  *
  * @author  Robert Tansley
  * @version $Revision$
@@ -196,7 +194,8 @@ public class DSpaceOAICatalog extends AbstractCatalog
      */
     public Map listIdentifiers(String from, String until, String set, String metadataPrefix)
         throws OAIInternalServerError, NoSetHierarchyException,
-            NoItemsMatchException, CannotDisseminateFormatException
+            NoItemsMatchException, CannotDisseminateFormatException,
+			BadArgumentException
     {
         log.info(LogManager.getHeader(null,
             "oai_request",
@@ -217,11 +216,11 @@ public class DSpaceOAICatalog extends AbstractCatalog
             context = new Context();
 
             // Get the relevant OAIItemInfo objects to make headers
-            DSpaceObject scope = resolveSet(context, set);
+            Collection scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until,
                 0, 0, // Everything for now
                 false, true, true);
-            // No Item objects, but we need to know containers and withdrawn items
+            // No Item objects, but we need to know collections they're in and withdrawn items
 
             if (itemInfos.size() == 0)
             {
@@ -385,7 +384,8 @@ public class DSpaceOAICatalog extends AbstractCatalog
      */
     public Map listRecords(String from, String until, String set, String metadataPrefix)
         throws OAIInternalServerError, NoSetHierarchyException,
-            CannotDisseminateFormatException, NoItemsMatchException
+            CannotDisseminateFormatException, NoItemsMatchException,
+			BadArgumentException
     {
         log.info(LogManager.getHeader(null,
             "oai_request",
@@ -434,9 +434,9 @@ public class DSpaceOAICatalog extends AbstractCatalog
     public Map listRecords(String resumptionToken)
         throws BadResumptionTokenException, OAIInternalServerError
     {
-            log.info(LogManager.getHeader(null,
-                "oai_request",
-                "verb=listRecords,resumptionToken=" + resumptionToken));
+        log.info(LogManager.getHeader(null,
+            "oai_request",
+            "verb=listRecords,resumptionToken=" + resumptionToken));
         /*
          * FIXME: This may return zero records if the previous harvest
          * returned a number of records that's an exact multiple of
@@ -445,10 +445,24 @@ public class DSpaceOAICatalog extends AbstractCatalog
         Object[] params = decodeResumptionToken(resumptionToken);
         Integer offset = (Integer) params[4];
 
-        Map m = doRecordHarvest((String) params[0], (String) params[1],
-            (String) params[2], (String) params[3], offset.intValue());
-
-        // null result means bad prefix, which means bad resumption token
+        Map m = null;
+        
+        /*
+         * We catch BadArgumentExceptions here, because doRecordHarvest()
+         * throws BadArgumentExcpetions when the set spec is bad.  set spec
+		 * bad == bad resumption token.   
+         */
+        try
+		{
+        	m = doRecordHarvest((String) params[0], (String) params[1],
+        			(String) params[2], (String) params[3], offset.intValue());
+        }
+        catch (BadArgumentException bae)
+		{
+        	m = null; 
+        }
+        	
+        // null result means a problem -> bad resumption token
         if (m == null)
         {
             log.info(LogManager.getHeader(null,
@@ -475,7 +489,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
      */
     private Map doRecordHarvest(String from, String until, String set,
         String metadataPrefix, int offset)
-        throws OAIInternalServerError
+        throws OAIInternalServerError, BadArgumentException
     {
         Context context = null;
         String schemaURL = getCrosswalks().getSchemaURL(metadataPrefix);
@@ -494,7 +508,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             context = new Context();
 
             // Get the relevant HarvestedItemInfo objects to make headers
-            DSpaceObject scope = resolveSet(context, set);
+            Collection scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until,
                 offset, MAX_RECORDS, // Limit amount returned from one request
                 true, true, true);   // Need items, containers + withdrawals
@@ -597,35 +611,16 @@ public class DSpaceOAICatalog extends AbstractCatalog
         {
             context = new Context();
 
-            // FIXME: This may break the OAI protocol with multiple inclusion
-            // FIXME: Should check perms?
-            Community[] allComms = Community.findAll(context);
+			Collection[] allCols = Collection.findAll(context);
 
-            for (int i = 0; i < allComms.length; i++)
+            for (int i = 0; i < allCols.length; i++)
             {
-                // Set XML community
-                String communitySpec = "<set><setSpec>" + allComms[i].getID() +
-                    "</setSpec><setName>" + allComms[i].getMetadata("name") +
+				String spec = "<set><setSpec>hdl_" +
+					allCols[i].getHandle().replace('/','_') +
+					" </setSpec><setName>" + allCols[i].getMetadata("name") +
                     "</setName></set>";
-                sets.add(communitySpec);
-
-                // Add set XML for collections
-                Collection[] colls = allComms[i].getCollections();
-
-                for (int j = 0; j < colls.length; j++)
-                {
-                    StringBuffer collectionSpec =
-                        new StringBuffer("<set><setSpec>");
-                    
-                    collectionSpec.append(allComms[i].getID())
-                        .append(":")
-                        .append(colls[j].getID())
-                        .append("</setSpec><setName>")
-                        .append(colls[j].getMetadata("name"))
-                        .append("</setName></set>");
-                    
-                    sets.add(collectionSpec.toString());
-                }
+                
+                sets.add(spec);
             }
         }
         catch (SQLException se)
@@ -689,31 +684,37 @@ public class DSpaceOAICatalog extends AbstractCatalog
      * @return  the corresponding community or collection, or null if
      *          no set provided
      */
-    private DSpaceObject resolveSet(Context context, String set)
-        throws SQLException
+    private Collection resolveSet(Context context, String set)
+        throws SQLException, BadArgumentException
     {
         if (set == null)
         {
             return null;
         }
-        
-        // We can be fairly simple because of our two-level hierarchy.
-        // Set spec is community-id[:collection-id]
-        int colon = set.indexOf(':');
 
-        if (colon >= 0)
-        {
-            // We have community & collection IDs
-            int collID = Integer.parseInt(set.substring(colon + 1));
-            
-            return Collection.find(context, collID);
-        }
-        else
-        {
-            // Just a community ID
-            return Community.find(context, Integer.parseInt(set));
-        }
-    }
+		DSpaceObject o = null;
+
+		/*
+		 * set specs are in form hdl_123.456_789
+		 * corresponding to hdl:123.456/789
+		 */
+		if (set.startsWith("hdl_"))
+		{
+			// Looks OK so far... turn second _ into /
+			String handle = set.substring(4).replace('_','/');
+			o = HandleManager.resolveToObject(context, handle);
+		}
+
+		// If it corresponds to a collection, that's the set we want
+		if (o != null && o instanceof Collection)
+		{
+			return (Collection) o;
+		}
+
+		// Handle is either non-existent, or corresponds to a non-collection
+		// Either way, a bad set spec, ergo a bad argument
+		throw new BadArgumentException();
+	}
 
 
     /**

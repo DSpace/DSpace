@@ -43,7 +43,6 @@ package org.dspace.search;
 import java.util.Date;
 import java.util.List;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 
 /**
  * Simple container class containing information about a harvested DSpace item.
@@ -66,16 +65,11 @@ public class HarvestedItemInfo
     public Item item;
     
     /**
-     * Containers (communities and collections).  Only filled out if
-     * requested.  An example of how this is filled out:  Say the item
-     * contained by collectionY in communityX, and collectionB in communityC.
-     * This field is filled out as follows: <P>
-     * <code>containers[0][0]</code> - ID of communityX <br>
-     * <code>containers[0][1]</code> - ID of collectionY <br>
-     * <code>containers[1][0]</code> - ID of communityA <br>
-     * <code>containers[1][1]</code> - ID of collectionB <br>
+     * A List of Strings.  The Handles of collections this item is in.  Only filled
+     * out if originally requested when invoking <code>Harvest</code>
+     * (N.B. not Collection objects)
      */
-    public int[][] containers;
+    public List collectionHandles;
     
     /** True if this item has been withdrawn */
     public boolean withdrawn;

@@ -40,7 +40,6 @@
 
 package org.dspace.app.oai;
 
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -52,12 +51,7 @@ import org.apache.log4j.Logger;
 import ORG.oclc.oai.server.catalog.RecordFactory;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.core.LogManager;
 import org.dspace.search.HarvestedItemInfo;
 
 /**
@@ -112,19 +106,21 @@ public class DSpaceRecordFactory extends RecordFactory
     protected Iterator getSetSpecs(Object nativeItem)
     {
         HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
+        Iterator i = hii.collectionHandles.iterator();
         List setSpecs = new LinkedList();
         
-        // Convert container IDs to set specs (comm-id:coll-id)
-        for (int i = 0; i < hii.containers.length; i++)
+        // Convert the DB Handle string 123.456/789 to the OAI-friendly
+        // hdl_123.456/789
+        while (i.hasNext())
         {
-            setSpecs.add(String.valueOf(hii.containers[i][0]) + ":" +
-                         String.valueOf(hii.containers[i][1]));
+        	String handle = "hdl_" + (String) i.next();
+        	setSpecs.add(handle.replace('/', '_'));
         }
         
         return setSpecs.iterator();
     }
-    
-    
+
+
     protected boolean isDeleted(Object nativeItem)
     {
         HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;

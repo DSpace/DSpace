@@ -46,12 +46,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.administer.DCType;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -84,7 +79,7 @@ public class Harvest
      * FIXME: Assumes all in_archive items have public metadata
      *
      * @param context     DSpace context
-     * @param scope       a Community or Collection, or <code>null</code>
+     * @param scope       a Collection, or <code>null</code>
      *                    indicating the scope is all of DSpace
      * @param startDate   start of date range, or <code>null</code>
      * @param endDate     end of date range, or <code>null</code>
@@ -97,7 +92,7 @@ public class Harvest
      * @param items       if <code>true</code> the <code>item</code> field of
      *                    each <code>HarvestedItemInfo</code> object is
      *                    filled out
-     * @param containers  if <code>true</code> the <code>containers</code>
+     * @param collections if <code>true</code> the <code>collectionHandles</code>
      *                    field of each <code>HarvestedItemInfo</code> object
      *                    is filled out
      * @param withdrawn   If <code>true</code>, information about withdrawn
@@ -105,13 +100,13 @@ public class Harvest
      * @return  List of <code>HarvestedItemInfo</code> objects
      */
     public static List harvest(Context context,
-        DSpaceObject scope,
+        Collection scope,
         String startDate,
         String endDate,
         int offset,
         int limit,
         boolean items,
-        boolean containers,
+        boolean collections,
         boolean withdrawn)
         throws SQLException
     {
@@ -123,22 +118,10 @@ public class Harvest
                 
         if (scope != null)
         {
-            if (scope.getType() == Constants.COMMUNITY)
-            {
-                // Getting things within a community
-                scopeTableSQL = ", community2item";
-                scopeWhereSQL = " AND community2item.community_id=" +
-                    scope.getID() +
-                    " AND community2item.item_id=handle.resource_id";
-            }
-            else if (scope.getType() == Constants.COLLECTION)
-            {
-                scopeTableSQL = ", collection2item";
-                scopeWhereSQL = " AND collection2item.collection_id=" +
-                    scope.getID() +
-                    " AND collection2item.item_id=handle.resource_id";
-            }
-            // Theoretically, no other possibilities, won't bother to check
+            scopeTableSQL = ", collection2item";
+            scopeWhereSQL = " AND collection2item.collection_id=" +
+                scope.getID() +
+                " AND collection2item.item_id=handle.resource_id";
         }
         
         // Put together our query.  Note there is no need for an
@@ -199,9 +182,9 @@ public class Harvest
                 itemInfo.datestamp = row.getDateColumn("last_modified");
                 itemInfo.withdrawn = row.getBooleanColumn("withdrawn");
 
-                if (containers)
+                if (collections)
                 {
-                    fillContainers(context, itemInfo);
+                    fillCollections(context, itemInfo);
                 }
 
                 if (items)
@@ -226,8 +209,8 @@ public class Harvest
      *
      * @param context     DSpace context
      * @param handle      Prefix-less Handle of item
-     * @param containers  if <code>true</code> the <code>containers</code>
-     *                    field of each <code>HarvestedItemInfo</code> object
+     * @param collections if <code>true</code> the <code>collectionHandles</code>
+     *                    field of the <code>HarvestedItemInfo</code> object
      *                    is filled out
      *
      * @return  <code>HarvestedItemInfo</code> object for the single item, or
@@ -235,7 +218,7 @@ public class Harvest
      */
     public static HarvestedItemInfo getSingle(Context context,
         String handle,
-        boolean containers)
+        boolean collections)
         throws SQLException
     {
         // FIXME: Assume Handle is item
@@ -256,9 +239,9 @@ public class Harvest
         itemInfo.itemID = i.getID();
 
         // Get the sets
-        if (containers)
+        if (collections)
         {
-            fillContainers(context, itemInfo);
+            fillCollections(context, itemInfo);
         }
                
         return itemInfo;
@@ -271,23 +254,24 @@ public class Harvest
      * @param context  DSpace context
      * @param itemInfo HarvestedItemInfo object to fill out
      */
-    private static void fillContainers(Context context,
+    private static void fillCollections(Context context,
         HarvestedItemInfo itemInfo)
         throws SQLException
     {
-        // Get the containers (communities/collections)
-        List containerRows = DatabaseManager.query(
+        // Get the collection Handles from DB
+        TableRowIterator colRows = DatabaseManager.query(
             context,
-            "SELECT community2collection.community_id, community2collection.collection_id FROM community2collection, collection2item WHERE community2collection.collection_id=collection2item.collection_id AND collection2item.item_id=" +
-            itemInfo.itemID).toList();
+            "SELECT handle.handle FROM handle, collection2item WHERE handle.resource_type_id=" +
+				Constants.COLLECTION + " AND collection2item.collection_id=handle.resource_id AND collection2item.item_id = " +
+				itemInfo.itemID);
 
-        itemInfo.containers = new int[containerRows.size()][2];
-
-        for (int i = 0; i < containerRows.size(); i++)
+        // Chuck 'em in the itemInfo object
+        itemInfo.collectionHandles = new LinkedList();
+        
+        while (colRows.hasNext())
         {
-            TableRow r = (TableRow) containerRows.get(i);
-            itemInfo.containers[i][0] = r.getIntColumn("community_id");
-            itemInfo.containers[i][1] = r.getIntColumn("collection_id");
+        	TableRow r = colRows.next();
+        	itemInfo.collectionHandles.add(r.getStringColumn("handle"));
         }
     }
 }

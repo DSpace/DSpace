@@ -95,7 +95,17 @@ public class OAIDCCrosswalk extends Crosswalk
 
             if (!(description && provenance))
             {
-                // Escape XML chars <, > and &
+            	String element = allDC[i].element;
+
+            	// contributor.author exposed as 'creator'
+            	if (allDC[i].element.equals("contributor") &&
+            			allDC[i].qualifier != null &&
+						allDC[i].qualifier.equals("author"))
+				{
+            		element = "creator";
+            	}
+            	
+            	// Escape XML chars <, > and &
                 String value = allDC[i].value;
 
                 // First do &'s - need to be careful not to replace the
@@ -123,11 +133,11 @@ public class OAIDCCrosswalk extends Crosswalk
                 }
 
                 metadata.append("<dc:")
-                    .append(allDC[i].element)
+                    .append(element)
                     .append(">")
                     .append(value)
                     .append("</dc:")
-                    .append(allDC[i].element)
+                    .append(element)
                     .append(">");
             }
         }
