@@ -99,11 +99,7 @@
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
             <th class="oddRowEvenCol"><strong>Action</strong></th>
-            <th class="oddRowOddCol"><strong>Public</strong></th>
-            <th class="oddRowEvenCol"><strong>EPerson</strong></th>
             <th class="oddRowOddCol"><strong>Group</strong></th>
-            <th class="oddRowEvenCol"><strong>StartDate</strong></th>
-            <th class="oddRowOddCol"><strong>EndDate</strong></th>
             <th class="oddRowEvenCol">&nbsp;</th>
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
@@ -123,26 +119,14 @@
                     <%= rp.getActionText() %>
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    ...  
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
-                </td>
-                <td class="<%= row %>RowOddCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <%= (rp.getStartDate() == null ? "..." : "..." ) %>  
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <%= (rp.getEndDate() == null   ? "..." : "..." ) %>  
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <input type="hidden" name="policy_id"     value="<%= rp.getID() %>">
                     <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
                     <input type="submit" name="submit_collection_edit_policy" value="Edit">
                 </td>
-                <td class="<%= row %>RowEvenCol">
+                <td class="<%= row %>RowOddCol">
                     <input type="submit" name="submit_collection_delete_policy" value="Delete">
                 </td>
             </tr>

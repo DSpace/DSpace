@@ -128,13 +128,10 @@
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
             <th class="oddRowEvenCol"><strong>Action</strong></th>
-            <th class="oddRowOddCol"><strong>Public</strong></th>
-            <th class="oddRowEvenCol"><strong>EPerson</strong></th>
-            <th class="oddRowOddCol"><strong>Group</strong></th>
-            <th class="oddRowEvenCol"><strong>StartDate</strong></th>
-            <th class="oddRowOddCol"><strong>EndDate</strong></th>
-            <th class="oddRowEvenCol">&nbsp;</th>
+            <th class="oddRowOddCol"><strong>EPerson</strong></th>
+            <th class="oddRowEvenCol"><strong>Group</strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
+            <th class="oddRowEvenCol">&nbsp;</th>
         </tr>
 
 <%
@@ -152,7 +149,7 @@
                     <%= rp.getActionText() %>
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    ...  
+                    <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
@@ -197,13 +194,10 @@
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
             <th class="oddRowEvenCol"><strong>Action</strong></th>
-            <th class="oddRowOddCol"><strong>Public</strong></th>
-            <th class="oddRowEvenCol"><strong>EPerson</strong></th>
-            <th class="oddRowOddCol"><strong>Group</strong></th>
-            <th class="oddRowEvenCol"><strong>StartDate</strong></th>
-            <th class="oddRowOddCol"><strong>EndDate</strong></th>
-            <th class="oddRowEvenCol">&nbsp;</th>
+            <th class="oddRowOddCol"><strong>EPerson</strong></th>
+            <th class="oddRowEvenCol"><strong>Group</strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
+            <th class="oddRowEvenCol">&nbsp;</th>
         </tr>
 
 <%
@@ -221,21 +215,12 @@
                     <%= rp.getActionText() %>
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    ...  
-                </td>
-                <td class="<%= row %>RowEvenCol">
                     <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
                 </td>
-                <td class="<%= row %>RowOddCol">
+                <td class="<%= row %>RowEvenCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
                 </td>
-                <td class="<%= row %>RowEvenCol">
-                    <%= (rp.getStartDate() == null ? "..." : "..." ) %>  
-                </td>
                 <td class="<%= row %>RowOddCol">
-                    <%= (rp.getEndDate() == null   ? "..." : "..." ) %>  
-                </td>
-                <td class="<%= row %>RowEvenCol">
                     <input type="hidden" name="policy_id"     value="<%= rp.getID() %>">
                     <input type="hidden" name="item_id"       value="<%= item.getID() %>">
                     <input type="hidden" name="bundle_id"     value="<%= myBun.getID() %>">
@@ -276,13 +261,10 @@
             <tr>
                 <th class="oddRowOddCol"><strong>ID</strong></th>
                 <th class="oddRowEvenCol"><strong>Action</strong></th>
-                <th class="oddRowOddCol"><strong>Public</strong></th>
-                <th class="oddRowEvenCol"><strong>EPerson</strong></th>
-                <th class="oddRowOddCol"><strong>Group</strong></th>
-                <th class="oddRowEvenCol"><strong>StartDate</strong></th>
-                <th class="oddRowOddCol"><strong>EndDate</strong></th>
-                <th class="oddRowEvenCol">&nbsp;</th>
+                <th class="oddRowOddCol"><strong>EPerson</strong></th>
+                <th class="oddRowEvenCol"><strong>Group</strong></th>
                 <th class="oddRowOddCol">&nbsp;</th>
+                <th class="oddRowEvenCol">&nbsp;</th>
             </tr>
 
 <%
@@ -300,21 +282,12 @@
                     <%= rp.getActionText() %>
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    ...  
-                </td>
-                <td class="<%= row %>RowEvenCol">
                     <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
                 </td>
-                <td class="<%= row %>RowOddCol">
+                <td class="<%= row %>RowEvenCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
                 </td>
-                <td class="<%= row %>RowEvenCol">
-                    <%= (rp.getStartDate() == null ? "..." : "..." ) %>  
-                </td>
                 <td class="<%= row %>RowOddCol">
-                    <%= (rp.getEndDate() == null   ? "..." : "..." ) %>  
-                </td>
-                <td class="<%= row %>RowEvenCol">
                     <input type="hidden" name="policy_id"     value="<%= rp.getID()     %>">
                     <input type="hidden" name="item_id"       value="<%= item.getID()   %>">
                     <input type="hidden" name="bitstream_id"  value="<%= myBits.getID() %>">
