@@ -341,11 +341,14 @@
         DCValue[] dateIssuedArray = item.getDC("date", "issued", Item.ANY);
         DCDate dateIssued = new DCDate(
             (dateIssuedArray.length > 0 ? dateIssuedArray[0].value : ""));
-	if (si.missing && dateIssued.getYear() <= 0)
+	if (si.missing && dateIssued.getYear() <= 0 && si.jumpToField != null && si.jumpToField.equals("date_issued_year"))
 	{
 %>
 		<tr>
-		    <td colspan=4 class="submitFormWarn">You must enter at least the year.</td>
+		    <td colspan=4 class="submitFormWarn">
+                      <a name="field"></a>
+                      You must enter at least the year.
+                    </td>
 		</tr>
 <%
 	}
@@ -366,13 +369,6 @@
 %>
                         </select>
                         Day:<input type=text name=date_issued_day size=2 maxlength=2 value="<%= (dateIssued.getDay() > 0 ? String.valueOf(dateIssued.getDay()) : "" ) %>">
-<%	if (si.jumpToField != null && si.jumpToField.equals("date_issued_year"))
-	{
-%>
-		    <a name="field"></a>
-<%
-	}
-%>
                         Year:<input type=text name=date_issued_year size=4 maxlength=4 value="<%= (dateIssued.getYear() > 0 ? String.valueOf(dateIssued.getYear()) : "" ) %>">
                     </td>
                     <td>
