@@ -913,6 +913,8 @@ public class Item
                             (dcv.qualifier == null ? "null" : dcv.qualifier) +
                             "\" value: \"" +
                             (dcv.value == null ? "null" : dcv.value) + "\""));
+                    throw new SQLException( "bad_dublin_core " + dcv.element
+                                + " " + dcv.qualifier );
                 }
                 else
                 {
