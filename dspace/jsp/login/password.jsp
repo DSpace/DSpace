@@ -44,7 +44,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout navbar="off" locbar="nolink" title="Log In">
+<dspace:layout navbar="off" locbar="off" title="Log In">
     <table border=0 width="90%">
         <tr>
             <td align="left">
