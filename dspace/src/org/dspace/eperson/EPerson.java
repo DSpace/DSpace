@@ -58,7 +58,7 @@ public class EPerson
     /** Our context */
     private Context myContext;
 
-    /** The row in the table representing this format */
+    /** The row in the table representing this eperson */
     private TableRow myRow;
 
 
@@ -272,7 +272,7 @@ public class EPerson
      */
     public void setRequireCertificate(boolean isrequired)
     {
-        myRow.setColumn("requirecertificate", isrequired);
+        myRow.setColumn("require_certificate", isrequired);
     }
 
 
@@ -283,7 +283,7 @@ public class EPerson
      */
     public boolean getRequireCertificate()
     {
-        return myRow.getBooleanColumn("requirecertificate");
+        return myRow.getBooleanColumn("require_certificate");
     }
 
 
