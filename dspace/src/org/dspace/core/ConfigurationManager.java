@@ -47,8 +47,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Properties;
 
@@ -296,7 +299,10 @@ public class ConfigurationManager
         try
         {
             //retrieve existing news from file
-            BufferedReader br = new BufferedReader( new FileReader(fileName) );
+            FileInputStream fir  = new FileInputStream(fileName);
+            InputStreamReader ir = new InputStreamReader( fir, "UTF-8" );
+            BufferedReader br    = new BufferedReader( ir );
+
             String lineIn;
 
             while((lineIn = br.readLine()) != null)
@@ -341,8 +347,10 @@ public class ConfigurationManager
         {
 
             //write the news out to the appropriate file
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));                 
-            PrintWriter out = new PrintWriter( bw );    
+            FileOutputStream fos          = new FileOutputStream(fileName);
+            OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
+//            BufferedWriter bw      = new BufferedWriter( osr );                 
+            PrintWriter out = new PrintWriter( osr );    
             out.print(news);           
             out.close();
 
