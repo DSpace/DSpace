@@ -11,6 +11,8 @@ public class QueryResults
     private List hitHandles;    // handles of content (items, collections, communities)
     private List hitTypes;      // Integers from Constants defng types of corresponding handles 
 
+    private String errorMsg;    //error string, if there is one
+    
     /** set total number of hits found by search engine, not number in hitHandles */
     public void setHitCount( int newCount ) { hitCount = newCount; }
     
@@ -40,4 +42,11 @@ public class QueryResults
     
     /** get the List of types corresponding to handles */
     public List getHitTypes() { return hitTypes; }
+
+    /** set error message */
+    public void setErrorMsg( String msg ) { errorMsg = msg; }
+    
+    /** get error message */
+    public String getErrorMsg() { return errorMsg; }
+
 }
