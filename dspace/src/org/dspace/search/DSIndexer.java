@@ -67,9 +67,11 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
 
 
-// issues:
-//   need to use in_archive field
-//   only does author and title
+/**
+ * DSIndexer contains the methods that index Items and their metadata, collections, communities, etc.
+ *  It is meant to either be invoked from the command line (see dspace/bin/index-all) or
+ *  via the indexContent() methods within DSpace.
+ */
 
 public class DSIndexer
 {
