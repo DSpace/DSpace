@@ -46,17 +46,20 @@
 
 <%@ page import="java.util.List"%>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%
     String title = (String) request.getAttribute("dspace.layout.title");
     String navbar = (String) request.getAttribute("dspace.layout.navbar");
     boolean locbar = ((Boolean) request.getAttribute("dspace.layout.locbar")).booleanValue();
+
+    String siteName = ConfigurationManager.getProperty("dspace.name");
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
     <head>
-        <title>DSpace: <%= title %></title>
+        <title><%= siteName %>: <%= title %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp">
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon">
