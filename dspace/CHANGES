@@ -2,6 +2,10 @@
 =======================
 
 (Richard Jones)
+- Added new DSpace log file analysis tool, including command line analysis and
+report generating tools and UI components for report display and navigation
+
+(Richard Jones)
 - "View Licence" link and copyright warning added to item display pages
 
 (Richard Jones)
