@@ -66,11 +66,10 @@ import org.dspace.core.ConfigurationManager;
 public class DSQuery
 {
     // Result types
+    static final String ALL		= "999";
     static final String ITEM		= "2";
     static final String COLLECTION	= "3";
     static final String COMMUNITY	= "4";
-
-    static final int MAXITEMHITS        = 50;
 
     /** Do a query, returning a List of DSpace Handles to objects matching the query.
      *  @param query string in Lucene query syntax
@@ -79,10 +78,11 @@ public class DSQuery
         throws ParseException, IOException
     {
                         
-        ArrayList itemlist = new ArrayList();
-        ArrayList commlist = new ArrayList();
-        ArrayList colllist = new ArrayList();
-        HashMap   metahash = new HashMap();
+        ArrayList resultlist	= new ArrayList();
+        ArrayList itemlist 	= new ArrayList();
+        ArrayList commlist 	= new ArrayList();
+        ArrayList colllist 	= new ArrayList();
+        HashMap   metahash 	= new HashMap();
 
         try
         {
@@ -93,7 +93,6 @@ public class DSQuery
 
             Query myquery = qp.parse(querystring);
             Hits hits = searcher.search(myquery);
-            int itemCounter = 0;
 
             for (int i = 0; i < hits.length(); i++)
             {
@@ -102,28 +101,24 @@ public class DSQuery
                 String handletext = d.get("handle");
                 String handletype = d.get("type");
                 
+                resultlist.add(handletext);
+                
                 if (handletype.equals(ITEM)) 
                 { 
-                        itemCounter++;
-                        if (itemCounter <= MAXITEMHITS)
-                	{
-                            itemlist.add(handletext);
-                        }
-//                	System.out.println (handletext + " is an item!");
+                	itemlist.add(handletext); 
                 } 
                 else if (handletype.equals(COLLECTION))
                 {
-//	        	System.out.println (handletext + " is a " + handletype);
 			colllist.add(handletext);
 	        }
 	        else if (handletype.equals(COMMUNITY))
 	        {	
-//	        	System.out.println (handletext + " is a " + handletype);
 		        commlist.add(handletext); break;
 		}
                 	
             }
             
+            metahash.put(ALL, resultlist);
             metahash.put(ITEM, itemlist);
             metahash.put(COLLECTION, colllist);
             metahash.put(COMMUNITY, commlist);
@@ -169,6 +164,14 @@ public class DSQuery
         return doQuery(newquery);
     }
 
+    /** return everything from a query
+     * @param results hashmap from doQuery
+     */
+    public static List getResults(HashMap results)
+    {
+    	return ((List)results.get(ALL));
+    }
+
     /** return just the items from a query
      * @param results hashmap from doQuery
      */
@@ -192,6 +195,15 @@ public class DSQuery
     {
     	return ((List)results.get(COMMUNITY));
     }
+
+    /** returns true if anything found
+     * @param results hashmap from doQuery
+     */
+    public static boolean resultsFound(HashMap results)
+    {
+		List thislist = getResults(results);
+		return (!thislist.isEmpty());
+	}
 
     /** returns true if items found
      * @param results hashmap from doQuery
