@@ -142,7 +142,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 DSpaceObject dso = HandleManager.resolveToObject(c, handle);    
 
                 // make sure it's an item
-                if( dso != null && dso.getType() != Constants.ITEM )
+                if( dso != null && dso.getType() == Constants.ITEM )
                 {
                     item = (Item) dso;
                 }
