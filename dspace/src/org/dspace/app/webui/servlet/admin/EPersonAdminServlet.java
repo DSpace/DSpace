@@ -125,34 +125,58 @@ public class EPersonAdminServlet extends DSpaceServlet
             // Update the metadata for an e-person
             EPerson e = EPerson.find(context,
                 UIUtil.getIntParameter(request, "eperson_id"));
-                
-            e.setEmail(request.getParameter("email").trim());
 
-            e.setFirstName(request.getParameter("firstname").equals("")
-                ? null
-                : request.getParameter("firstname"));
-
-            e.setLastName(request.getParameter("lastname").equals("")
-                ? null
-                : request.getParameter("lastname"));
+            // see if the user changed the email - if so, make sure
+            // the new email is unique
+            String oldEmail = e.getEmail();
+            String newEmail = request.getParameter("email").trim();
             
-            // FIXME: More data-driven?
-            e.setMetadata("phone",
-                request.getParameter("phone").equals("")
-                    ? null
-                    : request.getParameter("phone"));
+            if( !newEmail.equals( oldEmail ) )
+            {
+                // change, now see if it's unique
+                if( EPerson.findByEmail( context, newEmail ) == null )
+                {
+                    // it's unique - proceed!
+                    e.setEmail( newEmail );
 
-            e.setCanLogIn(request.getParameter("can_log_in") != null &&
+                    e.setFirstName(request.getParameter("firstname").equals("")
+                        ? null
+                        : request.getParameter("firstname"));
+
+                    e.setLastName(request.getParameter("lastname").equals("")
+                        ? null
+                        : request.getParameter("lastname"));
+            
+                    // FIXME: More data-driven?
+                    e.setMetadata("phone",
+                    request.getParameter("phone").equals("")
+                        ? null
+                        : request.getParameter("phone"));
+
+                    e.setCanLogIn(request.getParameter("can_log_in") != null &&
                         request.getParameter("can_log_in").equals("true"));
             
-            e.setRequireCertificate(
-                request.getParameter("require_certificate") != null &&
-                request.getParameter("require_certificate").equals("true"));
+                    e.setRequireCertificate(
+                        request.getParameter("require_certificate") != null &&
+                        request.getParameter("require_certificate").equals("true"));
 
-            e.update();
+                    e.update();
             
-            showMain(context, request, response);
-            context.complete();
+                    showMain(context, request, response);
+                    context.complete();
+                }
+                else
+                {
+                    // not unique - send error message & let try again
+                    request.setAttribute("eperson", e);
+                    request.setAttribute("error_message", "That EMail is in use by another EPerson.  Emails  must be unique.");
+
+                    JSPManager.showJSP(request, response,
+                        "/admin/eperson-edit.jsp");
+
+                    context.complete();
+                }
+            }
         }
         else if (button.equals("submit_delete"))
         {
