@@ -85,695 +85,72 @@ public class Browse
 
     private static Category log = Category.getInstance(Browse.class);
 
-    ////////////////////////////////////////
-    // getAuthors methods
-    ////////////////////////////////////////
-
     /**
-     * Return distinct Authors in this collection starting with NAME.
-     * If NAME is null, start with the first author.
-     *
+     * Return distinct Authors in the given scope.
      * Results are returned in alphabetical order.
      *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
+     * @param scope - The BrowseScope
+     * @return - A BrowseInfo object, the results of the browse
+     * @exception SQLException - If a database error occurs
      */
-    public static BrowseInfo getAuthors(Context context,
-                                        Collection collection,
-                                        String name,
-                                        int numberBefore,
-                                        int numberTotal)
+    public static BrowseInfo getAuthors(BrowseScope scope)
         throws SQLException
     {
-        return getSomethingInternal(context,
-                                    collection,
-                                    name,
-                                    COLLECTION_SCOPE,
-                                    AUTHORS_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
+        return getSomethingInternal(scope, AUTHORS_BROWSE, true, null);
     }
 
     /**
-     * Return distinct Authors in this community starting with NAME.
-     * If NAME is null, start with the first author alphabetically.
+     * Return Items indexed by title in the given scope.
      *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
+     * @param scope - The BrowseScope
+     * @return - A BrowseInfo object, the results of the browse
+     * @exception SQLException - If a database error occurs
      */
-    public static BrowseInfo getAuthors(Context context,
-                                        Community community,
-                                        String name,
-                                        int numberBefore,
-                                        int numberTotal)
+    public static BrowseInfo getItemsByTitle(BrowseScope scope)
         throws SQLException
     {
-        return getSomethingInternal(context,
-                                    community,
-                                    name,
-                                    COMMUNITY_SCOPE,
-                                    AUTHORS_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
+        return getSomethingInternal(scope, ITEMS_BY_TITLE_BROWSE, true, null);
     }
 
     /**
-     * Return distinct Authors in this DSpace site starting with NAME.
-     * If NAME is null, start with the first author alphabetically.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getAuthors(Context context,
-                                        String name,
-                                        int numberBefore,
-                                        int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    null,
-                                    name,
-                                    ALLDSPACE_SCOPE,
-                                    AUTHORS_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    ////////////////////////////////////////
-    // getItemsByTitle methods
-    ////////////////////////////////////////
-
-    /**
-     * Return Items in this collection starting with TITLE.
-     * If TITLE is null, start with the first title.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByTitle(Context context,
-                                             Collection collection,
-                                             String title,
-                                             int numberBefore,
-                                             int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    collection,
-                                    title,
-                                    COLLECTION_SCOPE,
-                                    ITEMS_BY_TITLE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    /**
-     * Return Items in this community starting with TITLE.
-     * If TITLE is null, start with the first title.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByTitle(Context context,
-                                             Community community,
-                                             String title,
-                                             int numberBefore,
-                                             int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    community,
-                                    title,
-                                    COMMUNITY_SCOPE,
-                                    ITEMS_BY_TITLE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    /**
-     * Return Items in this DSpace site starting with TITLE.
-     * If TITLE is null, start with the first title.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByTitle(Context context,
-                                             String title,
-                                             int numberBefore,
-                                             int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    null,
-                                    title,
-                                    ALLDSPACE_SCOPE,
-                                    ITEMS_BY_TITLE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    // getItemsByTitle methods using Item objects
-
-    /**
-     * Return Items in this collection starting with the title associated
-     * with ITEM. NOTE THAT IF THE ITEM HAS MORE THAN ONE TITLE, WHICH
-     * TITLE IS USED IS INDETERMINATE.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByTitle(Context context,
-                                             Collection collection,
-                                             Item item,
-                                             int numberBefore,
-                                             int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    collection,
-                                    item,
-                                    COLLECTION_SCOPE,
-                                    ITEMS_BY_TITLE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    /**
-     * Return Items in this collection starting with the title associated
-     * with ITEM. NOTE THAT IF THE ITEM HAS MORE THAN ONE TITLE, WHICH
-     * TITLE IS USED IS INDETERMINATE.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByTitle(Context context,
-                                             Community community,
-                                             Item item,
-                                             int numberBefore,
-                                             int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    community,
-                                    item,
-                                    COMMUNITY_SCOPE,
-                                    ITEMS_BY_TITLE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    /**
-     * Return Items in this collection starting with the title associated
-     * with ITEM. NOTE THAT IF THE ITEM HAS MORE THAN ONE TITLE, WHICH
-     * TITLE IS USED IS INDETERMINATE.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByTitle(Context context,
-                                             Item item,
-                                             int numberBefore,
-                                             int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    null,
-                                    item,
-                                    ALLDSPACE_SCOPE,
-                                    ITEMS_BY_TITLE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    // getItemsByTitle methods using Item ids
-
-    /**
-     * Return Items in this collection starting with the title associated
-     * with the Item with ITEM_ID. NOTE THAT IF THE ITEM HAS MORE THAN ONE
-     * TITLE, WHICH TITLE IS USED IS INDETERMINATE.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByTitle(Context context,
-                                             Collection collection,
-                                             int item_id,
-                                             int numberBefore,
-                                             int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    collection,
-                                    new Integer(item_id),
-                                    COLLECTION_SCOPE,
-                                    ITEMS_BY_TITLE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    /**
-     * Return Items in this collection starting with the title associated
-     * with the Item with ITEM_ID. NOTE THAT IF THE ITEM HAS MORE THAN ONE
-     * TITLE, WHICH TITLE IS USED IS INDETERMINATE.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByTitle(Context context,
-                                             Community community,
-                                             int item_id,
-                                             int numberBefore,
-                                             int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    community,
-                                    new Integer(item_id),
-                                    COMMUNITY_SCOPE,
-                                    ITEMS_BY_TITLE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    /**
-     * Return Items in this collection starting with the title associated
-     * with the Item with ITEM_ID. NOTE THAT IF THE ITEM HAS MORE THAN ONE
-     * TITLE, WHICH TITLE IS USED IS INDETERMINATE.
-     *
-     * Results are returned in alphabetical order.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByTitle(Context context,
-                                             int item_id,
-                                             int numberBefore,
-                                             int numberTotal)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    null,
-                                    new Integer(item_id),
-                                    ALLDSPACE_SCOPE,
-                                    ITEMS_BY_TITLE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    true);
-    }
-
-    ////////////////////////////////////////
-    // getItemsByDate methods
-    ////////////////////////////////////////
-
-    /**
-     * Return Items in this collection starting with DATE.
-     * If DATE is null, start at the first DATE.
+     * Return Items indexed by date of issue in the given scope.
      *
      * If DATESAFTER is true, the dates returned are the ones
      * AFTER date; otherwise the dates are the ones before DATE.
      * Results will be ordered in increasing order (ie, earliest to
      * latest) if DATESAFTER is true; in decreasing order otherwise.
      *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
+     * @param scope - The BrowseScope
+     * @return - A BrowseInfo object, the results of the browse
+     * @exception SQLException - If a database error occurs
      */
-    public static BrowseInfo getItemsByDate(Context context,
-                                            Collection collection,
-                                            String date,
-                                            int numberBefore,
-                                            int numberTotal,
+    public static BrowseInfo getItemsByDate(BrowseScope scope,
                                             boolean datesAfter)
         throws SQLException
     {
-        return getSomethingInternal(context,
-                                    collection,
-                                    date,
-                                    COLLECTION_SCOPE,
-                                    ITEMS_BY_DATE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    datesAfter);
+        return getSomethingInternal(scope, ITEMS_BY_DATE_BROWSE, datesAfter, null);
     }
 
     /**
-     * Return Items in this community starting with DATE.
-     * If DATE is null, start at the first DATE.
+     * Return Items in the given scope by Author (exact match).
      *
-     * If DATESAFTER is true, the dates returned are the ones
-     * AFTER date; otherwise the dates are the ones before DATE.
-     * Results will be ordered in increasing order (ie, earliest to
-     * latest) if DATESAFTER is true; in decreasing order otherwise.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByDate(Context context,
-                                            Community community,
-                                            String date,
-                                            int numberBefore,
-                                            int numberTotal,
-                                            boolean datesAfter)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    community,
-                                    date,
-                                    COMMUNITY_SCOPE,
-                                    ITEMS_BY_DATE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    datesAfter);
-    }
-
-    /**
-     * Return Items in this DSpace site starting with DATE.
-     * If DATE is null, start at the first DATE.
-     *
-     * If DATESAFTER is true, the dates returned are the ones
-     * AFTER date; otherwise the dates are the ones before DATE.
-     * Results will be ordered in increasing order (ie, earliest to
-     * latest) if DATESAFTER is true; in decreasing order otherwise.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByDate(Context context,
-                                            String date,
-                                            int numberBefore,
-                                            int numberTotal,
-                                            boolean datesAfter)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    null,
-                                    date,
-                                    ALLDSPACE_SCOPE,
-                                    ITEMS_BY_DATE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    datesAfter);
-    }
-
-    // ItemsByDate using Item object
-
-    /**
-     * Return Items in this collection starting with the date associated
-     * with ITEM. NOTE THAT IF THE ITEM HAS MORE THAN ONE DATE, WHICH
-     * DATE IS USED IS INDETERMINATE.
-     *
-     * If DATESAFTER is true, the dates returned are the ones
-     * AFTER date; otherwise the dates are the ones before DATE.
-     * Results will be ordered in increasing order (ie, earliest to
-     * latest) if DATESAFTER is true; in decreasing order otherwise.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByDate(Context context,
-                                            Collection collection,
-                                            Item item,
-                                            int numberBefore,
-                                            int numberTotal,
-                                            boolean datesAfter)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    collection,
-                                    item,
-                                    COLLECTION_SCOPE,
-                                    ITEMS_BY_DATE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    datesAfter);
-    }
-
-    /**
-     * Return Items in this collection starting with the date associated
-     * with ITEM. NOTE THAT IF THE ITEM HAS MORE THAN ONE DATE, WHICH
-     * DATE IS USED IS INDETERMINATE.
-     *
-     * If DATESAFTER is true, the dates returned are the ones
-     * AFTER date; otherwise the dates are the ones before DATE.
-     * Results will be ordered in increasing order (ie, earliest to
-     * latest) if DATESAFTER is true; in decreasing order otherwise.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByDate(Context context,
-                                            Community community,
-                                            Item item,
-                                            int numberBefore,
-                                            int numberTotal,
-                                            boolean datesAfter)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    community,
-                                    item,
-                                    COMMUNITY_SCOPE,
-                                    ITEMS_BY_DATE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    datesAfter);
-    }
-
-    /**
-     * Return Items in this collection starting with the date associated
-     * with ITEM. NOTE THAT IF THE ITEM HAS MORE THAN ONE DATE, WHICH
-     * DATE IS USED IS INDETERMINATE.
-     *
-     * If DATESAFTER is true, the dates returned are the ones
-     * AFTER date; otherwise the dates are the ones before DATE.
-     * Results will be ordered in increasing order (ie, earliest to
-     * latest) if DATESAFTER is true; in decreasing order otherwise.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByDate(Context context,
-                                            Item item,
-                                            int numberBefore,
-                                            int numberTotal,
-                                            boolean datesAfter)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    null,
-                                    item,
-                                    ALLDSPACE_SCOPE,
-                                    ITEMS_BY_DATE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    datesAfter);
-    }
-
-    // ItemsByDate using Item id
-
-    /**
-     * Return Items in this collection starting with the date associated
-     * with the ITEM with ITEM_ID. NOTE THAT IF THE ITEM HAS MORE THAN ONE
-     * DATE, WHICH DATE IS USED IS INDETERMINATE.
-     *
-     * If DATESAFTER is true, the dates returned are the ones
-     * AFTER date; otherwise the dates are the ones before DATE.
-     * Results will be ordered in increasing order (ie, earliest to
-     * latest) if DATESAFTER is true; in decreasing order otherwise.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByDate(Context context,
-                                            Collection collection,
-                                            int item_id,
-                                            int numberBefore,
-                                            int numberTotal,
-                                            boolean datesAfter)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    collection,
-                                    new Integer(item_id),
-                                    COLLECTION_SCOPE,
-                                    ITEMS_BY_DATE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    datesAfter);
-    }
-
-    /**
-     * Return Items in this collection starting with the date associated
-     * with the ITEM with ITEM_ID. NOTE THAT IF THE ITEM HAS MORE THAN ONE
-     * DATE, WHICH DATE IS USED IS INDETERMINATE.
-     *
-     * If DATESAFTER is true, the dates returned are the ones
-     * AFTER date; otherwise the dates are the ones before DATE.
-     * Results will be ordered in increasing order (ie, earliest to
-     * latest) if DATESAFTER is true; in decreasing order otherwise.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByDate(Context context,
-                                            Community community,
-                                            int item_id,
-                                            int numberBefore,
-                                            int numberTotal,
-                                            boolean datesAfter)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    community,
-                                    new Integer(item_id),
-                                    COMMUNITY_SCOPE,
-                                    ITEMS_BY_DATE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    datesAfter);
-    }
-
-    /**
-     * Return Items in this collection starting with the date associated
-     * with the ITEM with ITEM_ID. NOTE THAT IF THE ITEM HAS MORE THAN ONE
-     * DATE, WHICH DATE IS USED IS INDETERMINATE.
-     *
-     * If DATESAFTER is true, the dates returned are the ones
-     * AFTER date; otherwise the dates are the ones before DATE.
-     * Results will be ordered in increasing order (ie, earliest to
-     * latest) if DATESAFTER is true; in decreasing order otherwise.
-     *
-     * The maximum number returned is NUMBERTOTAL.
-     * Up to NUMBERBEFORE of preceding matches will be returned.
-     */
-    public static BrowseInfo getItemsByDate(Context context,
-                                            int item_id,
-                                            int numberBefore,
-                                            int numberTotal,
-                                            boolean datesAfter)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    null,
-                                    new Integer(item_id),
-                                    ALLDSPACE_SCOPE,
-                                    ITEMS_BY_DATE_BROWSE,
-                                    numberBefore,
-                                    numberTotal,
-                                    datesAfter);
-    }
-
-    ////////////////////////////////////////
-    // getItemsByAuthor methods
-    ////////////////////////////////////////
-
-    /**
-     * Return Items in this DSpace site by Author (exact match).
-     * The maximum number returned is NUMBERTOTAL.
-     * If NUMBERTOTAL is -1, all Items by this author are returned.
-     * Items are sorted by ELEMENT and QUALIFIER.
      * If SORTBYTITLE is true, then the returned items are sorted
-     * by title; otherwise, they are sorted by date.
+     * by title; otherwise, they are sorted by date issued.
+     *
+     * @param scope - The BrowseScope
+     * @return - A BrowseInfo object, the results of the browse
+     * @exception SQLException - If a database error occurs
      */
-    public static BrowseInfo getItemsByAuthor(Context context,
-                                              String author,
-                                              int numberTotal,
+    public static BrowseInfo getItemsByAuthor(BrowseScope scope,
                                               boolean sortByTitle)
         throws SQLException
     {
-        return getSomethingInternal(context,
-                                    null,
-                                    author,
-                                    ALLDSPACE_SCOPE,
-                                    ITEMS_BY_AUTHOR_BROWSE,
-                                    0,
-                                    numberTotal,
-                                    true,
-                                    sortByTitle ? Boolean.TRUE : Boolean.FALSE);
+        return getSomethingInternal
+            (scope,
+             ITEMS_BY_AUTHOR_BROWSE,
+             true,
+             sortByTitle ? Boolean.TRUE : Boolean.FALSE);
     }
-
-    /**
-     * Return Items in this Community by Author (exact match).
-     * The maximum number returned is NUMBERTOTAL.
-     * If NUMBERTOTAL is -1, all Items by this author are returned.
-     * If SORTBYTITLE is true, then the returned items are sorted
-     * by title; otherwise, they are sorted by date.
-     */
-    public static BrowseInfo getItemsByAuthor(Context context,
-                                              Community community,
-                                              String author,
-                                              int numberTotal,
-                                              boolean sortByTitle)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    community,
-                                    author,
-                                    COMMUNITY_SCOPE,
-                                    ITEMS_BY_AUTHOR_BROWSE,
-                                    0,
-                                    numberTotal,
-                                    true,
-                                    sortByTitle ? Boolean.TRUE : Boolean.FALSE);
-    }
-
-    /**
-     * Return Items in this Collection by Author (exact match).
-     * The maximum number returned is NUMBERTOTAL.
-     * If NUMBERTOTAL is -1, all Items by this author are returned.
-     * If SORTBYTITLE is true, then the returned items are sorted
-     * by title; otherwise, they are sorted by date.
-     */
-    public static BrowseInfo getItemsByAuthor(Context context,
-                                              Collection collection,
-                                              String author,
-                                              int numberTotal,
-                                              boolean sortByTitle)
-        throws SQLException
-    {
-        return getSomethingInternal(context,
-                                    collection,
-                                    author,
-                                    COLLECTION_SCOPE,
-                                    ITEMS_BY_AUTHOR_BROWSE,
-                                    0,
-                                    numberTotal,
-                                    true,
-                                    sortByTitle ? Boolean.TRUE : Boolean.FALSE);
-    }
-
-    ////////////////////////////////////////
-    // Last submitted methods
-    ////////////////////////////////////////
 
     /**
      * Returns the last N items submitted through DSpace
@@ -781,48 +158,15 @@ public class Browse
      *
      * @param n - Number of Items to return.
      * @return - A List of Items
+     * @exception SQLException - If a database error occurs
      */
-    public static List getLastSubmitted(Context context, int n)
+    public static List getLastSubmitted(BrowseScope scope)
         throws SQLException
     {
-        return getLastSubmittedInternal(context, null, ALLDSPACE_SCOPE, n);
-    }
+        Object obj = scope.getScope();
+        int type = getScope(obj);
+        int total = scope.getTotal();
 
-    /**
-     * Returns the last N items submitted in COMMUNITY.
-     * If N is -1, returns ALL Items submitted in COMMUNITY.
-     *
-     * @param n - Number of Items to return.
-     * @return - A List of Items
-     */
-    public static List getLastSubmitted(Context context, Community community, int n)
-        throws SQLException
-    {
-        return getLastSubmittedInternal(context, community, COMMUNITY_SCOPE, n);
-    }
-
-    /**
-     * Returns the last N items submitted in Collection.
-     * If N is -1, returns ALL Items submitted in COLLECTION.
-     *
-     * @param n - Number of Items to return.
-     * @return - A List of Items
-     */
-    public static List getLastSubmitted(Context context, Collection collection, int n)
-        throws SQLException
-    {
-        return getLastSubmittedInternal(context, collection, COLLECTION_SCOPE, n);
-    }
-
-    /**
-     * Workhorse method
-     */
-    private static List getLastSubmittedInternal(Context context,
-                                                 Object obj,
-                                                 int type,
-                                                 int n)
-        throws SQLException
-    {
         boolean isCommunity = (type == COMMUNITY_SCOPE);
         boolean isCollection = (type == COLLECTION_SCOPE);
 
@@ -857,13 +201,14 @@ public class Browse
             .append(isCollection ? " where collection_id = " : "")
             .append(isCollection ? Integer.toString(collection_id) : "")
             // Postgres-specific function
-            .append(type == -1 ? "" : " LIMIT ")
-            .append(type == -1 ? "" : Integer.toString(n))
+            .append(total == -1 ? "" : " LIMIT ")
+            .append(total == -1 ? "" : Integer.toString(total))
             .toString();
 
+        Context context = scope.getContext();
         List results = DatabaseManager.query(context, table, sql).toList();
 
-            // Skip processing if no results
+        // Skip processing if no results
         if ((results == null) || (results.isEmpty()))
             return Collections.EMPTY_LIST;
 
@@ -886,6 +231,10 @@ public class Browse
 
     /**
      * This method should be called whenever an item is removed.
+     *
+     * @param context - The database context
+     * @param id - The id of the item which has been removed
+     * @exception SQLException - If a database error occurs
      */
     public static void itemRemoved(Context context, int id)
         throws SQLException
@@ -903,8 +252,12 @@ public class Browse
 
     /**
      * This method should be called whenever an item has changed:
-     *   + DC values are added, removed, or changed
+     *   + DC values are added, removed, or modified
      *   + the value of the in_archive flag changes
+     *
+     * @param context - The database context
+     * @param item - The item which has been added
+     * @exception SQLException - If a database error occurs
      */
     public static void itemChanged(Context context, Item item)
         throws SQLException
@@ -923,6 +276,10 @@ public class Browse
 
     /**
      * This method should be called whenever an item is added.
+     *
+     * @param context - The database context
+     * @param item - The item which has been added
+     * @exception SQLException - If a database error occurs
      */
     public static void itemAdded(Context context, Item item)
         throws SQLException
@@ -969,6 +326,9 @@ public class Browse
 
     /**
      * Index all items in DSpace. This method may be resource-intensive.
+     *
+     * @param context - The database context
+     * @exception SQLException - If a database error occurs
      */
     public static void indexAll(Context context)
         throws SQLException
@@ -987,6 +347,9 @@ public class Browse
 
     /**
      * Remove all items in DSpace from the Browse index.
+     *
+     * @param context - The database context
+     * @exception SQLException - If a database error occurs
      */
     public static void indexRemoveAll(Context context)
         throws SQLException
@@ -1003,66 +366,47 @@ public class Browse
     // Private methods
     ////////////////////////////////////////
 
-    private static BrowseInfo getSomethingInternal
-        (Context context,
-         Object obj,
-         Object value,
-         int scope,
-         int browseType,
-         int numberBefore,
-         int numberTotal,
-         boolean ascending)
-        throws SQLException
-    {
-        return getSomethingInternal(context, obj, value, scope, browseType,
-                numberBefore, numberTotal, ascending, null);
-    }
-
-    /**
-     * Workhorse method
+    /*
+     * Internal implementation method.
      *
-     * @param obj - A community, collection, or null, depending on scope.
-     * @param value - A String, Item or item id
-     * @param scope - One of the scope constants
-     * @param browseType - One of the browseType constants
-     * @param numberBefore - Number of results to be returned BEFORE the
-     *   desired Item or value
-     * @param numberTotal - Maximum number of results to be returned (including
-     *   numberBefore)
+     * @param scope - The Browse scope
+     * @param browseType - The type of Browse
      * @param ascending - If true, results will be in lexographic order;
      *   otherwise, results will be in reverse lexographic order.
+     * @param sort - If true, results will be sorted by title;
+     *   otherwise, results will be sorted by date of issue.
+     * @return - A BrowseInfo object, the results of the browse
+     * @exception SQLException - If a database error occurs
      */
-    private static BrowseInfo getSomethingInternal
-        (Context context,
-         Object obj,
-         Object value,
-         int scope,
-         int browseType,
-         int numberBefore,
-         int numberTotal,
-         boolean ascending,
-         Boolean sort)
+    private static BrowseInfo getSomethingInternal(BrowseScope scope,
+                                                   int browseType,
+                                                   boolean ascending,
+                                                   Boolean sort)
         throws SQLException
     {
+        Context context  = scope.getContext();
+        Object obj       = scope.getScope();
+        int scopeType    = getScope(obj);
+        Object value     = scope.getFocus();
+        int numberBefore = scope.getNumberBefore();
+        int total        = scope.getTotal();
+
         ////////////////////
         // Sanity checks
         ////////////////////
-        // Note that we now allow null values, which signify that results
-        // should be returned from the start of an index.
-        //
         // No null collections
-        if ((scope == COLLECTION_SCOPE) && (obj == null))
+        if ((scopeType == COLLECTION_SCOPE) && (obj == null))
             throw new IllegalArgumentException("Collection is null");
-            // No null communities
-        if ((scope == COMMUNITY_SCOPE) && (obj == null))
+        // No null communities
+        if ((scopeType == COMMUNITY_SCOPE) && (obj == null))
             throw new IllegalArgumentException("Community is null");
 
         ////////////////////
         // Check for cached browses
         ////////////////////
         BrowseKey key = new BrowseKey
-            (obj, value, scope, browseType,
-             numberBefore, numberTotal, ascending, sort);
+            (obj, value, scopeType, browseType,
+             numberBefore, total, ascending, sort);
         BrowseInfo cachedInfo = (BrowseInfo) BrowseCache.get(key);
 
         if (cachedInfo != null)
@@ -1080,7 +424,7 @@ public class Browse
         //   the client passed a null value
         boolean searchFromStart = (value == null);
         // True if we want ALL values
-        boolean nolimit = (numberTotal == -1);
+        boolean nolimit = (total == -1);
         // True if we need a subquery
         boolean needsSubquery = valueIsInteger || valueIsItem;
         // True IF we are not looking for any previous results
@@ -1127,13 +471,13 @@ public class Browse
         ////////////////////
         // Run a subquery, if necessary
         String subqueryValue = needsSubquery ?
-            doSubquery(connection, obj, scope, browseType, value) : null;
+            doSubquery(connection, obj, scopeType, browseType, value) : null;
 
         if (needsSubquery && log.isInfoEnabled())
             log.info("Got subquery value: \"" + subqueryValue + "\"");
 
-        String sql = createSql(obj, value, scope,
-                browseType, numberTotal,
+        String sql = createSql(obj, value, scopeType,
+                browseType, total,
                 subqueryValue, false);
 
         if (log.isInfoEnabled())
@@ -1162,13 +506,13 @@ public class Browse
                 }
 
                 // Corner case -- no results desired
-                if ((!before) && (numberTotal == 0))
+                if ((!before) && (total == 0))
                     continue;
 
                     // Format the SQL
                 String SQL = formatSql(sql,
                         browseType,
-                        before ? numberBefore : numberTotal,
+                        before ? numberBefore : total,
                         subqueryValue,
                         before,
                         ascending);
@@ -1191,7 +535,7 @@ public class Browse
                     false);
 
                 // Run a query, get results
-                String table = BrowseTables.getTable(scope, browseType);
+                String table = BrowseTables.getTable(scopeType, browseType);
                 List results = DatabaseManager.query(table, statement).toList();
 
                 // Cleanup the statement
@@ -1219,7 +563,7 @@ public class Browse
                         if (theValue != null)
                         {
                             // And that we haven't returned more than the desired amount
-                            if (nolimit || (theResults.size() < numberTotal))
+                            if (nolimit || (theResults.size() < total))
                             {
                                 theResults.add(theValue);
                                 if (log.isDebugEnabled())
@@ -1246,21 +590,21 @@ public class Browse
             // Counting
             //////////////////////////////
             boolean countTotal = true;
-            int total = 0;
+            int theTotal = 0;
 
             // Got less authors than requested
             // This means that we do not need to count them
-            if ((browseType == ITEMS_BY_AUTHOR_BROWSE) && (numberTotal > resultSize))
+            if ((browseType == ITEMS_BY_AUTHOR_BROWSE) && (total > resultSize))
             {
                 countTotal = false;
-                total = resultSize;
+                theTotal = resultSize;
             }
 
             if (countTotal)
             {
-                statement = createTotalSql(obj, scope, browseType, connection, value);
+                statement = createTotalSql(obj, scopeType, browseType, connection, value);
 
-                total = getIntValue(statement);
+                theTotal = getIntValue(statement);
 
                 // Cleanup the statement
                 statement.close();
@@ -1272,7 +616,7 @@ public class Browse
             //   * When we search from the start of an index
             //   * When we got ALL the possible results
             boolean onlyCountTotal = searchFromStart &&
-                ((scope == ALLDSPACE_SCOPE) && (subqueryValue == null));
+                ((scopeType == ALLDSPACE_SCOPE) && (subqueryValue == null));
 
             // For all item searches, we need a specific query
             if (valueIsItem || valueIsInteger)
@@ -1289,16 +633,16 @@ public class Browse
 
             if (!onlyCountTotal)
             {
-                String countSql = createSql(obj, value, scope,
-                        browseType, numberTotal,
-                        subqueryValue, true);
+                String countSql = createSql(obj, value, scopeType,
+                                            browseType, total,
+                                            subqueryValue, true);
 
                 if (log.isInfoEnabled())
                     log.info("Count sql: \"" + countSql + "\"");
 
                 String SQL = formatSql(countSql,
                         browseType,
-                        numberTotal,
+                        total,
                         subqueryValue,
                         false,
                         ascending);
@@ -1396,7 +740,7 @@ public class Browse
         Object value,
         int scope,
         int browseType,
-        int numberTotal,
+        int total,
         String subqueryValue,
         boolean isCount
     )
@@ -1419,7 +763,7 @@ public class Browse
         // boolean searchFromStart = (value == null) && (! valueIsInteger) && (! valueIsInteger);
         boolean searchFromStart = (value == null);
         // True if we want ALL values
-        boolean nolimit = (numberTotal == -1);
+        boolean nolimit = (total == -1);
         // True if we added a where clause
         boolean addedWhereClause = false;
         // True if we need a subquery
@@ -1689,6 +1033,9 @@ public class Browse
         }
     }
 
+    /**
+     * Return a single String value from STATEMENT.
+     */
     private static String getStringValue(PreparedStatement statement)
         throws SQLException
     {
@@ -1706,6 +1053,9 @@ public class Browse
         }
     }
 
+    /**
+     * Return a single int value from STATEMENT.
+     */
     private static int getIntValue(PreparedStatement statement)
         throws SQLException
     {
@@ -1743,20 +1093,17 @@ public class Browse
     }
 
     /**
-   * Embedded test harness
-   *
-   * @param argv - Command-line arguments
-   */
-    public static void main(String[] argv)
-        throws SQLException
+     * Return the browse scope.
+     */
+    private static int getScope(Object scopeObj)
     {
-        System.out.print("Indexing all Items in DSpace....");
-        Context context = new Context();
-        indexAll(context);
-        context.complete();
-        System.out.println(" ... Done");
-    }
+        if (scopeObj instanceof Community)
+            return COMMUNITY_SCOPE;
+        if (scopeObj instanceof Collection)
+            return COLLECTION_SCOPE;
 
+        return ALLDSPACE_SCOPE;
+    }
 }
 
 class NormalizedTitle
@@ -1931,6 +1278,7 @@ class NormalizedTitle
     }
 }
 
+//  FIXME Use BrowseScope instead?
 class BrowseKey
 {
     public Object obj;
@@ -1938,7 +1286,7 @@ class BrowseKey
     public int scope;
     public int browseType;
     public int numberBefore;
-    public int numberTotal;
+    public int total;
     public boolean ascending;
     public Boolean sort;
 
@@ -1952,7 +1300,7 @@ class BrowseKey
     int scope,
     int browseType,
     int numberBefore,
-    int numberTotal,
+    int total,
     boolean ascending,
     Boolean sort
     )
@@ -1962,7 +1310,7 @@ class BrowseKey
         this.scope = scope;
         this.browseType = browseType;
         this.numberBefore = numberBefore;
-        this.numberTotal = numberTotal;
+        this.total = total;
         this.ascending = ascending;
         this.sort = sort;
     }
@@ -1983,7 +1331,7 @@ class BrowseKey
             (scope == theOther.scope) &&
             (browseType == theOther.browseType) &&
             (numberBefore == theOther.numberBefore) &&
-            (numberTotal == theOther.numberTotal) &&
+            (total == theOther.total) &&
             (ascending == theOther.ascending) &&
             (sort != null ? sort.equals(theOther.sort) : theOther.sort == null)
             ;
@@ -2000,7 +1348,7 @@ class BrowseKey
             .append(scope)
             .append(browseType)
             .append(numberBefore)
-            .append(numberTotal)
+            .append(total)
             .append(ascending)
             .append(sort)
             .toString().hashCode();
