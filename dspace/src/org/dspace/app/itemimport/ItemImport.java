@@ -494,6 +494,7 @@ public class ItemImport
             // get the old handle
             String newItemName = (String) i.next();
             String oldHandle = (String) myhash.get(newItemName);
+
             Item oldItem = null;
             Item newItem = null;
 
@@ -508,22 +509,31 @@ public class ItemImport
             {
                 oldItem = Item.find(c, Integer.parseInt(oldHandle));
             }
+            
+            /* Rather than exposing public item methods to change handles -- 
+             * two handles can't exist at the same time due to key constraints
+             * so would require temp handle being stored, old being copied to new and
+             * new being copied to old, all a bit messy -- a handle file is written to
+             * the import directory containing the old handle, the existing item is 
+             * deleted and then the import runs as though it were loading an item which 
+             * had already been assigned a handle (so a new handle is not even assigned).
+             * As a commit does not occur until after a successful add, it is safe to 
+             * do a delete as any error results in an aborted transaction without harming
+             * the original item */
+            File handleFile = new File(sourceDir + File.separatorChar + newItemName + File.separatorChar + "handle");
+            PrintWriter handleOut = new PrintWriter(new FileWriter(handleFile, true));
 
+            if (handleOut == null)
+            {
+                throw new Exception("can't open handle file: " + handleFile.getCanonicalPath());
+            }
+            
+            handleOut.println(oldHandle);
+            handleOut.close();
+            
+            deleteItem(c, oldItem);
+            
             newItem = addItem(c, mycollections, sourceDir, newItemName, null);
-
-            // schedule item for demolition
-            itemsToDelete.add(oldItem);
-        }
-
-        // now run through again, deleting items (do this last to avoid
-        // disasters!)
-        // (this way deletes only happen if there have been no errors
-        // previously)
-        i = itemsToDelete.iterator();
-
-        while (i.hasNext())
-        {
-            deleteItem(c, (Item) i.next());
         }
     }
 
