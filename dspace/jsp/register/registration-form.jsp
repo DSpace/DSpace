@@ -95,7 +95,7 @@
     
     <form action="<%= request.getContextPath() %>/register" method=POST>
     
-        <%@ include file="/register/profile-form.jsp" %>
+        <dspace:include page="/register/profile-form.jsp" />
     
 <%
     // Only show password update section if the user doesn't use

@@ -57,6 +57,6 @@
     circumstances that mean you should not be required to use a certificate,
     please contact us.</P>
 
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 
 </dspace:layout>

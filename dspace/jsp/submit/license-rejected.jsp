@@ -55,7 +55,7 @@
     <P>If you wish to contact us to discuss the license, please use one
     of the methods below:</P>
 
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 
     <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P>
 

@@ -56,5 +56,5 @@
         </tr>
     </table>
 
-    <%@ include file="/components/login-form.jsp" %>
+    <dspace:include page="/components/login-form.jsp" />
 </dspace:layout>

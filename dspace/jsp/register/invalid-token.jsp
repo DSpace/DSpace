@@ -79,5 +79,5 @@ LMNOP
 
     <P>If you're still having trouble, please contact us.</P>
     
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

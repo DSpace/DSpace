@@ -57,7 +57,7 @@
     again, and if the problem persists, please contact us so we can fix the
     problem.</P>
 
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 
     <P align=center>
         <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>

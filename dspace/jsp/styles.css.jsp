@@ -41,22 +41,40 @@
 <%--
   - Main DSpace Web UI stylesheet
   -
-  - This is a JSP so it can be tailored for different browser types
+  - This is a JSP so:
+  - a) it can be tailored for different browser types
+  - b) we can forward to a locally modified version if necessary
+  -
+  - NOTE!! If you're copying and pasting this to make local modifications,
+  - remove the "localVersion.equals()" if statement!!
   --%>
+<%@ page import="org.dspace.app.webui.util.JSPManager" %>
 
 <%
     // Make sure the browser knows we're a stylesheet
     response.setContentType("text/css");
 
-    String imageUrl   = request.getContextPath() + "/image/";
-
-    // Netscape 4.x?
-    boolean usingNetscape4 = false;
-    String userAgent = request.getHeader( "User-Agent" );
-    if( userAgent != null && userAgent.startsWith( "Mozilla/4" ) )
+    // Check for locally modified version
+    String localVersion = JSPManager.getLocalJSP("/styles.css.jsp");
+    
+    if (!localVersion.equals("/styles.css.jsp"))
     {
-        usingNetscape4 = true;
+        // Local version is different
+        JSPManager.showJSP(request, response, "/styles.css.jsp");
     }
+    else
+    {
+        // Use this version (site default)
+
+        String imageUrl   = request.getContextPath() + "/image/";
+
+        // Netscape 4.x?
+        boolean usingNetscape4 = false;
+        String userAgent = request.getHeader( "User-Agent" );
+        if( userAgent != null && userAgent.startsWith( "Mozilla/4" ) )
+        {
+            usingNetscape4 = true;
+        }
 %>
 
 A {  color: #003366 }
@@ -463,27 +481,7 @@ UL { font-family: "Trebuchet ms", "Arial", "Helvetica", sans-serif;
                   background: #fefecd;
                   text-decoration: none;
                   vertical-align: middle }
-
-<%-- Not sure if any of those below are used --%>
-
-.navoff { font-family: "Tahoma", "Arial", "Helvetica"; font-size: 10pt; font-style: normal; font-weight: bold; text-decoration: none ; color: #FFFFFF; margin-right: 5px; margin-left: 5px}
-
-.navon { font-family: "Tahoma", "Arial", "Helvetica"; font-size: 10pt; font-style: normal; font-weight: bold; text-decoration: none ; color: #000000; margin-right: 5px; margin-left: 5px; background-color: #FFFFCD}
-
-.fieldnames { font-family: "Tahoma", "Arial", "Helvetica"; font-size: 8pt; font-style: normal; font-weight: bold; color: #252645; text-decoration: none }
-
-.topnav { font-family: "Tahoma", "Arial", "Helvetica"; font-size: 10pt; font-style: normal; font-weight: bold; color: #252645; text-decoration: none }
-
-.titles {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt; font-style: normal; color: #000000; font-weight: bold}
-
-.titlesSecondary { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #000000; font-weight: bold }
-
-.bulletedlist { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; font-weight: bold; color: #252645; text-decoration: none ; list-style-image: none; list-style-type: disc}
-
-.textItalics {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; font-style: italic; line-height: normal; color: #000000}
-
-.title3rd { font-family: Arial, Helvetica, sans-serif; font-size: 8pt; font-style: normal; color: #000000; font-weight: bold }
-
-.bodytext { margin-right: 10px; margin-left: 10px }
-
-.mpressitem { margin-right: 40px; margin-left: 40px }
+<%
+        // Close conditional above
+    }
+%>

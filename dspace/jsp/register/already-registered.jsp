@@ -58,6 +58,6 @@
 
     <P>If you're having trouble logging in, please contact us.</P>
     
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 
 </dspace:layout>

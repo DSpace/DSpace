@@ -105,6 +105,6 @@
     <P>If you or your department are interested in registering with DSpace, please
     contact the DSpace site administrators.</P>
 
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 
 </dspace:layout>

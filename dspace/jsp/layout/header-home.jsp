@@ -45,6 +45,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.util.List"%>
+<%@ page import="org.dspace.app.webui.util.JSPManager" %>
 
 <%
     String title = (String) request.getAttribute("dspace.layout.title");
@@ -58,6 +59,7 @@
         <title>DSpace: <%= title %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp">
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
@@ -87,7 +89,7 @@
     {
 %>
             <tr>
-                <jsp:include page="/layout/location-bar.jsp" flush="true" />
+                <dspace:include page="/layout/location-bar.jsp" />
             </tr>
         </table>
 <%
@@ -95,7 +97,7 @@
 %>
 
         <%-- Page contents --%>
-    
+
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
         <table class="centralPane" width="100%" border=0 cellpadding=3 cellspacing=1>
 
@@ -104,7 +106,7 @@
 
             <%-- Navigation bar --%>
             <td class="navigationBar">
-                <jsp:include page="<%= navbar %>" flush="true" />
+                <dspace:include page="<%= navbar %>" />
             </td>
 
             <%-- Page Content --%>

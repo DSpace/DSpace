@@ -1,5 +1,5 @@
 <%--
-  - index.jsp
+  - home.jsp
   -
   - Version: $Revision$
   -
@@ -58,95 +58,19 @@
 
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.LogManager" %>
 
 <%
-    // Obtain a context so that the location bar can display log in status
     Context context = null;
 
     try
     {
+        // Obtain a context so that the location bar can display log in status
         context = UIUtil.obtainContext(request);
-%>
-
-<dspace:layout style="home" locbar="nolink" title="Home">
-
-  <h1><%= ConfigurationManager.getProperty("dspace.name") %> Home</h1>
-
-  <form action="<%= request.getContextPath() %>/simple-search" method=GET>
-    <table border=0 cellpadding=4 cellspacing=8>
-      <tr>
-        <td colspan=2 bgcolor="#e0e0e0">
-          <table width=100% border=0 cellpadding=6>
-            <tr>
-              <td valign=middle><h2>What can you find in DSpace?</h2></td>
-              <td valign=middle align=right class="standard"><a href="http://www.dspace.org/">More&nbsp;Information</a>&nbsp;&nbsp;&nbsp;</td>
-            </tr>
-          </table>
-          <table width=100%>
-            <tr>
-              <td width="50%">
-                <UL>
-                  <li>Articles</li>
-                  <li>Technical Reports</li>
-                  <li>Working Papers</li>
-                </ul>
-              </td>
-              <td width="50%">
-                <ul>
-                  <li>Datasets</li>
-                  <li>Images</li>
-                  <li>Videos....and more</li>
-                </ul>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td width="50%" align=center bgcolor="#e0e0e0" valign=top>
-          <H2>Search</H2>
-          <P class="submitFormHelp">Enter some text in the box below to search DSpace.</P>
-          <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="Go"></P>
-        </td>
-        <td width="50%" align=center bgcolor="#e0e0e0" valign=top>
-          <H2>Submit</H2>
-          <P class="submitFormHelp">Submit your digital content to DSpace!  To
-          start the submission process, select the button below.</P>
-          <P align=center><A HREF="<%= request.getContextPath() %>/submit">Start Submitting</A></P>
-          <P class="submitFormHelp"><strong>Authorized Users Only</strong></P>
-        </td>
-      </tr>
-      <tr>
-        <td bgcolor="#e0e0e0" valign=top>
-          <H2 align=center>Browse</H2>
-          <P class="submitFormHelp">You can also browse a DSpace index:</P>
-          <UL>
-            <LI><A HREF="<%= request.getContextPath() %>/community-list">Communities and collections</A></LI>
-            <LI><A HREF="<%= request.getContextPath() %>/browse-title">Titles</A></LI>
-            <LI><A HREF="<%= request.getContextPath() %>/browse-author">Authors</A></LI>
-            <LI><A HREF="<%= request.getContextPath() %>/browse-date">Dates</A></LI>
-          </UL>
-        </td>
-        <td align=center bgcolor="#e0e0e0" valign=top>
-          <H2>My DSpace</H2>
-          <P class="submitFormHelp">You can visit "My DSpace" to resume half-finished
-          submissions and check on the progress of previous submissions.</P>
-          <P align=center><A HREF="<%= request.getContextPath() %>/mydspace">Visit My DSpace</A></P>
-          <P class="submitFormHelp"><strong>Authorized Users Only</strong></P>
-        </td>
-      </tr>
-    </table>
-  </form>
-
-  <dspace:sidebar>
-    <%@ include file="/components/news.jsp" %>
-  </dspace:sidebar>
-</dspace:layout>
-
-<%
+        
+        // Show home page JSP
+        JSPManager.showJSP(request, response, "/home.jsp");
     }
     catch (SQLException se)
     {

@@ -58,6 +58,7 @@
         <title>DSpace: <%= title %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp">
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
@@ -87,7 +88,7 @@
     {
 %>
             <tr>
-                <jsp:include page="/layout/location-bar.jsp" flush="true" />
+                <dspace:include page="/layout/location-bar.jsp" />
             </tr>
         </table>
 <%
@@ -108,7 +109,7 @@
     {
 %>
             <td class="navigationBar">
-                <jsp:include page="<%= navbar %>" flush="true" />
+                <dspace:include page="<%= navbar %>" />
             </td>
 <%
     }

@@ -60,7 +60,7 @@
         please let us know so we can fix it!</P></LI>
     </UL>
 
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 
     <P align=center>
         <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>

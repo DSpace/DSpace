@@ -58,5 +58,5 @@
 
     <P align=center><strong>The e-mail address and password you supplied were not valid.  Please try again, or have you <A HREF="<%= request.getContextPath() %>/forgot">forgotten your password</A>?</strong></P>
 
-    <%@ include file="/components/login-form.jsp" %>
+    <dspace:include page="/components/login-form.jsp" />
 </dspace:layout>

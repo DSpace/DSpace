@@ -58,7 +58,7 @@
     further information, please <strong>contact the DSpace administrators:
     </strong></P>
 
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
     <P align=center>
         <A HREF="<%= request.getContextPath() %>/">
             Go to DSpace home page

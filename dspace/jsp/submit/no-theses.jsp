@@ -72,7 +72,7 @@
     <P>For more information please <strong>contact the DSpace site
     administrators</strong>:</P>
 
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 
     <P>Thank you for your interest in DSpace!</P>
 

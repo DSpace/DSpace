@@ -140,6 +140,22 @@
   </tag>
 
   <tag>
+    <name>include</name>
+    <tagclass>org.dspace.app.webui.jsptag.IncludeTag</tagclass>
+    <info>
+      Simple tag, similar to jsp:include, that will use the localised or
+      locally modified version of a JSP if one is installed.  e.g. when
+      including "/foo/bar.jsp", this tag will include "/local/foo/bar/jsp"
+      instead if it exists, falling back to "/foo/bar.jsp".
+    </info>
+    <attribute>
+      <name>page</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
     <name>item</name>
     <tagclass>org.dspace.app.webui.jsptag.ItemTag</tagclass>
     <info>

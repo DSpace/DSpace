@@ -58,5 +58,5 @@
 
     <P align=center><strong>You do not seem to have a valid Web certificate.</strong>  Please try again.</P>
 
-    <%@ include file="/components/login-form.jsp" %>
+    <dspace:include page="/components/login-form.jsp" />
 </dspace:layout>

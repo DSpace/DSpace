@@ -53,5 +53,5 @@
     registered</A> yet.  Please feel free to contact the site administrators
     with any queries.</P>
     
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

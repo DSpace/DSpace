@@ -72,7 +72,7 @@
 
     <P>If the problem persists, please contact the DSpace site administrators:</P>
 
-    <%@ include file="/components/contact-info.jsp" %>
+    <dspace:include page="/components/contact-info.jsp" />
 
     <P align=center>
         <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>
