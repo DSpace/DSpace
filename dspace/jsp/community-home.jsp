@@ -42,8 +42,10 @@
   - Community home JSP
   -
   - Attributes required:
-  -    community   - Community to render home page for
-  -    collections - array of Collections in this community
+  -    community             - Community to render home page for
+  -    collections           - array of Collections in this community
+  -    last.submitted.titles - String[] of titles of recently submitted items
+  -    last.submitted.urls   - String[] of URLs of recently submitted items
   --%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -53,9 +55,15 @@
 
 
 <%
+    // Retrieve attributes
     Community community = (Community) request.getAttribute( "community" );
     Collection[] collections =
         (Collection[]) request.getAttribute("collections");
+    String[] lastSubmittedTitles = (String[])
+        request.getAttribute("last.submitted.titles");
+    String[] lastSubmittedURLs = (String[])
+        request.getAttribute("last.submitted.urls");
+
 
     // Put the metadata values into guaranteed non-null variables
     String name = community.getMetadata("name");
@@ -161,20 +169,16 @@
   <dspace:sidebar>
     <H3>Recent&nbsp;Submissions</H3>
     
-<%-- FIXME: Recent items
-  while( recentItems.hasNext() )
-  {
-    Item item = (Item) recentItems.next();
-    String handle = (String) recentItemHandles.next();
-    String titles[] = item.getDCField( "title", null );
-    String title = (titles.length==0 ? "Untitled" : titles[0]);
+<%
+    for (int i = 0; i < lastSubmittedTitles.length; i++)
+    {
 %>
-    <P class="recentItem"><A HREF="item/<%= handle %>"><%= title %></A></P>
+    <P class="recentItem"><A HREF="<%= lastSubmittedURLs[i] %>"><%= lastSubmittedTitles[i] %></A></P>
 <%
   }
 %>
     <P>&nbsp;</P>
---%>
+
     <%= sidebar %>
 
   </dspace:sidebar>

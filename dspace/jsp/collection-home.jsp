@@ -53,8 +53,13 @@
 
 
 <%
+    // Retrieve attributes
     Community community = (Community) request.getAttribute("community");
     Collection collection = (Collection) request.getAttribute("collection");
+    String[] lastSubmittedTitles = (String[])
+        request.getAttribute("last.submitted.titles");
+    String[] lastSubmittedURLs = (String[])
+        request.getAttribute("last.submitted.urls");
 
     // Put the metadata values into guaranteed non-null variables
     String name = collection.getMetadata("name");
@@ -78,13 +83,6 @@
     String communityLink = "/communities/" + community.getID() + "/";
 %>
 
-
-<%--
-<dspace:layout locbar="links"
-               parent="<%= communityName" %>"
-               parentlink="<%= "/communities/" + community.getID() + "/" %>"
-               title="<%= name %>">
---%>
 
 <dspace:layout locbar="link" parenttitle="<%= communityName %>" parentlink="<%= communityLink %>" title="<%= name %>">
 
@@ -144,21 +142,14 @@
 
   <dspace:sidebar>
     <H3>Recent&nbsp;Submissions</H3>
-    
-<%-- FIXME: Recent items
-  while( recentItems.hasNext() )
-  {
-    Item item = (Item) recentItems.next();
-    String handle = (String) recentItemHandles.next();
-    String titles[] = item.getDCField( "title", null );
-    String title = (titles.length==0 ? "Untitled" : titles[0]);
+<%
+    for (int i = 0; i < lastSubmittedTitles.length; i++)
+    {
 %>
-    <P class="recentItem"><A HREF="item/<%= handle %>"><%= title %></A></P>
+    <P class="recentItem"><A HREF="<%= lastSubmittedURLs[i] %>"><%= lastSubmittedTitles[i] %></A></P>
 <%
   }
 %>
-    <P>&nbsp;</P>
---%>
     <%= sidebar %>
 
   </dspace:sidebar>

@@ -42,6 +42,7 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,11 +52,17 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.Browse;
+import org.dspace.browse.BrowseInfo;
+import org.dspace.browse.BrowseScope;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.handle.HandleManager;
 
 /**
  * Servlet for handling requests within communities and collections.
@@ -233,8 +240,20 @@ public class LocationServlet extends DSpaceServlet
 
         // FIXME: Logo
         
-        // FIXME: Last submitted items
+        // Find the 5 last submitted items
+        BrowseScope scope = new BrowseScope(context);
+        scope.setScope(community);
+        scope.setTotal(5);
+        
+        List items = Browse.getLastSubmitted(scope);
 
+        // Get titles and URLs to item pages
+        String[] itemTitles = getItemTitles(items);
+        String[] itemLinks = getItemURLs(context, items);
+
+        // Forward to community home page
+        request.setAttribute("last.submitted.titles", itemTitles);
+        request.setAttribute("last.submitted.urls", itemLinks);
         request.setAttribute("community", community);
         request.setAttribute("collections", collections);
         JSPManager.showJSP(request, response, "/community-home.jsp");
@@ -262,10 +281,80 @@ public class LocationServlet extends DSpaceServlet
 
         // FIXME: Logo
         
-        // FIXME: Last submitted items
+        // Find the 5 last submitted items
+        BrowseScope scope = new BrowseScope(context);
+        scope.setScope(collection);
+        scope.setTotal(5);
+        
+        List items = Browse.getLastSubmitted(scope);
 
+        // Get titles and URLs to item pages
+        String[] itemTitles = getItemTitles(items);
+        String[] itemLinks = getItemURLs(context, items);
+
+        // Forward to community home page
+        request.setAttribute("last.submitted.titles", itemTitles);
+        request.setAttribute("last.submitted.urls", itemLinks);
         request.setAttribute("community", community);
         request.setAttribute("collection", collection);
         JSPManager.showJSP(request, response, "/collection-home.jsp");
+    }
+
+
+    /**
+     * Utility method to obtain the titles for the Items in the given list.
+     *
+     * @param List of Items
+     * @return  array of corresponding titles
+     */
+    private String[] getItemTitles(List items)
+    {
+        String[] titles = new String[items.size()];
+        
+        for (int i = 0; i < items.size(); i++)
+        {
+            Item item = (Item) items.get(i);
+
+            // FIXME: Should probably check for preferred language?
+            DCValue[] titlesForThis = item.getDC("title", null, Item.ANY);
+            
+            // Just use the first title, if any
+            if (titlesForThis.length == 0)
+            {
+                // No title at all!
+                titles[i] = "Untitled";
+            }
+            else
+            {
+                // Use first title
+                titles[i] = titlesForThis[0].value;
+            }
+        }
+        
+        return titles;
+    }
+
+
+    /**
+     * Utility method obtain URLs for the most recent items
+     *
+     * @param context   DSpace context
+     * @param items     the items to get URLs for
+     * @return  an array of URLs (in Strings) corresponding to those items
+     */
+    private String[] getItemURLs(Context context, List items)
+        throws SQLException
+    {
+        String[] urls = new String[items.size()];
+        
+        for (int i = 0; i < items.size(); i++)
+        {
+            Item item = (Item) items.get(i);
+
+            String handle = HandleManager.findHandle(context, item);
+            urls[i] = HandleManager.resolveToURL(context, handle);
+        }
+        
+        return urls;
     }
 }
