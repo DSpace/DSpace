@@ -64,7 +64,16 @@
                parentlink="/dspace-admin"
                parenttitle="Administer">
 
-    <h1>Dublin Core Type Registry</h1>
+  <table width=95%>
+    <tr>
+      <td align=left>
+        <h1>Dublin Core Type Registry</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#dublincore">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
 
     <table class="miscTable" align="center">
         <tr>

@@ -80,8 +80,17 @@
                parenttitle="Administer"
                nocache="true">
 
-    <h1>Policies for community <%= community.getMetadata("name") %> (ID=<%=community.getID()%>)</h1>
-
+  <table width=95%>
+    <tr>
+      <td align=left>
+    <h1>Policies for Community "<%= community.getMetadata("name") %>" (hdl:<%= community.getHandle() %>, DB ID <%=community.getID()%>)</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#communitypolicies">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
+    
     <P align="center">
         <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method=POST>
             <input type="hidden" name="community_id" value="<%=community.getID()%>" >

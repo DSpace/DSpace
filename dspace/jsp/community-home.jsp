@@ -235,8 +235,13 @@
                 </form>
               </td>
             </tr>
-	 	  </table>
-	 	</td>
+            <tr>
+              <td class="standard" align="center">
+                 <dspace:popup page="/help/site-admin.html">Admin Help...</dspace:popup>
+              </td>
+            </tr>
+	  </table>
+	</td>
       </tr>
     </table>
     <% } %>

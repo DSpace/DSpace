@@ -71,6 +71,8 @@
     the format metadata.  Be sure to uncheck "internal" if the format should
     appear in the submission UI list of formats.</P>
 
+    <P><dspace:popup page="/help/site-admin.html#bitstream">More help...</dspace:popup></P>
+
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>

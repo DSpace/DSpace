@@ -131,6 +131,7 @@
                parenttitle="Administer"
                nocache="true">
 
+
 <%  if (collection == null) { %>
     <H1>Create Collection</H1>
 <% } else { %>

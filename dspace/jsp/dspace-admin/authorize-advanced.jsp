@@ -84,7 +84,7 @@
     <p>Allows you to do wildcard additions to and clearing
        of policies for types of content contained in a collection.
        Warning, dangerous - removing READ permissions from
-       items will make them not viewable!</p>
+       items will make them not viewable!  <dspace:popup page="/help/site-admin.html#advancedpolicies">More help...</dspace:popup></p>
 
     <form method=POST>
 

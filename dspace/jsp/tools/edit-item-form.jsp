@@ -84,7 +84,9 @@
     
     <P><strong>PLEASE NOTE: These changes are not validated in any way.
     You are responsible for entering the data in the correct format.
-    If you are not sure what the format is, please do NOT make changes.</strong></P>  
+    If you are not sure what the format is, please do NOT make changes.</strong></P>
+    
+    <P><dspace:popup page="/help/collection-admin.html#editmetadata">More help...</dspace:popup></P>  
 
     <center>
         <table width="70%">

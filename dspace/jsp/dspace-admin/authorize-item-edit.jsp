@@ -102,7 +102,17 @@
                parenttitle="Administer"
                nocache="true">
 
+  <table width=95%>
+    <tr>
+      <td align=left>
     <h1>Policies for Item <%= item.getHandle() %> (ID=<%= item.getID() %>)</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#itempolicies">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
+    
 
     <P>With this editor you can view and alter the policies of an item,
     plus alter policies of individual item components:  bundles and bitstreams.

@@ -64,7 +64,16 @@
                parenttitle="Administer"
                nocache="true">
 
+  <table width=95%>
+    <tr>
+      <td align=left>
     <h1>Group Editor</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#groups">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
 
     <P>Note that you do not need to manually add users to the "anonymous"
     group - all users are members implicitly.</P>

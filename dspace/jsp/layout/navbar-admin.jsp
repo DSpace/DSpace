@@ -47,6 +47,8 @@
 
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
+<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
 <%
     // Build up lists of menu item labels and links
     List labels = new LinkedList();
@@ -112,6 +114,15 @@
 %>
     <tr>
         <td colspan="2">&nbsp;</td>
+    </tr>
+
+    <tr class="navigationBarItem">
+        <td>
+            <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16">
+        </td>
+        <td nowrap class="navigationBarItem">
+            <dspace:popup page="/help/site-admin.html">Help</dspace:popup>
+        </td>
     </tr>
 
     <tr class="navigationBarItem">

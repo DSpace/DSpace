@@ -56,7 +56,16 @@
 
 <dspace:layout locbar="off" navbar="off" title="Describe the Collection" nocache="true">
 
-    <H1>Describe the Collection</H1>
+  <table width="95%">
+    <tr>
+      <td>
+        <H1>Describe the Collection</H1>
+      </td>
+      <td class="standard" align=right>
+        <dspace:popup page="/help/site-admin.html#wizard_description">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
 
     <form action="<%= request.getContextPath() %>/dspace-admin/collection-wizard" method=post enctype="multipart/form-data">
         <table>

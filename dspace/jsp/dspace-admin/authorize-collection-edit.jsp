@@ -84,7 +84,17 @@
                parenttitle="Administer"
                nocache="true">
 
-    <h1>Policies for collection <%= collection.getMetadata("name") %> (ID=<%= collection.getID() %>)</h1>
+  <table width=95%>
+    <tr>
+      <td align=left>
+        <h1>Policies for Collection "<%= collection.getMetadata("name") %>" (hdl:<%= collection.getHandle() %>, DB ID <%= collection.getID() %>)</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#collectionpolicies">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
+    
 
     <P align="center">
 

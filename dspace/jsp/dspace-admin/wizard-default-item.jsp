@@ -58,7 +58,16 @@
 
 <dspace:layout locbar="off" navbar="off" title="Enter Default Metadata" nocache="true">
 
+  <table width="95%">
+    <tr>
+      <td>
 	<H1>Enter Default Item Metadata</H1>
+      </td>
+      <td class="standard" align=right>
+        <dspace:popup page="/help/site-admin.html#wizard_default">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
 	
 	<P>Whenever a new submission is started in this collection, it will have the
 	metadata you entered below already filled out.</P>

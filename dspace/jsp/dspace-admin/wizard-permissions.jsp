@@ -69,7 +69,7 @@
 %>
 	<H1>Authorization to Read</H1>
 	
-	<P>Who has (by default) permission to read new items submitted to this collection?</P>
+	<P>Who has (by default) permission to read new items submitted to this collection?
 <%
 	break;
 
@@ -77,7 +77,7 @@
 %>
 	<H1>Authorization to Submit</H1>
 	
-	<P>Who has permission to submit new items to this collection?</P>
+	<P>Who has permission to submit new items to this collection?
 <%
 	break;
 	
@@ -88,7 +88,7 @@
 	<P>Who is responsible for performing the <strong>accept/reject</strong> step?
 	They will be able to accept or reject incoming submissions.  They will not be
 	able to edit the submission's metadata, however.  Only one of the group need perform the step
-	for each submission.</P>
+	for each submission.
 <%
 	break;
 
@@ -98,7 +98,7 @@
 	
 	<P>Who is responsible for performing the <strong>accept/reject/edit metadata</strong> step?
 	They will be able to edit the metadata of incoming submissions, and then accept
-	or reject them.  Only one of the group need perform the step for each submission.</P>
+	or reject them.  Only one of the group need perform the step for each submission.
 <%
 	break;
 
@@ -108,7 +108,7 @@
 	
 	<P>Who is responsible for performing the <strong>edit metadata</strong> step?
 	They will be able to edit the metadata of incoming submissions, but will not
-	be able to reject them.</P>
+	be able to reject them.
 <%
 	break;
 
@@ -118,11 +118,12 @@
 
 	<P>Who are the collection administrators for this collection?  They will be able to decide who can submit items
 to the collection, withdraw items, edit item metadata (after submission), and add (map) existing items from
-other collections to this collection (subject to authorization from that collection).</P>
+other collections to this collection (subject to authorization from that collection).
 <%
 	break;
 	}
 %>
+<dspace:popup page="/help/site-admin.html#wizard_permissions">More help...</dspace:popup></P>
 
 	<P>You can change this later using the relevant sections of the DSpace admin UI.</P>
 

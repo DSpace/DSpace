@@ -206,13 +206,13 @@
   <dspace:sidebar>
 <% if(admin_button || editor_button ) { %>
     <table class=miscTable align=center>
-	  <tr>
-	    <td class="evenRowEvenCol" colspan=2>
-	      <table>
+      <tr>
+	<td class="evenRowEvenCol" colspan=2>
+	  <table>
             <tr>
               <th class="standard">
                  <strong>Admin Tools</strong>
-              </th>
+              <th>
             </tr>
 
 <% if( admin_button ) { %>
@@ -237,17 +237,22 @@
               </td>
             </tr>
 <% if(submitters != null) { %>
-			<tr>
-				<td class="standard" align="center">
-				  <form method=GET action="<%=request.getContextPath()%>/tools/group-edit">
-				    <input type=hidden name="group_id" value="<%=submitters.getID()%>">
-				    <input type=submit name="submit_edit" value="Edit Submitters">
-				  </form>
-				</td>
-			</tr>
+            <tr>
+	      <td class="standard" align="center">
+		<form method=GET action="<%=request.getContextPath()%>/tools/group-edit">
+		  <input type=hidden name="group_id" value="<%=submitters.getID()%>">
+		  <input type=submit name="submit_edit" value="Edit Submitters">
+		</form>
+	      </td>
+            </tr>
 <% } %>
-	 	  </table>
-	 	</td>
+            <tr>
+              <td class="standard" align="center">
+                 <dspace:popup page="/help/collection-admin.html">Admin Help...</dspace:popup>
+              </td>
+            </tr>
+	  </table>
+	</td>
       </tr>
 <% } %>
 

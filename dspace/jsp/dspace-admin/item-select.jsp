@@ -61,7 +61,8 @@
     <A HREF="<%= request.getContextPath() %>/dspace-admin/edit-communities">communities/collections admin page.</A></P>
 <%  } %>
 
-    <P>Enter the Handle or internal item ID of the item you wish to select:</P>
+    <P>Enter the Handle or internal item ID of the item you wish to select.
+      <dspace:popup page="/help/site-admin.html#itempolicies">More Help...</dspace:popup></P>
     
     <form method=POST>
         <center>

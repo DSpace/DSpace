@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+  <HEAD>
+    <TITLE>DSpace: Collection Administrator Help</TITLE>
+    <link rel="stylesheet" href="../styles.css.jsp" type="text/css"/>
+  </HEAD>
+
+  <BODY class="help">
+    <H2>Collection Administrator Help</H2>
+
+    <TABLE>
+      <TR>
+        <TD ALIGN="LEFT"><H3>Help Contents</H3></TD>
+        <TD ALIGN="RIGHT"><a HREF="#" onClick="window.close()">Close this window</a></TD>
+      </TR>
+    </TABLE>
+
+    <UL>
+      <LI><A HREF="#general">General Information</A></LI>
+      <LI><A HREF="#submitters">Adding or Removing Authorized Submitters</A></LI>
+      <LI><A HREF="#groupeditor">The Group Editor</A></LI>
+      <LI><A HREF="#editmetadata">Editing Item Metadata</A></LI>
+      <LI><A HREF="#withdraw">Withdrawing an Item</A></LI>
+      <LI><A HREF="#itemmap">Including Items from Other Collections (Item Mapping)</A></LI>
+    </UL>
+
+    <H3><A NAME="general"></A>General Information</H3>
+
+    <P>If you are a collection administrator, you will need to log in before the administration controls appear in the DSpace UI.  The easiest way to do this is to go to your 'My DSpace' page.  Then, go to the collection home page for the collection you wish to administer.  On the top-right hand of the page you will see some extra controls.  Additionally, on the pages of those items owned by a collection you administer, you will see an extra 'Edit' button next to the item's Handle.</P>
+
+    <P>Also note that in some of the administration screens, links to additional administration tools may appear.  In some cases you may not be authorized to use those administration tools, so clicking on them will result in an 'authorization required' error message.</P>
+
+    <H3><A NAME="submitters"></A>Adding or Removing Authorized Submitters</H3>
+
+    <P><strong>Note that you cannot add submitters who do not already have e-person records in the system.  You will need the DSpace central administrators to add e-person records for all potential submitters.</strong></P>
+
+    <P>To add to or remove from the group of submitters authorized to submit to the collection, make sure you're logged in, go to the relevant collection's home page, and click on the 'Edit Submitters' button.  This will take you to the group editor page.</P>
+
+
+    <H3><A NAME="groupeditor"></A>The Group Editor</H3>
+
+    <P>The group editor allows you to add or remove e-people from a particular group, for example the group of e-people allowed to submit to a particular collection.</P>
+
+    <P>At the top of the screen is the name of the group.  It is <strong>strongly</strong> recommended that you do not change this; these group names follow a convention and some things might not work as expected if you change it.</P>
+
+    <P>Below that is a list of e-people currently in the group (full name and e-mail address.)  To remove someone from the group, select their name and click on the 'Remove Selected' button.</P>
+
+    <P>To select e-people to add to the list, (obviously) click on the 'Select E-people...' button, and a new pop-up window will appear.  This lets you browse around the list of e-people in the system and add them to the group.  You can sort the list by ID (an internal identifier), e-mail address and last name, by clicking on the heading of the relevant column.  The heading of the current sort column will be displayed in bold and have an arrow indicating how it is sorted.  You can browse around the full list by clicking on the links above and below the list in the pop-up window.</P>
+
+    <P>To add an e-person to the group in the main group editor window, click the 'Add' button to the left of their row.  Note that the pop-up window doesn't disappear at this point, to make it easier to add several e-people at once; however this can make it look like nothing's happened when you click on 'Add'.  However, if you look at the group on the main group editor page, you should see the e-people have been added to the list.</P>
+
+    <P>When you've finished adding or removing e-people to or from the group, click on 'Update Group' on the main group editor page.  (The e-person selector pop-up will close automatically, if you haven't closed it yourself beforehand.)</P>
+
+
+    <H3><A NAME="editmetadata"></A>Editing Item Metadata</H3>
+
+    <P>To edit an item's metadata (that is, an item that is already in the main archive, and not one that is in the submission workflow), make sure you're logged in, go to that item's display page, and click on the 'Edit' button on the top right.</P>
+
+    <P>To edit an existing Dublin Core value or values, make the necessary edits, and click on the <strong>Update</strong> button when finished.</p>
+
+    <P>If you want to add new Dublin Core metadata fields one at a time.  Select the relevant element and qualifier from the drop-down at the end of the list of DC fields, enter the text value in the box, and click on the <strong>Add</strong> button on the right-hand side.</P>
+
+    <P>This UI does no validation on anything you enter, so be careful; be sure to check <A HREF="business.html#dublincore">DSpace's use of Dublin Core metadata</A> to ensure that fields you enter will be understood by the system correctly.</P>
+
+
+    <H3><A NAME="withdraw"></A>Withdrawing an Item</H3>
+
+    <P>To withdraw an item, first log in to DSpace, go to the item's display page, then click on the 'Edit' button on the top right.  Then, on the item edit page, click on 'Withdraw...' button on the top right-hand corner of the page.  You'll then see the item record.  If you're sure you want to withdraw the item, click on 'Withdraw' at the bottom of this page.</P>
+
+    <P>Note that withdrawing does not completely remove the item from the archive; it simply removes it from all public view (search and browse indices and so forth).  DSpace does have a function to fully delete an item ('expunge'), used in a similar way to the withdraw tool, but it is strongly recommended you do not use it.</P>
+
+    <P>If you want to 'reinstate' an item that has been previously withdrawn, contact a DSpace site administrator.</P>
+
+
+    <H3><A NAME="itemmap"></A>Including Items from Other Collections (Item Mapping)</H3>
+
+    <P>TODO</P>
+
+
+  </BODY>
+</HTML>

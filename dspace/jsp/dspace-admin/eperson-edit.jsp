@@ -79,7 +79,16 @@
 
     <h1><%= (errorMessage==null ? "" : errorMessage) %></h1>
 
-    <h1>Edit EPerson <%= eperson.getEmail() %>:</h1>
+  <table width=95%>
+    <tr>
+      <td align=left>
+        <h1>Edit EPerson <%= eperson.getEmail() %>:</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#epeople">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
 
     <form method=POST>
 

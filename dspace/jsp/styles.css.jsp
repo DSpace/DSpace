@@ -241,11 +241,11 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                       font-weight: normal }
 
 .collectionDescription { margin-left: 20px;
-                	 margin-right: 10px;
-                	 font-family: "verdana", "Arial", "Helvetica", sans-serif;
-                	 font-size: 10pt;
+                     margin-right: 10px;
+                     font-family: "verdana", "Arial", "Helvetica", sans-serif;
+                     font-size: 10pt;
                          font-weight: normal;
-                	 list-style-type: none }
+                     list-style-type: none }
 
 .miscListItem { margin-left: 20px;
                 margin-right: 10px;
@@ -308,31 +308,31 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                        background: #ddddff }
 
 .topNavLink { margin-left: 10px;
-	      margin-right: 10px;
-	      font-family: "verdana", "Arial", "Helvetica", sans-serif;
-	      font-size: 10pt;
-	      text-align: center }
+          margin-right: 10px;
+          font-family: "verdana", "Arial", "Helvetica", sans-serif;
+          font-size: 10pt;
+          text-align: center }
 
 .submitFormLabel { margin-left: 10px;
-		   margin-right: 10px;
-		   font-family: "verdana", "Arial", "Helvetica", sans-serif;
+           margin-right: 10px;
+           font-family: "verdana", "Arial", "Helvetica", sans-serif;
                    font-weight: bold;
-		   font-size: 10pt;
-		   text-align: right }
+           font-size: 10pt;
+           text-align: right }
 
 .submitFormHelp {  margin-left: 10px;
-		   margin-right: 10px;
-		   font-family: "verdana", "Arial", "Helvetica", sans-serif;
-		   font-size: 8pt;
-		   text-align: center }
+           margin-right: 10px;
+           font-family: "verdana", "Arial", "Helvetica", sans-serif;
+           font-size: 8pt;
+           text-align: center }
 
 .submitFormWarn {  margin-left: 10px;
-		   margin-right: 10px;
-		   font-family: "verdana", "Arial", "Helvetica", sans-serif;
-		   font-weight: bold;
-		   font-size: 12pt;
-		   color: #ff6600;
-		   text-align: center }
+           margin-right: 10px;
+           font-family: "verdana", "Arial", "Helvetica", sans-serif;
+           font-weight: bold;
+           font-size: 12pt;
+           color: #ff6600;
+           text-align: center }
 
 .uploadHelp { margin-left: 20px;
               margin-right: 20px;
@@ -509,19 +509,23 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 .help h3{font-weight:bold;
          margin-left:0px;}
 
+.help h4{font-weight:bold;
+         font-size: 10pt;
+         margin-left:5px;}
+
 .help h5{font-weight:bold;
          margin-left:10px;
          line-height:.5;}
 
-.help p {font-size:12pt;}
+.help p {font-size:10pt;}
 
 .help table{margin-left:8px;
             width:90%;}
 
-.help ul {font-size:12pt;}
+.help ul {font-size:10pt;}
 
 .help p.bottomLinks {font-size:10pt;
                     font-weight:bold;}
 
-.help td.leftAlign{font-size:12pt;}
+.help td.leftAlign{font-size:10pt;}
 .help td.rightAlign{text-align:right;}

@@ -70,12 +70,21 @@
                parenttitle="Administer"
                nocache="true">
 
+  <table width=95%>
+    <tr>
+      <td align=left>
     <h1>Edit Group : <%=group.getName()%> (<%=group.getID()%>)</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/collection-admin.html#groupeditor">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
 
-    <p align="left">
+  <center>
     <form method=post>
 
-            Name: <input name="group_name" value="<%=group.getName()%>">
+        <P>Name: <input name="group_name" value="<%=group.getName()%>"></P>
 
         <h3>Current Group Members</h3>
 
@@ -83,9 +92,8 @@
         <dspace:selecteperson multiple="true" selected="<%= epeople %>"/> 
 
         <br>
-        <br>
 
-        <input type="submit" name="submit_group_update" value="Update Group" onclick="javascript:finishEPerson();">
+        <P><input type="submit" name="submit_group_update" value="Update Group" onclick="javascript:finishEPerson();"></P>
     </form>
-    </p>
+  </center>
 </dspace:layout>

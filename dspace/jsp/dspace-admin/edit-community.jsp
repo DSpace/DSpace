@@ -91,6 +91,9 @@
 
 <dspace:layout title="Edit Community" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer" nocache="true">
 
+  <table width=95%>
+    <tr>
+      <td align=left>
 <%
     if (community == null)
     {
@@ -105,6 +108,12 @@
 <%
     }
 %>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#editcommunity">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
 
     <form method=POST>
         <table>

@@ -89,14 +89,25 @@
                parenttitle="Administer"
                nocache="true">
 
-    <h1>Edit Policy for <%= edit_title %>:</h1>
+  <table width=95%>
+    <tr>
+      <td align=left>
+        <h1>Edit Policy for <%= edit_title %>:</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#authorize">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
+    
+    
     <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method=POST>
 
     <table class="miscTable" align="center">
         <tr>     
             <td>Group:</td>
             <td>
-                <select size="5" name="group_id">
+                <select size="15" name="group_id">
                     <%  for(int i = 0; i < groups.length; i++ ) { %>
                             <option value="<%= groups[i].getID() %>" <%= (groups[i].getID() == policy.getGroupID() ? "selected" : "" ) %> >
                             <%= groups[i].getName()%>

@@ -69,8 +69,16 @@
                parenttitle="Administer"
                nocache="true">
 
-    <h1>Currently Active Workflows</h1>
-
+  <table width=95%>
+    <tr>
+      <td align=left>    <h1>Currently Active Workflows</h1>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#workflow">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
+  
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"> <strong>ID</strong></th>

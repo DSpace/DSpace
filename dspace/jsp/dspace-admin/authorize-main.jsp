@@ -67,29 +67,39 @@
                parenttitle="Administer">
 
     <h1>Administer Authorization Policies</h1>
-    <h3>Choose a resource to manage policies for:</h3>
+  <table width=95%>
+    <tr>
+      <td align=left>
+          <h3>Choose a resource to manage policies for:</h3>
+      </td>
+      <td align="right" class="standard">
+        <dspace:popup page="/help/site-admin.html#authorize">Help...</dspace:popup>
+      </td>
+    </tr>
+  </table>
+    
     
     <form method=POST>    
 
     <center>
         <table width="70%">
             <tr>
-                <td align="left">
+                <td align="center">
                     <input type="submit" name="submit_community" value="Manage a Community's Policies">
                 </td>
             </tr>
             <tr>
-                <td align="left">
+                <td align="center">
                     <input type="submit" name="submit_collection" value="Manage Collection's Policies">
                 </td>
             </tr>
             <tr>
-                <td align="left">
+                <td align="center">
                     <input type="submit" name="submit_item" value="Manage An Item's Policies">
                 </td>
             </tr>
             <tr>
-                <td align="left">
+                <td align="center">
                     <input type="submit" name="submit_advanced" value="Advanced/Item Wildcard Policy Admin Tool">
                 </td>
             </tr>

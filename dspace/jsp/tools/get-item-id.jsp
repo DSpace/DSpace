@@ -62,7 +62,7 @@
 <%  } %>
 
     <P>Enter the Handle or internal item ID of the item you want to edit or
-    delete:</P>
+    delete.  <dspace:popup page="/help/site-admin.html#items">More help...</dspace:popup></P>
     
     <form method=GET>
         <center>
