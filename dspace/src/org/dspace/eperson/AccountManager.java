@@ -73,8 +73,8 @@ public class AccountManager
     /** log4j log */
     private static Logger log = Logger.getLogger(AccountManager.class);
 
-    /** Private Constructor */
-    private AccountManager () {}
+    /** Protected Constructor */
+    protected AccountManager () {}
 
     /**
      * Email registration info to the given email address.

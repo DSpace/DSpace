@@ -89,8 +89,8 @@ public class BitstreamStorageManager
     /** log4j log */
     private static Logger log = Logger.getLogger(BitstreamStorageManager.class);
 
-    /** Private Constructor */
-    private BitstreamStorageManager () {}
+    /** Protected Constructor */
+    protected BitstreamStorageManager () {}
 
     /**
      * Store a stream of bits.
