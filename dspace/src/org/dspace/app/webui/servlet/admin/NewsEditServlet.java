@@ -71,11 +71,7 @@ import org.dspace.core.LogManager;
 public class NewsEditServlet extends DSpaceServlet
 {
     private static Logger log = Logger.getLogger(NewsEditServlet.class);
-    
-    public static final int NEWS_TOP = 0;
-    
-    public static final int NEWS_SIDE = 1;
-       
+         
     protected void doDSGet(Context c,
                     HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -93,50 +89,22 @@ public class NewsEditServlet extends DSpaceServlet
            
         //Get submit button
         String button = UIUtil.getSubmitButton(request, "submit");
-     
-        //construct path for news file name
-        //files should always be in the /components subdir
-        String fileName = request.getRealPath("/components") + File.separatorChar;
-                    
+ 
         String news = "";
+        
+        //Are we editing the top news or the sidebar news?
+        int position = UIUtil.getIntParameter(request, "position");
+            
        
         if( button.equals("submit_edit") )
         {
-           //Are we editing the top news or the sidebar news?
-            int location = UIUtil.getIntParameter(request, "location");
+            //get the existing text from the file
+            news = ConfigurationManager.readNewsFile(position);
             
-            if(location == NEWS_TOP)
-            {
-                fileName += "news-top.html";
-                request.setAttribute("location", new Integer(NEWS_TOP));
-            }
-            else 
-            {
-                fileName += "news-side.html";
-                request.setAttribute("location", new Integer(NEWS_SIDE));
-            }
+            //pass the position back to the JSP
+            request.setAttribute("position", new Integer(position));
             
-            
-            try
-            {
-                //retrieve existing news from file
-                BufferedReader br = new BufferedReader( new FileReader(fileName) );
-                String lineIn;
-            
-                while((lineIn = br.readLine()) != null)
-                {
-                    news += lineIn;
-                }
-            
-                br.close();            
-            }
-            catch(IOException e )
-            {
-                log.warn(LogManager.getHeader(c,
-                "news_edit", e.getLocalizedMessage()));
-            }
-        
-            //pass the existing news back to the JSP
+             //pass the existing news back to the JSP
             request.setAttribute("news", news);
                   
             //show news edit page
@@ -145,39 +113,12 @@ public class NewsEditServlet extends DSpaceServlet
         }
         else if( button.equals("submit_save") )
         {       
-            //Are we editing the top news or the sidebar news?
-            int location = UIUtil.getIntParameter(request, "location");
-            
             //get text string from form
             news = (String) request.getParameter("news");
             
-            if(location == NEWS_TOP)
-            {
-                fileName += "news-top.html";
-             }
-            else
-            {
-                fileName += "news-side.html";
-            }
+            //write the string out to file
+            ConfigurationManager.writeNewsFile(position, news);
             
-            try
-            {
-            
-                //write the news out to the appropriate file\
-                BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));                 
-                PrintWriter out = new PrintWriter( bw );    
-                out.print(news);           
-                out.close();
-                
-                log.info(LogManager.getHeader(c,
-                "news_edit", "news written to " + fileName));
-                
-            }catch(IOException e)
-            {
-                log.warn(LogManager.getHeader(c,
-                "news_edit", e.getLocalizedMessage()));
-            }
-                                 
             JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
         }
         else
