@@ -114,6 +114,16 @@
                         </table>
                     </td>
                 </tr>
+                <tr class="evenRowOddCol">
+                    <td class="evenRowOddCol" align="left">
+                        <table border=0>
+                            <tr>
+                                <td valign=top><input type=checkbox name="default.item" value="true"></td>
+                                <td class="submitFormLabel" nowrap>New submissions will have some default metadata already filled out</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
 			</table>
 		</center>
 	
@@ -138,5 +148,3 @@
     </form>
 
 </dspace:layout>
-
-        

@@ -53,6 +53,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.administer.DCType;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -64,6 +65,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Community;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -199,7 +201,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 					break;
 					
 				case DEFAULT_ITEM:
-					//processDefaultItem(context, request, response, collection);
+					processDefaultItem(context, request, response, collection);
 					break;
 
 				default:
@@ -462,6 +464,43 @@ public class CollectionWizardServlet extends DSpaceServlet
 		context.complete();
 	}
 
+    
+    /**
+     * Process input from default item page 
+     * 
+     * @param context     DSpace context
+     * @param request     HTTP request
+     * @param response    HTTP response
+     * @param collection  Collection we're editing
+     */
+    private void processDefaultItem(Context context,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Collection collection)
+        throws SQLException, ServletException, IOException, AuthorizeException
+    {
+        Item item = collection.getTemplateItem();
+        
+        for (int i = 0; i < 10; i++)
+        {
+            int dcTypeID = UIUtil.getIntParameter(request, "dctype_" + i);
+            String value = request.getParameter("value_" + i);
+            String lang = request.getParameter("lang_" + i);
+            if (dcTypeID != -1 && value != null && !value.equals(""))
+            {
+                DCType dc = DCType.find(context, dcTypeID);
+                item.addDC(dc.getElement(), dc.getQualifier(), lang, value);
+            }
+        }
+
+        item.update();
+
+        // Now work out what next page is
+        showNextPage(context, request, response, collection, DEFAULT_ITEM);
+
+        context.complete();
+    }
+    
 
 	/**
 	 * Work out which page to show next, and show it
@@ -552,13 +591,14 @@ public class CollectionWizardServlet extends DSpaceServlet
 			// Next page is 'default item' iff there's a default item
 			if (collection.getTemplateItem() != null)
 			{
-				JSPManager.showJSP(request, response, "/dspace-admin/wizard-default-item.jsp");
+			    DCType[] types = DCType.findAll(context);
+                request.setAttribute("dctypes", types);
+                JSPManager.showJSP(request, response, "/dspace-admin/wizard-default-item.jsp");
 				break;				
 			}
 
 		case DEFAULT_ITEM:
-			// Next page is 'summary page (the last page)
-
+            // Next page is 'summary page (the last page)
 			JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");
 			break;				
 		}
