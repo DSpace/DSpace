@@ -72,7 +72,7 @@ my $logs_dir       = GetConfigParameter( "log.dir"        );
 
 # directories in this array are to be checked for ownership by
 # the dspace user
-my @dspace_ownership_dirs = ( $assetstore_dir, "$dspace_dir/jsp" );
+my @dspace_ownership_dirs = ( $assetstore_dir );
 
 # directories in this array are to be checked for zero-length files
 my @zerolength_dirs = ( $assetstore_dir );
