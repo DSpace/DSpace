@@ -1,9 +1,7 @@
 <%--
   - group_edit.jsp
   -
-  - Version: $Revision$
-  -
-  - Date: $Date$
+  - $Id$
   -
   - Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -69,13 +67,13 @@
                parentlink="/admin"
                parenttitle="Administer">
 
-    <h1>Edit Group : <%= group.getID() %></h1>
+    <h1>Edit Group : <%=group.getName()%> (<%=group.getID()%>)</h1>
 
     <p align="center">
         <form method=post>
             Name: <input name="group_name" value="<%=group.getName()%>">
             <input type="hidden" name="group_id" value="<%=group.getID()%>">
-            <input type="submit" name="submit_change_name" value="Change Name">
+            <input type="submit" name="submit_change_name" value="Update Name">
         </form>
     </p>
 

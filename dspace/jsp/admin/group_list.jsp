@@ -1,9 +1,7 @@
 <%--
   - group_list.jsp
   -
-  - Version: $Revision$
-  -
-  - Date: $Date$
+  - $Id$
   -
   - Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -69,6 +67,12 @@
     authorization policy or is a workflow group you will get an internal
     server error.</P>
 
+    <p align="center">
+        <form method=POST>
+            <input type="submit" name="submit_add" value="Add New">
+        </form>
+    </p>
+
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
@@ -103,10 +107,6 @@
 %>
     </table>
     
-    <p align="center">
-        <form method=POST>
-            <input type="submit" name="submit_add" value="Add New">
-        </form>
-    </p>
+
         
 </dspace:layout>
