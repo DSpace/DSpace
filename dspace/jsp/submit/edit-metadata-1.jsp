@@ -196,37 +196,23 @@
 
                 <tr>
 <%
-    if (si.missing)
+    if (si.missing && si.jumpToField != null && si.jumpToField.equals("title"))
     {
 %>
                     <td colspan=4 class="submitFormWarn">
-<%
-    }
-    else
-    {
-%>
-                    <td colspan=4 class="submitFormHelp">
-<%
-    }
-    if (si.jumpToField != null && si.jumpToField.equals("title"))
-    {
-%>
-                        <a name="field"></a>
-<%
-    }
-    if (si.missing)
-    {
-%>
+		    <a name="field"></a>
 			You must enter a main title for the item.
 <%
     }
     else
     {
 %>
+                    <td colspan=4 class="submitFormHelp">
                         Enter the main title of the item.
 <%
     }
 %>
+
                     </td>
                 </tr>
 <%
@@ -355,6 +341,14 @@
         DCValue[] dateIssuedArray = item.getDC("date", "issued", Item.ANY);
         DCDate dateIssued = new DCDate(
             (dateIssuedArray.length > 0 ? dateIssuedArray[0].value : ""));
+	if (si.missing && dateIssued.getYear() <= 0)
+	{
+%>
+		<tr>
+		    <td colspan=4 class="submitFormWarn">You must enter at least the year.</td>
+		</tr>
+<%
+	}
 %>
                 <tr>
 <%-- HACK: nowrap used since browsers do not act on "white-space" CSS property --%>
@@ -372,6 +366,13 @@
 %>
                         </select>
                         Day:<input type=text name=date_issued_day size=2 maxlength=2 value="<%= (dateIssued.getDay() > 0 ? String.valueOf(dateIssued.getDay()) : "" ) %>">
+<%	if (si.jumpToField != null && si.jumpToField.equals("date_issued_year"))
+	{
+%>
+		    <a name="field"></a>
+<%
+	}
+%>
                         Year:<input type=text name=date_issued_year size=4 maxlength=4 value="<%= (dateIssued.getYear() > 0 ? String.valueOf(dateIssued.getYear()) : "" ) %>">
                     </td>
                     <td>
