@@ -97,6 +97,10 @@ public class ItemTag extends TagSupport
                 renderDefault();
             }
         }
+        catch (java.sql.SQLException e)
+        {
+            throw new JspException(e);
+        }
         catch (IOException ie)
         {
             throw new JspException(ie);
@@ -184,7 +188,7 @@ public class ItemTag extends TagSupport
      * Render an item in the default style
      */
     private void renderDefault()
-        throws IOException
+        throws IOException, java.sql.SQLException
     {
         JspWriter out = pageContext.getOut();
 
@@ -248,6 +252,18 @@ public class ItemTag extends TagSupport
         fields.add(new String[] {"ISSN", "identifier", "issn"});
         fields.add(new String[] {"ISMN", "identifier", "ismn"});
         fields.add(new String[] {"Other Identifiers", "identifier", null});
+
+        HttpServletRequest request =
+            (HttpServletRequest) pageContext.getRequest();
+
+        // show edit link
+        if(item.canEdit())
+        {
+            String editLink = request.getContextPath() + "/tools/edit-item"
+                + "?item_id="+item.getID();
+                
+            out.println("<a href=\""+editLink+"\">Edit</a>");
+        }
         
         out.println("<center><table class=\"itemDisplayTable\">");
         
@@ -300,7 +316,7 @@ public class ItemTag extends TagSupport
      * Render full item record
      */
     private void renderFull()
-        throws IOException
+        throws IOException, java.sql.SQLException
     {
         JspWriter out = pageContext.getOut();
 
@@ -308,6 +324,18 @@ public class ItemTag extends TagSupport
         DCValue[] values = item.getDC(Item.ANY, Item.ANY, Item.ANY);
     
         out.println("<P align=center>Full metadata record</P>");
+
+        HttpServletRequest request =
+            (HttpServletRequest) pageContext.getRequest();
+
+        // show edit link
+        if(item.canEdit())
+        {
+            String editLink = request.getContextPath() + "/tools/edit-item"
+                + "?item_id="+item.getID();
+                
+            out.println("<a href=\""+editLink+"\">Edit</a>");
+        }
 
         // Three column table - DC field, value, language
         out.println("<center><table class=\"itemDisplayTable\">");
@@ -402,7 +430,7 @@ public class ItemTag extends TagSupport
         out.print("<table align=center class=\"miscTable\"><tr>");
         out.println("<td class=evenRowEvenCol><P><strong>Files in This Item:</strong></P>");
 
-        Bundle[] bundles = item.getBundles();
+        Bundle[] bundles = item.getBundles("ORIGINAL");
     
         if (bundles.length == 0)
         {
