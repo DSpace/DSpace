@@ -62,7 +62,7 @@
     <P>Are you sure you want to abort this workflow?  It will return to the user's personal workspace</P>
     
     <UL>
-        <LI>Collection:Any items and incomplete submissions in this collections that aren't contained in other collections</LI>
+        <LI>Collection: <%= workflow.getCollection().getMetadata("name") %></LI>
         <LI>Submitter: <%= WorkflowManager.getSubmitterName(workflow) %></LI>
         <LI>Title: <%= WorkflowManager.getItemTitle(workflow) %></LI>
     </UL>
