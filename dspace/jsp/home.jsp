@@ -61,7 +61,7 @@
     <table class="miscTable" width="95%" align="center">
         <tr>
             <td class="oddRowEvenCol">
-                <dspace:include page="/components/news.jsp" />
+                <dspace:include page="/components/news-top.html" />
             </td>
         </tr>
     </table>
@@ -103,9 +103,6 @@
     </table>
 
   <dspace:sidebar>
-    <%-- non-break spaces to make sidebar a reasonable width--%>
-    <H2>This&nbsp;is&nbsp;a&nbsp;default installation of DSpace!</H2>
-    <P>It can be extensively configured by installing modified JSPs,
-    and altering the site configuration.</P>
+    <dspace:include page="/components/news-side.html" />
   </dspace:sidebar>
 </dspace:layout>
