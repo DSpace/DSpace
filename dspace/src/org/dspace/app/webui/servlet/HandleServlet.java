@@ -446,7 +446,7 @@ public class HandleServlet extends DSpaceServlet
                 }
                                 
                 // is the user a COLLECTION_EDITOR?
-                if(AuthorizeManager.authorizeActionBoolean(context, collection, Constants.COLLECTION_EDITOR))
+                if(AuthorizeManager.authorizeActionBoolean(context, collection, Constants.COLLECTION_ADMIN))
                 {
                     request.setAttribute("editor_button", new Boolean(true));
                     

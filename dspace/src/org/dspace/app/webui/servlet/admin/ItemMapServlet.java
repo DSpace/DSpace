@@ -95,7 +95,7 @@ public class ItemMapServlet extends DSpaceServlet
         Collection myCollection = Collection.find(context, myID);
 
         // authorize check
-        AuthorizeManager.authorizeAction(context, myCollection, Constants.COLLECTION_EDITOR);
+        AuthorizeManager.authorizeAction(context, myCollection, Constants.COLLECTION_ADMIN);
 
         String action = request.getParameter("action");
         

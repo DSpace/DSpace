@@ -205,17 +205,15 @@ public class Collection extends DSpaceObject
 
             return null;
         }
-        else
+
+        if (log.isDebugEnabled())
         {
-            if (log.isDebugEnabled())
-            {
-                log.debug(LogManager.getHeader(context,
+        	log.debug(LogManager.getHeader(context,
                     "find_collection",
                     "collection_id=" + id));
-            }
-
-            return new Collection(context, row);
         }
+
+        return new Collection(context, row);
     }
 
 
@@ -585,7 +583,7 @@ public class Collection extends DSpaceObject
             admins.update();
         }
 
-        AuthorizeManager.addPolicy(ourContext, this, Constants.COLLECTION_EDITOR, admins);
+        AuthorizeManager.addPolicy(ourContext, this, Constants.COLLECTION_ADMIN, admins);
 
         // administrators also get ADD on the submitter group
         if( submitters != null )

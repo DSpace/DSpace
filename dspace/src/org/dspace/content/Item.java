@@ -1104,7 +1104,7 @@ public class Item extends DSpaceObject
         // Check authorisation
         
         // only do write authorization if user is not an editor
-        if( !AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(), Constants.COLLECTION_EDITOR) )
+        if( !AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(), Constants.COLLECTION_ADMIN) )
         {
             AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         }
@@ -1645,7 +1645,7 @@ public class Item extends DSpaceObject
         
         // is this person an COLLECTION_EDITOR for the owning collection?
         if( AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(),
-                Constants.COLLECTION_EDITOR))
+                Constants.COLLECTION_ADMIN))
         {
             return true;
         }        

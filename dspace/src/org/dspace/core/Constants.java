@@ -134,8 +134,9 @@ public class Constants
     /** Default Read policies for Items submitted to container */
     public static final int DEFAULT_ITEM_READ = 10;
 
-    /** collection editor -- metadata, icon, owned item metadata */
-    public static final int COLLECTION_EDITOR = 11;
+    /** collection admin -- metadata, logo, item metadata,
+     * submitters, withdraw items, etc. */
+    public static final int COLLECTION_ADMIN = 11;
     
     /** Position of front page news item -- top box */
     public static final int NEWS_TOP = 0;
@@ -159,7 +160,7 @@ public class Constants
         "WORKFLOW_ABORT",
         "DEFAULT_BITSTREAM_READ",
         "DEFAULT_ITEM_READ",
-        "COLLECTION_EDITOR"
+        "COLLECTION_ADMIN"
     };
 
 
@@ -193,7 +194,7 @@ public class Constants
         0,           // 8  - WORKFLOW_ABORT
         RCOLLECTION, // 9  - DEFAULT_BITSTREAM_READ
         RCOLLECTION, // 10 - DEFAULT_ITEM_READ
-        RCOLLECTION  // 11 - COLLECTION_EDITOR 
+        RCOLLECTION  // 11 - COLLECTION_ADMIN 
     };
 
 
@@ -223,7 +224,7 @@ public class Constants
      * If you know the action string, look up the corresponding type ID
      * constant.
      *
-     * @param type  String with the name of the action (must be exact match)
+     * @param action  String with the name of the action (must be exact match)
      *
      * @return  the corresponding action ID, or <code>-1</code> if the action
      *          string is unknown
