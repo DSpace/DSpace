@@ -329,7 +329,7 @@ public class EPerson
     public void setPassword(String s)
     {
         // FIXME:  encoding
-        String encoded = encodePassword(s);
+        String encoded = Utils.getMD5(s);
 
         myRow.setColumn("password", encoded);
     }
@@ -343,12 +343,9 @@ public class EPerson
      */
     public boolean checkPassword(String attempt)
     {
-        String encoded = encodePassword( attempt);
+        String encoded = Utils.getMD5(attempt);
 
-        if(attempt.equals(myRow.getStringColumn("password")))
-            return true;
-
-        return false;
+        return (encoded.equals(myRow.getStringColumn("password")));
     }
 
 
@@ -380,18 +377,5 @@ public class EPerson
         }
 
         return (getID() == ((EPerson) other).getID());
-    }
-
-    //--------- private methods ------------------
-
-    /**
-     * encodePassword() is a utility function to encode a password,
-     *
-     * @param cleartextpw   cleartext password to encode
-     */
-
-    private static String encodePassword(String cleartextpw)
-    {
-        return Utils.getMD5(cleartextpw);
     }
 }
