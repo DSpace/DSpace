@@ -75,7 +75,7 @@ title="Cancel or Save Submission">
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
         <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="step" value="<%= displayStep %>"/>
+            <jsp:param name="current_stage" value="<%= displayStep %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
         </jsp:include>
 

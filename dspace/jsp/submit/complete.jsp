@@ -46,7 +46,7 @@
 title="Submission Complete!">
 
     <jsp:include page="/submit/progressbar.jsp">
-        <jsp:param name="step" value="<%= SubmitServlet.SUBMISSION_COMPLETE %>"/>
+        <jsp:param name="current_stage" value="<%= SubmitServlet.SUBMISSION_COMPLETE %>"/>
         <jsp:param name="stage_reached" value="<%= SubmitServlet.SUBMISSION_COMPLETE %>"/>
     </jsp:include>
 

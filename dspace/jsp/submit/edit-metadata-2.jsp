@@ -68,7 +68,7 @@ title="Describe Your Item">
     <form action="<%= request.getContextPath() %>/submit#field" method=post>
 
         <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="step" value="<%= SubmitServlet.EDIT_METADATA_2 %>"/>
+            <jsp:param name="current_stage" value="<%= SubmitServlet.EDIT_METADATA_2 %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
         </jsp:include>
 

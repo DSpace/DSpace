@@ -73,7 +73,7 @@ title="Uploaded Files">
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
         <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="step" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
+            <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
         </jsp:include>
 

@@ -85,7 +85,7 @@
         "Complete"
     };
 
-    int step = Integer.parseInt(request.getParameter("step"));
+    int step = Integer.parseInt(request.getParameter("current_stage"));
     int stageReached = Integer.parseInt(request.getParameter("stage_reached"));
 
     // Are we in workflow mode?

@@ -327,7 +327,9 @@ public class SubmitServlet extends DSpaceServlet
         int step = UIUtil.getIntParameter(request, "step");
 
         // select collection is a special case - no submissioninfo object
-        if (step == SELECT_COLLECTION)
+        // If no step was given, we also assume "select collection"
+        // (Submit button on collection home page or elsewhere)
+        if (step == SELECT_COLLECTION || step == -1)
         {
             processSelectCollection(context, request, response);
             return;
@@ -1998,7 +2000,6 @@ public class SubmitServlet extends DSpaceServlet
                 i = INITIAL_QUESTIONS;
             }
             
-System.err.println("GOOOOO: " + i);
             return i;
         }
     }

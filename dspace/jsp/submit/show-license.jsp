@@ -64,7 +64,7 @@ title="DSpace Distribution License">
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
         <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="step" value="<%= SubmitServlet.GRANT_LICENSE %>"/>
+            <jsp:param name="current_stage" value="<%= SubmitServlet.GRANT_LICENSE %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
         </jsp:include>
 
