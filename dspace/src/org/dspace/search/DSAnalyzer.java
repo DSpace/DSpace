@@ -38,7 +38,7 @@
 package org.dspace.search;
 
 import java.io.Reader;
-import java.util.Hashtable;
+import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.LowerCaseFilter;
@@ -57,7 +57,8 @@ public class DSAnalyzer extends Analyzer
      * An array containing some common words that are not usually useful for
      * searching.
      */
-    private static final String[] STOP_WORDS = {
+    private static final String[] STOP_WORDS =
+    {
 
     // new stopwords (per MargretB)
             "a", "am", "and", "are", "as", "at", "be", "but", "by", "for",
@@ -75,8 +76,7 @@ public class DSAnalyzer extends Analyzer
     /*
      * Stop table
      */
-    final static private Hashtable stopTable = StopFilter
-            .makeStopTable(STOP_WORDS);
+    final static private Set stopSet = StopFilter.makeStopSet(STOP_WORDS);
 
     /*
      * Create a token stream for this analyzer.
@@ -87,7 +87,7 @@ public class DSAnalyzer extends Analyzer
 
         result = new StandardFilter(result);
         result = new LowerCaseFilter(result);
-        result = new StopFilter(result, stopTable);
+        result = new StopFilter(result, stopSet);
         result = new PorterStemFilter(result);
 
         return result;
