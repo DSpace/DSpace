@@ -64,7 +64,7 @@ public class LogManager
         String extrainfo)
     {
         String email = "anonymous";
-        String extraInfo;
+        String contextExtraInfo;
 
         if (context != null)
         {
@@ -75,14 +75,14 @@ public class LogManager
                 email = e.getEmail();
             }
 
-            extraInfo = context.getExtraLogInfo();
+            contextExtraInfo = context.getExtraLogInfo();
         }
         else
         {
-            extraInfo = "no_context";
+            contextExtraInfo = "no_context";
         }
 
-        String result = new String(email + ":" + extraInfo +
+        String result = new String(email + ":" + contextExtraInfo +
             ":" + action + ":" + extrainfo);
 
         return result;
