@@ -21,15 +21,24 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.search.DSIndexer;
 
 
-// possible args - collection, item, mediafilter
+/**
+ *  MediaFilterManager is the class that invokes the media filters over the repository's content.
+ *   a few command line flags affect the operation of the MFM:
+ *    -v verbose outputs all extracted text to SDTDOUT
+ *    -f force forces all bitstreams to be processed, even if they have been before
+ *    -n noindex does not recreate index after processing bitstreams
+ *
+ */
 
 public class MediaFilterManager
 {
     private static Map filterNames = new HashMap();
     private static Map filterCache = new HashMap();
-
+    
+    public static boolean createIndex = true; // default to creating index
     public static boolean isVerbose = false; // default to not verbose
     public static boolean isForce   = false; // default to not forced
 
@@ -46,6 +55,7 @@ public class MediaFilterManager
 
         options.addOption( "v", "verbose", false, "print all extracted text and other details to STDOUT");
         options.addOption( "f", "force",   false, "force all bitstreams to be processed");
+        options.addOption( "n", "noindex", false, "do NOT re-create search index after filtering bitstreams");
         options.addOption( "h", "help",    false, "help");
 
         CommandLine line = parser.parse( options, argv );
@@ -58,8 +68,9 @@ public class MediaFilterManager
             System.exit(0);
         }
         
-        if( line.hasOption( 'v' ) ) { isVerbose = true; } 
-        if( line.hasOption( 'f' ) ) { isForce   = true; }
+        if( line.hasOption( 'v' ) ) { isVerbose   = true;  } 
+        if( line.hasOption( 'n' ) ) { createIndex = false; } 
+        if( line.hasOption( 'f' ) ) { isForce     = true;  }
         
         // get path to config file
         String myPath = ConfigurationManager.getProperty("dspace.dir") + File.separator +
@@ -118,7 +129,15 @@ public class MediaFilterManager
 
         // now apply the filters
         applyFiltersAllItems(c);
-        
+       
+        // create search index?
+        if( createIndex )
+        {
+            System.out.println("Creating search index:");
+            DSIndexer.createIndex(c);
+        }        
+
+
         c.complete();
     }
     
