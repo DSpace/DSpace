@@ -85,7 +85,7 @@
         <P class="submitFormHelp">Please also note that the DSpace system is
         able to preserve the content of certain types of files better than other
         types.
-        <dspace:popup page="/help/submit_guide.html#formats">Information about file types</dspace:popup> and levels of
+        <dspace:popup page="/help/formats.jsp">Information about file types</dspace:popup> and levels of
         support for each are available.</P>
     
         <table border=0 align=center>
