@@ -109,6 +109,9 @@ public class CollectionWizardServlet extends DSpaceServlet
 	
 	/** Permissions page for workflow step 3 */
 	public final static int PERM_WF3 = 14;
+
+    /** Permissions page for collection editors */
+    public final static int PERM_EDITOR = 15;
 	
 	/** Logger */
 	private static Logger log = Logger.getLogger(CollectionWizardServlet.class);
@@ -174,7 +177,6 @@ public class CollectionWizardServlet extends DSpaceServlet
 
 			// Create the collection
 			Collection newCollection = c.createCollection();
-			Group g = newCollection.createSubmitters();
 			request.setAttribute("collection", newCollection);
 			JSPManager.showJSP(request, response, "/dspace-admin/wizard-questions.jsp");
 			context.complete();
@@ -269,7 +271,14 @@ public class CollectionWizardServlet extends DSpaceServlet
 				Group g = collection.createWorkflowGroup(i);
 			}
 		}
-		
+
+        // Check for collection editor
+        if (UIUtil.getBoolParameter(request, "editors"))
+        {
+            // Create editors group
+            Group g = collection.createEditors();
+        }
+        
 		// Default item stuff?
 		if (UIUtil.getBoolParameter(request, "default.item"))
 		{
@@ -350,6 +359,10 @@ public class CollectionWizardServlet extends DSpaceServlet
 		case PERM_WF3:
 			g = collection.getWorkflowGroup(3);
 			break;
+        
+        case PERM_EDITOR:
+            g = collection.getEditors();
+            break;
 		}
 
 		// Add people from the form to the group
@@ -596,15 +609,24 @@ public class CollectionWizardServlet extends DSpaceServlet
 			}
 
 		case PERM_WF3:
-			// Next page is 'default item' iff there's a default item
-			if (collection.getTemplateItem() != null)
-			{
-			    DCType[] types = DCType.findAll(context);
+		    // Next page is 'collection editor' iff there's a collection editor group
+            if (collection.getEditors() != null)
+            {
+                request.setAttribute("permission", new Integer(PERM_EDITOR));
+                JSPManager.showJSP(request, response, "/dspace-admin/wizard-permissions.jsp");
+                break;              
+            }
+        
+        case PERM_EDITOR:
+            // Next page is 'default item' iff there's a default item
+            if (collection.getTemplateItem() != null)
+            {
+                DCType[] types = DCType.findAll(context);
                 request.setAttribute("dctypes", types);
                 JSPManager.showJSP(request, response, "/dspace-admin/wizard-default-item.jsp");
-				break;				
-			}
-
+                break;              
+            }
+            
 		case DEFAULT_ITEM:
             // Next page is 'summary page (the last page)
 			JSPManager.showJSP(request, response, "/dspace-admin/edit-collection.jsp");

@@ -85,7 +85,7 @@
 %>
 	<H1>Workflow Reviewers</H1>
 	
-	<P>Who are the workflow reviews for this collection?  They be able to accept or reject
+	<P>Who are the workflow reviews for this collection?  They will be able to accept or reject
 incoming submissions.  They will not be able to edit item metadata, however.</P>
 <%
 	break;
@@ -94,7 +94,7 @@ incoming submissions.  They will not be able to edit item metadata, however.</P>
 %>
 	<H1>Workflow Approvers</H1>
 	
-	<P>Who are the workflow approvers for this collection?  They be able to accept or reject
+	<P>Who are the workflow approvers for this collection?  They will be able to accept or reject
 incoming submissions, and edit item metadata.</P>
 <%
 	break;
@@ -103,8 +103,18 @@ incoming submissions, and edit item metadata.</P>
 %>
 	<H1>Workflow Metadata Editors</H1>
 	
-	<P>Who are the workflow metadata editors for this collection?  They be able to edit item metadata of
+	<P>Who are the workflow metadata editors for this collection?  They will be able to edit item metadata of
 incoming submissions, but will not be able to reject them.</P>
+<%
+	break;
+
+	case CollectionWizardServlet.PERM_EDITOR:
+%>
+	<H1>Collection Editors (Administrators)</H1>
+
+	<P>Who are the collection editors for this collection?  They will be able to decide who can submit items
+to the collection, withdraw items, edit item metadata (after submission), and add (map) existing items from
+other collections to this collection (subject to authorization from that collection).</P>
 <%
 	break;
 	}

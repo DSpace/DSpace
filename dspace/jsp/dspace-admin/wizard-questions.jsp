@@ -89,7 +89,7 @@
                         <table border=0>
                             <tr>
                                 <td valign=top><input type=checkbox name="workflow1" value="true"></td>
-                                <td class="submitFormLabel" nowrap>This collection will have reviewers</td>
+                                <td class="submitFormLabel" nowrap>This collection will have workflow reviewers</td>
                             </tr>
                         </table>
                     </td>
@@ -99,7 +99,7 @@
                         <table border=0>
                             <tr>
                                 <td valign=top><input type=checkbox name="workflow2" value="true"></td>
-                                <td class="submitFormLabel" nowrap>This collection will have approvers</td>
+                                <td class="submitFormLabel" nowrap>This collection will have workflow approvers</td>
                             </tr>
                         </table>
                     </td>
@@ -109,7 +109,7 @@
                         <table border=0>
                             <tr>
                                 <td valign=top><input type=checkbox name="workflow3" value="true"></td>
-                                <td class="submitFormLabel" nowrap>This collection will have metadata editors</td>
+                                <td class="submitFormLabel" nowrap>This collection will have workflow metadata editors</td>
                             </tr>
                         </table>
                     </td>
@@ -118,8 +118,18 @@
                     <td class="evenRowOddCol" align="left">
                         <table border=0>
                             <tr>
+                                <td valign=top><input type=checkbox name="editors" value="true"></td>
+                                <td class="submitFormLabel" nowrap>This collection will have collection editors (administrators)</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>                
+                <tr class="oddRowOddCol">
+                    <td class="oddRowOddCol" align="left">
+                        <table border=0>
+                            <tr>
                                 <td valign=top><input type=checkbox name="default.item" value="true"></td>
-                                <td class="submitFormLabel" nowrap>New submissions will have some default metadata already filled out</td>
+                                <td class="submitFormLabel" nowrap>New submissions will have some metadata already filled out with defaults</td>
                             </tr>
                         </table>
                     </td>
