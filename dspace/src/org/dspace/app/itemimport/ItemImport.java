@@ -244,7 +244,7 @@ public class ItemImport
             Item oldItem = (Item)HandleManager.resolveToObject(c, oldHandle);
             Item newItem = addItem(c, mycollection, sourceDir, newItemName, oldHandle, null);
 
-/*   obsolete - but undeleted just to be safe....
+/*   obsolete - but commented out until I'm sure it's useless....
             String newHandle = HandleManager.findHandle(c, newItem);
 
             // discard the new handle - FIXME: database hack
@@ -317,13 +317,13 @@ public class ItemImport
         myitem = wi.getItem();
 
         // now fill out dublin core for item        
-        loadDublinCore( c, myitem, path + "/" + itemname + "/" + "dublin_core.xml" );
+        loadDublinCore( c, myitem, path + File.separatorChar + itemname + File.separatorChar + "dublin_core.xml" );
 
         // and the bitstreams from the contents file
         // process contents file, add bistreams and bundles
-        processContentsFile( c, myitem, path + "/" + itemname, "contents" );
+        processContentsFile( c, myitem, path + File.separatorChar + itemname, "contents" );
 
-        String myhandle = processHandleFile( c, myitem, path + "/" + itemname,
+        String myhandle = processHandleFile( c, myitem, path + File.separatorChar + itemname,
             "handle" );
 
         // put item in system
@@ -477,7 +477,7 @@ public class ItemImport
      */
     private String processHandleFile( Context c, Item i, String path, String filename )
     {
-        String filePath = path + "/" + filename;
+        String filePath = path + File.separatorChar + filename;
         String line     = "";
         String result   = null;
         
@@ -509,27 +509,20 @@ public class ItemImport
      *  contents file
      */
     private void processContentsFile( Context c, Item i, String path, String filename )
+        throws SQLException, IOException, AuthorizeException
     {
-        String contentspath = path + "/" + filename;
+        String contentspath = path + File.separatorChar + filename;
         String line = "";
 
         System.out.println( "\tProcessing contents file: " + contentspath );
 
-        try
+        BufferedReader is = new BufferedReader( new FileReader( contentspath ) );
+        while( ( line = is.readLine() ) != null )
         {
-            BufferedReader is = new BufferedReader( new FileReader( contentspath ) );
-            while( ( line = is.readLine() ) != null )
-            {
-                System.out.println( "\tBitstream: " + line );
-                processContentFileEntry( c, i, path, line );
-            }
-            is.close();
+            System.out.println( "\tBitstream: " + line );
+            processContentFileEntry( c, i, path, line );
         }
-        catch( Exception e )
-        {
-            e.printStackTrace();
-            System.out.println( "Caught exception: " + e );
-        }
+        is.close();
     }
 
 
@@ -537,7 +530,7 @@ public class ItemImport
     public void processContentFileEntry( Context c, Item i, String path, String name)
         throws SQLException, IOException, AuthorizeException
     {
-        String fullpath = path + "/" + name;
+        String fullpath = path + File.separatorChar + name;
 
         // get an input stream
         BufferedInputStream bis = new BufferedInputStream( new FileInputStream( fullpath ) );
