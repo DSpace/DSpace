@@ -236,7 +236,7 @@ public class WorkspaceItem implements InProgressSubmission
         // Copy template if appropriate
         Item templateItem = coll.getTemplateItem();
 
-        if (template && templateItem != null)
+        if (template && (templateItem != null))
         {
             DCValue[] dc = templateItem.getDC(Item.ANY, Item.ANY, Item.ANY);
             for (int n = 0; n < dc.length; n++)
@@ -246,9 +246,6 @@ public class WorkspaceItem implements InProgressSubmission
                     dc[n].language,
                     dc[n].value);
             }
-        }
-        else
-        {
         }
 
         i.update();
