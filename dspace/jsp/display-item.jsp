@@ -65,6 +65,7 @@
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.handle.HandleManager" %>
+<%@ page import="org.dspace.license.CC" %>
 
 <%
     // Attributes
@@ -76,6 +77,10 @@
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     
     String handle = item.getHandle();
+
+    // CC URL & RDF
+    String cc_url = CC.getLicenseURL(item);
+    String cc_rdf = CC.getLicenseRDF(item);
 
     // Full title needs to be put into a string to use as tag argument
     String title = "Item " + handle;
@@ -138,6 +143,20 @@
     <P align=center>
         <A HREF="<dspace:sfxlink item="<%= item %>" />"><IMG SRC="<%= request.getContextPath() %>/image/sfx-link.gif" BORDER=0 ALT="SFX Query"></A>
     </P>
+<%
+    }
+%>
+    <%-- Create Commons Link --%>
+<%
+    if (cc_url != null)
+    {
+%>
+    <P class="submitFormHelp">This item is licensed inder a <a href="<%= cc_url %>">Creative Commons License</a><br/>
+    <a href="<%= cc_url %>"><img src="<%= request.getContextPath() %>/image/cc-somerights.gif" border="0" ALT="Creative Commons" /></a>
+    </P>
+    <!--
+    <%= cc_rdf %>
+    -->
 <%
     }
 %>
