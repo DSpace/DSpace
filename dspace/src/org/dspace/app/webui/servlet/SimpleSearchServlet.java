@@ -136,7 +136,7 @@ public class SimpleSearchServlet extends DSpaceServlet
 
                 request.setAttribute("collection", collection);
                 request.setAttribute("community", community);
-                handles = DSQuery.doQuery(query, collection);
+                handles = DSQuery.getItemResults(DSQuery.doQuery(query, collection));
             }
             else if (community != null)
             {
@@ -147,7 +147,7 @@ public class SimpleSearchServlet extends DSpaceServlet
                 request.setAttribute("collection.array",
                     community.getCollections());
 
-                handles = DSQuery.doQuery(query, community);
+                handles = DSQuery.getItemResults(DSQuery.doQuery(query, community));
             }
             else
             {
@@ -155,7 +155,7 @@ public class SimpleSearchServlet extends DSpaceServlet
                 Community[] communities = Community.findAll(context);
                 request.setAttribute("community.array", communities);
 
-                handles = DSQuery.doQuery(query);
+                handles = DSQuery.getItemResults(DSQuery.doQuery(query));
             }
 
 
