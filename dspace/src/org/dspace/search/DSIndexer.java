@@ -218,6 +218,22 @@ public class DSIndexer
     }
 
 
+    private static String buildCollectionLocationString(Context c, Collection target)
+        throws SQLException
+    {
+        // build list of community ids
+        Community [] communities = target.getCommunities();
+
+        // now put those into strings
+        String location = "";
+        int i = 0;
+
+        for(i=0; i<communities.length; i++ ) location = new String(location + " m" + communities[i].getID() );
+
+        return location;
+    }
+
+
     /**
      * iterate through the communities, and index each one
      */
@@ -296,6 +312,8 @@ public class DSIndexer
     private static void writeCollectionIndex(Context c, IndexWriter writer, Collection target)
         throws SQLException, IOException
     {
+        String location_text = buildCollectionLocationString(c, target);
+
         // build a hash for the metadata
         HashMap textvalues = new HashMap();
 
@@ -304,9 +322,10 @@ public class DSIndexer
         String description = target.getMetadata("short_description");
         String intro_text  = target.getMetadata("introductory_text");
 
-        textvalues.put("name",        name       );
-        textvalues.put("description", description);
-        textvalues.put("intro_text",  intro_text );
+        textvalues.put("name",       name         );
+        textvalues.put("description",description  );
+        textvalues.put("intro_text", intro_text   );
+        textvalues.put("location",   location_text);
 
         // get the handle
         String myhandle = HandleManager.findHandle(c, target);
