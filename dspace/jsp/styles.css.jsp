@@ -507,6 +507,22 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   text-decoration: none;
                   vertical-align: middle }
 
+.attentionTable 
+{
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #cc9966;
+}
+
+.attentionCell 
+{
+    background: #ffffcc;
+    text-align: center;
+}
+
 .help {font-family: "verdana", "Arial", "Helvetica", sans-serif;
         background: #ffffff;
         margin-left:10px;}
