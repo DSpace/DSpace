@@ -78,10 +78,10 @@ public class PolicySet
      * @param context
      * @param collection
      */
-    public static void syncCollection(Context c, Collection collection)
+    public static void syncCollection_obsolete(Context c, Collection collection)
         throws SQLException, AuthorizeException
     {
-        // find all items in a collection, and clone the collection's read policy
+/*        // find all items in a collection, and clone the collection's read policy
         ItemIterator items = collection.getItems();
 
         int mycount = 0;
@@ -109,7 +109,7 @@ public class PolicySet
         Bitstream bs = collection.getLogo();
         AuthorizeManager.removeAllPolicies(c, bs);
         AuthorizeManager.addPolicies(c, policies, bs);
-
+*/
     }
 
 

@@ -50,6 +50,7 @@ import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -220,11 +221,35 @@ public class Collection extends DSpaceObject
      * @return  the newly created collection
      */
     static Collection create(Context context)
-        throws SQLException
+        throws SQLException, AuthorizeException
     {
         TableRow row = DatabaseManager.create(context, "collection");
         Collection c = new Collection(context, row);
         String newHandle = HandleManager.createHandle(context, c);
+
+        // create the default authorization policy for collections
+        // of 'anonymous' READ
+        Group anonymousGroup = Group.find(context, 0);
+
+        ResourcePolicy myPolicy = ResourcePolicy.create(context);
+        myPolicy.setResource( c );
+        myPolicy.setAction  ( Constants.READ );
+        myPolicy.setGroup   ( anonymousGroup );
+        myPolicy.update();
+
+        // now create the default policies for submitted items
+        myPolicy = ResourcePolicy.create(context);
+        myPolicy.setResource( c );
+        myPolicy.setAction  ( Constants.DEFAULT_ITEM_READ );
+        myPolicy.setGroup   ( anonymousGroup );
+        myPolicy.update();
+        
+        myPolicy = ResourcePolicy.create(context);
+        myPolicy.setResource( c );
+        myPolicy.setAction  ( Constants.DEFAULT_BITSTREAM_READ );
+        myPolicy.setGroup   ( anonymousGroup );
+        myPolicy.update();
+
         
         HistoryManager.saveHistory(context,
             c,

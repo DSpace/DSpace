@@ -73,7 +73,20 @@ public class InstallItem
     public static Item installItem(Context c, InProgressSubmission is)
         throws SQLException, IOException, AuthorizeException
     {
-        return installItem(c, is, c.getCurrentUser());
+        return installItem(c, is, c.getCurrentUser() );
+    }
+
+    /**
+     * Take an InProgressSubmission and turn it into a fully-archived Item.
+     * @param Context
+     * @param InProgressSubmission
+     * @param handle to assign instead of creating new one
+     */
+    public static Item installItem(Context c, InProgressSubmission is,
+            String handle)
+        throws SQLException, IOException, AuthorizeException
+    {
+        return installItem(c, is, c.getCurrentUser(), handle);
     }
 
 
@@ -81,12 +94,15 @@ public class InstallItem
      *  Take an InProgressSubmission and turn it into a fully-archived Item.
      *  @param Context
      *  @param InProgressSubmission
-     *  @param EPerson (unused, should be removed from API) 
+     *  @param EPerson (unused, should be removed from API)
+     *  @param previous handle 
      */
-    public static Item installItem(Context c, InProgressSubmission is, EPerson e2)
+    public static Item installItem(Context c, InProgressSubmission is, EPerson e2,
+            String suppliedHandle)
         throws SQLException, IOException, AuthorizeException
     {
         Item item = is.getItem();
+        String handle;
         
         // create accession date
         DCDate now = DCDate.getCurrent();
@@ -101,10 +117,19 @@ public class InstallItem
             item.addDC("date", "issued", null, now.toString());
         }
         
-        // create handle
-        String handle    = HandleManager.createHandle(c, item);
+        // if no previous handle supplied, create one
+        if(suppliedHandle == null)
+        {
+            // create handle
+            handle = HandleManager.createHandle(c, item);
+        }
+        else
+        {
+            handle = HandleManager.createHandle(c, item, suppliedHandle);
+        }
+
         String handleref = HandleManager.getCanonicalForm(handle);
-        
+
         // Add handle as identifier.uri DC value
         item.addDC("identifier", "uri", null, handleref);
 
@@ -149,16 +174,25 @@ public class InstallItem
         // remove in-progress submission
         is.deleteWrapper();
 
-        // remove the submit authorization policies
-        // and replace them with the collection's READ
-        // policies
-        // FIXME: this is an inelegant hack, but out of time!
-        List policies = AuthorizeManager.getPoliciesActionFilter(c,
-            is.getCollection(), Constants.READ );
-            
-        item.replaceAllPolicies(policies);
-
+        // remove the item's policies and replace them with
+        // the defaults from the collection
+        item.inheritCollectionDefaultPolicies( is.getCollection() );
+        
         return item;
+    }
+
+
+    /**
+     *  Take an InProgressSubmission and turn it into a fully-archived Item,
+     *   no previous handle specified
+     *  @param Context
+     *  @param InProgressSubmission
+     *  @param EPerson (unused, should be removed from API)
+     */
+    public static Item installItem(Context c, InProgressSubmission is, EPerson e2)
+        throws SQLException, IOException, AuthorizeException
+    {
+        return installItem(c, is, e2, null);
     }
 
 
