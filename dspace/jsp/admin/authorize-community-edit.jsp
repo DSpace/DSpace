@@ -60,7 +60,7 @@
 
 
 <%@ page import="org.dspace.authorize.ResourcePolicy" %>
-<%@ page import="org.dspace.content.Community"       %>
+<%@ page import="org.dspace.content.Community"        %>
 <%@ page import="org.dspace.core.Constants"           %>
 <%@ page import="org.dspace.eperson.EPerson"          %>
 <%@ page import="org.dspace.eperson.Group"            %>
@@ -135,7 +135,7 @@
                     <input type="submit" name="submit_community_edit_policy" value="Edit">
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <input type="submit" name="submit_community_delete_policy" value="Delete...">
+                    <input type="submit" name="submit_community_delete_policy" value="Delete">
                 </td>
             </tr>
         </form>

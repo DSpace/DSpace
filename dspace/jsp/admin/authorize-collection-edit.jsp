@@ -1,6 +1,8 @@
 <%--
   - authorize_collection_edit.jsp
   -
+  - $Id$
+  -
   - Version: $Revision$
   -
   - Date: $Date$
@@ -137,7 +139,7 @@
                     <input type="submit" name="submit_collection_edit_policy" value="Edit">
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <input type="submit" name="submit_collection_delete_policy" value="Delete...">
+                    <input type="submit" name="submit_collection_delete_policy" value="Delete">
                 </td>
             </tr>
         </form>
