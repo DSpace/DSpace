@@ -630,7 +630,7 @@ public class Collection extends DSpaceObject
      * will have been created but the collection record will not refer to it.
      */
     public void createTemplateItem()
-        throws SQLException, AuthorizeException
+        throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
@@ -789,6 +789,11 @@ public class Collection extends DSpaceObject
             HistoryManager.REMOVE,
             ourContext.getCurrentUser(),
             ourContext.getExtraLogInfo());
+
+        // remove subscriptions - hmm, should this be in Subscription.java?
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM subscription WHERE " +
+            "collection_id=" + getID() );
 
         // Remove items
         ItemIterator items = getItems();
