@@ -41,7 +41,10 @@
 package org.dspace.app.webui.util;
 
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 
@@ -50,7 +53,9 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
 import org.dspace.eperson.EPerson;
 
 
@@ -395,4 +400,69 @@ public class UIUtil
         
         return def;
     }
+
+
+    /**
+     * Send an alert to the designated "alert recipient" - that is, when a
+     * database error or internal error occurs, this person is sent an
+     * e-mail with details.
+     * <P>
+     * The recipient is configured via the "alert.recipient" property in
+     * <code>dspace.cfg</code>.  If this property is omitted, no alerts
+     * are sent.
+     * <P>
+     * This method "swallows" any exception that might occur - it will just
+     * be logged.  This is because this method will usually be invoked as
+     * part of an error handling routine anyway.
+     *
+     * @param  request    the HTTP request leading to the error
+     * @param  exception  the exception causing the error, or null
+     */
+    public static void sendAlert(HttpServletRequest request,
+        Exception exception)
+    {
+        String logInfo = UIUtil.getRequestLogInfo(request);
+
+        try
+        {
+            String recipient =
+                ConfigurationManager.getProperty("alert.recipient");
+
+            if (recipient != null)
+            {
+                Email email = ConfigurationManager.getEmail("internal_error");
+
+                email.addRecipient(recipient);
+                email.addArgument(
+                    ConfigurationManager.getProperty("dspace.url"));
+                email.addArgument(new Date());
+                email.addArgument(request.getSession().getId());
+                email.addArgument(logInfo);
+                
+                String stackTrace;
+                
+                if (exception != null)
+                {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    exception.printStackTrace(pw);
+                    pw.flush();
+                    stackTrace = sw.toString();
+                }
+                else
+                {
+                    stackTrace = "No exception";
+                }
+                
+                email.addArgument(stackTrace);
+                email.send();
+            }
+        }
+        catch (Exception e)
+        {
+            // Not much we can do here!
+            log.warn("Unable to send email alert", e);
+        }
+    }
+
 }

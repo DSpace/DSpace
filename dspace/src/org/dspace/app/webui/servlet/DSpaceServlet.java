@@ -157,7 +157,12 @@ public class DSpaceServlet extends HttpServlet
             log.warn(LogManager.getHeader(context,
                 "database_error",
                 se.toString()), se);
+
+            // Also email an alert
+            UIUtil.sendAlert(request, se);
+
             JSPManager.showInternalError(request, response);
+
         }
         catch (AuthorizeException ae)
         {

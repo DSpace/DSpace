@@ -140,6 +140,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>internal-error</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.InternalErrorServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>items-by-author</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ItemsByAuthorServlet</servlet-class>
   </servlet>
@@ -237,6 +242,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>internal-error</servlet-name>
+    <url-pattern>/internal-error</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>items-by-author</servlet-name>
     <url-pattern>/items-by-author</url-pattern>
   </servlet-mapping>
@@ -291,6 +301,11 @@
   <error-page>
     <error-code>404</error-code>
     <location>/error/404.jsp</location>
+  </error-page>
+
+  <error-page>
+    <error-code>500</error-code>
+    <location>/internal-error</location>
   </error-page>
 
 
