@@ -384,6 +384,45 @@ public class WorkspaceItem implements InProgressSubmission
     }
 
     /**
+     * Get all workspace items in the whole system
+     *
+     * @param   context     the context object
+     *
+     * @return      all workspace items
+     */
+    public static WorkspaceItem[] findAll(Context context)
+        throws SQLException
+    {
+        List wsItems = new ArrayList();
+        String query = "SELECT * FROM workspaceitem ORDER BY item_id";
+        TableRowIterator tri = DatabaseManager.query(context,
+                                    "workspaceitem",
+                                    query);
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            
+            // Check the cache
+            WorkspaceItem wi = (WorkspaceItem) context.fromCache(
+                    WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
+
+            // not in cache? turn row into workspaceitem
+            if (wi == null)
+            {
+                wi = new WorkspaceItem(context, row);
+            }
+            
+            wsItems.add(wi);
+        }
+        
+        WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
+        wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
+
+        return wsArray;
+    }
+    
+    /**
      * Get the internal ID of this workspace item
      * 
      * @return the internal identifier
