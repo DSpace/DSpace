@@ -97,6 +97,9 @@ public class Browse
     public static BrowseInfo getAuthors(BrowseScope scope)
         throws SQLException
     {
+        if (log.isDebugEnabled())
+            log.debug("Called getAuthors");
+
         scope.setBrowseType(AUTHORS_BROWSE);
         scope.setAscending(true);
         scope.setSortByTitle(null);
@@ -115,6 +118,9 @@ public class Browse
     public static BrowseInfo getItemsByTitle(BrowseScope scope)
         throws SQLException
     {
+        if (log.isDebugEnabled())
+            log.debug("Called getItemsByTitle");
+
         scope.setBrowseType(ITEMS_BY_TITLE_BROWSE);
         scope.setAscending(true);
         scope.setSortByTitle(null);
@@ -125,13 +131,16 @@ public class Browse
     /**
      * Return Items indexed by date of issue in the given scope.
      *
-     * If DATESAFTER is true, the dates returned are the ones
-     * AFTER date; otherwise the dates are the ones before DATE.
-     * Results will be ordered in increasing order (ie, earliest to
-     * latest) if DATESAFTER is true; in decreasing order otherwise.
+     * <p>
+     * If datesafter is true, the dates returned are the ones
+     * after the focus; otherwise the dates are the ones before the
+     * focus. Results will be ordered in increasing order (ie, earliest
+     * to latest) if datesafter is true; in decreasing order otherwise.
+     * </p>
      *
      * @param scope The BrowseScope
-     * @param datesafter
+     * @param datesafter If true, the dates returned are the ones
+     * after focus; otherwise the dates are the ones before focus.
      * @return A BrowseInfo object, the results of the browse
      * @exception SQLException If a database error occurs
      */
@@ -139,6 +148,9 @@ public class Browse
                                             boolean datesAfter)
         throws SQLException
     {
+        if (log.isDebugEnabled())
+            log.debug("Called getItemsByDate");
+
         scope.setBrowseType(ITEMS_BY_DATE_BROWSE);
         scope.setAscending(datesAfter);
         scope.setSortByTitle(null);
@@ -162,6 +174,9 @@ public class Browse
         if (! scope.hasFocus())
             throw new IllegalArgumentException("Must specify an author for getItemsByAuthor");
 
+        if (log.isDebugEnabled())
+            log.debug("Called getItemsByAuthor");
+
         scope.setBrowseType(ITEMS_BY_AUTHOR_BROWSE);
         scope.setAscending(true);
         scope.setSortByTitle(sortByTitle ? Boolean.TRUE : Boolean.FALSE);
@@ -181,8 +196,11 @@ public class Browse
     {
         Context context = scope.getContext();
         String sql = getLastSubmittedQuery(scope);
-        List results = DatabaseManager.query(context, sql).toList();
 
+        if (log.isDebugEnabled())
+            log.debug("SQL for last submitted is \"" + sql + "\"");
+
+        List results = DatabaseManager.query(context, sql).toList();
         return getLastSubmittedResults(context, results);
     }
 
@@ -427,7 +445,7 @@ public class Browse
             List results = new ArrayList();
             results.addAll(getResultsBeforeFocus(params, itemValue));
             int beforeFocus = results.size();
-            results.addAll(getResultsAfterFocus(params, itemValue));
+            results.addAll(getResultsAfterFocus(params, itemValue, beforeFocus));
 
             // Find out the total in the index, and the number of
             // matches for the query
@@ -494,7 +512,12 @@ public class Browse
 
             statement = createStatement(params, itemValueQuery);
             results = statement.executeQuery();
-            return results.next() ? results.getString(1) : null;
+            String itemValue = results.next() ? results.getString(1) : null;
+
+            if (log.isDebugEnabled())
+                log.debug("Subquery value is " + itemValue);
+
+            return itemValue;
         }
         finally
         {
@@ -516,28 +539,36 @@ public class Browse
         if (params.getNumberBefore() == 0)
             return Collections.EMPTY_LIST;
 
-        PreparedStatement statement = createSql(params, itemValue, true, false);
+        PreparedStatement statement = createSql(params, itemValue, false, false);
 
         List qresults = DatabaseManager.query(statement).toList();
         int numberDesired = params.getNumberBefore();
         List results = getResults(params, qresults, numberDesired);
+
         if (! results.isEmpty())
             Collections.reverse(results);
         return results;
     }
 
     protected static List getResultsAfterFocus(BrowseScope params,
-                                               String itemValue)
+                                               String itemValue,
+                                               int count)
         throws SQLException
     {
         // No results desired
         if (params.getTotal() == 0)
             return Collections.EMPTY_LIST;
 
-        PreparedStatement statement = createSql(params, itemValue, false, false);
+        PreparedStatement statement = createSql(params, itemValue, true, false);
 
         List qresults = DatabaseManager.query(statement).toList();
-        int numberDesired = params.getTotal();
+
+        // The number of results we want is either -1 (everything)
+        // or the total, less the number already retrieved.
+        int numberDesired = -1;
+        if (! params.hasNoLimit())
+            numberDesired = Math.max(params.getTotal() - count, 0);
+
         return getResults(params, qresults, numberDesired);
     }
 
@@ -633,7 +664,8 @@ public class Browse
         if ((! params.hasFocus()) && params.isAllDSpaceScope())
             return totalInIndex;
 
-        PreparedStatement statement = createSql(params, itemValue, true, true);
+        boolean direction = params.getAscending();
+        PreparedStatement statement = createSql(params, itemValue, direction, true);
 
         return getIntValue(statement);
     }
@@ -662,7 +694,7 @@ public class Browse
      *
      * @param scope The Browse Scope
      * @param results The results of the query
-     * @param max The maximum results to return
+     * @param max The maximum number of results to return
      */
     private static List getResults(BrowseScope scope,
                                    List results,
@@ -703,23 +735,33 @@ public class Browse
 
     /**
      * Create a PreparedStatement to run the correct query for params.
+     *
+     * @param params The Browse scope
+     * @param subqueryValue If the focus is an item, this is its value
+     * in the browse index (its title, author, date, etc). Otherwise null.
+     * @param after If true, create SQL to find the items after the focus.
+     * Otherwise create SQL to find the items before the focus.
+     * @param isCount If true, create SQL to count the number of matches
+     * for the query. Otherwise just the query.
      */
     private static PreparedStatement createSql(BrowseScope params,
                                                String subqueryValue,
-                                               boolean before,
+                                               boolean after,
                                                boolean isCount)
         throws SQLException
     {
         String sqli = createSqlInternal(params, subqueryValue, isCount);
-        String sql = formatSql(params, sqli, subqueryValue, before);
+        String sql = formatSql(params, sqli, subqueryValue, after);
         PreparedStatement statement = createStatement(params, sql);
 
+        // Browses without a focus have no parameters to bind
         if (params.hasFocus())
         {
             String value = subqueryValue != null ?
                 subqueryValue : (String) params.getFocus();
 
             statement.setString(1, value);
+            // Binds the parameter in the subquery clause
             if (subqueryValue != null)
                 statement.setString(2, value);
         }
@@ -816,8 +858,9 @@ public class Browse
     private static String formatSql(BrowseScope params,
                                     String sql,
                                     String subqueryValue,
-                                    boolean before)
+                                    boolean after)
     {
+        boolean before = ! after;
         int browseType = params.getBrowseType();
         boolean ascending = params.getAscending();
         int numberDesired = before ?
@@ -934,6 +977,7 @@ public class Browse
         String column = (isCommunity) ? "community_id" : "collection_id";
 
         return new StringBuffer()
+            .append(" ")
             .append(connector)
             .append(" ")
             .append(column)
