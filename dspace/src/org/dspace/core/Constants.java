@@ -137,8 +137,10 @@ public class Constants
     /** collection editor -- metadata, icon, owned item metadata */
     public static final int COLLECTION_EDITOR = 11;
     
+    /** Position of front page news item -- top box */
     public static final int NEWS_TOP = 0;
 
+    /** Position of front page news item -- sidebar */
     public static final int NEWS_SIDE = 1;
     
     /**
