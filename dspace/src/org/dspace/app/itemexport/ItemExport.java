@@ -330,7 +330,7 @@ public class ItemExport
                 
                 String output = "  <dcvalue element=\"" + dcv.element + "\" " +
                                 "qualifier=\"" + qualifier + "\">" +
-                                dcv.value +
+                                Utils.addEntities(dcv.value) +
                                 "</dcvalue>";
             
                 out.println( output );
