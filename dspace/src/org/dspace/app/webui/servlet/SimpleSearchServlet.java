@@ -185,13 +185,16 @@ public class SimpleSearchServlet extends DSpaceServlet
                 collectionHandles= DSQuery.getCollectionResults(results);
             }
 
+            // limit search results to 50 or fewer items - no limit on
+            // number of communities and collections
+            int numItems = (itemHandles.size() > 50 ? 50 : itemHandles.size() );
 
             // Make objects from the handles - make arrays, fill them out
-            resultsItems       = new Item      [itemHandles.size()      ];
+            resultsItems       = new Item      [numItems                ];
             resultsCommunities = new Community [communityHandles.size() ];
             resultsCollections = new Collection[collectionHandles.size()];
             
-            for (int i = 0; i < itemHandles.size(); i++)
+            for (int i = 0; i < numItems; i++)
             {
                 String myhandle = (String) itemHandles.get(i);
                 
