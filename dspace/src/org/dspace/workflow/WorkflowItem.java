@@ -102,6 +102,9 @@ public class WorkflowItem implements InProgressSubmission
             owner = null;
         else
             owner = EPerson.find(context, wfRow.getIntColumn("owner"));
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("workflow_id"));
     }
 
 
@@ -117,6 +120,15 @@ public class WorkflowItem implements InProgressSubmission
     public static WorkflowItem find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        WorkflowItem fromCache =
+            (WorkflowItem) context.fromCache(WorkflowItem.class, id);
+            
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find(context,
             "workflowitem",
             id);
@@ -127,7 +139,7 @@ public class WorkflowItem implements InProgressSubmission
             {
                 log.debug(LogManager.getHeader(context,
                     "find_workflow_item",
-                    "not_found,workflow_item_id=" + id));
+                    "not_found,workflow_id=" + id));
             }
 
             return null;
@@ -138,7 +150,7 @@ public class WorkflowItem implements InProgressSubmission
             {
                 log.debug(LogManager.getHeader(context,
                     "find_workflow_item",
-                    "workflow_item_id=" + id));
+                    "workflow_id=" + id));
             }
 
             return new WorkflowItem(context, row);
@@ -214,6 +226,9 @@ public class WorkflowItem implements InProgressSubmission
     public void delete(Context context)
         throws SQLException
     {
+        // Remove from cache
+        ourContext.removeCached(this, getID());
+
         // FIXME - auth?
         DatabaseManager.delete(context, wfRow);
     }

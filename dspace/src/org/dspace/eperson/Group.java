@@ -94,8 +94,23 @@ public class Group
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            epeople.add(new EPerson(myContext, r));
+
+            // First check the cache
+            EPerson fromCache = (EPerson) myContext.fromCache(
+                EPerson.class, r.getIntColumn("eperson_id"));
+
+            if (fromCache != null)
+            {
+                epeople.add(fromCache);
+            }
+            else
+            {
+                epeople.add(new EPerson(myContext, r));
+            }
         }
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("eperson_group_id"));
     }
 
 
@@ -224,6 +239,14 @@ public class Group
     public static Group find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        Group fromCache = (Group) context.fromCache(Group.class, id);
+            
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find( context, "epersongroup", id );
 
         if ( row == null )
@@ -256,7 +279,19 @@ public class Group
         }
         else
         {
-            return new Group( context, row );
+            // First check the cache
+            Group fromCache = (Group) context.fromCache(
+                Group.class,
+                row.getIntColumn("group_id"));
+
+            if (fromCache != null)
+            {
+                return fromCache;
+            }
+            else
+            {
+                return new Group( context, row );
+            }
         }
     }
 
@@ -269,6 +304,9 @@ public class Group
         throws SQLException
     {
         // FIXME: authorizations
+
+        // Remove from cache
+        myContext.removeCached(this, getID());
 
         // Remove any group memberships first
         DatabaseManager.updateQuery(myContext,

@@ -109,8 +109,19 @@ public class ItemIterator
         {
             // Convert the row into an Item object
             TableRow row = itemRows.next();
-            Item i = new Item(ourContext, row);
-            return i;
+            
+            // Check cache
+            Item fromCache = (Item) ourContext.fromCache(
+                Item.class, row.getIntColumn("item_id"));
+
+            if (fromCache != null)
+            {
+                return fromCache;
+            }
+            else
+            {
+                return new Item(ourContext, row);
+            }
         }
         else
         {

@@ -96,25 +96,23 @@ public class Bitstream
         bRow = row;
 
         // Get the bitstream format
-        int bfID = row.getIntColumn("bitstream_format_id");
-
-        TableRow formatRow = DatabaseManager.find(context,
-            "bitstreamformatregistry", bfID);
+        bitstreamFormat = BitstreamFormat.find(context, 
+            row.getIntColumn("bitstream_format_id"));
         
-        if (formatRow == null)
+        if (bitstreamFormat == null)
         {
             // No format: use "Unknown"
-            formatRow = DatabaseManager.findByUnique(context,
-                "bitstreamformatregistry", "short_description", "Unknown");
+            bitstreamFormat = BitstreamFormat.findUnknown(context);
 
             // Panic if we can't find it
-            if (formatRow == null)
+            if (bitstreamFormat == null)
             {
                 throw new IllegalStateException("No Unknown bitsream format");
             }
         }
 
-        bitstreamFormat = new BitstreamFormat(context, formatRow);
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("bitstream_id"));
     }
 
 
@@ -130,6 +128,15 @@ public class Bitstream
     public static Bitstream find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        Bitstream fromCache = (Bitstream) context.fromCache(
+            Bitstream.class, id);
+            
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find(context,
             "bitstream",
             id);
@@ -341,7 +348,17 @@ public class Bitstream
     {
         if (bitstreamFormat.getShortDescription().equals("Unknown"))
         {
-            return bRow.getStringColumn("user_format_description");
+            // Get user description if there is one
+            String desc = bRow.getStringColumn("user_format_description");
+
+            if (desc == null)
+            {
+                return "Unknown";
+            }
+            else
+            {
+                return desc;
+            }
         }
         else
         {
@@ -393,18 +410,6 @@ public class Bitstream
 
 
     /**
-     * Attempt to automatically recognise the bitstream's format.
-     * <code>null</code> is returned if the format is unknown.
-     *
-     * @return  the system's guess of the bitstream's format.
-     */
-    public BitstreamFormat identifyFormat()
-    {
-        return null;
-    }
-    
-
-    /**
      * Update the bitstream metadata.  Note that the content of the bitstream
      * cannot be changed - for that you need to create a new bitstream.
      */
@@ -434,6 +439,9 @@ public class Bitstream
         log.info(LogManager.getHeader(bContext,
             "delete_bitstream",
             "bitstream_id=" + getID()));
+
+        // Remove from cache
+        bContext.removeCached(this, getID());
 
         // Remove mappings
         DatabaseManager.updateQuery(bContext,
@@ -483,7 +491,20 @@ public class Bitstream
         
         while (tri.hasNext())
         {
-            bundles.add(new Bundle(bContext, tri.next()));
+            TableRow r = (TableRow) tri.next();
+
+            // First check the cache
+            Bundle fromCache = (Bundle) bContext.fromCache(
+                Bundle.class, r.getIntColumn("bundle_id"));
+
+            if (fromCache != null)
+            {
+                bundles.add(fromCache);
+            }
+            else
+            {
+                bundles.add(new Bundle(bContext, r));
+            }
         }
 
         Bundle[] bundleArray = new Bundle[bundles.size()];

@@ -71,6 +71,9 @@ public class EPerson
     {
         myContext = context;
         myRow = row;
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("eperson_id"));
     }
 
     /**
@@ -84,6 +87,14 @@ public class EPerson
     public static EPerson find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        EPerson fromCache = (EPerson) context.fromCache(EPerson.class, id);
+
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find( context, "eperson", id );
 
         if ( row == null )
@@ -96,14 +107,16 @@ public class EPerson
         }
     }
 
+
     /**
      * Find the eperson by their email address
      *
-     * @ return EPerson
+     * @return EPerson
      */
     public static EPerson findByEmail(Context context, String email)
         throws SQLException, AuthorizeException
     {
+
         TableRow row = DatabaseManager.findByUnique( context, "eperson", "email", email );
 
         if ( row == null )
@@ -112,7 +125,19 @@ public class EPerson
         }
         else
         {
-            return new EPerson( context, row );
+            // First check the cache
+            EPerson fromCache = (EPerson) context.fromCache(
+                EPerson.class,
+                row.getIntColumn("eperson_id"));
+
+            if (fromCache != null)
+            {
+                return fromCache;
+            }
+            else
+            {
+                return new EPerson( context, row );
+            }
         }
     }
 
@@ -141,6 +166,9 @@ public class EPerson
         throws SQLException
     {
         // FIXME: authorizations
+
+        // Remove from cache
+        myContext.removeCached(this, getID());
 
        	// Remove any group memberships first
        	DatabaseManager.updateQuery(myContext,

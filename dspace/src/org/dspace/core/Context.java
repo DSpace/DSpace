@@ -42,6 +42,8 @@ package org.dspace.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.eperson.EPerson;
@@ -57,6 +59,9 @@ import org.dspace.eperson.EPerson;
  * is called to commit the changes and free up any resources used by the
  * context.  If anything has gone wrong, <code>abort</code> is called to
  * roll back any changes and free up the resources.
+ * <P>
+ * The context object is also used as a cache for CM API objects.
+ *
  *
  * @author Robert Tansley
  * @version $Revision$
@@ -75,6 +80,9 @@ public class Context
     /** Indicates whether authorisation subsystem should be ignored */
     private boolean ignoreAuth;
    
+    /** Object cache for this context */
+    private Map objectCache;
+    
     
     /**
      * Construct a new context object.  A database connection is opened.
@@ -93,6 +101,7 @@ public class Context
         currentUser = null;
         extraLogInfo = "";
         ignoreAuth = false;
+        objectCache = new HashMap();
     }
     
 
@@ -246,5 +255,48 @@ public class Context
     {
         // Only return true if our DB connection is live
         return (connection != null);
+    }
+
+
+    /**
+     * Store an object in the object cache.
+     *
+     * @param  type  type of object to check for in cache
+     * @param  id    ID of object in cache
+     *
+     * @return   the object from the cache, or <code>null</code> if it's not
+     *           cached.
+     */
+    public Object fromCache(Class objectClass, int id)
+    {
+        String key = objectClass.getName() + id;
+        
+        return objectCache.get(key);
+    }
+
+
+    /**
+     * Store an object in the object cache.
+     * 
+     * @param  o   the object to store
+     * @param  id  the object's ID
+     */
+    public void cache(Object o, int id)
+    {
+        String key = o.getClass().getName() + id;
+        objectCache.put(key, o);
+    }
+
+
+    /**
+     * Remove an object from the object cache.
+     * 
+     * @param  o   the object to remove
+     * @param  id  the object's ID
+     */
+    public void removeCached(Object o, int id)
+    {
+        String key = o.getClass().getName() + id;
+        objectCache.remove(key);
     }
 }

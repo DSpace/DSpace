@@ -50,11 +50,12 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DCDate;
+import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
-
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -62,7 +63,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-
 import org.dspace.workflow.WorkflowItem;
 
 /**
@@ -104,6 +104,9 @@ public class WorkspaceItem implements InProgressSubmission
         item = Item.find(context, wiRow.getIntColumn("item_id"));
         collection = Collection.find(context,
             wiRow.getIntColumn("collection_id"));
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("workspace_item_id"));
     }
 
 
@@ -119,6 +122,15 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        WorkspaceItem fromCache =
+            (WorkspaceItem) context.fromCache(WorkspaceItem.class, id);
+            
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find(context,
             "workspaceitem",
             id);
@@ -152,13 +164,16 @@ public class WorkspaceItem implements InProgressSubmission
      * Create a new workspace item, with a new ID.  An Item is also
      * created.  The submitter is the current user in the context.
      *
-     * @param  context  DSpace context object
-     * @param  coll     Collection being submitted to
+     * @param  context   DSpace context object
+     * @param  coll      Collection being submitted to
+     * @param  template  if <code>true</code>, the workspace item starts as a 
+     *                   copy of the collection's template item
      *
      * @return  the newly created workspace item
      */
     public static WorkspaceItem create(Context context,
-                                       Collection coll)
+        Collection coll,
+        boolean template)
         throws AuthorizeException, SQLException
     {
         // Check the user has permission to ADD to the collection
@@ -167,6 +182,28 @@ public class WorkspaceItem implements InProgressSubmission
         // Create an item
         Item i = Item.create(context);
         i.setSubmitter(context.getCurrentUser());
+
+        // Copy template if appropriate
+        Item templateItem = coll.getTemplateItem();
+
+        if (template && templateItem != null)
+        {
+            DCValue[] dc = templateItem.getDC(Item.ANY, Item.ANY, Item.ANY);
+            for (int n = 0; n < dc.length; n++)
+            {
+                i.addDC(dc[n].element,
+                    dc[n].qualifier,
+                    dc[n].language,
+                    dc[n].value);
+            }
+        }
+        else
+        {
+            // Just set default language
+            i.addDC("language", "iso", null, 
+                ConfigurationManager.getProperty("default.language"));
+        }
+
         i.update();
         
         // Create the workspace item row
@@ -212,7 +249,16 @@ public class WorkspaceItem implements InProgressSubmission
         while (tri.hasNext())
         {
             TableRow row = tri.next();
-            WorkspaceItem wi = new WorkspaceItem(context, row);
+            
+            // Check the cache
+            WorkspaceItem wi = (WorkspaceItem) context.fromCache(
+                WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
+            
+            if (wi == null)
+            {
+                wi = new WorkspaceItem(context, row);
+            }
+            
             wsItems.add(wi);
         }
         
@@ -231,6 +277,28 @@ public class WorkspaceItem implements InProgressSubmission
     public int getID()
     {
         return wiRow.getIntColumn("workspace_item_id");
+    }
+
+
+    /**
+     * Get the value of the stage reached column
+     *
+     * @return  the value of the stage reached column
+     */
+    public int getStageReached()
+    {
+        return wiRow.getIntColumn("stage_reached");
+    }
+
+
+    /**
+     * Set the value of the stage reached column
+     *
+     * @param  v  the value of the stage reached column
+     */
+    public void setStageReached(int v)
+    {
+        wiRow.setColumn("stage_reached", v);
     }
 
 
@@ -324,6 +392,9 @@ public class WorkspaceItem implements InProgressSubmission
                 "item_id=" + item.getID() +
                 "collection_id=" + collection.getID()));
 
+        // Remove from cache
+        ourContext.removeCached(this, getID());
+
         // Need to delete the workspaceitem row first since it refers
         // to item ID
         DatabaseManager.delete(ourContext, wiRow);
@@ -331,6 +402,8 @@ public class WorkspaceItem implements InProgressSubmission
         // Delete item
         item.deleteWithContents();
     }
+
+
 
 
     // InProgressSubmission methods

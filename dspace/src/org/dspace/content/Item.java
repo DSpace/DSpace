@@ -100,9 +100,7 @@ public class Item
     /** The bundles in this item - kept in sync with DB */
     private List bundles;
 
-    /**
-     * The Dublin Core metadata - a list of DCValue objects.
-     */
+    /** The Dublin Core metadata - a list of DCValue objects. */
     private List dublinCore;
 
     /**
@@ -135,7 +133,7 @@ public class Item
                 itemRow.getIntColumn("submitter_id"));
         }
 
-        // Get bitstreams
+        // Get bundles
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "bundle",
             "SELECT bundle.* FROM bundle, item2bundle WHERE " +
@@ -146,7 +144,19 @@ public class Item
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            bundles.add(new Bundle(ourContext, r));
+
+            // First check the cache
+            Bundle fromCache = (Bundle) context.fromCache(
+                Bundle.class, r.getIntColumn("bundle_id"));
+
+            if (fromCache != null)
+            {
+                bundles.add(fromCache);
+            }
+            else
+            {
+                bundles.add(new Bundle(ourContext, r));
+            }
         }
 
         // Get Dublin Core metadata
@@ -174,6 +184,9 @@ public class Item
             // Add it to the list
             dublinCore.add(dcv);
         }
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("item_id"));
     }
 
 
@@ -189,6 +202,14 @@ public class Item
     public static Item find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        Item fromCache = (Item) context.fromCache(Item.class, id);
+            
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find(context,
             "item",
             id);
@@ -381,7 +402,6 @@ public class Item
                       String qualifier,
                       String lang,
                       String[] values)
-        throws AuthorizeException
     {
         // We will not verify that they are valid entries in the registry
         // until update() is called.
@@ -419,7 +439,6 @@ public class Item
                       String qualifier,
                       String lang,
                       String value)
-        throws AuthorizeException
     {
         String[] valArray = new String[1];
         valArray[0] = value;
@@ -448,7 +467,6 @@ public class Item
      *                    with any country code or no country code are removed.
      */
     public void clearDC(String element, String qualifier, String lang)
-        throws AuthorizeException
     {
         // We will build a list of values NOT matching the values to clear
         List values = new ArrayList();
@@ -582,8 +600,20 @@ public class Item
 
         while (tri.hasNext())
         {
-            TableRow r = (TableRow) tri.next();
-            collections.add(new Collection(ourContext, r));
+            TableRow row = tri.next();
+
+            // First check the cache
+            Collection fromCache = (Collection) ourContext.fromCache(
+                Collection.class, row.getIntColumn("collection_id"));
+
+            if (fromCache != null)
+            {
+                collections.add(fromCache);
+            }
+            else
+            {
+                collections.add(new Collection(ourContext, row));
+            }
         }
 
         Collection[] collectionArray = new Collection[collections.size()];
@@ -614,8 +644,20 @@ public class Item
 
         while (tri.hasNext())
         {
-            TableRow r = (TableRow) tri.next();
-            communities.add(new Community(ourContext, r));
+            TableRow row = tri.next();
+
+            // First check the cache
+            Community fromCache = (Community) ourContext.fromCache(
+                Community.class, row.getIntColumn("community_id"));
+
+            if (fromCache != null)
+            {
+                communities.add(fromCache);
+            }
+            else
+            {
+                communities.add(new Community(ourContext, row));
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
@@ -901,6 +943,9 @@ public class Item
         log.info(LogManager.getHeader(ourContext,
             "update_item",
             "item_id=" + getID()));
+
+        // Remove from cache
+        ourContext.removeCached(this, getID());
 
         // Remove from indices, if appropriate
         if (isArchived())

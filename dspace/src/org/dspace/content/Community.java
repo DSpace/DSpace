@@ -105,6 +105,9 @@ public class Community
             logo = Bitstream.find(ourContext,
                 communityRow.getIntColumn("logo_bitstream_id"));
         }
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("community_id"));
     }
 
 
@@ -119,6 +122,15 @@ public class Community
     public static Community find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        Community fromCache =
+            (Community) context.fromCache(Community.class, id);
+            
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find(context,
             "community",
             id);
@@ -195,7 +207,19 @@ public class Community
         while (tri.hasNext())
         {
             TableRow row = tri.next();
-            communities.add(new Community(context, row));
+
+            // First check the cache
+            Community fromCache = (Community) context.fromCache(
+                Community.class, row.getIntColumn("community_id"));
+
+            if (fromCache != null)
+            {
+                communities.add(fromCache);
+            }
+            else
+            {
+                communities.add(new Community(context, row));
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
@@ -342,7 +366,20 @@ public class Community
         // Make Collection objects
         while (tri.hasNext())
         {
-            collections.add(new Collection(ourContext, tri.next()));
+            TableRow row = tri.next();
+
+            // First check the cache
+            Collection fromCache = (Collection) ourContext.fromCache(
+                Collection.class, row.getIntColumn("collection_id"));
+
+            if (fromCache != null)
+            {
+                collections.add(fromCache);
+            }
+            else
+            {
+                collections.add(new Collection(ourContext, row));
+            }
         }
 
         // Put them in an array
@@ -442,6 +479,9 @@ public class Community
         log.info(LogManager.getHeader(ourContext,
             "delete_community",
             "community_id=" + getID()));
+
+        // Remove from cache
+        ourContext.removeCached(this, getID());
 
         // Remove any community-collection mappings
         DatabaseManager.updateQuery(ourContext,

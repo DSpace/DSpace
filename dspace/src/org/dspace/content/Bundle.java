@@ -110,8 +110,23 @@ public class Bundle
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            bitstreams.add(new Bitstream(ourContext, r));
+
+            // First check the cache
+            Bitstream fromCache = (Bitstream) context.fromCache(
+                Bitstream.class, r.getIntColumn("bitstream_id"));
+
+            if (fromCache != null)
+            {
+                bitstreams.add(fromCache);
+            }
+            else
+            {
+                bitstreams.add(new Bitstream(ourContext, r));
+            }
         }
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("bundle_id"));
     }
 
     
@@ -124,9 +139,17 @@ public class Bundle
      *   
      * @return  the bundle, or null if the ID is invalid.
      */
-    static Bundle find(Context context, int id)
+    public static Bundle find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        Bundle fromCache = (Bundle) context.fromCache(Bundle.class, id);
+            
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find(context,
             "bundle",
             id);
@@ -227,7 +250,19 @@ public class Bundle
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            items.add(new Item(ourContext, r));
+
+            // Used cached copy if there is one
+            Item fromCache = (Item) ourContext.fromCache(
+                Item.class, r.getIntColumn("item_id"));
+
+            if (fromCache != null)
+            {
+                items.add(fromCache);
+            }
+            else
+            {
+                items.add(new Item(ourContext, r));
+            }
         }
         
         Item[] itemArray = new Item[items.size()];
@@ -361,6 +396,9 @@ public class Bundle
         log.info(LogManager.getHeader(ourContext,
             "delete_bundle",
             "bundle_id=" + getID()));
+
+        // Remove from cache
+        ourContext.removeCached(this, getID());
 
         // Remove item-bundle mappings
         DatabaseManager.updateQuery(ourContext,

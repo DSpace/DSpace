@@ -40,6 +40,9 @@
 
 package org.dspace.content;
 
+import java.sql.SQLException;
+
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
 
 
@@ -52,6 +55,21 @@ import org.dspace.eperson.EPerson;
  */
 public interface InProgressSubmission
 {
+    /**
+     * Get the internal ID of this submission
+     *
+     * @return the internal identifier
+     */
+    int getID();
+
+
+    /**
+     * Update the submission, including the unarchived item.
+     */
+    void update()
+        throws SQLException, AuthorizeException;
+
+
     /**
      * Get the incomplete item object
      *

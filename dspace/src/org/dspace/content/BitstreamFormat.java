@@ -106,6 +106,9 @@ public class BitstreamFormat
     {
         bfContext = context;
         bfRow = row;
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("bitstream_format_id"));
     }
 
 
@@ -120,6 +123,15 @@ public class BitstreamFormat
     public static BitstreamFormat find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
+            BitstreamFormat.class, id);
+            
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find(context,
             "bitstreamformatregistry",
             id);
@@ -180,11 +192,21 @@ public class BitstreamFormat
                         "bitstream_format_id")));
             }
 
+            // From cache?
+            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
+                BitstreamFormat.class,
+                formatRow.getIntColumn("bitstream_format_id"));
+
+            if (fromCache != null)
+            {
+                return fromCache;
+            }
+            
+
             return new BitstreamFormat(context, formatRow);
         }
     }
         
-
 
     /**
      * Retrieve all bitstream formats from the registry.
@@ -204,7 +226,68 @@ public class BitstreamFormat
 
         while (tri.hasNext())
         {
-            formats.add(new BitstreamFormat(context, tri.next()));
+            TableRow row = tri.next();
+
+            // From cache?
+            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
+                BitstreamFormat.class,
+                row.getIntColumn("bitstream_format_id"));
+
+            if (fromCache != null)
+            {
+                formats.add(fromCache);
+            }
+            else
+            {
+                formats.add(new BitstreamFormat(context, row));
+            }
+        }
+
+        // Return the formats as an array
+        BitstreamFormat[] formatArray = new BitstreamFormat[formats.size()];
+        formatArray = (BitstreamFormat[]) formats.toArray(formatArray);
+
+        return formatArray;
+    }
+
+
+    /**
+     * Retrieve all non-internal bitstream formats from the registry.  The
+     * "unknown" format is not included, and the formats are ordered by
+     * support level (highest first) first then short description.
+     *
+     * @param  context  DSpace context object
+     *   
+     * @return  the bitstream formats.
+     */
+    public static BitstreamFormat[] findNonInternal(Context context)
+        throws SQLException
+    {
+        List formats = new ArrayList();
+
+        TableRowIterator tri = DatabaseManager.query(context,
+            "bitstreamformatregistry",
+            "SELECT * FROM bitstreamformatregistry WHERE internal=FALSE " +
+            "AND short_description NOT LIKE 'Unknown' " +
+            "ORDER BY support_level DESC, short_description");
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            // From cache?
+            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
+                BitstreamFormat.class,
+                row.getIntColumn("bitstream_format_id"));
+
+            if (fromCache != null)
+            {
+                formats.add(fromCache);
+            }
+            else
+            {
+                formats.add(new BitstreamFormat(context, row));
+            }
         }
 
         // Return the formats as an array
@@ -414,6 +497,9 @@ public class BitstreamFormat
             throw new AuthorizeException(
                 "Only administrators can delete bitstream formats");
         }
+
+        // Remove from cache
+        bfContext.removeCached(this, getID());
 
         // Find "unknown" type
         BitstreamFormat unknown = findUnknown(bfContext);

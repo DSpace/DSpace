@@ -146,6 +146,9 @@ public class Collection
         // where XX is the ID of this collection
         submitters = Group.findByName(ourContext,
             "COLLECTION_" + getID() + "_SUBMIT");
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("collection_id"));
     }
 
 
@@ -160,6 +163,15 @@ public class Collection
     public static Collection find(Context context, int id)
         throws SQLException
     {
+        // First check the cache
+        Collection fromCache =
+            (Collection) context.fromCache(Collection.class, id);
+            
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
         TableRow row = DatabaseManager.find(context,
             "collection",
             id);
@@ -230,7 +242,19 @@ public class Collection
         while (tri.hasNext())
         {
             TableRow row = tri.next();
-            collections.add(new Collection(context, row));
+
+            // First check the cache
+            Collection fromCache = (Collection) context.fromCache(
+                Collection.class, row.getIntColumn("collection_id"));
+
+            if (fromCache != null)
+            {
+                collections.add(fromCache);
+            }
+            else
+            {
+                collections.add(new Collection(context, row));
+            }
         }
 
         Collection[] collectionArray = new Collection[collections.size()];
@@ -657,6 +681,9 @@ public class Collection
             "delete_collection",
             "collection_id=" + getID()));
 
+        // Remove from cache
+        ourContext.removeCached(this, getID());
+
         // Delete community-collection mappings
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM community2collection WHERE collection_id=" + getID() +
@@ -740,7 +767,20 @@ public class Collection
 
         while (tri.hasNext())
         {
-            communities.add(new Community(ourContext, tri.next()));
+            TableRow row = tri.next();
+
+            // First check the cache
+            Community fromCache = (Community) ourContext.fromCache(
+                Community.class, row.getIntColumn("community_id"));
+
+            if (fromCache != null)
+            {
+                communities.add(fromCache);
+            }
+            else
+            {
+                communities.add(new Community(ourContext, row));
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
