@@ -127,6 +127,8 @@ Common usage:
     <replace file="build/dspace-web.xml"
              token="@@dspace.dir@@"
              value="${dspace.dir}" />
+    <!-- Make sure jsp/local exists -->
+   <mkdir dir="jsp/local" />
     <!-- Copy original JSPs, then copy localised versions on top -->
     <mkdir dir="build/jsp" />
     <copy todir="build/jsp" preservelastmodified="true">
