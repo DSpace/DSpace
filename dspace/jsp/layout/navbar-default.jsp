@@ -208,7 +208,7 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/help" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <dspace:popup page="/help/index.html">Help</dspace:popup>
+      <dspace:popup page="/help/index.jsp">Help</dspace:popup>
     </td>
   </tr>
 
