@@ -505,6 +505,16 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   background: #fefecd;
                   text-decoration: none;
                   vertical-align: middle }
+
+.searchBoxLabelSmall { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+                  font-size: 8pt;
+                  font-style: normal;
+                  font-weight: bold;
+                  color: #000000;
+                  background: #fefecd;
+                  text-decoration: none;
+                  vertical-align: middle }
+
 <%
         // Close conditional above
     }
