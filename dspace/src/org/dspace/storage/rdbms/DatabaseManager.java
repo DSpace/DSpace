@@ -234,7 +234,7 @@ public class DatabaseManager
      * @return - The number of rows deleted
      * @exception SQLException - If a database error occurs
      */
-    private static int delete( Context context, String table, int id )
+    public static int delete( Context context, String table, int id )
         throws SQLException
     {
         String ctable = canonicalize(table);
