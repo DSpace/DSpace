@@ -270,8 +270,10 @@ public class CollectionWizardServlet extends DSpaceServlet
 			{
 				// should have workflow step i
 				Group g = collection.createWorkflowGroup(i);
+
+        			AuthorizeManager.addPolicy(context, collection, Constants.ADD, g);
 			
-				// FIXME: Might need to do some authorisation stuff?  
+				// FIXME: Might need to do some more authorisation stuff?  
 			}
 		}
 		
