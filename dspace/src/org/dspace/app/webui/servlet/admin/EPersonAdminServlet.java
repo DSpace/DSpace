@@ -217,7 +217,17 @@ public class EPersonAdminServlet extends DSpaceServlet
             EPerson e = EPerson.find(context,
                 UIUtil.getIntParameter(request, "eperson_id"));
 
-            e.delete();
+            try
+            {
+                e.delete();
+            
+            }catch(EPersonDeletionException ex)
+            {
+                request.setAttribute("eperson", e);
+                request.setAttribute("tableList", ex.getTables());
+                JSPManager.showJSP(request, response,
+                "/dspace-admin/eperson-deletion-error.jsp");
+            }
             
             showMain(context, request, response);
             context.complete();
