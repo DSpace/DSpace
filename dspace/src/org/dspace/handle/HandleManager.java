@@ -44,7 +44,7 @@ import java.security.Security;
 import java.sql.*;
 import java.util.*;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.core.*;
 import org.dspace.content.Item;
@@ -63,7 +63,7 @@ import org.dspace.storage.rdbms.*;
 public class HandleManager
 {
     /** log4j category */
-    private static Category log = Category.getInstance(HandleManager.class);
+    private static Logger log = Logger.getLogger(HandleManager.class);
 
     /**
      * Return the local URL for HANDLE, or null if HANDLE cannot be found.

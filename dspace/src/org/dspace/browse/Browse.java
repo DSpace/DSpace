@@ -56,7 +56,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.storage.rdbms.*;
 import org.dspace.content.*;
@@ -83,7 +83,7 @@ public class Browse
     static final int ITEMS_BY_AUTHOR_BROWSE = 2;
     static final int ITEMS_BY_DATE_BROWSE = 3;
 
-    private static Category log = Category.getInstance(Browse.class);
+    private static Logger log = Logger.getLogger(Browse.class);
 
     /**
      * Return distinct Authors in the given scope.
@@ -1355,7 +1355,7 @@ class BrowseCache
     private static int[] MAXIMUM  = new int[BrowseTables.count()];
     private static long[] COUNT   = new long[BrowseTables.count()];
 
-    private static Category log = Category.getInstance(BrowseCache.class);
+    private static Logger log = Logger.getLogger(BrowseCache.class);
 
     private static Map cache     = new WeakHashMap();
     // Everything in the cache is held via Weak References, and is

@@ -49,7 +49,7 @@ import net.handle.hdllib.*;
 import net.handle.util.StringUtils;
 import net.handle.util.StreamTable;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
@@ -66,7 +66,7 @@ import org.dspace.handle.HandleManager;
 public class HandlePlugin implements HandleStorage
 {
     /** log4j category */
-    private static Category log = Category.getInstance(HandlePlugin.class);
+    private static Logger log = Logger.getLogger(HandlePlugin.class);
 
     ////////////////////////////////////////
     // Non-Resolving methods -- unimplemented

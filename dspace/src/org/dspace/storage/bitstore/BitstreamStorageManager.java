@@ -51,7 +51,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.rdbms.*;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * Manages bitstream storage
@@ -74,30 +74,20 @@ public class BitstreamStorageManager
     private static final int digitsPerLevel = 2;
     private static final int directoryLevels = 3;
 
-    /**
-     * Root directory (as String)
-     */
+    /** Root directory (as String) */
     private static String root = ConfigurationManager.getProperty("assetstore.dir");
 
-    /**
-     * Root directory (as File)
-     */
+    /** Root directory (as File) */
     private static File rootDirectory;
 
-    /**
-     * Initialization flag
-     */
+    /** Initialization flag */
     private static boolean initialized = false;
 
-    /**
-     * Algorithm for the MessageDigest
-     */
+    /** Algorithm for the MessageDigest */
     private static final String DIGEST_ALGORITHM = "MD5";
 
-    /**
-     * log4j category
-     */
-    private static Category log = Category.getInstance(BitstreamStorageManager.class);
+    /** log4j log */
+    private static Logger log = Logger.getLogger(BitstreamStorageManager.class);
 
     /**
      * Store a stream of bits.

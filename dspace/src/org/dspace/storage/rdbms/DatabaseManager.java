@@ -59,10 +59,8 @@ import org.dspace.core.Context;
  */
 public class DatabaseManager
 {
-    /**
-     * log4j category
-     */
-    private static Category log = Category.getInstance(DatabaseManager.class);
+    /** log4j category */
+    private static Logger log = Logger.getLogger(DatabaseManager.class);
 
     private static final String JDBC_URL_PROPERTY = "db.url";
 
@@ -70,9 +68,7 @@ public class DatabaseManager
     private static String jdbcUserName = ConfigurationManager.getProperty("db.username");
     private static String jdbcPassword = ConfigurationManager.getProperty("db.password");
 
-    /**
-     * True if initialization has been done
-     */
+    /** True if initialization has been done */
     private static boolean initialized = false;
 
     /**

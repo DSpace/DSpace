@@ -48,7 +48,7 @@ import java.util.Date;
 
 import javax.mail.MessagingException;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.*;
@@ -63,10 +63,8 @@ import org.dspace.storage.rdbms.*;
  */
 public class AccountManager
 {
-    /**
-     * log4j category
-     */
-    private static Category log = Category.getInstance(AccountManager.class);
+    /** log4j log */
+    private static Logger log = Logger.getLogger(AccountManager.class);
 
     /**
      * Send registration info to the EPerson with the given email address.
@@ -127,27 +125,27 @@ public class AccountManager
                                                    "RegistrationData",
                                                    "token",
                                                    token);
-        
+
         if (rd == null)
             return null;
-        
+
         Date expires = rd.getDateColumn("expires");
         if (expires != null)
         {
             if ((new java.util.Date()).after(expires))
                 return null;
         }
-        
+
         if (rd.isColumnNull("eperson_id"))
             throw new IllegalStateException("Eperson id not specified");
-        
+
         // This could conceivably happen if someone deleted the EPerson
         // without removing the token.
         EPerson ep = EPerson.find(context, rd.getIntColumn("eperson_id"));
-        
+
         if (ep == null)
             return null;
-        
+
         return ep;
     }
 
@@ -198,19 +196,19 @@ public class AccountManager
         throws SQLException, IOException, MessagingException, AuthorizeException
     {
         EPerson ep = EPerson.findByEmail(context, email);
-        
+
         if (ep == null)
             return null;
-        
+
         TableRow rd = DatabaseManager.create(context, "RegistrationData");
         rd.setColumn("token",      Utils.generateHexKey());
         rd.setColumn("expires",    getDefaultExpirationDate());
         rd.setColumn("eperson_id", ep.getID());
         DatabaseManager.update(context, rd);
-        
+
         // This is a potential problem -- if we create the callback
         // and then crash, registration will get SNAFU-ed.
-        
+
         // So FIRST leave some breadcrumbs
         if (log.isDebugEnabled())
             log.debug("Created callback " +
@@ -218,10 +216,10 @@ public class AccountManager
                       " with token " + rd.getStringColumn("token") +
                       " for eperson " + ep.getID() +
                       " with email \"" + email + "\"");
-        
+
         if (send)
             sendEmail(email, isRegister, rd);
-        
+
         return rd;
     }
 

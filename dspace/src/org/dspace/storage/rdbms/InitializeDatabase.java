@@ -44,7 +44,7 @@ package org.dspace.storage.rdbms;
 import java.io.File;
 import java.io.FileReader;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * Command-line executed class for initializing the DSpace database.  This
@@ -56,12 +56,9 @@ import org.apache.log4j.Category;
  */
 public class InitializeDatabase
 {
-    /**
-     * log4j category
-     */
-    private static Category log =
-        Category.getInstance(InitializeDatabase.class);
-
+    /** log4j category */
+    private static Logger log =
+        Logger.getLogger(InitializeDatabase.class);
 
     public static void main(String argv[])
     {
