@@ -79,7 +79,7 @@
                 <td colspan=<%= overallColSpan %> class="pageFootnote">
                     <table class="pageFooterBar" width="100%">
                         <tr>
-                            <td><A target=_blank HREF="http://www.hp.com/"><img src="<%= request.getContextPath() %>/image/hp-mit.gif" alt="invent @ MIT: The HP-MIT Alliance" border=0></A></td>
+                            <td><A target=_blank HREF="http://www.hpl.hp.com/mit/"><img src="<%= request.getContextPath() %>/image/hp-mit.gif" alt="invent @ MIT: The HP-MIT Alliance" border=0></A></td>
                             <td class="pageFootnote">
                                 Copyright&nbsp;&copy;&nbsp;2002&nbsp;<a target=_blank href="http://web.mit.edu/">MIT</a>&nbsp;and&nbsp;<a target=_blank href="http://www.hp.com/">Hewlett-Packard</a>&nbsp;-
                                 <a target=_blank href="<%= request.getContextPath() %>/feedback?fromPage=<%= fromPage %>">Feedback</a>
