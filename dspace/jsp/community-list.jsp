@@ -74,7 +74,7 @@
     if (admin_button)
     {
 %>
-      <table class=miscTable align=left>
+      <table class=miscTable align=center>
         <tr>
         <td>
             <H1>Communities and Collections</H1>
