@@ -44,6 +44,27 @@
 <project name="DSpace" default="compile" basedir=".">
 
   <!-- ============================================================= -->
+  <!-- Description                                                   -->
+  <!-- ============================================================= -->
+
+  <description>
+===================== DSpace platform build file =====================
+
+Common usage:
+
+  Fresh install, including database setup and registry loading:
+    % ant ; ant fresh_install
+  
+  Upgrade existing installation, leaving code, data and configuration
+    % ant ; ant -Dconfig=/installdir/config/dspace.cfg update
+  
+  The following targets require that the system is installed:
+    test, load_registries
+
+======================================================================
+  </description>
+
+  <!-- ============================================================= -->
   <!-- Will be using various environment variables                   -->
   <!-- ============================================================= -->
 
@@ -213,15 +234,10 @@
   <!-- Create public API javadoc                                     -->
   <!-- ============================================================= -->
 	
-  <!-- FIXME: In ant versions <1.5, this will build the API of all subpackages
-    -  of DSpace.  When we move to 1.5, we will be able to build the
-    -  public API properly, using just the top-level package classes. -->
-
   <target name="public_api"
           description="Create the DSpace public API documentation with javadoc">
     <mkdir dir="${basedir}/build/public-api" />
-    <javadoc packagenames="org.dspace.*"
-             sourcepath="${basedir}/src"
+    <javadoc sourcepath="${basedir}/src"
              destdir="${basedir}/build/public-api"
              author="true"
              version="true"
@@ -229,7 +245,15 @@
              doctitle="DSpace Public API"
              windowtitle="DSpace Public API"
              bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved."
-             classpathref="build.class.path" />
+             classpathref="build.class.path">
+      <package name="org.dspace.administer"/>
+      <package name="org.dspace.authorize"/>
+      <package name="org.dspace.content"/>
+      <package name="org.dspace.core"/>
+      <package name="org.dspace.eperson"/>
+      <package name="org.dspace.storage.bitstore"/>
+      <package name="org.dspace.storage.rdbms"/>
+    </javadoc>
   </target>
 
 
