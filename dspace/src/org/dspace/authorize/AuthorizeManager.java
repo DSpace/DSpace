@@ -101,7 +101,7 @@ public class AuthorizeManager
             if( e == null ) { userid = 0;         }
             else            { userid = e.getID(); }
             
-            AuthorizeException j = new AuthorizeException("Denied");
+            //AuthorizeException j = new AuthorizeException("Denied");
             //j.printStackTrace();
 
             // action can be -1 due to a null entry
