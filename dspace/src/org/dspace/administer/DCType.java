@@ -155,6 +155,36 @@ public class DCType
 
 
     /**
+     * Retrieve all Dublin Core types from the registry
+     *
+     * @return  an array of all the Dublin Core types
+     */
+    public static DCType[] findAll(Context context)
+        throws SQLException
+    {
+        List dcTypes = new ArrayList();
+
+        // Get all the dctyperegistry rows
+        TableRowIterator tri = DatabaseManager.query(context,
+            "dctyperegistry",
+            "SELECT * FROM dctyperegistry ORDER BY element, qualifier;");
+        
+        // Make into DC Type objects
+        while (tri.hasNext())
+        {
+            dcTypes.add(new DCType(context, tri.next()));
+        }
+
+        // Convert list into an array
+        DCType[] typeArray = new DCType[dcTypes.size()];
+        typeArray = (DCType[]) dcTypes.toArray(typeArray);
+        
+        // Return the array
+        return typeArray;
+    }
+
+
+    /**
      * Create a new Dublin Core type
      *
      * @param  context  DSpace context object
