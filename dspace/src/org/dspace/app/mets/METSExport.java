@@ -66,6 +66,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.PosixParser;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -75,6 +76,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
@@ -259,8 +261,9 @@ public class METSExport
             
             for (int b = 0; b < bitstreams.length; b++)
             {
-                // Skip license bitstream
-                if (bitstreams[b].getFormat().getID() != licenseFormat)
+                // Skip license bitstream and unauthorized resources
+                if (bitstreams[b].getFormat().getID() != licenseFormat
+                    && AuthorizeManager.authorizeActionBoolean(context, bitstreams[b], Constants.READ))
                 {
                     out = new FileOutputStream(aipDir.toString() +
                             java.io.File.separator + bitstreams[b].getChecksum());
