@@ -194,11 +194,16 @@ title="Uploaded File">
         <center>
             <table border=0 width=80%>
                 <tr>
-                    <td align=left>
-                        <input type=submit name=submit_cancel value="Cancel/Save">
+                    <td width="100%">&nbsp;</td>
+                    <td align>
+                        <input type=submit name=submit_prev value="&lt; Previous">
                     </td>
+                    <td>
+                        <input type=submit name=submit_next value="Next &gt;">
+                    </td>
+                    <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
-                        <input type=submit name=submit_prev value="&lt; Previous">&nbsp;<input type=submit name=submit_next value="Next &gt;">
+                        <input type=submit name=submit_cancel value="Cancel/Save">
                     </td>
                 </tr>
             </table>
