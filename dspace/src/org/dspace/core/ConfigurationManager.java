@@ -459,15 +459,21 @@ public class ConfigurationManager
         
 
     /**
-     * Command-line interface for running configuration tasks.  At present
-     * only accepts <code>-installTemplates</code> for processing and installing
-     * the configuration file templates for other tools.
+     * Command-line interface for running configuration tasks.  Possible
+     * arguments:
+     * <UL>
+     * <LI><code>-installTemplates</code> processes and installs the
+     * configuration file templates for other tools</LI>
+     * <LI><code>-property name</code> prints the value of the property
+     * <code>name</code> from <code>dspace.cfg</code> to the standard output.
+     * If the property does not exist, nothing is written.</LI>
+     * </UL>
      *
      * @param argv   command-line arguments
      */
     public static void main(String argv[])
     {
-        if (argv[0].equals("-installTemplates"))
+        if (argv.length == 1 && argv[0].equals("-installTemplates"))
         {
             try
             {
@@ -480,9 +486,23 @@ public class ConfigurationManager
                 log.warn("Error installing configuration files", ie);
             }
         }
+        else if (argv.length == 2 && argv[0].equals("-property"))
+        {
+            String val = getProperty(argv[1]);
+
+            if (val != null)
+            {
+                System.out.println(val);
+            }
+            else
+            {
+                System.out.println("");
+            }
+            System.exit(0);
+        }
         else
         {
-            System.err.println("Usage: ConfigurationManager -installTemplates");
+            System.err.println("Usage: ConfigurationManager OPTION\n  -installTemplates    install config files for external tools\n  -property prop.name  get value of prop.name from dspace.cfg");
         }
         
         System.exit(1);
