@@ -64,10 +64,15 @@
     }
 
     // E-mail may have to be truncated
-    String navbarEmail = user.getEmail();
-    if (navbarEmail.length() > 18)
+    String navbarEmail = null;
+    
+    if (user != null)
     {
-        navbarEmail = navbarEmail.substring(0, 17) + "...";
+        navbarEmail = user.getEmail();
+        if (navbarEmail.length() > 18)
+        {
+            navbarEmail = navbarEmail.substring(0, 17) + "...";
+        }
     }
 %>
 
