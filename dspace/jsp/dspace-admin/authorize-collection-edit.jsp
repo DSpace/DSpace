@@ -112,7 +112,7 @@
     {
         ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
-        <form method=POST>
+        <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method=POST>
             <tr>
                 <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
                 <td class="<%= row %>RowEvenCol">
