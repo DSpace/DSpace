@@ -1,6 +1,8 @@
 /*
  * RegistryLoader.java
  *
+ * $Id$
+ *
  * Version: $Revision$
  *
  * Date: $Date$
@@ -86,9 +88,9 @@ public class CreateAdministrator
 
             boolean dataOK = false;
             
-            String email = null;
+            String email     = null;
             String firstName = null;
-            String lastName = null;
+            String lastName  = null;
             String password1 = null;
             String password2 = null;
 
@@ -140,26 +142,22 @@ public class CreateAdministrator
             }
             
             // Find administrator group
-            Group admins = Group.find(context, 0);
+            Group admins = Group.find(context, 1);
 
             if (admins == null)
             {
-                // Create administrator group.  We use the DB directly, since
-                // the group must have the special ID '0'
-                DatabaseManager.loadSql(
-                    "INSERT INTO epersongroup VALUES(0, 'Administrators');");
-
-                admins = Group.find(context, 0);
+                System.out.println("Error, no admin group (group 1) found");
+                System.exit(1);
             }
 
             // Create the administrator e-person
             EPerson eperson = EPerson.create(context);
             
-            eperson.setEmail(email);
-            eperson.setLastName(lastName);
+            eperson.setEmail    (email    );
+            eperson.setLastName (lastName );
             eperson.setFirstName(firstName);
-            eperson.setPassword(password1);
-            eperson.setActive(true);
+            eperson.setPassword (password1);
+            eperson.setActive   (true     );
             eperson.setRequireCertificate(false);
             eperson.update();
             
