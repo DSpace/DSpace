@@ -55,6 +55,33 @@
   <!-- Servlets -->
 
   <servlet>
+    <servlet-name>browse-author</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
+    <init-param>
+      <param-name>browse</param-name>
+      <param-value>authors</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet>
+    <servlet-name>browse-date</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
+    <init-param>
+      <param-name>browse</param-name>
+      <param-value>dates</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet>
+    <servlet-name>browse-title</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
+    <init-param>
+      <param-name>browse</param-name>
+      <param-value>titles</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet>
     <servlet-name>community-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.CommunityListServlet</servlet-class>
   </servlet>
@@ -69,9 +96,29 @@
     <servlet-class>org.dspace.app.webui.servlet.LocationServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>retrieve</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
+  </servlet>
+
 
 
   <!-- Servlet Mappings -->
+
+  <servlet-mapping>
+    <servlet-name>browse-author</servlet-name>
+    <url-pattern>/browse-author</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>browse-date</servlet-name>
+    <url-pattern>/browse-date</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>browse-title</servlet-name>
+    <url-pattern>/browse-title</url-pattern>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>community-list</servlet-name>
@@ -86,6 +133,11 @@
   <servlet-mapping>
     <servlet-name>location</servlet-name>
     <url-pattern>/communities/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>retrieve</servlet-name>
+    <url-pattern>/retrieve/*</url-pattern>
   </servlet-mapping>
 
 

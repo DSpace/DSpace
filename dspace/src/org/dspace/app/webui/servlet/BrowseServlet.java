@@ -1,0 +1,460 @@
+/*
+ * BrowseServlet.java
+ *
+ * Version: $Revision$
+ *
+ * Date: $Date$
+ *
+ * Copyright (c) 2001, Hewlett-Packard Company and Massachusetts
+ * Institute of Technology.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * - Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the Hewlett-Packard Company nor the name of the
+ * Massachusetts Institute of Technology nor the names of their
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ */
+
+package org.dspace.app.webui.servlet;
+
+import java.io.InputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+
+import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.browse.Browse;
+import org.dspace.browse.BrowseInfo;
+import org.dspace.browse.BrowseScope;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.core.Utils;
+import org.dspace.handle.HandleManager;
+
+
+/**
+ * Servlet for browsing through indices.  This can be used to browse authors,
+ * items by date, or items by title.  In the deployment description, the
+ * parameter "browse" should be set to one of these values:
+ * <P>
+ * <UL>
+ * <LI><code>titles</code> - for browsing items by title (the default)</LI>
+ * <LI><code>authors</code> - for browsing authors</LI>
+ * <LI><code>dates</code> - for browsing items by date</LI>
+ * </UL>
+ * <P>
+ * Hence there should be three instances of this servlet, one for each type of
+ * browse.
+ *
+ * @author  Robert Tansley
+ * @version $Revision$
+ */
+public class BrowseServlet extends DSpaceServlet
+{
+    /** log4j category */
+    private static Logger log = Logger.getLogger(BrowseServlet.class);
+    
+    /** Is this servlet for browsing authors? */
+    private boolean browseAuthors;
+
+    /** Is this servlet for browsing items by title? */
+    private boolean browseTitles;
+
+    /** Is this servlet for browsing items by date? */
+    private boolean browseDates;
+
+
+    public void init()
+    {
+        // Sort out what we're browsing - default is titles
+        String browseWhat = getInitParameter("browse");
+        
+        browseAuthors = (browseWhat != null &&
+            browseWhat.equalsIgnoreCase("authors"));
+        browseDates = (browseWhat != null &&
+            browseWhat.equalsIgnoreCase("dates"));
+        browseTitles = (!browseAuthors && !browseDates);
+    }
+
+
+    protected void doDSGet(Context context,
+        HttpServletRequest request,
+        HttpServletResponse response)
+        throws ServletException, IOException, SQLException, AuthorizeException
+    {
+        // We will resolve the HTTP request parameters into a scope
+        BrowseScope scope = new BrowseScope(context);
+
+        // Will need to know whether to highlight the "focus" point
+        boolean highlight = false;
+
+        // Build up log information
+        String logInfo = "";
+        
+        // For browse by date, we'll need to work out the URL query string to
+        // use when the user swaps the ordering, so that they stay at the same
+        // point in the index
+        String flipOrderingQuery = "";
+
+        
+        // Grab HTTP request parameters
+        String focus = request.getParameter("focus");
+        String startsWith = request.getParameter("starts_with");
+        String top = request.getParameter("top");
+        String bottom = request.getParameter("bottom");
+
+        // The following three are specific to browsing items by date
+        String month = request.getParameter("month");
+        String year = request.getParameter("year");
+        String order = request.getParameter("order");
+
+
+        // For browse by date: oldest item first?
+        boolean oldestFirst = false;
+        if (order != null && order.equalsIgnoreCase("oldestfirst"))
+        {
+            oldestFirst = true;
+        }
+
+
+        if (browseDates &&
+            year != null &&
+            !year.equals("") &&
+            startsWith == null)
+        {
+            // We're browsing items by date, the user hasn't typed anything
+            // into the "year" text box, and they've selected a year from
+            // the drop-down list.  From this we work out where to start
+            // the browse.
+            startsWith = year;
+
+            if (month != null & !month.equals("-1"))
+            {
+                // They've selected a month as well
+                startsWith = year + "-" + month;
+            }
+        }
+
+        
+        // Set the scope according to the parameters passed in
+        if (focus != null)
+        {
+            // ----------------------------------------------
+            // Browse should start at a specified focus point
+            // ----------------------------------------------
+            if (browseAuthors)
+            {
+                // For browsing authors, focus is just a text value
+                scope.setFocus(focus);
+            }
+            else
+            {
+                // For browsing items by title or date, focus is a Handle
+                Item item = (Item) HandleManager.resolveToObject(context,
+                    focus);
+                
+                if (item == null)
+                {
+                    // Handle is invalid one.  Show an error.
+                    JSPManager.showInvalidIDError(request, response, focus,
+                        Constants.ITEM);
+                    return;
+                }
+                
+                scope.setFocus(item);
+            }
+
+            // Will need to highlight the focus
+            highlight = true;
+            
+            logInfo = "focus=" + focus;
+  
+            if (browseDates)
+            {
+                // if the date order is flipped, we'll keep the same focus
+                flipOrderingQuery = "focus=" + URLEncoder.encode(focus) + "&";
+            }
+        }
+        else if (!browseDates && startsWith != null)
+        {
+            // ----------------------------------------------
+            // Start the browse using user-specified text
+            // ----------------------------------------------
+            scope.setFocus(startsWith);
+            highlight = true;
+            logInfo = "starts_with=" + startsWith;
+
+            if (browseDates)
+            {
+                // if the date order is flipped, we'll keep the same focus
+                flipOrderingQuery = "starts_with=" +
+                    URLEncoder.encode(startsWith) + "&";
+            }
+        }
+        else if (top != null || bottom != null)
+        {
+            // ----------------------------------------------
+            // Paginating: put specified entry at top or bottom
+            // ----------------------------------------------
+
+            // Use a single value and a boolean to simplify the code below
+            String val = bottom;
+            boolean isTop = false;
+
+            if (top != null)
+            {
+                val = top;
+                isTop = true;
+            }
+
+
+            if (browseAuthors)
+            {
+                // Value will be a text value for author browse
+                scope.setFocus(val);
+            }
+            else
+            {
+                // Value is Handle if we're browsing items by title or date
+                Item item = (Item) HandleManager.resolveToObject(context,
+                    val);
+                
+                if (item == null)
+                {
+                    // Handle is invalid one.  Show an error.
+                    JSPManager.showInvalidIDError(request, response, focus,
+                        Constants.ITEM);
+                    return;
+                }
+                
+                scope.setFocus(item);
+            }
+            
+            // This entry appears at the top or bottom, and so needs to have
+            // 0 or 20 entries shown before it
+            scope.setNumberBefore(isTop ? 0 : 20);
+
+            logInfo = (isTop ? "top" : "bottom") + "=" + val;
+
+            if (browseDates)
+            {
+                // If the date order is flipped, we'll flip the table upside
+                // down - i.e. the top will become the bottom and the bottom
+                // the top.
+                if (top != null)
+                {
+                    flipOrderingQuery = "bottom=" + URLEncoder.encode(top) +
+                        "&";
+                }
+                else
+                {
+                    flipOrderingQuery = "top=" + URLEncoder.encode(bottom) +
+                        "&";
+                }
+            }
+        }
+        else
+        {
+            // ----------------------------------------------
+            // No positioning parameters set - use start of index
+            // ----------------------------------------------
+            
+            // Don't need to do anything for most browses
+            if (browseDates && oldestFirst)
+            {
+                // For a browse by date starting with the most recent item,
+                // we need to start at the most recent, so we'll set the focus
+                // to be very high
+                scope.setFocus("9999");
+            }
+        }
+
+
+        // Are we in a community or collection?
+        Community community = UIUtil.getCommunityLocation(request);
+        Collection collection = UIUtil.getCollectionLocation(request);
+
+        if (collection != null)
+        {
+            logInfo = logInfo + ",collection_id=" + collection.getID();
+            scope.setScope(collection);
+        }
+        else if (community != null)
+        {
+            logInfo = logInfo + ",community_id=" + community.getID();
+            scope.setScope(community);
+        }
+
+
+        BrowseInfo browseInfo;
+        
+        // Query the browse index
+        if (browseAuthors)
+        {
+            browseInfo = Browse.getAuthors(scope);
+        }
+        else if (browseDates)
+        {
+            browseInfo = Browse.getItemsByDate(scope, oldestFirst);
+        }
+        else
+        {
+            browseInfo = Browse.getItemsByTitle(scope);
+        }
+        
+        List results = browseInfo.getResults();
+
+
+        // Write log entry
+        String what = "title";
+        if (browseAuthors) 
+        {
+            what = "author";
+        }
+        else if (browseDates)
+        {
+            what = "date";
+        }
+
+        log.info(LogManager.getHeader(context,
+            "browse_" + what,
+            logInfo + ",results=" + results.size()));
+
+        
+        if (results.size() == 0)
+        {
+            // No results!
+            request.setAttribute("community", community);
+            request.setAttribute("collection", collection);
+
+            JSPManager.showJSP(request, response, "/browse/no-results.jsp");
+        }
+        else
+        {
+            // If we're browsing items by title or date, we need to work
+            // out the Handles for the items
+            if (browseDates || browseTitles)
+            {
+                String[] handles = new String[results.size()];
+                
+                for (int i = 0; i < results.size(); i++)
+                {
+                    Item item = (Item) results.get(i);
+                    handles[i] = HandleManager.findHandle(context, item);
+                }
+
+                request.setAttribute("handles", handles);
+            }
+
+
+            // Work out what the query strings will be for the previous
+            // and next pages
+
+            if (!browseInfo.isFirst())
+            {
+                // Not the first page, so we'll need a "previous page" button
+                // The top entry of the current page becomes the bottom
+                // entry of the "previous page"
+                String s;
+
+                if (browseAuthors)
+                {
+                    s = (String) results.get(0);
+                }
+                else
+                {
+                    Item firstItem = (Item) results.get(0);
+                    s = HandleManager.findHandle(context, firstItem);
+                }
+
+                request.setAttribute("previous.query",
+                    "bottom=" + URLEncoder.encode(s));
+            }
+            
+            
+            if (!browseInfo.isLast())
+            {
+                // Not the last page, so we'll need a "next page" button
+                // The bottom entry of the current page will be the top
+                // entry in the next page
+                String s;
+
+                if (browseAuthors)
+                {
+                    s = (String) results.get(results.size() - 1);
+                }
+                else
+                {
+                    Item lastItem = (Item) results.get(results.size() - 1);
+                    s = HandleManager.findHandle(context, lastItem);
+                }
+
+                request.setAttribute("next.query",
+                    "top=" + URLEncoder.encode(s));
+            }
+
+
+            // Set appropriate attributes and forward to results page
+            request.setAttribute("community", community);
+            request.setAttribute("collection", collection);
+            request.setAttribute("browse.info", browseInfo);
+            request.setAttribute("highlight", new Boolean(highlight));
+            
+            if (browseAuthors)
+            {
+                JSPManager.showJSP(request, response, "/browse/authors.jsp");
+            }
+            else if (browseDates)
+            {
+                request.setAttribute("browse.dates", new Boolean(true));
+                request.setAttribute("oldest.first", new Boolean(oldestFirst));
+                request.setAttribute("flip.ordering.query", flipOrderingQuery);
+                JSPManager.showJSP(request, response,
+                    "/browse/items.jsp");
+            }
+            else
+            {
+                request.setAttribute("browse.dates", new Boolean(false));
+                JSPManager.showJSP(request, response,
+                    "/browse/items.jsp");
+            }
+        }
+    }
+}

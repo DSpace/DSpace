@@ -82,10 +82,10 @@ import org.dspace.core.ConfigurationManager;
  * @author  Robert Tansley
  * @version $Revision$
  */
-public class Layout extends TagSupport
+public class LayoutTag extends TagSupport
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(Layout.class);
+    private static Logger log = Logger.getLogger(LayoutTag.class);
 
     /** layout style name */
     private String style;
@@ -109,7 +109,7 @@ public class Layout extends TagSupport
     private String sidebar;
 
 
-    public Layout()
+    public LayoutTag()
     {
         super();
     }

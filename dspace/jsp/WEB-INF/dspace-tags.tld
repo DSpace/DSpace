@@ -83,7 +83,7 @@
     -->
   <tag>
     <name>layout</name>
-    <tagclass>org.dspace.app.webui.jsptag.Layout</tagclass>
+    <tagclass>org.dspace.app.webui.jsptag.LayoutTag</tagclass>
     <info>Lays out an HTML page</info>
     <attribute>
       <name>title</name>
@@ -119,10 +119,28 @@
 
   <tag>
     <name>sidebar</name>
-    <tagclass>org.dspace.app.webui.jsptag.Sidebar</tagclass>
+    <tagclass>org.dspace.app.webui.jsptag.SidebarTag</tagclass>
     <info>
       The contents of the tag are displayed in a column on the right-hand side
       of the page.can be used only must be included within a layout tag.
     </info>
+  </tag>
+
+  <tag>
+    <name>date</name>
+    <tagclass>org.dspace.app.webui.jsptag.DateTag</tagclass>
+    <info>
+      Displays a DCDate in a readable form
+    </info>
+    <attribute>
+      <name>date</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>notime</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
   </tag>
 </taglib>

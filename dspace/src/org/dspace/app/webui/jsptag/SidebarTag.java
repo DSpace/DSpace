@@ -54,13 +54,19 @@ import javax.servlet.jsp.tagext.BodyTagSupport;
  * @author  Peter Breton
  * @version $Revision$
  */
-public class Sidebar extends BodyTagSupport
+public class SidebarTag extends BodyTagSupport
 {
+    public SidebarTag()
+    {
+        super();
+    }
+
+
     public int doAfterBody()
         throws JspException
     {
-        Layout tag = (Layout) TagSupport.findAncestorWithClass(this,
-            Layout.class);
+        LayoutTag tag = (LayoutTag) TagSupport.findAncestorWithClass(this,
+            LayoutTag.class);
 
         if (tag == null)
         {
