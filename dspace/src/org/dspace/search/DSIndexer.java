@@ -214,12 +214,17 @@ public class DSIndexer
         iw.addDocument(doc);
     }
 
-/*
-    FIXME - need to produce a Context object (anonymous
-    public static void main(String[] args)
+
+    /**
+     * When invoked as a command-line tool, (re)-builds the whole index
+     *
+     * @param args   the command-line arguments, none used
+     */
+    public static void main(String[] args) throws Exception
     {
-        createIndex();
+        Context c = new Context();
+        c.setIgnoreAuthorization(true);
+        createIndex(c);
         System.out.println("Done with indexing");
     }
-*/
 }

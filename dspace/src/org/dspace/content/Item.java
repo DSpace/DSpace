@@ -607,15 +607,15 @@ public class Item
         // Get community table rows
         TableRowIterator tri = DatabaseManager.query(ourContext,
             "community",
-            "SELECT community.* FROM community, community2collection, " +
-                "collection2item WHERE community2collection.collection_id=" +
-                "collection2item.collection_id AND collection2item.item_id=" +
+            "SELECT community.* FROM community, community2item " +
+                "WHERE community2item.community_id=community.community_id " +
+                "AND community2item.item_id=" +
                 itemRow.getIntColumn("item_id") + ";");
 
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
-            communities.add(new Item(ourContext, r));
+            communities.add(new Community(ourContext, r));
         }
 
         Community[] communityArray = new Community[communities.size()];
