@@ -76,6 +76,16 @@ public class TableRowIterator
      * Constructor
      *
      * @param results - A JDBC ResultSet
+     */
+    TableRowIterator (ResultSet results)
+    {
+        this(results, null);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param results - A JDBC ResultSet
      * @param table - The name of the table
      */
     TableRowIterator (ResultSet results, String table)
