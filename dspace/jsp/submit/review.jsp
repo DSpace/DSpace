@@ -449,7 +449,7 @@
             %>(Unknown)<%
             break;
         case 1:
-            %>(Unsupported)<%
+            %>(Known)<%
             break;
         case 2:
             %>(Supported)<%
