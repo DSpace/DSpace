@@ -128,6 +128,7 @@ Common usage:
     <mkdir dir="${history.dir}" />
     <mkdir dir="${search.dir}" />
     <mkdir dir="${log.dir}" />
+    <mkdir dir="${upload.temp.dir}" />
     <mkdir dir="${dspace.dir}/bin"/>
     <mkdir dir="${dspace.dir}/lib"/>
     <mkdir dir="${dspace.dir}/jsp/local"/>
@@ -175,7 +176,7 @@ Common usage:
       <arg value="${dspace.dir}/bin" />
     </exec>
     <copy todir="${dspace.dir}/lib" preservelastmodified="true">
-      <fileset dir="lib"/>
+      <fileset dir="lib" excludesfile="lib/servlet.jar" />
     </copy>
     <copy todir="${dspace.dir}/jsp" preservelastmodified="true">
       <fileset dir="jsp"/>
