@@ -40,9 +40,6 @@
 
 package org.dspace.administer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.dspace.content.Bundle;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -51,6 +48,20 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 
+/**
+ * Command-line tool for making changes to DSpace database when updating from
+ * version 1.1/1.1.1 to 1.2.
+ * <P>
+ * The changes are:
+ * <UL><LI>Setting owning collection field for items
+ * <LI>Reorganising content bitstreams into one bundle named ORIGINAL,
+ * license bitstreams into a bundle named LICENSE
+ * <LI>Setting the sequence_id numbers in the bitstream table.  This happens
+ * as item.update() is called on every item.
+ * <LI>If a (newly-reorganised) 'ORIGINAL' bundle contains a text/html
+ * bitstream, that bitstream is set to the primary bitstream for HTML support. 
+ * </UL>
+ */
 public class Upgrade11To12
 {
     public static void main(String [] argv)

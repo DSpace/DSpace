@@ -31,8 +31,8 @@ Briefly, DSpace consists of a three-layer architecture:
 </table>
 
 <P>
-Each layer is divided into subsystems.  These are stored in separate packages. 
-Only the public API of each subsystem should be used by other subsystems. 
+Each layer is divided into subsystems.  These are stored in separate packages.
+Only the public API of each subsystem should be used by other subsystems.
 Additionally, subsystems in the Application Layer should not use the Storage
 Layer directly.
 <P>
@@ -51,11 +51,16 @@ Each of the layers and the packages that are part of them are described below.
 
 <h3>Application Layer</h3>
 
-Presently, the application layer consists only of the Web user interface.  This
-resides in <code>org.dspace.app.webui</code>.  Since this and other applications are
-"customers" of DSpace, they do not need to have strictly defined public APIs.
-<P>
-Subsystems in the application layer should be sub-packages of
+Presently, the application layer consists of:
+
+<UL><LI>The Web user interface</LI>
+<LI>The <A href="http://www.openarchives.org/OAI/openarchivesprotocol.html">Open Archives Protocol for Initiative Metadata Harvesting</A> implementation</LI>
+<LI>Item import and export tools</LI>
+<LI>The Media Filter tool, which is a batch tool that iterates through the bitstreams in DSpace, and applies filters to bitstreams of a particular format.  This can be used to e.g. generate image thumbnails, and extract full-text from documents for indexing.</LI>
+<LI>The METS tools -- currently just an exporter, which exports DSpace AIPs with the metadata stored in an XML METS file.  Soon a corresponding importer will be added too.</LI>
+</UL>
+Since this and other applications are
+"customers" of DSpace, they do not need to have strictly defined public APIs.  Subsystems in the application layer should be sub-packages of
 <code>org.dspace.app</code>.  Subsystems in the application layer should not
 use the storage layer directly.
 
@@ -82,7 +87,15 @@ packages <code>org.dspace.storage.rdbms</code> and
 subsystems should also be sub-packages of <code>org.dspace.storage</code>.
 <P>
 
-<em>FIXME: Link to more detailed documentation</em>
+<h2>More Information</h2>
+
+<P>More detailed architectural information for the current stable release of DSpace can be found here:</P>
+
+<P><A HREF="http://dspace.org/technology/system-docs/">http://dspace.org/technology/system-docs/</A></P>
+
+<P>If you're using a beta or earlier version of DSpace, you should download the  'dspace-docs' documentation package corresponding to the version you're using from the SourceForge download page:</P>
+
+<P><A HREF="http://sourceforge.net/project/showfiles.php?group_id=19984">http://sourceforge.net/project/showfiles.php?group_id=19984</A></P>
 
 </body>
 </html>
