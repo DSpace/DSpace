@@ -216,21 +216,31 @@ public class AccountManager
                                        boolean send)
         throws SQLException, IOException, MessagingException, AuthorizeException
     {
-        TableRow rd = DatabaseManager.create(context, "RegistrationData");
-        rd.setColumn("token",      Utils.generateHexKey());
-        rd.setColumn("expires",    getDefaultExpirationDate());
-        rd.setColumn("email",      email);
-        DatabaseManager.update(context, rd);
+        // See if a registration token already exists for this user
+        TableRow rd = DatabaseManager.findByUnique(context,
+            "registrationdata",
+            "email",
+            email);
 
-        // This is a potential problem -- if we create the callback
-        // and then crash, registration will get SNAFU-ed.
+        // If it already exists, just re-issue it
+        if (rd == null)
+        {
+            rd = DatabaseManager.create(context, "RegistrationData");
+            rd.setColumn("token",      Utils.generateHexKey());
+            rd.setColumn("expires",    getDefaultExpirationDate());
+            rd.setColumn("email",      email);
+            DatabaseManager.update(context, rd);
 
-        // So FIRST leave some breadcrumbs
-        if (log.isDebugEnabled())
-            log.debug("Created callback " +
-                      rd.getIntColumn("registrationdata_id") +
-                      " with token " + rd.getStringColumn("token") +
-                      " with email \"" + email + "\"");
+            // This is a potential problem -- if we create the callback
+            // and then crash, registration will get SNAFU-ed.
+
+            // So FIRST leave some breadcrumbs
+            if (log.isDebugEnabled())
+                log.debug("Created callback " +
+                          rd.getIntColumn("registrationdata_id") +
+                          " with token " + rd.getStringColumn("token") +
+                          " with email \"" + email + "\"");
+        }
 
         if (send)
             sendEmail(email, isRegister, rd);
