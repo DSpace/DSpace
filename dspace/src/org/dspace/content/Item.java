@@ -1082,6 +1082,14 @@ public class Item
             removeBundle(bundles[i]);
         }
 
+        // Remove any Handle
+        // FIXME: This is sort of a "tentacle" - HandleManager should provide
+        // a way of doing this.  Plus, deleting a Handle may have ramifications
+        // that need considering.
+        DatabaseManager.updateQuery(ourContext,
+            "DELETE FROM handle WHERE resource_type_id=" +
+                Constants.ITEM + " AND resource_id=" + getID());
+
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
     }
