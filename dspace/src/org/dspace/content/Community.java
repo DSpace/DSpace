@@ -69,7 +69,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Community
+public class Community implements DSpaceObject
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(Community.class);
@@ -546,5 +546,13 @@ public class Community
         }
 
         return (getID() == ((Community) other).getID());
+    }
+
+    /**
+     * return type found in Constants
+     */
+    public int getType()
+    {
+        return Constants.COMMUNITY;
     }
 }

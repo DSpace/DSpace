@@ -71,7 +71,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Bundle
+public class Bundle implements DSpaceObject
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(Bundle.class);
@@ -323,6 +323,10 @@ public class Bundle
         // Add the bitstream object
         bitstreams.add(b);
 
+        // copy authorization policies from bundle to bitstream
+        // FIXME:  multiple inclusion is affected by this...
+        AuthorizeManager.inheritPolicies(ourContext, this, b);
+
         // Add the mapping row to the database
         TableRow mappingRow = DatabaseManager.create(ourContext,
             "bundle2bitstream");
@@ -420,7 +424,19 @@ public class Bundle
             removeBitstream(bs[i]);
         }
 
+        // remove our authorization policies
+        AuthorizeManager.removeAllPolicies(ourContext, this);
+
         // Remove ourself
         DatabaseManager.delete(ourContext, bundleRow);
     }
+
+    /**
+     * return type found in Constants
+     */
+    public int getType()
+    {
+        return Constants.BUNDLE;
+    }
+
 }

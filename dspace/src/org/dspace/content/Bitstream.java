@@ -68,7 +68,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Bitstream
+public class Bitstream implements DSpaceObject
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(Bitstream.class);
@@ -433,8 +433,9 @@ public class Bitstream
     void delete()
         throws SQLException, IOException, AuthorizeException
     {
+        // changed to a check on remove
         // Check authorisation
-        AuthorizeManager.authorizeAction(bContext, this, Constants.DELETE);
+        //AuthorizeManager.authorizeAction(bContext, this, Constants.DELETE);
 
         log.info(LogManager.getHeader(bContext,
             "delete_bitstream",
@@ -442,6 +443,9 @@ public class Bitstream
 
         // Remove from cache
         bContext.removeCached(this, getID());
+
+        // Remove policies
+        AuthorizeManager.removeAllPolicies(bContext, this);
 
         // Remove bitstream itself
         BitstreamStorageManager.delete(bContext,
@@ -508,4 +512,13 @@ public class Bitstream
 
         return bundleArray;
     }
+
+    /**
+     * return type found in Constants
+     */
+    public int getType()
+    {
+        return Constants.BITSTREAM;
+    }
+
 }

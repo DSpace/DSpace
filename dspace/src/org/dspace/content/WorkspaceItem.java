@@ -76,7 +76,7 @@ import org.dspace.workflow.WorkflowItem;
  */
 public class WorkspaceItem implements InProgressSubmission
 {
-    /** log4j category */
+    /** log4j logger */
     private static Logger log = Logger.getLogger(WorkspaceItem.class);
 
     /** The item this workspace object pertains to */
@@ -174,132 +174,71 @@ public class WorkspaceItem implements InProgressSubmission
      *
      * @return  the newly created workspace item
      */
-    public static WorkspaceItem create(Context context,
+    public static WorkspaceItem create(Context c,
         Collection coll,
         boolean template)
         throws AuthorizeException, SQLException
     {
         // Check the user has permission to ADD to the collection
-        AuthorizeManager.authorizeAction(context, coll, Constants.ADD);
+        AuthorizeManager.authorizeAction(c, coll, Constants.ADD);
 
         // Create an item
-        Item i = Item.create(context);
-        i.setSubmitter(context.getCurrentUser());
+        Item i = Item.create(c);
+        i.setSubmitter(c.getCurrentUser());
 
         // Now create the policies for the submitter and workflow
         // users to modify item and contents
         // contents = bitstreams, bundles
-
-        // submitter can read item
-        String mypolicy = "u"+context.getCurrentUser().getID();
-
+        
         // FIXME: icky hardcoded workflow steps
         Group step1group = coll.getWorkflowGroup( 1 );
         Group step2group = coll.getWorkflowGroup( 2 );
         Group step3group = coll.getWorkflowGroup( 3 );
 
-        if(step1group != null) { mypolicy += ",g" + step1group.getID(); }
-        if(step2group != null) { mypolicy += ",g" + step2group.getID(); }
-        if(step3group != null) { mypolicy += ",g" + step3group.getID(); }
+        EPerson e = c.getCurrentUser();
+
+        // read permission
+        AuthorizeManager.addPolicy(c, i, Constants.READ, e );
+
+        if( step1group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.READ, step1group);
+        if( step2group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.READ, step2group);
+        if( step3group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.READ, step3group);
+
+        // write permission
+        AuthorizeManager.addPolicy(c, i, Constants.WRITE, e );
+
+        if( step1group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.WRITE, step1group);
+        if( step2group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.WRITE, step2group);
+        if( step3group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.WRITE, step3group);
+
+
+        // add permission
+        AuthorizeManager.addPolicy(c, i, Constants.ADD, e );
+
+        if( step1group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.ADD, step1group);
+        if( step2group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.ADD, step2group);
+        if( step3group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.ADD, step3group);
         
-        ResourcePolicy rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.ITEM);
-        rp.setResourceID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.READ);
-        rp.update();
+        // remove contents permission
+        AuthorizeManager.addPolicy(c, i, Constants.REMOVE, e );
+
+        if( step1group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step1group);
+        if( step2group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step2group);
+        if( step3group != null )
+            AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step3group);
+
         
-        // submitter can write item
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.ITEM);
-        rp.setResourceID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.WRITE);
-        rp.update();
-        
-        // submitter can add to item
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.ITEM);
-        rp.setResourceID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.ADD);
-        rp.update();
-
-        // submitter can add to item
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.ITEM);
-        rp.setResourceID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.REMOVE);
-        rp.update();
-        
-        // submitter can add to bundles
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.BUNDLE);
-        rp.setContainerType(Constants.ITEM);
-        rp.setContainerID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.ADD);
-        rp.update();
-
-        // submitter can read bundles        
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.BUNDLE);
-        rp.setContainerType(Constants.ITEM);
-        rp.setContainerID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.READ);
-        rp.update();
-
-        // submitter can write bundles
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.BUNDLE);
-        rp.setContainerType(Constants.ITEM);
-        rp.setContainerID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.WRITE);
-        rp.update();
-
-        // submitter can delete bundles
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.BUNDLE);
-        rp.setContainerType(Constants.ITEM);
-        rp.setContainerID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.DELETE);
-        rp.update();
-                
-        // submitter can read bitstreams
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.BITSTREAM);
-        rp.setContainerType(Constants.ITEM);
-        rp.setContainerID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.READ);
-        rp.update();
-
-        // submitter can write bitstreams
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.BITSTREAM);
-        rp.setContainerType(Constants.ITEM);
-        rp.setContainerID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.WRITE);
-        rp.update();
-        
-        // submitter can delete bitstreams
-        rp = ResourcePolicy.create(context);
-        rp.setResourceType(Constants.BITSTREAM);
-        rp.setContainerType(Constants.ITEM);
-        rp.setContainerID(i.getID());
-        rp.setPolicy(mypolicy);
-        rp.setActionID(Constants.DELETE);
-        rp.update();
-
-        // workflow groups need access to the item
-        // and contents too.
-
-
         // Copy template if appropriate
         Item templateItem = coll.getTemplateItem();
 
@@ -324,25 +263,25 @@ public class WorkspaceItem implements InProgressSubmission
         i.update();
         
         // Create the workspace item row
-        TableRow row = DatabaseManager.create(context, "workspaceitem");
+        TableRow row = DatabaseManager.create(c, "workspaceitem");
 
         row.setColumn("item_id", i.getID());
         row.setColumn("collection_id", coll.getID());
 
-        log.info(LogManager.getHeader(context,
+        log.info(LogManager.getHeader(c,
             "create_workspace_item",
             "workspace_item_id=" + row.getIntColumn("workspace_item_id") +
                 "item_id=" + i.getID() + "collection_id=" + coll.getID()));
 
-        DatabaseManager.update(context, row );
+        DatabaseManager.update(c, row );
 
-        WorkspaceItem wi = new WorkspaceItem(context, row);
+        WorkspaceItem wi = new WorkspaceItem(c, row);
 
-        HistoryManager.saveHistory(context,
+        HistoryManager.saveHistory(c,
             wi,
             HistoryManager.CREATE,
-            context.getCurrentUser(),
-            context.getExtraLogInfo());
+            c.getCurrentUser(),
+            c.getExtraLogInfo());
 
         return wi;
     }
@@ -553,7 +492,7 @@ public class WorkspaceItem implements InProgressSubmission
                 "item_id=" + item.getID() +
                 "collection_id=" + collection.getID()));
 
-        deleteSubmitPermissions();
+        //deleteSubmitPermissions();
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -585,7 +524,7 @@ public class WorkspaceItem implements InProgressSubmission
                 "item_id=" + item.getID() +
                 "collection_id=" + collection.getID()));
 
-        deleteSubmitPermissions();
+//        deleteSubmitPermissions();
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -598,22 +537,22 @@ public class WorkspaceItem implements InProgressSubmission
     /**
      * Lots of temporary permissions/policies are created
      *  with the workspace.  Remove them.
+     *  FIXME - is this needed any more?  Or is the item delete
+     *   going to do this?
      */
 
+/* obsolete
     private void deleteSubmitPermissions()
         throws SQLException
     {
+//    rethink this - hopefully item policies will do this
+    
         // all policies specifically for the item
-        String myrequest = "DELETE FROM ResourcePolicy WHERE "
+        String myrequest = "DELETE FROM resourcepolicy WHERE "
             + "resource_type_id=" + Constants.ITEM
-            + " AND id=" + item.getID();
-
-        // all policies where the item is a container
-        myrequest = "DELETE FROM ResourcePolicy WHERE "
-            + "container_type_id=" + Constants.ITEM
-            + "AND container_id=" + item.getID();            
+            + " AND id="          + item.getID();
     }
-
+*/
 
     // InProgressSubmission methods
 

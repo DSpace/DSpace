@@ -80,7 +80,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Item
+public class Item implements DSpaceObject
 {
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
@@ -763,6 +763,10 @@ public class Item
             }
         }
 
+        // now add authorization policies from owning item
+        // hmm, not very "multiple-inclusion" friendly
+        AuthorizeManager.inheritPolicies(ourContext, this, b);
+
         // Add the bundle to in-memory list
         bundles.add(b);
 
@@ -948,7 +952,6 @@ public class Item
     }
 
 
-
     /**
      * Update the item "in archive" flag and Dublin Core metadata in the
      * database
@@ -997,8 +1000,7 @@ public class Item
 
                 if (dcType == null)
                 {
-                    // Bad DC field, ignore it
-                    // FIXME: An error?
+                    // Bad DC field, log and throw exception
                     log.warn(LogManager.getHeader(ourContext,
                         "bad_dc",
                         "Bad DC field.  element: \"" +
@@ -1007,6 +1009,7 @@ public class Item
                             (dcv.qualifier == null ? "null" : dcv.qualifier) +
                             "\" value: \"" +
                             (dcv.value == null ? "null" : dcv.value) + "\""));
+
                     throw new SQLException( "bad_dublin_core " + dcv.element
                                 + " " + dcv.qualifier );
                 }
@@ -1099,6 +1102,10 @@ public class Item
             removeBundle(bundles[i]);
         }
 
+        // and all of our authorization policies
+        // FIXME: not very "multiple-inclusion" friendly
+        AuthorizeManager.removeAllPolicies(ourContext, this);
+
         // Remove any Handle
         // FIXME: This is sort of a "tentacle" - HandleManager should provide
         // a way of doing this.  Plus, deleting a Handle may have ramifications
@@ -1109,6 +1116,7 @@ public class Item
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
+        
     }
 
 
@@ -1121,14 +1129,13 @@ public class Item
      * @return  <code>true</code> if object passed in represents the same
      *          item as this object
      */
-    public boolean equals(Object other)
+    public boolean equals(DSpaceObject other)
     {
-        if (!(other instanceof Item))
-        {
-            return false;
-        }
-
-        return (getID() == ((Item) other).getID());
+        if( this.getType() == other.getType() )
+            if( this.getID() == other.getID() )
+                return true;
+        
+        return false;
     }
 
 
@@ -1142,4 +1149,53 @@ public class Item
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM dcvalue WHERE item_id=" + getID() + ";");
     }
+
+
+    /**
+     * return type found in Constants
+     */
+    public int getType()
+    {
+        return Constants.ITEM;
+    }
+
+
+    /**
+     * remove all of the policies for item and its children,
+     *  replacing them with the policies passed in
+     *  FIXME: a bit of a hack - put this method in all 'container' objects?
+     */      
+    void replaceAllPolicies( TableRowIterator newpolicies )
+        throws SQLException, AuthorizeException
+    {
+        // remove all our policies, add new ones
+        AuthorizeManager.removeAllPolicies(ourContext, this);
+        AuthorizeManager.addPolicies(ourContext, newpolicies, this);
+        
+        // remove all policies from bundles, add new ones
+        // Remove bundles
+        Bundle[] bundles = getBundles();
+
+        for (int i = 0; i < bundles.length; i++)
+        {
+            Bundle mybundle = bundles[i];
+            
+            Bitstream[] bs = mybundle.getBitstreams();
+            
+            for(int j = 0; j < bs.length; j++ )
+            {
+                Bitstream mybitstream = bs[j];
+
+                // change bitstream policies                
+                AuthorizeManager.removeAllPolicies(ourContext, bs[j]);
+                AuthorizeManager.addPolicies(ourContext, newpolicies, bs[j]);
+            }
+
+            // change bundle policies            
+            AuthorizeManager.removeAllPolicies(ourContext, mybundle);
+            AuthorizeManager.addPolicies(ourContext, newpolicies, mybundle);
+        }
+    }
+    
+    
 }

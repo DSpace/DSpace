@@ -75,7 +75,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author   Robert Tansley
  * @version  $Revision$
  */
-public class Collection
+public class Collection implements DSpaceObject
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(Collection.class);
@@ -823,5 +823,13 @@ public class Collection
         {
             return Group.find(ourContext, collectionRow.getIntColumn(col));
         }
+    }
+    
+    /**
+     * return type found in Constants
+     */
+    public int getType()
+    {
+        return Constants.COLLECTION;
     }
 }

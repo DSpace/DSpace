@@ -46,9 +46,12 @@ import java.sql.SQLException;
 import org.dspace.browse.Browse;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
  * Support to install item in the archive
@@ -132,7 +135,19 @@ public class InstallItem
         
         // remove in-progress submission
         is.deleteWrapper();
-        
+
+        // remove the submit authorization policies
+        // and replace them with the collection's READ
+        // policies
+        // FIXME: this is an inelegant hack, but out of time!
+        TableRowIterator tri = DatabaseManager.query(c,
+            "resourcepolicy",
+            "SELECT * FROM resourcepolicy WHERE " +
+            "resource_type_id=" + Constants.COLLECTION       + " AND " +
+            "resource_id="      + is.getCollection().getID() + " AND " +
+            "action_id="      + Constants.READ );
+        item.replaceAllPolicies(tri);
+
         return item;
     }
 
