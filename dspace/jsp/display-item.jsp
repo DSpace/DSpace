@@ -60,6 +60,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Item" %>
@@ -101,16 +102,34 @@
     <dspace:item item="<%= item %>" communities="<%= communities %>" collections="<%= collections %>" style="<%= displayStyle %>" />
 
 <%
+    // Work out location link
+    Community com = UIUtil.getCommunityLocation(request);
+    Collection col = UIUtil.getCollectionLocation(request);
+
+    String locationLink = request.getContextPath();
+    
+    if (com != null)
+    {
+        locationLink = locationLink + "/communities/" + com.getID();
+        if (col != null)
+        {
+            locationLink = locationLink + "/collections/" + col.getID();
+        }
+    }
+    
+    locationLink = locationLink + "/item/" + handle;
+
+
     if (displayAll)
     {
 %>
-    <P align=center><A HREF="?mode=simple">Show simple item record</A></P>
+    <P align=center><A HREF="<%= locationLink %>?mode=simple">Show simple item record</A></P>
 <%
     }
     else
     {
 %>
-    <P align=center><A HREF="?mode=full">Show full item record</A></P>
+    <P align=center><A HREF="<%= locationLink %>?mode=full">Show full item record</A></P>
 <%
     }
 %>
