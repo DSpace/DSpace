@@ -65,6 +65,10 @@
 
     <h1>Group Editor</h1>
 
+    <P>Warning - if you try to delete a group that is referred to by an
+    authorization policy or is a workflow group you will get an internal
+    server error.</P>
+
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
@@ -89,7 +93,7 @@
                     <input type="submit" name="submit_edit" value="Edit">
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <input type="submit" name="submit_group_delete" value="Delete...">
+                    <input type="submit" name="submit_group_delete" value="Delete">
                 </td>
             </tr>
         </form>
