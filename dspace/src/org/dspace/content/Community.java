@@ -90,7 +90,7 @@ public class Community
     {
         ourContext = context;
         communityRow = row;
-        
+
         // Get the logo bitstream
         if (communityRow.isColumnNull("logo_bitstream_id"))
         {
@@ -128,7 +128,7 @@ public class Community
             return new Community(context, row);
         }
     }
-    
+
 
     /**
      * Create a new community, with a new ID.  Not inserted in database.
@@ -146,7 +146,7 @@ public class Community
         return new Community(context, row);
     }
 
-    
+
     /**
      * Get a list of all communities in the system.  These are alphabetically
      * sorted by community name.
@@ -161,9 +161,9 @@ public class Community
         TableRowIterator tri = DatabaseManager.query(context,
             "community",
             "SELECT * FROM community ORDER BY name;");
-        
+
         List communities = new ArrayList();
-        
+
         while (tri.hasNext())
         {
             TableRow row = tri.next();
@@ -172,11 +172,11 @@ public class Community
 
         Community[] communityArray = new Community[communities.size()];
         communityArray = (Community[]) communities.toArray(communityArray);
-        
+
         return communityArray;
     }
-    
-    
+
+
     /**
      * Get the internal ID of this collection
      *
@@ -230,7 +230,7 @@ public class Community
         return logo;
     }
 
-    
+
     /**
      * Give the community a logo.  Passing in <code>null</code> removes any
      * existing logo.  Note that <code>update(/code> will need to be called
@@ -262,7 +262,7 @@ public class Community
 
         logo = newLogo;
     }
-    
+
 
     /**
      * Update the community metadata (including logo) to the database.
@@ -303,7 +303,7 @@ public class Community
         // Put them in an array
         Collection[] collectionArray = new Collection[collections.size()];
         collectionArray = (Collection[]) collections.toArray(collectionArray);
-        
+
         return collectionArray;
     }
 
@@ -391,7 +391,7 @@ public class Community
 
         // First get collections
         Collection[] collections = getCollections();
-        
+
         // Delete ourselves
         delete();
 
@@ -399,12 +399,24 @@ public class Community
         for (int i = 0; i < collections.length; i++)
         {
             Community[] communities = collections[i].getCommunities();
-            
+
             if (communities.length == 0)
             {
                 // "Orphaned" collection - delete
                 collections[i].deleteWithContents();
             }
         }
+    }
+
+    /**
+     * Return true if OTHER is the same Community as this object,
+     * false otherwise
+     */
+    public boolean equals(Object other)
+    {
+        if (! (other instanceof Community))
+            return false;
+
+        return getID() == ((Community) other).getID();
     }
 }

@@ -75,7 +75,7 @@ public class Collection
 
     /** The logo bitstream */
     private Bitstream logo;
-    
+
     /** The item template */
     private Item template;
 
@@ -103,7 +103,7 @@ public class Collection
     {
         ourContext = context;
         collectionRow = row;
-        
+
         // Get the logo bitstream
         if (collectionRow.isColumnNull("logo_bitstream_id"))
         {
@@ -129,10 +129,10 @@ public class Collection
 
         // FIXME: Groups
     }
-    
+
 
     /**
-     * Get a collection from the database.  Loads in the metadata 
+     * Get a collection from the database.  Loads in the metadata
      *
      * @param  context  DSpace context object
      * @param  id       ID of the collection
@@ -155,8 +155,8 @@ public class Collection
             return new Collection(context, row);
         }
     }
-    
-    
+
+
     /**
      * Create a new collection, with a new ID.  Not inserted in database.
      *
@@ -173,7 +173,7 @@ public class Collection
         return new Collection(context, row);
     }
 
-    
+
     /**
      * Get all collections in the system.  These are alphabetically
      * sorted by collection name.
@@ -188,9 +188,9 @@ public class Collection
         TableRowIterator tri = DatabaseManager.query(context,
             "collection",
             "SELECT * FROM collection ORDER BY name;");
-        
+
         List collections = new ArrayList();
-        
+
         while (tri.hasNext())
         {
             TableRow row = tri.next();
@@ -199,11 +199,11 @@ public class Collection
 
         Collection[] collectionArray = new Collection[collections.size()];
         collectionArray = (Collection[]) collections.toArray(collectionArray);
-        
+
         return collectionArray;
     }
 
-    
+
     /**
      * Get the internal ID of this collection
      *
@@ -257,7 +257,7 @@ public class Collection
         return logo;
     }
 
-    
+
     /**
      * Give the collection a logo.  Passing in <code>null</code> removes any
      * existing logo.  Note that <code>update(/code> will need to be called
@@ -289,8 +289,8 @@ public class Collection
 
         logo = newLogo;
     }
-    
-    
+
+
     /**
      * Set the workflow reviewers
      *
@@ -383,7 +383,7 @@ public class Collection
     public String getLicense()
     {
         String license = collectionRow.getStringColumn("license");
-        
+
         if (license == null)
         {
             // Fallback to site-wide default
@@ -426,8 +426,8 @@ public class Collection
     {
         return template;
     }
-    
-    
+
+
     /**
      * Create an empty template item for this collection.  If one already
      * exists, no action is taken.  Caution:  Make sure you call
@@ -457,10 +457,10 @@ public class Collection
         throws SQLException, AuthorizeException, IOException
     {
         // FIXME: Check auth
-        
+
         collectionRow.setColumnNull("template_item_id");
         DatabaseManager.update(ourContext, collectionRow);
-        
+
         if (template != null)
         {
             template.deleteWithContents();
@@ -481,7 +481,7 @@ public class Collection
         throws SQLException, AuthorizeException
     {
         // FIXME: Check auth
-        
+
         // Create mapping
         TableRow row = DatabaseManager.create(ourContext, "collection2item");
 
@@ -540,7 +540,7 @@ public class Collection
 
         // Delete bitstream logo
         setLogo(null);
-        
+
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);
 
@@ -566,7 +566,7 @@ public class Collection
             "SELECT item.* FROM item, collection2item WHERE " +
                 "collection2item.item_id=item.item_id AND " +
                 "collection2item.collection_id=" + getID() + ";");
-                
+
 
         // Delete collection-item mappings
         DatabaseManager.updateQuery(ourContext,
@@ -576,7 +576,7 @@ public class Collection
         DatabaseManager.updateQuery(ourContext,
             "DELETE FROM community2collection WHERE collection_id=" + getID() +
                 ";");
-        
+
 
         // Delete items if they aren't contained within other collections
         while (items.hasNext())
@@ -614,7 +614,7 @@ public class Collection
 
         // Build a list of Community objects
         List communities = new ArrayList();
-        
+
         while (tri.hasNext())
         {
             // FIXME
@@ -626,4 +626,17 @@ public class Collection
 
         return communityArray;
     }
+
+    /**
+     * Return true if OTHER is the same Collection as this object,
+     * false otherwise
+     */
+    public boolean equals(Object other)
+    {
+        if (! (other instanceof Collection))
+            return false;
+
+        return getID() == ((Collection) other).getID();
+    }
+
 }
