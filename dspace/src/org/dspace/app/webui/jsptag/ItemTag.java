@@ -54,8 +54,6 @@ import org.dspace.core.Utils;
 
 import java.io.IOException;
 
-import java.net.URLEncoder;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -504,7 +502,7 @@ public class ItemTag extends TagSupport
                 out.print(request.getContextPath());
                 out.print("/html/");
                 out.print(handle + "/");
-                out.print(URLEncoder.encode(primaryBitstream.getName(),
+                out.print(UIUtil.encodeBitstreamName(primaryBitstream.getName(),
                         Constants.DEFAULT_ENCODING));
                 out.print("\">View/Open</A></td></tr>");
             }
@@ -557,7 +555,7 @@ public class ItemTag extends TagSupport
                             }
 
                             bsLink = bsLink
-                                    + URLEncoder.encode(
+                                    + UIUtil.encodeBitstreamName(
                                             bitstreams[k].getName(),
                                             Constants.DEFAULT_ENCODING) + "\">";
 
@@ -574,7 +572,7 @@ public class ItemTag extends TagSupport
                                             + "/retrieve/"
                                             + tb.getID()
                                             + "/"
-                                            + URLEncoder.encode(tb.getName(),
+                                            + UIUtil.encodeBitstreamName(tb.getName(),
                                                     Constants.DEFAULT_ENCODING);
 
                                     out.print(bsLink);

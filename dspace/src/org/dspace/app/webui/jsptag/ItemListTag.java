@@ -62,8 +62,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import java.net.URLEncoder;
-
 import java.sql.SQLException;
 
 import javax.imageio.ImageIO;
@@ -496,7 +494,7 @@ public class ItemListTag extends TagSupport
                                 .append(item.getHandle()).append("/").append(
                                         originalBitstream.getSequenceID())
                                 .append("/").append(
-                                        URLEncoder.encode(originalBitstream
+                                		UIUtil.encodeBitstreamName(originalBitstream
                                                 .getName(),
                                                 Constants.DEFAULT_ENCODING));
                     }
@@ -510,7 +508,7 @@ public class ItemListTag extends TagSupport
                     thumbLink.append("\"><img src=\"").append(
                             hrq.getContextPath()).append("/retrieve/").append(
                             thumbnailBitstream.getID()).append("/").append(
-                            URLEncoder.encode(thumbnailBitstream.getName(),
+                            		UIUtil.encodeBitstreamName(thumbnailBitstream.getName(),
                                     Constants.DEFAULT_ENCODING)).append(
                             "\" alt=\"").append(thumbnailBitstream.getName())
                             .append("\" ").append(
