@@ -236,9 +236,21 @@ public class DSIndexer
         writer = new IndexWriter(index_directory, new DSAnalyzer(),
                 wipe_existing);
 
-        // Potential improvement for large indices to avoid TooManyFiles
-        // exception.
-        //writer.setUseCompoundFile(true);
+        /* Set maximum number of terms to index if present in dspace.cfg */
+        if (ConfigurationManager.getProperty("search.maxfieldlength") != null)
+        {
+            int maxfieldlength = ConfigurationManager
+                    .getIntProperty("search.maxfieldlength");
+            if (maxfieldlength == -1)
+            {
+                writer.maxFieldLength = Integer.MAX_VALUE;
+            }
+            else
+            {
+                writer.maxFieldLength = maxfieldlength;
+            }
+        }
+
         return writer;
     }
 
