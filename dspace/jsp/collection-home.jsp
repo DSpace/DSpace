@@ -85,6 +85,8 @@
     Boolean editor_b      = (Boolean)request.getAttribute("editor_button");
     boolean editor_button = (editor_b == null ? false : editor_b.booleanValue());
 
+    Boolean submit_b      = (Boolean)request.getAttribute("can_submit_button");
+    boolean submit_button = (submit_b == null ? false : submit_b.booleanValue());
 
 
     // Put the metadata values into guaranteed non-null variables
@@ -163,12 +165,15 @@
       <td>
 <%-- HACK: <center> used for Netscape 4.x, which doesn't accept align=center
   for a paragraph with a button in it --%>
+<%  if (submit_button)
+    { %>
         <center>
           <form action="<%= request.getContextPath() %>/submit" method=POST>
             <input type=hidden name=collection value="<%= collection.getID() %>">
             <input type=submit name=submit value="Submit to This Collection">
           </form>
         </center>
+<%  } %>
       </td>
       <td class="oddRowEvenCol">
         <form method=GET>

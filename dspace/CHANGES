@@ -12,6 +12,9 @@
 (David Stuve)
 - Improved scalability in media filter (manager + JPEG)
 
+(Trevor Swarm)
+- Submit button on collection pages only appears if user has authorisation
+
 1.2.1
 =====
 (Jim Downing)
