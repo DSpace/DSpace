@@ -131,6 +131,15 @@
   </servlet>
 
   <servlet>
+    <servlet-name>forgot</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.RegisterServlet</servlet-class>
+    <init-param>
+      <param-name>register</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet>
     <servlet-name>items-by-author</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ItemsByAuthorServlet</servlet-class>
   </servlet>
@@ -158,6 +167,15 @@
   <servlet>
     <servlet-name>profile</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.EditProfileServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>register</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.RegisterServlet</servlet-class>
+    <init-param>
+      <param-name>register</param-name>
+      <param-value>true</param-value>
+    </init-param>
   </servlet>
 
   <servlet>
@@ -214,6 +232,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>forgot</servlet-name>
+    <url-pattern>/forgot</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>items-by-author</servlet-name>
     <url-pattern>/items-by-author</url-pattern>
   </servlet-mapping>
@@ -241,6 +264,11 @@
   <servlet-mapping>
     <servlet-name>profile</servlet-name>
     <url-pattern>/profile</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>register</servlet-name>
+    <url-pattern>/register</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

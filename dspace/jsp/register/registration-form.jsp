@@ -1,5 +1,5 @@
 <%--
-  - edit-profile.jsp
+  - registration-form.jsp
   -
   - Version: $Revision$
   -
@@ -37,13 +37,17 @@
   - USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
   - DAMAGE.
   --%>
-
+  
 <%--
-  - Profile editing page
+  - Registration information form
+  -
+  - Form where new users enter their personal information and select a
+  - password.
   -
   - Attributes to pass in:
   -
-  -   eperson          - the EPerson who's editing their profile
+  -   eperson          - the EPerson who's registering
+  -   key              - the token key they've been given for registering
   -   missing.fields   - if a Boolean true, the user hasn't entered enough
   -                      information on the form during a previous attempt
   -   password.problem - if a Boolean true, there's a problem with password
@@ -51,10 +55,12 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.app.webui.servlet.RegisterServlet" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 
 <%
-    EPerson eperson = (EPerson) request.getAttribute("eperson");
+    EPerson eperson = (EPerson) request.getAttribute( "eperson" );
+    String key = (String) request.getAttribute( "key" );
 
     Boolean attr = (Boolean) request.getAttribute("missing.fields");
     boolean missingFields = (attr != null && attr.booleanValue());
@@ -63,9 +69,9 @@
     boolean passwordProblem = (attr != null && attr.booleanValue());
 %>
 
-<dspace:layout title="Edit Your Profile">
+<dspace:layout title="Registration Information">
 
-    <H1>Edit Your Profile</H1>
+    <H1>Registration Information</H1>
     
 <%
     if (missingFields)
@@ -75,7 +81,7 @@
 <%
     }
 
-    if (passwordProblem)
+    if( passwordProblem)
     {
 %>
     <P><strong>The passwords you enter below must match, and need to be at
@@ -84,28 +90,28 @@
     }
 %>
 
-    <P>Please enter or amend the following information.  The fields marked with a * are
-    required. <A TARGET="dspace.help" HREF="<%= request.getContextPath() %>/help/index.html#editprofile">(More Help...)</A></P>
+    <P>Please enter the following information.  The fields marked with a * are
+    required.</P>
     
-    <form action="<%= request.getContextPath() %>/profile" method=POST>
-
+    <form action="<%= request.getContextPath() %>/register" method=POST>
+    
         <%@ include file="/register/profile-form.jsp" %>
-
+    
 <%
     // Only show password update section if the user doesn't use
     // certificates
     if (eperson.getRequireCertificate() == false)
     {
 %>
-        <P><strong>Optionally</strong>, you can choose a new password and enter it into the box below, and confirm it by typing it
-        again into the second box for verification.  It should be at least six characters long.</P>
+        <P>Please choose a password and enter it into the box below, and confirm it by typing it
+        again into the second box.  It should be at least six characters long.</P>
 
         <table class="misc" align="center">
             <tr>
                 <td class="oddRowEvenCol">
                     <table border=0 cellpadding=5>
                         <tr>
-                            <td align=right class=standard><strong>New Password:</strong></td>
+                            <td align=right class=standard><strong>Password:</strong></td>
                             <td class=standard><input type=password name="password"></td>
                         </tr>
                         <tr>
@@ -117,8 +123,12 @@
             </tr>
         </table>
 <%
-  }
+    }
 %>
-        <P align=center><input type=submit name=submit value="Update Profile"></P>
+
+        <input type=hidden name=step value="<%= RegisterServlet.PERSONAL_INFO_PAGE %>">
+        <input type=hidden name=key value="<%= key %>">
+        
+        <P align=center><input type=submit name=submit value="Complete Registration"></P>
     </form>
 </dspace:layout>

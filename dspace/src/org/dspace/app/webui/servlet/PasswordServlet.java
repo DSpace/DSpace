@@ -102,7 +102,7 @@ public class PasswordServlet extends DSpaceServlet
                 // they must use a certificate
                 JSPManager.showJSP(request,
                     response,
-                    "/login/require-certificate.jsp");
+                    "/error/require-certificate.jsp");
                 return;
             }
             else if (eperson.checkPassword(password))

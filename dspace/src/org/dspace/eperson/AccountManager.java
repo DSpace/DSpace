@@ -220,7 +220,7 @@ public class AccountManager
         // So FIRST leave some breadcrumbs
         if (log.isDebugEnabled())
             log.debug("Created callback " +
-                      rd.getIntColumn("id") +
+                      rd.getIntColumn("registrationdata_id") +
                       " with token " + rd.getStringColumn("token") +
                       " for eperson " + ep.getID() +
                       " with email \"" + email + "\"");
@@ -250,7 +250,7 @@ public class AccountManager
                                   TableRow rd)
         throws MessagingException, IOException
     {
-        String base = ConfigurationManager.getProperty("url.base");
+        String base = ConfigurationManager.getProperty("dspace.url");
 
         //  Note change from "key=" to "token="
         String specialLink = new StringBuffer()
