@@ -311,6 +311,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>supervise</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.SuperviseServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>workflow</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.WorkflowAbortServlet</servlet-class>
   </servlet>
@@ -493,6 +498,11 @@
   <servlet-mapping>
     <servlet-name>subscribe</servlet-name>
     <url-pattern>/subscribe</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>supervise</servlet-name>
+    <url-pattern>/dspace-admin/supervise</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
