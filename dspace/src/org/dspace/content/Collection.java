@@ -803,8 +803,15 @@ public class Collection extends DSpaceObject
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);
 
-        // FIXME: Groups?
+        // Remove all authorization policies
+        AuthorizeManager.removeAllPolicies(ourContext, this);
 
+        // Remove any workflow groups
+        Group g = null;
+        
+        g = getWorkflowGroup(1);  if( g != null ) { g.delete(); }
+        g = getWorkflowGroup(2);  if( g != null ) { g.delete(); }
+        g = getWorkflowGroup(3);  if( g != null ) { g.delete(); }
     }
 
 
