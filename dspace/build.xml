@@ -180,6 +180,16 @@ Common usage:
     </java>
   </target>
     
+  <target name="setup_browse"
+          description="Create the browse index, removing the old one">
+    <java classname="org.dspace.browse.InitializeBrowse"
+          classpathref="build.class.path"
+          fork="yes"
+          failonerror="yes">
+      <sysproperty key="log4j.configuration" value="file:${basedir}/etc/log4j.build.properties"/>
+      <sysproperty key="dspace.configuration" value="${config}"/>
+    </java>
+  </target>
 
   <!-- ============================================================= -->
   <!-- Load the initial contents of the registries into the database -->
