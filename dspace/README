@@ -5,10 +5,15 @@ available from:
 
 http://sourceforge.net/projects/dspace/
 
-Documentation may be viewed online at dspace.org, but these pertain to the
-most recent stable release; the installation instructions for this beta
-may be different so you are encouraged to obtain the docs from cvs, or to
-download the latest documentation snapshot from
+Documentation for the most recent stable release may be viewed online at
+dspace.org:
+
+http://dspace.org/technology/system-docs/
+
+Installation instructions for other version may be different, so you
+are encouraged to obtain the corresponding documentation package from
+SourceForge, or to download the latest documentation snapshot from CVS
+or:
 
 http://dspace.sourceforge.net/doc-snapshots/
 
