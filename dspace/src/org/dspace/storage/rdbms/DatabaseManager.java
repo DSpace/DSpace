@@ -52,7 +52,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 /**
- * Manages RDBMS
+ * Executes SQL queries.
  *
  * @author  Peter Breton
  * @version $Revision$
@@ -991,5 +991,120 @@ public class DatabaseManager
 
         DriverManager.registerDriver(new SimplePool());
         initialized = true;
+    }
+}
+
+// Simple representation of column information
+class ColumnInfo
+{
+    /** The name of the column */
+    private String name;
+
+    /** The JDBC type of the column */
+    private int type;
+
+    /** True if this column is a primary key */
+    private boolean isPrimaryKey;
+
+    /**
+     * Constructor
+     */
+    ColumnInfo() {}
+
+    /**
+     * Constructor
+     */
+    ColumnInfo( String name, int type )
+    {
+        this.name = name;
+        this.type = type;
+    }
+
+    /**
+     * Get the value of name
+     *
+     * @return - The value of name
+     */
+    public String getName()
+    {
+        return  name;
+    }
+
+    /**
+     * Set the value of name
+     *
+     * @param v - The value of name
+     */
+    void setName(String v)
+    {
+        name = v;
+    }
+
+    /**
+     * Get the value of type
+     *
+     * @return - The value of type
+     */
+    public int getType()
+    {
+        return  type;
+    }
+
+    /**
+     * Set the value of type
+     *
+     * @param v - The value of type
+     */
+    void setType(int v)
+    {
+        type = v;
+    }
+
+    /**
+     * Get the value of isPrimaryKey.
+     * @return Value of isPrimaryKey.
+     */
+    public boolean isPrimaryKey()
+    {
+        return isPrimaryKey;
+    }
+
+    /**
+     * Set the value of isPrimaryKey.
+     * @param v  Value to assign to isPrimaryKey.
+     */
+    void setIsPrimaryKey(boolean  v)
+    {
+        this.isPrimaryKey = v;
+    }
+
+    /*
+     * Return true if this object is equal to OTHER, false otherwise
+     */
+    public boolean equals(Object other)
+    {
+        if (!(other instanceof ColumnInfo))
+            return false;
+
+        ColumnInfo theOther = (ColumnInfo) other;
+
+        return
+            (name != null ? name.equals(theOther.name) :
+             theOther.name == null) &&
+            (type == theOther.type) &&
+            (isPrimaryKey == theOther.isPrimaryKey);
+    }
+
+    /*
+     * Return a hashCode for this object.
+     */
+    public int hashCode()
+    {
+        return new StringBuffer()
+            .append(name)
+            .append(type)
+            .append(isPrimaryKey)
+            .toString()
+            .hashCode();
     }
 }
