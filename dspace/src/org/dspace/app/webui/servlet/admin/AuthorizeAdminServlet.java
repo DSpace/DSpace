@@ -184,6 +184,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             {
                 // create new policy
                 policy = ResourcePolicy.create(c);
+                policy.setResource( collection );
                 policy.update();
             }
             else
@@ -216,6 +217,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             {
                 // create new policy
                 policy = ResourcePolicy.create(c);
+                policy.setResource( community );
                 policy.update();
             }
             else
@@ -238,12 +240,14 @@ public class AuthorizeAdminServlet extends DSpaceServlet
         else if( button.equals( "submit_collection_add_policy") )
         {
             // want to add a policy, create an empty one and invoke editor
-            ResourcePolicy policy = ResourcePolicy.create(c);
-            policy.update();
 
             Collection collection = Collection.find(c,
                             UIUtil.getIntParameter(request, "collection_id"));
-            
+
+            ResourcePolicy policy = ResourcePolicy.create(c);
+            policy.setResource( collection );
+            policy.update();
+
             Group   [] groups  = Group.findAll  (c, Group.NAME   );
             EPerson [] epeople = EPerson.findAll(c, EPerson.EMAIL);
             
@@ -261,11 +265,13 @@ public class AuthorizeAdminServlet extends DSpaceServlet
         else if( button.equals( "submit_community_add_policy") )
         {
             // want to add a policy, create an empty one and invoke editor
-            ResourcePolicy policy = ResourcePolicy.create(c);
-            policy.update();
 
             Community community = Community.find(c,
                             UIUtil.getIntParameter(request, "community_id"));
+
+            ResourcePolicy policy = ResourcePolicy.create(c);
+            policy.setResource( community );
+            policy.update();
             
             Group   [] groups  = Group.findAll  (c, Group.NAME   );
             EPerson [] epeople = EPerson.findAll(c, EPerson.EMAIL);
@@ -302,7 +308,6 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 collection = Collection.find( c, collection_id );
                 
                 // modify the policy    
-                policy.setResource( collection );
                 policy.setAction  ( action_id  );
                 policy.setGroup   ( group      );
                 policy.update();
@@ -336,7 +341,6 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 community = Community.find( c, community_id );
 
                 // modify the policy
-                policy.setResource( community );
                 policy.setAction  ( action_id  );
                 policy.setGroup   ( group      );
                 policy.update();
