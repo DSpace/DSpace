@@ -24,9 +24,9 @@ rm -f dspace/make-release-package
 rm -f dspace/.cvsignore
 
 echo "Creating tarball..."
-mv dspace $2
+mv dspace $2-source
 
-tar -cf - $2 | gzip -c > $2.tar.gz
+tar -cf - $2-source | gzip -c > $2.tar.gz
 
 echo "Cleaning up..."
 
