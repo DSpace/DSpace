@@ -401,6 +401,37 @@ public class Item extends DSpaceObject
 
 
     /**
+     * Set the owning Collection for the item
+     *
+     * @param collection
+     */
+    public void setOwningCollection(Collection c)
+    {
+        itemRow.setColumn("owning_collection", c.getID());
+    }
+
+
+    /**
+     * Get the owning Collection for the item
+     *
+     * @returns Collection that is the owner of the item
+     */    
+    public Collection getOwningCollection()
+        throws java.sql.SQLException
+    {
+        Collection myCollection = null;
+
+        // get the collection ID
+        int cid = itemRow.getIntColumn("owning_collection");
+        
+        myCollection = Collection.find(ourContext, cid);
+
+        return myCollection;
+    }
+
+
+
+    /**
      * Get Dublin Core metadata for the item.  Passing in a <code>null</code>
      * value only matches Dublin Core fields where that qualifier or languages
      * is actually <code>null</code>.  Passing in <code>Item.ANY</code>
@@ -775,17 +806,55 @@ public class Item extends DSpaceObject
 
 
     /**
+     * Get the bundles matching a bundle name
+     *  (name corresponds roughly to type)
+     *
+     * @param name name of bundle (ORIGINAL/TEXT/THUMBNAIL)
+     *
+     * @returns the bundles in an unordered array
+     */
+    public Bundle[] getBundles(String name)
+    {
+        List matchingBundles = new ArrayList();
+        
+        Iterator i = bundles.iterator();
+        
+        // now only keep bundles with matching names
+        while(i.hasNext())
+        {
+            Bundle b = (Bundle)i.next();
+            
+            if(name.equals(b.getName() ))
+            {
+                matchingBundles.add(b);
+            }
+        }
+        
+        Bundle [] bundleArray = new Bundle[matchingBundles.size()];
+        bundleArray = (Bundle[])matchingBundles.toArray(bundleArray);
+        
+        return bundleArray;
+    }
+
+
+
+    /**
      * Create a bundle in this item, with immediate effect
+     *
+     * @param name bundle name (ORIGINAL/TEXT/THUMBNAIL
      *
      * @return  the newly created bundle
      */
-    public Bundle createBundle()
+    public Bundle createBundle(String name)
         throws SQLException, AuthorizeException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         Bundle b = Bundle.create(ourContext);
+        b.setName(name);
+        b.update();
+        
         addBundle(b);
         return b;
     }
@@ -886,16 +955,16 @@ public class Item extends DSpaceObject
      * method for the most common use.
      *
      * @param is   the stream to create the new bitstream from
+     * @param name is the name of the bundle (ORIGINAL, TEXT, THUMBNAIL)
      */
-    public Bitstream createSingleBitstream(InputStream is)
+    public Bitstream createSingleBitstream(InputStream is, String name)
         throws AuthorizeException, IOException, SQLException
     {
         // Authorisation is checked by methods below
 
         // Create a bundle
-        Bundle bnd = createBundle();
+        Bundle bnd = createBundle(name);
         Bitstream bitstream = bnd.createBitstream(is);
-        bnd.update();
         addBundle(bnd);
 
         // FIXME: Create permissions for new bundle + bitstream
@@ -956,7 +1025,7 @@ public class Item extends DSpaceObject
         // Store text as a bitstream
         byte[] licenseBytes = licenseText.getBytes();
         ByteArrayInputStream bais = new ByteArrayInputStream(licenseBytes);
-        Bitstream b = createSingleBitstream(bais);
+        Bitstream b = createSingleBitstream(bais, "LICENSE");
 
         // Now set the format and name of the bitstream
         b.setName("license.txt");
@@ -1018,8 +1087,13 @@ public class Item extends DSpaceObject
         throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
-
+        
+        // only do write authorization if user is not an editor
+        if( !AuthorizeManager.authorizeActionBoolean(ourContext, getOwningCollection(), Constants.COLLECTION_EDITOR) )
+        {
+            AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        }
+        
         HistoryManager.saveHistory(ourContext,
             this,
             HistoryManager.MODIFY,
@@ -1328,6 +1402,23 @@ public class Item extends DSpaceObject
                 return true;
         
         return false;
+    }
+
+
+    /**
+     * Return true if this Collection 'owns' this item
+     *
+     * @param collection
+     *
+     * @return true if this Collection owns this item
+     *
+     */
+    public boolean isOwningCollection(Collection c)
+    {
+        int owner_id = itemRow.getIntColumn("owning_collection");
+        
+        if(c.getID() == owner_id) return true;
+        else return false;
     }
 
 
