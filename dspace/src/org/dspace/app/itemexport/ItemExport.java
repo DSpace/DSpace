@@ -386,23 +386,35 @@ public class ItemExport
                 // currently one bitstream per bundle!
                 Bitstream b   = (bundles[j].getBitstreams())[0];
                 String myName = b.getName();
-                
-                // write the manifest file entry
-                out.println( myName );
-                
+                String oldName = myName;
+                int myPrefix = 1;    // only used with name conflict
+                                
                 InputStream is = b.retrieve();
                 
-                File fout = new File( destDir, myName );
+                boolean isDone = false;  // done when bitstream is finally written
                 
-                if( fout.createNewFile() )
+                while( !isDone )
                 {
-                    FileOutputStream fos = new FileOutputStream(fout);
-                    Utils.bufferedCopy( is, fos );
+                    
+                    File fout = new File( destDir, myName );
+                
+                    if( fout.createNewFile() )
+                    {
+                        FileOutputStream fos = new FileOutputStream(fout);
+                        Utils.bufferedCopy( is, fos );
+
+                        // write the manifest file entry
+                        out.println( myName );
+
+                        isDone = true;
+                    }
+                    else
+                    {
+                        myName = myPrefix + "_" + oldName; // keep appending numbers to the filename until unique
+                        myPrefix++; 
+                    }
                 }
-                else
-                {
-                    throw new Exception("File " + fout + " already exists!" );
-                }
+
             }
             
             // close the contents file
