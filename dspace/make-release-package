@@ -12,7 +12,7 @@ mkdir tmp
 cd tmp
 
 echo "Checking out core code..."
-cvs -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' checkout -r $1 dspace
+cvs -q -d ':kserver:cvs.mit.edu:/cvs/dspace-new' export -r $1 dspace
 
 # Don't need to include this script!
 rm -f dspace/make-release-package
