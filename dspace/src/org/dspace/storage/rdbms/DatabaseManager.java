@@ -113,6 +113,25 @@ public class DatabaseManager
     }
 
     /**
+     * Return an iterator with the results of executing STATEMENT.
+     * The type of result is given by TABLE.
+     * The context is that of the connection which was used to create
+     * STATEMENT.
+     *
+     * @param statement - The prepared statement
+     * @param table - The name of the table which results
+     * @return - A TableRowIterator with the results of the query
+     * @exception SQLException - If a database error occurs
+     */
+    public static TableRowIterator query(String table,
+                                         PreparedStatement statement)
+        throws SQLException
+    {
+        return new TableRowIterator(statement.executeQuery(),
+                                    canonicalize(table));
+    }
+
+    /**
      * Return the single row result to this query, null if no result.
      * If more than one row results, only the first is returned.
      *
@@ -464,6 +483,23 @@ public class DatabaseManager
     }
 
     /**
+     * Return a list of all the columns which are not primary keys
+     */
+    protected static List getNonPrimaryKeyColumnNames ( ResultSetMetaData meta)
+        throws SQLException
+    {
+        List results = new ArrayList();
+        int columns = meta.getColumnCount();
+
+        for (int i = 0; i < columns; i++ )
+        {
+            results.add(meta.getColumnLabel(i + 1));
+        }
+
+        return results;
+    }
+
+    /**
      * Return the canonical name for TABLE.
      *
      * @param table - The name of the table.
@@ -471,7 +507,7 @@ public class DatabaseManager
      */
     static String canonicalize(String table)
     {
-        return table.toLowerCase();
+        return table == null ? null : table.toLowerCase();
     }
 
     ////////////////////////////////////////
@@ -622,11 +658,15 @@ public class DatabaseManager
     static TableRow process (ResultSet results, String table)
         throws SQLException
     {
-        TableRow row = new TableRow(canonicalize(table),
-                                    getNonPrimaryKeyColumnNames(table));
-
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
+
+        List columnNames = table == null ?
+            getNonPrimaryKeyColumnNames(meta) :
+            getNonPrimaryKeyColumnNames(table);
+
+        TableRow row = new TableRow(canonicalize(table), columnNames);
+
 
         // Process the columns in order
         // (This ensures maximum backwards compatibility with
@@ -643,6 +683,10 @@ public class DatabaseManager
             else if (jdbctype == Types.INTEGER)
             {
                 row.setColumn(name, results.getInt(i));
+            }
+            else if (jdbctype == Types.BIGINT)
+            {
+                row.setColumn(name, results.getLong(i));
             }
             else if (jdbctype == Types.VARCHAR)
             {
