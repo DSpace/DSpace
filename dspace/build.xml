@@ -73,7 +73,7 @@
   <!-- ============================================================= -->
 
   <!-- We will include the environment CLASSPATH -->
-  <path id="class.path">
+  <path id="build.class.path">
     <pathelement path="${env.CLASSPATH}"/>
     <fileset dir="${basedir}/lib">
       <include name="**/*.jar"/>
@@ -92,7 +92,7 @@
            destdir="${basedir}/build/classes"
            debug="on">
        <include name="**/*.java"/>
-       <classpath refid="class.path"/>
+       <classpath refid="build.class.path"/>
     </javac>
   </target>
   
@@ -152,6 +152,30 @@
   <target name="clean"
           description="Remove compiled files - does not affect installation">
     <delete dir="${basedir}/build" />
+  </target>
+
+
+  <!-- ============================================================= -->
+  <!-- Create public API javadoc                                     -->
+  <!-- ============================================================= -->
+	
+  <!-- FIXME: In ant versions <1.5, this will build the API of all subpackages
+    -  of DSpace.  When we move to 1.5, we will be able to build the
+    -  public API properly, using just the top-level package classes. -->
+
+  <target name="public_api"
+          description="Create the DSpace public API documentation with javadoc">
+    <mkdir dir="${basedir}/build/public-api" />
+    <javadoc packagenames="org.dspace.*"
+             sourcepath="${basedir}/src"
+             destdir="${basedir}/build/public-api"
+             author="true"
+             version="true"
+             access="public"
+             doctitle="DSpace Public API"
+             windowtitle="DSpace Public API"
+             bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved.">
+    </javadoc>
   </target>
 
 </project>
