@@ -42,6 +42,7 @@
 package org.dspace.core;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -52,6 +53,8 @@ import java.io.PrintWriter;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+
+import org.dspace.core.Constants;
 
 
 /**
@@ -254,6 +257,102 @@ public class ConfigurationManager
         }
 
         return license;
+    }
+    
+          /**
+     * Get the path for the news files.
+     *
+     */
+     public static String getNewsFilePath()
+    {
+        String filePath = ConfigurationManager.getProperty("dspace.dir") + File.separator +
+            "config" + File.separator;    
+        
+        return filePath;
+    }
+     
+     /**
+     * Reads news from a text file. Called by home.jsp to get the front page
+     * news, which can be configured by the admin. 
+     *
+     * @param position a constant indicating which file (top or side)
+      *should be read in.
+     */
+     public static String readNewsFile(int position)
+     {
+     
+        String fileName = getNewsFilePath();
+        
+        if(position == Constants.NEWS_TOP)
+        {
+            fileName += "news-top.html";
+        }
+        else
+        {
+            fileName += "news-side.html";
+        }
+             
+        String text = "";
+                     
+        try
+        {
+            //retrieve existing news from file
+            BufferedReader br = new BufferedReader( new FileReader(fileName) );
+            String lineIn;
+
+            while((lineIn = br.readLine()) != null)
+            {
+                text += lineIn;
+            }
+
+            br.close();            
+        }
+        catch(IOException e )
+        {
+            log.warn("news_read: " + e.getLocalizedMessage());
+        }
+        
+        return text;
+    }
+     
+      /**
+     * Writes news to a text file. 
+     *
+     * @param position a constant indicating which file (top or side)
+      *should be written to.
+       *
+       *@param news the text to be written to the file.
+     */
+     public static String writeNewsFile(int position, String news)
+     {
+     
+        String fileName = getNewsFilePath();
+        
+        if(position == Constants.NEWS_TOP)
+        {
+            fileName += "news-top.html";
+        }
+        else
+        {
+            fileName += "news-side.html";
+        }
+        
+         
+        try
+        {
+
+            //write the news out to the appropriate file
+            BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));                 
+            PrintWriter out = new PrintWriter( bw );    
+            out.print(news);           
+            out.close();
+
+        }catch(IOException e)
+        {
+            log.warn("news_write: " + e.getLocalizedMessage());
+        }
+        
+        return news;
     }
 
 
@@ -516,4 +615,10 @@ public class ConfigurationManager
         
         System.exit(1);
     }
+    
+    
+
+     
+    
+    
 }
