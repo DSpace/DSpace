@@ -115,6 +115,9 @@ public class SimpleSearchServlet extends DSpaceServlet
                 url = "/handle/" + location;
             }
             
+            // Encode the query
+            query = URLEncoder.encode(query);
+            
             // Do the redirect
             response.sendRedirect(response.encodeRedirectURL(
                     request.getContextPath() + url +
