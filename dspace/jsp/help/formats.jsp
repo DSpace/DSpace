@@ -115,9 +115,9 @@
 
 <table class="formats" border="0">
     <tr>
-        <th align="left"><strong>MIME Type</strong></th>
-        <th align="left"><strong>Extensions</strong></th>
         <th align="left"><strong>Name</strong></th>
+        <th align="left"><strong>Extensions</strong></th>        
+        <th align="left"><strong>MIME Type</strong></th>
         <th align="left"><strong>Support Level</strong></th>
     </tr>
 
@@ -140,24 +140,25 @@
         }
 %>
            <tr>
-                <td><%= formats[i].getMIMEType() %></td>
-                <td><%= extValue %></td>
                 <td><%= formats[i].getShortDescription() %></td>
+                <td><%= extValue %></td>
+                <td><%= formats[i].getMIMEType() %></td>
                 <td>
                 <%
                     String support = "";
-                    if(formats[i].getSupportLevel() == 0)
+                    
+                    if(formats[i].getSupportLevel() == 2)
                     {
-                        support = "unknown";
+                        support = "supported";
                         
                     }
-                    if(formats[i].getSupportLevel() == 1)
+                    else if(formats[i].getSupportLevel() == 1)
                     {
                         support = "known";
-                     }
-                     else
-                     {
-                        support = "supported";
+                    }
+                    else
+                    {
+                        support = "unknown";
                     }
                   %>
                   <%= support%>
