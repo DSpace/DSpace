@@ -23,7 +23,7 @@ and edit within the collection admin page
 listings, a workspace for each item and a workspace item metadata viewer
 
 (David Little)
-- SF patch #1165647, 1165649-52 - USCD mods to support SRB and Registration
+- SF patch #1165647, 1165649-52, 1165659, 1165662, 1165664-7, 1165670 - USCD mods to support SRB and Registration
 
 (Scott Yeadon)
 - Updated handle.jar and associated license to 5.4.3
