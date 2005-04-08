@@ -169,11 +169,15 @@ CREATE TABLE EPerson
   self_registered     BOOL,
   last_active         TIMESTAMP,
   sub_frequency       INTEGER,
-  phone	              VARCHAR(32)
+  phone	              VARCHAR(32),
+  netid               VARCHAR(64)
 );
 
 -- index by email
 CREATE INDEX eperson_email_idx ON EPerson(email);
+
+-- index by netid
+CREATE INDEX eperson_netid_idx ON EPerson(netid);
 
 -------------------------------------------------------
 -- EPersonGroup table

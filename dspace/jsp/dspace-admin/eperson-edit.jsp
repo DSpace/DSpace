@@ -57,7 +57,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
@@ -67,6 +67,9 @@
     String lastName  = eperson.getLastName();
     String phone     = eperson.getMetadata("phone");
     String errorMessage  = (String)request.getAttribute("error_message");
+    String netid = eperson.getNetid();
+
+    boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
 %>
 
 <dspace:layout title="Edit EPerson"
@@ -114,6 +117,15 @@
                 <input name="firstname" size="24" value="<%=firstName == null ? "" : firstName%>">
             </td>
         </tr>
+
+        <% if (ldap_enabled) { %>
+	<tr>
+            <td>LDAP NetID:</td>
+            <td>
+                <input name="netid" size="24" value="<%=netid == null ? "" : netid%>">
+            </td>
+        </tr>
+        <% } %>
 
         <tr>
             <td>Phone:</td>

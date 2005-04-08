@@ -286,6 +286,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>ldap-login</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.LDAPServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>profile</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.EditProfileServlet</servlet-class>
   </servlet>
@@ -494,6 +499,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>ldap-login</servlet-name>
+    <url-pattern>/ldap-login</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>profile</servlet-name>
     <url-pattern>/profile</url-pattern>
   </servlet-mapping>
@@ -547,7 +557,6 @@
     <servlet-name>workspace</servlet-name>
     <url-pattern>/workspace</url-pattern>
   </servlet-mapping>
-
 
   <!-- Icon MIME type -->
   <mime-mapping>

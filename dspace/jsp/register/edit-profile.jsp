@@ -53,7 +53,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
@@ -63,6 +63,9 @@
 
     attr = (Boolean) request.getAttribute("password.problem");
     boolean passwordProblem = (attr != null && attr.booleanValue());
+
+    boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
+    boolean ldap_eperson = (ldap_enabled && (eperson.getNetid() != null) && (eperson.getNetid().equals("") == false));
 %>
 
 <dspace:layout title="Edit Your Profile" nocache="true">
@@ -96,7 +99,7 @@
 <%
     // Only show password update section if the user doesn't use
     // certificates
-    if (eperson.getRequireCertificate() == false)
+    if ((eperson.getRequireCertificate() == false) && (ldap_eperson == false))
     {
 %>
         <P><strong>Optionally</strong>, you can choose a new password and enter it into the box below, and confirm it by typing it

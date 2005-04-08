@@ -66,3 +66,5 @@ CREATE TABLE epersongroup2workspaceitem
 ALTER TABLE collection ADD submitter INTEGER;
 
 ALTER TABLE collection ADD admin INTEGER;
+
+ALTER TABLE eperson ADD netid varchar(64) UNIQUE;

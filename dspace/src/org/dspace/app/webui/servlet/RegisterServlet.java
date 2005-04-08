@@ -53,10 +53,14 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
+import java.util.Hashtable;
+import javax.naming.*;
+import javax.naming.directory.*;
 
 /**
  * Servlet for handling user registration and forgotten passwords.
@@ -94,9 +98,13 @@ public class RegisterServlet extends DSpaceServlet
     /** true = registering users, false = forgotten passwords */
     private boolean registering;
 
+    /** ldap is enabled */
+    private boolean ldap_enabled;
+
     public void init()
     {
         registering = getInitParameter("register").equalsIgnoreCase("true");
+        ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
     }
 
     protected void doDSGet(Context context, HttpServletRequest request,
@@ -120,6 +128,7 @@ public class RegisterServlet extends DSpaceServlet
             if (registering)
             {
                 // Registering a new user
+                if (ldap_enabled) JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
                 JSPManager.showJSP(request, response, "/register/new-user.jsp");
             }
             else
@@ -229,15 +238,18 @@ public class RegisterServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
         String email = request.getParameter("email").toLowerCase().trim();
+        String netid = request.getParameter("netid");
+        String password = request.getParameter("password");
         EPerson eperson = EPerson.findByEmail(context, email);
+        EPerson eperson2 = null;
+        if (netid!=null) eperson2 = EPerson.findByNetid(context, netid);
 
         try
         {
             if (registering)
             {
-                // If an already-active user is trying to register, inform them
-                // so
-                if ((eperson != null) && eperson.canLogIn())
+                // If an already-active user is trying to register, inform them so
+                if ((eperson != null && eperson.canLogIn()) || (eperson2 != null && eperson2.canLogIn()))
                 {
                     log.info(LogManager.getHeader(context,
                             "already_registered", "email=" + email));
@@ -254,21 +266,66 @@ public class RegisterServlet extends DSpaceServlet
 
                     if (canRegister)
                     {
-                        // OK to register. Send token.
-                        log.info(LogManager.getHeader(context,
+                        //-- registering by email
+                        if ((!ldap_enabled)||(netid==null)||(netid.trim().equals("")))
+                        {
+                            // OK to register.  Send token.
+                            log.info(LogManager.getHeader(context,
                                 "sendtoken_register", "email=" + email));
 
-                        AccountManager.sendRegistrationInfo(context, email);
-                        JSPManager.showJSP(request, response,
+                            AccountManager.sendRegistrationInfo(context, email);
+                            JSPManager.showJSP(request, response,
                                 "/register/registration-sent.jsp");
 
-                        // Context needs completing to write registration data
-                        context.complete();
+                            // Context needs completing to write registration data
+                            context.complete();
+                        }
+                        //-- registering by netid
+                        else 
+                        {
+                            //--------- START LDAP AUTH SECTION -------------
+                            if (password!=null && !password.equals("")) 
+                            {
+                                String ldap_provider_url = ConfigurationManager.getProperty("ldap.provider_url");
+                                String ldap_id_field = ConfigurationManager.getProperty("ldap.id_field");
+                                String ldap_search_context = ConfigurationManager.getProperty("ldap.search_context");
+                           
+                                // Set up environment for creating initial context
+                                Hashtable env = new Hashtable(11);
+                                env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+                                env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
+                        
+                                // Authenticate 
+                                env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
+                                env.put(javax.naming.Context.SECURITY_PRINCIPAL, ldap_id_field+"="+netid+","+ldap_search_context);
+                                env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
+                        
+                                try {
+                                   // Create initial context
+                                   DirContext ctx = new InitialDirContext(env);
+             
+                                   // Close the context when we're done
+                                   ctx.close();
+                                } 
+                                catch (NamingException e) 
+                                {
+                                    // If we reach here, supplied email/password was duff.
+                                    log.info(LogManager.getHeader(context,
+                                        "failed_login",
+                                        "netid=" + netid + e));
+                                    JSPManager.showJSP(request, response, "/login/ldap-incorrect.jsp");
+                                    return;
+                                }
+                            }
+                            //--------- END LDAP AUTH SECTION -------------
+                            // Forward to "personal info page"
+                            JSPManager.showJSP(request, response, "/register/registration-form.jsp");
+                        }
                     }
                     else
                     {
                         JSPManager.showJSP(request, response,
-                                "/register/cannot-register.jsp");
+                            "/register/cannot-register.jsp");
                     }
                 }
             }
@@ -329,7 +386,8 @@ public class RegisterServlet extends DSpaceServlet
 
             if (registering)
             {
-                JSPManager.showJSP(request, response, "/register/new-user.jsp");
+                if (ldap_enabled) JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
+                else JSPManager.showJSP(request, response, "/register/new-user.jsp");
             }
             else
             {
@@ -367,23 +425,29 @@ public class RegisterServlet extends DSpaceServlet
 
         // Get the email address
         String email = AccountManager.getEmail(context, token);
-
+        String netid = request.getParameter("netid");
+        if ((netid!=null)&&(email==null)) email = request.getParameter("email");
+        
         // If the token isn't valid, show an error
-        if (email == null)
+        if (email == null && netid==null)
         {
             log.info(LogManager.getHeader(context, "invalid_token", "token="
-                    + token));
+                + token));
 
             // Invalid token
             JSPManager
-                    .showJSP(request, response, "/register/invalid-token.jsp");
+                .showJSP(request, response, "/register/invalid-token.jsp");
 
             return;
         }
 
         // If the token is valid, we create an eperson record if need be
-        EPerson eperson = EPerson.findByEmail(context, email);
-
+        EPerson eperson = null;
+        if (email!=null) eperson = EPerson.findByEmail(context, email);
+        EPerson eperson2 = null;
+        eperson2 = EPerson.findByNetid(context, netid);
+        if (eperson2 !=null) eperson = eperson2;
+        
         if (eperson == null)
         {
             // Need to create new eperson
@@ -392,6 +456,7 @@ public class RegisterServlet extends DSpaceServlet
             context.setIgnoreAuthorization(true);
             eperson = EPerson.create(context);
             eperson.setEmail(email);
+            eperson.setNetid(netid);
             eperson.update();
             context.setIgnoreAuthorization(false);
         }
@@ -412,10 +477,9 @@ public class RegisterServlet extends DSpaceServlet
 
         // If the user set a password, make sure it's OK
         boolean passwordOK = true;
-
-        if ((eperson.getRequireCertificate() == false)
-                && Authenticate.getSiteAuth().allowSetPassword(context,
-                        request, eperson.getEmail()))
+        if (eperson.getRequireCertificate() == false && netid==null &&
+            Authenticate.getSiteAuth().allowSetPassword(context, request,
+                eperson.getEmail()))
         {
             passwordOK = EditProfileServlet.confirmAndSetPassword(eperson,
                     request);
@@ -428,8 +492,8 @@ public class RegisterServlet extends DSpaceServlet
                     "email=" + eperson.getEmail()));
 
             // delete the token
-            AccountManager.deleteToken(context, token);
-
+            if (token!=null) AccountManager.deleteToken(context, token);
+            
             // Update user record
             eperson.update();
 
@@ -441,6 +505,7 @@ public class RegisterServlet extends DSpaceServlet
         {
             request.setAttribute("token", token);
             request.setAttribute("eperson", eperson);
+            request.setAttribute("netid", netid);
             request.setAttribute("missing.fields", new Boolean(!infoOK));
             request.setAttribute("password.problem", new Boolean(!passwordOK));
 

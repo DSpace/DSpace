@@ -129,15 +129,17 @@ public class EPersonAdminServlet extends DSpaceServlet
                     // it's unique - proceed!
                     e.setEmail(newEmail);
 
-                    e
-                            .setFirstName(request.getParameter("firstname")
+                    e.setFirstName(request.getParameter("firstname")
                                     .equals("") ? null : request
                                     .getParameter("firstname"));
 
-                    e
-                            .setLastName(request.getParameter("lastname")
+                    e.setLastName(request.getParameter("lastname")
                                     .equals("") ? null : request
                                     .getParameter("lastname"));
+
+                    e.setNetid(request.getParameter("netid").equals("")
+                        ? null
+                        : request.getParameter("netid"));
 
                     // FIXME: More data-driven?
                     e.setMetadata("phone", request.getParameter("phone")
@@ -174,12 +176,14 @@ public class EPersonAdminServlet extends DSpaceServlet
             else
             {
                 // no change to email
-                e
-                        .setFirstName(request.getParameter("firstname").equals(
+                e.setNetid(request.getParameter("netid").equals("")
+                    ? null
+                    : request.getParameter("netid"));
+
+                e.setFirstName(request.getParameter("firstname").equals(
                                 "") ? null : request.getParameter("firstname"));
 
-                e
-                        .setLastName(request.getParameter("lastname")
+                e.setLastName(request.getParameter("lastname")
                                 .equals("") ? null : request
                                 .getParameter("lastname"));
 

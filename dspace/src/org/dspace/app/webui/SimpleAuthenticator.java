@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -69,12 +70,18 @@ public class SimpleAuthenticator implements SiteAuthenticator
     /** log4j category */
     private static Logger log = Logger.getLogger(SiteAuthenticator.class);
 
+    /** ldap enabled */
+    private static boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
+
     public void startAuthentication(Context context,
             HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
         // Present the username/password screen
-        response.sendRedirect(response.encodeRedirectURL(request
+        if (ldap_enabled) response.sendRedirect(response.encodeRedirectURL(request
+                .getContextPath()
+                + "/ldap-login"));
+        else response.sendRedirect(response.encodeRedirectURL(request
                 .getContextPath()
                 + "/password-login"));
     }

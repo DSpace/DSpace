@@ -73,6 +73,9 @@ public class EPerson extends DSpaceObject
     /** The e-mail field (for sorting) */
     public static final int ID = 3;
 
+    /** The netid field (for sorting) */
+    public static final int NETID = 4;
+
     /** log4j logger */
     private static Logger log = Logger.getLogger(EPerson.class);
 
@@ -164,12 +167,49 @@ public class EPerson extends DSpaceObject
     }
 
     /**
+     * Find the eperson by their netid
+     *
+     * @author John Finlay
+     * @return EPerson
+     */
+    public static EPerson findByNetid(Context context, String netid)
+        throws SQLException, AuthorizeException
+    {
+	if (netid==null) return null;
+
+        TableRow row = DatabaseManager.findByUnique( context, "eperson", "netid", netid );
+
+        if ( row == null )
+        {
+            return null;
+        }
+        else
+        {
+            // First check the cache
+            EPerson fromCache = (EPerson) context.fromCache(
+                EPerson.class,
+                row.getIntColumn("eperson_id"));
+
+            if (fromCache != null)
+            {
+                return fromCache;
+            }
+            else
+            {
+                return new EPerson( context, row );
+            }
+        }
+    }
+
+
+    /**
      * Retrieve all e-person records from the database, sorted by a particular
      * field. Fields are:
      * <UL>
      * <LI><code>ID</code></LI>
      * <LI><code>LASTNAME</code></LI>
      * <LI><code>EMAIL</code></LI>
+     * <LI><code>NETID</code></LI>
      * </UL>
      */
     public static EPerson[] findAll(Context context, int sortField)
@@ -179,18 +219,20 @@ public class EPerson extends DSpaceObject
 
         switch (sortField)
         {
-        case ID:
-            s = "eperson_id";
-
-            break;
-
-        case EMAIL:
-            s = "email";
-
-            break;
-
-        default:
-            s = "lastname";
+            case ID:
+                s = "eperson_id";
+                break;
+                
+            case EMAIL:
+                s = "email";
+                break;
+                
+            case NETID:
+                s = "netid";
+                break;
+                
+            default:
+                s = "lastname";
         }
 
         TableRowIterator rows = DatabaseManager.query(context,
@@ -337,6 +379,32 @@ public class EPerson extends DSpaceObject
         }
 
         myRow.setColumn("email", s);
+    }
+
+    /**
+     * Get the e-person's netid
+     *
+     * @return  their netid
+     */
+    public String getNetid()
+    {
+        return myRow.getStringColumn("netid");
+    }
+
+
+    /**
+     * Set the EPerson's netid
+     *
+     * @param  s   the new netid
+     */
+    public void setNetid(String s)
+    {
+        if (s != null)
+        {
+            s = s.toLowerCase();
+        }
+    
+        myRow.setColumn("netid", s);
     }
 
     /**

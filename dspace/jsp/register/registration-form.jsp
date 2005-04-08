@@ -64,6 +64,8 @@
 <%
     EPerson eperson = (EPerson) request.getAttribute( "eperson" );
     String token = (String) request.getAttribute("token");
+    String netid = (String) request.getParameter("netid");
+    String email = (String) request.getParameter("email");	
 
     Boolean attr = (Boolean) request.getAttribute("missing.fields");
     boolean missingFields = (attr != null && attr.booleanValue());
@@ -100,9 +102,9 @@
     required.</P>
     
     <form action="<%= request.getContextPath() %>/register" method=POST>
-    
+    <% if (netid!=null) { %> <input type="hidden" name="netid" value="<%= netid %>"> <% } %>
+    <% if (email!=null) { %> <input type="hidden" name="email" value="<%= email %>"> <% } %>
         <dspace:include page="/register/profile-form.jsp" />
-    
 <%
 
     if (setPassword)
