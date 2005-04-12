@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.admin.WorkflowAbortServlet" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
@@ -57,16 +60,26 @@
     WorkflowItem workflow = (WorkflowItem) request.getAttribute("workflow");
 %>
 
-<dspace:layout title="Abort Workflow" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer">
+<dspace:layout titlekey="jsp.dspace-admin.workflow-abort-confirm.title"
+               navbar="admin"
+               locbar="link"
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <H1>Delete Workflow: <%= workflow.getID() %></H1>
+    <%-- <H1>Delete Workflow: <%= workflow.getID() %></H1> --%>
     
-    <P>Are you sure you want to abort this workflow?  It will return to the user's personal workspace</P>
+<H1><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.heading"/> <%= workflow.getID() %></H1>
+    
+    <%-- <P>Are you sure you want to abort this workflow?  It will return to the user's personal workspace</P> --%>
+    <P><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.warning"/></P>
     
     <UL>
-        <LI>Collection: <%= workflow.getCollection().getMetadata("name") %></LI>
-        <LI>Submitter: <%= WorkflowManager.getSubmitterName(workflow) %></LI>
-        <LI>Title: <%= WorkflowManager.getItemTitle(workflow) %></LI>
+        <%-- <LI>Collection: <%= workflow.getCollection().getMetadata("name") %></LI> --%>
+        <LI><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.collection"/> <%= workflow.getCollection().getMetadata("name") %></LI>
+        <%-- <LI>Submitter: <%= WorkflowManager.getSubmitterName(workflow) %></LI> --%>
+        <LI><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.submitter"/> <%= WorkflowManager.getSubmitterName(workflow) %></LI>
+        <%-- <LI>Title: <%= WorkflowManager.getItemTitle(workflow) %></LI> --%>
+        <LI><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.title"/> <%= WorkflowManager.getItemTitle(workflow) %></LI>
     </UL>
     
     <form method=POST>
@@ -76,10 +89,12 @@
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit_abort_confirm" value="Abort">
+                        <%-- <input type="submit" name="submit_abort_confirm" value="Abort"> --%>
+                        <input type="submit" name="submit_abort_confirm" value="<fmt:message key="jsp.dspace-admin.workflow-abort-confirm.abort"/>">
                     </td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.workflow-abort-confirm.cancel"/>">
                     </td>
                 </tr>
             </table>

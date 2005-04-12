@@ -52,6 +52,7 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
@@ -100,13 +101,13 @@
     Bitstream logo = community.getLogo();
 %>
 
-
 <dspace:layout locbar="commLink" title="<%= name %>">
-  <table border=0 cellpadding=5 width=100%>
+
+<table border=0 cellpadding=5 width=100%>
     <tr>
       <td width=100%>
         <H1><%= name %></H1>
-        <H3>Community home page</H3>
+		<H3><fmt:message key="jsp.community-home.heading1"/></H3>
       </td>
       <td valign=top>
 <%  if (logo != null) { %>
@@ -124,8 +125,10 @@
           <table>
             <tr>
               <td class="standard">
-                <small><strong>In:</strong></small>&nbsp;<select name="location">
-                  <option value="/">All of DSpace</option>
+                <%--<small><strong>In:</strong></small>&nbsp;<select name="location">--%>
+				<small><strong><fmt:message key="jsp.community-home.location1"/></strong></small>&nbsp;<select name="location">
+                  <%--<option value="/">All of DSpace</option>--%>
+				  <option value="/"><fmt:message key="jsp.community-home.location2"/></option>
                   <option selected value="<%= community.getHandle() %>"><%= name %></option>
 <%
     for (int i = 0; i < collections.length; i++)
@@ -148,13 +151,13 @@
             </tr>
             <tr>
               <td class="standard" align=center>
-                <small><strong>Search</strong>&nbsp;for&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="Go">
-              </td>
+                <small><fmt:message key="jsp.community-home.searchfor"/>&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="<fmt:message key="jsp.community-home.go.button"/>"> 
+			  </td>
             </tr>
             <tr>
               <td align=center class="standard">
-                <small>or&nbsp;<strong>browse</strong>&nbsp;</small><input type="submit" name="submit_titles" value="Titles">&nbsp;<input type="submit" name="submit_authors" value="Authors">&nbsp;<input type="submit" name="submit_dates" value="By Date">
-              </td>
+                <small><fmt:message key="jsp.community-home.orbrowse"/>&nbsp;</small><input type="submit" name="submit_titles" value="<fmt:message key="jsp.community-home.titles.button"/>">&nbsp;<input type="submit" name="submit_authors" value="<fmt:message key="jsp.community-home.authors.button"/>">&nbsp;<input type="submit" name="submit_dates" value="<fmt:message key="jsp.community-home.date.button"/>">
+			  </td>
             </tr>
           </table>
         </td>
@@ -169,7 +172,8 @@
     {
 %>
 
-        <H2>Collections in this community</H2>
+        <%-- <H2>Collections in this community</H2> --%>
+		<H2><fmt:message key="jsp.community-home.heading2"/></H2>
    
         <UL class="collectionListItem">
 <%
@@ -218,7 +222,8 @@
     if (subcommunities.length != 0)
     {
 %>
-        <H2>Sub-communities within this community</H2>
+        <%--<H2>Sub-communities within this community</H2>--%>
+		<H2><fmt:message key="jsp.community-home.heading3"/><H2>
    
         <UL class="collectionListItem">
 <%
@@ -273,7 +278,8 @@
 	      <table>
             <tr>
               <th class="standard">
-                 <strong>Admin Tools</strong>
+                 <%--<strong>Admin Tools</strong>--%>
+				 <strong><fmt:message key="jsp.admintools"/></strong>
               </th>
             </tr>
             <tr>
@@ -282,25 +288,27 @@
 	            <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
 		          <input type="hidden" name="community_id" value="<%= community.getID() %>">
 		          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COMMUNITY%>">
-                  <input type="submit" value="Edit...">
+                  <%--<input type="submit" value="Edit...">--%>
+				  <input type="submit" value="<fmt:message key="jsp.community-home.edit.button"/>">
                 </form>
              <% } %>
              <% if(add_button) { %>
 				<form method=POST action="<%=request.getContextPath()%>/tools/collection-wizard">
-		     		<input type="hidden" name="community_id" value="<%= community.getID() %>">
-                    <input type="submit" value="Create collection">
+                    <%--<input type="submit" value="Create collection">--%>
+	   			    <input type="submit" value="<fmt:message key="jsp.community-home.create1.button"/>">
                 </form>
                 <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
                     <input type="hidden" name="parent_community_id" value="<%= community.getID() %>">
-                    <input type="submit" name="submit" value="Create Sub-community">
+                    <%--<input type="submit" name="submit" value="Create Sub-community">--%>
+					<input type="submit" name="submit" value="<fmt:message key="jsp.community-home.create2.button"/>">
                  </form>
              <% } %>
               </td>
             </tr>
             <tr>
               <td class="standard" align="center">
-                 <dspace:popup page="/help/site-admin.html">Admin Help...</dspace:popup>
+                 <dspace:popup page="/help/site-admin.html"><fmt:message key="jsp.adminhelp"/></dspace:popup>
               </td>
             </tr>
 	  </table>
@@ -311,7 +319,7 @@
 
 
 
-    <H3>Recent&nbsp;Submissions</H3>
+	<H3><fmt:message key="jsp.community-home.recentsub"/></H3>
     
 <%
     for (int i = 0; i < lastSubmittedTitles.length; i++)

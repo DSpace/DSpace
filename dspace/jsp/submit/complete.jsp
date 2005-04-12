@@ -44,17 +44,21 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
 
 <%
     SubmissionInfo si =
         (SubmissionInfo) request.getAttribute("submission.info");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Submission Complete!">
+<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.complete.title">
 
     <jsp:include page="/submit/progressbar.jsp">
         <jsp:param name="current_stage" value="<%= SubmitServlet.SUBMISSION_COMPLETE %>"/>
@@ -63,15 +67,18 @@
     </jsp:include>
 
 
-    <H1>Submit: Submission Complete!</H1>
+    <%-- <H1>Submit: Submission Complete!</H1> --%>
+	<H1><fmt:message key="jsp.submit.complete.heading"/></H1>
     
     <%-- FIXME    Probably should say something specific to workflow --%>
-    <P>Your submission will now go through the workflow process designated for 
+    <%-- <P>Your submission will now go through the workflow process designated for 
     the collection to which you are submitting.    You will receive e-mail
     notification as soon as your submission has become a part of the collection,
     or if for some reason there is a problem with your submission. You can also
-    check on the status of your submission by going to the My DSpace page.</P>
+    check on the status of your submission by going to the My DSpace page.</P> --%>
+	<P><fmt:message key="jsp.submit.complete.info"/></P>
     
-    <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P>
+    <%--  <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P> --%>
+    <P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.complete.link"/></A></P>
 
 </dspace:layout>

@@ -41,6 +41,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.NewsEditServlet" %>
@@ -48,19 +51,8 @@
 
 <%
     Integer position = (Integer)request.getAttribute("position");
-    String positionStr = "";
 
-    //determine which news block we're working on
-    if(position.intValue() == Constants.NEWS_TOP)
-    {
-        positionStr = "top box";
-    }
-    else
-    {
-        positionStr = "sidebar";
-    }
-    
-    //get the existing news 
+    //get the existing news
     String news = (String)request.getAttribute("news");
 
     if (news == null)
@@ -70,35 +62,49 @@
 
 %>
 
-<dspace:layout title="News Edit Form"
+<dspace:layout titlekey="jsp.dspace-admin.news-edit.title"
                navbar="admin"
                locbar="link"
-               parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <H1>News Editor</H1>
-    
-    <p>Add or edit text in the box below to have it appear
-    in the <strong><%= positionStr%></strong> of the DSpace home page.</p>
+    <%-- <H1>News Editor</H1> --%>
+    <H1><fmt:message key="jsp.dspace-admin.news-edit.heading"/></H1>
 
-    <p>You may format the text using HTML tags, but please note that the HTML will not be validated here.</p>
-    
+    <%-- <p>Add or edit text in the box below to have it appear
+    in the <strong><%= positionStr%></strong> of the DSpace home page.</p> --%>
+    <p><fmt:message key="jsp.dspace-admin.news-edit.text1"/><strong>
+<% if (position.intValue() == Constants.NEWS_TOP)
+   { %>
+    <fmt:message key="jsp.dspace-admin.news-edit.positionStr.top"/>
+<% }
+   else
+   { %>
+    <fmt:message key="jsp.dspace-admin.news-edit.positionStr.side"/>
+<% } %>
+    </strong> <fmt:message key="jsp.dspace-admin.news-edit.text2"/></p>
+
+    <%-- <p>You may format the text using HTML tags, but please note that the HTML will not be validated here.</p> --%>
+    <p><fmt:message key="jsp.dspace-admin.news-edit.text3"/></p>
+
     <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="POST">
         <center>
             <table>
                 <tr>
-                    <td class="submitFormLabel">News:</td>
+                   <%--  <td class="submitFormLabel">News:</td> --%>
+                    <td class="submitFormLabel"><fmt:message key="jsp.dspace-admin.news-edit.news"/></td>
                     <td><textarea name="news" rows="10" cols="50" wrap=soft><%= news %></textarea></td>
                 </tr>
                 <tr>
                     <td colspan="2" align="center">
                     <input type="HIDDEN" name="position" value='<%= position.intValue()%>'>
-                    <input type="SUBMIT" name="submit_save" value="Save">
-                    <input type="SUBMIT" name="cancel" value="Cancel">
+                    <%-- <input type="SUBMIT" name="submit_save" value="Save"> --%>
+                    <input type="SUBMIT" name="submit_save" value="<fmt:message key="jsp.dspace-admin.news-edit.save"/>">
+                    <%-- <input type="SUBMIT" name="cancel" value="Cancel"> --%>
+                    <input type="SUBMIT" name="cancel" value="<fmt:message key="jsp.dspace-admin.news-edit.cancel"/>">
                     </td>
                 </tr>
             </table>
         </center>
     </form>
-
 </dspace:layout>

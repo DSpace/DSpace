@@ -44,16 +44,22 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+    
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout navbar="off" locbar="off" title="Log In" nocache="true">
+<dspace:layout navbar="off" locbar="off" titlekey="jsp.login.password.title" nocache="true">
+
     <table border=0 width="90%">
         <tr>
             <td align="left">
-                <H1>Log In to DSpace</H1>
+		<%-- <H1>Log In to DSpace</H1> --%>
+                <H1><fmt:message key="jsp.login.password.heading"/></H1>
             </td>
             <td align="right" class="standard">
-                <dspace:popup page="/help/index.html#login">Help...</dspace:popup>
+                <dspace:popup page="/help/index.html#login"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>

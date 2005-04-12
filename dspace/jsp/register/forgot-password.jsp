@@ -50,6 +50,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.RegisterServlet" %>
@@ -58,22 +61,26 @@
     boolean retry = (request.getAttribute("retry") != null);
 %>
 
-<dspace:layout title="Forgotten Password">
 
-    <H1>Forgotten Password</H1>
+<dspace:layout titlekey="jsp.register.forgot-password.title">
+
+    <%-- <H1>Forgotten Password</H1> --%>
+	<H1><fmt:message key="jsp.register.forgot-password.title"/></H1>
     
 <%
     if (retry)
     {
 %>
-    <P><strong>The e-mail address you entered was not recognized.  Please
-    try again.</strong></P>
+    <%-- <P><strong>The e-mail address you entered was not recognized.  Please
+    try again.</strong></P> --%>
+	<P><strong><fmt:message key="jsp.register.forgot-password.info1"/></strong></P>
 <%
     }
 %>
-    <P>Please enter your e-mail
+    <%-- <P>Please enter your e-mail
     address in the box below and click "I Forgot My Password".  You'll be sent
-    an e-mail which will allow you to set a new password.</P>
+    an e-mail which will allow you to set a new password.</P> --%>
+	<P><fmt:message key="jsp.register.forgot-password.info2"/></P>
     
     <form action="<%= request.getContextPath() %>/forgot" method=POST>
         <input type=hidden name=step value="<%= RegisterServlet.ENTER_EMAIL_PAGE %>">
@@ -84,12 +91,14 @@
                     <td class="oddRowEvenCol">
                         <table border=0 cellpadding=5>
                             <tr>
-                                <td class=standard><strong>E-mail Address:</strong></td>
+                                <%-- <td class=standard><strong>E-mail Address:</strong></td> --%>
+								<td class=standard><strong><fmt:message key="jsp.register.forgot-password.email.field"/></strong></td>
                                 <td class=standard><input type=text name="email"></td>
                             </tr>
                             <tr>
                                 <td align=center colspan=2>
-                                    <input type=submit name=submit value="I Forgot My Password">
+                                    <%-- <input type=submit name=submit value="I Forgot My Password"> --%>
+									<input type=submit name=submit value="<fmt:message key="jsp.register.forgot-password.forgot.button"/>">
                                 </td>
                             </tr>
                         </table>

@@ -45,15 +45,22 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout locbar="off" title="Submission Cancelled">
 
-    <H1>Submission Cancelled</H1>
+<dspace:layout locbar="off" titlekey="jsp.submit.cancelled-removed.title">
 
-    <P>Your submission has been cancelled, and the incomplete item removed
-    from the system.</P>
+    <%-- <H1>Submission Cancelled</H1> --%>
+	<H1><fmt:message key="jsp.submit.cancelled-removed.title"/></H1>
 
-    <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P>
+    <%-- <P>Your submission has been cancelled, and the incomplete item removed
+    from the system.</P> --%>
+	<P><fmt:message key="jsp.submit.cancelled-removed.info"/></P>
+
+    <%-- <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P> --%>
+	<P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.cancelled-removed.link"/></A></P>
 
 </dspace:layout>

@@ -47,6 +47,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+    
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 
@@ -57,7 +61,11 @@
         (SubmissionInfo) request.getAttribute("submission.info");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Upload a File" nocache="true">
+
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.submit.choose-file.title"
+               nocache="true">
 
     <form method=post action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data">
 
@@ -67,32 +75,43 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <H1>Submit: Upload a File</H1>
+        <%-- <H1>Submit: Upload a File</H1> --%>
+		<H1><fmt:message key="jsp.submit.choose-file.heading"/></H1>
     
-        <P>Please enter the name of
+        <%-- <P>Please enter the name of
         <%= (si.submission.hasMultipleFiles() ? "one of the files" : "the file" ) %> on your
         local hard drive corresponding to your item.  If you click "Browse...", a
         new window will appear in which you can locate and select the file on your
-        local hard drive. <dspace:popup page="/help/index.html#upload">(More Help...)</dspace:popup></P>
+        local hard drive. <dspace:popup page="/help/index.html#upload">(More Help...)</dspace:popup></P> --%>
+
+		<P><fmt:message key="jsp.submit.choose-file.info1"/>
+		<dspace:popup page="/help/index.html#upload"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
         
-        <P class="submitFormHelp"><strong>Netscape users please note:</strong> By
+        <%-- <P class="submitFormHelp"><strong>Netscape users please note:</strong> By
         default, the window brought up by clicking "Browse..." will only display
         files of type HTML.  If the file you are uploading isn't an HTML file,
         you will need to select the option to display files of other types.
-        <dspace:popup page="/help/index.html#netscapeupload">Instructions for Netscape users</dspace:popup> are available.</P>
+        <dspace:popup page="/help/index.html#netscapeupload">Instructions for Netscape users</dspace:popup> are available.</P> --%>
+		<P class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info3"/>
+        <dspace:popup page="${helpPage}#netscapeupload"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup> <fmt:message key="jsp.submit.choose-file.info5"/></P>
         
 <%-- FIXME: Collection-specific stuff should go here? --%>
 
-        <P class="submitFormHelp">Please also note that the DSpace system is
+        <%-- <P class="submitFormHelp">Please also note that the DSpace system is
         able to preserve the content of certain types of files better than other
         types.
         <dspace:popup page="/help/formats.jsp">Information about file types</dspace:popup> and levels of
-        support for each are available.</P>
+        support for each are available.</P> --%>
+        
+		<P class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info6"/>
+        <dspace:popup page="/help/formats.jsp"><fmt:message key="jsp.submit.choose-file.info7"/></dspace:popup> <fmt:message key="jsp.submit.choose-file.info8"/>
+        </P>
     
         <table border=0 align=center>
             <tr>
                 <td class="submitFormLabel">
-                    Document File:
+                    <%-- Document File: --%>
+					<fmt:message key="jsp.submit.choose-file.document"/>
                 </td>
                 <td>
                     <input type=file size=40 name="file">
@@ -107,12 +126,14 @@
             </tr>
             <tr>
                 <td class="submitFormHelp" colspan=2>
-                    Please give a brief description of the contents of this file, for
-                    example "Main article", or "Experiment data readings."
+                    <%-- Please give a brief description of the contents of this file, for
+                    example "Main article", or "Experiment data readings." --%>
+					<fmt:message key="jsp.submit.choose-file.info9"/>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">File Description:</td>
+                <%-- <td class="submitFormLabel">File Description:</td> --%>
+				<td class="submitFormLabel"><fmt:message key="jsp.submit.choose-file.filedescr"/></td>
                 <td><input type=text name="description" size=40></td>
             </tr>
 <%
@@ -130,14 +151,17 @@
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td align>
-                        <input type=submit name=submit_prev value="&lt; Previous">
+                        <!-- <input type=submit name=submit_prev value="&lt; Previous"> -->
+						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.choose-file.previous.button"/>">
                     </td>
                     <td>
-                        <input type=submit name=submit_next value="Next &gt;">
+                        <!-- <input type=submit name=submit_next value="Next &gt;"> -->
+						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.choose-file.next.button"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
-                        <input type=submit name=submit_cancel value="Cancel/Save">
+                        <!-- <input type=submit name=submit_cancel value="Cancel/Save"> -->
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.choose-file.cancel.button"/>">
                     </td>
                 </tr>
             </table>

@@ -48,35 +48,44 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="Theses Not Accepted in DSpace">
+<dspace:layout titlekey="jsp.submit.no-theses.title">
 
-    <H1>Theses Not Accepted in DSpace</H1>
+    <%-- <H1>Theses Not Accepted in DSpace</H1> --%>
+	<H1><fmt:message key="jsp.submit.no-theses.heading"/></H1>
 
-    <P>DSpace does not currently accept individually-submitted
+    <%-- <P>DSpace does not currently accept individually-submitted
     theses, but you are encouraged to use the separate electronic thesis
     submission site supported by the Libraries and by MIT Information Systems to
     submit your thesis to the <a href="http://thesis.mit.edu">Digital Library of
     MIT Theses</a>.  To learn how to submit your thesis to that system, see <a
     href="http://web.mit.edu/etheses/www/etheses-home.html">Submitting
-    an Electronic Thesis at MIT</a>.</P>
+    an Electronic Thesis at MIT</a>.</P> --%>
+	<P><fmt:message key="jsp.submit.no-theses.info1"/></P>
 
-    <P>Because DSpace does not accept individually-submitted theses, your
+    <%-- <P>Because DSpace does not accept individually-submitted theses, your
     submission will not proceed; any files you have uploaded for the current item
-    will not be stored.</P> 
+    will not be stored.</P>  --%>
+	<P><fmt:message key="jsp.submit.no-theses.info2"/></P> 
 
-    <P>Please note that printed copies of your thesis are still the official
+    <%-- <P>Please note that printed copies of your thesis are still the official
     requirement for your degree.  Due to important legal and record-keeping
     reasons, it is likely that in the future DSpace will work directly with the
     electronic thesis system to load groups of theses which have been officially
-    vetted and approved.  Thanks for understanding.</P> 
+    vetted and approved.  Thanks for understanding.</P>  --%>
+	<P><fmt:message key="jsp.submit.no-theses.info3"/></P> 
 
-    <P>For more information please <strong>contact the DSpace site
-    administrators</strong>:</P>
+    <%-- <P>For more information please <strong>contact the DSpace site
+    administrators</strong>:</P> --%>
+	<P><fmt:message key="jsp.submit.no-theses.info4"/></P>
 
     <dspace:include page="/components/contact-info.jsp" />
 
-    <P>Thank you for your interest in DSpace!</P>
+    <%-- <P>Thank you for your interest in DSpace!</P> --%>
+	<P><fmt:message key="jsp.submit.no-theses.info5"/></P>
 
 </dspace:layout>

@@ -55,6 +55,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
@@ -72,23 +76,23 @@
     boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
 %>
 
-<dspace:layout title="Edit EPerson"
+<dspace:layout titlekey="jsp.dspace-admin.eperson-edit.title"
                navbar="admin"
                locbar="link"
+               parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
-               parenttitle="Administer"
                nocache="true">
-
 
     <h1><%= (errorMessage==null ? "" : errorMessage) %></h1>
 
   <table width=95%>
     <tr>
       <td align=left>
-        <h1>Edit EPerson <%= eperson.getEmail() %>:</h1>
+        <%-- <h1>Edit EPerson <%= eperson.getEmail() %>:</h1> --%>
+        <h1><fmt:message key="jsp.dspace-admin.eperson-edit.heading"/> <%= eperson.getEmail() %>:</h1>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#epeople">Help...</dspace:popup>
+        <dspace:popup page="/help/site-admin.html#epeople"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
@@ -97,7 +101,8 @@
 
     <table class="miscTable" align="center">
         <tr>     
-            <td>Email:</td>
+            <%-- <td>Email:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.eperson-edit.email"/></td>
             <td>
                 <input type="hidden" name="eperson_id" value="<%=eperson.getID()%>">
                 <input name="email" size="24" value="<%=email == null ? "" : email%>">
@@ -105,14 +110,16 @@
         </tr>
 
         <tr>
-            <td>Last Name:</td>
+            <%-- <td>Last Name:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.eperson-edit.name1"/></td>
             <td>
                 <input name="lastname" size="24" value="<%=lastName == null ? "" : lastName%>">
             </td>
         </tr>
 
         <tr>
-            <td>First Name:</td>
+            <%-- <td>First Name:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.eperson-edit.name2"/></td>
             <td>
                 <input name="firstname" size="24" value="<%=firstName == null ? "" : firstName%>">
             </td>
@@ -128,21 +135,24 @@
         <% } %>
 
         <tr>
-            <td>Phone:</td>
+            <%-- <td>Phone:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.eperson-edit.phone"/></td>
             <td>
                 <input name="phone" size="24" value="<%=phone == null ? "" : phone%>">
             </td>
         </tr>
 
         <tr>
-            <td>Can Log In:</td>
+            <%-- <td>Can Log In:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.eperson-edit.can"/></td>
             <td>
                 <input type="checkbox" name="can_log_in" value="true"<%= eperson.canLogIn() ? " CHECKED" : "" %>>
             </td>
         </tr>
 
         <tr>
-            <td>Require Certificate:</td>
+            <%-- <td>Require Certificate:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.eperson-edit.require"/></td>
             <td>
                 <input type="checkbox" name="require_certificate" value="true"<%= eperson.getRequireCertificate() ? " CHECKED" : "" %>>
             </td>
@@ -155,15 +165,16 @@
         <table width="70%">
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_save" value="Save Edits">
+                    <%-- <input type="submit" name="submit_save" value="Save Edits"> --%>
+                    <input type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.eperson-edit.save"/>">
                 </td>
                 <td align="right">
-                    <input type="submit" name="submit_delete" value="Delete EPerson...">
+                    <%-- <input type="submit" name="submit_delete" value="Delete EPerson..."> --%>
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.eperson-edit.delete"/>">
                 </td>
             </tr>
         </table>
     </center>        
 
     </form>
-
 </dspace:layout>

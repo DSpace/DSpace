@@ -45,15 +45,23 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="No User Record Available">
-    <h1>No User Record Available</h1>
+<dspace:layout titlekey="jsp.login.not-in-records.title">
 
-    <P>You have a valid Web certficate, but the DSpace system does not have a
+    <%-- <h1>No User Record Available</h1> --%>
+    <h1><fmt:message key="jsp.login.not-in-records.heading"/></h1>
+
+    <%-- <P>You have a valid Web certficate, but the DSpace system does not have a
     record of you.  You will need to <A HREF="<%= request.getContextPath() %>/register">
     register with DSpace</A> before using those areas of the system that
-    require a user account.</P>
+    require a user account.</P> --%>
+    <P><fmt:message key="jsp.login.not-in-records.texta"/> <A HREF="<%= request.getContextPath() %>/register">
+    <fmt:message key="jsp.login.not-in-records.textb"/></A> <fmt:message key="jsp.login.not-in-records.textc"/></P>
 
-    <P><A HREF="<%= request.getContextPath() %>/register">Register with DSpace</A></P>
+    <%-- <P><A HREF="<%= request.getContextPath() %>/register">Register wth DSpace</A></P> --%>
+    <P><A HREF="<%= request.getContextPath() %>/register"><fmt:message key="jsp.login.not-in-records.register"/></A></P>
 </dspace:layout>

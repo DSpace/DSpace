@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -55,15 +58,23 @@
     BitstreamFormat format = (BitstreamFormat) request.getAttribute("format");
 %>
 
-<dspace:layout title="Delete Bitstream Format" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer">
+<dspace:layout titlekey="jsp.dspace-admin.confirm-delete-format.title"
+               navbar="admin"
+               locbar="link"
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <H1>Delete Bitstream Format: <%= format.getID() %></H1>
+    <%-- <H1>Delete Bitstream Format: <%= format.getID() %></H1> --%>
+    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-format.heading"/> <%= format.getID() %></H1>
     
-    <P>Are you sure the format <strong><%= format.getShortDescription() %></strong>
-    should be deleted?</P>
+    <%-- <P>Are you sure the format <strong><%= format.getShortDescription() %></strong>
+    should be deleted?</P> --%>
+    <P><fmt:message key="jsp.dspace-admin.confirm-delete-format.confirm1"/> <strong><%= format.getShortDescription() %></strong>
+    <fmt:message key="jsp.dspace-admin.confirm-delete-format.confirm2"/></P>
     
-    <P>Any existing bitstreams of this format will be reverted to the
-    <em>unknown</em> bitstream format.</P>
+    <%-- <P>Any existing bitstreams of this format will be reverted to the
+    <em>unknown</em> bitstream format.</P> --%>
+    <P><fmt:message key="jsp.dspace-admin.confirm-delete-format.warning"/></P>
 
     <form method=POST>
         <input type="hidden" name="format_id" value="<%= format.getID() %>">
@@ -72,14 +83,15 @@
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit_confirm_delete" value="Delete">
+                        <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
+                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.confirm-delete-format.delete"/>">
                     </td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.confirm-delete-format.cancel"/>">
                     </td>
                 </tr>
             </table>
         </center>
     </form>
 </dspace:layout>
-

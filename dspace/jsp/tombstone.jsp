@@ -46,18 +46,19 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+	
+<dspace:layout titlekey="jsp.tombstone.title">
 
-<dspace:layout title="Item Withdrawn">
+    <H1><fmt:message key="jsp.tombstone.title"/></H1>
 
-    <H1>Item Withdrawn</H1>
-
-    <P>The item you are trying to access has been withdrawn from DSpace.  If you
-    have any questions, please contact the administrators.</P>
-
+    <P><fmt:message key="jsp.tombstone.text"/></P>
+	
     <dspace:include page="/components/contact-info.jsp" />
 
     <P align=center>
-        <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>
+        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.tombstone.link"/></A>
     </P>
 
 </dspace:layout>

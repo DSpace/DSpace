@@ -42,13 +42,17 @@
   - HTML header for main home page
   --%>
 
-<%@ page contentType="text/html;charset=UTF-8" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <%@ page import="java.util.List"%>
+<%@ page import="java.util.Enumeration"%>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="javax.servlet.jsp.jstl.core.*" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
 <%
     String title = (String) request.getAttribute("dspace.layout.title");
@@ -65,7 +69,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp">
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon">
-<SCRIPT LANGUAGE="JavaScript" src="<%= request.getContextPath() %>/utils.js"></script>
+        <SCRIPT LANGUAGE="JavaScript" src="<%= request.getContextPath() %>/utils.js"></script>
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
@@ -80,7 +84,7 @@
             <tr>
                 <td>
                     <A HREF="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="DSpace" width=198 height=79 border=0></A></td>
-                <td class="tagLine" width="99%" cellpadding=10> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
+                    <td class="tagLine" width="99%" cellpadding=10> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
                     <A class="tagLineText" target=_blank href="http://www.dspace.org/">About DSpace Software</A>
                 </td>
                 <td nowrap valign=middle>
@@ -91,6 +95,13 @@
                 <td colspan=3>&nbsp;</td>
             </tr>
         </table>
+
+        <%-- Localization --%>
+<%--  <c:if test="${param.locale != null}">--%>
+<%--   <fmt:setLocale value="${param.locale}" scope="session" /> --%>
+<%-- </c:if> --%>
+<%--        <fmt:setBundle basename="Messages" scope="session"/> --%>
+
 
         <%-- Page contents --%>
 
@@ -127,4 +138,3 @@
 <%
     }
 %>
-

@@ -47,27 +47,36 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
     String handle = (String) request.getAttribute("handle");
 %>
 
-<dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Submission Archived">
+<dspace:layout locbar="link"
+               parentlink="/mydspace"
+               parenttitlekey="jsp.mydspace"
+               titlekey="jsp.mydspace.in-archive.title">
 
-    <H1>Thank You</H1>
+    <%--<H1>Thank You</H1>--%>
+    <H1><fmt:message key="jsp.mydspace.in-archive.heading1"/></H1>
 
-    <P>The submission has been placed in the main archive.  It has been assigned
-    the following identifier:</P>
+    <%--<P>The submission has been placed in the main archive.  It has been assigned
+    the following identifier:</P>--%>
+	<P><fmt:message key="jsp.mydspace.in-archive.text1"/></P>
 
     <P><A HREF="<%= handle %>"><%= handle %></A></P>
 
-    <P>Notification has been sent to the appropriate people.</P>
+    <%--<P>Notification has been sent to the appropriate people.</P>--%>
+	<P><fmt:message key="jsp.mydspace.in-archive.text2"/></P>
 
     <P align=center>
         <A HREF="<%= request.getContextPath() %>/mydspace">
-            Return to My DSpace
+            <%--Return to My DSpace--%>
+			<fmt:message key="jsp.mydspace.in-archive.return.link"/>
         </A>
     </P>
-
 </dspace:layout>

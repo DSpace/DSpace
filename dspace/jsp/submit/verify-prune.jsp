@@ -52,6 +52,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 
@@ -72,45 +75,54 @@
     String buttonPressed = (String) request.getAttribute("button.pressed");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Answers to Initial Questions Changed" nocache="true">
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.submit.verify-prune.title"
+               nocache="true">
 
-    <H1>Submit: Caution</H1>
+    <%-- <H1>Submit: Caution</H1> --%>
+	<H1><fmt:message key="jsp.submit.verify-prune.heading"/></H1>
     
-    <P><strong>The changes you've made to the first "Describe Your Item" page
-    will affect your submission:</strong></P>
+    <%-- <P><strong>The changes you've made to the first "Describe Your Item" page
+    will affect your submission:</strong></P> --%>
+	<P><strong><fmt:message key="jsp.submit.verify-prune.info1"/></strong></P>
     
 <%
     if (willRemoveTitles)
     {
 %>
-    <P>You've indicated that your submission does not have alternative titles,
+    <%-- <P>You've indicated that your submission does not have alternative titles,
     but you've already entered some.  If you proceed with this change, the
-    alternative titles you've entered will be removed.</P>
+    alternative titles you've entered will be removed.</P> --%>
+	<P><fmt:message key="jsp.submit.verify-prune.info2"/></P>
 <%
     }
     
     if (willRemoveDate)
     {
 %>
-    <P>You've indicated that your submission has not been published or publicly
+    <%-- <P>You've indicated that your submission has not been published or publicly
     distributed before, but you've already entered an issue date, publisher
     and/or citation.  If you proceed, this information will be removed, and
-    DSpace will assign an issue date.</P>
+    DSpace will assign an issue date.</P> --%>
+	<P><fmt:message key="jsp.submit.verify-prune.info3"/></P>
 <%
     }
     
     if (willRemoveFiles)
     {
 %>
-    <P>You've indicated that the item you're submitting consists of only a single
+    <%-- <P>You've indicated that the item you're submitting consists of only a single
     file, but you've already uploaded more than one file.  If you proceed, only
     the first file you uploaded will be kept, and the rest will be discarded by
-    the system. (The files on your local hard drive will not be affected.)</P>
+    the system. (The files on your local hard drive will not be affected.)</P> --%>
+	<P><fmt:message key="jsp.submit.verify-prune.info4"/></P>
 <%
     }
 %>
 
-    <P><strong>Are you sure you want to proceed with the changes?</strong></P>
+    <%-- <P><strong>Are you sure you want to proceed with the changes?</strong></P> --%>
+	<P><strong><fmt:message key="jsp.submit.verify-prune.question"/></strong></P>
 
     <P>&nbsp;</P>
 
@@ -136,10 +148,12 @@
             <table border=0 width=70%>
                 <tr>
                     <td align=left>
-                        <input type=submit name="proceed" value="Proceed With Changes">
+                        <%-- <input type=submit name="proceed" value="Proceed With Changes"> --%>
+						<input type=submit name="proceed" value="<fmt:message key="jsp.submit.verify-prune.proceed.button"/>">
                     </td>
                     <td align=right>
-                        <input type=submit name="do_not_proceed" value="Do Not Make the Changes">
+                        <%-- <input type=submit name="do_not_proceed" value="Do Not Make the Changes"> --%>
+						<input type=submit name="do_not_proceed" value="<fmt:message key="jsp.submit.verify-prune.notproceed.button"/>">
                     </td>
                 </tr>
             </table>

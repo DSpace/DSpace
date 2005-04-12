@@ -42,34 +42,37 @@
   - Component which displays a login form and associated information
   --%>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <table class="miscTable" align=center width="70%">
-    <tr>
-        <td class="evenRowEvenCol">
-
-            <P><strong>New user?  <A HREF="<%= request.getContextPath() %>/register">Click here to register</A>.</strong></P>
-            
-            <P>Please enter your e-mail address and password into the form below.</P>
-
-            <form method=POST action="<%= request.getContextPath() %>/password-login">
-
-                <table border=0 cellpadding=5 align=center>
-                    <tr>
-                        <td class=standard align=right><strong>E-mail Address:</strong></td>
-                        <td><input type=text name="login_email"></td>
-                    </tr>
-                    <tr>
-                        <td class=standard align=right><strong>Password:</strong></td>
-                        <td><input type=password name="login_password"></td>
-                    </tr>
-                    <tr>
-                        <td align=center colspan=2>
-                            <input type=submit name=login_submit value="Log In">
-                        </td>
-                    </tr>
-                </table>
-            </form>
-
-            <P>Have you <A HREF="<%= request.getContextPath() %>/forgot">forgotten your password</A>?</P>
-        </td>
-    </tr>
+  <tr>
+    <td class="evenRowEvenCol">
+      <%-- <p><strong>New user? <a href="<%= request.getContextPath() %>/register">Click here to register</a>.</strong></p> --%>
+      <p><strong><fmt:message key="jsp.components.login-form.new"/> <a href="<%= request.getContextPath() %>/register"><fmt:message key="jsp.components.login-form.click"/></a>.</strong></p>
+      <%-- <p>Please enter your e-mail address and password into the form below.</p> --%>
+	  <p><fmt:message key="jsp.components.login-form.enter"/></p>
+      <form method=POST action="<%= request.getContextPath() %>/password-login">
+        <table border=0 cellpadding=5 align=center>
+          <tr>
+            <%-- <td class=standard align=right><strong>E-mail Address:</strong></td> --%>
+            <td class=standard align=right><strong><fmt:message key="jsp.components.login-form.email"/></strong></td>
+            <td><input type=text name="login_email"></td>
+          </tr>
+          <tr>
+            <%-- <td class=standard align=right><strong>Password:</strong></td> --%>
+            <td class=standard align=right><strong><fmt:message key="jsp.components.login-form.password"/></strong></td>
+            <td><input type=password name="login_password"></td>
+          </tr>
+          <tr>
+            <td align=center colspan=2>
+              <%-- <input type=submit name=login_submit value="Log In"> --%>
+              <input type=submit name=login_submit value="<fmt:message key="jsp.components.login-form.login"/>">
+            </td>
+          </tr>
+        </table>
+      </form>
+      <%-- <p>Have you <a href="<%= request.getContextPath() %>/forgot">forgotten your password</a>?</p></td> --%>
+	  <p><fmt:message key="jsp.components.login-form.have"/> <a href="<%= request.getContextPath() %>/forgot"><fmt:message key="jsp.components.login-form.forgot"/></a><fmt:message key="jsp.components.login-form.question"/></p></td>
+  </tr>
 </table>

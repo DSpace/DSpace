@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson" %>
@@ -56,13 +59,29 @@
         ((Boolean) request.getAttribute("password.updated")).booleanValue();
 %>
 
-<dspace:layout title="Profile Updated">
 
-    <H1>Profile Updated</H1>
+<dspace:layout titlekey="jsp.register.profile-updated.title">
 
-    <P>Thank you, your profile information
+
+    <%-- <H1>Profile Updated</H1> --%>
+	<H1><fmt:message key="jsp.register.profile-updated.title"/></H1>
+
+    <%-- <P>Thank you, your profile information
     <%= (passwordUpdated ? "and password have" : "has") %>
-    been updated.</P>
+    been updated.</P> --%>
+    
+	<P><fmt:message key="jsp.register.profile-updated.info1"/> 
+	
+<% if(passwordUpdated)
+   { %>
+    <fmt:message key="jsp.register.profile-updated.passwordUpd"/>
+<% }
+   else
+   { %>
+    <fmt:message key="jsp.register.profile-updated.passwordNotUpd"/>
+<% } %>
+    <fmt:message key="jsp.register.profile-updated.info2"/></P>
 
-    <P><A HREF="<%= request.getContextPath() %>/">Return to DSpace Home</A></P>
+    <%-- <P><A HREF="<%= request.getContextPath() %>/">Return to DSpace Home</A></P> --%>
+	<P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.profile-updated.return.link"/></A></P>
 </dspace:layout>

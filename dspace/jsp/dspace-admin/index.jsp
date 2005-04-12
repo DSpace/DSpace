@@ -50,6 +50,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+	
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.sql.SQLException" %>
@@ -69,10 +72,13 @@
     {
         context = UIUtil.obtainContext(request);
 %>
-<dspace:layout locbar="link" navbar="admin" title="Administer">
-    <h1>Administration Tools</h1>
+<dspace:layout locbar="link" navbar="admin" titlekey="jsp.administer">
+
+    <%-- <h1>Administration Tools</h1> --%>
+    <h1><fmt:message key="jsp.dspace-admin.index.heading"/></h1>
     
-    <P>Please select an operation from the navigation bar on the left.</P>
+    <%-- <P>Please select an operation from the navigation bar on the left.</P> --%>
+    <P><fmt:message key="jsp.dspace-admin.index.text"/></P>
 </dspace:layout>
 <%
     }

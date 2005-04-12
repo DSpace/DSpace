@@ -44,14 +44,20 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="New Password E-mail Sent">
 
-    <H1>New Password E-mail Sent</H1>
+<dspace:layout titlekey="jsp.register.password-token-sent.title">
 
-    <P>You have been sent an e-mail containing a special URL.  When you visit
-    this URL, you will be able to set a new password to carry on using DSpace.</P>
+
+    <%-- <H1>New Password E-mail Sent</H1> --%>
+	<H1><fmt:message key="jsp.register.password-token-sent.title"/></H1>
+
+    <%-- <P>You have been sent an e-mail containing a special URL.  When you visit
+    this URL, you will be able to set a new password to carry on using DSpace.</P> --%>
+	<P><fmt:message key="jsp.register.password-token-sent.info"/></P>
 
 </dspace:layout>
-

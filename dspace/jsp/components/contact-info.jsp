@@ -41,21 +41,21 @@
 <%--
   - Contact information for the DSpace site.
   --%>
+  
+  <%@ page contentType="text/html;charset=UTF-8" %>
+  
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <center>
-    <P><%= ConfigurationManager.getProperty("dspace.name") %> administration
-    contact details:</p>
+
+  <P><%= ConfigurationManager.getProperty("dspace.name") %> - <fmt:message key="jsp.components.contact-info.details"/></p>
 
     <table>
         <tr>
-            <td class="standard">By e-mail:</td>
+            <td class="standard"><fmt:message key="jsp.components.contact-info.email"/></td>
             <td class="standard"><a href="mailto:<%= ConfigurationManager.getProperty("mail.admin") %>"><%= ConfigurationManager.getProperty("mail.admin") %></a></td>
-        </tr>
-        <tr>
-            <td class="standard">Or telephone:</td>
-            <td class="standard">xxx-555-xxxx</td>
         </tr>
     </table>
 </center>

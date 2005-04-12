@@ -53,16 +53,22 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="Submission Stopped">
+<dspace:layout titlekey="jsp.submit.thesis-removed-workaround.title">
 
-    <H1>Submission Stopped: Theses Not Accepted in DSpace</H1>
+    <%-- <H1>Submission Stopped: Theses Not Accepted in DSpace</H1> --%>
+	<H1><fmt:message key="jsp.submit.thesis-removed-workaround.heading"/></H1>
 
-    <P>Since DSpace does not accept theses, your submission has been stopped.
-    To start submitting something else click below.</P>
+    <%-- <P>Since DSpace does not accept theses, your submission has been stopped.
+    To start submitting something else click below.</P> --%>
+	<P><fmt:message key="jsp.submit.thesis-removed-workaround.info"/></P>
 
     <P align=center><strong><A HREF="<%= request.getContextPath() %>/submit">
-    Start a new submission</A></P>
+    <%-- Start a new submission</A></P> --%>
+	<fmt:message key="jsp.submit.thesis-removed-workaround.link"/></A></P>
 
 </dspace:layout>

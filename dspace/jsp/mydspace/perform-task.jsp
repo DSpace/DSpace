@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
@@ -65,41 +68,48 @@
 %>
 
 <dspace:layout locbar="link"
-               parenttitle="My DSpace"
                parentlink="/mydspace"
-               title="Perform Task"
+               parenttitlekey="jsp.mydspace"
+               titlekey="jsp.mydspace.perform-task.title"
                nocache="true">
 
-    <H1>Perform Task</H1>
+    <%-- <H1>Perform Task</H1> --%>
+    <H1><fmt:message key="jsp.mydspace.perform-task.title"/></H1>
     
 <%
     if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP1)
     {
 %>
-    <P>The following item has been submitted to collection <strong><%= collection.getMetadata("name") %></strong>.
+    <%-- <P>The following item has been submitted to collection <strong><%= collection.getMetadata("name") %></strong>.
     Please review the item, check that it meets the criteria for entry into
     the collection.  After reviewing the item, please approve or reject the
-    item using the controls at the bottom of the page.</P>
+    item using the controls at the bottom of the page.</P> --%>
+	<P><fmt:message key="jsp.mydspace.perform-task.text1"/> <strong><%= collection.getMetadata("name") %></strong>
+	.  <fmt:message key="jsp.mydspace.perform-task.text2"/></P>
 <%
     }
     else if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP2)
     {
 %>
-    <P>The following item has been submitted to collection <strong><%= collection.getMetadata("name") %></strong>.
+    <%-- <P>The following item has been submitted to collection <strong><%= collection.getMetadata("name") %></strong>.
     Please review the item, check that it meets the criteria for entry into
     the collection.  After reviewing the item, you may edit the metadata with the
     item, and then approve or reject the item using the controls at the bottom of
-    the page.</P>
+    the page.</P> --%>
+	<P><fmt:message key="jsp.mydspace.perform-task.text1"/> <strong><%= collection.getMetadata("name") %></strong>
+	.  <fmt:message key="jsp.mydspace.perform-task.text3"/></P>
 <%
     }
     else if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP3)
     {
 %>
-    <P>The following item has been accepted for inclusion in collection
+    <%-- <P>The following item has been accepted for inclusion in collection
     <strong><%= collection.getMetadata("name") %></strong>.  Please perform any
     necessary edits of the metadata to conform with the standards of the collection,
     and then commit the item to the archive using the controls at the bottom
-    of the page.</P>
+    of the page.</P> --%>
+	<P><fmt:message key="jsp.mydspace.perform-task.text4"/>
+    <strong><%= collection.getMetadata("name") %></strong>.  <fmt:message key="jsp.mydspace.perform-task.text5"/></P>
 <%
     }
 %>
@@ -121,10 +131,12 @@
 %>
             <tr>
                 <td class="<%= row %>RowOddCol">
-                    If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".
+                    <%-- If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve". --%>
+					<fmt:message key="jsp.mydspace.perform-task.instruct1"/>
                 </td>
                 <td class="<%= row %>RowEvenCol" valign=middle>
-                    <input type="submit" name="submit_approve" value="Approve">
+                    <%-- <input type="submit" name="submit_approve" value="Approve"> --%>
+					<input type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.perform-task.approve.button"/>">
                 </td>
             </tr>
 <%
@@ -135,11 +147,13 @@
 %>
             <tr>
                 <td class="<%= row %>RowOddCol">
-                    Once you've edited the item, use this option to commit the
-                    item to the archive.
+                    <%-- Once you've edited the item, use this option to commit the
+                    item to the archive. --%>
+					<fmt:message key="jsp.mydspace.perform-task.instruct2"/>
                 </td>
                 <td class="<%= row %>RowEvenCol" valign=middle>
-                    <input type="submit" name="submit_approve" value="Commit to Archive">
+                    <%-- <input type="submit" name="submit_approve" value="Commit to Archive"> --%>
+					<input type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.perform-task.commit.button"/>">
                 </td>
             </tr>
 <%
@@ -152,13 +166,15 @@
 %>
             <tr>
                 <td class="<%= row %>RowOddCol">
-                    If you have reviewed the item and found it is <strong>not</strong> suitable
+                    <%-- If you have reviewed the item and found it is <strong>not</strong> suitable
                     for inclusion in the collection, select "Reject".  You will then be asked 
                     to enter a message indicating why the item is unsuitable, and whether the
-                    submitter should change something and re-submit.
+                    submitter should change something and re-submit. --%>
+					<fmt:message key="jsp.mydspace.perform-task.instruct3"/>
                 </td>
                 <td class="<%= row %>RowEvenCol" valign=middle>
-                    <input type=submit name=submit_reject value="Reject" />
+                    <%-- <input type=submit name=submit_reject value="Reject" /> --%>
+					<input type=submit name=submit_reject value="<fmt:message key="jsp.mydspace.perform-task.reject.button"/>"/>
                 </td>
             </tr>
 <%
@@ -171,10 +187,12 @@
 %>
             <tr>
                 <td class="<%= row %>RowOddCol">
-                    Select this option to correct, amend or otherwise edit the item's metadata.
+                    <%-- Select this option to correct, amend or otherwise edit the item's metadata. --%>
+					<fmt:message key="jsp.mydspace.perform-task.instruct4"/>
                 </td>
                 <td class="<%= row %>RowEvenCol" valign=middle>
-                    <input type=submit name=submit_edit value="Edit Metadata" />
+                    <%-- <input type=submit name=submit_edit value="Edit Metadata" /> --%>
+					<input type=submit name=submit_edit value="<fmt:message key="jsp.mydspace.perform-task.edit.button"/>" />
                 </td>
             </tr>
 <%
@@ -183,10 +201,12 @@
 %>
             <tr>
                 <td class="<%= row %>RowOddCol">
-                    If you wish to leave this task for now, and return to your "My DSpace", use this option.
-                </td>
+                    <%-- If you wish to leave this task for now, and return to your "My DSpace", use this option. --%>
+                    <fmt:message key="jsp.mydspace.perform-task.instruct5"/>
+				</td>
                 <td class="<%= row %>RowEvenCol" valign=middle>
-                    <input type=submit name=submit_cancel value="Do Later" />
+                    <%-- <input type=submit name=submit_cancel value="Do Later" /> --%>
+					<input type=submit name=submit_cancel value="<fmt:message key="jsp.mydspace.perform-task.later.button"/>" />
                 </td>
             </tr>
 <%
@@ -194,10 +214,12 @@
 %>
             <tr>
                 <td class="<%= row %>RowOddCol">
-                    To return the task to the pool so that another user can perform the task, use this option.
-                </td>
+                    <%-- To return the task to the pool so that another user can perform the task, use this option. --%>
+                    <fmt:message key="jsp.mydspace.perform-task.instruct6"/>
+				</td>
                 <td class="<%= row %>RowEvenCol" valign=middle>
-                    <input type=submit name=submit_pool value="Return Task to Pool" />
+                    <%-- <input type=submit name=submit_pool value="Return Task to Pool" /> --%>
+					<input type=submit name=submit_pool value="<fmt:message key="jsp.mydspace.perform-task.return.button"/>" />
                 </td>
             </tr>
         </table>

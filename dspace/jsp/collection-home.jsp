@@ -54,6 +54,7 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
@@ -70,7 +71,7 @@
     Collection collection = (Collection) request.getAttribute("collection");
     Community  community  = (Community) request.getAttribute("community");
     Group      submitters = (Group) request.getAttribute("submitters");
-       
+
     String[] lastSubmittedTitles = (String[])
         request.getAttribute("last.submitted.titles");
     String[] lastSubmittedURLs = (String[])
@@ -114,10 +115,9 @@
     Bitstream logo = collection.getLogo();
 %>
 
-
 <dspace:layout locbar="commLink" title="<%= name %>">
 
-  <table border=0 cellpadding=5 width=100%>
+<table border=0 cellpadding=5 width=100%>
     <tr>
       <td width=100%>
         <H1><%= name %>
@@ -130,7 +130,8 @@
             }
 %>
 		</H1>
-        <H3>Collection home page</H3>
+
+		<H3><fmt:message key="jsp.collection-home.heading1"/></H3>
       </td>
       <td valign=top>
 <%  if (logo != null) { %>
@@ -147,8 +148,8 @@
           <table>
             <tr>
               <td class="standard">
-                <small><strong>In:</strong></small>&nbsp;<select name="location">
-                  <option value="/">All of DSpace</option>
+				<small><strong><fmt:message key="jsp.collection-home.location1"/></strong></small>&nbsp;<select name="location">
+				  <option value="/"><fmt:message key="jsp.collection-home.location2"/></option>
                   <option selected value="<%= community.getHandle() %>"><%= communityName %></option>
                   <option selected value="<%= collection.getHandle() %>/"><%= name %></option>
                 </select>
@@ -156,13 +157,13 @@
             </tr>
             <tr>
               <td class="standard" align=center>
-                <small><strong>Search</strong>&nbsp;for&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="Go">
+				<small><fmt:message key="jsp.collection-home.searchfor"/>&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="<fmt:message key="jsp.collection-home.go"/>">
               </td>
             </tr>
             <tr>
               <td align=center class="standard">
-                <small>or&nbsp;<strong>browse</strong>&nbsp;</small><input type="submit" name="submit_titles" value="Titles">&nbsp;<input type="submit" name="submit_authors" value="Authors">&nbsp;<input type="submit" name="submit_dates" value="By Date">
-              </td>
+                <small><fmt:message key="jsp.collection-home.orbrowse"/>&nbsp;</small><input type="submit" name="submit_titles" value="<fmt:message key="jsp.collection-home.titles.button"/>">&nbsp;<input type="submit" name="submit_authors" value="<fmt:message key="jsp.collection-home.authors.button"/>">&nbsp;<input type="submit" name="submit_dates" value="<fmt:message key="jsp.collection-home.date.button"/>">
+			  </td>
             </tr>
           </table>
         </td>
@@ -180,7 +181,8 @@
         <center>
           <form action="<%= request.getContextPath() %>/submit" method=POST>
             <input type=hidden name=collection value="<%= collection.getID() %>">
-            <input type=submit name=submit value="Submit to This Collection">
+            <%--<input type=submit name=submit value="Submit to This Collection">--%>
+			<input type=submit name=submit value="<fmt:message key="jsp.collection-home.submit.button"/>">
           </form>
         </center>
 <%  } %>
@@ -192,17 +194,21 @@
               <td class="standard">
 <%  if (loggedIn && subscribed)
     { %>
-                <small>You are subscribed to this collection. <A HREF="<%= request.getContextPath() %>/subscribe">See&nbsp;Subscriptions</A></small>
-              </td>
+                <%--<small>You are subscribed to this collection. <A HREF="<%= request.getContextPath() %>/subscribe">See&nbsp;Subscriptions</A></small>--%>
+                <small><fmt:message key="jsp.collection-home.subscribed"/> <A HREF="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.collection-home.info"/></A></small>
+			  </td>
               <td class="standard">
-                <input type="submit" name="submit_unsubscribe" value="Unsubscribe">
+                <%--<input type="submit" name="submit_unsubscribe" value="Unsubscribe">--%>
+				<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.collection-home.unsub"/>">
 <%  } else { %>
                 <small>
-                  Subscribe to this collection to receive daily e-mail notification of new additions
+                  <%--Subscribe to this collection to receive daily e-mail notification of new additions--%>
+				  <fmt:message key="jsp.collection-home.subscribe.msg"/>
                 </small>
               </td>
               <td class="standard">
-                <input type="submit" name="submit_subscribe" value="Subscribe">
+                <%--<input type="submit" name="submit_subscribe" value="Subscribe">--%>
+				<input type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>">
 <%  } %>
               </td>
             </tr>
@@ -214,7 +220,7 @@
 
   <%= intro %>
 
-  
+
 
   <P class="copyrightText"><%= copyright %></P>
 
@@ -226,7 +232,8 @@
 	  <table>
             <tr>
               <th class="standard">
-                 <strong>Admin Tools</strong>
+                 <%--<strong>Admin Tools</strong>--%>
+				 <strong><fmt:message key="jsp.admintools"/></strong>
               <th>
             </tr>
 
@@ -237,7 +244,8 @@
                   <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
                   <input type="hidden" name="community_id" value="<%= community.getID() %>">
                   <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
-                  <input type="submit" value="Edit...">
+                  <%--<input type="submit" value="Edit...">--%>
+				  <input type="submit" value="<fmt:message key="jsp.collection-home.edit.button"/>">
                 </form>
               </td>
             </tr>
@@ -248,23 +256,25 @@
               <td class="standard" align="center">
                  <form method=POST action="<%=request.getContextPath()%>/tools/itemmap">
                   <input type="hidden" name="cid" value="<%= collection.getID() %>">
-                  <input type="submit" value="Item Mapper">
+                  <%--<input type="submit" value="Item Mapper">--%>
+				  <input type="submit" value="<fmt:message key="jsp.collection-home.item.button"/>">
                 </form>
               </td>
             </tr>
 <% if(submitters != null) { %>
             <tr>
 	      <td class="standard" align="center">
-		<form method=GET action="<%=request.getContextPath()%>/tools/group-edit">
+		<form method=POST action="<%=request.getContextPath()%>/tools/group-edit">
 		  <input type=hidden name="group_id" value="<%=submitters.getID()%>">
-		  <input type=submit name="submit_edit" value="Edit Submitters">
+		  <%--<input type=submit name="submit_edit" value="Edit Submitters">--%>
+		  <input type=submit name="submit_edit" value="<fmt:message key="jsp.collection-home.editsub.button"/>">
 		</form>
 	      </td>
             </tr>
 <% } %>
             <tr>
               <td class="standard" align="center">
-                 <dspace:popup page="/help/collection-admin.html">Admin Help...</dspace:popup>
+                 <dspace:popup page="/help/collection-admin.html"><fmt:message key="jsp.adminhelp"/></dspace:popup>
               </td>
             </tr>
 <% } %>
@@ -276,14 +286,14 @@
 <%  } %>
 
 
-    <H3>Recent&nbsp;Submissions</H3>
+	<H3><fmt:message key="jsp.collection-home.recentsub"/></H3>
 <%
     for (int i = 0; i < lastSubmittedTitles.length; i++)
     {
 %>
     <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i]%>"><%= Utils.addEntities(lastSubmittedTitles[i]) %></A></P>
 <%
-  }
+    }
 %>
     <%= sidebar %>
   </dspace:sidebar>

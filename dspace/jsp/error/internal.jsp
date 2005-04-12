@@ -43,27 +43,34 @@
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+	
 <%@ page import="java.io.PrintWriter" %>
 
 <%@ page isErrorPage="true" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="Internal System Error">
+<dspace:layout titlekey="jsp.error.internal.title">
 
-    <H1>Internal System Error</H1>
+    <%-- <H1>Internal System Error</H1> --%>
+    <H1><fmt:message key="jsp.error.internal.heading"/></H1>
 
-    <P>Oops!  The system has experienced an internal error.  This is our fault,
-    please pardon our dust during these early stages of the DSpace system!</P>
+    <%-- <P>Oops!  The system has experienced an internal error.  This is our fault,
+    please pardon our dust during these early stages of the DSpace system!</P> --%>
+    <P><fmt:message key="jsp.error.internal.text1"/></P>
 
-    <P>The system has logged this error.  Please try to do what you were doing
+    <%-- <P>The system has logged this error.  Please try to do what you were doing
     again, and if the problem persists, please contact us so we can fix the
-    problem.</P>
+    problem.</P> --%>
 
     <dspace:include page="/components/contact-info.jsp" />
 
     <P align=center>
-        <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>
+        <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
+        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.error.internal.go"/></A>
     </P>
         <!--
     <%

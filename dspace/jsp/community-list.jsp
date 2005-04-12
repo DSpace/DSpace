@@ -53,6 +53,8 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+	
 <%@ page import="java.util.Map" %>
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.sql.SQLException" %>
@@ -122,45 +124,47 @@
     }
 %>
 
-<dspace:layout title="Communities and Collections">
+<dspace:layout titlekey="jsp.community-list.title">
 
 <%
     if (admin_button)
     {
 %>
-      <table class=miscTableNoColor align=center>
+      
+
+<table class=miscTableNoColor align=center>
         <tr>
         <td>
-            <H1>Communities and Collections</H1>
+			<H1><fmt:message key="jsp.community-list.title"/></H1>
 
-            <P>Shown below is a list of communities and the collections and sub-communities within them.
-            Click on a name to view that community or collection home page.</P>
+			<P><fmt:message key="jsp.community-list.text1"/></P>
         </td>
         <td>
         <table class=miscTable align=center>
 	    <tr>
 	        <td class="evenRowEvenCol" colspan=2>
-	            <table>
-                        <tr>
-                            <th class="standard">
-                                <strong>Admin Tools</strong>
-                            </th>
-                        </tr>
-                        <tr>
-                            <td class="standard" align="center">
+                <table>
+                    <tr>
+                        <th class="standard">
+                            <strong><fmt:message key="jsp.admintools"/></strong>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td class="standard" align="center">
 	                        <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
-		                    <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
-                                    <input type="submit" name="submit" value="Create Top-Level Community...">
-                                </form>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="standard" align="center">
-                            <dspace:popup page="/help/site-admin.html">Admin Help...</dspace:popup>
-                            </td>
-                        </tr>
-	 	    </table>
-	 	</td>
+		                        <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
+                                    <%--<input type="submit" name="submit" value="Create Top-Level Community...">--%>
+									<input type="submit" name="submit" value="<fmt:message key="jsp.community-list.create.button"/>">
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="standard" align="center">
+                            <dspace:popup page="/help/site-admin.html"><fmt:message key="jsp.adminhelp"/></dspace:popup>
+                        </td>
+                    </tr>
+               </table>
+            </td>
             </tr>
         </table>
         </td>
@@ -172,10 +176,9 @@
     else
     {
 %>
-    <H1>Communities and Collections</H1>
+	<H1><fmt:message key="jsp.community-list.title"/></H1>
 
-    <P>Shown below is a list of communities and the collections and sub-communities within them.
-    Click on a name to view that community or collection home page.</P>
+	<P><fmt:message key="jsp.community-list.text1"/></P>
 <%
     }
 %>

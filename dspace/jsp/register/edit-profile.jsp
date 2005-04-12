@@ -51,6 +51,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+    
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
@@ -68,29 +72,33 @@
     boolean ldap_eperson = (ldap_enabled && (eperson.getNetid() != null) && (eperson.getNetid().equals("") == false));
 %>
 
-<dspace:layout title="Edit Your Profile" nocache="true">
 
-    <H1>Edit Your Profile</H1>
+<dspace:layout titlekey="jsp.register.edit-profile.title" nocache="true">
+
+    <%-- <H1>Edit Your Profile</H1> --%>
+	<H1><fmt:message key="jsp.register.edit-profile.title"/></H1>
     
 <%
     if (missingFields)
     {
 %>
-    <P><strong>Please fill out all of the required fields.</strong></P>
+    <%-- <P><strong>Please fill out all of the required fields.</strong></P> --%>
+	<P><strong><fmt:message key="jsp.register.edit-profile.info1"/></strong></P>
 <%
     }
 
     if (passwordProblem)
     {
 %>
-    <P><strong>The passwords you enter below must match, and need to be at
-    least 6 characters long.</strong></P>
+    <%-- <P><strong>The passwords you enter below must match, and need to be at
+    least 6 characters long.</strong></P> --%>
+	<P><strong><fmt:message key="jsp.register.edit-profile.info2"/></strong></P>
 <%
     }
 %>
 
-    <P>Please enter or amend the following information.  The fields marked with a * are
-    required. <dspace:popup page="/help/index.html#editprofile">(More Help...)</dspace:popup></P>
+	<P><fmt:message key="jsp.register.edit-profile.info3"/>
+    <dspace:popup page="/help/index.html#editprofile"><fmt:message key="jsp.morehelp"/></dspace:popup></P></P>
     
     <form action="<%= request.getContextPath() %>/profile" method=POST>
 
@@ -102,19 +110,22 @@
     if ((eperson.getRequireCertificate() == false) && (ldap_eperson == false))
     {
 %>
-        <P><strong>Optionally</strong>, you can choose a new password and enter it into the box below, and confirm it by typing it
-        again into the second box for verification.  It should be at least six characters long.</P>
+        <%-- <P><strong>Optionally</strong>, you can choose a new password and enter it into the box below, and confirm it by typing it
+        again into the second box for verification.  It should be at least six characters long.</P> --%>
+		<P><fmt:message key="jsp.register.edit-profile.info5"/></P>
 
         <table class="misc" align="center">
             <tr>
                 <td class="oddRowEvenCol">
                     <table border=0 cellpadding=5>
                         <tr>
-                            <td align=right class=standard><strong>New Password:</strong></td>
+                            <%-- <td align=right class=standard><strong>New Password:</strong></td> --%>
+							<td align=right class=standard><strong><fmt:message key="jsp.register.edit-profile.pswd.field"/></strong></td>
                             <td class=standard><input type=password name="password"></td>
                         </tr>
                         <tr>
-                            <td align=right class=standard><strong>Again to Confirm:</strong></td>
+                            <%-- <td align=right class=standard><strong>Again to Confirm:</strong></td> --%>
+							<td align=right class=standard><strong><fmt:message key="jsp.register.edit-profile.confirm.field"/></strong></td>
                             <td class=standard><input type=password name="password_confirm"></td>
                         </tr>
                     </table>
@@ -124,6 +135,7 @@
 <%
   }
 %>
-        <P align=center><input type=submit name=submit value="Update Profile"></P>
+       <%-- <P align=center><input type=submit name=submit value="Update Profile"></P> --%>
+	   <P align=center><input type=submit name=submit value="<fmt:message key="jsp.register.edit-profile.update.button"/>"></P>
     </form>
 </dspace:layout>

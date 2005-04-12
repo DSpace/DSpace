@@ -52,6 +52,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+    
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson" %>
@@ -63,20 +67,22 @@
     
 %>
 
-<dspace:layout title="Edit Group"
+<dspace:layout titlekey="jsp.tools.group-edit.title"
                navbar="admin"
                locbar="link"
+               parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
-               parenttitle="Administer"
                nocache="true">
 
   <table width=95%>
     <tr>
       <td align=left>
-    <h1>Edit Group : <%=group.getName()%> (<%=group.getID()%>)</h1>
+    <%-- <h1>Edit Group : <%=group.getName()%> (<%=group.getID()%>)</h1> --%>
+	<h1><fmt:message key="jsp.tools.group-edit.title"/> : <%=group.getName()%> (<%=group.getID()%>)</h1>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/collection-admin.html#groupeditor">Help...</dspace:popup>
+        <%-- <dspace:popup page="/help/collection-admin.html#groupeditor">Help...</dspace:popup> --%>
+		<dspace:popup page="/help/collection-admin.html#groupeditor"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
@@ -84,16 +90,19 @@
   <center>
     <form method=post>
 
-        <P>Name: <input name="group_name" value="<%=group.getName()%>"></P>
+        <%-- <P>Name: <input name="group_name" value="<%=group.getName()%>"></P> --%>
+		<P><fmt:message key="jsp.tools.group-edit.name"/> <input name="group_name" value="<%=group.getName()%>"></P>
 
-        <h3>Current Group Members</h3>
+        <%-- <h3>Current Group Members</h3> --%>
+		<h3><fmt:message key="jsp.tools.group-edit.heading"/></h3>
 
         <input type="hidden" name="group_id" value="<%=group.getID()%>">
         <dspace:selecteperson multiple="true" selected="<%= epeople %>"/> 
 
         <br>
 
-        <P><input type="submit" name="submit_group_update" value="Update Group" onclick="javascript:finishEPerson();"></P>
-    </form>
+        <%-- <P><input type="submit" name="submit_group_update" value="Update Group" onclick="javascript:finishEPerson();"></P> --%>
+        <P><input type="submit" name="submit_group_update" value="<fmt:message key="jsp.tools.group-edit.update.button"/>" onclick="javascript:finishEPerson();"></P>
+	</form>
   </center>
 </dspace:layout>

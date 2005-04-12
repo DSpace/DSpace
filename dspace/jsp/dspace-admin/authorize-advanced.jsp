@@ -59,7 +59,11 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
 
 <%@ page import="java.util.List"     %>
 <%@ page import="java.util.Iterator" %>
@@ -74,23 +78,27 @@
     Collection [] collections= (Collection []) request.getAttribute("collections");
 %>
 
-<dspace:layout title="Advanced Policy Manager"
+<dspace:layout titlekey="jsp.dspace-admin.authorize-advanced.advanced"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer">
 
-    <h1>Advanced Policy Manager</h1>
-    <p>Allows you to do wildcard additions to and clearing
+<h1><fmt:message key="jsp.dspace-admin.authorize-advanced.advanced"/></h1>
+
+	<%-- <p>Allows you to do wildcard additions to and clearing
        of policies for types of content contained in a collection.
        Warning, dangerous - removing READ permissions from
-       items will make them not viewable!  <dspace:popup page="/help/site-admin.html#advancedpolicies">More help...</dspace:popup></p>
+       items will make them not viewable!  <dspace:popup page="/help/site-admin.html#advancedpolicies">More help...</dspace:popup></p> --%>
+	<p><fmt:message key="jsp.dspace-admin.authorize-advanced.text"/> <dspace:popup page="/help/site-admin.html#advancedpolicies"><fmt:message key="jsp.morehelp"/></dspace:popup></p>
 
+    
     <form method=POST>
 
     <table class="miscTable" align="center">
         <tr>     
-            <td>Collection:</td>
+            <%-- <td>Collection:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.authorize-advanced.col"/></td>
             <td>
                 <select size="10" name="collection_id">
                     <%  for(int i = 0; i < collections.length; i++ ) { %>
@@ -102,17 +110,21 @@
         </tr>
 
         <tr>
-            <td>Content Type:</td>
+            <%-- <td>Content Type:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.authorize-advanced.type"/></td>
             <td>
                 <select name="resource_type">
-                    <option value="<%=Constants.ITEM%>">item</option>
-                    <option value="<%=Constants.BITSTREAM%>">bitstream</option>
+                    <%-- <option value="<%=Constants.ITEM%>">item</option>
+                    <option value="<%=Constants.BITSTREAM%>">bitstream</option> --%>
+                    <option value="<%=Constants.ITEM%>"><fmt:message key="jsp.dspace-admin.authorize-advanced.type1"/></option>
+                    <option value="<%=Constants.BITSTREAM%>"><fmt:message key="jsp.dspace-admin.authorize-advanced.type2"/></option>
                 </select>
             </td>
         </tr>
 
         <tr>     
-            <td>Group:</td>
+            <%-- <td>Group:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.authorize-advanced.group"/></td>
             <td>
                 <select size="10" name="group_id">
                     <%  for(int i = 0; i < groups.length; i++ ) { %>
@@ -123,7 +135,8 @@
             </td>
         </tr>
 
-        <tr><td>Action:</td>
+        <%-- <tr><td>Action:</td> --%>
+        <tr><td><fmt:message key="jsp.dspace-admin.authorize-advanced.action"/></td>
             <td>
                 <select name="action_id">
                     <%  for( int i = 0; i < Constants.actionText.length; i++ ) { %>
@@ -141,16 +154,17 @@
         <table width="70%">
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_advanced_add" value="Add Policy">
+                    <%-- <input type="submit" name="submit_advanced_add" value="Add Policy"> --%>
+                    <input type="submit" name="submit_advanced_add" value="<fmt:message key="jsp.dspace-admin.authorize-advanced.add"/>">
                 </td>
                 <td align="right">
-                    <input type="submit" name="submit_advanced_clear" value="Clear Policies"> (warning: clears all policies for a given set of objects)
+                    <%-- <input type="submit" name="submit_advanced_clear" value="Clear Policies"> (warning: clears all policies for a given set of objects) --%>
+                    <input type="submit" name="submit_advanced_clear" value="<fmt:message key="jsp.dspace-admin.authorize-advanced.clear"/>"></td> <td><fmt:message key="jsp.dspace-admin.authorize-advanced.warning"/>
                 </td>
             </tr>
         </table>
     </center>        
 
     </form>
-
 </dspace:layout>
 

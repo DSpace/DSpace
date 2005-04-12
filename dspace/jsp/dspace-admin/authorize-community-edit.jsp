@@ -55,7 +55,11 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
 
 <%@ page import="java.util.List"     %>
 <%@ page import="java.util.Iterator" %>
@@ -73,20 +77,21 @@
         (List) request.getAttribute("policies");
 %>
 
-<dspace:layout title="Edit community policies"
+<dspace:layout titlekey="jsp.dspace-admin.authorize-community-edit.title"
                navbar="admin"
                locbar="link"
+               parenttitle="general.administer"
                parentlink="/dspace-admin"
-               parenttitle="Administer"
                nocache="true">
-
+               
   <table width=95%>
     <tr>
       <td align=left>
-    <h1>Policies for Community "<%= community.getMetadata("name") %>" (hdl:<%= community.getHandle() %>, DB ID <%=community.getID()%>)</h1>
+    <%-- <h1>Policies for Community "<%= community.getMetadata("name") %>" (hdl:<%= community.getHandle() %>, DB ID <%=community.getID()%>)</h1> --%>
+	<h1><fmt:message key="jsp.dspace-admin.authorize-community-edit.policies"/><%= community.getMetadata("name") %>" (hdl:<%= community.getHandle() %>, DB ID <%=community.getID()%>)</h1>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#communitypolicies">Help...</dspace:popup>
+        <dspace:popup page="/help/site-admin.html#communitypolicies"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
@@ -94,7 +99,8 @@
     <P align="center">
         <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method=POST>
             <input type="hidden" name="community_id" value="<%=community.getID()%>" >
-            <input type="submit" name="submit_community_add_policy" value="Add New">
+            <%-- <input type="submit" name="submit_community_add_policy" value="Add New"> --%>
+            <input type="submit" name="submit_community_add_policy" value="<fmt:message key="jsp.dspace-admin.authorize-community-edit.add"/>">
         </form>
     </p>
 
@@ -102,8 +108,10 @@
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
-            <th class="oddRowEvenCol"><strong>Action</strong></th>
-            <th class="oddRowOddCol"><strong>Group</strong></th>
+            <%-- <th class="oddRowEvenCol"><strong>Action</strong></th> --%>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.authorize-community-edit.action"/></strong></th>
+            <%-- <th class="oddRowOddCol"><strong>Group</strong></th> --%>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.authorize-community-edit.group"/></strong></th>
             <th class="oddRowEvenCol">&nbsp;</th>
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
@@ -128,10 +136,12 @@
                 <td class="<%= row %>RowEvenCol">
                     <input type="hidden" name="policy_id"     value="<%= rp.getID() %>">
                     <input type="hidden" name="community_id" value="<%= community.getID() %>">
-                    <input type="submit" name="submit_community_edit_policy" value="Edit">
+                    <%-- <input type="submit" name="submit_community_edit_policy" value="Edit"> --%>
+                    <input type="submit" name="submit_community_edit_policy" value="<fmt:message key="jsp.dspace-admin.authorize-community-edit.edit"/>">
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    <input type="submit" name="submit_community_delete_policy" value="Delete">
+                    <%-- <input type="submit" name="submit_community_delete_policy" value="Delete"> --%>
+                    <input type="submit" name="submit_community_delete_policy" value="<fmt:message key="jsp.dspace-admin.authorize-community-edit.delete"/>">
                 </td>
             </tr>
         </form>
@@ -140,5 +150,4 @@
     }
 %>
     </table>
-        
 </dspace:layout>

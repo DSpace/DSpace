@@ -50,6 +50,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Collection" %>
@@ -59,13 +62,14 @@
         (Collection[]) request.getAttribute("collections");
 %>
 
-<dspace:layout title="Select Collection"
+<dspace:layout titlekey="jsp.dspace-admin.collection-select.title"
                navbar="admin"
                locbar="link"
-               parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <h1>Collections:</h1>
+    <%-- <h1>Collections:</h1> --%>
+    <h1><fmt:message key="jsp.dspace-admin.collection-select.col"/></h1>
 
     <form method=POST>
 
@@ -87,15 +91,16 @@
         <table width="70%">
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_collection_select" value="Edit Policies">
+                    <%-- <input type="submit" name="submit_collection_select" value="Edit Policies"> --%>
+                    <input type="submit" name="submit_collection_select" value="<fmt:message key="jsp.dspace-admin.collection-select.edit"/>">
                 </td>
                 <td align="right">
-                    <input type="submit" name="submit_collection_select_cancel" value="Cancel">
+                    <%-- <input type="submit" name="submit_collection_select_cancel" value="Cancel"> --%>
+                    <input type="submit" name="submit_collection_select_cancel" value="<fmt:message key="jsp.dspace-admin.collection-select.cancel"/>">
                 </td>
             </tr>
         </table>
     </center>        
 
     </form>
-
 </dspace:layout>

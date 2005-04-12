@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
 <%@ page import="org.dspace.content.Item" %>
 
@@ -57,18 +60,20 @@
     Item item = (Item) request.getAttribute("item");
 %>
 
-<dspace:layout title="Delete Item" 
+<dspace:layout titlekey="jsp.tools.confirm-delete-item.title"
                navbar="admin"
                locbar="link"
+               parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
-               parenttitle="Administer"
                nocache="true">
 
-    <H1>Delete Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1>
-    
-    <P>Are you sure this item should be completely deleted?  Caution:
-    At present, no tombstone would be left.</P>
-    
+    <%-- <H1>Delete Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1> --%>
+    <H1><fmt:message key="jsp.tools.confirm-delete-item.title"/>: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1>
+
+    <%-- <P>Are you sure this item should be completely deleted?  Caution:
+    At present, no tombstone would be left.</P> --%>
+	<P><fmt:message key="jsp.tools.confirm-delete-item.info"/></P>
+
     <dspace:item item="<%= item %>" style="full" />
 
     <form method=POST>
@@ -79,14 +84,15 @@
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit" value="Delete">
+                        <%-- <input type="submit" name="submit" value="Delete"> --%>
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.confirm-delete-item.delete.button"/>">
                     </td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.confirm-delete-item.cancel.button"/>">
                     </td>
                 </tr>
             </table>
         </center>
     </form>
 </dspace:layout>
-

@@ -56,6 +56,8 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.net.URLEncoder" %>
@@ -69,6 +71,10 @@
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.Utils" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
+<%@ page import="org.apache.taglibs.standard.tag.common.fmt.BundleSupport" %>
+<%@ page import="java.util.Locale" %>
+
 <%
     // Get attributes
     Collection collection = (Collection) request.getAttribute("collection");
@@ -81,21 +87,11 @@
     String prevQuery = (String) request.getAttribute("previous.query");
     String nextQuery = (String) request.getAttribute("next.query");
 
-    // Description of what the user is actually browsing
-    String scopeName = "All of DSpace";
-    if (collection != null)
-    {
-        scopeName = collection.getMetadata("name");
-    }
-    else if (community != null)
-    {
-        scopeName = community.getMetadata("name");
-    }
 %>
 
-<dspace:layout title="Browse by Author">
+<dspace:layout titlekey="jsp.browse.authors.title">
 
-    <H2>Browsing <%= scopeName %> by Author</H2>
+    <H2><fmt:message key="jsp.browse.authors.title"/></H2>
 
     <form action="browse-author" method=GET>
 
@@ -103,10 +99,11 @@
         <table align=center border=0 bgcolor="#CCCCCC" cellpadding=0>
             <tr>
                 <td>
-                    <table border=0 bgcolor="#EEEEEE" cellpadding=2>
+                    <table border=0 bgcolor="#EEEEEE" cellpadding=2> <%--allow for greek alphabet also--%>
                         <tr>
                             <td class="browseBar">
-                                <span class="browseBarLabel">Jump&nbsp;to:&nbsp;</span>
+                        	    <%--<span class="browseBarLabel">Jump&nbsp;to:&nbsp;</span>--%>
+						        <span class="browseBarLabel"><fmt:message key="jsp.browse.authors.jump"/></span>
                                 <A HREF="browse-author?starts_with=0">0-9</A>
 <%
     for (char c = 'A'; c <= 'Z'; c++)
@@ -120,8 +117,10 @@
                         </tr>
                         <tr>
                             <td class="browseBar" align=center>
-                                <span class="browseBarLabel">or enter first few letters:&nbsp;</span>
-                                <input type="text" name="starts_with">&nbsp;<input type="submit" value="Go!">
+                                <%--<span class="browseBarLabel">or enter first few letters:&nbsp;</span>--%>
+								<span class="browseBarLabel"><fmt:message key="jsp.browse.authors.enter"/>&nbsp;</span>
+								<%--<input type="text" name="starts_with">&nbsp;<input type="submit" value="Go!">--%>
+                                <input type="text" name="starts_with">&nbsp;<input type="submit" value="<fmt:message key="jsp.browse.authors.go"/>">
                             </td>
                         </tr>
                     </table>
@@ -131,7 +130,8 @@
 
         <BR />
 
-        <P align=center>Showing authors <%= browseInfo.getOverallPosition() + 1 %>-<%= browseInfo.getOverallPosition() + browseInfo.getResultCount() %> of <%= browseInfo.getTotal() %>.</P>
+        <%--<P align=center>Showing authors <%= browseInfo.getOverallPosition() + 1 %>-<%= browseInfo.getOverallPosition() + browseInfo.getResultCount() %> of <%= browseInfo.getTotal() %>.</P>--%>
+        <P align=center><fmt:message key="jsp.browse.authors.show"/> <%= browseInfo.getOverallPosition() + 1 %>-<%= browseInfo.getOverallPosition() + browseInfo.getResultCount() %> <fmt:message key="jsp.browse.authors.of"/> <%= browseInfo.getTotal() %>.</P>
 
         <%-- Previous page/Next page --%>
         <table align=center border=0 width=70%>
@@ -141,7 +141,9 @@
     if (prevQuery != null)
     {
 %>
-                    <A HREF="browse-author?<%= prevQuery %>">Previous page</A>
+
+                    <%-- <A HREF="browse-author?<%= prevQuery %>">Previous page</A> --%>
+					<A HREF="browse-author?<%= prevQuery %>"><fmt:message key="jsp.browse.authors.previous"/></A>
 <%
     }
 %>
@@ -151,7 +153,8 @@
     if (nextQuery != null)
     {
 %>
-                    <A HREF="browse-author?<%= nextQuery %>">Next page</A>
+		            <%-- <A HREF="browse-author?<%= nextQuery %>">Next page</A> --%>
+                    <A HREF="browse-author?<%= nextQuery %>"><fmt:message key="jsp.browse.authors.next"/></A>
 <%
     }
 %>
@@ -190,7 +193,8 @@
     if (prevQuery != null)
     {
 %>
-                    <A HREF="browse-author?<%= prevQuery %>">Previous page</A>
+                    <%-- <A HREF="browse-author?<%= prevQuery %>">Previous page</A> --%>
+				    <A HREF="browse-author?<%= prevQuery %>"><fmt:message key="jsp.browse.authors.previous"/></A>
 <%
     }
 %>
@@ -200,7 +204,8 @@
     if (nextQuery != null)
     {
 %>
-                    <A HREF="browse-author?<%= nextQuery %>">Next page</A>
+		            <%-- <A HREF="browse-author?<%= nextQuery %>">Next page</A> --%>
+                    <A HREF="browse-author?<%= nextQuery %>"><fmt:message key="jsp.browse.authors.next"/></A>
 <%
     }
 %>

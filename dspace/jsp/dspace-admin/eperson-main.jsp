@@ -48,26 +48,32 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+	
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 
 <%
 %>
 
-<dspace:layout title="EPerson Administrations"
+<dspace:layout titlekey="jsp.dspace-admin.eperson-main.title"
                navbar="admin"
                locbar="link"
-               parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <h1>Administer EPeople</h1>
+    <%-- <h1>Administer EPeople</h1> --%>
+    <h1><fmt:message key="jsp.dspace-admin.eperson-main.heading"/></h1>
   <table width=95%>
     <tr>
       <td align=left>
-        <h3>Choose an action:</h3>
+        <%-- <h3>Choose an action:</h3> --%>
+        <h3><fmt:message key="jsp.dspace-admin.eperson-main.choose"/></h3>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#epeople">Help...</dspace:popup>
+        <dspace:popup page="/help/site-admin.html#epeople"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
@@ -78,26 +84,29 @@
         <table width="90%">
             <tr>
                 <td colspan=3 align=center>
-                    <input type="submit" name="submit_add" value="Add EPerson...">
+                    <%-- <input type="submit" name="submit_add" value="Add EPerson..."> --%>
+                    <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.eperson-main.add"/>">
                 </td>
             </tr>
             <tr>
-            	<td colspan=3><strong>OR</strong></td>
+            	<%-- <td colspan=3><strong>OR</strong></td> --%>
+            	<td colspan=3><strong><fmt:message key="jsp.dspace-admin.eperson-main.or"/></strong></td>
             </tr>
             <tr>
                 <td>
                     <dspace:selecteperson multiple="false" />
                 </td>
                 <td>
-                	then&nbsp;<input type="submit" name="submit_edit" value="Edit..." onclick="javascript:finishEPerson();">
+                	<%-- then&nbsp;<input type="submit" name="submit_edit" value="Edit..." onclick="javascript:finishEPerson();"> --%>
+                	<fmt:message key="jsp.dspace-admin.eperson-main.then"/>&nbsp;<input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.eperson-main.edit"/>" onclick="javascript:finishEPerson();">
                 </td>
                 <td>
-                	<input type="submit" name="submit_delete" value="Delete..." onclick="javascript:finishEPerson();">
+                	<%-- <input type="submit" name="submit_delete" value="Delete..." onclick="javascript:finishEPerson();"> --%>
+                	<input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.eperson-main.delete"/>" onclick="javascript:finishEPerson();">
                 </td>
             </tr>
         </table>
     </center>        
 
     </form>
-
 </dspace:layout>

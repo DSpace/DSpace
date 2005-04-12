@@ -55,6 +55,7 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -72,31 +73,18 @@
     BrowseInfo browseInfo = (BrowseInfo) request.getAttribute("browse.info" );
     String author = (String) request.getAttribute("author");
     boolean orderByTitle = ((Boolean) request.getAttribute("order.by.title")).booleanValue();
-
-
-    // Description of what the user is actually browsing
-    String scopeName = "All of DSpace";
-    if (collection != null)
-    {
-        scopeName = collection.getMetadata("name");
-    }
-    else if (community != null)
-    {
-        scopeName = community.getMetadata("name");
-    }
-
-    String pageTitle = "Items for Author " + author;
 %>
 
-<dspace:layout title="<%= pageTitle %>">
+<dspace:layout titlekey="jsp.browse.items-by-author.title">
 
-    <H2>Items for Author <%= Utils.addEntities(author) %> in <%= scopeName %></H2>
+  <H2><fmt:message key="jsp.browse.items-by-author.heading1"/> "<%= Utils.addEntities(author) %>"</H2>
 
     <%-- Sorting controls --%>
     <table border=0 cellpadding=10 align=center>
         <tr>
             <td colspan=2 align=center class=standard>
-                <a href="browse-author?starts_with=<%= URLEncoder.encode(author) %>">Return to Browse by Author</A>
+                <%-- <a href="browse-author?starts_with=<%= URLEncoder.encode(author) %>">Return to Browse by Author</A> --%>
+			    <a href="browse-author?starts_with=<%= URLEncoder.encode(author) %>"><fmt:message key="jsp.browse.items-by-author.return"/></A>
             </td>
         </tr>
         <tr>
@@ -105,19 +93,23 @@
     if (orderByTitle)
     {
 %>
-                <strong>Sorting by Title</strong>
+                <%-- <strong>Sorting by Title</strong> --%>
+                <strong><fmt:message key="jsp.browse.items-by-author.sort1"/></strong>
             </td>
             <td class=standard>
-                <a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=date">Sort by Date</a>
+                <%-- <a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=date">Sort by Date</a> --%>
+				<a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=date"><fmt:message key="jsp.browse.items-by-author.sort2"/></a>
 <%
     }
     else
     {
 %>
-                <a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=title">Sort by Title</a>
+      	        <%-- <a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=title">Sort by Title</a> --%>
+	            <a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=title"><fmt:message key="jsp.browse.items-by-author.sort3"/></a>
             </td>
             <td class=standard>
-                <strong>Sorting by Date</strong>
+                <%-- <strong>Sorting by Date</strong> --%>
+				<strong><fmt:message key="jsp.browse.items-by-author.sort4"/></strong>
 <%
     }
 %>
@@ -125,7 +117,8 @@
         </tr>
     </table>
 
-    <P align=center>Showing <%= browseInfo.getResultCount() %> items.</P>
+    <%-- <P align=center>Showing <%= browseInfo.getResultCount() %> items.</P> --%>
+	<P align=center><fmt:message key="jsp.browse.items-by-author.show"/> <%= browseInfo.getResultCount() %> <fmt:message key="jsp.browse.items-by-author.items"/></P>
 
 
     <%-- The items --%>

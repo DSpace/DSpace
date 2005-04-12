@@ -40,44 +40,55 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+	
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+
+
+<dspace:layout titlekey="jsp.register.invalid-token.title">
 
 <%--
   - Invalid token sent message.
   --%>
 
-<dspace:layout title="Invalid Token">
 
-    <H1>Invalid Token</H1>
+    <%-- <H1>Invalid Token</H1> --%>
+	<H1><fmt:message key="jsp.register.invalid-token.title"/></H1>
 
-    <P>The registration or forgotten password "token" in the URL is invalid.
-    This may be because of one of the following reason:</P>
+    <%-- <P>The registration or forgotten password "token" in the URL is invalid.
+    This may be because of one of the following reason:</P> --%>
+	<P><fmt:message key="jsp.register.invalid-token.info1"/></P>
 
     <UL>
-        <LI>The token might be incorrectly copied into the URL.  Some e-mail
+        <%--  <LI>The token might be incorrectly copied into the URL.  Some e-mail
         programs will "wrap" long lines of text in an email, so maybe it split
-        your special URL up into two lines, like this:
+        your special URL up into two lines, like this: --%>
+		<LI><fmt:message key="jsp.register.invalid-token.info2"/>
 
         <PRE>
 <%= ConfigurationManager.getProperty("dspace.url") %>/register?token=ABCDEFGHIJK
 LMNOP
         </PRE>
 
-        If it has, you should copy and paste the first line into your browser's
+        <%-- If it has, you should copy and paste the first line into your browser's
         address bar, then copy the second line, and paste into the address bar
         just on the end of the first line, making sure there are no spaces.  The
-        address bar should then contain something like:
+        address bar should then contain something like: --%>
+		<LI><fmt:message key="jsp.register.invalid-token.info3"/>
 
         <PRE>
 <%= ConfigurationManager.getProperty("dspace.url") %>/register?token=ABCDEFGHIJKLMNOP
         </PRE>
 
-        Then press return in the address bar, and the URL should work fine.</LI>
+        <%-- Then press return in the address bar, and the URL should work fine.</LI> --%>
+		<fmt:message key="jsp.register.invalid-token.info4"/></LI>
     </UL>
 
-    <P>If you're still having trouble, please contact us.</P>
+    <%-- <P>If you're still having trouble, please contact us.</P> --%>
+	<P><fmt:message key="jsp.register.invalid-token.info5"/></P>
     
     <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

@@ -52,6 +52,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson" %>
@@ -75,16 +78,16 @@
 	// Now work out values for next/prev page buttons
 	int jumpFiveBack = first - PAGESIZE * 5;
 	if (jumpFiveBack < 0) jumpFiveBack = 0;
-	
+
 	int jumpOneBack = first - PAGESIZE;
 	if (jumpOneBack < 0) jumpOneBack = 0;
-	
+
 	int jumpOneForward = first + PAGESIZE;
 	if (jumpOneForward > epeople.length) jumpOneForward = first;
-	
+
 	int jumpFiveForward = first + PAGESIZE * 5;
 	if (jumpFiveForward > epeople.length) jumpFiveForward = jumpEnd;
-	
+
 	// What's the link?
 	String sortByParam = "lastname";
 	if (sortBy == EPerson.EMAIL) sortByParam = "email";
@@ -97,7 +100,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
     <head>
-        <title>Select E-people</title>
+        <%-- <title>Select E-people</title> --%>
+        </title><fmt:message key="jsp.tools.eperson-list.title"/></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp">
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon">
@@ -114,7 +118,7 @@ function addEPerson(id, email, name)
 // Clear selected items from main e-people list
 function clearEPeople()
 {
-	var list = self.opener.document.forms[0].eperson_id;
+	var list = self.opener.document.forms[1].eperson_id;
 	while (list.options.length > 0)
 	{
 		list.options[0] = null;
@@ -126,24 +130,32 @@ function clearEPeople()
 	</head>
 	<body class="pageContents">
 
-    <h3>E-people <%= first + 1 %>-<%= last + 1 %> of <%= epeople.length %></H3>
+    <%-- <h3>E-people <%= first + 1 %>-<%= last + 1 %> of <%= epeople.length %></H3> --%>
+	<h3><fmt:message key="jsp.tools.eperson-list.heading"/> <%= first + 1 %>-<%= last + 1 %> <fmt:message key="jsp.tools.eperson-list.of"/> <%= epeople.length %></H3>
 
 <%
 	if (multiple)
 	{ %>
-	<P class="submitFormHelp">Clicking on the 'Add' button next to an e-person will add that
-	e-person to the list on the main form. </P>
+	<%-- <P class="submitFormHelp">Clicking on the 'Add' button next to an e-person will add that
+	e-person to the list on the main form. </P> --%>
+	<P class="submitFormHelp"><fmt:message key="jsp.tools.eperson-list.info1"/></P>
 <%  } %>
-    
+
 <%-- Controls for jumping around list--%>
 	<table width="99%">
 		<tr>
-			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %>0">First</A></strong></small></td>
+		 <%--   <td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %>0">First</A></strong></small></td>
 			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</A></strong></small></td>
 			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</A></strong></small></td>
 			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</A></strong></small></td>
 			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td> --%>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %>0"><fmt:message key="jsp.tools.eperson-list.first"/></A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 <fmt:message key="jsp.tools.eperson-list.pages"/></A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 <fmt:message key="jsp.tools.eperson-list.page"/></A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneForward %>">1 <fmt:message key="jsp.tools.eperson-list.page"/> &gt;</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveForward %>">5 <fmt:message key="jsp.tools.eperson-list.pages"/> &gt;</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.eperson-list.last"/></A></strong></small></td>
 		</tr>
 	</table>
 <br>
@@ -155,14 +167,32 @@ function clearEPeople()
             <th class="oddRowOddCol">&nbsp;</th>
             <th class="oddRowEvenCol"><%= sortBy == EPerson.ID ? "<strong>ID &uarr;</strong>" : "<A HREF=\"" + sortLink + "id\">ID</A>" %></th>
             <th class="oddRowOddCol"><%= sortBy == EPerson.EMAIL ? "<strong>E-mail &uarr;</strong>" : "<A HREF=\"" + sortLink + "email\">E-mail</A>" %></th>
-            <th class="oddRowEvenCol"><%= sortBy == EPerson.LASTNAME ? "<strong>Last Name &uarr;</strong>" : "<A HREF=\"" + sortLink + "lastname\">Last Name</A>" %></th>
-            <th class="oddRowOddCol">First Name</th>
-        </tr>
+            <%-- <th class="oddRowEvenCol"><%= sortBy == EPerson.LASTNAME ? "<strong>Last Name &uarr;</strong>" : "<A HREF=\"" + sortLink + "lastname\">Last Name</A>" %></th> --%>
+            <th class="oddRowEvenCol">
+                <%
+	    		if(sortBy == EPerson.LASTNAME)
+	    	     {
+	    	%>
 
+    	        	<strong><fmt:message key="jsp.tools.eperson-list.lastname"/> &uarr;</strong>
+	    	<%
+	    	    }
+	    	    else
+	    	    {
+	    	%>
+			<A HREF="<%=sortLink%>lastname"><fmt:message key="jsp.tools.eperson-list.lastname"/></A>
+	    	<%
+	                 }
+		%>
+
+            </th>
+
+            <%-- <th class="oddRowOddCol">First Name</th> --%>
+            <th class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.firstname"/></th>
+        </tr>
 <%
     String row = "even";
 
-	String buttonText = (multiple ? "Add" : "Select");
 	// If this is a dialogue to select a *single* e-person, we want
 	// to clear any existing entry in the e-person list, and
 	// to close this window when a 'select' button is clicked
@@ -177,7 +207,10 @@ function clearEPeople()
         String fullname = e.getFullName().replace('\'', ' ');
 %>
         <tr>
-			<td class="<%= row %>RowOddCol"><input type=button value="<%= buttonText %>" onClick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= e.getEmail() %>', '<%= fullname %>');<%= closeWindow %>"></td>
+			<td class="<%= row %>RowOddCol">
+			    <input type=button value="<%
+	if (multiple) { %><fmt:message key="jsp.tools.eperson-list.add"/><% }
+	else {          %><fmt:message key="jsp.tools.eperson-list.select"/><% } %>" onClick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= e.getEmail() %>', '<%= fullname %>');<%= closeWindow %>"></td>
 			<td class="<%= row %>RowEvenCol"><%= e.getID() %></td>
 			<td class="<%= row %>RowOddCol"><%= e.getEmail() %></td>
             <td class="<%= row %>RowEvenCol">
@@ -198,18 +231,26 @@ function clearEPeople()
 <%-- Controls for jumping around list--%>
 	<table width="99%">
 		<tr>
+			<%--
 			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %>0">First</A></strong></small></td>
 			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</A></strong></small></td>
 			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</A></strong></small></td>
 			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</A></strong></small></td>
 			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td> --%>
+		        <td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %>0"><fmt:message key="jsp.tools.eperson-list.first"/></A></strong></small></td>
+		        <td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 <fmt:message key="jsp.tools.eperson-list.pages"/></A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 <fmt:message key="jsp.tools.eperson-list.page"/></A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpOneForward %>">1 <fmt:message key="jsp.tools.eperson-list.page"/> &gt;</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpFiveForward %>">5 <fmt:message key="jsp.tools.eperson-list.pages"/> &gt;</A></strong></small></td>
+			<td width="17%" align="center"><small><strong><A HREF="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.eperson-list.last"/></A></strong></small></td>
 		</tr>
 	</table>
 
-	<P align="center"><input type="button" value="Close" onClick="window.close();"></P>
+	<%-- <P align="center"><input type="button" value="Close" onClick="window.close();"></P> --%>
+	<P align="center"><input type="button" value="<fmt:message key="jsp.tools.eperson-list.close.button"/>" onClick="window.close();"></P>
 
 	</form>
-	
+
 	</body>
 </html>

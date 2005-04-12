@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
@@ -56,13 +59,18 @@
     WorkspaceItem wi = (WorkspaceItem) request.getAttribute("workspace.item");
 %>
 
-<dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Remove Item" nocache="true">
+<dspace:layout locbar="link"
+               parentlink="/mydspace"
+               parenttitlekey="jsp.mydspace"
+               titlekey="jsp.mydspace.remove-item.title"
+               nocache="true">
 
-    <H1>Remove Item</H1>
+<H1><fmt:message key="jsp.mydspace.remove-item.title"/></H1>
     
-    <P>Are you sure you want to remove the following incomplete item?</P>
+    <%-- <P>Are you sure you want to remove the following incomplete item?</P> --%>
+    <P><fmt:message key="jsp.mydspace.remove-item.confirmation"/></P>
 
-    <dspace:item item="<%= wi.getItem() %>" />
+    <dspace:item item="<%= wi.getItem() %>"/>
 
     <form action="<%= request.getContextPath() %>/mydspace" method=post>
         <input type="hidden" name="workspace_id" value="<%= wi.getID() %>">
@@ -71,10 +79,12 @@
         <table align=center border=0 width=90%>
             <tr>
                 <td align=left>
-                    <input type="submit" name="submit_delete" value="Remove the Item">
+                    <%-- <input type="submit" name="submit_delete" value="Remove the Item"> --%>
+					<input type="submit" name="submit_delete" value="<fmt:message key="jsp.mydspace.remove-item.remove.button"/>">
                 </td>
                 <td align=right>
-                    <input type="submit" name="submit_cancel" value="Cancel Removal">
+                    <%-- <input type="submit" name="submit_cancel" value="Cancel Removal"> --%>
+					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.remove-item.cancel.button"/>">
                 </td>
             </tr>
         </table>

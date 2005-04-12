@@ -44,15 +44,22 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="Password Changed">
 
-    <H1>Password Changed</H1>
+<dspace:layout titlekey="jsp.register.password-changed.title">
 
-    <P>Thank you, your new password has been set and is active immediately.</P>
+    <%-- <H1>Password Changed</H1> --%>
+	<H1><fmt:message key="jsp.register.password-changed.title"/></H1>
 
-    <P><A HREF="<%= request.getContextPath() %>/">Go to DSpace Home</A></P>
+    <%-- <P>Thank you, your new password has been set and is active immediately.</P> --%>
+	<P><fmt:message key="jsp.register.password-changed.info"/></P>
+
+    <%-- <P><A HREF="<%= request.getContextPath() %>/">Go to DSpace Home</A></P> --%>
+	<P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.password-changed.link"/></A></P>
 
 </dspace:layout>
 

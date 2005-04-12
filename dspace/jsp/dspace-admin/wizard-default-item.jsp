@@ -51,35 +51,49 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+    
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%  Collection collection = (Collection) request.getAttribute("collection");
     DCType[] dcTypes = (DCType[]) request.getAttribute("dctypes"); %>
 
-<dspace:layout locbar="off" navbar="off" title="Enter Default Metadata" nocache="true">
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.dspace-admin.wizard-default-item.title"
+               nocache="true">
+  
 
-  <table width="95%">
+<table width="95%">
     <tr>
       <td>
-	<H1>Enter Default Item Metadata</H1>
+	<%-- <H1>Enter Default Item Metadata</H1> --%>
+	<H1><fmt:message key="jsp.dspace-admin.wizard-default-item.enter"/></H1>
       </td>
       <td class="standard" align=right>
-        <dspace:popup page="/help/site-admin.html#wizard_default">Help...</dspace:popup>
+        <dspace:popup page="/help/site-admin.html#wizard_default"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
 	
-	<P>Whenever a new submission is started in this collection, it will have the
-	metadata you entered below already filled out.</P>
+	<%-- <P>Whenever a new submission is started in this collection, it will have the
+	metadata you entered below already filled out.</P> --%>
+	<P><fmt:message key="jsp.dspace-admin.wizard-default-item.text1"/></P>
 	
-	<P>You can leave as many fields blank as you like.</P>
+	<%-- <P>You can leave as many fields blank as you like.</P> --%>
+	<P><fmt:message key="jsp.dspace-admin.wizard-default-item.text2"/></P>
 	
     <form method=POST action="<%= request.getContextPath() %>/tools/collection-wizard">
         <center><table class="miscTable">
             <tr>
-                <th class="oddRowOddCol"><strong>Dublin Core Field</strong></th>
-                <th class="oddRowEvenCol"><strong>Value</strong></th>
-                <th class="oddRowOddCol"><strong>Language</strong></th>
+                <%-- <th class="oddRowOddCol"><strong>Dublin Core Field</strong></th> --%>
+                <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.wizard-default-item.dcore"/></strong></th>
+                <%-- <th class="oddRowEvenCol"><strong>Value</strong></th> --%>
+                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.wizard-default-item.value"/></strong></th>
+                <%-- <th class="oddRowOddCol"><strong>Language</strong></th> --%>
+                <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.wizard-default-item.language"/></strong></th>
             <tr>
 <%
     String row = "even";
@@ -89,7 +103,8 @@
 	 %>
 			<tr>
 			    <td class="<%= row %>RowOddCol"><select name="dctype_<%= i %>">
-			    	<option value="-1">Select field...</option>
+			    	<%-- <option value="-1">Select field...</option> --%>
+			    	<option value="-1"><fmt:message key="jsp.dspace-admin.wizard-default-item.select"/></option>
 <%
 		for (int dc = 0; dc < dcTypes.length; dc++)
 		{ %>
@@ -116,11 +131,12 @@
         <center>
             <table border=0 width="80%">
                 <tr>
-                    <td width="100%">
-                        &nbsp;
+                    <td width="100%">&nbsp;
+                        
                     </td>
                     <td>
-                        <input type=submit name="submit_next" value="Next &gt;">
+                        <%-- <input type=submit name="submit_next" value="Next &gt;"> --%>
+                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.wizard-default-item.next"/>">
                     </td>
                 </tr>
             </table>

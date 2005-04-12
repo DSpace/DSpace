@@ -44,21 +44,28 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout navbar="off" locbar="nolink" title="Log In">
-    <table border=0 width="90%">
+<dspace:layout navbar="off" locbar="nolink" titlekey="jsp.login.no-valid-cert.title">
+
+<table border=0 width="90%">
         <tr>
             <td align="left">
-                <H1>Log In to DSpace</H1>
+                <%-- <H1>Log In to DSpace</H1> --%>
+                <H1><fmt:message key="jsp.login.no-valid-cert.heading"/></H1>
             </td>
             <td align="right" class="standard">
-                <dspace:popup page="/help/index.html#login">Help...</dspace:popup>
+                <dspace:popup page="/help/index.html#login"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>
 
-    <P align=center><strong>You do not seem to have a valid Web certificate.</strong>  Please try again.</P>
+    <%-- <P align=center><strong>You do not seem to have a valid Web certificate.</strong>  Please try again.</P> --%>
+    <P align=center><fmt:message key="jsp.login.no-valid-cert.text"/></P>
 
     <dspace:include page="/components/login-form.jsp" />
 </dspace:layout>

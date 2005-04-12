@@ -44,13 +44,19 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="Cannot Register">
-    <H1>Cannot Register</H1>
+<dspace:layout titlekey="jsp.register.cannot-register.title">
+
+    <%-- <H1>Cannot Register</H1> --%>
+	<H1><fmt:message key="jsp.register.cannot-register.title"/></H1>
     
-    <P>The configuration of this DSpace site does not allow you to register
-    yourself.  Please feel free to contact us with any queries.</P>
+    <%-- <P>The configuration of this DSpace site does not allow you to register
+    yourself.  Please feel free to contact us with any queries.</P> --%>
+	<P><fmt:message key="jsp.register.cannot-register.msg"/></P>
     
     <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

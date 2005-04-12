@@ -50,19 +50,27 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%  Collection collection = (Collection) request.getAttribute("collection"); %>
 
-<dspace:layout locbar="off" navbar="off" title="Describe the Collection" nocache="true">
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.dspace-admin.wizard-basicinfo.title"
+               nocache="true">
 
-  <table width="95%">
+<table width="95%">
     <tr>
       <td>
-        <H1>Describe the Collection</H1>
+        <%-- <H1>Describe the Collection</H1> --%>
+        <H1><fmt:message key="jsp.dspace-admin.wizard-basicinfo.heading"/></H1>
       </td>
       <td class="standard" align=right>
-        <dspace:popup page="/help/site-admin.html#wizard_description">Help...</dspace:popup>
+        <dspace:popup page="/help/site-admin.html#wizard_description"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
@@ -70,7 +78,8 @@
     <form action="<%= request.getContextPath() %>/tools/collection-wizard" method=post enctype="multipart/form-data">
         <table>
             <tr>
-            	<td><P class="submitFormLabel">Name:</P></td>
+            	<%-- <td><P class="submitFormLabel">Name:</P></td> --%>
+            	<td><P class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-basicinfo.name"/></P></td>
                 <td><input type="text" name="name" size=50></td>
             </tr>
 
@@ -82,12 +91,16 @@
             </tr>
 
             <tr>
-                <td colspan=3 class="submitFormHelp">
+                <%-- <td colspan=3 class="submitFormHelp">
 	                Shown in list on community home page
+                </td> --%>
+				<td colspan=3 class="submitFormHelp">
+	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.shown"/>
                 </td>
             </tr>
             <tr>
-                <td><P class="submitFormLabel">Short Description:</P></td>
+                <%-- <td><P class="submitFormLabel">Short Description:</P></td> --%>
+                <td><P class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-basicinfo.description"/></P></td>
                 <td><input type="text" name="short_description" size=50></td>
             </tr>
 
@@ -95,11 +108,13 @@
 
             <tr>
                 <td colspan=3 class="submitFormHelp">
-	                HTML, shown in center of collection home page.  Be sure to enclose in &lt;P&gt; &lt;/P&gt; tags!
+	                <%-- HTML, shown in center of collection home page.  Be sure to enclose in &lt;P&gt; &lt;/P&gt; tags! --%>
+	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.html1"/>
                 </td>
             </tr>
             <tr>
-                <td><P class="submitFormLabel">Introductory text:</P></td>
+                <%-- <td><P class="submitFormLabel">Introductory text:</P></td> --%>
+                <td><P class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-basicinfo.intro"/></P></td>
                 <td><textarea name="introductory_text" rows=4 cols=50></textarea></td>
             </tr>
 
@@ -107,11 +122,13 @@
 
             <tr>
                 <td colspan=3 class="submitFormHelp">
-	                Plain text, shown at bottom of collection home page
+	                <%-- Plain text, shown at bottom of collection home page --%>
+	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.plain"/>
                 </td>
             </tr>
             <tr>
-                <td><P class="submitFormLabel">Copyright text:</P></td>
+                <%-- <td><P class="submitFormLabel">Copyright text:</P></td> --%>
+                <td><P class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-basicinfo.copyright"/></P></td>
                 <td><textarea name="copyright_text" rows=3 cols=50></textarea></td>
             </tr>
 
@@ -119,11 +136,13 @@
 
             <tr>
                 <td colspan=3 class="submitFormHelp">
-	                HTML, shown on right-hand side of collection home page.  Be sure to enclose in &lt;P&gt; &lt;/P&gt; tags!
+	                <%-- HTML, shown on right-hand side of collection home page.  Be sure to enclose in &lt;P&gt; &lt;/P&gt; tags! --%>
+	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.html2"/>
                 </td>
             </tr>
             <tr>
-                <td><P class="submitFormLabel">Side bar text:</P></td>
+                <%-- <td><P class="submitFormLabel">Side bar text:</P></td> --%>
+                <td><P class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-basicinfo.side"/></P></td>
                 <td><textarea name="side_bar_text" rows=4 cols=50></textarea></td>
             </tr>
 
@@ -131,11 +150,13 @@
 
             <tr>
                 <td colspan=3 class="submitFormHelp">
-	                License that submitters must grant.  Leave this blank to use the default license.
+	                <%-- License that submitters must grant.  Leave this blank to use the default license. --%>
+	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.license1"/>
                 </td>
             </tr>
             <tr>
-                <td><P class="submitFormLabel">License:</P></td>
+                <%-- <td><P class="submitFormLabel">License:</P></td> --%>
+                <td><P class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-basicinfo.license2"/></P></td>
                 <td><textarea name="license" rows=4 cols=50></textarea></td>
             </tr>
 
@@ -143,11 +164,13 @@
 
             <tr>
                 <td colspan=3 class="submitFormHelp">
-	                Plain text, any provenance information about this collection.  Not shown on collection pages.
+	                <%-- Plain text, any provenance information about this collection.  Not shown on collection pages. --%>
+	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.plain2"/>
                 </td>
             </tr>
             <tr>
-                <td><P class="submitFormLabel">Provenance:</P></td>
+                <%-- <td><P class="submitFormLabel">Provenance:</P></td> --%>
+                <td><P class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-basicinfo.provenance"/></P></td>
                 <td><textarea name="provenance_description" rows=4 cols=50></textarea></td>
             </tr>
 
@@ -155,11 +178,13 @@
 
              <tr>
                 <td colspan=3 class="submitFormHelp">
-	                Choose a JPEG or GIF logo for the collection home page.  Should be quite small.
+	                <%-- Choose a JPEG or GIF logo for the collection home page.  Should be quite small. --%>
+	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.choose"/>
                 </td>
             </tr>
             <tr>
-                <td><P class="submitFormLabel">Logo:</P></td>
+                <%-- <td><P class="submitFormLabel">Logo:</P></td> --%>
+                <td><P class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-basicinfo.logo"/></P></td>
                 <td><input type=file size=40 name="file"></td>
             </tr>
         </table>
@@ -173,15 +198,16 @@
         <center>
             <table border=0 width="80%">
                 <tr>
-                    <td width="100%">
-                        &nbsp;
+                    <td width="100%">&nbsp;
+
                     </td>
                     <td>
-                        <input type=submit name="submit_next" value="Next &gt;">
-                    </td>
+                        <%-- <input type=submit name="submit_next" value="Next &gt;"> --%>
+                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.wizard-basicinfo.next"/>">
+                   </td>
                 </tr>
             </table>
         </center>
     </form>
-    
+
 </dspace:layout>

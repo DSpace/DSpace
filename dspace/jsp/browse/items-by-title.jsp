@@ -56,6 +56,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.browse.BrowseInfo" %>
@@ -78,31 +81,22 @@
     String prevQuery = (String) request.getAttribute("previous.query");
     String nextQuery = (String) request.getAttribute("next.query");
 
-    // Description of what the user is actually browsing
-    String scopeName = "All of DSpace";
-    if (collection != null)
-    {
-        scopeName = collection.getMetadata("name");
-    }
-    else if (community != null)
-    {
-        scopeName = community.getMetadata("name");
-    }
 %>
 
-<dspace:layout title="Browse by Title">
+<dspace:layout titlekey="jsp.browse.items-by-title.title">
 
-    <H2>Browsing <%= scopeName %> by Title</H2>
+    <H2><fmt:message key="jsp.browse.items-by-title.title"/></H2>
 
     <%-- Title browse controls table --%>
     <form action="browse-title" method=GET>
-        <table align=center border=0 bgcolor="#CCCCCC" cellpadding=0>
-            <tr>
-                <td>
-                    <table border=0 bgcolor="#EEEEEE" cellpadding=2>
-                        <tr>
-                            <td class="browseBar">
-                                <span class="browseBarLabel">Jump&nbsp;to:&nbsp;</span>
+            <table align=center border=0 bgcolor="#CCCCCC" cellpadding=0>
+                <tr>
+                    <td>
+                        <table border=0 bgcolor="#EEEEEE" cellpadding=2> <%--allow for greek alphabet also--%>
+                            <tr>
+                                <td class="browseBar">
+                                    <%-- <span class="browseBarLabel">Jump&nbsp;to:&nbsp;</span> --%>
+    								<span class="browseBarLabel"><fmt:message key="jsp.browse.items-by-title.jump"/></span>
                                 <A HREF="browse-title?starts_with=0">0-9</A>
 <%
     for (char c = 'A'; c <= 'Z'; c++)
@@ -115,22 +109,26 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="browseBar" align=center>
-                                <span class="browseBarLabel">or enter first few letters:&nbsp;</span>
-                                <input type="text" name="starts_with"/>&nbsp;<input type="submit" value="Go!">
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+                                <td class="browseBar" align=center>
+                                    <%-- <span class="browseBarLabel">or enter first few letters:&nbsp;</span> --%>
+    								<span class="browseBarLabel"><fmt:message key="jsp.browse.items-by-title.enter"/>&nbsp;</span>
+                                    <%-- <input type="text" name="starts_with"/>&nbsp;<input type="submit" value="Go!"> --%>
+    								<input type="text" name="starts_with"/>&nbsp;<input type="submit" value="<fmt:message key="jsp.browse.items-by-title.go"/>">
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
     </form>
-
+    
     <BR>
 
     <P align=center>
-        Showing items <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %>
-        of <%= browseInfo.getTotal() %>.
+        <%-- Showing items <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %>
+        of <%= browseInfo.getTotal() %>. --%>
+		<fmt:message key="jsp.browse.items-by-title.show"/> <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %>
+        <fmt:message key="jsp.browse.items-by-title.of"/> <%= browseInfo.getTotal() %>.
     </P>
 
     <%-- Previous page/Next page --%>
@@ -141,7 +139,8 @@
     if (prevQuery != null)
     {
 %>
-                <A HREF="browse-title?<%= prevQuery %>">Previous page</A>
+                <%-- <A HREF="browse-title?<%= prevQuery %>">Previous page</A> --%>
+				<A HREF="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.items-by-title.previous"/></A>
 <%
     }
 %>
@@ -151,7 +150,8 @@
     if (nextQuery != null)
     {
 %>
-                <A HREF="browse-title?<%= nextQuery %>">Next page</A>
+                <%-- <A HREF="browse-title?<%= nextQuery %>">Next page</A> --%>
+				<A HREF="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.items-by-title.next"/></A>
 <%
     }
 %>
@@ -164,7 +164,7 @@
     if (highlight)
     {
         highlightAttribute = String.valueOf(browseInfo.getOffset());
-    }    
+    }
 %>
     <dspace:itemlist items="<%= browseInfo.getItemResults() %>" emphcolumn="title" highlightrow="<%= highlightAttribute %>" />
 
@@ -177,7 +177,8 @@
     if (prevQuery != null)
     {
 %>
-                <A HREF="browse-title?<%= prevQuery %>">Previous page</A>
+                <%-- <A HREF="browse-title?<%= prevQuery %>">Previous page</A> --%>
+				<A HREF="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.items-by-title.previous"/></A>
 <%
     }
 %>
@@ -187,7 +188,8 @@
     if (nextQuery != null)
     {
 %>
-                <A HREF="browse-title?<%= nextQuery %>">Next page</A>
+                <%-- <A HREF="browse-title?<%= nextQuery %>">Next page</A> --%>
+				<A HREF="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.items-by-title.next"/></A>
 <%
     }
 %>

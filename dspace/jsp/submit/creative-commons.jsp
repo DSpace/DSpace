@@ -49,6 +49,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 
@@ -69,7 +72,10 @@
     boolean licenseExists = (lExists == null ? false : lExists.booleanValue());
 %>
 
-<dspace:layout locbar="off" navbar="off" title="DSpace Distribution License" nocache="true">
+<dspace:layout locbar="off"
+               navbar="off"
+               title="creative-commons.title"
+               nocache="true">
 
     <form name="foo" id="license_form" action="<%= request.getContextPath() %>/submit" method=post>
 
@@ -79,32 +85,42 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <H1>Submit: Use a Creative Commons License</H1>
+        <%-- <H1>Submit: Use a Creative Commons License</H1> --%>
+		<H1><fmt:message key="jsp.submit.creative-commons.heading"/></H1>
 <br />
 
 <%
         if (licenseExists)
         {
 %>
-        <P>You have already chosen a Creative Commons license and added it to this item.
-        You may:</P>
-        <ul>
+        <%-- <P>You have already chosen a Creative Commons license and added it to this item.
+        You may:</P> --%>
+		<P><fmt:message key="jsp.submit.creative-commons.info1"/></P>
+    <%-- <ul>
             <li>Press the 'Next' button below to <em>keep</em> the license previously chosen.</li>
             <li>Press the 'Skip Creative Commons' button below to <em>remove</em> the current choice, and forego a Creative Commons license.</li>
             <li>Complete the selection process below to <em>replace</em> the current choice.</li>
+         </ul> --%>
+		 <ul>
+            <li><fmt:message key="jsp.submit.creative-commons.choice1"/></li>
+            <li><fmt:message key="jsp.submit.creative-commons.choice2"/></li>
+            <li><fmt:message key="jsp.submit.creative-commons.choice3"/></li>
          </ul>
 <%
         }
         else
         {
 %>
-        <P>To license your Item under Creative Commons, follow the instructions below. You will be given an opportunity to review your selection.
-        Follow the 'proceed' link to add the license. If you wish to omit a Creative Commons license, press the 'Skip Creative Commons' button.</P>
+        <%-- <P>To license your Item under Creative Commons, follow the instructions below. You will be given an opportunity to review your selection.
+        Follow the 'proceed' link to add the license. If you wish to omit a Creative Commons license, press the 'Skip Creative Commons' button.</P> --%>
+		<P><fmt:message key="jsp.submit.creative-commons.info2"/></P>
 <%
         }
 %>  
 
-	<IFRAME src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540">Your browser must support IFrames to use this feature
+	<%-- <IFRAME src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540">Your browser must support IFrames to use this feature
+	</IFRAME> --%>
+	<IFRAME src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540"><fmt:message key="jsp.submit.creative-commons.info3"/>
 	</IFRAME>
 
         <%= SubmitServlet.getSubmissionParameters(si) %>
@@ -116,24 +132,28 @@
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td>
-                        <input type=submit name=submit_prev value="&lt; Previous">
+                        <%-- <input type=submit name=submit_prev value="&lt; Previous"> --%>
+						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.creative-commons.previous.button"/>">
                     </td>
 <%
      if (licenseExists)
      {
 %>
                     <td>
-                        <input type=submit name=submit_next value="Next &gt;">
+                        <%-- <input type=submit name=submit_next value="Next &gt;"> --%>
+						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.creative-commons.next.button"/>">
                     </td>
 <%
      }
 %>
                     <td>
-                        <input type=submit name=submit_no_cc value="Skip Creative Commons &gt;"/>
+                        <%-- <input type=submit name=submit_no_cc value="Skip Creative Commons &gt;"/> --%>
+						<input type=submit name=submit_no_cc value="<fmt:message key="jsp.submit.creative-commons.skip.button"/>"/>
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
-                        <input type=submit name=submit_cancel value="Cancel/Save"/>
+                        <%-- <input type=submit name=submit_cancel value="Cancel/Save"/> --%>
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.creative-commons.cancel.button"/>"/>
                     </td>
                 </tr>
             </table>

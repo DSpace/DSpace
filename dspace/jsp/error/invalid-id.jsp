@@ -49,6 +49,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page isErrorPage="true" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -65,34 +68,50 @@
     }
 
     // Get text for the type
-    String typeString = "object";
+    //String typeString = "object";
+   // if (type != null)
+   // {
+   //     typeString = Constants.typeText[type.intValue()].toLowerCase();
+   // }
+
+
+    String typeString = "constants.object";
     if (type != null)
     {
-        typeString = Constants.typeText[type.intValue()].toLowerCase();
+        typeString = "constants.type" + type.intValue();
     }
+
+
 %>
 
-<dspace:layout locbar="off" title="Invalid Identifier">
+<dspace:layout locbar="off" titlekey="jsp.error.invalid-id.title">
 
-    <H1>Invalid Identifier</H1>
+    <%-- <H1>Invalid Identifier</H1> --%>
+    <H1><fmt:message key="jsp.error.invalid-id.heading"/></H1>
 
-    <P>The identifier <%= badID %> does not correspond to a valid
+    <%-- <P>The identifier <%= badID %> does not correspond to a valid
     <%= typeString %> in DSpace.  This may be because of one of the following
-    reasons:</P>
+    reasons:</P> --%>
+	<P><fmt:message key="jsp.error.invalid-id.text1a"/> <%= badID %> <fmt:message key="jsp.error.invalid-id.text1b"/>
+    <fmt:message key="constants.object"/> <fmt:message key="jsp.error.invalid-id.text1c"/></P>
 
     <UL>
-        <LI>The URL of the current page is incorrect - if you followed a link
-        from outside of DSpace it may be mistyped or corrupt.</LI>
-        <LI>You entered an invalid ID into a form - please try again.</LI>
+        <%-- <LI>The URL of the current page is incorrect - if you followed a link
+        from outside of DSpace it may be mistyped or corrupt.</LI> --%>
+        <LI><fmt:message key="jsp.error.invalid-id.list1"/></LI>
+        <%-- <LI>You entered an invalid ID into a form - please try again.</LI> --%>
+        <LI><fmt:message key="jsp.error.invalid-id.list2"/></LI>
     </UL>
     
-    <P>If you're having problems, or you expected the ID to work, feel free to
-    contact the site administrators.</P>
+    <%-- <P>If you're having problems, or you expected the ID to work, feel free to
+    contact the site administrators.</P> --%>
+    <P><fmt:message key="jsp.error.invalid-id.text2"/></P>
 
     <dspace:include page="/components/contact-info.jsp" />
 
     <P align=center>
-        <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>
+        <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
+        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.error.invalid-id.go"/></A>
     </P>
 	
 

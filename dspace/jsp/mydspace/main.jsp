@@ -53,6 +53,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
@@ -86,38 +90,45 @@
         (SupervisedItem[]) request.getAttribute("supervised.items");
 %>
 
-<dspace:layout title="My DSpace" nocache="true">
+<dspace:layout titlekey="jsp.mydspace" nocache="true">
 
-    <table width="100%" border=0>
+<table width="100%" border=0>
         <tr>
             <td align=left>
                 <H1>
-                    My DSpace: <%= user.getFullName() %>
+                    <%-- My DSpace: <%= user.getFullName() %> --%>
+                    <fmt:message key="jsp.mydspace"/>: <%= user.getFullName() %>
                 </H1>
             </td>
             <td align=right class=standard>
-                <dspace:popup page="/help/index.html#mydspace">Help...</dspace:popup>
+                <dspace:popup page="/help/index.html#mydspace"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         <tr>
     </table>
-  
+
 <%-- Task list:  Only display if the user has any tasks --%>
 <%
     if (owned.length > 0)
     {
 %>
-    <H2>Owned Tasks</H2>
+    <%-- <H2>Owned Tasks</H2> --%>
+    <H2><fmt:message key="jsp.mydspace.main.heading2"/></H2>
 
     <P class="submitFormHelp">
-        Below are the current tasks that you have chosen to do.
+        <%-- Below are the current tasks that you have chosen to do. --%>
+        <fmt:message key="jsp.mydspace.main.text1"/>
     </P>
 
     <table class=miscTable align=center>
         <tr>
-            <th class=oddRowOddCol>Task</th>
+            <%-- <th class=oddRowOddCol>Task</th>
             <th class=oddRowEvenCol>Item</th>
             <th class=oddRowOddCol>Submitted To</th>
-            <th class=oddRowEvenCol>Submitted By</th>
+            <th class=oddRowEvenCol>Submitted By</th> --%>
+            <th class=oddRowOddCol><fmt:message key="jsp.mydspace.main.task"/></th>
+            <th class=oddRowOddCol><fmt:message key="jsp.mydspace.main.item"/></th>
+            <th class=oddRowOddCol><fmt:message key="jsp.mydspace.main.subto"/></th>
+            <th class=oddRowEvenCol><fmt:message key="jsp.mydspace.main.subby"/></th>
             <th class=oddRowOddCol>&nbsp;</th>
             <th class=oddRowEvenCol>&nbsp;</th>
         </tr>
@@ -143,9 +154,11 @@
 <%
             switch (owned[i].getState())
             {
-            case WorkflowManager.WFSTATE_STEP1: %>Review Submission<% break;
-            case WorkflowManager.WFSTATE_STEP2: %>Check Submission<% break;
-            case WorkflowManager.WFSTATE_STEP3: %>Final Edit of Submission<% break;
+
+            //There was once some code...
+            case WorkflowManager.WFSTATE_STEP1: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
+            case WorkflowManager.WFSTATE_STEP2: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
+            case WorkflowManager.WFSTATE_STEP3: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
             }
 %>
                 </td>
@@ -153,10 +166,12 @@
                 <td class="<%= row %>RowOddCol"><%= owned[i].getCollection().getMetadata("name") %></td>
                 <td class="<%= row %>RowEvenCol"><A HREF="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></A></td>
                 <td class="<%= row %>RowOddCol">
-                    <input type="submit" name="submit_perform" value="Perform This Task">
+                    <%-- <input type="submit" name="submit_perform" value="Perform This Task"> --%>
+                    <input type="submit" name="submit_perform" value="<fmt:message key="jsp.mydspace.main.perform.button"/>">
                 </td>
                 <td class="<%= row %>RowEvemCol">
-                    <input type="submit" name="submit_return" value="Return to Pool">
+                    <%-- <input type="submit" name="submit_return" value="Return to Pool"> --%>
+                    <input type="submit" name="submit_return" value="<fmt:message key="jsp.mydspace.main.return.button"/>">
                 </td>
             </form>
         </tr>
@@ -167,24 +182,29 @@
     </table>
 <%
     }
-  
+
     // Pooled tasks - only show if there are any
     if (pooled.length > 0)
     {
 %>
-    <H2>Tasks in the Pool</H2>
+    <%-- <H2>Tasks in the Pool</H2> --%>
+    <H2><fmt:message key="jsp.mydspace.main.heading3"/></H2>
 
     <P class="submitFormHelp">
-        Below are tasks in the task pool that have been assigned to you.
+        <%--Below are tasks in the task pool that have been assigned to you. --%>
+        <fmt:message key="jsp.mydspace.main.text2"/>
     </P>
 
     <table class=miscTable align=center>
         <tr>
-            <th class=oddRowOddCol>Task</th>
+       <%-- <th class=oddRowOddCol>Task</th>
             <th class=oddRowEvenCol>Item</th>
             <th class=oddRowOddCol>Submitted To</th>
-            <th class=oddRowEvenCol>Submitted By</th>
-            <th class=oddRowOddCol>&nbsp;</th>
+            <th class=oddRowEvenCol>Submitted By</th> --%>
+            <th class=oddRowOddCol><fmt:message key="jsp.mydspace.main.task"/></th>
+            <th class=oddRowEvenCol><fmt:message key="jsp.mydspace.main.item"/></th>
+            <th class=oddRowOddCol><fmt:message key="jsp.mydspace.main.subto"/></th>
+            <th class=oddRowEvenCol><fmt:message key="jsp.mydspace.main.subby"/></th>
         </tr>
 <%
         // even or odd row:  Starts even since header row is odd (1).  Toggled
@@ -208,9 +228,9 @@
 <%
             switch (pooled[i].getState())
             {
-            case WorkflowManager.WFSTATE_STEP1POOL: %>Review Submission<% break;
-            case WorkflowManager.WFSTATE_STEP2POOL: %>Check Submission<% break;
-            case WorkflowManager.WFSTATE_STEP3POOL: %>Final Edit of Submission<% break;
+            case WorkflowManager.WFSTATE_STEP1POOL: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
+            case WorkflowManager.WFSTATE_STEP2POOL: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
+            case WorkflowManager.WFSTATE_STEP3POOL: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
             }
 %>
                 </td>
@@ -218,7 +238,8 @@
                 <td class="<%= row %>RowOddCol"><%= pooled[i].getCollection().getMetadata("name") %></td>
                 <td class="<%= row %>RowEvenCol"><A HREF="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></A></td>
                 <td class="<%= row %>RowOddCol">
-                    <input type="submit" name="submit_claim" value="Take Task">
+                    <%-- <input type="submit" name="submit_claim" value="Take Task"> --%>
+                    <input type="submit" name="submit_claim" value="<fmt:message key="jsp.mydspace.main.take.button"/>">
                 </td>
             </form>
         </tr>
@@ -237,17 +258,20 @@
             <table border=0 width="70%">
                 <tr>
                     <td align=left>
-                        <input type=submit name="submit_new" value="Start a New Submission">
+                        <%-- <input type=submit name="submit_new" value="Start a New Submission"> --%>
+                        <input type=submit name="submit_new" value="<fmt:message key="jsp.mydspace.main.start.button"/>">
                     </td>
                     <td align=right>
-                        <input type=submit name="submit_own" value="View Accepted Submissions">
+                        <%-- <input type=submit name="submit_own" value="View Accepted Submissions"> --%>
+                        <input type=submit name="submit_own" value="<fmt:message key="jsp.mydspace.main.view.button"/>">
                     </td>
                 </tr>
             </table>
         </center>
     </form>
 
-    <P align="center"><A HREF="<%= request.getContextPath() %>/subscribe">See Your Subscriptions</A></P>
+    <%-- <P align="center"><A HREF="<%= request.getContextPath() %>/subscribe">See Your Subscriptions</A></P> --%>
+    <P align="center"><A HREF="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.mydspace.main.link"/></A></P>
 
 <%
     // Display workspace items (authoring or supervised), if any
@@ -256,20 +280,22 @@
         // even or odd row:  Starts even since header row is odd (1)
         String row = "even";
 %>
-    <H2>WorkSpace</H2>
+
+    <H2><fmt:message key="jsp.mydspace.main.heading4"/></H2>
 
     <p>This section is for use in the continued authoring of your document.</p>
 
     <table class=miscTable align=center>
         <tr>
+
             <th class=oddRowOddCol>&nbsp;</th>
             <th class=oddRowEvenCol>Submitted by</th>
-            <th class=oddRowOddCol>Title</th>
-            <th class=oddRowEvenCol>Submitted to</th>
+            <th class=oddRowOddCol><fmt:message key="jsp.mydspace.main.elem1"/></th>
+            <th class=oddRowEvenCol><fmt:message key="jsp.mydspace.main.elem2"/></th>
             <th class=oddRowOddCol>&nbsp;</th>
         </tr>
 <%
-        if (supervisedItems.length > 0 && workspaceItems.length > 0) 
+        if (supervisedItems.length > 0 && workspaceItems.length > 0)
         {
 %>
         <tr>
@@ -315,7 +341,7 @@
 
 <%-- Start of the Supervisors workspace list --%>
 <%
-        if (supervisedItems.length > 0) 
+        if (supervisedItems.length > 0)
         {
 %>
         <tr>
@@ -334,6 +360,7 @@
                                                   : "Untitled");
             EPerson submitter = supervisedItems[i].getItem().getSubmitter();
 %>
+
         <tr>
             <form action="<%= request.getContextPath() %>/workspace" method="post">
             <td class="<%= row %>RowOddCol">
@@ -371,12 +398,15 @@
         // even or odd row:  Starts even since header row is odd (1)
         String row = "even";
 %>
-    <H2>Submissions In Workflow Process</H2>
+    <%-- <H2>Submissions In Workflow Process</H2> --%>
+    <H2><fmt:message key="jsp.mydspace.main.heading5"/></H2>
 
     <table class=miscTable align=center>
         <tr>
-            <th class=oddRowOddCol>Title</th>
-            <th class=oddRowEvenCol>Submitted to</th>
+       <%-- <th class=oddRowOddCol>Title</th>
+            <th class=oddRowEvenCol>Submitted to</th> --%>
+            <th class=oddRowOddCol><fmt:message key="jsp.mydspace.main.elem1"/></th>
+            <th class=oddRowEvenCol><fmt:message key="jsp.mydspace.main.elem2"/></th>
         </tr>
 <%
         for (int i = 0; i < workflowItems.length; i++)

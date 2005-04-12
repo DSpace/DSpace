@@ -50,6 +50,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="java.util.Map" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
@@ -63,13 +66,19 @@
     Map collectionMap = (Map) request.getAttribute("collections.map");
 %>
 
-<dspace:layout title="Edit Communities and Collections" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer">
+<dspace:layout titlekey="jsp.dspace-admin.list-communities.title"
+               navbar="admin"
+               locbar="link"
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <H1>Edit Communities and Collections</H1>
+    <%-- <H1>Edit Communities and Collections</H1> --%>
+    <H1><fmt:message key="jsp.dspace-admin.list-communities.heading"/></H1>
     
     <form method=POST>
         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY %>">
-        <P align="center"><input type="submit" name="submit" value="Create Top Community..."></P>
+        <%-- <P align="center"><input type="submit" name="submit" value="Create Top Community..."></P> --%>
+        <P align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.list-communities.create1"/>"></P>
     </form>
 
     <table class="miscTable" align="center">
@@ -86,28 +95,32 @@
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COMMUNITY %>">
                     <input type="hidden" name="community_id" value="<%= communities[i].getID() %>">
-                    <input type="submit" name="submit" value="Edit...">
+                    <%-- <input type="submit" name="submit" value="Edit..."> --%>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.list-communities.edit"/>">
                 </td>
             </form>
             <form method=POST>
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COMMUNITY %>">
                     <input type="hidden" name="community_id" value="<%= communities[i].getID() %>">
-                    <input type="submit" name="submit" value="Delete...">
+                    <%-- <input type="submit" name="submit" value="Delete..."> --%>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.list-communities.delete"/>">
                 </td>
             </form>
             <form method=POST>
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COLLECTION %>">
                     <input type="hidden" name="community_id" value="<%= communities[i].getID() %>">
-                    <input type="submit" name="submit" value="Create Collection...">
+                    <%-- <input type="submit" name="submit" value="Create Collection..."> --%>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.list-communities.create2"/>">
                 </td>
             </form>
             <form method=POST>
                 <td>
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY %>">
                     <input type="hidden" name="parent_community_id" value="<%= communities[i].getID() %>">
-                    <input type="submit" name="submit" value="Create Sub-community...">
+                    <%-- <input type="submit" name="submit" value="Create Sub-community..."> --%>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.list-communities.create3"/>">
                 </td>
             </form>
         </tr>
@@ -127,7 +140,8 @@
                 <td>
                     <input type="hidden" name="action"        value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
                     <input type="hidden" name="collection_id" value="<%= collections[j].getID() %>">
-                    <input type="submit" name="submit"        value="Edit...">
+                    <%-- <input type="submit" name="submit"        value="Edit..."> --%>
+                    <input type="submit" name="submit"        value="<fmt:message key="jsp.dspace-admin.list-communities.edit"/>">
                 </td>
             </form>
             <form method=POST>
@@ -135,7 +149,8 @@
                     <input type="hidden" name="action"        value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>">
                     <input type="hidden" name="collection_id" value="<%= collections[j].getID() %>">
                     <input type="hidden" name="community_id"  value="<%= communities[i].getID() %>">
-                    <input type="submit" name="submit"        value="Delete...">
+                    <%-- <input type="submit" name="submit"        value="Delete..."> --%>
+                    <input type="submit" name="submit"        value="<fmt:message key="jsp.dspace-admin.list-communities.delete"/>">
                 </td>
             </form>
         </tr>

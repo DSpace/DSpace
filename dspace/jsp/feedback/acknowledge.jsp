@@ -44,12 +44,17 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="Thank you for your comments">
+<dspace:layout titlekey="jsp.feedback.acknowledge.title">
 
-    <h1>Thank you for your comments!</h1>
+    <%-- <h1>Thank you for your comments!</h1> --%>
+    <h1><fmt:message key="jsp.feedback.acknowledge.heading"/></h1>
 
-    <p>Your comments have been received.</p>
+    <%-- <p>Your comments have been received.</p> --%>
+    <p><fmt:message key="jsp.feedback.acknowledge.text"/></p>
 
 </dspace:layout>

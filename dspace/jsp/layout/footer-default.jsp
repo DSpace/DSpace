@@ -42,6 +42,8 @@
   - Footer for home page
   --%>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.net.URLEncoder" %>
@@ -84,7 +86,7 @@
                             <td></td>
                             <td class="pageFootnote">
                                 <a target=_blank href="http://www.dspace.org/">DSpace Software</a> Copyright&nbsp;&copy;&nbsp;2002-2004&nbsp;<a target=_blank href="http://web.mit.edu/">MIT</a>&nbsp;and&nbsp;<a target=_blank href="http://www.hp.com/">Hewlett-Packard</a>&nbsp;-
-                                <a target=_blank href="<%= request.getContextPath() %>/feedback?fromPage=<%= fromPage %>">Feedback</a>
+                                <a target=_blank href="<%= request.getContextPath() %>/feedback?fromPage=<%= fromPage %>"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
                             </td>
                             <td nowrap valign=middle> <%-- nowrap, valign for broken NS 4.x --%>
                             </td>
@@ -95,3 +97,4 @@
         </table>
     </body>
 </html>
+

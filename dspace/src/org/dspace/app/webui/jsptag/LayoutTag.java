@@ -50,6 +50,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
@@ -95,6 +96,9 @@ public class LayoutTag extends TagSupport
     /** title */
     private String title;
 
+    /** title key (from message dictionary) */
+    private String titleKey;
+
     /** Navigation bar type, null means none */
     private String navbar;
 
@@ -103,6 +107,9 @@ public class LayoutTag extends TagSupport
 
     /** Name of "parent" page */
     private String parentTitle;
+
+    /** Name of "parent" page key (from message dictionary) */
+    private String parentTitleKey;
 
     /** Link to "parent" page */
     private String parentLink;
@@ -171,6 +178,13 @@ public class LayoutTag extends TagSupport
                     parents.add(parentTitle);
                     parentLinks.add(parentLink);
                 }
+                else if (parentTitleKey != null)
+                {
+                    parents.add(LocaleSupport.getLocalizedMessage(pageContext,
+                            parentTitleKey));
+                    parentLinks.add(parentLink);
+                }
+
             }
             else if (locbar.equalsIgnoreCase("commLink"))
             {
@@ -245,7 +259,19 @@ public class LayoutTag extends TagSupport
         }
 
         // Set title
-        request.setAttribute("dspace.layout.title", title);
+        if (title != null)
+        {
+            request.setAttribute("dspace.layout.title", title);
+        }
+        else if (titleKey != null)
+        {
+            request.setAttribute("dspace.layout.title", LocaleSupport
+                    .getLocalizedMessage(pageContext, titleKey));
+        }
+        else
+        {
+            request.setAttribute("dspace.layout.title", "NO TITLE");
+        }
 
         // Now include the header
         try
@@ -346,6 +372,22 @@ public class LayoutTag extends TagSupport
     }
 
     /**
+     * @return Returns the titleKey.
+     */
+    public String getTitlekey()
+    {
+        return titleKey;
+    }
+    
+    /**
+     * @param titleKey The titleKey to set.
+     */
+    public void setTitlekey(String titleKey)
+    {
+        this.titleKey = titleKey;
+    }
+    
+    /**
      * Get the value of navbar.
      * 
      * @return Value of navbar.
@@ -406,6 +448,26 @@ public class LayoutTag extends TagSupport
     public void setParenttitle(String v)
     {
         this.parentTitle = v;
+    }
+
+    /**
+     * get parent title key (from message dictionary)
+     * 
+     * @return Returns the parentTitleKey.
+     */
+    public String getParenttitlekey()
+    {
+        return parentTitleKey;
+    }
+
+    /**
+     * set parent title key (from message dictionary)
+     * 
+     * @param parentTitlekey The parentTitleKey to set.
+     */
+    public void setParenttitlekey(String parentTitleKey)
+    {
+        this.parentTitleKey = parentTitleKey;
     }
 
     /**

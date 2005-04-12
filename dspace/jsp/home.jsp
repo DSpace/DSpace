@@ -47,6 +47,8 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.io.File" %>
@@ -57,29 +59,29 @@
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
-    
+
     String topNews = ConfigurationManager.readNewsFile(Constants.NEWS_TOP);
     String sideNews = ConfigurationManager.readNewsFile(Constants.NEWS_SIDE);
 
 %>
 
-<dspace:layout locbar="nolink" title="Home">
+<dspace:layout locbar="nolink" titlekey="jsp.home.title">
 
     <table class="miscTable" width="95%" align="center">
         <tr>
             <td class="oddRowEvenCol"><%= topNews %></td>
         </tr>
     </table>
-  
+
     <br>
 
     <form action="<%= request.getContextPath() %>/simple-search" method=GET>
         <table class="miscTable" width="95%" align="center">
             <tr>
                 <td class="oddRowEvenCol">
-                    <H3>Search</H3>
-                      <P>Enter some text in the box below to search DSpace.</P>
-                      <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="Go"></P>
+                  <H3><fmt:message key="jsp.home.search1"/></H3>
+                      <P><fmt:message key="jsp.home.search2"/></P>
+                      <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="<fmt:message key="jsp.home.search.button"/>"></P>
                 </td>
             </tr>
         </table>
@@ -88,8 +90,8 @@
     <table class="miscTable" width="95%" align="center">
         <tr>
             <td class="oddRowEvenCol">
-                <H3>Communities in DSpace</H3>
-                <P>Select a community to browse its collections.</P>
+               <H3><fmt:message key="jsp.home.com1"/></H3>
+                <P><fmt:message key="jsp.home.com2"/></P>
                 <table border=0 cellpadding=2>
 <%
     for (int i = 0; i < communities.length; i++)
@@ -116,5 +118,5 @@
         </tr>
     </table>
 
-  <dspace:sidebar><%= sideNews %></dspace:sidebar>
+    <dspace:sidebar><%= sideNews %></dspace:sidebar>
 </dspace:layout>

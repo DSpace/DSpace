@@ -53,6 +53,9 @@
   
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.net.URLEncoder"            %>
@@ -75,14 +78,18 @@
                                     request.getAttribute("all_collections");
 %>
 
-<dspace:layout title="Item Mapper">
+<dspace:layout titlekey="jsp.tools.itemmap-main.title">
 
-    <h2>Item Mapper - Map Items from Other Collections</h2>
+    <%-- <h2>Item Mapper - Map Items from Other Collections</h2> --%>
+	<h2><fmt:message key="jsp.tools.itemmap-main.heading"/></h2>
 
-    <p>Collection: "<%=collection.getMetadata("name")%>"</p>
-
-    <p>There are <%=count_native%> items owned by this collection, and
-    <%=count_import%> items mapped in from other collections.</p>
+    <%--  <p>Collection: "<%=collection.getMetadata("name")%>"</p> --%>
+    <p><fmt:message key="jsp.tools.itemmap-main.collection"/> "<%=collection.getMetadata("name")%>"</p>
+	 
+    <%-- <p>There are <%=count_native%> items owned by this collection, and
+    <%=count_import%> items mapped in from other collections.</p> --%>
+	<p><fmt:message key="jsp.tools.itemmap-main.info1"/> <%=count_native%> <fmt:message key="jsp.tools.itemmap-main.info2"/>
+    <%=count_import%> <fmt:message key="jsp.tools.itemmap-main.info3"/></p>
    
 <%-- 
     <h3>Quick Add Item:</h3>
@@ -132,21 +139,27 @@
 
     <input type=submit name="action" value="Add Entire Collection!">
     </form>        
---%>
+    --%>
 
-    <h3>Import By Author Match</h3>
-    Enter part of an author's name for a list of matching items<br>
+    <%-- <h3>Import By Author Match</h3>
+    Enter part of an author's name for a list of matching items<br> --%>
+	<h3><fmt:message key="jsp.tools.itemmap-main.info4"/></h3>
+    <fmt:message key="jsp.tools.itemmap-main.info5"/><br>
 
     <form method=POST>
         <input type=hidden name="cid" value="<%=collection.getID()%>">
         <input name="namepart">
-        <input type=submit name="action" value="Search Authors">
+        <%-- <input type=submit name="action" value="Search Authors"> --%>
+        <input type=hidden name="action" value="Search Authors">
+	<input type=submit value="<fmt:message key="jsp.tools.itemmap-main.search.button"/>">
         <br>
     </form> 
 
-    <h3>Browse Items Imported From Collections:</h3>
+    <%-- <h3>Browse Items Imported From Collections:</h3> --%>
+	<h3><fmt:message key="jsp.tools.itemmap-main.info6"/></h3>
 
-    <p>Click on collection names to browse for items to remove that were mapped in from that collection.</p>
+    <%-- <p>Click on collection names to browse for items to remove that were mapped in from that collection.</p> --%>
+	<p><fmt:message key="jsp.tools.itemmap-main.info7"/></p>
 
 <%
     String row = "even";
@@ -155,7 +168,8 @@
     if(!colKeys.hasNext())
     {
 %>
-    <p>This collection has no items mapped into it.</p>
+    <%-- <p>This collection has no items mapped into it.</p> --%>
+	<p><fmt:message key="jsp.tools.itemmap-main.info8"/></p>
 <%
     }
 

@@ -48,6 +48,8 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Community" %>
@@ -59,29 +61,49 @@
     Collection collection = (Collection) request.getAttribute("collection");
 
     // Description of what the user is actually browsing, and where link back
-    String scopeName = "All of DSpace";
     String linkText = "DSpace Home";
     String linkBack = "/";
 
     if(collection != null)
     {
-        scopeName = collection.getMetadata("name");
         linkText = collection.getMetadata("name");
         linkBack = "/handle/" + collection.getHandle();
     }
     else if(community != null)
     {
-        scopeName = community.getMetadata("name");
         linkText = community.getMetadata("name");
         linkBack = "/handle/" + community.getHandle();
     }
 %>
 
-<dspace:layout title="No Entries in Index">
+<dspace:layout titlekey="jsp.browse.no-results.title">
 
-    <H1>No Entries in Index</H1>
-    
-    <P>There are no entries in the index for <%= scopeName %>.</P>
+    <H1><fmt:message key="jsp.browse.no-results.no1"/></H1>
+
+
+<P><fmt:message key="jsp.browse.no-results.no2"/> 
+    <%
+	    if (collection != null)
+	    {
+   %>
+            	<fmt:message key="jsp.browse.no-results.col"/> "<%= collection.getMetadata("name")%>".
+   <%
+	    }
+	    else if (community != null)
+	    {
+   %>
+   		<fmt:message key="jsp.browse.no-results.com"/> "<%= community.getMetadata("name")%>".
+   <%
+ 	    }
+ 	    else
+ 	    {
+   %>
+   		<fmt:message key="jsp.no-results.browse.genericScope"/>
+   <%
+   	    }
+   %>
+ </P>
+
     
     <P><A HREF="<%= request.getContextPath() %><%= linkBack %>"><%= linkText %></A></P>
 

@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.eperson.EPerson" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -54,16 +57,17 @@
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
 %>
-
-<dspace:layout title="Delete E-Person"
+<dspace:layout titlekey="jsp.dspace-admin.eperson-confirm-delete.title"
                navbar="admin"
                locbar="link"
-               parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <H1>Delete e-person: <%= eperson.getFullName() %> (<%= eperson.getEmail() %>)</H1>
+    <%-- <H1>Delete e-person: <%= eperson.getFullName() %> (<%= eperson.getEmail() %>)</H1> --%>
+    <H1><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.heading"/> <%= eperson.getFullName() %> (<%= eperson.getEmail() %>)</H1>
     
-    <P>Are you sure this e-person should be deleted?</P>
+    <%-- <P>Are you sure this e-person should be deleted?</P> --%>
+    <P><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></P>
     
     <form method=POST>
         <input type="hidden" name="eperson_id" value="<%= eperson.getID() %>">
@@ -72,10 +76,12 @@
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit_confirm_delete" value="Delete">
+                        <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
+                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.eperson-confirm-delete.delete"/>">
                     </td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.eperson-confirm-delete.cancel"/>">
                     </td>
                 </tr>
             </table>

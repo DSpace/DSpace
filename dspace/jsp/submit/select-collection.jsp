@@ -50,6 +50,10 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+    
+	
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
@@ -57,7 +61,10 @@
         (Collection[]) request.getAttribute("collections");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Select Collection to Submit to" nocache="true">
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.submit.select-collection.title"
+               nocache="true">
 
     <jsp:include page="/submit/progressbar.jsp">
         <jsp:param name="current_stage" value="<%= SubmitServlet.SELECT_COLLECTION %>"/>
@@ -65,11 +72,15 @@
         <jsp:param name="md_pages" value="1"/>
     </jsp:include>
 
-    <H1>Submit: Choose Collection</H1>
+    <%-- <H1>Submit: Choose Collection</H1> --%>
+    <H1><fmt:message key="jsp.submit.select-collection.heading"/></H1>
 
-    <p>Select the collection you wish to submit an item to from the list
+    <%-- <p>Select the collection you wish to submit an item to from the list
     below, then click "Next".  
-    <dspace:popup page="/help/index.html#choosecollection">(More Help...)</dspace:popup></p>
+    <dspace:popup page="/help/index.html#choosecollection">(More Help...)</dspace:popup></p> --%>
+
+	<p><fmt:message key="jsp.submit.select-collection.info1"/> 
+    <dspace:popup page="/help/index.html#choosecollection"><fmt:message key="jsp.morehelp"/> </dspace:popup></p>
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
@@ -77,7 +88,8 @@
         <center>
             <table>
                 <tr>
-                    <td class="submitFormLabel">Collection</td>
+                    <%-- <td class="submitFormLabel">Collection</td> --%>
+					<td class="submitFormLabel"><fmt:message key="jsp.submit.select-collection.collection"/></td>
                     <td>
                         <select name=collection>
 <%
@@ -101,11 +113,13 @@
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td>
-                        <input type=submit name=submit_next value="Next &gt;">
+                        <%-- <input type=submit name=submit_next value="Next &gt;"> --%>
+						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.select-collection.next.button"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
-                        <input type=submit name=submit_cancel value="Cancel/Save">
+                        <%-- <input type=submit name=submit_cancel value="Cancel/Save"> --%>
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.select-collection.cancel.button"/>">
                     </td>
                 </tr>
             </table>

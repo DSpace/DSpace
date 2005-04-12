@@ -48,6 +48,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+    
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 
@@ -60,7 +64,10 @@
     String license = (String) request.getAttribute("license");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="DSpace Distribution License" nocache="true">
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.submit.show-license.title"
+               nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
@@ -70,19 +77,24 @@
              <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <H1>Submit: Grant DSpace Distribution License</H1>
+        <%-- <H1>Submit: Grant DSpace Distribution License</H1> --%>
+		<H1><fmt:message key="jsp.submit.show-license.heading1"/></H1>
 
-        <P><strong>There is one last step:</strong> In order for DSpace to reproduce, translate and distribute your
+        <%-- <P><strong>There is one last step:</strong> In order for DSpace to reproduce, translate and distribute your
         submission worldwide, your agreement to the following terms is necessary.
         Please take a moment to read the terms of this license, and click on one of the
         buttons at the bottom of the page.  By clicking on the "Grant License"
         button, you indicate that you grant the following terms of the license.
-        <dspace:popup page="/help/index.html#license">(More Help...)</dspace:popup></P>
+        <dspace:popup page="/help/index.html#license">(More Help...)</dspace:popup></P> --%>
 
-        <P><strong>Not granting the license will not delete your submission.</strong>
+		<P><fmt:message key="jsp.submit.show-license.info1"/>
+        <dspace:popup page="/help/index.html#license"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
+
+        <%-- <P><strong>Not granting the license will not delete your submission.</strong>
         Your item will remain in your "My DSpace" page.  You can then either remove
         the submission from the system, or agree to the license later once any
-        queries you might have are resolved.</P>
+        queries you might have are resolved.</P> --%>
+		<P><fmt:message key="jsp.submit.show-license.info2"/></P>
 
         <table class=miscTable align=center>
             <tr>
@@ -96,8 +108,10 @@
         <input type=hidden name=step value=<%= SubmitServlet.GRANT_LICENSE %>>
 
         <center>
-            <P><input type=submit name=submit_grant value="I Grant the License"></P>
-            <P><input type=submit name=submit_reject value="I Do Not Grant the License"></P>
+            <%-- <P><input type=submit name=submit_grant value="I Grant the License"></P>
+            <P><input type=submit name=submit_reject value="I Do Not Grant the License"></P> --%>
+			<P><input type=submit name=submit_grant value="<fmt:message key="jsp.submit.show-license.grant.button"/>"></P>
+            <P><input type=submit name=submit_reject value="<fmt:message key="jsp.submit.show-license.notgrant.button"/>"></P>
         </center>
     </form>
 </dspace:layout>

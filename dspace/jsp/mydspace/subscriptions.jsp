@@ -48,6 +48,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+    
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Community" %>
@@ -61,17 +65,19 @@
 %>
 
 <dspace:layout locbar="link"
-               parenttitle="My DSpace"
-               parentlink="/mydspace "
-               title="Your Subscriptions">
+               parentlink="/mydspace"
+               parenttitlekey="jsp.mydspace"
+               titlekey="jsp.mydspace.subscriptions.title">
 
     <table width="100%" border=0>
         <tr>
             <td align=left>
-                <H1>Your Subscriptions</H1>
+                <%-- <H1>Your Subscriptions</H1> --%>
+				<H1><fmt:message key="jsp.mydspace.subscriptions.title"/></H1>
             </td>
             <td align=right class=standard>
-                <dspace:popup page="/help/index.html#subscribe">Help...</dspace:popup>
+                <%-- <dspace:popup page="/help/index.html#subscribe">Help...</dspace:popup> --%>
+		<dspace:popup page="/help/index.html#subscribe"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         <tr>
     </table>
@@ -80,20 +86,23 @@
     if (updated)
     {
 %>
-    <P><strong>Your subscriptions have been updated.</strong></P>
+    <%-- <P><strong>Your subscriptions have been updated.</strong></P> --%>
+	<P><strong><fmt:message key="jsp.mydspace.subscriptions.info1"/></strong></P>
 <%
     }
 %>
-    <P>To subscribe to a collection, visit the collection's home page, and
-    click on the "Subscribe" button.</P>
+    <%-- <P>To subscribe to a collection, visit the collection's home page, and
+    click on the "Subscribe" button.</P> --%>
+	<P><fmt:message key="jsp.mydspace.subscriptions.info2"/></P>
 <%
     if (subscriptions.length > 0)
     {
 %>
-    <P>Below are the collections you are subscribed to.  You will be sent an
+    <%-- <P>Below are the collections you are subscribed to.  You will be sent an
     e-mail each day detailing new items that have become available in these
     collections.  On days that no new items have appeared, no e-mail will be
-    sent.</P>
+    sent.</P> --%>
+	<P><fmt:message key="jsp.mydspace.subscriptions.info3"/></P>
     
     <center>
         <table class="miscTable">
@@ -114,7 +123,8 @@
                     </td>
                     <td class="<%= row %>RowEvenCol">
                         <input type="hidden" name="collection" value="<%= subscriptions[i].getID() %>">
-                        <input type="submit" name="submit_unsubscribe" value="Unsubscribe">
+                        <%-- <input type="submit" name="submit_unsubscribe" value="Unsubscribe"> --%>
+						<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>">
                     </td>
                 </form>
             </tr>
@@ -129,7 +139,8 @@
 
     <center>
         <form method=POST>
-            <input type="submit" name="submit_clear" value="Remove All Subscriptions">
+            <%-- <input type="submit" name="submit_clear" value="Remove All Subscriptions"> --%>
+			<input type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>">
         </form>
     </center>
 <%
@@ -137,12 +148,14 @@
     else
     {
 %>
-    <P>You are not currently subscribed to any collections.</P>
+    <%-- <P>You are not currently subscribed to any collections.</P> --%>
+	<P><fmt:message key="jsp.mydspace.subscriptions.info4"/></P>
 <%
     }
 %>
 
-    <P align="center"><A HREF="<%= request.getContextPath() %>/mydspace">Go to
-    My DSpace </A></P>
+    <%-- <P align="center"><A HREF="<%= request.getContextPath() %>/mydspace">Go to
+    My DSpace </A></P> --%>
+	<P align="center"><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.subscriptions.link"/> </A></P>
 
 </dspace:layout>

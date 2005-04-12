@@ -53,6 +53,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 <%@ page import="org.dspace.content.Bitstream" %>
@@ -73,7 +76,11 @@
     BitstreamFormat format = bitstream.getFormat();
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Uploaded File" nocache="true">
+
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.submit.show-uploaded-file.title"
+               nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
@@ -87,32 +94,42 @@
     if (justUploaded)
     {
 %>
-        <H1>Submit: File Uploaded Successfully</H1>
+        <%-- <H1>Submit: File Uploaded Successfully</H1> --%>
+		<H1><fmt:message key="jsp.submit.show-uploaded-file.heading1"/></H1>
 
-        <P><strong>Your file was successfully uploaded.</strong></P>
+        <%-- <P><strong>Your file was successfully uploaded.</strong></P> --%>
+		<P><strong><fmt:message key="jsp.submit.show-uploaded-file.info1"/></strong></P>
 <%
     }
     else
     {
 %>
-        <H1>Submit: Uploaded File</H1>
+        <%-- <H1>Submit: Uploaded File</H1> --%>
+		<H1><fmt:message key="jsp.submit.show-uploaded-file.heading2"/></H1>
 <%
     }
 %>
-        <P>Here are the details of the file you have uploaded.  Please check the
+        <%-- <P>Here are the details of the file you have uploaded.  Please check the
         details before going to the next step.
-        <dspace:popup page="/help/index.html#uploadedfile">(More Help...)</dspace:popup></P>
+        <dspace:popup page="/help/index.html#uploadedfile">(More Help...)</dspace:popup></P> --%>
+
+		<P><fmt:message key="jsp.submit.show-uploaded-file.info2"/>
+        <dspace:popup page="/help/index.html#uploadedfile"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
 
         <table class="miscTable" align=center>
             <tr>
-                <th class="oddRowOddCol">File</th>
+                <%-- <th class="oddRowOddCol">File</th>
                 <th class="oddRowEvenCol">Size</th>
-                <th class="oddRowOddCol">File Format</th>
+                <th class="oddRowOddCol">File Format</th> --%>
+				<th class="oddRowOddCol"><fmt:message key="jsp.submit.show-uploaded-file.file"/></th>
+                <th class="oddRowEvenCol"><fmt:message key="jsp.submit.show-uploaded-file.size"/></th>
+                <th class="oddRowOddCol"><fmt:message key="jsp.submit.show-uploaded-file.format"/></th>
 <%
     if (showChecksums)
     {
 %>
-                <th class="oddRowEvenCol">Checksum</th>
+                <%-- <th class="oddRowEvenCol">Checksum</th> --%>
+				<th class="oddRowEvenCol"><fmt:message key="jsp.submit.show-uploaded-file.checksum"/></th>
 <%
     }
 %>
@@ -121,24 +138,26 @@
                 <td class="evenRowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstream.getName()) %>" target="_blank"><%= bitstream.getName() %></A></td>
                 <td class="evenRowEvenCol"><%= bitstream.getSize() %> bytes</td>
                 <td class="evenRowOddCol">
-<%
-    String description = bitstream.getFormatDescription();
-    String supportLevel = "supported";
-
-    if (format.getSupportLevel() == 1)
-    {
-        supportLevel = "known";
-    }
-
+                    <%= bitstream.getFormatDescription() %>
+<%    
     if (format.getSupportLevel() == 0)
-    {
-        supportLevel = "unsupported";
-    }
-
-    // Full param to dspace:popup must be single variable
-    String supportLevelLink = "/help/formats.jsp#" + supportLevel;
-%>
-                    <%= description %> <dspace:popup page="<%= supportLevelLink %>">(<%= supportLevel %>)</dspace:popup>
+    { %>
+      (<dspace:popup page="/help/formats.jsp#unsupported">
+          <fmt:message key="jsp.submit.show-uploaded-file.notSupported"/>
+      </dspace:popup>)
+<%  }
+    else if (format.getSupportLevel() == 1)
+    { %>
+      (<dspace:popup page="/help/formats.jsp#known">
+          <fmt:message key="jsp.submit.show-uploaded-file.known"/>
+      </dspace:popup>)
+<%  }
+    else
+    { %>
+      (<dspace:popup page="/help/formats.jsp#supported">
+          <fmt:message key="jsp.submit.show-uploaded-file.supported"/>
+      </dspace:popup>)
+<%  } %>
                 </td>
 <%
     if (showChecksums)
@@ -155,36 +174,45 @@
 
         <center>
             <P>
-                <input type=submit name="submit_format_<%= bitstream.getID() %>" value="Click here if this is the wrong format">
-            </P>
-        </center>
-        
-        <center>
-            <P>
-                <input type=submit name="submit_remove_<%= bitstream.getID() %>" value="Click here if this is the wrong file">
+               <%--  <input type=submit name="submit_format_<%= bitstream.getID() %>" value="Click here if this is the wrong format"> --%>
+			    <input type=submit name="submit_format_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click1.button"/>">
             </P>
         </center>
 
-        <BR>        
+        <center>
+            <P>
+                <%-- <input type=submit name="submit_remove_<%= bitstream.getID() %>" value="Click here if this is the wrong file"> --%>
+				<input type=submit name="submit_remove_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click2.button"/>">
+            </P>
+        </center>
+
+        <BR>
 <%-- Show information about how to verify correct upload --%>
-        <P class="uploadHelp">You can verify that the file has been uploaded correctly by:</P>
+        <%-- <P class="uploadHelp">You can verify that the file has been uploaded correctly by:</P> --%>
+		<P class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info3"/></P>
         <UL class="uploadHelp">
-            <LI class="uploadHelp">Clicking on the filename above.  This will download the file in a
-            new browser window, so that you can check the contents.</LI>
+            <%-- <LI class="uploadHelp">Clicking on the filename above.  This will download the file in a
+            new browser window, so that you can check the contents.</LI> --%>
+			<LI class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info4"/></LI>
 <%
     if (showChecksums)
     {
 %>
-            <LI class="uploadHelp">Comparing the checksum displayed above with a checksum worked out on
+            <%-- <LI class="uploadHelp">Comparing the checksum displayed above with a checksum worked out on
             your local computer.  They should be exactly the same.
-            <dspace:popup page="/help/index.html#checksum">Click here to find out how to do this.</dspace:popup></LI>
+            <dspace:popup page="/help/index.html#checksum">Click here to find out how to do this.</dspace:popup></LI> --%>
+			
+			<LI class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info5"/>
+            <dspace:popup page="/help/index.html#checksum"><fmt:message key="jsp.submit.show-uploaded-file.info6"/></dspace:popup></LI>
 <%
     }
     else
     {
 %>
-            <LI class="uploadHelp">The system can calculate a checksum you can verify.
-            <dspace:popup page="/help/index.html#checksum">Click here for more information.</dspace:popup> <input type=submit name=submit_show_checksums value="Show checksums"></LI>
+            <%-- <LI class="uploadHelp">The system can calculate a checksum you can verify.
+            <dspace:popup page="/help/index.html#checksum">Click here for more information.</dspace:popup> <input type=submit name=submit_show_checksums value="Show checksums"></LI> --%>
+			<LI class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info7"/>
+            <dspace:popup page="/help/index.html#checksum"><fmt:message key="jsp.submit.show-uploaded-file.info8"/></dspace:popup> <input type=submit name=submit_show_checksums value="<fmt:message key="jsp.submit.show-uploaded-file.show.button"/>"></LI>
 <%
     }
 %>
@@ -201,14 +229,17 @@
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td align>
-                        <input type=submit name=submit_prev value="&lt; Previous">
+                        <%-- <input type=submit name=submit_prev value="&lt; Previous"> --%>
+						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.show-uploaded-file.previous.button"/>">
                     </td>
                     <td>
-                        <input type=submit name=submit_next value="Next &gt;">
+                       <%--  <input type=submit name=submit_next value="Next &gt;"> --%>
+					    <input type=submit name=submit_next value="<fmt:message key="jsp.submit.show-uploaded-file.next.button"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
-                        <input type=submit name=submit_cancel value="Cancel/Save">
+                        <%-- <input type=submit name=submit_cancel value="Cancel/Save"> --%>
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.show-uploaded-file.cancel.button"/>">
                     </td>
                 </tr>
             </table>
@@ -216,4 +247,3 @@
     </form>
 
 </dspace:layout>
-        

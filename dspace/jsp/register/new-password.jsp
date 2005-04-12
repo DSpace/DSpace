@@ -53,6 +53,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.RegisterServlet" %>
@@ -66,24 +69,29 @@
     boolean passwordProblem = (attr != null && attr.booleanValue());
 %>
 
-<dspace:layout title="Enter New Password" nocache="true">
 
-    <h1>Enter a New Password</H1>
+<dspace:layout titlekey="jsp.register.new-password.title" nocache="true">
+
+    <%-- <h1>Enter a New Password</H1> --%>
+	<h1><fmt:message key="jsp.register.new-password.heading"/></H1>
     
-    <P>Hello <%= eperson.getFullName() %>,</P>
+    <!-- <P>Hello <%= eperson.getFullName() %>,</P> -->
+	<P><fmt:message key="jsp.register.new-password.hello"/> <%= eperson.getFullName() %>,</P>
     
 <%
     if (passwordProblem)
     {
 %>
-    <P><strong>The passwords you enter below must match, and need to be at
-    least 6 characters long.</strong></P>
+    <%-- <P><strong>The passwords you enter below must match, and need to be at
+    least 6 characters long.</strong></P> --%>
+	<P><strong><fmt:message key="jsp.register.new-password.info1"/></strong></P>
 <%
     }
 %>
     
-    <P>Please enter a new password into the box below, and confirm it by typing it
-    again into the second box.  It should be at least six characters long.</P>
+    <%-- <P>Please enter a new password into the box below, and confirm it by typing it
+    again into the second box.  It should be at least six characters long.</P> --%>
+	<P><fmt:message key="jsp.register.new-password.info2"/></P>
 
     <form action="<%= request.getContextPath() %>/forgot" method=POST>
         <table class="misc" align="center">
@@ -91,16 +99,19 @@
                 <td class="oddRowEvenCol">
                     <table border=0 cellpadding=5>
                         <tr>
-                            <td align=right class=standard><strong>New Password:</strong></td>
+                            <%-- <td align=right class=standard><strong>New Password:</strong></td> --%>
+							<td align=right class=standard><strong><fmt:message key="jsp.register.new-password.pswd.field"/></strong></td>
                             <td class=standard><input type=password name="password"></td>
                         </tr>
                         <tr>
-                            <td align=right class=standard><strong>Again to Confirm:</strong></td>
+                            <%-- <td align=right class=standard><strong>Again to Confirm:</strong></td> --%>
+							<td align=right class=standard><strong><fmt:message key="jsp.register.new-password.confirm.field"/></strong></td>
                             <td class=standard><input type=password name="password_confirm"></td>
                         </tr>
                         <tr>
                             <td align=center colspan=2>
-                                <input type=submit name=submit value="Set New Password">
+                                <%-- <input type=submit name=submit value="Set New Password"> --%>
+								<input type=submit name=submit value="<fmt:message key="jsp.register.new-password.set.button"/>">
                             </td>
                         </tr>
                     </table>

@@ -48,6 +48,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
@@ -60,16 +63,18 @@
 %>
 
 <dspace:layout locbar="link"
-               parenttitle="My DSpace"
                parentlink="/mydspace"
-               title="Enter Reason for Rejection"
+               parenttitlekey="jsp.mydspace"
+               title="reject-reason.title"
                nocache="true">
 
-    <H1>Enter Reason for Rejection</H1>
+    <%-- <H1>Enter Reason for Rejection</H1> --%>
+	<H1><fmt:message key="jsp.mydspace.reject-reason.title"/></H1>
 
-    <P>Please enter the reason you are rejecting the submission into the box
+    <%-- <P>Please enter the reason you are rejecting the submission into the box
     below.  Please indicate in your message whether the submitter should fix
-    a problem and resubmit.</P>
+    a problem and resubmit.</P> --%>
+	<P><fmt:message key="jsp.mydspace.reject-reason.text1"/></P>
     
     <form action="<%= request.getContextPath() %>/mydspace" method=POST>
         <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>">
@@ -81,10 +86,12 @@
         <table border=0 width="90%" cellpadding=10 align=center>
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_send" value="Reject Item">
+                    <%-- <input type="submit" name="submit_send" value="Reject Item"> --%>
+					 <input type="submit" name="submit_send" value="<fmt:message key="jsp.mydspace.reject-reason.reject.button"/>">
                 </td>
                 <td align="right">
-                    <input type="submit" name="submit_cancel" value="Cancel Rejection">
+                    <%-- <input type="submit" name="submit_cancel" value="Cancel Rejection"> --%>
+					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.reject-reason.cancel.button"/>">
                 </td>
             </tr>
         </table>

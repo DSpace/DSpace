@@ -51,6 +51,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 <%@ page import="org.dspace.content.Bitstream" %>
@@ -71,7 +75,7 @@
     Item item = si.submission.getItem();
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Select File Format" nocache="true">
+<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.get-file-format.title" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
@@ -81,27 +85,33 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <H1>Submit: Select File Format</H1>
+        <%-- <H1>Submit: Select File Format</H1> --%>
+		<H1><fmt:message key="jsp.submit.get-file-format.heading"/></H1>
 
-        <P>Uploaded file: <code><%= si.bitstream.getName() %></code> (<%= si.bitstream.getSize() %> bytes)</P>
+        <%-- <P>Uploaded file: <code><%= si.bitstream.getName() %></code> (<%= si.bitstream.getSize() %> bytes)</P> --%>
+		<P><fmt:message key="jsp.submit.get-file-format.info1"/> <code><%= si.bitstream.getName() %></code> (<%= si.bitstream.getSize() %> bytes)</P>
 
 <%
     if (guess == null)
     {
 %>
-        <P>DSpace could not identify the format of this file.</P>
+        <%-- <P>DSpace could not identify the format of this file.</P> --%>
+		<P><fmt:message key="jsp.submit.get-file-format.info2"/></P>
 <%
     }
     else
     {
 %>
-        <P>DSpace recognized the file format as <%= guess.getShortDescription() %>.
-        <strong>Please be sure before you change this!</strong></P>
+        <%-- <P>DSpace recognized the file format as <%= guess.getShortDescription() %>.
+        <strong>Please be sure before you change this!</strong></P> --%>
+		<P><fmt:message key="jsp.submit.get-file-format.info3"/> <%= guess.getShortDescription() %>.
+        <strong><fmt:message key="jsp.submit.get-file-format.info4"/></strong></P>
     
         <input type=hidden name=format value="<%= guess.getID() %>">
         <%= SubmitServlet.getSubmissionParameters(si) %>
         <input type=hidden name=step value="<%= SubmitServlet.GET_FILE_FORMAT %>" />
-        <P align=center><input type=submit name=submit value="Choose automatically-recognized type"></P>
+        <%-- <P align=center><input type=submit name=submit value="Choose automatically-recognized type"></P> --%>
+		<P align=center><input type=submit name=submit value="<fmt:message key="jsp.submit.get-file-format.choose.button"/>"></P>
     </form>
 
 <%-- Option list put in a separate form --%>
@@ -110,15 +120,19 @@
     }
 %>
 
-        <P>Select the format of the file from the list below, for example "Adobe
+        <%-- <P>Select the format of the file from the list below, for example "Adobe
         PDF" or "Microsoft Word", <strong>OR</strong> if the format is not in the list, please describe
         the format file in the input box below the list.
-        <dspace:popup page="/help/index.html#formats">(More Help...)</dspace:popup></P>
+        <dspace:popup page="/help/index.html#formats">(More Help...)</dspace:popup></P> --%>
+
+		<P><fmt:message key="jsp.submit.get-file-format.info5"/>
+        <dspace:popup page="/help/index.html#formats"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
     
         <center>
             <select name=format size=8>
                 <option value="-1" <%= si.bitstream.getFormat().getShortDescription().equals("Unknown") ? "SELECTED" : "" %>>
-                    Format Not in List
+                    <%-- Format Not in List --%>
+					<fmt:message key="jsp.submit.get-file-format.info6"/>
                 </option>
 <%
     for (int i = 0; i < formats.length; i++)
@@ -128,9 +142,13 @@
                     <%= si.bitstream.getFormat().getID() == formats[i].getID() ? "SELECTED" : "" %>
                     value="<%= formats[i].getID() %>">
                    <%= formats[i].getShortDescription() %>
-<%
+<%-- <%
         if (formats[i].getSupportLevel() == 1) { %>(known)<% }
-        if (formats[i].getSupportLevel() == 2) { %>(supported)<% }
+        if (formats[i].getSupportLevel() == 2) { %>(supported)<% } 
+      %> --%>
+<%
+        if (formats[i].getSupportLevel() == 1) { %><fmt:message key="jsp.submit.get-file-format.known"/><% }
+        if (formats[i].getSupportLevel() == 2) { %><fmt:message key="jsp.submit.get-file-format.supported"/><% }
 %>
                 </option>
 <%
@@ -139,15 +157,17 @@
             </select>
         </center>
     
-        <P class=submitFormHelp><strong>If the format is not in the above list</strong>, describe
+       <%--  <P class=submitFormHelp><strong>If the format is not in the above list</strong>, describe
         it in the format below.  Enter the name of the application you used to create
         the file, and the version number of the application (for example,
-        "ACMESoft SuperApp version 1.5").</P>
+        "ACMESoft SuperApp version 1.5").</P> --%>
+		 <P class=submitFormHelp><fmt:message key="jsp.submit.get-file-format.info7"/></P>
 
         <table border=0 align=center>
             <tr>
                 <td class="submitFormLabel">
-                    File Format:
+                    <%-- File Format: --%>
+					<fmt:message key="jsp.submit.get-file-format.format"/>
                 </td>
                 <td>
 <%
@@ -165,6 +185,7 @@
         <%= SubmitServlet.getSubmissionParameters(si) %>
         <input type=hidden name=step value="<%= SubmitServlet.GET_FILE_FORMAT %>">
 
-        <center><P><input type=submit name=submit value="Set File Format"></P></center>
+        <%-- <center><P><input type=submit name=submit value="Set File Format"></P></center> --%>
+		<center><P><input type=submit name=submit value="<fmt:message key="jsp.submit.get-file-format.set.button"/>"></P></center>
     </form>
 </dspace:layout>

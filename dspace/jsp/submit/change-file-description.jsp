@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 <%@ page import="org.dspace.content.Bitstream" %>
@@ -59,7 +62,11 @@
         (SubmissionInfo) request.getAttribute("submission.info");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Change File Description" nocache="true">
+
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.submit.change-file-description.title"
+               nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
@@ -69,16 +76,22 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <H1>Submit: Change File Description</H1>
-        
-        <P>Here are the details of the file.  
-        <dspace:popup page="/help/index.html#filedescription">(More Help...)</dspace:popup></P>
+        <%-- <H1>Submit: Change File Description</H1> --%>
+		<H1><fmt:message key="jsp.submit.change-file-description.heading"/></H1>
+
+        <%-- <P>Here are the details of the file.  
+        <dspace:popup page="/help/index.html#filedescription">(More Help...)</dspace:popup></P> --%>
+		<P><fmt:message key="jsp.submit.change-file-description.info1"/> 
+          <dspace:popup page="/help/index.html#filedescription"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
 
         <table class="miscTable" align=center>
             <tr>
-                <th class="oddRowOddCol">File</th>
+           <%-- <th class="oddRowOddCol">File</th>
                 <th class="oddRowEvenCol">Size</th>
-                <th class="oddRowOddCol">File Format</th>
+                <th class="oddRowOddCol">File Format</th> --%>
+				<th class="oddRowOddCol"><fmt:message key="jsp.submit.change-file-description.file"/></th>
+                <th class="oddRowEvenCol"><fmt:message key="jsp.submit.change-file-description.size"/></th>
+                <th class="oddRowOddCol"><fmt:message key="jsp.submit.change-file-description.format"/></th>
             </tr>
             <tr>
                 <td class="evenRowOddCol"><%= si.bitstream.getName() %></td>
@@ -87,8 +100,8 @@
             </tr>
         </table>
 
-        <P>Enter the correct description of the file in the box below:</P>
-        
+        <!-- <P>Enter the correct description of the file in the box below:</P> -->
+        <P><fmt:message key="jsp.submit.change-file-description.info2"/></P>
 <%
     String currentDesc = si.bitstream.getDescription();
     if (currentDesc == null)
@@ -99,7 +112,8 @@
         <center>
             <table>
                 <tr>
-                    <td class="submitFormLabel">File Description:</td>
+                    <%-- <td class="submitFormLabel">File Description:</td> --%>
+					<td class="submitFormLabel"><fmt:message key="jsp.submit.change-file-description.filedescr"/></td>
                     <td><input type=text name=description size=50 value="<%= currentDesc %>"></td>
                 </tr>
             </table>
@@ -108,7 +122,8 @@
         <%= SubmitServlet.getSubmissionParameters(si) %>
         <input type=hidden name=step value=<%= SubmitServlet.CHANGE_FILE_DESCRIPTION %>>
         
-        <center><P><input type=submit name=submit value="Submit"></P></center>
+        <%-- <center><P><input type=submit name=submit value="Submit"></P></center> --%>
+		<center><P><input type=submit name=submit value="<fmt:message key="jsp.submit.change-file-description.submit.button"/>"></P></center>
 
     </form>
 

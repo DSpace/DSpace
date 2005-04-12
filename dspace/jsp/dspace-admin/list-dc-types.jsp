@@ -49,6 +49,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.administer.DCType" %>
@@ -58,33 +62,40 @@
         (DCType[]) request.getAttribute("types");
 %>
 
-<dspace:layout title="Dublin Core Type Registry"
+<dspace:layout titlekey="jsp.dspace-admin.list-dc-types.title"
                navbar="admin"
                locbar="link"
-               parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
   <table width=95%>
     <tr>
       <td align=left>
-        <h1>Dublin Core Type Registry</h1>
+       <%-- <h1>Dublin Core Type Registry</h1> --%>
+        <h1><fmt:message key="jsp.dspace-admin.list-dc-types.heading"/></h1>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#dublincore">Help...</dspace:popup>
+        <dspace:popup page="/help/site-admin.html#dublincore"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
 
-    <p align="center">
+    <%-- <p align="center">
         Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!
+    </p> --%>
+    <p align="center">
+        <fmt:message key="jsp.dspace-admin.list-dc-types.note1"/>
     </p>
 
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
-            <th class="oddRowEvenCol"><strong>Element</strong></th>
-            <th class="oddRowOddCol"><strong>Qualifier</strong></th>
-            <th class="oddRowEvenCol"><strong>Scope Note</strong></th>
+           <%-- <th class="oddRowEvenCol"><strong>Element</strong></th> --%>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.list-dc-types.element"/></strong></th>
+            <%-- <th class="oddRowOddCol"><strong>Qualifier</strong></th> --%>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.list-dc-types.qualifier"/></strong></th>
+            <%-- <th class="oddRowEvenCol"><strong>Scope Note</strong></th> --%>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.list-dc-types.scope"/></strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
             <th class="oddRowEvenCol">&nbsp;</th>
         </tr>
@@ -108,10 +119,12 @@
                 </td>
                 <td class="<%= row %>RowOddCol">
                     <input type="hidden" name="dc_type_id" value="<%= types[i].getID() %>">
-                    <input type="submit" name="submit_update" value="Update">
+                    <%-- <input type="submit" name="submit_update" value="Update"> --%>
+                    <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.list-dc-types.update"/>">
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <input type="submit" name="submit_delete" value="Delete...">
+                    <%-- <input type="submit" name="submit_delete" value="Delete..."> --%>
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.list-dc-types.delete"/>">
                 </td>
             </tr>
         </form>
@@ -122,9 +135,11 @@
     </table>
         
     <P align="center">
-        Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!<br><br>
+        <%-- Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!<br><br> --%>
+        <fmt:message key="jsp.dspace-admin.list-dc-types.note2"/><br><br>
         <form method=POST>
-            <input type="submit" name="submit_add" value="Add New">
+            <%-- <input type="submit" name="submit_add" value="Add New"> --%>
+            <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.list-dc-types.add"/>">
         </form>
     </p>
 </dspace:layout>

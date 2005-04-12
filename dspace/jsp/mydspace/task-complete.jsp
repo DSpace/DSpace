@@ -44,14 +44,24 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout locbar="link" parenttitle="My DSpace" parentlink="/mydspace" title="Task Completed">
 
-    <H1>Thank You</H1>
+<dspace:layout locbar="link"
+               parentlink="/mydspace"
+               parenttitlekey="jsp.mydspace"
+               title="task-complete.title">
 
-    <P>The task is complete, and notification has been sent to the appropriate people.</P>
+<%-- <H1>Thank You</H1> --%>
+<H1><fmt:message key="jsp.mydspace.task-complete.heading"/></H1>
 
-    <P align=center><A HREF="<%= request.getContextPath() %>/mydspace">Return to My DSpace </A></P>
-
+    <%-- <P>The task is complete, and notification has been sent to the appropriate people.</P> --%>
+    <P><fmt:message key="jsp.mydspace.task-complete.text1"/></P>
+ 
+    <%-- <P align=center><A HREF="<%= request.getContextPath() %>/mydspace">Return to My DSpace </A></P> --%>
+    <P align=center><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.task-complete.return.link"/> </A></P>
+ 
 </dspace:layout>

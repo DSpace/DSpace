@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.content.Item" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -55,11 +58,18 @@
     Item item = (Item) request.getAttribute("item");
 %>
 
-<dspace:layout title="Upload Bitstream" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer" nocache="true">
+<dspace:layout titlekey="jsp.tools.upload-bitstream.title"
+               navbar="admin"
+               locbar="link"
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin"
+               nocache="true">
 
-    <H1>Upload Bitstream</H1>
+    <%-- <H1>Upload Bitstream</H1> --%>
+	<H1><fmt:message key="jsp.tools.upload-bitstream.title"/></H1>
     
-    <P>Select the bitstream to upload</P>
+    <%-- <P>Select the bitstream to upload</P> --%>
+	<P><fmt:message key="jsp.tools.upload-bitstream.info"/></P>
     
     <form method=POST enctype="multipart/form-data">
         <P align=center>
@@ -68,6 +78,8 @@
         
         <input type="hidden" name="item_id" value="<%= item.getID() %>">
 
-        <P align=center><input type="submit" name="submit" value="Upload"></P>
+        <!-- <P align=center><input type="submit" name="submit" value="Upload"></P> -->
+		<P align=center><input type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload.button"/>"></P>
     </form>
+    
 </dspace:layout>

@@ -63,6 +63,11 @@
     </description>
   </context-param>
 
+  <context-param>
+    <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+    <param-value>Messages</param-value>
+  </context-param>
+
 
   <!-- Filters -->
 
@@ -581,6 +586,12 @@
     <location>/internal-error</location>
   </error-page>
 
+
+  <!-- JSTL Format tag, for i18n -->
+  <taglib>
+    <taglib-uri>http://java.sun.com/jsp/jstl/fmt</taglib-uri>
+    <taglib-location>/WEB-INF/fmt.tld</taglib-location>
+  </taglib>
 
   <!-- DSpace JSP Tag Library -->
   <taglib>

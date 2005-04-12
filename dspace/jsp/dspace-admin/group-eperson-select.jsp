@@ -52,6 +52,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson" %>
@@ -63,14 +66,15 @@
         (EPerson []) request.getAttribute("epeople");
 %>
 
-<dspace:layout title="Select EPerson"
+<dspace:layout titlekey="jsp.dspace-admin.group-eperson-select.title"
                navbar="admin"
                locbar="link"
+               parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
-               parenttitle="Administer"
                nocache="true">
 
-    <h1>Select EPerson to Add to Group <%= group.getID() %></h1>
+    <%-- <h1>Select EPerson to Add to Group <%= group.getID() %></h1> --%>
+    <h1><fmt:message key="jsp.dspace-admin.group-eperson-select.heading"/> <%= group.getID() %></h1>
 
     <form method=POST>
 
@@ -94,15 +98,16 @@
         <table width="70%">
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_add_eperson_add" value="Add EPerson">
+                    <%-- <input type="submit" name="submit_add_eperson_add" value="Add EPerson"> --%>
+                    <input type="submit" name="submit_add_eperson_add" value="<fmt:message key="jsp.dspace-admin.group-eperson-select.add"/>">
                 </td>
                 <td align="right">
-                    <input type="submit" name="submit_add_eperson_cancel" value="Cancel">
+                    <%-- <input type="submit" name="submit_add_eperson_cancel" value="Cancel"> --%>
+                    <input type="submit" name="submit_add_eperson_cancel" value="<fmt:message key="jsp.dspace-admin.group-eperson-select.cancel"/>">
                 </td>
             </tr>
         </table>
     </center>        
 
     </form>
-
 </dspace:layout>

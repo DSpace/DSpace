@@ -50,6 +50,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.RegisterServlet" %>
@@ -58,18 +61,22 @@
     boolean retry = (request.getAttribute("retry") != null);
 %>
 
-<dspace:layout title="User Registration">
 
-    <H1>User Registration</H1>
+<dspace:layout titlekey="jsp.register.new-user.title">
+
+    <%-- <H1>User Registration</H1> --%>
+	<H1><fmt:message key="jsp.register.new-user.title"/></H1>
     
 <%
     if (retry)
     { %>
-    <P><strong>The e-mail address you entered was invalid.</strong>  Please try again.</strong></P>
+    <%-- <P><strong>The e-mail address you entered was invalid.</strong>  Please try again.</strong></P> --%>
+	<P><fmt:message key="jsp.register.new-user.info1"/></P>
 <%  } %>
 
-    <P>If you've never logged on to DSpace before, please enter your e-mail
-    address in the box below and click "Register".</P>
+    <%-- <P>If you've never logged on to DSpace before, please enter your e-mail
+    address in the box below and click "Register".</P> --%>
+	<P><fmt:message key="jsp.register.new-user.info2"/></P>
     
     <form action="<%= request.getContextPath() %>/register" method=POST>
 
@@ -80,12 +87,14 @@
                 <td class="oddRowEvenCol">
                     <table border=0 cellpadding=5>
                         <tr>
-                            <td class=standard><strong>E-mail Address:</strong></td>
+                            <%-- <td class=standard><strong>E-mail Address:</strong></td> --%>
+							<td class=standard><strong><fmt:message key="jsp.register.new-user.email.field"/></strong></td>
                             <td class=standard><input type=text name="email"></td>
                         </tr>
                         <tr>
                             <td align=center colspan=2>
-                                <input type=submit name=submit value="Register">
+                                <%-- <input type=submit name=submit value="Register"> --%>
+								<input type=submit name=submit value="<fmt:message key="jsp.register.new-user.register.button"/>">
                             </td>
                         </tr>
                     </table>
@@ -94,8 +103,9 @@
         </table>
     </form>
     
-    <P>If you or your department are interested in registering with DSpace, please
-    contact the DSpace site administrators.</P>
+    <%-- <P>If you or your department are interested in registering with DSpace, please
+    contact the DSpace site administrators.</P> --%>
+	<P><fmt:message key="jsp.register.new-user.info3"/></P>
 
     <dspace:include page="/components/contact-info.jsp" />
 

@@ -45,16 +45,22 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout locbar="off" navbar="off" title="Submission Saved">
+<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.saved.title">
 
-    <H1>Submission Saved</H1>
+    <%-- <H1>Submission Saved</H1> --%>
+	<H1><fmt:message key="jsp.submit.saved.title"/></H1>
 
-    <P>Your submission has been saved for you to finish later.  You can continue
+    <%-- <P>Your submission has been saved for you to finish later.  You can continue
     the submission by going to your "My DSpace" page and clicking on the
-    relevant "Resume" button.</P>
+    relevant "Resume" button.</P> --%>
+	<P><fmt:message key="jsp.submit.saved.info"/></P>
 
-    <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P>
+    <%-- <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P> --%>
+	<P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.saved.link"/></A></P>
 
 </dspace:layout>

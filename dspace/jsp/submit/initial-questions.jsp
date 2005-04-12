@@ -48,6 +48,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.DCInputSet" %>
@@ -62,7 +66,10 @@
         (DCInputSet) request.getAttribute("submission.inputs");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Describe Your Item" nocache="true">
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.submit.initial-questions.title"
+               nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
@@ -72,11 +79,14 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <H1>Submit: Describe Your Item</H1>
+        <%-- <H1>Submit: Describe Your Item</H1> --%>
+		<H1><fmt:message key="jsp.submit.initial-questions.heading"/></H1>
     
-        <P>Please check the boxes next to the statements that apply to your
+        <%-- <P>Please check the boxes next to the statements that apply to your
         submission.
-        <dspace:popup page="/help/index.html#describe1">(More Help...)</dspace:popup></P>
+        <dspace:popup page="/help/index.html#describe1">(More Help...)</dspace:popup></P> --%>
+
+        <dspace:popup page="/help/index.html#describe1"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
 
         <center>
             <table class="miscTable">
@@ -90,7 +100,8 @@
                         <table border=0>
                             <tr>
                                 <td valign=top><input type=checkbox name="multiple_titles" value="true" <%= (si.submission.hasMultipleTitles() ? "CHECKED" : "") %>></td>
-                                <td class="submitFormLabel" nowrap>The item has more than one title, e.g. a translated title</td>
+                                <%-- <td class="submitFormLabel" nowrap>The item has more than one title, e.g. a translated title</td> --%>
+								<td class="submitFormLabel" nowrap><fmt:message key="jsp.submit.initial-questions.elem1"/></td>
                             </tr>
                         </table>
                     </td>
@@ -106,7 +117,8 @@
                         <table border=0>
                             <tr>
                                 <td valign=top><input type=checkbox name="published_before" value="true" <%= (si.submission.isPublishedBefore() ? "CHECKED" : "") %>></td>
-                                <td class="submitFormLabel" nowrap>The item has been published or publicly distributed before</td>
+                                <%-- <td class="submitFormLabel" nowrap>The item has been published or publicly distributed before</td> --%>
+								<td class="submitFormLabel" nowrap><fmt:message key="jsp.submit.initial-questions.elem2"/></td>
                             </tr>
                         </table>
                     </td>
@@ -122,7 +134,8 @@
                         <table border=0>
                             <tr>
                                 <td valign=top><input type=checkbox name="multiple_files" value="true" <%= (si.submission.hasMultipleFiles() ? "CHECKED" : "") %>></td>
-                                <td class="submitFormLabel" nowrap>The item consists of <em>more than one</em> file</td>
+                                <%-- <td class="submitFormLabel" nowrap>The item consists of <em>more than one</em> file</td> --%>
+								<td class="submitFormLabel" nowrap><fmt:message key="jsp.submit.initial-questions.elem3"/></td>
                             </tr>
                         </table>
                     </td>
@@ -136,7 +149,8 @@
                         <table border=0>
                             <tr>
                                 <td valign=top><input type=checkbox name="is_thesis" value="true"></td>
-                                <td class="submitFormLabel" nowrap>The item is a thesis</td>
+                                <%-- <td class="submitFormLabel" nowrap>The item is a thesis</td> --%>
+								<td class="submitFormLabel" nowrap><fmt:message key="jsp.submit.initial-questions.elem4"/></td>
                             </tr>
                         </table>
                     </td>
@@ -156,15 +170,17 @@
         <center>
             <table border=0 width="80%">
                 <tr>
-                    <td width="100%">
-                        &nbsp;
+                    <td width="100%">&nbsp;
+                        
                     </td>
                     <td>
-                        <input type=submit name=submit_next value="Next &gt;">
+                        <%-- <input type=submit name=submit_next value="Next &gt;"> --%>
+						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.initial-questions.next.button"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
-                        <input type=submit name=submit_cancel value="Cancel/Save">
+                        <%-- <input type=submit name=submit_cancel value="Cancel/Save"> --%>
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.initial-questions.cancel.button"/>">
                     </td>
                 </tr>
             </table>

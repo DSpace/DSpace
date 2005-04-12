@@ -50,6 +50,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 
@@ -60,7 +63,10 @@
         (SubmissionInfo) request.getAttribute("submission.info");
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Error Uploading File" nocache="true">
+<dspace:layout locbar="off"
+               navbar="off"
+               titlekey="jsp.submit.upload-error.title"
+               nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
@@ -70,17 +76,20 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <H1>Submit: Error Uploading File</H1>
+        <%-- <H1>Submit: Error Uploading File</H1> --%>
+		<H1><fmt:message key="jsp.submit.upload-error.heading"/></H1>
 
-        <P>There was a problem uploading your file.  Either the filename you entered
+        <%-- <P>There was a problem uploading your file.  Either the filename you entered
         was incorrect, or there was a network problem which prevented the file from
-        reaching us correctly.  Please try again.</P>
+        reaching us correctly.  Please try again.</P> --%>
+		<P><fmt:message key="jsp.submit.upload-error.info"/></P>
 
         <%= SubmitServlet.getSubmissionParameters(si) %>
         <input type=hidden name=step value="<%= SubmitServlet.UPLOAD_ERROR %>">
 <%-- HACK: <center> tag needed for broken Netscape 4.78 behaviour --%>
         <center>
-            <P><input type=submit name=submit value="Retry Upload"></P>
+            <%-- <P><input type=submit name=submit value="Retry Upload"></P> --%>
+			<P><input type=submit name=submit value="<fmt:message key="jsp.submit.upload-error.retry.button"/>"></P>
         </center>
     </form>
 

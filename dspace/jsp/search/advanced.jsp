@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Community"   %>
@@ -69,16 +72,18 @@
 
 %>
 
-<dspace:layout locbar="nolink" title="Advanced Search">
+<dspace:layout locbar="nolink" titlekey="jsp.search.advanced.title">
 
 <form action="<%= request.getContextPath() %>/simple-search" method=GET>
 <input type=hidden name=advanced value="true">
 <table class=miscTable align=center>
     <tr>
       <td class="oddRowEvenCol" align=center>
-      	<p><strong>Search:</strong>&nbsp;
+      	<%-- <p><strong>Search:</strong>&nbsp; --%>
+      	<p><strong><fmt:message key="jsp.search.advanced.search"/></strong>&nbsp;
 		<select name="location">
-			<option selected value="/">All of DSpace</option>
+			<%-- <option selected value="/">All of DSpace</option> --%>
+			<option selected value="/"><fmt:message key="jsp.search.advanced.all"/></option>
 <%
         for (int i = 0; i < communityArray.length; i++)
         {
@@ -96,23 +101,33 @@
             <tr>
             <td width="12%" align="left" valign="top"></td>
               <td width="20%" align="left" valign="top" nowrap>
-                Search type: <br>
+                <%-- Search type: <br> --%>
+                <fmt:message key="jsp.search.advanced.type"/> <br>
 
                   <select name="field1">
-                    <option value="ANY" <%= field1.equals("ANY") ? "selected" : "" %>>Keyword</option>
-                    <option value="author" <%= field1.equals("author") ? "selected" : "" %>>Author</option>
-                    <option value="title" <%= field1.equals("title") ? "selected" : "" %>>Title</option>
-                    <option value="keyword" <%= field1.equals("keyword") ? "selected" : "" %>>Subject</option>
-                    <option value="abstract" <%= field1.equals("abstract") ? "selected" : "" %>>Abstract</option>
-                    <option value="series" <%= field1.equals("series") ? "selected" : "" %>>Series</option>
-                    <option value="sponsor" <%= field1.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
-                    <option value="identifier" <%= field1.equals("identifier") ? "selected" : "" %>>Identifier</option>
+                    <%-- <option value="ANY" <%= field1.equals("ANY") ? "selected" : "" %>>Keyword</option> --%>
+                    <option value="ANY" <%= field1.equals("ANY") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.keyword"/></option>
+		    <%-- <option value="author" <%= field1.equals("author") ? "selected" : "" %>>Author</option> --%>
+                    <option value="author" <%= field1.equals("author") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.author"/></option>
+                    <%-- <option value="title" <%= field1.equals("title") ? "selected" : "" %>>Title</option> --%>
+                    <option value="title" <%= field1.equals("title") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.title"/></option>
+                    <%-- <option value="keyword" <%= field1.equals("keyword") ? "selected" : "" %>>Subject</option> --%>
+                    <option value="keyword" <%= field1.equals("keyword") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.subject"/></option>
+                    <%-- <option value="abstract" <%= field1.equals("abstract") ? "selected" : "" %>>Abstract</option --%>
+                    <option value="abstract" <%= field1.equals("abstract") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.abstract"/></option>
+                    <%-- <option value="series" <%= field1.equals("series") ? "selected" : "" %>>Series</option> --%>
+                    <option value="series" <%= field1.equals("series") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.series"/></option>
+                    <%-- <option value="sponsor" <%= field1.equals("sponsor") ? "selected" : "" %>>Sponsor</option> --%>
+                    <option value="sponsor" <%= field1.equals("sponsor") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.sponsor"/></option>
+                    <%-- <option value="identifier" <%= field1.equals("identifier") ? "selected" : "" %>>Identifier</option> --%>
+                    <option value="identifier" <%= field1.equals("identifier") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.id"/></option>
+                    <option value="language" <%= field1.equals("language") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.language"/></option>
                   </select>
                 </p>
             </td>
             <td align="left" valign="top" nowrap width="68%">
-
-              	Search for: <br>
+                <%-- Search for: <br> --%>
+              	<fmt:message key="jsp.search.advanced.searchfor"/> <br>
                 <input type="text" name="query1" value='<%= query1 %>' size="30">
                 <br>
               </p>
@@ -122,20 +137,21 @@
             <td width="12%" align="left" valign="top">
               <select name="conjunction1">
                 <option value="AND" <%= conjunction1.equals("AND") ? "selected" : "" %>> AND </option>
-                <option value="OR" <%= conjunction1.equals("OR") ? "selected" : "" %>> OR </option>
+		<option value="OR" <%= conjunction1.equals("OR") ? "selected" : "" %>> OR </option>
                 <option value="NOT" <%= conjunction1.equals("NOT") ? "selected" : "" %>> NOT </option>
               </select>
             </td>
             <td width="20%" align="left" valign="top" nowrap>
                   <select name="field2">
-                    <option value="ANY" <%= field2.equals("ANY") ? "selected" : "" %>>Keyword</option>
-                    <option value="author" <%= field2.equals("author") ? "selected" : "" %>>Author</option>
-                    <option value="title" <%= field2.equals("title") ? "selected" : "" %>>Title</option>
-                    <option value="keyword" <%= field2.equals("keyword") ? "selected" : "" %>>Subject</option>
-                    <option value="abstract" <%= field2.equals("abstract") ? "selected" : "" %>>Abstract</option>
-                    <option value="series" <%= field2.equals("series") ? "selected" : "" %>>Series</option>
-                    <option value="sponsor" <%= field2.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
-                    <option value="identifier" <%= field2.equals("identifier") ? "selected" : "" %>>Identifier</option>
+                    <option value="ANY" <%= field2.equals("ANY") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.keyword"/></option>
+                    <option value="author" <%= field2.equals("author") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.author"/></option>
+                    <option value="title" <%= field2.equals("title") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.title"/></option>
+                    <option value="keyword" <%= field2.equals("keyword") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.subject"/></option>
+                    <option value="abstract" <%= field2.equals("abstract") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.abstract"/></option>
+                    <option value="series" <%= field2.equals("series") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.series"/></option>
+                    <option value="sponsor" <%= field2.equals("sponsor") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.sponsor"/></option>
+                    <option value="identifier" <%= field2.equals("identifier") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.id"/></option>
+                    <option value="language" <%= field1.equals("language") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.language"/></option>
                   </select>
            </td>
             <td align="left" valign="top" nowrap width="68%">
@@ -153,14 +169,15 @@
             <td width="20%" align="left" valign="top" nowrap>
 
                   <select name="field3">
-                    <option value="ANY" <%= field3.equals("ANY") ? "selected" : "" %>>Keyword</option>
-                    <option value="author" <%= field3.equals("author") ? "selected" : "" %>>Author</option>
-                    <option value="title" <%= field3.equals("title") ? "selected" : "" %>>Title</option>
-                    <option value="keyword" <%= field3.equals("keyword") ? "selected" : "" %>>Subject</option>
-                    <option value="abstract" <%= field3.equals("abstract") ? "selected" : "" %>>Abstract</option>
-                    <option value="series" <%= field3.equals("series") ? "selected" : "" %>>Series</option>
-                    <option value="sponsor" <%= field3.equals("sponsor") ? "selected" : "" %>>Sponsor</option>
-                    <option value="identifier" <%= field3.equals("identifier") ? "selected" : "" %>>Identifier</option>
+                    <option value="ANY" <%= field3.equals("ANY") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.keyword"/></option>
+                    <option value="author" <%= field3.equals("author") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.author"/></option>
+                    <option value="title" <%= field3.equals("title") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.title"/></option>
+                    <option value="keyword" <%= field3.equals("keyword") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.subject"/></option>
+                    <option value="abstract" <%= field3.equals("abstract") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.abstract"/></option>
+                    <option value="series" <%= field3.equals("series") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.series"/></option>
+                    <option value="sponsor" <%= field3.equals("sponsor") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.sponsor"/></option>
+                    <option value="identifier" <%= field3.equals("identifier") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.id"/></option>
+                    <option value="language" <%= field1.equals("language") ? "selected" : "" %>><fmt:message key="jsp.search.advanced.language"/></option>
                   </select>
                   <br>
             </td>
@@ -173,10 +190,12 @@
   <tr>
     <td valign=bottom align=right NOWRAP>
       &nbsp; &nbsp; &nbsp;
-      <input type="submit" name="submit" value="Search">
+      <%-- <input type="submit" name="submit" value="Search"> --%>
+      <input type="submit" name="submit" value="<fmt:message key="jsp.search.advanced.search2"/>">
             &nbsp;  &nbsp; &nbsp;
 
-      <input type="reset" name="reset" value=" Clear ">
+      <%-- <input type="reset" name="reset" value=" Clear "> --%>
+      <input type="reset" name="reset" value=" <fmt:message key="jsp.search.advanced.clear"/> ">
     </td>
   </tr>
 </table>
@@ -191,7 +210,8 @@
      <% 
     }else
     { %>
-        <P align=center>Search produced no results.</P>
+        <%-- <P align=center>Search produced no results.</P> --%>
+        <P align=center><fmt:message key="jsp.search.advanced.text"/></P>
      <%
      }
 }

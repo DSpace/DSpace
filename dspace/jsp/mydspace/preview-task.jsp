@@ -46,6 +46,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
@@ -64,36 +67,43 @@
 %>
 
 <dspace:layout locbar="link"
-               parenttitle="My DSpace"
                parentlink="/mydspace"
-               title="Preview Task"
+               parenttitle="preview-task.parenttitle"
+               titlekey="jsp.mydspace.preview-task.title"
                nocache="true">
 
-    <H1>Preview Task</H1>
+    <%-- <H1>Preview Task</H1> --%>
+	<H1><fmt:message key="jsp.mydspace.preview-task.title"/></H1>
     
 <%
     if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP1POOL)
     {
 %>
-    <P>The following item has been submitted to collection
+    <%-- <P>The following item has been submitted to collection
     <strong><%= collection.getMetadata("name") %></strong>.  In order to
-    accept the task of reviewing this item, please click "Accept This Task" below.</P>
+    accept the task of reviewing this item, please click "Accept This Task" below.</P> --%>
+	<P><fmt:message key="jsp.mydspace.preview-task.text1"/> 
+    <strong><%= collection.getMetadata("name") %>.  </strong><fmt:message key="jsp.mydspace.preview-task.text2"/></P>
 <%
     }
     else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP2POOL)
     {
 %>    
-    <P>The following item has been submitted to collection
+    <%-- <P>The following item has been submitted to collection
     <strong><%= collection.getMetadata("name") %></strong>.  In order to
-    accept the task of checking this item, please click "Accept This Task" below.</P>
+    accept the task of checking this item, please click "Accept This Task" below.</P> --%>
+	<P><fmt:message key="jsp.mydspace.preview-task.text1"/> 
+    <strong><%= collection.getMetadata("name") %>.  </strong><fmt:message key="jsp.mydspace.preview-task.text3"/></P>
 <%
     }
     else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP3POOL)
     {
 %>
-    <P>The following item has been accepted for inclusion in collection
+    <%-- <P>The following item has been accepted for inclusion in collection
     <strong><%= collection.getMetadata("name") %></strong>.  In order to
-    accept the task of the final edit of this item, please click "Accept This Task" below.</P>
+    accept the task of the final edit of this item, please click "Accept This Task" below.</P> --%>
+	<P><fmt:message key="jsp.mydspace.preview-task.text4"/> 
+    <strong><%= collection.getMetadata("name") %>.  </strong><fmt:message key="jsp.mydspace.preview-task.text5"/></P>
 <%
     }
 %>
@@ -106,10 +116,12 @@
         <table border=0 width=90% cellpadding=10 align=center>
             <tr>
                 <td align=left>
-                    <input type="submit" name="submit_start" value="Accept This Task">
+                    <%-- <input type="submit" name="submit_start" value="Accept This Task"> --%>
+					<input type="submit" name="submit_start" value="<fmt:message key="jsp.mydspace.preview-task.accept.button"/>">
                 </td>
                 <td align=right>
-                    <input type="submit" name="submit_cancel" value="Cancel">
+                    <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
+					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.preview-task.cancel.button"/>">
                 </td>
             </tr>
         </table>

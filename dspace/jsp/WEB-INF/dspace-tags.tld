@@ -60,7 +60,11 @@
     - "parent" page using "parent" and "parentlink".  Otherwise, the page is
     - treated as a "top-level" page directly under the home page.
     -
-    - title   - title of the page
+    - Specify only ONE of 'title' or 'titlekey'.
+    - Specify only ONE of 'parenttitle' or 'parenttitlekey'.
+    -
+    - title    - title of the page in text.  For backwards compatibility.
+    - titlekey - message key from i18n dictionary file for page title
     - navbar  - type of navbar to be used, or "off".  The navbar is loaded from
     -           layout/navbar_XXX.jsp.  If this parameter is omitted, "default"
     -           is used (i.e. layout/navbar-default.jsp).
@@ -72,6 +76,8 @@
     -                 auto   - show community/collection from request (default)
     - parenttitle  - title of "parent" page, that is, the page one up in the
     -                site hierarchy.
+    - parenttitlekey  - message key from i18n dictionary of "parent" page,
+    -                   that is, the page one up in the site hierarchy.
     - parentlink - path to parent page - must be specified if "parent" specified
     - style   - page layout style.  Default is "default".  Page is loaded
     -            from layout/header-XXX.jsp and layout/footer-XXX.jsp.
@@ -84,7 +90,12 @@
     <info>Lays out an HTML page</info>
     <attribute>
       <name>title</name>
-      <required>true</required>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>titlekey</name>
+      <required>false</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>
     <attribute>
@@ -99,6 +110,11 @@
     </attribute>
     <attribute>
       <name>parenttitle</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>parenttitlekey</name>
       <required>false</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>

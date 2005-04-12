@@ -45,15 +45,22 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout title="Inactive Account">
-    <H1>Inactive Account</H1>
+<dspace:layout titlekey="jsp.register.inactive-account.title">
+
+    <%-- <H1>Inactive Account</H1> --%>
+	<H1><fmt:message key="jsp.register.inactive-account.title"/></H1>
     
-    <P>The e-mail address you entered corresponds to an inactive account.
+    <%-- <P>The e-mail address you entered corresponds to an inactive account.
     Perhaps you haven't yet <A HREF="<%= request.getContextPath() %>/register">
     registered</A>.  Please feel free to contact the site administrators
-    with any queries.</P>
+    with any queries.</P> --%>
+	<P><fmt:message key="jsp.register.inactive-account.info1"/> <A HREF="<%= request.getContextPath() %>/register">
+    .  <fmt:message key="jsp.register.inactive-account.link"/></A><fmt:message key="jsp.register.inactive-account.info2"/></P>
     
     <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

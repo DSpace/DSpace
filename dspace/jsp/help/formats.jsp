@@ -46,6 +46,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.sql.SQLException" %>
@@ -89,39 +93,54 @@
 %>
 <html>
 <head>
-<title>DSpace Supported Formats</title>
+<title>
+	<fmt:message key="jsp.help.formats.title"/></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="../styles.css.jsp" type="text/css"/>
 </head>
 <body class="help">
 
-<h2 align="center"><a name="top">DSpace Supported Formats</a></h2>
-<p align="right"><a href="index.html">return to main help</a></p>
-<h5><a href="#policy">Format Support Policy</a></h5>
-<h5><a href="#formats">Format Support Levels</a></h5>
-<h5><a href="#notlisted">What To Do If Your Format Isn't Listed</a></h5>
+<%-- <h2 align="center"><a name="top">DSpace Supported Formats</a></h2> --%>
+<h2 align="center"><a name="top"><fmt:message key="jsp.help.formats.heading"/></a></h2>
+<p align="right"><a href="index.html"><fmt:message key="jsp.help.formats.return"/></a></p>
+
+<%-- <h5><a href="#policy">Format Support Policy</a></h5> --%>
+<h5><a href="#policy"><fmt:message key="jsp.help.formats.format1"/></a></h5>
+<%-- <h5><a href="#formats">Format Support Levels</a></h5> --%>
+<h5><a href="#formats"><fmt:message key="jsp.help.formats.format2"/></a></h5>
+<%-- <h5><a href="#notlisted">What To Do If Your Format Isn't Listed</a></h5> --%>
+<h5><a href="#notlisted"><fmt:message key="jsp.help.formats.format3"/></a></h5>
 <p>&nbsp;</p>
 <table>
     <tr>
-    <td class="leftAlign"><a name="policy"></a><strong>FORMAT SUPPORT POLICY</strong></td>
-    <td class="rightAlign"><a href="#top" align="right">top</a></td>
+    <%-- <td class="leftAlign"><a name="policy"></a><strong>FORMAT SUPPORT POLICY</strong></td> --%>
+    <td class="leftAlign"><a name="policy"></a><strong><fmt:message key="jsp.help.formats.policy"/></strong></td>
+    <%-- <td class="rightAlign"><a href="#top" align="right">top</a></td> --%>
+    <td class="rightAlign"><a href="#top" align="right"><fmt:message key="jsp.help.formats.top"/></a></td>
     </tr>
 </table>
-<p><i>(Your Format Support Policy Here)</i></p> 
+<%-- <p><i>(Your Format Support Policy Here)</i></p> --%>
+<p><i><fmt:message key="jsp.help.formats.here"/></i></p> 
 <p>&nbsp;</p>
 <table>
     <tr>
-    <td class="leftAlign"><a name="formats"></a><strong>FORMAT SUPPORT LEVELS</strong></td>
-    <td class="rightAlign"><a href="#top" align="right">top</a></td>
+    <%-- <td class="leftAlign"><a name="formats"></a><strong>FORMAT SUPPORT LEVELS</strong></td> --%>
+    <td class="leftAlign"><a name="formats"></a><strong><fmt:message key="jsp.help.formats.levels"/></strong></td>
+    <%-- <td class="rightAlign"><a href="#top" align="right">top</a></td> --%>
+    <td class="rightAlign"><a href="#top" align="right"><fmt:message key="jsp.help.formats.top"/></a></td>
     </tr>
 </table>
 
 <table class="formats" border="0">
     <tr>
-        <th align="left"><strong>Name</strong></th>
-        <th align="left"><strong>Extensions</strong></th>        
-        <th align="left"><strong>MIME Type</strong></th>
-        <th align="left"><strong>Support Level</strong></th>
+        <%-- <th align="left"><strong>Name</strong></th> --%>
+        <th align="left"><strong><fmt:message key="jsp.help.formats.name"/></strong></th>
+        <%-- <th align="left"><strong>Extensions</strong></th> --%>
+        <th align="left"><strong><fmt:message key="jsp.help.formats.extensions"/></strong></th>        
+        <%-- <th align="left"><strong>MIME Type</strong></th> --%>
+        <th align="left"><strong><fmt:message key="jsp.help.formats.mime"/></strong></th>
+        <%-- <th align="left"><strong>Support Level</strong></th> --%>
+        <th align="left"><strong><fmt:message key="jsp.help.formats.support"/></strong></th>
     </tr>
 
 <%
@@ -174,14 +193,18 @@
 <p>&nbsp;</p>
 <table>
     <tr>
-    <td class="leftAlign"><a name="notlisted"></a><strong>WHAT TO DO IF YOUR FORMAT ISN'T LISTED</strong></td>
-    <td class="rightAlign"><a href="#top" align="right">top</a></td>
+    <%-- <td class="leftAlign"><a name="notlisted"></a><strong>WHAT TO DO IF YOUR FORMAT ISN'T LISTED</strong></td> --%>
+    <td class="leftAlign"><a name="notlisted"></a><strong><fmt:message key="jsp.help.formats.what"/></strong></td>
+    <%-- <td class="rightAlign"><a href="#top" align="right">top</a></td> --%>
+    <td class="rightAlign"><a href="#top" align="right"><fmt:message key="jsp.help.formats.top"/></a></td>
     </tr>
 </table>
 <p>
-Please contact your <a href="#" onClick="javascript:window.open('../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')">DSpace Administrator</a>
-if you have questions about a particular format.
+<%-- Please contact your <a href="#" onClick="javascript:window.open('../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')">DSpace Administrator</a>
+if you have questions about a particular format. --%>
+<fmt:message key="jsp.help.formats.contact1"/> <a href="#" onClick="javascript:window.open('../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')"><fmt:message key="jsp.help.formats.contact2"/></a>
+<fmt:message key="jsp.help.formats.contact3"/>
 </p>
 <p>&nbsp;</p>
 </body>
-</html>
+</html

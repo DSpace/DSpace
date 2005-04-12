@@ -59,6 +59,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.authorize.ResourcePolicy" %>
@@ -82,20 +86,21 @@
     int resourceRelevance = 1 << resourceType;     
 %>
 
-<dspace:layout title="Edit Policy"
+<dspace:layout titlekey="jsp.dspace-admin.authorize-policy-edit.title"
                navbar="admin"
                locbar="link"
+               parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
-               parenttitle="Administer"
                nocache="true">
-
-  <table width=95%>
+ 
+<table width=95%>
     <tr>
       <td align=left>
-        <h1>Edit Policy for <%= edit_title %>:</h1>
+        <%-- <h1>Edit Policy for <%= edit_title %>:</h1> --%>
+        <h1><fmt:message key="jsp.dspace-admin.authorize-policy-edit.heading"/> <%= edit_title %>:</h1>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#authorize">Help...</dspace:popup>
+        <dspace:popup page="/help/site-admin.html#authorize"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
@@ -105,7 +110,8 @@
 
     <table class="miscTable" align="center">
         <tr>     
-            <td>Group:</td>
+            <%-- <td>Group:</td> --%>
+            <td><fmt:message key="jsp.dspace-admin.authorize-policy-edit.group"/></td>
             <td>
                 <select size="15" name="group_id">
                     <%  for(int i = 0; i < groups.length; i++ ) { %>
@@ -117,7 +123,8 @@
             </td>
         </tr>
 
-        <tr><td>Action:</td>
+        <%-- <tr><td>Action:</td> --%>
+        <tr><td><fmt:message key="jsp.dspace-admin.authorize-policy-edit.action"/></td>
             <td><input type="hidden" name="<%=id_name%>" value="<%=id%>">
                 <input type="hidden" name="policy_id" value="<%=policy.getID()%>" >
                 <select name="action_id">
@@ -144,15 +151,16 @@
         <table width="70%">
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_save_policy" value="Save Policy">
+                    <%-- <input type="submit" name="submit_save_policy" value="Save Policy"> --%>
+                    <input type="submit" name="submit_save_policy" value="<fmt:message key="jsp.dspace-admin.authorize-policy-edit.save"/>">
                 </td>
                 <td align="right">
-                    <input type="submit" name="submit_cancel_policy" value="Cancel">
+                    <%-- <input type="submit" name="submit_cancel_policy" value="Cancel"> --%>
+                    <input type="submit" name="submit_cancel_policy" value="<fmt:message key="jsp.dspace-admin.authorize-policy-edit.cancel"/>">
                 </td>
             </tr>
         </table>
     </center>        
 
     </form>
-
 </dspace:layout>

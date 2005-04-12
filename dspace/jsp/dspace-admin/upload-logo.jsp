@@ -49,6 +49,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
@@ -60,23 +63,40 @@
     Community community = (Community) request.getAttribute("community");
 %>
 
-<dspace:layout title="Upload Logo"
+<dspace:layout titlekey="jsp.dspace-admin.upload-logo.title"
                navbar="admin"
                locbar="link"
+               parenttitlekey="jsp.administer"
                parentlink="/dspace-admin" 
-               parenttitle="Administer" 
                nocache="true">
 
-    <H1>Upload Logo</H1>
+    <%-- <H1>Upload Logo</H1> --%>
+    <H1><fmt:message key="jsp.dspace-admin.upload-logo.heading"/></H1>
     
-    <P>Select the logo to upload for
-        <%= (collection != null ? "collection <strong>" + collection.getMetadata("name") + "</strong>"
+    <%-- <P>Select the logo to upload for
+	<%= (collection != null ? "collection <strong>" + collection.getMetadata("name") + "</strong>"
                                 : "community <strong>" + community.getMetadata("name") + "</strong>") %>
-    </P>
+    </P> --%>
+    
+    
+    	<P><fmt:message key ="upload-logo.select"/> 
+    	    <%
+	    	if (collection != null){
+	    %>
+	    		<fmt:message key="jsp.dspace-admin.upload-logo.col"/> <strong><%= collection.getMetadata("name")%></strong>
+	    <%	
+	    	}
+	    	else{
+	    %>
+	    		<fmt:message key="jsp.dspace-admin.upload-logo.com"/> <strong><%= community.getMetadata("name")%></strong>
+	    <%
+	    	}
+	    %>
+        </P>
     
     <form method=POST enctype="multipart/form-data">
         <P align=center>
-            <input type=file size=40 name="file">
+          <input type=file size=40 name="file">
         </P>
         
         <input type="hidden" name="community_id" value="<%= community.getID() %>">
@@ -84,6 +104,7 @@
         <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
 <%  } %>
 
-        <P align=center><input type="submit" name="submit" value="Upload"></P>
+        <%-- <P align=center><input type="submit" name="submit" value="Upload"></P> --%>
+        <P align=center><input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.upload-logo.upload"/>"></P>
     </form>
 </dspace:layout>

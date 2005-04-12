@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.administer.DCType" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -58,18 +61,22 @@
         (type.getQualifier() == null ? "" : "." + type.getQualifier());
 %>
 
-<dspace:layout title="Delete Dublin Core Type"
+<dspace:layout titlekey="jsp.dspace-admin.confirm-delete-dctype.title"
                navbar="admin"
                locbar="link"
-               parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <H1>Delete Dublin Core Format: <code><%= typeName %></code></H1>
+    <%-- <H1>Delete Dublin Core Format: <code><%= typeName %></code></H1> --%>
+    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.heading"/> <code><%= typeName %></code></H1>
     
-    <P>Are you sure the format <strong><%= typeName %></strong>
-    should be deleted?</P>
+    <%-- <P>Are you sure the format <strong><%= typeName %></strong>
+    should be deleted?</P> --%>
+    <P><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.confirm1"/> <strong><%= typeName %></strong>
+    <fmt:message key="jsp.dspace-admin.confirm-delete-dctype.confirm2"/></P>
     
-    <P>This will result in an error if any DC values have this type.</P>
+    <%-- <P>This will result in an error if any DC values have this type.</P> --%>
+    <P><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.warning"/></P>
 
     <form method=POST>
         <input type="hidden" name="dc_type_id" value="<%= type.getID() %>">
@@ -78,10 +85,12 @@
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit_confirm_delete" value="Delete">
+                        <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
+                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.confirm-delete-dctype.delete"/>">
                     </td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.confirm-delete-dctype.cancel"/>">
                     </td>
                 </tr>
             </table>

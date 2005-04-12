@@ -53,6 +53,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Community" %>
@@ -62,13 +65,14 @@
         (Community[]) request.getAttribute("communities");
 %>
 
-<dspace:layout title="Select Community"
+<dspace:layout titlekey="jsp.dspace-admin.community-select.title"
                navbar="admin"
                locbar="link"
-               parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <h1>communities:</h1>
+    <%-- <h1>communities:</h1> --%>
+    <h1><fmt:message key="jsp.dspace-admin.community-select.com"/></h1>
 
     <form method=POST>
 
@@ -90,15 +94,16 @@
         <table width="70%">
             <tr>
                 <td align="left">
-                    <input type="submit" name="submit_community_select" value="Edit Policies">
+                    <%-- <input type="submit" name="submit_community_select" value="Edit Policies"> --%>
+                    <input type="submit" name="submit_community_select" value="<fmt:message key="jsp.dspace-admin.community-select.edit"/>">
                 </td>
                 <td align="right">
-                    <input type="submit" name="submit_community_select_cancel" value="Cancel">
+                    <%-- <input type="submit" name="submit_community_select_cancel" value="Cancel"> --%>
+                    <input type="submit" name="submit_community_select_cancel" value="<fmt:message key="jsp.dspace-admin.community-select.cancel"/>">
                 </td>
             </tr>
         </table>
     </center>        
 
     </form>
-
 </dspace:layout>

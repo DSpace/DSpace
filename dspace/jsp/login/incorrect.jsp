@@ -44,21 +44,32 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout navbar="off" locbar="nolink" title="Log In">
+
+<dspace:layout navbar="off"
+               locbar="nolink"
+               titlekey="jsp.login.incorrect.title">
+
+
     <table border=0 width="90%">
         <tr>
             <td align="left">
-                <H1>Log In to DSpace</H1>
+                <%-- <H1>Log In to DSpace</H1> --%>
+                <H1><fmt:message key="jsp.login.incorrect.heading"/></H1>
             </td>
             <td align="right" class="standard">
-                <dspace:popup page="/help/index.html#login">Help...</dspace:popup>
+                <dspace:popup page="/help/index.html#login"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>
 
-    <P align=center><strong>The e-mail address and password you supplied were not valid.  Please try again, or have you <A HREF="<%= request.getContextPath() %>/forgot">forgotten your password</A>?</strong></P>
+    <%-- <P align=center><strong>The e-mail address and password you supplied were not valid.  Please try again, or have you <A HREF="<%= request.getContextPath() %>/forgot">forgotten your password</A>?</strong></P> --%>
+    <P align=center><strong><fmt:message key="jsp.login.incorrect.texta"/> <A HREF="<%= request.getContextPath() %>/forgot"><fmt:message key="jsp.login.incorrect.textb"/></A><fmt:message key="jsp.login.incorrect.textc"/></strong></P>
 
     <dspace:include page="/components/login-form.jsp" />
 </dspace:layout>

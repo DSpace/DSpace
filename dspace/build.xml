@@ -139,6 +139,11 @@ Common usage:
     <copy todir="build/jsp" preservelastmodified="true" overwrite="true">
       <fileset dir="jsp/local" />
     </copy>
+  	<!-- Copy Messages.properties file -->
+  	<copy file="config/Messages.properties" 
+  	      todir="build/classes"
+  		  preservelastmodified="true"/>
+  	<!-- Build DSpace Web UI .war -->
     <war destfile="build/dspace.war"
          webxml="build/dspace-web.xml">
        <fileset dir="build/jsp" />

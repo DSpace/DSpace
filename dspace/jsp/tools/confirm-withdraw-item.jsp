@@ -47,6 +47,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
 <%@ page import="org.dspace.content.Item" %>
 
@@ -57,16 +60,18 @@
     Item item = (Item) request.getAttribute("item");
 %>
 
-<dspace:layout title="Withdraw Item"
+<dspace:layout titlekey="jsp.tools.confirm-withdraw-item.title"
                navbar="admin"
                locbar="link"
+               parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
-               parenttitle="Administer"
                nocache="true">
 
-    <H1>Withdraw Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1>
-    
-    <P>Are you sure this item should be withdrawn from the archive?</P>
+    <%-- <H1>Withdraw Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1> --%>
+    <H1><fmt:message key="jsp.tools.confirm-withdraw-item.title"/>: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1>
+	
+    <%-- <P>Are you sure this item should be withdrawn from the archive?</P> --%>
+	<P><fmt:message key="jsp.tools.confirm-withdraw-item.question"/></P>
     
     <dspace:item item="<%= item %>" style="full" />
 
@@ -78,14 +83,15 @@
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit" value="Withdraw">
+                        <%-- <input type="submit" name="submit" value="Withdraw"> --%>
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.confirm-withdraw-item.withdraw.button"/>">
                     </td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.confirm-withdraw-item.cancel.button"/>">
                     </td>
                 </tr>
             </table>
         </center>
     </form>
 </dspace:layout>
-

@@ -62,6 +62,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.net.URLEncoder"            %>
@@ -91,9 +94,12 @@
     int pageFirst   = ((Integer)request.getAttribute("pagefirst"  )).intValue();
 %>
 
-<dspace:layout title="Search Results">
+<dspace:layout titlekey="jsp.search.results.title">
 
-    <H1>Search Results</H1>
+    <%-- <H1>Search Results</H1> --%>
+    
+
+<H1><fmt:message key="jsp.search.results.heading"/></H1>
     
     <%-- Controls for a repeat search --%>
     <form action="simple-search" method=GET>
@@ -103,14 +109,16 @@
                     <table>
                         <tr>
                             <td>
-                                <strong>Search:</strong>&nbsp;<select name="location">
+                                <%-- <strong>Search:</strong>&nbsp;<select name="location"> --%>
+                                <strong><fmt:message key="jsp.search.results.search"/></strong>&nbsp;<select name="location">
 <%
     if (community == null && collection == null)
     {
         // Scope of the search was all of DSpace.  The scope control will list
         // "all of DSpace" and the communities.
 %>
-                                    <option selected value="/">All of DSpace</option>
+                                    <%-- <option selected value="/">All of DSpace</option> --%>
+                                    <option selected value="/"><fmt:message key="jsp.search.results.all"/></option>
 <%
         for (int i = 0; i < communityArray.length; i++)
         {
@@ -124,7 +132,8 @@
         // Scope of the search was within a community.  Scope control will list
         // "all of DSpace", the community, and the collections within the community.
 %>
-                                    <option value="/">All of DSpace</option>
+                                    <%-- <option value="/">All of DSpace</option> --%>
+                                    <option value="/"><fmt:message key="jsp.search.results.all"/></option>
                                     <option selected value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
 <%
         for (int i = 0; i < collectionArray.length; i++)
@@ -138,7 +147,8 @@
     {
         // Scope of the search is a specific collection
 %>
-                                    <option value="/">All of DSpace</option>
+                                    <%-- <option value="/">All of DSpace</option> --%>
+                                    <option value="/"><fmt:message key="jsp.search.results.all"/></option>
                                     <option value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
                                     <option selected value="<%= collection.getHandle() %>"><%= collection.getMetadata("name") %></option>
 <%
@@ -149,7 +159,8 @@
                         </tr>
                         <tr>
                             <td align=center>
-                                for&nbsp;<input type="text" name="query" value='<%= (query==null ? "" : query) %>'>&nbsp;<input type="submit" value="Go">
+                                <%-- for&nbsp;<input type="text" name="query" value='<//%= (query==null ? "" : query) %>'>&nbsp;<input type="submit" value="Go"> --%>
+                                <fmt:message key="jsp.search.results.for"/>&nbsp;<input type="text" name="query" value='<%= (query==null ? "" : query) %>'>&nbsp;<input type="submit" value="<fmt:message key="jsp.search.results.go"/>">
                             </td>
                         </tr>
                     </table>
@@ -167,36 +178,40 @@
 else if( qResults.getHitCount() == 0 )
 {
  %>
-    <P align=center>Search produced no results.</P>
+    <%-- <P align=center>Search produced no results.</P> --%>
+    <P align=center><fmt:message key="jsp.search.results.nores"/></P>
 <%
 }
 else
 {
 %>
-    <P align=center>Results <%=qResults.getStart()+1%>-<%=qResults.getStart()+qResults.getHitHandles().size()%> of
+    <%-- <P align=center>Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
+	<P align=center><fmt:message key="jsp.search.results.results"/> <%=qResults.getStart()+1%>-<%=qResults.getStart()+qResults.getHitHandles().size()%> <fmt:message key="jsp.search.results.of"/>
     <%=qResults.getHitCount()%>. </P>
 
 <% } %>
 
 <% if (communities.length > 0 ) { %>
-    <h3>Community Hits:</h3>
+    <%-- <h3>Community Hits:</h3> --%>
+    <h3><fmt:message key="jsp.search.results.comhits"/></h3>
     <dspace:communitylist  communities="<%= communities %>" />
 <% } %>
 
 <% if (collections.length > 0 ) { %>   
     <br>
-    <h3>Collection hits:</h3>
+    <%-- <h3>Collection hits:</h3> --%>
+    <h3><fmt:message key="jsp.search.results.colhits"/></h3>
     <dspace:collectionlist collections="<%= collections %>" />
 <% } %>
 
 <% if (items.length > 0) { %>
     <br>
-    <h3>Item hits:</h3>
+    <%-- <h3>Item hits:</h3> --%>
+    <h3><fmt:message key="jsp.search.results.itemhits"/></h3>
     <dspace:itemlist items="<%= items %>" />
 <% } %>
 
 <P align="center">
-
 
 <%
     // retain scope when navigating result sets
