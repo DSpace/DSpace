@@ -294,7 +294,7 @@
              <% } %>
              <% if(add_button) { %>
 				<form method=POST action="<%=request.getContextPath()%>/tools/collection-wizard">
-                    <%--<input type="submit" value="Create collection">--%>
+                    <input type="hidden" name="community_id" value="<%= community.getID() %>">
 	   			    <input type="submit" value="<fmt:message key="jsp.community-home.create1.button"/>">
                 </form>
                 <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
