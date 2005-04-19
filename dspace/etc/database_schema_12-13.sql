@@ -63,8 +63,8 @@ CREATE TABLE epersongroup2workspaceitem
 -- modification to collection table to support being able to change the
 -- submitter and collection admin group names
 -------------------------------------------------------------------------------
-ALTER TABLE collection ADD submitter INTEGER;
+ALTER TABLE collection ADD submitter INTEGER REFERENCES EPersonGroup( eperson_group_id );
 
-ALTER TABLE collection ADD admin INTEGER;
+ALTER TABLE collection ADD admin INTEGER REFERENCES EPersonGroup( eperson_group_id );
 
 ALTER TABLE eperson ADD netid varchar(64) UNIQUE;
