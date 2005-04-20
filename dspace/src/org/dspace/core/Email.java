@@ -41,6 +41,7 @@ package org.dspace.core;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -254,7 +255,9 @@ public class Email
         // Format the mail message
         Object[] args = arguments.toArray();
         String fullMessage = MessageFormat.format(content, args);
-
+        Date date = new Date();
+        
+        message.setSentDate(date);
         message.setFrom(new InternetAddress(from));
         message.setSubject(subject);
         message.setText(fullMessage);
