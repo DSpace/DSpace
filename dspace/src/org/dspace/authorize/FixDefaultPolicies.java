@@ -1,11 +1,11 @@
 /*
- * FixDefaultPolicies.java - Command line hack to find all collections without
- *  default policies, and set them up.  All collections must have default
- *  policies now for submitted items to inherit.
+ * FixDefaultPolicies.java
  *
- * $Id$
+ * Version: $Revision$
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Date: $Date$
+ *
+ * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

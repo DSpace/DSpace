@@ -1,18 +1,11 @@
 /*
  * Bitstream.java
  *
- * *****
- * Mods by David Little, UCSD Libraries 02/17/05
- * Purpose: To allow the registration of files (bitstreams) into DSpace. See
- * class javadoc comments below.
- * Mods mark: MOD DRL
- * *****
- *
  * Version: $Revision$
  *
  * Date: $Date$
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -206,7 +199,6 @@ public class Bitstream extends DSpaceObject
      * authorisation; other methods such as Bundle.createBitstream() will
      * check authorisation.  The newly created bitstream has the "unknown"
      * format.
-     * MOD DRL: added method - parallels create()
      *
      * @param  context DSpace context object
      * @param assetstore corresponds to an assetstore in dspace.cfg
@@ -584,7 +576,6 @@ public class Bitstream extends DSpaceObject
     
     /**
      * Determine if this bitstream is registered
-     * MOD DRL: added method - used by ItemExport
      * 
      * @return true if the bitstream is registered, false otherwise
      */
@@ -595,7 +586,6 @@ public class Bitstream extends DSpaceObject
     
     /**
      * Get the asset store number where this bitstream is stored
-     * MOD DRL: added method - used by ItemExport
      * 
      * @return the asset store number of the bitstream
      */

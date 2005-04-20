@@ -1,9 +1,11 @@
 /*
  * ReportTools.java
  *
- * Created on 02 February 2005
+ * Version: $Revision$
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Date: $Date$
+ *
+ * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

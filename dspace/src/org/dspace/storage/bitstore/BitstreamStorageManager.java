@@ -1,18 +1,11 @@
 /*
  * BitstreamStorageManager.java
  *
- * *****
- * Mods by David Little, UCSD Libraries 12/21/04
- * Purpose: To allow the registration of files (bitstreams) into DSpace. See
- * class javadoc comments below.
- * Mods mark: MOD DRL
- * *****
- *
  * Version: $Revision$
  *
  * Date: $Date$
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -86,6 +79,11 @@ import edu.sdsc.grid.io.srb.SRBFileSystem;
  * when the asset store for new ('incoming') bitstreams is changed.
  * </P>
  * 
+ * <P>
+ * Mods by David Little, UCSD Libraries 12/21/04 to allow the registration of
+ * files (bitstreams) into DSpace.
+ * </P>
+ *
  * @author Peter Breton, Robert Tansley
  * @version $Revision$
  */
@@ -94,7 +92,6 @@ public class BitstreamStorageManager
     /** log4j log */
     private static Logger log = Logger.getLogger(BitstreamStorageManager.class);
 
-    // MOD DRL - change File to GeneralFile for SRB compatibility
 	/**
 	 * The asset store locations. The information for each GeneralFile in the
 	 * array comes from dspace.cfg, so see the comments in that file.
@@ -113,7 +110,6 @@ public class BitstreamStorageManager
 	 * SRBFileSystem object to create an SRBFile object
 	 */
 	private static GeneralFile[] assetStores;
-    // MOD end
 
     /** The asset store to use for new bitstreams */
     private static int incoming;
@@ -132,19 +128,16 @@ public class BitstreamStorageManager
 
     private static final int directoryLevels = 3;
 
-    // MOD DRL - declare the identifier marking registered bitstreams
 	/**
 	 * This prefix string marks registered bitstreams in internal_id
 	 */
 	private static final String REGISTERED_FLAG = "-R";
-    // MOD end
 
     /* Read in the asset stores from the config. */
     static
     {
         ArrayList stores = new ArrayList();
 
-        // MOD DRL - block modified for SRB compatibility
 		// 'assetstore.dir' is always store number 0
 		String sAssetstoreDir = ConfigurationManager
 				.getProperty("assetstore.dir");
@@ -236,7 +229,6 @@ public class BitstreamStorageManager
 						+ " with assetstore " + i);
 			}
 		}
-        // MOD end
 
         // Read asset store to put new files in. Default is 0.
         incoming = ConfigurationManager.getIntProperty("assetstore.incoming");
@@ -319,14 +311,10 @@ public class BitstreamStorageManager
         }
 
         // Where on the file system will this new bitstream go?
-        // MOD DRL - changed declaration from File to GeneralFile
 		GeneralFile file = getFile(bitstream);
-        // MOD end
 
         // Make the parent dirs if necessary
-        // MOD DRL - changed declaration from File to GeneralFile
 		GeneralFile parent = file.getParentFile();
-        // MOD end
 
         if (!parent.exists())
         {
@@ -336,9 +324,7 @@ public class BitstreamStorageManager
         //Create the corresponding file and open it
         file.createNewFile();
 
-        // MOD DRL - modified for SRB compatibility
 		GeneralFileOutputStream fos = FileFactory.newFileOutputStream(file);
-        // MOD end
 
         // Read through a digest input stream that will work out the MD5
         DigestInputStream dis = null;
@@ -384,7 +370,6 @@ public class BitstreamStorageManager
         return bitstream_id;
     }
 
-    // MOD DRL - added method to support registration
 	/**
 	 * Register a bitstream already in storage.
 	 *
@@ -537,9 +522,7 @@ public class BitstreamStorageManager
 		}
 		return bitstream_id;
 	}
-    // MOD end
 
-	// MOD DRL - added method to identify registered bitstreams
 	/**
 	 * Does the internal_id column in the bitstream row indicate the bitstream
 	 * is a registered file
@@ -555,7 +538,6 @@ public class BitstreamStorageManager
 	    }
 	    return false;
 	}
-	// MOD end
 
     /**
      * Retrieve the bits for the bitstream with ID. If the bitstream does not
@@ -577,11 +559,9 @@ public class BitstreamStorageManager
     {
         TableRow bitstream = DatabaseManager.find(context, "bitstream", id);
 
-        // MOD DRL - modified to support SRB
 		GeneralFile file = getFile(bitstream);
 
 		return (file != null) ? FileFactory.newFileInputStream(file) : null;
-        // MOD end
     }
 
     /**
@@ -658,9 +638,7 @@ public class BitstreamStorageManager
                 TableRow row = (TableRow) iterator.next();
                 int bid = row.getIntColumn("bitstream_id");
 
-                // MOD DRL - changed File to GeneralFile
 				GeneralFile file = getFile(row);
-                // MOD end
 
                 // Make sure entries which do not exist are removed
                 if (file == null)
@@ -679,11 +657,9 @@ public class BitstreamStorageManager
 
                 DatabaseManager.delete(context, "Bitstream", bid);
 
-				// MOD DRL - don't delete registered bitstreams
 				if (isRegisteredBitstream(row.getStringColumn("internal_id"))) {
 				    continue;			// do not delete registered bitstreams
 				}
-				// MOD end
 
                 boolean success = file.delete();
 
@@ -725,9 +701,7 @@ public class BitstreamStorageManager
      *            The file to check
      * @return True if this file is too recent to be deleted
      */
-    // MOD DRL - changed File to GeneralFile
     private static boolean isRecent(GeneralFile file)
-    // MOD end
     {
         long lastmod = file.lastModified();
         long now = new java.util.Date().getTime();
@@ -747,26 +721,20 @@ public class BitstreamStorageManager
      * @param file
      *            The file with parent directories to delete
      */
-    // MOD DRL - changed File to GeneralFile
     private synchronized static void deleteParents(GeneralFile file)
-    // MOD end
     {
         if (file == null)
         {
             return;
         }
 
-        // MOD DRL - changed File to GeneralFile
 		GeneralFile tmp = file;
-        // MOD end
 
         for (int i = 0; i < directoryLevels; i++)
         {
 
-        	// MOD DRL - changed File to GeneralFile
 			GeneralFile directory = tmp.getParentFile();
 			GeneralFile[] files = directory.listFiles();
-            // MOD end
 
             // Only delete empty directories
             if (files.length != 0)
@@ -792,9 +760,7 @@ public class BitstreamStorageManager
      * @exception IOException
      *                If a problem occurs while determining the file
      */
-    // MOD DRL - changed File to GeneralFile
     private static GeneralFile getFile(TableRow bitstream) throws IOException
-    // MOD end
     {
         // Check that bitstream is not null
         if (bitstream == null)
@@ -811,7 +777,6 @@ public class BitstreamStorageManager
             storeNumber = 0;
         }
 
-        // MOD DRL - block modified for registration and SRB
 		GeneralFile assetstore = assetStores[storeNumber];
 
 		// turn the internal_id into a file path relative to the assetstore
@@ -856,10 +821,8 @@ public class BitstreamStorageManager
 			return new SRBFile((SRBFile) assetstore, bufFilename.toString());
 		}
 		return null;
-        // MOD end
     }
 
-	// MOD DRL - added method separate out this task to clean up getFile()
 	/**
 	 * Return the intermediate path derived from the internal_id. This method
 	 * splits the id into groups which become subdirectories.
@@ -881,6 +844,5 @@ public class BitstreamStorageManager
 		buf.append(File.separator);
 		return buf.toString();
 	}
-	// MOD end
 
 }

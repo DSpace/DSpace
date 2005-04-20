@@ -1,10 +1,11 @@
 /*
- * PolicySet.java - Command line hack for setting all of the
- *  policies for a collection's items
+ * PolicySet.java
  *
- * $Id$
+ * Version: $Revision$
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Date: $Date$
+ *
+ * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

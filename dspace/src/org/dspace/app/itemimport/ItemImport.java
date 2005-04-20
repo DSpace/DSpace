@@ -1,20 +1,11 @@
 /*
  * ItemImport.java
  *
- * *****
- * Mods by David Little, UCSD Libraries 12/21/04
- * Purpose: To allow the registration of files (bitstreams) into DSpace. See
- * class javadoc comments below.
- * Mods mark: MOD DRL
- * *****
- * 
- * $Id$
- *
  * Version: $Revision$
  *
  * Date: $Date$
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -95,21 +86,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-//MOD DRL - class comment modified
 /**
  * Import items into DSpace. The conventional use is upload files by copying
  * them. DSpace writes the item's bitstreams into its assetstore. Metadata is
  * also loaded to the DSpace database.
- * 
+ * <P>
  * A second use assumes the bitstream files already exist in a storage
  * resource accessible to DSpace. In this case the bitstreams are 'registered'.
  * That is, the metadata is loaded to the DSpace database and DSpace is given
  * the location of the file which is subsumed into DSpace.
- * 
+ * <P>
  * The distinction is controlled by the format of lines in the 'contents' file.
  * See comments in processContentsFile() below.
+ * <P>
+ * Modified by David Little, UCSD Libraries 12/21/04 to
+ * allow the registration of files (bitstreams) into DSpace.
  */
-// MOD end
 public class ItemImport
 {
     static boolean useWorkflow = false;
@@ -880,7 +872,6 @@ public class ItemImport
         return result;
     }
 
-    // MOD DRL - this method has be modified for registration
     /**
      * Given a contents file and an item, stuffing it with bitstreams from the
      * contents file
@@ -906,7 +897,6 @@ public class ItemImport
                     continue;
                 }
 
-            	// MOD DRL - determine if bitstreams are being 
             	//	1) registered into dspace (leading -r)
             	//  2) imported conventionally into dspace (no -r)
             	if (line.trim().startsWith("-r "))
@@ -970,7 +960,6 @@ public class ItemImport
                             + "\tBundle: " + sBundle);
                     continue;				// process next line in contents file
             	}
-            	// MOD end
 
             	// look for a bundle name
                 String bundleMarker = "\tbundle:";
@@ -1066,7 +1055,6 @@ public class ItemImport
         }
     }
 
-    // MOD DRL: added method - parallels processContentFileEntry()
     /**
      * Register the bitstream file into DSpace
      * 

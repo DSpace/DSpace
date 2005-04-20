@@ -1,19 +1,11 @@
 /*
  * ItemExport.java
  *
- * *****
- * Mods by David Little, UCSD Libraries 3/10/05
- * Purpose: To allow support the export of registrated files (bitstreams).
- * Mods mark: MOD DRL
- * *****
- * 
- * $Id$
- *
  * Version: $Revision$
  *
  * Date: $Date$
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,16 +65,19 @@ import org.dspace.handle.HandleManager;
  * Item exporter to create simple AIPs for DSpace content. Currently exports
  * individual items, or entire collections. For instructions on use, see
  * printUsage() method.
- * 
+ * <P>
  * ItemExport creates the simple AIP package that the importer also uses. It
  * consists of:
- * 
+ * <P>
  * /exportdir/42/ (one directory per item) / dublin_core.xml - qualified dublin
  * core in RDF schema / contents - text file, listing one file per line / file1 -
  * files contained in the item / file2 / ...
- * 
+ * <P>
  * issues -doesn't handle special characters in metadata (needs to turn &'s into
  * &amp;, etc.)
+ * <P>
+ * Modified by David Little, UCSD Libraries 12/21/04 to
+ * allow the registration of files (bitstreams) into DSpace.
  */
 public class ItemExport
 {
@@ -392,7 +387,6 @@ public class ItemExport
         }
     }
 
-    // MOD DRL
     /**
      * Create both the bitstreams and the contents file. Any bitstreams that
      * were originally registered will be marked in the contents file as such.
@@ -405,7 +399,6 @@ public class ItemExport
      * @throws Exception if there is any problem writing to the export 
      * 		directory
      */
-    // MOD end
     private static void writeBitstreams(Context c, Item i, File destDir)
             throws Exception
     {
@@ -447,7 +440,6 @@ public class ItemExport
                             Utils.bufferedCopy(is, fos);
 
                             // write the manifest file entry
-                            // MOD DRL - to support registration
                             if (b.isRegisteredBitstream()) {
                                 out.println("-r -s " + b.getStoreNumber() 
                                 		+ " -f " + myName 
@@ -455,7 +447,6 @@ public class ItemExport
                             } else {
                                 out.println(myName + "\tbundle:" + bundleName);
                             }
-                            // MOD end
 
                             isDone = true;
                         }

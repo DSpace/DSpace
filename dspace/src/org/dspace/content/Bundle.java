@@ -1,17 +1,11 @@
 /*
  * Bundle.java
  *
- * *****
- * Mods by David Little, UCSD Libraries 02/17/05
- * Purpose: To allow integration with SRB for bitstream storage.
- * Mods mark: MOD DRL
- * *****
- * 
  * Version: $Revision$
  *
  * Date: $Date$
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -369,7 +363,6 @@ public class Bundle extends DSpaceObject
     /**
      * Create a new bitstream in this bundle. This method is for registering
      * bitstreams.
-     * MOD DRL: added method - parallels createBitstream()
      *
      * @param assetstore corresponds to an assetstore in dspace.cfg
      * @param bitstreamPath the path and filename relative to the assetstore 
