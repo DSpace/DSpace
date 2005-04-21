@@ -68,3 +68,22 @@ ALTER TABLE collection ADD submitter INTEGER REFERENCES EPersonGroup( eperson_gr
 ALTER TABLE collection ADD admin INTEGER REFERENCES EPersonGroup( eperson_group_id );
 
 ALTER TABLE eperson ADD netid varchar(64) UNIQUE;
+
+-------------------------------------------------------------------------------
+-- Additional indices for performance
+-------------------------------------------------------------------------------
+
+-- index by resource id and resource type id
+CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
+
+-- Indexing browse tables update/re-index performance
+CREATE INDEX Communities2Item_item_id_idx ON Communities2Item( item_id );
+CREATE INDEX ItemsByAuthor_item_id_idx ON ItemsByAuthor(item_id);
+CREATE INDEX ItemsByTitle_item_id_idx ON ItemsByTitle(item_id);
+CREATE INDEX ItemsByDate_item_id_idx ON ItemsByDate(item_id);
+CREATE INDEX ItemsByDateAccessioned_item_id_idx ON ItemsByDateAccessioned(item_id);
+
+-- Improve mapping tables
+CREATE INDEX Community2Collection_community_id_idx ON Community2Collection(community_id);
+CREATE INDEX Community2Collection_collection_id_idx ON Community2Collection(collection_id);
+CREATE INDEX Collection2Item_item_id_idx ON Collection2Item( item_id );
