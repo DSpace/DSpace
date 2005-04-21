@@ -96,21 +96,33 @@ $out_directory = "/dspace/reports/";
 ($second, $minute, $hour, $day, $month, $year, $week_day, $day_of_year, $is_dst) = localtime(time);
 
 # set up the variables to use in the loop
-$year_offset = -1 * (($year + 1900) - $start_year);
-$no_months = (-1 * $year_offset * 12) + ($month - $start_month + 1);
+
+# number of years after the current year (will mostly be negative)
+# <current year> = (<perl year> + 1900)
+# <start year offset> = <start year> - <current year>
+$year_offset = $start_year - ($year + 1900);
+
+# total number of months between now and the start date (negated to be positive in general)
+# <months in year offset> = |<start year offset>| * 12
+# <difference in current year months> = (<current perl month> + 1) - <start month>
+# <total number of months> = <months in year offset> + <difference in current year months>
+# we use -1 to make <start year offset> positive since it should always be negative
+$no_months = (-1 * ($year_offset * 12)) + (($month + 1) - $start_month);
+
+# start day of every month
 $start_day = "01";
 
+# for every month ...
 for ($i = 0; $i < $no_months; $i++)
 {
-    # first get the current month being aggregated, and make sure that the
-    # year wrapps accordingly
-    $this_month = $start_month + $i;
-    if ($this_month > 12)
-    {
-        $this_month %= 12;
-        $year_offset++;
-    }
-    $this_year = $year + $year_offset + 1900;
+    # the month of the year (horrid modular maths)
+    $this_month = (($start_month + $i - 1) % 12) + 1;
+
+    # number of years gone through since we started the loop
+    $year_count = floor(($i + $start_month - 1) / 12);
+
+    # the year of the current analysis period
+    $this_year = $year + $year_offset + $year_count + 1900;
 
     # input and output file paths
     $in = $in_directory . $in_prefix . $this_year . "-" . $this_month . $in_suffix;
