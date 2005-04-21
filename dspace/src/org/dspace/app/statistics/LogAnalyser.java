@@ -654,7 +654,8 @@ public class LogAnalyser
         summary.append("service_name=" + name + "\n");
         
         // output the date information if necessary
-        SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy '0:0 AM, 'z");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy");
+        
         if (startDate != null)
         {
             summary.append("start_date=" + sdf.format(startDate) + "\n");

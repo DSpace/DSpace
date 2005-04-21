@@ -47,6 +47,7 @@ import java.sql.SQLException;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -695,7 +696,7 @@ public class ReportGenerator
             
             // first initialise a date format object to do our date processing
             // if necessary
-            DateFormat df = DateFormat.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy");
             
             // read the analysis contents in
             if (section.equals("archive"))
@@ -773,12 +774,12 @@ public class ReportGenerator
              
             if (section.equals("start_date"))
             {
-                startDate = df.parse(value);
+                startDate = sdf.parse(value);
             }
             
             if (section.equals("end_date"))
             {
-                endDate = df.parse(value);
+                endDate = sdf.parse(value);
             }
             
             if (section.equals("analysis_process_time"))
