@@ -62,7 +62,9 @@
 
     <%-- <P><strong>You can <a href="<%= request.getContextPath() %>/forgot"> set
     a new password if you've forgotten it</A>.</P> --%>
-	<P><strong><fmt:message key="jsp.register.already-registered.info2"/> <a href="<%= request.getContextPath() %>/forgot"> <fmt:message key="jsp.register.already-registered.info3"/></A>.</P>
+	<P><fmt:message key="jsp.register.already-registered.info2">
+        <fmt:param><%= request.getContextPath() %>/forgot</fmt:param>
+    </fmt:message></P>
 
     <%-- <P>If you're having trouble logging in, please contact us.</P> --%>
 	<P><fmt:message key="jsp.register.already-registered.info4"/></P>

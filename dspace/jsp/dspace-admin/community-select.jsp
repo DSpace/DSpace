@@ -95,11 +95,11 @@
             <tr>
                 <td align="left">
                     <%-- <input type="submit" name="submit_community_select" value="Edit Policies"> --%>
-                    <input type="submit" name="submit_community_select" value="<fmt:message key="jsp.dspace-admin.community-select.edit"/>">
+                    <input type="submit" name="submit_community_select" value="<fmt:message key="jsp.dspace-admin.general.editpolicy"/>">
                 </td>
                 <td align="right">
                     <%-- <input type="submit" name="submit_community_select_cancel" value="Cancel"> --%>
-                    <input type="submit" name="submit_community_select_cancel" value="<fmt:message key="jsp.dspace-admin.community-select.cancel"/>">
+                    <input type="submit" name="submit_community_select_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
                 </td>
             </tr>
         </table>

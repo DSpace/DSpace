@@ -70,18 +70,17 @@
     <%= (passwordUpdated ? "and password have" : "has") %>
     been updated.</P> --%>
     
-	<P><fmt:message key="jsp.register.profile-updated.info1"/> 
-	
+	<P>
 <% if(passwordUpdated)
    { %>
-    <fmt:message key="jsp.register.profile-updated.passwordUpd"/>
+    <fmt:message key="jsp.register.profile-updated.info1"/>
 <% }
    else
    { %>
-    <fmt:message key="jsp.register.profile-updated.passwordNotUpd"/>
+    <fmt:message key="jsp.register.profile-updated.info2"/>
 <% } %>
-    <fmt:message key="jsp.register.profile-updated.info2"/></P>
+    </P>
 
     <%-- <P><A HREF="<%= request.getContextPath() %>/">Return to DSpace Home</A></P> --%>
-	<P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.profile-updated.return.link"/></A></P>
+	<P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.general.return-home"/></A></P>
 </dspace:layout>

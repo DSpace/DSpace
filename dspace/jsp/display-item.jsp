@@ -123,7 +123,7 @@
                 <form method=GET action="<%= request.getContextPath() %>/tools/edit-item">
                     <input type="hidden" name="item_id" value="<%= item.getID() %>">
                     <%--<input type="submit" name="submit" value="Edit...">--%>
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.display-item.edit.button"/>">
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>">
                 </form>
             </td>
 <%      } %>

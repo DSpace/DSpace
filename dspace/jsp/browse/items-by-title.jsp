@@ -113,7 +113,7 @@
                                     <%-- <span class="browseBarLabel">or enter first few letters:&nbsp;</span> --%>
     								<span class="browseBarLabel"><fmt:message key="jsp.browse.items-by-title.enter"/>&nbsp;</span>
                                     <%-- <input type="text" name="starts_with"/>&nbsp;<input type="submit" value="Go!"> --%>
-    								<input type="text" name="starts_with"/>&nbsp;<input type="submit" value="<fmt:message key="jsp.browse.items-by-title.go"/>">
+    								<input type="text" name="starts_with"/>&nbsp;<input type="submit" value="<fmt:message key="jsp.browse.general.go"/>">
                                 </td>
                             </tr>
                         </table>
@@ -127,8 +127,11 @@
     <P align=center>
         <%-- Showing items <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %>
         of <%= browseInfo.getTotal() %>. --%>
-		<fmt:message key="jsp.browse.items-by-title.show"/> <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %>
-        <fmt:message key="jsp.browse.items-by-title.of"/> <%= browseInfo.getTotal() %>.
+		<fmt:message key="jsp.browse.items-by-title.show">
+            <fmt:param><%= browseInfo.getOverallPosition()+1 %></fmt:param>
+            <fmt:param><%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %></fmt:param>
+            <fmt:param><%= browseInfo.getTotal() %></fmt:param>
+        </fmt:message>
     </P>
 
     <%-- Previous page/Next page --%>
@@ -140,7 +143,7 @@
     {
 %>
                 <%-- <A HREF="browse-title?<%= prevQuery %>">Previous page</A> --%>
-				<A HREF="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.items-by-title.previous"/></A>
+				<A HREF="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
 <%
     }
 %>
@@ -151,7 +154,7 @@
     {
 %>
                 <%-- <A HREF="browse-title?<%= nextQuery %>">Next page</A> --%>
-				<A HREF="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.items-by-title.next"/></A>
+				<A HREF="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
 <%
     }
 %>
@@ -178,7 +181,7 @@
     {
 %>
                 <%-- <A HREF="browse-title?<%= prevQuery %>">Previous page</A> --%>
-				<A HREF="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.items-by-title.previous"/></A>
+				<A HREF="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
 <%
     }
 %>
@@ -189,7 +192,7 @@
     {
 %>
                 <%-- <A HREF="browse-title?<%= nextQuery %>">Next page</A> --%>
-				<A HREF="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.items-by-title.next"/></A>
+				<A HREF="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
 <%
     }
 %>

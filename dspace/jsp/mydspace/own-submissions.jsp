@@ -96,7 +96,9 @@
         {
 %>
     <%-- <P>There are <strong><%= items.length %></strong> items in the main archive that were submitted by you.</P> --%>
-	<P><fmt:message key="jsp.mydspace.own-submissions.text4"/> <strong><%= items.length %></strong> <fmt:message key="jsp.mydspace.own-submissions.text5"/></P>
+	<P><fmt:message key="jsp.mydspace.own-submissions.text4">
+        <fmt:param><%= items.length %></fmt:param>
+    </fmt:message></P>
 <%
         }
 %>
@@ -106,5 +108,5 @@
 %>
 
     <%-- <P align=center><A HREF="<%= request.getContextPath() %>/mydspace">Back to My DSpace</A></P> --%>
-	<P align=center><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.own-submissions.link"/></A></P>
+	<P align=center><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.backto-mydspace"/></A></P>
 </dspace:layout>

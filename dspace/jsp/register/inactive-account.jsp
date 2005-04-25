@@ -59,8 +59,9 @@
     Perhaps you haven't yet <A HREF="<%= request.getContextPath() %>/register">
     registered</A>.  Please feel free to contact the site administrators
     with any queries.</P> --%>
-	<P><fmt:message key="jsp.register.inactive-account.info1"/> <A HREF="<%= request.getContextPath() %>/register">
-    .  <fmt:message key="jsp.register.inactive-account.link"/></A><fmt:message key="jsp.register.inactive-account.info2"/></P>
+	<P><fmt:message key="jsp.register.inactive-account.info">
+        <fmt:param><%= request.getContextPath() %>/register</fmt:param>
+    </fmt:message></P>
     
     <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

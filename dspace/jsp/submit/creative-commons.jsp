@@ -74,7 +74,7 @@
 
 <dspace:layout locbar="off"
                navbar="off"
-               title="creative-commons.title"
+               titlekey="jsp.submit.creative-commons.title"
                nocache="true">
 
     <form name="foo" id="license_form" action="<%= request.getContextPath() %>/submit" method=post>
@@ -133,7 +133,7 @@
                     <td width="100%">&nbsp;</td>
                     <td>
                         <%-- <input type=submit name=submit_prev value="&lt; Previous"> --%>
-						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.creative-commons.previous.button"/>">
+						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.general.previous"/>">
                     </td>
 <%
      if (licenseExists)
@@ -141,7 +141,7 @@
 %>
                     <td>
                         <%-- <input type=submit name=submit_next value="Next &gt;"> --%>
-						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.creative-commons.next.button"/>">
+						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.general.next"/>">
                     </td>
 <%
      }
@@ -153,7 +153,7 @@
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
                         <%-- <input type=submit name=submit_cancel value="Cancel/Save"/> --%>
-						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.creative-commons.cancel.button"/>"/>
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>"/>
                     </td>
                 </tr>
             </table>

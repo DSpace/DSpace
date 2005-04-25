@@ -283,7 +283,8 @@
 
     <H2><fmt:message key="jsp.mydspace.main.heading4"/></H2>
 
-    <p>This section is for use in the continued authoring of your document.</p>
+    <%-- <p>This section is for use in the continued authoring of your document.</p> --%>
+    <p><fmt:message key="jsp.mydspace.main.text4" /></p>
 
     <table class=miscTable align=center>
         <tr>
@@ -300,7 +301,8 @@
 %>
         <tr>
             <th colspan="5">
-                Authoring
+                <%-- Authoring --%>
+                <fmt:message key="jsp.mydspace.main.authoring" />
             </th>
         </tr>
 <%
@@ -330,7 +332,7 @@
             <td class="<%= row %>RowOddCol">
                 <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
                 <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>"/>
-                <input type="submit" name="submit_delete" value="Remove"/>
+                <input type="submit" name="submit_delete" value="<fmt:message key="jsp.mydspace.general.remove" />"/>
             </td>
             </form>
         </tr>
@@ -346,7 +348,7 @@
 %>
         <tr>
             <th colspan="5">
-                Supervising
+                <fmt:message key="jsp.mydspace.main.supervising" />
             </th>
         </tr>
 <%

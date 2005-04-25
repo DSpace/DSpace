@@ -89,7 +89,7 @@
 
     <P align=center>
         <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.error.integrity.go"/></A>
+        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
     </P>
 	
 

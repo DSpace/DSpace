@@ -210,7 +210,7 @@ other collections to this collection (subject to authorization from that collect
                     </td>
                     <td>
                         <%-- <input type=submit name="submit_next" value="Next &gt;" onclick="javascript:finishEPerson();"> --%>
-                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.wizard-permissions.next"/>" onclick="javascript:finishEPerson();">
+                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>" onclick="javascript:finishEPerson();">
                     </td>
                 </tr>
             </table>

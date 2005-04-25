@@ -69,7 +69,9 @@
     </table>
 
     <%-- <P align=center><strong>The e-mail address and password you supplied were not valid.  Please try again, or have you <A HREF="<%= request.getContextPath() %>/forgot">forgotten your password</A>?</strong></P> --%>
-    <P align=center><strong><fmt:message key="jsp.login.incorrect.texta"/> <A HREF="<%= request.getContextPath() %>/forgot"><fmt:message key="jsp.login.incorrect.textb"/></A><fmt:message key="jsp.login.incorrect.textc"/></strong></P>
+    <P align=center><strong><fmt:message key="jsp.login.incorrect.text">
+        <fmt:param><%= request.getContextPath() %>/forgot</fmt:param>
+    </fmt:message></strong></P>
 
     <dspace:include page="/components/login-form.jsp" />
 </dspace:layout>

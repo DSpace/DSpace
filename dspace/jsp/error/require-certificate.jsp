@@ -54,7 +54,7 @@
 <dspace:layout titlekey="jsp.error.require-certificate.title">
 
     <%-- <h1>Certificate Required</h1> --%>
-    <h1><fmt:message key="jsp.error.require-certificate.heading"/></h1>
+    <h1><fmt:message key="jsp.error.require-certificate.title"/></h1>
 
     <%-- <P>The configuration of this DSpace site means that you need a valid
     Web certificate to log in.  If you are having problems with this,

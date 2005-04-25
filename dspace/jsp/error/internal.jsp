@@ -56,7 +56,7 @@
 <dspace:layout titlekey="jsp.error.internal.title">
 
     <%-- <H1>Internal System Error</H1> --%>
-    <H1><fmt:message key="jsp.error.internal.heading"/></H1>
+    <H1><fmt:message key="jsp.error.internal.title"/></H1>
 
     <%-- <P>Oops!  The system has experienced an internal error.  This is our fault,
     please pardon our dust during these early stages of the DSpace system!</P> --%>
@@ -70,7 +70,7 @@
 
     <P align=center>
         <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.error.internal.go"/></A>
+        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
     </P>
         <!--
     <%

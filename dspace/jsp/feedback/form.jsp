@@ -77,7 +77,7 @@
 <dspace:layout titlekey="jsp.feedback.form.title">
 
     <%-- <H1>Feedback Form</H1> --%>
-    <H1><fmt:message key="jsp.feedback.form.heading"/></H1>
+    <H1><fmt:message key="jsp.feedback.form.title"/></H1>
     
     <%-- <p>Thanks for taking the time to share your feedback about the
     DSpace system. Your comments are appreciated!</p> --%>

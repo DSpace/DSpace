@@ -66,6 +66,6 @@
     <dspace:include page="/components/contact-info.jsp" />
 
     <%-- <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P> --%>
-	<P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.license-rejected.link"/></A></P>
+	<P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/></A></P>
 
 </dspace:layout>

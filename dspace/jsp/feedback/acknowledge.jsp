@@ -52,7 +52,7 @@
 <dspace:layout titlekey="jsp.feedback.acknowledge.title">
 
     <%-- <h1>Thank you for your comments!</h1> --%>
-    <h1><fmt:message key="jsp.feedback.acknowledge.heading"/></h1>
+    <h1><fmt:message key="jsp.feedback.acknowledge.title"/></h1>
 
     <%-- <p>Your comments have been received.</p> --%>
     <p><fmt:message key="jsp.feedback.acknowledge.text"/></p>

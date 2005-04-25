@@ -113,7 +113,7 @@
                         <input type="hidden" name="item_id" value="<%= item.getID() %>">
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_WITHDRAW %>">
                         <%-- <input type="submit" name="submit" value="Withdraw..."> --%>
-						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.withdraw.button"/>">
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.withdraw-w-confirm.button"/>">
                     </form>
 <%
     }
@@ -134,7 +134,7 @@
                         <input type="hidden" name="item_id" value="<%= item.getID() %>">
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_DELETE %>">
                         <%-- <input type="submit" name="submit" value="Delete (Expunge)..."> --%>
-						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete.button"/>">
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete-w-confirm.button"/>">
                     </form>
                 </td>
             </tr>
@@ -180,7 +180,7 @@
                         <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>">
                         <%-- <input type="submit" name="submit_item_select" value="Edit..."> --%>
-						<input type="submit" name="submit_item_select" value="<fmt:message key="jsp.tools.edit-item-form.edit.button"/>">
+						<input type="submit" name="submit_item_select" value="<fmt:message key="jsp.tools.general.edit"/>">
                     </form>
                 </td>
             </tr>
@@ -262,7 +262,7 @@
                 </td>
                 <td class="<%= row %>RowOddCol">
                     <%-- <input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="Remove"> --%>
-					<input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="<fmt:message key="jsp.tools.edit-item-form.remove.button"/>">
+					<input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="<fmt:message key="jsp.tools.general.remove"/>">
                 </td>
             </tr>
 <%      row = (row.equals("odd") ? "even" : "odd");
@@ -286,7 +286,7 @@
                 </td>
                 <td class="<%= row %>RowOddCol">
                     <%-- <input type="submit" name="submit_addfield" value="Add"> --%>
-					<input type="submit" name="submit_addfield" value="<fmt:message key="jsp.tools.edit-item-form.add.button"/>">
+					<input type="submit" name="submit_addfield" value="<fmt:message key="jsp.tools.general.add"/>">
                 </td>
             </tr>
         </table>
@@ -299,8 +299,7 @@
         <%-- <P><strong>Note: Changes to the bitstreams will not be automatically reflected in the
         Dublin Core metadata above (e.g. <code>format.extent</code>, <code>format.mimetype</code>).
         You will need to update this by hand.</strong></P> --%>
-		<P><strong><fmt:message key="jsp.tools.edit-item-form.note1"/> <code>format.extent</code>, <code>format.mimetype</code>).
-        <fmt:message key="jsp.tools.edit-item-form.note2"/></strong></P>
+		<P><strong><fmt:message key="jsp.tools.edit-item-form.note1"/></strong></P>
 
         <%-- <P>Also note that if the "user format description" field isn't empty, the format will
         always be set to "Unknown", so clear the user format description before changing the
@@ -316,7 +315,7 @@
                 <th class="oddRowEvenCol"><strong>Format</strong></th>
                 <th class="oddRowOddCol"><strong>User&nbsp;Format&nbsp;Description</strong></th> --%>
                 
-		<th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem5"/><br><fmt:message key="jsp.tools.edit-item-form.elem6"/></strong></th>
+		<th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem5"/></strong></th>
                 <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem7"/></strong></th>
                 <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem8"/></strong></th>
                 <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem9"/></strong></th>
@@ -367,7 +366,7 @@
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <%-- <A TARGET=_blank HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</A>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
-					<A TARGET=_blank HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.edit-item-form.view"/></A>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="<fmt:message key="jsp.tools.edit-item-form.remove.button"/>">
+					<A TARGET=_blank HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></A>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="<fmt:message key="jsp.tools.general.remove"/>">
                 </td>
             </tr>
 <%
@@ -389,11 +388,11 @@
                 <tr>
                     <td align="left">
                         <%-- <input type="submit" name="submit" value="Update"> --%>
-						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.update.button"/>">
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.update"/>">
                     </td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.edit-item-form.cancel.button"/>">
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>">
                     </td>
                 </tr>
             </table>

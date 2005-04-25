@@ -72,7 +72,7 @@
                parentlink="/dspace-admin">
 
     <%-- <h1>Bitstream Format Registry</h1> --%>
-    <h1><fmt:message key="jsp.dspace-admin.list-formats.heading"/></h1>
+    <h1><fmt:message key="jsp.dspace-admin.list-formats.title"/></h1>
 
     <%-- <P><strong>Extensions</strong> are comma-separated lists of filename
     extensions used to automatically identify the formats of uploaded files.
@@ -162,14 +162,14 @@
                 <td class="<%= row %>RowEvenCol">
                     <input type="hidden" name="format_id" value="<%= formats[i].getID() %>">
                     <%-- <input type="submit" name="submit_update" value="Update"> --%>
-                    <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.list-formats.update"/>">
+                    <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>">
                 </td>
                 <td class="<%= row %>RowOddCol">
                     <%
                       if (BitstreamFormat.findUnknown(context).getID() != formats[i].getID()) {
                     %>
                     <%-- <input type="submit" name="submit_delete" value="Delete..."> --%>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.list-formats.delete"/>">
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>">
                     <% 
                       } 
                     %>
@@ -185,7 +185,7 @@
     <P align="center">
         <form method=POST>
             <%-- <input type="submit" name="submit_add" value="Add New"> --%>
-            <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.list-formats.add"/>">
+            <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.addnew"/>">
         </form>
     </p>
 </dspace:layout>

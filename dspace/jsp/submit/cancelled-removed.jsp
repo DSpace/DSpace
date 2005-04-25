@@ -61,6 +61,6 @@
 	<P><fmt:message key="jsp.submit.cancelled-removed.info"/></P>
 
     <%-- <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P> --%>
-	<P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.cancelled-removed.link"/></A></P>
+	<P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/></A></P>
 
 </dspace:layout>

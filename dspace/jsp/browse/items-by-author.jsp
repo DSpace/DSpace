@@ -118,7 +118,9 @@
     </table>
 
     <%-- <P align=center>Showing <%= browseInfo.getResultCount() %> items.</P> --%>
-	<P align=center><fmt:message key="jsp.browse.items-by-author.show"/> <%= browseInfo.getResultCount() %> <fmt:message key="jsp.browse.items-by-author.items"/></P>
+	<P align=center><fmt:message key="jsp.browse.items-by-author.show">
+        <fmt:param><%= browseInfo.getResultCount() %></fmt:param>
+    <fmt:message></P>
 
 
     <%-- The items --%>

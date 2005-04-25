@@ -78,27 +78,31 @@
 
 <dspace:layout titlekey="jsp.browse.no-results.title">
 
-    <H1><fmt:message key="jsp.browse.no-results.no1"/></H1>
+    <H1><fmt:message key="jsp.browse.no-results.title"/></H1>
 
 
-<P><fmt:message key="jsp.browse.no-results.no2"/> 
+<P>
     <%
 	    if (collection != null)
 	    {
    %>
-            	<fmt:message key="jsp.browse.no-results.col"/> "<%= collection.getMetadata("name")%>".
+            	<fmt:message key="jsp.browse.no-results.col">
+                    <fmt:param><%= collection.getMetadata("name")%></fmt:param>
+                </fmt:message>
    <%
 	    }
 	    else if (community != null)
 	    {
    %>
-   		<fmt:message key="jsp.browse.no-results.com"/> "<%= community.getMetadata("name")%>".
+   		<fmt:message key="jsp.browse.no-results.com">
+            <fmt:param><%= community.getMetadata("name")%></fmt:param>
+        </fmt:message>
    <%
  	    }
  	    else
  	    {
    %>
-   		<fmt:message key="jsp.no-results.browse.genericScope"/>
+   		<fmt:message key="jsp.browse.no-results.genericScope"/>
    <%
    	    }
    %>

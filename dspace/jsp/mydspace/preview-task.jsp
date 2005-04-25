@@ -82,8 +82,9 @@
     <%-- <P>The following item has been submitted to collection
     <strong><%= collection.getMetadata("name") %></strong>.  In order to
     accept the task of reviewing this item, please click "Accept This Task" below.</P> --%>
-	<P><fmt:message key="jsp.mydspace.preview-task.text1"/> 
-    <strong><%= collection.getMetadata("name") %>.  </strong><fmt:message key="jsp.mydspace.preview-task.text2"/></P>
+	<P><fmt:message key="jsp.mydspace.preview-task.text1"> 
+        <mft:param value="<%= collection.getMetadata("name") %>" />
+    </fmt:message></P>
 <%
     }
     else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP2POOL)
@@ -92,8 +93,9 @@
     <%-- <P>The following item has been submitted to collection
     <strong><%= collection.getMetadata("name") %></strong>.  In order to
     accept the task of checking this item, please click "Accept This Task" below.</P> --%>
-	<P><fmt:message key="jsp.mydspace.preview-task.text1"/> 
-    <strong><%= collection.getMetadata("name") %>.  </strong><fmt:message key="jsp.mydspace.preview-task.text3"/></P>
+	<P><fmt:message key="jsp.mydspace.preview-task.text3"> 
+        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+    </fmt:message></P>
 <%
     }
     else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP3POOL)
@@ -102,8 +104,9 @@
     <%-- <P>The following item has been accepted for inclusion in collection
     <strong><%= collection.getMetadata("name") %></strong>.  In order to
     accept the task of the final edit of this item, please click "Accept This Task" below.</P> --%>
-	<P><fmt:message key="jsp.mydspace.preview-task.text4"/> 
-    <strong><%= collection.getMetadata("name") %>.  </strong><fmt:message key="jsp.mydspace.preview-task.text5"/></P>
+	<P><fmt:message key="jsp.mydspace.preview-task.text4"> 
+        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+    </fmt:message></P>
 <%
     }
 %>
@@ -121,7 +124,7 @@
                 </td>
                 <td align=right>
                     <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.preview-task.cancel.button"/>">
+					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.general.cancel"/>">
                 </td>
             </tr>
         </table>

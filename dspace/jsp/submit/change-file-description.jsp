@@ -123,7 +123,7 @@
         <input type=hidden name=step value=<%= SubmitServlet.CHANGE_FILE_DESCRIPTION %>>
         
         <%-- <center><P><input type=submit name=submit value="Submit"></P></center> --%>
-		<center><P><input type=submit name=submit value="<fmt:message key="jsp.submit.change-file-description.submit.button"/>"></P></center>
+		<center><P><input type=submit name=submit value="<fmt:message key="jsp.submit.general.submit"/>"></P></center>
 
     </form>
 

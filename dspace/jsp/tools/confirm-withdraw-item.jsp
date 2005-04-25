@@ -88,7 +88,7 @@
                     </td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.confirm-withdraw-item.cancel.button"/>">
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>">
                     </td>
                 </tr>
             </table>

@@ -114,12 +114,12 @@
                     <td width="100%">&nbsp;</td>
                     <td>
                         <%-- <input type=submit name=submit_next value="Next &gt;"> --%>
-						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.select-collection.next.button"/>">
+						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.general.next"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
                         <%-- <input type=submit name=submit_cancel value="Cancel/Save"> --%>
-						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.select-collection.cancel.button"/>">
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>">
                     </td>
                 </tr>
             </table>

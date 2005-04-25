@@ -68,12 +68,14 @@
 	<H1><fmt:message key="jsp.register.registered.title"/></H1>
     
     <%-- <P>Thank you <%= eperson.getFirstName() %>,</P> --%>
-	<P><fmt:message key="jsp.register.registered.thank"/> <%= eperson.getFirstName() %>,</P>
+	<P><fmt:message key="jsp.register.registered.thank">
+        <fmt:param><%= eperson.getFirstName() %></fmt:param>
+    </fmt:message></P>
 
     <%-- <P>You're now registered to use the DSpace system.  You can subscribe to
     collections to receive e-mail updates about new items.</P> --%>
 	<P><fmt:message key="jsp.register.registered.info"/></P>
     
     <%-- <P><A HREF="<%= request.getContextPath() %>/">Return to DSpace Home</A></P> --%>
-	<P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.registered.return.link"/></A></P>
+	<P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.general.return-home"/></A></P>
 </dspace:layout>

@@ -74,7 +74,9 @@
                nocache="true">
 
     <%-- <h1>Select EPerson to Add to Group <%= group.getID() %></h1> --%>
-    <h1><fmt:message key="jsp.dspace-admin.group-eperson-select.heading"/> <%= group.getID() %></h1>
+    <h1><fmt:message key="jsp.dspace-admin.group-eperson-select.heading">
+        <fmt:param><%= group.getID() %></fmt:param>
+    </fmt:message></h1>
 
     <form method=POST>
 
@@ -103,7 +105,7 @@
                 </td>
                 <td align="right">
                     <%-- <input type="submit" name="submit_add_eperson_cancel" value="Cancel"> --%>
-                    <input type="submit" name="submit_add_eperson_cancel" value="<fmt:message key="jsp.dspace-admin.group-eperson-select.cancel"/>">
+                    <input type="submit" name="submit_add_eperson_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
                 </td>
             </tr>
         </table>

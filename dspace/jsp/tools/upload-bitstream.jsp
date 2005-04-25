@@ -79,7 +79,7 @@
         <input type="hidden" name="item_id" value="<%= item.getID() %>">
 
         <!-- <P align=center><input type="submit" name="submit" value="Upload"></P> -->
-		<P align=center><input type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload.button"/>"></P>
+		<P align=center><input type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload"/>"></P>
     </form>
     
 </dspace:layout>

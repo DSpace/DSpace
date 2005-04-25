@@ -73,16 +73,16 @@
 
     <%-- <p>Add or edit text in the box below to have it appear
     in the <strong><%= positionStr%></strong> of the DSpace home page.</p> --%>
-    <p><fmt:message key="jsp.dspace-admin.news-edit.text1"/><strong>
+    <p>
 <% if (position.intValue() == Constants.NEWS_TOP)
    { %>
-    <fmt:message key="jsp.dspace-admin.news-edit.positionStr.top"/>
+    <fmt:message key="jsp.dspace-admin.news-edit.text.topbox"/>
 <% }
    else
    { %>
-    <fmt:message key="jsp.dspace-admin.news-edit.positionStr.side"/>
+    <fmt:message key="jsp.dspace-admin.news-edit.text.sidebar"/>
 <% } %>
-    </strong> <fmt:message key="jsp.dspace-admin.news-edit.text2"/></p>
+    </p>
 
     <%-- <p>You may format the text using HTML tags, but please note that the HTML will not be validated here.</p> --%>
     <p><fmt:message key="jsp.dspace-admin.news-edit.text3"/></p>
@@ -99,9 +99,9 @@
                     <td colspan="2" align="center">
                     <input type="HIDDEN" name="position" value='<%= position.intValue()%>'>
                     <%-- <input type="SUBMIT" name="submit_save" value="Save"> --%>
-                    <input type="SUBMIT" name="submit_save" value="<fmt:message key="jsp.dspace-admin.news-edit.save"/>">
+                    <input type="SUBMIT" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>">
                     <%-- <input type="SUBMIT" name="cancel" value="Cancel"> --%>
-                    <input type="SUBMIT" name="cancel" value="<fmt:message key="jsp.dspace-admin.news-edit.cancel"/>">
+                    <input type="SUBMIT" name="cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
                     </td>
                 </tr>
             </table>

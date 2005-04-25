@@ -71,8 +71,9 @@
     <%-- <P><strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to
     edit a community or collection, you need to use the
     <A HREF="<%= request.getContextPath() %>/dspace-admin/edit-communities">communities/collections admin page.</A></P> --%>
-    <P><fmt:message key="jsp.dspace-admin.item-select.text1"/>
-    <A HREF="<%= request.getContextPath() %>/dspace-admin/edit-communities"><fmt:message key="jsp.dspace-admin.item-select.text2"/></A></P>
+    <P><fmt:message key="jsp.dspace-admin.item-select.text">
+        <fmt:param><%= request.getContextPath() %>/dspace-admin/edit-communities</fmt:param>
+    </fmt:message></P>
 <%  } %>
 
     <%-- <P>Enter the Handle or internal item ID of the item you wish to select. --%>

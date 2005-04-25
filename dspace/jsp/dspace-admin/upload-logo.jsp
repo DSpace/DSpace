@@ -71,7 +71,7 @@
                nocache="true">
 
     <%-- <H1>Upload Logo</H1> --%>
-    <H1><fmt:message key="jsp.dspace-admin.upload-logo.heading"/></H1>
+    <H1><fmt:message key="jsp.dspace-admin.upload-logo.title"/></H1>
     
     <%-- <P>Select the logo to upload for
 	<%= (collection != null ? "collection <strong>" + collection.getMetadata("name") + "</strong>"
@@ -79,16 +79,20 @@
     </P> --%>
     
     
-    	<P><fmt:message key ="upload-logo.select"/> 
+    	<P>
     	    <%
 	    	if (collection != null){
 	    %>
-	    		<fmt:message key="jsp.dspace-admin.upload-logo.col"/> <strong><%= collection.getMetadata("name")%></strong>
+	    		<fmt:message key="jsp.dspace-admin.upload-logo.select.col">
+                    <fmt:param><%= collection.getMetadata("name")%></fmt:param>
+                </fmt:message>
 	    <%	
 	    	}
 	    	else{
 	    %>
-	    		<fmt:message key="jsp.dspace-admin.upload-logo.com"/> <strong><%= community.getMetadata("name")%></strong>
+	    		<fmt:message key="jsp.dspace-admin.upload-logo.select.com">
+                    <fmt:param><%= community.getMetadata("name")%></fmt:param>
+                </fmt:message>
 	    <%
 	    	}
 	    %>
@@ -105,6 +109,6 @@
 <%  } %>
 
         <%-- <P align=center><input type="submit" name="submit" value="Upload"></P> --%>
-        <P align=center><input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.upload-logo.upload"/>"></P>
+        <P align=center><input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.upload"/>"></P>
     </form>
 </dspace:layout>

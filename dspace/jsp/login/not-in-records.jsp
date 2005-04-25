@@ -53,14 +53,15 @@
 <dspace:layout titlekey="jsp.login.not-in-records.title">
 
     <%-- <h1>No User Record Available</h1> --%>
-    <h1><fmt:message key="jsp.login.not-in-records.heading"/></h1>
+    <h1><fmt:message key="jsp.login.not-in-records.title"/></h1>
 
     <%-- <P>You have a valid Web certficate, but the DSpace system does not have a
     record of you.  You will need to <A HREF="<%= request.getContextPath() %>/register">
     register with DSpace</A> before using those areas of the system that
     require a user account.</P> --%>
-    <P><fmt:message key="jsp.login.not-in-records.texta"/> <A HREF="<%= request.getContextPath() %>/register">
-    <fmt:message key="jsp.login.not-in-records.textb"/></A> <fmt:message key="jsp.login.not-in-records.textc"/></P>
+    <P><fmt:message key="jsp.login.not-in-records.text">
+        <fmt:param><%= request.getContextPath() %>/register</fmt:param>
+    </fmt:message></P>
 
     <%-- <P><A HREF="<%= request.getContextPath() %>/register">Register wth DSpace</A></P> --%>
     <P><A HREF="<%= request.getContextPath() %>/register"><fmt:message key="jsp.login.not-in-records.register"/></A></P>

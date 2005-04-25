@@ -65,12 +65,15 @@
                parentlink="/dspace-admin">
 
     <%-- <H1>Delete Bitstream Format: <%= format.getID() %></H1> --%>
-    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-format.heading"/> <%= format.getID() %></H1>
+    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-format.heading">
+        <fmt:param><%= format.getID() %></fmt:param>
+    </fmt:message></H1>
     
     <%-- <P>Are you sure the format <strong><%= format.getShortDescription() %></strong>
     should be deleted?</P> --%>
-    <P><fmt:message key="jsp.dspace-admin.confirm-delete-format.confirm1"/> <strong><%= format.getShortDescription() %></strong>
-    <fmt:message key="jsp.dspace-admin.confirm-delete-format.confirm2"/></P>
+    <P><fmt:message key="jsp.dspace-admin.confirm-delete-format.confirm">
+        <fmt:param><%= format.getShortDescription() %></fmt:param>
+    </fmt:message></P>
     
     <%-- <P>Any existing bitstreams of this format will be reverted to the
     <em>unknown</em> bitstream format.</P> --%>
@@ -84,11 +87,11 @@
                 <tr>
                     <td align="left">
                         <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.confirm-delete-format.delete"/>">
+                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
                     </td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.confirm-delete-format.cancel"/>">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
                     </td>
                 </tr>
             </table>

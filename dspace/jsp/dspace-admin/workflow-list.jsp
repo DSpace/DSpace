@@ -92,7 +92,7 @@
             <%-- <th class="oddRowOddCol"> <strong>Submitter</strong></th> --%>
             <th class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.workflow-list.submitter"/></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Title</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.workflow-list.title"/></strong></th>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.workflow-list.item-title"/></strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
 
@@ -116,7 +116,7 @@
                 <td class="<%= row %>RowOddCol">
                     <input type="hidden" name="workflow_id" value="<%= workflows[i].getID() %>">
                     <%-- <input type="submit" name="submit_abort" value="Abort..."> --%>
-                    <input type="submit" name="submit_abort" value="<fmt:message key="jsp.dspace-admin.workflow-list.abort"/>">
+                    <input type="submit" name="submit_abort" value="<fmt:message key="jsp.dspace-admin.general.abort-w-confirm"/>">
                 </td>
             </tr>
         </form>

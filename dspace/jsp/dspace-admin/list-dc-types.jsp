@@ -72,7 +72,7 @@
     <tr>
       <td align=left>
        <%-- <h1>Dublin Core Type Registry</h1> --%>
-        <h1><fmt:message key="jsp.dspace-admin.list-dc-types.heading"/></h1>
+        <h1><fmt:message key="jsp.dspace-admin.list-dc-types.title"/></h1>
       </td>
       <td align="right" class="standard">
         <dspace:popup page="/help/site-admin.html#dublincore"><fmt:message key="jsp.help"/></dspace:popup>
@@ -84,7 +84,7 @@
         Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!
     </p> --%>
     <p align="center">
-        <fmt:message key="jsp.dspace-admin.list-dc-types.note1"/>
+        <fmt:message key="jsp.dspace-admin.list-dc-types.note"/>
     </p>
 
     <table class="miscTable" align="center">
@@ -120,11 +120,11 @@
                 <td class="<%= row %>RowOddCol">
                     <input type="hidden" name="dc_type_id" value="<%= types[i].getID() %>">
                     <%-- <input type="submit" name="submit_update" value="Update"> --%>
-                    <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.list-dc-types.update"/>">
+                    <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>">
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_delete" value="Delete..."> --%>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.list-dc-types.delete"/>">
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>">
                 </td>
             </tr>
         </form>
@@ -136,10 +136,10 @@
         
     <P align="center">
         <%-- Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!<br><br> --%>
-        <fmt:message key="jsp.dspace-admin.list-dc-types.note2"/><br><br>
+        <fmt:message key="jsp.dspace-admin.list-dc-types.note"/><br><br>
         <form method=POST>
             <%-- <input type="submit" name="submit_add" value="Add New"> --%>
-            <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.list-dc-types.add"/>">
+            <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.addnew"/>">
         </form>
     </p>
 </dspace:layout>

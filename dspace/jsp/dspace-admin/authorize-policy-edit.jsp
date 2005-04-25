@@ -97,7 +97,9 @@
     <tr>
       <td align=left>
         <%-- <h1>Edit Policy for <%= edit_title %>:</h1> --%>
-        <h1><fmt:message key="jsp.dspace-admin.authorize-policy-edit.heading"/> <%= edit_title %>:</h1>
+        <h1><fmt:message key="jsp.dspace-admin.authorize-policy-edit.heading">
+            <fmt:param><%= edit_title %></fmt:param>
+        </fmt:message></h1>
       </td>
       <td align="right" class="standard">
         <dspace:popup page="/help/site-admin.html#authorize"><fmt:message key="jsp.help"/></dspace:popup>
@@ -111,7 +113,7 @@
     <table class="miscTable" align="center">
         <tr>     
             <%-- <td>Group:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.authorize-policy-edit.group"/></td>
+            <td><fmt:message key="jsp.dspace-admin.general.group-colon"/></td>
             <td>
                 <select size="15" name="group_id">
                     <%  for(int i = 0; i < groups.length; i++ ) { %>
@@ -124,7 +126,7 @@
         </tr>
 
         <%-- <tr><td>Action:</td> --%>
-        <tr><td><fmt:message key="jsp.dspace-admin.authorize-policy-edit.action"/></td>
+        <tr><td><fmt:message key="jsp.dspace-admin.general.action-colon"/></td>
             <td><input type="hidden" name="<%=id_name%>" value="<%=id%>">
                 <input type="hidden" name="policy_id" value="<%=policy.getID()%>" >
                 <select name="action_id">
@@ -152,11 +154,11 @@
             <tr>
                 <td align="left">
                     <%-- <input type="submit" name="submit_save_policy" value="Save Policy"> --%>
-                    <input type="submit" name="submit_save_policy" value="<fmt:message key="jsp.dspace-admin.authorize-policy-edit.save"/>">
+                    <input type="submit" name="submit_save_policy" value="<fmt:message key="jsp.dspace-admin.general.save"/>">
                 </td>
                 <td align="right">
                     <%-- <input type="submit" name="submit_cancel_policy" value="Cancel"> --%>
-                    <input type="submit" name="submit_cancel_policy" value="<fmt:message key="jsp.dspace-admin.authorize-policy-edit.cancel"/>">
+                    <input type="submit" name="submit_cancel_policy" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
                 </td>
             </tr>
         </table>

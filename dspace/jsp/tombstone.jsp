@@ -58,7 +58,7 @@
     <dspace:include page="/components/contact-info.jsp" />
 
     <P align=center>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.tombstone.link"/></A>
+        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
     </P>
 
 </dspace:layout>

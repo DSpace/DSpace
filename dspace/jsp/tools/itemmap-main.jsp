@@ -84,12 +84,16 @@
 	<h2><fmt:message key="jsp.tools.itemmap-main.heading"/></h2>
 
     <%--  <p>Collection: "<%=collection.getMetadata("name")%>"</p> --%>
-    <p><fmt:message key="jsp.tools.itemmap-main.collection"/> "<%=collection.getMetadata("name")%>"</p>
+    <p><fmt:message key="jsp.tools.itemmap-main.collection">
+        <fmt:param><%=collection.getMetadata("name")%></fmt:param>
+    </fmt:message></p>
 	 
     <%-- <p>There are <%=count_native%> items owned by this collection, and
     <%=count_import%> items mapped in from other collections.</p> --%>
-	<p><fmt:message key="jsp.tools.itemmap-main.info1"/> <%=count_native%> <fmt:message key="jsp.tools.itemmap-main.info2"/>
-    <%=count_import%> <fmt:message key="jsp.tools.itemmap-main.info3"/></p>
+	<p><fmt:message key="jsp.tools.itemmap-main.info1">
+        <fmt:param><%=count_native%></fmt:param>
+        <fmt:param><%=count_import%></fmt:param>
+    </fmt:message></p>
    
 <%-- 
     <h3>Quick Add Item:</h3>
@@ -151,7 +155,7 @@
         <input name="namepart">
         <%-- <input type=submit name="action" value="Search Authors"> --%>
         <input type=hidden name="action" value="Search Authors">
-	<input type=submit value="<fmt:message key="jsp.tools.itemmap-main.search.button"/>">
+	    <input type=submit value="<fmt:message key="jsp.tools.itemmap-main.search.button"/>">
         <br>
     </form> 
 
@@ -188,4 +192,3 @@
     <P align=center><A HREF="<%=myLink%>&cid=<%=cid%>&t=<%=myID%>"><%=myTitle%> (<%=myCount%>)</A></P>
 <%  } %>            
 </dspace:layout>
-        

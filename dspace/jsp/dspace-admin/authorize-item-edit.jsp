@@ -110,7 +110,10 @@
     <tr>
       <td align=left>
     <%-- <h1>Policies for Item <%= item.getHandle() %> (ID=<%= item.getID() %>)</h1> --%>
-	<h1><fmt:message key="jsp.dspace-admin.authorize-item-edit.policies"/> <%= item.getHandle() %> (ID=<%= item.getID() %>)</h1>
+	<h1><fmt:message key="jsp.dspace-admin.authorize-item-edit.policies">
+        <fmt:param><%= item.getHandle() %></fmt:param>
+        <fmt:param><%= item.getID() %></fmt:param>
+    </fmt:message></h1>
       </td>
       <td align="right" class="standard">
         <%-- <dspace:popup page="/help/site-admin.html#itempolicies">Help...</dspace:popup> --%>
@@ -141,7 +144,7 @@
         <form method=POST>
             <input type="hidden" name="item_id" value="<%=item.getID()%>" >
             <%-- <input type="submit" name="submit_item_add_policy" value="Add New Policy"> --%>
-            <input type="submit" name="submit_item_add_policy" value="<fmt:message key="jsp.dspace-admin.authorize-item-edit.add"/>">
+            <input type="submit" name="submit_item_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>">
         </form>
     </p>
 
@@ -150,11 +153,11 @@
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Action</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.action"/></strong></th>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
             <%-- <th class="oddRowOddCol"><strong>EPerson</strong></th> --%>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.eperson"/></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Group</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.group"/></strong></th>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
             <th class="oddRowEvenCol">&nbsp;</th>
         </tr>
@@ -183,11 +186,11 @@
                     <input type="hidden" name="policy_id"     value="<%= rp.getID() %>">
                     <input type="hidden" name="item_id"       value="<%= item.getID() %>">
                     <%-- <input type="submit" name="submit_item_edit_policy" value="Edit"> --%>
-                    <input type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.authorize-item-edit.edit"/>">
+                    <input type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_item_delete_policy" value="Delete"> --%>
-                    <input type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.authorize-item-edit.delete"/>">
+                    <input type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
                 </td>
             </tr>
         </form>
@@ -207,14 +210,16 @@
 
 %>                
         <%-- <H3>Bundle <%=myBun.getID()%> Policies</H3> --%>
-        <H3><fmt:message key="jsp.dspace-admin.authorize-item-edit.bundle"/> <%=myBun.getID()%></H3>
+        <H3><fmt:message key="jsp.dspace-admin.authorize-item-edit.bundle">
+            <fmt:param><%=myBun.getID()%></fmt:param>
+        </fmt:message></H3>
 
         <P align="center">
             <form method=POST>
                 <input type="hidden" name="item_id"   value="<%=item.getID()%>" >
                 <input type="hidden" name="bundle_id" value="<%=myBun.getID()%>" >
                 <%-- <input type="submit" name="submit_bundle_add_policy" value="Add New Policy"> --%>
-                <input type="submit" name="submit_bundle_add_policy" value="<fmt:message key="jsp.dspace-admin.authorize-item-edit.add"/>">
+                <input type="submit" name="submit_bundle_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>">
             </form>
         </P>
         
@@ -223,10 +228,10 @@
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Action</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.action"/></strong></th>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
             <th class="oddRowOddCol"><strong>EPerson</strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Group</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.group"/></strong></th>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
             <th class="oddRowEvenCol">&nbsp;</th>
         </tr>
@@ -256,11 +261,11 @@
                     <input type="hidden" name="item_id"       value="<%= item.getID() %>">
                     <input type="hidden" name="bundle_id"     value="<%= myBun.getID() %>">
                     <%-- <input type="submit" name="submit_item_edit_policy" value="Edit"> --%>
-                    <input type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.authorize-item-edit.edit"/>">
+                    <input type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_item_delete_policy" value="Delete"> --%>
-                    <input type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.authorize-item-edit.delete"/>">
+                    <input type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
                 </td>
             </tr>
         </form>
@@ -283,23 +288,26 @@
             // display bitstream's policies
 %>                        
             <%-- <P>Bitstream <%=myBits.getID()%> (<%=myBits.getName()%>)</P> --%>
-            <P><fmt:message key="jsp.dspace-admin.authorize-item-edit.bit"/> <%=myBits.getID()%> (<%=myBits.getName()%>)</P>
+            <P><fmt:message key="jsp.dspace-admin.authorize-item-edit.bitstream">
+                <fmt:param><%=myBits.getID()%></fmt:param>
+                <fmt:param><%=myBits.getName()%></fmt:param>
+            </fmt:message></P>
             <P align="center">
                 <FORM method=POST>
                     <input type="hidden" name="item_id"      value="<%=item.getID()%>">
                     <input type="hidden" name="bitstream_id" value="<%=myBits.getID()%>" >
                     <%-- <input type="submit" name="submit_bitstream_add_policy" value="Add New Policy"> --%>
-                    <input type="submit" name="submit_bitstream_add_policy" value="<fmt:message key="jsp.dspace-admin.authorize-item-edit.add"/>">
+                    <input type="submit" name="submit_bitstream_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>">
                 </FORM>
             </P>
             <table class="miscTable" align="center">
             <tr>
                 <th class="oddRowOddCol"><strong>ID</strong></th>
                 <%-- <th class="oddRowEvenCol"><strong>Action</strong></th> --%>
-                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.action"/></strong></th>
-                <th class="oddRowOddCol"><strong>EPerson</strong></th>
+                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
+                <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.eperson" /></strong></th>
                 <%-- <th class="oddRowEvenCol"><strong>Group</strong></th> --%>
-                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.group"/></strong></th>
+                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
                 <th class="oddRowOddCol">&nbsp;</th>
                 <th class="oddRowEvenCol">&nbsp;</th>
             </tr>
@@ -329,11 +337,11 @@
                     <input type="hidden" name="item_id"       value="<%= item.getID()   %>">
                     <input type="hidden" name="bitstream_id"  value="<%= myBits.getID() %>">
                     <%-- <input type="submit" name="submit_item_edit_policy" value="Edit"> --%>
-                    <input type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.authorize-item-edit.edit"/>">
+                    <input type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_item_delete_policy" value="Delete"> --%>
-                    <input type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.authorize-item-edit.delete"/>">
+                    <input type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
                 </td>
             </tr>
         </form>

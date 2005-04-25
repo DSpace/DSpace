@@ -148,8 +148,8 @@
           <table>
             <tr>
               <td class="standard">
-				<small><strong><fmt:message key="jsp.collection-home.location1"/></strong></small>&nbsp;<select name="location">
-				  <option value="/"><fmt:message key="jsp.collection-home.location2"/></option>
+				<small><strong><fmt:message key="jsp.general.location"/></strong></small>&nbsp;<select name="location">
+				  <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
                   <option selected value="<%= community.getHandle() %>"><%= communityName %></option>
                   <option selected value="<%= collection.getHandle() %>/"><%= name %></option>
                 </select>
@@ -157,12 +157,12 @@
             </tr>
             <tr>
               <td class="standard" align=center>
-				<small><fmt:message key="jsp.collection-home.searchfor"/>&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="<fmt:message key="jsp.collection-home.go"/>">
+				<small><fmt:message key="jsp.general.searchfor"/>&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="<fmt:message key="jsp.general.go"/>">
               </td>
             </tr>
             <tr>
               <td align=center class="standard">
-                <small><fmt:message key="jsp.collection-home.orbrowse"/>&nbsp;</small><input type="submit" name="submit_titles" value="<fmt:message key="jsp.collection-home.titles.button"/>">&nbsp;<input type="submit" name="submit_authors" value="<fmt:message key="jsp.collection-home.authors.button"/>">&nbsp;<input type="submit" name="submit_dates" value="<fmt:message key="jsp.collection-home.date.button"/>">
+                <small><fmt:message key="jsp.general.orbrowse"/>&nbsp;</small><input type="submit" name="submit_titles" value="<fmt:message key="jsp.general.titles.button"/>">&nbsp;<input type="submit" name="submit_authors" value="<fmt:message key="jsp.general.authors.button"/>">&nbsp;<input type="submit" name="submit_dates" value="<fmt:message key="jsp.general.date.button"/>">
 			  </td>
             </tr>
           </table>
@@ -245,7 +245,7 @@
                   <input type="hidden" name="community_id" value="<%= community.getID() %>">
                   <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
                   <%--<input type="submit" value="Edit...">--%>
-				  <input type="submit" value="<fmt:message key="jsp.collection-home.edit.button"/>">
+				  <input type="submit" value="<fmt:message key="jsp.general.edit.button"/>">
                 </form>
               </td>
             </tr>

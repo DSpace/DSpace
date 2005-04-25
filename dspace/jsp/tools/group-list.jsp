@@ -99,7 +99,7 @@
 
     <table class="miscTable" align="center">
         <tr>
-            <th class="oddRowOddCol"><strong>ID</strong></th>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.group-list.id" />ID</strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Name</strong></th> --%>
 			<th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.group-list.name"/></strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
@@ -120,11 +120,11 @@
                 <td class="<%= row %>RowOddCol">
                     <input type="hidden" name="group_id" value="<%= groups[i].getID() %>">
                     <%-- <input type="submit" name="submit_edit" value="Edit..."> --%>
-					<input type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.group-list.edit.button"/>">
+					<input type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.general.edit"/>">
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_group_delete" value="Delete"> --%>
-					<input type="submit" name="submit_group_delete" value="<fmt:message key="jsp.tools.group-list.delete.button"/>">
+					<input type="submit" name="submit_group_delete" value="<fmt:message key="jsp.tools.general.delete"/>">
                 </td>
             </tr>
         </form>

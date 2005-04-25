@@ -156,6 +156,6 @@
 
     <%-- <P align="center"><A HREF="<%= request.getContextPath() %>/mydspace">Go to
     My DSpace </A></P> --%>
-	<P align="center"><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.subscriptions.link"/> </A></P>
+	<P align="center"><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/> </A></P>
 
 </dspace:layout>

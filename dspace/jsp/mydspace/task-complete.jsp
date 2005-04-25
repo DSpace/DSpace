@@ -53,15 +53,15 @@
 <dspace:layout locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
-               title="task-complete.title">
+               title="jsp.mydspace.task-complete.title">
 
 <%-- <H1>Thank You</H1> --%>
-<H1><fmt:message key="jsp.mydspace.task-complete.heading"/></H1>
+<H1><fmt:message key="jsp.mydspace.task-complete.title"/></H1>
 
     <%-- <P>The task is complete, and notification has been sent to the appropriate people.</P> --%>
     <P><fmt:message key="jsp.mydspace.task-complete.text1"/></P>
  
     <%-- <P align=center><A HREF="<%= request.getContextPath() %>/mydspace">Return to My DSpace </A></P> --%>
-    <P align=center><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.task-complete.return.link"/> </A></P>
+    <P align=center><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.returnto-mydspace"/> </A></P>
  
 </dspace:layout>

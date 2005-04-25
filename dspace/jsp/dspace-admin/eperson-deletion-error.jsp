@@ -46,6 +46,9 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+
 <%@ page isErrorPage="true" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -61,16 +64,19 @@
   
 %>
 
-<dspace:layout title="EPerson deletion error"
+<dspace:layout titlekey="jsp.dspace-admin.eperson-deletion-error.title"
                navbar="admin"
                locbar="link"
-               parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-    <H1>Cannot Delete EPerson</H1>
+    <H1><fmt:message key="jsp.dspace-admin.eperson-deletion-error.heading" /></H1>
 
-    <P>The EPerson <%=fullName%> cannot be deleted because a reference to it
-     exists in the following table(s):</P>
+    <%-- <P>The EPerson <%=fullName%> cannot be deleted because a reference to it
+     exists in the following table(s):</P> --%>
+    <P><fmt:message key="jsp.dspace-admin.eperson-deletion-error.errormsg">
+        <fmt:param><%=fullName%></fmt:param>
+    </fmt:message></P>
 
      <UL>
      <% while(tableIt.hasNext())
@@ -90,7 +96,7 @@
     <p>&nbsp;</p>
 
     <P align=center>
-        <A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople">Return to the Administer EPeople page</A>
+        <A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople"><fmt:message key="jsp.dspace-admin.confirm-delete-format.returntoedit" /></A>
     </P>
 	
 

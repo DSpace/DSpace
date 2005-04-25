@@ -93,7 +93,7 @@
         you will need to select the option to display files of other types.
         <dspace:popup page="/help/index.html#netscapeupload">Instructions for Netscape users</dspace:popup> are available.</P> --%>
 		<P class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info3"/>
-        <dspace:popup page="${helpPage}#netscapeupload"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup> <fmt:message key="jsp.submit.choose-file.info5"/></P>
+        <dspace:popup page="${helpPage}#netscapeupload"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup></P>
         
 <%-- FIXME: Collection-specific stuff should go here? --%>
 
@@ -104,7 +104,7 @@
         support for each are available.</P> --%>
         
 		<P class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info6"/>
-        <dspace:popup page="/help/formats.jsp"><fmt:message key="jsp.submit.choose-file.info7"/></dspace:popup> <fmt:message key="jsp.submit.choose-file.info8"/>
+        <dspace:popup page="/help/formats.jsp"><fmt:message key="jsp.submit.choose-file.info7"/></dspace:popup>
         </P>
     
         <table border=0 align=center>
@@ -152,16 +152,16 @@
                     <td width="100%">&nbsp;</td>
                     <td align>
                         <!-- <input type=submit name=submit_prev value="&lt; Previous"> -->
-						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.choose-file.previous.button"/>">
+						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.general.previous"/>">
                     </td>
                     <td>
                         <!-- <input type=submit name=submit_next value="Next &gt;"> -->
-						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.choose-file.next.button"/>">
+						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.general.next"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
                         <!-- <input type=submit name=submit_cancel value="Cancel/Save"> -->
-						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.choose-file.cancel.button"/>">
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>">
                     </td>
                 </tr>
             </table>

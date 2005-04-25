@@ -76,7 +76,7 @@
 
 <dspace:layout locbar="off"
                navbar="off"
-               title="cancel.title"
+               title="jsp.submit.cancel.title"
                nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>

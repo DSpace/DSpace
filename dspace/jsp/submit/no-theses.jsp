@@ -56,7 +56,7 @@
 <dspace:layout titlekey="jsp.submit.no-theses.title">
 
     <%-- <H1>Theses Not Accepted in DSpace</H1> --%>
-	<H1><fmt:message key="jsp.submit.no-theses.heading"/></H1>
+	<H1><fmt:message key="jsp.submit.no-theses.title"/></H1>
 
     <%-- <P>DSpace does not currently accept individually-submitted
     theses, but you are encouraged to use the separate electronic thesis

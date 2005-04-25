@@ -148,7 +148,7 @@
                             </td>
                             <td class="browseBar" rowspan=2>
 							    <%-- <input type=submit value="Go"> --%>
-                                <input type=submit value="<fmt:message key="jsp.browse.items-by-date.go"/>">
+                                <input type=submit value="<fmt:message key="jsp.browse.general.go"/>">
                             </td>
                         </tr>
                         <tr>
@@ -212,7 +212,11 @@
     <BR>
 
     <%-- <P align=center>Showing items <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %> of <%= browseInfo.getTotal() %>.</P> --%>
-	<P align=center><fmt:message key="jsp.browse.items-by-date.show"/> <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %> <fmt:message key="jsp.browse.items-by-date.of"/> <%= browseInfo.getTotal() %>.</P>
+	<P align=center><fmt:message key="jsp.browse.items-by-date.show">
+        <fmt:param><%= browseInfo.getOverallPosition()+1 %></fmt:param>
+        <fmt:param><%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %></fmt:param>
+        <fmt:param><%= browseInfo.getTotal() %></fmt:param>
+    </fmt:message></P>
 
     <%-- Previous page/Next page --%>
     <table align=center border=0 width=70%>
@@ -223,7 +227,7 @@
     {
 %>
                 <%-- <A HREF="browse-date?<%= prevQuery %>">Previous page</A> --%>
-                <A HREF="browse-date?<%= prevQuery %>"><fmt:message key="jsp.browse.items-by-date.previous"/></A>
+                <A HREF="browse-date?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
 <%
     }
 %>
@@ -234,7 +238,7 @@
     {
 %>
                 <%-- <A HREF="browse-date?<%= nextQuery %>">Next page</A> --%>
-				<A HREF="browse-date?<%= nextQuery %>"><fmt:message key="jsp.browse.items-by-date.next"/></A>
+				<A HREF="browse-date?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
 <%
     }
 %>
@@ -262,7 +266,7 @@
     {
 %>
                 <%-- <A HREF="browse-date?<%= prevQuery %>">Previous page</A> --%>
-				<A HREF="browse-date?<%= prevQuery %>"><fmt:message key="jsp.browse.items-by-date.previous"/></A>
+				<A HREF="browse-date?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
 <%
     }
 %>
@@ -273,7 +277,7 @@
     {
 %>
                 <%-- <A HREF="browse-date?<%= nextQuery %>">Next page</A> --%>
-				<A HREF="browse-date?<%= nextQuery %>"><fmt:message key="jsp.browse.items-by-date.next"/></A>
+				<A HREF="browse-date?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
 <%
     }
 %>

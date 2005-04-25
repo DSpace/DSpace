@@ -136,7 +136,7 @@
                     </td>
                     <td>
                         <%-- <input type=submit name="submit_next" value="Next &gt;"> --%>
-                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.wizard-default-item.next"/>">
+                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>">
                     </td>
                 </tr>
             </table>

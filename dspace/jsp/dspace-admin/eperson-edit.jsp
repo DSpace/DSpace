@@ -89,7 +89,9 @@
     <tr>
       <td align=left>
         <%-- <h1>Edit EPerson <%= eperson.getEmail() %>:</h1> --%>
-        <h1><fmt:message key="jsp.dspace-admin.eperson-edit.heading"/> <%= eperson.getEmail() %>:</h1>
+        <h1><fmt:message key="jsp.dspace-admin.eperson-edit.heading">
+            <fmt:param><%= eperson.getEmail() %></fmt:param>
+        </fmt:message></h1>
       </td>
       <td align="right" class="standard">
         <dspace:popup page="/help/site-admin.html#epeople"><fmt:message key="jsp.help"/></dspace:popup>
@@ -111,7 +113,7 @@
 
         <tr>
             <%-- <td>Last Name:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.eperson-edit.name1"/></td>
+            <td><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></td>
             <td>
                 <input name="lastname" size="24" value="<%=lastName == null ? "" : lastName%>">
             </td>
@@ -119,7 +121,7 @@
 
         <tr>
             <%-- <td>First Name:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.eperson-edit.name2"/></td>
+            <td><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></td>
             <td>
                 <input name="firstname" size="24" value="<%=firstName == null ? "" : firstName%>">
             </td>
@@ -166,11 +168,11 @@
             <tr>
                 <td align="left">
                     <%-- <input type="submit" name="submit_save" value="Save Edits"> --%>
-                    <input type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.eperson-edit.save"/>">
+                    <input type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>">
                 </td>
                 <td align="right">
                     <%-- <input type="submit" name="submit_delete" value="Delete EPerson..."> --%>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.eperson-edit.delete"/>">
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
                 </td>
             </tr>
         </table>

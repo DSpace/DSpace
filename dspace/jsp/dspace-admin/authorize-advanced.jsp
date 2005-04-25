@@ -124,7 +124,7 @@
 
         <tr>     
             <%-- <td>Group:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.authorize-advanced.group"/></td>
+            <td><fmt:message key="jsp.dspace-admin.general.group-colon"/></td>
             <td>
                 <select size="10" name="group_id">
                     <%  for(int i = 0; i < groups.length; i++ ) { %>
@@ -136,7 +136,7 @@
         </tr>
 
         <%-- <tr><td>Action:</td> --%>
-        <tr><td><fmt:message key="jsp.dspace-admin.authorize-advanced.action"/></td>
+        <tr><td><fmt:message key="jsp.dspace-admin.general.action-colon"/></td>
             <td>
                 <select name="action_id">
                     <%  for( int i = 0; i < Constants.actionText.length; i++ ) { %>

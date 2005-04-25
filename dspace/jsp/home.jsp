@@ -81,7 +81,7 @@
                 <td class="oddRowEvenCol">
                   <H3><fmt:message key="jsp.home.search1"/></H3>
                       <P><fmt:message key="jsp.home.search2"/></P>
-                      <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="<fmt:message key="jsp.home.search.button"/>"></P>
+                      <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="<fmt:message key="jsp.general.search.button"/>"></P>
                 </td>
             </tr>
         </table>

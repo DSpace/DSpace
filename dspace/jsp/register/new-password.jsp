@@ -73,10 +73,12 @@
 <dspace:layout titlekey="jsp.register.new-password.title" nocache="true">
 
     <%-- <h1>Enter a New Password</H1> --%>
-	<h1><fmt:message key="jsp.register.new-password.heading"/></H1>
+	<h1><fmt:message key="jsp.register.new-password.title"/></H1>
     
     <!-- <P>Hello <%= eperson.getFullName() %>,</P> -->
-	<P><fmt:message key="jsp.register.new-password.hello"/> <%= eperson.getFullName() %>,</P>
+	<P><fmt:message key="jsp.register.new-password.hello">
+        <fmt:param><%= eperson.getFullName() %></fmt:param>
+    </fmt:message></P>
     
 <%
     if (passwordProblem)

@@ -65,7 +65,10 @@
                parentlink="/dspace-admin">
 
     <%-- <H1>Delete e-person: <%= eperson.getFullName() %> (<%= eperson.getEmail() %>)</H1> --%>
-    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-eperson.heading"/> <%= eperson.getFullName() %> (<%= eperson.getEmail() %>)</H1>
+    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-eperson.heading">
+        <fmt:param><%= eperson.getFullName() %></fmt:param>
+        <fmt:param><%= eperson.getEmail() %></fmt:param>
+    </fmt:message></H1>
     
     <%-- <P>Are you sure this e-person should be deleted?</P> --%>
     <P><fmt:message key="jsp.dspace-admin.confirm-delete-eperson.confirm"/></P>
@@ -78,11 +81,11 @@
                 <tr>
                     <td align="left">
                         <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.confirm-delete-eperson.delete"/>">
+                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
                     </td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.confirm-delete-eperson.cancel"/>">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
                     </td>
                 </tr>
             </table>

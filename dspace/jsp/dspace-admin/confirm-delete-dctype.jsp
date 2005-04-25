@@ -68,12 +68,15 @@
                parentlink="/dspace-admin">
 
     <%-- <H1>Delete Dublin Core Format: <code><%= typeName %></code></H1> --%>
-    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.heading"/> <code><%= typeName %></code></H1>
+    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.heading">
+        <fmt:param><%= typeName %></fmt:param>
+    </fmt:message></H1>
     
     <%-- <P>Are you sure the format <strong><%= typeName %></strong>
     should be deleted?</P> --%>
-    <P><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.confirm1"/> <strong><%= typeName %></strong>
-    <fmt:message key="jsp.dspace-admin.confirm-delete-dctype.confirm2"/></P>
+    <P><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.confirm">
+        <fmt:param><%= typeName %></fmt:param>
+    </fmt:message></P>
     
     <%-- <P>This will result in an error if any DC values have this type.</P> --%>
     <P><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.warning"/></P>
@@ -86,11 +89,11 @@
                 <tr>
                     <td align="left">
                         <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.confirm-delete-dctype.delete"/>">
+                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
                     </td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.confirm-delete-dctype.cancel"/>">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
                     </td>
                 </tr>
             </table>

@@ -105,21 +105,25 @@
                parentlink="/dspace-admin">
 
     <%-- <h1>Browse EPeople <%=firstEPerson%>-<%=lastEPerson%> of <%=epeople.length%></h1> --%>
-    <h1><fmt:message key="jsp.dspace-admin.eperson-browse.heading1"/> <%=firstEPerson%>-<%=lastEPerson%> <fmt:message key="jsp.dspace-admin.eperson-browse.of"/> <%=epeople.length%></h1>
+    <h1><fmt:message key="jsp.dspace-admin.eperson-browse.heading">
+        <fmt:param><%=firstEPerson%></fmt:param>
+        <fmt:param><%=lastEPerson%></fmt:param>
+        <fmt:param><%=epeople.length%></fmt:param>
+    </fmt:message></h1>
 
     <table class="miscTable" align="center">
         <tr>
             <th class="oddRowOddCol"> <strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=id">ID</A></strong></th>
             <%-- <th class="oddRowEvenCol"><strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=email">E-mail Address</A></strong></th> --%>
-            <th class="oddRowEvenCol"><strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=email"><fmt:message key="jsp.dspace-admin.eperson-browse.address"/></A></strong></th>
+            <th class="oddRowEvenCol"><strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=email"><fmt:message key="jsp.dspace-admin.eperson-browse.email"/></A></strong></th>
             <%-- <th class="oddRowOddCol"> <strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname">Last Name</A></strong></th> --%>
-            <th class="oddRowOddCol"> <strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname"><fmt:message key="jsp.dspace-admin.eperson-browse.name1"/></A></strong></th>
+            <th class="oddRowOddCol"> <strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname"><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></A></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>First Name</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson-browse.name2"/></strong></th>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></strong></th>
             <%-- <th class="oddRowOddCol"> <strong>Can Log In?</strong></th> --%>
-            <th class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.eperson-browse.can"/></strong></th>
+            <th class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.eperson-browse.canlogin"/></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Must Use Cert?</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson-browse.must"/></strong></th>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson-browse.mustusecert"/></strong></th>
             <%-- <th class="oddRowOddCol"> <strong>Self Registered</strong></th> --%>
             <th class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.eperson-browse.self"/></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Telephone</strong></th> --%>
@@ -165,11 +169,11 @@
                     <input type="hidden" name="sortby" value="<%= request.getParameter("sortby") %>">
 <%      } %>
                     <%-- <input type="submit" name="submit_edit" value="Edit..."> --%>
-                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.eperson-browse.edit"/>">
+                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_delete" value="Delete..."> --%>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.eperson-browse.delete"/>">
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>">
                 </td>
             </tr>
         </form>

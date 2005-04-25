@@ -85,11 +85,11 @@
                 <tr>
                     <td align="left">
                         <%-- <input type="submit" name="submit" value="Delete"> --%>
-						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.confirm-delete-item.delete.button"/>">
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.delete"/>">
                     </td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.confirm-delete-item.cancel.button"/>">
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>">
                     </td>
                 </tr>
             </table>

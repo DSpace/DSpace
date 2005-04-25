@@ -92,7 +92,11 @@
     <tr>
       <td align=left>
         <%-- <h1>Policies for Collection "<%= collection.getMetadata("name") %>" (hdl:<%= collection.getHandle() %>, DB ID <%= collection.getID() %>)</h1> --%>
-		<h1><fmt:message key="jsp.dspace-admin.authorize-collection-edit.policies"/><%= collection.getMetadata("name") %>" (hdl:<%= collection.getHandle() %>, DB ID <%= collection.getID() %>)</h1>
+		<h1><fmt:message key="jsp.dspace-admin.authorize-collection-edit.policies">
+            <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+            <fmt:param>hdl:<%= collection.getHandle() %></fmt:param>
+            <fmt:param><%= collection.getID() %></fmt:param>
+        </fmt:message></h1>
       </td>
       <td align="right" class="standard">
         <dspace:popup page="/help/site-admin.html#collectionpolicies"><fmt:message key="jsp.help"/></dspace:popup>
@@ -106,7 +110,7 @@
         <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method=POST>
             <input type="hidden" name="collection_id" value="<%=collection.getID()%>" >
             <%-- <input type="submit" name="submit_collection_add_policy" value="Add New"> --%>
-            <input type="submit" name="submit_collection_add_policy" value="<fmt:message key="jsp.dspace-admin.authorize-collection-edit.add"/>">
+            <input type="submit" name="submit_collection_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>">
         </form>
     </p>
 
@@ -115,9 +119,9 @@
         <tr>
             <th class="oddRowOddCol"><strong>ID</strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Action</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.authorize-collection-edit.action"/></strong></th>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
             <%-- <th class="oddRowOddCol"><strong>Group</strong></th> --%>
-            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.authorize-collection-edit.group"/></strong></th>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
             <th class="oddRowEvenCol">&nbsp;</th>
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
@@ -143,11 +147,11 @@
                     <input type="hidden" name="policy_id"     value="<%= rp.getID() %>">
                     <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
                     <%-- <input type="submit" name="submit_collection_edit_policy" value="Edit"> --%>
-                    <input type="submit" name="submit_collection_edit_policy" value="<fmt:message key="jsp.dspace-admin.authorize-collection-edit.edit"/>">
+                    <input type="submit" name="submit_collection_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
                 </td>
                 <td class="<%= row %>RowOddCol">
                     <%-- <input type="submit" name="submit_collection_delete_policy" value="Delete"> --%>
-                    <input type="submit" name="submit_collection_delete_policy" value="<fmt:message key="jsp.dspace-admin.authorize-collection-edit.delete"/>">
+                    <input type="submit" name="submit_collection_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
                 </td>
             </tr>
         </form>

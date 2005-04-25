@@ -67,7 +67,7 @@
     <tr>
       <td>
         <%-- <H1>Describe the Collection</H1> --%>
-        <H1><fmt:message key="jsp.dspace-admin.wizard-basicinfo.heading"/></H1>
+        <H1><fmt:message key="jsp.dspace-admin.wizard-basicinfo.title"/></H1>
       </td>
       <td class="standard" align=right>
         <dspace:popup page="/help/site-admin.html#wizard_description"><fmt:message key="jsp.help"/></dspace:popup>
@@ -203,7 +203,7 @@
                     </td>
                     <td>
                         <%-- <input type=submit name="submit_next" value="Next &gt;"> --%>
-                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.wizard-basicinfo.next"/>">
+                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>">
                    </td>
                 </tr>
             </table>

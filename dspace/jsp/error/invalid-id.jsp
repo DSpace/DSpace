@@ -87,13 +87,15 @@
 <dspace:layout locbar="off" titlekey="jsp.error.invalid-id.title">
 
     <%-- <H1>Invalid Identifier</H1> --%>
-    <H1><fmt:message key="jsp.error.invalid-id.heading"/></H1>
+    <H1><fmt:message key="jsp.error.invalid-id.title"/></H1>
 
     <%-- <P>The identifier <%= badID %> does not correspond to a valid
     <%= typeString %> in DSpace.  This may be because of one of the following
     reasons:</P> --%>
-	<P><fmt:message key="jsp.error.invalid-id.text1a"/> <%= badID %> <fmt:message key="jsp.error.invalid-id.text1b"/>
-    <fmt:message key="constants.object"/> <fmt:message key="jsp.error.invalid-id.text1c"/></P>
+	<P><fmt:message key="jsp.error.invalid-id.text1">
+        <fmt:param><%= badID %></fmt:param>
+        <fmt:param><% =typeString %></fmt:param>
+    </fmt:message></P>
 
     <UL>
         <%-- <LI>The URL of the current page is incorrect - if you followed a link
@@ -111,7 +113,7 @@
 
     <P align=center>
         <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.error.invalid-id.go"/></A>
+        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
     </P>
 	
 

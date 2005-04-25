@@ -98,11 +98,11 @@
                 </td>
                 <td>
                 	<%-- then&nbsp;<input type="submit" name="submit_edit" value="Edit..." onclick="javascript:finishEPerson();"> --%>
-                	<fmt:message key="jsp.dspace-admin.eperson-main.then"/>&nbsp;<input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.eperson-main.edit"/>" onclick="javascript:finishEPerson();">
+                	<fmt:message key="jsp.dspace-admin.eperson-main.then"/>&nbsp;<input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" onclick="javascript:finishEPerson();">
                 </td>
                 <td>
                 	<%-- <input type="submit" name="submit_delete" value="Delete..." onclick="javascript:finishEPerson();"> --%>
-                	<input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.eperson-main.delete"/>" onclick="javascript:finishEPerson();">
+                	<input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>" onclick="javascript:finishEPerson();">
                 </td>
             </tr>
         </table>

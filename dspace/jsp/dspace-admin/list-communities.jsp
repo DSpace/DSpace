@@ -73,7 +73,7 @@
                parentlink="/dspace-admin">
 
     <%-- <H1>Edit Communities and Collections</H1> --%>
-    <H1><fmt:message key="jsp.dspace-admin.list-communities.heading"/></H1>
+    <H1><fmt:message key="jsp.dspace-admin.list-communities.title"/></H1>
     
     <form method=POST>
         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY %>">

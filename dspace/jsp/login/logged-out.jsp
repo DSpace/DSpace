@@ -52,10 +52,10 @@
 <dspace:layout locbar="nolink" titlekey="jsp.login.logged-out.title">
 
     <%-- <H1>Logged Out</H1> --%>
-    <H1><fmt:message key="jsp.login.logged-out.heading"/></H1>
+    <H1><fmt:message key="jsp.login.logged-out.title"/></H1>
 
     <%-- <P>Thank you for remembering to log out!</P> --%>
     <P><fmt:message key="jsp.login.logged-out.thank"/></P>
     <%-- <P><A HREF="<%= request.getContextPath() %>/">Go to DSpace Home</A></P> --%>
-    <P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.login.logged-out.go"/></A></P>
+    <P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A></P>
 </dspace:layout>

@@ -86,22 +86,22 @@
         <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="POST">
             <tr>
                 <%-- <td class="oddRowOddCol">Top News</td> --%>
-                <td class="oddRowOddCol"><fmt:message key="jsp.dspace-admin.news-main.news1"/></td>
+                <td class="oddRowOddCol"><fmt:message key="jsp.dspace-admin.news-main.news.top"/></td>
                 <td class="oddRowEvenCol">
                     <input type="hidden" name="position" value=<%= Constants.NEWS_TOP %>>
                     <%-- <input type="submit" name="submit_edit" value="Edit..."> --%>
-                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.news-main.edit"/>">
+                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
                 </td>
             </tr>
         </form>
         <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="POST">
             <tr>
                 <%-- <td class="evenRowOddCol">Sidebar News</td> --%>
-                <td class="evenRowOddCol"><fmt:message key="jsp.dspace-admin.news-main.news2"/></td>
+                <td class="evenRowOddCol"><fmt:message key="jsp.dspace-admin.news-main.news.sidebar"/></td>
                 <td class="evenRowEvenCol">
                     <input type="hidden" name="position" value=<%= Constants.NEWS_SIDE %>>
                     <%-- <input type="submit" name="submit_edit" value="Edit..."> --%>
-                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.news-main.edit"/>">
+                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
                 </td>
             </tr>
         </form>

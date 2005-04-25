@@ -50,7 +50,9 @@
 
 <center>
 
-  <P><%= ConfigurationManager.getProperty("dspace.name") %> - <fmt:message key="jsp.components.contact-info.details"/></p>
+  <P><fmt:message key="jsp.components.contact-info.details">
+    <fmt:param><%= ConfigurationManager.getProperty("dspace.name") %></fmt:param>
+  </fmt:message></p>
 
     <table>
         <tr>

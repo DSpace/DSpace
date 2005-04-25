@@ -136,7 +136,9 @@
             </tr>
             <tr>
                 <td class="evenRowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstream.getName()) %>" target="_blank"><%= bitstream.getName() %></A></td>
-                <td class="evenRowEvenCol"><%= bitstream.getSize() %> bytes</td>
+                <td class="evenRowEvenCol"><fmt:message key="jsp.submit.show-uploaded-file.size-in-bytes">
+                    <fmt:param><%= bitstream.getSize() %></fmt:param>
+                </fmt:message></td>
                 <td class="evenRowOddCol">
                     <%= bitstream.getFormatDescription() %>
 <%    
@@ -230,16 +232,16 @@
                     <td width="100%">&nbsp;</td>
                     <td align>
                         <%-- <input type=submit name=submit_prev value="&lt; Previous"> --%>
-						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.show-uploaded-file.previous.button"/>">
+						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.general.previous"/>">
                     </td>
                     <td>
                        <%--  <input type=submit name=submit_next value="Next &gt;"> --%>
-					    <input type=submit name=submit_next value="<fmt:message key="jsp.submit.show-uploaded-file.next.button"/>">
+					    <input type=submit name=submit_next value="<fmt:message key="jsp.submit.general.next"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
                         <%-- <input type=submit name=submit_cancel value="Cancel/Save"> --%>
-						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.show-uploaded-file.cancel.button"/>">
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>">
                     </td>
                 </tr>
             </table>

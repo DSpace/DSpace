@@ -84,8 +84,9 @@
     Please review the item, check that it meets the criteria for entry into
     the collection.  After reviewing the item, please approve or reject the
     item using the controls at the bottom of the page.</P> --%>
-	<P><fmt:message key="jsp.mydspace.perform-task.text1"/> <strong><%= collection.getMetadata("name") %></strong>
-	.  <fmt:message key="jsp.mydspace.perform-task.text2"/></P>
+	<P><fmt:message key="jsp.mydspace.perform-task.text1">
+        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+    </fmt:message></P>
 <%
     }
     else if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP2)
@@ -96,8 +97,9 @@
     the collection.  After reviewing the item, you may edit the metadata with the
     item, and then approve or reject the item using the controls at the bottom of
     the page.</P> --%>
-	<P><fmt:message key="jsp.mydspace.perform-task.text1"/> <strong><%= collection.getMetadata("name") %></strong>
-	.  <fmt:message key="jsp.mydspace.perform-task.text3"/></P>
+	<P><fmt:message key="jsp.mydspace.perform-task.text3">
+        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+	</fmt:message></P>
 <%
     }
     else if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP3)
@@ -108,8 +110,9 @@
     necessary edits of the metadata to conform with the standards of the collection,
     and then commit the item to the archive using the controls at the bottom
     of the page.</P> --%>
-	<P><fmt:message key="jsp.mydspace.perform-task.text4"/>
-    <strong><%= collection.getMetadata("name") %></strong>.  <fmt:message key="jsp.mydspace.perform-task.text5"/></P>
+	<P><fmt:message key="jsp.mydspace.perform-task.text4">
+        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+    </fmt:message></P>
 <%
     }
 %>
@@ -136,7 +139,7 @@
                 </td>
                 <td class="<%= row %>RowEvenCol" valign=middle>
                     <%-- <input type="submit" name="submit_approve" value="Approve"> --%>
-					<input type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.perform-task.approve.button"/>">
+					<input type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.general.approve"/>">
                 </td>
             </tr>
 <%
@@ -174,7 +177,7 @@
                 </td>
                 <td class="<%= row %>RowEvenCol" valign=middle>
                     <%-- <input type=submit name=submit_reject value="Reject" /> --%>
-					<input type=submit name=submit_reject value="<fmt:message key="jsp.mydspace.perform-task.reject.button"/>"/>
+					<input type=submit name=submit_reject value="<fmt:message key="jsp.mydspace.general.reject"/>"/>
                 </td>
             </tr>
 <%

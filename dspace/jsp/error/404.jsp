@@ -54,7 +54,7 @@
 <dspace:layout titlekey="jsp.error.404.title">
 
     <%-- <H1>Error: Document Not Found</H1> --%>
-    <H1><fmt:message key="jsp.error.404.heading"/></H1>
+    <H1><fmt:message key="jsp.error.404.title"/></H1>
     <%-- <P>The document you are trying to access has not been found on the server.</P> --%>
     <P><fmt:message key="jsp.error.404.text1"/></P>
     <UL>
@@ -63,8 +63,9 @@
         the link and try again.  If you still get this error, then try going
         to the <A HREF="<%= request.getContextPath() %>/">DSpace home page</A>
         and looking for what you want from there.</P></LI> --%>
-		<LI><P><fmt:message key="jsp.error.404.text2a"/> <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.error.404.text2b"/></A>
-        <fmt:message key="jsp.error.404.text2c"/></P></LI>
+		<LI><P><fmt:message key="jsp.error.404.text2">
+            <fmt:param><%= request.getContextPath() %>/</fmt:param>
+        </fmt:message></P></LI>
         <%-- <LI><P>If you got to this error by clicking in a link on the DSpace site,
         please let us know so we can fix it!</P></LI> --%>
 		<LI><P><fmt:message key="jsp.error.404.text3"/></P></LI>
@@ -74,7 +75,7 @@
 
     <P align=center>
         <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.error.404.go"/></A>
+        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
     </P>
 
 </dspace:layout>

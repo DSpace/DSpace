@@ -49,7 +49,7 @@
   <tr>
     <td class="evenRowEvenCol">
       <%-- <p><strong>New user? <a href="<%= request.getContextPath() %>/register">Click here to register</a>.</strong></p> --%>
-      <p><strong><fmt:message key="jsp.components.login-form.new"/> <a href="<%= request.getContextPath() %>/register"><fmt:message key="jsp.components.login-form.click"/></a>.</strong></p>
+      <p><strong><a href="<%= request.getContextPath() %>/register"><fmt:message key="jsp.components.login-form.newuser"/></a></strong></p>
       <%-- <p>Please enter your e-mail address and password into the form below.</p> --%>
 	  <p><fmt:message key="jsp.components.login-form.enter"/></p>
       <form method=POST action="<%= request.getContextPath() %>/password-login">
@@ -73,6 +73,6 @@
         </table>
       </form>
       <%-- <p>Have you <a href="<%= request.getContextPath() %>/forgot">forgotten your password</a>?</p></td> --%>
-	  <p><fmt:message key="jsp.components.login-form.have"/> <a href="<%= request.getContextPath() %>/forgot"><fmt:message key="jsp.components.login-form.forgot"/></a><fmt:message key="jsp.components.login-form.question"/></p></td>
+	  <p><a href="<%= request.getContextPath() %>/forgot"><fmt:message key="jsp.components.login-form.forgot"/></a></p></td>
   </tr>
 </table>

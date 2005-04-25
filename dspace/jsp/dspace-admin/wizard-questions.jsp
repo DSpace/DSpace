@@ -68,7 +68,7 @@
     <%-- <H1>Describe the Collection</H1> --%>
     
 
-<H1><fmt:message key="jsp.dspace-admin.wizard-questions.heading"/></H1>
+<H1><fmt:message key="jsp.dspace-admin.wizard-questions.title"/></H1>
 
     <form action="<%= request.getContextPath() %>/tools/collection-wizard" method=post>
 
@@ -207,7 +207,7 @@
                         
                     </td>
                     <td>
-                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.wizard-questions.next"/>">
+                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>">
                     </td>
                 </tr>
             </table>

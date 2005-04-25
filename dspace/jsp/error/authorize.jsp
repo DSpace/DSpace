@@ -54,7 +54,7 @@
 <dspace:layout titlekey="jsp.error.authorize.title">
 
     <%-- <h1>Authorization Required</h1> --%>
-    <h1><fmt:message key="jsp.error.authorize.heading"/></h1>
+    <h1><fmt:message key="jsp.error.authorize.title"/></h1>
 
     <%-- <P>You do not have permission to perform the action you just attempted.</P> --%>
     <P><fmt:message key="jsp.error.authorize.text1"/></P>
@@ -67,7 +67,7 @@
 
     <P align=center>
         <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.error.authorize.go"/></A>
+        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
     </P>
 	
 </dspace:layout>

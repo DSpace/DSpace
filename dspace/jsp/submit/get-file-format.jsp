@@ -89,7 +89,10 @@
 		<H1><fmt:message key="jsp.submit.get-file-format.heading"/></H1>
 
         <%-- <P>Uploaded file: <code><%= si.bitstream.getName() %></code> (<%= si.bitstream.getSize() %> bytes)</P> --%>
-		<P><fmt:message key="jsp.submit.get-file-format.info1"/> <code><%= si.bitstream.getName() %></code> (<%= si.bitstream.getSize() %> bytes)</P>
+		<P><fmt:message key="jsp.submit.get-file-format.info1">
+            <fmt:param><%= si.bitstream.getName() %></fmt:param>
+            <fmt:param><%= si.bitstream.getSize() %></fmt:param>
+        </fmt:message></P>
 
 <%
     if (guess == null)
@@ -104,8 +107,9 @@
 %>
         <%-- <P>DSpace recognized the file format as <%= guess.getShortDescription() %>.
         <strong>Please be sure before you change this!</strong></P> --%>
-		<P><fmt:message key="jsp.submit.get-file-format.info3"/> <%= guess.getShortDescription() %>.
-        <strong><fmt:message key="jsp.submit.get-file-format.info4"/></strong></P>
+		<P><fmt:message key="jsp.submit.get-file-format.info3">
+            <fmt:param><%= guess.getShortDescription() %></fmt:param>
+        </fmt:message></P>
     
         <input type=hidden name=format value="<%= guess.getID() %>">
         <%= SubmitServlet.getSubmissionParameters(si) %>
@@ -186,6 +190,6 @@
         <input type=hidden name=step value="<%= SubmitServlet.GET_FILE_FORMAT %>">
 
         <%-- <center><P><input type=submit name=submit value="Set File Format"></P></center> --%>
-		<center><P><input type=submit name=submit value="<fmt:message key="jsp.submit.get-file-format.set.button"/>"></P></center>
+		<center><P><input type=submit name=submit value="<fmt:message key="jsp.submit.general.submit"/>"></P></center>
     </form>
 </dspace:layout>

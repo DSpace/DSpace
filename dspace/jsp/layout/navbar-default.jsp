@@ -87,7 +87,9 @@
     if (user != null)
     {
 %>
-  <P class="loggedIn"><fmt:message key="jsp.layout.navbar-default.logged"/> <%= navbarEmail %>
+  <P class="loggedIn"><fmt:message key="jsp.layout.navbar-default.loggedin">
+      <fmt:param><%= navbarEmail %></fmt:param>
+  </fmt:message>
     (<A HREF="<%= request.getContextPath() %>/logout"><fmt:message key="jsp.layout.navbar-default.logout"/></A>)</P>
 <%
     }
@@ -138,7 +140,7 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/community-list" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities"/><br />&amp;&nbsp;<fmt:message key="jsp.layout.navbar-default.collections"/></a>
+      <a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a>
     </td>
   </tr>
 
@@ -191,7 +193,8 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/mydspace" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16">
     </td>
     <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/>
+      <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a><br>
+      <fmt:message key="jsp.layout.navbar-default.users-authorized" />
     </td>
   </tr>
 

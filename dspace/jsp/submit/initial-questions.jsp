@@ -86,6 +86,7 @@
         submission.
         <dspace:popup page="/help/index.html#describe1">(More Help...)</dspace:popup></P> --%>
 
+        <P><fmt:message key="jsp.submit.initial-questions.info" /> 
         <dspace:popup page="/help/index.html#describe1"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
 
         <center>
@@ -175,12 +176,12 @@
                     </td>
                     <td>
                         <%-- <input type=submit name=submit_next value="Next &gt;"> --%>
-						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.initial-questions.next.button"/>">
+						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.general.next"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
                         <%-- <input type=submit name=submit_cancel value="Cancel/Save"> --%>
-						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.initial-questions.cancel.button"/>">
+						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>">
                     </td>
                 </tr>
             </table>
