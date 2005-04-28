@@ -70,6 +70,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.Group;
 
 /** 
  * This servlet provides an interface to the statistics reporting for a DSpace
@@ -96,7 +97,20 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        showStatistics(c, request, response);
+        // check to see if the statistics are restricted to administrators
+        boolean publicise = ConfigurationManager.getBooleanProperty("report.public");
+        
+        // is the user a member of the Administrator (1) group
+        boolean admin = Group.isMember(c, 1);
+        
+        if (publicise || admin)
+        {
+            showStatistics(c, request, response);
+        }
+        else
+        {
+            throw new AuthorizeException();
+        }
     }
     
     /**
