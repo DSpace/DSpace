@@ -86,6 +86,9 @@
     labels.add("Supervisors");
     links.add("/dspace-admin/supervise");
     
+    labels.add("Statistics");
+    links.add("/statistics");
+    
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);    
     int c = currentPage.indexOf( '?' );
