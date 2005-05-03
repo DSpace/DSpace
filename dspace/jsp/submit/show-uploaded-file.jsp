@@ -137,7 +137,7 @@
             <tr>
                 <td class="evenRowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstream.getName()) %>" target="_blank"><%= bitstream.getName() %></A></td>
                 <td class="evenRowEvenCol"><fmt:message key="jsp.submit.show-uploaded-file.size-in-bytes">
-                    <fmt:param><%= bitstream.getSize() %></fmt:param>
+                    <fmt:param><fmt:formatNumber><%= bitstream.getSize() %></fmt:formatNumber></fmt:param>
                 </fmt:message></td>
                 <td class="evenRowOddCol">
                     <%= bitstream.getFormatDescription() %>
