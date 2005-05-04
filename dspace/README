@@ -1,21 +1,16 @@
-DSpace Version 1.2.2 beta 1, 15-February-2005
+DSpace Version 1.2.2, 04-May-2005
 
-Installation instructions are included in the 'dspace-docs' download,
-available from:
+Installation instructions for packaged downloads are included in the
+'docs' directory.
 
-http://sourceforge.net/projects/dspace/
-
-Documentation for the most recent stable release may be viewed online at
-dspace.org:
+Documentation for the most recent stable release may also be viewed 
+online at dspace.org:
 
 http://dspace.org/technology/system-docs/
 
 Installation instructions for other version may be different, so you
-are encouraged to obtain the corresponding documentation package from
-SourceForge, or to download the latest documentation snapshot from CVS
-or:
-
-http://dspace.sourceforge.net/doc-snapshots/
+are encouraged to use the documentation included with a downloaded
+package, or obtain the corresponding documentation from CVS.
 
 Please also read the KNOWN_BUGS file.
 

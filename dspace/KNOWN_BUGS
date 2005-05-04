@@ -1,43 +1,34 @@
-This release of DSpace contains two known bugs, described below. If you
-encounter these bugs and they cause you problems please report this to
-dspace-devel@lists.sourceforge.net so that the developers can know that
-these bugs are a user priority.
-
-[ 1088692 ] Edit item template as a collection administrator
-
-The problem described below occurs only when the item template is defined
- during the create collection wizard.
-
-If I check "New submissions will have some metadata already filled out
-with defaults", during the create collection wizard, and then I log in as
-a collection admin and try to edit the item template, I get an internal
-server error.
-
--- Gabriela Mircea
+This version of DSpace has the following known problems.  Please follow the
+provided links to learn more about the problem, and to see if it has been
+subsequently fixed.
 
 
-[ 1105336 ] Inappropriate Auth required when creating collection
- 
- Group G has at least ADD and WRITE permissions on
- Community Cy
- Logged in as anyone in G
+http://sourceforge.net/tracker/index.php?func=detail&aid=1174342&group_id=19984&atid=119984
+Potential Memory Issue for a large collection
 
- 1) In Cy, create a new collection.
+http://sourceforge.net/tracker/index.php?func=detail&aid=1173600&group_id=19984&atid=119984
+Items Mapper has memory issue for a large collection
 
- 2) Check none but "This collection will have delegated
- collection administrators"
+http://sourceforge.net/tracker/index.php?func=detail&aid=1169975&group_id=19984&atid=119984
+workspace item policy not updated after workflow change
 
- 3) Click Next>.
+http://sourceforge.net/tracker/index.php?func=detail&aid=1161459&group_id=19984&atid=119984
+ItemExporter fails with Too many open files
 
- System shows you the 401/403 screen (Forbidden / Authorization required)
+http://sourceforge.net/tracker/index.php?func=detail&aid=1155173&group_id=19984&atid=119984
+Forms in custom 'skin' break group admin tool
 
- Same result occurs immediately if you check "Some users will be able to
- submit to this collection".
+http://sourceforge.net/tracker/index.php?func=detail&aid=1120726&group_id=19984&atid=119984
+Performance bottlekneck in Group.update()
 
- If you deselect all options, you can edit the collection details and
- select epeople to have read permissions, but get Auth Required when you
- try to commit the read permissions.
+http://sourceforge.net/tracker/index.php?func=detail&aid=1066771&group_id=19984&atid=119984
+Metadata edit form dropping DC qualified element
 
--- Jim Downing
+http://sourceforge.net/tracker/index.php?func=detail&aid=1066713&group_id=19984&atid=119984
+Two (sub)communities can not have one name
 
+http://sourceforge.net/tracker/index.php?func=detail&aid=1160898&group_id=19984&atid=119984
+dspace_migrate removes Date.Issued from prev published items
 
+http://sourceforge.net/tracker/index.php?func=detail&aid=1076506&group_id=19984&atid=119984
+Templates applied to imported items

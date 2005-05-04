@@ -152,7 +152,7 @@ public class DCInputSet
      *
      * @return true if the current set has the named field
      */
-    private boolean isFieldPresent(String fieldName)
+    public boolean isFieldPresent(String fieldName)
     {
     	for (int i = 0; i < inputPages.length; i++)
 	    {

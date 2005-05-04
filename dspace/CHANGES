@@ -1,10 +1,18 @@
+1.2.2
+=====
+(Richard Rodgers)
+Bug fix for bug causing corruption of metadata if edited post-submission
+
+1.2.2 beta 2
+============
+
 (Robert Tansley)
 - Fixed bug whereby 'Submit to this Collection' button only appears if admin.
 
 (Larry Stone)
 - SF patch #1143570 Fix various bugs handling slash ("/") in bitstream names
 
-(Scott Phillips)
+(Scott Phillips & David Little)
 - Patch for SF bug #1145527 Able to delete 'unknown' bitstream format
 
 (Mike Simpson)
