@@ -69,7 +69,7 @@ CREATE SEQUENCE itemsbyauthor_seq;
 CREATE SEQUENCE itemsbytitle_seq;
 CREATE SEQUENCE itemsbydate_seq;
 CREATE SEQUENCE itemsbydateaccessioned_seq;
-
+CREATE SEQUENCE epersongroup2workspaceitem_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -130,11 +130,16 @@ CREATE TABLE EPerson
   self_registered     NUMBER(1),
   last_active         TIMESTAMP,
   sub_frequency       INTEGER,
-  phone	              VARCHAR2(32)
+  phone	              VARCHAR2(32),
+  netid               VARCHAR2(64) UNIQUE
 );
 
 -- index by email
 CREATE INDEX eperson_email_idx ON EPerson(email);
+
+-- index by netid
+CREATE INDEX eperson_netid_idx ON EPerson(netid);
+
 
 -------------------------------------------------------
 -- EPersonGroup table
@@ -257,7 +262,9 @@ CREATE TABLE Collection
   side_bar_text     VARCHAR2(2000),
   workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id )
+  workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  submitter         INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
 -------------------------------------------------------
@@ -280,6 +287,10 @@ CREATE TABLE Community2Collection
   collection_id  INTEGER REFERENCES Collection(collection_id)
 );
 
+-- Improve mapping tables
+CREATE INDEX Community2Collection_community_id_idx ON Community2Collection(community_id);
+CREATE INDEX Community2Collection_collection_id_idx ON Community2Collection(collection_id);
+
 -------------------------------------------------------
 -- Collection2Item table
 -------------------------------------------------------
@@ -292,6 +303,9 @@ CREATE TABLE Collection2Item
 
 -- index by collection_id
 CREATE INDEX collection2item_collection_idx ON Collection2Item(collection_id);
+
+-- Improve mapping tables
+CREATE INDEX Collection2Item_item_id_idx ON Collection2Item( item_id );
 
 -------------------------------------------------------
 -- ResourcePolicy table
@@ -339,6 +353,9 @@ CREATE TABLE Handle
 
 -- index by handle, commonly looked up
 CREATE INDEX handle_handle_idx ON Handle(handle);
+
+-- index by resource id and resource type id
+CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
 
 -------------------------------------------------------
 --  WorkspaceItem table
@@ -431,6 +448,17 @@ CREATE TABLE HistoryState
   object_id                  VARCHAR2(64)
 );
 
+-------------------------------------------------------------------------------
+-- EPersonGroup2WorkspaceItem table
+-------------------------------------------------------------------------------
+
+CREATE TABLE EPersonGroup2WorkspaceItem 
+(
+  id INTEGER PRIMARY KEY,
+  eperson_group_id INTEGER REFERENCES EPersonGroup(eperson_group_id),
+  workspace_item_id INTEGER REFERENCES WorkspaceItem(workspace_item_id)
+);
+
 ------------------------------------------------------------
 -- Browse subsystem tables and views
 ------------------------------------------------------------
@@ -454,6 +482,9 @@ FROM Community2Collection, Collection2Item
 WHERE Collection2Item.collection_id   = Community2Collection.collection_id
 ;
 
+-- Indexing browse tables update/re-index performance
+CREATE INDEX Communities2Item_item_id_idx ON Communities2Item( item_id );
+
 -------------------------------------------------------
 --  ItemsByAuthor table
 -------------------------------------------------------
@@ -467,6 +498,9 @@ CREATE TABLE ItemsByAuthor
 
 -- index by sort_author, of course!
 CREATE INDEX sort_author_idx on ItemsByAuthor(sort_author);
+
+-- Indexing browse tables update/re-index performance
+CREATE INDEX ItemsByAuthor_item_id_idx ON ItemsByAuthor(item_id);
 
 -------------------------------------------------------
 --  CollectionItemsByAuthor view
@@ -500,6 +534,8 @@ CREATE TABLE ItemsByTitle
 -- index by the sort_title
 CREATE INDEX sort_title_idx on ItemsByTitle(sort_title);
 
+-- Indexing browse tables update/re-index performance
+CREATE INDEX ItemsByTitle_item_id_idx ON ItemsByTitle(item_id);
 
 -------------------------------------------------------
 --  CollectionItemsByTitle view
@@ -532,6 +568,9 @@ CREATE TABLE ItemsByDate
 -- sort by date
 CREATE INDEX date_issued_idx on ItemsByDate(date_issued);
 
+-- Indexing browse tables update/re-index performance
+CREATE INDEX ItemsByDate_item_id_idx ON ItemsByDate(item_id);
+
 -------------------------------------------------------
 --  CollectionItemsByDate view
 -------------------------------------------------------
@@ -559,6 +598,9 @@ CREATE TABLE ItemsByDateAccessioned
    item_id                       INTEGER REFERENCES Item(item_id),
    date_accessioned              VARCHAR2(2000)
 );
+
+-- Indexing browse tables update/re-index performance
+CREATE INDEX ItemsByDateAccessioned_item_id_idx ON ItemsByDateAccessioned(item_id);
 
 -------------------------------------------------------
 --  CollectionItemsByDateAccession view

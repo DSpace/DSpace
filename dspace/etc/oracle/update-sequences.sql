@@ -88,3 +88,4 @@
 @incseq.sql itemsbytitle_seq itemsbytitle items_by_title_id
 @incseq.sql itemsbydate_seq itemsbydate items_by_date_id
 @incseq.sql itemsbydateaccessioned_seq itemsbydateaccessioned items_by_date_accessioned_id
+@incseq.sql epersongroup2workspaceitem_seq epersongroup2workspaceitem id
