@@ -50,6 +50,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
 
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
@@ -64,15 +66,15 @@
     WorkspaceItem[] workspaceItems = (WorkspaceItem[]) request.getAttribute("wsItems");
 %>
 
-<dspace:layout title="Administer Supervision Orders"
+<dspace:layout titlekey="jsp.dspace-admin.supervise-link.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer">
 
-<h1>Administer Supervision Orders</h1>
+<h1><fmt:message key="jsp.dspace-admin.supervise-link.heading"/></h1>
 
-<h3>Choose a Group, WorkSpace Item, and Initial Policy Setting to apply:</h3>
+<h3><fmt:message key="jsp.dspace-admin.supervise-link.choose"/></h3>
 
 <form method="post">
 
@@ -80,7 +82,7 @@
 <%-- Select the group to supervise --%>
     <tr>
         <td>
-            <b>Group:</b> 
+            <b><fmt:message key="jsp.dspace-admin.supervise-link.group"/></b> 
             <select name="TargetGroup">
 <%
     for (int i = 0; i < groups.length; i++)
@@ -98,11 +100,11 @@
 <%-- Select the defaul policy type --%>
     <tr>
         <td>
-            <b>Initial Policy Setting:</b>
+            <b><fmt:message key="jsp.dspace-admin.supervise-link.policy"/></b>
             <select name="PolicyType">
-                <option value="<%= Supervisor.POLICY_NONE %>" selected>None</option>
-                <option value="<%= Supervisor.POLICY_EDITOR %>">Editor</option>
-                <option value="<%= Supervisor.POLICY_OBSERVER %>">Observer</option>
+                <option value="<%= Supervisor.POLICY_NONE %>" selected><fmt:message key="jsp.dspace-admin.supervise-link.policynone"/></option>
+                <option value="<%= Supervisor.POLICY_EDITOR %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyeditor"/></option>
+                <option value="<%= Supervisor.POLICY_OBSERVER %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyobserver"/></option>
             </select>
             <br/><br/>
         </td>
@@ -111,16 +113,16 @@
 <%-- Select the workspace item to be supervised --%>
     <tr>
         <td>
-            <b>WorkSpace to be Supervised:</b>
+            <b><fmt:message key="jsp.dspace-admin.supervise-link.workspace"/></b>
             <br/><br/>
             <div align="left">
             <table class=miscTable>
                 <tr>
-                    <th class=oddRowOddCol>ID</th>
-                    <th class=oddRowEvenCol>Submitted by</th>
-                    <th class=oddRowOddCol>Title</th>
-                    <th class=oddRowEvenCol>Submitted to</th>
-                    <th class=oddRowOddCol>Select</th>
+                    <th class=oddRowOddCol><fmt:message key="jsp.dspace-admin.supervise-link.id"/></th>
+                    <th class=oddRowEvenCol><fmt:message key="jsp.dspace-admin.supervise-link.submittedby"/></th>
+                    <th class=oddRowOddCol><fmt:message key="jsp.dspace-admin.supervise-link.title"/></th>
+                    <th class=oddRowEvenCol><fmt:message key="jsp.dspace-admin.supervise-link.submittedto"/></th>
+                    <th class=oddRowOddCol><fmt:message key="jsp.dspace-admin.supervise-link.select"/></th>
                 </tr>
 <%
     String row = "even";
@@ -129,7 +131,7 @@
     {
         // get title (or "untitled" if none) and submitter of workspace item
         DCValue[] titleArray = workspaceItems[i].getItem().getDC("title", null, Item.ANY);
-        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
+//        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
         EPerson submitter = workspaceItems[i].getItem().getSubmitter();
 %>
                 <tr>
@@ -140,7 +142,20 @@
                         <a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a>
                     </td>
                     <td class="<%= row %>RowOddCol">
-                        <%= title %>
+<%
+					if (titleArray.length > 0)
+					{
+%>
+						<%= titleArray[0].value %>
+<%
+					}
+					else
+					{
+%>
+						<fmt:message key="jsp.dspace-admin.supervise-link.untitled"/>
+<%
+					}
+%>
                     </td>
                     <td class="<%= row %>RowEvenCol">
                         <%= workspaceItems[i].getCollection().getMetadata("name") %>
@@ -160,8 +175,8 @@
     </tr>
     <tr>
         <td>
-            <input type="submit" name="submit_link" value="Submit Supervision Order"/>
-            <input type="submit" name="submit_base" value="Cancel"/>
+            <input type="submit" name="submit_link" value="<fmt:message key="jsp.dspace-admin.supervise-link.submit.button"/>"/>
+            <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.supervise-link.cancel.button"/>"/>
         </td>
     </tr>
 </table>

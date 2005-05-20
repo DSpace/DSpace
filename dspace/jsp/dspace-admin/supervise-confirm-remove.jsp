@@ -45,10 +45,14 @@
    -    wsItem  - An item that is going to be removed
    -    group   - the group supervising the item
    --%>
+   
+   
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
 
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
@@ -62,15 +66,15 @@
     Group group = (Group) request.getAttribute("group");
 %>
 
-<dspace:layout title="Administer Supervision Orders"
+<dspace:layout titlekey="jsp.dspace-admin.supervise-confirm-remove.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer">
 
-<h1>Confirm Remove</h1>
+<h1><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.heading"/></h1>
 
-<h3>You have requested that the following supervision order be removed:</h3>
+<h3><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.subheading"/></h3>
 
 <br/><br/>
 
@@ -78,31 +82,44 @@
 
 <%
         DCValue[] titleArray = wsItem.getItem().getDC("title", null, Item.ANY);
-        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
+//        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
         EPerson submitter = wsItem.getItem().getSubmitter();
 %>
 
-<strong>Title</strong>:
+<strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.titleheader"/></strong>:
 <br/>
-<%= title %>
+<%
+		if (titleArray.length > 0)
+		{
+%>
+			<%= titleArray[0].value %>
+<%
+		}
+		else
+		{
+%>
+			<fmt:message key="jsp.dspace-admin.supervise-confirm-remove.untitled"/>
+<%
+		}
+%>
 <br/><br/>
-<strong>Author</strong>:
+<strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.authorheader"/></strong>:
 <br/>
 <a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a>
 <br/><br/>
-<strong>Supervising Group</strong>:
+<strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.supervisorgrouppheader"/></strong>:
 <br/>
 <%= group.getName() %>
 <br/><br/>
 
-Are you sure you wish to remove this supervision order?
+<fmt:message key="jsp.dspace-admin.supervise-confirm-remove.confirm"/>
 
 <%-- form to request removal of supervisory linking --%>
 <form method="post">
     <input type="hidden" name="gID" value="<%= group.getID() %>"/>
     <input type="hidden" name="siID" value="<%= wsItem.getID() %>"/>
-    <input type="submit" name="submit_doremove" value="Remove"/>
-    <input type="submit" name="submit_base" value="Cancel"/>
+    <input type="submit" name="submit_doremove" value="<fmt:message key="jsp.dspace-admin.supervise-confirm-remove.remove.button"/>"/>
+    <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.supervise-confirm-remove.cancel.button"/>"/>
 </form>
 
 </dspace:layout>

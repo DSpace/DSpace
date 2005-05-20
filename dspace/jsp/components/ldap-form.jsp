@@ -41,29 +41,35 @@
 <%--
   - Component which displays a login form and associated information
   --%>
+  
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
 
 <table class="miscTable" align=center width="70%">
     <tr>
         <td class="evenRowEvenCol">
 
-            <P><strong>New user?  <A HREF="<%= request.getContextPath() %>/register">Click here to register</A>.</strong></P>
-            
-            <P>Please enter your username and password into the form below.</P>
-
+<%--            <P><strong>New user?  <A HREF="<%= request.getContextPath() %>/register">Click here to register</A>.</strong></P> --%>
+		        <p><strong><a href="<%= request.getContextPath() %>/register"><fmt:message key="jsp.components.ldap-form.newuser"/></a></strong></p>            
+<%--            <P>Please enter your username and password into the form below.</P> --%>
+		        <p><fmt:message key="jsp.components.ldap-form.enter"/></p>
             <form method=POST action="<%= request.getContextPath() %>/ldap-login">
 
                 <table border=0 cellpadding=5 align=center>
                     <tr>
-                        <td class=standard align=right><strong>Username <br />or Email address:</strong></td>
+<%--                        <td class=standard align=right><strong>Username <br />or Email address:</strong></td> --%>
+                        <td class=standard align=right><strong><fmt:message key="jsp.components.ldap-form.username-or-email"/></strong></td>
                         <td><input tabid="1" type=text name="login_netid"></td>
                     </tr>
                     <tr>
-                        <td class=standard align=right><strong>Password:</strong></td>
+<%--                        <td class=standard align=right><strong>Password:</strong></td> --%>
+            		    <td class=standard align=right><strong><fmt:message key="jsp.components.ldap-form.password"/></strong></td>
                         <td><input type=password name="login_password"></td>
                     </tr>
                     <tr>
                         <td align=center colspan=2>
-                            <input type=submit name=login_submit value="Log In">
+<%--                            <input type=submit name=login_submit value="Log In"> --%>
+						    <input type=submit name=login_submit value="<fmt:message key="jsp.components.ldap-form.login.button"/>">
                         </td>
                     </tr>
                 </table>

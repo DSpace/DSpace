@@ -45,27 +45,29 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
 
-<dspace:layout title="Administer Supervision Orders"
+<dspace:layout titlekey="jsp.dspace-admin.supervise-main.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer">
 
-<h1>Administer Supervision Orders</h1>
+<h1><fmt:message key="jsp.dspace-admin.supervise-main.heading"/></h1>
 
-<h3>Select one of the options on this page</h3>
+<h3><fmt:message key="jsp.dspace-admin.supervise-main.subheading"/></h3>
 
 <br><br>
 
 <div align="center">
 <%-- form to navigate to any of the three options available --%>
 <form method="post">
-    <input type="submit" name="submit_add" value="Add a Supervision Order"/>
+    <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.supervise-main.add.button"/>"/>
     <br><br>
-    <input type="submit" name="submit_view" value="View Current Supervision Orders"/>
+    <input type="submit" name="submit_view" value="<fmt:message key="jsp.dspace-admin.supervise-main.view.button"/>"/>
     <br><br>
-    <input type="submit" name="submit_clean" value="Clean Supervision Order Database"/>
+    <input type="submit" name="submit_clean" value="<fmt:message key="jsp.dspace-admin.supervise-main.clean.button"/>"/>
 </form>
 <div align="center">
 

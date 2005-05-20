@@ -46,22 +46,21 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-
-<dspace:layout title="Administer Supervision Orders"
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+    
+<dspace:layout titlekey="jsp.dspace-admin.supervise-duplicate.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer">
 
-<h1>Operation Failed</h1>
+<h1><fmt:message key="jsp.dspace-admin.supervise-duplicate.heading"/></h1>
 
-<p>
-The supervision order could not be applied to the WorkSpace item as your selected
-group is already supervising your selected item.
-</p>
+<p><fmt:message key="jsp.dspace-admin.supervise-duplicate.errormsg"/></p>
 
 <div align="center">
-<a href="<%= request.getContextPath() %>/dspace-admin/supervise">Return to the Supervisor Admin page</a>
+<a href="<%= request.getContextPath() %>/dspace-admin/supervise"><fmt:message key="jsp.dspace-admin.supervise-duplicate.return"/></a>
 </div>
 
 </dspace:layout>

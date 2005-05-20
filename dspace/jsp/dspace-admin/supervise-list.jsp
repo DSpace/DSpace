@@ -48,6 +48,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
 
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
@@ -60,24 +62,23 @@
     SupervisedItem[] supervisedItems = (SupervisedItem[]) request.getAttribute("supervised");
 %>
 
-<dspace:layout title="Administer Supervision Orders"
+<dspace:layout titlekey="jsp.dspace-admin.supervise-list.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer">
+               parenttitlekey="jsp.administer">
 
-<h1>Current Supervision Orders</h1>
+<h1><fmt:message key="jsp.dspace-admin.supervise-list.heading"/></h1>
 
-<h3>This page lists all current supervisory settings, with the option to remove
-any setting</h3>
+<h3><fmt:message key="jsp.dspace-admin.supervise-list.subheading"/></h3>
 
 <br/><br/>
 
 <div align="center">
 <%-- form to navigate to the "add supervisory settings" page --%> 
 <form method="post">
-    <input type="submit" name="submit_add" value="Add a Supervision Order"/>
-    <input type="submit" name="submit_base" value="Go Back"/>
+    <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.supervise-list.add.button"/>"/>
+    <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.supervise-list.back.button"/>"/>
 </form>
 
 <table class="miscTable">
@@ -86,13 +87,13 @@ any setting</h3>
             &nbsp;
         </th>
         <th class="oddRowEvenCol">
-            Supervising Group
+            <fmt:message key="jsp.dspace-admin.supervise-list.group"/>
         </th>
         <th class="oddRowOddCol">
-            Item Author
+            <fmt:message key="jsp.dspace-admin.supervise-list.author"/>
         </th>
         <th class="oddRowEvenCol">
-            Item Title
+            <fmt:message key="jsp.dspace-admin.supervise-list.title"/>
         </th>
         <th class="oddRowOddCol">
             &nbsp;
@@ -106,7 +107,7 @@ any setting</h3>
         // get title (or "untitled" if not set), author, and supervisors of 
         // the supervised item
         DCValue[] titleArray = supervisedItems[i].getItem().getDC("title", null, Item.ANY);
-        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
+//        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
         EPerson submitter = supervisedItems[i].getItem().getSubmitter();
         Group[] supervisors = supervisedItems[i].getSupervisorGroups();
 
@@ -119,7 +120,7 @@ any setting</h3>
             <%-- form to navigate to the item policies --%>
             <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
                 <input type="hidden" name="item_id" value="<%=supervisedItems[i].getItem().getID() %>"/>
-                <input type="submit" name="submit_item_select" value="Policies"/>
+                <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.supervise-list.policies.button"/>"/>
             </form>
         </td>
         <td class="<%= row %>RowEvenCol">
@@ -129,14 +130,27 @@ any setting</h3>
             <a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a>
         </td>
         <td class="<%= row %>RowEvenCol">
-            <%= title %>
+<%
+		if (titleArray.length > 0)
+		{
+%>
+			<%= titleArray[0].value %>
+<%
+		}
+		else
+		{
+%>
+			<fmt:message key="jsp.dspace-admin.supervise-list.untitled"/>
+<%
+		}
+%>
         </td>
         <td class="<%= row %>RowOddCol">
             <%-- form to request removal of supervisory linking --%>
             <form method="post">
             <input type="hidden" name="gID" value="<%= supervisors[j].getID() %>"/>
             <input type="hidden" name="siID" value="<%= supervisedItems[i].getID() %>"/>
-            <input type="submit" name="submit_remove" value="Remove"/>
+            <input type="submit" name="submit_remove" value="<fmt:message key="jsp.dspace-admin.supervise-list.remove.button"/>"/>
             </form>
         </td>
     </tr> 
