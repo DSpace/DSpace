@@ -81,6 +81,9 @@ import org.dspace.core.ConfigurationManager;
  * <LI><code>dspace.current.user</code>- the EPerson currently logged in, or
  * <code>null</code> if anonymous access</LI>
  * </UL>
+ * <P>
+ * Furthermore it sets the content type of the response to text/html using UTF-8
+ * to ensure this will be returned in the HTTP header.
  * 
  * @author Robert Tansley
  * @version $Revision$
@@ -286,6 +289,10 @@ public class LayoutTag extends TagSupport
                 response.addHeader("Pragma", "no-cache");
                 response.addHeader("Cache-control", "no-store");
             }
+
+            // Ensure the HTTP header will declare that UTF-8 is used
+            // in the response.
+            response.setContentType("text/html; charset=UTF-8");
 
             ServletConfig config = pageContext.getServletConfig();
 
