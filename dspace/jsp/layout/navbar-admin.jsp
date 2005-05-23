@@ -50,45 +50,9 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
-    // Build up lists of menu item labels and links
-    List labels = new LinkedList();
-    List links = new LinkedList();
-    
-    labels.add("Communities/<br>Collections");
-    links.add("/tools/edit-communities");
-    
-    labels.add("E-people");
-    links.add("/dspace-admin/edit-epeople");
-    
-    labels.add("Groups");
-    links.add("/tools/group-edit");
-    
-    labels.add("Items");
-    links.add("/tools/edit-item");
-    
-    labels.add("Dublin Core<br>Registry");
-    links.add("/dspace-admin/dc-registry");
-    
-    labels.add("Bitstream Format<br>Registry");
-    links.add("/dspace-admin/format-registry");
-    
-    labels.add("Workflow");
-    links.add("/dspace-admin/workflow");
-    
-    labels.add("Authorization");
-    links.add("/dspace-admin/authorize");
-    
-    labels.add("Edit News");
-    links.add("/dspace-admin/news-edit");
-
-    labels.add("Supervisors");
-    links.add("/dspace-admin/supervise");
-    
-    labels.add("Statistics");
-    links.add("/statistics");
-    
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);    
     int c = currentPage.indexOf( '?' );
@@ -100,45 +64,125 @@
 
 <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
 <table width="100%" border="0" cellspacing="2" cellpadding="2">
-<%
-    for (int i = 0; i < labels.size(); i++)
-    {
-        String s = (String) labels.get(i);
-        String l = (String) links.get(i);
 
-        // Use "highlit" arrow if label corresponds to current page
-        String image = (currentPage.endsWith(l) ? "arrow-highlight" : "arrow");
-%>            
-    <tr class="navigationBarItem">
-        <td>
-            <img alt="" src="<%= request.getContextPath() %>/image/<%= image %>.gif" width="16" height="16">
-        </td>
-        <td nowrap class="navigationBarItem">
-            <a href="<%= request.getContextPath() %><%= l %>"><%= s %></a>
-        </td>
-    </tr>
-<%
-    }
-%>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/edit-communities") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/tools/edit-communities"><fmt:message key="jsp.layout.navbar-admin.communities-collections"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/edit-epeople") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople"><fmt:message key="jsp.layout.navbar-admin.epeople"/></a>
+    </td>
+  </tr>
 
-    <tr class="navigationBarItem">
-        <td>
-            <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16">
-        </td>
-        <td nowrap class="navigationBarItem">
-            <dspace:popup page="/help/site-admin.html">Help</dspace:popup>
-        </td>
-    </tr>
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/group-edit") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/tools/group-edit"><fmt:message key="jsp.layout.navbar-admin.groups"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/edit-item") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/tools/edit-item"><fmt:message key="jsp.layout.navbar-admin.items"/></a>
+    </td>
+  </tr>
 
-    <tr class="navigationBarItem">
-        <td>
-            <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16">
-        </td>
-        <td nowrap class="navigationBarItem">
-            <a href="<%= request.getContextPath() %>/logout">Log Out</a>
-        </td>
-    </tr>
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/dc-registry") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/dc-registry"><fmt:message key="jsp.layout.navbar-admin.dcregistry"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/format-registry") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/format-registry"><fmt:message key="jsp.layout.navbar-admin.formatregistry"/></a>
+    </td>
+  </tr>
+  
+   <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/workflow") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/workflow"><fmt:message key="jsp.layout.navbar-admin.workflow"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/authorize") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/authorize"><fmt:message key="jsp.layout.navbar-admin.authorization"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/news-edit") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/news-edit"><fmt:message key="jsp.layout.navbar-admin.editnews"/></a>
+    </td>
+  </tr>
+
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/supervise") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/supervise"><fmt:message key="jsp.layout.navbar-admin.supervisors"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/statistics") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/statistics"><fmt:message key="jsp.layout.navbar-admin.statistics"/></a>
+    </td>
+  </tr>
+  
+  <tr>
+     <td colspan="2">&nbsp;</td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+     <td>
+         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16">
+     </td>
+     <td nowrap class="navigationBarItem">
+         <dspace:popup page="/help/site-admin.html"><fmt:message key="jsp.layout.navbar-admin.help"/></dspace:popup>
+     </td>
+ </tr>
+
+ <tr class="navigationBarItem">
+     <td>
+         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16">
+     </td>
+     <td nowrap class="navigationBarItem">
+         <a href="<%= request.getContextPath() %>/logout"><fmt:message key="jsp.layout.navbar-admin.logout"/></a>
+     </td>
+ </tr>
 </table>
