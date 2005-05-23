@@ -553,8 +553,8 @@
 		ArrayList filtered = new ArrayList();
 		for (int i = 0; i < unfiltered.length; i++)
 		{
-			String fieldName = unfiltered[i].element + "." + unfiltered[i].qualifier;
-			if ( ! inputs.isFieldPresent(fieldName) )
+			String unfilteredFieldName = unfiltered[i].element + "." + unfiltered[i].qualifier;
+			if ( ! inputs.isFieldPresent(unfilteredFieldName) )
 			{
 				filtered.add( unfiltered[i] );
 			} 
