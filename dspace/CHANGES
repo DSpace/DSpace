@@ -2,6 +2,7 @@
 ========
 (Jozsef Marton)
 - SF Patch #1196103 Set the content type in the HTTP header
+- SF Patch #1196095 closes SF Bug #1188016 - EPerson editing issue
 
 (Richard Rodgers)
 - SF Patch #1189665 Custom Submission Patch for handling null qualifier and page flow metadata issue

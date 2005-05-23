@@ -118,7 +118,7 @@ function addEPerson(id, email, name)
 // Clear selected items from main e-people list
 function clearEPeople()
 {
-	var list = self.opener.document.forms[1].eperson_id;
+	var list = self.opener.document.forms[0].eperson_id;
 	while (list.options.length > 0)
 	{
 		list.options[0] = null;
