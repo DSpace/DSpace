@@ -1,5 +1,7 @@
 1.3 beta
 ========
+(Richard Rodgers)
+- SF Patch #1189665 Custom Submission Patch for handling null qualifier and page flow metadata issue
 
 (Naveed Hashmi)
 - SF Patch #1181335 Fixed bug whereby system emails do not have sent dates attached to them

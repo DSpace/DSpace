@@ -52,6 +52,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="javax.servlet.ServletException" %>
@@ -543,12 +544,23 @@
     }
 
     void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String element, boolean repeatable,
+      String fieldName, String element, DCInputSet inputs, boolean repeatable,
       int fieldCountIncr, List qualMap, String label) 
       throws java.io.IOException 
     {
-
-      DCValue[] defaults = item.getDC(element, Item.ANY, Item.ANY);
+		DCValue[] unfiltered = item.getDC(element, Item.ANY, Item.ANY);
+		// filter out both unqualified and qualified values occuring elsewhere in inputs
+		ArrayList filtered = new ArrayList();
+		for (int i = 0; i < unfiltered.length; i++)
+		{
+			String fieldName = unfiltered[i].element + "." + unfiltered[i].qualifier;
+			if ( ! inputs.isFieldPresent(fieldName) )
+			{
+				filtered.add( unfiltered[i] );
+			} 
+		}
+		DCValue[] defaults = (DCValue[])filtered.toArray(new DCValue[0]);
+      //DCValue[] defaults = item.getDC(element, Item.ANY, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String   q, v, currentQual, currentVal;
@@ -800,7 +812,7 @@
        } 
        else if (inputType.equals("qualdrop_value")) 
        {
-           doQualdropValue(out, item, fieldName, dcElement, repeatable,
+           doQualdropValue(out, item, fieldName, dcElement, inputSet, repeatable,
                            fieldCountIncr, inputs[z].getPairs(), label);
        } 
        else if (inputType.equals("textarea")) 

@@ -857,6 +857,10 @@ public class SubmitServlet extends DSpaceServlet
     	      for (int z = 0; z < vals.size(); z++)
     	      {
     	      		String thisQual = (String)quals.get(z);
+    	      		if ( "".equals(thisQual) )
+    	      		{
+    	      		    thisQual = null;
+    	      		}
     	      		String thisVal = (String)vals.get(z);
     	      		if (! buttonPressed.equals("submit_" + dcElement + "_remove_" + z) &&
     	      			! thisVal.equals(""))
