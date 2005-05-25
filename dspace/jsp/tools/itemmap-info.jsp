@@ -50,6 +50,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="java.net.URLEncoder"            %>
 <%@ page import="java.util.Iterator"             %>
@@ -63,14 +64,14 @@
     String message        = (String)request.getAttribute("message");
 %>
 
-<dspace:layout title="Item Map Info">
+<dspace:layout titlekey="jsp.tools.itemmap-info.title">
 
-    <h2>Item Map Info</h2>
+    <h2><fmt:message key="jsp.tools.itemmap-info.heading"/></h2>
 
     <p><%=message%></p>
     
     <form method=POST>
         <input type="hidden" name="cid" value="<%=collection.getID()%>">
-        <input type="submit" name="submit" value="Continue">
+        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.itemmap-info.button.continue"/>">
     </form>
 </dspace:layout>

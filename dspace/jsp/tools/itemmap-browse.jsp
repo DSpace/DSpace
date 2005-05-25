@@ -54,6 +54,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="java.net.URLEncoder"            %>
 <%@ page import="java.util.Iterator"             %>
@@ -70,31 +71,34 @@
     String browsetype      = (String)request.getAttribute("browsetype");
 %>
 
-<dspace:layout title="Browse Items">
+<dspace:layout titlekey="jsp.tools.itemmap-browse.title">
 
-    <h2>Browse <%=browsetext%></h2>
+    <%-- <h2>Browse <%=browsetext%></h2> --%>
+    <h2><fmt:message key="jsp.tools.itemmap-browse.heading">
+        <fmt:param><%= eperson.getEmail() %></fmt:param>
+    </fmt:message></h2>
 
-    <p>Check the box next to items you wish to add or remove, and choose 'add' or 'remove'.</p>
-
+    <%-- <p>Check the box next to items you wish to add or remove, and choose 'add' or 'remove'.</p> --%>
+    <p><fmt:message key="jsp.tools.itemmap-browse.infomsg"/></p>
     <form method=POST action="<%= request.getContextPath() %>/tools/itemmap">
         <input type="hidden" name="cid" value="<%=collection.getID()%>">
 
         <table>     
           <tr>
             <td><input type="submit" name="action" value="<%=browsetype%>"></td>
-            <td><input type="submit" name="submit" value="Cancel"></td>
+            <td><input type="submit" name="submit" value=""><fmt:message key="jsp.tools.itemmap-browse.button.cancel"/></td>
           </tr>
         </table>
 
 
         <table class="miscTable" align="center">
         <tr>
-            <th class="oddRowOddCol"><strong>Date</strong></th>
-            <th class="oddRowEvenCol"><strong>First Author</strong></th>
-            <th class="oddRowOddCol"><strong>Title</strong></th>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.itemmap-browse.th.date"/></strong></th>
+            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.itemmap-browse.th.author"/></strong></th>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.itemmap-browse.th.title"/></strong></th>
             <% if(showcollection.booleanValue()) { %>
-                <th class="oddRowEvenCol"><strong>Action</strong></th>
-                <th class="oddRowOddCol"> Remove </th>
+                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.itemmap-browse.th.action"/></strong></th>
+                <th class="oddRowOddCol"> <fmt:message key="jsp.tools.itemmap-browse.th.remove"/> </th>
             <% } else { %>     
                 <th class="oddRowEvenCol"><input type=submit name="action"
                 value="<%=browsetype%>"</th>
@@ -140,7 +144,7 @@
         <table>     
           <tr>
             <td><input type="submit" name="action" value="<%=browsetype%>"></td>
-            <td><input type="submit" name="submit" value="Cancel"></td>
+            <td><input type="submit" name="submit" value="<fmt:message key="jsp.tools.itemmap-browse.button.cancel"/>"></td>
           </tr>
         </table>
 

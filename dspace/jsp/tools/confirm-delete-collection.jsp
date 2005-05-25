@@ -52,24 +52,35 @@
 <%@ page import="org.dspace.content.Community" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
     Collection collection = (Collection) request.getAttribute("collection");
     Community community = (Community) request.getAttribute("community");
 %>
 
-<dspace:layout title="Delete Collection" navbar="admin" locbar="link" parentlink="/tools" parenttitle="Administer">
+<dspace:layout titlekey="jsp.tools.confirm-delete-collection.title"
+		navbar="admin"
+		locbar="link"
+		parentlink="/tools"
+		parenttitlekey="jsp.administer">
 
-    <H1>Delete Collection: <%= collection.getID() %></H1>
+    <%-- <H1>Delete Collection: <%= collection.getID() %></H1> --%>
+    <h1><fmt:message key="jsp.tools.confirm-delete-collection.heading">
+        <fmt:param><%= collection.getID() %></fmt:param>
+    </fmt:message></h1>
     
-    <P>Are you sure the collection <strong><%= collection.getMetadata("name") %></strong>
-    should be deleted?  This will delete:</P>
+    <%-- <P>Are you sure the collection <strong><%= collection.getMetadata("name") %></strong>
+    should be deleted?  This will delete:</P> --%>
+    <p><fmt:message key="jsp.tools.confirm-delete-collection.confirm">
+        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+    </fmt:message></p>
     
-    <UL>
-        <LI>Any items and incomplete submissions in this collections that aren't contained in other collections</LI>
-        <LI>The contents of those items</LI>
-        <LI>All associated authorisation policies</LI>
-    </UL>
+    <ul>
+        <li><fmt:message key="jsp.tools.confirm-delete-collection.info1"/></li>
+        <li><fmt:message key="jsp.tools.confirm-delete-collection.info2"/></li>
+        <li><fmt:message key="jsp.tools.confirm-delete-collection.info3"/></li>
+    </ul>
     
     <form method=POST>
         <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
@@ -80,14 +91,13 @@
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit" value="Delete">
+                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.confirm-delete-collection.button.delete"/>">
                     </td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.confirm-delete-collection.button.cancel"/>">
                     </td>
                 </tr>
             </table>
         </center>
     </form>
 </dspace:layout>
-
