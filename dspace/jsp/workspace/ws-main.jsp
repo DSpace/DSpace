@@ -48,6 +48,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
 <%@ page import="org.dspace.content.DCValue" %>
@@ -63,36 +64,51 @@
     // get the title and submitter of the item
     DCValue[] titleArray =
          workspaceItem.getItem().getDC("title", null, Item.ANY);
-    String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
+//    String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
     EPerson submitter = workspaceItem.getItem().getSubmitter();
 %>
 
-<dspace:layout title="My DSpace">
+<dspace:layout titlekey="jsp.workspace.ws-main.title">
 
     <table width="100%" border=0>
         <tr>
             <td align=left>
-                <H1>
-                    WorkSpace Item
-                </H1>
+                <h1>
+                    <fmt:message key="jsp.workspace.ws-main.wsitem"/>
+                </h1>
             </td>
             <td align=right class=standard>
-                <dspace:popup page="/help/index.html#mydspace">Help...</dspace:popup>
+                <dspace:popup page="/help/index.html#mydspace"<fmt:message key="jsp.workspace.ws-main.help"/>></dspace:popup>
             </td>
         </tr>
     </table>
 
-    <h2><%= title %></h2>
-    <strong><A HREF="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></A></strong>
+<%--    <h2><%= title %></h2> --%>
+<%
+		if (titleArray.length > 0)
+		{
+%>
+			<h2><%= titleArray[0].value %></h2>
+<%
+		}
+		else
+		{
+%>
+			<h2><fmt:message key="jsp.workspace.ws-main.untitled"/></h2>
+<%
+		}
+%>
+
+    <strong><a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a></strong>
     <br/><br/>
-    This item is being submitted to the collection: 
+    <fmt:message key="jsp.workspace.ws-main.submitmsg"/> 
     <%= workspaceItem.getCollection().getMetadata("name") %>
     <br/><br/>
 
     <table class=miscTable align=center>
         <tr>
-            <th class=oddRowOddCol>Option</th>
-            <th class=oddRowEvenCol>Description</th>
+            <th class=oddRowOddCol><fmt:message key="jsp.workspace.ws-main.optionheading"/></th>
+            <th class=oddRowEvenCol><fmt:message key="jsp.workspace.ws-main.descheading"/></th>
         </tr>
         <tr>
             <td class="evenRowOddCol" align="center">
@@ -100,11 +116,11 @@
                 <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
                 <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
                 <input type="hidden" name="resume" value="<%= workspaceItem.getID() %>"/>
-                <input type="submit" name="submit_resume" value="Edit"/>
+                <input type="submit" name="submit_resume" value="<fmt:message key="jsp.workspace.ws-main.button.edit"/>"/>
                 </form>
             </td>
             <td class="evenRowEvenCol">
-                Open the item up for editing and file management.
+                <fmt:message key="jsp.workspace.ws-main.editmsg"/>
             </td>
         </tr>
         
@@ -112,11 +128,11 @@
             <td class="oddRowOddCol" align="center">
                 <form action="<%= request.getContextPath() %>/view-workspaceitem" method="post">
                 <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
-                <input type="submit" name="submit_view" value="View"/>
+                <input type="submit" name="submit_view" value="<fmt:message key="jsp.workspace.ws-main.button.view"/>"/>
                 </form>
             </td>
             <td class="oddRowEvenCol">
-                View the item record as it stands at this stage of submission.
+                <fmt:message key="jsp.workspace.ws-main.viewmsg"/>
             </td>
         </tr>
         
@@ -125,16 +141,16 @@
                 <form action="<%= request.getContextPath() %>/mydspace" method="post">
                 <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
                 <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
-                <input type="submit" name="submit_delete" value="Remove"/>
+                <input type="submit" name="submit_delete" value="<fmt:message key="jsp.workspace.ws-main.button.remove"/>"/>
                 </form>
             </td>
             <td class="evenRowEvenCol">
-                Remove the item all together.
+                <fmt:message key="jsp.workspace.ws-main.removemsg"/>
             </td>
         </tr>
 
     </table>
 
-<P><A HREF="<%= request.getContextPath() %>/mydspace">Return to My DSpace</A></P>
+<p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.workspace.ws-main.returnlink"/></a></p>
 
 </dspace:layout>

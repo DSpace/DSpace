@@ -44,26 +44,24 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<dspace:layout title="My DSpace - View Workspace Item Error">
+<dspace:layout titlekey="jsp.workspace.wsv-error.title">
 
-<h1>Error - View Workspace Item</h1>
+<h1><fmt:message key="jsp.workspace.wsv-error.heading"/></h1>
 
 <p>
-The system was unable to process your request correctly.  You must specify an item.
+<fmt:message key="jsp.workspace.wsv-error.errormsg1"/>
 </p>
 
 <p>
-Go back to "My DSpace", and select "Open" for the WorkSpace Item that you wish to
-work with, then select "View" from the list of options.  If you are still 
-experiencing problems please do not hesitate to contact us and we will do our 
-best to solve the problem.
+<fmt:message key="jsp.workspace.wsv-error.errormsg2"/>
 </p>
 
 <dspace:include page="/components/contact-info.jsp" />
 
-<P align=center>
-    <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A>
-</P>
+<p align=center>
+    <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.workspace.wsv-error.returnlink"/></a>
+</p>
 
 </dspace:layout>
