@@ -83,7 +83,7 @@
     <strong><%= collection.getMetadata("name") %></strong>.  In order to
     accept the task of reviewing this item, please click "Accept This Task" below.</P> --%>
 	<P><fmt:message key="jsp.mydspace.preview-task.text1"> 
-        <mft:param value="<%= collection.getMetadata("name") %>" />
+        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
     </fmt:message></P>
 <%
     }
