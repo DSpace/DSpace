@@ -118,7 +118,8 @@ public class EPersonAdminServlet extends DSpaceServlet
             // the new email is unique
             String oldEmail = e.getEmail();
             String newEmail = request.getParameter("email").trim();
-
+            String netid = request.getParameter("netid");
+			
             if (!newEmail.equals(oldEmail))
             {
                 // change to email, now see if it's unique
@@ -135,10 +136,15 @@ public class EPersonAdminServlet extends DSpaceServlet
                                     .equals("") ? null : request
                                     .getParameter("lastname"));
 
-                    e.setNetid(request.getParameter("netid").equals("")
-                        ? null
-                        : request.getParameter("netid"));
-
+                    if (netid != null)
+                    {
+                    	e.setNetid(netid.equals("") ? null : netid);
+                    }
+                    else
+                    {
+                    	e.setNetid(null);
+                    }
+                    
                     // FIXME: More data-driven?
                     e.setMetadata("phone", request.getParameter("phone")
                             .equals("") ? null : request.getParameter("phone"));
@@ -174,9 +180,14 @@ public class EPersonAdminServlet extends DSpaceServlet
             else
             {
                 // no change to email
-                e.setNetid(request.getParameter("netid").equals("")
-                    ? null
-                    : request.getParameter("netid"));
+                if (netid != null)
+                {
+                	e.setNetid(netid.equals("") ? null : netid);
+                }
+                else
+                {
+                	e.setNetid(null);
+                }
 
                 e.setFirstName(request.getParameter("firstname").equals(
                                 "") ? null : request.getParameter("firstname"));
