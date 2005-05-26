@@ -45,12 +45,10 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<dspace:layout title="No reports currently available">
+<dspace:layout titlekey="jsp.statistics.no-report.title">
 
-<p>
-There are currently no reports available for this service.  Please check back
-later.
-</p>
+<p><fmt:message key="jsp.statistics.no-report.info1"/></p>
 
 </dspace:layout>

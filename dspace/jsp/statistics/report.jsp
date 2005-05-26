@@ -48,6 +48,7 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
     String report = (String) request.getAttribute("report");
@@ -57,30 +58,28 @@
     
     SimpleDateFormat sdfDisplay = new SimpleDateFormat("MM'/'yyyy");
     SimpleDateFormat sdfLink = new SimpleDateFormat("yyyy'-'M");
-    
-    String title = "Statistical Summary";
 %>
 
-<dspace:layout title="<%= title %>">
+<dspace:layout titlekey="jsp.statistics.report.title">
 
     <p>
 <%
     if (general.booleanValue())
     {
 %>
-    <strong>Most recent general report</strong>
+    <strong><fmt:message key="jsp.statistics.report.info1"/></strong>
 <%
     }
     else
     {
 %>
-    <strong><a href="<%= request.getContextPath() %>/statistics">Most recent general report</a></strong>
+    <strong><a href="<%= request.getContextPath() %>/statistics"><fmt:message key="jsp.statistics.report.info1"/></a></strong>
     </p>
 <%
     }
 %>
     <p>
-    <strong>Monthly reports:</strong>
+    <strong><fmt:message key="jsp.statistics.report.info2"/></strong>
 <%
         for (int i = 0; i < months.length; i++)
         {
