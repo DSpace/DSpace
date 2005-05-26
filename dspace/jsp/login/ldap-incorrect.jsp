@@ -44,20 +44,23 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<dspace:layout navbar="off" locbar="nolink" title="Log In">
+<dspace:layout navbar="off"
+			   locbar="nolink"
+			   titlekey="jsp.login.ldap-incorrect.title">
     <table border=0 width="90%">
         <tr>
             <td align="left">
-                <H1>Log In to DSpace</H1>
+                <h1><fmt:message key="jsp.login.ldap-incorrect.heading"/></h1>
             </td>
             <td align="right" class="standard">
-                <dspace:popup page="/help/index.html#login">Help...</dspace:popup>
+                <dspace:popup page="/help/index.html#login"><fmt:message key="jsp.login.ldap-incorrect.help"/></dspace:popup>
             </td>
         </tr>
     </table>
 
-    <P align=center><strong>The username and password you supplied were not valid.  Please try again.</strong></P>
+    <p align=center><strong><fmt:message key="jsp.login.ldap-incorrect.errormsg"/></strong></p>
 
     <dspace:include page="/components/ldap-form.jsp" />
 </dspace:layout>
