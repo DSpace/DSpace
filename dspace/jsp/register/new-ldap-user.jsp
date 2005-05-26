@@ -51,6 +51,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="org.dspace.app.webui.servlet.RegisterServlet" %>
 
@@ -58,18 +59,17 @@
     boolean retry = (request.getAttribute("retry") != null);
 %>
 
-<dspace:layout title="User Registration">
+<dspace:layout titlekey="jsp.register.new-ldap-user.title">
 
-    <H1>User Registration</H1>
+    <h1><fmt:message key="jsp.register.new-ldap-user.heading"/></h1>
     
 <%
     if (retry)
     { %>
-	<P><strong>The username, password, or e-mail address you entered was invalid.</strong>  Please try again.</strong></P>
+	<p><strong><fmt:message key="jsp.register.new-ldap-user.info1"/></strong></p>
 <%  } %>
 
-    <P>If you've never logged on to DSpace before, please enter your username, password, and e-mail
-    address in the fields below and click "Register".  If you do not already have a username you may register by just entering your e-mail address.</P>
+    <p><fmt:message key="jsp.register.new-ldap-user.info1"/></p>
     
     <form action="<%= request.getContextPath() %>/register" method=POST>
 
@@ -79,20 +79,20 @@
                 <td class="oddRowEvenCol">
                     <table border=0 cellpadding=5>
                     	<tr>
-                            <td class=standard><strong>Username:</strong></td>
+                            <td class=standard><strong><fmt:message key="jsp.register.new-ldap-user.label.username"/></strong></td>
                             <td class=standard><input type=text name="netid"></td>
                         </tr>
                         <tr>
-                            <td class=standard><strong>Password:</strong></td>
+                            <td class=standard><strong><fmt:message key="jsp.register.new-ldap-user.label.password"/></strong></td>
                             <td class=standard><input type="password" name="password"></td>
                         </tr>
                         <tr>
-                            <td class=standard><strong>E-mail Address:</strong></td>
+                            <td class=standard><strong><fmt:message key="jsp.register.new-ldap-user.label.email"/></strong></td>
                             <td class=standard><input type=text name="email"></td>
                         </tr>
                         <tr>
                             <td align=center colspan=2>
-                                <input type=submit name=submit value="Register">
+                                <input type=submit name=submit value="<fmt:message key="jsp.register.new-ldap-user.button.register"/>">
                             </td>
                         </tr>
                     </table>
@@ -101,8 +101,7 @@
         </table>
     </form>
     
-    <P>If you or your department are interested in registering with DSpace, please
-    contact the DSpace site administrators.</P>
+    <p></p>
 
     <dspace:include page="/components/contact-info.jsp" />
 
