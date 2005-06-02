@@ -69,7 +69,7 @@
 	<p><strong><fmt:message key="jsp.register.new-ldap-user.info1"/></strong></p>
 <%  } %>
 
-    <p><fmt:message key="jsp.register.new-ldap-user.info1"/></p>
+    <p><fmt:message key="jsp.register.new-ldap-user.info2"/></p>
     
     <form action="<%= request.getContextPath() %>/register" method=POST>
 
@@ -101,7 +101,7 @@
         </table>
     </form>
     
-    <p></p>
+    <p><fmt:message key="jsp.register.new-ldap-user.info3" /></p>
 
     <dspace:include page="/components/contact-info.jsp" />
 

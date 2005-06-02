@@ -89,10 +89,10 @@
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.confirm-delete-community.button.delete"/>">
+                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.delete"/>">
                     </td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.confirm-delete-community.button.cancel"/>">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>">
                     </td>
                 </tr>
             </table>

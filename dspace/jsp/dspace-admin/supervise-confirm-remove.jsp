@@ -107,7 +107,7 @@
 <br/>
 <a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a>
 <br/><br/>
-<strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.supervisorgrouppheader"/></strong>:
+<strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.supervisorgroupheader"/></strong>:
 <br/>
 <%= group.getName() %>
 <br/><br/>
@@ -118,8 +118,8 @@
 <form method="post">
     <input type="hidden" name="gID" value="<%= group.getID() %>"/>
     <input type="hidden" name="siID" value="<%= wsItem.getID() %>"/>
-    <input type="submit" name="submit_doremove" value="<fmt:message key="jsp.dspace-admin.supervise-confirm-remove.remove.button"/>"/>
-    <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.supervise-confirm-remove.cancel.button"/>"/>
+    <input type="submit" name="submit_doremove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>
+    <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>"/>
 </form>
 
 </dspace:layout>

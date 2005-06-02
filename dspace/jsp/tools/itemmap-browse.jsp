@@ -86,7 +86,7 @@
         <table>     
           <tr>
             <td><input type="submit" name="action" value="<%=browsetype%>"></td>
-            <td><input type="submit" name="submit" value=""><fmt:message key="jsp.tools.itemmap-browse.button.cancel"/></td>
+            <td><input type="submit" name="submit" value=""><fmt:message key="jsp.tools.general.cancel"/></td>
           </tr>
         </table>
 
@@ -144,10 +144,10 @@
         <table>     
           <tr>
             <td><input type="submit" name="action" value="<%=browsetype%>"></td>
-            <td><input type="submit" name="submit" value="<fmt:message key="jsp.tools.itemmap-browse.button.cancel"/>"></td>
+            <td><input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.cancel"/>"></td>
           </tr>
         </table>
 
     </form>
 
-</dspace:layout>        
+</dspace:layout>

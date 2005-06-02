@@ -176,7 +176,7 @@
     <tr>
         <td>
             <input type="submit" name="submit_link" value="<fmt:message key="jsp.dspace-admin.supervise-link.submit.button"/>"/>
-            <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.supervise-link.cancel.button"/>"/>
+            <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>"/>
         </td>
     </tr>
 </table>

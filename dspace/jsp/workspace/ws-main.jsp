@@ -78,7 +78,7 @@
                 </h1>
             </td>
             <td align=right class=standard>
-                <dspace:popup page="/help/index.html#mydspace"<fmt:message key="jsp.workspace.ws-main.help"/>></dspace:popup>
+                <dspace:popup page="/help/index.html#mydspace"<fmt:message key="jsp.help"/>></dspace:popup>
             </td>
         </tr>
     </table>
@@ -151,6 +151,6 @@
 
     </table>
 
-<p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.workspace.ws-main.returnlink"/></a></p>
+<p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.returnto-mydspace"/></a></p>
 
 </dspace:layout>

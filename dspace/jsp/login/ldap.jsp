@@ -56,7 +56,7 @@
                 <h1><fmt:message key="jsp.login.ldap.heading"/></h1>
             </td>
             <td align="right" class="standard">
-                <dspace:popup page="/help/index.html#login"><fmt:message key="jsp.login.ldap.help"/></dspace:popup>
+                <dspace:popup page="/help/index.html#login"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>

@@ -150,7 +150,7 @@
             <form method="post">
             <input type="hidden" name="gID" value="<%= supervisors[j].getID() %>"/>
             <input type="hidden" name="siID" value="<%= supervisedItems[i].getID() %>"/>
-            <input type="submit" name="submit_remove" value="<fmt:message key="jsp.dspace-admin.supervise-list.remove.button"/>"/>
+            <input type="submit" name="submit_remove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>
             </form>
         </td>
     </tr> 
