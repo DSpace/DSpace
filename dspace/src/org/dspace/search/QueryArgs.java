@@ -127,6 +127,17 @@ public class QueryArgs
         return pageSize;
     }
 
+    /**
+     * Builds an advanced-query description string.
+     *
+     * The string is built using the passed in values
+     * query{1,2,3}, field{1,2,3} and conjunction{1,2} taken from
+     * the parameter request.
+     * 
+     * @param request the request object to take the values from
+     *
+     * @return the query description string built
+     */
     public String buildQuery(HttpServletRequest request)
     {
         String newquery = "(";
@@ -163,6 +174,15 @@ public class QueryArgs
         return (newquery);
     }
 
+    /**
+     * Builds a query-part using the field and value passed in
+     * with ' --&gt; " (single to double quote) translation.
+     *
+     * @param myquery the value the query will look for
+     * @param myfield the field myquery will be looked for in
+     *
+     * @return the query created
+     */
     private String buildQueryPart(String myquery, String myfield)
     {
         Perl5Util util = new Perl5Util();
@@ -185,6 +205,15 @@ public class QueryArgs
         return (newquery);
     }
 
+    /**
+     * Constructs a HashMap with the keys field{1,2,3}, query{1,2,3} and
+     * conjunction{1,2} taking the values from the passed-in argument
+     * defaulting to "".
+     *
+     * @param request the request-describing object to take the values from
+     *
+     * @return the created HashMap
+     */
     public HashMap buildQueryHash(HttpServletRequest request)
     {
         HashMap queryHash = new HashMap();
@@ -215,6 +244,28 @@ public class QueryArgs
         return (queryHash);
     }
 
+    /**
+     * Builds an HTTP query string for some parameters with the value
+     * taken from the request context passed in.
+     *
+     * The returned string includes key/value pairs in the HTTP query string
+     * format (key1=value1&amp;key2=value2...) for the keys query{1,2,3},
+     * field{1,2,3} and conjunction{1,2} with values taken from request
+     * and defaulting to "".
+     * <P>
+     * Note, that the values are url-encoded using the UTF-8 encoding scheme
+     * as the corresponding W3C recommendation states.
+     * <P>
+     * Also note that neither leading ? (question mark)
+     * nor leading &amp; (ampersand mark) is included.
+     * Take this into account when appending to a real URL.
+     * 
+     * @param request the request object to take the values from
+     *
+     * @return the query string that can be used without further
+     *          transformationin URLs
+     * 
+     */
     public String buildHTTPQuery(HttpServletRequest request)
             throws UnsupportedEncodingException
     {
@@ -232,6 +283,7 @@ public class QueryArgs
                     + URLEncoder.encode(value, Constants.DEFAULT_ENCODING);
         }
 
-        return (querystring);
+        // return the result with the leading "&" removed
+        return (querystring.substring(1));
     }
 }
