@@ -1,6 +1,7 @@
 1.3 beta
 ========
 (Jozsef Marton)
+- SF Patch #1214539 i18n'ise the custom JSP tags
 - SF Patch #1196103 Set the content type in the HTTP header
 - SF Patch #1196095 closes SF Bug #1188016 - EPerson editing issue
 

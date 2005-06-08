@@ -69,6 +69,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 /**
@@ -125,14 +126,20 @@ public class ItemListTag extends TagSupport
             // Write column headings
             out.print("<tr><th class=\"oddRowOddCol\">"
                     + (emphasiseDate ? "<strong>" : "")
-                    + "Date&nbsp;of&nbsp;Issue"
+                    + LocaleSupport.getLocalizedMessage(pageContext,
+                            "org.dspace.app.webui.jsptag.ItemListTag.issueDate")
                     + (emphasiseDate ? "</strong>" : "") + "</th>");
 
             out.println("<th class=\"oddRowEvenCol\">"
-                    + (emphasiseTitle ? "<strong>" : "") + "Title"
+                    + (emphasiseTitle ? "<strong>" : "")
+                    + LocaleSupport.getLocalizedMessage(pageContext,
+                            "org.dspace.app.webui.jsptag.ItemListTag.title")
                     + (emphasiseTitle ? "</strong>" : "") + "</th>");
 
-            out.println("<th class=\"oddRowOddCol\">Authors</th></tr>");
+            out.println("<th class=\"oddRowOddCol\">"
+                    + LocaleSupport.getLocalizedMessage(pageContext,
+                            "org.dspace.app.webui.jsptag.ItemListTag.authors")
+                    + "</th></tr>");
 
             // Row: toggles between Odd and Even
             String row = "even";
@@ -141,7 +148,8 @@ public class ItemListTag extends TagSupport
             {
                 // Title - we just use the first one
                 DCValue[] titleArray = items[i].getDC("title", null, Item.ANY);
-                String title = "Untitled";
+                String title = LocaleSupport.getLocalizedMessage(pageContext,
+                                "org.dspace.app.webui.jsptag.ItemListTag.title.untitled");
 
                 if (titleArray.length > 0)
                 {

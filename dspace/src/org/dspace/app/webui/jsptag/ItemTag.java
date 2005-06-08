@@ -61,6 +61,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 /**
@@ -204,16 +205,32 @@ public class ItemTag extends TagSupport
 
         if (titleDC.length == 0)
         {
-            fields.add(new String[] { "Title", "Untitled" });
+            fields.add(new String[] {
+                    LocaleSupport.getLocalizedMessage(pageContext,
+                            "org.dspace.app.webui.jsptag.ItemTag.title"),
+                    LocaleSupport.getLocalizedMessage(pageContext,
+                            "org.dspace.app.webui.jsptag.ItemTag.title.untitled ") });
         }
         else
         {
-            fields.add(new String[] { "Title", "title", null });
+            fields.add(new String[] {
+                    LocaleSupport.getLocalizedMessage(pageContext,
+                            "org.dspace.app.webui.jsptag.ItemTag.title"),
+                    "title", null });
         }
 
-        fields.add(new String[] { "Other Titles", "title", "alternative" });
-        fields.add(new String[] { "Authors", "contributor", Item.ANY });
-        fields.add(new String[] { "Keywords", "subject", null });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.title.other"),
+                "title", "alternative" });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.authors"),
+                "contributor", Item.ANY });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.keywords"),
+                "subject", null });
 
         // Date issued
         DCValue[] dateIssued = item.getDC("date", "issued", Item.ANY);
@@ -226,11 +243,23 @@ public class ItemTag extends TagSupport
 
         String displayDate = UIUtil.displayDate(dd, false, false);
 
-        fields.add(new String[] { "Issue Date", displayDate });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.issueDate"),
+                displayDate });
 
-        fields.add(new String[] { "Publisher", "publisher", null });
-        fields.add(new String[] { "Citation", "identifier", "citation" });
-        fields.add(new String[] { "Series/Report no.", "relation",
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.publisher"),
+                "publisher", null });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.citation"),
+                "identifier", "citation" });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.series"),
+                "relation",
                 "ispartofseries" });
 
         // Truncate abstract
@@ -245,16 +274,40 @@ public class ItemTag extends TagSupport
                 abstr = abstr.substring(0, 1000) + "...";
             }
 
-            fields.add(new String[] { "Abstract", abstr });
+            fields.add(new String[] {
+                    LocaleSupport.getLocalizedMessage(pageContext,
+                            "org.dspace.app.webui.jsptag.ItemTag.abstract"),
+                    abstr });
         }
 
-        fields.add(new String[] { "Description", "description", null });
-        fields.add(new String[] { "Gov't Doc # ", "identifier", "govdoc" });
-        fields.add(new String[] { "URI", "identifier", "uri" });
-        fields.add(new String[] { "ISBN", "identifier", "isbn" });
-        fields.add(new String[] { "ISSN", "identifier", "issn" });
-        fields.add(new String[] { "ISMN", "identifier", "ismn" });
-        fields.add(new String[] { "Other Identifiers", "identifier", null });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.description"),
+                "description", null });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.govdoc"),
+                "identifier", "govdoc" });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.uri"),
+                "identifier", "uri" });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.isbn"),
+                "identifier", "isbn" });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.issn"),
+                "identifier", "issn" });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.ismn"),
+                "identifier", "ismn" });
+        fields.add(new String[] {
+                LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.otherIDs"),
+                "identifier", null });
 
         HttpServletRequest request = (HttpServletRequest) pageContext
                 .getRequest();
@@ -321,15 +374,26 @@ public class ItemTag extends TagSupport
         // Get all the metadata
         DCValue[] values = item.getDC(Item.ANY, Item.ANY, Item.ANY);
 
-        out.println("<P align=center>Full metadata record</P>");
+        out.println("<P align=center>"
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                                "org.dspace.app.webui.jsptag.ItemTag.full")
+                        +"</P>");
 
         HttpServletRequest request = (HttpServletRequest) pageContext
                 .getRequest();
 
         // Three column table - DC field, value, language
         out.println("<center><table class=\"itemDisplayTable\">");
-        out
-                .println("<tr><th class=\"standard\">DC Field</th><th class=\"standard\">Value</th><th class=\"standard\">Language</th></tr>");
+        out.println("<tr><th class=\"standard\">"
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                                "org.dspace.app.webui.jsptag.ItemTag.dcfield")
+                        +"</th><th class=\"standard\">"
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                                "org.dspace.app.webui.jsptag.ItemTag.value")
+                        +"</th><th class=\"standard\">"
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                                "org.dspace.app.webui.jsptag.ItemTag.lang")
+                        +"</th></tr>");
 
         for (int i = 0; i < values.length; i++)
         {
@@ -392,9 +456,10 @@ public class ItemTag extends TagSupport
 
         if (collections != null)
         {
-            out
-                    .print("<tr><td class=\"metadataFieldLabel\">"
-                            + "Appears in Collections:</td><td class=\"metadataFieldValue\">");
+            out.print("<tr><td class=\"metadataFieldLabel\">"
+                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                    "org.dspace.app.webui.jsptag.ItemTag.appears")
+                            + "</td><td class=\"metadataFieldValue\">");
 
             for (int i = 0; i < collections.length; i++)
             {
@@ -421,14 +486,19 @@ public class ItemTag extends TagSupport
                 .getRequest();
 
         out.print("<table align=center class=\"miscTable\"><tr>");
-        out
-                .println("<td class=evenRowEvenCol><P><strong>Files in This Item:</strong></P>");
+        out.println("<td class=evenRowEvenCol><P><strong>"
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                                "org.dspace.app.webui.jsptag.ItemTag.files")
+                        + "</strong></P>");
 
         Bundle[] bundles = item.getBundles("ORIGINAL");
 
         if (bundles.length == 0)
         {
-            out.println("<P>There are no files associated with this item.</P>");
+            out.println("<P>"
+                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                    "org.dspace.app.webui.jsptag.ItemTag.files.no")
+                            + "</P>");
         }
         else
         {
@@ -467,16 +537,26 @@ public class ItemTag extends TagSupport
                 }
             }
 
-            out
-                    .println("<table cellpadding=6><tr><th class=\"standard\">File</th>");
+            out.println("<table cellpadding=6><tr><th class=\"standard\">"
+                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                    "org.dspace.app.webui.jsptag.ItemTag.file")
+                            + "</th>");
 
             if (multiFile)
             {
-                out.println("<th class=\"standard\">Description</th>");
+                out.println("<th class=\"standard\">"
+                                + LocaleSupport.getLocalizedMessage(pageContext,
+                                        "org.dspace.app.webui.jsptag.ItemTag.description")
+                                + "</th>");
             }
 
-            out
-                    .println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th></tr>");
+            out.println("<th class=\"standard\">"
+                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                    "org.dspace.app.webui.jsptag.ItemTag.filesize")
+                            + "</th><th class=\"standard\">"
+                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                    "org.dspace.app.webui.jsptag.ItemTag.fileformat")
+                            + "</th></tr>");
 
             // if primary bitstream is html, display a link for only that one to
             // HTMLServlet
@@ -505,14 +585,16 @@ public class ItemTag extends TagSupport
                 out.print(primaryBitstream.getSize() / 1024);
                 out.print("Kb</td><td class=\"standard\">");
                 out.print(primaryBitstream.getFormatDescription());
-                out
-                        .print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
+                out.print("</td><td class=\"standard\"><A TARGET=_blank HREF=\"");
                 out.print(request.getContextPath());
                 out.print("/html/");
                 out.print(handle + "/");
                 out.print(UIUtil.encodeBitstreamName(primaryBitstream.getName(),
                         Constants.DEFAULT_ENCODING));
-                out.print("\">View/Open</A></td></tr>");
+                out.print("\">"
+                                + LocaleSupport.getLocalizedMessage(pageContext,
+                                        "org.dspace.app.webui.jsptag.ItemTag.view")
+                                + "</A></td></tr>");
             }
             else
             {
@@ -589,7 +671,10 @@ public class ItemTag extends TagSupport
                                 }
                             }
 
-                            out.print(bsLink + "View/Open</A></td></tr>");
+                            out.print(bsLink
+                                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                                    "org.dspace.app.webui.jsptag.ItemTag.view")
+                                            + "</A></td></tr>");
                         }
                     }
                 }
@@ -620,7 +705,10 @@ public class ItemTag extends TagSupport
         Bundle[] bundles = item.getBundles("LICENSE");
         
         out.println("<table align=\"center\" class=\"attentionTable\"><tr>");
-        out.println("<td class=\"attentionCell\"><P><strong>This item is protected by original copyright</strong></P>");
+        out.println("<td class=\"attentionCell\"><P><strong>"
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                                "org.dspace.app.webui.jsptag.ItemTag.itemprotected")
+                        + "</strong></P>");
         
         for (int i = 0; i < bundles.length; i++)
         {
@@ -635,7 +723,10 @@ public class ItemTag extends TagSupport
                 out.print(bitstreams[k].getID() + "/");
                 out.print(UIUtil.encodeBitstreamName(bitstreams[k].getName(), 
                                         Constants.DEFAULT_ENCODING));
-                out.print("\">View Licence</a></strong></div>");
+                out.print("\">"
+                                + LocaleSupport.getLocalizedMessage(pageContext,
+                                        "org.dspace.app.webui.jsptag.ItemTag.viewlicence")
+                                + "</a></strong></div>");
             }    
         }
 

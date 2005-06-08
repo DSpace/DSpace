@@ -44,6 +44,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.dspace.content.Collection;
@@ -73,7 +74,9 @@ public class CollectionListTag extends TagSupport
             out.println("<table align=center class=\"miscTable\">");
 
             // Write column headings
-            out.print("<tr><th class=\"oddRowOddCol\">" + "Collection Name"
+            out.print("<tr><th class=\"oddRowOddCol\">"
+                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                    "org.dspace.app.webui.jsptag.CollectionListTag.collectionName")
                     + "</th></tr>");
 
             // Row: toggles between Odd and Even

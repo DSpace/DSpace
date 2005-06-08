@@ -44,6 +44,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.dspace.eperson.EPerson;
@@ -163,17 +164,23 @@ public class SelectEPersonTag extends TagSupport
                 out.print("<TD>");
             }
 
-            String p = (multiple ? "people" : "person");
-            out.print("<input type=\"button\" value=\"Select E-" + p
-                    + "...\" onclick=\"javascript:popup_window('"
+            String p = (multiple ? 
+                            LocaleSupport.getLocalizedMessage(pageContext,
+                                    "org.dspace.app.webui.jsptag.SelectEPersonTag.selectPeople")
+                            : LocaleSupport.getLocalizedMessage(pageContext,
+                                    "org.dspace.app.webui.jsptag.SelectEPersonTag.selectPerson") );
+            out.print("<input type=\"button\" value=\"" + p
+                    + "\" onclick=\"javascript:popup_window('"
                     + req.getContextPath() + "/tools/eperson-list?multiple="
                     + multiple + "', 'eperson_popup');\">");
 
             if (multiple)
             {
                 out.print("</TD><TD width=\"50%\" align=\"center\">");
-                out
-                        .print("<input type=\"button\" value=\"Remove Selected\" onclick=\"javascript:removeSelected(window.document.forms[0].eperson_id);\">");
+                out.print("<input type=\"button\" value=\""
+                                        + LocaleSupport.getLocalizedMessage(pageContext,
+                                                "org.dspace.app.webui.jsptag.SelectEPersonTag.removeSelected")
+                                        + "\" onclick=\"javascript:removeSelected(window.document.forms[0].eperson_id);\">");
             }
 
             out.println("</TD></TR></TABLE>");
