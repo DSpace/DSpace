@@ -94,7 +94,7 @@
     reasons:</P> --%>
 	<P><fmt:message key="jsp.error.invalid-id.text1">
         <fmt:param><%= badID %></fmt:param>
-        <fmt:param><% =typeString %></fmt:param>
+        <fmt:param><%= typeString %></fmt:param>
     </fmt:message></P>
 
     <UL>
