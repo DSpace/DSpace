@@ -71,13 +71,18 @@
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="javax.servlet.jsp.tagext.TagSupport" %>
+<%@ page import="javax.servlet.jsp.PageContext" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%!
 
     void doPersonalName(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label) 
+      int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
@@ -96,9 +101,13 @@
       //Width hints used here to affect whole table 
       headers.append("<tr><td width=\"40%\">&nbsp;</td>")
              .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-             .append("Last name<br>e.g. <strong>Smith</strong></td>")
+//             .append("Last name<br>e.g. <strong>Smith</strong></td>")
+			 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.lastname"))
+			 .append("</td>")
              .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-             .append("First name(s) + \"Jr\"<br> e.g. <strong>Donald Jr</strong></td>")
+//             .append("First name(s) + \"Jr\"<br> e.g. <strong>Donald Jr</strong></td>")
+			 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.firstname"))
+			 .append("</td>")
              .append("<td width=\"40%\">&nbsp;</td>")
              .append("</tr>");
       out.write(headers.toString());
@@ -148,14 +157,20 @@
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"> </td></tr>")
+		  .append("\" value=\"")
+		  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+		  .append("\"> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=submit name=\"submit_")
 	      .append(fieldName)
-	      .append("_more\" value=\"Add More\"> </td></tr>");
+// 	      .append("_more\" value=\"Add More\"> </td></tr>");
+	      .append("_more\" value=\"")
+	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+	      .append("\"> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -169,7 +184,7 @@
 
     void doDate(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label) 
+      int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
@@ -196,15 +211,20 @@
             dateIssued = new org.dspace.content.DCDate("");
     
          sb.append("<td colspan=2 nowrap class=\"submitFormDateLabel\">")
-            .append("Month:<select name=\"")
+//          .append("Month:<select name=\"")
+         	.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.month"))
+            .append("<select name=\"")
 	    .append(fieldName)
 	    .append("_month");
          if (repeatable)
             sb.append('_').append(i);
          sb.append("\"><option value=\"-1\"")
             .append((dateIssued.getMonth() == -1 ? " SELECTED" : ""))
-	    .append(">(No month)</option>");
-    
+//	    .append(">(No month)</option>");
+	    .append(">")
+	    .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.no_month"))
+	    .append("</option>");
+	    
          for (int j = 1; j < 13; j++) 
 	 {
             sb.append("<option value=\"")
@@ -216,7 +236,9 @@
          }
     
          sb.append("</select>")
-            .append("Day:<input type=text name=\"")
+//            .append("Day:<input type=text name=\"")
+		.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.day"))
+		.append("<input type=text name=\"")
 	    .append(fieldName)
 	    .append("_day");
          if (repeatable)
@@ -224,7 +246,10 @@
          sb.append("\" size=2 maxlength=2 value=\"")
             .append((dateIssued.getDay() > 0 ? 
 	             String.valueOf(dateIssued.getDay()) : "" ))
-	    .append("\">Year:<input type=text name=\"")
+//	    .append("\">Year:<input type=text name=\"")
+		.append("\">")
+		.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.year"))
+		.append("<input type=text name=\"")
 	    .append(fieldName)
 	    .append("_year");
          if (repeatable)
@@ -241,14 +266,20 @@
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+		  .append("\" value=\"")
+		  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+		  .append("\"> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=submit name=\"submit_")
 	      .append(fieldName)
-	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"> </td></tr>");
+	      .append("_more\" value=\"")
+	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+	      .append("\"> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -262,7 +293,7 @@
 
     void doSeriesNumber(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label) 
+      int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
@@ -311,14 +342,20 @@
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+	      .append("\" value=\"")
+   	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+   	      .append("\"> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=submit name=\"submit_")
 	      .append(fieldName)
-	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"> </td></tr>");
+	      .append("_more\" value=\"")
+	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+	      .append("\"> </td></tr>");	      	      
 	 } 
 	 else 
 	 {
@@ -332,7 +369,7 @@
 
     void doTextArea(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label) 
+      int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
@@ -373,14 +410,20 @@
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+	      .append("\" value=\"")
+   	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+   	      .append("\"> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=submit name=\"submit_")
 	      .append(fieldName)
-	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"> </td></tr>");
+	      .append("_more\" value=\"")
+	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+	      .append("\"> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -394,7 +437,7 @@
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label) 
+      int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
@@ -435,14 +478,20 @@
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+	      .append("\" value=\"")
+   	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+   	      .append("\"> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=submit name=\"submit_")
 	      .append(fieldName)
-	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"> </td></tr>");
+	      .append("_more\" value=\"")
+	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+	      .append("\"> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -456,7 +505,7 @@
 
     void doTwoBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label) 
+      int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
       DCValue[] defaults = item.getDC(element, qualifier, Item.ANY);
@@ -469,9 +518,13 @@
          //Width hints used here to affect whole table 
          headers.append("<tr><td width=\"40%\">&nbsp;</td>")
              .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-             .append("Series Name</td>")
+//             .append("Series Name</td>")
+			 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.seriesname"))
+             .append("</td>")
              .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-             .append("Report or Paper No.</td>")
+//             .append("Report or Paper No.</td>")
+			 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.paperno"))
+             .append("</td>")
              .append("<td width=\"40%\">&nbsp;</td>")
              .append("</tr>");
          out.write(headers.toString());
@@ -499,7 +552,10 @@
 	     .append(fieldName)
 	     .append("_remove_")
 	     .append(i)
-	     .append("\" value=\"Remove\"></td>\n");
+//	     .append("\" value=\"Remove\"></td>\n");
+	     .append("\" value=\"")
+	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
+	     .append("\"></td>\n");
          else 
 	 {
            sb.append("<td align=\"left\"><input type=text name=\"")
@@ -518,7 +574,10 @@
 	     .append(fieldName)
 	     .append("_remove_")
 	     .append(i)
-	     .append("\" value=\"Remove\"></td></tr>\n");
+//	     .append("\" value=\"Remove\"></td></tr>\n");
+	     .append("\" value=\"")
+	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
+	     .append("\"></td></tr>\n");
 	 else 
 	 {
            sb.append("<td align=\"left\"><input type=text name=\"")
@@ -530,7 +589,10 @@
 	   {
 	     sb.append("<td><input type=submit name=\"submit_")
 	       .append(fieldName)
-	       .append("_more\" value=\"Add More\"></td>\n"); 
+//	       .append("_more\" value=\"Add More\"></td>\n"); 
+	       .append("_more\" value=\"")
+	       .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+	       .append("\"></td>\n");
 	   } 
 	   else 
 	   {
@@ -545,7 +607,7 @@
 
     void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String element, DCInputSet inputs, boolean repeatable,
-      int fieldCountIncr, List qualMap, String label) 
+      int fieldCountIncr, List qualMap, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 		DCValue[] unfiltered = item.getDC(element, Item.ANY, Item.ANY);
@@ -626,14 +688,20 @@
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(j)
-	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+	      .append("\" value=\"")
+   	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+   	      .append("\"> </td></tr>");
 	 } 
 	 else if (repeatable && j == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=submit name=\"submit_")
 	      .append(fieldName)
-	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"> </td></tr>");
+	      .append("_more\" value=\"")
+	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+	      .append("\"> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -709,7 +777,7 @@
     int pageNum = pageNumStr.intValue();
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Describe Your Item">
+<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
 
   <form action="<%= request.getContextPath() %>/submit#<%= si.jumpToField%>" method=post>
 
@@ -719,23 +787,21 @@
       <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
     </jsp:include>
 
-    <H1>Submit: Describe Your Item</H1>
+    <h1><fmt:message key="jsp.submit.edit-metadata.heading"/></h1>
 
 <%
      if (pageNum == SubmitServlet.EDIT_METADATA_1) 
      {
 %>
-        <P>Please fill in the requested information about your submission below.  In
-        most browsers, you can use the tab key to move the cursor to the next input
-        box or button, to save you having to use the mouse each time.
-        <dspace:popup page="/help/index.html#describe2">(More Help...)</dspace:popup></P>
+        <p><fmt:message key="jsp.submit.edit-metadata.info1"/>
+        <dspace:popup page="/help/index.html#describe2"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></p>
 <%
      } 
      else 
      {
 %>
-    <P>Please fill further information about your submission below.
-        <dspace:popup page="/help/index.html#describe3">(More Help...)</dspace:popup></P>
+    <p><fmt:message key="jsp.submit.edit-metadata.info2"/>
+        <dspace:popup page="/help/index.html#describe3"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></p>
     
 <%
      }
@@ -797,28 +863,28 @@
        if (inputType.equals("name")) 
        {
            doPersonalName(out, item, fieldName, dcElement, dcQualifier,
-	     				  repeatable, fieldCountIncr, label);
+	     				  repeatable, fieldCountIncr, label, pageContext);
        } 
        else if (inputType.equals("date")) 
        {
            doDate(out, item, fieldName, dcElement, dcQualifier, 
-	     		  repeatable, fieldCountIncr, label);
+	     		  repeatable, fieldCountIncr, label, pageContext);
        } 
        else if (inputType.equals("series")) 
        {
            doSeriesNumber(out, item, fieldName, dcElement, dcQualifier, 
-	                      repeatable, fieldCountIncr, label);
+	                      repeatable, fieldCountIncr, label, pageContext);
 
        } 
        else if (inputType.equals("qualdrop_value")) 
        {
            doQualdropValue(out, item, fieldName, dcElement, inputSet, repeatable,
-                           fieldCountIncr, inputs[z].getPairs(), label);
+                           fieldCountIncr, inputs[z].getPairs(), label, pageContext);
        } 
        else if (inputType.equals("textarea")) 
        {
 	   	   doTextArea(out, item, fieldName, dcElement, dcQualifier, 
-	     			  repeatable, fieldCountIncr, label);
+	     			  repeatable, fieldCountIncr, label, pageContext);
 
        } 
        else if (inputType.equals("dropdown")) 
@@ -829,12 +895,12 @@
        else if (inputType.equals("twobox")) 
        {
 	   		doTwoBox(out, item, fieldName, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label);
+	     			 repeatable, fieldCountIncr, label, pageContext);
        } 
        else 
        {
 	   		doOneBox(out, item, fieldName, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label);
+	     			 repeatable, fieldCountIncr, label, pageContext);
        }
 %>
 
@@ -863,14 +929,14 @@
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td>
-                        <input type=submit name="submit_prev" value="&lt; Previous">
+                        <input type=submit name="submit_prev" value="<fmt:message key="jsp.submit.edit-metadata.previous"/>">
                     </td>
                     <td>
-                        <input type=submit name="submit_next" value="Next &gt;">
+                        <input type=submit name="submit_next" value="<fmt:message key="jsp.submit.edit-metadata.next"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
-                        <input type=submit name="submit_cancel" value="Cancel/Save">
+                        <input type=submit name="submit_cancel" value="<fmt:message key="jsp.submit.edit-metadata.cancelsave"/>">
                     </td>
                 </tr>
             </table>
