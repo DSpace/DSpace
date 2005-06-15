@@ -91,7 +91,7 @@
         <%-- <P>Uploaded file: <code><%= si.bitstream.getName() %></code> (<%= si.bitstream.getSize() %> bytes)</P> --%>
 		<P><fmt:message key="jsp.submit.get-file-format.info1">
             <fmt:param><%= si.bitstream.getName() %></fmt:param>
-            <fmt:param><%= si.bitstream.getSize() %></fmt:param>
+            <fmt:param><%= String.valueOf(si.bitstream.getSize()) %></fmt:param>
         </fmt:message></P>
 
 <%
