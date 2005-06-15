@@ -356,6 +356,33 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 
 .submitProgressButton{ border: 0 }
 
+.submitProgressButtonDone{ border: 0;
+                           background-image: url(/image/submit/done.gif);
+                           background-position: center;
+                           height: 30px;
+                           width: 90px;
+                           font-size: 12pt;
+                           color: black;
+                           background-repeat: no-repeat; }
+
+.submitProgressButtonCurrent{ border: 0;
+                           background-image: url(/image/submit/current.gif);
+                           background-position: center;
+                           height: 30px;
+                           width: 90px;
+                           font-size: 12pt;
+                           color: white;
+                           background-repeat: no-repeat; }
+
+.submitProgressButtonNotDone{ border: 0;
+                           background-image: url(/image/submit/notdone.gif);
+                           background-position: center;
+                           height: 30px;
+                           width: 90px;
+                           font-size: 12pt;
+                           color: black;
+                           background-repeat: no-repeat; }
+
 .miscTable { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              font-size: 12pt;
              font-style: normal;

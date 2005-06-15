@@ -60,34 +60,23 @@
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
-    // These are the filename stubs for the images used for each step
-    String[] imageNames =
-    {
-        "select",
-        "describe",
-        "describe",	// all metadata edit steps mapped to this string
-        "upload",
-        "verify",
-        "license",
-        "license",
-        "complete"
-    };
-
     // Step names for ALT text in images
     String[] stepNames =
     {
-        "Select",
-        "Describe",
-        "Describe", // all metadata edit steps mapped to this string
-        "Upload",
-        "Verify",
-        "License",
-        "License",
-        "Complete"
+    	LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.progressbar.select"),
+    	LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.progressbar.describe"),
+    	LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.progressbar.describe"),
+    	LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.progressbar.upload"),
+    	LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.progressbar.verify"),
+    	LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.progressbar.license"),
+    	LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.progressbar.license"),
+    	LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.progressbar.complete")
     };
 
     int step = Integer.parseInt(request.getParameter("current_stage"));
@@ -142,14 +131,14 @@
         {
     %>
             <%-- HACK: border=0 for non-CSS compliant Netscape 4.x --%>
-            <td><input class="submitProgressButton" border=0 type=image name="submit_jump_<%= idx %>" src="<%= request.getContextPath() %>/image/submit/<%= step2Name(idx,imageNames) %>-done.gif" value=" <%= step2Name(idx,stepNames) %> (Done) - " alt=" <%= step2Name(idx,stepNames) %> (Done) - "></td>
+            <td><input class="submitProgressButtonDone" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
     <%
         }
         else
         {
             // User has reached final step, cannot jump back
     %>
-            <td><IMG SRC="<%= request.getContextPath() %>/image/submit/<%= step2Name(idx,imageNames) %>-done.gif" ALT=" <%= step2Name(idx,stepNames) %> (Done) - "></td>
+            <td><input class="submitProgressButtonDone" disabled="yes" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
     <%
         }
         // skip unused metadata edit steps
@@ -168,7 +157,7 @@
     if (step > 0)
     {
 %>
-            <td><IMG SRC="<%= request.getContextPath() %>/image/submit/<%= step2Name(step,imageNames) %>-current.gif" ALT=" <%= step2Name(step,stepNames) %> (Current) - "></td>
+            <td><input class="submitProgressButtonCurrent" disabled="yes" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
 <%
     }
     
@@ -197,14 +186,14 @@
             // Stage has been previously accessed, so user may jump to it
 %>
 <%-- HACK: border=0 for non-CSS compliant Netscape 4.x --%>
-            <td><input class="submitProgressButton" border=0 type=image name="submit_jump_<%= idx %>" src="<%= request.getContextPath() %>/image/submit/<%= step2Name(idx,imageNames) %>-done.gif" value=" <%= step2Name(idx,stepNames) %> (Done) - " alt=" <%= step2Name(idx,stepNames) %> (Done) - "></td>
+            <td><input class="submitProgressButtonDone" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
 <%
         }
         else
         {
             // Stage hasn't been reached yet (can't be jumped to)
 %>
-            <td><IMG SRC="<%= request.getContextPath() %>/image/submit/<%= step2Name(idx,imageNames) %>-notdone.gif" ALT=" <%= step2Name(idx,stepNames) %> (Not Done) - "></td>
+				 <td><input class="submitProgressButtonNotDone" disabled="yes" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
 <%
         }
         // skip unused metadata edit steps
