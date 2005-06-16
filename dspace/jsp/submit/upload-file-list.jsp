@@ -58,9 +58,10 @@
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
     SubmissionInfo si =
@@ -70,7 +71,7 @@
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
 %>
 
-<dspace:layout locbar="off" navbar="off" title="Uploaded Files">
+<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
 
@@ -80,30 +81,37 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <H1>Submit: <%= (justUploaded ? "File Uploaded Successfully" : "Uploaded Files") %></H1>
+<%--        <h1>Submit: <%= (justUploaded ? "File Uploaded Successfully" : "Uploaded Files") %></h1> --%>
     
 <%
     if (justUploaded)
     {
 %>
-        <P><strong>Your file was successfully uploaded.</strong></P>
+		<h1><fmt:message key="jsp.submit.upload-file-list.heading1"/></h1>
+        <p><fmt:message key="jsp.submit.upload-file-list.info1"/></p>
+<%
+    }
+    else
+    {
+%>
+	    <h1><fmt:message key="jsp.submit.upload-file-list.heading2"/></h1>
 <%
     }
 %>
-        <P>The table below shows the files you have uploaded for this item. <dspace:popup page="/help/index.html#uploadedfile">(More Help...)</dspace:popup></P>
+        <p><fmt:message key="jsp.submit.upload-file-list.info2"/> <dspace:popup page="/help/index.html#uploadedfile"><fmt:message key="jsp.morehelp"/></dspace:popup></p>
         
         <table class="miscTable" align=center>
             <tr>
-		<th class="oddRowEvenCol">Primary<br>bitstream</th>
-                <th class="oddRowOddCol">File</th>
-                <th class="oddRowEvenCol">Size</th>
-                <th class="oddRowOddCol">Description</th>
-                <th class="oddRowEvenCol">File Format</th>
+		<th class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading1"/></th>
+                <th class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading2"/></th>
+                <th class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading3"/></th>
+                <th class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading4"/></th>
+                <th class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading5"/></th>
 <%
     if (showChecksums)
     {
 %>
-                <th class="oddRowOddCol">Checksum</th>
+                <th class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading6"/></th>
 <%
     }
     
@@ -133,16 +141,16 @@
     {
         BitstreamFormat format = bitstreams[i].getFormat();
         String description = bitstreams[i].getFormatDescription();
-        String supportLevel = "supported";
+        String supportLevel = LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.supportlevel1");
 
         if(format.getSupportLevel() == 1)
         {
-            supportLevel = "known";
+            supportLevel = LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.supportlevel2");
         }
 
         if(format.getSupportLevel() == 0)
         {
-            supportLevel = "unsupported";
+            supportLevel = LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.supportlevel3");
         }
 
         // Full param to dspace:popup must be single variable
@@ -157,17 +165,17 @@
 			   <%   }
 			      } %> >
 		</td>
-                <td class="<%= row %>RowOddCol"><A HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></A></td>
+                <td class="<%= row %>RowOddCol"><a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></a></td>
                 <td class="<%= row %>RowEvenCol"><%= bitstreams[i].getSize() %> bytes</td>
                 <td class="<%= row %>RowOddCol">
                     <%= (bitstreams[i].getDescription() == null || bitstreams[i].getDescription().equals("")
-                        ? "<em>None</em>"
+                        ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.empty1")
                         : bitstreams[i].getDescription()) %>
-                    <input type=submit name="submit_describe_<%= bitstreams[i].getID() %>" value="Change">
+                    <input type=submit name="submit_describe_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
                 </td>
                 <td class="<%= row %>RowEvenCol">
                     <%= description %> <dspace:popup page="<%= supportLevelLink %>">(<%= supportLevel %>)</dspace:popup>
-                    <input type=submit name="submit_format_<%= bitstreams[i].getID() %>" value="Change">
+                    <input type=submit name="submit_format_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
                 </td>
 <%
         // Checksum
@@ -187,7 +195,7 @@
             String column = (showChecksums ? "Even" : "Odd");
 %>
                 <td class="<%= row %>Row<%= column %>Col">
-                    <input type=submit name="submit_remove_<%= bitstreams[i].getID() %>" value="Remove">
+                    <input type=submit name="submit_remove_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button2"/>">
                 </td>
 <%
         }
@@ -201,7 +209,7 @@
 
 <%-- HACK:  Need a space - is there a nicer way to do this than <BR> or a --%>
 <%--        blank <P>? --%>
-        <BR>
+        <br>
 
 <%-- Show information about how to verify correct upload, but not in workflow
      mode! --%>
@@ -209,30 +217,28 @@
     if (!SubmitServlet.isWorkflow(si))
     {
 %>
-        <P class="uploadHelp">You can verify that the file(s) have been uploaded correctly by:</P>
-        <UL class="uploadHelp">
-            <LI class="uploadHelp">Clicking on the filenames above.  This will download the file in a
-            new browser window, so that you can check the contents.</LI>
+        <p class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info3"/></p>
+        <ul class="uploadHelp">
+            <li class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info4"/></li>
 <%
         if (showChecksums)
         {
 %>
-            <LI class="uploadHelp">Comparing checksums displayed above with checksums worked out on
-            your local computer.  They should be exactly the same.
-            <dspace:popup page="/help/index.html#checksum">Click here to find out how to do this.</dspace:popup></LI>
+            <li class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info5"/>
+            <dspace:popup page="/help/index.html#checksum"><fmt:message key="jsp.submit.upload-file-list.help1"/></dspace:popup></li>
 <%
         }
         else
         {
 %>
-            <LI class="uploadHelp">The system can calculate a checksum you can verify.
-            <dspace:popup page="/help/index.html#checksum">Click here for more information.</dspace:popup> <input type=submit name=submit_show_checksums value="Show checksums"></LI>
+            <li class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info6"/>
+            <dspace:popup page="/help/index.html#checksum"><fmt:message key="jsp.submit.upload-file-list.help2"/></dspace:popup> <input type=submit name=submit_show_checksums value="<fmt:message key="jsp.submit.upload-file-list.button3"/>"></li>
 <%
         }
 %>
-        </UL>
+        </ul>
 
-        <BR>
+        <br>
 <%
     }
 %>    
@@ -248,7 +254,7 @@
     if (!SubmitServlet.isWorkflow(si))
     {
 %>
-            <p><input type=submit name=submit_more value="Add Another File"></p>
+            <p><input type=submit name=submit_more value="<fmt:message key="jsp.submit.upload-file-list.button4"/>"></p>
 <%
     }
 %>
@@ -256,14 +262,14 @@
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td>
-                        <input type=submit name=submit_prev value="&lt; Previous">
+                        <input type=submit name=submit_prev value="<fmt:message key="jsp.submit.upload-file-list.button5"/>">
                     </td>
                     <td>
-                        <input type=submit name=submit_next value="Next &gt;">
+                        <input type=submit name=submit_next value="<fmt:message key="jsp.submit.upload-file-list.button6"/>">
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align=right>
-                        <input type=submit name=submit_cancel value="Cancel/Save">
+                        <input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.upload-file-list.button7"/>">
                     </td>
                 </tr>
             </table>
