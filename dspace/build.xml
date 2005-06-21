@@ -106,7 +106,9 @@ Common usage:
     <mkdir dir="build/classes"/>
     <javac srcdir="src"
            destdir="build/classes"
-           debug="on">
+           debug="on"
+    	       source="1.4"
+  	       target="1.4">
       <include name="**/*.java"/>
       <classpath refid="build.class.path"/>
     </javac>
