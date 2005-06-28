@@ -1,5 +1,8 @@
 1.3 beta
 ========
+(Claudia Jürgen)
+- SF Patch #1226958 XHTML compliance of Messages_en.properties
+
 (Larry Stone)
 - SF Patch #1216889 typo in invalid-id.jsp
 
