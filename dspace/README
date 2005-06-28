@@ -1,9 +1,6 @@
-DSpace Version 1.3 alpha, 12-April-2005
+DSpace Version 1.3 beta, 28-June-2005
 
-Installation instructions are included in the 'dspace-docs' download,
-available from:
-
-http://sourceforge.net/projects/dspace/
+Installation instructions are included in this release package.
 
 A beta version of this documentation is also packaged with this release.
 
@@ -15,9 +12,6 @@ http://dspace.org/technology/system-docs/
 Installation instructions for other version may be different, so you
 are encouraged to obtain the corresponding documentation package from
 SourceForge, or to download the latest documentation snapshot from CVS
-or:
-
-http://dspace.sourceforge.net/doc-snapshots/
 
 Please also read the KNOWN_BUGS file.
 
