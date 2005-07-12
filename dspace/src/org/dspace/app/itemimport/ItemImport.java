@@ -978,7 +978,8 @@ public class ItemImport
                     String bundleName = line.substring(markerIndex
                             + bundleMarker.length());
                     String bitstreamName = line.substring(0, markerIndex);
-
+                    bitstreamName = bitstreamName.trim();
+                    
                     processContentFileEntry(c, i, path, bitstreamName,
                             bundleName);
                     System.out.println("\tBitstream: " + bitstreamName
