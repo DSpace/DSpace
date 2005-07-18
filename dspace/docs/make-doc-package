@@ -1,0 +1,36 @@
+#!/bin/sh
+
+USAGE="$0 cvs-tag version"
+
+# Just in case you need to 'socksify' etc
+CVS_COMMAND="cvs"
+
+# Check args
+if [ "$#" != "2" ]; then
+        echo $USAGE
+        exit 1
+fi
+
+FILENAME="dspace-$2-docs"
+
+
+mkdir tmp
+cd tmp
+
+echo "Checking out docs..."
+$CVS_COMMAND -q export -r $1 docs
+
+# Remove stuff not to include in ZIP
+rm -f docs/.cvsignore
+rm -rf docs/originals
+rm -f docs/make-doc-package
+
+echo "Creating ZIP..."
+mv docs $FILENAME
+zip -9 -r ../$FILENAME.zip $FILENAME
+
+echo "Cleaning up..."
+cd ..
+rm -rf tmp
+
+echo "Package created as $FILENAME.zip"

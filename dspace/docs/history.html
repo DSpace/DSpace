@@ -1,0 +1,535 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+  <title>DSpace System Documentation: Version History</title>
+  <link rel="StyleSheet" href="style.css" type="text/css">
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+</head>
+<body>
+<h1>DSpace System Documentation: Version History</h1>
+<p><a href="index.html">Back to contents</a></p>
+
+<h2><a name="version1_3">Changes in DSpace 1.3beta1</a></h2>
+
+<h3>General Improvements</h3>
+
+<ul>
+   <li>Initial i18n Support for JSPs - Note: the implementation of this feature required changes to almost all JSP pages</li>
+</ul>
+
+<h3>Bug fixes</h3>
+<ul>
+   <li>Set the content type in the HTTP header</li>
+   <li>Fix issue where EPerson edit would not work due to form indexing (partial fix)</li>
+</ul>
+
+<h2><a name="version1_3">Changes in DSpace 1.2.2</a></h2>
+
+<H3>General Improvements</h3>
+
+<ul>
+    <li>LDAP authentication support</li>
+    <li>Log file analysis and report generation</li>
+    <li>Item licence viewing</li>
+    <li>Supervision order/collaborative workspace administrative tools</li>
+    <li>Basic workspace for submissions in progress, with support for supervion</li>
+    <li>SRB storage system option</li>
+    <li>Updated handle server system</li>
+</ul>
+
+<h3>Bug fixes</h3>
+<ul>
+    <li>POST handling in HTMLServlet</li>
+    <li>Missing ContentType directives added to some JSPs</li>
+    <li>Name dependency on Collection Admin and Submitter groups fixed</li>
+    <li>Improved OAI-PMH XML encoding~</li>
+</ul>
+
+<H3><A NAME="jsp-changes-1_2_1-1_3">Changes in JSPs (since 1.2.1)</A></H3>
+
+<ul>
+<li><code>collection-home.jsp</code> <em>changed</em></li>
+<li><code>community-home.jsp</code> <em>changed</em></li>
+<li><code>community-list.jsp</code> <em>changed</em></li>
+<li><code>display-item.jsp</code> <em>changed</em></li>
+<li><code>home.jsp</code> <em>changed</em></li>
+<li><code>styles.css.jsp</code> <em>changed</em></li>
+<li><code>components/ldap-form.jsp</code> <em>is new</em></li>
+<li><code>dspace-admin/eperson-edit.jsp</code> <em>changed</em></li>
+<li><code>dspace-admin/list-formats.jsp</code> <em>changed</em></li>
+<li><code>dspace-admin/supervise-confirm-remove.jsp</code> <em>is new</em></li>
+<li><code>dspace-admin/supervise-duplicate.jsp</code> <em>is new</em></li>
+<li><code>dspace-admin/supervise-link.jsp</code> <em>is new</em></li>
+<li><code>dspace-admin/supervise-list.jsp</code> <em>is new</em></li>
+<li><code>dspace-admin/supervise-main.jsp</code> <em>is new</em></li>
+<li><code>dspace-admin/wizard-questions.jsp</code> <em>changed</em></li>
+<li><code>error/404.jsp</code> <em>changed</em></li>
+<li><code>layout/footer-default.jsp</code> <em>changed</em></li>
+<li><code>layout/header-default.jsp</code> <em>changed</em></li>
+<li><code>layout/location-bar.jsp</code> <em>changed</em></li>
+<li><code>layout/navbar-admin.jsp</code> <em>changed</em></li>
+<li><code>layout/navbar-default.jsp</code> <em>changed</em></li>
+<li><code>login/ldap-incorrect.jsp</code> <em>is new</em></li>
+<li><code>login/ldap.jsp</code> <em>is new</em></li>
+<li><code>mydspace/main.jsp</code> <em>changed</em></li>
+<li><code>register/edit-profile.jsp</code> <em>changed</em></li>
+<li><code>register/new-ldap-user.jsp</code> <em>is new</em></li>
+<li><code>register/registration-form.jsp</code> <em>changed</em></li>
+<li><code>search/results.jsp</code> <em>changed</em></li>
+<li><code>statistics/no-report.jsp</code> <em>is new</em></li>
+<li><code>statistics/report.jsp</code> <em>is new</em></li>
+<li><code>submit/cancel.jsp</code> <em>changed</em></li>
+<li><code>submit/change-file-description.jsp</code> <em>changed</em></li>
+<li><code>submit/choose-file.jsp</code> <em>changed</em></li>
+<li><code>submit/complete.jsp</code> <em>changed</em></li>
+<li><code>submit/creative-commons.jsp</code> <em>changed</em></li>
+<li><code>submit/edit-metadata-1.jsp</code> <em>is removed</em></li>
+<li><code>submit/edit-metadata-2.jsp</code> <em>is removed</em></li>
+<li><code>submit/edit-metadata.jsp</code> <em>is new</em></li>
+<li><code>submit/get-file-format.jsp</code> <em>changed</em></li>
+<li><code>submit/initial-questions.jsp</code> <em>changed</em></li>
+<li><code>submit/progressbar.jsp</code> <em>changed</em></li>
+<li><code>submit/review.jsp</code> <em>changed</em></li>
+<li><code>submit/select-collection.jsp</code> <em>changed</em></li>
+<li><code>submit/show-license.jsp</code> <em>changed</em></li>
+<li><code>submit/show-uploaded-file.jsp</code> <em>changed</em></li>
+<li><code>submit/upload-error.jsp</code> <em>changed</em></li>
+<li><code>submit/upload-file-list.jsp</code> <em>changed</em></li>
+<li><code>workspace/ws-error.jsp</code> <em>is new</em></li>
+<li><code>workspace/ws-main.jsp</code> <em>is new</em></li>
+<li><code>workspace/wsv-error.jsp</code> <em>is new</em></li>
+</ul>
+
+<h2><a name="version1_2_2">Changes in DSpace 1.2.2</a></h2>
+
+<H3>General Improvements</h3>
+
+<ul>
+  <li>Customisable submission forms added</li>
+  <li>Configurable number of index terms in Lucene for full-text indexing</li>
+  <li>Improved scalability in media filter</li>
+  <li>Submit button on collection pages only appears if user has authorisation</li>
+  <li>PostgreSQL 8.0 compatibility</li>
+  <li>Search scope retention to improve browsing</li>
+  <li>Community and collection strengths displayed</li>
+  <li>Upgraded OAICat software</li>
+</ul>
+
+<h3>Bug fixes</h3>
+<ul>
+  <li>Fix for Oracle too many cursors problem.</li>
+  <li>Fix for UTF-8 encoded searches in advanced search.</li>
+  <li>Fix for handling "\" in bitstream names.</li>
+  <li>Fix to prevent delete of "unknown" bitstream format</li>
+  <li>Fix for ItemImport creating new handles for replaced items</li>
+</ul>
+
+<H3><A NAME="jsp-changes-1_2_1-1_2_2">Changes in JSPs</A></H3>
+
+<ul>
+<li><code>collection-home.jsp</code> <em>changed</em></li>
+<li><code>community-home.jsp</code> <em>changed</em></li> 
+<li><code>community-list.jsp</code> <em>changed</em></li> 
+<li><code>home.jsp</code> <em>changed</em></li> 
+<li><code>dspace-admin/list-formats.jsp</code> <em>changed</em></li> 
+<li><code>dspace-admin/wizard-questions.jsp</code> <em>changed</em></li> 
+<li><code>search/results.jsp</code> <em>changed</em></li> 
+<li><code>submit/cancel.jsp</code> <em>changed</em></li>
+<li><code>submit/change-file-description.jsp</code> <em>changed</em></li>
+<li><code>submit/choose-file.jsp</code> <em>changed</em></li>
+<li><code>submit/complete.jsp</code> <em>changed</em></li>
+<li><code>submit/creative-commons.jsp</code> <em>changed</em></li>
+<li><code>submit/edit-metadata.jsp</code> <em>new</em></li>
+<li><code>submit/get-file-format.jsp</code> <em>changed</em></li>
+<li><code>submit/initial-questions.jsp</code> <em>changed</em></li>
+<li><code>submit/progressbar.jsp</code> <em>changed</em></li>
+<li><code>submit/review.jsp</code> <em>changed</em></li>
+<li><code>submit/select-collection.jsp</code> <em>changed</em></li>
+<li><code>submit/show-license.jsp</code> <em>changed</em></li>
+<li><code>submit/show-uploaded-file.jsp</code> <em>changed</em></li>
+<li><code>submit/upload-error.jsp</code> <em>changed</em></li>
+<li><code>submit/upload-file-list.jsp</code> <em>changed</em></li>
+</ul>
+
+<h2><a name="version1_2_1">Changes in DSpace 1.2.1</a></h2>
+
+
+<H3>General Improvements</h3>
+
+<ul>
+  <li>Oracle support added</li>
+  <li>Thumbnails in item view can now be switched off/on</li>
+  <li>Browse and search thumbnail options</li>
+  <li>Improved item importer
+      <ul>
+        <li> can now import to multiple collections</li>
+        <li> added --test flag to simulate an import, without actually making any changes </li>
+        <li> added --resume flag to try to resume the import in case the import is aborted</li>
+      </ul>
+  </li>
+  <li>Configurable fields for the search index</li>
+  <li>Script for transferring items between DSpace instances</li>
+  <li>Sun library JARs (JavaMail, Java Activation Framework and Servlet) now included in DSpace source code bundle</li>
+</ul>
+
+<h3>Bug fixes</h3>
+<ul>
+  <li>A logo to existing collection can now be added. Fixes SF bug #1065933</li>
+  <li>The community logo can now be edited. Fixes SF bug #1035692</li>
+  <li>MediaFilterManager doesn't 'touch' every item every time. Fixes SF bug #1015296 </li>
+  <li>Supported formats help page, set the format support level to "known" as default</li>
+  <LI>Fixed various database connection pool leaks</LI>
+
+</ul>
+
+<H3><A NAME="jsp-changes-1_2-1_2_1">Changed JSPs</A></H3>
+
+<UL>
+<li><code>collection-home</code> <em>changed</em></li>
+<li><code>community-home</code> <em>changed</em></li>
+<li><code>display-item</code> <em>changed</em></li>
+<li><code>dspace-admin/confirm-delete-collection</code> <em>moved to tools/ and changed</em></li>
+<li><code>dspace-admin/confirm-delete-community</code> <em>moved to tools/ and changed</em></li>
+<li><code>dspace-admin/edit-collection</code> <em>moved to tools/ and changed</em></li>
+<li><code>dspace-admin/edit-community</code> <em>moved to tools/ and changed</em></li>
+<li><code>dspace-admin/index</code> <em>changed </em></li>
+<li><code>dspace-admin/upload-logo</code> <em>changed </em></li>
+<li><code>dspace-admin/wizard-basicinfo</code> <em>changed </em></li>
+<li><code>dspace-admin/wizard-default-item</code> <em>changed </em></li>
+<li><code>dspace-admin/wizard-permissions</code> <em>changed </em></li>
+<li><code>dspace-admin/wizard-questions</code> <em>changed </em></li>
+<li><code>help/formats.html</code> <em>removed</em></li>
+<li><code>help/formats</code> <em>changed</em></li>
+<li><code>index</code> <em>changed</em></li>
+<li><code>layout/navbar-admin</code> <em>changed</em></li>
+</UL>
+
+
+<h2><a name="version1_2">Changes in DSpace 1.2</a></h2>
+
+<H3>General Improvments</h3>
+
+<ul>
+  <li>Communities can now contain sub-communities</li>
+  <li>Items may be included in more than one collection</li>
+  <li>Full text extraction and searching for MS Word, PDF, HTML, text
+documents</li>
+  <li>Thumbnails displayed in item view for items that contain images</li>
+  <li>Configurable MediaFilter tool creates both extracted text and
+thumbnails</li>
+  <li>Bitstream IDs are now persistent - generated from item's handle
+and a sequence number</li>
+  <li>Creative Commons licenses can optionally be added to items
+ during web submission process</li>
+</ul>
+
+<H3>Administration</H3>
+<ul>
+  <li>If you are logged in as administrator, you see admin buttons on
+item, collection, and community pages</li>
+  <li>New collection administration wizard</li>
+  <li>Can now administer collection's submitters from collection admin
+tool</li>
+  <li>Delegated administration - new 'collection editor' role - edits
+item metadata, manages submitters list, edits collection metadata, links
+to items from other collections, and can withdraw items</li>
+  <li>Admin UI moved from /admin to /dspace-admin to avoid conflict
+with Tomcat /admin JSPs</li>
+  <li>New EPerson selector popup makes Group editing much easier</li>
+  <li>'News' section is now editable using admin UI (no more mucking
+with JSPs)</li>
+</ul>
+
+<H3>Import/Export/OAI</H3>
+
+<ul>
+  <li>New tool that exports DSpace content in AIPs that use METS XML
+for metadata (incomplete)</li>
+  <li>OAI - sets are now collections, identified by Handles ('safe'
+with /, : converted to _)</li>
+  <li>OAI - contributor.author now mapped to oai_dc:creator</li>
+</ul>
+
+<H3>Miscellaneous</H3>
+<ul>
+  <li>Build process streamlined with use of WAR files, symbolic links
+no longer used, friendlier to later versions of Tomcat</li>
+  <li>MIT-specific aspects of UI removed to avoid confusion</li>
+  <li>Item metadata now rendered to avoid interpreting as HTML
+(displays as entered)</li>
+  <li>Forms now have no-cache directive to avoid trouble with browser
+'back' button</li>
+  <li>Bundles now have 'names' for more structure in item's content</li>
+</ul>
+<div id="jsp-file-changes">
+<h3><a name="jsp-file-changes">JSP file changes between 1.1 and 1.2</a></h3>
+<p>This list generated with <code>cvs -Q rdiff -s -r dspace-1_1 dspace</code>
+and a sprinkling of perl.</p>
+<ul>
+<li>Changed: dspace/jsp/collection-home.jsp </li>
+<li>Changed: dspace/jsp/community-home.jsp </li>
+<li>Changed: dspace/jsp/community-list.jsp </li>
+<li>Changed: dspace/jsp/display-item.jsp </li>
+<li>Changed: dspace/jsp/index.jsp </li>
+<li>Changed: dspace/jsp/home.jsp </li>
+<li>Changed: dspace/jsp/styles.css.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-advanced.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-collection-edit.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-community-edit.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-item-edit.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-main.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-policy-edit.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/collection-select.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/community-select.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-collection.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-community.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-dctype.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-eperson.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-format.jsp </li>
+<li>Moved to dspace/jsp/tools: dspace/jsp/admin/confirm-delete-item.jsp </li>
+<li>Moved to dspace/jsp/tools: dspace/jsp/admin/confirm-withdraw-item.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/edit-collection.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/edit-community.jsp </li>
+<li>Moved to dspace/jsp/tools and changed: dspace/jsp/admin/edit-item-form.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/eperson-browse.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/eperson-confirm-delete.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/eperson-edit.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/eperson-main.jsp </li>
+<li>Moved to dspace/jsp/tools and changed: dspace/jsp/admin/get-item-id.jsp </li>
+<li>Moved to dspace/jsp/tools and changed: dspace/jsp/admin/group-edit.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/group-eperson-select.jsp </li>
+<li>Moved to dspace/jsp/tools and changed: dspace/jsp/admin/group-list.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/index.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/item-select.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/list-communities.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/list-dc-types.jsp </li>
+<li>Removed: dspace/jsp/admin/list-epeople.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/list-formats.jsp </li>
+<li>Moved to dspace/jsp/tools: dspace/jsp/admin/upload-bitstream.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/upload-logo.jsp </li>
+<li>Moved to dspace-admin: dspace/jsp/admin/workflow-abort-confirm.jsp </li>
+<li>Moved to dspace-admin and changed: dspace/jsp/admin/workflow-list.jsp </li>
+<li>Changed: dspace/jsp/browse/authors.jsp </li>
+<li>Changed: dspace/jsp/browse/items-by-author.jsp </li>
+<li>Changed: dspace/jsp/browse/items-by-date.jsp </li>
+<li>Changed: dspace/jsp/browse/no-results.jsp </li>
+<li>New: dspace-admin/eperson-deletion-error.jsp </li>
+<li>New: dspace/jsp/dspace-admin/news-edit.jsp </li>
+<li>New: dspace/jsp/dspace-admin/news-main.jsp </li>
+<li>New: dspace/jsp/dspace-admin/wizard-basicinfo.jsp </li>
+<li>New: dspace/jsp/dspace-admin/wizard-default-item.jsp </li>
+<li>New: dspace/jsp/dspace-admin/wizard-permissions.jsp </li>
+<li>New: dspace/jsp/dspace-admin/wizard-questions.jsp </li>
+<li>Changed: dspace/jsp/components/contact-info.jsp </li>
+<li>Changed: dspace/jsp/error/internal.jsp </li>
+<li>New: dspace/jsp/help/formats.jsp </li>
+<li>Changed: dspace/jsp/layout/footer-default.jsp </li>
+<li>Changed: dspace/jsp/layout/header-default.jsp </li>
+<li>Changed: dspace/jsp/layout/navbar-admin.jsp </li>
+<li>Changed: dspace/jsp/layout/navbar-default.jsp </li>
+<li>Changed: dspace/jsp/login/password.jsp </li>
+<li>Changed: dspace/jsp/mydspace/main.jsp </li>
+<li>Changed: dspace/jsp/mydspace/perform-task.jsp </li>
+<li>Changed: dspace/jsp/mydspace/preview-task.jsp </li>
+<li>Changed: dspace/jsp/mydspace/reject-reason.jsp </li>
+<li>Changed: dspace/jsp/mydspace/remove-item.jsp </li>
+<li>Changed: dspace/jsp/register/edit-profile.jsp </li>
+<li>Changed: dspace/jsp/register/inactive-account.jsp </li>
+<li>Changed: dspace/jsp/register/new-password.jsp </li>
+<li>Changed: dspace/jsp/register/registration-form.jsp </li>
+<li>Changed: dspace/jsp/search/advanced.jsp </li>
+<li>Changed: dspace/jsp/search/results.jsp </li>
+<li>Changed: dspace/jsp/submit/cancel.jsp </li>
+<li>New: dspace/jsp/submit/cc-license.jsp </li>
+<li>Changed: dspace/jsp/submit/choose-file.jsp </li>
+<li>New: dspace/jsp/submit/creative-commons.css </li>
+<li>New: dspace/jsp/submit/creative-commons.jsp </li>
+<li>Changed: dspace/jsp/submit/edit-metadata-1.jsp </li>
+<li>Changed: dspace/jsp/submit/edit-metadata-2.jsp </li>
+<li>Changed: dspace/jsp/submit/get-file-format.jsp </li>
+<li>Changed: dspace/jsp/submit/initial-questions.jsp </li>
+<li>Changed: dspace/jsp/submit/progressbar.jsp </li>
+<li>Changed: dspace/jsp/submit/review.jsp </li>
+<li>Changed: dspace/jsp/submit/select-collection.jsp </li>
+<li>Changed: dspace/jsp/submit/show-license.jsp </li>
+<li>Changed: dspace/jsp/submit/show-uploaded-file.jsp </li>
+<li>Changed: dspace/jsp/submit/upload-error.jsp </li>
+<li>Changed: dspace/jsp/submit/upload-file-list.jsp </li>
+<li>Changed: dspace/jsp/submit/verify-prune.jsp </li>
+<li>New: dspace/jsp/tools/edit-item-form.jsp </li>
+<li>New: dspace/jsp/tools/eperson-list.jsp </li>
+<li>New: dspace/jsp/tools/itemmap-browse.jsp </li>
+<li>New: dspace/jsp/tools/itemmap-info.jsp </li>
+<li>New: dspace/jsp/tools/itemmap-main.jsp </li>
+
+</ul>
+</div>
+<div id="java-file-changes">
+<h3><a name="java-file-changes">Java file changes between 1.1 and 1.2</a></h3>
+<p>This list generated with <code>cvs -Q rdiff -s -r dspace-1_1 dspace</code>
+and a sprinkling of perl.</p>
+<ul>
+  <li>New: dspace/src/org/dspace/administer/CommunityFiliator.java </li>
+<li>Changed: dspace/src/org/dspace/administer/CreateAdministrator.java </li>
+<li>Changed: dspace/src/org/dspace/administer/DCType.java </li>
+<li>New: dspace/src/org/dspace/administer/Upgrade11To12.java </li>
+<li>Changed: dspace/src/org/dspace/app/itemexport/ItemExport.java </li>
+<li>Changed: dspace/src/org/dspace/app/itemimport/ItemImport.java </li>
+<li>New: dspace/src/org/dspace/app/mediafilter/HTMLFilter.java </li>
+<li>New: dspace/src/org/dspace/app/mediafilter/JPEGFilter.java </li>
+<li>New: dspace/src/org/dspace/app/mediafilter/MediaFilter.java </li>
+<li>New: dspace/src/org/dspace/app/mediafilter/MediaFilterManager.java </li>
+<li>New: dspace/src/org/dspace/app/mediafilter/PDFFilter.java </li>
+<li>New: dspace/src/org/dspace/app/mediafilter/WordFilter.java </li>
+<li>New: dspace/src/org/dspace/app/mets/METSExport.java </li>
+<li>Changed: dspace/src/org/dspace/app/oai/DSpaceOAICatalog.java </li>
+<li>Changed: dspace/src/org/dspace/app/oai/DSpaceRecordFactory.java </li>
+<li>Changed: dspace/src/org/dspace/app/oai/OAIDCCrosswalk.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/filter/AdminOnlyFilter.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/filter/RegisteredOnlyFilter.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/jsptag/IncludeTag.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/jsptag/ItemListTag.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/jsptag/ItemTag.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/jsptag/LayoutTag.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/jsptag/PopupTag.java </li>
+<li>New: dspace/src/org/dspace/app/webui/jsptag/SelectEPersonTag.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/AdvancedSearchServlet.java </li>
+<li>New: dspace/src/org/dspace/app/webui/servlet/BitstreamServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/CommunityListServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/HandleServlet.java </li>
+<li>New: dspace/src/org/dspace/app/webui/servlet/HTMLServlet.java </li>
+<li>New: dspace/src/org/dspace/app/webui/servlet/LoadDSpaceConfig.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/RegisterServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/SimpleSearchServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/SubmitServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/AuthorizeAdminServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/BitstreamFormatRegistry.java </li>
+<li>New: dspace/src/org/dspace/app/webui/servlet/admin/CollectionWizardServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/DCTypeRegistryServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/EditCommunitiesServlet.java </li>
+<li>Removed: dspace/src/org/dspace/app/webui/servlet/admin/EditEPersonServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/EditItemServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/EPersonAdminServlet.java </li>
+<li>New: dspace/src/org/dspace/app/webui/servlet/admin/EPersonListServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/GroupEditServlet.java </li>
+<li>New: dspace/src/org/dspace/app/webui/servlet/admin/ItemMapServlet.java </li>
+<li>New: dspace/src/org/dspace/app/webui/servlet/admin/NewsEditServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/WorkflowAbortServlet.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/util/Authenticate.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/util/FileUploadRequest.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/util/JSPManager.java </li>
+<li>Changed: dspace/src/org/dspace/app/webui/util/UIUtil.java </li>
+<li>Changed: dspace/src/org/dspace/authorize/AuthorizeManager.java </li>
+<li>Changed: dspace/src/org/dspace/authorize/FixDefaultPolicies.java </li>
+<li>Changed: dspace/src/org/dspace/authorize/PolicySet.java </li>
+<li>Changed: dspace/src/org/dspace/authorize/ResourcePolicy.java </li>
+<li>Changed: dspace/src/org/dspace/browse/Browse.java </li>
+<li>Changed: dspace/src/org/dspace/content/Bitstream.java </li>
+<li>Changed: dspace/src/org/dspace/content/Bundle.java </li>
+<li>Changed: dspace/src/org/dspace/content/Collection.java </li>
+<li>Changed: dspace/src/org/dspace/content/Community.java </li>
+<li>Changed: dspace/src/org/dspace/content/DSpaceObject.java </li>
+<li>Changed: dspace/src/org/dspace/content/InProgressSubmission.java </li>
+<li>Changed: dspace/src/org/dspace/content/InstallItem.java </li>
+<li>Changed: dspace/src/org/dspace/content/Item.java </li>
+<li>Changed: dspace/src/org/dspace/content/WorkspaceItem.java </li>
+<li>Changed: dspace/src/org/dspace/core/ConfigurationManager.java </li>
+<li>Changed: dspace/src/org/dspace/core/Constants.java </li>
+<li>Changed: dspace/src/org/dspace/core/Utils.java </li>
+<li>Changed: dspace/src/org/dspace/eperson/EPerson.java </li>
+<li>New: dspace/src/org/dspace/eperson/EPersonDeletionException.java </li>
+<li>Changed: dspace/src/org/dspace/eperson/Group.java </li>
+<li>New: dspace/src/org/dspace/license/CreativeCommons.java </li>
+<li>Changed: dspace/src/org/dspace/search/DSIndexer.java </li>
+<li>Changed: dspace/src/org/dspace/search/DSQuery.java </li>
+<li>Changed: dspace/src/org/dspace/search/Harvest.java </li>
+<li>Changed: dspace/src/org/dspace/search/HarvestedItemInfo.java </li>
+<li>Changed: dspace/src/org/dspace/search/QueryArgs.java </li>
+<li>Changed: dspace/src/org/dspace/search/QueryResults.java </li>
+<li>Changed: dspace/src/org/dspace/storage/rdbms/DatabaseManager.java </li>
+<li>Changed: dspace/src/org/dspace/storage/rdbms/TableRow.java </li>
+<li>Changed: dspace/src/org/dspace/workflow/WorkflowItem.java </li>
+<li>Changed: dspace/src/org/dspace/workflow/WorkflowManager.java </li>
+</ul>
+</div>
+<h2><a name="version1_1_1">Changes in DSpace 1.1.1</a></h2>
+<h3>Bug fixes</h3>
+<ul>
+  <li>non-administrators can now submit again</li>
+  <li>installations now preserve file creation dates, eliminating
+confusion with    upgrades</li>
+  <li>authorization editing pages no longer create null entries in
+database, and no longer handles them poorly (no longer gives blank page
+instead of displaying policies.)</li>
+  <li>registration page Invalid token error page now displayed when an
+invalid token is received (as opposed to internal server error.) Fixes
+SF bug #739999</li>
+  <li>eperson admin 'recent submission' links fixed for DSpaces
+deployed somewhere other than at / (e.g. /dspace).</li>
+  <li>help pages Link to help pages now includes servlet context (e.g.
+'/dspace'). Fixes SF bug #738399.</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+  <li><code>bin/dspace-info.pl</code> now checks jsp and asset store
+files for zero-length files</li>
+  <li><code>make-release-package</code> now works with SourceForge CVS</li>
+  <li>eperson editor now doesn't display the spurious text 'null'</li>
+  <li>item exporter now uses Jakarta's cli command line arg parser
+(much cleaner)</li>
+  <li>item importer improvements:
+    <ul>
+      <li>now uses Jakarta's cli command line arg parser (much cleaner)</li>
+      <li>imported items can now be routed through a workflow</li>
+      <li>more validation and error messages before import</li>
+      <li>can now use email addresses and handles instead of just
+database IDs</li>
+      <li>can import an item to a collection with the workflow
+suppressed</li>
+    </ul>
+  </li>
+</ul>
+<h2><a name="version1_1">Changes in DSpace 1.1</a></h2>
+<ul>
+  <li>Fixed various OAI-related bugs; DSpace's OAI support should now
+be correct.  Note that harvesting is now based on the new Item 'last
+modified' date (as opposed to the Dublin Core <code>date.available</code>
+date.)</li>
+  <li>Fixed Handle support--DSpace now responds to naming authority
+requests  correctly.</li>
+  <li>Multiple bitstream stores can now be specified; this allows
+DSpace storage to span several disks, and so there is no longer a hard
+limit on storage.</li>
+  <li>Search improvements:
+    <ul>
+      <li>New fielded searching UI</li>
+      <li>Search results are now paged</li>
+      <li>Abstracts are indexed</li>
+      <li>Better use of Lucene API; should stop the number of open file
+handles getting large</li>
+    </ul>
+  </li>
+  <li>Submission UI improvements:
+    <ul>
+      <li>now insists on a title being specified</li>
+      <li>fixed navigation on file upload page</li>
+      <li>citation &amp; identifier fields for previously published
+submissions now    fixed</li>
+    </ul>
+  </li>
+  <li>Many Unicode fixes to the database and Web user interface</li>
+  <li>Collections can now be deleted</li>
+  <li>Bitstream descriptions (if available) displayed on item display
+page</li>
+  <li>Modified a couple of servlets to handle invalid parameters better
+(i.e. to report a suitable error message instead of an internal server
+error)</li>
+  <li>Item templates now work</li>
+  <li>Fixed registration token expiration problem (they no longer
+expire.)</li>
+</ul>
+<hr>
+<address> Copyright &copy; 2002-2004 MIT and Hewlett Packard </address>
+</body>
+</html>
