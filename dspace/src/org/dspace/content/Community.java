@@ -934,29 +934,21 @@ public class Community extends DSpaceObject
      *
      * @return  total items
      */
-    public int countItems()
-        throws SQLException
-    {
-        /** item count in a collection */
-        int collitems = 0;
-
-        /** item count in a community */
-        int commitems = 0;
-
+    public int countItems() throws SQLException
+    {       
+    	int total = 0;
+    	// add collection counts
         Collection[] cols = getCollections();
-
-        if ( cols.length > 0 )
+        for ( int i = 0; i < cols.length; i++)
         {
-            for (int j = 0; j < cols.length; j++)
-            {
-                // Get total items of a collection
-                collitems = cols[j].countItems();
-
-                commitems += collitems;
-
-            }
+        	total += cols[i].countItems();
         }
-
-        return commitems;
+        // add sub-community counts
+        Community[] comms = getSubcommunities();
+        for ( int j = 0; j < comms.length; j++ )
+        {
+        	total += comms[j].countItems();
+        }
+        return total;
     }
 }
