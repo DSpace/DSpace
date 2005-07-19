@@ -438,6 +438,9 @@ public class ItemExport
                         {
                             FileOutputStream fos = new FileOutputStream(fout);
                             Utils.bufferedCopy(is, fos);
+                            // close streams
+                            is.close();
+                            fos.close();
 
                             // write the manifest file entry
                             if (b.isRegisteredBitstream()) {
