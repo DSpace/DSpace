@@ -41,6 +41,7 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.LinkedList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -97,11 +98,21 @@ public class ItemMapServlet extends DSpaceServlet
         {
             action = "";
         }
+	
+	// Defined non-empty value shows that 'Cancel' has been pressed
+	String cancel = request.getParameter("cancel");
 
-        if (action.equals(""))
+	if (cancel == null)
+	{
+		cancel = "";
+	}
+
+        if (action.equals("") || !cancel.equals(""))
         {
             // get with no action parameter set means to put up the main page
             // which is statistics and some command buttons to add/remove items
+	    //
+	    // also holds for interruption by pressing 'Cancel'
             int count_native = 0; // # of items owned by this collection
             int count_import = 0; // # of virtual items
             Map myItems = new HashMap(); // # for the browser
@@ -245,12 +256,13 @@ public class ItemMapServlet extends DSpaceServlet
         {
             // get item IDs to remove
             String[] itemIDs = request.getParameterValues("item_ids");
-            String message = "";
+            String message = "remove";
+	    LinkedList removedItems = new LinkedList();
 
             for (int j = 0; j < itemIDs.length; j++)
             {
                 int i = Integer.parseInt(itemIDs[j]);
-                message += ("<br>Remove item " + i);
+		removedItems.add(itemIDs[j]);
 
                 Item myItem = Item.find(context, i);
 
@@ -263,6 +275,7 @@ public class ItemMapServlet extends DSpaceServlet
 
             request.setAttribute("message", message);
             request.setAttribute("collection", myCollection);
+	    request.setAttribute("processedItems", removedItems);
 
             // show this page when we're done
             jspPage = "itemmap-info.jsp";
@@ -274,11 +287,13 @@ public class ItemMapServlet extends DSpaceServlet
         {
             // get item IDs to add
             String[] itemIDs = request.getParameterValues("item_ids");
-            String message = "";
+            String message = "added";
+	    LinkedList addedItems = new LinkedList();
+	    
 
             if (itemIDs == null)
             {
-                message = "No items selected, none added.";
+                message = "none-selected";
             }
             else
             {
@@ -295,7 +310,7 @@ public class ItemMapServlet extends DSpaceServlet
                         if (!myItem.isOwningCollection(myCollection))
                         {
                             myCollection.addItem(myItem);
-                            message += ("<br>Added item " + i);
+			    addedItems.add(itemIDs[j]);
                         }
                     }
                 }
@@ -303,6 +318,7 @@ public class ItemMapServlet extends DSpaceServlet
 
             request.setAttribute("message", message);
             request.setAttribute("collection", myCollection);
+	    request.setAttribute("processedItems", addedItems);
 
             // show this page when we're done
             jspPage = "itemmap-info.jsp";
@@ -345,8 +361,7 @@ public class ItemMapServlet extends DSpaceServlet
             }
 
             request.setAttribute("collection", myCollection);
-            request.setAttribute("browsetext", "Items matching author '"
-                    + myQuery + "'");
+            request.setAttribute("browsetext", myQuery);
             request.setAttribute("items", items);
             request.setAttribute("browsetype", new String("Add"));
 

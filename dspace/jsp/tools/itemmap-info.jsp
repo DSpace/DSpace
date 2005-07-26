@@ -55,20 +55,43 @@
 <%@ page import="java.net.URLEncoder"            %>
 <%@ page import="java.util.Iterator"             %>
 <%@ page import="java.util.Map"                  %>
+<%@ page import="java.util.LinkedList"           %>
 <%@ page import="org.dspace.content.Collection"  %>
 <%@ page import="org.dspace.content.Item"        %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%
     Collection collection = (Collection)request.getAttribute("collection");
-    String message        = (String)request.getAttribute("message");
+    
+    // supported values: "none-selected", "added", "remove"
+    String message        = (String)request.getAttribute("message");    
+    
+    LinkedList processedItems = (LinkedList)request.getAttribute("processedItems");
 %>
 
 <dspace:layout titlekey="jsp.tools.itemmap-info.title">
 
     <h2><fmt:message key="jsp.tools.itemmap-info.heading"/></h2>
 
-    <p><%=message%></p>
+    <p>
+    <% if (message.equals("none-selected")) { %>
+        <fmt:message key="jsp.tools.itemmap-info.msg.none-selected" />
+    <% } else if (message.equals("added")) { %>
+            <%-- Iterate through processed items --%>
+            <% for (int i=0; i<processedItems.size(); i++) { %>
+                    <fmt:message key="jsp.tools.itemmap-info.msg.added">
+                            <fmt:param><%= (String)processedItems.get(i) %></fmt:param>
+                    </fmt:message><br/>
+            <% } %>
+    <% } else if (message.equals("remove")) { %>
+            <%-- Iterate through processed items --%>
+            <% for (int i=0; i<processedItems.size(); i++) { %>
+                    <fmt:message key="jsp.tools.itemmap-info.msg.remove">
+                            <fmt:param><%= (String)processedItems.get(i) %></fmt:param>
+                    </fmt:message><br/>
+            <% } %>
+    <% } %>
+    </p>
     
     <form method=POST>
         <input type="hidden" name="cid" value="<%=collection.getID()%>">

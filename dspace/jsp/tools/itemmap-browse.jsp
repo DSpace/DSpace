@@ -68,25 +68,39 @@
     Map collections        = (Map)request.getAttribute("collections");
     String browsetext      = (String)request.getAttribute("browsetext");
     Boolean showcollection = new Boolean(false);
-    String browsetype      = (String)request.getAttribute("browsetype");
+    String browsetype      = (String)request.getAttribute("browsetype");    // Only "Add" and "Remove" are handled properly
 %>
 
 <dspace:layout titlekey="jsp.tools.itemmap-browse.title">
 
     <%-- <h2>Browse <%=browsetext%></h2> --%>
-    <h2><fmt:message key="jsp.tools.itemmap-browse.heading">
-        <fmt:param><%= eperson.getEmail() %></fmt:param>
-    </fmt:message></h2>
+    <h2>
+        <% if (browsetype.equals("Add")) { %>
+            <fmt:message key="jsp.tools.itemmap-browse.heading-authors">
+                <fmt:param><%= browsetext %></fmt:param>
+            </fmt:message>
+        <% } else if (browsetype.equals("Remove")) { %>
+            <fmt:message key="jsp.tools.itemmap-browse.heading-collection">
+                <fmt:param><%= browsetext %></fmt:param>
+            </fmt:message>
+        <% } %>
+    </h2>
 
     <%-- <p>Check the box next to items you wish to add or remove, and choose 'add' or 'remove'.</p> --%>
     <p><fmt:message key="jsp.tools.itemmap-browse.infomsg"/></p>
-    <form method=POST action="<%= request.getContextPath() %>/tools/itemmap">
-        <input type="hidden" name="cid" value="<%=collection.getID()%>">
+    <form method="POST" action="<%= request.getContextPath() %>/tools/itemmap">
+        <input type="hidden" name="cid" value="<%=collection.getID()%>" />
 
         <table>     
           <tr>
-            <td><input type="submit" name="action" value="<%=browsetype%>"></td>
-            <td><input type="submit" name="submit" value=""><fmt:message key="jsp.tools.general.cancel"/></td>
+            <td><input type="hidden" name="action" value="<%=browsetype%>" />
+                <% if (browsetype.equals("Add")) { %>
+                        <input type="submit" value="<fmt:message key="jsp.tools.general.add"/>" />
+                <% } else if (browsetype.equals("Remove")) { %>
+                        <input type="submit" value="<fmt:message key="jsp.tools.general.remove"/>" />
+                <% } %>
+            </td>
+            <td><input type="submit" name="cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" /></td>
           </tr>
         </table>
 
@@ -99,9 +113,14 @@
             <% if(showcollection.booleanValue()) { %>
                 <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.itemmap-browse.th.action"/></strong></th>
                 <th class="oddRowOddCol"> <fmt:message key="jsp.tools.itemmap-browse.th.remove"/> </th>
-            <% } else { %>     
-                <th class="oddRowEvenCol"><input type=submit name="action"
-                value="<%=browsetype%>"</th>
+            <% } else { %>
+                <th class="oddRowEvenCol">
+                <% if (browsetype.equals("Add")) { %>
+                        <input type="submit" value="<fmt:message key="jsp.tools.general.add"/>" />
+                <% } else if (browsetype.equals("Remove")) { %>
+                        <input type="submit" value="<fmt:message key="jsp.tools.general.remove"/>" />
+                <% } %>
+                </th>
             <% } %>     
         </tr>
 <%
@@ -129,8 +148,8 @@
 
 <% } else { %>
 
-        <td class="<%= row %>RowEvenCol"><input type=checkbox name="item_ids"
-        value="<%=item.getID()%>">
+        <td class="<%= row %>RowEvenCol"><input type="checkbox" name="item_ids"
+        value="<%=item.getID()%>" /></td>
 
 <% }
 
@@ -143,8 +162,14 @@
 
         <table>     
           <tr>
-            <td><input type="submit" name="action" value="<%=browsetype%>"></td>
-            <td><input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.cancel"/>"></td>
+            <td>
+                <% if (browsetype.equals("Add")) { %>
+                        <input type="submit" value="<fmt:message key="jsp.tools.general.add"/>" />
+                <% } else if (browsetype.equals("Remove")) { %>
+                        <input type="submit" value="<fmt:message key="jsp.tools.general.remove"/>" />
+                <% } %>
+            </td>
+            <td><input type="submit" name="cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" /></td>
           </tr>
         </table>
 
