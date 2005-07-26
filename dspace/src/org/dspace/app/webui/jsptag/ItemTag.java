@@ -209,7 +209,7 @@ public class ItemTag extends TagSupport
                     LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemTag.title"),
                     LocaleSupport.getLocalizedMessage(pageContext,
-                            "org.dspace.app.webui.jsptag.ItemTag.title.untitled ") });
+                            "org.dspace.app.webui.jsptag.ItemTag.title.untitled") });
         }
         else
         {
