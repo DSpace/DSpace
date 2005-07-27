@@ -357,7 +357,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 .submitProgressButton{ border: 0 }
 
 .submitProgressButtonDone{ border: 0;
-                           background-image: url(/image/submit/done.gif);
+                           background-image: url(<%= imageUrl %>/submit/done.gif);
                            background-position: center;
                            height: 30px;
                            width: 90px;
@@ -366,7 +366,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                            background-repeat: no-repeat; }
 
 .submitProgressButtonCurrent{ border: 0;
-                           background-image: url(/image/submit/current.gif);
+                           background-image: url(<%= imageUrl %>/submit/current.gif);
                            background-position: center;
                            height: 30px;
                            width: 90px;
@@ -375,7 +375,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                            background-repeat: no-repeat; }
 
 .submitProgressButtonNotDone{ border: 0;
-                           background-image: url(/image/submit/notdone.gif);
+                           background-image: url(<%= imageUrl %>/submit/notdone.gif);
                            background-position: center;
                            height: 30px;
                            width: 90px;
