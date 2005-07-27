@@ -6,6 +6,9 @@
 - Double quotes in metadata values are changed to HTML entities
 before adding to form.  Fixes bug SF #1238276.
 - Minor HTMLfixes to ws-main.jsp
+- Error reported when uploading zero-length files.  This is the only apparent
+way to tell when an invalid filename has been specified in the upload form.
+Fixes bug SF #1242548
 
 (Claudia Jürgen)
 - SF Patch #1226874 "null" in Introductory text of communities and collection

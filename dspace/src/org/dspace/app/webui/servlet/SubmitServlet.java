@@ -1018,7 +1018,7 @@ public class SubmitServlet extends DSpaceServlet
 
                 temp = wrapper.getFile("file");
 
-                if (temp != null)
+                if (temp != null && temp.length() > 0)
                 {
                     // Read the temp file into a bitstream
                     InputStream is = new BufferedInputStream(
