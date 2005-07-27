@@ -99,11 +99,10 @@
 		}
 %>
 
-    <strong><a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a></strong>
-    <br/><br/>
-    <fmt:message key="jsp.workspace.ws-main.submitmsg"/> 
-    <%= workspaceItem.getCollection().getMetadata("name") %>
-    <br/><br/>
+    <P><strong><a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a></strong></P>
+
+	<P><fmt:message key="jsp.workspace.ws-main.submitmsg"/> 
+    <%= workspaceItem.getCollection().getMetadata("name") %></P>
 
     <table class=miscTable align=center>
         <tr>
