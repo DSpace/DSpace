@@ -86,6 +86,11 @@
         {
             side = "";
         }
+        
+		if (intro == null)
+		{
+			intro = "";
+		}
 
         logo = community.getLogo();
     }

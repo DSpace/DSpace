@@ -107,6 +107,11 @@
         {
             side = "";
         }
+        
+		if (intro == null)
+		{
+			intro = "";
+		}
 
         if (provenance == null)
         {
