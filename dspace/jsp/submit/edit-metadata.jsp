@@ -140,7 +140,7 @@
          sb.append("<td><input type=text name=\"")
            .append(last.toString())
            .append("\" size=23 value=\"")
-           .append(dpn.getLastName())
+           .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
 	   .append("\"></td>\n<td><input type=text name=\"")
 	   .append(first.toString())
            .append("\" size=23 value=\"")
@@ -325,14 +325,14 @@
          if (repeatable)
            sb.append("_").append(i);
          sb.append("\" size=23 value=\"")
-           .append(sn.getSeries())
+           .append(sn.getSeries().replaceAll("\"", "&quot;"))
 	   .append("\"></td>\n<td><input type=text name=\"")
 	   .append(fieldName)
 	   .append("_number");
          if (repeatable)
            sb.append("_").append(i);
          sb.append("\" size=23 value=\"")
-           .append(sn.getNumber())
+           .append(sn.getNumber().replaceAll("\"", "&quot;"))
 	   .append("\"></td>\n");
 
 	 if (repeatable && i < defaults.length) 
@@ -459,7 +459,7 @@
 	    sb.append("<tr><td>&nbsp;</td>");
 
          if (i < defaults.length)
-           val = defaults[i].value;
+           val = defaults[i].value.replaceAll("\"", "&quot;");
          else
            val = "";
 
@@ -547,7 +547,7 @@
              .append(fieldName)
              .append("_").append(i)
              .append("\" size=\"15\" value=\"")
-             .append(defaults[i].value)
+             .append(defaults[i].value.replaceAll("\"", "&quot;"))
 	     .append("\">&nbsp;<input type=submit name=\"submit_")
 	     .append(fieldName)
 	     .append("_remove_")
@@ -569,7 +569,7 @@
              .append(fieldName)
              .append("_").append(i)
              .append("\" size=\"15\" value=\"")
-             .append(defaults[i].value)
+             .append(defaults[i].value.replaceAll("\"", "&quot;"))
 	     .append("\">&nbsp;<input type=submit name=\"submit_")
 	     .append(fieldName)
 	     .append("_remove_")
@@ -678,7 +678,7 @@
          if (repeatable)
            sb.append("_").append(j);
          sb.append("\" size=34 value=\"")
-           .append(currentVal)
+           .append(currentVal.replaceAll("\"", "&quot;"))
 	   .append("\"></td>\n");
 
 	 if (repeatable && j < defaults.length) 
