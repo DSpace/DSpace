@@ -842,9 +842,21 @@ public class Browse
             return totalInIndex;
         }
 
-        PreparedStatement statement = createSql(scope, itemValue, true, true);
-
-        return getIntValue(statement);
+        PreparedStatement statement = null;
+        try {
+        	statement = createSql(scope, itemValue, true, true);
+        	return getIntValue(statement);
+        }
+        finally {
+        	if(statement != null) {
+        		try {
+        			statement.close();
+        		}
+        		catch(SQLException e) {
+        			log.error("Problem releasing statement", e);
+        		}
+        	}
+        }
     }
 
     private static int getPosition(int total, int matches, int beforeFocus)
