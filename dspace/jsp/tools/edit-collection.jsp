@@ -55,8 +55,10 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.eperson.Group" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
     Collection collection = (Collection) request.getAttribute("collection");
@@ -131,20 +133,23 @@
     }
 %>
 
-<dspace:layout title="Edit Collection"
+<dspace:layout titlekey="jsp.tools.edit-collection.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
-               parenttitle="Administer"
+               parenttitlekey="jsp.administer"
                nocache="true">
 
 <%
     if (collection == null)
     {
 %>
-    <H1>Create Collection</H1>
+    <h1><fmt:message key="jsp.tools.edit-collection.heading1"/></h1>
 <% } else { %>
-    <H1>Edit Collection <%= collection.getHandle() %></H1>
+    <h1><fmt:message key="jsp.tools.edit-collection.heading2">
+        <fmt:param><%= collection.getHandle() %></fmt:param>
+        </fmt:message>
+    </h1>
     <% if(admin_button ) { %>
       <center>
         <table width="70%">
@@ -154,7 +159,7 @@
                 <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>">
                 <input type="hidden" name="community_id" value="<%= community.getID() %>">
                 <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
-                <input type="submit" name="submit" value="Delete this Collection...">
+                <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.button.delete"/>">
               </form>
             </td>
           </tr>
@@ -169,41 +174,41 @@
      Basic metadata
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Name:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label1"/></td>
                 <td><input type="text" name="name" value="<%= name %>" size=50></td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Short Description</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label2"/></td>
                 <td>
                     <input type="text" name="short_description" value="<%= shortDesc %>" size=50>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Introductory text (HTML):</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label3"/></td>
                 <td>
                     <textarea name="introductory_text" rows=6 cols=50><%= intro %></textarea>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Copyright text (plain text):</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label4"/></td>
                 <td>
                     <textarea name="copyright_text" rows=6 cols=50><%= copy %></textarea>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Side bar text (HTML):</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label5"/></td>
                 <td>
                     <textarea name="side_bar_text" rows=6 cols=50><%= side %></textarea>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">License:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label6"/></td>
                 <td>
                     <textarea name="license" rows=6 cols=50><%= license %></textarea>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Provenance:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label7"/></td>
                 <td>
                     <textarea name="provenance_description" rows=6 cols=50><%= provenance %></textarea>
                 </td>
@@ -212,7 +217,7 @@
      Logo
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Logo:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label8"/></td>
                 <td>
 <%  if (logo != null) { %>
                     <table>
@@ -221,31 +226,31 @@
                                 <img src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>">
                             </td>
                             <td>
-                                <input type="submit" name="submit_set_logo" value="Upload new logo..."><br><br>
-                                <input type="submit" name="submit_delete_logo" value="Delete (no logo)">
+                                <input type="submit" name="submit_set_logo" value="<fmt:message key="jsp.tools.edit-collection.form.button.add-logo"/>"><br><br>
+                                <input type="submit" name="submit_delete_logo" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete-logo"/>">
                             </td>
                         </tr>
                     </table>
 <%  } else { %>
-                    <input type="submit" name="submit_set_logo" value="Upload a logo...">
+                    <input type="submit" name="submit_set_logo" value="<fmt:message key="jsp.tools.edit-collection.form.button.set-logo"/>">
 <%  } %>
                 </td>
             </tr>
             
             <tr><td>&nbsp;</td></tr>
-            <tr><td colspan=2><center><h3>Submission Workflow</h3></center></td></tr>
+            <tr><td colspan=2><center><h3><fmt:message key="jsp.tools.edit-collection.form.label9"/></h3></center></td></tr>
 
 <% if(admin_button ) { %>
 <%-- ===========================================================
      Collection Submitters
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Submitters:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label10"/></td>
                 <td>
 <%  if (submitters == null) {%>
-                    <input type="submit" name="submit_submitters_create" value="Create...">
+                    <input type="submit" name="submit_submitters_create" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>">
 <%  } else { %>
-                    <input type="submit" name="submit_submitters_edit" value="Edit...">
+                    <input type="submit" name="submit_submitters_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>">
 <%  } %>                    
                 </td>
             </tr>   
@@ -254,16 +259,22 @@
      Workflow groups
      =========================================================== --%>
 <%
-    String[] roleTexts = {"Accept/Reject", "Accept/Reject/Edit Metadata", "Edit Metadata"};
+    String[] roleTexts =
+    {
+        	LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-collection.wf-role1"),
+        	LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-collection.wf-role2"),
+        	LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-collection.wf-role3")
+    };
+
     for (int i = 0; i<3; i++) { %>
             <tr>
-                <td class="submitFormLabel"><em><%= roleTexts[i] %></em> Step:</td>
+                <td class="submitFormLabel"><em><%= roleTexts[i] %></em> <fmt:message key="jsp.tools.edit-collection.form.label11"/></td>
                 <td>
 <%      if (wfGroups[i] == null) { %>
-                    <input type="submit" name="submit_wf_create_<%= i + 1 %>" value="Create...">
+                    <input type="submit" name="submit_wf_create_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>">
 <%      } else { %>
-                    <input type="submit" name="submit_wf_edit_<%= i + 1 %>" value="Edit...">
-                    <input type="submit" name="submit_wf_delete_<%= i + 1 %>" value="Delete">
+                    <input type="submit" name="submit_wf_edit_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>">
+                    <input type="submit" name="submit_wf_delete_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>">
 <%      } %>
                 </td>
             </tr>
@@ -275,12 +286,12 @@
      Collection Administrators
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Collection Administrators:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label12"/></td>
                 <td>
 <%  if (admins == null) {%>
-                    <input type="submit" name="submit_admins_create" value="Create...">
+                    <input type="submit" name="submit_admins_create" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>">
 <%  } else { %>
-                    <input type="submit" name="submit_admins_edit" value="Edit...">
+                    <input type="submit" name="submit_admins_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>">
 <%  } %>                    
                 </td>
             </tr>   
@@ -289,13 +300,13 @@
      Item template
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Item template:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label13"/></td>
                 <td>
 <%  if (template == null) {%>
-                    <input type="submit" name="submit_create_template" value="Create...">
+                    <input type="submit" name="submit_create_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>">
 <%  } else { %>
-                    <input type="submit" name="submit_edit_template" value="Edit...">
-                    <input type="submit" name="submit_delete_template" value="Delete">
+                    <input type="submit" name="submit_edit_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>">
+                    <input type="submit" name="submit_delete_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>">
 <%  } %>                    
                 </td>
             </tr>   
@@ -304,9 +315,9 @@
      Edit collection's policies
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Collection's Authorizations:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label14"/></td>
                 <td>
-                    <input type="submit" name="submit_authorization_edit" value="Edit...">
+                    <input type="submit" name="submit_authorization_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>">
                 </td>
             </tr>   
 <%  } %>
@@ -325,7 +336,7 @@
 %>
                         <input type="hidden" name="community_id" value="<%= community.getID() %>">
                         <input type="hidden" name="create" value="true">
-                        <input type="submit" name="submit" value="Create">
+                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.form.button.create2"/>">
 <%
     }
     else
@@ -334,7 +345,7 @@
                         <input type="hidden" name="community_id" value="<%= community.getID() %>">
                         <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
                         <input type="hidden" name="create" value="false">
-                        <input type="submit" name="submit" value="Update">
+                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.form.button.update"/>">
 <%
     }
 %>
@@ -342,7 +353,7 @@
                     <td>
                         <input type="hidden" name="community_id" value="<%= community.getID() %>">
                         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_EDIT_COLLECTION %>">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.edit-collection.form.button.cancel"/>">
                     </td>
                 </tr>
             </table>
