@@ -13,9 +13,7 @@
     <P>This section describes how to update a DSpace installation from one version to the next.  Details of the differences between the functionality of each version are given in the <A HREF="history.html">Version History</A> section.</P>
 
     <H2><A NAME="12_13">Updating From 1.2.x to 1.3</A></H2>
-    
-    FIXME: this is the start of the 1.3 update documentation
-    
+
     <P>In the notes below <code><i>[dspace]</i></code> refers to the install directory for your existing DSpace installation, and <code><i>[dspace-1.3-source]</i></code> to the source directory for DSpace 1.3. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
     <ol>
@@ -28,85 +26,12 @@
         <li><p>Install the new config files by moving <code>dstat.cfg</code> and <code>dstat.map</code> from <code>[dspace-1.3-source]/config/</code> to <code>[dspace]/config</code></p>
         <LI><P>You need to add new parameters to your <code><i>[dspace]/</i>dspace.cfg</code>:</P>
         <pre>
-##### SRB File Storage #####
-
-# The same 'assetstore.incoming' property is used to support the use of SRB 
-# (Storage Resource Broker - see http://www.sdsc.edu/srb/) as an _optional_ 
-# replacement of or supplement to conventional file storage. DSpace will work
-# with or without SRB and full backward compatibility is maintained.
-#
-# The 'assetstore.incoming' property is an integer that references where _new_
-# bitstreams will be stored.  The default (say the starting reference) is zero.
-# The value will be used to identify the storage where all new bitstreams will
-# be stored until this number is changed.  This number is stored in the 
-# Bitstream table (store_number column) in the DSpace database, so older 
-# bitstreams that may have been stored when 'asset.incoming' had a different 
-# value can be found.
-#
-# In the simple case in which DSpace uses local (or mounted) storage the
-# number can refer to different directories (or partitions).  This gives DSpace
-# some level of scalability.  The number links to another set of properties
-# 'assetstore.dir', 'assetstore.dir.1' (remember zero is default), 
-# 'assetstore.dir.2', etc., where the values are directories.
-#
-# To support the use of SRB DSpace uses this same scheme but broadened to 
-# support:
-# - using SRB instead of the local filesystem
-# - using the local filesystem (native DSpace)
-# - using a mix of SRB and local filesystem
-#
-# In this broadened use the 'asset.incoming' integer will refer one of the 
-# following storage locations
-# - a local filesystem directory (native DSpace)
-# - a set of SRB account parameters (host, port, zone, domain, username, 
-#	password, home directory, and resource)
-#
-# Should the be any conflict, like '2' refering to a local directory and 
-# to a set of SRB parameters, the program will select the local directory.
-#
-# If SRB is chosen from the first install of DSpace, it is suggested that
-# 'assetstore.dir' (no integer appended) be retained to reference a local
-# directory (as above under File Storage) because build.xml uses this value 
-# to do a mkdir. In this case, 'assetstore.incoming' can be set to 1 (i.e.
-# uncomment the line in File Storage above) and the 'assetstore.dir' will not 
-# be used.
-#
-# Here is an example set of SRB parameters:
-# Assetstore 1 - SRB
-#srb.host.1 = mysrbmcathost.myu.edu
-#srb.port.1 = 5544
-#srb.mcatzone.1 = mysrbzone
-#srb.mdasdomainname.1 = mysrbdomain
-#srb.defaultstorageresource.1 = mydefaultsrbresource
-#srb.username.1 = mysrbuser
-#srb.password.1 = mysrbpassword
-#srb.homedirectory.1 = /mysrbzone/home/mysrbuser.mysrbdomain
-#srb.parentdir.1 = mysrbdspaceassetstore
-#
-# Assetstore n, n+1, ...
-# Follow same pattern as for assetstores above (local or SRB)
-
-# Directory for history serializations
-history.dir = /dspace/history
-
-# Where to put search index files
-search.dir = /dspace/search
-# Higher values of search.max-clauses will enable prefix searches to work on large 
-# repositories
-#search.max-clauses=2048
-
-# Where to put the logs
-log.dir = /dspace/log
-
-# Where to temporarily store uploaded files
-upload.temp.dir = /dspace/upload
-
-# Maximum size of uploaded files in bytes, must be positive
-# 512Mb
-upload.max = 536870912
-
-
 ###### Statistical Report Configuration Settings ######
+
+# should the stats be publicly available?  should be set to false if you only
+# want administrators to access the stats, or you do not intend to generate
+# any
+report.public = false
 
 # directory where live reports are stored
 report.directory = /dspace/reports/
@@ -125,10 +50,10 @@ report.directory = /dspace/reports/
         <LI><P>Rebuild the search indices:</P>
             <p><code><i>[dspace]</i>/bin/index-all</code></p>
       <LI><P>Copy the <code>.war</code> Web application files in <code><i>[dspace-1.3-source]</i>/build</code> to the <code>webapps</code> sub-directory of your servlet container (e.g. Tomcat).  e.g.:</P>
-          <p><code>cp <i>[dspace-1.3-source]</i>/build/*.war <i>[tomcat]</i>/webapps</code></ps>
+          <p><code>cp <i>[dspace-1.3-source]</i>/build/*.war <i>[tomcat]</i>/webapps</code></p>
       <LI><P>Restart Tomcat.</P></LI>
     </ol>
-    
+
     <H2><A NAME="121_122">Updating From 1.2.1 to 1.2.2</A></H2>
 
      <P>The changes in 1.2.2 are only code and config changes so the update should be fairly simple.</P>
@@ -171,11 +96,11 @@ search.maxfieldlength = 10000
       <P>If you're using Tomcat, you need to delete the directories corresponding to the old <code>.war</code> files.  For example, if <code>dspace.war</code> is installed in <code><i>[tomcat]</i>/webapps/dspace.war</code>, you should delete the <code><i>[tomcat]</i>/webapps/dspace</code> directory.  Otherwise, Tomcat will continue to use the old code in that directory. </P></LI>
 
       <LI><P>To finialise the install of the new configurable submission forms you need to copy the file <code><em>[dspace-1.2.2-source]</em>/config/input-forms.xml</code> into <code><em>[dspace]</em>/config</code>. </P></LI>
-      
+
       <LI><P>Restart Tomcat.</P></LI>
     </OL>
-    
-    
+
+
     <H2><A NAME="12_121">Updating From 1.2 to 1.2.1</A></H2>
 
      <P>The changes in 1.2.1 are only code changes so the update should be fairly simple.</P>

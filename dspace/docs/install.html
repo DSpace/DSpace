@@ -27,13 +27,17 @@
       <li>
         <P><A HREF="http://www.postgresql.org/">PostgreSQL 7.3</A> or later, an open source relational database.</P>
 
-        <P>Be sure to compile with the following options to the '<code>configure</code>' script:</P>
+        <P>Unicode (specifically UTF-8) support must be enabled.  This is enabled by default in 8.0+.  For 7.<em>x</em>, be sure to compile with the following options to the '<code>configure</code>' script:</P>
 
         <PRE>--enable-multibyte --enable-unicode --with-java</PRE>
 
-        <P><A NAME="enabletcpip"></a>Once installed, you need to enable TCP/IP connections (DSpace uses JDBC).  Edit <code>postgresql.conf</code> (usually in <code>/usr/local/pgsql/data</code> or <code>/var/lib/pgsql/data</code>), and add this line:</P>
+        <P><A NAME="enabletcpip"></a>Once installed, you need to enable TCP/IP connections (DSpace uses JDBC).  For 7.<em>x</em>, edit <code>postgresql.conf</code> (usually in <code>/usr/local/pgsql/data</code> or <code>/var/lib/pgsql/data</code>), and add this line:</P>
 
         <PRE>tcpip_socket = true</PRE>
+
+        <P>For 8.0+, in <code>postgresql.conf</code> uncomment the line starting:</P>
+
+        <PRE>listen_addresses = 'localhost'</PRE>
 
         <P>Then tighten up security a bit by editing <code>pg_hba.conf</code> and adding this line:</P>
 
@@ -330,7 +334,7 @@ Also, make sure that the <code>db.username</code> and <code>db.password</code> p
     <HR>
 
     <ADDRESS>
-      Copyright &copy; 2002-2004 MIT and Hewlett Packard
+      Copyright &copy; 2002-2005 MIT and Hewlett Packard
     </ADDRESS>
   </BODY>
 </HTML>
