@@ -74,7 +74,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class Subscribe
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(Group.class);
+    private static Logger log = Logger.getLogger(Subscribe.class);
 
     /**
      * Subscribe an e-person to a collection. An e-mail will be sent every day a
@@ -237,7 +237,7 @@ public class Subscribe
      *            DSpace context object
      */
     public static void processDaily(Context context) throws SQLException,
-            MessagingException, IOException
+            IOException
     {
         // Grab the subscriptions
         TableRowIterator tri = DatabaseManager.query(context,
@@ -259,7 +259,17 @@ public class Subscribe
                 // New e-person. Send mail for previous e-person
                 if (currentEPerson != null)
                 {
-                    sendEmail(context, currentEPerson, collections);
+
+                    try
+                    {
+                        sendEmail(context, currentEPerson, collections);
+                    }
+                    catch (MessagingException me)
+                    {
+                        log.error("Failed to send subscription to eperson_id="
+                                + currentEPerson.getID());
+                        log.error(me);
+                    }
                 }
 
                 currentEPerson = EPerson.find(context, row
@@ -274,7 +284,16 @@ public class Subscribe
         // Process the last person
         if (currentEPerson != null)
         {
-            sendEmail(context, currentEPerson, collections);
+            try
+            {
+                sendEmail(context, currentEPerson, collections);
+            }
+            catch (MessagingException me)
+            {
+                log.error("Failed to send subscription to eperson_id="
+                        + currentEPerson.getID());
+                log.error(me);
+            }
         }
     }
 
@@ -401,12 +420,27 @@ public class Subscribe
      * @param argv
      *            command-line arguments, none used yet
      */
-    public static void main(String[] argv) throws Exception
+    public static void main(String[] argv) 
     {
-        Context context = new Context();
-        processDaily(context);
+        Context context = null;
 
-        // Nothing is actually written
-        context.abort();
+        try
+        {
+            context = new Context();
+            processDaily(context);
+            context.complete();
+        }
+        catch( Exception e )
+        {
+            log.fatal(e);
+        }
+        finally
+        {
+            if( context != null && context.isValid() )
+            {
+                // Nothing is actually written
+                context.abort();
+            }
+        }
     }
 }
