@@ -149,7 +149,7 @@ public class ItemListTag extends TagSupport
                 // Title - we just use the first one
                 DCValue[] titleArray = items[i].getDC("title", null, Item.ANY);
                 String title = LocaleSupport.getLocalizedMessage(pageContext,
-                                "org.dspace.app.webui.jsptag.ItemListTag.title.untitled");
+                                "jsp.general.untitled");
 
                 if (titleArray.length > 0)
                 {

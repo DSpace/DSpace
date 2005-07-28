@@ -609,7 +609,7 @@ public class HandleServlet extends DSpaceServlet
             if (titlesForThis.length == 0)
             {
                 // No title at all!
-                titles[i] = "Untitled";
+                titles[i] = null;
             }
             else
             {

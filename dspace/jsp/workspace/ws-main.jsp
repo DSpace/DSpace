@@ -94,7 +94,7 @@
 		else
 		{
 %>
-			<h2><fmt:message key="jsp.workspace.ws-main.untitled"/></h2>
+			<h2><fmt:message key="jsp.general.untitled"/></h2>
 <%
 		}
 %>

@@ -48,7 +48,7 @@
   -   collection     - Collection we're managing
   -   collections    - Map of Collections, keyed by collection_id
   -   browsetext     - text to display at the top
-
+  -   browsetype     - "Add" or "Remove"
   --%>
   
 <%@ page contentType="text/html;charset=UTF-8" %>

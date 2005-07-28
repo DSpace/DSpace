@@ -290,10 +290,14 @@
 <%
     for (int i = 0; i < lastSubmittedTitles.length; i++)
     {
+    	String displayTitle = (lastSubmittedTitles[i] == null
+    		? LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.untitled")
+    		: Utils.addEntities(lastSubmittedTitles[i]));
+    		
 %>
-    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i]%>"><%= Utils.addEntities(lastSubmittedTitles[i]) %></A></P>
+    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= displayTitle %></A></P>
 <%
-    }
+  }
 %>
     <%= sidebar %>
   </dspace:sidebar>

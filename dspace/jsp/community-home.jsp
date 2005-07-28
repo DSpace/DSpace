@@ -55,6 +55,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
@@ -324,8 +326,12 @@
 <%
     for (int i = 0; i < lastSubmittedTitles.length; i++)
     {
+    	String displayTitle = (lastSubmittedTitles[i] == null
+    		? LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.untitled")
+    		: Utils.addEntities(lastSubmittedTitles[i]));
+    		
 %>
-    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= Utils.addEntities(lastSubmittedTitles[i]) %></A></P>
+    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= displayTitle %></A></P>
 <%
   }
 %>

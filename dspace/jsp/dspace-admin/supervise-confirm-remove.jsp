@@ -98,7 +98,7 @@
 		else
 		{
 %>
-			<fmt:message key="jsp.dspace-admin.supervise-confirm-remove.untitled"/>
+			<fmt:message key="jsp.general.untitled"/>
 <%
 		}
 %>

@@ -167,9 +167,7 @@ public class EPersonAdminServlet extends DSpaceServlet
                 {
                     // not unique - send error message & let try again
                     request.setAttribute("eperson", e);
-                    request
-                            .setAttribute("error_message",
-                                    "That EMail is in use by another EPerson.  Emails  must be unique.");
+                    request.setAttribute("email_exists", new Boolean(true));
 
                     JSPManager.showJSP(request, response,
                             "/dspace-admin/eperson-edit.jsp");

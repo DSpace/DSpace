@@ -140,7 +140,7 @@
 		else
 		{
 %>
-			<fmt:message key="jsp.dspace-admin.supervise-list.untitled"/>
+			<fmt:message key="jsp.general.untitled"/>
 <%
 		}
 %>

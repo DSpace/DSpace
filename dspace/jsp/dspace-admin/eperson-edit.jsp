@@ -39,6 +39,9 @@
   -
   - Attributes:
   -   eperson - eperson to be edited
+  -   email_exists - if non-null, user has attempted to enter a duplicate email
+  -                  address, so an error should be displayed
+  -
   - Returns:
   -   submit_save   - admin wants to save edits
   -   submit_delete - admin wants to delete edits
@@ -70,8 +73,8 @@
     String firstName = eperson.getFirstName();
     String lastName  = eperson.getLastName();
     String phone     = eperson.getMetadata("phone");
-    String errorMessage  = (String)request.getAttribute("error_message");
     String netid = eperson.getNetid();
+    boolean emailExists = (request.getAttribute("email_exists") != null);
 
     boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
 %>
@@ -82,8 +85,6 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
-
-    <h1><%= (errorMessage==null ? "" : errorMessage) %></h1>
 
   <table width=95%>
     <tr>
@@ -98,6 +99,12 @@
       </td>
     </tr>
   </table>
+
+<% if (emailExists)
+	{ %><P><strong>
+	     <fmt:message key="jsp.dspace-admin.eperson-edit.emailexists"/>
+	   </strong></P>
+<%  } %>
 
     <form method=POST>
 
