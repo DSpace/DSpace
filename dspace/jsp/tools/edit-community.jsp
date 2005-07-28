@@ -54,6 +54,7 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
     Community community = (Community) request.getAttribute("community");
@@ -96,7 +97,11 @@
     }
 %>
 
-<dspace:layout title="Edit Community" navbar="admin" locbar="link" parentlink="/dspace-admin" parenttitle="Administer" nocache="true">
+<dspace:layout titlekey="jsp.tools.edit-community.title"
+		       navbar="admin"
+		       locbar="link"
+		       parentlink="/dspace-admin"
+		       parenttitlekey="jsp.administer" nocache="true">
 
   <table width=95%>
     <tr>
@@ -105,13 +110,16 @@
     if (community == null)
     {
 %>
-    <H1>Create Community</H1>
+    <h1><fmt:message key="jsp.tools.edit-community.heading1"/></h1>
 <%
     }
     else
     {
 %>
-    <H1>Edit Community <%= community.getHandle() %></H1>
+    <h1><fmt:message key="jsp.tools.edit-community.heading2">
+        <fmt:param><%= community.getHandle() %></fmt:param>
+        </fmt:message>
+    </h1>
     <% if(admin_button ) { %>
       <center>
         <table width="70%">
@@ -120,7 +128,7 @@
               <form method=POST>
                 <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COMMUNITY %>">
                 <input type="hidden" name="community_id" value="<%= community.getID() %>">
-                <input type="submit" name="submit" value="Delete this Community...">
+                <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-community.button.delete"/>">
               </form>
             </td>
           </tr>
@@ -132,7 +140,7 @@
 %>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#editcommunity">Help...</dspace:popup>
+        <dspace:popup page="/help/site-admin.html#editcommunity"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
@@ -143,29 +151,29 @@
      Basic metadata
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Name:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label1"/></td>
                 <td><input type="text" name="name" value="<%= name %>" size=50></td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Short Description</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label2"/></td>
                 <td>
                     <input type="text" name="short_description" value="<%= shortDesc %>" size=50>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Introductory text (HTML):</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label3"/></td>
                 <td>
                     <textarea name="introductory_text" rows=6 cols=50><%= intro %></textarea>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Copyright text (plain text):</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label4"/></td>
                 <td>
                     <textarea name="copyright_text" rows=6 cols=50><%= copy %></textarea>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Side bar text (HTML):</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label5"/></td>
                 <td>
                     <textarea name="side_bar_text" rows=6 cols=50><%= side %></textarea>
                 </td>
@@ -174,7 +182,7 @@
      Logo
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Logo:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label6"/></td>
                 <td>
 <%  if (logo != null) { %>
                     <table>
@@ -183,13 +191,13 @@
                                 <img src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>">
                             </td>
                             <td>
-                                <input type="submit" name="submit_set_logo" value="Upload new logo..."><br><br>
-                                <input type="submit" name="submit_delete_logo" value="Delete (no logo)">
+                                <input type="submit" name="submit_set_logo" value="<fmt:message key="jsp.tools.edit-community.form.button.add-logo"/>"><br><br>
+                                <input type="submit" name="submit_delete_logo" value="<fmt:message key="jsp.tools.edit-community.form.button.delete-logo"/>">
                             </td>
                         </tr>
                     </table>
 <%  } else { %>
-                    <input type="submit" name="submit_set_logo" value="Upload a logo...">
+                    <input type="submit" name="submit_set_logo" value="<fmt:message key="jsp.tools.edit-community.form.button.set-logo"/>">
 <%  } %>
                 </td>
             </tr>
@@ -198,9 +206,9 @@
      Edit community's policies
      =========================================================== --%>
             <tr>
-                <td class="submitFormLabel">Community's Authorizations:</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label7"/></td>
                 <td>
-                    <input type="submit" name="submit_authorization_edit" value="Edit...">
+                    <input type="submit" name="submit_authorization_edit" value="<fmt:message key="jsp.tools.edit-community.form.button.edit"/>">
                 </td>
             </tr>   
     <% } %>
@@ -221,12 +229,12 @@
 %>
                         <input type="hidden" name="parent_community_id" value="<%= parentID %>">
                         <input type="hidden" name="create" value="true">
-                        <input type="submit" name="submit" value="Create">
+                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-community.form.button.create"/>">
                     </td>
                     <td>
                         <input type="hidden" name="parent_community_id" value="<%= parentID %>">
                         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_EDIT_COMMUNITY %>">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.edit-community.form.button.cancel"/>">
 <%
     }
     else
@@ -234,12 +242,12 @@
 %>
                         <input type="hidden" name="community_id" value="<%= community.getID() %>">
                         <input type="hidden" name="create" value="false">
-                        <input type="submit" name="submit" value="Update">
+                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-community.form.button.update"/>">
                     </td>
                     <td>
                         <input type="hidden" name="community_id" value="<%= community.getID() %>">
                         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_EDIT_COMMUNITY %>">
-                        <input type="submit" name="submit_cancel" value="Cancel">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.edit-community.form.button.cancel"/>">
 <%
     }
 %>
