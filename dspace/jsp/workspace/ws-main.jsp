@@ -68,7 +68,10 @@
     EPerson submitter = workspaceItem.getItem().getSubmitter();
 %>
 
-<dspace:layout titlekey="jsp.workspace.ws-main.title">
+<dspace:layout locbar="link"
+               parentlink="/mydspace"
+               parenttitlekey="jsp.mydspace"
+               titlekey="jsp.workspace.ws-main.title">
 
     <table width="100%" border=0>
         <tr>

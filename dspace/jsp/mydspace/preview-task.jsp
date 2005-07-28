@@ -68,7 +68,7 @@
 
 <dspace:layout locbar="link"
                parentlink="/mydspace"
-               parenttitle="preview-task.parenttitle"
+               parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace.preview-task.title"
                nocache="true">
 
