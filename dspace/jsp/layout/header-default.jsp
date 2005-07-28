@@ -83,9 +83,9 @@
             <%-- DSpace logo --%>
             <tr>
                 <td>
-                    <A HREF="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="DSpace" width=198 height=79 border=0></A></td>
+                    <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width=198 height=79 border=0></a></td>
                     <td class="tagLine" width="99%" cellpadding=10> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
-                    <A class="tagLineText" target=_blank href="http://www.dspace.org/">About DSpace Software</A>
+                    <a class="tagLineText" target=_blank href="http://www.dspace.org/"><fmt:message key="jsp.layout.header-default.about"/></a>
                 </td>
                 <td nowrap valign=middle>
 

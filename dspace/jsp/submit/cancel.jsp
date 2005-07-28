@@ -76,7 +76,7 @@
 
 <dspace:layout locbar="off"
                navbar="off"
-               title="jsp.submit.cancel.title"
+               titlekey="jsp.submit.cancel.title"
                nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method=post>
@@ -87,13 +87,9 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <%-- <H1>Cancel or Save Submission</H1> --%>
-		<H1><fmt:message key="jsp.submit.cancel.title"/></H1>
+		<h1><fmt:message key="jsp.submit.cancel.title"/></h1>
 
-        <%-- <P>Do you want the half-finished submission removed, or do you want to keep
-        it so you can carry on working on it later?  You can also return to where
-        you where during the submission process if you clicked Cancel by accident.</P> --%>
-		<P><fmt:message key="jsp.submit.cancel.info"/></P>
+		<p><fmt:message key="jsp.submit.cancel.info"/></p>
     
         <%= SubmitServlet.getSubmissionParameters(si) %>
         <input type=hidden name=previous_step value=<%= step %>>
@@ -102,15 +98,12 @@
         <table align=center border=0 width=90%>
             <tr>
                 <td align=left>
-                    <%-- <input type=submit name="submit_back" value="Oops, continue submission"> --%>
 					<input type=submit name="submit_back" value="<fmt:message key="jsp.submit.cancel.continue.button"/>">
                 </td>
                 <td align=center>
-                    <%-- <input type=submit name="submit_remove" value="Remove the submission"> --%>
 					<input type=submit name="submit_remove" value="<fmt:message key="jsp.submit.cancel.remove.button"/>">
                 </td>
                 <td align=right>
-                    <%-- <input type=submit name="submit_keep" value="Save it, I'll work on it later"> --%>
 					<input type=submit name="submit_keep" value="<fmt:message key="jsp.submit.cancel.save.button"/>">
                 </td>
             </tr>
