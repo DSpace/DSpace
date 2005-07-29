@@ -25,25 +25,59 @@
       <li><P><A HREF="http://jakarta.apache.org/ant/index.html">Apache Ant 1.5</A> or later (Java make-like tool)</P></li>
 
       <li>
-        <P><A HREF="http://www.postgresql.org/">PostgreSQL 7.3</A> or later, an open source relational database.</P>
+        <P><A HREF="http://www.postgresql.org/">PostgreSQL 7.3</A> or later, an open source relational database, or <a href="http://www.oracle.com/database/">Oracle 9 or higher</A>.</P>
 
-        <P>Unicode (specifically UTF-8) support must be enabled.  This is enabled by default in 8.0+.  For 7.<em>x</em>, be sure to compile with the following options to the '<code>configure</code>' script:</P>
+        <UL>
+          <LI>
+            <P><strong>PostgreSQL</strong></P>
 
-        <PRE>--enable-multibyte --enable-unicode --with-java</PRE>
+            <P>Unicode (specifically UTF-8) support must be enabled.  This is enabled by default in 8.0+.  For 7.<em>x</em>, be sure to compile with the following options to the '<code>configure</code>' script:</P>
 
-        <P><A NAME="enabletcpip"></a>Once installed, you need to enable TCP/IP connections (DSpace uses JDBC).  For 7.<em>x</em>, edit <code>postgresql.conf</code> (usually in <code>/usr/local/pgsql/data</code> or <code>/var/lib/pgsql/data</code>), and add this line:</P>
+            <PRE>--enable-multibyte --enable-unicode --with-java</PRE>
 
-        <PRE>tcpip_socket = true</PRE>
+            <P><A NAME="enabletcpip"></a>Once installed, you need to enable TCP/IP connections (DSpace uses JDBC).  For 7.<em>x</em>, edit <code>postgresql.conf</code> (usually in <code>/usr/local/pgsql/data</code> or <code>/var/lib/pgsql/data</code>), and add this line:</P>
 
-        <P>For 8.0+, in <code>postgresql.conf</code> uncomment the line starting:</P>
+            <PRE>tcpip_socket = true</PRE>
 
-        <PRE>listen_addresses = 'localhost'</PRE>
+            <P>For 8.0+, in <code>postgresql.conf</code> uncomment the line starting:</P>
 
-        <P>Then tighten up security a bit by editing <code>pg_hba.conf</code> and adding this line:</P>
+            <PRE>listen_addresses = 'localhost'</PRE>
 
-        <PRE>host  dspace  dspace  127.0.0.1  255.255.255.255  md5</PRE>
+            <P>Then tighten up security a bit by editing <code>pg_hba.conf</code> and adding this line:</P>
 
-        <P>Then restart PostgreSQL.</P>
+            <PRE>host  dspace  dspace  127.0.0.1  255.255.255.255  md5</PRE>
+
+            <P>Then restart PostgreSQL.</P>
+          </LI>
+
+          <LI>
+            <P><strong>Oracle</strong></P>
+
+            <P>Copy the Oracle JDBC driver into <code><i>[dspace-source]</i>/lib</code>.</P>
+
+            <P>Create a database for DSpace.  Make sure that the character set is one of the Unicode character sets.  DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set.  Create a user account for DSpace (e.g. <code>dspace</code>,) and ensure that it has permissions to add and remove tables in the database.</P>
+
+            <P>Edit the config/dspace.cfg file in your source directory for the  following settings:</P>
+
+<PRE>db.name   = oracle
+db.url    = jdbc.oracle.thin:@//host:port/dspace
+db.driver = oracle.jdbc.OracleDriver</PRE>
+
+            <P>Go to <code><i>[dspace-source]</i>/etc/oracle</code> and copy the contents to their parent directory, overwriting the versions in the parent:
+
+<PRE>cd dspace_source/etc/oracle
+cp * ..</PRE>
+
+            <P>You now have Oracle-specific <code>.sql</code> files in your <code>etc</code> directory, and your dspace.cfg is modified to point to your Oracle database and are ready to continue with a normal DSpace install, skipping the Postgres setup steps.</P>
+
+            <P><STRONG>NOTE:</STRONG> DSpace uses sequences to generate unique object IDs - beware Oracle sequences, which are said to lose their values when doing a database export/import, say restoring from a backup.  Be sure to run the script <code>etc/update-sequences.sql</code>.</P>
+
+            <P><STRONG>ALSO NOTE:</STRONG> Everything is fully functional, although Oracle limits you to 4k of text in text fields such as item metadata or collection descriptions.</P>
+
+            <P>For people interested in switching from Postgres to Oracle, I know of no tools that would do this automatically.  You will need to recreate the community, collection, and eperson structure in the Oracle system, and then use the item export and import tools to move your content over.</P>
+          </LI>
+        </UL>
+
       </li>
 
       <li><P><A HREF="http://jakarta.apache.org/tomcat/">Jakarta Tomcat 4.x/5.x</A> or equivalent, such as <A HREF="http://www.mortbay.org/jetty/index.html">Jetty</A> or <A HREF="http://www.caucho.com/">Caucho Resin</A>.</P>
