@@ -99,7 +99,7 @@
 
     <table class="miscTable" align="center">
         <tr>
-            <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.group-list.id" />ID</strong></th>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.group-list.id" /></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Name</strong></th> --%>
 			<th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.group-list.name"/></strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
