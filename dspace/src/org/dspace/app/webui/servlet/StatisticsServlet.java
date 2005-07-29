@@ -129,7 +129,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         
         request.setAttribute("general", new Boolean(false));
         
-        File reportDir = new File(ConfigurationManager.getProperty("report.directory"));
+        File reportDir = new File(ConfigurationManager.getProperty("report.dir"));
         
         File[] reports = reportDir.listFiles();
         File reportFile = null;
