@@ -139,7 +139,7 @@ public class SupervisedItem extends WorkspaceItem
     /**
      * Gets all the groups that are supervising a particular workspace item
      * 
-     * @param context the context this object exists in
+     * @param c the context this object exists in
      * @param wi the ID of the workspace item
      *
      * @return the supervising groups in an array

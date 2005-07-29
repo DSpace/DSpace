@@ -348,13 +348,12 @@ public class Group extends DSpaceObject
     }
 
     /**
-     * finds all groups in the site
+     * Finds all groups in the site
      * 
-     * @param context
-     * @param sortField,
-     *            Group.ID or Group.NAME (default)
+     * @param context    DSpace context
+     * @param sortField  field to sort by -- Group.ID or Group.NAME
      * 
-     * @return Group []
+     * @return array of all groups in the site
      */
     public static Group[] findAll(Context context, int sortField)
             throws SQLException

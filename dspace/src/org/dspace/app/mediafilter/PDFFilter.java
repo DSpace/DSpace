@@ -55,12 +55,6 @@ import org.pdfbox.util.PDFTextStripper;
  */
 public class PDFFilter extends MediaFilter
 {
-    /**
-     * @param filename
-     *            string filename
-     * 
-     * @return string filtered filename
-     */
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".txt";

@@ -152,7 +152,7 @@ public class WorkspaceItem implements InProgressSubmission
      * Create a new workspace item, with a new ID. An Item is also created. The
      * submitter is the current user in the context.
      * 
-     * @param context
+     * @param c
      *            DSpace context object
      * @param coll
      *            Collection being submitted to

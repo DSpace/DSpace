@@ -319,7 +319,7 @@ public class ItemListTag extends TagSupport
     /**
      * Set the column to emphasise - "title", "date" or null
      * 
-     * @param emphcolumnIn
+     * @param emphColumnIn
      *            column to emphasise
      */
     public void setEmphcolumn(String emphColumnIn)

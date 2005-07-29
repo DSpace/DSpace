@@ -134,8 +134,8 @@ public class WorkflowManager
      * 
      * @param c
      *            Context
-     * @param pw
-     *            The PersonalWorkspace to convert to a workflow item
+     * @param wsi
+     *            The WorkspaceItem to convert to a workflow item
      * @return The resulting workflow item
      */
     public static WorkflowItem start(Context c, WorkspaceItem wsi)
@@ -928,7 +928,7 @@ public class WorkflowManager
     /**
      * get the title of the item in this workflow
      * 
-     * @param workflowitem
+     * @param wi  the workflow item object
      */
     public static String getItemTitle(WorkflowItem wi) throws SQLException
     {
@@ -949,7 +949,7 @@ public class WorkflowManager
     /**
      * get the name of the eperson who started this workflow
      * 
-     * @param workflowitem
+     * @param wi  the workflow item
      */
     public static String getSubmitterName(WorkflowItem wi) throws SQLException
     {

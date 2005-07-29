@@ -52,12 +52,6 @@ import org.textmining.text.extraction.WordExtractor;
  */
 public class WordFilter extends MediaFilter
 {
-    /**
-     * @param filename
-     *            string filename
-     * 
-     * @return string filtered filename
-     */
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".txt";

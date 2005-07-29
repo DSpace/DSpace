@@ -163,7 +163,7 @@ public class WorkflowItem implements InProgressSubmission
     /**
      * return all workflowitems
      * 
-     * @param context
+     * @param c  active context
      * @return WorkflowItem [] of all workflows in system
      */
     public static WorkflowItem[] findAll(Context c) throws SQLException
@@ -296,7 +296,7 @@ public class WorkflowItem implements InProgressSubmission
     /**
      * set owner of WorkflowItem
      * 
-     * @param EPerson
+     * @param ep
      *            owner
      */
     public void setOwner(EPerson ep)
@@ -326,8 +326,8 @@ public class WorkflowItem implements InProgressSubmission
     /**
      * Set state of WorkflowItem
      * 
-     * @param new
-     *            state
+     * @param newstate
+     *            new state (from <code>WorkflowManager</code>)
      */
     public void setState(int newstate)
     {

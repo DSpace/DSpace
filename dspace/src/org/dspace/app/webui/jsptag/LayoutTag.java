@@ -470,7 +470,7 @@ public class LayoutTag extends TagSupport
     /**
      * set parent title key (from message dictionary)
      * 
-     * @param parentTitlekey The parentTitleKey to set.
+     * @param parentTitleKey The parentTitleKey to set.
      */
     public void setParenttitlekey(String parentTitleKey)
     {

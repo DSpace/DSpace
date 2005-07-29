@@ -53,12 +53,7 @@ import javax.swing.text.html.HTMLEditorKit;
  */
 public class HTMLFilter extends MediaFilter
 {
-    /**
-     * @param filename
-     *            string filename
-     * 
-     * @return string filtered filename
-     */
+
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".txt";

@@ -186,7 +186,7 @@ public class ResourcePolicy
      * If the policy refers to a single resource, this is the ID of that
      * resource.
      * 
-     * @param resource_id
+     * @param myid   id of resource (database primary key)
      */
     public void setResourceID(int myid)
     {
@@ -221,7 +221,7 @@ public class ResourcePolicy
     /**
      * set the action this policy authorizes
      * 
-     * @param id
+     * @param myid  action ID from <code>org.dspace.core.Constants</code>
      */
     public void setAction(int myid)
     {
@@ -229,7 +229,7 @@ public class ResourcePolicy
     }
 
     /**
-     * @return get EPersonID, or -1 if EPerson not set
+     * @return eperson ID, or -1 if EPerson not set
      */
     public int getEPersonID()
     {
@@ -256,7 +256,7 @@ public class ResourcePolicy
     /**
      * assign an EPerson to this policy
      * 
-     * @param EPerson
+     * @param e EPerson
      */
     public void setEPerson(EPerson e)
     {
@@ -302,7 +302,7 @@ public class ResourcePolicy
     /**
      * set Group for this policy
      * 
-     * @param group
+     * @param g group
      */
     public void setGroup(Group g)
     {
@@ -374,8 +374,8 @@ public class ResourcePolicy
     /**
      * Set the start date for the policy
      * 
-     * @param date,
-     *            or null for no start date
+     * @param d
+     *            date, or null for no start date
      */
     public void setStartDate(java.util.Date d)
     {
@@ -395,8 +395,8 @@ public class ResourcePolicy
     /**
      * Set end date for the policy
      * 
-     * @param end
-     *            date, or null
+     * @param d
+     *            end date, or null
      */
     public void setEndDate(java.util.Date d)
     {

@@ -42,11 +42,8 @@ package org.dspace.app.statistics;
 
 import org.dspace.app.statistics.LogLine;
 
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
@@ -58,7 +55,6 @@ import java.lang.StringBuffer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -339,7 +335,7 @@ public class LogAnalyser
      * @param   myOutFile    the file to which to output aggregation data.  Uses default if null
      * @param   myStartDate     the desired start of the analysis.  Starts from the beginning otherwise
      * @param   myEndDate       the desired end of the analysis.  Goes to the end otherwise
-     * @param   myLookup        force a lookup of the database
+     * @param   myLookUp        force a lookup of the database
      */
     public static void processLogs(Context context, String myLogDir, 
                                     String myFileTemplate, String myConfigFile, 
@@ -1154,11 +1150,11 @@ public class LogAnalyser
     
     /**
      * get the number of items in the archive which were accessioned between 
-     * the provided start and end dates if they exist
+     * the provided start and end dates, with the given value for the DC field
+     * 'type' (unqualified)
      *
      * @param   context     the DSpace context for the action
-     * @param   start       the Date from which to start counting
-     * @param   end         the Date at which to stop counting
+     * @param   type        value for DC field 'type' (unqualified)
      *
      * @return              an integer containing the relevant count
      */

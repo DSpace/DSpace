@@ -276,8 +276,8 @@ public class Context
     /**
      * Store an object in the object cache.
      * 
-     * @param type
-     *            type of object to check for in cache
+     * @param objectClass
+     *            Java Class of object to check for in cache
      * @param id
      *            ID of object in cache
      * 
@@ -322,7 +322,7 @@ public class Context
     /**
      * set membership in a special group
      * 
-     * @param groupid
+     * @param groupID  special group's ID
      */
     public void setSpecialGroup(int groupID)
     {
@@ -334,8 +334,7 @@ public class Context
     /**
      * test if member of special group
      * 
-     * @param groupid
-     *            to test
+     * @param groupID  ID of special group to test
      * @return true if member
      */
     public boolean inSpecialGroup(int groupID)

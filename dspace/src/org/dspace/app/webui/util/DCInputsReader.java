@@ -122,10 +122,6 @@ public class DCInputsReader
      * hashmap will contain three top level structures: a map between
      * collections and forms, the definition for each page of each form,
      * and lists of pairs of values that populate selection boxes.
-     *
-     * @param templateName the name of the form template XML file
-     *
-     * @return  HashMap containing all form definition data
      */
 
     public DCInputsReader() 

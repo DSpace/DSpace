@@ -311,7 +311,8 @@ public class METSExport
      *            DSpace context
      * @param item
      *            DSpace item to create METS object for
-     * @return METS object for DSpace item
+     * @param os
+     *            Stream to write METS document to (UTF-8 encoding will be used)
      */
     public static void writeMETS(Context context, Item item, OutputStream os)
             throws SQLException, IOException, AuthorizeException

@@ -60,40 +60,6 @@ import org.dspace.eperson.Group;
 public class PolicySet
 {
     /**
-     * Old code, kept around in case there's a need to bring a collection's
-     * contents' policies in line with the collections'
-     * 
-     * @param context
-     * @param collection
-     */
-    public static void syncCollection_obsolete(Context c, Collection collection)
-            throws SQLException, AuthorizeException
-    {
-        /*
-         * // find all items in a collection, and clone the collection's read
-         * policy ItemIterator items = collection.getItems();
-         * 
-         * int mycount = 0;
-         * 
-         * List policies = AuthorizeManager.getPoliciesActionFilter( c,
-         * collection, Constants.READ);
-         * 
-         * if( policies.isEmpty() ) { System.out.println( "Error: collection has
-         * no READ policies" ); return; }
-         * 
-         * while( items.hasNext() ) { mycount++;
-         * 
-         * Item i = items.next(); System.out.println(mycount + ": Replacing
-         * policies for item " + i.getID() );
-         * 
-         * i.replaceAllPolicies(policies); }
-         *  // now do the logo bitstream also (great variable name :-) Bitstream
-         * bs = collection.getLogo(); AuthorizeManager.removeAllPolicies(c, bs);
-         * AuthorizeManager.addPolicies(c, policies, bs);
-         */
-    }
-
-    /**
      * Command line interface to setPolicies - run to see arguments
      */
     public static void main(String[] argv) throws Exception
@@ -139,17 +105,28 @@ public class PolicySet
      * Useful policy wildcard tool. Can set entire collections' contents'
      * policies
      * 
-     * @param context
-     * @param container
+     * @param c
+     *            current context
+     * @param containerType
      *            type, Constants.ITEM or Constants.COLLECTION
-     * @param container
-     *            ID
-     * @param content
+     * @param containerID
+     *            ID of container (DB primary key)
+     * @param contentType
      *            type (BUNDLE, ITEM, or BITSTREAM)
-     * @param replace,
-     *            removing old policies, or just add to existing policies
-     * @param just
-     *            delete all policies for matching objects
+     * @param actionID
+     *            action ID
+     * @param groupID
+     *            group ID (database key)
+     * @param isReplace
+     *            if <code>true</code>, existing policies are removed first,
+     *            otherwise add to existing policies
+     * @param clearOnly
+     *            if <code>true</code>, just delete policies for matching
+     *            objects
+     * @throws SQLException
+     *             if database problem
+     * @throws AuthorizeException
+     *             if current user is not authorized to change these policies
      */
     public static void setPolicies(Context c, int containerType,
             int containerID, int contentType, int actionID, int groupID,

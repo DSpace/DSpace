@@ -839,9 +839,8 @@ public class Item extends DSpaceObject
      * 
      * @param name
      *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
-     * @return Bundle []
      * 
-     * @returns the bundles in an unordered array
+     * @return the bundles in an unordered array
      */
     public Bundle[] getBundles(String name)
     {

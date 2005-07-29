@@ -168,27 +168,32 @@ public class EPerson extends DSpaceObject
 
     /**
      * Find the eperson by their netid
-     *
-     * @author John Finlay
-     * @return EPerson
+     * 
+     * @param context
+     *            DSpace context
+     * @param netid
+     *            Network ID
+     * 
+     * @return corresponding EPerson, or <code>null</code>
      */
     public static EPerson findByNetid(Context context, String netid)
-        throws SQLException, AuthorizeException
+            throws SQLException
     {
-	if (netid==null) return null;
+        if (netid == null)
+            return null;
 
-        TableRow row = DatabaseManager.findByUnique( context, "eperson", "netid", netid );
+        TableRow row = DatabaseManager.findByUnique(context, "eperson",
+                "netid", netid);
 
-        if ( row == null )
+        if (row == null)
         {
             return null;
         }
         else
         {
             // First check the cache
-            EPerson fromCache = (EPerson) context.fromCache(
-                EPerson.class,
-                row.getIntColumn("eperson_id"));
+            EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+                    .getIntColumn("eperson_id"));
 
             if (fromCache != null)
             {
@@ -196,7 +201,7 @@ public class EPerson extends DSpaceObject
             }
             else
             {
-                return new EPerson( context, row );
+                return new EPerson(context, row);
             }
         }
     }
@@ -211,6 +216,8 @@ public class EPerson extends DSpaceObject
      * <LI><code>EMAIL</code></LI>
      * <LI><code>NETID</code></LI>
      * </UL>
+     * 
+     * @return  array of EPerson objects
      */
     public static EPerson[] findAll(Context context, int sortField)
             throws SQLException

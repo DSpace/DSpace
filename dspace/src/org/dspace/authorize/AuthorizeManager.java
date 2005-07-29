@@ -71,8 +71,22 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class AuthorizeManager
 {
     /**
-     * Authorizes for each of the actions in turn, but only throws the first
-     * AuthorizeException if all the authorizations fail.
+     * Utility method, checks that the current user of the given context can
+     * perform all of the specified actions on the given object. An
+     * <code>AuthorizeException</code> if all the authorizations fail.
+     * 
+     * @param c
+     *            context with the current user
+     * @param o
+     *            DSpace object user is attempting to perform action on
+     * @param actions
+     *            array of action IDs from
+     *            <code>org.dspace.core.Constants</code>
+     * @throws AuthorizeException
+     *             if any one of the specified actions cannot be performed by
+     *             the current user on the given object.
+     * @throws SQLException
+     *             if there's a database problem
      */
     public static void authorizeAnyOf(Context c, DSpaceObject o, int[] actions)
             throws AuthorizeException, SQLException
@@ -100,13 +114,16 @@ public class AuthorizeManager
     }
 
     /**
-     * primary authorization interface, assumes user is the context's
-     * currentuser, and throws an exception
+     * Checks that the context's current user can perform the given action on
+     * the given object. Throws an exception if the user is not authorized,
+     * otherwise the method call does nothing.
      * 
-     * @param context
-     * @param object,
+     * @param c
+     *            context
+     * @param o
      *            a DSpaceObject
      * @param action
+     *            action to perform from <code>org.dspace.core.Constants</code>
      * 
      * @throws AuthorizeException
      *             if the user is denied
@@ -186,10 +203,16 @@ public class AuthorizeManager
      * same authorize, returns boolean for those who don't want to deal with
      * catching exceptions.
      * 
-     * @param context
-     * @param object,
-     *            a DSpaceObject
-     * @param action
+     * @param c
+     *            DSpace context, containing current user
+     * @param o
+     *            DSpaceObject
+     * @param a
+     *            action being attempted, from
+     *            <code>org.dspace.core.Constants</code>
+     * 
+     * @return <code>true</code> if the current user in the context is
+     *         authorized to perform the given action on the given object
      */
     public static boolean authorizeActionBoolean(Context c, DSpaceObject o,
             int a) throws SQLException
@@ -214,15 +237,23 @@ public class AuthorizeManager
     }
 
     /**
-     * authorize() is the authorize method that returns a boolean - always
-     * returns true if c.ignoreAuthorization is set
+     * Check to see if the given user can perform the given action on the given
+     * object. Always returns true if the ignore authorization flat is set in
+     * the current context.
      * 
-     * @param resourcetype -
-     *            found core.Constants (collection, item, etc.)
-     * @param resorceidID
-     *            of resource you're trying to do an authorize on
-     * @param actionid -
-     *            action to perform (read, write, etc)
+     * @param c
+     *            current context. User is irrelevant; "ignore authorization"
+     *            flag is relevant
+     * @param o
+     *            object action is being attempted on
+     * @param action
+     *            ID of action being attempted, from
+     *            <code>org.dspace.core.Constants</code>
+     * @param e
+     *            user attempting action
+     * @return <code>true</code> if user is authorized to perform the given
+     *         action, <code>false</code> otherwise
+     * @throws SQLException
      */
     private static boolean authorize(Context c, DSpaceObject o, int action,
             EPerson e) throws SQLException
@@ -292,9 +323,15 @@ public class AuthorizeManager
     ///////////////////////////////////////////////
 
     /**
-     * check to see if the current user is an admin, or always return true if
-     * c.ignoreAuthorization is set. Anonymous users can't be Admins (EPerson
-     * set to NULL)
+     * Check to see if the current user is an admin. Always return
+     * <code>true</code> if c.ignoreAuthorization is set. Anonymous users
+     * can't be Admins (EPerson set to NULL)
+     * 
+     * @param c
+     *            current context
+     * 
+     * @return <code>true</code> if user is an admin or ignore authorization
+     *         flag set
      */
     public static boolean isAdmin(Context c) throws SQLException
     {
@@ -321,14 +358,19 @@ public class AuthorizeManager
     ///////////////////////////////////////////////
 
     /**
-     * add a policy for an eperson
+     * Add a policy for an individual eperson
      * 
-     * @param context
-     * @param DSpaceObject
-     *            to add policy to
+     * @param c
+     *            context. Current user irrelevant
+     * @param o
+     *            DSpaceObject to add policy to
      * @param actionID
-     * @param Eperson
-     *            who can perform the action
+     *            ID of action from <code>org.dspace.core.Constants</code>
+     * @param e
+     *            eperson who can perform the action
+     * 
+     * @throws AuthorizeException
+     *             if current user in context is not authorized to add policies
      */
     public static void addPolicy(Context c, DSpaceObject o, int actionID,
             EPerson e) throws SQLException, AuthorizeException
@@ -343,14 +385,20 @@ public class AuthorizeManager
     }
 
     /**
-     * add a policy for a group
+     * Add a policy for a group
      * 
-     * @param context
-     * @param DSpaceObject
-     *            to add policy to
+     * @param c
+     *            current context
+     * @param o
+     *            object to add policy for
      * @param actionID
-     * @param Group
-     *            that can perform the action
+     *            ID of action from <code>org.dspace.core.Constants</code>
+     * @param g
+     *            group to add policy for
+     * @throws SQLException
+     *             if there's a database problem
+     * @throws AuthorizeException
+     *             if the current user is not authorized to add this policy
      */
     public static void addPolicy(Context c, DSpaceObject o, int actionID,
             Group g) throws SQLException, AuthorizeException
@@ -367,9 +415,10 @@ public class AuthorizeManager
     /**
      * Return a List of the policies for an object
      * 
-     * @param context
-     * @param dspace
-     *            object
+     * @param c  current context
+     * @param o  object to retrieve policies for
+     * 
+     * @return List of <code>ResourcePolicy</code> objects
      */
     public static List getPolicies(Context c, DSpaceObject o)
             throws SQLException
@@ -410,7 +459,8 @@ public class AuthorizeManager
      *            DSpaceObject policies relate to
      * @param actionID
      *            action (defined in class Constants)
-     *  
+     * @throws SQLException
+     *             if there's a database problem
      */
     public static List getPoliciesActionFilter(Context c, DSpaceObject o,
             int actionID) throws SQLException
@@ -444,13 +494,17 @@ public class AuthorizeManager
     }
 
     /**
-     * add policies to an object to match those from a previous object
+     * Add policies to an object to match those from a previous object
      * 
-     * @param context
-     * @param DSpaceObject
+     * @param c  context
+     * @param src
      *            source of policies
-     * @param DSpaceObject
+     * @param dest
      *            destination of inherited policies
+     * @throws SQLException
+     *             if there's a database problem
+     * @throws AuthorizeException
+     *             if the current user is not authorized to add these policies
      */
     public static void inheritPolicies(Context c, DSpaceObject src,
             DSpaceObject dest) throws SQLException, AuthorizeException
@@ -462,16 +516,18 @@ public class AuthorizeManager
     }
 
     /**
-     * adds List of policies to a DSpacObject. The list is copied
+     * Copies policies from a list of resource policies to a given DSpaceObject
      * 
-     * @param context
-     * @param List
-     *            of policies
-     * @param DSpaceObject
-     *            to be modified
-     * 
+     * @param c
+     *            DSpace context
+     * @param policies
+     *            List of ResourcePolicy objects
+     * @param dest
+     *            object to have policies added
      * @throws SQLException
+     *             if there's a database problem
      * @throws AuthorizeException
+     *             if the current user is not authorized to add these policies
      */
     public static void addPolicies(Context c, List policies, DSpaceObject dest)
             throws SQLException, AuthorizeException
@@ -499,11 +555,14 @@ public class AuthorizeManager
     }
 
     /**
-     * removes ALL policies for an object
+     * removes ALL policies for an object.  FIXME doesn't check authorization
      * 
-     * @param context
-     * @param dspace
-     *            object
+     * @param c
+     *            DSpace context
+     * @param o
+     *            object to remove policies for
+     * @throws SQLException
+     *             if there's a database problem
      */
     public static void removeAllPolicies(Context c, DSpaceObject o)
             throws SQLException
@@ -515,13 +574,18 @@ public class AuthorizeManager
     }
 
     /**
-     * Remove all policies from an object that match a given action
+     * Remove all policies from an object that match a given action. FIXME
+     * doesn't check authorization
      * 
      * @param context
+     *            current context
      * @param dso
-     *            DSpaceObject affected object
-     * @param action
-     *            to match, or -1=all
+     *            object to remove policies from
+     * @param actionID
+     *            ID of action to match from
+     *            <code>org.dspace.core.Constants</code>, or -1=all
+     * @throws SQLException
+     *             if there's a database problem
      */
     public static void removePoliciesActionFilter(Context context,
             DSpaceObject dso, int actionID) throws SQLException
@@ -541,10 +605,15 @@ public class AuthorizeManager
     }
 
     /**
-     * removes all policies relating to a group
+     * Removes all policies relating to a particular group. FIXME doesn't check
+     * authorization
      * 
-     * @param context
+     * @param c
+     *            current context
      * @param groupID
+     *            ID of the group
+     * @throws SQLException
+     *             if there's a database problem
      */
     public static void removeGroupPolicies(Context c, int groupID)
             throws SQLException
@@ -554,12 +623,17 @@ public class AuthorizeManager
     }
 
     /**
-     * removes all policies for an object that belong to a Group
+     * Removes all policies from a group for a particular object that belong to
+     * a Group. FIXME doesn't check authorization
      * 
-     * @param context
-     * @param DSpaceObject
-     * @param Group
-     *  
+     * @param c
+     *            current context
+     * @param o
+     *            the object
+     * @param g
+     *            the group
+     * @throws SQLException
+     *             if there's a database problem
      */
     public static void removeGroupPolicies(Context c, DSpaceObject o, Group g)
             throws SQLException
@@ -570,12 +644,19 @@ public class AuthorizeManager
     }
 
     /**
-     * returns all groups authorized to perform and action on an object returns
-     * empty array if no matches
+     * Returns all groups authorized to perform an action on an object. Returns
+     * empty array if no matches.
      * 
-     * @param context
-     * @param DSpaceObject
+     * @param c
+     *            current context
+     * @param o
+     *            object
      * @param actionID
+     *            ID of action frm <code>org.dspace.core.Constants</code>
+     * @return array of <code>Group</code>s that can perform the specified
+     *         action on the specified object
+     * @throws java.sql.SQLException
+     *             if there's a database problem
      */
     public static Group[] getAuthorizedGroups(Context c, DSpaceObject o,
             int actionID) throws java.sql.SQLException

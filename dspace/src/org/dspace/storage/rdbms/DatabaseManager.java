@@ -737,7 +737,7 @@ public class DatabaseManager
      * 
      * @param sql
      *            The SQL to load.
-     * @param SQLException
+     * throws SQLException
      *            If a database error occurs
      */
     public static void loadSql(String sql) throws SQLException
@@ -754,11 +754,11 @@ public class DatabaseManager
     /**
      * Load SQL from a reader into the RDBMS.
      * 
-     * @param reader
+     * @param r
      *            The Reader from which to read the SQL.
-     * @param SQLException
+     * @throws SQLException
      *            If a database error occurs
-     * @param IOException
+     * @throws IOException
      *            If an error occurs obtaining data from the reader
      */
     public static void loadSql(Reader r) throws SQLException, IOException

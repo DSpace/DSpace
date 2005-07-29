@@ -159,8 +159,8 @@ public class DSIndexer
     /**
      * reIndexContent removes something from the index, then re-indexes it
      * 
-     * @param context
-     * @param DSpaceObject
+     * @param c context object
+     * @param dso  object to re-index
      */
     public static void reIndexContent(Context c, DSpaceObject dso)
             throws SQLException, IOException
@@ -172,7 +172,7 @@ public class DSIndexer
     /**
      * create full index - wiping old index
      * 
-     * @param context
+     * @param c   context to use
      */
     public static void createIndex(Context c) throws SQLException, IOException
     {
@@ -527,7 +527,6 @@ public class DSIndexer
             String keyword_text = "";
 
             String abstract_text = "";
-            String sor_text = "";
             String series_text = "";
             String mime_text = "";
             String sponsor_text = "";

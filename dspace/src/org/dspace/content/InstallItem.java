@@ -45,7 +45,6 @@ import java.sql.SQLException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 
@@ -58,43 +57,35 @@ import org.dspace.search.DSIndexer;
 public class InstallItem
 {
     /**
-     * Take an InProgressSubmission and turn it into a fully-archived Item.
+     * Take an InProgressSubmission and turn it into a fully-archived Item,
+     * creating a new Handle
      * 
-     * @param Context
-     * @param InProgressSubmission
+     * @param c
+     *            DSpace Context
+     * @param is
+     *            submission to install
+     * 
+     * @return the fully archived Item
      */
     public static Item installItem(Context c, InProgressSubmission is)
             throws SQLException, IOException, AuthorizeException
     {
-        return installItem(c, is, c.getCurrentUser());
+        return installItem(c, is, null);
     }
 
     /**
      * Take an InProgressSubmission and turn it into a fully-archived Item.
      * 
-     * @param Context
-     * @param InProgressSubmission
-     * @param handle
-     *            to assign instead of creating new one
-     */
-    public static Item installItem(Context c, InProgressSubmission is,
-            String handle) throws SQLException, IOException, AuthorizeException
-    {
-        return installItem(c, is, c.getCurrentUser(), handle);
-    }
-
-    /**
-     * Take an InProgressSubmission and turn it into a fully-archived Item.
+     * @param c  current context
+     * @param is
+     *            submission to install
+     * @param suppliedHandle
+     *            the existing Handle to give the installed item
      * 
-     * @param Context
-     * @param InProgressSubmission
-     * @param EPerson
-     *            (unused, should be removed from API)
-     * @param previous
-     *            handle
+     * @return the fully archived Item
      */
     public static Item installItem(Context c, InProgressSubmission is,
-            EPerson e2, String suppliedHandle) throws SQLException,
+            String suppliedHandle) throws SQLException,
             IOException, AuthorizeException
     {
         Item item = is.getItem();
@@ -189,26 +180,14 @@ public class InstallItem
         return item;
     }
 
-    /**
-     * Take an InProgressSubmission and turn it into a fully-archived Item, no
-     * previous handle specified
-     * 
-     * @param Context
-     * @param InProgressSubmission
-     * @param EPerson
-     *            (unused, should be removed from API)
-     */
-    public static Item installItem(Context c, InProgressSubmission is,
-            EPerson e2) throws SQLException, IOException, AuthorizeException
-    {
-        return installItem(c, is, e2, null);
-    }
 
     /**
-     * generate provenance-worthy description of the bitstreams contained in an
-     * item
+     * Generate provenance-worthy description of the bitstreams contained in an
+     * item.
      * 
-     * @param item
+     * @param myitem  the item generate description for
+     * 
+     * @return provenance description
      */
     public static String getBitstreamProvenanceMessage(Item myitem)
     {

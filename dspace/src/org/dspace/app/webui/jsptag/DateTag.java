@@ -75,7 +75,7 @@ public class DateTag extends TagSupport
     /**
      * Set the date
      * 
-     * @param s
+     * @param d
      *            the date to display
      */
     public void setDate(DCDate d)

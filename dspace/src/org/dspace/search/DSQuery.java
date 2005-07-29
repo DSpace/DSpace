@@ -41,7 +41,6 @@ package org.dspace.search;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -97,14 +96,12 @@ public class DSQuery
     }
 
     /**
-     * Do a query, returning a List of DSpace Handles to objects matching the
-     * query.
+     * Do a query, returning a QueryResults object
+     *
+     * @param c  context
+     * @param args query arguments in QueryArgs object
      * 
-     * @param query
-     *            string in Lucene query syntax
-     * 
-     * @return HashMap with lists for items, communities, and collections (keys
-     *         are strings from Constants.ITEM, Constants.COLLECTION, etc.
+     * @return query results QueryResults
      */
     public static QueryResults doQuery(Context c, QueryArgs args)
             throws IOException
@@ -274,8 +271,12 @@ public class DSQuery
     /**
      * Do a query, restricted to a collection
      * 
-     * @param query
-     * @param collection
+     * @param c
+     *            context
+     * @param args
+     *            query args
+     * @param coll
+     *            collection to restrict to
      * 
      * @return QueryResults same results as doQuery, restricted to a collection
      */
@@ -299,10 +300,14 @@ public class DSQuery
     /**
      * Do a query, restricted to a community
      * 
-     * @param querystring
-     * @param community
+     * @param c
+     *            context
+     * @param args
+     *            query args
+     * @param comm
+     *            community to restrict to
      * 
-     * @return HashMap results, same as full doQuery, only hits in a Community
+     * @return QueryResults same results as doQuery, restricted to a collection
      */
     public static QueryResults doQuery(Context c, QueryArgs args, Community comm)
             throws IOException
@@ -321,117 +326,6 @@ public class DSQuery
         return doQuery(c, args);
     }
 
-    /**
-     * return everything from a query
-     * 
-     * @param results
-     *            hashmap from doQuery
-     * 
-     * @return List of all objects returned by search
-     */
-    public static List getResults(HashMap results)
-    {
-        return ((List) results.get(ALL));
-    }
-
-    /**
-     * return just the items from a query
-     * 
-     * @param results
-     *            hashmap from doQuery
-     * 
-     * @return List of items found by query
-     */
-    public static List getItemResults(HashMap results)
-    {
-        return ((List) results.get(ITEM));
-    }
-
-    /**
-     * return just the collections from a query
-     * 
-     * @param results
-     *            hashmap from doQuery
-     * 
-     * @return List of collections found by query
-     */
-    public static List getCollectionResults(HashMap results)
-    {
-        return ((List) results.get(COLLECTION));
-    }
-
-    /**
-     * return just the communities from a query
-     * 
-     * @param results
-     *            hashmap from doQuery
-     * 
-     * @return list of Communities found by query
-     */
-    public static List getCommunityResults(HashMap results)
-    {
-        return ((List) results.get(COMMUNITY));
-    }
-
-    /**
-     * returns true if anything found
-     * 
-     * @param results
-     *            hashmap from doQuery
-     * 
-     * @return true if anything found, false if nothing
-     */
-    public static boolean resultsFound(HashMap results)
-    {
-        List thislist = getResults(results);
-
-        return (!thislist.isEmpty());
-    }
-
-    /**
-     * returns true if items found
-     * 
-     * @param results
-     *            hashmap from doQuery
-     * 
-     * @return true if items found, false if none found
-     */
-    public static boolean itemsFound(HashMap results)
-    {
-        List thislist = getItemResults(results);
-
-        return (!thislist.isEmpty());
-    }
-
-    /**
-     * returns true if collections found
-     * 
-     * @param results
-     *            hashmap from doQuery
-     * 
-     * @return true if collections found, false if none
-     */
-    public static boolean collectionsFound(HashMap results)
-    {
-        List thislist = getCollectionResults(results);
-
-        return (!thislist.isEmpty());
-    }
-
-    /**
-     * returns true if communities found
-     * 
-     * @param results
-     *            hashmap from doQuery
-     * 
-     * @return true if communities found, false if none
-     */
-    public static boolean communitiesFound(HashMap results)
-    {
-        List thislist = getCommunityResults(results);
-
-        return (!thislist.isEmpty());
-    }
 
     /**
      * Do a query, printing results to stdout largely for testing, but it is

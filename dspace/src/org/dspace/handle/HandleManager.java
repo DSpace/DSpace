@@ -174,13 +174,16 @@ public class HandleManager
     }
 
     /**
-     * Creates a handle entry, but with a handle supplied by the caller
+     * Creates a handle entry, but with a handle supplied by the caller (new
+     * Handle not generated)
      * 
      * @param context
      *            DSpace context
      * @param dso
      *            DSpaceObject
-     * @param supppliedHandle
+     * @param suppliedHandle
+     *            existing handle value
+     * @return the Handle
      */
     public static String createHandle(Context context, DSpaceObject dso,
             String suppliedHandle) throws SQLException
@@ -281,7 +284,7 @@ public class HandleManager
      * 
      * @param context
      *            DSpace context
-     * @param obj
+     * @param dso
      *            The object to obtain a handle for
      * @return The handle for object, or null if the object has no handle.
      * @exception SQLException

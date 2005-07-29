@@ -40,7 +40,6 @@
 package org.dspace.app.mediafilter;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -57,12 +56,6 @@ import org.dspace.core.ConfigurationManager;
  */
 public class JPEGFilter extends MediaFilter
 {
-    /**
-     * @param filename
-     *            string filename
-     * 
-     * @return string filtered filename
-     */
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".jpg";
@@ -110,8 +103,6 @@ public class JPEGFilter extends MediaFilter
                 .getIntProperty("thumbnail.maxwidth");
         float ymax = (float) ConfigurationManager
                 .getIntProperty("thumbnail.maxheight");
-
-        Image thumb = null;
 
         // now get the image dimensions
         float xsize = (float) buf.getWidth(null);
