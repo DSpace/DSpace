@@ -1,5 +1,5 @@
 <%--
-  - confirm-delete-eperson.jsp
+  - eperson-confirm-delete.jsp
   -
   - Version: $Revision$
   -
