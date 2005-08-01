@@ -206,7 +206,8 @@
 <div align="center">
    <form method="post" action="<%= request.getContextPath() %>/workspace">
         <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>"/>
-        <input type="submit" name="submit_open" value="Back to Workspace"/>
+        <!-- <input type="submit" name="submit_open" value="Back to Workspace"/> -->
+        <input type="submit" name="submit_open" value="<fmt:message key="jsp.display-item.back_to_workspace"/>"/>
     </form>
 </div>
 <%
