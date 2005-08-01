@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 
 <html>
 <head>
@@ -29,7 +28,7 @@
 
   <p>Items are further subdivided into named <em>bundles</em> of <em>bitstreams</em>. Bitstreams are, as the name suggests, streams of bits, usually ordinary computer files. Bitstreams that are somehow closely related, for example HTML files and images that compose a single HTML document, are organised into bundles.</p>
 
-  <p>In practice, most items tend to have three named bundles:</p>
+  <p>In practice, most items tend to have these named bundles:</p>
 
   <ul>
     <li><em>ORIGINAL</em> -- the bundle with the original, deposited bitstreams</li>
@@ -75,7 +74,7 @@
 
   <p>Each item has one qualified Dublin Core metadata record. Other metadata might be stored in an item as a serialized bitstream, but we store Dublin Core for every item for interoperability and ease of discovery. The Dublin Core may be entered by end-users as they submit content, or it might be derived from other metadata as part of an ingest process.</p>
 
-  <p><a name="#deletions" id="#deletions">Items can be removed from DSpace in one of two ways:</a> They may be 'withdrawn', which means they remain in the archive but are completely hidden from view. In this case, if an end-user attempts to access the withdrawn item, they are presented with a 'tombstone,' that indicates the item has been removed. For whatever reason, an item may also be 'expunged' if necessary, in which case all traces of it are removed from the archive.</p>
+  <p><a name="deletions" id="deletions">Items can be removed from DSpace in one of two ways:</a> They may be 'withdrawn', which means they remain in the archive but are completely hidden from view. In this case, if an end-user attempts to access the withdrawn item, they are presented with a 'tombstone,' that indicates the item has been removed. For whatever reason, an item may also be 'expunged' if necessary, in which case all traces of it are removed from the archive.</p>
 
   <table>
     <caption>
@@ -383,7 +382,7 @@
 
   <p>Handles can be written in two forms:</p>
   <pre>
-hdl:1721.123/4567<br>
+hdl:1721.123/4567
 http://hdl.handle.net/1721.123/4567
 </pre>
 
@@ -404,11 +403,13 @@ http://hdl.handle.net/1721.123/4567
 https://dspace.myu.edu/bitstream/123.456/789/24/foo.html
 </pre>
 
-  <p>The above refers to the bitstream with sequence ID 24 in the item with the Handle <code>hdl:123.456/789</code>. The <code>foo.html</code> is really just there as a hint to browsers: Although DSpace will provide the appropriate MIME type, some browsers only function correctly if the file has an expected extension.<br></p>
+  <p>The above refers to the bitstream with sequence ID 24 in the item with the Handle <code>hdl:123.456/789</code>. The <code>foo.html</code> is really just there as a hint to browsers: Although DSpace will provide the appropriate MIME type, some browsers only function correctly if the file has an expected extension.</p>
 
-  <h2><a name="srb" id="srb">Storage Resource Broker (SRB) Support<br></a></h2>
+  <h2><a name="srb" id="srb">Storage Resource Broker (SRB) Support</a></h2>
 
-  <p>DSpace offers two means for storing bitstreams. The first is in the file system on the server. The second is using <a href="http://www.sdsc.edu/srb">SRB (Storage Resource Broker)</a>. Both are achieved using a simple, lightweight API.<br></p>SRB is purely an option but may be used in lieu of the server's file system or in addition to the file system. Without going into a full description, SRB is a very robust, sophisticated storage manager that offers essentially unlimited storage and straightforward means to replicate (in simple terms, backup) the content on other local or remote storage resources.
+  <p>DSpace offers two means for storing bitstreams. The first is in the file system on the server. The second is using <a href="http://www.sdsc.edu/srb">SRB (Storage Resource Broker)</a>. Both are achieved using a simple, lightweight API.</P>
+
+  <P>SRB is purely an option but may be used in lieu of the server's file system or in addition to the file system. Without going into a full description, SRB is a very robust, sophisticated storage manager that offers essentially unlimited storage and straightforward means to replicate (in simple terms, backup) the content on other local or remote storage resources.</P>
 
   <h2><a name="search_browse" id="search_browse">Search and Browse</a></h2>
 
@@ -497,11 +498,11 @@ https://dspace.myu.edu/bitstream/123.456/789/24/foo.html
 
   <p>DSpace also includes batch tools to import and export items in a simple directory structure, where the Dublin Core metadata is stored in an XML file. This may be used as the basis for moving content between DSpace and other systems.</p>
 
-  <p>There is also a METS-based export tool, which exports items as METS-based metadata with associated bitstreams referenced from the METS file.<br></p>
+  <p>There is also a METS-based export tool, which exports items as METS-based metadata with associated bitstreams referenced from the METS file.</p>
 
   <h2><a name="registration" id="registration">Registration</a></h2>
 
-  <p>Registration is an alternate means of incorporating items, their metadata, and their bitstreams into DSpace by taking advantage of the bitstreams already being in accessible computer storage. An example might be that there is a repository for existing digital assets. Rather than using the normal <a href="#ingest">interactive ingest process</a> or the <a href="#importexport">batch import</a> to furnish DSpace the metadata and to upload bitstreams, registration provides DSpace the metadata and the <span style="font-style: italic;">location</span> of the bitstreams. DSpace uses a variation of the import tool to accomplish registration.<br></p>
+  <p>Registration is an alternate means of incorporating items, their metadata, and their bitstreams into DSpace by taking advantage of the bitstreams already being in accessible computer storage. An example might be that there is a repository for existing digital assets. Rather than using the normal <a href="#ingest">interactive ingest process</a> or the <a href="#importexport">batch import</a> to furnish DSpace the metadata and to upload bitstreams, registration provides DSpace the metadata and the <span style="font-style: italic;">location</span> of the bitstreams. DSpace uses a variation of the import tool to accomplish registration.</p>
   <hr>
 
   <address>

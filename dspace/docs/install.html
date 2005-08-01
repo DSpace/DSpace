@@ -227,6 +227,19 @@ alert.recipient (not essential but very useful!)</PRE>
     <pre># Clean up the database nightly at 2.40am
 40 2 * * * vacuumdb --analyze dspace > /dev/null 2>&1</pre>
 
+    <p>In order that statistical reports are generated regularly and thus kept up to date you should set up the following cron jobs:</p>
+
+    <pre># Run stat analyses
+0 1 * * * [dspace]/bin/stat-general
+0 1 * * * [dspace]/bin/stat-monthly
+0 2 * * * [dspace]/bin/stat-report-general
+0 2 * * * [dspace]/bin/stat-report-monthly</pre>
+
+    <p>Obviously, you should choose execution times which are most useful to you, and you should ensure that the <code>-report-</code> scripts run a short while after the analysis scripts to give them time to complete (a run of around 8 months worth of logs can take around 25 seconds to complete); the resulting reports will let you know how long analysis took and you can adjust your cron times accordingly.</p>
+
+    <P>For information on customising the output of this see <A HREF="configure.html#statistics">configuring system statistical reports</A>.</P>
+
+
     <H3>DSpace over HTTPS</H3>
 
     <P>Plain old HTTP is totally insecure, and if your DSpace uses username/password authentication or stores some restricted content, running it over HTTPS (HTTP over a Secure Socket Layer (SSL)) is advisable.  There are two options for this:  Using Apache HTTPD, or Tomcat/Jetty's in-built HTTPS support.</P>
