@@ -144,7 +144,7 @@ Common usage:
   	<!-- Copy Messages.properties files -->
   	<copy todir="build/classes"
   		  preservelastmodified="true">
-      <fileset dir="config">
+      <fileset dir="config/language-packs">
   		<include name="Messages*.properties"/>
       </fileset>
     </copy>
