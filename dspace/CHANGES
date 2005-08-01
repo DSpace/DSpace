@@ -1,5 +1,9 @@
 1.3 beta
 ========
+(Richard Jones)
+- New configuration option, webui.licence_bundle.show -- configures display
+of deposit license in item display page
+
 (Scott Yeadon)
  - SF Bug #1247508  Error when browsing item with no content/bitstream
  
