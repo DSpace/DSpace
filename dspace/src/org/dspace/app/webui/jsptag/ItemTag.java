@@ -359,9 +359,11 @@ public class ItemTag extends TagSupport
 
         listBitstreams();
         
-        out.println("<br><br>");
-        
-        showLicence();
+        if (ConfigurationManager.getBooleanProperty("webui.licence_bundle.show"))
+        {
+            out.println("<br><br>");
+            showLicence();
+        }
     }
 
     /**
@@ -440,9 +442,11 @@ public class ItemTag extends TagSupport
 
         listBitstreams();
         
-        out.println("<br><br>");
-        
-        showLicence();
+        if (ConfigurationManager.getBooleanProperty("webui.licence_bundle.show"))
+        {
+            out.println("<br><br>");
+            showLicence();
+        }
     }
 
     /**
