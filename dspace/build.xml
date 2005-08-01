@@ -240,7 +240,10 @@ Common usage:
        file present for the initial run of "install-configs". -->
   <target name="init_configs">
     <copy todir="${dspace.dir}/config" preservelastmodified="true">
-      <fileset dir="config"/>
+      <fileset dir="config">
+    	<exclude name="language-packs/**" />
+      	<exclude name="registries/**" />
+      </fileset>
     </copy>
     <copy file="etc/log4j.build.properties"
           tofile="${dspace.dir}/config/log4j.properties"
