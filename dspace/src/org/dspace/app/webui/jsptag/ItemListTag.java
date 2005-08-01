@@ -442,6 +442,12 @@ public class ItemListTag extends TagSupport
             throws JspException
     {
         Bundle[] original = item.getBundles("ORIGINAL");
+
+        if (original.length == 0)
+        {
+        	return "";
+        }
+        
         boolean html = false;
 
         // if multiple bitstreams, check if the primary one is HTML
