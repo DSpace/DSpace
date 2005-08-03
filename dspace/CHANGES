@@ -1,5 +1,6 @@
-1.3 beta
-========
+1.3 final
+=========
+
 (Richard Jones)
 - New configuration option, webui.licence_bundle.show -- configures display
 of deposit license in item display page
@@ -31,6 +32,10 @@ Fixes bug SF #1242548
 (Claudia Jürgen)
 - SF Patch #1226958 XHTML compliance of Messages_en.properties
 
+
+1.3 beta 1
+==========
+
 (Larry Stone)
 - SF Patch #1216889 typo in invalid-id.jsp
 
@@ -44,6 +49,7 @@ Fixes bug SF #1242548
 
 (Naveed Hashmi)
 - SF Patch #1181335 Fixed bug whereby system emails do not have sent dates attached to them
+
 
 1.3 alpha
 =========
@@ -90,6 +96,12 @@ user accounts to observe or collaborate on unfinished submission
 characters previously caused bad XML in OAI-PMH ListSets responses)
 
 
+1.2.2
+=====
+(Richard Rodgers)
+Bug fix for bug causing corruption of metadata if edited post-submission
+
+
 1.2.2 beta 2
 ============
 
@@ -125,6 +137,7 @@ characters previously caused bad XML in OAI-PMH ListSets responses)
 - Updated OAICat.jar, fixed DSpaceOAICatalog.java to suit.  New OAICat fixes
   SF bug #1123934.
 
+
 1.2.2  beta 1
 =============
 (Jenny Toves, Brian Hughes, Larry Stone, William Reilly, Richard Rodgers)
@@ -151,10 +164,12 @@ characters previously caused bad XML in OAI-PMH ListSets responses)
 (Jim Downing)
 - Added KNOWN_BUGS file to caveat problems in this release
 
+
 1.2.1-beta4
 ===========
 (Jim Downing)
 - More bug fixes for various small NPEs
+
 
 1.2.1-beta3
 ===========

@@ -1,14 +1,22 @@
-[ 1206842 ] Count does not count all items
-Where communities contain sub-communities, the count only indicates the number of items in 
-collections that are directly in that community e.g. If collection A exists in Community A has 10 items and
-collection B exists in Sub-community B which exists in Community A has 5 items, the count will only show 10
-next to Community A and not 15.
+Detailed bug descriptions and current status can be found on the SourceForge
+bug tracker:
 
-Community A
-Collection A [10]
+http://sourceforge.net/tracker/?group_id=19984&atid=119984
 
-Sub-community B
-Collection B [5]
-
-
-Bugs which are not specific to this release can be found on Sourceforge (http://sourceforge.net/projects/dspace)
+1242527 Duplicate Items during submission
+1238166 Multi Media and D-Space
+1235521 Error occured at creating a collection (v.1.3b1)
+1235518 Japanese metadata inputted in submit pages are malformed
+1221954 Community and Collection page validation
+1217068 Failed to complete review in workflow
+1196724 Deleting owner of mapped items
+1174342 Potencial Memory Issue for a large collection
+1173600 Items Mapper has memory issue for a large collection
+1169975 workspace item policy not updated after workflow change
+1155173 Forms in custom 'skin' break group admin tool
+1120726 Performance bottlekneck in Group.update()
+1066771 Metadata edit form dropping DC qualified element
+1066713 Two (sub)communities can not have one name
+1035366 size column should be bigint
+1160898 dspace_migrate removes Date.Issued from prev published items
+1076506 Templates applied to imported items

@@ -10,96 +10,47 @@
 <h1>DSpace System Documentation: Version History</h1>
 <p><a href="index.html">Back to contents</a></p>
 
-<h2><a name="version1_3">Changes in DSpace 1.3beta1</a></h2>
+<h2><a name="version1_3">Changes in DSpace 1.3</a></h2>
 
 <h3>General Improvements</h3>
 
 <ul>
-   <li>Initial i18n Support for JSPs - Note: the implementation of this feature required changes to almost all JSP pages</li>
-</ul>
-
-<h3>Bug fixes</h3>
-<ul>
-   <li>Set the content type in the HTTP header</li>
-   <li>Fix issue where EPerson edit would not work due to form indexing (partial fix)</li>
-</ul>
-
-<h2><a name="version1_3">Changes in DSpace 1.3 Alpha</a></h2>
-
-<H3>General Improvements</h3>
-
-<ul>
+    <li>Initial i18n Support for JSPs - Note: the implementation of this feature required changes to almost all JSP pages</li>
     <li>LDAP authentication support</li>
     <li>Log file analysis and report generation</li>
-    <li>Item licence viewing</li>
+    <li>Configurable item licence viewing</li>
     <li>Supervision order/collaborative workspace administrative tools</li>
-    <li>Basic workspace for submissions in progress, with support for supervion</li>
+    <li>Basic workspace for submissions in progress, with support for supervision</li>
     <li>SRB storage system option</li>
     <li>Updated handle server system</li>
+    <li>Database optimisations</li>
+    <li>Various documentation additions and cleanups</li>
 </ul>
 
 <h3>Bug fixes</h3>
 <ul>
-    <li>POST handling in HTMLServlet</li>
-    <li>Missing ContentType directives added to some JSPs</li>
-    <li>Name dependency on Collection Admin and Submitter groups fixed</li>
-    <li>Improved OAI-PMH XML encoding~</li>
+   <li>1161459 - ItemExporter fails with Too many open files</li>
+   <li>1167373 - Email date field not populated</li>
+   <li>1193948 - New item submit problem</li>
+   <li>1188132 - NullPointerException when Adding EPerson</li>
+   <li>1188016 - Cannot Edit an Eperson</li>
+   <li>1219701 - Unable to open unfinished submission</li>
+   <li>1206836 - community strengths not reflecting sub-community
+   <li>1238262 - Submit UI nav/progress buttons no longer show progress</li>
+   <li>1238276 - Double quote problem in some fields in submit UI</li>
+   <li>1238277 - format support level not shown in "uploaded file" page</li>
+   <li>1242548 - Uploading non-existing files</li>
+   <li>1244743 - Bad lookup key for special case of DC Title in ItemTag.java</li>
+   <li>1245223 - Subscription Emailer fails</li>
+   <li>1247508 - Error when browsing item with no content/bitstream collections</li>
+   <li>Set the content type in the HTTP header</li>
+   <li>Fix issue where EPerson edit would not work due to form indexing (partial fix)</li>
+   <li>POST handling in HTMLServlet</li>
+   <li>Missing ContentType directives added to some JSPs</li>
+   <li>Name dependency on Collection Admin and Submitter groups fixed</li>
+   <li>Fixed OAI-PMH XML encoding</li>
 </ul>
 
-<H3><A NAME="jsp-changes-1_2_1-1_3">Changes in JSPs (since 1.2.1)</A></H3>
-
-<ul>
-<li><code>collection-home.jsp</code> <em>changed</em></li>
-<li><code>community-home.jsp</code> <em>changed</em></li>
-<li><code>community-list.jsp</code> <em>changed</em></li>
-<li><code>display-item.jsp</code> <em>changed</em></li>
-<li><code>home.jsp</code> <em>changed</em></li>
-<li><code>styles.css.jsp</code> <em>changed</em></li>
-<li><code>components/ldap-form.jsp</code> <em>is new</em></li>
-<li><code>dspace-admin/eperson-edit.jsp</code> <em>changed</em></li>
-<li><code>dspace-admin/list-formats.jsp</code> <em>changed</em></li>
-<li><code>dspace-admin/supervise-confirm-remove.jsp</code> <em>is new</em></li>
-<li><code>dspace-admin/supervise-duplicate.jsp</code> <em>is new</em></li>
-<li><code>dspace-admin/supervise-link.jsp</code> <em>is new</em></li>
-<li><code>dspace-admin/supervise-list.jsp</code> <em>is new</em></li>
-<li><code>dspace-admin/supervise-main.jsp</code> <em>is new</em></li>
-<li><code>dspace-admin/wizard-questions.jsp</code> <em>changed</em></li>
-<li><code>error/404.jsp</code> <em>changed</em></li>
-<li><code>layout/footer-default.jsp</code> <em>changed</em></li>
-<li><code>layout/header-default.jsp</code> <em>changed</em></li>
-<li><code>layout/location-bar.jsp</code> <em>changed</em></li>
-<li><code>layout/navbar-admin.jsp</code> <em>changed</em></li>
-<li><code>layout/navbar-default.jsp</code> <em>changed</em></li>
-<li><code>login/ldap-incorrect.jsp</code> <em>is new</em></li>
-<li><code>login/ldap.jsp</code> <em>is new</em></li>
-<li><code>mydspace/main.jsp</code> <em>changed</em></li>
-<li><code>register/edit-profile.jsp</code> <em>changed</em></li>
-<li><code>register/new-ldap-user.jsp</code> <em>is new</em></li>
-<li><code>register/registration-form.jsp</code> <em>changed</em></li>
-<li><code>search/results.jsp</code> <em>changed</em></li>
-<li><code>statistics/no-report.jsp</code> <em>is new</em></li>
-<li><code>statistics/report.jsp</code> <em>is new</em></li>
-<li><code>submit/cancel.jsp</code> <em>changed</em></li>
-<li><code>submit/change-file-description.jsp</code> <em>changed</em></li>
-<li><code>submit/choose-file.jsp</code> <em>changed</em></li>
-<li><code>submit/complete.jsp</code> <em>changed</em></li>
-<li><code>submit/creative-commons.jsp</code> <em>changed</em></li>
-<li><code>submit/edit-metadata-1.jsp</code> <em>is removed</em></li>
-<li><code>submit/edit-metadata-2.jsp</code> <em>is removed</em></li>
-<li><code>submit/edit-metadata.jsp</code> <em>is new</em></li>
-<li><code>submit/get-file-format.jsp</code> <em>changed</em></li>
-<li><code>submit/initial-questions.jsp</code> <em>changed</em></li>
-<li><code>submit/progressbar.jsp</code> <em>changed</em></li>
-<li><code>submit/review.jsp</code> <em>changed</em></li>
-<li><code>submit/select-collection.jsp</code> <em>changed</em></li>
-<li><code>submit/show-license.jsp</code> <em>changed</em></li>
-<li><code>submit/show-uploaded-file.jsp</code> <em>changed</em></li>
-<li><code>submit/upload-error.jsp</code> <em>changed</em></li>
-<li><code>submit/upload-file-list.jsp</code> <em>changed</em></li>
-<li><code>workspace/ws-error.jsp</code> <em>is new</em></li>
-<li><code>workspace/ws-main.jsp</code> <em>is new</em></li>
-<li><code>workspace/wsv-error.jsp</code> <em>is new</em></li>
-</ul>
 
 <h2><a name="version1_2_2">Changes in DSpace 1.2.2</a></h2>
 
@@ -129,12 +80,12 @@
 
 <ul>
 <li><code>collection-home.jsp</code> <em>changed</em></li>
-<li><code>community-home.jsp</code> <em>changed</em></li> 
-<li><code>community-list.jsp</code> <em>changed</em></li> 
-<li><code>home.jsp</code> <em>changed</em></li> 
-<li><code>dspace-admin/list-formats.jsp</code> <em>changed</em></li> 
-<li><code>dspace-admin/wizard-questions.jsp</code> <em>changed</em></li> 
-<li><code>search/results.jsp</code> <em>changed</em></li> 
+<li><code>community-home.jsp</code> <em>changed</em></li>
+<li><code>community-list.jsp</code> <em>changed</em></li>
+<li><code>home.jsp</code> <em>changed</em></li>
+<li><code>dspace-admin/list-formats.jsp</code> <em>changed</em></li>
+<li><code>dspace-admin/wizard-questions.jsp</code> <em>changed</em></li>
+<li><code>search/results.jsp</code> <em>changed</em></li>
 <li><code>submit/cancel.jsp</code> <em>changed</em></li>
 <li><code>submit/change-file-description.jsp</code> <em>changed</em></li>
 <li><code>submit/choose-file.jsp</code> <em>changed</em></li>
@@ -365,94 +316,8 @@ and a sprinkling of perl.</p>
 
 </ul>
 </div>
-<div id="java-file-changes">
-<h3><a name="java-file-changes">Java file changes between 1.1 and 1.2</a></h3>
-<p>This list generated with <code>cvs -Q rdiff -s -r dspace-1_1 dspace</code>
-and a sprinkling of perl.</p>
-<ul>
-  <li>New: dspace/src/org/dspace/administer/CommunityFiliator.java </li>
-<li>Changed: dspace/src/org/dspace/administer/CreateAdministrator.java </li>
-<li>Changed: dspace/src/org/dspace/administer/DCType.java </li>
-<li>New: dspace/src/org/dspace/administer/Upgrade11To12.java </li>
-<li>Changed: dspace/src/org/dspace/app/itemexport/ItemExport.java </li>
-<li>Changed: dspace/src/org/dspace/app/itemimport/ItemImport.java </li>
-<li>New: dspace/src/org/dspace/app/mediafilter/HTMLFilter.java </li>
-<li>New: dspace/src/org/dspace/app/mediafilter/JPEGFilter.java </li>
-<li>New: dspace/src/org/dspace/app/mediafilter/MediaFilter.java </li>
-<li>New: dspace/src/org/dspace/app/mediafilter/MediaFilterManager.java </li>
-<li>New: dspace/src/org/dspace/app/mediafilter/PDFFilter.java </li>
-<li>New: dspace/src/org/dspace/app/mediafilter/WordFilter.java </li>
-<li>New: dspace/src/org/dspace/app/mets/METSExport.java </li>
-<li>Changed: dspace/src/org/dspace/app/oai/DSpaceOAICatalog.java </li>
-<li>Changed: dspace/src/org/dspace/app/oai/DSpaceRecordFactory.java </li>
-<li>Changed: dspace/src/org/dspace/app/oai/OAIDCCrosswalk.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/filter/AdminOnlyFilter.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/filter/RegisteredOnlyFilter.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/jsptag/IncludeTag.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/jsptag/ItemListTag.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/jsptag/ItemTag.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/jsptag/LayoutTag.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/jsptag/PopupTag.java </li>
-<li>New: dspace/src/org/dspace/app/webui/jsptag/SelectEPersonTag.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/AdvancedSearchServlet.java </li>
-<li>New: dspace/src/org/dspace/app/webui/servlet/BitstreamServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/CommunityListServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/HandleServlet.java </li>
-<li>New: dspace/src/org/dspace/app/webui/servlet/HTMLServlet.java </li>
-<li>New: dspace/src/org/dspace/app/webui/servlet/LoadDSpaceConfig.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/RegisterServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/SimpleSearchServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/SubmitServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/AuthorizeAdminServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/BitstreamFormatRegistry.java </li>
-<li>New: dspace/src/org/dspace/app/webui/servlet/admin/CollectionWizardServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/DCTypeRegistryServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/EditCommunitiesServlet.java </li>
-<li>Removed: dspace/src/org/dspace/app/webui/servlet/admin/EditEPersonServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/EditItemServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/EPersonAdminServlet.java </li>
-<li>New: dspace/src/org/dspace/app/webui/servlet/admin/EPersonListServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/GroupEditServlet.java </li>
-<li>New: dspace/src/org/dspace/app/webui/servlet/admin/ItemMapServlet.java </li>
-<li>New: dspace/src/org/dspace/app/webui/servlet/admin/NewsEditServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/servlet/admin/WorkflowAbortServlet.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/util/Authenticate.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/util/FileUploadRequest.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/util/JSPManager.java </li>
-<li>Changed: dspace/src/org/dspace/app/webui/util/UIUtil.java </li>
-<li>Changed: dspace/src/org/dspace/authorize/AuthorizeManager.java </li>
-<li>Changed: dspace/src/org/dspace/authorize/FixDefaultPolicies.java </li>
-<li>Changed: dspace/src/org/dspace/authorize/PolicySet.java </li>
-<li>Changed: dspace/src/org/dspace/authorize/ResourcePolicy.java </li>
-<li>Changed: dspace/src/org/dspace/browse/Browse.java </li>
-<li>Changed: dspace/src/org/dspace/content/Bitstream.java </li>
-<li>Changed: dspace/src/org/dspace/content/Bundle.java </li>
-<li>Changed: dspace/src/org/dspace/content/Collection.java </li>
-<li>Changed: dspace/src/org/dspace/content/Community.java </li>
-<li>Changed: dspace/src/org/dspace/content/DSpaceObject.java </li>
-<li>Changed: dspace/src/org/dspace/content/InProgressSubmission.java </li>
-<li>Changed: dspace/src/org/dspace/content/InstallItem.java </li>
-<li>Changed: dspace/src/org/dspace/content/Item.java </li>
-<li>Changed: dspace/src/org/dspace/content/WorkspaceItem.java </li>
-<li>Changed: dspace/src/org/dspace/core/ConfigurationManager.java </li>
-<li>Changed: dspace/src/org/dspace/core/Constants.java </li>
-<li>Changed: dspace/src/org/dspace/core/Utils.java </li>
-<li>Changed: dspace/src/org/dspace/eperson/EPerson.java </li>
-<li>New: dspace/src/org/dspace/eperson/EPersonDeletionException.java </li>
-<li>Changed: dspace/src/org/dspace/eperson/Group.java </li>
-<li>New: dspace/src/org/dspace/license/CreativeCommons.java </li>
-<li>Changed: dspace/src/org/dspace/search/DSIndexer.java </li>
-<li>Changed: dspace/src/org/dspace/search/DSQuery.java </li>
-<li>Changed: dspace/src/org/dspace/search/Harvest.java </li>
-<li>Changed: dspace/src/org/dspace/search/HarvestedItemInfo.java </li>
-<li>Changed: dspace/src/org/dspace/search/QueryArgs.java </li>
-<li>Changed: dspace/src/org/dspace/search/QueryResults.java </li>
-<li>Changed: dspace/src/org/dspace/storage/rdbms/DatabaseManager.java </li>
-<li>Changed: dspace/src/org/dspace/storage/rdbms/TableRow.java </li>
-<li>Changed: dspace/src/org/dspace/workflow/WorkflowItem.java </li>
-<li>Changed: dspace/src/org/dspace/workflow/WorkflowManager.java </li>
-</ul>
-</div>
+
+
 <h2><a name="version1_1_1">Changes in DSpace 1.1.1</a></h2>
 <h3>Bug fixes</h3>
 <ul>
@@ -530,6 +395,6 @@ error)</li>
 expire.)</li>
 </ul>
 <hr>
-<address> Copyright &copy; 2002-2004 MIT and Hewlett Packard </address>
+<address> Copyright &copy; 2002-2005 MIT and Hewlett Packard </address>
 </body>
 </html>
