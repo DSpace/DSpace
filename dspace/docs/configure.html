@@ -337,7 +337,7 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
   <p>You could create a customized version of the password login servlet to perform a similar action. For example, if your organization uses Windows NT domain authentication, you could implement a version of PasswordServlet.java that validates against Windows NT authentication, and automatically adds an e-person record for new users. It is strongly recommended that you do not edit PasswordServlet but create a new servlet for this, so that future updates of the DSpace code do not overwrite your changes. You would also have to implement a customized <code>SiteAuthenticator</code> in which the <code>startAuthentication</code> method would forward requests to your new servlet.</p>
 
 
-  <h3><a name="ldap" id="ldap">Configuring LDAP Authentication</a></h3>
+  <h2><a name="ldap" id="ldap">Configuring LDAP Authentication</a></h2>
 
   <p>If LDAP is enabled in the dspace.cfg file, then new users will be able to register by entering their username and password without being sent the registration token. If users do not have a username and password, then they can still register and login with just their email address the same way they do now.</p>
 
@@ -376,6 +376,40 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
     <li><b>ldap.phone_field = telephoneNumber</b><br>
     This is the field where the user's phone number is stored in the ldap directory. If the field is not found the field will be left blank in the new eperson object.</li>
   </ul>
+
+  <h2><a name="search-index" id="search-index">Configuring Lucene Search Indexes</a></h2>
+  
+  <p>(Available in DSpace 1.2.1+)</p>
+  
+  <p>Search Indexes can be configured via the <code>dspace.cfg</code> file. This allows institutions to choose which DSpace metadata fields are indexed by Lucene.</p>
+  
+  <p>For example, the following entries appear in a default DSpace installation:
+  <pre>
+		search.index.1 = author:contributor.*
+		search.index.2 = author:creator.*
+		search.index.3 = title:title.*
+		search.index.4 = keyword:subject.*
+		search.index.5 = abstract:description.abstract
+		search.index.6 = author:description.statementofresponsibility
+		search.index.7 = series:relation.ispartofseries
+		search.index.8 = abstract:description.tableofcontents
+		search.index.9 = mime:format.mimetype
+		search.index.10 = sponsor:description.sponsorship
+		search.index.11 = id:identifier.*
+	</pre>
+	</p>
+  
+  <p>The form of each entry is <code>search.index.&lt;id&gt; = &lt;search field&gt;:&lt;metadata field&gt;</code> where:
+    <ul>
+	  <li><code>&lt;id&gt;</code> is an incremental number to distinguish each search index entry</li>
+	  <li><code>&lt;search field&gt;</code> is an identifier for the search field this index will correspond to</li>
+	  <li><code>&lt;metadata field&gt;</code> is the DSpace metadata field to be indexed</li>
+	</ul>
+	<p>So in the example above, search.indexes1, 2 and 6 are configured as the <code>author</code> search field. The <code>author</code> index is created by Lucene indexing all <code>contributor</code>, <code>creator</code> and <code>description.statementofresponsibility</code> medatata fields.</p>
+	<p>After changing the configuration, run <code>index-all</code> to recreate the indexes.</p>
+  </p>
+  
+  <p><strong>NOTE:</strong> While the indexes are created, this only affects the search results and has no effect on the search components of the user interface. To add new search capability (e.g. to add a new search category to the Advanced Search) requires local customisation to the user interface.</p>
 
   <h2><a name="statistics" id="statistics">Configuring System Statistical Reports</a></h2>
 
