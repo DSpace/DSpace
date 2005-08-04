@@ -1,3 +1,9 @@
+1.3.1 final
+===========
+(Robert Tansley)
+- Fixed bug 1252153 - Error on fresh install
+
+
 1.3 final
 =========
 (Scott Yeadon)
