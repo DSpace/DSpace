@@ -543,7 +543,7 @@ public class Item extends DSpaceObject
             dcv.element = element;
             dcv.qualifier = qualifier;
             dcv.language = lang;
-            dcv.value = values[i].trim();
+            dcv.value = (values[i] == null ? null : values[i].trim());
             dublinCore.add(dcv);
         }
 

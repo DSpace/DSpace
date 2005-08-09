@@ -39,6 +39,7 @@
  */
 package org.dspace.app.itemexport;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -249,21 +250,7 @@ public class ItemExport
             exportItem(c, i, destDirName, seqStart);
         }
 
-        File destDir = new File(destDirName);
-
         c.complete();
-    }
-
-    private static void printUsage()
-    {
-        System.out.println("Output simple AIPs, given collection or item ID");
-        System.out
-                .println("Usage: ITEM|COLLECTION ID dest_dir sequence_number");
-        System.out.println("  dest_dir = destination of archive files");
-        System.out
-                .println("  sequence_number = 0, or some other number to start naming the archive directories");
-        System.out
-                .println("  first item dir is sequence_number, then sequence_number+1, etc.");
     }
 
     private static void exportItem(Context c, ItemIterator i,
@@ -299,19 +286,17 @@ public class ItemExport
                 throw new Exception("Directory " + destDir + "/" + seqStart
                         + " already exists!");
             }
+
+            if (itemDir.mkdir())
+            {
+                // make it this far, now start exporting
+                writeMetadata(c, myItem, itemDir);
+                writeBitstreams(c, myItem, itemDir);
+                writeHandle(c, myItem, itemDir);
+            }
             else
             {
-                if (itemDir.mkdir())
-                {
-                    // make it this far, now start exporting
-                    writeMetadata(c, myItem, itemDir);
-                    writeBitstreams(c, myItem, itemDir);
-                    writeHandle(c, myItem, itemDir);
-                }
-                else
-                {
-                    throw new Exception("Error, can't make dir " + itemDir);
-                }
+                throw new Exception("Error, can't make dir " + itemDir);
             }
         }
         else
@@ -331,11 +316,18 @@ public class ItemExport
 
         if (outFile.createNewFile())
         {
-            PrintWriter out = new PrintWriter(new FileWriter(outFile));
+            BufferedOutputStream out = new BufferedOutputStream(
+                    new FileOutputStream(outFile));
 
             DCValue[] dcorevalues = i.getDC(Item.ANY, Item.ANY, Item.ANY);
 
-            out.println("<dublin_core>");
+            // XML preamble
+            byte[] utf8 = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n"
+                    .getBytes("UTF-8");
+            out.write(utf8, 0, utf8.length);
+
+            utf8 = "<dublin_core>\n".getBytes("UTF-8");
+            out.write(utf8, 0, utf8.length);
 
             for (int j = 0; j < dcorevalues.length; j++)
             {
@@ -347,14 +339,16 @@ public class ItemExport
                     qualifier = "none";
                 }
 
-                String output = "  <dcvalue element=\"" + dcv.element + "\" "
+                utf8 = ("  <dcvalue element=\"" + dcv.element + "\" "
                         + "qualifier=\"" + qualifier + "\">"
-                        + Utils.addEntities(dcv.value) + "</dcvalue>";
+                        + Utils.addEntities(dcv.value) + "</dcvalue>\n").getBytes("UTF-8");
 
-                out.println(output);
+                out.write(utf8, 0, utf8.length);
             }
 
-            out.println("</dublin_core>");
+            utf8 = "</dublin_core>\n".getBytes("UTF-8");
+            out.write(utf8, 0, utf8.length);
+
             out.close();
         }
         else
