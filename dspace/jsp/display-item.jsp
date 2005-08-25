@@ -132,7 +132,7 @@
 <%
     }
 
-    String displayStyle = (displayAll ? "full" : "default");
+    String displayStyle = (displayAll ? "full" : "");
 %>
     <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
 

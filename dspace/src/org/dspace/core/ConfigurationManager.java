@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.log4j.Category;
@@ -194,6 +195,16 @@ public class ConfigurationManager
         return boolValue;
     }
 
+    /**
+     * Returns an enumeration of all the keys in the DSpace configuration
+     * 
+     * @return an enumeration of all the keys in the DSpace configuration
+     */
+    public static Enumeration propertyNames()
+    {
+        return properties.propertyNames();
+    }
+    
     /**
      * Get the template for an email message. The message is suitable for
      * inserting values using <code>java.text.MessageFormat</code>.
