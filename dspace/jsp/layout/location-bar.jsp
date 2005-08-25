@@ -57,7 +57,7 @@
   
 <%@ page import="java.util.List" %>
 
-<P class="locationBar">
+<p class="locationBar">
 <%
     List parentTitles = (List) request.getAttribute("dspace.layout.parenttitles");
     List parentLinks = (List) request.getAttribute("dspace.layout.parentlinks");
@@ -70,7 +70,7 @@
         // New line for each breadcrumb (no <br> needed for first)
         if (i > 0)
         {
-%><br><%
+%><br/><%
         }
 
         if (u.equals(""))
@@ -82,9 +82,9 @@
         else
         {
 %>
-<A HREF="<%= request.getContextPath() %><%= u %>"><%= s %></A>&nbsp;&gt;
+<a href="<%= request.getContextPath() %><%= u %>"><%= s %></a>&nbsp;&gt;
 <%
         }
 }
 %>
-</P>
+</p>

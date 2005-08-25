@@ -98,26 +98,26 @@
 <%-- 
     <h3>Quick Add Item:</h3>
 
-    <P>Enter the Handle or internal item ID of the item you want to add:</P>
+    <p>Enter the Handle or internal item ID of the item you want to add:</p>
     
-    <form method=POST>
-        <input type="hidden" name="action" value="add">
-        <input type="hidden" name="cid" value="<%=collection.getID()%>">
+    <form method="post" action="">
+        <input type="hidden" name="action" value="add"/>
+        <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
         <center>
-            <table class=miscTable>
+            <table class="miscTable">
                 <tr class="oddRowEvenCol">
-                    <td class="submitFormLabel">Handle:</td>
+                    <td class="submitFormLabel"><label for="thandle">Handle:</label></td>
                     <td>
-                            <input type="text" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size=12>
-                            <input type="submit" name="submit" value="Add">
+                            <input type="text" name="handle" id="thandle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size="12"/>
+                            <input type="submit" name="submit" value="Add"/>
                     </td>
                 </tr>
                 <tr></tr>
                 <tr class="oddRowEvenCol">
-                    <td class="submitFormLabel">Internal ID:</td>
+                    <td class="submitFormLabel"><label for="titem_id">Internal ID:</label></td>
                     <td>
-                            <input type="text" name="item_id" size=12>
-                            <input type="submit" name="submit" value="Add">
+                            <input type="text" name="item_id" id="titem_id" size="12"/>
+                            <input type="submit" name="submit" value="Add"/>
                     </td>
                 </tr>
             </table>
@@ -125,8 +125,8 @@
     </form>
 
     <h3>Import an entire collection</h3>
-    <form method=POST>
-    <input type=hidden name="cid" value="<%=collection.getID()%>">
+    <form method="post" action="">
+    <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
     <select name="collection2import">
 <%  for(int i=0; i<all_collections.length; i++)
     {
@@ -141,22 +141,22 @@
     } %>
     </select>
 
-    <input type=submit name="action" value="Add Entire Collection!">
+    <input type="submit" name="action" value="Add Entire Collection!"/>
     </form>        
     --%>
 
     <%-- <h3>Import By Author Match</h3>
     Enter part of an author's name for a list of matching items<br> --%>
 	<h3><fmt:message key="jsp.tools.itemmap-main.info4"/></h3>
-    <fmt:message key="jsp.tools.itemmap-main.info5"/><br>
+    <fmt:message key="jsp.tools.itemmap-main.info5"/><br/>
 
-    <form method=POST>
-        <input type=hidden name="cid" value="<%=collection.getID()%>">
-        <input name="namepart">
-        <%-- <input type=submit name="action" value="Search Authors"> --%>
-        <input type=hidden name="action" value="Search Authors">
-	    <input type=submit value="<fmt:message key="jsp.tools.itemmap-main.search.button"/>">
-        <br>
+    <form method="post" action="">
+        <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
+        <input name="namepart"/>
+        <%-- <input type="submit" name="action" value="Search Authors"/> --%>
+        <input type="hidden" name="action" value="Search Authors"/>
+	    <input type="submit" value="<fmt:message key="jsp.tools.itemmap-main.search.button"/>" />
+        <br/>
     </form> 
 
     <%-- <h3>Browse Items Imported From Collections:</h3> --%>
@@ -177,7 +177,6 @@
 <%
     }
 
-
     while( colKeys.hasNext() )
     {
         Collection myCollection = (Collection)collections.get(colKeys.next());
@@ -189,6 +188,6 @@
 
         String myLink = request.getContextPath()+"/tools/itemmap?action=browse";
 %>
-    <P align=center><A HREF="<%=myLink%>&cid=<%=cid%>&t=<%=myID%>"><%=myTitle%> (<%=myCount%>)</A></P>
+    <p align="center"><a href="<%=myLink%>&amp;cid=<%=cid%>&amp;t=<%=myID%>"><%=myTitle%> (<%=myCount%>)</a></p>
 <%  } %>            
 </dspace:layout>

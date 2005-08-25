@@ -51,12 +51,12 @@
 
 <dspace:layout titlekey="jsp.register.registration-sent.title">
 
-     <%-- <H1>Registration E-mail Sent</H1> --%>
-	 <H1><fmt:message key="jsp.register.registration-sent.title"/></H1>
+     <%-- <h1>Registration E-mail Sent</h1> --%>
+	 <h1><fmt:message key="jsp.register.registration-sent.title"/></h1>
 
-    <%-- <P>You have been sent an e-mail containing a special URL, or "token".  When
+    <%-- <p>You have been sent an e-mail containing a special URL, or "token".  When
     you visit this URL, you will need to fill out some simple information.
-    After that,	you'll be ready to log into DSpace!</P> --%>
-	<P><fmt:message key="jsp.register.registration-sent.info"/></P>
+    After that,	you'll be ready to log into DSpace!</p> --%>
+	<p><fmt:message key="jsp.register.registration-sent.info"/></p>
 
 </dspace:layout>

@@ -75,9 +75,8 @@
 %>
 
 <dspace:layout titlekey="jsp.feedback.form.title">
-
-    <%-- <H1>Feedback Form</H1> --%>
-    <H1><fmt:message key="jsp.feedback.form.title"/></H1>
+    <%-- <h1>Feedback Form</h1> --%>
+    <h1><fmt:message key="jsp.feedback.form.title"/></h1>
     
     <%-- <p>Thanks for taking the time to share your feedback about the
     DSpace system. Your comments are appreciated!</p> --%>
@@ -87,29 +86,26 @@
     if (problem)
     {
 %>
-        <%-- <P><strong>Please fill out all of the information below.</strong></P> --%>
-        <P><strong><fmt:message key="jsp.feedback.form.text2"/></strong></P>
+        <%-- <p><strong>Please fill out all of the information below.</strong></p> --%>
+        <p><strong><fmt:message key="jsp.feedback.form.text2"/></strong></p>
 <%
     }
 %>
-    <form action="<%= request.getContextPath() %>/feedback" method="POST">
+    <form action="<%= request.getContextPath() %>/feedback" method="post">
         <center>
             <table>
                 <tr>
-                    <%-- <td class="submitFormLabel">Your Email Address:</td> --%>
-                    <td class="submitFormLabel"><fmt:message key="jsp.feedback.form.email"/></td>
-                    <td><input type="TEXT" name="email" size="50" value="<%= email %>"></td>
+                    <td class="submitFormLabel"><label for="temail"><fmt:message key="jsp.feedback.form.email"/></label></td>
+                    <td><input type="text" name="email" id="temail" size="50" value="<%= email %>" /></td>
                 </tr>
                 <tr>
-                    <%-- <td class="submitFormLabel">Your Comments:</td> --%>
-                    <td class="submitFormLabel"><fmt:message key="jsp.feedback.form.comment"/></td>
-                    <td><textarea name="feedback" rows="6" cols="50" wrap=soft><%= feedback %></textarea></td>
+                    <td class="submitFormLabel"><label for="tfeedback"><fmt:message key="jsp.feedback.form.comment"/></label></td>
+                    <td><textarea name="feedback" id="tfeedback" rows="6" cols="50"><%= feedback %></textarea></td>
                 </tr>
                 <tr>
                     <td colspan="2" align="center">
-                    <input type="HIDDEN" name="fromPage" value='<%= request.getParameter("fromPage") %>'>
-                    <%-- <input type="SUBMIT" name="submit" value="Send"> --%>
-                    <input type="SUBMIT" name="submit" value="<fmt:message key="jsp.feedback.form.send"/>">
+                    <input type="hidden" name="fromPage" value="<%= request.getParameter("fromPage") %>"/>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.feedback.form.send"/>" />
                     </td>
                 </tr>
             </table>

@@ -74,82 +74,79 @@
 	{
 	case CollectionWizardServlet.PERM_READ:
 %>
-	<%-- <H1>Authorization to Read</H1> --%>
+	<%-- <h1>Authorization to Read</h1> --%>
 
-<H1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading1"/></H1>
+    <h1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading1"/></h1>
 
-	<%-- <P>Who has (by default) permission to read new items submitted to this collection? --%>
-	<P><fmt:message key="jsp.dspace-admin.wizard-permissions.text1"/>
+	<%-- <p>Who has (by default) permission to read new items submitted to this collection? --%>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text1"/></p>
 <%
 	break;
 
 	case CollectionWizardServlet.PERM_SUBMIT:
 %>
-	<%-- <H1>Authorization to Submit</H1> --%>
-	<H1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading2"/></H1>
+	<%-- <h1>Authorization to Submit</h1> --%>
+	<h1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading2"/></h1>
 
-	<%-- <P>Who has permission to submit new items to this collection? --%>
-	<P><fmt:message key="jsp.dspace-admin.wizard-permissions.text2"/>
+	<%-- <p>Who has permission to submit new items to this collection? --%>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text2"/></p>
 <%
 	break;
 
 	case CollectionWizardServlet.PERM_WF1:
 %>
-	<%-- <H1>Submission Workflow Accept/Reject Step</H1> --%>
-	<H1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading3"/></H1>
+	<%-- <h1>Submission Workflow Accept/Reject Step</h1> --%>
+	<h1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading3"/></h1>
 
-	<%-- <P>Who is responsible for performing the <strong>accept/reject</strong> step?
+	<%-- <p>Who is responsible for performing the <strong>accept/reject</strong> step?
 	They will be able to accept or reject incoming submissions.  They will not be
 	able to edit the submission's metadata, however.  Only one of the group need perform the step
 	for each submission. --%>
-	<P><fmt:message key="jsp.dspace-admin.wizard-permissions.text3"/>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text3"/></p>
 <%
 	break;
 
 	case CollectionWizardServlet.PERM_WF2:
 %>
-	<%-- <H1>Submission Workflow Accept/Reject/Edit Metadata Step</H1> --%>
-	<H1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading4"/></H1>
+	<%-- <h1>Submission Workflow Accept/Reject/Edit Metadata Step</h1> --%>
+	<h1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading4"/></h1>
 
-	<%-- <P>Who is responsible for performing the <strong>accept/reject/edit metadata</strong> step?
+	<%-- <p>Who is responsible for performing the <strong>accept/reject/edit metadata</strong> step?
 		They will be able to edit the metadata of incoming submissions, and then accept
 		or reject them.  Only one of the group need perform the step for each submission. --%>
-	<P><fmt:message key="jsp.dspace-admin.wizard-permissions.text4"/>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text4"/></p>
 <%
 	break;
 
 	case CollectionWizardServlet.PERM_WF3:
 %>
-	<%-- <H1>Submission Workflow Edit Metadata Step</H1> --%>
-	<H1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading5"/></H1>
+	<%-- <h1>Submission Workflow Edit Metadata Step</h1> --%>
+	<h1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading5"/></h1>
 
-	<%-- <P>Who is responsible for performing the <strong>edit metadata</strong> step?
+	<%-- <p>Who is responsible for performing the <strong>edit metadata</strong> step?
 	They will be able to edit the metadata of incoming submissions, but will not
-	be able to reject them. --%>
-	<P><fmt:message key="jsp.dspace-admin.wizard-permissions.text5"/>
+	be able to reject them.</p>--%>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text5"/>
 <%
 	break;
 
 	case CollectionWizardServlet.PERM_ADMIN:
 %>
-	<%-- <H1>Delegated Collection Administrators</H1> --%>
-	<H1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading6"/></H1>
-
-	<%-- <P>Who are the collection administrators for this collection?  They will be able to decide who can submit items
-to the collection, withdraw items, edit item metadata (after submission), and add (map) existing items from
-other collections to this collection (subject to authorization from that collection). --%>
-	<P><fmt:message key="jsp.dspace-admin.wizard-permissions.text6"/>
+	<%-- <h1>Delegated Collection Administrators</h1> --%>
+	<h1><fmt:message key="jsp.dspace-admin.wizard-permissions.heading6"/></h1>
+	<%-- <p>Who are the collection administrators for this collection?  They will be able to decide who can submit items
+    to the collection, withdraw items, edit item metadata (after submission), and add (map) existing items from
+    other collections to this collection (subject to authorization from that collection).</p>--%>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text6"/></p>
 <%
 	break;
 	}
 %>
-<dspace:popup page="/help/site-admin.html#wizard_permissions"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
+<p><object><dspace:popup page="/help/site-admin.html#wizard_permissions"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>
+	<%-- <p>You can change this later using the relevant sections of the DSpace admin UI.</p> --%>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.change"/></p>
 
-	<%-- <P>You can change this later using the relevant sections of the DSpace admin UI.</P> --%>
-	<P><fmt:message key="jsp.dspace-admin.wizard-permissions.change"/></P>
-
-    <form action="<%= request.getContextPath() %>/tools/collection-wizard" method=post>
-
+    <form action="<%= request.getContextPath() %>/tools/collection-wizard" method="post">
 		<center>
 			<table>
 <%
@@ -162,19 +159,19 @@ other collections to this collection (subject to authorization from that collect
 %>
 				<tr>
 					<td></td>
-					<%-- <td><input type=checkbox name="mitgroup" value="true">&nbsp;<span class="submitFormLabel">All MIT users</span> --%>
-					<td><input type=checkbox name="mitgroup" value="true">&nbsp;<span class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-permissions.mit"/></span>
+					<%-- 	<td><input type="checkbox" name="mitgroup" value="true" />&nbsp;<span class="submitFormLabel">All MIT users</span> --%>
+					<td><input type="checkbox" name="mitgroup" value="true"/>&nbsp;<span class="submitFormLabel"><fmt:message key="jsp.dspace-admin.wizard-permissions.mit"/></span>
 					</td>
 				</tr>
 				<tr>
-					<td colspan=3>&nbsp;</td>
+					<td colspan="3">&nbsp;</td>
 				</tr>
 				<tr>
-					<%-- <td colspan=3 class="submitFormHelp"><STRONG>OR</STRONG></td> --%>
-					<td colspan=3 class="submitFormHelp"><STRONG><fmt:message key="jsp.dspace-admin.wizard-permissions.or"/></STRONG></td>
+					<%-- <td colspan="3" class="submitFormHelp"><STRONG>OR</STRONG></td> --%>
+					<td colspan=3 class="submitFormHelp"><strong><fmt:message key="jsp.dspace-admin.wizard-permissions.or"/></strong></td>
 				</tr>
 				<tr>
-					<td colspan=3>&nbsp;</td>
+					<td colspan="3">&nbsp;</td>
 				</tr>
 <%
 	}
@@ -190,7 +187,7 @@ other collections to this collection (subject to authorization from that collect
 				</tr>
 				<tr>
 					<td></td>
-					<td align=center>
+					<td align="center">
 						<dspace:selecteperson multiple="yes" />
 					</td>
 				</tr>
@@ -198,19 +195,19 @@ other collections to this collection (subject to authorization from that collect
 		</center>
 
 <%-- Hidden fields needed for servlet to know which collection and page to deal with --%>
-        <input type=hidden name="collection_id" value=<%= ((Collection) request.getAttribute("collection")).getID() %>>
-        <input type=hidden name="stage" value=<%= CollectionWizardServlet.PERMISSIONS %>>
-        <input type=hidden name="permission" value=<%= perm %>>
+        <input type="hidden" name="collection_id" value="<%= ((Collection) request.getAttribute("collection")).getID() %>" />
+        <input type="hidden" name="stage" value="<%= CollectionWizardServlet.PERMISSIONS %>" />
+        <input type="hidden" name="permission" value="<%= perm %>" />
 
         <center>
-            <table border=0 width="80%">
+            <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;
 
                     </td>
                     <td>
-                        <%-- <input type=submit name="submit_next" value="Next &gt;" onclick="javascript:finishEPerson();"> --%>
-                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>" onclick="javascript:finishEPerson();">
+                        <%-- <input type="submit" name="submit_next" value="Next &gt;" onclick="javascript:finishEPerson();"> --%>
+                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>" onclick="javascript:finishEPerson();"/>
                     </td>
                 </tr>
             </table>

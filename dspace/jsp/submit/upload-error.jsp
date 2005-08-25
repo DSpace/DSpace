@@ -68,7 +68,7 @@
                titlekey="jsp.submit.upload-error.title"
                nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method=post>
+    <form action="<%= request.getContextPath() %>/submit" method="post">
 
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
@@ -76,20 +76,20 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <%-- <H1>Submit: Error Uploading File</H1> --%>
-		<H1><fmt:message key="jsp.submit.upload-error.heading"/></H1>
+        <%-- <h1>Submit: Error Uploading File</h1> --%>
+		<h1><fmt:message key="jsp.submit.upload-error.heading"/></h1>
 
-        <%-- <P>There was a problem uploading your file.  Either the filename you entered
+        <%-- <p>There was a problem uploading your file.  Either the filename you entered
         was incorrect, or there was a network problem which prevented the file from
-        reaching us correctly.  Please try again.</P> --%>
-		<P><fmt:message key="jsp.submit.upload-error.info"/></P>
+        reaching us correctly.  Please try again.</p> --%>
+		<p><fmt:message key="jsp.submit.upload-error.info"/></p>
 
         <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type=hidden name=step value="<%= SubmitServlet.UPLOAD_ERROR %>">
+        <input type="hidden" name="step" value="<%= SubmitServlet.UPLOAD_ERROR %>" />
 <%-- HACK: <center> tag needed for broken Netscape 4.78 behaviour --%>
         <center>
-            <%-- <P><input type=submit name=submit value="Retry Upload"></P> --%>
-			<P><input type=submit name=submit value="<fmt:message key="jsp.submit.upload-error.retry.button"/>"></P>
+            <%-- <p><input type="submit" name="submit" value="Retry Upload" /></p> --%>
+			<p><input type="submit" name="submit" value="<fmt:message key="jsp.submit.upload-error.retry.button"/>" /></p>
         </center>
     </form>
 

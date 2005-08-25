@@ -64,26 +64,27 @@ import org.dspace.core.ConfigurationManager;
  * This tag <em>sets</em> request attributes that should be used by the header
  * and footer to render the page appropriately:
  * <P>
- * <UL>
- * <LI><code>dspace.layout.title</code>- title of page</LI>
- * <LI><code>dspace.layout.locbar</code>- value will Boolean true or false
- * </LI>
- * <LI><code>dspace.layout.parenttitles</code>- a <code>List</code> of
+ * <ul>
+ * <li><code>dspace.layout.title</code>- title of page</li>
+ * <li><code>dspace.layout.locbar</code>- value will Boolean true or false
+ * </li>
+ * <li><code>dspace.layout.parenttitles</code>- a <code>List</code> of
  * <code>String</code> s corresponding with titles to put in the location bar.
- * Only set if <code>dspace.layout.locbar</code> is true</LI>
- * <LI><code>dspace.layout.parentlinks</code>- a <code>List</code> of
+ * Only set if <code>dspace.layout.locbar</code> is true</li>
+ * <li><code>dspace.layout.parentlinks</code>- a <code>List</code> of
  * <code>String</code> s corresponding with links to put in the location bar.
  * Empty strings mean no link. Will only be set if
- * <code>dspace.layout.locbar</code> is true.</LI>
- * <LI><code>dspace.layout.navbar</code>- value will be "off", or the
- * navigation bar to include, e.g. "/layout/navbar_default.jsp"</LI>
- * <LI><code>dspace.layout.sidebar</code>- contents of the sidebar</LI>
- * <LI><code>dspace.current.user</code>- the EPerson currently logged in, or
- * <code>null</code> if anonymous access</LI>
- * </UL>
- * <P>
+ * <code>dspace.layout.locbar</code> is true.</li>
+ * <li><code>dspace.layout.navbar</code>- value will be "off", or the
+ * navigation bar to include, e.g. "/layout/navbar_default.jsp"</li>
+ * <li><code>dspace.layout.sidebar</code>- contents of the sidebar</li>
+ * <li><code>dspace.current.user</code>- the EPerson currently logged in, or
+ * <code>null</code> if anonymous access</li>
+ * </ul>
+ * <p>
  * Furthermore it sets the content type of the response to text/html using UTF-8
  * to ensure this will be returned in the HTTP header.
+ * </p>
  * 
  * @author Robert Tansley
  * @version $Revision$

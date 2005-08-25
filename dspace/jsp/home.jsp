@@ -72,33 +72,35 @@
             <td class="oddRowEvenCol"><%= topNews %></td>
         </tr>
     </table>
-
-    <br>
-
-    <form action="<%= request.getContextPath() %>/simple-search" method=GET>
+    <br/>
+    <form action="<%= request.getContextPath() %>/simple-search" method="get">
         <table class="miscTable" width="95%" align="center">
             <tr>
                 <td class="oddRowEvenCol">
-                  <H3><fmt:message key="jsp.home.search1"/></H3>
-                      <P><fmt:message key="jsp.home.search2"/></P>
-                      <P><input type=text name=query size=20>&nbsp;<input type=submit name=submit value="<fmt:message key="jsp.general.search.button"/>"></P>
+                  <h3><fmt:message key="jsp.home.search1"/></h3>
+                      <p><label for="tquery"><fmt:message key="jsp.home.search2"/></label></p>
+                      <p><input type="text" name="query" size="20" id="tquery" />&nbsp;
+                         <input type="submit" name="submit" value="<fmt:message key="jsp.general.search.button"/>" /></p>
                 </td>
             </tr>
         </table>
     </form>
-
     <table class="miscTable" width="95%" align="center">
         <tr>
             <td class="oddRowEvenCol">
-               <H3><fmt:message key="jsp.home.com1"/></H3>
-                <P><fmt:message key="jsp.home.com2"/></P>
-                <table border=0 cellpadding=2>
+               <h3><fmt:message key="jsp.home.com1"/></h3>
+                <p><fmt:message key="jsp.home.com2"/></p>
+                <table border="0" cellpadding="2">
+
 <%
+ if (communities.length != 0)
+ {
+
     for (int i = 0; i < communities.length; i++)
     {
 %>                  <tr>
                         <td class="standard">
-                            <A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></A>
+                            <a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
 <%
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
@@ -114,9 +116,11 @@
     }
 %>
                 </table>
+<%
+ }
+%>  
             </td>
         </tr>
     </table>
-
     <dspace:sidebar><%= sideNews %></dspace:sidebar>
 </dspace:layout>

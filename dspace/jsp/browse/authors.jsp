@@ -91,36 +91,36 @@
 
 <dspace:layout titlekey="jsp.browse.authors.title">
 
-    <H2><fmt:message key="jsp.browse.authors.title"/></H2>
-
-    <form action="browse-author" method=GET>
+    <h2><fmt:message key="jsp.browse.authors.title"/></h2>
+    <form action="browse-author" method="get">
 
         <%-- Browse controls --%>
-        <table align=center border=0 bgcolor="#CCCCCC" cellpadding=0>
+        <table align="center" border="0" bgcolor="#CCCCCC" cellpadding="0">
             <tr>
                 <td>
-                    <table border=0 bgcolor="#EEEEEE" cellpadding=2> <%--allow for greek alphabet also--%>
+                    <table border="0" bgcolor="#EEEEEE" cellpadding="2"> <%--allow for greek alphabet also--%>
                         <tr>
                             <td class="browseBar">
                         	    <%--<span class="browseBarLabel">Jump&nbsp;to:&nbsp;</span>--%>
 						        <span class="browseBarLabel"><fmt:message key="jsp.browse.authors.jump"/></span>
-                                <A HREF="browse-author?starts_with=0">0-9</A>
+                                <a href="browse-author?starts_with=0">0-9</a>
 <%
     for (char c = 'A'; c <= 'Z'; c++)
     {
 %>
-                                <A HREF="browse-author?starts_with=<%= c %>"><%= c %></A>
+                                <a href="browse-author?starts_with=<%= c %>"><%= c %></a>
 <%
     }
 %>
                             </td>
                         </tr>
                         <tr>
-                            <td class="browseBar" align=center>
+                            <td class="browseBar" align="center" id="tstarts_with">
+                                <span class="browseBarLabel"><label for="tstarts_with"><fmt:message key="jsp.browse.authors.enter"/>&nbsp;</label></span>                              
                                 <%--<span class="browseBarLabel">or enter first few letters:&nbsp;</span>--%>
-								<span class="browseBarLabel"><fmt:message key="jsp.browse.authors.enter"/>&nbsp;</span>
 								<%--<input type="text" name="starts_with">&nbsp;<input type="submit" value="Go!">--%>
-                                <input type="text" name="starts_with">&nbsp;<input type="submit" value="<fmt:message key="jsp.browse.general.go"/>">
+                                <input type="text" name="starts_with"/>&nbsp;<input type="submit" value="<fmt:message key="jsp.browse.general.go"/>" />
+
                             </td>
                         </tr>
                     </table>
@@ -128,47 +128,47 @@
             </tr>
         </table>
 
-        <BR />
+        <br />
 
-        <%--<P align=center>Showing authors <%= browseInfo.getOverallPosition() + 1 %>-<%= browseInfo.getOverallPosition() + browseInfo.getResultCount() %> of <%= browseInfo.getTotal() %>.</P>--%>
-        <P align=center><fmt:message key="jsp.browse.authors.show">
+        <%--<p align="center">Showing authors <%= browseInfo.getOverallPosition() + 1 %>-<%= browseInfo.getOverallPosition() + browseInfo.getResultCount() %> of <%= browseInfo.getTotal() %>.</p>--%>
+        <p align="center"><fmt:message key="jsp.browse.authors.show">
             <fmt:param><%= browseInfo.getOverallPosition() + 1 %></fmt:param>
             <fmt:param><%= browseInfo.getOverallPosition() + browseInfo.getResultCount() %></fmt:param>
             <fmt:param><%= browseInfo.getTotal() %></fmt:param>
-        </fmt:message></P>
+        </fmt:message></p>
 
         <%-- Previous page/Next page --%>
-        <table align=center border=0 width=70%>
+        <table align="center" border="0" width="70%">
             <tr>
-                <td class=standard align=left>
+                <td class="standard" align="left">
 <%
     if (prevQuery != null)
     {
 %>
 
-                    <%-- <A HREF="browse-author?<%= prevQuery %>">Previous page</A> --%>
-					<A HREF="browse-author?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
+
+                    <%-- <a="browse-author?<%= prevQuery %>">Previous page</a> --%>
+					<a href="browse-author?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></a>
 <%
     }
 %>
                 </td>
-                <td class=standard align=right>
+                <td class="standard" align="right">
 <%
     if (nextQuery != null)
     {
 %>
-		            <%-- <A HREF="browse-author?<%= nextQuery %>">Next page</A> --%>
-                    <A HREF="browse-author?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
+		            <%-- <a href="browse-author?<%= nextQuery %>">Next page</a> --%>
+                    <a href="browse-author?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></a>
 <%
     }
 %>
                 </td>
             </tr>
         </table>
-
-
+        
         <%-- The authors --%>
-        <table align=center class="miscTable">
+        <table align="center" class="miscTable" summary="This table displays a list of authors">
 <%
     // Row: toggles between Odd and Even
     String row = "odd";
@@ -179,7 +179,7 @@
 %>
             <tr>
                 <td class="<%= highlight && i==browseInfo.getOffset() ? "highlight" : row %>RowOddCol">
-                    <A HREF="items-by-author?author=<%= URLEncoder.encode(results[i]) %>"><%= Utils.addEntities(results[i]) %></A>
+                    <a href="items-by-author?author=<%= URLEncoder.encode(results[i], "UTF-8") %>"><%= Utils.addEntities(results[i]) %></a>
                 </td>
             </tr>
 <%
@@ -187,37 +187,32 @@
     }
 %>
         </table>
-
-
         <%-- Previous page/Next page --%>
-        <table align=center border=0 width=70%>
+        <table align="center" border="0" width="70%">
             <tr>
-                <td class=standard align=left>
+                <td class="standard" align="left">
 <%
     if (prevQuery != null)
     {
 %>
-                    <%-- <A HREF="browse-author?<%= prevQuery %>">Previous page</A> --%>
-				    <A HREF="browse-author?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
+				    <a href="browse-author?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></a>
 <%
     }
 %>
                 </td>
-                <td class=standard align=right>
+                <td class="standard" align="right">
 <%
     if (nextQuery != null)
     {
 %>
-		            <%-- <A HREF="browse-author?<%= nextQuery %>">Next page</A> --%>
-                    <A HREF="browse-author?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
+		            <%-- <a href="browse-author?<%= nextQuery %>">Next page</a> --%>
+                    <a href="browse-author?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></a>
 <%
     }
 %>
                 </td>
             </tr>
         </table>
-
-
     </form>
 
 </dspace:layout>

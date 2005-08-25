@@ -68,11 +68,13 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-    <%-- <H1>News Editor</H1> --%>
-    <H1><fmt:message key="jsp.dspace-admin.news-edit.heading"/></H1>
-
+    <%-- <h1>News Editor</h1> --%>
+    <h1><fmt:message key="jsp.dspace-admin.news-edit.heading"/></h1>
     <%-- <p>Add or edit text in the box below to have it appear
     in the <strong><%= positionStr%></strong> of the DSpace home page.</p> --%>
+
+ <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="post">
+
     <p>
 <% if (position.intValue() == Constants.NEWS_TOP)
    { %>
@@ -83,25 +85,22 @@
     <fmt:message key="jsp.dspace-admin.news-edit.text.sidebar"/>
 <% } %>
     </p>
-
     <%-- <p>You may format the text using HTML tags, but please note that the HTML will not be validated here.</p> --%>
     <p><fmt:message key="jsp.dspace-admin.news-edit.text3"/></p>
-
-    <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="POST">
         <center>
             <table>
                 <tr>
                    <%--  <td class="submitFormLabel">News:</td> --%>
                     <td class="submitFormLabel"><fmt:message key="jsp.dspace-admin.news-edit.news"/></td>
-                    <td><textarea name="news" rows="10" cols="50" wrap=soft><%= news %></textarea></td>
+                    <td><textarea name="news" rows="10" cols="50"><%= news %></textarea></td>
                 </tr>
                 <tr>
                     <td colspan="2" align="center">
-                    <input type="HIDDEN" name="position" value='<%= position.intValue()%>'>
-                    <%-- <input type="SUBMIT" name="submit_save" value="Save"> --%>
-                    <input type="SUBMIT" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>">
-                    <%-- <input type="SUBMIT" name="cancel" value="Cancel"> --%>
-                    <input type="SUBMIT" name="cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
+                    <input type="hidden" name="position" value='<%= position.intValue()%>'/>
+                    <%-- <input type="submit" name="submit_save" value="Save"> --%>
+                    <input type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
+                    <%-- <input type="submit" name="cancel" value="Cancel"> --%>
+                    <input type="submit" name="cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
                     </td>
                 </tr>
             </table>

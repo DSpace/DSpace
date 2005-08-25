@@ -68,10 +68,9 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-  <table width=95%>
+  <table width="95%">
     <tr>
-      <td align=left>
-       <%-- <h1>Dublin Core Type Registry</h1> --%>
+      <td align="left">
         <h1><fmt:message key="jsp.dspace-admin.list-dc-types.title"/></h1>
       </td>
       <td align="right" class="standard">
@@ -80,66 +79,67 @@
     </tr>
   </table>
 
-    <%-- <p align="center">
-        Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!
-    </p> --%>
     <p align="center">
         <fmt:message key="jsp.dspace-admin.list-dc-types.note"/>
     </p>
 
-    <table class="miscTable" align="center">
-        <tr>
-            <th class="oddRowOddCol"><strong>ID</strong></th>
-           <%-- <th class="oddRowEvenCol"><strong>Element</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.list-dc-types.element"/></strong></th>
-            <%-- <th class="oddRowOddCol"><strong>Qualifier</strong></th> --%>
-            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.list-dc-types.qualifier"/></strong></th>
-            <%-- <th class="oddRowEvenCol"><strong>Scope Note</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.list-dc-types.scope"/></strong></th>
-            <th class="oddRowOddCol">&nbsp;</th>
-            <th class="oddRowEvenCol">&nbsp;</th>
-        </tr>
-
+        <table width="70%" class="miscTable" align="center" summary="Dublic Core Type Registry data table">
+           <tr>
+              <th class="oddRowOddCol">
+                 <strong>
+                            ID 
+                            / <fmt:message key="jsp.dspace-admin.list-dc-types.element"/> 
+                            / <fmt:message key="jsp.dspace-admin.list-dc-types.qualifier"/> 
+                            / <fmt:message key="jsp.dspace-admin.list-dc-types.scope"/>
+                 </strong>
+              </th>
+           </tr>
+           
 <%
     String row = "even";
     for (int i = 0; i < types.length; i++)
     {
 %>
-        <form method=POST>
-            <tr>
-                <td class="<%= row %>RowOddCol"><%= types[i].getID() %></td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="text" name="element" value="<%= types[i].getElement() %>" size=12>
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <input type="text" name="qualifier" value="<%= (types[i].getQualifier() == null ? "" : types[i].getQualifier()) %>" size=12>
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <textarea name="scope_note" rows=3 cols=40><%= (types[i].getScopeNote() == null ? "" : types[i].getScopeNote()) %></textarea>
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <input type="hidden" name="dc_type_id" value="<%= types[i].getID() %>">
-                    <%-- <input type="submit" name="submit_update" value="Update"> --%>
-                    <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>">
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <%-- <input type="submit" name="submit_delete" value="Delete..."> --%>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>">
-                </td>
-            </tr>
-        </form>
+      <tr>
+         <td>
+             <form method="post" action="">
+                 <table>
+                     <tr>
+                         <td class="<%= row %>RowOddCol"><%= types[i].getID() %></td>
+                         <td class="<%= row %>RowEvenCol">
+                             <input type="text" name="element" value="<%= types[i].getElement() %>" size="12"/>
+                         </td>
+                         <td class="<%= row %>RowOddCol">
+                             <input type="text" name="qualifier" value="<%= (types[i].getQualifier() == null ? "" : types[i].getQualifier()) %>" size="12"/>
+                         </td>
+                         <td class="<%= row %>RowEvenCol">
+                             <textarea name="scope_note" rows="3" cols="40"><%= (types[i].getScopeNote() == null ? "" : types[i].getScopeNote()) %></textarea>
+                         </td>
+                         <td class="<%= row %>RowOddCol">
+                            <input type="hidden" name="dc_type_id" value="<%= types[i].getID() %>"/>
+                            <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>"/>
+                         </td>
+                         <td class="<%= row %>RowEvenCol">
+                            <input type="hidden" name="dc_type_id" value="<%= types[i].getID() %>"/>
+                            <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>"/>
+                         </td>
+                     </tr>
+                 </table>
+             </form>
+         </td>
+      </tr>
 <%
         row = (row.equals("odd") ? "even" : "odd");
     }
 %>
-    </table>
-        
-    <P align="center">
-        <%-- Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!<br><br> --%>
-        <fmt:message key="jsp.dspace-admin.list-dc-types.note"/><br><br>
-        <form method=POST>
-            <%-- <input type="submit" name="submit_add" value="Add New"> --%>
-            <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.addnew"/>">
-        </form>
-    </p>
+
+ </table>
+
+    <form method="post" action="">     
+      <p align="center">
+        <fmt:message key="jsp.dspace-admin.list-dc-types.note"/><br /><br />
+            <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.addnew"/>" />
+      </p>
+   </form>
 </dspace:layout>
+

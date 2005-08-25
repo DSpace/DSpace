@@ -78,14 +78,14 @@
         <fmt:param><%= group.getID() %></fmt:param>
     </fmt:message></h1>
 
-    <form method=POST>
+    <form method="post" action="">
 
     <table class="miscTable" align="center">
         <tr>
             <td>
-                <input type="hidden" name="group_id" value="<%=group.getID()%>">
+                <input type="hidden" name="group_id" value="<%=group.getID()%>"/>
                 
-                <select size="15" name="eperson_id" multiple>
+                <select size="15" name="eperson_id" multiple="multiple">
                         <%  for (int i = 0; i < epeople.length; i++) { %>
                             <option value="<%= epeople[i].getID()%>">
                                 <%= epeople[i].getEmail()%>
@@ -101,11 +101,11 @@
             <tr>
                 <td align="left">
                     <%-- <input type="submit" name="submit_add_eperson_add" value="Add EPerson"> --%>
-                    <input type="submit" name="submit_add_eperson_add" value="<fmt:message key="jsp.dspace-admin.group-eperson-select.add"/>">
+                    <input type="submit" name="submit_add_eperson_add" value="<fmt:message key="jsp.dspace-admin.group-eperson-select.add"/>" />
                 </td>
                 <td align="right">
                     <%-- <input type="submit" name="submit_add_eperson_cancel" value="Cancel"> --%>
-                    <input type="submit" name="submit_add_eperson_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
+                    <input type="submit" name="submit_add_eperson_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
                 </td>
             </tr>
         </table>

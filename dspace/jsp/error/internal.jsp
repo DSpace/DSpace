@@ -54,28 +54,25 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout titlekey="jsp.error.internal.title">
-
-    <%-- <H1>Internal System Error</H1> --%>
-    <H1><fmt:message key="jsp.error.internal.title"/></H1>
-
-    <%-- <P>Oops!  The system has experienced an internal error.  This is our fault,
-    please pardon our dust during these early stages of the DSpace system!</P> --%>
-    <P><fmt:message key="jsp.error.internal.text1"/></P>
-
-    <%-- <P>The system has logged this error.  Please try to do what you were doing
+    <%-- <h1>Internal System Error</h1> --%>
+    <h1><fmt:message key="jsp.error.internal.title"/></h1>
+    <%-- <p>Oops!  The system has experienced an internal error.  This is our fault,
+    please pardon our dust during these early stages of the DSpace system!</p> --%>
+    <p><fmt:message key="jsp.error.internal.text1"/></p>
+    <%-- <p>The system has logged this error.  Please try to do what you were doing
     again, and if the problem persists, please contact us so we can fix the
-    problem.</P> --%>
+    problem.</p> --%>
 
     <dspace:include page="/components/contact-info.jsp" />
 
-    <P align=center>
-        <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
-    </P>
+    <p align="center">
+        <%-- <a href="<%= request.getContextPath() %>/">Go to the DSpace home page</a> --%>
+        <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a>
+    </p>
         <!--
     <%
     Throwable ex = (Throwable) request.getAttribute("javax.servlet.error.exception");
-    if(ex == null) out.println("No stack trace available<br>");
+    if(ex == null) out.println("No stack trace available<br/>");
     else {
                 for(Throwable t = ex ; t!=null; t = t.getCause())
                 {

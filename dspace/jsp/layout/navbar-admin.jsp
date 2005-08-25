@@ -67,99 +67,99 @@
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/edit-communities") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/edit-communities") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/tools/edit-communities"><fmt:message key="jsp.layout.navbar-admin.communities-collections"/></a>
     </td>
   </tr>
   
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/edit-epeople") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/edit-epeople") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople"><fmt:message key="jsp.layout.navbar-admin.epeople"/></a>
     </td>
   </tr>
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/group-edit") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/group-edit") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/tools/group-edit"><fmt:message key="jsp.layout.navbar-admin.groups"/></a>
     </td>
   </tr>
   
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/edit-item") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/edit-item") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/tools/edit-item"><fmt:message key="jsp.layout.navbar-admin.items"/></a>
     </td>
   </tr>
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/dc-registry") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/dc-registry") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/dspace-admin/dc-registry"><fmt:message key="jsp.layout.navbar-admin.dcregistry"/></a>
     </td>
   </tr>
   
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/format-registry") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/format-registry") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/dspace-admin/format-registry"><fmt:message key="jsp.layout.navbar-admin.formatregistry"/></a>
     </td>
   </tr>
   
    <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/workflow") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/workflow") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/dspace-admin/workflow"><fmt:message key="jsp.layout.navbar-admin.workflow"/></a>
     </td>
   </tr>
   
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/authorize") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/authorize") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/dspace-admin/authorize"><fmt:message key="jsp.layout.navbar-admin.authorization"/></a>
     </td>
   </tr>
   
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/news-edit") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/news-edit") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/dspace-admin/news-edit"><fmt:message key="jsp.layout.navbar-admin.editnews"/></a>
     </td>
   </tr>
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/supervise") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/supervise") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/dspace-admin/supervise"><fmt:message key="jsp.layout.navbar-admin.supervisors"/></a>
     </td>
   </tr>
   
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/statistics") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16">
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/statistics") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
-    <td nowrap class="navigationBarItem">
+    <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/statistics"><fmt:message key="jsp.layout.navbar-admin.statistics"/></a>
     </td>
   </tr>
@@ -170,18 +170,18 @@
   
   <tr class="navigationBarItem">
      <td>
-         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16">
+         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16"/>
      </td>
-     <td nowrap class="navigationBarItem">
+     <td nowrap="nowrap" class="navigationBarItem">
          <dspace:popup page="/help/site-admin.html"><fmt:message key="jsp.layout.navbar-admin.help"/></dspace:popup>
      </td>
  </tr>
 
  <tr class="navigationBarItem">
      <td>
-         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16">
+         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16"/>
      </td>
-     <td nowrap class="navigationBarItem">
+     <td nowrap="nowrap" class="navigationBarItem">
          <a href="<%= request.getContextPath() %>/logout"><fmt:message key="jsp.layout.navbar-admin.logout"/></a>
      </td>
  </tr>

@@ -90,45 +90,41 @@
 %>
 
 <dspace:layout titlekey="jsp.browse.items-by-date.title">
-
-    <H2><fmt:message key="jsp.browse.items-by-date.title"/></H2>
-
+    <h2><fmt:message key="jsp.browse.items-by-date.title"/></h2>
     <%-- Date browse controls table --%>
-    <form action="browse-date" method=GET>
-
+    <form action="browse-date" method="get">
 <%
     if (oldestFirst)
     {
         // Remember ordering when using browse controls
 %>
-        <input type=hidden name="order" value="oldestfirst">
+        <input type="hidden" name="order" value="oldestfirst"/>
 <%
     }
 %>
-        <table align=center border=0 bgcolor="#CCCCCC" cellpadding=0>
+        <table align="center" border="0" bgcolor="#CCCCCC" cellpadding="0" summary="Browse the respository by date">
             <tr>
                 <td>
-                    <table border=0 bgcolor="#EEEEEE" cellpadding=2>
+                    <table border="0" bgcolor="#EEEEEE" cellpadding="2">
                         <tr>
                             <td class="browseBar">
                                 <%-- <span class="browseBarLabel">Jump to a point in the index: </span> --%>
 								<span class="browseBarLabel"><fmt:message key="jsp.browse.items-by-date.jump"/> </span>
-                                <select name=month>
+                                <select name="month">
 								    <%-- <option selected value="-1">(Choose month)</option> --%>
-                                    <option selected value="-1"><fmt:message key="jsp.browse.items-by-date.month"/></option>
+                                    <option selected="selected" value="-1"><fmt:message key="jsp.browse.items-by-date.month"/></option>
 <%
     for (int i = 1; i <= 12; i++)
     {
 %>
-                                    <option value=<%= i %>><%= DCDate.getMonthName(i) %></option>
+                                    <option value="<%= i %>"><%= DCDate.getMonthName(i) %></option>
 <%
     }
 %>
                                 </select>
-
-                                <select name=year>
+                                <select name="year">
 								    <%-- <option selected value="-1">(Choose year)</option> --%>
-                                    <option selected value="-1"><fmt:message key="jsp.browse.items-by-date.year"/></option>
+                                    <option selected="selected" value="-1"><fmt:message key="jsp.browse.items-by-date.year"/></option>
 <%
     int thisYear = DCDate.getCurrent().getYear();
     for (int i = thisYear; i >= 1990; i--)
@@ -146,17 +142,17 @@
                                     <option>1950</option>
                                 </select>
                             </td>
-                            <td class="browseBar" rowspan=2>
-							    <%-- <input type=submit value="Go"> --%>
-                                <input type=submit value="<fmt:message key="jsp.browse.general.go"/>">
+                            <td class="browseBar" rowspan="2">
+							    <%-- <input type="submit" value="Go"> --%>
+                                <input type="submit" value="<fmt:message key="jsp.browse.general.go"/>" />
                             </td>
                         </tr>
                         <tr>
                             <%-- HACK:  Shouldn't use align here --%>
-                            <td class="browseBar" align=center>
+                            <td class="browseBar" align="center">
 							    <%-- <span class="browseBarLabel">Or type in a year:</span> --%>
                                 <span class="browseBarLabel"><fmt:message key="jsp.browse.items-by-date.type"/></span>
-                                <input type=text name=starts_with size=4 maxlength=4>
+                                <input type="text" name="starts_with" size="4" maxlength="4"/>
                             </td>
                         </tr>
                     </table>
@@ -167,15 +163,15 @@
 
         <%-- Flip the ordering controls --%>
 
-        <table border=0 width=70% align=center>
+        <table border="0" width="70%" align="center">
             <tr>
-                <td align=left class=standard>
+                <td align="left" class="standard">
 <%
     if (oldestFirst)
     {
 %>
-                    <%-- <a href="browse-date?<%= flipOrderingQuery %>">Show Most Recent First</A> --%>
-                    <a href="browse-date?<%= flipOrderingQuery %>"><fmt:message key="jsp.browse.items-by-date.recent"/></A>
+                    <%-- <a href="browse-date?<%= flipOrderingQuery %>">Show Most Recent First</a> --%>
+                    <a href="browse-date?<%= flipOrderingQuery %>"><fmt:message key="jsp.browse.items-by-date.recent"/></a>
 <%
     }
     else
@@ -187,7 +183,7 @@
     }
 %>
                 </td>
-                <td align=right class=standard>
+                <td align="right" class="standard">
 <%
     if( oldestFirst )
     {
@@ -199,8 +195,8 @@
     else
     {
 %>
-                    <%-- <a href="browse-date?<%= flipOrderingQuery %>order=oldestfirst">Show Oldest First</A> --%>
-                    <a href="browse-date?<%= flipOrderingQuery %>order=oldestfirst"><fmt:message key="jsp.browse.items-by-date.old"/></A>
+                    <%-- <a href="browse-date?<%= flipOrderingQuery %>order=oldestfirst">Show Oldest First</a> --%>
+                    <a href="browse-date?<%= flipOrderingQuery %>order=oldestfirst"><fmt:message key="jsp.browse.items-by-date.old"/></a>
 <%
     }
 %>
@@ -209,36 +205,38 @@
         </table>
     </form>
 
-    <BR>
+    <br/>
 
-    <%-- <P align=center>Showing items <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %> of <%= browseInfo.getTotal() %>.</P> --%>
-	<P align=center><fmt:message key="jsp.browse.items-by-date.show">
+    <%-- <p align="center">Showing items <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %> of <%= browseInfo.getTotal() %>.</p> --%>
+	<p align="center"><fmt:message key="jsp.browse.items-by-date.show">
         <fmt:param><%= browseInfo.getOverallPosition()+1 %></fmt:param>
         <fmt:param><%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %></fmt:param>
         <fmt:param><%= browseInfo.getTotal() %></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 
     <%-- Previous page/Next page --%>
-    <table align=center border=0 width=70%>
+    <table align="center" border="0" width="70%">
         <tr>
-            <td class=standard align=left>
+            <td class="standard" align="left">
 <%
     if (prevQuery != null)
     {
 %>
-                <%-- <A HREF="browse-date?<%= prevQuery %>">Previous page</A> --%>
-                <A HREF="browse-date?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
+                <%-- <a href="browse-date?<%= prevQuery %>">Previous page</a> --%>
+                <a href="browse-date?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></a>
+
 <%
     }
 %>
             </td>
-            <td class=standard align=right>
+            <td class="standard" align="right">
 <%
     if (nextQuery != null)
     {
 %>
-                <%-- <A HREF="browse-date?<%= nextQuery %>">Next page</A> --%>
-				<A HREF="browse-date?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
+                <%-- <a href="browse-date?<%= nextQuery %>">Next page</a> --%>
+				<a href="browse-date?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></a>
+
 <%
     }
 %>
@@ -258,26 +256,27 @@
 
 
     <%-- Previous page/Next page --%>
-    <table align=center border=0 width=70%>
+    <table align="center" border="0" width="70%">
         <tr>
-            <td class=standard align=left>
+            <td class="standard" align="left">
 <%
     if (prevQuery != null)
     {
 %>
-                <%-- <A HREF="browse-date?<%= prevQuery %>">Previous page</A> --%>
-				<A HREF="browse-date?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
+                <%-- <a href="browse-date?<%= prevQuery %>">Previous page</a> --%>
+				<a href="browse-date?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></a>
 <%
     }
 %>
             </td>
-            <td class=standard align=right>
+            <td class="standard" align="right">
 <%
     if (nextQuery != null)
     {
 %>
-                <%-- <A HREF="browse-date?<%= nextQuery %>">Next page</A> --%>
-				<A HREF="browse-date?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
+
+                <%-- <a href="browse-date?<%= nextQuery %>">Next page</a> --%>
+				<a href="browse-date?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></a>
 <%
     }
 %>

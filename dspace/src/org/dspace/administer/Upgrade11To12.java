@@ -52,15 +52,15 @@ import org.dspace.core.Context;
  * version 1.1/1.1.1 to 1.2.
  * <P>
  * The changes are:
- * <UL>
- * <LI>Setting owning collection field for items
- * <LI>Reorganising content bitstreams into one bundle named ORIGINAL, license
+ * <ul>
+ * <li>Setting owning collection field for items
+ * <li>Reorganising content bitstreams into one bundle named ORIGINAL, license
  * bitstreams into a bundle named LICENSE
- * <LI>Setting the sequence_id numbers in the bitstream table. This happens as
+ * <li>Setting the sequence_id numbers in the bitstream table. This happens as
  * item.update() is called on every item.
- * <LI>If a (newly-reorganised) 'ORIGINAL' bundle contains a text/html
+ * <li>If a (newly-reorganised) 'ORIGINAL' bundle contains a text/html
  * bitstream, that bitstream is set to the primary bitstream for HTML support.
- * </UL>
+ * </ul>
  */
 public class Upgrade11To12
 {

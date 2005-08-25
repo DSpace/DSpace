@@ -80,80 +80,80 @@
                titlekey="jsp.submit.verify-prune.title"
                nocache="true">
 
-    <%-- <H1>Submit: Caution</H1> --%>
-	<H1><fmt:message key="jsp.submit.verify-prune.heading"/></H1>
-    
-    <%-- <P><strong>The changes you've made to the first "Describe Your Item" page
-    will affect your submission:</strong></P> --%>
-	<P><strong><fmt:message key="jsp.submit.verify-prune.info1"/></strong></P>
+    <%-- <h1>Submit: Caution</h1> --%>
+	<h1><fmt:message key="jsp.submit.verify-prune.heading"/></h1>
+ 
+    <%-- <p><strong>The changes you've made to the first "Describe Your Item" page
+    will affect your submission:</strong></p> --%>
+	<p><strong><fmt:message key="jsp.submit.verify-prune.info1"/></strong></p>
     
 <%
     if (willRemoveTitles)
     {
 %>
-    <%-- <P>You've indicated that your submission does not have alternative titles,
+    <%-- <p>You've indicated that your submission does not have alternative titles,
     but you've already entered some.  If you proceed with this change, the
-    alternative titles you've entered will be removed.</P> --%>
-	<P><fmt:message key="jsp.submit.verify-prune.info2"/></P>
+    alternative titles you've entered will be removed.</p> --%>
+	<p><fmt:message key="jsp.submit.verify-prune.info2"/></p>
 <%
     }
     
     if (willRemoveDate)
     {
 %>
-    <%-- <P>You've indicated that your submission has not been published or publicly
+    <%-- <p>You've indicated that your submission has not been published or publicly
     distributed before, but you've already entered an issue date, publisher
     and/or citation.  If you proceed, this information will be removed, and
-    DSpace will assign an issue date.</P> --%>
-	<P><fmt:message key="jsp.submit.verify-prune.info3"/></P>
+    DSpace will assign an issue date.</p> --%>
+	<p><fmt:message key="jsp.submit.verify-prune.info3"/></p>
 <%
     }
     
     if (willRemoveFiles)
     {
 %>
-    <%-- <P>You've indicated that the item you're submitting consists of only a single
+    <%-- <p>You've indicated that the item you're submitting consists of only a single
     file, but you've already uploaded more than one file.  If you proceed, only
     the first file you uploaded will be kept, and the rest will be discarded by
-    the system. (The files on your local hard drive will not be affected.)</P> --%>
-	<P><fmt:message key="jsp.submit.verify-prune.info4"/></P>
+    the system. (The files on your local hard drive will not be affected.)</p> --%>
+	<p><fmt:message key="jsp.submit.verify-prune.info4"/></p>
 <%
     }
 %>
 
-    <%-- <P><strong>Are you sure you want to proceed with the changes?</strong></P> --%>
-	<P><strong><fmt:message key="jsp.submit.verify-prune.question"/></strong></P>
+    <%-- <p><strong>Are you sure you want to proceed with the changes?</strong></p> --%>
+	<p><strong><fmt:message key="jsp.submit.verify-prune.question"/></strong></p>
 
-    <P>&nbsp;</P>
+    <p>&nbsp;</p>
 
-    <form action="<%= request.getContextPath() %>/submit" method="POST">
+    <form action="<%= request.getContextPath() %>/submit" method="post">
     
 <%-- Embed necessary information --%>
-        <input type=hidden name="multiple_titles" value="<%= multipleTitles %>">
-        <input type=hidden name="published_before" value="<%= publishedBefore %>">
-        <input type=hidden name="multiple_files" value="<%= multipleFiles %>">
-        <input type=hidden name="will_remove_titles" value="<%= willRemoveTitles %>">
-        <input type=hidden name="will_remove_date" value="<%= willRemoveDate %>">
-        <input type=hidden name="will_remove_files" value="<%= willRemoveFiles %>">
+        <input type="hidden" name="multiple_titles" value="<%= multipleTitles %>"/>
+        <input type="hidden" name="published_before" value="<%= publishedBefore %>"/>
+        <input type="hidden" name="multiple_files" value="<%= multipleFiles %>"/>
+        <input type="hidden" name="will_remove_titles" value="<%= willRemoveTitles %>"/>
+        <input type="hidden" name="will_remove_date" value="<%= willRemoveDate %>"/>
+        <input type="hidden" name="will_remove_files" value="<%= willRemoveFiles %>"/>
 
 <%-- Pass through original button press --%>
-        <input type=hidden name="<%= buttonPressed %>" value="true">
+        <input type="hidden" name="<%= buttonPressed %>" value="true"/>
 
-        <input type=hidden name=step value="<%= SubmitServlet.VERIFY_PRUNE %>">
+        <input type="hidden" name="step" value="<%= SubmitServlet.VERIFY_PRUNE %>"/>
         <%= SubmitServlet.getSubmissionParameters(si) %>
 
 <%-- Note: These submit buttons' names don't start with "submit", so the
   -- Previously passed in button will be picked up --%>
         <center>
-            <table border=0 width=70%>
+            <table border="0" width="70%">
                 <tr>
-                    <td align=left>
-                        <%-- <input type=submit name="proceed" value="Proceed With Changes"> --%>
-						<input type=submit name="proceed" value="<fmt:message key="jsp.submit.verify-prune.proceed.button"/>">
+                    <td align="left">
+                        <%-- <input type="submit" name="proceed" value="Proceed With Changes"> --%>
+						<input type="submit" name="proceed" value="<fmt:message key="jsp.submit.verify-prune.proceed.button"/>" />
                     </td>
-                    <td align=right>
-                        <%-- <input type=submit name="do_not_proceed" value="Do Not Make the Changes"> --%>
-						<input type=submit name="do_not_proceed" value="<fmt:message key="jsp.submit.verify-prune.notproceed.button"/>">
+                    <td align="right">
+                        <%-- <input type="submit" name="do_not_proceed" value="Do Not Make the Changes"> --%>
+						<input type="submit" name="do_not_proceed" value="<fmt:message key="jsp.submit.verify-prune.notproceed.button"/>" />
                     </td>
                 </tr>
             </table>

@@ -53,29 +53,29 @@
 
 <dspace:layout titlekey="jsp.error.404.title">
 
-    <%-- <H1>Error: Document Not Found</H1> --%>
-    <H1><fmt:message key="jsp.error.404.title"/></H1>
-    <%-- <P>The document you are trying to access has not been found on the server.</P> --%>
-    <P><fmt:message key="jsp.error.404.text1"/></P>
-    <UL>
-        <%-- <LI><P>If you got here by following a link or bookmark provided by someone
+    <%-- <h1>Error: Document Not Found</h1> --%>
+    <h1><fmt:message key="jsp.error.404.title"/></h1>
+    <%-- <p>The document you are trying to access has not been found on the server.</p> --%>
+    <p><fmt:message key="jsp.error.404.text1"/></p>
+    <ul>
+        <%-- <li><p>If you got here by following a link or bookmark provided by someone
         else, the link may be incorrect or you mistyped the link.  Please check
         the link and try again.  If you still get this error, then try going
-        to the <A HREF="<%= request.getContextPath() %>/">DSpace home page</A>
-        and looking for what you want from there.</P></LI> --%>
-		<LI><P><fmt:message key="jsp.error.404.text2">
+        to the <a href="<%= request.getContextPath() %>/">DSpace home page</a>
+        and looking for what you want from there.</p></li> --%>
+		<li><p><fmt:message key="jsp.error.404.text2">
             <fmt:param><%= request.getContextPath() %>/</fmt:param>
-        </fmt:message></P></LI>
-        <%-- <LI><P>If you got to this error by clicking in a link on the DSpace site,
-        please let us know so we can fix it!</P></LI> --%>
-		<LI><P><fmt:message key="jsp.error.404.text3"/></P></LI>
-    </UL>
+        </fmt:message></p></li>
+        <%-- <li><p>If you got to this error by clicking in a link on the DSpace site,
+        please let us know so we can fix it!</p></li> --%>
+		<li><p><fmt:message key="jsp.error.404.text3"/></p></li>
+    </ul>
 
     <dspace:include page="/components/contact-info.jsp" />
 
-    <P align=center>
-        <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
-    </P>
+    <p align="center">
+        <%-- <a href="<%= request.getContextPath() %>/">Go to the DSpace home page</a> --%>
+        <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a>
+    </p>
 
 </dspace:layout>

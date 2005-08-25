@@ -77,7 +77,7 @@
                titlekey="jsp.submit.creative-commons.title"
                nocache="true">
 
-    <form name="foo" id="license_form" action="<%= request.getContextPath() %>/submit" method=post>
+    <form name="foo" id="license_form" action="<%= request.getContextPath() %>/submit" method="post">
 
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.CC_LICENSE %>"/>
@@ -85,17 +85,17 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <%-- <H1>Submit: Use a Creative Commons License</H1> --%>
-		<H1><fmt:message key="jsp.submit.creative-commons.heading"/></H1>
+        <%-- <h1>Submit: Use a Creative Commons License</h1> --%>
+		<h1><fmt:message key="jsp.submit.creative-commons.heading"/></h1>
 <br />
 
 <%
         if (licenseExists)
         {
 %>
-        <%-- <P>You have already chosen a Creative Commons license and added it to this item.
-        You may:</P> --%>
-		<P><fmt:message key="jsp.submit.creative-commons.info1"/></P>
+        <%-- <p>You have already chosen a Creative Commons license and added it to this item.
+        You may:</p> --%>
+		<p><fmt:message key="jsp.submit.creative-commons.info1"/></p>
     <%-- <ul>
             <li>Press the 'Next' button below to <em>keep</em> the license previously chosen.</li>
             <li>Press the 'Skip Creative Commons' button below to <em>remove</em> the current choice, and forego a Creative Commons license.</li>
@@ -111,49 +111,49 @@
         else
         {
 %>
-        <%-- <P>To license your Item under Creative Commons, follow the instructions below. You will be given an opportunity to review your selection.
-        Follow the 'proceed' link to add the license. If you wish to omit a Creative Commons license, press the 'Skip Creative Commons' button.</P> --%>
-		<P><fmt:message key="jsp.submit.creative-commons.info2"/></P>
+        <%-- <p>To license your Item under Creative Commons, follow the instructions below. You will be given an opportunity to review your selection.
+        Follow the 'proceed' link to add the license. If you wish to omit a Creative Commons license, press the 'Skip Creative Commons' button.</p> --%>
+		<p><fmt:message key="jsp.submit.creative-commons.info2"/></p>
 <%
         }
 %>  
 
-	<%-- <IFRAME src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540">Your browser must support IFrames to use this feature
-	</IFRAME> --%>
-	<IFRAME src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540"><fmt:message key="jsp.submit.creative-commons.info3"/>
-	</IFRAME>
+	<%-- <iframe src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540">Your browser must support IFrames to use this feature
+	</iframe> --%>
+	<iframe src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540"><fmt:message key="jsp.submit.creative-commons.info3"/>
+	</iframe>
 
         <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type=hidden name=step value=<%= SubmitServlet.CC_LICENSE %>>
-	<input type=hidden name=cc_license_url value="" />
-	<input type=hidden name=submit_grant value="I Grant the License" />
+    <input type="hidden" name="step" value="<%= SubmitServlet.CC_LICENSE %>" />
+	<input type="hidden" name="cc_license_url" value="" />
+	<input type="hidden" name="submit_grant" value="I Grant the License" />
         <center>
-            <table border=0 width=80%>
+            <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td>
-                        <%-- <input type=submit name=submit_prev value="&lt; Previous"> --%>
-						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.general.previous"/>">
+                        <%-- <input type="submit" name="submit_prev" value="&lt; Previous"> --%>
+						<input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.general.previous"/>" />
                     </td>
 <%
      if (licenseExists)
      {
 %>
                     <td>
-                        <%-- <input type=submit name=submit_next value="Next &gt;"> --%>
-						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.general.next"/>">
+                        <%-- <input type="submit" name="submit_next" value="Next &gt;"> --%>
+						<input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.general.next"/>" />
                     </td>
 <%
      }
 %>
                     <td>
-                        <%-- <input type=submit name=submit_no_cc value="Skip Creative Commons &gt;"/> --%>
-						<input type=submit name=submit_no_cc value="<fmt:message key="jsp.submit.creative-commons.skip.button"/>"/>
+                        <%-- <input type="submit" name="submit_no_cc" value="Skip Creative Commons &gt;"/> --%>
+						<input type="submit" name="submit_no_cc" value="<fmt:message key="jsp.submit.creative-commons.skip.button"/>"/>
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align=right>
-                        <%-- <input type=submit name=submit_cancel value="Cancel/Save"/> --%>
-						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>"/>
+                    <td align="right">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel/Save"/> --%>
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>"/>
                     </td>
                 </tr>
             </table>

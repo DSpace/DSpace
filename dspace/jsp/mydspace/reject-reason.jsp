@@ -68,30 +68,30 @@
                title="reject-reason.title"
                nocache="true">
 
-    <%-- <H1>Enter Reason for Rejection</H1> --%>
-	<H1><fmt:message key="jsp.mydspace.reject-reason.title"/></H1>
+    <%-- <h1>Enter Reason for Rejection</h1> --%>
+	<h1><fmt:message key="jsp.mydspace.reject-reason.title"/></h1>
 
-    <%-- <P>Please enter the reason you are rejecting the submission into the box
+    <%-- <p>Please enter the reason you are rejecting the submission into the box
     below.  Please indicate in your message whether the submitter should fix
-    a problem and resubmit.</P> --%>
-	<P><fmt:message key="jsp.mydspace.reject-reason.text1"/></P>
+    a problem and resubmit.</p> --%>
+	<p><fmt:message key="jsp.mydspace.reject-reason.text1"/></p>
     
-    <form action="<%= request.getContextPath() %>/mydspace" method=POST>
-        <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>">
-        <input type="hidden" name="step" value="<%= MyDSpaceServlet.REJECT_REASON_PAGE %>">
+    <form action="<%= request.getContextPath() %>/mydspace" method="post">
+        <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>"/>
+        <input type="hidden" name="step" value="<%= MyDSpaceServlet.REJECT_REASON_PAGE %>"/>
         <center>
-            <textarea rows=6 cols=50 name="reason"></textarea>
+            <textarea rows="6" cols="50" name="reason"></textarea>
         </center>
 
-        <table border=0 width="90%" cellpadding=10 align=center>
+        <table border="0" width="90%" cellpadding="10" align="center">
             <tr>
                 <td align="left">
-                    <%-- <input type="submit" name="submit_send" value="Reject Item"> --%>
-					 <input type="submit" name="submit_send" value="<fmt:message key="jsp.mydspace.reject-reason.reject.button"/>">
+                    <%-- <input type="submit" name="submit_send" value="Reject Item" /> --%>
+					 <input type="submit" name="submit_send" value="<fmt:message key="jsp.mydspace.reject-reason.reject.button"/>" />
                 </td>
                 <td align="right">
-                    <%-- <input type="submit" name="submit_cancel" value="Cancel Rejection"> --%>
-					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.reject-reason.cancel.button"/>">
+                    <%-- <input type="submit" name="submit_cancel" value="Cancel Rejection" /> --%>
+					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.reject-reason.cancel.button"/>" />
                 </td>
             </tr>
         </table>

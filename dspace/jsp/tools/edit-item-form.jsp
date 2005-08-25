@@ -87,54 +87,55 @@
                parentlink="/dspace-admin"
                nocache="true">
 
-    <%-- <H1>Edit Item</H1> --%>
-	<H1><fmt:message key="jsp.tools.edit-item-form.title"/></H1>
+    <%-- <h1>Edit Item</h1> --%>
+	<h1><fmt:message key="jsp.tools.edit-item-form.title"/></h1>
     
-    <%-- <P><strong>PLEASE NOTE: These changes are not validated in any way.
+    <%-- <p><strong>PLEASE NOTE: These changes are not validated in any way.
     You are responsible for entering the data in the correct format.
-    If you are not sure what the format is, please do NOT make changes.</strong></P> --%>
-	<P><strong><fmt:message key="jsp.tools.edit-item-form.note"/></strong></P>
+    If you are not sure what the format is, please do NOT make changes.</strong></p> --%>
+	<p><strong><fmt:message key="jsp.tools.edit-item-form.note"/></strong></p>
     
-    <%-- <P><dspace:popup page="/help/collection-admin.html#editmetadata">More help...</dspace:popup></P>  --%>
-	<P><dspace:popup page="/help/collection-admin.html#editmetadata"><fmt:message key="jsp.morehelp"/></dspace:popup></P>  
+    <%-- <p><dspace:popup page="/help/collection-admin.html#editmetadata">More help...</dspace:popup></p>  --%>
+	<p><object><dspace:popup page="/help/collection-admin.html#editmetadata"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>  
 
     <center>
-        <table width="70%">
+        <table width="70%" summary="Edit item table">
             <tr>
                 <%-- <td class="submitFormLabel">Item&nbsp;internal&nbsp;ID:</td> --%>
 				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.itemID"/></td>
                 <td class="standard"><%= item.getID() %></td>
-                <td class="standard" width="100%" align="right" rowspan=5>
+                <td class="standard" width="100%" align="right" rowspan="5">
 <%
     if (!item.isWithdrawn())
     {
 %>
-                    <form method=POST action="<%= request.getContextPath() %>/tools/edit-item">
-                        <input type="hidden" name="item_id" value="<%= item.getID() %>">
-                        <input type="hidden" name="action" value="<%= EditItemServlet.START_WITHDRAW %>">
+                    <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                        <input type="hidden" name="action" value="<%= EditItemServlet.START_WITHDRAW %>" />
                         <%-- <input type="submit" name="submit" value="Withdraw..."> --%>
-						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.withdraw-w-confirm.button"/>">
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.withdraw-w-confirm.button"/>"/>
                     </form>
 <%
     }
     else
     {
 %>
-                    <form method=POST action="<%= request.getContextPath() %>/tools/edit-item">
-                        <input type="hidden" name="item_id" value="<%= item.getID() %>">
-                        <input type="hidden" name="action" value="<%= EditItemServlet.REINSTATE %>">
+                    <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                        <input type="hidden" name="action" value="<%= EditItemServlet.REINSTATE %>" />
                         <%-- <input type="submit" name="submit" value="Reinstate"> --%>
-						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.reinstate.button"/>">
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.reinstate.button"/>"/>
                     </form>
 <%
     }
 %>
-                    <br>
-                    <form method=POST action="<%= request.getContextPath() %>/tools/edit-item">
-                        <input type="hidden" name="item_id" value="<%= item.getID() %>">
-                        <input type="hidden" name="action" value="<%= EditItemServlet.START_DELETE %>">
+
+                    <br/>
+                    <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                        <input type="hidden" name="action" value="<%= EditItemServlet.START_DELETE %>" />
                         <%-- <input type="submit" name="submit" value="Delete (Expunge)..."> --%>
-						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete-w-confirm.button"/>">
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete-w-confirm.button"/>"/>
                     </form>
                 </td>
             </tr>
@@ -143,6 +144,7 @@
 				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.handle"/></td>
                 <td class="standard"><%= (handle == null ? "None" : handle) %></td>
             </tr>
+            <tr>
                 <%-- <td class="submitFormLabel">Last modified:</td> --%>
 				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.modified"/></td>
                 <td class="standard"><dspace:date date="<%= new DCDate(item.getLastModified()) %>" /></td>
@@ -152,7 +154,7 @@
 				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.collections"/></td>
                 <td class="standard">
 <%  for (int i = 0; i < collections.length; i++) { %>
-                    <%= collections[i].getMetadata("name") %><br>
+                    <%= collections[i].getMetadata("name") %><br/>
 <%  } %>
                 </td>
             </tr>
@@ -165,7 +167,7 @@
                     <em><fmt:message key="jsp.tools.edit-item-form.na"/></em>
 <%  } else {
     String url = ConfigurationManager.getProperty("dspace.url") + "/handle/" + handle; %>
-                    <A TARGET=_blank HREF="<%= url %>"><%= url %></A>
+                    <a target="_blank" href="<%= url %>"><%= url %></a>
 <%  } %>
                 </td>
             </tr>
@@ -176,11 +178,11 @@
                 <%-- <td class="submitFormLabel">Item's Authorizations:</td> --%>
 				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.item"/></td>
                 <td>
-                    <form method=POST action="<%= request.getContextPath() %>/dspace-admin/authorize">
-                        <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>">
-                        <input type="hidden" name="item_id" value="<%= item.getID() %>">
+                    <form method="post" action="<%= request.getContextPath() %>/dspace-admin/authorize">
+                        <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>" />
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <%-- <input type="submit" name="submit_item_select" value="Edit..."> --%>
-						<input type="submit" name="submit_item_select" value="<fmt:message key="jsp.tools.general.edit"/>">
+						<input type="submit" name="submit_item_select" value="<fmt:message key="jsp.tools.general.edit"/>"/>
                     </form>
                 </td>
             </tr>
@@ -194,26 +196,27 @@
     if (item.isWithdrawn())
     {
 %>
-    <%-- <P align=center><strong>This item was withdrawn from DSpace</strong></P> --%>
-	<P align=center><strong><fmt:message key="jsp.tools.edit-item-form.msg"/></strong></P>
+    <%-- <p align="center"><strong>This item was withdrawn from DSpace</strong></p> --%>
+	<p align="center"><strong><fmt:message key="jsp.tools.edit-item-form.msg"/></strong></p>
 <%
     }
 %>
-    <P>&nbsp;</P>
+    <p>&nbsp;</p>
 
 
-    <form method=POST action="<%= request.getContextPath() %>/tools/edit-item">
-        <table class="miscTable">
+    <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
+        <table class="miscTable" summary="Edit item withdrawn table">
             <tr>
                 <%-- <th class="oddRowOddCol"><strong>Element</strong></th>
-                <th class="oddRowEvenCol"><strong>Qualifier</strong></th>
-                <th class="oddRowOddCol"><strong>Value</strong></th>
-                <th class="oddRowEvenCol"><strong>Language</strong></th> --%>
-				<th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem1"/></strong></th>
-                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem2"/></strong></th>
-                <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem3"/></strong></th>
-                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem4"/></strong></th>
-                <th class="oddRowOddCol">&nbsp;</th>
+                <th id="t1" class="oddRowEvenCol"><strong>Qualifier</strong></th>
+                <th id="t2" class="oddRowOddCol"><strong>Value</strong></th>
+                <th id="t3" class="oddRowEvenCol"><strong>Language</strong></th> --%>
+                
+				<th id="t1" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem1"/></strong></th>
+                <th id="t2" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem2"/></strong></th>
+                <th id="t3" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem3"/></strong></th>
+                <th id="t4" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem4"/></strong></th>
+                <th id="t5" class="oddRowOddCol">&nbsp;</th>
             </tr>
 <%
     DCValue[] dcv = item.getDC(Item.ANY, Item.ANY, Item.ANY);
@@ -252,17 +255,17 @@
         }
  %>
             <tr>
-                <td class="<%= row %>RowOddCol"><%= dcv[i].element %>&nbsp;&nbsp;</td>
-                <td class="<%= row %>RowEvenCol"><%= (dcv[i].qualifier == null ? "" : dcv[i].qualifier) %></td>
-                <td class="<%= row %>RowOddCol">
-                    <textarea name="value_<%= key %>_<%= sequenceNumber %>" rows=3 cols=50><%= dcv[i].value %></textarea>
+                <td headers="t1" class="<%= row %>RowOddCol"><%= dcv[i].element %>&nbsp;&nbsp;</td>
+                <td headers="t2" class="<%= row %>RowEvenCol"><%= (dcv[i].qualifier == null ? "" : dcv[i].qualifier) %></td>
+                <td headers="t3" class="<%= row %>RowOddCol">
+                    <textarea name="value_<%= key %>_<%= sequenceNumber %>" rows="3" cols="50"><%= dcv[i].value %></textarea>
                 </td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="text" name="language_<%= key %>_<%= sequenceNumber %>" value="<%= (dcv[i].language == null ? "" : dcv[i].language) %>" size=5>
+                <td headers="t4" class="<%= row %>RowEvenCol">
+                    <input type="text" name="language_<%= key %>_<%= sequenceNumber %>" value="<%= (dcv[i].language == null ? "" : dcv[i].language) %>" size="5"/>
                 </td>
-                <td class="<%= row %>RowOddCol">
-                    <%-- <input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="Remove"> --%>
-					<input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="<fmt:message key="jsp.tools.general.remove"/>">
+                <td headers="t5" class="<%= row %>RowOddCol">
+                    <%-- <input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="Remove" /> --%>
+					<input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="<fmt:message key="jsp.tools.general.remove"/>"/>
                 </td>
             </tr>
 <%      row = (row.equals("odd") ? "even" : "odd");
@@ -271,42 +274,42 @@
             <tr><td>&nbsp;</td></tr>
 
             <tr>
-                <td colspan=2 class="<%= row %>RowEvenCol">
+                <td headers="t1" colspan="2" class="<%= row %>RowEvenCol">
                     <select name="addfield_dctype">
 <%  for (int i = 0; i < dcTypes.length; i++) { %>
                         <option value="<%= dcTypes[i].getID() %>"><%= dcTypes[i].getElement() %><%= (dcTypes[i].getQualifier() == null ? "" : "." + dcTypes[i].getQualifier()) %></option>
 <%  } %>
                     </select>
                 </td>
-                <td class="<%= row %>RowOddCol">
-                    <textarea name="addfield_value" rows=3 cols=50></textarea>
+                <td headers="t3" class="<%= row %>RowOddCol">
+                    <textarea name="addfield_value" rows="3" cols="50"></textarea>
                 </td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="text" name="addfield_language" size=5>
+                <td headers="t4" class="<%= row %>RowEvenCol">
+                    <input type="text" name="addfield_language" size="5"/>
                 </td>
-                <td class="<%= row %>RowOddCol">
+                <td headers="t5" class="<%= row %>RowOddCol">
                     <%-- <input type="submit" name="submit_addfield" value="Add"> --%>
-					<input type="submit" name="submit_addfield" value="<fmt:message key="jsp.tools.general.add"/>">
+					<input type="submit" name="submit_addfield" value="<fmt:message key="jsp.tools.general.add"/>"/>
                 </td>
             </tr>
         </table>
         
-        <P>&nbsp;</P>
+        <p>&nbsp;</p>
 
-        <%-- <H2>Bitstreams</H2> --%>
-		<H2><fmt:message key="jsp.tools.edit-item-form.heading"/></H2>
+        <%-- <h2>Bitstreams</h2> --%>
+		<h2><fmt:message key="jsp.tools.edit-item-form.heading"/></h2>
 
-        <%-- <P><strong>Note: Changes to the bitstreams will not be automatically reflected in the
+        <%-- <p><strong>Note: Changes to the bitstreams will not be automatically reflected in the
         Dublin Core metadata above (e.g. <code>format.extent</code>, <code>format.mimetype</code>).
-        You will need to update this by hand.</strong></P> --%>
-		<P><strong><fmt:message key="jsp.tools.edit-item-form.note1"/></strong></P>
+        You will need to update this by hand.</strong></p> --%>
+		<p><strong><fmt:message key="jsp.tools.edit-item-form.note1"/></strong></p>
 
-        <%-- <P>Also note that if the "user format description" field isn't empty, the format will
+        <%-- <p>Also note that if the "user format description" field isn't empty, the format will
         always be set to "Unknown", so clear the user format description before changing the
-        format field.</P> --%>
-		<P><fmt:message key="jsp.tools.edit-item-form.note3"/></P>
+        format field.</p> --%>
+		<p><fmt:message key="jsp.tools.edit-item-form.note3"/></p>
 
-        <table class="miscTable">
+        <table class="miscTable" summary="Bitstream data table">
             <tr>
 	  <%-- <th class="oddRowEvenCol"><strong>Primary<br>Bitstream</strong></th>
                 <th class="oddRowOddCol"><strong>Name</strong></th>
@@ -315,13 +318,13 @@
                 <th class="oddRowEvenCol"><strong>Format</strong></th>
                 <th class="oddRowOddCol"><strong>User&nbsp;Format&nbsp;Description</strong></th> --%>
                 
-		<th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem5"/></strong></th>
-                <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem7"/></strong></th>
-                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem8"/></strong></th>
-                <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem9"/></strong></th>
-                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem10"/></strong></th>
-                <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem11"/></strong></th>
-                <th class="oddRowEvenCol">&nbsp;</th>
+		        <th id="t11" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem5"/></strong></th>
+                <th id="t12" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem7"/></strong></th>
+                <th id="t13" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem8"/></strong></th>
+                <th id="t14" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem9"/></strong></th>
+                <th id="t15" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem10"/></strong></th>
+                <th id="t16" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem11"/></strong></th>
+                <th id="t17" class="oddRowEvenCol">&nbsp;</th>
             </tr>
 <%
     Bundle[] bundles = item.getBundles();
@@ -340,33 +343,33 @@
             <tr>
 		<% if (bundles[i].getName().equals("ORIGINAL"))
 		   { %>
-                     <td class="<%= row %>RowEvenCol" align="center">
-                       <input type="radio" name="<%= bundles[i].getID() %>_primary_bitstream_id" value=<%= bitstreams[j].getID() %>
+                     <td headers="t11" class="<%= row %>RowEvenCol" align="center">
+                       <input type="radio" name="<%= bundles[i].getID() %>_primary_bitstream_id" value="<%= bitstreams[j].getID() %>"
                            <% if (bundles[i].getPrimaryBitstreamID() == bitstreams[j].getID()) { %>
-                                  <%="checked" %>
-                           <% } %> >
+                                  checked="<%="checked" %>"
+                           <% } %> />
                    </td>
 		<% } else { %>
-		     <td> </td>
+		     <td headers="t11"> </td>
 		<% } %>
-                <td class="<%= row %>RowOddCol">
-                    <input type="text" name="bitstream_name_<%= key %>" value="<%= (bitstreams[j].getName() == null ? "" : bitstreams[j].getName()) %>">
+                <td headers="t12" class="<%= row %>RowOddCol">
+                    <input type="text" name="bitstream_name_<%= key %>" value="<%= (bitstreams[j].getName() == null ? "" : bitstreams[j].getName()) %>"/>
                 </td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="text" name="bitstream_source_<%= key %>" value="<%= (bitstreams[j].getSource() == null ? "" : bitstreams[j].getSource()) %>">
+                <td headers="t13" class="<%= row %>RowEvenCol">
+                    <input type="text" name="bitstream_source_<%= key %>" value="<%= (bitstreams[j].getSource() == null ? "" : bitstreams[j].getSource()) %>"/>
                 </td>
-                <td class="<%= row %>RowOddCol">
-                    <input type="text" name="bitstream_description_<%= key %>" value="<%= (bitstreams[j].getDescription() == null ? "" : bitstreams[j].getDescription()) %>">
+                <td headers="t14" class="<%= row %>RowOddCol">
+                    <input type="text" name="bitstream_description_<%= key %>" value="<%= (bitstreams[j].getDescription() == null ? "" : bitstreams[j].getDescription()) %>"/>
                 </td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="text" name="bitstream_format_id_<%= key %>" value="<%= bf.getID() %>" size="4"> (<%= bf.getShortDescription() %>)
+                <td headers="t15" class="<%= row %>RowEvenCol">
+                    <input type="text" name="bitstream_format_id_<%= key %>" value="<%= bf.getID() %>" size="4"/> (<%= bf.getShortDescription() %>)
                 </td>
-                <td class="<%= row %>RowOddCol">
-                    <input type="text" name="bitstream_user_format_description_<%= key %>" value="<%= (bitstreams[j].getUserFormatDescription() == null ? "" : bitstreams[j].getUserFormatDescription()) %>">
+                <td headers="t16" class="<%= row %>RowOddCol">
+                    <input type="text" name="bitstream_user_format_description_<%= key %>" value="<%= (bitstreams[j].getUserFormatDescription() == null ? "" : bitstreams[j].getUserFormatDescription()) %>"/>
                 </td>
-                <td class="<%= row %>RowEvenCol">
-                    <%-- <A TARGET=_blank HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</A>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
-					<A TARGET=_blank HREF="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></A>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="<fmt:message key="jsp.tools.general.remove"/>">
+                <td headers="t17" class="<%= row %>RowEvenCol">
+                    <%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
+					<a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="<fmt:message key="jsp.tools.general.remove"/>" />
                 </td>
             </tr>
 <%
@@ -376,23 +379,24 @@
 %>
         </table>
 
-        <%-- <P align="center"><input type="submit" name="submit_addbitstream" value="Add Bitstream"></P> --%>
-		<P align="center"><input type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"></P>
+        <%-- <p align="center"><input type="submit" name="submit_addbitstream" value="Add Bitstream"></p> --%>
+		<p align="center"><input type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/></p>
 
-        <P>&nbsp;</P>
+        <p>&nbsp;</p>
 
-        <input type="hidden" name="item_id" value="<%= item.getID() %>">
-        <input type="hidden" name="action" value="<%= EditItemServlet.UPDATE_ITEM %>">
+        <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
+        <input type="hidden" name="action" value="<%= EditItemServlet.UPDATE_ITEM %>"/>
         <center>
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <%-- <input type="submit" name="submit" value="Update"> --%>
-						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.update"/>">
+                        <%-- <input type="submit" name="submit" value="Update" /> --%>
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.update"/>" />
                     </td>
                     <td align="right">
-                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>">
+
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel" /> --%>
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
                     </td>
                 </tr>
             </table>

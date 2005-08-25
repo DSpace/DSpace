@@ -54,6 +54,11 @@ function addEPerson(id, email, name)
 {
     var newplace = window.document.forms[0].eperson_id.options.length;
 
+    if (newplace > 0 && window.document.forms[0].eperson_id.options[0].text == "")
+    {
+        newplace = 0;
+    }
+
     // First we check to see if e-person is already there
     for (var i = 0; i < window.document.forms[0].eperson_id.options.length; i++)
     {

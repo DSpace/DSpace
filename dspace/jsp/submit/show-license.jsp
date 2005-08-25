@@ -69,7 +69,7 @@
                titlekey="jsp.submit.show-license.title"
                nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method=post>
+    <form action="<%= request.getContextPath() %>/submit" method="post">
 
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.GRANT_LICENSE %>"/>
@@ -77,41 +77,29 @@
              <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <%-- <H1>Submit: Grant DSpace Distribution License</H1> --%>
-		<H1><fmt:message key="jsp.submit.show-license.heading1"/></H1>
+	<p><fmt:message key="jsp.submit.show-license.info1"/></p>
+        &nbsp;&nbsp;<dspace:popup page="/help/index.html#license"><fmt:message key="jsp.morehelp"/></dspace:popup>
 
-        <%-- <P><strong>There is one last step:</strong> In order for DSpace to reproduce, translate and distribute your
-        submission worldwide, your agreement to the following terms is necessary.
-        Please take a moment to read the terms of this license, and click on one of the
-        buttons at the bottom of the page.  By clicking on the "Grant License"
-        button, you indicate that you grant the following terms of the license.
-        <dspace:popup page="/help/index.html#license">(More Help...)</dspace:popup></P> --%>
-
-		<P><fmt:message key="jsp.submit.show-license.info1"/>
-        <dspace:popup page="/help/index.html#license"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
-
-        <%-- <P><strong>Not granting the license will not delete your submission.</strong>
+        <%-- <p><strong>Not granting the license will not delete your submission.</strong>
         Your item will remain in your "My DSpace" page.  You can then either remove
         the submission from the system, or agree to the license later once any
-        queries you might have are resolved.</P> --%>
-		<P><fmt:message key="jsp.submit.show-license.info2"/></P>
+        queries you might have are resolved.</p> --%>
+		<p><fmt:message key="jsp.submit.show-license.info2"/></p>
 
-        <table class=miscTable align=center>
+        <table class="miscTable" align="center">
             <tr>
                 <td class="oddRowEvenCol">
-                    <PRE><%= license %></PRE>
+                    <pre><%= license %></pre>
                 </td>
             </tr>
         </table>
 
         <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type=hidden name=step value=<%= SubmitServlet.GRANT_LICENSE %>>
+        <input type="hidden" name="step" value="<%= SubmitServlet.GRANT_LICENSE %>" />
 
         <center>
-            <%-- <P><input type=submit name=submit_grant value="I Grant the License"></P>
-            <P><input type=submit name=submit_reject value="I Do Not Grant the License"></P> --%>
-			<P><input type=submit name=submit_grant value="<fmt:message key="jsp.submit.show-license.grant.button"/>"></P>
-            <P><input type=submit name=submit_reject value="<fmt:message key="jsp.submit.show-license.notgrant.button"/>"></P>
+	    <p><input type="submit" name="submit_grant" value="<fmt:message key="jsp.submit.show-license.grant.button"/>" /></p>
+            <p><input type="submit" name="submit_reject" value="<fmt:message key="jsp.submit.show-license.notgrant.button"/>" /></p>          
         </center>
     </form>
 </dspace:layout>

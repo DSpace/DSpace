@@ -73,7 +73,7 @@
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">
 
-    <form action="<%= request.getContextPath() %>/submit" method=post>
+    <form action="<%= request.getContextPath() %>/submit" method="post">
 
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
@@ -98,20 +98,21 @@
 <%
     }
 %>
-        <p><fmt:message key="jsp.submit.upload-file-list.info2"/> <dspace:popup page="/help/index.html#uploadedfile"><fmt:message key="jsp.morehelp"/></dspace:popup></p>
+        <p><fmt:message key="jsp.submit.upload-file-list.info2"/></p><dspace:popup page="/help/index.html#uploadedfile"><fmt:message key="jsp.morehelp"/></dspace:popup>
         
-        <table class="miscTable" align=center>
+        <table class="miscTable" align="center" summary="Table dispalying your submitted files">
             <tr>
-		<th class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading1"/></th>
-                <th class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading2"/></th>
-                <th class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading3"/></th>
-                <th class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading4"/></th>
-                <th class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading5"/></th>
+				<th id="t1" class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading1"/></th>
+                <th id="t2" class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading2"/></th>
+                <th id="t3" class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading3"/></th>
+                <th id="t4" class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading4"/></th>
+                <th id="t5" class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading5"/></th>
 <%
     if (showChecksums)
     {
 %>
-                <th class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading6"/></th>
+
+                <th id="t6" class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading6"/></th>
 <%
     }
     
@@ -121,7 +122,7 @@
         // Whether it's an odd or even column depends on whether we're showing checksums
         String column = (showChecksums ? "Even" : "Odd");
 %>
-                <th class="oddRow<%= column %>Col">&nbsp;</th>
+                <th id="t7" class="oddRow<%= column %>Col">&nbsp;</th>
 <%
     }
 %>
@@ -157,32 +158,32 @@
         String supportLevelLink = "/help/formats.jsp#" + supportLevel;
 %>
             <tr>
-		<td class="<%= row %>RowEvenCol" align="center">
-		    <input type="radio" name="primary_bitstream_id" value=<%= bitstreams[i].getID() %>
+		<td headers="t1" class="<%= row %>RowEvenCol" align="center">
+		    <input type="radio" name="primary_bitstream_id" value="<%= bitstreams[i].getID() %>"
 			   <% if (bundles[0] != null) {
 				if (bundles[0].getPrimaryBitstreamID() == bitstreams[i].getID()) { %>
 			       	  <%="checked" %>
 			   <%   }
-			      } %> >
+			      } %> />
 		</td>
-                <td class="<%= row %>RowOddCol"><a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></a></td>
-                <td class="<%= row %>RowEvenCol"><%= bitstreams[i].getSize() %> bytes</td>
-                <td class="<%= row %>RowOddCol">
+                <td headers="t2" class="<%= row %>RowOddCol"><a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></a></td>
+                <td headers="t3" class="<%= row %>RowEvenCol"><%= bitstreams[i].getSize() %> bytes</td>
+                <td headers="t4" class="<%= row %>RowOddCol">
                     <%= (bitstreams[i].getDescription() == null || bitstreams[i].getDescription().equals("")
                         ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.empty1")
                         : bitstreams[i].getDescription()) %>
-                    <input type=submit name="submit_describe_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
+                    <input type="submit" name="submit_describe_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>" />
                 </td>
-                <td class="<%= row %>RowEvenCol">
+                <td headers="t5" class="<%= row %>RowEvenCol">
                     <%= description %> <dspace:popup page="<%= supportLevelLink %>">(<%= supportLevel %>)</dspace:popup>
-                    <input type=submit name="submit_format_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
+                    <input type="submit" name="submit_format_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>" />
                 </td>
 <%
         // Checksum
         if (showChecksums)
         {
 %>
-                <td class="<%= row %>RowOddCol">
+                <td headers="t6" class="<%= row %>RowOddCol">
                     <code><%= bitstreams[i].getChecksum() %> (<%= bitstreams[i].getChecksumAlgorithm() %>)</code>
                 </td>
 <%
@@ -194,8 +195,8 @@
             // Whether it's an odd or even column depends on whether we're showing checksums
             String column = (showChecksums ? "Even" : "Odd");
 %>
-                <td class="<%= row %>Row<%= column %>Col">
-                    <input type=submit name="submit_remove_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button2"/>">
+                <td headers="t7" class="<%= row %>Row<%= column %>Col">
+                    <input type="submit" name="submit_remove_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button2"/>" />
                 </td>
 <%
         }
@@ -207,9 +208,9 @@
 %>
         </table>
 
-<%-- HACK:  Need a space - is there a nicer way to do this than <BR> or a --%>
-<%--        blank <P>? --%>
-        <br>
+<%-- HACK:  Need a space - is there a nicer way to do this than <br> or a --%>
+<%--        blank <p>? --%>
+        <br />
 
 <%-- Show information about how to verify correct upload, but not in workflow
      mode! --%>
@@ -232,44 +233,43 @@
         {
 %>
             <li class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info6"/>
-            <dspace:popup page="/help/index.html#checksum"><fmt:message key="jsp.submit.upload-file-list.help2"/></dspace:popup> <input type=submit name=submit_show_checksums value="<fmt:message key="jsp.submit.upload-file-list.button3"/>"></li>
+            <dspace:popup page="/help/index.html#checksum"><fmt:message key="jsp.submit.upload-file-list.help2"/></dspace:popup> <input type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.upload-file-list.button3"/>" /></li>
 <%
         }
 %>
         </ul>
-
-        <br>
+        <br />
 <%
     }
 %>    
 
 <%-- Hidden fields needed for submit servlet to know which item to deal with --%>
         <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type=hidden name=step value=<%= SubmitServlet.FILE_LIST %>>
+        <input type="hidden" name="step" value="<%= SubmitServlet.FILE_LIST %>" />
 
-<%-- HACK: Center used to align table; CSS and align=center ignored by some browsers --%>
+<%-- HACK: Center used to align table; CSS and align="center" ignored by some browsers --%>
         <center>
 <%
     // Don't allow files to be added in workflow mode
     if (!SubmitServlet.isWorkflow(si))
     {
 %>
-            <p><input type=submit name=submit_more value="<fmt:message key="jsp.submit.upload-file-list.button4"/>"></p>
+            <p><input type="submit" name="submit_more" value="<fmt:message key="jsp.submit.upload-file-list.button4"/>" /></p>
 <%
     }
 %>
-            <table border=0 width=80%>
+            <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td>
-                        <input type=submit name=submit_prev value="<fmt:message key="jsp.submit.upload-file-list.button5"/>">
+                        <input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.upload-file-list.button5"/>" />
                     </td>
                     <td>
-                        <input type=submit name=submit_next value="<fmt:message key="jsp.submit.upload-file-list.button6"/>">
+                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.upload-file-list.button6"/>" />
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align=right>
-                        <input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.upload-file-list.button7"/>">
+                    <td align="right">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.upload-file-list.button7"/>" />
                     </td>
                 </tr>
             </table>

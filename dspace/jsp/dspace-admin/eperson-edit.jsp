@@ -6,7 +6,7 @@
   - Redistribution and use in source and binary forms, with or without
   - modification, are permitted provided that the following conditions are
   - met:
-  -
+  - 
   - - Redistributions of source code must retain the above copyright
   - notice, this list of conditions and the following disclaimer.
   -
@@ -86,9 +86,10 @@
                parentlink="/dspace-admin"
                nocache="true">
 
-  <table width=95%>
+
+  <table width="95%">
     <tr>
-      <td align=left>
+      <td align="left">
         <%-- <h1>Edit EPerson <%= eperson.getEmail() %>:</h1> --%>
         <h1><fmt:message key="jsp.dspace-admin.eperson-edit.heading">
             <fmt:param><%= eperson.getEmail() %></fmt:param>
@@ -101,36 +102,36 @@
   </table>
 
 <% if (emailExists)
-	{ %><P><strong>
+	{ %><p><strong>
 	     <fmt:message key="jsp.dspace-admin.eperson-edit.emailexists"/>
-	   </strong></P>
+	   </strong></p>
 <%  } %>
 
-    <form method=POST>
+    <form method="post" action="">
 
     <table class="miscTable" align="center">
         <tr>     
-            <%-- <td>Email:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.eperson-edit.email"/></td>
+            <%-- <td>Email:</td> --%>         
+            <td><label for="temail"><fmt:message key="jsp.dspace-admin.eperson-edit.email"/></label></td>
             <td>
-                <input type="hidden" name="eperson_id" value="<%=eperson.getID()%>">
-                <input name="email" size="24" value="<%=email == null ? "" : email%>">
+                <input type="hidden" name="eperson_id" value="<%=eperson.getID()%>"/>
+                <input name="email" id="temail" size="24" value="<%=email == null ? "" : email%>"/>
             </td>
         </tr>
 
         <tr>
             <%-- <td>Last Name:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></td>
+            <td><label for="tlastname"><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></label></td>
             <td>
-                <input name="lastname" size="24" value="<%=lastName == null ? "" : lastName%>">
+                <input name="lastname" id="tlastname" size="24" value="<%=lastName == null ? "" : lastName%>"/>
             </td>
         </tr>
 
-        <tr>
+        <tr>           
             <%-- <td>First Name:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></td>
+            <td><label for="tfirstname"><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></label></td>
             <td>
-                <input name="firstname" size="24" value="<%=firstName == null ? "" : firstName%>">
+                <input name="firstname" id="tfirstname" size="24" value="<%=firstName == null ? "" : firstName%>"/>
             </td>
         </tr>
 
@@ -138,48 +139,45 @@
 	<tr>
             <td>LDAP NetID:</td>
             <td>
-                <input name="netid" size="24" value="<%=netid == null ? "" : netid%>">
+                <input name="netid" size="24" value="<%=netid == null ? "" : netid%>" />
             </td>
         </tr>
         <% } %>
 
         <tr>
             <%-- <td>Phone:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.eperson-edit.phone"/></td>
+            <td><label for="tphone"><fmt:message key="jsp.dspace-admin.eperson-edit.phone"/></label></td>
             <td>
-                <input name="phone" size="24" value="<%=phone == null ? "" : phone%>">
+                <input name="phone" id="tphone" size="24" value="<%=phone == null ? "" : phone%>"/>
             </td>
         </tr>
-
         <tr>
             <%-- <td>Can Log In:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.eperson-edit.can"/></td>
+            <td><label for="tcan_log_in"><fmt:message key="jsp.dspace-admin.eperson-edit.can"/></label></td>
             <td>
-                <input type="checkbox" name="can_log_in" value="true"<%= eperson.canLogIn() ? " CHECKED" : "" %>>
+                <input type="checkbox" name="can_log_in" id="tcan_log_in" value="true"<%= eperson.canLogIn() ? " checked=\"checked\"" : "" %> />
             </td>
         </tr>
 
         <tr>
             <%-- <td>Require Certificate:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.eperson-edit.require"/></td>
+            <td><label for="trequire_certificate"><fmt:message key="jsp.dspace-admin.eperson-edit.require"/></label></td>
             <td>
-                <input type="checkbox" name="require_certificate" value="true"<%= eperson.getRequireCertificate() ? " CHECKED" : "" %>>
+                <input type="checkbox" name="require_certificate" id="trequire_certificate" value="true"<%= eperson.getRequireCertificate() ? " checked=\"checked\"" : "" %> />
             </td>
         </tr>
-
-
     </table>
-    
+
     <center>
         <table width="70%">
             <tr>
                 <td align="left">
                     <%-- <input type="submit" name="submit_save" value="Save Edits"> --%>
-                    <input type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>">
+                    <input type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
                 </td>
                 <td align="right">
                     <%-- <input type="submit" name="submit_delete" value="Delete EPerson..."> --%>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
                 </td>
             </tr>
         </table>

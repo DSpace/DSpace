@@ -62,37 +62,36 @@
     String siteName = ConfigurationManager.getProperty("dspace.name");
 %>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
-<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
     <head>
         <title><%= siteName %>: <%= title %></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp">
-        <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon">
-        <SCRIPT LANGUAGE="JavaScript" src="<%= request.getContextPath() %>/utils.js"></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp" type="text/css" />
+        <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
-    <body leftmargin=0 topmargin=0 marginwidth=0 marginheight=0>
+    <body>
 
         <%-- DSpace top-of-page banner --%>
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-        <table class="pageBanner" width="100%" border=0 cellpadding=0 cellspacing=0>
+        <table class="pageBanner" width="100%" border="0" cellpadding="0" cellspacing="0">
 
             <%-- DSpace logo --%>
             <tr>
                 <td>
-                    <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width=198 height=79 border=0></a></td>
-                    <td class="tagLine" width="99%" cellpadding=10> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
-                    <a class="tagLineText" target=_blank href="http://www.dspace.org/"><fmt:message key="jsp.layout.header-default.about"/></a>
+                    <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="198" height="79" border="0"/></a></td>
+                    <td class="tagLine" width="99%"> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
+                    <a class="tagLineText" target="_blank" href="http://www.dspace.org/"><fmt:message key="jsp.layout.header-default.about"/></a>
                 </td>
-                <td nowrap valign=middle>
-
+                <td nowrap="nowrap" valign="middle">
                 </td>
             </tr>
             <tr class="stripe"> <%-- Blue stripe --%>
-                <td colspan=3>&nbsp;</td>
+                <td colspan="3">&nbsp;</td>
             </tr>
         </table>
 
@@ -102,14 +101,13 @@
 <%-- </c:if> --%>
 <%--        <fmt:setBundle basename="Messages" scope="session"/> --%>
 
-
         <%-- Page contents --%>
 
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-        <table class="centralPane" width="100%" border=0 cellpadding=3 cellspacing=1>
+        <table class="centralPane" width="100%" border="0" cellpadding="3" cellspacing="1">
 
             <%-- HACK: valign: for non-CSS compliant Netscape browser --%>
-            <tr valign=top>
+            <tr valign="top">
 
             <%-- Navigation bar --%>
 <%

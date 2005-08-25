@@ -121,22 +121,22 @@ public class ItemListTag extends TagSupport
 
         try
         {
-            out.println("<table align=center class=\"miscTable\">");
+            out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browse all dspace content\">");
 
             // Write column headings
-            out.print("<tr><th class=\"oddRowOddCol\">"
+            out.print("<tr><th id=\"t1\" class=\"oddRowOddCol\">"
                     + (emphasiseDate ? "<strong>" : "")
                     + LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemListTag.issueDate")
                     + (emphasiseDate ? "</strong>" : "") + "</th>");
 
-            out.println("<th class=\"oddRowEvenCol\">"
+            out.println("<th id=\"t2\" class=\"oddRowEvenCol\">"
                     + (emphasiseTitle ? "<strong>" : "")
                     + LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemListTag.title")
                     + (emphasiseTitle ? "</strong>" : "") + "</th>");
 
-            out.println("<th class=\"oddRowOddCol\">"
+            out.println("<th id=\"t3\" class=\"oddRowOddCol\">"
                     + LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemListTag.authors")
                     + "</th></tr>");
@@ -171,9 +171,9 @@ public class ItemListTag extends TagSupport
                 }
 
                 // First column is date
-                out.print("<tr><td nowrap class=\"");
+                out.print("<tr><td headers=\"t1\" nowrap=\"nowrap\" class=\"");
                 out.print((i == highlightRow) ? "highlight" : row);
-                out.print("RowOddCol\" align=right>");
+                out.print("RowOddCol\" align=\"right\">");
 
                 if (emphasiseDate)
                 {
@@ -197,7 +197,7 @@ public class ItemListTag extends TagSupport
                 }
 
                 // Second column is title
-                out.print("</td><td class=\"");
+                out.print("</td><td headers=\"t2\" class=\"");
                 out.print((i == highlightRow) ? "highlight" : row);
                 out.print("RowEvenCol\">");
 
@@ -206,13 +206,13 @@ public class ItemListTag extends TagSupport
                     out.print("<strong>");
                 }
 
-                out.print("<A HREF=\"");
+                out.print("<a href=\"");
                 out.print(hrq.getContextPath());
                 out.print("/handle/");
                 out.print(items[i].getHandle());
                 out.print("\">");
                 out.print(Utils.addEntities(title));
-                out.print("</A>");
+                out.print("</a>");
 
                 if (emphasiseTitle)
                 {
@@ -220,7 +220,7 @@ public class ItemListTag extends TagSupport
                 }
 
                 // Third column is authors
-                out.print("</td><td class=\"");
+                out.print("</td><td headers=\"t3\" class=\"");
                 out.print((i == highlightRow) ? "highlight" : row);
                 out.print("RowOddCol\">");
 
@@ -503,7 +503,7 @@ public class ItemListTag extends TagSupport
                     if (linkToBitstream)
                     {
                         thumbLink = new StringBuffer(
-                                "<br/><a target=_blank href=\"").append(
+                                "<br/><a target=\"_blank\" href=\"").append(
                                 hrq.getContextPath()).append("/bitstream/")
                                 .append(item.getHandle()).append("/").append(
                                         originalBitstream.getSequenceID())

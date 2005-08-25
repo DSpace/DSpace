@@ -71,43 +71,33 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-    <%-- <h1>Bitstream Format Registry</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.list-formats.title"/></h1>
 
-    <%-- <P><strong>Extensions</strong> are comma-separated lists of filename
-    extensions used to automatically identify the formats of uploaded files.
-    Do not include the dot.</P> --%>
-    <P><fmt:message key="jsp.dspace-admin.list-formats.text1"/></P>
+    <p><fmt:message key="jsp.dspace-admin.list-formats.text1"/></p>
+    <p><fmt:message key="jsp.dspace-admin.list-formats.text2"/></p>
 
-    <%-- <P>When you add a bitstream format, it is initially made "internal" so that
-    it does not appear in the submission UI before you've finished editing
-    the format metadata.  Be sure to uncheck "internal" if the format should
-    appear in the submission UI list of formats.</P> --%>
-    <P><fmt:message key="jsp.dspace-admin.list-formats.text2"/></P>
-
-    <P><dspace:popup page="/help/site-admin.html#bitstream"><fmt:message key="jsp.help"/></dspace:popup></P>
-
-    <table class="miscTable" align="center">
-        <tr>
-            <th class="oddRowOddCol"><strong>ID</strong></th>
-            <%-- <th class="oddRowEvenCol"><strong>MIME Type</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.list-formats.mime"/></strong></th>
-            <%-- <th class="oddRowOddCol"><strong>Name</strong></th> --%>
-            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.list-formats.name"/></strong></th>
-            <%-- <th class="oddRowEvenCol"><strong>Long Description</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.list-formats.description"/></strong></th>
-            <%-- <th class="oddRowOddCol"><strong>Support Level</strong></th> --%>
-            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.list-formats.support"/></strong></th>
-            <%-- <th class="oddRowEvenCol"><strong>Internal?</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.list-formats.internal"/></strong></th>
-            <%-- <th class="oddRowOddCol"><strong>Extensions</strong></th> --%>
-            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.list-formats.extensions"/></strong></th>
-            <th class="oddRowEvenCol">&nbsp;</th>
-            <th class="oddRowOddCol">&nbsp;</th>
-        </tr>
+    &nbsp;&nbsp;<dspace:popup page="/help/site-admin.html#bitstream"><fmt:message key="jsp.help"/></dspace:popup>
 
 <%
     Context context = UIUtil.obtainContext(request);
+
+%>
+
+        <table class="miscTable" align="center" summary="Bitstream Format Registry data table">
+            <tr>
+                <th class="oddRowOddCol">
+                    <strong>
+                            ID
+                            / <fmt:message key="jsp.dspace-admin.list-formats.mime"/>
+                            / <fmt:message key="jsp.dspace-admin.list-formats.name"/>
+                            / <fmt:message key="jsp.dspace-admin.list-formats.description"/>
+                            / <fmt:message key="jsp.dspace-admin.list-formats.support"/>
+                            / <fmt:message key="jsp.dspace-admin.list-formats.internal"/>
+                            / <fmt:message key="jsp.dspace-admin.list-formats.extensions"/>
+                    </strong>
+                 </th>
+            </tr>
+<%
 
     String row = "even";
     for (int i = 0; i < formats.length; i++)
@@ -124,68 +114,68 @@
             extValue = extValue + extensions[j];
         }
 %>
-        <form method=POST>
-            <tr>
-                <td class="<%= row %>RowOddCol"><%= formats[i].getID() %></td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="text" name="mimetype" value="<%= formats[i].getMIMEType() %>" size=14>
-                </td>
-                <td class="<%= row %>RowOddCol">
+             <tr>
+                 <td>
+                  <form method="post" action="">
+                    <table>
+                       <tr>
+                          <td class="<%= row %>RowOddCol"><%= formats[i].getID() %></td>
+                          <td class="<%= row %>RowEvenCol">
+                              <input type="text" name="mimetype" value="<%= formats[i].getMIMEType() %>" size="14"/>
+                          </td>
+                          <td class="<%= row %>RowOddCol">
                     <%
                       if (BitstreamFormat.findUnknown(context).getID() == formats[i].getID()) {
                     %>
                       <i><%= formats[i].getShortDescription() %></i>
                     <% } else { %>
-                      <input type="text" name="short_description" value="<%= formats[i].getShortDescription() %>" size=10>
+                              <input type="text" name="short_description" value="<%= formats[i].getShortDescription() %>" size="10"/>
                     <% } %>
-
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="text" name="description" value="<%= formats[i].getDescription() %>" size=20>
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <select name="support_level">
-                        <%-- <option value="0" <%= formats[i].getSupportLevel() == 0 ? "SELECTED" : "" %>>Unknown</option>
-                        <option value="1" <%= formats[i].getSupportLevel() == 1 ? "SELECTED" : "" %>>Known</option>
-                        <option value="2" <%= formats[i].getSupportLevel() == 2 ? "SELECTED" : "" %>>Supported</option> --%>
-                        <option value="0" <%= formats[i].getSupportLevel() == 0 ? "SELECTED" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.unknown"/></option>
-			<option value="1" <%= formats[i].getSupportLevel() == 1 ? "SELECTED" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.known"/></option>
-                        <option value="2" <%= formats[i].getSupportLevel() == 2 ? "SELECTED" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.supported"/></option>
-                    </select>
-                </td>
-                <td class="<%= row %>RowEvenCol" align="center">
-                    <input type="checkbox" name="internal" value="true"<%= formats[i].isInternal() ? " CHECKED" : "" %>>
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <input type="text" name="extensions" value="<%= extValue %>" size="10">
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="hidden" name="format_id" value="<%= formats[i].getID() %>">
-                    <%-- <input type="submit" name="submit_update" value="Update"> --%>
-                    <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>">
-                </td>
-                <td class="<%= row %>RowOddCol">
+                          </td>
+                          <td class="<%= row %>RowEvenCol">
+                              <input type="text" name="description" value="<%= formats[i].getDescription() %>" size="20"/>
+                          </td>
+                          <td class="<%= row %>RowOddCol">
+                              <select name="support_level">
+                                  <option value="0" <%= formats[i].getSupportLevel() == 0 ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.unknown"/></option>
+	    	                  <option value="1" <%= formats[i].getSupportLevel() == 1 ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.known"/></option>
+                                  <option value="2" <%= formats[i].getSupportLevel() == 2 ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.supported"/></option>
+                              </select>
+                          </td>
+                          <td class="<%= row %>RowEvenCol" align="center">
+                              <input type="checkbox" name="internal" value="true"<%= formats[i].isInternal() ? " checked=\"checked\"" : "" %>/>
+                          </td>
+                          <td class="<%= row %>RowOddCol">
+                              <input type="text" name="extensions" value="<%= extValue %>" size="10"/>
+                          </td>
+                          <td class="<%= row %>RowEvenCol">
+                              <input type="hidden" name="format_id" value="<%= formats[i].getID() %>" />
+                              <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>"/>
+                          </td>
+                          <td class="<%= row %>RowOddCol">
                     <%
                       if (BitstreamFormat.findUnknown(context).getID() != formats[i].getID()) {
                     %>
-                    <%-- <input type="submit" name="submit_delete" value="Delete..."> --%>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>">
-                    <% 
+                             <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>" />
+                     <% 
                       } 
                     %>
-                </td>
-            </tr>
-        </form>
+                         </td>
+                    </tr>    
+                  </table> 
+                 </form>
+             </td>
+        </tr>
 <%
         row = (row.equals("odd") ? "even" : "odd");
     }
 %>
-    </table>
-        
-    <P align="center">
-        <form method=POST>
-            <%-- <input type="submit" name="submit_add" value="Add New"> --%>
-            <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.addnew"/>">
-        </form>
+
+  </table>
+
+  <form method="post" action="">
+    <p align="center">
+            <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.addnew"/>" />
     </p>
+  </form>
 </dspace:layout>

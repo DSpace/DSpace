@@ -74,35 +74,28 @@
                parentlink="/dspace-admin"
                nocache="true">
 
-  <table width=95%>
+  <table width="95%">
     <tr>
-      <td align=left>
-    <%-- <h1>Edit Group : <%=group.getName()%> (<%=group.getID()%>)</h1> --%>
+      <td align="left">
 	<h1><fmt:message key="jsp.tools.group-edit.title"/> : <%=group.getName()%> (<%=group.getID()%>)</h1>
       </td>
       <td align="right" class="standard">
-        <%-- <dspace:popup page="/help/collection-admin.html#groupeditor">Help...</dspace:popup> --%>
-		<dspace:popup page="/help/collection-admin.html#groupeditor"><fmt:message key="jsp.help"/></dspace:popup>
+	<dspace:popup page="/help/collection-admin.html#groupeditor"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
 
   <center>
-    <form method=post>
+    <form method="post" action="">
+	<p><label for="tgroup_name"><fmt:message key="jsp.tools.group-edit.name"/></label><input name="group_name" id="tgroup_name" value="<%=group.getName()%>"/></p>
+   	    <h3><fmt:message key="jsp.tools.group-edit.heading"/></h3>
 
-        <%-- <P>Name: <input name="group_name" value="<%=group.getName()%>"></P> --%>
-		<P><fmt:message key="jsp.tools.group-edit.name"/> <input name="group_name" value="<%=group.getName()%>"></P>
-
-        <%-- <h3>Current Group Members</h3> --%>
-		<h3><fmt:message key="jsp.tools.group-edit.heading"/></h3>
-
-        <input type="hidden" name="group_id" value="<%=group.getID()%>">
+        <input type="hidden" name="group_id" value="<%=group.getID()%>"/>
         <dspace:selecteperson multiple="true" selected="<%= epeople %>"/> 
 
-        <br>
+        <br/>
 
-        <%-- <P><input type="submit" name="submit_group_update" value="Update Group" onclick="javascript:finishEPerson();"></P> --%>
-        <P><input type="submit" name="submit_group_update" value="<fmt:message key="jsp.tools.group-edit.update.button"/>" onclick="javascript:finishEPerson();"></P>
-	</form>
+        <p><input type="submit" name="submit_group_update" value="<fmt:message key="jsp.tools.group-edit.update.button"/>" onclick="javascript:finishEPerson();"/></p>
+   </form>
   </center>
 </dspace:layout>

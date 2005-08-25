@@ -72,35 +72,34 @@
     boolean ldap_eperson = (ldap_enabled && (eperson.getNetid() != null) && (eperson.getNetid().equals("") == false));
 %>
 
-
 <dspace:layout titlekey="jsp.register.edit-profile.title" nocache="true">
 
-    <%-- <H1>Edit Your Profile</H1> --%>
-	<H1><fmt:message key="jsp.register.edit-profile.title"/></H1>
+    <%-- <h1>Edit Your Profile</h1> --%>
+	<h1><fmt:message key="jsp.register.edit-profile.title"/></h1>
     
 <%
     if (missingFields)
     {
 %>
-    <%-- <P><strong>Please fill out all of the required fields.</strong></P> --%>
-	<P><strong><fmt:message key="jsp.register.edit-profile.info1"/></strong></P>
+    <%-- <p><strong>Please fill out all of the required fields.</strong></p> --%>
+	<p><strong><fmt:message key="jsp.register.edit-profile.info1"/></strong></p>
 <%
     }
 
     if (passwordProblem)
     {
 %>
-    <%-- <P><strong>The passwords you enter below must match, and need to be at
-    least 6 characters long.</strong></P> --%>
-	<P><strong><fmt:message key="jsp.register.edit-profile.info2"/></strong></P>
+    <%-- <p><strong>The passwords you enter below must match, and need to be at
+    least 6 characters long.</strong></p> --%>
+	<p><strong><fmt:message key="jsp.register.edit-profile.info2"/></strong></p>
 <%
     }
 %>
 
-	<P><fmt:message key="jsp.register.edit-profile.info3"/>
-    <dspace:popup page="/help/index.html#editprofile"><fmt:message key="jsp.morehelp"/></dspace:popup></P></P>
+	<p><fmt:message key="jsp.register.edit-profile.info3"/>
+    <object><dspace:popup page="/help/index.html#editprofile"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>
     
-    <form action="<%= request.getContextPath() %>/profile" method=POST>
+    <form action="<%= request.getContextPath() %>/profile" method="post">
 
         <dspace:include page="/register/profile-form.jsp" />
 
@@ -110,23 +109,23 @@
     if ((eperson.getRequireCertificate() == false) && (ldap_eperson == false))
     {
 %>
-        <%-- <P><strong>Optionally</strong>, you can choose a new password and enter it into the box below, and confirm it by typing it
-        again into the second box for verification.  It should be at least six characters long.</P> --%>
-		<P><fmt:message key="jsp.register.edit-profile.info5"/></P>
+        <%-- <p><strong>Optionally</strong>, you can choose a new password and enter it into the box below, and confirm it by typing it
+        again into the second box for verification.  It should be at least six characters long.</p> --%>
+		<p><fmt:message key="jsp.register.edit-profile.info5"/></p>
 
         <table class="misc" align="center">
             <tr>
                 <td class="oddRowEvenCol">
-                    <table border=0 cellpadding=5>
+                    <table border="0" cellpadding="5">
                         <tr>
-                            <%-- <td align=right class=standard><strong>New Password:</strong></td> --%>
-							<td align=right class=standard><strong><fmt:message key="jsp.register.edit-profile.pswd.field"/></strong></td>
-                            <td class=standard><input type=password name="password"></td>
+                            <%-- <td align="right" class="standard"><label for="tpassword"><strong>New Password:</strong></label></td> --%>
+							<td align="right" class="standard"><label for="tpassword"><strong><fmt:message key="jsp.register.edit-profile.pswd.field"/></strong></label></td>
+                            <td class="standard"><input type="password" name="password" id="tpassword" /></td>
                         </tr>
                         <tr>
-                            <%-- <td align=right class=standard><strong>Again to Confirm:</strong></td> --%>
-							<td align=right class=standard><strong><fmt:message key="jsp.register.edit-profile.confirm.field"/></strong></td>
-                            <td class=standard><input type=password name="password_confirm"></td>
+                           <%-- <td align="right" class="standard"><strong>Again to Confirm:</strong></td> --%>
+							<td align="right" class="standard"><label for="tpassword_confirm"><strong><fmt:message key="jsp.register.edit-profile.confirm.field"/></strong></label></td>
+                            <td class="standard"><input type="password" name="password_confirm" id="tpassword_confirm" /></td>
                         </tr>
                     </table>
                 </td>
@@ -135,7 +134,7 @@
 <%
   }
 %>
-       <%-- <P align=center><input type=submit name=submit value="Update Profile"></P> --%>
-	   <P align=center><input type=submit name=submit value="<fmt:message key="jsp.register.edit-profile.update.button"/>"></P>
+       <%-- <p align="center"><input type="submit" name="submit" value="Update Profile"></p> --%>
+	   <p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.register.edit-profile.update.button"/>" /></p>
     </form>
 </dspace:layout>

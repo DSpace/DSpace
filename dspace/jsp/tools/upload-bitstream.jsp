@@ -65,21 +65,21 @@
                parentlink="/dspace-admin"
                nocache="true">
 
-    <%-- <H1>Upload Bitstream</H1> --%>
-	<H1><fmt:message key="jsp.tools.upload-bitstream.title"/></H1>
+    <%-- <h1>Upload Bitstream</h1> --%>
+	<h1><fmt:message key="jsp.tools.upload-bitstream.title"/></h1>
     
-    <%-- <P>Select the bitstream to upload</P> --%>
-	<P><fmt:message key="jsp.tools.upload-bitstream.info"/></P>
+    <%-- <p>Select the bitstream to upload</p> --%>
+	<p><fmt:message key="jsp.tools.upload-bitstream.info"/></p>
     
-    <form method=POST enctype="multipart/form-data">
-        <P align=center>
-            <input type=file size=40 name="file">
-        </P>
+    <form method="post" enctype="multipart/form-data" action="">
+        <p align="center">
+            <input type="file" size="40" name="file"/>
+        </p>
         
-        <input type="hidden" name="item_id" value="<%= item.getID() %>">
+        <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
 
-        <!-- <P align=center><input type="submit" name="submit" value="Upload"></P> -->
-		<P align=center><input type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload"/>"></P>
+        <!-- <p align="center"><input type="submit" name="submit" value="Upload"></p> -->
+		<p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload"/>" /></p>
     </form>
     
 </dspace:layout>

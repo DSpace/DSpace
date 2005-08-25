@@ -63,31 +63,30 @@
     Iterator tableIt = tableList.iterator();
   
 %>
-
 <dspace:layout titlekey="jsp.dspace-admin.eperson-deletion-error.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-    <H1><fmt:message key="jsp.dspace-admin.eperson-deletion-error.heading" /></H1>
+    <h1><fmt:message key="jsp.dspace-admin.eperson-deletion-error.heading" /></h1>
 
-    <%-- <P>The EPerson <%=fullName%> cannot be deleted because a reference to it
-     exists in the following table(s):</P> --%>
-    <P><fmt:message key="jsp.dspace-admin.eperson-deletion-error.errormsg">
+    <%-- <p>The EPerson <%=fullName%> cannot be deleted because a reference to it
+     exists in the following table(s):</p> --%>
+    <p><fmt:message key="jsp.dspace-admin.eperson-deletion-error.errormsg">
         <fmt:param><%=fullName%></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 
-     <UL>
+     <ul>
      <% while(tableIt.hasNext())
         {
             
-        %><LI><%=(String)tableIt.next()%></LI>
+        %><li><%=(String)tableIt.next()%></li>
         
         <%
         }  
         %>
-     </UL>
+     </ul>
     
    
     <p>&nbsp;</p>
@@ -95,9 +94,9 @@
     <p>&nbsp;</p>
     <p>&nbsp;</p>
 
-    <P align=center>
-        <A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople"><fmt:message key="jsp.dspace-admin.confirm-delete-format.returntoedit" /></A>
-    </P>
-	
+    <p align="center">
+        <a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople"><fmt:message key="jsp.dspace-admin.confirm-delete-format.returntoedit" /></a>
+    </p>
 
 </dspace:layout>
+

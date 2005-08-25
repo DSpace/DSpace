@@ -119,10 +119,10 @@
 
 <dspace:layout locbar="commLink" title="<%= name %>">
 
-<table border=0 cellpadding=5 width=100%>
+  <table border="0" cellpadding="5" width="100%">
     <tr>
-      <td width=100%>
-        <H1><%= name %>
+      <td width="100%">
+        <h1><%= name %>
 <%
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
             {
@@ -131,41 +131,45 @@
 <%
             }
 %>
-		</H1>
-
-		<H3><fmt:message key="jsp.collection-home.heading1"/></H3>
+		</h1>
+		<h3><fmt:message key="jsp.collection-home.heading1"/></h3>
       </td>
-      <td valign=top>
+      <td valign="top">
 <%  if (logo != null) { %>
-        <img alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>">
+        <img alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" />
 <% } %></td>
     </tr>
   </table>
 
   <%-- Search/Browse --%>
-  <form method=GET>
-    <table class=miscTable align=center>
+  <form method="get" action="">
+    <table class="miscTable" align="center" summary="This table allows you to search through all collections in the repository">
       <tr>
-        <td class="evenRowEvenCol" colspan=2>
+        <td class="evenRowEvenCol" colspan="2">
           <table>
             <tr>
               <td class="standard">
-				<small><strong><fmt:message key="jsp.general.location"/></strong></small>&nbsp;<select name="location">
-				  <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                  <option selected value="<%= community.getHandle() %>"><%= communityName %></option>
-                  <option selected value="<%= collection.getHandle() %>/"><%= name %></option>
-                </select>
+	        <label for="tlocation"><small><strong><fmt:message key="jsp.general.location"/></strong></small></label>&nbsp;
+                  <select name="location" id="tlocation">
+		    <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
+                    <option selected="selected" value="<%= community.getHandle() %>"><%= communityName %></option>
+                    <option selected="selected" value="<%= collection.getHandle() %>/"><%= name %></option>
+                  </select>
               </td>
             </tr>
             <tr>
-              <td class="standard" align=center>
-				<small><fmt:message key="jsp.general.searchfor"/>&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="<fmt:message key="jsp.general.go"/>">
+              <td class="standard" align="center">
+				<label for="tquery"><small><fmt:message key="jsp.general.searchfor"/>&nbsp;</small></label><input type="text" name="query" id="tquery"/>&nbsp;
+				<input type="submit" name="submit_search" value="<fmt:message key="jsp.general.go"/>" />
               </td>
             </tr>
             <tr>
-              <td align=center class="standard">
-                <small><fmt:message key="jsp.general.orbrowse"/>&nbsp;</small><input type="submit" name="submit_titles" value="<fmt:message key="jsp.general.titles.button"/>">&nbsp;<input type="submit" name="submit_authors" value="<fmt:message key="jsp.general.authors.button"/>">&nbsp;<input type="submit" name="submit_dates" value="<fmt:message key="jsp.general.date.button"/>">
-			  </td>
+              <td align="center" class="standard">
+                <small><fmt:message key="jsp.general.orbrowse"/>&nbsp;</small>
+                <input type="submit" name="submit_titles" value="<fmt:message key="jsp.general.titles.button"/>" />&nbsp;
+                <input type="submit" name="submit_authors" value="<fmt:message key="jsp.general.authors.button"/>" />&nbsp;
+                <input type="submit" name="submit_dates" value="<fmt:message key="jsp.general.date.button"/>" />
+	      </td>
             </tr>
           </table>
         </td>
@@ -173,81 +177,72 @@
     </table>
   </form>
 
-  <table width="100%" align="center" cellspacing=10>
+  <table width="100%" align="center" cellspacing="10">
     <tr>
       <td>
-<%-- HACK: <center> used for Netscape 4.x, which doesn't accept align=center
+<%-- HACK: <center> used for Netscape 4.x, which doesn't accept align="center"
   for a paragraph with a button in it --%>
 <%  if (submit_button)
     { %>
         <center>
-          <form action="<%= request.getContextPath() %>/submit" method=POST>
-            <input type=hidden name=collection value="<%= collection.getID() %>">
-            <%--<input type=submit name=submit value="Submit to This Collection">--%>
-			<input type=submit name=submit value="<fmt:message key="jsp.collection-home.submit.button"/>">
+          <form action="<%= request.getContextPath() %>/submit" method="post">
+            <input type="hidden" name="collection" value="<%= collection.getID() %>" />
+			<input type="submit" name="submit" value="<fmt:message key="jsp.collection-home.submit.button"/>" />
           </form>
         </center>
 <%  } %>
       </td>
       <td class="oddRowEvenCol">
-        <form method=GET>
+        <form method="get" action="">
           <table>
             <tr>
               <td class="standard">
 <%  if (loggedIn && subscribed)
     { %>
-                <%--<small>You are subscribed to this collection. <A HREF="<%= request.getContextPath() %>/subscribe">See&nbsp;Subscriptions</A></small>--%>
-                <small><fmt:message key="jsp.collection-home.subscribed"/> <A HREF="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.collection-home.info"/></A></small>
+                <small><fmt:message key="jsp.collection-home.subscribed"/> <a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.collection-home.info"/></a></small>
 			  </td>
               <td class="standard">
-                <%--<input type="submit" name="submit_unsubscribe" value="Unsubscribe">--%>
-				<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.collection-home.unsub"/>">
+            		<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.collection-home.unsub"/>" />
 <%  } else { %>
                 <small>
-                  <%--Subscribe to this collection to receive daily e-mail notification of new additions--%>
-				  <fmt:message key="jsp.collection-home.subscribe.msg"/>
+            		  <fmt:message key="jsp.collection-home.subscribe.msg"/>
                 </small>
               </td>
               <td class="standard">
-                <%--<input type="submit" name="submit_subscribe" value="Subscribe">--%>
-				<input type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>">
+				<input type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>" />
 <%  } %>
               </td>
             </tr>
           </table>
-        </td>
-      </form>
+        </form>
+      </td>
     </tr>
   </table>
 
   <%= intro %>
 
-
-
-  <P class="copyrightText"><%= copyright %></P>
+  <p class="copyrightText"><%= copyright %></p>
 
   <dspace:sidebar>
 <% if(admin_button || editor_button ) { %>
-    <table class=miscTable align=center>
+    <table class="miscTable" align="center">
       <tr>
-	<td class="evenRowEvenCol" colspan=2>
-	  <table>
+	    <td class="evenRowEvenCol" colspan="2">
+	     <table>
             <tr>
-              <th class="standard">
-                 <%--<strong>Admin Tools</strong>--%>
-				 <strong><fmt:message key="jsp.admintools"/></strong>
-              <th>
+              <th id="t1" class="standard">
+                 <strong><fmt:message key="jsp.admintools"/></strong>                
+              </th>
             </tr>
 
 <% if( editor_button ) { %>
             <tr>
-              <td class="standard" align="center">
-                 <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
-                  <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
-                  <input type="hidden" name="community_id" value="<%= community.getID() %>">
-                  <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>">
-                  <%--<input type="submit" value="Edit...">--%>
-				  <input type="submit" value="<fmt:message key="jsp.general.edit.button"/>">
+              <td headers="t1" class="standard" align="center">
+                <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
+                  <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
+                  <input type="hidden" name="community_id" value="<%= community.getID() %>" />
+                  <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>" />
+                  <input type="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
                 </form>
               </td>
             </tr>
@@ -255,27 +250,25 @@
 
 <% if( admin_button ) { %>
             <tr>
-              <td class="standard" align="center">
-                 <form method=POST action="<%=request.getContextPath()%>/tools/itemmap">
-                  <input type="hidden" name="cid" value="<%= collection.getID() %>">
-                  <%--<input type="submit" value="Item Mapper">--%>
-				  <input type="submit" value="<fmt:message key="jsp.collection-home.item.button"/>">
+              <td headers="t1" class="standard" align="center">
+                 <form method="post" action="<%=request.getContextPath()%>/tools/itemmap">
+                  <input type="hidden" name="cid" value="<%= collection.getID() %>" />
+				  <input type="submit" value="<fmt:message key="jsp.collection-home.item.button"/>" />                  
                 </form>
               </td>
             </tr>
 <% if(submitters != null) { %>
             <tr>
-	      <td class="standard" align="center">
-		<form method=POST action="<%=request.getContextPath()%>/tools/group-edit">
-		  <input type=hidden name="group_id" value="<%=submitters.getID()%>">
-		  <%--<input type=submit name="submit_edit" value="Edit Submitters">--%>
-		  <input type=submit name="submit_edit" value="<fmt:message key="jsp.collection-home.editsub.button"/>">
-		</form>
-	      </td>
-            </tr>
+	         <td headers="t1" class="standard" align="center">
+		      <form method="get" action="<%=request.getContextPath()%>/tools/group-edit">
+		        <input type="hidden" name="group_id" value="<%=submitters.getID()%>" />
+		        <input type="submit" name="submit_edit" value="<fmt:message key="jsp.collection-home.editsub.button"/>" />
+		      </form>
+	         </td>
+           </tr>
 <% } %>
             <tr>
-              <td class="standard" align="center">
+              <td headers="t1" class="standard" align="center">
                  <dspace:popup page="/help/collection-admin.html"><fmt:message key="jsp.adminhelp"/></dspace:popup>
               </td>
             </tr>
@@ -288,7 +281,7 @@
 <%  } %>
 
 
-	<H3><fmt:message key="jsp.collection-home.recentsub"/></H3>
+	<h3><fmt:message key="jsp.collection-home.recentsub"/></h3>
 <%
     for (int i = 0; i < lastSubmittedTitles.length; i++)
     {
@@ -297,7 +290,7 @@
     		: Utils.addEntities(lastSubmittedTitles[i]));
     		
 %>
-    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= displayTitle %></A></P>
+    <p class="recentItem"><a href="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= displayTitle %></a></p>
 <%
   }
 %>
@@ -305,3 +298,4 @@
   </dspace:sidebar>
 
 </dspace:layout>
+

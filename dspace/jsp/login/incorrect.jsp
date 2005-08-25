@@ -50,17 +50,15 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-
 <dspace:layout navbar="off"
                locbar="nolink"
                titlekey="jsp.login.incorrect.title">
 
-
-    <table border=0 width="90%">
-        <tr>
+    <table border="0" width="90%">
+       <tr>
             <td align="left">
-                <%-- <H1>Log In to DSpace</H1> --%>
-                <H1><fmt:message key="jsp.login.incorrect.heading"/></H1>
+                <%-- <h1>Log In to DSpace</h1> --%>
+                <h1><fmt:message key="jsp.login.incorrect.heading"/></h1>
             </td>
             <td align="right" class="standard">
                 <dspace:popup page="/help/index.html#login"><fmt:message key="jsp.help"/></dspace:popup>
@@ -68,10 +66,10 @@
         </tr>
     </table>
 
-    <%-- <P align=center><strong>The e-mail address and password you supplied were not valid.  Please try again, or have you <A HREF="<%= request.getContextPath() %>/forgot">forgotten your password</A>?</strong></P> --%>
-    <P align=center><strong><fmt:message key="jsp.login.incorrect.text">
+    <%-- <p align="center"><strong>The e-mail address and password you supplied were not valid.  Please try again, or have you <a href="<%= request.getContextPath() %>/forgot">forgotten your password</a>?</strong></p> --%>
+    <p align="center"><strong><fmt:message key="jsp.login.incorrect.text">
         <fmt:param><%= request.getContextPath() %>/forgot</fmt:param>
-    </fmt:message></strong></P>
+    </fmt:message></strong></p>
 
     <dspace:include page="/components/login-form.jsp" />
 </dspace:layout>

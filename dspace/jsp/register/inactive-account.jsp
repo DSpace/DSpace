@@ -52,16 +52,16 @@
 
 <dspace:layout titlekey="jsp.register.inactive-account.title">
 
-    <%-- <H1>Inactive Account</H1> --%>
-	<H1><fmt:message key="jsp.register.inactive-account.title"/></H1>
+    <%-- <h1>Inactive Account</h1> --%>
+	<h1><fmt:message key="jsp.register.inactive-account.title"/></h1>
     
-    <%-- <P>The e-mail address you entered corresponds to an inactive account.
-    Perhaps you haven't yet <A HREF="<%= request.getContextPath() %>/register">
-    registered</A>.  Please feel free to contact the site administrators
-    with any queries.</P> --%>
-	<P><fmt:message key="jsp.register.inactive-account.info">
+    <%-- <p>The e-mail address you entered corresponds to an inactive account.
+    Perhaps you haven't yet <a href="<%= request.getContextPath() %>/register">
+    registered</a>.  Please feel free to contact the site administrators
+    with any queries.</p> --%>
+	<p><fmt:message key="jsp.register.inactive-account.info">
         <fmt:param><%= request.getContextPath() %>/register</fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
     
     <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

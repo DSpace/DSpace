@@ -70,9 +70,9 @@
                parentlink="/dspace-admin"
                nocache="true">
     
-  <table width=95%>
+  <table width="95%">
     <tr>
-      <td align=left>
+      <td align="left">
         <%-- <h1>News Editor</h1> --%>
         <h1><fmt:message key="jsp.dspace-admin.news-main.heading"/></h1>
       </td>
@@ -82,29 +82,30 @@
     </tr>
   </table>
 
+ <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="post">
     <table class="miscTable" align="center">
-        <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="POST">
-            <tr>
+          <tr>
                 <%-- <td class="oddRowOddCol">Top News</td> --%>
-                <td class="oddRowOddCol"><fmt:message key="jsp.dspace-admin.news-main.news.top"/></td>
-                <td class="oddRowEvenCol">
-                    <input type="hidden" name="position" value=<%= Constants.NEWS_TOP %>>
+                <th id="t1" class="oddRowOddCol"><fmt:message key="jsp.dspace-admin.news-main.news.top"/></th> 
+                <td headers="t1" class="oddRowEvenCol">
+                    <input type="hidden" name="position" value="<%= Constants.NEWS_TOP %>" />
                     <%-- <input type="submit" name="submit_edit" value="Edit..."> --%>
-                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
+                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
                 </td>
             </tr>
-        </form>
-        <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="POST">
+    </table>
+ </form>
+ <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="post">
+    <table class="miscTable" align="center">
             <tr>
                 <%-- <td class="evenRowOddCol">Sidebar News</td> --%>
-                <td class="evenRowOddCol"><fmt:message key="jsp.dspace-admin.news-main.news.sidebar"/></td>
-                <td class="evenRowEvenCol">
-                    <input type="hidden" name="position" value=<%= Constants.NEWS_SIDE %>>
+                <th id="t2" class="evenRowOddCol"><fmt:message key="jsp.dspace-admin.news-main.news.sidebar"/></th>
+                <td headers="t2" class="evenRowEvenCol">
+                    <input type="hidden" name="position" value="<%= Constants.NEWS_SIDE %>" />
                     <%-- <input type="submit" name="submit_edit" value="Edit..."> --%>
-                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
+                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
                 </td>
             </tr>
-        </form>
     </table>
-    
+  </form>
 </dspace:layout>

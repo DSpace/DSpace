@@ -78,20 +78,20 @@
     }
 %>
 
-<table border=0 align=center cellpadding=5>
+<table border="0" align="center" cellpadding="5">
     <tr>
-        <%-- <td align=right class=standard><strong>First name*:</strong></td> --%>
-		<td align=right class=standard><strong><fmt:message key="jsp.register.profile-form.fname.field"/></strong></td>
-        <td class=standard><input type=text name="first_name" size="40" value="<%= firstName %>"></td>
+        <%-- <td align="right" class="standard"><strong>First name*:</strong></td> --%>
+		<td align="right" class="standard"><strong><fmt:message key="jsp.register.profile-form.fname.field"/></strong></td>
+        <td class="standard"><input type="text" name="first_name" id="tfirst_name" size="40" value="<%= firstName %>"/></td>
     </tr>
     <tr>
-        <%-- <td align=right class=standard><strong>Last name*:</strong></td> --%>
-		<td align=right class=standard><strong><fmt:message key="jsp.register.profile-form.lname.field"/></strong></td>
-        <td class=standard><input type=text name="last_name" size="40" value="<%= lastName %>"></td>
+        <%-- <td align="right" class="standard"><label for="tlast_name"><strong>Last name*:</strong></label></td> --%>
+		<td align="right" class="standard"><label for="tlast_name"><strong><fmt:message key="jsp.register.profile-form.lname.field"/></strong></label></td>
+        <td class="standard"><input type="text" name="last_name" id="tlast_name" size="40" value="<%= lastName %>" /></td>
     </tr>
     <tr>
-        <%-- <td align=right class=standard><strong>Contact telephone:</strong></td> --%>
-		<td align=right class=standard><strong><fmt:message key="jsp.register.profile-form.phone.field"/></strong></td>
-        <td class=standard><input type=text name="phone" size="40" maxlength="32" value="<%= phone %>"></td>
+        <%-- <td align="right" class="standard"><strong>Contact telephone:</strong></td> --%>
+		<td align="right" class="standard"><label for="tphone"><strong><fmt:message key="jsp.register.profile-form.phone.field"/></strong></label></td>
+        <td class="standard"><input type="text" name="phone" id="tphone" size="40" maxlength="32" value="<%= phone %>"/></td>
     </tr>
 </table>

@@ -74,9 +74,9 @@
     <%-- <h1>communities:</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.community-select.com"/></h1>
 
-    <form method=POST>
+    <form method="post" action="">
 
-    <table class="miscTable" align="center">
+    <table class="miscTable" align="center" summary="Community selection table">
         <tr>
             <td>
                     <select size="12" name="community_id">
@@ -95,11 +95,11 @@
             <tr>
                 <td align="left">
                     <%-- <input type="submit" name="submit_community_select" value="Edit Policies"> --%>
-                    <input type="submit" name="submit_community_select" value="<fmt:message key="jsp.dspace-admin.general.editpolicy"/>">
+                    <input type="submit" name="submit_community_select" value="<fmt:message key="jsp.dspace-admin.general.editpolicy"/>" />
                 </td>
                 <td align="right">
                     <%-- <input type="submit" name="submit_community_select_cancel" value="Cancel"> --%>
-                    <input type="submit" name="submit_community_select_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
+                    <input type="submit" name="submit_community_select_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
                 </td>
             </tr>
         </table>

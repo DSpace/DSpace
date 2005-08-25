@@ -66,13 +66,13 @@ import org.dspace.handle.HandleManager;
  * Servlet for browsing through indices. This can be used to browse authors,
  * items by date, or items by title. In the deployment description, the initial
  * parameter "browse" should be set to one of these values:
- * <P>
- * <UL>
- * <LI><code>titles</code>- for browsing items by title (the default)</LI>
- * <LI><code>authors</code>- for browsing authors</LI>
- * <LI><code>dates</code>- for browsing items by date</LI>
- * </UL>
- * <P>
+ * <p>
+ * <ul>
+ * <lI><code>titles</code>- for browsing items by title (the default)</li>
+ * <lI><code>authors</code>- for browsing authors</li>
+ * <lI><code>dates</code>- for browsing items by date</li>
+ * </ul>
+ * <p>
  * Hence there should be three instances of this servlet, one for each type of
  * browse.
  * 
@@ -203,7 +203,7 @@ public class BrowseServlet extends DSpaceServlet
                 // if the date order is flipped, we'll keep the same focus
                 flipOrderingQuery = "focus="
                         + URLEncoder.encode(focus, Constants.DEFAULT_ENCODING)
-                        + "&";
+                        + "&amp;";
             }
         }
         else if (startsWith != null)
@@ -216,7 +216,7 @@ public class BrowseServlet extends DSpaceServlet
                 // if the date order is flipped, we'll keep the same focus
                 flipOrderingQuery = "starts_with="
                         + URLEncoder.encode(startsWith,
-                                Constants.DEFAULT_ENCODING) + "&";
+                                Constants.DEFAULT_ENCODING) + "&amp;";
 
                 /*
                  * When the user is browsing with the most recent items first,
@@ -303,13 +303,13 @@ public class BrowseServlet extends DSpaceServlet
                     flipOrderingQuery = "bottom="
                             + URLEncoder
                                     .encode(top, Constants.DEFAULT_ENCODING)
-                            + "&";
+                            + "&amp;";
                 }
                 else
                 {
                     flipOrderingQuery = "top="
                             + URLEncoder.encode(bottom,
-                                    Constants.DEFAULT_ENCODING) + "&";
+                                    Constants.DEFAULT_ENCODING) + "&amp;";
                 }
             }
         }
@@ -398,7 +398,7 @@ public class BrowseServlet extends DSpaceServlet
                     // For browsing by date, oldest first, we need
                     // to add the ordering parameter
                     request.setAttribute("previous.query",
-                            "order=oldestfirst&bottom="
+                            "order=oldestfirst&amp;bottom="
                                     + URLEncoder.encode(s,
                                             Constants.DEFAULT_ENCODING));
                 }
@@ -432,7 +432,7 @@ public class BrowseServlet extends DSpaceServlet
                 {
                     // For browsing by date, oldest first, we need
                     // to add the ordering parameter
-                    request.setAttribute("next.query", "order=oldestfirst&top="
+                    request.setAttribute("next.query", "order=oldestfirst&amp;top="
                             + URLEncoder.encode(s, Constants.DEFAULT_ENCODING));
                 }
                 else

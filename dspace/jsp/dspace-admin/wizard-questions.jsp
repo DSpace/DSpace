@@ -60,133 +60,129 @@
 
 <%  Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue()); %>
-
+    
 <dspace:layout locbar="off"
                navbar="off"
                titlekey="jsp.dspace-admin.wizard-questions.title"
                nocache="true">
-    <%-- <H1>Describe the Collection</H1> --%>
-    
+    <%-- <h1>Describe the Collection</h1> --%>
+<h1><fmt:message key="jsp.dspace-admin.wizard-questions.title"/></h1>
 
-<H1><fmt:message key="jsp.dspace-admin.wizard-questions.title"/></H1>
-
-    <form action="<%= request.getContextPath() %>/tools/collection-wizard" method=post>
-
-        <%--<P>Please check the boxes next to the statements that apply to the collection. --%>
-        <P><fmt:message key="jsp.dspace-admin.wizard-questions.text"/>
-          <dspace:popup page="/help/site-admin.html#createcollection"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
-
+    <form action="<%= request.getContextPath() %>/tools/collection-wizard" method="post">
+        <%--<p>Please check the boxes next to the statements that apply to the collection. --%>
+        <p><fmt:message key="jsp.dspace-admin.wizard-questions.text"/>
+          <object><dspace:popup page="/help/site-admin.html#createcollection"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>
         <center>
             <table class="miscTable">
                 <tr class="oddRowOddCol">
                     <td class="oddRowOddCol" align="left">
-                        <table border=0>
+                        <table border="0">
                             <tr>
-                                <td valign=top>
-                                <% if(!admin_button ) { %> <input type=hidden name="public_read" value="true" >
-                                <input type=checkbox name="public_read" value="true" disabled CHECKED>
+                                <td valign="top">
+                                <% if(!admin_button ) { %> <input type="hidden" name="public_read" value="true"/>
+                                <input type="checkbox" name="public_read" value="true" disabled="disabled" checked="checked"/>
                                 <% } else { %>
-                                <input type=checkbox name="public_read" value="true" CHECKED>
+                                <input type="checkbox" name="public_read" value="true" checked="checked"/>
                                 <% } %>
                                 </td>
                                 <%-- <td class="submitFormLabel" nowrap>New items should be publicly readable</td> --%>
-                                <td class="submitFormLabel" nowrap><fmt:message key="jsp.dspace-admin.wizard-questions.check1"/></td>
+                                <td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.dspace-admin.wizard-questions.check1"/></td>
                             </tr>
                         </table>
                     </td>
                 </tr>
                 <tr class="evenRowOddCol">
                     <td class="evenRowOddCol" align="left">
-                        <table border=0>
+                        <table border="0">
                             <tr>
-                                <td valign=top>
-                                <% if(!admin_button ) { %> <input type=hidden name="submitters" value="false" >
-                                <input type=checkbox name="submitters" value="true" disabled>
+                                <td valign="top">
+                                <% if(!admin_button ) { %> <input type="hidden" name="submitters" value="false" />
+                                <input type="checkbox" name="submitters" value="true" disabled="disabled"/>
                                 <% } else { %>
-                                <input type=checkbox name="submitters" value="true" CHECKED>
+                                <input type="checkbox" name="submitters" value="true" checked="checked"/>
                                 <% } %>
                                 </td>
                                 <%-- <td class="submitFormLabel" nowrap>Some users will be able to submit to this collection</td> --%>
-                                <td class="submitFormLabel" nowrap><fmt:message key="jsp.dspace-admin.wizard-questions.check2"/></td>
+                                <td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.dspace-admin.wizard-questions.check2"/></td>
                             </tr>
                         </table>
                     </td>
                 </tr>
                 <tr class="oddRowOddCol">
                     <td class="oddRowOddCol" align="left">
-                        <table border=0>
+                        <table border="0">
                             <tr>
-                                <td valign=top>
-                                <% if(!admin_button ) { %> <input type=hidden name="workflow1" value="false" >
-                                <input type=checkbox name="workflow1" value="true" disabled>
+                                <td valign="top">
+                                <% if(!admin_button ) { %> <input type="hidden" name="workflow1" value="false" />
+                                <input type="checkbox" name="workflow1" value="true" disabled="disabled"/>
                                 <% } else { %>
-                                <input type=checkbox name="workflow1" value="true">
+                                <input type="checkbox" name="workflow1" value="true"/>
                                 <% } %>
                                 </td>
                                 <%-- <td class="submitFormLabel" nowrap>The submission workflow will include an <em>accept/reject</em> step</td> --%>
-                                <td class="submitFormLabel" nowrap><fmt:message key="jsp.dspace-admin.wizard-questions.check3"/></td>
+                                <td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.dspace-admin.wizard-questions.check3"/></td>
                             </tr>
                         </table>
                     </td>
                 </tr>
                 <tr class="evenRowOddCol">
                     <td class="evenRowOddCol" align="left">
-                        <table border=0>
+                        <table border="0">
                             <tr>
-                                <td valign=top>
-                                <% if(!admin_button ) { %> <input type=hidden name="workflow2" value="false" >
-                                <input type=checkbox name="workflow2" value="true" disabled>
+                                <td valign="top">
+                                <% if(!admin_button ) { %> <input type="hidden" name="workflow2" value="false" />
+                                <input type="checkbox" name="workflow2" value="true" disabled="disabled"/>
                                 <% } else { %>
-                                <input type=checkbox name="workflow2" value="true">
+                                <input type="checkbox" name="workflow2" value="true"/>
                                 <% } %>
                                 </td>
                                 <%-- <td class="submitFormLabel" nowrap>The submission workflow will include an <em>accept/reject/edit metadata</em> step</td> --%>
-                                <td class="submitFormLabel" nowrap><fmt:message key="jsp.dspace-admin.wizard-questions.check4"/></td>
+                                <td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.dspace-admin.wizard-questions.check4"/></td>
                             </tr>
                         </table>
                     </td>
                 </tr>
                 <tr class="oddRowOddCol">
                     <td class="oddRowOddCol" align="left">
-                        <table border=0>
+                        <table border="0">
                             <tr>
-                                <td valign=top>
-                                <% if(!admin_button ) { %> <input type=hidden name="workflow3" value="false" >
-                                <input type=checkbox name="workflow3" value="true" disabled>
+                                <td valign="top">
+                                <% if(!admin_button ) { %> <input type="hidden" name="workflow3" value="false" />
+                                <input type="checkbox" name="workflow3" value="true" disabled="disabled"/>
                                 <% } else { %>
-                                <input type=checkbox name="workflow3" value="true">
+                                <input type="checkbox" name="workflow3" value="true"/>
                                 <% } %>
                                 </td>
                                 <%-- <td class="submitFormLabel" nowrap>The submission workflow will include an <em>edit metadata</em> step</td> --%>
-                                <td class="submitFormLabel" nowrap><fmt:message key="jsp.dspace-admin.wizard-questions.check5"/></td>
+                                <td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.dspace-admin.wizard-questions.check5"/></td>
                             </tr>
                         </table>
                     </td>
                 </tr>
                 <tr class="evenRowOddCol">
                     <td class="evenRowOddCol" align="left">
-                        <table border=0>
+                        <table border="0">
                             <tr>
-                                <td valign=top>
-                                <% if(!admin_button ) { %> <input type=hidden name="admins" value="false" >
-                                <input type=checkbox name="admins" value="true" disabled>
+                                <td valign="top">
+                                <% if(!admin_button ) { %> <input type="hidden" name="admins" value="false" />
+                                <input type="checkbox" name="admins" value="true" disabled="disabled"/>
                                 <% } else { %>
-                                <input type=checkbox name="admins" value="true">
+                                <input type="checkbox" name="admins" value="true"/>
                                 <% } %>
                                 </td>
                                 <%-- <td class="submitFormLabel" nowrap>This collection will have delegated collection administrators</td> --%>
-                                <td class="submitFormLabel" nowrap><fmt:message key="jsp.dspace-admin.wizard-questions.check6"/></td>
+                                <td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.dspace-admin.wizard-questions.check6"/></td>
                             </tr>
                         </table>
                     </td>
                 </tr>                
                 <tr class="oddRowOddCol">
                     <td class="oddRowOddCol" align="left">
-                        <table border=0>
+                        <table border="0">
                             <tr>
-                                <td valign=top><input type=checkbox name="default.item" value="true"></td>
+                                <td valign="top"><input type="checkbox" name="default.item" value="true"/></td>
                                 <%-- <td class="submitFormLabel" nowrap>New submissions will have some metadata already filled out with defaults</td> --%>
-                                <td class="submitFormLabel" nowrap><fmt:message key="jsp.dspace-admin.wizard-questions.check7"/></td>
+                                <td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.dspace-admin.wizard-questions.check7"/></td>
                             </tr>
                         </table>
                     </td>
@@ -194,20 +190,20 @@
 			</table>
 		</center>
 	
-       <P>&nbsp;</P>
+       <p>&nbsp;</p>
 
 <%-- Hidden fields needed for servlet to know which collection and page to deal with --%>
-        <input type=hidden name="collection_id" value=<%= ((Collection) request.getAttribute("collection")).getID() %>>
-        <input type=hidden name="stage" value=<%= CollectionWizardServlet.INITIAL_QUESTIONS %>>
+        <input type="hidden" name="collection_id" value="<%= ((Collection) request.getAttribute("collection")).getID() %>" />
+        <input type="hidden" name="stage" value="<%= CollectionWizardServlet.INITIAL_QUESTIONS %>" />
 
         <center>
-            <table border=0 width="80%">
+            <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;
                         
                     </td>
                     <td>
-                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>">
+                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>" />
                     </td>
                 </tr>
             </table>

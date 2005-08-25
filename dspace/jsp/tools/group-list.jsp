@@ -68,9 +68,9 @@
                parentlink="/dspace-admin"
                nocache="true">
 
-  <table width=95%>
+  <table width="95%">
     <tr>
-      <td align=left>
+      <td align="left">
     <%--  <h1>Group Editor</h1> --%>
     <h1><fmt:message key="jsp.tools.group-list.title"/></h1>
       </td>
@@ -81,26 +81,18 @@
     </tr>
   </table>
 
-    <%-- <P>Note that you do not need to manually add users to the "anonymous"
-    group - all users are members implicitly.</P> --%>
-	<P><fmt:message key="jsp.tools.group-list.note1"/></P>
+	<p><fmt:message key="jsp.tools.group-list.note1"/></p>
+	<p><fmt:message key="jsp.tools.group-list.note2"/></p>
+   
+    <form method="post" action="">
+        <p align="center">
+	    <input type="submit" name="submit_add" value="<fmt:message key="jsp.tools.group-list.create.button"/>" />
+        </p>
+    </form>
 
-    <%-- <P>Warning - if you try to delete a group that is referred to by an
-    authorization policy or is a workflow group you will get an internal
-    server error.</P> --%>
-	<P><fmt:message key="jsp.tools.group-list.note2"/></P>
-
-    <p align="center">
-        <form method=POST>
-            <%-- <input type="submit" name="submit_add" value="Create New Group"> --%>
-			<input type="submit" name="submit_add" value="<fmt:message key="jsp.tools.group-list.create.button"/>">
-        </form>
-    </p>
-
-    <table class="miscTable" align="center">
+    <table class="miscTable" align="center" summary="Group data display table">
         <tr>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.group-list.id" /></strong></th>
-            <%-- <th class="oddRowEvenCol"><strong>Name</strong></th> --%>
 			<th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.group-list.name"/></strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
             <th class="oddRowEvenCol">&nbsp;</th>
@@ -111,23 +103,24 @@
     for (int i = 0; i < groups.length; i++)
     {
 %>
-        <form method=POST>
             <tr>
                 <td class="<%= row %>RowOddCol"><%= groups[i].getID() %></td>
                 <td class="<%= row %>RowEvenCol">
                     <%= groups[i].getName() %>
                 </td>
                 <td class="<%= row %>RowOddCol">
-                    <input type="hidden" name="group_id" value="<%= groups[i].getID() %>">
-                    <%-- <input type="submit" name="submit_edit" value="Edit..."> --%>
-					<input type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.general.edit"/>">
+                    <form method="post" action="">
+                        <input type="hidden" name="group_id" value="<%= groups[i].getID() %>"/>
+  		        <input type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.general.edit"/>" />
+                   </form>
                 </td>
                 <td class="<%= row %>RowEvenCol">
-                    <%-- <input type="submit" name="submit_group_delete" value="Delete"> --%>
-					<input type="submit" name="submit_group_delete" value="<fmt:message key="jsp.tools.general.delete"/>">
+                    <form method="post" action="">
+                        <input type="hidden" name="group_id" value="<%= groups[i].getID() %>"/>
+	                <input type="submit" name="submit_group_delete" value="<fmt:message key="jsp.tools.general.delete"/>" />
+                    </form>
                 </td>
             </tr>
-        </form>
 <%
         row = (row.equals("odd") ? "even" : "odd");
     }

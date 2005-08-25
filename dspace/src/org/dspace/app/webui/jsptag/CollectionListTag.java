@@ -71,10 +71,10 @@ public class CollectionListTag extends TagSupport
 
         try
         {
-            out.println("<table align=center class=\"miscTable\">");
+            out.println("<table align=\"center\" class=\"miscTable\" title=\"Collection List\">");
 
             // Write column headings
-            out.print("<tr><th class=\"oddRowOddCol\">"
+            out.print("<tr><th id=\"t1\" class=\"oddRowOddCol\">"
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.CollectionListTag.collectionName")
                     + "</th></tr>");
@@ -88,8 +88,8 @@ public class CollectionListTag extends TagSupport
                 String name = collections[i].getMetadata("name");
 
                 // first and only column is 'name'
-                out.print("</td><td class=\"" + row + "RowEvenCol\">");
-                out.print("<A HREF=\"");
+                out.print("</td><td headers=\"t1\" class=\"" + row + "RowEvenCol\">");
+                out.print("<a href=\"");
 
                 HttpServletRequest hrq = (HttpServletRequest) pageContext
                         .getRequest();
@@ -97,7 +97,7 @@ public class CollectionListTag extends TagSupport
                 out.print(collections[i].getHandle());
                 out.print("\">");
                 out.print(name);
-                out.print("</A>");
+                out.print("</a>");
 
                 out.println("</td></tr>");
 

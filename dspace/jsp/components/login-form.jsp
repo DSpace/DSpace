@@ -41,38 +41,34 @@
 <%--
   - Component which displays a login form and associated information
   --%>
-
+  
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<table class="miscTable" align=center width="70%">
+<table class="miscTable" align="center" width="70%">
   <tr>
     <td class="evenRowEvenCol">
-      <%-- <p><strong>New user? <a href="<%= request.getContextPath() %>/register">Click here to register</a>.</strong></p> --%>
+     <form method="post" action="<%= request.getContextPath() %>/password-login">  
       <p><strong><a href="<%= request.getContextPath() %>/register"><fmt:message key="jsp.components.login-form.newuser"/></a></strong></p>
-      <%-- <p>Please enter your e-mail address and password into the form below.</p> --%>
 	  <p><fmt:message key="jsp.components.login-form.enter"/></p>
-      <form method=POST action="<%= request.getContextPath() %>/password-login">
-        <table border=0 cellpadding=5 align=center>
+
+        <table border="0" cellpadding="5" align="center">
           <tr>
-            <%-- <td class=standard align=right><strong>E-mail Address:</strong></td> --%>
-            <td class=standard align=right><strong><fmt:message key="jsp.components.login-form.email"/></strong></td>
-            <td><input type=text name="login_email"></td>
-          </tr>
+            <td class="standard" align="right"><label for="tlogin_email"><strong><fmt:message key="jsp.components.login-form.email"/></strong></label></td>
+            <td><input type="text" name="login_email" id="tlogin_email" /></td>
+          </tr>        
           <tr>
-            <%-- <td class=standard align=right><strong>Password:</strong></td> --%>
-            <td class=standard align=right><strong><fmt:message key="jsp.components.login-form.password"/></strong></td>
-            <td><input type=password name="login_password"></td>
-          </tr>
+            <td class="standard" align="right"><label for="tlogin_password"><strong><fmt:message key="jsp.components.login-form.password"/></strong></label></td>
+            <td><input type="password" name="login_password" id="tlogin_password" /></td>
+          </tr>      
           <tr>
-            <td align=center colspan=2>
-              <%-- <input type=submit name=login_submit value="Log In"> --%>
-              <input type=submit name=login_submit value="<fmt:message key="jsp.components.login-form.login"/>">
+            <td align="center" colspan="2">
+              <input type="submit" name="login_submit" value="<fmt:message key="jsp.components.login-form.login"/>" />
             </td>
           </tr>
         </table>
+
       </form>
-      <%-- <p>Have you <a href="<%= request.getContextPath() %>/forgot">forgotten your password</a>?</p></td> --%>
 	  <p><a href="<%= request.getContextPath() %>/forgot"><fmt:message key="jsp.components.login-form.forgot"/></a></p></td>
   </tr>
 </table>

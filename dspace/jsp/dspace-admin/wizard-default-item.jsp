@@ -69,32 +69,31 @@
 <table width="95%">
     <tr>
       <td>
-	<%-- <H1>Enter Default Item Metadata</H1> --%>
-	<H1><fmt:message key="jsp.dspace-admin.wizard-default-item.enter"/></H1>
+	<%-- <h1>Enter Default Item Metadata</h1> --%>
+	<h1><fmt:message key="jsp.dspace-admin.wizard-default-item.enter"/></h1>
       </td>
-      <td class="standard" align=right>
+      <td class="standard" align="right">
         <dspace:popup page="/help/site-admin.html#wizard_default"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
+	<%-- <p>Whenever a new submission is started in this collection, it will have the
+	metadata you entered below already filled out.</p> --%>
+	<p><fmt:message key="jsp.dspace-admin.wizard-default-item.text1"/></p>
 	
-	<%-- <P>Whenever a new submission is started in this collection, it will have the
-	metadata you entered below already filled out.</P> --%>
-	<P><fmt:message key="jsp.dspace-admin.wizard-default-item.text1"/></P>
+	<%-- <p>You can leave as many fields blank as you like.</p> --%>
+	<p><fmt:message key="jsp.dspace-admin.wizard-default-item.text2"/></p>
 	
-	<%-- <P>You can leave as many fields blank as you like.</P> --%>
-	<P><fmt:message key="jsp.dspace-admin.wizard-default-item.text2"/></P>
-	
-    <form method=POST action="<%= request.getContextPath() %>/tools/collection-wizard">
-        <center><table class="miscTable">
+    <form method="post" action="<%= request.getContextPath() %>/tools/collection-wizard">
+        <center><table class="miscTable" summary="Enter default metadata table">
             <tr>
                 <%-- <th class="oddRowOddCol"><strong>Dublin Core Field</strong></th> --%>
-                <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.wizard-default-item.dcore"/></strong></th>
+                <th id="t1" class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.wizard-default-item.dcore"/></strong></th>
                 <%-- <th class="oddRowEvenCol"><strong>Value</strong></th> --%>
-                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.wizard-default-item.value"/></strong></th>
+                <th id="t2" class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.wizard-default-item.value"/></strong></th>
                 <%-- <th class="oddRowOddCol"><strong>Language</strong></th> --%>
-                <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.wizard-default-item.language"/></strong></th>
-            <tr>
+                <th id="t3" class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.wizard-default-item.language"/></strong></th>
+            </tr>
 <%
     String row = "even";
 
@@ -102,7 +101,7 @@
 	{
 	 %>
 			<tr>
-			    <td class="<%= row %>RowOddCol"><select name="dctype_<%= i %>">
+			    <td headers="t1" class="<%= row %>RowOddCol"><select name="dctype_<%= i %>">
 			    	<%-- <option value="-1">Select field...</option> --%>
 			    	<option value="-1"><fmt:message key="jsp.dspace-admin.wizard-default-item.select"/></option>
 <%
@@ -112,31 +111,31 @@
 			dcTypes[dc].getElement() : dcTypes[dc].getElement() + "." + dcTypes[dc].getQualifier() %></option>
 <%      } %>
 				</select></td>
-				<td class="<%= row %>RowEvenCol">
-					<input type="text" name="value_<%= i %>" size=40>
+				<td headers="t2" class="<%= row %>RowEvenCol">
+					<input type="text" name="value_<%= i %>" size="40" />
 				</td>
-				<td class="<%= row %>RowEvenCol">
-					<input type="text" name="lang_<%= i %>" size=5 maxlength=5>
+				<td headers="t3" class="<%= row %>RowEvenCol">
+					<input type="text" name="lang_<%= i %>" size="5" maxlength="5" />
 				</td>
 			</tr>
 <%	} %>
 		</table>
 	</center>
-       <P>&nbsp;</P>
+       <p>&nbsp;</p>
 
 <%-- Hidden fields needed for servlet to know which collection and page to deal with --%>
-        <input type=hidden name="collection_id" value=<%= collection.getID() %>>
-        <input type=hidden name="stage" value=<%= CollectionWizardServlet.DEFAULT_ITEM %>>
+        <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
+        <input type="hidden" name="stage" value="<%= CollectionWizardServlet.DEFAULT_ITEM %>" />
 
         <center>
-            <table border=0 width="80%">
+            <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;
                         
                     </td>
                     <td>
-                        <%-- <input type=submit name="submit_next" value="Next &gt;"> --%>
-                        <input type=submit name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>">
+                        <%-- <input type="submit" name="submit_next" value="Next &gt;" /> --%>
+                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>" />
                     </td>
                 </tr>
             </table>

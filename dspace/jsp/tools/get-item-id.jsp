@@ -55,51 +55,50 @@
 
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
-
 <dspace:layout titlekey="jsp.tools.get-item-id.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-	<%-- <H1>Edit or Delete Item</H1> --%>
-	<H1><fmt:message key="jsp.tools.get-item-id.heading"/></H1>
+	<%-- <h1>Edit or Delete Item</h1> --%>
+	<h1><fmt:message key="jsp.tools.get-item-id.heading"/></h1>
     
 <%
     if (request.getAttribute("invalid.id") != null) { %>
-    <%-- <P><strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to
+    <%-- <p><strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to
     edit a community or collection, you need to use the --%>
-    <%-- <A HREF="<%= request.getContextPath() %>/dspace-admin/edit-communities">communities/collections admin page.</A></P> --%>
-	<P><fmt:message key="jsp.tools.get-item-id.info1">
+    <%-- <a href="<%= request.getContextPath() %>/dspace-admin/edit-communities">communities/collections admin page.</a></p> --%>
+	<p><fmt:message key="jsp.tools.get-item-id.info1">
         <fmt:param><%= request.getContextPath() %>/dspace-admin/edit-communities</fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 <%  } %>
 
-    <%-- <P>Enter the Handle or internal item ID of the item you want to edit or
-    delete.  <dspace:popup page="/help/site-admin.html#items">More help...</dspace:popup></P> --%>
+    <%-- <p>Enter the Handle or internal item ID of the item you want to edit or
+    delete.  <dspace:popup page="/help/site-admin.html#items">More help...</dspace:popup></p> --%>
 
-	<P><fmt:message key="jsp.tools.get-item-id.info2"/>  <dspace:popup page="/help/site-admin.html#items"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
+	<fmt:message key="jsp.tools.get-item-id.info2"/>  <dspace:popup page="/help/site-admin.html#items"><fmt:message key="jsp.morehelp"/></dspace:popup>
     
-    <form method=GET>
+    <form method="get" action="">
         <center>
-            <table class=miscTable>
+            <table class="miscTable">
                 <tr class="oddRowEvenCol">
                     <%-- <td class="submitFormLabel">Handle:</td> --%>
-					<td class="submitFormLabel"><fmt:message key="jsp.tools.get-item-id.handle"/></td>
+					<td class="submitFormLabel"><label for="thandle"><fmt:message key="jsp.tools.get-item-id.handle"/></label></td>
                     <td>
-                            <input type="text" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size=12>
-                            <%-- <input type="submit" name="submit" value="Find"> --%>
-							<input type="submit" name="submit" value="<fmt:message key="jsp.tools.get-item-id.find.button"/>">
+                            <input type="text" name="handle" id="thandle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size="12"/>
+                            <%-- <input type="submit" name="submit" value="Find" /> --%>
+							<input type="submit" name="submit" value="<fmt:message key="jsp.tools.get-item-id.find.button"/>" />
                     </td>
                 </tr>
-                <tr></tr>
+                <tr><td></td></tr>
                 <tr class="oddRowEvenCol">
                     <%-- <td class="submitFormLabel">Internal ID:</td> --%>
-					<td class="submitFormLabel"><fmt:message key="jsp.tools.get-item-id.internal"/></td>
+					<td class="submitFormLabel"><label for="titem_id"><fmt:message key="jsp.tools.get-item-id.internal"/></label></td>
                     <td>
-                            <input type="text" name="item_id" size=12>
+                            <input type="text" name="item_id" id="titem_id" size="12"/>
                             <%-- <input type="submit" name="submit" value="Find"> --%>
-							<input type="submit" name="submit" value="<fmt:message key="jsp.tools.get-item-id.find.button"/>">
+							<input type="submit" name="submit" value="<fmt:message key="jsp.tools.get-item-id.find.button"/>" />
                     </td>
                 </tr>
             </table>

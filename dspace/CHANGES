@@ -1,3 +1,6 @@
+(Naveed Hashmi)
+- (SF Patch #1230956) DSpace UI XHTML/WAI compliant
+
 (Robert Tansley)
 - Bug fix: Item exporter now correctly exports metadata in UTF-8
 - Bug fix: Item.addDC() fixed to handle 'null' values passed in (previously threw

@@ -66,19 +66,17 @@
         <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
     </jsp:include>
 
-
-    <%-- <H1>Submit: Submission Complete!</H1> --%>
-	<H1><fmt:message key="jsp.submit.complete.heading"/></H1>
+    <%-- <h1>Submit: Submission Complete!</h1> --%>
+	<h1><fmt:message key="jsp.submit.complete.heading"/></h1>
     
     <%-- FIXME    Probably should say something specific to workflow --%>
-    <%-- <P>Your submission will now go through the workflow process designated for 
+    <%-- <p>Your submission will now go through the workflow process designated for 
     the collection to which you are submitting.    You will receive e-mail
     notification as soon as your submission has become a part of the collection,
     or if for some reason there is a problem with your submission. You can also
-    check on the status of your submission by going to the My DSpace page.</P> --%>
-	<P><fmt:message key="jsp.submit.complete.info"/></P>
-    
-    <%--  <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P> --%>
-    <P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.complete.link"/></A></P>
+    check on the status of your submission by going to the My DSpace page.</p> --%>
+	<p><fmt:message key="jsp.submit.complete.info"/></p> 
+    <%--  <p><a href="<%= request.getContextPath() %>/mydspace">Go to My DSpace</a></p> --%>
+    <p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.complete.link"/></a></p>
 
 </dspace:layout>

@@ -110,7 +110,7 @@
 		}		
 %>
 <center>
-    <table class=submitProgressTable border=0 cellspacing=0 cellpadding=0>
+    <table class="submitProgressTable" border="0" cellspacing="0" cellpadding="0">
         <tr>
 <%    
     int lastMDStep = SubmitServlet.EDIT_METADATA_1 + mdPages - 1;
@@ -130,15 +130,15 @@
         if (step != SubmitServlet.SUBMISSION_COMPLETE)
         {
     %>
-            <%-- HACK: border=0 for non-CSS compliant Netscape 4.x --%>
-            <td><input class="submitProgressButtonDone" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
+            <%-- HACK: border="0" for non-CSS compliant Netscape 4.x --%>
+            <td><input class="submitProgressButtonDone" type="submit" name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>" /></td>
     <%
         }
         else
         {
             // User has reached final step, cannot jump back
     %>
-            <td><input class="submitProgressButtonDone" disabled="yes" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
+            <td><input class="submitProgressButtonDone" disabled="disabled" type="submit" name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>" /></td>
     <%
         }
         // skip unused metadata edit steps
@@ -157,7 +157,7 @@
     if (step > 0)
     {
 %>
-            <td><input class="submitProgressButtonCurrent" disabled="yes" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
+            <td><input class="submitProgressButtonCurrent" disabled="disabled" type="submit" name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>" /></td>
 <%
     }
     
@@ -185,15 +185,15 @@
         {
             // Stage has been previously accessed, so user may jump to it
 %>
-<%-- HACK: border=0 for non-CSS compliant Netscape 4.x --%>
-            <td><input class="submitProgressButtonDone" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
+<%-- HACK: border="0" for non-CSS compliant Netscape 4.x --%>
+            <td><input class="submitProgressButtonDone" type="submit" name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>" /></td>
 <%
         }
         else
         {
             // Stage hasn't been reached yet (can't be jumped to)
 %>
-				 <td><input class="submitProgressButtonNotDone" disabled="yes" border=0 type=submit name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>"></td>
+				 <td><input class="submitProgressButtonNotDone" disabled="disabled" type="submit" name="submit_jump_<%= idx %>" value=" <%= step2Name(idx,stepNames) %>" /></td>
 <%
         }
         // skip unused metadata edit steps

@@ -77,18 +77,17 @@
 
 <dspace:layout titlekey="jsp.browse.items-by-author.title">
 
-  <H2><fmt:message key="jsp.browse.items-by-author.heading1"/> "<%= Utils.addEntities(author) %>"</H2>
-
+  <h2><fmt:message key="jsp.browse.items-by-author.heading1"/> "<%= Utils.addEntities(author) %>"</h2>
     <%-- Sorting controls --%>
-    <table border=0 cellpadding=10 align=center>
+    <table border="0" cellpadding="10" align="center" summary="Browse the repository by author">
         <tr>
-            <td colspan=2 align=center class=standard>
-                <%-- <a href="browse-author?starts_with=<%= URLEncoder.encode(author) %>">Return to Browse by Author</A> --%>
-			    <a href="browse-author?starts_with=<%= URLEncoder.encode(author) %>"><fmt:message key="jsp.browse.items-by-author.return"/></A>
+            <td colspan="2" align="center" class="standard">
+                <%-- <a href="browse-author?starts_with=<%= URLEncoder.encode(author) %>">Return to Browse by Author</a> --%>
+			    <a href="browse-author?starts_with=<%= URLEncoder.encode(author) %>"><fmt:message key="jsp.browse.items-by-author.return"/></a>
             </td>
         </tr>
         <tr>
-            <td class=standard>
+            <td class="standard">
 <%
     if (orderByTitle)
     {
@@ -96,18 +95,18 @@
                 <%-- <strong>Sorting by Title</strong> --%>
                 <strong><fmt:message key="jsp.browse.items-by-author.sort1"/></strong>
             </td>
-            <td class=standard>
+            <td class="standard">
                 <%-- <a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=date">Sort by Date</a> --%>
-				<a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=date"><fmt:message key="jsp.browse.items-by-author.sort2"/></a>
+				<a href="items-by-author?author=<%= URLEncoder.encode(author) %>&amp;order=date"><fmt:message key="jsp.browse.items-by-author.sort2"/></a>
 <%
     }
     else
     {
 %>
       	        <%-- <a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=title">Sort by Title</a> --%>
-	            <a href="items-by-author?author=<%= URLEncoder.encode(author) %>&order=title"><fmt:message key="jsp.browse.items-by-author.sort3"/></a>
+	            <a href="items-by-author?author=<%= URLEncoder.encode(author) %>&amp;order=title"><fmt:message key="jsp.browse.items-by-author.sort3"/></a>
             </td>
-            <td class=standard>
+            <td class="standard">
                 <%-- <strong>Sorting by Date</strong> --%>
 				<strong><fmt:message key="jsp.browse.items-by-author.sort4"/></strong>
 <%
@@ -117,8 +116,9 @@
         </tr>
     </table>
 
-    <%-- <P align=center>Showing <%= browseInfo.getResultCount() %> items.</P> --%>
-	<p align=center><fmt:message key="jsp.browse.items-by-author.show">
+    <%-- <p align="center">Showing <%= browseInfo.getResultCount() %> items.</p> --%>
+	<p align="center"><fmt:message key="jsp.browse.items-by-author.show">
+
         <fmt:param><%= browseInfo.getResultCount() %></fmt:param>
     </fmt:message></p>
 

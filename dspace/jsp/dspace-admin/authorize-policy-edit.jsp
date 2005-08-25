@@ -92,10 +92,9 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
- 
-<table width=95%>
+  <table width="95%">
     <tr>
-      <td align=left>
+      <td align="left">
         <%-- <h1>Edit Policy for <%= edit_title %>:</h1> --%>
         <h1><fmt:message key="jsp.dspace-admin.authorize-policy-edit.heading">
             <fmt:param><%= edit_title %></fmt:param>
@@ -106,30 +105,30 @@
       </td>
     </tr>
   </table>
-    
-    
-    <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method=POST>
+      
+    <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
 
-    <table class="miscTable" align="center">
+    <table class="miscTable" align="center" summary="Edit Policy Form">
         <tr>     
             <%-- <td>Group:</td> --%>
-            <td><fmt:message key="jsp.dspace-admin.general.group-colon"/></td>
-            <td>
-                <select size="15" name="group_id">
+            <th id="t1"><label for="tgroup_id"><fmt:message key="jsp.dspace-admin.general.group-colon"/></label></th>
+            <td headers="t1">
+                <select size="15" name="group_id" id="tgroup_id">
                     <%  for(int i = 0; i < groups.length; i++ ) { %>
-                            <option value="<%= groups[i].getID() %>" <%= (groups[i].getID() == policy.getGroupID() ? "selected" : "" ) %> >
+                            <option value="<%= groups[i].getID() %>" <%= (groups[i].getID() == policy.getGroupID() ? "selected=\"selected\"" : "" ) %> >
                             <%= groups[i].getName()%>
                             </option>
                         <%  } %>
                 </select>
             </td>
         </tr>
-
         <%-- <tr><td>Action:</td> --%>
-        <tr><td><fmt:message key="jsp.dspace-admin.general.action-colon"/></td>
-            <td><input type="hidden" name="<%=id_name%>" value="<%=id%>">
-                <input type="hidden" name="policy_id" value="<%=policy.getID()%>" >
-                <select name="action_id">
+        <tr>
+          <th id="t2"><label for="taction_id"><fmt:message key="jsp.dspace-admin.general.action-colon"/></label></th>
+            <td headers="t2">
+                <input type="hidden" name="<%=id_name%>" value="<%=id%>" />
+                <input type="hidden" name="policy_id" value="<%=policy.getID()%>" />
+                <select name="action_id" id="taction_id">
                     <%  for( int i = 0; i < Constants.actionText.length; i++ )
                             {
                                 // only display if action i is relevant
@@ -137,7 +136,7 @@
                                 if( (Constants.actionTypeRelevance[i]&resourceRelevance) > 0)
                                 { %>
                                     <option value="<%= i %>"
-                                    <%=(policy.getAction() == i ? "selected" : "")%>>
+                                    <%=(policy.getAction() == i ? "selected=\"selected\"" : "")%>>
                                     <%= Constants.actionText[i]%>
                                     </option>
                     <%          }
@@ -147,18 +146,18 @@
         </tr>
     </table>
 
-    <% if( newpolicy != null ) { %> <input name="newpolicy" type=hidden value="<%=newpolicy%>"> <% } %>
+    <% if( newpolicy != null ) { %> <input name="newpolicy" type="hidden" value="<%=newpolicy%>"/> <% } %>
     
     <center>
         <table width="70%">
             <tr>
                 <td align="left">
                     <%-- <input type="submit" name="submit_save_policy" value="Save Policy"> --%>
-                    <input type="submit" name="submit_save_policy" value="<fmt:message key="jsp.dspace-admin.general.save"/>">
+                    <input type="submit" name="submit_save_policy" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
                 </td>
                 <td align="right">
                     <%-- <input type="submit" name="submit_cancel_policy" value="Cancel"> --%>
-                    <input type="submit" name="submit_cancel_policy" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
+                    <input type="submit" name="submit_cancel_policy" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
                 </td>
             </tr>
         </table>

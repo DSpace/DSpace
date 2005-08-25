@@ -105,10 +105,10 @@
           StringBuffer row = new StringBuffer();
           
           row.append("<tr>");
-          row.append("<td class=metadataFieldLabel>");
+          row.append("<td class=\"metadataFieldLabel\">");
           row.append(inputs[z].getLabel());
           row.append("</td>");
-          row.append("<td class=metadataFieldValue>");
+          row.append("<td class=\"metadataFieldValue\">");
 
           if (inputType.equals("qualdrop_value"))
           {
@@ -120,8 +120,7 @@
           }
           if (values.length == 0) 
           {
-             row.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.no_md"))
-             	.append("</td>").append("</tr>");
+             row.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.no_md"));
           }
           else 
           {
@@ -167,25 +166,24 @@
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.review.title" nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method=post>
+    <form action="<%= request.getContextPath() %>/submit" method="post">
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.REVIEW_SUBMISSION %>"/>
             <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
-
         <h1><fmt:message key="jsp.submit.review.heading"/></h1>
 
         <p><fmt:message key="jsp.submit.review.info1"/></p>
 
-        <p><fmt:message key="jsp.submit.review.info2"/>
-        <dspace:popup page="/help/index.html#verify"><fmt:message key="jsp.morehelp"/></dspace:popup></p>
+        <p><fmt:message key="jsp.submit.review.info2"/></p>
+        &nbsp;&nbsp;<dspace:popup page="/help/index.html#verify"><fmt:message key="jsp.morehelp"/></dspace:popup>
 
         <p><fmt:message key="jsp.submit.review.info3"/></p>
 
         <p><fmt:message key="jsp.submit.review.info4"/></p>
 
-        <table align=center class=miscTable width=80%>
+        <table align="center" class="miscTable" width="80%">
 <%-- ====================================================== --%>
 <%--                  INITIAL QUESTIONS                     --%>
 <%-- ====================================================== --%>
@@ -193,24 +191,24 @@
                 <td class="oddRowOddCol">
                     <table>
                         <tr>
-                            <td width=100%>
+                            <td width="100%">
                                 <table>
                                     <tr>
-                                        <td class=metadataFieldLabel><fmt:message key="jsp.submit.review.init-question1"/></td>
-                                        <td class=metadataFieldValue><%= (si.submission.hasMultipleTitles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></td>
+                                        <td class="metadataFieldLabel"><fmt:message key="jsp.submit.review.init-question1"/></td>
+                                        <td class="metadataFieldValue"><%= (si.submission.hasMultipleTitles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></td>
                                     </tr>
                                     <tr>
-                                        <td class=metadataFieldLabel><fmt:message key="jsp.submit.review.init-question2"/></td>
-                                        <td class=metadataFieldValue><%= (si.submission.isPublishedBefore() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></td>
+                                        <td class="metadataFieldLabel"><fmt:message key="jsp.submit.review.init-question2"/></td>
+                                        <td class="metadataFieldValue"><%= (si.submission.isPublishedBefore() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></td>
                                     </tr>
                                     <tr>
-                                        <td class=metadataFieldLabel><fmt:message key="jsp.submit.review.init-question3"/></td>
-                                        <td class=metadataFieldValue><%= (si.submission.hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></td>
+                                        <td class="metadataFieldLabel"><fmt:message key="jsp.submit.review.init-question3"/></td>
+                                        <td class="metadataFieldValue"><%= (si.submission.hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></td>
                                     </tr>
                                 </table>
                             </td>
-                            <td valign=middle>
-                                    <input type=submit name=submit_jump_<%= SubmitServlet.INITIAL_QUESTIONS %> value="<fmt:message key="jsp.submit.review.button.correct"/>">
+                            <td valign="middle">
+                                    <input type="submit" name="submit_jump_<%= SubmitServlet.INITIAL_QUESTIONS %>" value="<fmt:message key="jsp.submit.review.button.correct"/>" />
                             </td>
                         </tr>
                     </table>
@@ -228,38 +226,38 @@
                 <td class="evenRowOddCol">
                     <table>
                         <tr>
-                            <td width=100%>
+                            <td width="100%">
                                 <table>
 
 <%
-    layoutSection(request, out, inputSet, si, item, i, pageContext);
-%>
-                                </table>
-                            </td>
-                            <td valign=middle>
-                                 <input type=submit name=submit_jump_<%= SubmitServlet.EDIT_METADATA_1 + i %> value="<fmt:message key="jsp.submit.review.button.correct"/>">
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-<%
-	}
-%>
-<%-- ====================================================== --%>
-<%--             DESCRIBE ITEM PAGE 2 ELEMENTS              --%>
-<%-- ====================================================== 
-            <tr>
-                <td class=oddRowOddCol>
-                    <table>
-                        <tr>
-                            <td width=100%>
-                                <table>
-    layoutSection(request, out, inputSet, si, item, 1, pageContext);
+	    layoutSection(request, out, inputSet, si, item, i, pageContext);
+	%>
+					</table>
+				    </td>
+				    <td valign="middle">
+					 <input type="submit" name="submit_jump_<%= SubmitServlet.EDIT_METADATA_1 + i %>" value="<fmt:message key="jsp.submit.review.button.correct"/>" />
+				    </td>
+				</tr>
+			    </table>
+			</td>
+		    </tr>
+	<%
+		}
+	%>
+	<%-- ====================================================== --%>
+	<%--             DESCRIBE ITEM PAGE 2 ELEMENTS              --%>
+	<%-- ====================================================== 
+		    <tr>
+			<td class="oddRowOddCol">
+			    <table>
+				<tr>
+				    <td width="100%">
+					<table>
+	    layoutSection(request, out, inputSet, si, item, 1, pageContext);
                                 </table>
                     </td>
-                            <td valign=middle align=right>
-                                    <input type=submit name=submit_jump_<%= SubmitServlet.EDIT_METADATA_2 %> value="<fmt:message key="jsp.submit.review.button.correct"/>">
+                            <td valign="middle" align="right">
+                                    <input type="submit" name="submit_jump_<%= SubmitServlet.EDIT_METADATA_2 %>" value="<fmt:message key="jsp.submit.review.button.correct"/>" />
                             </td>
                   </tr>
                 </table>
@@ -270,14 +268,14 @@
 <%--                    UPLOADED_FILES                      --%>
 <%-- ====================================================== --%>
             <tr>
-                <td class=evenRowOddCol>
+                <td class="evenRowOddCol">
                     <table>
                         <tr>
-                            <td width=100%>
+                            <td width="100%">
                                 <table>
                                     <tr>
-                                        <td class=metadataFieldLabel><%= (si.submission.hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload2")) %></td>
-                                        <td class=metadataFieldValue>
+                                        <td class="metadataFieldLabel"><%= (si.submission.hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload2")) %></td>
+                                        <td class="metadataFieldValue">
 <%
     Bitstream[] bitstreams = item.getNonInternalBitstreams();
 
@@ -306,7 +304,7 @@
             %><fmt:message key="jsp.submit.review.supported"/><%
         }
 %>        
-                                            <br>
+                                            <br />
 <%
     }
 %>
@@ -314,21 +312,22 @@
                                     </tr>
                                 </table>
                     </td>
-                            <td valign=middle align=right>
+                            <td valign="middle" align="right">
 <%
     // Can't edit files in workflow mode
     if(!SubmitServlet.isWorkflow(si))
     {
 %>
-                                    <input type=submit name=submit_jump_<%= SubmitServlet.UPLOAD_FILES %>
-                                     value="<%= (si.submission.hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.button.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.button.upload2")) %>">
+                                    <input type="submit" name="submit_jump_<%= SubmitServlet.UPLOAD_FILES %>"
+                                     value="<%= (si.submission.hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.button.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.button.upload2")) %>" />
 <%
     }
     else
     {
 %>
-                                    <input type=submit name=submit_jump_<%= SubmitServlet.UPLOAD_FILES %>
-                                     value="<fmt:message key="jsp.submit.review.button.edit"/>">
+
+                                    <input type="submit" name="submit_jump_<%= SubmitServlet.UPLOAD_FILES %>"
+                                     value="<fmt:message key="jsp.submit.review.button.edit"/>" />
 <%
     }
 %>
@@ -341,23 +340,24 @@
         </table>    
 
         <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type=hidden name=step value=<%= SubmitServlet.REVIEW_SUBMISSION %>>
+        <input type="hidden" name="step" value="<%= SubmitServlet.REVIEW_SUBMISSION %>" />
 
         <p>&nbsp;</p>
     
         <center>
-            <table border=0 width=80%>
+            <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td>
-                        <input type=submit name=submit_prev value="<fmt:message key="jsp.submit.review.button.previous"/>">
+                        <input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.review.button.previous"/>" />
                     </td>
                     <td>
-                        <input type=submit name=submit_next value="<fmt:message key="jsp.submit.review.button.next"/>">
+                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.review.button.next"/>" />
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align=right>
-                        <input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.review.button.cancelsave"/>">
+
+                    <td align="right">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.review.button.cancelsave"/>" />
                     </td>
                 </tr>
             </table>

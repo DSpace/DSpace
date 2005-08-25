@@ -67,38 +67,38 @@
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace">
 
-    <%-- <H2>Your Submissions</H2> --%>
-    <H2><fmt:message key="jsp.mydspace.own-submissions.title"/></H2>
+    <%-- <h2>Your Submissions</h2> --%>
+    <h2><fmt:message key="jsp.mydspace.own-submissions.title"/></h2>
     
 <%
     if (items.length == 0)
     {
 %>
-    <%-- <P>There are no items in the main archive that have been submitted by you.</P> --%>
-	<P><fmt:message key="jsp.mydspace.own-submissions.text1"/></P>
+    <%-- <p>There are no items in the main archive that have been submitted by you.</p> --%>
+	<p><fmt:message key="jsp.mydspace.own-submissions.text1"/></p>
 <%
     }
     else
     {
 %>
-    <%-- <P>Below are listed your previous submissions that have been accepted into
-    the archive.</P> --%>
-	<P><fmt:message key="jsp.mydspace.own-submissions.text2"/></P>
+    <%-- <p>Below are listed your previous submissions that have been accepted into
+    the archive.</p> --%>
+	<p><fmt:message key="jsp.mydspace.own-submissions.text2"/></p>
 <%
         if (items.length == 1)
         {
 %>
-    <%-- <P>There is <strong>1</strong> item in the main archive that was submitted by you.</P> --%>
-	<P><fmt:message key="jsp.mydspace.own-submissions.text3"/></P>
+    <%-- <p>There is <strong>1</strong> item in the main archive that was submitted by you.</p> --%>
+	<p><fmt:message key="jsp.mydspace.own-submissions.text3"/></p>
 <%
         }
         else
         {
 %>
-    <%-- <P>There are <strong><%= items.length %></strong> items in the main archive that were submitted by you.</P> --%>
-	<P><fmt:message key="jsp.mydspace.own-submissions.text4">
+    <%-- <p>There are <strong><%= items.length %></strong> items in the main archive that were submitted by you.</p> --%>
+	<p><fmt:message key="jsp.mydspace.own-submissions.text4">
         <fmt:param><%= items.length %></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 <%
         }
 %>
@@ -107,6 +107,6 @@
     }
 %>
 
-    <%-- <P align=center><A HREF="<%= request.getContextPath() %>/mydspace">Back to My DSpace</A></P> --%>
-	<P align=center><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.backto-mydspace"/></A></P>
+    <%-- <p align="center"><a href="<%= request.getContextPath() %>/mydspace">Back to My DSpace</a></p> --%>
+	<p align="center"><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.backto-mydspace"/></a></p>
 </dspace:layout>

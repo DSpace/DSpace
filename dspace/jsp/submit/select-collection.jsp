@@ -72,26 +72,26 @@
         <jsp:param name="md_pages" value="1"/>
     </jsp:include>
 
-    <%-- <H1>Submit: Choose Collection</H1> --%>
-    <H1><fmt:message key="jsp.submit.select-collection.heading"/></H1>
+    <%-- <h1>Submit: Choose Collection</h1> --%>
+    <h1><fmt:message key="jsp.submit.select-collection.heading"/></h1>
 
     <%-- <p>Select the collection you wish to submit an item to from the list
     below, then click "Next".  
-    <dspace:popup page="/help/index.html#choosecollection">(More Help...)</dspace:popup></p> --%>
+    <object><dspace:popup page="/help/index.html#choosecollection">(More Help...)</dspace:popup></object></p> --%>
 
 	<p><fmt:message key="jsp.submit.select-collection.info1"/> 
-    <dspace:popup page="/help/index.html#choosecollection"><fmt:message key="jsp.morehelp"/> </dspace:popup></p>
+    <object><dspace:popup page="/help/index.html#choosecollection"><fmt:message key="jsp.morehelp"/> </dspace:popup></object></p>
 
-    <form action="<%= request.getContextPath() %>/submit" method=post>
+    <form action="<%= request.getContextPath() %>/submit" method="post">
 <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
 <%--       browsers to center the table. --%>
         <center>
-            <table>
+            <table summary="Select collection table">
                 <tr>
-                    <%-- <td class="submitFormLabel">Collection</td> --%>
-					<td class="submitFormLabel"><fmt:message key="jsp.submit.select-collection.collection"/></td>
+                    <%-- <td class="submitFormLabel"><label for="tcollection">Collection</label></td> --%>
+					<td class="submitFormLabel"><label for="tcollection"><fmt:message key="jsp.submit.select-collection.collection"/></label></td>
                     <td>
-                        <select name=collection>
+                        <select name="collection" id="tcollection">
 <%
         for (int i = 0; i < collections.length; i++)
         {
@@ -106,25 +106,23 @@
             </table>
 
             <%-- Hidden field indicating the step --%>
-            <input type="hidden" name="step" value="<%= SubmitServlet.SELECT_COLLECTION %>">
-            <br>
+            <input type="hidden" name="step" value="<%= SubmitServlet.SELECT_COLLECTION %>" />
+            <br />
 
-            <table border=0 width=80%>
+            <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td>
-                        <%-- <input type=submit name=submit_next value="Next &gt;"> --%>
-						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.general.next"/>">
+                        <%-- <input type="submit" name="submit_next" value="Next &gt;"> --%>
+						<input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.general.next"/>" />
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align=right>
-                        <%-- <input type=submit name=submit_cancel value="Cancel/Save"> --%>
-						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>">
+                    <td align="right">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel/Save"> --%>
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
                     </td>
                 </tr>
             </table>
-
-
         </center>
     </form>
     

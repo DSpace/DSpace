@@ -86,17 +86,17 @@ import org.dspace.workflow.WorkflowManager;
 /**
  * Submission servlet for DSpace. Handles the initial submission of items, as
  * well as the editing of items further down the line.
- * <P>
+ * <p>
  * Whenever the submit servlet receives a GET request, this is taken to indicate
  * the start of a fresh new submission, where no collection has been selected,
  * and the submission process is started from scratch.
- * <P>
+ * <p>
  * All other interactions happen via POSTs. Part of the post will normally be a
  * (hidden) "step" parameter, which will correspond to the form that the user
  * has just filled out. If this is absent, step 0 (select collection) is
  * assumed, meaning that it's simple to place "Submit to this collection"
  * buttons on collection home pages.
- * <P>
+ * <p>
  * According to the step number of the incoming form, the values posted from the
  * form are processed (using the process* methods), and the item updated as
  * appropriate. The servlet then forwards control of the request to the
@@ -108,7 +108,7 @@ import org.dspace.workflow.WorkflowManager;
  * This holds the core information relevant to the submission, e.g. the item,
  * personal workspace or workflow item, the submitting "e-person", and the
  * target collection.
- * <P>
+ * <p>
  * When control of the request reaches a JSP, it is assumed that all checks,
  * interactions with the database and so on have been performed and that all
  * necessary information to render the form is in memory. e.g. The
@@ -116,7 +116,7 @@ import org.dspace.workflow.WorkflowManager;
  * do no error or integrity checking; it is the servlet's responsibility to
  * ensure that everything is prepared. The servlet is fairly diligent about
  * ensuring integrity at each step.
- * <P>
+ * <p>
  * Each step has an integer constant defined below. The main sequence of the
  * submission procedure always runs from 0 upwards, until SUBMISSION_COMPLETE.
  * Other, not-in-sequence steps (such as the cancellation screen and the
@@ -2110,25 +2110,25 @@ public class SubmitServlet extends DSpaceServlet
 
         if (isWorkflow(si))
         {
-            info = info + "<input type=hidden name=workflow_id value=\""
-                    + si.submission.getID() + "\">";
+            info = info + "<input type=\"hidden\" name=\"workflow_id\" value=\""
+                    + si.submission.getID() + "\"/>";
         }
         else
         {
-            info = info + "<input type=hidden name=workspace_item_id value=\""
-                    + si.submission.getID() + "\">";
+            info = info + "<input type=\"hidden\" name=\"workspace_item_id\" value=\""
+                    + si.submission.getID() + "\"/>";
         }
 
         if (si.bundle != null)
         {
-            info = info + "<input type=hidden name=bundle_id value=\""
-                    + si.bundle.getID() + "\">";
+            info = info + "<input type=\"hidden\" name=\"bundle_id\" value=\""
+                    + si.bundle.getID() + "\"/>";
         }
 
         if (si.bitstream != null)
         {
-            info = info + "<input type=hidden name=bitstream_id value=\""
-                    + si.bitstream.getID() + "\">";
+            info = info + "<input type=\"hidden\" name=\"bitstream_id\" value=\""
+                    + si.bitstream.getID() + "\"/>";
         }
 
         return info;

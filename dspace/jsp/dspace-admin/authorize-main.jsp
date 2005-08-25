@@ -72,9 +72,9 @@
 
     <%-- <h1>Administer Authorization Policies</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.authorize-main.adm"/></h1>
-  <table width=95%>
+  <table width="95%">
     <tr>
-      <td align=left>
+      <td align="left">
           <%-- <h3>Choose a resource to manage policies for:</h3> --%>
 		  <h3><fmt:message key="jsp.dspace-admin.authorize-main.choose"/></h3>
       </td>
@@ -85,32 +85,32 @@
   </table>
     
     
-    <form method=POST>    
+    <form method="post" action="">    
 
     <center>
         <table width="70%">
             <tr>
                 <td align="center">
                     <%-- <input type="submit" name="submit_community" value="Manage a Community's Policies"> --%>
-                    <input type="submit" name="submit_community" value="<fmt:message key="jsp.dspace-admin.authorize-main.manage1"/>">
+                    <input type="submit" name="submit_community" value="<fmt:message key="jsp.dspace-admin.authorize-main.manage1"/>" />
                 </td>
             </tr>
             <tr>
                 <td align="center">
                     <%-- <input type="submit" name="submit_collection" value="Manage Collection's Policies"> --%>
-                    <input type="submit" name="submit_collection" value="<fmt:message key="jsp.dspace-admin.authorize-main.manage2"/>">
+                    <input type="submit" name="submit_collection" value="<fmt:message key="jsp.dspace-admin.authorize-main.manage2"/>" />
                 </td>
             </tr>
             <tr>
                 <td align="center">
                     <%-- <input type="submit" name="submit_item" value="Manage An Item's Policies"> --%>
-                    <input type="submit" name="submit_item" value="<fmt:message key="jsp.dspace-admin.authorize-main.manage3"/>">
+                    <input type="submit" name="submit_item" value="<fmt:message key="jsp.dspace-admin.authorize-main.manage3"/>" />
                 </td>
             </tr>
             <tr>
                 <td align="center">
                     <%-- <input type="submit" name="submit_advanced" value="Advanced/Item Wildcard Policy Admin Tool"> --%>
-                    <input type="submit" name="submit_advanced" value="<fmt:message key="jsp.dspace-admin.authorize-main.advanced"/>">
+                    <input type="submit" name="submit_advanced" value="<fmt:message key="jsp.dspace-admin.authorize-main.advanced"/>" />
                 </td>
             </tr>
         </table>

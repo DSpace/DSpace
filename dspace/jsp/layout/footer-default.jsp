@@ -58,7 +58,7 @@
     }
 %>
                     <%-- End of page content --%>
-                    <P>&nbsp;</P>
+                    <p>&nbsp;</p>
                 </td>
 
             <%-- Right-hand side bar if appropriate --%>
@@ -80,15 +80,19 @@
     fromPage = URLEncoder.encode(fromPage);
 %>
              <tr class="pageFooterBar">
-                <td colspan=<%= overallColSpan %> class="pageFootnote">
+                <td colspan="<%= overallColSpan %>" class="pageFootnote">
                     <table class="pageFooterBar" width="100%">
                         <tr>
-                            <td></td>
+                            <td>
+                                <a href="http://validator.w3.org/check?uri=referer"><img
+                                    src="http://www.w3.org/Icons/valid-xhtml10"
+                                    alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+                            </td>
                             <td class="pageFootnote">
                                 <fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
-                                <a target=_blank href="<%= request.getContextPath() %>/feedback?fromPage=<%= fromPage %>"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
+                                <a target="_blank" href="<%= request.getContextPath() %>/feedback?fromPage=<%= fromPage %>"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
                             </td>
-                            <td nowrap valign=middle> <%-- nowrap, valign for broken NS 4.x --%>
+                            <td nowrap="nowrap" valign="middle"> <%-- nowrap, valign for broken NS 4.x --%>
                             </td>
                         </tr>
                     </table>

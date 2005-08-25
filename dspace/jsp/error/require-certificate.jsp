@@ -50,16 +50,15 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-
 <dspace:layout titlekey="jsp.error.require-certificate.title">
 
     <%-- <h1>Certificate Required</h1> --%>
     <h1><fmt:message key="jsp.error.require-certificate.title"/></h1>
 
-    <%-- <P>The configuration of this DSpace site means that you need a valid
+    <%-- <p>The configuration of this DSpace site means that you need a valid
     Web certificate to log in.  If you are having problems with this,
-    please contact us.</P> --%>
-    <P><fmt:message key="jsp.error.require-certificate.text"/></P>
+    please contact us.</p> --%>
+    <p><fmt:message key="jsp.error.require-certificate.text"/></p>
 
     <dspace:include page="/components/contact-info.jsp" />
 

@@ -78,10 +78,10 @@
 
 <dspace:layout titlekey="jsp.browse.no-results.title">
 
-    <H1><fmt:message key="jsp.browse.no-results.title"/></H1>
+    <h1><fmt:message key="jsp.browse.no-results.title"/></h1>
 
 
-<P>
+<p>
     <%
 	    if (collection != null)
 	    {
@@ -106,9 +106,8 @@
    <%
    	    }
    %>
- </P>
-
-    
-    <P><A HREF="<%= request.getContextPath() %><%= linkBack %>"><%= linkText %></A></P>
+ </p>
+   
+    <p><a href="<%= request.getContextPath() %><%= linkBack %>"><%= linkText %></a></p>
 
 </dspace:layout>

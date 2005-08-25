@@ -85,36 +85,32 @@
 %>
 
 <dspace:layout locbar="off" titlekey="jsp.error.invalid-id.title">
-
-    <%-- <H1>Invalid Identifier</H1> --%>
-    <H1><fmt:message key="jsp.error.invalid-id.title"/></H1>
-
-    <%-- <P>The identifier <%= badID %> does not correspond to a valid
-    <%= typeString %> in DSpace.  This may be because of one of the following
-    reasons:</P> --%>
-	<P><fmt:message key="jsp.error.invalid-id.text1">
+    <%-- <h1>Invalid Identifier</h1> --%>
+    <h1><fmt:message key="jsp.error.invalid-id.title"/></h1>
+    <%-- <p>The identifier <%= badID %> does not correspond to a valid
+    reasons:</p> --%>
+	<p><fmt:message key="jsp.error.invalid-id.text1">
         <fmt:param><%= badID %></fmt:param>
         <fmt:param><%= typeString %></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 
-    <UL>
-        <%-- <LI>The URL of the current page is incorrect - if you followed a link
-        from outside of DSpace it may be mistyped or corrupt.</LI> --%>
-        <LI><fmt:message key="jsp.error.invalid-id.list1"/></LI>
-        <%-- <LI>You entered an invalid ID into a form - please try again.</LI> --%>
-        <LI><fmt:message key="jsp.error.invalid-id.list2"/></LI>
-    </UL>
+    <ul>
+        <%-- <li>The URL of the current page is incorrect - if you followed a link
+        from outside of DSpace it may be mistyped or corrupt.</li> --%>
+        <li><fmt:message key="jsp.error.invalid-id.list1"/></li>
+        <%-- <li>You entered an invalid ID into a form - please try again.</li> --%>
+        <li><fmt:message key="jsp.error.invalid-id.list2"/></li>
+    </ul>
     
-    <%-- <P>If you're having problems, or you expected the ID to work, feel free to
-    contact the site administrators.</P> --%>
-    <P><fmt:message key="jsp.error.invalid-id.text2"/></P>
+    <%-- <p>If you're having problems, or you expected the ID to work, feel free to
+    contact the site administrators.</p> --%>
+    <p><fmt:message key="jsp.error.invalid-id.text2"/></p>
 
     <dspace:include page="/components/contact-info.jsp" />
 
-    <P align=center>
-        <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
-    </P>
+    <p align="center">
+        <%-- <a href="<%= request.getContextPath() %>/">Go to the DSpace home page</a> --%>
+        <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a>
+    </p>
 	
-
 </dspace:layout>

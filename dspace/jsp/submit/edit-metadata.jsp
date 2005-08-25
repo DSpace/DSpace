@@ -137,14 +137,14 @@
 	 else
 	    dpn = new org.dspace.content.DCPersonName();
 	 
-         sb.append("<td><input type=text name=\"")
+         sb.append("<td><input type=\"text\" name=\"")
            .append(last.toString())
-           .append("\" size=23 value=\"")
+           .append("\" size=\"23\" value=\"")
            .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
-	   .append("\"></td>\n<td><input type=text name=\"")
+	   .append("\"/></td>\n<td><input type=\"text\" name=\"")
 	   .append(first.toString())
-           .append("\" size=23 value=\"")
-           .append(dpn.getFirstNames()).append("\"></td>\n");
+           .append("\" size=\"23\" value=\"")
+           .append(dpn.getFirstNames()).append("\"/></td>\n");
 
 	 if (repeatable && i < defaults.length) 
 	 {
@@ -153,24 +153,24 @@
 	        .append(' ')
 	        .append(dpn.getFirstNames());
 	    // put a remove button next to filled in values
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-//	      .append("\" value=\"Remove This Entry\"> </td></tr>")
+//	      .append("\" value=\"Remove This Entry\"/> </td></tr>")
 		  .append("\" value=\"")
 		  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-		  .append("\"> </td></tr>");
+		  .append("\"/> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-// 	      .append("_more\" value=\"Add More\"> </td></tr>");
+// 	      .append("_more\" value=\"Add More\"/> </td></tr>");
 	      .append("_more\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-	      .append("\"> </td></tr>");
+	      .append("\"/> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -210,7 +210,7 @@
          else
             dateIssued = new org.dspace.content.DCDate("");
     
-         sb.append("<td colspan=2 nowrap class=\"submitFormDateLabel\">")
+         sb.append("<td colspan=\"2\" nowrap=\"nowrap\" class=\"submitFormDateLabel\">")
 //          .append("Month:<select name=\"")
          	.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.month"))
             .append("<select name=\"")
@@ -219,7 +219,7 @@
          if (repeatable)
             sb.append('_').append(i);
          sb.append("\"><option value=\"-1\"")
-            .append((dateIssued.getMonth() == -1 ? " SELECTED" : ""))
+            .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
 //	    .append(">(No month)</option>");
 	    .append(">")
 	    .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.no_month"))
@@ -229,7 +229,7 @@
 	 {
             sb.append("<option value=\"")
 	      .append(j)
-	      .append((dateIssued.getMonth() == j ? "\" SELECTED" : "\"" ))
+	      .append((dateIssued.getMonth() == j ? "\" selected=\"selected\"" : "\"" ))
 	      .append(">")
 	      .append(org.dspace.content.DCDate.getMonthName(j))
 	      .append("</option>");
@@ -238,35 +238,35 @@
          sb.append("</select>")
 //            .append("Day:<input type=text name=\"")
 		.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.day"))
-		.append("<input type=text name=\"")
+		.append("<input type=\"text\" name=\"")
 	    .append(fieldName)
 	    .append("_day");
          if (repeatable)
             sb.append("_").append(i);
-         sb.append("\" size=2 maxlength=2 value=\"")
+         sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
             .append((dateIssued.getDay() > 0 ? 
 	             String.valueOf(dateIssued.getDay()) : "" ))
-//	    .append("\">Year:<input type=text name=\"")
-		.append("\">")
+//	    .append("\"/>Year:<input type=text name=\"")
+		.append("\"/>")
 		.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.year"))
-		.append("<input type=text name=\"")
+		.append("<input type=\"text\" name=\"")
 	    .append(fieldName)
 	    .append("_year");
          if (repeatable)
             sb.append("_").append(i);
-         sb.append("\" size=4 maxlength=4 value=\"")
+         sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
             .append((dateIssued.getYear() > 0 ? 
 	         String.valueOf(dateIssued.getYear()) : "" ))
-	    .append("\"></td>\n");
+	    .append("\"/></td>\n");
     
 	 if (repeatable && i < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"/> </td></tr>");
 		  .append("\" value=\"")
 		  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
 		  .append("\"> </td></tr>");
@@ -274,12 +274,12 @@
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"/> </td></tr>");
 	      .append("_more\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-	      .append("\"> </td></tr>");
+	      .append("\"/> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -319,43 +319,44 @@
          else
            sn = new org.dspace.content.DCSeriesNumber();
 
-         sb.append("<td><input type=text name=\"")
+         sb.append("<td><input type=\"text\" name=\"")
            .append(fieldName)
 	   .append("_series");
          if (repeatable)
            sb.append("_").append(i);
-         sb.append("\" size=23 value=\"")
+
+         sb.append("\" size=\"23\" value=\"")
            .append(sn.getSeries().replaceAll("\"", "&quot;"))
-	   .append("\"></td>\n<td><input type=text name=\"")
+	   .append("\"/></td>\n<td><input type=\"text\" name=\"")
 	   .append(fieldName)
 	   .append("_number");
          if (repeatable)
            sb.append("_").append(i);
-         sb.append("\" size=23 value=\"")
+         sb.append("\" size=\"23\" value=\"")
            .append(sn.getNumber().replaceAll("\"", "&quot;"))
-	   .append("\"></td>\n");
+	   .append("\"/></td>\n");
 
 	 if (repeatable && i < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"/> </td></tr>");
 	      .append("\" value=\"")
    	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-   	      .append("\"> </td></tr>");
+   	      .append("\"/> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"/> </td></tr>");
 	      .append("_more\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-	      .append("\"> </td></tr>");	      	      
+	      .append("\"/> </td></tr>");	      	      
 	 } 
 	 else 
 	 {
@@ -395,35 +396,35 @@
          else
            val = "";
 
-         sb.append("<td colspan=2><textarea name=\"")
+         sb.append("<td colspan=\"2\"><textarea name=\"")
            .append(fieldName);
          if (repeatable)
            sb.append("_").append(i);
-         sb.append("\" rows=4 cols=45 wrap=soft>")
+         sb.append("\" rows=\"4\" cols=\"45\" >")
            .append(val)
 	   .append("</textarea></td>\n");
 
 	 if (repeatable && i < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"/> </td></tr>");
 	      .append("\" value=\"")
    	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-   	      .append("\"> </td></tr>");
+   	      .append("\"/> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"/> </td></tr>");
 	      .append("_more\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-	      .append("\"> </td></tr>");
+	      .append("\"/> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -463,35 +464,35 @@
          else
            val = "";
 
-         sb.append("<td colspan=2><input type=text name=\"")
+         sb.append("<td colspan=\"2\"><input type=\"text\" name=\"")
            .append(fieldName);
          if (repeatable)
            sb.append("_").append(i);
-         sb.append("\" size=50 value=\"")
+         sb.append("\" size=\"50\" value=\"")
            .append(val)
-	   .append("\"></td>\n");
+	   .append("\"/></td>\n");
 
 	 if (repeatable && i < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(i)
-//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"/> </td></tr>");
 	      .append("\" value=\"")
    	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-   	      .append("\"> </td></tr>");
+   	      .append("\"/> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"/> </td></tr>");
 	      .append("_more\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-	      .append("\"> </td></tr>");
+	      .append("\"/> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -543,56 +544,56 @@
 	    sb.append("<tr><td>&nbsp;</td>");
 
          if (i < defaults.length)
-           sb.append("<td align=\"left\"><input type=text name=\"")
+           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldName)
              .append("_").append(i)
              .append("\" size=\"15\" value=\"")
              .append(defaults[i].value.replaceAll("\"", "&quot;"))
-	     .append("\">&nbsp;<input type=submit name=\"submit_")
+	     .append("\"/>&nbsp;<input type=\"submit\" name=\"submit_")
 	     .append(fieldName)
 	     .append("_remove_")
 	     .append(i)
-//	     .append("\" value=\"Remove\"></td>\n");
+//	     .append("\" value=\"Remove\"/></td>\n");
 	     .append("\" value=\"")
 	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-	     .append("\"></td>\n");
+	     .append("\"/></td>\n");
          else 
 	 {
-           sb.append("<td align=\"left\"><input type=text name=\"")
+           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldName)
              .append("_").append(i)
-             .append("\" size=\"15\"></td>\n");
+             .append("\" size=\"15\"/></td>\n");
 	 }
 	 i++;
 	 if (i < defaults.length)
-           sb.append("<td align=\"left\"><input type=text name=\"")
+           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldName)
              .append("_").append(i)
              .append("\" size=\"15\" value=\"")
              .append(defaults[i].value.replaceAll("\"", "&quot;"))
-	     .append("\">&nbsp;<input type=submit name=\"submit_")
+	     .append("\"/>&nbsp;<input type=\"submit\" name=\"submit_")
 	     .append(fieldName)
 	     .append("_remove_")
 	     .append(i)
-//	     .append("\" value=\"Remove\"></td></tr>\n");
+//	     .append("\" value=\"Remove\"/></td></tr>\n");
 	     .append("\" value=\"")
 	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-	     .append("\"></td></tr>\n");
+	     .append("\"/></td></tr>\n");
 	 else 
 	 {
-           sb.append("<td align=\"left\"><input type=text name=\"")
+           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldName)
              .append("_").append(i)
-             .append("\" size=\"15\">");
+             .append("\" size=\"15\"/></td>");
 
 	   if (i+1 >= fieldCount) 
 	   {
-	     sb.append("<td><input type=submit name=\"submit_")
+	     sb.append("<td><input type=\"submit\" name=\"submit_")
 	       .append(fieldName)
-//	       .append("_more\" value=\"Add More\"></td>\n"); 
+//	       .append("_more\" value=\"Add More\"/></td>\n"); 
 	       .append("_more\" value=\"")
 	       .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-	       .append("\"></td>\n");
+	       .append("\"/></td>\n");
 	   } 
 	   else 
 	   {
@@ -652,7 +653,7 @@
             sb.append("<tr><td>&nbsp;</td>");
 
 	 // do the dropdown box
-	 sb.append("<td colspan=2><select name=\"")
+	 sb.append("<td colspan=\"2\"><select name=\"")
            .append(fieldName)
 	   .append("_qualifier");
          if (repeatable) 
@@ -663,8 +664,8 @@
 	   q = (String)qualMap.get(i);
 	   v = (String)qualMap.get(i+1);
            sb.append("<option")
-	     .append((v.equals(currentQual) ? " SELECTED ": "" ))
-	     .append(" VALUE=\"")
+	     .append((v.equals(currentQual) ? " selected=\"selected\" ": "" ))
+	     .append(" value=\"")
 	     .append(v)
 	     .append("\">")
 	     .append(q)
@@ -672,36 +673,36 @@
          }
       
 	 // do the input box
-         sb.append("</select>&nbsp;<input type=text name=\"")
+         sb.append("</select>&nbsp;<input type=\"text\" name=\"")
            .append(fieldName)
 	   .append("_value");
          if (repeatable)
            sb.append("_").append(j);
-         sb.append("\" size=34 value=\"")
+         sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
-	   .append("\"></td>\n");
+	   .append("\"/></td>\n");
 
 	 if (repeatable && j < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
 	      .append("_remove_")
 	      .append(j)
-//	      .append("\" value=\"Remove This Entry\"> </td></tr>");
+//	      .append("\" value=\"Remove This Entry\"/> </td></tr>");
 	      .append("\" value=\"")
    	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-   	      .append("\"> </td></tr>");
+   	      .append("\"/> </td></tr>");
 	 } 
 	 else if (repeatable && j == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
-	    sb.append("<td><input type=submit name=\"submit_")
+	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"> </td></tr>");
+//	      .append("_more\" value=\"Add More\"/> </td></tr>");
 	      .append("_more\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-	      .append("\"> </td></tr>");
+	      .append("\"/> </td></tr>");
 	 } 
 	 else 
 	 {
@@ -728,12 +729,12 @@
 	.append(label)
 	.append("</td>");
 
-      sb.append("<td colspan=2>")
+      sb.append("<td colspan=\"2\">")
         .append("<select name=\"")
 	.append(fieldName)
 	.append("\"");
       if (repeatable)
-	sb.append(" size=6  multiple");
+	sb.append(" size=\"6\"  multiple=\"multiple\"");
       sb.append(">");
 
       for (int i = 0; i < valueList.size(); i += 2)
@@ -746,7 +747,7 @@
 	         break;
          }
 	 sb.append("<option ")
-	   .append(j < defaults.length ? " selected " : "")
+	   .append(j < defaults.length ? " selected=\"selected\" " : "")
 	   .append("value=\"")
 	   .append(value)
 	   .append("\">")
@@ -779,7 +780,7 @@
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
 
-  <form action="<%= request.getContextPath() %>/submit#<%= si.jumpToField%>" method=post>
+  <form action="<%= request.getContextPath() %>/submit#<%= si.jumpToField%>" method="post">
 
     <jsp:include page="/submit/progressbar.jsp">
       <jsp:param name="current_stage" value="<%= pageNum %>"/>
@@ -794,14 +795,14 @@
      {
 %>
         <p><fmt:message key="jsp.submit.edit-metadata.info1"/>
-        <dspace:popup page="/help/index.html#describe2"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></p>
+        <object><dspace:popup page="/help/index.html#describe2"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></object></p>
 <%
      } 
      else 
      {
 %>
     <p><fmt:message key="jsp.submit.edit-metadata.info2"/>
-        <dspace:popup page="/help/index.html#describe3"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></p>
+        <object><dspace:popup page="/help/index.html#describe3"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></object></p>
     
 <%
      }
@@ -907,7 +908,7 @@
 <%-- HACK: Using this line to give the browser hints as to the widths of cells --%>
        <tr>
          <td width="40%">&nbsp;</td>
-         <td colspan=2 width=5%>&nbsp;</td>
+         <td colspan="2" width="5%">&nbsp;</td>
          <td width="40%">&nbsp;</td>
        </tr>
 
@@ -919,24 +920,24 @@
         
 <%-- HACK:  Need a space - is there a nicer way to do this than <BR> or a --%>
 <%--        blank <P>? --%>
-        <P>&nbsp;</P>
+        <p>&nbsp;</p>
 
 <%-- Hidden fields needed for submit servlet to know which item to deal with --%>
         <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type=hidden name="step" value="<%= pageNum %>">
+        <input type="hidden" name="step" value="<%= pageNum %>"/>
         <center>
-            <table border=0 width=80%>
+            <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
                     <td>
-                        <input type=submit name="submit_prev" value="<fmt:message key="jsp.submit.edit-metadata.previous"/>">
+                        <input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.edit-metadata.previous"/>"/>
                     </td>
                     <td>
-                        <input type=submit name="submit_next" value="<fmt:message key="jsp.submit.edit-metadata.next"/>">
+                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.edit-metadata.next"/>"/>
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align=right>
-                        <input type=submit name="submit_cancel" value="<fmt:message key="jsp.submit.edit-metadata.cancelsave"/>">
+                    <td align="right">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.edit-metadata.cancelsave"/>"/>
                     </td>
                 </tr>
             </table>

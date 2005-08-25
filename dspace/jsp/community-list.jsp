@@ -86,41 +86,41 @@
 
     void showCommunity(Community c) throws IOException, SQLException
     {
-        out.println( "<LI class=\"communityLink\">" );
-        out.println( "<strong><A HREF=\"" + request.getContextPath() + "/handle/" + c.getHandle() + "\">" + c.getMetadata("name") + "</A></strong>");
+        out.println( "<li class=\"communityLink\">" );
+        out.println( "<strong><a href=\"" + request.getContextPath() + "/handle/" + c.getHandle() + "\">" + c.getMetadata("name") + "</a></strong>");
 
         // Get the collections in this community
         Collection[] cols = c.getCollections();
         if (cols.length > 0)
         {
-            out.println("<UL>");
+            out.println("<ul>");
             for (int j = 0; j < cols.length; j++)
             {
-                out.println("<LI class=\"collectionListItem\">");
-                out.println("<A HREF=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</A>");
+                out.println("<li class=\"collectionListItem\">");
+                out.println("<a href=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</a>");
 				if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
                     out.println(" [" + cols[j].countItems() + "]");
                 }
 
-                out.println("</LI>");
+                out.println("</li>");
             }
-            out.println("</UL>");
+            out.println("</ul>");
         }
 
         // Get the sub-communities in this community
         Community[] comms = c.getSubcommunities();
         if (comms.length > 0)
         {
-            out.println("<UL>");
+            out.println("<ul>");
             for (int k = 0; k < comms.length; k++)
             {
                showCommunity(comms[k]);
             }
-            out.println("</UL>");
- 
+            out.println("</ul>"); 
         }
-        out.println("<BR>");
+        out.println("<br />");
+        out.println("</li>");
     }
 %>
 
@@ -129,43 +129,41 @@
 <%
     if (admin_button)
     {
-%>
-      
+%>     
 
-<table class=miscTableNoColor align=center>
+<table class="miscTableNoColor" align="center">
         <tr>
         <td>
-			<H1><fmt:message key="jsp.community-list.title"/></H1>
-
-			<P><fmt:message key="jsp.community-list.text1"/></P>
+			<h1><fmt:message key="jsp.community-list.title"/></h1>
+			<p><fmt:message key="jsp.community-list.text1"/></p>
         </td>
         <td>
-        <table class=miscTable align=center>
+        <table class="miscTable" align="center">
 	    <tr>
-	        <td class="evenRowEvenCol" colspan=2>
+	        <td class="evenRowEvenCol" colspan="2">
                 <table>
                     <tr>
-                        <th class="standard">
+                        <th class="standard" id="t1">
                             <strong><fmt:message key="jsp.admintools"/></strong>
                         </th>
                     </tr>
                     <tr>
-                        <td class="standard" align="center">
-	                        <form method=POST action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
-		                        <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
+                        <td headers="t1" class="standard" align="center">
+	                        <form method="post" action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+		                        <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_CREATE_COMMUNITY%>" />
                                     <%--<input type="submit" name="submit" value="Create Top-Level Community...">--%>
-									<input type="submit" name="submit" value="<fmt:message key="jsp.community-list.create.button"/>">
+									<input type="submit" name="submit" value="<fmt:message key="jsp.community-list.create.button"/>" />
                             </form>
                         </td>
                     </tr>
                     <tr>
-                        <td class="standard" align="center">
+                        <td headers="t1" class="standard" align="center">
                             <dspace:popup page="/help/site-admin.html"><fmt:message key="jsp.adminhelp"/></dspace:popup>
                         </td>
                     </tr>
                </table>
             </td>
-            </tr>
+        </tr>
         </table>
         </td>
        </tr>
@@ -176,13 +174,15 @@
     else
     {
 %>
-	<H1><fmt:message key="jsp.community-list.title"/></H1>
-
-	<P><fmt:message key="jsp.community-list.text1"/></P>
+	<h1><fmt:message key="jsp.community-list.title"/></h1>
+	<p><fmt:message key="jsp.community-list.text1"/></p>
 <%
     }
 %>
-    <UL>
+<% if (communities.length != 0)
+{
+%>
+    <ul>
 <%
     if (showAll)
     {
@@ -197,10 +197,10 @@
         for (int i = 0; i < communities.length; i++)
         {
 %>		
-            <LI class="communityLink">
+            <li class="communityLink">
             <%-- HACK: <strong> tags here for broken Netscape 4.x CSS support --%>
-            <strong><A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></A></strong>
-	    <UL>
+            <strong><a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a></strong>
+	    <ul>
 <%
             // Get the collections in this community from the map
             Collection[] cols = (Collection[]) collectionMap.get(
@@ -209,8 +209,8 @@
             for (int j = 0; j < cols.length; j++)
             {
 %>
-                <LI class="collectionListItem">
-                <A HREF="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></A>
+                <li class="collectionListItem">
+                <a href="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></a>
 <%
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
@@ -220,12 +220,12 @@
                 }
 %>
 
-				</LI>
+				</li>
 <%
             }
 %>
-            </UL>
-	    <UL>
+            </ul>
+	    <ul>
 <%
             // Get the sub-communities in this community from the map
             Community[] comms = (Community[]) subcommunityMap.get(
@@ -234,8 +234,8 @@
             for (int k = 0; k < comms.length; k++)
             {
 %>
-                <LI class="communityLink">
-                <A HREF="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></A>
+                <li class="communityLink">
+                <a href="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></a>
 <%
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
@@ -244,17 +244,19 @@
 <%
                 }
 %>
-				</LI>
+				</li>
 <%
             }
 %>
-            </UL>
-            <BR>
-        </LI>
+            </ul>
+            <br />
+        </li>
 <%
         }
     }
 %>
-    </UL>
+    </ul>
  
+<% }
+%>
 </dspace:layout>

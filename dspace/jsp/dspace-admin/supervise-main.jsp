@@ -58,17 +58,17 @@
 
 <h3><fmt:message key="jsp.dspace-admin.supervise-main.subheading"/></h3>
 
-<br><br>
+<br/>
 
-<div align="center">
+<div align="center" />
 <%-- form to navigate to any of the three options available --%>
-<form method="post">
+<form method="post" action="">
     <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.supervise-main.add.button"/>"/>
-    <br><br>
+    <br/><br/>
     <input type="submit" name="submit_view" value="<fmt:message key="jsp.dspace-admin.supervise-main.view.button"/>"/>
-    <br><br>
+    <br/><br/>
     <input type="submit" name="submit_clean" value="<fmt:message key="jsp.dspace-admin.supervise-main.clean.button"/>"/>
 </form>
-<div align="center">
+<div align="center" />
 
 </dspace:layout>

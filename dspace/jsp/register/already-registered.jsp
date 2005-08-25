@@ -50,24 +50,23 @@
 	
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-
 <dspace:layout titlekey="jsp.register.already-registered.title">
     
 <%-- <h1>Already Registered</h1> --%>
 <h1><fmt:message key="jsp.register.already-registered.title"/></h1>
 
-    <%-- <P>Our records show that you've already registered with DSpace and have
-    an active account with us.</P> --%>
-	<P><fmt:message key="jsp.register.already-registered.info1"/></P>
+    <%-- <p>Our records show that you've already registered with DSpace and have
+    an active account with us.</p> --%>
+	<p><fmt:message key="jsp.register.already-registered.info1"/></p>
 
-    <%-- <P><strong>You can <a href="<%= request.getContextPath() %>/forgot"> set
-    a new password if you've forgotten it</A>.</P> --%>
-	<P><fmt:message key="jsp.register.already-registered.info2">
+    <%-- <p><strong>You can <a href="<%= request.getContextPath() %>/forgot"> set
+    a new password if you've forgotten it</a>.</p> --%>
+	<p><fmt:message key="jsp.register.already-registered.info2">
         <fmt:param><%= request.getContextPath() %>/forgot</fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 
-    <%-- <P>If you're having trouble logging in, please contact us.</P> --%>
-	<P><fmt:message key="jsp.register.already-registered.info4"/></P>
+    <%-- <p>If you're having trouble logging in, please contact us.</p> --%>
+	<p><fmt:message key="jsp.register.already-registered.info4"/></p>
     
     <dspace:include page="/components/contact-info.jsp" />
 

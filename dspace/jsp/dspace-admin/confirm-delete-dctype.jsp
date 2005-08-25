@@ -67,33 +67,32 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-    <%-- <H1>Delete Dublin Core Format: <code><%= typeName %></code></H1> --%>
-    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.heading">
+    <%-- <h1>Delete Dublin Core Format: <code><%= typeName %></code></h1> --%>
+    <h1><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.heading">
         <fmt:param><%= typeName %></fmt:param>
-    </fmt:message></H1>
-    
-    <%-- <P>Are you sure the format <strong><%= typeName %></strong>
-    should be deleted?</P> --%>
-    <P><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.confirm">
+    </fmt:message></h1>
+
+    <%-- <p>Are you sure the format <strong><%= typeName %></strong>
+    should be deleted?</p> --%>
+    <p><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.confirm">
         <fmt:param><%= typeName %></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
     
-    <%-- <P>This will result in an error if any DC values have this type.</P> --%>
-    <P><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.warning"/></P>
+    <%-- <p>This will result in an error if any DC values have this type.</p> --%>
+    <p><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.warning"/></p>
 
-    <form method=POST>
-        <input type="hidden" name="dc_type_id" value="<%= type.getID() %>">
-
+    <form method="post" action="">
+        <input type="hidden" name="dc_type_id" value="<%= type.getID() %>"/>
         <center>
             <table width="70%">
                 <tr>
                     <td align="left">
                         <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
+                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
                     </td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
                     </td>
                 </tr>
             </table>

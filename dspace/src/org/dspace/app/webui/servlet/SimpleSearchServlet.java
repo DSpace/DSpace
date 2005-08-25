@@ -68,13 +68,13 @@ import org.dspace.search.QueryResults;
 
 /**
  * Servlet for handling a simple search.
- * <P>
+ * <p>
  * All metadata is search for the value contained in the "query" parameter. If
  * the "location" parameter is present, the user's location is switched to that
  * location using a redirect. Otherwise, the user's current location is used to
  * constrain the query; i.e., if the user is "in" a collection, only results
  * from the collection will be returned.
- * <P>
+ * <p>
  * The value of the "location" parameter should be ALL (which means no
  * location), a the ID of a community (e.g. "123"), or a community ID, then a
  * slash, then a collection ID, e.g. "123/456".

@@ -79,7 +79,7 @@
                titlekey="jsp.submit.cancel.title"
                nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method=post>
+    <form action="<%= request.getContextPath() %>/submit" method="post">
 
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= displayStep %>"/>
@@ -87,24 +87,25 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
+
 		<h1><fmt:message key="jsp.submit.cancel.title"/></h1>
 
 		<p><fmt:message key="jsp.submit.cancel.info"/></p>
     
         <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type=hidden name=previous_step value=<%= step %>>
-        <input type=hidden name=step value=<%= SubmitServlet.SUBMISSION_CANCELLED %>>
+        <input type="hidden" name="previous_step" value="<%= step %>" />
+        <input type="hidden" name="step" value="<%= SubmitServlet.SUBMISSION_CANCELLED %>" />
 
-        <table align=center border=0 width=90%>
+        <table align="center" border="0" width="90%">
             <tr>
-                <td align=left>
-					<input type=submit name="submit_back" value="<fmt:message key="jsp.submit.cancel.continue.button"/>">
+                <td align="left">
+					<input type="submit" name="submit_back" value="<fmt:message key="jsp.submit.cancel.continue.button"/>" />
                 </td>
-                <td align=center>
-					<input type=submit name="submit_remove" value="<fmt:message key="jsp.submit.cancel.remove.button"/>">
+                <td align="center">
+					<input type="submit" name="submit_remove" value="<fmt:message key="jsp.submit.cancel.remove.button"/>" />
                 </td>
-                <td align=right>
-					<input type=submit name="submit_keep" value="<fmt:message key="jsp.submit.cancel.save.button"/>">
+                <td align="right">
+					<input type="submit" name="submit_keep" value="<fmt:message key="jsp.submit.cancel.save.button"/>" />
                 </td>
             </tr>
         </table>

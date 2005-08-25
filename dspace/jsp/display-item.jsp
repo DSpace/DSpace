@@ -107,10 +107,9 @@
     {
 %>
 
-
-<table align=center class=miscTable>
+    <table align="center" class="miscTable">
         <tr>
-            <td class=evenRowEvenCol align="center">
+            <td class="evenRowEvenCol" align="center">
                 <%-- <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
                 <strong><fmt:message key="jsp.display-item.identifier"/>
@@ -119,17 +118,17 @@
 <%
         if (admin_button)  // admin edit button
         { %>
-            <td class=evenRowEvenCol align="center">
-                <form method=GET action="<%= request.getContextPath() %>/tools/edit-item">
-                    <input type="hidden" name="item_id" value="<%= item.getID() %>">
+            <td class="evenRowEvenCol" align="center">
+                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                     <%--<input type="submit" name="submit" value="Edit...">--%>
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>">
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
                 </form>
             </td>
 <%      } %>
         </tr>
     </table>
-    <br>
+    <br />
 <%
     }
 
@@ -144,14 +143,14 @@
     {
 %>
 
-    <div align=center>
+    <div align="center">
 <%
         if (workspace_id != null)
         {
 %>
     <form method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
-        <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>">
-        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>">
+        <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>" />
+        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>" />
     </form>
 <%
         }
@@ -159,8 +158,8 @@
         {
 %>
     <form method="get" action="<%=locationLink %>">
-        <input type="hidden" name="mode" value="simple">
-        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>">
+        <input type="hidden" name="mode" value="simple"/>
+        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>" />
     </form>
 <%
         }
@@ -171,15 +170,14 @@
     else
     {
 %>
-
-    <div align=center>
+    <div align="center">
 <%
         if (workspace_id != null)
         {
 %>
     <form method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
-        <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>">
-        <input type="submit" name="submit_full" value="<fmt:message key="jsp.display-item.text2"/>">
+        <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>" />
+        <input type="submit" name="submit_full" value="<fmt:message key="jsp.display-item.text2"/>" />
     </form>
 <%
         }
@@ -187,8 +185,8 @@
         {
 %>
     <form method="get" action="<%=locationLink %>">
-        <input type="hidden" name="mode" value="full">
-        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text2"/>">
+        <input type="hidden" name="mode" value="full"/>
+        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text2"/>" />
     </form>
 <%
         }
@@ -206,7 +204,6 @@
 <div align="center">
    <form method="post" action="<%= request.getContextPath() %>/workspace">
         <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>"/>
-        <!-- <input type="submit" name="submit_open" value="Back to Workspace"/> -->
         <input type="submit" name="submit_open" value="<fmt:message key="jsp.display-item.back_to_workspace"/>"/>
     </form>
 </div>
@@ -218,9 +215,9 @@
     if (ConfigurationManager.getProperty("sfx.server.url") != null)
     {
 %>
-    <P align=center>
-        <A HREF="<dspace:sfxlink item="<%= item %>" />"><IMG SRC="<%= request.getContextPath() %>/image/sfx-link.gif" BORDER=0 ALT="SFX Query"></A>
-    </P>
+    <p align="center">
+        <a href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= request.getContextPath() %>/image/sfx-link.gif" border="0" alt="SFX Query" /></a>
+    </p>
 <%
     }
 %>
@@ -229,17 +226,14 @@
     if (cc_url != null)
     {
 %>
-    <%--<P class="submitFormHelp">This item is licensed inder a <a href="<%= cc_url %>">Creative Commons License</a><br/>--%>
-    <P class="submitFormHelp"><fmt:message key="jsp.display-item.text3"/> <a href="<%= cc_url %>"><fmt:message key="jsp.display-item.license"/></a><br/>
-    <a href="<%= cc_url %>"><img src="<%= request.getContextPath() %>/image/cc-somerights.gif" border="0" ALT="Creative Commons" /></a>
-    </P>
+    <p class="submitFormHelp"><fmt:message key="jsp.display-item.text3"/> <a href="<%= cc_url %>"><fmt:message key="jsp.display-item.license"/></a><br/>
+    <a href="<%= cc_url %>"><img src="<%= request.getContextPath() %>/image/cc-somerights.gif" border="0" alt="Creative Commons" /></a>
+    </p>
     <!--
     <%= cc_rdf %>
     -->
 <%
     }
 %>
-    <%--<P class="submitFormHelp">All items in DSpace are protected by copyright, with all rights reserved.</P>--%>
-    <P class="submitFormHelp"><fmt:message key="jsp.display-item.copyright"/></P>
-
+    <p class="submitFormHelp"><fmt:message key="jsp.display-item.copyright"/></p>
 </dspace:layout>

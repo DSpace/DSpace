@@ -73,56 +73,51 @@
                parentlink="/dspace-admin"
                nocache="true">
   
-<table width=95%>
+<table width="95%">
     <tr>
-      <%-- <td align=left>    <h1>Currently Active Workflows</h1> --%>
-      <td align=left>    <h1><fmt:message key="jsp.dspace-admin.workflow-list.heading"/></h1>
+      <%-- <td align="left">    <h1>Currently Active Workflows</h1> --%>
+      <td align="left"><h1><fmt:message key="jsp.dspace-admin.workflow-list.heading"/></h1>   
       </td>
       <td align="right" class="standard">
         <dspace:popup page="/help/site-admin.html#workflow"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
-  
-    <table class="miscTable" align="center">
-        <tr>
-            <th class="oddRowOddCol"> <strong>ID</strong></th>
-            <%-- <th class="oddRowEvenCol"><strong>Collection</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.workflow-list.collection"/></strong></th>
-            <%-- <th class="oddRowOddCol"> <strong>Submitter</strong></th> --%>
-            <th class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.workflow-list.submitter"/></strong></th>
-            <%-- <th class="oddRowEvenCol"><strong>Title</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.workflow-list.item-title"/></strong></th>
-            <th class="oddRowOddCol">&nbsp;</th>
-        </tr>
 
+   <table class="miscTable" align="center" summary="Table displaying list of currently active workflows">
+       <tr>
+           <th class="oddRowOddCol"> <strong>ID</strong></th>
+           <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.workflow-list.collection"/></strong></th>
+           <th class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.workflow-list.submitter"/></strong></th>
+           <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.workflow-list.item-title"/></strong></th>
+           <th class="oddRowOddCol">&nbsp;</th>
+       </tr>
 <%
     String row = "even";
     for (int i = 0; i < workflows.length; i++)
     {
 %>
-        <form method=POST>
-            <tr>
-                <td class="<%= row %>RowOddCol"><%= workflows[i].getID() %></td>
-                <td class="<%= row %>RowEvenCol">
+        <tr>
+            <td class="<%= row %>RowOddCol"><%= workflows[i].getID() %></td>
+            <td class="<%= row %>RowEvenCol">
                     <%= workflows[i].getCollection().getMetadata("name") %>
-                </td>
-                <td class="<%= row %>RowOddCol">
+            </td>
+            <td class="<%= row %>RowOddCol">
                     <%= WorkflowManager.getSubmitterName(workflows[i])   %>
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <%= Utils.addEntities(WorkflowManager.getItemTitle(workflows[i]))       %>
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <input type="hidden" name="workflow_id" value="<%= workflows[i].getID() %>">
-                    <%-- <input type="submit" name="submit_abort" value="Abort..."> --%>
-                    <input type="submit" name="submit_abort" value="<fmt:message key="jsp.dspace-admin.general.abort-w-confirm"/>">
-                </td>
-            </tr>
-        </form>
+            </td>
+            <td class="<%= row %>RowEvenCol">
+                    <%= Utils.addEntities(WorkflowManager.getItemTitle(workflows[i]))  %>
+            </td>
+            <td class="<%= row %>RowOddCol">
+               <form method="post" action="">
+                   <input type="hidden" name="workflow_id" value="<%= workflows[i].getID() %>"/>
+                   <input type="submit" name="submit_abort" value="<fmt:message key="jsp.dspace-admin.general.abort-w-confirm"/>" />
+              </form>
+            </td>
+        </tr>
 <%
         row = (row.equals("odd") ? "even" : "odd");
     }
 %>
-    </table>
+     </table>
 </dspace:layout>

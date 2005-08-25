@@ -1,4 +1,4 @@
-<%--
+ <%--
   - itemmap-browse.jsp
   -
   - Version: $ $
@@ -88,7 +88,7 @@
 
     <%-- <p>Check the box next to items you wish to add or remove, and choose 'add' or 'remove'.</p> --%>
     <p><fmt:message key="jsp.tools.itemmap-browse.infomsg"/></p>
-    <form method="POST" action="<%= request.getContextPath() %>/tools/itemmap">
+    <form method="post" action="<%= request.getContextPath() %>/tools/itemmap">
         <input type="hidden" name="cid" value="<%=collection.getID()%>" />
 
         <table>     

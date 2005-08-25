@@ -144,7 +144,7 @@ public class DCInput
      */
     public String getWarning()
     {
-    	return "<tr><td colspan=4 class=\"submitFormWarn\">" + warning + "</td></tr>";
+    	return "<tr><td colspan=\"4\" class=\"submitFormWarn\">" + warning + "</td></tr>";
     }
     
     /**
@@ -174,7 +174,7 @@ public class DCInput
      */
     public String getHints()
     {
-    	return "<tr><td colspan=4 class=\"submitFormHelp\">" + hint + "</td></tr>";
+    	return "<tr><td colspan=\"4\" class=\"submitFormHelp\">" + hint + "</td></tr>";
     }
     
     /**

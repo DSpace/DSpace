@@ -78,7 +78,7 @@
 
 <br/><br/>
 
-<div align="center">
+<div align="center"/>
 
 <%
         DCValue[] titleArray = wsItem.getItem().getDC("title", null, Item.ANY);
@@ -115,7 +115,7 @@
 <fmt:message key="jsp.dspace-admin.supervise-confirm-remove.confirm"/>
 
 <%-- form to request removal of supervisory linking --%>
-<form method="post">
+<form method="post" action="">
     <input type="hidden" name="gID" value="<%= group.getID() %>"/>
     <input type="hidden" name="siID" value="<%= wsItem.getID() %>"/>
     <input type="submit" name="submit_doremove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>

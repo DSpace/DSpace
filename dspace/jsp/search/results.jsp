@@ -96,21 +96,20 @@
 
 <dspace:layout titlekey="jsp.search.results.title">
 
-    <%-- <H1>Search Results</H1> --%>
+    <%-- <h1>Search Results</h1> --%>
     
-
-<H1><fmt:message key="jsp.search.results.title"/></H1>
+<h1><fmt:message key="jsp.search.results.title"/></h1>
     
     <%-- Controls for a repeat search --%>
-    <form action="simple-search" method=GET>
-        <table class=miscTable align=center>
+    <form action="simple-search" method="get">
+        <table class="miscTable" align="center" summary="Table displaying your search results">
             <tr>
                 <td class="evenRowEvenCol">
                     <table>
                         <tr>
                             <td>
                                 <%-- <strong>Search:</strong>&nbsp;<select name="location"> --%>
-                                <strong><fmt:message key="jsp.search.results.searchin"/></strong>&nbsp;<select name="location">
+                                <label for="tlocation"><strong><fmt:message key="jsp.search.results.searchin"/></strong></label>&nbsp;<select name="location" id="tlocation">
 <%
     if (community == null && collection == null)
     {
@@ -118,7 +117,7 @@
         // "all of DSpace" and the communities.
 %>
                                     <%-- <option selected value="/">All of DSpace</option> --%>
-                                    <option selected value="/"><fmt:message key="jsp.general.genericScope"/></option>
+                                    <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
 <%
         for (int i = 0; i < communityArray.length; i++)
         {
@@ -134,7 +133,7 @@
 %>
                                     <%-- <option value="/">All of DSpace</option> --%>
                                     <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                                    <option selected value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
+                                    <option selected="selected" value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
 <%
         for (int i = 0; i < collectionArray.length; i++)
         {
@@ -150,7 +149,7 @@
                                     <%-- <option value="/">All of DSpace</option> --%>
                                     <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
                                     <option value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
-                                    <option selected value="<%= collection.getHandle() %>"><%= collection.getMetadata("name") %></option>
+                                    <option selected="selected" value="<%= collection.getHandle() %>"><%= collection.getMetadata("name") %></option>
 <%
     }
 %>
@@ -158,9 +157,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td align=center>
-                                <%-- for&nbsp;<input type="text" name="query" value='<//%= (query==null ? "" : query) %>'>&nbsp;<input type="submit" value="Go"> --%>
-                                <fmt:message key="jsp.search.results.searchfor"/>&nbsp;<input type="text" name="query" value='<%= (query==null ? "" : query) %>'>&nbsp;<input type="submit" value="<fmt:message key="jsp.general.go"/>">
+                            <td align="center">
+                                <fmt:message key="jsp.search.results.searchfor"/>&nbsp;<input type="text" name="query" value='<%= (query==null ? "" : query) %>'/>&nbsp;<input type="submit" value="<fmt:message key="jsp.general.go"/>" />
                             </td>
                         </tr>
                     </table>
@@ -172,25 +170,25 @@
 <% if( qResults.getErrorMsg()!=null )
 {
  %>
-    <P align=center class="submitFormWarn"><%= qResults.getErrorMsg() %></P>
+    <p align="center" class="submitFormWarn"><%= qResults.getErrorMsg() %></p>
 <%
 }
 else if( qResults.getHitCount() == 0 )
 {
  %>
-    <%-- <P align=center>Search produced no results.</P> --%>
-    <P align=center><fmt:message key="jsp.search.general.noresults"/></P>
+    <%-- <p align="center">Search produced no results.</p> --%>
+    <p align="center"><fmt:message key="jsp.search.general.noresults"/></p>
 <%
 }
 else
 {
 %>
-    <%-- <P align=center>Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
-	<P align=center><fmt:message key="jsp.search.results.results">
+    <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
+	<p align="center"><fmt:message key="jsp.search.results.results">
         <fmt:param><%=qResults.getStart()+1%></fmt:param>
         <fmt:param><%=qResults.getStart()+qResults.getHitHandles().size()%></fmt:param>
         <fmt:param><%=qResults.getHitCount()%></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 
 <% } %>
 
@@ -201,20 +199,20 @@ else
 <% } %>
 
 <% if (collections.length > 0 ) { %>   
-    <br>
+    <br/>
     <%-- <h3>Collection hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.colhits"/></h3>
     <dspace:collectionlist collections="<%= collections %>" />
 <% } %>
 
 <% if (items.length > 0) { %>
-    <br>
+    <br/>
     <%-- <h3>Item hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.itemhits"/></h3>
     <dspace:itemlist items="<%= items %>" />
 <% } %>
 
-<P align="center">
+<p align="center">
 
 <%
     // retain scope when navigating result sets
@@ -232,7 +230,7 @@ else
                     + searchScope 
                     + "/simple-search?query="
                     + URLEncoder.encode(query)
-                    + "&start=";
+                    + "&amp;start=";
 
     String nextURL = prevURL;
 
@@ -243,7 +241,6 @@ else
             + (pageCurrent) * qResults.getPageSize();
     
     
-
 if (pageFirst != pageCurrent)
 {
     %><a href="<%= prevURL %>"><fmt:message key="jsp.search.general.previous" /></a><%
@@ -252,12 +249,12 @@ if (pageFirst != pageCurrent)
 
 for( int q = pageFirst; q <= pageLast; q++ )
 {
-    String myLink = "<A HREF=\""
+    String myLink = "<a href=\""
                     + request.getContextPath()
                     + searchScope 
                     + "/simple-search?query="
                     + URLEncoder.encode(query)
-                    + "&start=";
+                    + "&amp;start=";
 
 
     if( q == pageCurrent )
@@ -270,7 +267,7 @@ for( int q = pageFirst; q <= pageLast; q++ )
             + (q-1) * qResults.getPageSize()
             + "\">"
             + q
-            + "</A>";
+            + "</a>";
     }
 %>
 
@@ -285,7 +282,7 @@ if (pageTotal > pageCurrent)
 }
 %>
 
-</P>
+</p>
 
 </dspace:layout>
 

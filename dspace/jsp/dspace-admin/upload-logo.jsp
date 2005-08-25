@@ -1,8 +1,5 @@
 <%--
-  - upload-logo.jsp
-  -
   - Version: $Revision$
-  -
   - Date: $Date$
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
@@ -61,6 +58,7 @@
 <%
     Collection collection = (Collection) request.getAttribute("collection");
     Community community = (Community) request.getAttribute("community");
+    
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.upload-logo.title"
@@ -70,16 +68,13 @@
                parentlink="/dspace-admin" 
                nocache="true">
 
-    <%-- <H1>Upload Logo</H1> --%>
-    <H1><fmt:message key="jsp.dspace-admin.upload-logo.title"/></H1>
-    
-    <%-- <P>Select the logo to upload for
+    <%-- <h1>Upload Logo</h1> --%>
+    <h1><fmt:message key="jsp.dspace-admin.upload-logo.title"/></h1>   
+    <%-- <p>Select the logo to upload for
 	<%= (collection != null ? "collection <strong>" + collection.getMetadata("name") + "</strong>"
                                 : "community <strong>" + community.getMetadata("name") + "</strong>") %>
-    </P> --%>
-    
-    
-    	<P>
+    </p> --%>    
+    	<p>
     	    <%
 	    	if (collection != null){
 	    %>
@@ -96,19 +91,19 @@
 	    <%
 	    	}
 	    %>
-        </P>
+        </p>
     
-    <form method=POST enctype="multipart/form-data">
-        <P align=center>
-          <input type=file size=40 name="file">
-        </P>
+    <form method="post" enctype="multipart/form-data" action="">
+        <p align="center">
+            <input type="file" size="40" name="file"/>
+        </p>
         
-        <input type="hidden" name="community_id" value="<%= community.getID() %>">
-<%  if (collection != null) { %>
-        <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
-<%  } %>
+ <input type="hidden" name="community_id" value="<%= community.getID() %>" />
 
-        <%-- <P align=center><input type="submit" name="submit" value="Upload"></P> --%>
-        <P align=center><input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.upload"/>"></P>
+<%  if (collection != null) { %>
+        <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
+<%  } %>
+        <%-- <p align="center"><input type="submit" name="submit" value="Upload"/></p> --%>
+        <p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.upload"/>" /></p>
     </form>
 </dspace:layout>

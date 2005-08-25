@@ -74,9 +74,9 @@
 
 <br/><br/>
 
-<div align="center">
+<div align="center" />
 <%-- form to navigate to the "add supervisory settings" page --%> 
-<form method="post">
+<form method="post" action="">
     <input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.supervise-list.add.button"/>"/>
     <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.supervise-list.back.button"/>"/>
 </form>
@@ -147,7 +147,7 @@
         </td>
         <td class="<%= row %>RowOddCol">
             <%-- form to request removal of supervisory linking --%>
-            <form method="post">
+            <form method="post" action="">
             <input type="hidden" name="gID" value="<%= supervisors[j].getID() %>"/>
             <input type="hidden" name="siID" value="<%= supervisedItems[i].getID() %>"/>
             <input type="submit" name="submit_remove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>

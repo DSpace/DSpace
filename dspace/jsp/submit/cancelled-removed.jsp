@@ -50,17 +50,16 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-
 <dspace:layout locbar="off" titlekey="jsp.submit.cancelled-removed.title">
 
-    <%-- <H1>Submission Cancelled</H1> --%>
-	<H1><fmt:message key="jsp.submit.cancelled-removed.title"/></H1>
+    <%-- <h1>Submission Cancelled</h1> --%>
+	<h1><fmt:message key="jsp.submit.cancelled-removed.title"/></h1>
 
-    <%-- <P>Your submission has been cancelled, and the incomplete item removed
-    from the system.</P> --%>
-	<P><fmt:message key="jsp.submit.cancelled-removed.info"/></P>
+    <%-- <p>Your submission has been cancelled, and the incomplete item removed
+    from the system.</p> --%>
+	<p><fmt:message key="jsp.submit.cancelled-removed.info"/></p>
 
-    <%-- <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P> --%>
-	<P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/></A></P>
+    <%-- <p><a href="<%= request.getContextPath() %>/mydspace">Go to My DSpace</a></p> --%>
+	<p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/></a></p>
 
 </dspace:layout>

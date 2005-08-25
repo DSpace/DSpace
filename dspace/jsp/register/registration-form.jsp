@@ -82,58 +82,57 @@
 
 <dspace:layout titlekey="jsp.register.registration-form.title" nocache="true">
 
-    <%-- <H1>Registration Information</H1> --%>
-	<H1><fmt:message key="jsp.register.registration-form.title"/></H1>
+    <%-- <h1>Registration Information</h1> --%>
+	<h1><fmt:message key="jsp.register.registration-form.title"/></h1>
     
 <%
     if (missingFields)
     {
 %>
-    <%-- <P><strong>Please fill out all of the required fields.</strong></P> --%>
-	<P><strong><fmt:message key="jsp.register.registration-form.instruct1"/></strong></P>
+    <%-- <p><strong>Please fill out all of the required fields.</strong></p> --%>
+	<p><strong><fmt:message key="jsp.register.registration-form.instruct1"/></strong></p>
 <%
     }
 
     if( passwordProblem)
     {
 %>
-    <%-- <P><strong>The passwords you enter below must match, and need to be at
-    least 6 characters long.</strong></P> --%>
-	<P><strong><fmt:message key="jsp.register.registration-form.instruct2"/></strong></P>
+    <%-- <p><strong>The passwords you enter below must match, and need to be at
+    least 6 characters long.</strong></p> --%>
+	<p><strong><fmt:message key="jsp.register.registration-form.instruct2"/></strong></p>
 <%
     }
 %>
 
-    <%-- <P>Please enter the following information.  The fields marked with a * are
-    required.</P> --%>
-	<P><fmt:message key="jsp.register.registration-form.instruct3"/></P>
-    
-    <form action="<%= request.getContextPath() %>/register" method=POST>
-    <% if (netid!=null) { %> <input type="hidden" name="netid" value="<%= netid %>"> <% } %>
-    <% if (email!=null) { %> <input type="hidden" name="email" value="<%= email %>"> <% } %>
+    <%-- <p>Please enter the following information.  The fields marked with a * are
+    required.</p> --%>
+	<p><fmt:message key="jsp.register.registration-form.instruct3"/></p>
+    <form action="<%= request.getContextPath() %>/register" method="post">
+    <% if (netid!=null) { %> <input type="hidden" name="netid" value="<%= netid %>" /> <% } %>
+    <% if (email!=null) { %> <input type="hidden" name="email" value="<%= email %>" /> <% } %>
         <dspace:include page="/register/profile-form.jsp" />
 <%
 
     if (setPassword)
     {
 %>
-        <%-- <P>Please choose a password and enter it into the box below, and confirm it by typing it
-        again into the second box.  It should be at least six characters long.</P> --%>
-		<P><fmt:message key="jsp.register.registration-form.instruct4"/></P>
+        <%-- <p>Please choose a password and enter it into the box below, and confirm it by typing it
+        again into the second box.  It should be at least six characters long.</p> --%>
+		<p><fmt:message key="jsp.register.registration-form.instruct4"/></p>
 
         <table class="misc" align="center">
             <tr>
                 <td class="oddRowEvenCol">
-                    <table border=0 cellpadding=5>
+                    <table border="0" cellpadding="5">
                         <tr>
-                            <%-- <td align=right class=standard><strong>Password:</strong></td> --%>
-							<td align=right class=standard><strong><fmt:message key="jsp.register.registration-form.pswd.field"/></strong></td>
-                            <td class=standard><input type=password name="password"></td>
+                            <%-- <td align="right" class="standard"><strong>Password:</strong></td> --%>
+							<td align="right" class="standard"><label for="tpassword"><strong><fmt:message key="jsp.register.registration-form.pswd.field"/></strong></label></td>
+                            <td class="standard"><input type="password" name="password" id="tpassword" /></td>
                         </tr>
                         <tr>
-                            <%-- <td align=right class=standard><strong>Again to Confirm:</strong></td> --%>
-							<td align=right class=standard><strong><fmt:message key="jsp.register.registration-form.confirm.field"/></strong></td>
-                            <td class=standard><input type=password name="password_confirm"></td>
+                            <%-- <td align="right" class="standard"><strong>Again to Confirm:</strong></td> --%>
+							<td align="right" class="standard"><label for="tpassword_confirm"><strong><fmt:message key="jsp.register.registration-form.confirm.field"/></strong></label></td>
+                            <td class="standard"><input type="password" name="password_confirm" id="tpassword_confirm" /></td>
                         </tr>
                     </table>
                 </td>
@@ -143,10 +142,10 @@
     }
 %>
 
-        <input type=hidden name=step value="<%= RegisterServlet.PERSONAL_INFO_PAGE %>">
-        <input type=hidden name=token value="<%= token %>">
+        <input type="hidden" name="step" value="<%= RegisterServlet.PERSONAL_INFO_PAGE %>"/>
+        <input type="hidden" name="token" value="<%= token %>"/>
         
-        <%-- <P align=center><input type=submit name=submit value="Complete Registration"></P> --%>
-		<P align=center><input type=submit name=submit value="<fmt:message key="jsp.register.registration-form.complete.button"/>"></P>
+        <%-- <p align="center"><input type="submit" name="submit" value="Complete Registration"></p> --%>
+		<p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.register.registration-form.complete.button"/>" /></p>
     </form>
 </dspace:layout>

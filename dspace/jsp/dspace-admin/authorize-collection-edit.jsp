@@ -88,11 +88,10 @@
                parentlink="/dspace-admin"
                nocache="true">
 
-<table width=95%>
+  <table width="95%">
     <tr>
-      <td align=left>
-        <%-- <h1>Policies for Collection "<%= collection.getMetadata("name") %>" (hdl:<%= collection.getHandle() %>, DB ID <%= collection.getID() %>)</h1> --%>
-		<h1><fmt:message key="jsp.dspace-admin.authorize-collection-edit.policies">
+      <td align="left">
+            <h1><fmt:message key="jsp.dspace-admin.authorize-collection-edit.policies">
             <fmt:param><%= collection.getMetadata("name") %></fmt:param>
             <fmt:param>hdl:<%= collection.getHandle() %></fmt:param>
             <fmt:param><%= collection.getID() %></fmt:param>
@@ -104,27 +103,13 @@
     </tr>
   </table>
 
-
-    <P align="center">
-
-        <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method=POST>
-            <input type="hidden" name="collection_id" value="<%=collection.getID()%>" >
+ <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post"> 
+    <p align="center">
+            <input type="hidden" name="collection_id" value="<%=collection.getID()%>" />
             <%-- <input type="submit" name="submit_collection_add_policy" value="Add New"> --%>
-            <input type="submit" name="submit_collection_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>">
-        </form>
+            <input type="submit" name="submit_collection_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
     </p>
-
-
-    <table class="miscTable" align="center">
-        <tr>
-            <th class="oddRowOddCol"><strong>ID</strong></th>
-            <%-- <th class="oddRowEvenCol"><strong>Action</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
-            <%-- <th class="oddRowOddCol"><strong>Group</strong></th> --%>
-            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
-            <th class="oddRowEvenCol">&nbsp;</th>
-            <th class="oddRowOddCol">&nbsp;</th>
-        </tr>
+ </form>
 
 <%
     String row = "even";
@@ -134,30 +119,38 @@
     {
         ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
-        <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method=POST>
+      <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
+        <table class="miscTable" align="center" summary="Collection Policy Edit Form">
             <tr>
-                <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
-                <td class="<%= row %>RowEvenCol">
-                    <%= rp.getActionText() %>
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>
-                </td>
-                <td class="<%= row %>RowEvenCol">
-                    <input type="hidden" name="policy_id"     value="<%= rp.getID() %>">
-                    <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
-                    <%-- <input type="submit" name="submit_collection_edit_policy" value="Edit"> --%>
-                    <input type="submit" name="submit_collection_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <%-- <input type="submit" name="submit_collection_delete_policy" value="Delete"> --%>
-                    <input type="submit" name="submit_collection_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
-                </td>
+               <th class="oddRowOddCol"><strong>ID</strong></th>
+               <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
+               <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
+               <th class="oddRowEvenCol">&nbsp;</th>
+               <th class="oddRowOddCol">&nbsp;</th>
             </tr>
-        </form>
+
+            <tr>
+               <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
+               <td class="<%= row %>RowEvenCol">
+                    <%= rp.getActionText() %>
+               </td>
+               <td class="<%= row %>RowOddCol">
+                    <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>
+               </td>
+               <td class="<%= row %>RowEvenCol">
+                    <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
+                    <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
+                    <input type="submit" name="submit_collection_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
+               </td>
+               <td class="<%= row %>RowOddCol">
+                    <input type="submit" name="submit_collection_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+               </td>
+            </tr>
+       </table>
+     </form>
+
 <%
         row = (row.equals("odd") ? "even" : "odd");
     }
 %>
-    </table>
 </dspace:layout>

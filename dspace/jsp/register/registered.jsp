@@ -61,21 +61,20 @@
     EPerson eperson = (EPerson) request.getAttribute("eperson");
 %>
 
-
 <dspace:layout titlekey="jsp.register.registered.title">
 
-    <%-- <H1>Registration Complete</H1> --%>
-	<H1><fmt:message key="jsp.register.registered.title"/></H1>
+    <%-- <h1>Registration Complete</h1> --%>
+	<h1><fmt:message key="jsp.register.registered.title"/></h1>
     
-    <%-- <P>Thank you <%= eperson.getFirstName() %>,</P> --%>
-	<P><fmt:message key="jsp.register.registered.thank">
+    <%-- <p>Thank you <%= eperson.getFirstName() %>,</p> --%>
+	<p><fmt:message key="jsp.register.registered.thank">
         <fmt:param><%= eperson.getFirstName() %></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 
-    <%-- <P>You're now registered to use the DSpace system.  You can subscribe to
-    collections to receive e-mail updates about new items.</P> --%>
-	<P><fmt:message key="jsp.register.registered.info"/></P>
+    <%-- <p>You're now registered to use the DSpace system.  You can subscribe to
+    collections to receive e-mail updates about new items.</p> --%>
+	<p><fmt:message key="jsp.register.registered.info"/></p>
     
-    <%-- <P><A HREF="<%= request.getContextPath() %>/">Return to DSpace Home</A></P> --%>
-	<P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.general.return-home"/></A></P>
+    <%-- <p><a href="<%= request.getContextPath() %>/">Return to DSpace Home</a></p> --%>
+	<p><a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.general.return-home"/></a></p>
 </dspace:layout>

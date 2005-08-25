@@ -15,7 +15,7 @@ The API for programming the DSpace system.
 Briefly, DSpace consists of a three-layer architecture:
 <P>
 
-<table border=0 cellspacing=0 cellpadding=10>
+<table border="0" cellspacing=0 cellpadding=10>
   <tr>
     <td bgcolor="#fe9693" align="center"><strong>Application Layer</strong></td>
     <td><code>org.dspace.app.*</code></td>
@@ -53,12 +53,12 @@ Each of the layers and the packages that are part of them are described below.
 
 Presently, the application layer consists of:
 
-<UL><LI>The Web user interface</LI>
-<LI>The <A href="http://www.openarchives.org/OAI/openarchivesprotocol.html">Open Archives Protocol for Initiative Metadata Harvesting</A> implementation</LI>
-<LI>Item import and export tools</LI>
-<LI>The Media Filter tool, which is a batch tool that iterates through the bitstreams in DSpace, and applies filters to bitstreams of a particular format.  This can be used to e.g. generate image thumbnails, and extract full-text from documents for indexing.</LI>
-<LI>The METS tools -- currently just an exporter, which exports DSpace AIPs with the metadata stored in an XML METS file.  Soon a corresponding importer will be added too.</LI>
-</UL>
+<ul><li>The Web user interface</li>
+<li>The <A href="http://www.openarchives.org/OAI/openarchivesprotocol.html">Open Archives Protocol for Initiative Metadata Harvesting</A> implementation</li>
+<li>Item import and export tools</li>
+<li>The Media Filter tool, which is a batch tool that iterates through the bitstreams in DSpace, and applies filters to bitstreams of a particular format.  This can be used to e.g. generate image thumbnails, and extract full-text from documents for indexing.</li>
+<li>The METS tools -- currently just an exporter, which exports DSpace AIPs with the metadata stored in an XML METS file.  Soon a corresponding importer will be added too.</li>
+</ul>
 Since this and other applications are
 "customers" of DSpace, they do not need to have strictly defined public APIs.  Subsystems in the application layer should be sub-packages of
 <code>org.dspace.app</code>.  Subsystems in the application layer should not

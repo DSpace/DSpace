@@ -50,7 +50,7 @@
 		locbar="off"
 		titlekey="jsp.login.ldap.title">
 		
-    <table border=0 width="90%">
+    <table border="0" width="90%">
         <tr>
             <td align="left">
                 <h1><fmt:message key="jsp.login.ldap.heading"/></h1>

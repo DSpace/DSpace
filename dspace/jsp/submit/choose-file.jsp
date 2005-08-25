@@ -67,7 +67,7 @@
                titlekey="jsp.submit.choose-file.title"
                nocache="true">
 
-    <form method=post action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data">
+    <form method="post" action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data">
 
         <jsp:include page="/submit/progressbar.jsp">
             <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
@@ -75,46 +75,45 @@
             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-        <%-- <H1>Submit: Upload a File</H1> --%>
-		<H1><fmt:message key="jsp.submit.choose-file.heading"/></H1>
+        <%-- <h1>Submit: Upload a File</h1> --%>
+		<h1><fmt:message key="jsp.submit.choose-file.heading"/></h1>
     
-        <%-- <P>Please enter the name of
+        <%-- <p>Please enter the name of
         <%= (si.submission.hasMultipleFiles() ? "one of the files" : "the file" ) %> on your
         local hard drive corresponding to your item.  If you click "Browse...", a
         new window will appear in which you can locate and select the file on your
-        local hard drive. <dspace:popup page="/help/index.html#upload">(More Help...)</dspace:popup></P> --%>
+        local hard drive. <object><dspace:popup page="/help/index.html#upload">(More Help...)</dspace:popup></object></p> --%>
 
-		<P><fmt:message key="jsp.submit.choose-file.info1"/>
-		<dspace:popup page="/help/index.html#upload"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
+		<p><fmt:message key="jsp.submit.choose-file.info1"/>
+		<object><dspace:popup page="/help/index.html#upload"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>
         
-        <%-- <P class="submitFormHelp"><strong>Netscape users please note:</strong> By
+        <%-- <p class="submitFormHelp"><strong>Netscape users please note:</strong> By
         default, the window brought up by clicking "Browse..." will only display
         files of type HTML.  If the file you are uploading isn't an HTML file,
         you will need to select the option to display files of other types.
-        <dspace:popup page="/help/index.html#netscapeupload">Instructions for Netscape users</dspace:popup> are available.</P> --%>
-		<P class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info3"/>
-        <dspace:popup page="${helpPage}#netscapeupload"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup></P>
+        <object><dspace:popup page="/help/index.html#netscapeupload">Instructions for Netscape users</dspace:popup></object> are available.</p> --%>
+		<p class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info3"/>
+        <object><dspace:popup page="${helpPage}#netscapeupload"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup></object></p>
         
 <%-- FIXME: Collection-specific stuff should go here? --%>
-
-        <%-- <P class="submitFormHelp">Please also note that the DSpace system is
+        <%-- <p class="submitFormHelp">Please also note that the DSpace system is
         able to preserve the content of certain types of files better than other
         types.
-        <dspace:popup page="/help/formats.jsp">Information about file types</dspace:popup> and levels of
-        support for each are available.</P> --%>
+        <object><dspace:popup page="/help/formats.jsp">Information about file types</dspace:popup></object> and levels of
+        support for each are available.</p> --%>
         
-		<P class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info6"/>
-        <dspace:popup page="/help/formats.jsp"><fmt:message key="jsp.submit.choose-file.info7"/></dspace:popup>
-        </P>
+		<p class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info6"/>
+        <object><dspace:popup page="/help/formats.jsp"><fmt:message key="jsp.submit.choose-file.info7"/></dspace:popup></object>
+        </p>
     
-        <table border=0 align=center>
+        <table border="0" align="center">
             <tr>
                 <td class="submitFormLabel">
                     <%-- Document File: --%>
-					<fmt:message key="jsp.submit.choose-file.document"/>
+					<label for="tfile"><fmt:message key="jsp.submit.choose-file.document"/></label>
                 </td>
                 <td>
-                    <input type=file size=40 name="file">
+                    <input type="file" size="40" name="file" id="tfile" />
                 </td>
             </tr>
 <%
@@ -122,10 +121,10 @@
     {
 %>
             <tr>
-                <td colspan=2>&nbsp;</td>
+                <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
-                <td class="submitFormHelp" colspan=2>
+                <td class="submitFormHelp" colspan="2">
                     <%-- Please give a brief description of the contents of this file, for
                     example "Main article", or "Experiment data readings." --%>
 					<fmt:message key="jsp.submit.choose-file.info9"/>
@@ -133,8 +132,8 @@
             </tr>
             <tr>
                 <%-- <td class="submitFormLabel">File Description:</td> --%>
-				<td class="submitFormLabel"><fmt:message key="jsp.submit.choose-file.filedescr"/></td>
-                <td><input type=text name="description" size=40></td>
+				<td class="submitFormLabel"><label for="tdescription"><fmt:message key="jsp.submit.choose-file.filedescr"/></label></td>
+                <td><input type="text" name="description" id="tdescription" size="40"/></td>
             </tr>
 <%
     }
@@ -142,32 +141,30 @@
         </table>
         
         <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type=hidden name=step value="<%= SubmitServlet.CHOOSE_FILE %>">
+        <input type="hidden" name="step" value="<%= SubmitServlet.CHOOSE_FILE %>" />
     
-        <P>&nbsp;</P>
+        <p>&nbsp;</p>
 
         <center>
-            <table border=0 width=80%>
+            <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
-                    <td align>
-                        <!-- <input type=submit name=submit_prev value="&lt; Previous"> -->
-						<input type=submit name=submit_prev value="<fmt:message key="jsp.submit.general.previous"/>">
+                    <td>
+                        <!-- <input type="submit" name="submit_prev" value="&lt; Previous"> -->
+						<input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.general.previous"/>" />
                     </td>
                     <td>
-                        <!-- <input type=submit name=submit_next value="Next &gt;"> -->
-						<input type=submit name=submit_next value="<fmt:message key="jsp.submit.general.next"/>">
+                        <!-- <input type="submit" name="submit_next" value="Next &gt;"> -->
+						<input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.general.next"/>" />
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align=right>
-                        <!-- <input type=submit name=submit_cancel value="Cancel/Save"> -->
-						<input type=submit name=submit_cancel value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>">
+                    <td align="right">
+                        <!-- <input type="submit" name="submit_cancel" value="Cancel/Save"> -->
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
                     </td>
                 </tr>
             </table>
-        </center>
-    
-
+        </center>  
     </form>
 
 </dspace:layout>

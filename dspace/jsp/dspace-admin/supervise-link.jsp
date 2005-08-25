@@ -76,7 +76,7 @@
 
 <h3><fmt:message key="jsp.dspace-admin.supervise-link.choose"/></h3>
 
-<form method="post">
+<form method="post" action="">
 
 <table>
 <%-- Select the group to supervise --%>
@@ -102,7 +102,7 @@
         <td>
             <b><fmt:message key="jsp.dspace-admin.supervise-link.policy"/></b>
             <select name="PolicyType">
-                <option value="<%= Supervisor.POLICY_NONE %>" selected><fmt:message key="jsp.dspace-admin.supervise-link.policynone"/></option>
+                <option value="<%= Supervisor.POLICY_NONE %>" selected="selected"><fmt:message key="jsp.dspace-admin.supervise-link.policynone"/></option>
                 <option value="<%= Supervisor.POLICY_EDITOR %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyeditor"/></option>
                 <option value="<%= Supervisor.POLICY_OBSERVER %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyobserver"/></option>
             </select>
@@ -116,13 +116,13 @@
             <b><fmt:message key="jsp.dspace-admin.supervise-link.workspace"/></b>
             <br/><br/>
             <div align="left">
-            <table class=miscTable>
+            <table class="miscTable">
                 <tr>
-                    <th class=oddRowOddCol><fmt:message key="jsp.dspace-admin.supervise-link.id"/></th>
-                    <th class=oddRowEvenCol><fmt:message key="jsp.dspace-admin.supervise-link.submittedby"/></th>
-                    <th class=oddRowOddCol><fmt:message key="jsp.dspace-admin.supervise-link.title"/></th>
-                    <th class=oddRowEvenCol><fmt:message key="jsp.dspace-admin.supervise-link.submittedto"/></th>
-                    <th class=oddRowOddCol><fmt:message key="jsp.dspace-admin.supervise-link.select"/></th>
+                    <th class="odRowOddCol"><fmt:message key="jsp.dspace-admin.supervise-link.id"/></th>
+                    <th class="oddRowEvenCol"><fmt:message key="jsp.dspace-admin.supervise-link.submittedby"/></th>
+                    <th class="oddRowOddCol"><fmt:message key="jsp.dspace-admin.supervise-link.title"/></th>
+                    <th class="oddRowEvenCol"><fmt:message key="jsp.dspace-admin.supervise-link.submittedto"/></th>
+                    <th class="oddRowOddCol"><fmt:message key="jsp.dspace-admin.supervise-link.select"/></th>
                 </tr>
 <%
     String row = "even";

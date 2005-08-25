@@ -61,22 +61,21 @@
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace.in-archive.title">
 
-    <%--<H1>Thank You</H1>--%>
-    <H1><fmt:message key="jsp.mydspace.in-archive.heading1"/></H1>
+    <%--<h1>Thank You</h1>--%>
+    <h1><fmt:message key="jsp.mydspace.in-archive.heading1"/></h1>
 
-    <%--<P>The submission has been placed in the main archive.  It has been assigned
-    the following identifier:</P>--%>
-	<P><fmt:message key="jsp.mydspace.in-archive.text1"/></P>
+    <%--<p>The submission has been placed in the main archive.  It has been assigned
+    the following identifier:</p>--%>
+	<p><fmt:message key="jsp.mydspace.in-archive.text1"/></p>
+    <p><a href="<%= handle %>"><%= handle %></a></p>
 
-    <P><A HREF="<%= handle %>"><%= handle %></A></P>
+    <%--<p>Notification has been sent to the appropriate people.</p>--%>
+	<p><fmt:message key="jsp.mydspace.in-archive.text2"/></p>
 
-    <%--<P>Notification has been sent to the appropriate people.</P>--%>
-	<P><fmt:message key="jsp.mydspace.in-archive.text2"/></P>
-
-    <P align=center>
-        <A HREF="<%= request.getContextPath() %>/mydspace">
+    <p align="center">
+        <a href="<%= request.getContextPath() %>/mydspace">
             <%--Return to My DSpace--%>
 			<fmt:message key="jsp.mydspace.in-archive.return.link"/>
-        </A>
-    </P>
+        </a>
+    </p>
 </dspace:layout>

@@ -54,8 +54,8 @@
 <%
     String cc_license_url = (String) request.getParameter("license_url");
 %>
-<SCRIPT language="JavaScript">
+<script type="text/javascript">
 the_form = parent.document.getElementById("license_form");
 the_form.cc_license_url.value = "<%= cc_license_url %>";
 the_form.submit();
-</SCRIPT>
+</script>

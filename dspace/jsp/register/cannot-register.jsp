@@ -51,12 +51,12 @@
 
 <dspace:layout titlekey="jsp.register.cannot-register.title">
 
-    <%-- <H1>Cannot Register</H1> --%>
-	<H1><fmt:message key="jsp.register.cannot-register.title"/></H1>
+    <%-- <h1>Cannot Register</h1> --%>
+	<h1><fmt:message key="jsp.register.cannot-register.title"/></h1>
     
-    <%-- <P>The configuration of this DSpace site does not allow you to register
-    yourself.  Please feel free to contact us with any queries.</P> --%>
-	<P><fmt:message key="jsp.register.cannot-register.msg"/></P>
+    <%-- <p>The configuration of this DSpace site does not allow you to register
+    yourself.  Please feel free to contact us with any queries.</p> --%>
+	<p><fmt:message key="jsp.register.cannot-register.msg"/></p>
     
     <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

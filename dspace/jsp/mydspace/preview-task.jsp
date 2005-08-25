@@ -72,59 +72,47 @@
                titlekey="jsp.mydspace.preview-task.title"
                nocache="true">
 
-    <%-- <H1>Preview Task</H1> --%>
-	<H1><fmt:message key="jsp.mydspace.preview-task.title"/></H1>
+	<h1><fmt:message key="jsp.mydspace.preview-task.title"/></h1>
     
 <%
     if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP1POOL)
     {
 %>
-    <%-- <P>The following item has been submitted to collection
-    <strong><%= collection.getMetadata("name") %></strong>.  In order to
-    accept the task of reviewing this item, please click "Accept This Task" below.</P> --%>
-	<P><fmt:message key="jsp.mydspace.preview-task.text1"> 
+	<p><fmt:message key="jsp.mydspace.preview-task.text1"> 
         <fmt:param><%= collection.getMetadata("name") %></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 <%
     }
     else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP2POOL)
     {
 %>    
-    <%-- <P>The following item has been submitted to collection
-    <strong><%= collection.getMetadata("name") %></strong>.  In order to
-    accept the task of checking this item, please click "Accept This Task" below.</P> --%>
-	<P><fmt:message key="jsp.mydspace.preview-task.text3"> 
+	<p><fmt:message key="jsp.mydspace.preview-task.text3"> 
         <fmt:param><%= collection.getMetadata("name") %></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 <%
     }
     else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP3POOL)
     {
 %>
-    <%-- <P>The following item has been accepted for inclusion in collection
-    <strong><%= collection.getMetadata("name") %></strong>.  In order to
-    accept the task of the final edit of this item, please click "Accept This Task" below.</P> --%>
-	<P><fmt:message key="jsp.mydspace.preview-task.text4"> 
+	<p><fmt:message key="jsp.mydspace.preview-task.text4"> 
         <fmt:param><%= collection.getMetadata("name") %></fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 <%
     }
 %>
     
     <dspace:item item="<%= item %>" />
 
-    <form action="<%= request.getContextPath() %>/mydspace" method=POST>
-        <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>">
-        <input type="hidden" name="step" value="<%= MyDSpaceServlet.PREVIEW_TASK_PAGE %>">
-        <table border=0 width=90% cellpadding=10 align=center>
+    <form action="<%= request.getContextPath() %>/mydspace" method="post">
+        <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>"/>
+        <input type="hidden" name="step" value="<%= MyDSpaceServlet.PREVIEW_TASK_PAGE %>"/>
+        <table border="0" width="90%" cellpadding="10" align="center">
             <tr>
-                <td align=left>
-                    <%-- <input type="submit" name="submit_start" value="Accept This Task"> --%>
-					<input type="submit" name="submit_start" value="<fmt:message key="jsp.mydspace.preview-task.accept.button"/>">
+                <td align="left">
+		    <input type="submit" name="submit_start" value="<fmt:message key="jsp.mydspace.preview-task.accept.button"/>" />
                 </td>
-                <td align=right>
-                    <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.general.cancel"/>">
+                <td align="right">
+	  	    <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.general.cancel"/>" />
                 </td>
             </tr>
         </table>

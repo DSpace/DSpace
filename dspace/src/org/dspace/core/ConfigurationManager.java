@@ -603,13 +603,13 @@ public class ConfigurationManager
     /**
      * Command-line interface for running configuration tasks. Possible
      * arguments:
-     * <UL>
-     * <LI><code>-installTemplates</code> processes and installs the
-     * configuration file templates for other tools</LI>
-     * <LI><code>-property name</code> prints the value of the property
+     * <ul>
+     * <li><code>-installTemplates</code> processes and installs the
+     * configuration file templates for other tools</li>
+     * <li><code>-property name</code> prints the value of the property
      * <code>name</code> from <code>dspace.cfg</code> to the standard
-     * output. If the property does not exist, nothing is written.</LI>
-     * </UL>
+     * output. If the property does not exist, nothing is written.</li>
+     * </ul>
      * 
      * @param argv
      *            command-line arguments

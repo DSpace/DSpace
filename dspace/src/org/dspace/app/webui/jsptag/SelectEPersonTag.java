@@ -50,24 +50,24 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.dspace.eperson.EPerson;
 
 /**
- * <P>
+ * <p>
  * Tag for producing an e-person select widget in a form. Somewhat analogous to
  * the HTML SELECT element. An input field is produced with a button which pops
  * up a window from which e-people can be selected. Selected e-epeople are added
  * to the field in the form. If the selector is for multiple e-people, a 'remove
  * selected from list' button is also added.
- * </P>
+ * </p>
  * 
- * <P>
+ * <p>
  * On any form that has a selecteperson tag (only one allowed per page), you
  * need to include the following Javascript code on all of the submit buttons,
  * to ensure that the e-people IDs are posted and that the popup window is
  * closed:
- * </P>
+ * </p>
  * 
- * <P>
+ * <p>
  * <code>onclick="javascript:finishEPerson();"</code>
- * </P>
+ * </p>
  * 
  * @author Robert Tansley
  * @version $Revision$
@@ -137,31 +137,36 @@ public class SelectEPersonTag extends TagSupport
             HttpServletRequest req = (HttpServletRequest) pageContext
                     .getRequest();
 
-            out
-                    .print("<table><tr><td colspan=2><select multiple name=\"eperson_id\" SIZE=");
+            out.print("<table><tr><td colspan=\"2\"><select multiple=\"multiple\" name=\"eperson_id\" size=\"");
             out.print(multiple ? "10" : "1");
-            out.println(">");
-
+            out.println("\">");
+            // ensure that if no eperson is selected that a blank option is displayed - xhtml compliance 
+            if (epeople == null || epeople.length == 0)
+            {
+              out.print("<option/>");
+            }
+             
             if (epeople != null)
             {
                 for (int i = 0; i < epeople.length; i++)
                 {
-                    out.print("<OPTION VALUE=\"" + epeople[i].getID() + "\">");
+                    out.print("<option value=\"" + epeople[i].getID() + "\">");
                     out.print(epeople[i].getFullName() + " ("
                             + epeople[i].getEmail() + ")");
-                    out.println("</OPTION>");
+                    out.println("</option>");
                 }
             }
-
-            out.print("</SELECT></TD>");
+            // add blank option value if no person selected to ensure that code is xhtml compliant 
+            //out.print("<option/>");
+            out.print("</select></td>");
 
             if (multiple)
             {
-                out.print("</TR><TR><TD width=\"50%\" align=\"center\">");
+                out.print("</tr><tr><td width=\"50%\" align=\"center\">");
             }
             else
-            {
-                out.print("<TD>");
+            {   
+                out.print("<td>");
             }
 
             String p = (multiple ? 
@@ -172,18 +177,18 @@ public class SelectEPersonTag extends TagSupport
             out.print("<input type=\"button\" value=\"" + p
                     + "\" onclick=\"javascript:popup_window('"
                     + req.getContextPath() + "/tools/eperson-list?multiple="
-                    + multiple + "', 'eperson_popup');\">");
+                    + multiple + "', 'eperson_popup');\" />");
 
             if (multiple)
             {
-                out.print("</TD><TD width=\"50%\" align=\"center\">");
+                out.print("</td><td width=\"50%\" align=\"center\">");
                 out.print("<input type=\"button\" value=\""
                                         + LocaleSupport.getLocalizedMessage(pageContext,
                                                 "org.dspace.app.webui.jsptag.SelectEPersonTag.removeSelected")
-                                        + "\" onclick=\"javascript:removeSelected(window.document.forms[0].eperson_id);\">");
+                                        + "\" onclick=\"javascript:removeSelected(window.document.forms[0].eperson_id);\"/>");
             }
 
-            out.println("</TD></TR></TABLE>");
+            out.println("</td></tr></table>");
         }
         catch (IOException ie)
         {

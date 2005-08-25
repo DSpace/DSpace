@@ -50,12 +50,12 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.login.logged-out.title">
+    <%-- <h1>Logged Out</h1> --%>
+    <h1><fmt:message key="jsp.login.logged-out.title"/></h1>
 
-    <%-- <H1>Logged Out</H1> --%>
-    <H1><fmt:message key="jsp.login.logged-out.title"/></H1>
+    <%-- <p>Thank you for remembering to log out!</p> --%>
+    <p><fmt:message key="jsp.login.logged-out.thank"/></p>
+    <%-- <p><a href="<%= request.getContextPath() %>/">Go to DSpace Home</a></p> --%>
+    <p><a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a></p>
 
-    <%-- <P>Thank you for remembering to log out!</P> --%>
-    <P><fmt:message key="jsp.login.logged-out.thank"/></P>
-    <%-- <P><A HREF="<%= request.getContextPath() %>/">Go to DSpace Home</A></P> --%>
-    <P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A></P>
 </dspace:layout>

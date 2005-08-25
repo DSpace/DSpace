@@ -61,16 +61,12 @@
 
 
 <dspace:layout titlekey="jsp.register.profile-updated.title">
-
-
-    <%-- <H1>Profile Updated</H1> --%>
-	<H1><fmt:message key="jsp.register.profile-updated.title"/></H1>
-
-    <%-- <P>Thank you, your profile information
+    <%-- <h1>Profile Updated</h1> --%>
+	<h1><fmt:message key="jsp.register.profile-updated.title"/></h1>
+    <%-- <p>Thank you, your profile information
     <%= (passwordUpdated ? "and password have" : "has") %>
-    been updated.</P> --%>
-    
-	<P>
+    been updated.</p> --%>   
+	<p>
 <% if(passwordUpdated)
    { %>
     <fmt:message key="jsp.register.profile-updated.info1"/>
@@ -79,8 +75,8 @@
    { %>
     <fmt:message key="jsp.register.profile-updated.info2"/>
 <% } %>
-    </P>
+    </p>
 
-    <%-- <P><A HREF="<%= request.getContextPath() %>/">Return to DSpace Home</A></P> --%>
-	<P><A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.general.return-home"/></A></P>
+    <%-- <p><a href="<%= request.getContextPath() %>/">Return to DSpace Home</a></p> --%>
+	<p><a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.register.general.return-home"/></a></p>
 </dspace:layout>

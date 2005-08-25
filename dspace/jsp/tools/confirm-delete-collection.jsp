@@ -65,13 +65,13 @@
 		parentlink="/tools"
 		parenttitlekey="jsp.administer">
 
-    <%-- <H1>Delete Collection: <%= collection.getID() %></H1> --%>
+    <%-- <h1>Delete Collection: <%= collection.getID() %></h1> --%>
     <h1><fmt:message key="jsp.tools.confirm-delete-collection.heading">
         <fmt:param><%= collection.getID() %></fmt:param>
     </fmt:message></h1>
     
-    <%-- <P>Are you sure the collection <strong><%= collection.getMetadata("name") %></strong>
-    should be deleted?  This will delete:</P> --%>
+    <%-- <p>Are you sure the collection <strong><%= collection.getMetadata("name") %></strong>
+    should be deleted?  This will delete:</p> --%>
     <p><fmt:message key="jsp.tools.confirm-delete-collection.confirm">
         <fmt:param><%= collection.getMetadata("name") %></fmt:param>
     </fmt:message></p>
@@ -82,19 +82,19 @@
         <li><fmt:message key="jsp.tools.confirm-delete-collection.info3"/></li>
     </ul>
     
-    <form method=POST>
-        <input type="hidden" name="collection_id" value="<%= collection.getID() %>">
-        <input type="hidden" name="community_id" value="<%= community.getID() %>">
-        <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_DELETE_COLLECTION %>">
+    <form method="post" action="">
+        <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
+        <input type="hidden" name="community_id" value="<%= community.getID() %>" />
+        <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_DELETE_COLLECTION %>" />
 
         <center>
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.delete"/>">
+                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.delete"/>"/>
                     </td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>"/>
                     </td>
                 </tr>
             </table>

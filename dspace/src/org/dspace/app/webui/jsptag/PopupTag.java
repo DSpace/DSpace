@@ -98,11 +98,11 @@ public class PopupTag extends BodyTagSupport
          * The output is the following, with PAGE and TEXT replaced
          * appropriately:
          * 
-         * <SCRIPT TYPE="text/javascript"> <!-- document.write(' <A HREF="#"
+         * <script type="text/javascript"> <!-- document.write(' <a href="#"
          * onClick="var popupwin =
          * window.open(\'PAGE\',\'dspacepopup\',\'height=600,width=550,resizable,scrollbars\');popupwin.focus();return
-         * false;">TEXT <\/a>'); // --> </SCRIPT> <NOSCRIPT> <a href="PAGE"
-         * target="dspacepopup">TEXT </a>. </NOSCRIPT>
+         * false;">TEXT <\/a>'); // --> </script> <noscript> <a href="PAGE"
+         * target="dspacepopup">TEXT </a>. </noscript>
          * 
          * The script writes a Javascripted link which opens the popup window
          * 600x550, or brings it to the front if it's already open. If
@@ -116,14 +116,14 @@ public class PopupTag extends BodyTagSupport
         HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
         String actualPage = hrq.getContextPath() + page;
 
-        String html = "<SCRIPT TYPE=\"text/javascript\">\n"
+        String html = "<script type=\"text/javascript\">\n"
                 + "<!-- Javascript starts here\n"
-                + "document.write('<A HREF=\"#\" onClick=\"var popupwin = window.open(\\'"
+                + "document.write('<a href=\"#\" onClick=\"var popupwin = window.open(\\'"
                 + actualPage
                 + "\\',\\'dspacepopup\\',\\'height=600,width=550,resizable,scrollbars\\');popupwin.focus();return false;\">"
                 + linkText + "<\\/a>');\n" + "// -->\n"
-                + "</SCRIPT><NOSCRIPT><A HREF=\"" + actualPage
-                + "\" TARGET=\"dspacepopup\">" + linkText + "</A></NOSCRIPT>";
+                + "</script><noscript><a href=\"" + actualPage
+                + "\" target=\"dspacepopup\">" + linkText + "</a></noscript>";
 
         try
         {

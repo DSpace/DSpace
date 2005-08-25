@@ -73,14 +73,14 @@
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.workspace.ws-main.title">
 
-    <table width="100%" border=0>
+    <table width="100%" border="0">
         <tr>
-            <td align=left>
+            <td align="left">
                 <h1>
                     <fmt:message key="jsp.workspace.ws-main.wsitem"/>
                 </h1>
             </td>
-            <td align=right class=standard>
+            <td align="right" class="standard">
                 <dspace:popup page="/help/index.html#mydspace"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
@@ -102,23 +102,23 @@
 		}
 %>
 
-    <P><strong><a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a></strong></P>
+    <p><strong><a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a></strong></p>
 
-	<P><fmt:message key="jsp.workspace.ws-main.submitmsg"/> 
-    <%= workspaceItem.getCollection().getMetadata("name") %></P>
+	<p><fmt:message key="jsp.workspace.ws-main.submitmsg"/> 
+    <%= workspaceItem.getCollection().getMetadata("name") %></p>
 
-    <table class=miscTable align=center>
+    <table class="miscTable" align="center">
         <tr>
-            <th class=oddRowOddCol><fmt:message key="jsp.workspace.ws-main.optionheading"/></th>
-            <th class=oddRowEvenCol><fmt:message key="jsp.workspace.ws-main.descheading"/></th>
+            <th class="oddRowOddCol"><fmt:message key="jsp.workspace.ws-main.optionheading"/></th>
+            <th class="oddRowEvenCol"><fmt:message key="jsp.workspace.ws-main.descheading"/></th>
         </tr>
         <tr>
             <td class="evenRowOddCol" align="center">
-                <form action="<%= request.getContextPath() %>/mydspace" method="POST">
-                <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
-                <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
-                <input type="hidden" name="resume" value="<%= workspaceItem.getID() %>"/>
-                <input type="submit" name="submit_resume" value="<fmt:message key="jsp.workspace.ws-main.button.edit"/>"/>
+                <form action="<%= request.getContextPath() %>/mydspace" method="post">
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
+                    <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
+                    <input type="hidden" name="resume" value="<%= workspaceItem.getID() %>"/>
+                    <input type="submit" name="submit_resume" value="<fmt:message key="jsp.workspace.ws-main.button.edit"/>"/>
                 </form>
             </td>
             <td class="evenRowEvenCol">
@@ -129,8 +129,8 @@
         <tr>
             <td class="oddRowOddCol" align="center">
                 <form action="<%= request.getContextPath() %>/view-workspaceitem" method="post">
-                <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
-                <input type="submit" name="submit_view" value="<fmt:message key="jsp.workspace.ws-main.button.view"/>"/>
+                   <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
+                   <input type="submit" name="submit_view" value="<fmt:message key="jsp.workspace.ws-main.button.view"/>"/>
                 </form>
             </td>
             <td class="oddRowEvenCol">
@@ -141,9 +141,9 @@
         <tr>
             <td class="evenRowOddCol" align="center">
                 <form action="<%= request.getContextPath() %>/mydspace" method="post">
-                <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
-                <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
-                <input type="submit" name="submit_delete" value="<fmt:message key="jsp.workspace.ws-main.button.remove"/>"/>
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
+                    <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.workspace.ws-main.button.remove"/>"/>
                 </form>
             </td>
             <td class="evenRowEvenCol">

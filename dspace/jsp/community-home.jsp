@@ -104,34 +104,33 @@
 %>
 
 <dspace:layout locbar="commLink" title="<%= name %>">
-
-<table border=0 cellpadding=5 width=100%>
+  <table border="0" cellpadding="5" width="100%">
     <tr>
-      <td width=100%>
-        <H1><%= name %></H1>
-		<H3><fmt:message key="jsp.community-home.heading1"/></H3>
+      <td width="100%">
+        <h1><%= name %></h1>
+		<h3><fmt:message key="jsp.community-home.heading1"/></h3>
       </td>
-      <td valign=top>
+      <td valign="top">
 <%  if (logo != null) { %>
-        <img alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>">
+        <img alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
 <% } %></td>
     </tr>
   </table>
 
 
   <%-- Search/Browse --%>
-  <form method=GET>
-    <table class=miscTable align=center>
+  <form method="get" action="">
+    <table class="miscTable" align="center" summary="This table allows you to search through all communities held in the repository">
       <tr>
-        <td class="evenRowEvenCol" colspan=2>
+        <td class="evenRowEvenCol" colspan="2">
           <table>
             <tr>
               <td class="standard">
                 <%--<small><strong>In:</strong></small>&nbsp;<select name="location">--%>
-				<small><strong><fmt:message key="jsp.general.location"/></strong></small>&nbsp;<select name="location">
-                  <%--<option value="/">All of DSpace</option>--%>
-				  <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                  <option selected value="<%= community.getHandle() %>"><%= name %></option>
+                <small><label for="tlocation"><strong><fmt:message key="jsp.general.location"/></strong></label></small>&nbsp;<select name="location" id="tlocation"> 
+                 <%--<option value="/">All of DSpace</option>--%>
+				 <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
+                 <option selected="selected" value="<%= community.getHandle() %>"><%= name %></option>
 <%
     for (int i = 0; i < collections.length; i++)
     {
@@ -152,13 +151,13 @@
               </td>
             </tr>
             <tr>
-              <td class="standard" align=center>
-                <small><fmt:message key="jsp.general.searchfor"/>&nbsp;</small><input type="text" name="query">&nbsp;<input type="submit" name="submit_search" value="<fmt:message key="jsp.general.go"/>"> 
+              <td class="standard" align="center">
+                <small><label for="tquery"><strong><fmt:message key="jsp.general.searchfor"/>&nbsp;</strong></label></small><input type="text" name="query" id="tquery" />&nbsp;<input type="submit" name="submit_search" value="<fmt:message key="jsp.general.go"/>" /> 
 			  </td>
             </tr>
             <tr>
-              <td align=center class="standard">
-                <small><fmt:message key="jsp.general.orbrowse"/>&nbsp;</small><input type="submit" name="submit_titles" value="<fmt:message key="jsp.general.titles.button"/>">&nbsp;<input type="submit" name="submit_authors" value="<fmt:message key="jsp.general.authors.button"/>">&nbsp;<input type="submit" name="submit_dates" value="<fmt:message key="jsp.general.date.button"/>">
+              <td align="center" class="standard">
+                <small><fmt:message key="jsp.general.orbrowse"/>&nbsp;</small><input type="submit" name="submit_titles" value="<fmt:message key="jsp.general.titles.button"/>" />&nbsp;<input type="submit" name="submit_authors" value="<fmt:message key="jsp.general.authors.button"/>" />&nbsp;<input type="submit" name="submit_dates" value="<fmt:message key="jsp.general.date.button"/>" />
 			  </td>
             </tr>
           </table>
@@ -174,20 +173,19 @@
     {
 %>
 
-        <%-- <H2>Collections in this community</H2> --%>
-		<H2><fmt:message key="jsp.community-home.heading2"/></H2>
-   
-        <UL class="collectionListItem">
+        <%-- <h2>Collections in this community</h2> --%>
+		<h2><fmt:message key="jsp.community-home.heading2"/></h2>  
+        <ul class="collectionListItem">
 <%
         for (int i = 0; i < collections.length; i++)
         {
 %>
-    <LI>
+    <li>
 	    <table>
 	    <tr>
 	    <td>
-	      <A HREF="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>">
-	      <%= collections[i].getMetadata("name") %></A>
+	      <a href="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>">
+	      <%= collections[i].getMetadata("name") %></a>
 <%
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
             {
@@ -199,23 +197,23 @@
 	    </td>
 	    <% if (remove_button) { %>
 	    <td>
-	      <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
-	          <input type="hidden" name="parent_community_id" value="<%= community.getID() %>">
-	          <input type="hidden" name="community_id" value="<%= community.getID() %>">
-	          <input type="hidden" name="collection_id" value="<%= collections[i].getID() %>">
-	          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COLLECTION%>">
-	          <input type="image" src="<%= request.getContextPath() %>/image/remove.gif">
+	      <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
+	          <input type="hidden" name="parent_community_id" value="<%= community.getID() %>" />
+	          <input type="hidden" name="community_id" value="<%= community.getID() %>" />
+	          <input type="hidden" name="collection_id" value="<%= collections[i].getID() %>" />
+	          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COLLECTION%>" />
+	          <input type="image" src="<%= request.getContextPath() %>/image/remove.gif" />
 	      </form>
 	    </td>
 	    <% } %>
 	    </tr>
 	    </table>
-      <P class="collectionDescription"><%= collections[i].getMetadata("short_description") %></P>
-    </LI>
+      <p class="collectionDescription"><%= collections[i].getMetadata("short_description") %></p>
+    </li>
 <%
         }
 %>
-  </UL>
+  </ul>
 <%
     }
 %>
@@ -224,20 +222,20 @@
     if (subcommunities.length != 0)
     {
 %>
-        <%--<H2>Sub-communities within this community</H2>--%>
-		<H2><fmt:message key="jsp.community-home.heading3"/><H2>
+        <%--<h2>Sub-communities within this community</h2>--%>
+		<h2><fmt:message key="jsp.community-home.heading3"/></h2>
    
-        <UL class="collectionListItem">
+        <ul class="collectionListItem">
 <%
         for (int j = 0; j < subcommunities.length; j++)
         {
 %>
-            <LI>
+            <li>
 			    <table>
 			    <tr>
 			    <td>
-	                <A HREF="<%= request.getContextPath() %>/handle/<%= subcommunities[j].getHandle() %>">
-	                <%= subcommunities[j].getMetadata("name") %></A>
+	                <a href="<%= request.getContextPath() %>/handle/<%= subcommunities[j].getHandle() %>">
+	                <%= subcommunities[j].getMetadata("name") %></a>
 <%
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
@@ -249,67 +247,69 @@
 			    </td>
 	    		<% if (remove_button) { %>
 			    <td>
-	                <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
-			          <input type="hidden" name="parent_community_id" value="<%= community.getID() %>">
-			          <input type="hidden" name="community_id" value="<%= subcommunities[j].getID() %>">
-			          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COMMUNITY%>">
-	                  <input type="image" src="<%= request.getContextPath() %>/image/remove.gif">
+	                <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
+			          <input type="hidden" name="parent_community_id" value="<%= community.getID() %>" />
+			          <input type="hidden" name="community_id" value="<%= subcommunities[j].getID() %>" />
+			          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COMMUNITY%>" />
+	                  <input type="image" src="<%= request.getContextPath() %>/image/remove.gif" />
 	                </form>
 			    </td>
 	    		<% } %>
 			    </tr>
 			    </table>
-                <P class="collectionDescription"><%= subcommunities[j].getMetadata("short_description") %></P>
-            </LI>
+                <p class="collectionDescription"><%= subcommunities[j].getMetadata("short_description") %></p>
+            </li>
 <%
         }
 %>
-        </UL>
+        </ul>
 <%
     }
 %>
 
-  <P class="copyrightText"><%= copyright %></P>
+  <p class="copyrightText"><%= copyright %></p>
 
   <dspace:sidebar>
     <% if(editor_button || add_button)  // edit button(s)
     { %>
-    <table class=miscTable align=center>
+    <table class="miscTable" align="center">
 	  <tr>
-	    <td class="evenRowEvenCol" colspan=2>
+	    <td class="evenRowEvenCol" colspan="2">
 	      <table>
             <tr>
-              <th class="standard">
+              <th id="t1" class="standard">
                  <%--<strong>Admin Tools</strong>--%>
 				 <strong><fmt:message key="jsp.admintools"/></strong>
               </th>
             </tr>
             <tr>
-              <td class="standard" align="center">
+              <td headers="t1" class="standard" align="center">
              <% if(editor_button) { %>
-	            <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
-		          <input type="hidden" name="community_id" value="<%= community.getID() %>">
-		          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COMMUNITY%>">
-                  <%--<input type="submit" value="Edit...">--%>
-				  <input type="submit" value="<fmt:message key="jsp.general.edit.button"/>">
+	            <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
+		          <input type="hidden" name="community_id" value="<%= community.getID() %>" />
+		          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COMMUNITY%>" />
+                  <%--<input type="submit" value="Edit..." />--%>
+                  <input type="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
                 </form>
              <% } %>
              <% if(add_button) { %>
-				<form method=POST action="<%=request.getContextPath()%>/tools/collection-wizard">
-                    <input type="hidden" name="community_id" value="<%= community.getID() %>">
-	   			    <input type="submit" value="<fmt:message key="jsp.community-home.create1.button"/>">
+
+				<form method="post" action="<%=request.getContextPath()%>/tools/collection-wizard">
+		     		<input type="hidden" name="community_id" value="<%= community.getID() %>" />
+                    <input type="submit" value="<fmt:message key="jsp.community-home.create1.button"/>" />
                 </form>
-                <form method=POST action="<%=request.getContextPath()%>/tools/edit-communities">
-                    <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY%>">
-                    <input type="hidden" name="parent_community_id" value="<%= community.getID() %>">
-                    <%--<input type="submit" name="submit" value="Create Sub-community">--%>
-					<input type="submit" name="submit" value="<fmt:message key="jsp.community-home.create2.button"/>">
+                
+                <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
+                    <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY%>" />
+                    <input type="hidden" name="parent_community_id" value="<%= community.getID() %>" />
+                    <%--<input type="submit" name="submit" value="Create Sub-community" />--%>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.community-home.create2.button"/>" />
                  </form>
              <% } %>
               </td>
             </tr>
             <tr>
-              <td class="standard" align="center">
+              <td headers="t1" class="standard" align="center">
                  <dspace:popup page="/help/site-admin.html"><fmt:message key="jsp.adminhelp"/></dspace:popup>
               </td>
             </tr>
@@ -318,11 +318,7 @@
       </tr>
     </table>
     <% } %>
-
-
-
-	<H3><fmt:message key="jsp.community-home.recentsub"/></H3>
-    
+	<h3><fmt:message key="jsp.community-home.recentsub"/></h3>    
 <%
     for (int i = 0; i < lastSubmittedTitles.length; i++)
     {
@@ -331,16 +327,16 @@
     		: Utils.addEntities(lastSubmittedTitles[i]));
     		
 %>
-    <P class="recentItem"><A HREF="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= displayTitle %></A></P>
+    <p class="recentItem"><a href="<%= request.getContextPath() %><%= lastSubmittedURLs[i] %>"><%= displayTitle %></a></p>
 <%
   }
 %>
-    <P>&nbsp;</P>
+    <p>&nbsp;</p>
 
     <%= sidebar %>
 
   </dspace:sidebar>
 
 
-
 </dspace:layout>
+

@@ -91,11 +91,12 @@
         context.abort();
     }
 %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
 <title>
 	<fmt:message key="jsp.help.formats.title"/></title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <link rel="stylesheet" href="../styles.css.jsp" type="text/css"/>
 </head>
 <body class="help">
@@ -116,7 +117,7 @@
     <%-- <td class="leftAlign"><a name="policy"></a><strong>FORMAT SUPPORT POLICY</strong></td> --%>
     <td class="leftAlign"><a name="policy"></a><strong><fmt:message key="jsp.help.formats.policy"/></strong></td>
     <%-- <td class="rightAlign"><a href="#top" align="right">top</a></td> --%>
-    <td class="rightAlign"><a href="#top" align="right"><fmt:message key="jsp.help.formats.top"/></a></td>
+    <td class="rightAlign"><a href="#top"><fmt:message key="jsp.help.formats.top"/></a></td>
     </tr>
 </table>
 <%-- <p><i>(Your Format Support Policy Here)</i></p> --%>
@@ -127,20 +128,20 @@
     <%-- <td class="leftAlign"><a name="formats"></a><strong>FORMAT SUPPORT LEVELS</strong></td> --%>
     <td class="leftAlign"><a name="formats"></a><strong><fmt:message key="jsp.help.formats.support-levels"/></strong></td>
     <%-- <td class="rightAlign"><a href="#top" align="right">top</a></td> --%>
-    <td class="rightAlign"><a href="#top" align="right"><fmt:message key="jsp.help.formats.top"/></a></td>
+    <td class="rightAlign"><a href="#top"><fmt:message key="jsp.help.formats.top"/></a></td>
     </tr>
 </table>
 
-<table class="formats" border="0">
+<table class="formats" border="0" summary="List of formats">
     <tr>
         <%-- <th align="left"><strong>Name</strong></th> --%>
-        <th align="left"><strong><fmt:message key="jsp.help.formats.name"/></strong></th>
+        <th id="t1" align="left"><strong><fmt:message key="jsp.help.formats.name"/></strong></th>
         <%-- <th align="left"><strong>Extensions</strong></th> --%>
-        <th align="left"><strong><fmt:message key="jsp.help.formats.extensions"/></strong></th>        
+        <th id="t2" align="left"><strong><fmt:message key="jsp.help.formats.extensions"/></strong></th>        
         <%-- <th align="left"><strong>MIME Type</strong></th> --%>
-        <th align="left"><strong><fmt:message key="jsp.help.formats.mime"/></strong></th>
+        <th id="t3" align="left"><strong><fmt:message key="jsp.help.formats.mime"/></strong></th>
         <%-- <th align="left"><strong>Support Level</strong></th> --%>
-        <th align="left"><strong><fmt:message key="jsp.help.formats.support"/></strong></th>
+        <th id="t4" align="left"><strong><fmt:message key="jsp.help.formats.support"/></strong></th>
     </tr>
 
 <%
@@ -162,10 +163,10 @@
         }
 %>
            <tr>
-                <td><%= formats[i].getShortDescription() %></td>
-                <td><%= extValue %></td>
-                <td><%= formats[i].getMIMEType() %></td>
-                <td>
+                <td headers="t1"><%= formats[i].getShortDescription() %></td>
+                <td headers="t2"><%= extValue %></td>
+                <td headers="t3"><%= formats[i].getMIMEType() %></td>
+                <td headers="t4">
                 <%
                     if(formats[i].getSupportLevel() == 2)
                     {
@@ -193,15 +194,15 @@
     <%-- <td class="leftAlign"><a name="notlisted"></a><strong>WHAT TO DO IF YOUR FORMAT ISN'T LISTED</strong></td> --%>
     <td class="leftAlign"><a name="notlisted"></a><strong><fmt:message key="jsp.help.formats.whattodo"/></strong></td>
     <%-- <td class="rightAlign"><a href="#top" align="right">top</a></td> --%>
-    <td class="rightAlign"><a href="#top" align="right"><fmt:message key="jsp.help.formats.top"/></a></td>
+    <td class="rightAlign"><a href="#top"><fmt:message key="jsp.help.formats.top"/></a></td>
     </tr>
 </table>
 <p>
 <%-- Please contact your <a href="#" onClick="javascript:window.open('../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')">DSpace Administrator</a>
 if you have questions about a particular format. --%>
-<fmt:message key="jsp.help.formats.contact1"/> <a href="#" onClick="javascript:window.open('../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')"><fmt:message key="jsp.help.formats.contact2"/></a>
+<fmt:message key="jsp.help.formats.contact1"/> <a href="#" onclick="javascript:window.open('../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')"><fmt:message key="jsp.help.formats.contact2"/></a>
 <fmt:message key="jsp.help.formats.contact3"/>
 </p>
 <p>&nbsp;</p>
 </body>
-</html
+</html>

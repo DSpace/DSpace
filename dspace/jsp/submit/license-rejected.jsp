@@ -51,21 +51,21 @@
 
 <dspace:layout titlekey="jsp.submit.license-rejected.title">
 
-    <%-- <H1>Submit: License Rejected</H1> --%>
-	<H1><fmt:message key="jsp.submit.license-rejected.heading"/></H1>
+    <%-- <h1>Submit: License Rejected</h1> --%>
+	<h1><fmt:message key="jsp.submit.license-rejected.heading"/></h1>
     
-    <%-- <P>You have chosen not to grant the license to distribute your submission
+    <%-- <p>You have chosen not to grant the license to distribute your submission
     via the DSpace system.  Your submission has not been deleted and can be
-    accessed from the My DSpace page.</P> --%>
-	<P><fmt:message key="jsp.submit.license-rejected.info1"/></P>
+    accessed from the My DSpace page.</p> --%>
+	<p><fmt:message key="jsp.submit.license-rejected.info1"/></p>
     
-    <%-- <P>If you wish to contact us to discuss the license, please use one
-    of the methods below:</P> --%>
-	<P><fmt:message key="jsp.submit.license-rejected.info2"/></P>
+    <%-- <p>If you wish to contact us to discuss the license, please use one
+    of the methods below:</p> --%>
+	<p><fmt:message key="jsp.submit.license-rejected.info2"/></p>
 
     <dspace:include page="/components/contact-info.jsp" />
 
-    <%-- <P><A HREF="<%= request.getContextPath() %>/mydspace">Go to My DSpace</A></P> --%>
-	<P><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/></A></P>
+    <%-- <p><a href="<%= request.getContextPath() %>/mydspace">Go to My DSpace</a></p> --%>
+	<p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/></a></p>
 
 </dspace:layout>

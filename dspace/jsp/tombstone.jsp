@@ -51,14 +51,14 @@
 	
 <dspace:layout titlekey="jsp.tombstone.title">
 
-    <H1><fmt:message key="jsp.tombstone.title"/></H1>
+    <h1><fmt:message key="jsp.tombstone.title"/></h1>
 
-    <P><fmt:message key="jsp.tombstone.text"/></P>
+    <p><fmt:message key="jsp.tombstone.text"/></p>
 	
     <dspace:include page="/components/contact-info.jsp" />
 
-    <P align=center>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
-    </P>
+    <p align="center">
+        <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a>
+    </p>
 
 </dspace:layout>

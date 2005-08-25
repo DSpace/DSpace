@@ -49,7 +49,7 @@
 <dspace:layout navbar="off"
 			   locbar="nolink"
 			   titlekey="jsp.login.ldap-incorrect.title">
-    <table border=0 width="90%">
+    <table border="0" width="90%">
         <tr>
             <td align="left">
                 <h1><fmt:message key="jsp.login.ldap-incorrect.heading"/></h1>

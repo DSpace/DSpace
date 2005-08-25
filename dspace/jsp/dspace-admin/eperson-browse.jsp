@@ -83,17 +83,17 @@
     if (pageIndex > 0)
     {
         // not at start, so create 'previous' button
-        previousButton = "<input type=\"hidden\" name=\"page_index\" value=\"" + pageIndex + "\">" +
-                         "<input type=\"hidden\" name=\"page_request\" value=\"previous\"> "       +
-                         "<input type=\"submit\" name=\"submit_browse\" value=\"Previous\">";
+        previousButton = "<input type=\"hidden\" name=\"page_index\" value=\"" + pageIndex + "\"/>" +
+                         "<input type=\"hidden\" name=\"page_request\" value=\"previous\"/> "       +
+                         "<input type=\"submit\" name=\"submit_browse\" value=\"Previous\"/>";
     }
 
     if (pageIndex < (pageCount-1) )
     {
         // not showing last either, so create 'next' button
-        nextButton = "<input type=\"hidden\" name=\"page_index\" value=\"" + pageIndex + "\">" +
-                         "<input type=\"hidden\" name=\"page_request\" value=\"next\"> "       +
-                         "<input type=\"submit\" name=\"submit_browse\" value=\"Next\">";
+        nextButton = "<input type=\"hidden\" name=\"page_index\" value=\"" + pageIndex + "\"/>" +
+                         "<input type=\"hidden\" name=\"page_request\" value=\"next\"/> "       +
+                         "<input type=\"submit\" name=\"submit_browse\" value=\"Next\"/>";
     }
 
 %>
@@ -111,25 +111,25 @@
         <fmt:param><%=epeople.length%></fmt:param>
     </fmt:message></h1>
 
-    <table class="miscTable" align="center">
+    <table class="miscTable" align="center" summary="Browse E-people">
         <tr>
-            <th class="oddRowOddCol"> <strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=id">ID</A></strong></th>
-            <%-- <th class="oddRowEvenCol"><strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=email">E-mail Address</A></strong></th> --%>
-            <th class="oddRowEvenCol"><strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=email"><fmt:message key="jsp.dspace-admin.eperson-browse.email"/></A></strong></th>
-            <%-- <th class="oddRowOddCol"> <strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname">Last Name</A></strong></th> --%>
-            <th class="oddRowOddCol"> <strong><A HREF="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname"><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></A></strong></th>
+            <th id="t1" class="oddRowOddCol"> <strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=id">ID</a></strong></th>
+            <%-- <th class="oddRowEvenCol"><strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=email">E-mail Address</a></strong></th> --%>
+            <th id="t2" class="oddRowEvenCol"><strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=email"><fmt:message key="jsp.dspace-admin.eperson-browse.email"/></a></strong></th>
+            <%-- <th class="oddRowOddCol"> <strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname">Last Name</a></strong></th> --%>
+            <th id="t3" class="oddRowOddCol"> <strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname"><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></a></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>First Name</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></strong></th>
+            <th id="t4" class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></strong></th>
             <%-- <th class="oddRowOddCol"> <strong>Can Log In?</strong></th> --%>
-            <th class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.eperson-browse.canlogin"/></strong></th>
+            <th id="t5" class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.eperson-browse.canlogin"/></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Must Use Cert?</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson-browse.mustusecert"/></strong></th>
+            <th id="t6" class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson-browse.mustusecert"/></strong></th>
             <%-- <th class="oddRowOddCol"> <strong>Self Registered</strong></th> --%>
-            <th class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.eperson-browse.self"/></strong></th>
+            <th id="t7" class="oddRowOddCol"> <strong><fmt:message key="jsp.dspace-admin.eperson-browse.self"/></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>Telephone</strong></th> --%>
-            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson-browse.phone"/></strong></th>
-            <th class="oddRowOddCol">&nbsp;</th>
-            <th class="oddRowEvenCol">&nbsp;</th>
+            <th id="t8" class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson-browse.phone"/></strong></th>
+            <th id="t9" class="oddRowOddCol">&nbsp;</th>
+            <th id="t10" class="oddRowEvenCol">&nbsp;</th>
         </tr>
 
 <%
@@ -137,43 +137,43 @@
     for (int i = firstEPerson; i <= lastEPerson; i++)
     {
         EPerson e = epeople[i];
-        String commandString = request.getContextPath() + "/dspace-admin/edit-epeople?submit_edit&eperson_id=" + e.getID();
+        String commandString = request.getContextPath() + "/dspace-admin/edit-epeople?submit_edit&amp;eperson_id=" + e.getID();
 %>
-        <form method=POST action="<%= request.getContextPath() %>/dspace-admin/edit-epeople">
+        <form method="post" action="<%= request.getContextPath() %>/dspace-admin/edit-epeople">
             <tr>
-                <td class="<%= row %>RowOddCol"><%= e.getID() %></td>
-                <td class="<%= row %>RowEvenCol">
+                <td headers="t1" class="<%= row %>RowOddCol"><%= e.getID() %></td>
+                <td headers="t2" class="<%= row %>RowEvenCol">
                     <%= (e.getEmail() == null ? "" : e.getEmail()) %>
                 </td>
-                <td class="<%= row %>RowOddCol">
+                <td headers="t3" class="<%= row %>RowOddCol">
                     <%= (e.getLastName() == null ? "" : e.getLastName()) %>
                 </td>
-                <td class="<%= row %>RowEvenCol">
+                <td headers="t4" class="<%= row %>RowEvenCol">
                     <%= (e.getFirstName() == null ? "" : e.getFirstName()) %>
                 </td>
-                <td class="<%= row %>RowOddCol" align="center">
+                <td headers="t5" class="<%= row %>RowOddCol" align="center">
                     <%= e.canLogIn() ? "yes" : "no" %>
                 </td>
-                <td class="<%= row %>RowEvenCol" align="center">
+                <td headers="t6" class="<%= row %>RowEvenCol" align="center">
                     <%= e.getRequireCertificate() ? "yes" : "no" %>
                 </td>
-                <td class="<%= row %>RowOddCol">
+                <td headers="t7" class="<%= row %>RowOddCol">
                     <%= e.getSelfRegistered() ? "yes" : "no" %>
                 </td>
-                <td class="<%= row %>RowEvenCol">
+                <td headers="t8" class="<%= row %>RowEvenCol">
                     <%= (e.getMetadata("phone") == null ? "" : e.getMetadata("phone")) %>
                 </td>
-                <td class="<%= row %>RowOddCol">
-                    <input type="hidden" name="eperson_id" value="<%= e.getID() %>">
+                <td headers="t9" class="<%= row %>RowOddCol">
+                    <input type="hidden" name="eperson_id" value="<%= e.getID() %>"/>
 <%      if (request.getParameter("sortby") != null) { %>
-                    <input type="hidden" name="sortby" value="<%= request.getParameter("sortby") %>">
+                    <input type="hidden" name="sortby" value="<%= request.getParameter("sortby") %>"/>
 <%      } %>
                     <%-- <input type="submit" name="submit_edit" value="Edit..."> --%>
-                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>">
+                    <input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
                 </td>
-                <td class="<%= row %>RowEvenCol">
+                <td headers="t10" class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_delete" value="Delete..."> --%>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>">
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>" />
                 </td>
             </tr>
         </form>
@@ -183,11 +183,11 @@
 %>
     </table>
 
-    <form method=POST>
+    <form method="post" action="">
     <%=previousButton%>
     </form>
 
-    <form method=POST>
+    <form method="post" action="">
     <%=nextButton%>
     </form>
 

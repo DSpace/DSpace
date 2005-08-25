@@ -55,40 +55,39 @@
   --%>
 
 
-    <%-- <H1>Invalid Token</H1> --%>
-	<H1><fmt:message key="jsp.register.invalid-token.title"/></H1>
+    <%-- <h1>Invalid Token</h1> --%>
+	<h1><fmt:message key="jsp.register.invalid-token.title"/></h1>
 
-    <%-- <P>The registration or forgotten password "token" in the URL is invalid.
-    This may be because of one of the following reason:</P> --%>
-	<P><fmt:message key="jsp.register.invalid-token.info1"/></P>
+    <%-- <p>The registration or forgotten password "token" in the URL is invalid.
+    This may be because of one of the following reason:</p> --%>
+	<p><fmt:message key="jsp.register.invalid-token.info1"/></p>
 
-    <UL>
-        <%--  <LI>The token might be incorrectly copied into the URL.  Some e-mail
+    <ul>
+        <%--  <li>The token might be incorrectly copied into the URL.  Some e-mail
         programs will "wrap" long lines of text in an email, so maybe it split
         your special URL up into two lines, like this: --%>
-		<LI><fmt:message key="jsp.register.invalid-token.info2"/>
-
-        <PRE>
+		<li><fmt:message key="jsp.register.invalid-token.info2"/>
+        <pre>
 <%= ConfigurationManager.getProperty("dspace.url") %>/register?token=ABCDEFGHIJK
 LMNOP
-        </PRE>
+        </pre>
 
         <%-- If it has, you should copy and paste the first line into your browser's
         address bar, then copy the second line, and paste into the address bar
         just on the end of the first line, making sure there are no spaces.  The
         address bar should then contain something like: --%>
-		<LI><fmt:message key="jsp.register.invalid-token.info3"/>
+		<li><fmt:message key="jsp.register.invalid-token.info3"/>
 
-        <PRE>
+        <pre>
 <%= ConfigurationManager.getProperty("dspace.url") %>/register?token=ABCDEFGHIJKLMNOP
-        </PRE>
+        </pre>
 
-        <%-- Then press return in the address bar, and the URL should work fine.</LI> --%>
-		<fmt:message key="jsp.register.invalid-token.info4"/></LI>
-    </UL>
+        <%-- Then press return in the address bar, and the URL should work fine.</li> --%>
+		<fmt:message key="jsp.register.invalid-token.info4"/></li>
+    </ul>
 
-    <%-- <P>If you're still having trouble, please contact us.</P> --%>
-	<P><fmt:message key="jsp.register.invalid-token.info5"/></P>
+    <%-- <p>If you're still having trouble, please contact us.</p> --%>
+	<p><fmt:message key="jsp.register.invalid-token.info5"/></p>
     
     <dspace:include page="/components/contact-info.jsp" />
 </dspace:layout>

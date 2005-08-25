@@ -77,8 +77,8 @@
     <%-- <h1>Administration Tools</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.index.heading"/></h1>
     
-    <%-- <P>Please select an operation from the navigation bar on the left.</P> --%>
-    <P><fmt:message key="jsp.dspace-admin.index.text"/></P>
+    <%-- <p>Please select an operation from the navigation bar on the left.</p> --%>
+    <p><fmt:message key="jsp.dspace-admin.index.text"/></p>
 </dspace:layout>
 <%
     }

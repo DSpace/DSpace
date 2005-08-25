@@ -47,10 +47,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-
 <center>
-
-  <P><fmt:message key="jsp.components.contact-info.details">
+  <p><fmt:message key="jsp.components.contact-info.details">
     <fmt:param><%= ConfigurationManager.getProperty("dspace.name") %></fmt:param>
   </fmt:message></p>
 
@@ -61,4 +59,3 @@
         </tr>
     </table>
 </center>
-

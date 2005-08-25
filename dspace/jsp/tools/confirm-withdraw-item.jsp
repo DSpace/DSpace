@@ -67,28 +67,28 @@
                parentlink="/dspace-admin"
                nocache="true">
 
-    <%-- <H1>Withdraw Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1> --%>
-    <H1><fmt:message key="jsp.tools.confirm-withdraw-item.title"/>: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></H1>
+    <%-- <h1>Withdraw Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></h1> --%>
+    <h1><fmt:message key="jsp.tools.confirm-withdraw-item.title"/>: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></h1>
 	
-    <%-- <P>Are you sure this item should be withdrawn from the archive?</P> --%>
-	<P><fmt:message key="jsp.tools.confirm-withdraw-item.question"/></P>
+    <%-- <p>Are you sure this item should be withdrawn from the archive?</p> --%>
+	<p><fmt:message key="jsp.tools.confirm-withdraw-item.question"/></p>
     
     <dspace:item item="<%= item %>" style="full" />
 
-    <form method=POST>
-        <input type="hidden" name="item_id" value="<%= item.getID() %>">
-        <input type="hidden" name="action" value="<%= EditItemServlet.CONFIRM_WITHDRAW %>">
+    <form method="post" action="">
+        <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
+        <input type="hidden" name="action" value="<%= EditItemServlet.CONFIRM_WITHDRAW %>"/>
 
         <center>
             <table width="70%">
                 <tr>
                     <td align="left">
-                        <%-- <input type="submit" name="submit" value="Withdraw"> --%>
-						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.confirm-withdraw-item.withdraw.button"/>">
+                        <%-- <input type="submit" name="submit" value="Withdraw" /> --%>
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.confirm-withdraw-item.withdraw.button"/>" />
                     </td>
                     <td align="right">
-                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel" /> --%>
+						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
                     </td>
                 </tr>
             </table>

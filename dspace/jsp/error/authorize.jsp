@@ -56,18 +56,18 @@
     <%-- <h1>Authorization Required</h1> --%>
     <h1><fmt:message key="jsp.error.authorize.title"/></h1>
 
-    <%-- <P>You do not have permission to perform the action you just attempted.</P> --%>
-    <P><fmt:message key="jsp.error.authorize.text1"/></P>
+    <%-- <p>You do not have permission to perform the action you just attempted.</p> --%>
+    <p><fmt:message key="jsp.error.authorize.text1"/></p>
 
-    <%-- <P>If you think you should have authorization, please feel free to
-    contact the DSpace administrators:</P> --%>
-    <P><fmt:message key="jsp.error.authorize.text2"/></P>
+    <%-- <p>If you think you should have authorization, please feel free to
+    contact the DSpace administrators:</p> --%>
+    <p><fmt:message key="jsp.error.authorize.text2"/></p>
 
     <dspace:include page="/components/contact-info.jsp" />
 
-    <P align=center>
-        <%-- <A HREF="<%= request.getContextPath() %>/">Go to the DSpace home page</A> --%>
-        <A HREF="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></A>
-    </P>
+    <p align="center">
+        <%-- <a href="<%= request.getContextPath() %>/">Go to the DSpace home page</a> --%>
+        <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a>
+    </p>
 	
 </dspace:layout>

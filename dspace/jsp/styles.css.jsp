@@ -68,7 +68,11 @@ BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
        color: #000000;
        background: #bbbbbb;
        margin: 0;
-       padding: 0 }
+       padding: 0;
+       margin-left:0px;
+       margin-right:0px; 
+       margin-top:0px; 
+       margin-bottom:0px }
 
 <%-- Note: Font information must be repeated for broken Netscape 4.xx --%>
 H1 { margin-left: 10px;

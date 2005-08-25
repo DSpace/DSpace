@@ -63,28 +63,28 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-    <%-- <H1>Delete e-person: <%= eperson.getFullName() %> (<%= eperson.getEmail() %>)</H1> --%>
-    <H1><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.heading">
+    <%-- <h1>Delete e-person: <%= eperson.getFullName() %> (<%= eperson.getEmail() %>)</h1> --%>
+    <h1><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.heading">
         <fmt:param><%= eperson.getFullName() %></fmt:param>
         <fmt:param><%= eperson.getEmail() %></fmt:param>
-    </fmt:message></H1>
+    </fmt:message></h1>
     
-    <%-- <P>Are you sure this e-person should be deleted?</P> --%>
-    <P><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></P>
+    <%-- <p>Are you sure this e-person should be deleted?</p> --%>
+    <p><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></p>
     
-    <form method=POST>
-        <input type="hidden" name="eperson_id" value="<%= eperson.getID() %>">
+    <form method="post" action="">
+        <input type="hidden" name="eperson_id" value="<%= eperson.getID() %>"/>
 
         <center>
             <table width="70%">
                 <tr>
                     <td align="left">
                         <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
+                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
                     </td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
                     </td>
                 </tr>
             </table>

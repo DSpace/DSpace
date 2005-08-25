@@ -85,35 +85,34 @@
 
 <dspace:layout titlekey="jsp.browse.items-by-title.title">
 
-    <H2><fmt:message key="jsp.browse.items-by-title.title"/></H2>
-
+    <h2><fmt:message key="jsp.browse.items-by-title.title"/></h2>
     <%-- Title browse controls table --%>
-    <form action="browse-title" method=GET>
-            <table align=center border=0 bgcolor="#CCCCCC" cellpadding=0>
-                <tr>
-                    <td>
-                        <table border=0 bgcolor="#EEEEEE" cellpadding=2> <%--allow for greek alphabet also--%>
-                            <tr>
-                                <td class="browseBar">
-                                    <%-- <span class="browseBarLabel">Jump&nbsp;to:&nbsp;</span> --%>
-    								<span class="browseBarLabel"><fmt:message key="jsp.browse.items-by-title.jump"/></span>
-                                <A HREF="browse-title?starts_with=0">0-9</A>
+    <form action="browse-title" method="get">
+        <table align="center" border="0" bgcolor="#CCCCCC" cellpadding="0" summary="Browse the respository by title">
+            <tr>
+                <td>
+                    <table border="0" bgcolor="#EEEEEE" cellpadding="2"> <%--allow for greek alphabet also--%>
+                        <tr>
+                            <td class="browseBar">
+                             <%-- <span class="browseBarLabel">Jump&nbsp;to:&nbsp;</span> --%>
+    							<span class="browseBarLabel"><fmt:message key="jsp.browse.items-by-title.jump"/></span>
+                                 <a href="browse-title?starts_with=0">0-9</a>
 <%
     for (char c = 'A'; c <= 'Z'; c++)
     {
 %>
-                                <A HREF="browse-title?starts_with=<%= c %>"><%= c %></A>
+                                <a href="browse-title?starts_with=<%= c %>"><%= c %></a>
 <%
     }
 %>
                             </td>
                         </tr>
                         <tr>
-                                <td class="browseBar" align=center>
+                                <td class="browseBar" align="center">
                                     <%-- <span class="browseBarLabel">or enter first few letters:&nbsp;</span> --%>
     								<span class="browseBarLabel"><fmt:message key="jsp.browse.items-by-title.enter"/>&nbsp;</span>
                                     <%-- <input type="text" name="starts_with"/>&nbsp;<input type="submit" value="Go!"> --%>
-    								<input type="text" name="starts_with"/>&nbsp;<input type="submit" value="<fmt:message key="jsp.browse.general.go"/>">
+    								<input type="text" name="starts_with"/>&nbsp;<input type="submit" value="<fmt:message key="jsp.browse.general.go"/>" />
                                 </td>
                             </tr>
                         </table>
@@ -121,10 +120,10 @@
                 </tr>
             </table>
     </form>
-    
-    <BR>
 
-    <P align=center>
+    <br/>
+
+    <p align="center">
         <%-- Showing items <%= browseInfo.getOverallPosition()+1 %>-<%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %>
         of <%= browseInfo.getTotal() %>. --%>
 		<fmt:message key="jsp.browse.items-by-title.show">
@@ -132,29 +131,31 @@
             <fmt:param><%= browseInfo.getOverallPosition()+browseInfo.getResultCount() %></fmt:param>
             <fmt:param><%= browseInfo.getTotal() %></fmt:param>
         </fmt:message>
-    </P>
+    </p>
 
     <%-- Previous page/Next page --%>
-    <table align=center border=0 width=70%>
+    <table align="center" border="0" width="70%">
         <tr>
-            <td class=standard align=left>
+            <td class="standard" align="left">
 <%
     if (prevQuery != null)
     {
 %>
-                <%-- <A HREF="browse-title?<%= prevQuery %>">Previous page</A> --%>
-				<A HREF="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
+                <%-- <a href="browse-title?<%= prevQuery %>">Previous page</a> --%>
+				<a href="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></a>
+
 <%
     }
 %>
             </td>
-            <td class=standard align=right>
+            <td class="standard" align="right">
 <%
     if (nextQuery != null)
     {
 %>
-                <%-- <A HREF="browse-title?<%= nextQuery %>">Next page</A> --%>
-				<A HREF="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
+                <%-- <a href="browse-title?<%= nextQuery %>">Next page</a> --%>
+				<a href="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></a>
+
 <%
     }
 %>
@@ -171,28 +172,29 @@
 %>
     <dspace:itemlist items="<%= browseInfo.getItemResults() %>" emphcolumn="title" highlightrow="<%= highlightAttribute %>" />
 
-
     <%-- Previous page/Next page --%>
-    <table align=center border=0 width=70%>
+    <table align="center" border="0" width="70%">
         <tr>
-            <td class=standard align=left>
+            <td class="standard" align="left">
 <%
     if (prevQuery != null)
     {
 %>
-                <%-- <A HREF="browse-title?<%= prevQuery %>">Previous page</A> --%>
-				<A HREF="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></A>
+                <%-- <a href="browse-title?<%= prevQuery %>">Previous page</a> --%>
+				<a href="browse-title?<%= prevQuery %>"><fmt:message key="jsp.browse.general.previous"/></a>
+
 <%
     }
 %>
             </td>
-            <td class=standard align=right>
+            <td class="standard" align="right">
 <%
     if (nextQuery != null)
     {
 %>
-                <%-- <A HREF="browse-title?<%= nextQuery %>">Next page</A> --%>
-				<A HREF="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></A>
+                <%-- <a href="browse-title?<%= nextQuery %>">Next page</a> --%>
+				<a href="browse-title?<%= nextQuery %>"><fmt:message key="jsp.browse.general.next"/></a>
+
 <%
     }
 %>

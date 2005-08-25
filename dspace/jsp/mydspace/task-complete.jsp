@@ -49,19 +49,18 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-
 <dspace:layout locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                title="jsp.mydspace.task-complete.title">
 
-<%-- <H1>Thank You</H1> --%>
-<H1><fmt:message key="jsp.mydspace.task-complete.title"/></H1>
+<%-- <h1>Thank You</h1> --%>
+<h1><fmt:message key="jsp.mydspace.task-complete.title"/></h1>
 
-    <%-- <P>The task is complete, and notification has been sent to the appropriate people.</P> --%>
-    <P><fmt:message key="jsp.mydspace.task-complete.text1"/></P>
+    <%-- <p>The task is complete, and notification has been sent to the appropriate people.</p> --%>
+    <p><fmt:message key="jsp.mydspace.task-complete.text1"/></p>
  
-    <%-- <P align=center><A HREF="<%= request.getContextPath() %>/mydspace">Return to My DSpace </A></P> --%>
-    <P align=center><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.returnto-mydspace"/> </A></P>
+    <%-- <p align="center"><a href="<%= request.getContextPath() %>/mydspace">Return to My DSpace </a></p> --%>
+    <p align="center"><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.returnto-mydspace"/> </a></p>
  
 </dspace:layout>

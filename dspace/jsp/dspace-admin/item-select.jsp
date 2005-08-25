@@ -61,45 +61,45 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
   
-    <%-- <H1>Select an Item</H1> --%>
-    
+    <%-- <h1>Select an Item</h1> --%>  
 
-<H1><fmt:message key="jsp.dspace-admin.item-select.heading"/></H1>
+<h1><fmt:message key="jsp.dspace-admin.item-select.heading"/></h1>
     
 <%
     if (request.getAttribute("invalid.id") != null) { %>
-    <%-- <P><strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to
+    <%-- <p><strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to
     edit a community or collection, you need to use the
-    <A HREF="<%= request.getContextPath() %>/dspace-admin/edit-communities">communities/collections admin page.</A></P> --%>
-    <P><fmt:message key="jsp.dspace-admin.item-select.text">
+    <a href="<%= request.getContextPath() %>/dspace-admin/edit-communities">communities/collections admin page.</a></p> --%>
+
+    <p><fmt:message key="jsp.dspace-admin.item-select.text">
         <fmt:param><%= request.getContextPath() %>/dspace-admin/edit-communities</fmt:param>
-    </fmt:message></P>
+    </fmt:message></p>
 <%  } %>
 
-    <%-- <P>Enter the Handle or internal item ID of the item you wish to select. --%>
-    <P><fmt:message key="jsp.dspace-admin.item-select.enter"/>
-      <dspace:popup page="/help/site-admin.html#itempolicies"><fmt:message key="jsp.morehelp"/></dspace:popup></P>
+    <%-- <p>Enter the Handle or internal item ID of the item you wish to select. --%>
+    <p><fmt:message key="jsp.dspace-admin.item-select.enter"/>
+      <dspace:popup page="/help/site-admin.html#itempolicies"><fmt:message key="jsp.morehelp"/></dspace:popup></p>
     
-    <form method=POST>
+    <form method="post" action="">
         <center>
-            <table class=miscTable>
+            <table class="miscTable">
                 <tr class="oddRowEvenCol">
                     <%-- <td class="submitFormLabel">Handle:</td> --%>
-                    <td class="submitFormLabel"><fmt:message key="jsp.dspace-admin.item-select.handle"/></td>
+                    <td class="submitFormLabel"><label for="thandle"><fmt:message key="jsp.dspace-admin.item-select.handle"/></label></td>
                     <td>
-                            <input type="text" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size=12>
+                            <input type="text" name="handle" id="thandle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size=12>
                             <%-- <input type="submit" name="submit_item_select" value="Find"> --%>
-                            <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.item-select.find"/>">
+                            <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.item-select.find"/>" />
                     </td>
                 </tr>
-                <tr></tr>
+                <tr><td></td></tr>
                 <tr class="oddRowEvenCol">
                     <%-- <td class="submitFormLabel">Internal ID:</td> --%>
-                    <td class="submitFormLabel"><fmt:message key="jsp.dspace-admin.item-select.id"/></td>
+                    <td class="submitFormLabel"><label for="titem_id"><fmt:message key="jsp.dspace-admin.item-select.id"/></label></td>
                     <td>
-                            <input type="text" name="item_id" size=12>
+                            <input type="text" name="item_id" size="12">
                             <%-- <input type="submit" name="submit_item_select" value="Find"> --%>
-                            <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.item-select.find"/>">
+                            <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.item-select.find"/>" />
                     </td>
                 </tr>
             </table>

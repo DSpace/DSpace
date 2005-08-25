@@ -69,43 +69,36 @@
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace.subscriptions.title">
 
-    <table width="100%" border=0>
+    <table width="100%" border="0">
         <tr>
-            <td align=left>
-                <%-- <H1>Your Subscriptions</H1> --%>
-				<H1><fmt:message key="jsp.mydspace.subscriptions.title"/></H1>
+            <td align="left">
+                <%-- <h1>Your Subscriptions</h1> --%>
+				<h1><fmt:message key="jsp.mydspace.subscriptions.title"/></h1>
             </td>
-            <td align=right class=standard>
+            <td align="right" class="standard">
                 <%-- <dspace:popup page="/help/index.html#subscribe">Help...</dspace:popup> --%>
 		<dspace:popup page="/help/index.html#subscribe"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
-        <tr>
+        </tr>
     </table>
  
 <%
     if (updated)
     {
 %>
-    <%-- <P><strong>Your subscriptions have been updated.</strong></P> --%>
-	<P><strong><fmt:message key="jsp.mydspace.subscriptions.info1"/></strong></P>
+	<p><strong><fmt:message key="jsp.mydspace.subscriptions.info1"/></strong></p>
 <%
     }
 %>
-    <%-- <P>To subscribe to a collection, visit the collection's home page, and
-    click on the "Subscribe" button.</P> --%>
-	<P><fmt:message key="jsp.mydspace.subscriptions.info2"/></P>
+	<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
 <%
     if (subscriptions.length > 0)
     {
 %>
-    <%-- <P>Below are the collections you are subscribed to.  You will be sent an
-    e-mail each day detailing new items that have become available in these
-    collections.  On days that no new items have appeared, no e-mail will be
-    sent.</P> --%>
-	<P><fmt:message key="jsp.mydspace.subscriptions.info3"/></P>
+	<p><fmt:message key="jsp.mydspace.subscriptions.info3"/></p>
     
     <center>
-        <table class="miscTable">
+        <table class="miscTable" summary="Table displaying your subscriptions">
 <%
         String row = "odd";
 
@@ -117,16 +110,16 @@
                   -  HACK: form shouldn't open here, but IE adds a carraige
                   -  return where </form> is placed, breaking our nice layout.
                   --%>
-                <form method=POST>
-                    <td class="<%= row %>RowOddCol">
-                        <A HREF="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= subscriptions[i].getMetadata("name") %></A>
-                    </td>
-                    <td class="<%= row %>RowEvenCol">
-                        <input type="hidden" name="collection" value="<%= subscriptions[i].getID() %>">
-                        <%-- <input type="submit" name="submit_unsubscribe" value="Unsubscribe"> --%>
-						<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>">
-                    </td>
-                </form>
+
+                 <td class="<%= row %>RowOddCol">
+                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= subscriptions[i].getMetadata("name") %></a>
+                 </td>
+                 <td class="<%= row %>RowEvenCol">
+                    <form method="post" action=""> 
+                        <input type="hidden" name="collection" value="<%= subscriptions[i].getID() %>" />
+			<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
+                    </form>
+                 </td>
             </tr>
 <%
             row = (row.equals("even") ? "odd" : "even" );
@@ -135,12 +128,11 @@
         </table>
     </center>
 
-    <br>
+    <br/>
 
     <center>
-        <form method=POST>
-            <%-- <input type="submit" name="submit_clear" value="Remove All Subscriptions"> --%>
-			<input type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>">
+        <form method="post" action="">
+    	    <input type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" />
         </form>
     </center>
 <%
@@ -148,14 +140,10 @@
     else
     {
 %>
-    <%-- <P>You are not currently subscribed to any collections.</P> --%>
-	<P><fmt:message key="jsp.mydspace.subscriptions.info4"/></P>
+	<p><fmt:message key="jsp.mydspace.subscriptions.info4"/></p>
 <%
     }
 %>
-
-    <%-- <P align="center"><A HREF="<%= request.getContextPath() %>/mydspace">Go to
-    My DSpace </A></P> --%>
-	<P align="center"><A HREF="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/> </A></P>
+<p align="center"><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/> </a></p>
 
 </dspace:layout>
