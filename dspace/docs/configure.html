@@ -270,6 +270,44 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
 
   <p>When you restart the web server you should see your customized JSPs.</p>
 
+  <h2><a name="customsimpleitem" id="customsimpleitem">Customizing the Simple Item Display Metadata</a></h2>
+
+  <h3>Customizing the Default Simple Item Display Metadata</h3>
+
+  <p>In <code>dspace.cfg</code> create a <code>webui.itemdisplay.default</code> item specifying a comma-separated list of metadata fields to display. For example, <p><code>webui.itemdisplay.default = dc.title, date.issued(date), identifier.uri(link), description.*</code></p> will set the default simple item display to show the title, issue date (in date format), handle URI (rendered as a link) and all DC description metadata. If no <code>webui.itemdisplay.default</code> is present, the default defers to a preset list hard-coded in DSpace. If an item has no value for a particular field, it won't be displayed.</p>
+
+  <p>Add entries to the <code>Messages.properties</code> file as required. The name of the field for display will be drawn from the current UI dictionary, using the key <code>metadata.&lt;metadata field&gt;</code>. For example <code>metadata.dc.title = Title</code>
+
+  <p>The metadata in <code>dspace.cfg</code> can be specified in the form <code>&lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*][(date)|(link)], ...</code>. For example, 
+     <ul>
+		<li>dc.title refers to unqualifed Dublin Core (DC) 'title' element</li>
+		<li>dc.title.alternative refers to the qualified DC element 'title.alternative'</li>
+		<li>dc.title.* refers to all DC 'title' elements (i.e. any or no qualifier)</li>
+		<li>dc.identifier.url refers to DC 'identifier.uri' and render as a link</li>
+		<li>dc.identifier.url refers to DC 'date.issued' and render as a date</li>
+	 </ul>
+  </p>
+
+  <h3>Customizing the Simple Item Display Metadata for Individual Collections</h3>
+
+  <p>Create <code>dspace.cfg</code> entries for each of the "styles" of item display in the same way the default layout is configured. For example,
+   <p>
+		<code>webui.itemdisplay.thesis-style = contributor.*, identifier.uri, description.abstract</code>
+   </p>
+    Then associate this simple item display with collections using an additional <code>dspace.cfg</code> item. For example,
+	<p>
+		<code>webui.itemdisplay.thesis-style.collections = 123456789/1, 123456789/56</code>
+	</p>
+	Don't forget to add any required message keys to the <code>Messages.properties</code> file. In the above example, the <code>Messages.properties</code> file would need to contain something like:
+     <p>
+			metadata.dc.contributor.* = Authors
+			<br/>
+			metadata.dc.identifier.uri = Citation
+			<br/>
+			metadata.dc.description.abstract = Abstract
+     </p>
+  <p>
+
   <h2><a name="authenticate" id="authenticate">Custom Authentication Code</a></h2>
 
   <p>Since many institutions and organizations have exisiting authentication systems, DSpace has been designed to allow these to be easily integrated. To do this, you can provide a custom class implementing the Java interface <code>org.dspace.app.webui.SiteAuthenticator</code>. These methods are invoked when various authentication-related events occur in the Web user interface.</p>
