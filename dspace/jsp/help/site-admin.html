@@ -25,6 +25,7 @@
       <li><a href="#epeople">E-people</a></li>
       <li><a href="#groups">Groups</a></li>
       <li><a href="#items">Items</a></li>
+      <li><a href="#supervision">Supervision Orders</a></li>
       <li><a href="#dublincore">Dublin Core Registry</a></li>
       <li><a href="#bitstream">Bitstream Format Registry</a></li>
       <li><a href="#workflow">Workflow</a></li>
@@ -174,6 +175,99 @@
     <p><a href="collection-admin.html#withdraw">Instructions for withdrawing items</a></p>
 
     <p>Note that the 'expunge' function will expunge the item and its metadata from the system without  leaving a trace.  Note that this functionality hasn't been fully tested (and it's not recommended), so there may be problems.  For example, since there's no record of the deletion, the fact that the item has been deleted isn't exposed to OAI harvesters.</p>
+
+
+    <h3><a name="supervision"></a>Supervision Orders</h3>
+    
+    <p>Select <em>Supervisors</em> in the administration area and you are presented with three options:</p>
+
+	<ul>
+		<li>Add a Supervision Order</li>
+		<li>View Current Supervision Orders</li>
+		<li>Clean Supervision Order Database</li>
+	</ul>
+
+	<p>The sections below detail how to deal with common supervision order tasks.</p>
+
+	<p><em>Note: The option to Clean Supervision Order Database should be used once 
+	in a while just to perform basic maintenance operations on the database.  It is 
+	completely automatic and takes a very short time to execute.</em></p>
+
+
+	<h4>Viewing Current Supervision Orders</h4>
+
+	<p>Select <em>View Current Supervision Orders</em> and you are presented with a list 
+	of all supervision orders currently in effect.  From this page you can modify the 
+	policies for the supervision order or remove the supervision order. (see the sections
+	below).</p>
+
+	<p>The details you have on this page allow you to see the name of the group doing 
+	the supervising, the author of the item being supervised and the title of that item.</p>
+
+	<p>You may also add a supervision order from this page as per the section <strong>Adding Supervision Orders</strong> below.
+
+
+	<h4>Adding Supervision Orders</h4>
+
+	<p>Select <em>Add a Supervision Order</em> from either the main supervision order 
+	page or the Current Supervision Orders page.</p>
+
+	<p>To set a supervision order you need to define the group to do the supervising 
+	and the item in the workspace to be supervised.  In addition, this page gives you 
+	the option to set a default set of policies for the supervising group to have over 
+	the item.</p>
+	
+	<p>Select the desired group from the pull down list of groups on this page; 
+	this box contains all the groups that currently exist on the system.  Next select the WorkSpace item to be 
+	Supervised.  This means clicking on the round select box on the right of the item in the listing you can see on this page,
+	which shows all items currently in user workspaces.</p>
+
+	<p><em>Note: the ID that is in the left hand column of the item listing is the 
+	database id for the workspace item, and is there for the reference of system 
+	administrators.</em></p>
+
+	<p>Once you have chosen the group and the workspace item to be connected you 
+	may also select a default policy from the <em>Initial Policy Setting</em> pull down box.
+	The default policy options that this provides are:
+	
+	<ul>
+		<li><strong>None</strong> - The supervision order is created but the supervising group is 
+		not given any policies regarding the item to be supervised.  This usually 
+		indicates that the administrator has decided to manually set policies for 
+		this supervision order.</li>
+		<li><strong>Observer</strong> - The supervising group is given READ access to the item 
+		(but not to any bundles or bitstreams that already exist).  Any new 
+		bundles or bitstreams inherit the supervision group's policy to permit 
+		READ operations.</li>
+		<li><strong>Editor</strong> - The supervising group is given ADD, WRITE, 
+		and READ access to the item (but not any bundles or bitstreams that 
+		already exist).  Any new bundles or bitstreams inherit the supervising 
+		groups's policy to permit ADD, WRITE and READ operations.</li>
+	</ul>
+	
+	<p>Once happy with your selection click on <em>Submit Supervision Order</em> 
+	and your settings will be applied, and you will be returned to the 
+	supervision order main page.</p>
+
+
+	<h4>Removing Supervision Orders</h4>
+
+	<p>Go to the <em>View Current Supervision Orders</em> page and select <em>Remove</em>
+	from the supervision order that to wish to remove.  You will be asked to confirm 
+	the removal of the order, upon confirmation of which it will be removed from the system.</p>
+
+
+	<h4>Customising Supervision Order Policies</h4>
+
+	<p>Go to the <em>View Current Supervision Orders</em> page and select <em>Policies</em> for 
+	the supervision order for which you would like to customise the policies.  You will be 
+	taken to the <em>Policies for Item</em> page.  From here you may customise the policies 
+	for the particular item.</p>
+
+	<p>In order to set policies for the supervisor group you should select, for example, 
+	<em>Add New Policy</em> for the item or any of its component parts, then select the 
+	supervisor group that you are wanting to configure from the given list of groups.  
+	You can then select the Action that you want to perform and hit <em>Save Policy</em>.
 
 
     <h3><a name="dublincore"></a>Dublin Core Registry</h3>
