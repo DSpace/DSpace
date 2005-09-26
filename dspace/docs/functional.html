@@ -368,6 +368,26 @@
 
   <p>The reason for this apparently arbitrary design is that is was the simplist case that covered the needs of the early adopter communities at MIT. The functionality of the workflow system will no doubt be extended in the future.</p>
 
+
+  <h2><a name="supervision" id="supervision">Supervision and Collaboration</a></h2>
+  
+  <p>In order to facilitate, as a primary objective, the opportunity for thesis authors to be supervised in the preparation of their e-thesis,
+  a supervision order system exists to bind groups of other users (thesis supervisors) to an item in someone's pre-submission workspace.  The bound group can have
+  system policies associated with it that allow different levels of interaction with the student's item; a small set of default policy groups are
+  provided:</p>
+  
+  <ul>
+  	<li>Full editorial control
+  	<li>View item contents
+  	<li>No policies
+  </ul>
+  
+  <p>Once the default set has been applied, a system administrator may modify them as they would any other policy set in DSpace</p>
+  
+  <p>This functionality could also be used in situations where researchers wish to collaborate on a particular submission, although there
+  is no particular collaborative workspace functionality.</p>
+
+
   <h2><a name="handles" id="handles">Handles</a></h2>
 
   <p>Researchers require a stable point of reference for their works. The simple evolution from sharing of citations to emailing of URLs broke when Web users learned that sites can disappear or be reconfigured without notice, and that their bookmark files containing critical links to research results couldn't be trusted long term. To help solve this problem, a core DSpace feature is the creation of persistent identifier for every item, collection and community stored in DSpace. To persist identifier, DSpace requires a storage- and location- independent mechanism for creating and maintaining identifiers. DSpace uses the <a href="http://www.handle.net/">CNRI Handle System</a> for creating these identifiers. The rest of this section assumes a basic familiarity with the Handle system.</p>
@@ -511,13 +531,22 @@ https://dspace.myu.edu/bitstream/123.456/789/24/foo.html
   <P>The report includes data such as:</P>
 
   <UL>
-    <LI>Number of items</li>
-    <li>Page viewings</li>
-    <li>Broken-down list of item viewings</li>
-    <li>OAI-PMH requests</li>
-    <li>Most popular searches</li>
+  	<LI>A customisable general summary of activities in the archive, by default including:
+  	  <ul>
+  	  	<li>Number of item views</li>
+  	  	<li>Number of collection visits</li>
+  	  	<li>Number of community visits</li>
+  	  	<li>Number of OAI Requests</li>
+  	  </ul></li>
+  	<LI>Customisable summary of archive contents</LI>
+  	<li>Broken-down list of item viewings</li>
+    <LI>A full break-down of all system activity</li>
     <li>User logins</li>
+    <li>Most popular searches</li>
   </ul>
+
+  <p>The results of statistical analysis can be presented on a by-month and an in-total report, and are available via the user interface.  The
+  reports can also either be made public or restricted to administrator access only.</p>
 
   <hr>
 
