@@ -140,7 +140,7 @@ public class Supervisor {
         // remove the link from the supervisory database
         String query = "DELETE FROM epersongroup2workspaceitem " +
                        "WHERE workspace_item_id = " + wsItemID +
-                       " AND eperson_group_id = " + groupID + ";";
+                       " AND eperson_group_id = " + groupID;
         
         DatabaseManager.updateQuery(context, query);
         
@@ -168,7 +168,7 @@ public class Supervisor {
                        ") OR NOT EXISTS ( " +
                        "SELECT 1 FROM epersongroup WHERE eperson_group_id " +
                        "= epersongroup2workspaceitem.eperson_group_id " +
-                       ");";
+                       ")";
         
         DatabaseManager.updateQuery(context, query);
     }

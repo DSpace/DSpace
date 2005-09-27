@@ -422,6 +422,9 @@ public class Group extends DSpaceObject
                 "DELETE FROM EPersonGroup2EPerson WHERE eperson_group_id="
                         + getID());
 
+        //      don't forget the new table
+        deleteEpersonGroup2WorkspaceItem();
+
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
 
@@ -429,6 +432,15 @@ public class Group extends DSpaceObject
 
         log.info(LogManager.getHeader(myContext, "delete_group", "group_id="
                 + getID()));
+    }
+
+    /**
+     * @throws SQLException
+     */
+    private void deleteEpersonGroup2WorkspaceItem() throws SQLException
+    {
+        DatabaseManager.updateQuery(myContext,
+                "DELETE FROM EPersonGroup2WorkspaceItem WHERE eperson_group_id=" + getID());
     }
 
     /**

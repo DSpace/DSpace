@@ -139,7 +139,15 @@ public class Harvest
 
         if (startDate != null)
         {
-            query = query + " AND item.last_modified >= '" + startDate + "'";
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            {
+                query = query + " AND item.last_modified >= " 
+                        + oracleTimeStampFromIsoString(startDate);
+            }
+            else //postgres
+            {
+                query = query + " AND item.last_modified >= '" + startDate + "'";
+            }            
         }
 
         if (endDate != null)
@@ -167,7 +175,15 @@ public class Harvest
                 endDate = endDate.substring(0, 19) + ".999Z";
             }
 
-            query = query + " AND item.last_modified <= '" + endDate + "'";
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            {
+                query = query + " AND item.last_modified <= " 
+                        + oracleTimeStampFromIsoString(endDate);
+            }
+            else //postgres
+            {
+                query = query + " AND item.last_modified <= '" + endDate + "'";
+            }
         }
 
         if (withdrawn == false)
@@ -313,4 +329,35 @@ public class Harvest
             itemInfo.collectionHandles.add(r.getStringColumn("handle"));
         }
     }
+    
+    /**
+     * creates an oracle format timestamp from an ISO 8601-style string
+     * @param isoDateString
+     * @return oracle format timestamp String
+     */
+    private static String oracleTimeStampFromIsoString(String isoDateString)
+    {
+        String timeStampString;
+        
+        if (isoDateString.length() == 10)
+        {
+            timeStampString = "TO_TIMESTAMP('" + isoDateString + "T00:00:00" 
+                                + "'," + "'YYYY-MM-DD\"T\"HH24:MI:SS')";
+            
+        } else if (isoDateString.length() == 19 )
+        {
+            timeStampString = "TO_TIMESTAMP('" + isoDateString  
+                                + "','YYYY-MM-DD\"T\"HH24:MI:SS')";
+        } else if (isoDateString.length() > 19)
+        {
+            timeStampString = "TO_TIMESTAMP('" + isoDateString  
+                                + "','YYYY-MM-DD\"T\"HH24:MI:SS.FF\"Z\"')"; 
+        } else
+        {
+            throw new IllegalArgumentException("argument does not seem to be in the expected ISO 8601 format");
+        }
+                                   
+        return timeStampString;
+    }
+
 }

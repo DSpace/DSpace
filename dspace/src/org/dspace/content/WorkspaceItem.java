@@ -506,12 +506,24 @@ public class WorkspaceItem implements InProgressSubmission
         // Remove from cache
         ourContext.removeCached(this, getID());
 
+        // Need to delete the epersongroup2workspaceitem row first since it refers
+        // to workspaceitem ID
+        deleteEpersonGroup2WorkspaceItem();
+
         // Need to delete the workspaceitem row first since it refers
         // to item ID
         DatabaseManager.delete(ourContext, wiRow);
 
         // Delete item
         item.delete();
+    }
+
+    private void deleteEpersonGroup2WorkspaceItem() throws SQLException
+    {
+        
+        String removeSQL="DELETE FROM epersongroup2workspaceitem WHERE workspace_item_id = " + getID();
+        DatabaseManager.updateQuery(ourContext, removeSQL);
+        
     }
 
     public void deleteWrapper() throws SQLException, AuthorizeException,

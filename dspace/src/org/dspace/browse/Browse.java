@@ -1702,7 +1702,15 @@ class BrowseCache
 
             if (results != null)
             {
-                count = results.getLongColumn("count");
+                //use getIntColumn for Oracle count data
+                if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+                {
+                    count = results.getIntColumn("count");              
+                }
+                else  //getLongColumn works for postgres
+                {
+                    count = results.getLongColumn("count");
+                }
                 max = results.getIntColumn("max");
             }
 
