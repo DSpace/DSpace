@@ -1143,11 +1143,19 @@ public class Collection extends DSpaceObject
         throws SQLException
      {
         Statement statement = ourContext.getDBConnection().createStatement();
-        ResultSet rs = statement.executeQuery(
-			 	"SELECT count(*) FROM collection2item, item WHERE "
-				+ "collection2item.collection_id = " + getID() 
-				+ " AND collection2item.item_id = item.item_id "
-				+ "AND in_archive ='t' AND item.withdrawn='f'");
+        final ResultSet rs;
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            rs = statement.executeQuery(
+                "SELECT count(*) FROM collection2item, item WHERE "
+                + "collection2item.collection_id = " + getID() 
+                + " AND collection2item.item_id = item.item_id "
+                + "AND in_archive =1 AND item.withdrawn=0");
+        else 
+            rs = statement.executeQuery(
+                "SELECT count(*) FROM collection2item, item WHERE "
+                + "collection2item.collection_id = " + getID() 
+                + " AND collection2item.item_id = item.item_id "
+                + "AND in_archive ='t' AND item.withdrawn='f'");
         int itemcount = 0;
         rs.next();
         itemcount = rs.getInt(1);
