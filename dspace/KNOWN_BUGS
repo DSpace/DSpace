@@ -22,3 +22,5 @@ http://sourceforge.net/tracker/?group_id=19984&atid=119984
 1066771 	Metadata edit form dropping DC qualified element
 1066713 	Two (sub)communities can not have one name
 1035366 	size column should be bigint
+
+Oracle compatibility: a problem with input-forms.xml using blank fields can be fixed by applying the sourceforge patch to input-forms.xml at http://sourceforge.net/tracker/index.php?func=detail&aid=1297575&group_id=19984&atid=319984
