@@ -3,6 +3,8 @@
 (Robert Tansley)
 - SF Patch #1244813 Expose METS to OAI-PMH harvesters
 
+(Tim Donohue)
+- SF Patch #1274250 Fix Malformed METS metadata export
 
 1.3.2 final, 1.3.2 beta 2
 =========================
