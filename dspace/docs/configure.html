@@ -175,6 +175,20 @@ property.name = property value
     <li><code>License</code></li>
   </ul>
 
+  <h2><a name="crosswalks" id="crosswalks">Activating Additional Crosswalks</a></h2>
+
+  <p>DSpace comes with an unqualified DC Crosswalk used in the default OAI-PMH data provider. There are also other Crosswalks bundled with the DSpace distribution which can be activated by editing one or more configuration files. How to do this for each available Crosswalk is described below.</p>
+
+  <h3>METS</h3>
+  <p>The METS Crosswalk can be activated as follows:
+	<ul>
+		<li>Uncomment the METS Crosswalk entry from the <code>config/templates/oaicat.properties</code> file</li>
+		<li>Run	the <code>bin/install-configs</code> script</li>
+		<li>Restart Tomcat</li>
+		<li>Verify the Crosswalk is activated by accessing a URL such as <code>http://mydspace/dspace-oai/request?verb=ListRecords&metadataPrefix=mets</code></li>
+	</ul>
+	</p>
+
   <h2><a name="templates" id="templates">Configuration Files for Other Applications</a></h2>
 
   <p>To ease the hassle of keeping configuration files for other applications involved in running a DSpace site, for example Apache, in sync, the DSpace system can automatically update them for you when the main DSpace configuration is changed. This feature of the DSpace system is entirely optional, but we found it useful.</p>

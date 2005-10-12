@@ -90,10 +90,6 @@ public class DSpaceOAICatalog extends AbstractCatalog
     public final static String OAI_ID_PREFIX = "oai:"
             + ConfigurationManager.getProperty("dspace.hostname") + ":";
 
-    /** Location of OAI DC schema */
-    private final String oaiDC = "http://www.openarchives.org/OAI/2.0/oai_dc/ "
-            + "http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
-
     /** Maximum number of records returned by one request */
     private final int MAX_RECORDS = 100;
 
@@ -337,8 +333,9 @@ public class DSpaceOAICatalog extends AbstractCatalog
                                         : metadataPrefix)));
 
         Context context = null;
+        String record = null;
         HarvestedItemInfo itemInfo = null;
-
+        
         // First get the item from the DB
         try
         {
@@ -347,11 +344,32 @@ public class DSpaceOAICatalog extends AbstractCatalog
             {
                 context = new Context();
 
+                /*
+                 * Try and get the item. the .substring() is to strip the
+                 * oai:(hostname): prefix to get the raw handle
+                 */
                 itemInfo = Harvest.getSingle(context, identifier
-                        .substring(OAI_ID_PREFIX.length()), // Strip prefix to
-                                                            // get raw handle
-                        true);
+                        .substring(OAI_ID_PREFIX.length()), true);
             }
+
+            if (itemInfo == null)
+            {
+                log.info(LogManager.getHeader(null, "oai_error",
+                        "id_does_not_exist"));
+                throw new IdDoesNotExistException(identifier);
+            }
+
+            String schemaURL;
+
+            if ((schemaURL = getCrosswalks().getSchemaURL(metadataPrefix)) == null)
+            {
+                log.info(LogManager.getHeader(null, "oai_error",
+                        "cannot_disseminate_format"));
+                throw new CannotDisseminateFormatException(metadataPrefix);
+            }
+
+            record = getRecordFactory().create(itemInfo, schemaURL,
+                    metadataPrefix);
         }
         catch (SQLException se)
         {
@@ -368,22 +386,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             }
         }
 
-        String schemaURL = null;
-
-        if (itemInfo == null)
-        {
-            log.info(LogManager.getHeader(null, "oai_error",
-                    "id_does_not_exist"));
-            throw new IdDoesNotExistException(identifier);
-        }
-        else if ((schemaURL = getCrosswalks().getSchemaURL(metadataPrefix)) == null)
-        {
-            log.info(LogManager.getHeader(null, "oai_error",
-                    "cannot_disseminate_format"));
-            throw new CannotDisseminateFormatException(metadataPrefix);
-        }
-
-        return getRecordFactory().create(itemInfo, schemaURL, metadataPrefix);
+        return record;
     }
 
     /**

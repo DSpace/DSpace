@@ -225,11 +225,10 @@ public class Harvest
                     && ((limit == 0) || (index < (offset + limit))))
             {
                 HarvestedItemInfo itemInfo = new HarvestedItemInfo();
-
+                
+                itemInfo.context = context;
                 itemInfo.handle = row.getStringColumn("handle");
                 itemInfo.itemID = row.getIntColumn("resource_id");
-
-                // Put datestamp in ISO8601
                 itemInfo.datestamp = row.getDateColumn("last_modified");
                 itemInfo.withdrawn = row.getBooleanColumn("withdrawn");
 
@@ -284,6 +283,7 @@ public class Harvest
         // Fill out OAI info item object
         HarvestedItemInfo itemInfo = new HarvestedItemInfo();
 
+        itemInfo.context = context;
         itemInfo.item = i;
         itemInfo.handle = handle;
         itemInfo.withdrawn = i.isWithdrawn();

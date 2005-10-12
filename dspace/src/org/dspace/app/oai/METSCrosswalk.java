@@ -1,5 +1,5 @@
 /*
- * HarvestedItemInfo.java
+ * METSCrosswalk.java
  *
  * Version: $Revision$
  *
@@ -37,44 +37,68 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.search;
+package org.dspace.app.oai;
 
-import java.util.Date;
-import java.util.List;
+import java.io.ByteArrayOutputStream;
+import java.util.Properties;
 
-import org.dspace.content.Item;
-import org.dspace.core.Context;
+import org.dspace.app.mets.METSExport;
+import org.dspace.search.HarvestedItemInfo;
+
+import ORG.oclc.oai.server.crosswalk.Crosswalk;
+import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 
 /**
- * Simple container class containing information about a harvested DSpace item.
+ * OAICat crosswalk to allow METS to be harvested.
  * 
+ * No security or privacy measures in place.
+ * 
+ * @author Li XiaoYu (Rita)
  * @author Robert Tansley
- * @version $Revision$
  */
-public class HarvestedItemInfo
+public class METSCrosswalk extends Crosswalk
 {
-    /** Context used when creating this object */
-    public Context context;
-    
-    /** Internal item ID (as opposed to item's OAI ID, which is the Handle) */
-    public int itemID;
+    public METSCrosswalk(Properties properties)
+    {
+        super(
+                "http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd");
+    }
 
-    /** The Handle, with no prefix */
-    public String handle;
+    public boolean isAvailableFor(Object nativeItem)
+    {
+        // We have METS for everything
+        return true;
+    }
 
-    /** The datestamp */
-    public Date datestamp;
+    public String createMetadata(Object nativeItem)
+            throws CannotDisseminateFormatException
+    {
+        HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
 
-    /** The item. Only filled out if requested */
-    public Item item;
+        try
+        {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-    /**
-     * A List of Strings. The Handles of collections this item is in. Only
-     * filled out if originally requested when invoking <code>Harvest</code>
-     * (N.B. not Collection objects)
-     */
-    public List collectionHandles;
+            METSExport.writeMETS(hii.context, hii.item, baos, true);
 
-    /** True if this item has been withdrawn */
-    public boolean withdrawn;
+            // FIXME: Nasty hack to remove <?xml...?> header that METS toolkit
+            // puts there.  Hopefully the METS toolkit itself can be updated
+            // to fix this
+            String fullXML = baos.toString("UTF-8");
+            String head = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n";
+            int pos = fullXML.indexOf(head);
+            if (pos != -1)
+            {
+                fullXML = fullXML.substring(pos + head.length());
+            }
+            
+            return fullXML;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
 }

@@ -76,6 +76,7 @@ import edu.harvard.hul.ois.mets.Agent;
 import edu.harvard.hul.ois.mets.AmdSec;
 import edu.harvard.hul.ois.mets.BinData;
 import edu.harvard.hul.ois.mets.Checksumtype;
+import edu.harvard.hul.ois.mets.Div;
 import edu.harvard.hul.ois.mets.DmdSec;
 import edu.harvard.hul.ois.mets.FLocat;
 import edu.harvard.hul.ois.mets.FileGrp;
@@ -88,6 +89,7 @@ import edu.harvard.hul.ois.mets.MetsHdr;
 import edu.harvard.hul.ois.mets.Name;
 import edu.harvard.hul.ois.mets.RightsMD;
 import edu.harvard.hul.ois.mets.Role;
+import edu.harvard.hul.ois.mets.StructMap;
 import edu.harvard.hul.ois.mets.Type;
 import edu.harvard.hul.ois.mets.XmlData;
 import edu.harvard.hul.ois.mets.helper.Base64;
@@ -274,7 +276,7 @@ public class METSExport
         // Write the METS file
         FileOutputStream out = new FileOutputStream(aipDir.toString()
                 + java.io.File.separator + "mets.xml");
-        writeMETS(context, item, out);
+        writeMETS(context, item, out, false);
         out.close();
 
         // Write bitstreams
@@ -293,7 +295,7 @@ public class METSExport
                 {
                     out = new FileOutputStream(aipDir.toString()
                             + java.io.File.separator
-                            + bitstreams[b].getChecksum());
+                            + bitstreams[b].getName());
 
                     InputStream in = bitstreams[b].retrieve();
                     Utils.bufferedCopy(in, out);
@@ -312,9 +314,13 @@ public class METSExport
      * @param item
      *            DSpace item to create METS object for
      * @param os
-     *            Stream to write METS document to (UTF-8 encoding will be used)
+     *            A stream to write METS package to (UTF-8 encoding will be used)
+     * @param fullURL
+     *            if <code>true</code>, the &lt;FLocat&gt; values for each
+     *            bitstream will be the full URL for that bitstream. Otherwise,
+     *            only the filename itself will be used.
      */
-    public static void writeMETS(Context context, Item item, OutputStream os)
+    public static void writeMETS(Context context, Item item, OutputStream os, boolean fullURL)
             throws SQLException, IOException, AuthorizeException
     {
         try
@@ -395,6 +401,7 @@ public class METSExport
 
             // fileSec
             FileSec fileSec = new FileSec();
+            boolean fileSecEmpty = true;
 
             Bundle[] bundles = item.getBundles();
 
@@ -483,10 +490,19 @@ public class METSExport
                     file.setCHECKSUM(bitstreams[bits].getChecksum());
                     file.setCHECKSUMTYPE(Checksumtype.MD5);
 
-                    // FLocat: filename is MD5 checksum
+                    // FLocat: filename is as in records, or full URL
+                    // FIXME: Duplicate filenames and characters illegal to
+                    // local OS may cause problems
                     FLocat flocat = new FLocat();
                     flocat.setLOCTYPE(Loctype.URL);
-                    flocat.setXlinkHref(bitstreams[bits].getChecksum());
+                    if (fullURL)
+                    {
+                        flocat.setXlinkHref(bitstreamPID);
+                    }
+                    else
+                    {
+                        flocat.setXlinkHref(bitstreams[bits].getName());
+                    }
 
                     // Add FLocat to File, and File to FileGrp
                     file.getContent().add(flocat);
@@ -495,12 +511,22 @@ public class METSExport
 
                 // Add fileGrp to fileSec
                 fileSec.getContent().add(fileGrp);
+                fileSecEmpty = false;
             }
 
             // Add fileSec to document
-            mets.getContent().add(fileSec);
+            if (!fileSecEmpty)
+            {
+                mets.getContent().add(fileSec);
+            }
+            
+            // FIXME: Add Structmap here, but it is empty and we won't use it now.
+            StructMap structMap = new StructMap();
+            Div div = new Div();
+            structMap.getContent().add(div);
+            mets.getContent().add(structMap);
 
-            // FIXME: Structmap
+            
             mets.validate(new MetsValidator());
 
             mets.write(new MetsWriter(os));
