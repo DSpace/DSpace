@@ -59,6 +59,7 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.PluginManager;
 import org.dspace.search.DSIndexer;
 
 /**
@@ -71,10 +72,6 @@ import org.dspace.search.DSIndexer;
  */
 public class MediaFilterManager
 {
-    private static Map filterNames = new HashMap();
-
-    private static Map filterCache = new HashMap();
-
     public static boolean createIndex = true; // default to creating index
 
     public static boolean isVerbose = false; // default to not verbose
@@ -124,14 +121,6 @@ public class MediaFilterManager
             isForce = true;
         }
 
-        // get path to config file
-        String myPath = ConfigurationManager.getProperty("dspace.dir")
-                + File.separator + "config" + File.separator
-                + "mediafilter.cfg";
-
-        // format name, classname
-        System.out.println("Using configuration in " + myPath);
-
         Context c = null;
 
         try
@@ -140,56 +129,6 @@ public class MediaFilterManager
 
             // have to be super-user to do the filtering
             c.setIgnoreAuthorization(true);
-
-            // read in the mediafilter.cfg file, store in HashMap
-            BufferedReader is = new BufferedReader(new FileReader(myPath));
-            String myLine = null;
-
-            while ((myLine = is.readLine()) != null)
-            {
-                // skip any lines beginning with #
-                if (myLine.indexOf("#") == 0)
-                {
-                    continue;
-                }
-
-                // no comment, so try and parse line
-                StringTokenizer st = new StringTokenizer(myLine);
-
-                // has to have at least 2 tokens
-                if (st.countTokens() >= 2)
-                {
-                    String[] tokens = new String[st.countTokens()];
-
-                    // grab all tokens and stuff in array
-                    for (int i = 0; i < tokens.length; i++)
-                    {
-                        tokens[i] = st.nextToken();
-                    }
-
-                    // class is the last token
-                    String myClass = tokens[tokens.length - 1];
-                    String myFormat = tokens[0];
-
-                    // everything else is the format
-                    for (int i = 1; i < (tokens.length - 1); i++)
-                    {
-                        myFormat = myFormat + " " + tokens[i];
-                    }
-
-                    System.out.println("Format: '" + myFormat
-                            + "' Filtering Class: '" + myClass + "'");
-
-                    // now convert format name to a format ID (int) for the hash
-                    // key
-                    int formatID = BitstreamFormat.findByShortDescription(c,
-                            myFormat).getID();
-
-                    filterNames.put(new Integer(formatID), myClass);
-                }
-            }
-
-            is.close();
 
             // now apply the filters
             applyFiltersAllItems(c);
@@ -264,23 +203,11 @@ public class MediaFilterManager
             Bitstream myBitstream) throws Exception
     {
         // do we have a filter for that format?
-        Integer formatID = new Integer(myBitstream.getFormat().getID());
-
-        if (filterNames.containsKey(formatID))
+        MediaFilter myFilter = (MediaFilter)PluginManager.getNamedPlugin(
+                                  MediaFilter.class,
+                                  myBitstream.getFormat().getShortDescription());
+        if (myFilter != null)
         {
-            // now, have we instantiated the class already?
-            if (!filterCache.containsKey(formatID))
-            {
-                // given a class name, load the class
-                Class f = Class.forName((String) filterNames.get(formatID));
-                MediaFilter myFilter = (MediaFilter) f.newInstance();
-
-                filterCache.put(formatID, myFilter);
-            }
-
-            // now get the filter and use it
-            MediaFilter myFilter = (MediaFilter) filterCache.get(formatID);
-
             try
             {
                 // only update item if bitstream not skipped

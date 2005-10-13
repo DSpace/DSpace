@@ -2,6 +2,7 @@
 ==========
 (Larry Stone)
 - SF Patch #1254679 Plugin Manager implementation
+- SF Patch #1254704 Convert Media Filters to use Plugin Manager
 
 (Henry Jerez (LANL))
 - SF Patch #1246928 DIDL plug-in for DSpace
