@@ -189,6 +189,17 @@ property.name = property value
 	</ul>
 	</p>
 
+  <h3>DIDL</h3>
+  <p>The DIDL Crosswalk can be activated as follows:
+	<ul>
+		<li>Uncomment the <code>oai.didl.maxresponse</code> item in <code>dspace.cfg</code></li>
+		<li>Uncomment the DIDL Crosswalk entry from the <code>config/templates/oaicat.properties</code> file</li>
+		<li>Run	the <code>bin/install-configs</code> script</li>
+		<li>Restart Tomcat</li>
+		<li>Verify the Crosswalk is activated by accessing a URL such as <code>http://mydspace/dspace-oai/request?verb=ListRecords&metadataPrefix=didl</code></li>
+	</ul>
+	</p>
+
   <h2><a name="templates" id="templates">Configuration Files for Other Applications</a></h2>
 
   <p>To ease the hassle of keeping configuration files for other applications involved in running a DSpace site, for example Apache, in sync, the DSpace system can automatically update them for you when the main DSpace configuration is changed. This feature of the DSpace system is entirely optional, but we found it useful.</p>
