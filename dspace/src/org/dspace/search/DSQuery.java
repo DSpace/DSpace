@@ -133,7 +133,7 @@ public class DSQuery
             Searcher searcher = getSearcher(ConfigurationManager
                     .getProperty("search.dir"));
 
-            QueryParser qp = new QueryParser("default", new DSAnalyzer());
+            QueryParser qp = new QueryParser("default", DSIndexer.getAnalyzer());
             log.info("Final query string: " + querystring);
             Query myquery = qp.parse(querystring);
             Hits hits = searcher.search(myquery);

@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
@@ -64,6 +65,7 @@ import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 
 /**
@@ -76,6 +78,10 @@ public class DSIndexer
 {
     private static final Logger log = Logger.getLogger(DSIndexer.class);
 
+    // TODO: Support for analyzers per language, or multiple indices
+    /** The analyzer for this DSpace instance */
+    private static Analyzer analyzer = null;
+    
     /**
      * IndexItem() adds a single item to the index
      */
@@ -221,6 +227,47 @@ public class DSIndexer
         }
     }
 
+    /**
+     * Get the Lucene analyzer to use according to current configuration (or
+     * default). TODO: Should have multiple analyzers (and maybe indices?) for
+     * multi-lingual DSpaces.
+     * 
+     * @return <code>Analyzer</code> to use
+     * @throws IllegalStateException
+     *             if the configured analyzer can't be instantiated
+     */
+    static Analyzer getAnalyzer() throws IllegalStateException
+    {
+        if (analyzer == null)
+        {
+            // We need to find the analyzer class from the configuration
+            String analyzerClassName = ConfigurationManager
+                    .getProperty("search.analyzer");
+
+            if (analyzerClassName == null)
+            {
+                // Use default
+                analyzerClassName = "org.dspace.search.DSAnalyzer";
+            }
+
+            try
+            {
+                Class analyzerClass = Class.forName(analyzerClassName);
+                analyzer = (Analyzer) analyzerClass.newInstance();
+            }
+            catch (Exception e)
+            {
+                log.fatal(LogManager.getHeader(null, "no_search_analyzer",
+                        "search.analyzer=" + analyzerClassName), e);
+
+                throw new IllegalStateException(e.toString());
+            }
+        }
+
+        return analyzer;
+    }
+    
+    
     ////////////////////////////////////
     //      Private
     ////////////////////////////////////
@@ -235,7 +282,7 @@ public class DSIndexer
 
         String index_directory = ConfigurationManager.getProperty("search.dir");
 
-        writer = new IndexWriter(index_directory, new DSAnalyzer(),
+        writer = new IndexWriter(index_directory, getAnalyzer(),
                 wipe_existing);
 
         /* Set maximum number of terms to index if present in dspace.cfg */

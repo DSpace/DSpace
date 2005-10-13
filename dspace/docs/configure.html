@@ -612,6 +612,12 @@ dstat-report-monthly
 
   <p>If this config item is missing or is set to any value other than <code>true</code> the item counts will not be shown.</p>
 
+  <h2><a name="luceneanalyzer" id="luceneanalyzer">Lucene Analyzer</a></h2>
+
+  <p>The Lucene analyzer used in searching and indexing can be configured by setting the <code>search.analyzer</code> configuration item in <code>dspace.cfg</code> to the class of the desired analzyer. If this item is not present/commented out, the default Lucene analyzer <code>org.dspace.search.DSAnalyzer</code> is used.</p>
+
+  <p>As well as those analyzers included in the Lucene distribution (see <code>lucene.jar</code>), a Chinese analyzer from the Lucene sandbox is included in <code>lucene-sandbox.jar</code>. This analyzer is yet to be included in the core Lucene distribution but can be configured by setting <code>search.analyzer = org.apache.lucene.analysis.cn.ChineseAnalyzer</code> in <code>dspace.cfg</code>.</p>
+
   <h2><a name="formathelp" id="formathelp">On-line Help About File Formats</a></h2>
 
   <p>Because the file format support policy is determined by each individual institution, the on-line help on this subject is intentionally left blank. The help file will, however, retrieve a list of formats and the support levels associated with them in your database and display this information to the user. We highly recommend that you edit the "Format Support Policy" section of the file <code><i>[dspace-source]</i>/jsp/help/formats.jsp</code>.</p>

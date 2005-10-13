@@ -2,6 +2,7 @@
 ==========
 (Robert Tansley)
 - SF Patch #1244813 Expose METS to OAI-PMH harvesters
+- SF Patch #1209318 Configurable Lucene Analyzer, Chinese search
 
 (Tim Donohue)
 - SF Patch #1274250 Fix Malformed METS metadata export
