@@ -41,8 +41,12 @@ package org.dspace.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -77,11 +81,18 @@ public class Group extends DSpaceObject
     /** The row in the table representing this object */
     private TableRow myRow;
 
-    /** list of epeople in the group */
+    /** lists of epeople and groups in the group */
     private List epeople = new ArrayList();
 
-    /** epeople list needs to be written out again */
-    private boolean epeoplechanged = false;
+    private List groups = new ArrayList();
+
+    /** lists that need to be written out again */
+    private boolean epeopleChanged = false;
+
+    private boolean groupsChanged = false;
+
+    /** is this just a stub, or is all data loaded? */
+    private boolean isDataLoaded = false;
 
     /**
      * Construct a Group from a given context and tablerow
@@ -94,36 +105,91 @@ public class Group extends DSpaceObject
         myContext = context;
         myRow = row;
 
-        // get epeople objects
-        TableRowIterator tri = DatabaseManager
-                .query(
-                        myContext,
-                        "eperson",
-                        "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE "
-                                + "epersongroup2eperson.eperson_id=eperson.eperson_id AND "
-                                + "epersongroup2eperson.eperson_group_id="
-                                + myRow.getIntColumn("eperson_group_id"));
-
-        while (tri.hasNext())
-        {
-            TableRow r = (TableRow) tri.next();
-
-            // First check the cache
-            EPerson fromCache = (EPerson) myContext.fromCache(EPerson.class, r
-                    .getIntColumn("eperson_id"));
-
-            if (fromCache != null)
-            {
-                epeople.add(fromCache);
-            }
-            else
-            {
-                epeople.add(new EPerson(myContext, r));
-            }
-        }
-
         // Cache ourselves
         context.cache(this, row.getIntColumn("eperson_group_id"));
+    }
+
+    /**
+     * Populate Group with eperson and group objects
+     * 
+     * @param context
+     * @throws SQLException
+     */
+    public void loadData()
+    {
+        // only populate if not already populated
+        if (!isDataLoaded)
+        {
+            // naughty thing to do - swallowing SQL exception and throwing it as
+            // a RuntimeException - a hack to avoid changing the API all over
+            // the place
+            try
+            {
+                // get epeople objects
+                TableRowIterator tri = DatabaseManager
+                        .query(
+                                myContext,
+                                "eperson",
+                                "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE "
+                                        + "epersongroup2eperson.eperson_id=eperson.eperson_id AND "
+                                        + "epersongroup2eperson.eperson_group_id="
+                                        + myRow
+                                                .getIntColumn("eperson_group_id"));
+
+                while (tri.hasNext())
+                {
+                    TableRow r = (TableRow) tri.next();
+
+                    // First check the cache
+                    EPerson fromCache = (EPerson) myContext.fromCache(
+                            EPerson.class, r.getIntColumn("eperson_id"));
+
+                    if (fromCache != null)
+                    {
+                        epeople.add(fromCache);
+                    }
+                    else
+                    {
+                        epeople.add(new EPerson(myContext, r));
+                    }
+                }
+
+                // now get Group objects
+                tri = DatabaseManager
+                        .query(
+                                myContext,
+                                "epersongroup",
+                                "SELECT epersongroup.* FROM epersongroup, group2group WHERE "
+                                        + "group2group.child_id=epersongroup.eperson_group_id AND "
+                                        + "group2group.parent_id="
+                                        + myRow
+                                                .getIntColumn("eperson_group_id"));
+
+                while (tri.hasNext())
+                {
+                    TableRow r = (TableRow) tri.next();
+
+                    // First check the cache
+                    Group fromCache = (Group) myContext.fromCache(Group.class,
+                            r.getIntColumn("eperson_group_id"));
+
+                    if (fromCache != null)
+                    {
+                        groups.add(fromCache);
+                    }
+                    else
+                    {
+                        groups.add(new Group(myContext, r));
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+            isDataLoaded = true;
+        }
     }
 
     /**
@@ -192,13 +258,34 @@ public class Group extends DSpaceObject
      */
     public void addMember(EPerson e)
     {
-        if (epeople.contains(e))
+        loadData(); // make sure Group has data loaded
+
+        if (isMember(e))
         {
             return;
         }
 
         epeople.add(e);
-        epeoplechanged = true;
+        epeopleChanged = true;
+    }
+
+    /**
+     * add group to this group
+     * 
+     * @param g
+     */
+    public void addMember(Group g)
+    {
+        loadData(); // make sure Group has data loaded
+
+        // don't add if it's already a member
+        if (isMember(g))
+        {
+            return;
+        }
+
+        groups.add(g);
+        groupsChanged = true;
     }
 
     /**
@@ -209,9 +296,26 @@ public class Group extends DSpaceObject
      */
     public void removeMember(EPerson e)
     {
+        loadData(); // make sure Group has data loaded
+
         if (epeople.remove(e))
         {
-            epeoplechanged = true;
+            epeopleChanged = true;
+        }
+    }
+
+    /**
+     * remove group from this group
+     * 
+     * @param g
+     */
+    public void removeMember(Group g)
+    {
+        loadData(); // make sure Group has data loaded
+
+        if (groups.remove(g))
+        {
+            groupsChanged = true;
         }
     }
 
@@ -229,7 +333,23 @@ public class Group extends DSpaceObject
             return true;
         }
 
+        loadData(); // make sure Group has data loaded
+
         return epeople.contains(e);
+    }
+
+    /**
+     * check to see if group is a member
+     * 
+     * @param g
+     *            group to check
+     * @return
+     */
+    public boolean isMember(Group g)
+    {
+        loadData(); // make sure Group has data loaded
+
+        return groups.contains(g);
     }
 
     /**
@@ -259,29 +379,215 @@ public class Group extends DSpaceObject
 
         EPerson currentuser = c.getCurrentUser();
 
-        //  only test for membership if context contains a user
+        // only test for membership if context contains a user
         if (currentuser != null)
         {
-            // not in special groups, try database
-            int userid = currentuser.getID();
-
-            TableRowIterator tri = DatabaseManager
-                    .query(
-                            c,
-                            "eperson",
-                            "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE "
-                                    + "epersongroup2eperson.eperson_id=eperson.eperson_id AND "
-                                    + "epersongroup2eperson.eperson_group_id="
-                                    + groupid + " AND eperson.eperson_id="
-                                    + userid);
-
-            if (tri.hasNext())
-            {
-                return true;
-            }
+            return epersonInGroup(c, groupid, currentuser);
         }
 
+        // currentuser not set, return FALSE
         return false;
+    }
+
+    /**
+     * Get all of the groups that an eperson is a member of
+     * 
+     * @param c
+     * @param e
+     * @return
+     * @throws SQLException
+     */
+    public static Group[] allMemberGroups(Context c, EPerson e)
+            throws SQLException
+    {
+        List groupList = new ArrayList();
+
+        Set myGroups = allMemberGroupIDs(c, e);
+        // now convert those Integers to Groups
+        Iterator i = myGroups.iterator();
+
+        while (i.hasNext())
+        {
+            groupList.add(Group.find(c, ((Integer) i.next()).intValue()));
+        }
+
+        return (Group[]) groupList.toArray(new Group[0]);
+    }
+
+    /**
+     * get Set of Integers all of the group memberships for an eperson
+     * 
+     * @param c
+     * @param e
+     * @return Set of Integer groupIDs
+     * @throws SQLException
+     */
+    public static Set allMemberGroupIDs(Context c, EPerson e)
+            throws SQLException
+    {
+        // two queries - first to get groups eperson is a member of
+        // second query gets parent groups for groups eperson is a member of
+
+        TableRowIterator tri = DatabaseManager.query(c, "epersongroup2eperson",
+                "SELECT * FROM epersongroup2eperson WHERE eperson_id="
+                        + e.getID());
+
+        Set groupIDs = new HashSet();
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            int childID = row.getIntColumn("eperson_group_id");
+
+            groupIDs.add(new Integer(childID));
+        }
+
+        // now we have all owning groups, also grab all parents of owning groups
+        // yes, I know this could have been done as one big query and a union,
+        // but doing the Oracle port taught me to keep to simple SQL!
+
+        String groupQuery = "";
+
+        Iterator i = groupIDs.iterator();
+
+        while (i.hasNext())
+        {
+            int groupID = ((Integer) i.next()).intValue();
+
+            groupQuery += "child_id=" + groupID;
+            if (i.hasNext())
+                groupQuery += " OR ";
+        }
+
+        if ("".equals(groupQuery))
+        {
+            // don't do query, isn't member of any groups
+            return groupIDs;
+        }
+
+        // was member of at least one group
+        tri = DatabaseManager.query(c, "group2groupcache",
+                "SELECT * FROM group2groupcache WHERE " + groupQuery);
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            int parentID = row.getIntColumn("parent_id");
+
+            groupIDs.add(new Integer(parentID));
+        }
+
+        return groupIDs;
+    }
+    
+    
+    /**
+     * Get all of the epeople who are a member of the
+     * specified group, or a member of a sub-group of the
+     * specified group, etc.
+     * 
+     * @param c   
+     *          DSpace context
+     * @param g   
+     *          Group object
+     * @return   Array of EPerson objects
+     * @throws SQLException
+     */
+    public static EPerson[] allMembers(Context c, Group g)
+            throws SQLException
+    {
+        List epersonList = new ArrayList();
+
+        Set myEpeople = allMemberIDs(c, g);
+        // now convert those Integers to EPerson objects
+        Iterator i = myEpeople.iterator();
+
+        while (i.hasNext())
+        {
+            epersonList.add(EPerson.find(c, ((Integer) i.next()).intValue()));
+        }
+
+        return (EPerson[]) epersonList.toArray(new EPerson[0]);
+    }
+
+    /**
+     * Get Set of all Integers all of the epeople
+     * members for a group
+     * 
+     * @param c
+     *          DSpace context
+     * @param g
+     *          Group object
+     * @return Set of Integer epersonIDs
+     * @throws SQLException
+     */
+    public static Set allMemberIDs(Context c, Group g)
+            throws SQLException
+    {
+        // two queries - first to get all groups which are a member of this group
+        // second query gets all members of each group in the first query
+        Set epeopleIDs = new HashSet();
+        
+        // Get all groups which are a member of this group
+        TableRowIterator tri = DatabaseManager.query(c, "group2groupcache",
+                "SELECT * FROM group2groupcache WHERE parent_id="
+                        + g.getID());
+        
+        Set groupIDs = new HashSet();
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            int childID = row.getIntColumn("child_id");
+
+            groupIDs.add(new Integer(childID));
+        }
+
+        // now we have all the groups (including this one)
+        // it is time to find all the EPeople who belong to those groups
+        // and filter out all duplicates
+
+        Iterator i = groupIDs.iterator();
+
+        // don't forget to add the current group to this query!
+        String epersonQuery = "eperson_group_id=" + g.getID();
+        if (i.hasNext())
+            epersonQuery += " OR ";
+        
+        while (i.hasNext())
+        {
+            int groupID = ((Integer) i.next()).intValue();
+
+            epersonQuery += "eperson_group_id=" + groupID;
+            if (i.hasNext())
+                epersonQuery += " OR ";
+        }
+
+        //get all the EPerson IDs
+        tri = DatabaseManager.query(c, "epersongroup2eperson",
+                "SELECT * FROM epersongroup2eperson WHERE " + epersonQuery);
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            int epersonID = row.getIntColumn("eperson_id");
+   
+            epeopleIDs.add(new Integer(epersonID));
+        }
+
+        return epeopleIDs;
+    }
+
+    private static boolean epersonInGroup(Context c, int groupID, EPerson e)
+            throws SQLException
+    {
+        Set groupIDs = Group.allMemberGroupIDs(c, e);
+
+        return groupIDs.contains(new Integer(groupID));
     }
 
     /**
@@ -350,8 +656,10 @@ public class Group extends DSpaceObject
     /**
      * Finds all groups in the site
      * 
-     * @param context    DSpace context
-     * @param sortField  field to sort by -- Group.ID or Group.NAME
+     * @param context
+     *            DSpace context
+     * @param sortField
+     *            field to sort by -- Group.ID or Group.NAME
      * 
      * @return array of all groups in the site
      */
@@ -406,7 +714,7 @@ public class Group extends DSpaceObject
 
     /**
      * Delete a group
-     *  
+     * 
      */
     public void delete() throws SQLException
     {
@@ -422,7 +730,17 @@ public class Group extends DSpaceObject
                 "DELETE FROM EPersonGroup2EPerson WHERE eperson_group_id="
                         + getID());
 
-        //      don't forget the new table
+        // remove any group2groupcache entries
+        DatabaseManager.updateQuery(myContext,
+                "DELETE FROM group2groupcache WHERE parent_id=" + getID()
+                        + " OR child_id=" + getID());
+
+        // Now remove any group2group assignments
+        DatabaseManager.updateQuery(myContext,
+                "DELETE FROM group2group WHERE parent_id=" + getID()
+                        + " OR child_id=" + getID());
+
+        // don't forget the new table
         deleteEpersonGroup2WorkspaceItem();
 
         // Remove ourself
@@ -440,26 +758,46 @@ public class Group extends DSpaceObject
     private void deleteEpersonGroup2WorkspaceItem() throws SQLException
     {
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM EPersonGroup2WorkspaceItem WHERE eperson_group_id=" + getID());
+                "DELETE FROM EPersonGroup2WorkspaceItem WHERE eperson_group_id="
+                        + getID());
     }
 
     /**
-     * Return EPerson members of a group
+     * Return EPerson members of a Group
      */
     public EPerson[] getMembers()
     {
+        loadData(); // make sure all data is loaded
+
         EPerson[] myArray = new EPerson[epeople.size()];
         myArray = (EPerson[]) epeople.toArray(myArray);
 
         return myArray;
     }
+   
+    /**
+     * Return Group members of a Group
+     * 
+     * @return
+     */
+    public Group[] getMemberGroups()
+    {
+        loadData(); // make sure all data is loaded
 
+        Group[] myArray = new Group[groups.size()];
+        myArray = (Group[]) groups.toArray(myArray);
+
+        return myArray;
+    }
+    
     /**
      * Return true if group has no members
      */
     public boolean isEmpty()
     {
-        if (epeople.size() == 0)
+        loadData(); // make sure all data is loaded
+
+        if ((epeople.size() == 0) && (groups.size() == 0))
         {
             return true;
         }
@@ -478,7 +816,7 @@ public class Group extends DSpaceObject
         DatabaseManager.update(myContext, myRow);
 
         // Redo eperson mappings if they've changed
-        if (epeoplechanged)
+        if (epeopleChanged)
         {
             // Remove any existing mappings
             DatabaseManager.updateQuery(myContext,
@@ -499,7 +837,34 @@ public class Group extends DSpaceObject
                 DatabaseManager.update(myContext, mappingRow);
             }
 
-            epeoplechanged = false;
+            epeopleChanged = false;
+        }
+
+        // Redo Group mappings if they've changed
+        if (groupsChanged)
+        {
+            // Remove any existing mappings
+            DatabaseManager.updateQuery(myContext,
+                    "delete from group2group where parent_id=" + getID());
+
+            // Add new mappings
+            Iterator i = groups.iterator();
+
+            while (i.hasNext())
+            {
+                Group g = (Group) i.next();
+
+                TableRow mappingRow = DatabaseManager.create(myContext,
+                        "group2group");
+                mappingRow.setColumn("parent_id", getID());
+                mappingRow.setColumn("child_id", g.getID());
+                DatabaseManager.update(myContext, mappingRow);
+            }
+
+            // groups changed, now change group cache
+            rethinkGroupCache();
+
+            groupsChanged = false;
         }
 
         log.info(LogManager.getHeader(myContext, "update_group", "group_id="
@@ -534,5 +899,138 @@ public class Group extends DSpaceObject
     public String getHandle()
     {
         return null;
+    }
+
+    /**
+     * Regenerate the group cache AKA the group2groupcache table in the database -
+     * meant to be called when a group is added or removed from another group
+     * 
+     */
+    private void rethinkGroupCache() throws SQLException
+    {
+        // read in the group2group table
+        TableRowIterator tri = DatabaseManager.query(myContext, "group2group",
+                "SELECT * FROM group2group");
+
+        Map parents = new HashMap();
+
+        while (tri.hasNext())
+        {
+            TableRow row = (TableRow) tri.next();
+
+            Integer parentID = new Integer(row.getIntColumn("parent_id"));
+            Integer childID = new Integer(row.getIntColumn("child_id"));
+
+            // if parent doesn't have an entry, create one
+            if (!parents.containsKey(parentID))
+            {
+                Set children = new HashSet();
+
+                // add child id to the list
+                children.add(childID);
+                parents.put(parentID, children);
+            }
+            else
+            {
+                // parent has an entry, now add the child to the parent's record
+                // of children
+                Set children = (Set) parents.get(parentID);
+                children.add(childID);
+            }
+        }
+
+        // now parents is a hash of all of the IDs of groups that are parents
+        // and each hash entry is a hash of all of the IDs of children of those
+        // parent groups
+        // so now to establish all parent,child relationships we can iterate
+        // through the parents hash
+
+        Iterator i = parents.keySet().iterator();
+
+        while (i.hasNext())
+        {
+            Integer parentID = (Integer) i.next();
+
+            Set myChildren = getChildren(parents, parentID);
+
+            Iterator j = myChildren.iterator();
+
+            while (j.hasNext())
+            {
+                // child of a parent
+                Integer childID = (Integer) j.next();
+
+                ((Set) parents.get(parentID)).add(childID);
+            }
+        }
+
+        // empty out group2groupcache table
+        DatabaseManager.updateQuery(myContext,
+                "DELETE FROM group2groupcache WHERE id >= 0");
+
+        // write out new one
+        Iterator pi = parents.keySet().iterator(); // parent iterator
+
+        while (pi.hasNext())
+        {
+            Integer parent = (Integer) pi.next();
+
+            Set children = (Set) parents.get(parent);
+            Iterator ci = children.iterator(); // child iterator
+
+            while (ci.hasNext())
+            {
+                Integer child = (Integer) ci.next();
+
+                TableRow row = DatabaseManager.create(myContext,
+                        "group2groupcache");
+
+                int parentID = parent.intValue();
+                int childID = child.intValue();
+
+                row.setColumn("parent_id", parentID);
+                row.setColumn("child_id", childID);
+
+                DatabaseManager.update(myContext, row);
+            }
+        }
+    }
+
+    /**
+     * Used recursively to generate a map of ALL of the children of the given
+     * parent
+     * 
+     * @param parents
+     *            Map of parent,child relationships
+     * @param parent
+     *            the parent you're interested in
+     * @return Map whose keys are all of the children of a parent
+     */
+    private Set getChildren(Map parents, Integer parent)
+    {
+        Set myChildren = new HashSet();
+
+        // degenerate case, this parent has no children
+        if (!parents.containsKey(parent))
+            return myChildren;
+
+        // got this far, so we must have children
+        Set children = (Set) parents.get(parent);
+
+        // now iterate over all of the children
+        Iterator i = children.iterator();
+
+        while (i.hasNext())
+        {
+            Integer childID = (Integer) i.next();
+
+            // add this child's ID to our return set
+            myChildren.add(childID);
+
+            // and now its children
+            myChildren.addAll(getChildren(parents, childID));
+        }
+
+        return myChildren;
     }
 }

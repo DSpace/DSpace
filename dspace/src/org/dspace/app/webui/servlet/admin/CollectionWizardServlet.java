@@ -394,14 +394,15 @@ public class CollectionWizardServlet extends DSpaceServlet
             break;
         }
 
-        // Add people from the form to the group
-        int[] ids = UIUtil.getIntParameters(request, "eperson_id");
-
-        if (ids != null)
+        // Add people and groups from the form to the group
+        int[] eperson_ids = UIUtil.getIntParameters(request, "eperson_id");
+        int[] group_ids = UIUtil.getIntParameters(request, "group_ids");
+        
+        if (eperson_ids != null)
         {
-            for (int i = 0; i < ids.length; i++)
+            for (int i = 0; i < eperson_ids.length; i++)
             {
-                EPerson eperson = EPerson.find(context, ids[i]);
+                EPerson eperson = EPerson.find(context, eperson_ids[i]);
 
                 if (eperson != null)
                 {
@@ -409,6 +410,20 @@ public class CollectionWizardServlet extends DSpaceServlet
                 }
             }
         }
+        
+        if (group_ids != null)
+        {
+            for (int i = 0; i < group_ids.length; i++)
+            {
+                Group group = Group.find(context, group_ids[i]);
+            
+                if (group != null)
+                {
+                    g.addMember(group);
+                }
+            }
+        }
+        
 
         // Update group
         g.update();

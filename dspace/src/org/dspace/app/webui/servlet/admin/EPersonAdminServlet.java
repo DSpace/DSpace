@@ -53,6 +53,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.EPersonDeletionException;
 
 /**
@@ -101,7 +102,11 @@ public class EPersonAdminServlet extends DSpaceServlet
             EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
                     "eperson_id"));
 
+            // what groups is this person a member of?
+            Group[] groupMemberships = Group.allMemberGroups(context, e);
+
             request.setAttribute("eperson", e);
+            request.setAttribute("group.memberships", groupMemberships);
 
             JSPManager.showJSP(request, response,
                     "/dspace-admin/eperson-edit.jsp");
@@ -119,7 +124,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             String oldEmail = e.getEmail();
             String newEmail = request.getParameter("email").trim();
             String netid = request.getParameter("netid");
-			
+
             if (!newEmail.equals(oldEmail))
             {
                 // change to email, now see if it's unique
@@ -128,23 +133,25 @@ public class EPersonAdminServlet extends DSpaceServlet
                     // it's unique - proceed!
                     e.setEmail(newEmail);
 
-                    e.setFirstName(request.getParameter("firstname")
+                    e
+                            .setFirstName(request.getParameter("firstname")
                                     .equals("") ? null : request
                                     .getParameter("firstname"));
 
-                    e.setLastName(request.getParameter("lastname")
+                    e
+                            .setLastName(request.getParameter("lastname")
                                     .equals("") ? null : request
                                     .getParameter("lastname"));
 
                     if (netid != null)
                     {
-                    	e.setNetid(netid.equals("") ? null : netid);
+                        e.setNetid(netid.equals("") ? null : netid);
                     }
                     else
                     {
-                    	e.setNetid(null);
+                        e.setNetid(null);
                     }
-                    
+
                     // FIXME: More data-driven?
                     e.setMetadata("phone", request.getParameter("phone")
                             .equals("") ? null : request.getParameter("phone"));
@@ -180,17 +187,19 @@ public class EPersonAdminServlet extends DSpaceServlet
                 // no change to email
                 if (netid != null)
                 {
-                	e.setNetid(netid.equals("") ? null : netid);
+                    e.setNetid(netid.equals("") ? null : netid);
                 }
                 else
                 {
-                	e.setNetid(null);
+                    e.setNetid(null);
                 }
 
-                e.setFirstName(request.getParameter("firstname").equals(
+                e
+                        .setFirstName(request.getParameter("firstname").equals(
                                 "") ? null : request.getParameter("firstname"));
 
-                e.setLastName(request.getParameter("lastname")
+                e
+                        .setLastName(request.getParameter("lastname")
                                 .equals("") ? null : request
                                 .getParameter("lastname"));
 

@@ -137,13 +137,13 @@ public class SelectEPersonTag extends TagSupport
             HttpServletRequest req = (HttpServletRequest) pageContext
                     .getRequest();
 
-            out.print("<table><tr><td colspan=\"2\"><select multiple=\"multiple\" name=\"eperson_id\" size=\"");
+            out.print("<table><tr><td colspan=\"2\" align=\"center\"><select multiple=\"multiple\" name=\"eperson_id\" size=\"");
             out.print(multiple ? "10" : "1");
             out.println("\">");
             // ensure that if no eperson is selected that a blank option is displayed - xhtml compliance 
             if (epeople == null || epeople.length == 0)
             {
-              out.print("<option/>");
+              out.print("<option value=\"\">&nbsp;</option>");
             }
              
             if (epeople != null)

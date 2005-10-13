@@ -70,6 +70,8 @@ CREATE SEQUENCE itemsbytitle_seq;
 CREATE SEQUENCE itemsbydate_seq;
 CREATE SEQUENCE itemsbydateaccessioned_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
+CREATE SEQUENCE group2group_seq;
+CREATE SEQUENCE group2groupcache_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -148,6 +150,32 @@ CREATE TABLE EPersonGroup
 (
   eperson_group_id INTEGER PRIMARY KEY,
   name             VARCHAR2(256) UNIQUE
+);
+
+------------------------------------------------------
+-- Group2Group table, records group membership in other groups
+------------------------------------------------------
+CREATE TABLE Group2Group
+(
+  id        INTEGER PRIMARY KEY,
+  parent_id INTEGER REFERENCES EPersonGroup(eperson_group_id),
+  child_id  INTEGER REFERENCES EPersonGroup(eperson_group_id)
+);
+
+------------------------------------------------------
+-- Group2GroupCache table, is the 'unwound' hierarchy in
+-- Group2Group.  It explicitly names every parent child
+-- relationship, even with nested groups.  For example,
+-- If Group2Group lists B is a child of A and C is a child of B,
+-- this table will have entries for parent(A,B), and parent(B,C)
+-- AND parent(A,C) so that all of the child groups of A can be
+-- looked up in a single simple query
+------------------------------------------------------
+CREATE TABLE Group2GroupCache
+(
+  id        INTEGER PRIMARY KEY,
+  parent_id INTEGER REFERENCES EPersonGroup(eperson_group_id),
+  child_id  INTEGER REFERENCES EPersonGroup(eperson_group_id)
 );
 
 -------------------------------------------------------

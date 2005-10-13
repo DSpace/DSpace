@@ -164,31 +164,32 @@
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3">&nbsp;</td>
+					<td colspan="2">&nbsp;</td>
 				</tr>
 				<tr>
-					<%-- <td colspan="3" class="submitFormHelp"><STRONG>OR</STRONG></td> --%>
-					<td colspan=3 class="submitFormHelp"><strong><fmt:message key="jsp.dspace-admin.wizard-permissions.or"/></strong></td>
+					<%-- <td colspan="2" class="submitFormHelp"><strong>OR</strong></td> --%>
+					<td colspan="2" class="submitFormHelp"><strong><fmt:message key="jsp.dspace-admin.wizard-permissions.or"/></strong></td>
 				</tr>
 				<tr>
-					<td colspan="3">&nbsp;</td>
+					<td colspan="2">&nbsp;</td>
 				</tr>
 <%
 	}
 %>
 
-<%-- width=40% centres table nicely --%>
 				<tr>
-					<td width="40%"></td>
-					<td class="submitFormHelp">
-						<%-- Click on the 'Select E-people' button to choose e-people to add to the list.</td> --%>
-						<fmt:message key="jsp.dspace-admin.wizard-permissions.click"/></td>
-					<td width="40%"></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td align="center">
-						<dspace:selecteperson multiple="yes" />
+					<td colspan="2">
+						<table align="center" width="80%">
+          				<tr>
+            				<td class="submitFormHelp"><fmt:message key="jsp.dspace-admin.wizard-permissions.click"/><br/>
+              					<dspace:selecteperson multiple="true" /> 
+            				</td>
+							<td>&nbsp;</td>
+            				<td class="submitFormHelp"><fmt:message key="jsp.dspace-admin.wizard-permissions.click2"/><br/>
+              					<dspace:selectgroup   multiple="true" />
+            				</td>
+		  				</tr>
+        				</table>
 					</td>
 				</tr>
 			</table>
@@ -206,8 +207,8 @@
 
                     </td>
                     <td>
-                        <%-- <input type="submit" name="submit_next" value="Next &gt;" onclick="javascript:finishEPerson();"> --%>
-                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>" onclick="javascript:finishEPerson();"/>
+                        <%-- <input type="submit" name="submit_next" value="Next &gt;" onclick="javascript:finishEPerson();finishGroups();"> --%>
+                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>" onclick="javascript:finishEPerson();finishGroups();"/>
                     </td>
                 </tr>
             </table>

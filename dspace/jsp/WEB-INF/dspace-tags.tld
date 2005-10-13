@@ -313,6 +313,36 @@
   </tag>
 
   <tag>
+    <name>selectgroup</name>
+    <tagclass>org.dspace.app.webui.jsptag.SelectGroupTag</tagclass>
+    <info>
+      Tag for producing a Group select widget in a form.  Somewhat
+      analogous to the HTML SELECT element.  An input
+      field is produced with a button which pops up a window from which
+      groups can be selected.  Selected groups are added to the field
+      in the form.  If the selector is for multiple groups, a 'remove
+      selected from list' button is also added.
+
+      On any form that has a selectgroup tag (only one allowed per page),
+      you need to include the following Javascript code on all of the submit
+      buttons, to ensure that the e-people IDs are posted and that the popup
+      window is close:
+
+      onclick="javascript:finishGroup();"
+    </info>
+    <attribute>
+      <name>multiple</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>selected</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
     <name>sfxlink</name>
     <tagclass>org.dspace.app.webui.jsptag.SFXLinkTag</tagclass>
     <info>

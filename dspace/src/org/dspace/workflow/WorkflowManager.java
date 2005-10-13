@@ -457,13 +457,16 @@ public class WorkflowManager
 
             if ((mygroup != null) && !(mygroup.isEmpty()))
             {
+                // get a list of all epeople in group (or any subgroups)
+                EPerson[] epa = Group.allMembers(c, mygroup);
+                
                 // there were reviewers, change the state
                 //  and add them to the list
-                createTasks(c, wi, mygroup);
+                createTasks(c, wi, epa);
                 wi.update();
 
                 // email notification
-                notifyGroupOfTask(c, mygroup, wi);
+                notifyGroupOfTask(c, wi, mygroup, epa);
             }
             else
             {
@@ -495,12 +498,15 @@ public class WorkflowManager
 
             if ((mygroup != null) && !(mygroup.isEmpty()))
             {
+                //get a list of all epeople in group (or any subgroups)
+                EPerson[] epa = Group.allMembers(c, mygroup);
+                
                 // there were approvers, change the state
                 //  timestamp, and add them to the list
-                createTasks(c, wi, mygroup);
+                createTasks(c, wi, epa);
 
                 // email notification
-                notifyGroupOfTask(c, mygroup, wi);
+                notifyGroupOfTask(c, wi, mygroup, epa);
             }
             else
             {
@@ -528,12 +534,15 @@ public class WorkflowManager
 
             if ((mygroup != null) && !(mygroup.isEmpty()))
             {
+                // get a list of all epeople in group (or any subgroups)
+                EPerson[] epa = Group.allMembers(c, mygroup);
+                
                 // there were editors, change the state
                 //  timestamp, and add them to the list
-                createTasks(c, wi, mygroup);
+                createTasks(c, wi, epa);
 
                 // email notification
-                notifyGroupOfTask(c, mygroup, wi);
+                notifyGroupOfTask(c, wi, mygroup, epa);
             }
             else
             {
@@ -758,13 +767,10 @@ public class WorkflowManager
     }
 
     // creates workflow tasklist entries for a workflow
-    //  from a given eperson group
-    private static void createTasks(Context c, WorkflowItem wi, Group eg)
+    // for all the given EPeople
+    private static void createTasks(Context c, WorkflowItem wi, EPerson[] epa)
             throws SQLException
     {
-        // get a list of epeople
-        EPerson[] epa = eg.getMembers();
-
         // create a tasklist entry for each eperson
         for (int i = 0; i < epa.length; i++)
         {
@@ -786,8 +792,8 @@ public class WorkflowManager
         DatabaseManager.updateQuery(c, myrequest);
     }
 
-    private static void notifyGroupOfTask(Context c, Group mygroup,
-            WorkflowItem wi) throws SQLException, IOException
+    private static void notifyGroupOfTask(Context c, WorkflowItem wi,
+            Group mygroup, EPerson[] epa) throws SQLException, IOException
     {
         // check to see if notification is turned off
         // and only do it once - delete key after notification has
@@ -841,7 +847,7 @@ public class WorkflowManager
                 email.addArgument(message);
                 email.addArgument(getMyDSpaceLink());
 
-                emailGroup(c, mygroup, email);
+                emailRecipients(c, epa, email);
             }
             catch (MessagingException e)
             {
@@ -853,21 +859,19 @@ public class WorkflowManager
     }
 
     /**
-     * Add the members of a group to the recipeients of an email, and send it
+     * Add all the specified people to the list of email recipients,
+     * and send it
      * 
      * @param c
      *            Context
-     * @param mygroup
-     *            Group to get members from
+     * @param epeople
+     *            Eperson[] of recipients
      * @param email
      *            Email object containing the message
      */
-    private static void emailGroup(Context c, Group mygroup, Email email)
+    private static void emailRecipients(Context c, EPerson[] epa, Email email)
             throws SQLException, MessagingException
     {
-        // send message to each member of the group
-        EPerson[] epa = mygroup.getMembers();
-
         for (int i = 0; i < epa.length; i++)
         {
             email.addRecipient(epa[i].getEmail());

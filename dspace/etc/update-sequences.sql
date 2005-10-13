@@ -60,6 +60,8 @@ SELECT setval('fileextension_seq', max(file_extension_id)) FROM fileextension;
 SELECT setval('bitstream_seq', max(bitstream_id)) FROM bitstream;
 SELECT setval('eperson_seq', max(eperson_id)) FROM eperson;
 SELECT setval('epersongroup_seq', max(eperson_group_id)) FROM epersongroup;
+SELECT setval('group2group_seq', max(id)) FROM group2group;
+SELECT setval('group2groupcache_seq', max(id)) FROM group2groupcache;
 SELECT setval('item_seq', max(item_id)) FROM item;
 SELECT setval('bundle_seq', max(bundle_id)) FROM bundle;
 SELECT setval('item2bundle_seq', max(id)) FROM item2bundle;

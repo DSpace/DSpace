@@ -68,6 +68,7 @@
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.eperson.Group"   %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
 
@@ -85,6 +86,9 @@
 
     WorkflowItem[] pooled =
         (WorkflowItem[]) request.getAttribute("workflow.pooled");
+	
+    Group [] groupMemberships =
+        (Group []) request.getAttribute("group.memberships");
 
     SupervisedItem[] supervisedItems =
         (SupervisedItem[]) request.getAttribute("supervised.items");
@@ -123,7 +127,6 @@
             <th id="t2" class="oddRowOddCol"><fmt:message key="jsp.mydspace.main.item"/></th>
             <th id="t3" class="oddRowOddCol"><fmt:message key="jsp.mydspace.main.subto"/></th>
             <th id="t4" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.subby"/></th>
-            <!-- <th id="t5" class="oddRowOddCol">&nbsp;</th> -->
             <th id="t5" class="oddRowEvenCol">&nbsp;</th>
         </tr>
 <%
@@ -409,6 +412,23 @@
     }
 %>
     </table>
+<%
+  }
+
+  if(groupMemberships.length>0)
+  {
+%>
+    <h2><fmt:message key="jsp.mydspace.main.heading6"/></h2>
+    <ul>
+<%
+    for(int i=0; i<groupMemberships.length; i++)
+    {
+%>
+    <li><%=groupMemberships[i].getName()%></li> 
+<%    
+    }
+%>
+	</ul>
 <%
   }
 %>

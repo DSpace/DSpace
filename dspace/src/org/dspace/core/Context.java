@@ -43,11 +43,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -322,30 +324,53 @@ public class Context
     /**
      * set membership in a special group
      * 
-     * @param groupID  special group's ID
+     * @param groupID
+     *            special group's ID
      */
     public void setSpecialGroup(int groupID)
     {
         specialGroups.add(new Integer(groupID));
 
-        //        System.out.println("Added " + groupID);
+        // System.out.println("Added " + groupID);
     }
 
     /**
      * test if member of special group
      * 
-     * @param groupID  ID of special group to test
+     * @param groupID
+     *            ID of special group to test
      * @return true if member
      */
     public boolean inSpecialGroup(int groupID)
     {
         if (specialGroups.contains(new Integer(groupID)))
         {
-            //            System.out.println("Contains " + groupID);
+            // System.out.println("Contains " + groupID);
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * gets an array of all of the special groups that current user is a member
+     * of
+     * 
+     * @return
+     * @throws SQLException
+     */
+    public Group[] getSpecialGroups() throws SQLException
+    {
+        List myGroups = new ArrayList();
+
+        Iterator i = specialGroups.iterator();
+
+        while (i.hasNext())
+        {
+            myGroups.add(Group.find(this, ((Integer) i.next()).intValue()));
+        }
+
+        return (Group[]) myGroups.toArray(new Group[0]);
     }
 
     protected void finalize()

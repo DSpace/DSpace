@@ -54,7 +54,7 @@ function addEPerson(id, email, name)
 {
     var newplace = window.document.forms[0].eperson_id.options.length;
 
-    if (newplace > 0 && window.document.forms[0].eperson_id.options[0].text == "")
+    if (newplace > 0 && window.document.forms[0].eperson_id.options[0].value == "")
     {
         newplace = 0;
     }
@@ -74,6 +74,31 @@ function addEPerson(id, email, name)
     }
 }
 
+// Add to list of groups on this page -- invoked by eperson popup window
+function addGroup(id, name)
+{
+    var newplace = window.document.forms[0].group_ids.options.length;
+
+	if (newplace > 0 && window.document.forms[0].group_ids.options[0].value == "")
+    {
+        newplace = 0;
+    }
+
+    // First we check to see if group is already there
+    for (var i = 0; i < window.document.forms[0].group_ids.options.length; i++)
+    {
+        if ((window.document.forms[0].group_ids.options[i].value == id)  || (window.document.forms[0].group_id.value == id))
+        {
+            newplace = -1;
+        }
+    }
+
+    if (newplace > -1)
+    {
+        window.document.forms[0].group_ids.options[newplace] = new Option(name + " (" + id + ")", id);
+    }
+}
+
 // This needs to be invoked in the 'onClick' javascript event for buttons
 // on pages with a dspace:selecteperson element in them
 function finishEPerson()
@@ -86,6 +111,17 @@ function finishEPerson()
 	}
 }
 
+// This needs to be invoked in the 'onClick' javascript event for buttons
+// on pages with a dspace:selecteperson element in them
+function finishGroups()
+{
+    selectAll(window.document.forms[0].group_ids);
+
+    if (popupWindow != null)
+    {
+		popupWindow.close();
+    }
+}
 
 // =========================================================
 //  Miscellaneous utility methods
@@ -105,7 +141,7 @@ function selectAll(sourceList)
 {
     for(var i = 0; i < sourceList.options.length; i++)
     {
-        if (sourceList.options[i] != null)
+        if ((sourceList.options[i] != null) && (sourceList.options[i].value != ""))
             sourceList.options[i].selected = true;
     }
     return true;

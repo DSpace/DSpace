@@ -40,6 +40,7 @@
 package org.dspace.eperson;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -206,18 +207,16 @@ public class EPerson extends DSpaceObject
         }
     }
 
-
     /**
      * Retrieve all e-person records from the database, sorted by a particular
-     * field. Fields are:
-<<<<<<< EPerson.java
+     * field. Fields are: <<<<<<< EPerson.java
      * <ul>
      * <li><code>ID</code></li>
      * <li><code>LASTNAME</code></li>
      * <li><code>EMAIL</code></li>
      * <li><code>NETID</code></li>
      * </ul>
-=======
+     * =======
      * <UL>
      * <LI><code>ID</code></LI>
      * <LI><code>LASTNAME</code></LI>
@@ -225,8 +224,7 @@ public class EPerson extends DSpaceObject
      * <LI><code>NETID</code></LI>
      * </UL>
      * 
-     * @return  array of EPerson objects
->>>>>>> 1.27
+     * @return array of EPerson objects >>>>>>> 1.27
      */
     public static EPerson[] findAll(Context context, int sortField)
             throws SQLException
@@ -235,20 +233,20 @@ public class EPerson extends DSpaceObject
 
         switch (sortField)
         {
-            case ID:
-                s = "eperson_id";
-                break;
-                
-            case EMAIL:
-                s = "email";
-                break;
-                
-            case NETID:
-                s = "netid";
-                break;
-                
-            default:
-                s = "lastname";
+        case ID:
+            s = "eperson_id";
+            break;
+
+        case EMAIL:
+            s = "email";
+            break;
+
+        case NETID:
+            s = "netid";
+            break;
+
+        default:
+            s = "lastname";
         }
 
         TableRowIterator rows = DatabaseManager.query(context,
@@ -311,7 +309,7 @@ public class EPerson extends DSpaceObject
 
     /**
      * Delete an eperson
-     *  
+     * 
      */
     public void delete() throws SQLException, AuthorizeException,
             EPersonDeletionException
@@ -326,12 +324,12 @@ public class EPerson extends DSpaceObject
         HistoryManager.saveHistory(myContext, this, HistoryManager.REMOVE,
                 myContext.getCurrentUser(), myContext.getExtraLogInfo());
 
-        //check for presence of eperson in tables that
-        //have constraints on eperson_id
+        // check for presence of eperson in tables that
+        // have constraints on eperson_id
         Vector constraintList = getDeleteConstraints();
 
-        //if eperson exists in tables that have constraints
-        //on eperson, throw an exception
+        // if eperson exists in tables that have constraints
+        // on eperson, throw an exception
         if (constraintList.size() > 0)
         {
             throw new EPersonDeletionException(constraintList);
@@ -399,19 +397,19 @@ public class EPerson extends DSpaceObject
 
     /**
      * Get the e-person's netid
-     *
-     * @return  their netid
+     * 
+     * @return their netid
      */
     public String getNetid()
     {
         return myRow.getStringColumn("netid");
     }
 
-
     /**
      * Set the EPerson's netid
-     *
-     * @param  s   the new netid
+     * 
+     * @param s
+     *            the new netid
      */
     public void setNetid(String s)
     {
@@ -419,7 +417,7 @@ public class EPerson extends DSpaceObject
         {
             s = s.toLowerCase();
         }
-    
+
         myRow.setColumn("netid", s);
     }
 
@@ -678,7 +676,7 @@ public class EPerson extends DSpaceObject
     {
         Vector tableList = new Vector();
 
-        //check for eperson in item table
+        // check for eperson in item table
         TableRowIterator tri = DatabaseManager.query(myContext,
                 "SELECT * from item where submitter_id=" + getID());
 
@@ -687,7 +685,7 @@ public class EPerson extends DSpaceObject
             tableList.add("item");
         }
 
-        //check for eperson in workflowitem table
+        // check for eperson in workflowitem table
         tri = DatabaseManager.query(myContext,
                 "SELECT * from workflowitem where owner=" + getID());
 
@@ -696,7 +694,7 @@ public class EPerson extends DSpaceObject
             tableList.add("workflowitem");
         }
 
-        //check for eperson in tasklistitem table
+        // check for eperson in tasklistitem table
         tri = DatabaseManager.query(myContext,
                 "SELECT * from tasklistitem where eperson_id=" + getID());
 
@@ -705,8 +703,37 @@ public class EPerson extends DSpaceObject
             tableList.add("tasklistitem");
         }
 
-        //the list of tables can be used to construct an error message
-        //explaining to the user why the eperson cannot be deleted.
+        // the list of tables can be used to construct an error message
+        // explaining to the user why the eperson cannot be deleted.
         return tableList;
+    }
+
+    /**
+     * return an array of all of the groups that this EPerson is a member of
+     * 
+     * @return Group []
+     * @throws SQLException
+     */
+    public Group[] getGroupMemberships() throws SQLException
+    {
+        // special groups
+        Group[] specialGroups = myContext.getSpecialGroups();
+
+        List groupList = new ArrayList();
+
+        for (int i = 0; i < specialGroups.length; i++)
+        {
+            groupList.add(specialGroups[i]);
+        }
+
+        // primary group IDs - returned as a set of Integers
+        Group[] myGroups = Group.allMemberGroups(myContext, this);
+
+        for (int i = 0; i < myGroups.length; i++)
+        {
+            groupList.add(myGroups[i]);
+        }
+
+        return (Group[]) groupList.toArray(new Group[0]);
     }
 }

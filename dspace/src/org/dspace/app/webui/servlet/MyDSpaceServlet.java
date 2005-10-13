@@ -58,6 +58,7 @@ import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
@@ -137,11 +138,11 @@ public class MyDSpaceServlet extends DSpaceServlet
         }
     }
 
-    //****************************************************************
-    //****************************************************************
-    //             METHODS FOR PROCESSING POSTED FORMS
-    //****************************************************************
-    //****************************************************************
+    // ****************************************************************
+    // ****************************************************************
+    // METHODS FOR PROCESSING POSTED FORMS
+    // ****************************************************************
+    // ****************************************************************
     protected void processMainPage(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -558,11 +559,11 @@ public class MyDSpaceServlet extends DSpaceServlet
         }
     }
 
-    //****************************************************************
-    //****************************************************************
-    //             METHODS FOR SHOWING FORMS
-    //****************************************************************
-    //****************************************************************
+    // ****************************************************************
+    // ****************************************************************
+    // METHODS FOR SHOWING FORMS
+    // ****************************************************************
+    // ****************************************************************
 
     /**
      * Show the main My DSpace page
@@ -600,15 +601,19 @@ public class MyDSpaceServlet extends DSpaceServlet
         WorkspaceItem[] workspaceItems = WorkspaceItem.findByEPerson(context,
                 context.getCurrentUser());
 
-        SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(context, 
-                context.getCurrentUser());
-        
+        // User's authorization groups
+        Group[] memberships = context.getCurrentUser().getGroupMemberships();
+
+        SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(
+                context, context.getCurrentUser());
+
         // Set attributes
         request.setAttribute("mydspace.user", context.getCurrentUser());
         request.setAttribute("workspace.items", workspaceItems);
         request.setAttribute("workflow.items", workflowItems);
         request.setAttribute("workflow.owned", owned);
         request.setAttribute("workflow.pooled", pooled);
+        request.setAttribute("group.memberships", memberships);
         request.setAttribute("supervised.items", supervisedItems);
 
         // Forward to main mydspace page

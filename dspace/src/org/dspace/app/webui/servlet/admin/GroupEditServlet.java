@@ -46,6 +46,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -102,6 +106,7 @@ public class GroupEditServlet extends DSpaceServlet
             {
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
+                request.setAttribute("membergroups", group.getMemberGroups());
 
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
             }
@@ -119,57 +124,122 @@ public class GroupEditServlet extends DSpaceServlet
 
                 int[] eperson_ids = UIUtil.getIntParameters(request,
                         "eperson_id");
+                int[] group_ids = UIUtil.getIntParameters(request, "group_ids");
 
                 // now get members, and add new ones and remove missing ones
                 EPerson[] members = group.getMembers();
+                Group[] membergroups = group.getMemberGroups();
 
                 if (eperson_ids != null)
                 {
+                    // some epeople were listed, now make group's epeople match
+                    // given epeople
+                    Set memberSet = new HashSet();
+                    Set epersonIDSet = new HashSet();
+
+                    // add all members to a set
+                    for (int x = 0; x < members.length; x++)
+                    {
+                        Integer epersonID = new Integer(members[x].getID());
+                        memberSet.add(epersonID);
+                    }
+
+                    // now all eperson_ids are put in a set
                     for (int x = 0; x < eperson_ids.length; x++)
                     {
-                        // look for this ID in the EPerson array
-                        int foundIndex = -1;
+                        epersonIDSet.add(new Integer(eperson_ids[x]));
+                    }
 
-                        for (int y = 0; y < members.length; y++)
-                        {
-                            if ((members[y] != null)
-                                    && (members[y].getID() == eperson_ids[x]))
-                            {
-                                foundIndex = y;
+                    // process eperson_ids, adding those to group not already
+                    // members
+                    Iterator i = epersonIDSet.iterator();
 
-                                break;
-                            }
-                        }
+                    while (i.hasNext())
+                    {
+                        Integer currentID = (Integer) i.next();
 
-                        if (foundIndex == -1)
+                        if (!memberSet.contains(currentID))
                         {
-                            // didn't find it, add eperson
-                            EPerson e = EPerson.find(c, eperson_ids[x]);
-                            group.addMember(e);
-                        }
-                        else
-                        {
-                            // found it, clear entry in members table
-                            members[foundIndex] = null;
+                            group.addMember(EPerson.find(c, currentID
+                                    .intValue()));
                         }
                     }
 
-                    // now go through the members array, and any that
-                    // weren't set to NULL are no longer members, so remove them
-                    for (int y = 0; y < members.length; y++)
+                    // process members, removing any that aren't in eperson_ids
+                    for (int x = 0; x < members.length; x++)
                     {
-                        if (members[y] != null)
+                        EPerson e = members[x];
+
+                        if (!epersonIDSet.contains(new Integer(e.getID())))
                         {
-                            group.removeMember(members[y]);
+                            group.removeMember(e);
                         }
                     }
                 }
                 else
                 {
                     // no members found (ids == null), remove them all!
+
                     for (int y = 0; y < members.length; y++)
                     {
                         group.removeMember(members[y]);
+                    }
+                }
+
+                if (group_ids != null)
+                {
+                    // some groups were listed, now make group's member groups
+                    // match given group IDs
+                    Set memberSet = new HashSet();
+                    Set groupIDSet = new HashSet();
+
+                    // add all members to a set
+                    for (int x = 0; x < membergroups.length; x++)
+                    {
+                        Integer myID = new Integer(membergroups[x].getID());
+                        memberSet.add(myID);
+                    }
+
+                    // now all eperson_ids are put in a set
+                    for (int x = 0; x < group_ids.length; x++)
+                    {
+                        groupIDSet.add(new Integer(group_ids[x]));
+                    }
+
+                    // process group_ids, adding those to group not already
+                    // members
+                    Iterator i = groupIDSet.iterator();
+
+                    while (i.hasNext())
+                    {
+                        Integer currentID = (Integer) i.next();
+
+                        if (!memberSet.contains(currentID))
+                        {
+                            group
+                                    .addMember(Group.find(c, currentID
+                                            .intValue()));
+                        }
+                    }
+
+                    // process members, removing any that aren't in eperson_ids
+                    for (int x = 0; x < membergroups.length; x++)
+                    {
+                        Group g = membergroups[x];
+
+                        if (!groupIDSet.contains(new Integer(g.getID())))
+                        {
+                            group.removeMember(g);
+                        }
+                    }
+
+                }
+                else
+                {
+                    // no members found (ids == null), remove them all!
+                    for (int y = 0; y < membergroups.length; y++)
+                    {
+                        group.removeMember(membergroups[y]);
                     }
                 }
 
@@ -177,12 +247,14 @@ public class GroupEditServlet extends DSpaceServlet
 
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
+                request.setAttribute("membergroups", group.getMemberGroups());
+
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
                 c.complete();
             }
             else if (submit_group_delete)
             {
-                // bogus authorize, only admins can do this
+                // phony authorize, only admins can do this
                 AuthorizeManager.authorizeAction(c, group, Constants.WRITE);
 
                 // delete group, return to group-list.jsp
@@ -196,6 +268,8 @@ public class GroupEditServlet extends DSpaceServlet
                 // unknown action, show edit page
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
+                request.setAttribute("membergroups", group.getMemberGroups());
+
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
             }
         }
@@ -215,6 +289,8 @@ public class GroupEditServlet extends DSpaceServlet
 
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
+                request.setAttribute("membergroups", group.getMemberGroups());
+
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
                 c.complete();
             }
@@ -232,8 +308,8 @@ public class GroupEditServlet extends DSpaceServlet
     {
         Group[] groups = Group.findAll(c, Group.NAME);
 
-        //        if( groups == null ) { System.out.println("groups are null"); }
-        //        else System.out.println("# of groups: " + groups.length);
+        // if( groups == null ) { System.out.println("groups are null"); }
+        // else System.out.println("# of groups: " + groups.length);
         request.setAttribute("groups", groups);
 
         JSPManager.showJSP(request, response, "/tools/group-list.jsp");

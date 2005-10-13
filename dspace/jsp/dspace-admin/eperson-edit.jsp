@@ -65,9 +65,12 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.eperson.Group"   %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
+
+	Group [] groupMemberships = (Group []) request.getAttribute("group.memberships");
 
     String email     = eperson.getEmail();
     String firstName = eperson.getFirstName();
@@ -184,4 +187,25 @@
     </center>        
 
     </form>
+
+<%
+  if(groupMemberships.length>0)
+  {
+%>
+    <h3><fmt:message key="jsp.dspace-admin.eperson-edit.groups"/></h3>
+    <ul>
+	<%  for(int i=0; i<groupMemberships.length; i++)
+     	{
+        String myLink = groupMemberships[i].getName();
+        String args   = "submit_edit&amp;group_id="+groupMemberships[i].getID();
+        
+        myLink = "<a href=\""
+        +request.getContextPath()
+        +"/tools/group-edit?"+args+"\">" + myLink + "</a>";
+	%>
+    	<li><%=myLink%></li>
+	<%  } %>
+    </ul>
+<% } %>  
+
 </dspace:layout>

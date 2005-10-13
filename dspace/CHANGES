@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Tim Donohue)
+- SF Patch #1315186 EPerson Group enhancement (allow groups within groups)
+
 (Larry Stone)
 - SF Patch #1254679 Plugin Manager implementation
 - SF Patch #1254704 Convert Media Filters to use Plugin Manager
