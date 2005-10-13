@@ -190,6 +190,9 @@ property.name = property value
 	</p>
 
   <h3>DIDL</h3>
+  <p>By activating the DIDL provider, DSpace items are represented as MPEG-21 DIDL objects. These DIDL objects are XML documents that wrap both the Dublin Core metadata that describes the DSpace item and its actual bitstreams. A bitstream is provided inline in the DIDL object in a base64 encoded manner, and/or by means of a pointer to the bitstream. The data provider exposes DIDL objects via the metadataPrefix didl.</p>
+  <p>The crosswalk does not deal with special characters and purposely skips dissemination of the <code>license.txt</code> file awaiting a better understanding on how to map DSpace rights information to MPEG21-DIDL.</p>
+</p>
   <p>The DIDL Crosswalk can be activated as follows:
 	<ul>
 		<li>Uncomment the <code>oai.didl.maxresponse</code> item in <code>dspace.cfg</code></li>
