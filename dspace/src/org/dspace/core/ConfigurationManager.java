@@ -388,6 +388,22 @@ public class ConfigurationManager
         return news;
     }
 
+    private static File loadedFile = null;
+
+    /**
+     * Return the file that configuration was actually loaded from.
+     * Only returns a valid File after configuration has been loaded.
+     *
+     * @return File naming configuration data file, or null if not loaded yet.
+     */
+    public static File getConfigurationFile()
+    {
+        // in case it hasn't been done yet.
+        loadConfig(null);
+
+        return loadedFile;
+    }
+
     /**
      * Load the DSpace configuration properties. Only does anything if
      * properties are not already loaded. Properties are loaded in from the
@@ -413,18 +429,22 @@ public class ConfigurationManager
             if (configFile != null)
             {
                 is = new FileInputStream(configFile);
+                loadedFile = new File(configFile);
             }
             // Has the default configuration location been overridden?
             else if (configProperty != null)
             {
                 // Load the overriding configuration
                 is = new FileInputStream(configProperty);
+                loadedFile = new File(configProperty);
             }
             else
             {
                 // Load configuration from default location
                 is = ConfigurationManager.class
                         .getResourceAsStream("/dspace.cfg");
+                loadedFile = new File(ConfigurationManager.class
+                        .getResource("/dspace.cfg").getPath());
             }
 
             if (is == null)

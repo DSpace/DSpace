@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Larry Stone)
+- SF Patch #1254679 Plugin Manager implementation
+
 (Henry Jerez (LANL))
 - SF Patch #1246928 DIDL plug-in for DSpace
 
