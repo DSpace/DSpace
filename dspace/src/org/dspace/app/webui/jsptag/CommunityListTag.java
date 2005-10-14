@@ -74,7 +74,7 @@ public class CommunityListTag extends TagSupport
             out.println("<table align=\"center\" class=\"miscTable\" title=\"Community List\">");
 
             // Write column headings
-            out.print("<tr><th id=\"t1\" class=\"oddRowOddCol\">"
+            out.print("<tr><th id=\"t5\" class=\"oddRowOddCol\">"
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.CommunityListTag.communityName")
                     + "</th></tr>");
@@ -88,7 +88,7 @@ public class CommunityListTag extends TagSupport
                 String name = communities[i].getMetadata("name");
 
                 // first and only column is 'name'
-                out.print("</td><td headers=\"t1\"class=\"" + row + "RowEvenCol\">");
+                out.print("<tr><td headers=\"t5\" class=\"" + row + "RowEvenCol\">");
                 out.print("<a href=\"");
 
                 HttpServletRequest hrq = (HttpServletRequest) pageContext
