@@ -828,7 +828,7 @@ dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c collectionID -
 
   <h2><a name="mediafilters" id="mediafilters">MediaFilters: Transforming DSpace Content</a></h2>
 
-  <p>DSpace can apply filters to content/bitstreams, creating new content. Filters are included that extract text for <strong>full-text searching</strong>, and create <strong>thumbnails</strong> for items that contain images. The media filters are controlled by the <code>MediaFilterManager</code> which traverses the asset store, invoking the <code>MediaFilter</code> subclasses on bitstreams. The file config/mediafilter.cfg contains a list of bitstream format types and the filters that operate on bitstreams of that type. The media filter system is intended to be run from the command line (or regularly as a cron task):</p>
+  <p>DSpace can apply filters to content/bitstreams, creating new content. Filters are included that extract text for <strong>full-text searching</strong>, and create <strong>thumbnails</strong> for items that contain images. The media filters are controlled by the <code>MediaFilterManager</code> which traverses the asset store, invoking the <code>MediaFilter</code> subclasses on bitstreams. The MediaFilter plugin config item <code>plugin.named.org.dspace.app.mediafilter.MediaFilter</code> in <code>dspace.cfg</code> contains a list of bitstream format types and the filters that operate on bitstreams of that type. The media filter system is intended to be run from the command line (or regularly as a cron task):</p>
   <pre>
 dspace/bin/filter-media
 </pre>
