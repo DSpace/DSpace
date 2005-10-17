@@ -660,7 +660,7 @@ dsrun org.dspace.app.itemexport.ItemExport --type=ITEM --id=itemID --dest=dest_d
 
   <p><code>dspace_migrate &lt;exported item directory&gt;</code></p>
 
-  <p>prior to running the item importer. This will remove the above metadata items from the <code>dublin_core.xml</code> file and remove all <code>handle</code> files. It will then be safe to run the item exporter. Use</p>
+  <p>prior to running the item importer. This will remove the above metadata items, except for date.issued - if the item has been published or publicly distributed before and identifier.uri - if it is not the handle, from the <code>dublin_core.xml</code> file and remove all <code>handle</code> files. It will then be safe to run the item exporter. Use</p>
 
   <p><code>dspace_migrate --help</code></p>
 
