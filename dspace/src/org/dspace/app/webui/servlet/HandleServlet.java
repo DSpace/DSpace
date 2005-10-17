@@ -409,14 +409,12 @@ public class HandleServlet extends DSpaceServlet
             if (request.getParameter("submit_subscribe") != null)
             {
                 // Subscribe button pressed.
-                if (context.getCurrentUser() == null)
-                {
-                    // Only registered can subscribe
-                    Authenticate
-                            .startAuthentication(context, request, response);
+                // Only registered can subscribe, so redirect unless logged in.
+                if (context.getCurrentUser() == null &&
+                    !Authenticate
+                            .startAuthentication(context, request, response))
 
                     return;
-                }
                 else
                 {
                     Subscribe.subscribe(context, context.getCurrentUser(),

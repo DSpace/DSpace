@@ -172,11 +172,8 @@ public class DSpaceServlet extends HttpServlet
              * they tried to do something they aren't allowed to, so we display
              * an error in that case.
              */
-            if (context.getCurrentUser() == null)
-            {
-                Authenticate.startAuthentication(context, request, response);
-            }
-            else
+            if (context.getCurrentUser() != null ||
+                Authenticate.startAuthentication(context, request, response))
             {
                 // FIXME: Log the right info?
                 // Log the error

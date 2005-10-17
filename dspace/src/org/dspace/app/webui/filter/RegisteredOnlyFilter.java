@@ -89,12 +89,10 @@ public class RegisteredOnlyFilter implements Filter
             // Obtain a context
             context = UIUtil.obtainContext(hrequest);
 
-            // If there is no current user, they must log in
-            if (context.getCurrentUser() == null)
-            {
-                Authenticate.startAuthentication(context, hrequest, hresponse);
-            }
-            else
+            // Continue if logged in or startAuthentication finds a user;
+            // otherwise it will issue redirect so just return.
+            if (context.getCurrentUser() != null ||
+                Authenticate.startAuthentication(context, hrequest, hresponse))
             {
                 // Allow request to proceed
                 chain.doFilter(hrequest, hresponse);

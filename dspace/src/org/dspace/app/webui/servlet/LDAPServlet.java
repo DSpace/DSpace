@@ -56,6 +56,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.AuthenticationManager;
 import java.util.Hashtable;
 
 import javax.naming.directory.*;
@@ -215,7 +216,7 @@ public class LDAPServlet extends DSpaceServlet
                     if ((ldapPhone!=null)&&(!ldapPhone.equals(""))) eperson.setMetadata("phone", ldapPhone);
                     eperson.setNetid(netid);
                     eperson.setCanLogIn(true);
-                    Authenticate.getSiteAuth().initEPerson(context, request, eperson);
+                    AuthenticationManager.initEPerson(context, request, eperson);
                     eperson.update();
                     context.commit();
                     context.setIgnoreAuthorization(false); 

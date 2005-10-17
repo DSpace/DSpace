@@ -58,6 +58,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.AuthenticationManager;
 import java.util.Hashtable;
 import javax.naming.*;
 import javax.naming.directory.*;
@@ -159,8 +160,8 @@ public class RegisterServlet extends DSpaceServlet
             if (registering && (email != null))
             {
                 // Indicate if user can set password
-                boolean setPassword = Authenticate.getSiteAuth()
-                        .allowSetPassword(context, request, email);
+                boolean setPassword =
+                    AuthenticationManager.allowSetPassword(context, request, email);
                 request.setAttribute("set.password", new Boolean(setPassword));
 
                 // Forward to "personal info page"
@@ -261,8 +262,8 @@ public class RegisterServlet extends DSpaceServlet
                 {
                     // Find out from site authenticator whether this email can
                     // self-register
-                    boolean canRegister = Authenticate.getSiteAuth()
-                            .canSelfRegister(context, request, email);
+                    boolean canRegister =
+                        AuthenticationManager.canSelfRegister(context, request, email);
 
                     if (canRegister)
                     {
@@ -473,12 +474,12 @@ public class RegisterServlet extends DSpaceServlet
         eperson.setSelfRegistered(true);
 
         // Give site auth a chance to set/override appropriate fields
-        Authenticate.getSiteAuth().initEPerson(context, request, eperson);
+        AuthenticationManager.initEPerson(context, request, eperson);
 
         // If the user set a password, make sure it's OK
         boolean passwordOK = true;
         if (eperson.getRequireCertificate() == false && netid==null &&
-            Authenticate.getSiteAuth().allowSetPassword(context, request,
+            AuthenticationManager.allowSetPassword(context, request,
                 eperson.getEmail()))
         {
             passwordOK = EditProfileServlet.confirmAndSetPassword(eperson,
@@ -510,7 +511,7 @@ public class RegisterServlet extends DSpaceServlet
             request.setAttribute("password.problem", new Boolean(!passwordOK));
 
             // Indicate if user can set password
-            boolean setPassword = Authenticate.getSiteAuth().allowSetPassword(
+            boolean setPassword = AuthenticationManager.allowSetPassword(
                     context, request, email);
             request.setAttribute("set.password", new Boolean(setPassword));
 

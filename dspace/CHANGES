@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Larry Stone)
+- SF Patch #1209635 changes to implement Stackable Authentication
+
 (Tim Donohue)
 - SF Patch #1315186 EPerson Group enhancement (allow groups within groups)
 

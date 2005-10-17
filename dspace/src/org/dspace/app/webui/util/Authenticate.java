@@ -40,23 +40,26 @@
 package org.dspace.app.webui.util;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.SiteAuthenticator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.AuthenticationManager;
+import org.dspace.eperson.AuthenticationMethod;
 
 /**
  * Methods for authenticating the user. This is DSpace platform code, as opposed
  * to the site-specific authentication code, that resides in implementations of
- * the <code>org.dspace.app.webui.SiteAuthenticator</code> interface.
+ * the <code>org.dspace.eperson.AuthenticationMethod</code> interface.
  * 
  * @author Robert Tansley
  * @version $Revision$
@@ -65,48 +68,6 @@ public class Authenticate
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(Authenticate.class);
-
-    /** The site authenticator */
-    private static SiteAuthenticator siteAuth = null;
-
-    /**
-     * Get the site authenticator. Reads the appropriate configuration property.
-     * 
-     * @return the implementation of the SiteAuthenticator interface to use for
-     *         this DSpace site.
-     */
-    public static SiteAuthenticator getSiteAuth()
-    {
-        if (siteAuth != null)
-        {
-            return siteAuth;
-        }
-
-        // Instantiate the site authenticator
-        String siteAuthClassName = ConfigurationManager
-                .getProperty("webui.site.authenticator");
-
-        try
-        {
-            Class siteAuthClass = Class.forName(siteAuthClassName);
-            siteAuth = (SiteAuthenticator) siteAuthClass.newInstance();
-        }
-        catch (Exception e)
-        {
-            // Problem instantiating
-            if (siteAuthClassName == null)
-            {
-                siteAuthClassName = "null";
-            }
-
-            log.fatal(LogManager.getHeader(null, "no_site_authenticator",
-                    "webui.site.authenticator=" + siteAuthClassName), e);
-
-            throw new IllegalStateException(e.toString());
-        }
-
-        return siteAuth;
-    }
 
     /**
      * Return the request that the system should be dealing with, given the
@@ -199,19 +160,42 @@ public class Authenticate
      * to authentication being required, and then invokes the site-specific
      * authentication method.
      * 
+     * If it returns true, the user was authenticated without any
+     * redirection (e.g. by an X.509 certificate or other implicit method) so
+     * the process that called this can continue and send its own response.
+     * A "false" result means this method has sent its own redirect.
+     *
      * @param context
      *            current DSpace context
      * @param request
      *            current HTTP request - the one that prompted authentication
      * @param response
      *            current HTTP response
+     *
+     * @return true if authentication is already finished (implicit method)
      */
-    public static void startAuthentication(Context context,
+    public static boolean startAuthentication(Context context,
             HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
         HttpSession session = request.getSession();
 
+        /*
+         * Authenticate:
+         * 1. try implicit methods first, since that may work without
+         *    a redirect. return true if no redirect needed.
+         * 2. if those fail, redirect to enter credentials.
+         *    return false.
+         */
+        if (AuthenticationManager.authenticateImplicit(context, null, null,
+                null, request) == AuthenticationMethod.SUCCESS)
+        {
+            loggedIn(context, request, context.getCurrentUser());
+            log.info(LogManager.getHeader(context, "login", "type=implicit"));
+            return true;
+        }
+        else
+        {
         // Since we may be doing a redirect, make sure the redirect is not
         // cached
         response.addDateHeader("expires", 1);
@@ -226,8 +210,31 @@ public class Authenticate
         session.setAttribute("interrupted.request.url", UIUtil
                 .getOriginalURL(request));
 
-        // Start up the site authenticator
-        getSiteAuth().startAuthentication(context, request, response);
+            /*
+             * Grovel over authentication methods, counting the
+             * ones with a "redirect" login page -- if there's only one,
+             * go directly there.  If there is a choice, go to JSP chooser.
+             */
+            Iterator ai = AuthenticationManager.authenticationMethodIterator();
+            AuthenticationMethod am;
+            int count = 0;
+            String url = null;
+            while (ai.hasNext())
+            {
+                String s;
+                am = (AuthenticationMethod)ai.next();
+                if ((s = am.loginPageURL(context, request, response)) != null)
+                {
+                    url = s;
+                    ++count;
+                }
+            }
+            if (count == 1)
+                response.sendRedirect(url);
+            else
+                JSPManager.showJSP(request, response, "/login/chooser.jsp");
+        }
+        return false;
     }
 
     /**

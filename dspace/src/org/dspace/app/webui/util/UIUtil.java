@@ -49,7 +49,6 @@ import java.net.URLEncoder;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.SiteAuthenticator;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -58,6 +57,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.AuthenticationManager;
 
 /**
  * Miscellaneous UI utility methods
@@ -102,13 +102,13 @@ public class UIUtil
                 Authenticate.loggedIn(c, request, e);
             }
 
-            // Set any special groups - invoke the site authenticator
-            SiteAuthenticator siteAuth = Authenticate.getSiteAuth();
-            int[] groupIDs = siteAuth.getSpecialGroups(c, request);
+            // Set any special groups - invoke the authentication mgr.
+            int[] groupIDs = AuthenticationManager.getSpecialGroups(c, request);
 
             for (int i = 0; i < groupIDs.length; i++)
             {
                 c.setSpecialGroup(groupIDs[i]);
+                log.debug("Adding Special Group id="+String.valueOf(groupIDs[i]));
             }
 
             // Set the session ID

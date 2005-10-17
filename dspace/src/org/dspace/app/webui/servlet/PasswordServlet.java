@@ -53,12 +53,17 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.AuthenticationManager;
+import org.dspace.eperson.AuthenticationMethod;
 
 /**
  * Simple username and password authentication servlet. Displays the login form
  * <code>/login/password.jsp</code> on a GET, otherwise process the parameters
  * as an email and password.
  * 
+ * Calls stackable authentication to give credentials to all
+ * authentication methods that can make use of them, not just DSpace-internal.
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -82,41 +87,32 @@ public class PasswordServlet extends DSpaceServlet
         // Process the POSTed email and password
         String email = request.getParameter("login_email");
         String password = request.getParameter("login_password");
+        String jsp = null;
 
         // Locate the eperson
-        EPerson eperson = EPerson.findByEmail(context, email.toLowerCase());
-        boolean loggedIn = false;
+        int status = AuthenticationManager.authenticate(context, email, password,
+                        null, request);
 
-        // Verify the password
-        if ((eperson != null) && eperson.canLogIn())
-        {
-            // e-mail address corresponds to active account
-            if (eperson.getRequireCertificate())
-            {
-                // they must use a certificate
-                JSPManager.showJSP(request, response,
-                        "/error/require-certificate.jsp");
-
-                return;
-            }
-            else if (eperson.checkPassword(password))
+        if (status == AuthenticationMethod.SUCCESS)
             {
                 // Logged in OK.
-                Authenticate.loggedIn(context, request, eperson);
+            Authenticate.loggedIn(context, request, context.getCurrentUser());
 
-                log.info(LogManager
-                        .getHeader(context, "login", "type=password"));
+            log.info(LogManager.getHeader(context, "login", "type=explicit"));
 
                 // resume previous request
                 Authenticate.resumeInterruptedRequest(request, response);
 
                 return;
             }
-        }
+        else if (status == AuthenticationMethod.CERT_REQUIRED)
+            jsp = "/error/require-certificate.jsp";
+        else
+            jsp = "/login/incorrect.jsp";
 
         // If we reach here, supplied email/password was duff.
-        log.info(LogManager
-                .getHeader(context, "failed_login", "email=" + email));
-        JSPManager.showJSP(request, response, "/login/incorrect.jsp");
+        log.info(LogManager.getHeader(context, "failed_login",
+                "email=" + email + ", result=" + String.valueOf(status)));
+        JSPManager.showJSP(request, response, jsp);
     }
 }
