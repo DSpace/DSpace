@@ -77,6 +77,7 @@ public class HTMLServlet extends DSpaceServlet
     // bsName, or null if there is no match.  Match must be exact.
     // NOTE: This does not detect duplicate bitstream names, just returns first.
     private static Bitstream getItemBitstreamByName(Item item, String bsName)
+    						throws SQLException
     {
         Bundle[] bundles = item.getBundles();
 

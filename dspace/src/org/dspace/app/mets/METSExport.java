@@ -585,6 +585,7 @@ public class METSExport
      * @return the corresponding original bitstream (or null)
      */
     private static Bitstream findOriginalBitstream(Item item, Bitstream derived)
+    				throws SQLException
     {
         Bundle[] bundles = item.getBundles();
 
