@@ -190,6 +190,7 @@ public class InstallItem
      * @return provenance description
      */
     public static String getBitstreamProvenanceMessage(Item myitem)
+    						throws SQLException
     {
         // Get non-internal format bitstreams
         Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
