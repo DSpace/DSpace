@@ -62,6 +62,7 @@ import java.util.Properties;
 import java.util.Date;
 import java.io.*;
 import java.lang.*;
+import java.sql.SQLException;
 import ORG.oclc.oai.server.crosswalk.Crosswalk;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 import org.dspace.content.DCDate;
@@ -186,78 +187,88 @@ public class DIDLCrosswalk extends Crosswalk
 				/**putfirst item here**/
 			
 				
-		//**CYCLE HERE!!!!**//	
-		Bundle[] bundles= item.getBundles("ORIGINAL");
-		
-		if (bundles.length == 0)
+		//**CYCLE HERE!!!!**//
+       
+        try
         {
-            metadata.append("<P>There are no files associated with this item.</P>");
-        }
-        else
-        {  
-	     
-/**cycle bundles**/
-			for (int i = 0; i < bundles.length; i++)
-            { 
-				int flag=0;			
-                Bitstream[] bitstreams = bundles[i].getBitstreams();
-	/**cycle bitstreams**/
-                for (int k = 0; k < bitstreams.length ; k++)
-                {
-                    // Skip internal types
-                    if (!bitstreams[k].getFormat().isInternal())
-                    {
-                    if (flag==0)	
-                    	{
-                   		flag=1;
-                    	}
-               metadata.append("<didl:Component id=" + "\"uuid-"+ UUIDFactory.generateUUID().toString() + "\">");
-			   metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
-               metadata.append("\" mimeType=\"");
-               metadata.append(bitstreams[k].getFormat().getMIMEType());
-               metadata.append("\">");
-	       metadata.append("</didl:Resource>");
-	 
-		  if (bitstreams[k].getSize()< maxsize){
-			
-				metadata.append("<didl:Resource mimeType=\"");
-				metadata.append(bitstreams[k].getFormat().getMIMEType());
-		 		metadata.append("\" encoding=\"base64\">");
-		 		try
-		 		{
-		 			
-		 			byte[] buffer = new byte[bitstreams[k].getSize()];
-		 			
-		 			//BufferedInputStream bis=new BufferedInputStream(bitstreams[k].retrieve());
-		 			Context contextl= new Context();
-		 			BufferedInputStream bis=new BufferedInputStream(BitstreamStorageManager.retrieve(contextl,bitstreams[k].getID()));
-		 			int size=bis.read(buffer);
-		 		    contextl.complete();
-		 			
-		 			sun.misc.BASE64Encoder encoder=(sun.misc.BASE64Encoder) Class.forName("sun.misc.BASE64Encoder").newInstance();
-		 			 String encoding = encoder.encodeBuffer(buffer);
-		 			 metadata.append(encoding);
-		 		}
-		 		catch (Exception ex)
-		 		{
-		 			System.err.println("Caught exception:"+ex.getCause());
-		 			ex.printStackTrace();
-		 metadata.append("http://retrieve/"+ new Integer(bitstreams[k].getID()).toString()  +"bitstream=" + k +"/" );
-		 		
-		 		}
+        	Bundle[] bundles= item.getBundles("ORIGINAL");    
 		
-						
-                        metadata.append("</didl:Resource>");
-                }
-		        metadata.append("</didl:Component>");	
-               
-		     }
-            /*end bitstream cycle*/     
-             	}
-           /*end bundle cycle*/      
-             
-            }
-        }
+			if (bundles.length == 0)
+	        {
+	            metadata.append("<P>There are no files associated with this item.</P>");
+	        }
+	        else
+	        {  
+		     
+	/**cycle bundles**/
+				for (int i = 0; i < bundles.length; i++)
+	            { 
+					int flag=0;			
+	                Bitstream[] bitstreams = bundles[i].getBitstreams();
+		/**cycle bitstreams**/
+	                for (int k = 0; k < bitstreams.length ; k++)
+	                {
+	                    // Skip internal types
+	                    if (!bitstreams[k].getFormat().isInternal())
+	                    {
+	                    if (flag==0)	
+	                    	{
+	                   		flag=1;
+	                    	}
+	               metadata.append("<didl:Component id=" + "\"uuid-"+ UUIDFactory.generateUUID().toString() + "\">");
+				   metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
+	               metadata.append("\" mimeType=\"");
+	               metadata.append(bitstreams[k].getFormat().getMIMEType());
+	               metadata.append("\">");
+		       metadata.append("</didl:Resource>");
+		 
+			  if (bitstreams[k].getSize()< maxsize){
+				
+					metadata.append("<didl:Resource mimeType=\"");
+					metadata.append(bitstreams[k].getFormat().getMIMEType());
+			 		metadata.append("\" encoding=\"base64\">");
+			 		try
+			 		{
+			 			
+			 			byte[] buffer = new byte[bitstreams[k].getSize()];
+			 			
+			 			//BufferedInputStream bis=new BufferedInputStream(bitstreams[k].retrieve());
+			 			Context contextl= new Context();
+			 			BufferedInputStream bis=new BufferedInputStream(BitstreamStorageManager.retrieve(contextl,bitstreams[k].getID()));
+			 			int size=bis.read(buffer);
+			 		    contextl.complete();
+			 			
+			 			sun.misc.BASE64Encoder encoder=(sun.misc.BASE64Encoder) Class.forName("sun.misc.BASE64Encoder").newInstance();
+			 			 String encoding = encoder.encodeBuffer(buffer);
+			 			 metadata.append(encoding);
+			 		}
+			 		catch (Exception ex)
+			 		{
+			 			System.err.println("Caught exception:"+ex.getCause());
+			 			ex.printStackTrace();
+			 metadata.append("http://retrieve/"+ new Integer(bitstreams[k].getID()).toString()  +"bitstream=" + k +"/" );
+			 		
+			 		}
+			
+							
+	                        metadata.append("</didl:Resource>");
+	                }
+			        metadata.append("</didl:Component>");	
+	               
+			     }
+	            /*end bitstream cycle*/     
+	           }
+	           /*end bundle cycle*/
+          }
+
+      }
+     }
+     catch (SQLException sqle)
+     {
+ 		System.err.println("Caught exception:"+sqle.getCause());
+ 		sqle.printStackTrace();
+     }
+
 				
 		//**END CYCLE HERE **//		
 	
