@@ -70,7 +70,11 @@
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
 
-	Group [] groupMemberships = (Group []) request.getAttribute("group.memberships");
+	Group [] groupMemberships = null;
+	if(request.getAttribute("group.memberships") != null)
+	{
+		groupMemberships = (Group []) request.getAttribute("group.memberships");
+	}
 
     String email     = eperson.getEmail();
     String firstName = eperson.getFirstName();
@@ -189,7 +193,7 @@
     </form>
 
 <%
-  if(groupMemberships.length>0)
+  if((groupMemberships != null) && (groupMemberships.length>0))
   {
 %>
     <h3><fmt:message key="jsp.dspace-admin.eperson-edit.groups"/></h3>
