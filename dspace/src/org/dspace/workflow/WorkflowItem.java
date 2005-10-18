@@ -383,7 +383,7 @@ public class WorkflowItem implements InProgressSubmission
         return collection;
     }
 
-    public EPerson getSubmitter()
+    public EPerson getSubmitter() throws SQLException
     {
         return item.getSubmitter();
     }

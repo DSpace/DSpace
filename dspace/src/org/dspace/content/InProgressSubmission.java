@@ -90,7 +90,7 @@ public interface InProgressSubmission
      * 
      * @return the submitting e-person
      */
-    EPerson getSubmitter();
+    EPerson getSubmitter() throws SQLException;
 
     /**
      * Find out if the submission has (or is intended to have) more than one
