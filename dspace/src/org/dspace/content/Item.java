@@ -132,47 +132,10 @@ public class Item extends DSpaceObject
         itemRow = row;
         dublinCoreChanged = false;
         dublinCore = new ArrayList();
-        bundles = new ArrayList();
-
-        // Get the submitter
-        submitter = null;
-
-        if (!itemRow.isColumnNull("submitter_id"))
-        {
-            submitter = EPerson.find(ourContext, itemRow
-                    .getIntColumn("submitter_id"));
-        }
-
-        // Get bundles
-        TableRowIterator tri = DatabaseManager.query(ourContext, "bundle",
-                "SELECT bundle.* FROM bundle, item2bundle WHERE "
-                        + "item2bundle.bundle_id=bundle.bundle_id AND "
-                        + "item2bundle.item_id="
-                        + itemRow.getIntColumn("item_id"));
-
-        while (tri.hasNext())
-        {
-            TableRow r = tri.next();
-
-            // First check the cache
-            Bundle fromCache = (Bundle) context.fromCache(Bundle.class, r
-                    .getIntColumn("bundle_id"));
-
-            if (fromCache != null)
-            {
-                bundles.add(fromCache);
-            }
-            else
-            {
-                bundles.add(new Bundle(ourContext, r));
-            }
-        }
-        // close the TableRowIterator to free up resources
-        tri.close();
-
+ 
         // Get Dublin Core metadata
-        tri = DatabaseManager.query(ourContext, "dcvalue",
-                "SELECT * FROM dcvalue WHERE item_id="
+        TableRowIterator tri = DatabaseManager.query(ourContext, "dcvalue",
+                		"SELECT * FROM dcvalue WHERE item_id="
                         + itemRow.getIntColumn("item_id")
                         + " ORDER BY dc_type_id, place");
 
@@ -197,10 +160,6 @@ public class Item extends DSpaceObject
         // close the TableRowIterator to free up resources
         tri.close();
 
-        // commented out - this belongs in the create() method, not the
-        // constructor
-        // Set the last modified date
-        //itemRow.setColumn("last_modified", new Date());
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
 
@@ -693,8 +652,13 @@ public class Item extends DSpaceObject
      * 
      * @return the submitter
      */
-    public EPerson getSubmitter()
+    public EPerson getSubmitter() throws SQLException
     {
+        if (submitter == null && !itemRow.isColumnNull("submitter_id"))
+        {
+            submitter = EPerson.find(ourContext, itemRow
+                    .getIntColumn("submitter_id"));
+        }
         return submitter;
     }
 
@@ -826,8 +790,39 @@ public class Item extends DSpaceObject
      * 
      * @return the bundles in an unordered array
      */
-    public Bundle[] getBundles()
+    public Bundle[] getBundles() throws SQLException
     {
+    	if (bundles == null)
+    	{
+    		bundles = new ArrayList();
+    		// Get bundles
+    		TableRowIterator tri = DatabaseManager.query(ourContext, "bundle",
+    					"SELECT bundle.* FROM bundle, item2bundle WHERE "
+    					+ "item2bundle.bundle_id=bundle.bundle_id AND "
+    					+ "item2bundle.item_id="
+                        + itemRow.getIntColumn("item_id"));
+
+    		while (tri.hasNext())
+    		{
+    			TableRow r = tri.next();
+
+    			// First check the cache
+    			Bundle fromCache = (Bundle) ourContext.fromCache(Bundle.class,
+    										r.getIntColumn("bundle_id"));
+
+    			if (fromCache != null)
+    			{
+    				bundles.add(fromCache);
+    			}
+    			else
+    			{
+    				bundles.add(new Bundle(ourContext, r));
+    			}
+    		}
+    		// close the TableRowIterator to free up resources
+    		tri.close();
+    	}
+        
         Bundle[] bundleArray = new Bundle[bundles.size()];
         bundleArray = (Bundle[]) bundles.toArray(bundleArray);
 
@@ -842,20 +837,17 @@ public class Item extends DSpaceObject
      * 
      * @return the bundles in an unordered array
      */
-    public Bundle[] getBundles(String name)
+    public Bundle[] getBundles(String name) throws SQLException
     {
         List matchingBundles = new ArrayList();
 
-        Iterator i = bundles.iterator();
-
         // now only keep bundles with matching names
-        while (i.hasNext())
+        Bundle[] bunds = getBundles();
+        for (int i = 0; i < bunds.length; i++ )
         {
-            Bundle b = (Bundle) i.next();
-
-            if (name.equals(b.getName()))
+            if (name.equals(bunds[i].getName()))
             {
-                matchingBundles.add(b);
+                matchingBundles.add(bunds[i]);
             }
         }
 
@@ -912,11 +904,10 @@ public class Item extends DSpaceObject
                 + getID() + ",bundle_id=" + b.getID()));
 
         // Check it's not already there
-        for (int i = 0; i < bundles.size(); i++)
+        Bundle[] bunds = getBundles();
+        for (int i = 0; i < bunds.length; i++)
         {
-            Bundle existing = (Bundle) bundles.get(i);
-
-            if (b.getID() == existing.getID())
+            if (b.getID() == bunds[i].getID())
             {
                 // Bundle is already there; no change
                 return;
@@ -956,16 +947,15 @@ public class Item extends DSpaceObject
                 + getID() + ",bundle_id=" + b.getID()));
 
         // Remove from internal list of bundles
-        ListIterator li = bundles.listIterator();
-
-        while (li.hasNext())
+        Bundle[] bunds = getBundles();
+        
+        for (int i = 0; i < bunds.length; i++)
         {
-            Bundle existing = (Bundle) li.next();
-
-            if (b.getID() == existing.getID())
+            if (b.getID() == bunds[i].getID())
             {
                 // We've found the bundle to remove
-                li.remove();
+                bundles.remove(bunds[i]);
+                break;
             }
         }
 
@@ -1048,17 +1038,17 @@ public class Item extends DSpaceObject
      * 
      * @return non-internal bitstreams.
      */
-    public Bitstream[] getNonInternalBitstreams()
+    public Bitstream[] getNonInternalBitstreams() throws SQLException
     {
         List bitstreamList = new ArrayList();
 
         // Go through the bundles and bitstreams picking out ones which aren't
         // of internal formats
-        Bundle[] bundles = getBundles();
+        Bundle[] bunds = getBundles();
 
-        for (int i = 0; i < bundles.length; i++)
+        for (int i = 0; i < bunds.length; i++)
         {
-            Bitstream[] bitstreams = bundles[i].getBitstreams();
+            Bitstream[] bitstreams = bunds[i].getBitstreams();
 
             for (int j = 0; j < bitstreams.length; j++)
             {
@@ -1127,13 +1117,13 @@ public class Item extends DSpaceObject
         int licensetype = bf.getID();
 
         // search through bundles, looking for bitstream type license
-        Bundle[] buns = getBundles();
+        Bundle[] bunds = getBundles();
 
-        for (int i = 0; i < buns.length; i++)
+        for (int i = 0; i < bunds.length; i++)
         {
             boolean removethisbundle = false;
 
-            Bitstream[] bits = buns[i].getBitstreams();
+            Bitstream[] bits = bunds[i].getBitstreams();
 
             for (int j = 0; j < bits.length; j++)
             {
@@ -1149,7 +1139,7 @@ public class Item extends DSpaceObject
             // fix by telling system not to check authorization?
             if (removethisbundle)
             {
-                removeBundle(buns[i]);
+                removeBundle(bunds[i]);
             }
         }
     }
@@ -1480,11 +1470,11 @@ public class Item extends DSpaceObject
         removeDCFromDatabase();
 
         // Remove bundles
-        Bundle[] bundles = getBundles();
+        Bundle[] bunds = getBundles();
 
-        for (int i = 0; i < bundles.length; i++)
+        for (int i = 0; i < bunds.length; i++)
         {
-            removeBundle(bundles[i]);
+            removeBundle(bunds[i]);
         }
 
         // remove all of our authorization policies
@@ -1500,6 +1490,35 @@ public class Item extends DSpaceObject
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
+    }
+    
+    /**
+     * Remove item and all its sub-structure from the context cache.
+     * Useful in batch processes where a single context has a long,
+     * multi-item lifespan
+     */
+    public void decache() throws SQLException
+    {
+        // Remove item and it's submitter from cache
+        ourContext.removeCached(this, getID());
+        if (submitter != null)
+        {
+        	ourContext.removeCached(submitter, submitter.getID());
+        }
+        // Remove bundles & bitstreams from cache if they have been loaded
+        if (bundles != null)
+        {
+        	Bundle[] bunds = getBundles();
+        	for (int i = 0; i < bunds.length; i++)
+        	{
+        		ourContext.removeCached(bunds[i], bunds[i].getID());
+        		Bitstream[] bitstreams = bunds[i].getBitstreams();
+        		for (int j = 0; j < bitstreams.length; j++)
+        		{
+        			ourContext.removeCached(bitstreams[j], bitstreams[j].getID());
+        		}
+        	}
+        }
     }
 
     /**
@@ -1600,11 +1619,11 @@ public class Item extends DSpaceObject
     {
         // remove all policies from bundles, add new ones
         // Remove bundles
-        Bundle[] bundles = getBundles();
+        Bundle[] bunds = getBundles();
 
-        for (int i = 0; i < bundles.length; i++)
+        for (int i = 0; i < bunds.length; i++)
         {
-            Bundle mybundle = bundles[i];
+            Bundle mybundle = bunds[i];
 
             Bitstream[] bs = mybundle.getBitstreams();
 
@@ -1637,11 +1656,11 @@ public class Item extends DSpaceObject
         AuthorizeManager.removeGroupPolicies(ourContext, this, g);
 
         // remove all policies from bundles
-        Bundle[] bundles = getBundles();
+        Bundle[] bunds = getBundles();
 
-        for (int i = 0; i < bundles.length; i++)
+        for (int i = 0; i < bunds.length; i++)
         {
-            Bundle mybundle = bundles[i];
+            Bundle mybundle = bunds[i];
 
             Bitstream[] bs = mybundle.getBitstreams();
 
