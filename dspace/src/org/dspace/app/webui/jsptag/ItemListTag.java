@@ -441,7 +441,16 @@ public class ItemListTag extends TagSupport
     private String getThumbMarkup(HttpServletRequest hrq, Item item)
             throws JspException
     {
-        Bundle[] original = item.getBundles("ORIGINAL");
+        Bundle[] original = null;
+        
+        try
+        {
+        	original = item.getBundles("ORIGINAL");
+        }
+        catch(SQLException sqle)
+        {
+        	throw new JspException(sqle.getMessage());       	
+        }
 
         if (original.length == 0)
         {
@@ -466,14 +475,14 @@ public class ItemListTag extends TagSupport
             }
         }
 
-        Bundle[] thumbs = item.getBundles("THUMBNAIL");
-
-        // if there are thumbs and we're not dealing with an HTML item
-        // then show the thumbnail
-        if ((thumbs.length > 0) && !html)
+        try
         {
-            try
-            {
+        	Bundle[] thumbs = item.getBundles("THUMBNAIL");
+
+        	// if there are thumbs and we're not dealing with an HTML item
+        	// then show the thumbnail
+        	if ((thumbs.length > 0) && !html)
+        	{
                 Context c = UIUtil.obtainContext(hrq);
 
                 Bitstream thumbnailBitstream;
@@ -532,16 +541,16 @@ public class ItemListTag extends TagSupport
                     return thumbLink.toString();
                 }
             }
-            catch (SQLException sqle)
-            {
-                throw new JspException(sqle.getMessage());
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new JspException(
+        }
+        catch (SQLException sqle)
+        {
+        	throw new JspException(sqle.getMessage());
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new JspException(
                         "Server does not support DSpace's default encoding. ",
                         e);
-            }
         }
 
         return "";
