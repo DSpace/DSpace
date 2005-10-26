@@ -1,5 +1,14 @@
 1.4 beta 1
 ==========
+(Scott Yeadon)
+- Fix Oracle compatibility bug in Browse.java
+
+(Gabriela Mircea)
+- SF Bug #1160898 dspace_migrate removes Date.Issued from prev published items
+
+(Richard Rodgers)
+- Performance enhancement - lazy initialization of Item sub-objects
+
 (Larry Stone)
 - SF Patch #1209635 changes to implement Stackable Authentication
 
