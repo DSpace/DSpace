@@ -91,11 +91,27 @@ property.name = property value
       </tr>
 
       <tr>
-        <td><code>webui.site.authenticator</code></td>
+        <td><code>plugin.sequence.org.dspace.eperson.AuthenticationMethod</code></td>
 
-        <td><code>edu.myu.MyAuthenticator</code></td>
+        <td><code>org.dspace.eperson.X509Authentication, org.dspace.eperson.PasswordAuthentication</code></td>
 
-        <td>The Java class name of a class implementing the <code>org.dspace.app.webui.SiteAuthenticator</code> interface.</td>
+        <td>Comma-separated list of classes implementing the <code>org.dspace.eperson.AuthenticationMethod</code> interface, which make up the <a href="#authenticate">authentication stack</a>.  Authentication methods are called on in the order listed.</td>
+      </tr>
+
+      <tr>
+        <td><code>authentication.x509.keystore.path</code></td>
+
+        <td><code>/tomcat/conf/keystore</code></td>
+
+        <td>Path to Java keystore containing Client CA's certificiate for client X.509 certificates (Optional; only needed if X.509 user authentication is used.)</td>
+      </tr>
+
+      <tr>
+        <td><code>authentication.x509.keystore.password</code></td>
+
+        <td><code>changeit</code></td>
+
+        <td>Password to Java keystore configured above in <code>authentication.x509.keystore.path</code></td>
       </tr>
 
       <tr>
@@ -338,7 +354,17 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
 
   <h2><a name="authenticate" id="authenticate">Custom Authentication Code</a></h2>
 
-  <p>Since many institutions and organizations have exisiting authentication systems, DSpace has been designed to allow these to be easily integrated. To do this, you can provide a custom class implementing the Java interface <code>org.dspace.app.webui.SiteAuthenticator</code>. These methods are invoked when various authentication-related events occur in the Web user interface.</p>
+  <p>Since many institutions and organizations have exisiting authentication systems, DSpace has been designed to allow these to be easily integrated.
+     It keeps a series, or "stack", of <em>authentication methods</em>, so
+     each one can be tried in turn.  This makes it easy to add new
+     authentication methods or rearrange the order without changing any
+     existing code.  You can also share authentication code with other sites.</p>
+
+  <p>An authentication method is a class that implements the
+     interface <code>org.dspace.eperson.AuthenticationMethod</code>.
+     It <em>authenticates</em> a user by evaluating the <em>credentials</em>
+     (e.g. username and password) he or she presents and
+     checking that they are valid.</p>
 
   <p>The basic authentication procedure in the DSpace Web UI is this:</p>
 
@@ -357,14 +383,27 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
 
     <li>The parameters etc. of the request are stored</li>
 
-    <li>The <code>startAuthentication</code> method is invoked on the currently configured <code>SiteAuthenticator</code> implementation</li>
+    <li>The Web UI's <code>startAuthentication</code> method is invoked.</li>
 
-    <li>That <code>startAuthentication</code> might instantly authenticate the user somehow, or forward the request to some sort of log-in page--the parameters of the original request are safely stored and will be accessible after the log-in process has completed</li>
+    <li>First it tries all the authentication methods which do <em>implicit</em>
+        authentication (i.e. they work with just the information already
+        in the Web request, such as an X.509 client certificate).  If one
+        of these succeeds, it proceeds from Step 2 above.</li>
 
-    <li>If authentication is successful, the original request is resumed from step 2. above.</li>
+    <li>If none of the implicit methods succeed, the UI responds by putting
+        up a "login" page to collect credentials for one of the
+        <em>explicit</em> authentication methods in the stack.  The servlet
+        processing that page then
+        gives the proffered credentials to each authentication method in turn
+        until one succeeds, at which point it
+        retries the original operation from Step 2 above.</li>
   </ol>
 
-  <p>Please see the <code>SiteAuthenticator.java</code> source file for information about each of the methods. The default implementation, <code>org.dspace.app.webui.SimpleAuthenticator</code>, is a simple implementation that implements these policies:</p>
+  <p>Please see the source files <code>AuthenticationManager.java</code> and <code>AuthenticationMethod.java</code> for more details about this mechanism.
+
+  <h3>Authentication by Password</h3>
+
+  <p>The default method <code>org.dspace.eperson.PasswordAuthentication</code> has the following properties:
 
   <ul>
     <li>
@@ -380,30 +419,40 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
     </li>
   </ul>
 
-  <p>As of version 1.3, the <code>SimpleAuthenticator</code> also supports <A HREF="#ldap">LDAP authentication</A>.</P>
+  <h3>LDAP Authentication</h3>
 
-  <p>Included in the source is the implementation of <code>SiteAuthenticator</code> used at MIT, <code>edu.mit.dspace.MITAuthenticator</code>. This implements a slightly more complex authentication mechanism:</p>
+  <p>As of version 1.3, the authentication method <code>org.dspace.eperson.LDAPAuthentication</code> is also supplied to support <A HREF="#ldap">LDAP authentication</A>.</P>
 
-  <ul>
-    <li>
-      <p>If an authentication user in an MIT user, they must log in using an X509 Web certificate. The <code>certificate-login</code> servlet, similar to the <code>password-login</code> servlet, authenticates users via these certificates, and if successful, resumes the original request just as the password log-in servlet would.</p>
-    </li>
+  <h3>X.509 Certificate Authentication</h3>
 
-    <li>
-      <p>MIT users are also automatically added to the special (dynamic) group called 'MIT Users' (which must be present in the system!). This allows us to create authorization policies for MIT users without having to manually maintain membership of the MIT users group.</p>
-    </li>
+  <p>The X509 certificate authentication method has an extra feature: If the <code>authentication.x509.autoregister</code> configuration property is <code>true</code>, it will automatically register the user with the system.</p>
 
-    <li>
-      <p>Anyone can register themselves, but MIT users doing this cannot set a password; they must use their X509 Web certificate to log in.</p>
-    </li>
-  </ul>
+  <h3>Example of Custom Authentication</h3>
 
-  <p>The X509 certificate login servlet has an extra feature: If the <code>webui.cert.autoregister</code> configuration property is <code>true</code>, it will automatically register the user with the system.</p>
+  <p>Also included in the source is an implementation of an authentication method used at MIT, <code>edu.mit.dspace.MITSpecialGroup</code>.
+     This does not actually authenticate a user, it <em>only</em>
+     adds the current user to a special (dynamic) group called 'MIT
+     Users' (which must be present in the system!).  This allows us to
+     create authorization policies for MIT users without having to
+     manually maintain membership of the MIT users group.</p>
 
-  <p>You could create a customized version of the password login servlet to perform a similar action. For example, if your organization uses Windows NT domain authentication, you could implement a version of PasswordServlet.java that validates against Windows NT authentication, and automatically adds an e-person record for new users. It is strongly recommended that you do not edit PasswordServlet but create a new servlet for this, so that future updates of the DSpace code do not overwrite your changes. You would also have to implement a customized <code>SiteAuthenticator</code> in which the <code>startAuthentication</code> method would forward requests to your new servlet.</p>
+  <p>By keeping this code in a separate method, we can customize the
+     authentication process for MIT by simply adding it to the stack in
+     the DSpace configuration.  None of the code has to be touched.
+
+  <p>You can create your own custom authentication method and add it to
+     the stack.  Use the most similar existing method as a model, e.g.
+     <code>org.dspace.eperson.PasswordAuthentication</code> for an "explicit"
+     method (with credentials entered interactively) or
+     <code>org.dspace.eperson.X509Authentication</code> for an implicit
+     method.</p>
 
 
   <h2><a name="ldap" id="ldap">Configuring LDAP Authentication</a></h2>
+
+  <p>You can enable LDAP authentication by adding its method to the
+     stack in the DSpace configuration, e.g.
+     <pre>plugin.sequence.org.dspace.eperson.AuthenticationMethod = org.dspace.eperson.LDAPAuthentication</pre></p>
 
   <p>If LDAP is enabled in the dspace.cfg file, then new users will be able to register by entering their username and password without being sent the registration token. If users do not have a username and password, then they can still register and login with just their email address the same way they do now.</p>
 

@@ -244,6 +244,47 @@ alert.recipient (not essential but very useful!)</PRE>
 
     <P>Plain old HTTP is totally insecure, and if your DSpace uses username/password authentication or stores some restricted content, running it over HTTPS (HTTP over a Secure Socket Layer (SSL)) is advisable.  There are two options for this:  Using Apache HTTPD, or Tomcat/Jetty's in-built HTTPS support.</P>
 
+    <P><strong>To use the HTTPS support in Tomcat 5.0:</strong>
+
+    <UL>
+      <LI>Create a Java keystore for your server with the password
+          <code>changeit</code>, loaded with the CA certificates for
+          the authorities of any clients whose certificates you wish to accept.
+          For example, if your server is installed under <b><code>/tomcat</code></b>
+          <br><code> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore /tomcat/conf/keystore  -alias client1 -file client1.pem</code>
+          </LI>
+
+      <LI>Install your server certificate under the alias "tomcat":
+      <br><code> $JAVA_HOME/bin/keytool -import -noprompt -v -storepass changeit -keystore /tomcat/conf/keystore -alias tomcat -file myserver.pem</code>
+      </LI>
+
+      <LI>Install the CA (Certifying Authority) certificate for the CA that
+      granted your server cert, if necessary:
+      <br><code> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore /tomcat/conf/keystore -alias ServerCA -file ca.pem</code>
+      </LI>
+
+      <LI>Now add another Connector tag to your <code>server.xml</code>
+      Tomcat configuration file, like this example: (You may wish to change
+      some details such as the port, pathnames, and keystore password)
+      <pre>
+    &lt;Connector port="8443"
+               maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
+               enableLookups="false" disableUploadTimeout="true"
+               acceptCount="100" debug="0" scheme="https" secure="true"
+               sslProtocol="TLS"
+               keystoreFile="/tomcat/conf/keystore"
+               keystorePass="changeit"
+               clientAuth="true"
+               truststoreFile="/tomcat/conf/keystore"
+               trustedstorePass="changeit" /&gt;</pre></LI>
+
+      <LI>See the
+        <A HREF="configure.html#dspacecfg">configuration section</A>
+        for instructions on enabling the X.509 authentication method.
+        </LI>
+
+    </UL>
+
     <P><strong>To use Apache HTTPD:</strong> The DSpace source bundle includes a partial Apache configuration <code>apache13.conf</code>, which contains most of the DSpace-specific configuration required.  It assumes you're using <A HREF="http://jakarta.apache.org/tomcat/tomcat-4.1-doc/config/webapp.html">mod_webapp</A>, which is deprecated and tricky to compile but a lot easier to configure than <code>mod_jk2</code> which is the current recommendation from Tomcat.   Use of this is optional, you might just want to use it as an example.  To use it directly, in the main Apache <code>httpd.conf</code>, you should:</P>
 
     <UL>
@@ -253,7 +294,8 @@ alert.recipient (not essential but very useful!)</PRE>
       <LI>Include the DSpace part, e.g. with: <code>Include <i>[dspace]</i>/config/httpd.conf</code>.  You can decide where the DSpace part will go in your file system--see the <A HREF="configure.html#templates">configuration section</A>.</LI>
     </UL>
 
-    <P><strong>To use Tomcat or Jetty's HTTPS support</strong> consult the documentation for the relevant tool.</P>
+    <P><strong>To use Jetty's HTTPS support</strong> consult the documentation for the relevant tool.</P>
+
 
 
     <H3><A NAME="handles">The Handle Server</A></H3>
