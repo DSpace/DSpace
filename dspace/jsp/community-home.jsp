@@ -101,9 +101,17 @@
     sidebar = "";
 
     Bitstream logo = community.getLogo();
+    
+    boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+    String feedData = "NONE";
+    if (feedEnabled)
+    {
+        feedData = "comm:" + ConfigurationManager.getProperty("webui.feed.formats");
+    }
 %>
 
-<dspace:layout locbar="commLink" title="<%= name %>">
+<dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
+
   <table border="0" cellpadding="5" width="100%">
     <tr>
       <td width="100%">
@@ -318,7 +326,7 @@
       </tr>
     </table>
     <% } %>
-	<h3><fmt:message key="jsp.community-home.recentsub"/></h3>    
+	<h3><fmt:message key="jsp.community-home.recentsub"/></h3>
 <%
     for (int i = 0; i < lastSubmittedTitles.length; i++)
     {
@@ -331,7 +339,43 @@
 <%
   }
 %>
-    <p>&nbsp;</p>
+    <p>&nbsp;</p>    
+<%
+    if(feedEnabled)
+    {
+%>
+    <center>
+    <h4><fmt:message key="jsp.community-home.feeds"/></h4>
+<%
+    	String[] fmts = feedData.substring(5).split(",");
+    	String icon = null;
+    	int width = 0;
+    	for (int j = 0; j < fmts.length; j++)
+    	{
+    		if ("rss_1.0".equals(fmts[j]))
+    		{
+    		   icon = "rss1.gif";
+    		   width = 80;
+    		}
+    		else if ("rss_2.0".equals(fmts[j]))
+    		{
+    		   icon = "rss2.gif";
+    		   width = 80;
+    		}
+    		else
+    	    {
+    	       icon = "rss.gif";
+    	       width = 36;
+    	    }
+%>
+    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/<%= community.getHandle() %>"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" ></a>
+<%
+    	}
+%>
+    </center>
+<%
+    }
+%>
 
     <%= sidebar %>
 
