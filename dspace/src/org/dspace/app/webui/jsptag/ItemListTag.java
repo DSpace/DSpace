@@ -395,6 +395,7 @@ public class ItemListTag extends TagSupport
             //AuthorizeManager.authorizeAction(bContext, this, Constants.READ);
             // 	read in bitstream's image
             buf = ImageIO.read(is);
+            is.close();
         }
         catch (SQLException sqle)
         {
