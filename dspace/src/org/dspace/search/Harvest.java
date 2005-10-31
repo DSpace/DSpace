@@ -45,6 +45,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -67,7 +68,7 @@ public class Harvest
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(Harvest.class);
-
+    
     /**
      * Obtain information about items that have been created, modified or
      * withdrawn within a given date range. You can also specify 'offset' and
@@ -81,7 +82,7 @@ public class Harvest
      * @param context
      *            DSpace context
      * @param scope
-     *            a Collection, or <code>null</code> indicating the scope is
+     *            a Collection, Community, or <code>null</code> indicating the scope is
      *            all of DSpace
      * @param startDate
      *            start of date range, or <code>null</code>
@@ -108,7 +109,7 @@ public class Harvest
      * @return List of <code>HarvestedItemInfo</code> objects
      * @throws SQLException
      */
-    public static List harvest(Context context, Collection scope,
+    public static List harvest(Context context, DSpaceObject scope,
             String startDate, String endDate, int offset, int limit,
             boolean items, boolean collections, boolean withdrawn)
             throws SQLException
@@ -121,10 +122,20 @@ public class Harvest
 
         if (scope != null)
         {
-            scopeTableSQL = ", collection2item";
-            scopeWhereSQL = " AND collection2item.collection_id="
-                    + scope.getID()
-                    + " AND collection2item.item_id=handle.resource_id";
+        	if (scope.getType() == Constants.COLLECTION)
+        	{
+        		scopeTableSQL = ", collection2item";
+        		scopeWhereSQL = " AND collection2item.collection_id="
+        						+ scope.getID()
+        						+ " AND collection2item.item_id=handle.resource_id";
+        	}
+        	else if (scope.getType() == Constants.COMMUNITY)
+        	{
+        		scopeTableSQL = ", community2item";
+        		scopeWhereSQL = " AND community2item.community_id="
+								+ scope.getID()
+								+ " AND community2item.item_id=handle.resource_id";
+        	}
         }
 
         // Put together our query. Note there is no need for an

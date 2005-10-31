@@ -182,11 +182,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>certificate-login</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.X509CertificateServlet</servlet-class>
-  </servlet>
-
-  <servlet>
     <servlet-name>collection-wizard</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.CollectionWizardServlet</servlet-class>
   </servlet>
@@ -234,6 +229,11 @@
   <servlet>
     <servlet-name>group-select-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.GroupListServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>feed</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.FeedServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -318,7 +318,7 @@
     <servlet-name>retrieve</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
   </servlet>
-
+  
   <servlet>
     <servlet-name>simple-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SimpleSearchServlet</servlet-class>
@@ -392,11 +392,6 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>certificate-login</servlet-name>
-    <url-pattern>/certificate-login</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
     <servlet-name>community-list</servlet-name>
     <url-pattern>/community-list</url-pattern>
   </servlet-mapping>
@@ -420,7 +415,6 @@
     <servlet-name>edit-communities</servlet-name>
     <url-pattern>/dspace-admin/edit-communities</url-pattern>
   </servlet-mapping>
-
 
   <servlet-mapping>
     <servlet-name>edit-epeople</servlet-name>
@@ -451,7 +445,11 @@
     <servlet-name>itemmap</servlet-name>
     <url-pattern>/tools/itemmap</url-pattern>
   </servlet-mapping>
-
+  
+  <servlet-mapping>
+    <servlet-name>feed</servlet-name>
+    <url-pattern>/feed/*</url-pattern>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>feedback</servlet-name>
@@ -602,7 +600,7 @@
     <taglib-uri>http://java.sun.com/jsp/jstl/fmt</taglib-uri>
     <taglib-location>/WEB-INF/fmt.tld</taglib-location>
   </taglib>
-
+  
   <!-- DSpace JSP Tag Library -->
   <taglib>
     <taglib-uri>http://www.dspace.org/dspace-tags.tld</taglib-uri>

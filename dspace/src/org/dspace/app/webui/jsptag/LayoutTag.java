@@ -123,6 +123,9 @@ public class LayoutTag extends TagSupport
 
     /** Whether to add headers to prevent browsers caching the page */
     private String noCache;
+    
+    /** Syndication feed "autodiscovery" link data */
+    private String feedData;
 
     public LayoutTag()
     {
@@ -275,6 +278,52 @@ public class LayoutTag extends TagSupport
         else
         {
             request.setAttribute("dspace.layout.title", "NO TITLE");
+        }
+        
+        // Set feedData if present
+        if (feedData != null && ! "NONE".equals(feedData))
+        {
+            // set the links' reference - community or collection
+        	boolean commLinks = feedData.startsWith("comm:");
+        	if ( commLinks )
+        	{
+                Community com = (Community)request.getAttribute("dspace.community");
+        		request.setAttribute("dspace.layout.feedref", com.getHandle());
+        	}
+        	else
+        	{
+        		Collection col = (Collection)request.getAttribute("dspace.collection");
+        		request.setAttribute("dspace.layout.feedref", col.getHandle());
+        	}
+        	// build a list of link attributes for each link format
+        	String[] formats = feedData.substring(feedData.indexOf(":")+1).split(",");
+        	List linkParts = new ArrayList();
+        	// each link has a mime-type, title, and format (used in href URL)
+        	for (int i = 0; i < formats.length; i++)
+        	{
+        		if("rss_1.0".equals(formats[i]))
+        		{
+        			linkParts.add("rdf+xml");
+        		}
+        		else
+        		{
+        			linkParts.add("rss+xml");
+        		}
+        		if (commLinks)
+        		{
+        			linkParts.add("Items in Community");
+        		}
+        		else
+        		{
+        			linkParts.add("Items in Collection");
+        		}
+        		linkParts.add(formats[i]);
+        	}
+        	request.setAttribute("dspace.layout.linkparts", linkParts);
+        }
+        else
+        {
+        	request.setAttribute("dspace.layout.feedref", "NONE" );
         }
 
         // Now include the header
@@ -561,6 +610,27 @@ public class LayoutTag extends TagSupport
     {
         this.noCache = v;
     }
+    
+    /**
+     * Get the value of feedData.
+     * 
+     * @return Value of feedData.
+     */
+    public String getFeedData()
+    {
+        return feedData;
+    }
+
+    /**
+     * Set the value of feedData.
+     * 
+     * @param v
+     *            Value to assign to feedData.
+     */
+    public void setFeedData(String v)
+    {
+        this.feedData = v;
+    }
 
     public void release()
     {
@@ -572,5 +642,6 @@ public class LayoutTag extends TagSupport
         parentTitle = null;
         parentLink = null;
         noCache = null;
+        feedData = null;
     }
 }

@@ -60,6 +60,8 @@
     boolean locbar = ((Boolean) request.getAttribute("dspace.layout.locbar")).booleanValue();
 
     String siteName = ConfigurationManager.getProperty("dspace.name");
+    String feedRef = (String)request.getAttribute("dspace.layout.feedref");
+    List parts = (List)request.getAttribute("dspace.layout.linkparts");
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -69,6 +71,17 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp" type="text/css" />
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
+<%
+    if (!"NONE".equals(feedRef))
+    {
+        for (int i = 0; i < parts.size(); i+= 3)
+        {
+%>
+        <link rel="alternate" type="application/<%= (String)parts.get(i) %>" title="<%= (String)parts.get(i+1) %>" href="<%= request.getContextPath() %>/feed/<%= (String)parts.get(i+2) %>/<%= feedRef %>"/>
+<%
+        }
+    }
+%>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
     </head>
 
