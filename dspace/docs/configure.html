@@ -689,6 +689,28 @@ dstat-report-monthly
 
   <p>Setting <code>webui.licence_bundle = true</code> in <code>dspace.cfg</code> will result in a hyperlink being rendered on the Item View page that points to the item's licence.</p>
 
+  <p>In addition to the email subscription service, recent submissions to communities and collections are also available via RSS feeds. The feed link or links appear on the community and collection
+     home pages, in the sidebar underneath the <em>Recent Submissions</em> citations. The content of the feed includes the community/collection handle, name, short description, and icon; for each
+     item it includes: the handle, title, author, date issued, description, and abstract if present. Feed behavior can be configured by setting the following properties
+     in <code>dspace.cfg</code>:</p>
+  <p><code>webui.feed.enable</code> = true</code></p>
+  <p>Set the value of this property to <code>true</code> to enable RSS feeds. If <code>false</code>, feeds will not be generated, and the feed links will not appear.</p>
+  <p><code>webui.feed.items = 4</code></p>
+  <p>The value of this property governs the number of DSpace items appearing in each feed, which are the most recent <code>n</code> submissions.</p>
+  <p><code>webui.feed.cache.size = 100</code></p>
+  <p>To improve performance, generated feeds may be cached in memory. If caching is desired, set the value of this property to a positive number,
+  which represents the total number of feeds kept in the cache at one time, for all communities and collections. A value of <code>0</code> disables caching, and the feed is generated
+  on demand for each request. If the cache grows beyond the specified value, the least-requested feeds are removed to maintain its size.
+  To assist you in optimization, whenever cache maintenance is performed a profile of the cache is recorded in the DSpace system log,
+  showing its size, and the total, average, minimum, and maximum number of 'hits' against cached feeds.</p>
+  <p><code>webui.cache.age = 48</code></p>
+  <p>To ensure that the feeds in the cache remain current, requested feeds are checked after they reach a certain <em>age</em>.
+  This property specifies that age in hours. A value of <code>0</code> will force a check with each request, which guarantees currency, but with a performance penalty. If caching is disabled, this property is ignored.</p>
+  <p><code>webui.feed.formats = rss_1.0,rss_2.0</code></p>
+  <p>The RSS feature supports several different syndication formats. If you wish only a single format to be offered,
+  set the value of this property to that format, selecting only from the list of canonical names provided. If you wish multiple formats,
+  set the value to a comma-separated list of canonical names. Each format will appear as a distinct icon and link
+  in the community and collection home page, as well as an 'autodiscovery' link in the page header.</p>
   <hr>
 
   <address>
