@@ -1,5 +1,16 @@
 1.4 beta 1
 ==========
+(Claudia Jürgen/Scott Yeadon)
+- SF Patch #1228949 & #1340327 - new cmdline scope restrictions for MediaFilter:
+  By maximum number processed
+  By community/collection/item
+
+(Ben Bosman)
+- SF Patch #1160997 RSS Add-on
+
+(Richard Rodgers)
+- Close thumbnail file stream after use - fix for leak that left open files
+
 (Scott Yeadon)
 - Fix Oracle compatibility bug in Browse.java
 
