@@ -40,35 +40,32 @@
 
 package org.dspace.app.mediafilter;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
+import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 
 /**
  * MediaFilterManager is the class that invokes the media filters over the
  * repository's content. a few command line flags affect the operation of the
- * MFM: -v verbose outputs all extracted text to SDTDOUT -f force forces all
- * bitstreams to be processed, even if they have been before -n noindex does not
- * recreate index after processing bitstreams
- *  
+ * MFM: -v verbose outputs all extracted text to STDOUT; -f force forces all
+ * bitstreams to be processed, even if they have been before; -n noindex does not
+ * recreate index after processing bitstreams; -i [identifier] limits processing 
+ * scope to a community, collection or item; and -m [max] limits processing to a
+ * maximum number of items.
  */
 public class MediaFilterManager
 {
@@ -77,6 +74,12 @@ public class MediaFilterManager
     public static boolean isVerbose = false; // default to not verbose
 
     public static boolean isForce = false; // default to not forced
+    
+    public static String identifier = null; // object scope limiter
+    
+    public static int max2Process = Integer.MAX_VALUE;  // maximum number to process
+    
+    public static int processed = 0;   // number processed
 
     public static void main(String[] argv) throws Exception
     {
@@ -87,13 +90,17 @@ public class MediaFilterManager
         CommandLineParser parser = new PosixParser();
 
         Options options = new Options();
-
+        
         options.addOption("v", "verbose", false,
                 "print all extracted text and other details to STDOUT");
         options.addOption("f", "force", false,
                 "force all bitstreams to be processed");
         options.addOption("n", "noindex", false,
                 "do NOT re-create search index after filtering bitstreams");
+        options.addOption("i", "identifier", true,
+        		"ONLY process bitstreams belonging to identifier");
+        options.addOption("m", "maximum", true,
+				"process no more than maximum items");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
@@ -120,6 +127,22 @@ public class MediaFilterManager
         {
             isForce = true;
         }
+        
+        if (line.hasOption('i'))
+        {
+        	identifier = line.getOptionValue('i');
+        }
+        
+        if (line.hasOption('m'))
+        {
+        	max2Process = Integer.parseInt(line.getOptionValue('m'));
+        	if (max2Process <= 1)
+        	{
+        		System.out.println("Invalid maximum value '" + 
+        				     		line.getOptionValue('m') + "' - ignoring");
+        		max2Process = Integer.MAX_VALUE;
+        	}
+        }
 
         Context c = null;
 
@@ -131,8 +154,33 @@ public class MediaFilterManager
             c.setIgnoreAuthorization(true);
 
             // now apply the filters
-            applyFiltersAllItems(c);
-
+            if (identifier == null)
+            {
+            	applyFiltersAllItems(c);
+            }
+            else  // restrict application scope to identifier
+            {
+            	DSpaceObject dso = HandleManager.resolveToObject(c, identifier);
+            	if (dso == null)
+            	{
+            		throw new IllegalArgumentException("Cannot resolve "
+                                + identifier + " to a DSpace object");
+            	}
+            	
+            	switch (dso.getType())
+            	{
+            		case Constants.COMMUNITY:
+            						applyFiltersCommunity(c, (Community)dso);
+            						break;					
+            		case Constants.COLLECTION:
+            						applyFiltersCollection(c, (Collection)dso);
+            						break;						
+            		case Constants.ITEM:
+            						applyFiltersItem(c, (Item)dso);
+            						break;
+            	}
+            }
+          
             // create search index?
             if (createIndex)
             {
@@ -155,41 +203,74 @@ public class MediaFilterManager
     public static void applyFiltersAllItems(Context c) throws Exception
     {
         ItemIterator i = Item.findAll(c);
-
-        while (i.hasNext())
+        while (i.hasNext() && processed <= max2Process)
         {
-            Item myItem = i.next();
-
-            filterItem(c, myItem);
-
-            // commit changes after each filtered item
-            c.commit();
+        	applyFiltersItem(c, i.next());
         }
+    }
+    
+    public static void applyFiltersCommunity(Context c, Community community)
+                                             throws Exception
+    {
+       	Community[] subcommunities = community.getSubcommunities();
+       	for (int i = 0; i < subcommunities.length; i++)
+       	{
+       		applyFiltersCommunity(c, subcommunities[i]);
+       	}
+       	
+       	Collection[] collections = community.getCollections();
+       	for (int j = 0; j < collections.length; j++)
+       	{
+       		applyFiltersCollection(c, collections[j]);
+       	}
+    }
+        
+    public static void applyFiltersCollection(Context c, Collection collection)
+                                              throws Exception
+    {
+        ItemIterator i = collection.getItems();
+        while (i.hasNext() && processed <= max2Process)
+        {
+        	applyFiltersItem(c, i.next());
+        }
+    }
+       
+    public static void applyFiltersItem(Context c, Item item) throws Exception
+    {
+          if (filterItem(c, item))
+          {
+        	  // commit changes after each filtered item
+        	  c.commit();
+              // increment processed count
+              ++processed;
+          }
+          // clear item objects from context cache
+          item.decache();
     }
 
     /**
      * iterate through the item's bitstreams in the ORIGINAL bundle, applying
      * filters if possible
+     * 
+     * @return true if any bitstreams processed, 
+     *         false if none
      */
-    public static void filterItem(Context c, Item myItem) throws Exception
+    public static boolean filterItem(Context c, Item myItem) throws Exception
     {
         // get 'original' bundles
-        Bundle[] myBundles = myItem.getBundles();
-
+        Bundle[] myBundles = myItem.getBundles("ORIGINAL");
+        boolean done = false;
         for (int i = 0; i < myBundles.length; i++)
         {
-            // could have multiple 'ORIGINAL' bundles (hmm, probably not)
-            if ("ORIGINAL".equals(myBundles[i].getName()))
+        	// now look at all of the bitstreams
+            Bitstream[] myBitstreams = myBundles[i].getBitstreams();
+            
+            for (int k = 0; k < myBitstreams.length; k++)
             {
-                // now look at all of the bitstreams
-                Bitstream[] myBitstreams = myBundles[i].getBitstreams();
-
-                for (int k = 0; k < myBitstreams.length; k++)
-                {
-                    filterBitstream(c, myItem, myBitstreams[k]);
-                }
+            	done |= filterBitstream(c, myItem, myBitstreams[k]);
             }
         }
+        return done;
     }
 
     /**
@@ -198,8 +279,11 @@ public class MediaFilterManager
      * An exception will be thrown if the media filter class cannot be
      * instantiated, exceptions from filtering will be logged to STDOUT and
      * swallowed.
+     * 
+     * @return true if bitstream processed, 
+     *         false if no applicable filter or already processed
      */
-    public static void filterBitstream(Context c, Item myItem,
+    public static boolean filterBitstream(Context c, Item myItem,
             Bitstream myBitstream) throws Exception
     {
         // do we have a filter for that format?
@@ -215,6 +299,7 @@ public class MediaFilterManager
                 {
                     myItem.update(); // Make sure new bitstream has a sequence
                                      // number
+                    return true;
                 }
             }
             catch (Exception e)
@@ -224,5 +309,6 @@ public class MediaFilterManager
                 e.printStackTrace();
             }
         }
+        return false;
     }
 }
