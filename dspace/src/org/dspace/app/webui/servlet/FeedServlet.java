@@ -257,7 +257,9 @@ public class FeedServlet extends DSpaceServlet
     		throws IOException, SQLException
     {
     	// container-level elements
-    	String objectUrl = HandleManager.getCanonicalForm(dso.getHandle());
+    	String objectUrl = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
+    		? HandleManager.resolveToURL(context, dso.getHandle())
+    		: HandleManager.getCanonicalForm(dso.getHandle());   	
     	String dspaceUrl = ConfigurationManager.getProperty("dspace.url");
     	String type = null;
     	String description = null;
@@ -336,11 +338,15 @@ public class FeedServlet extends DSpaceServlet
      */
     private com.sun.syndication.feed.rss.Item itemFromDSpaceItem(Context context,
     		                                                     Item dspaceItem)
+    	throws SQLException
     {
         com.sun.syndication.feed.rss.Item rssItem = 
         	new com.sun.syndication.feed.rss.Item();
         
-        String itHandle = HandleManager.getCanonicalForm(dspaceItem.getHandle());
+    	String itHandle = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
+		? HandleManager.resolveToURL(context, dspaceItem.getHandle())
+		: HandleManager.getCanonicalForm(dspaceItem.getHandle());
+
         rssItem.setLink(itHandle);
         
     	String title = getDC(dspaceItem, "title", null, Item.ANY);

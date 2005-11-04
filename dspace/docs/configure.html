@@ -713,6 +713,8 @@ dstat-report-monthly
   set the value of this property to that format, selecting only from the list of canonical names provided. If you wish multiple formats,
   set the value to a comma-separated list of canonical names. Each format will appear as a distinct icon and link
   in the community and collection home page, as well as an 'autodiscovery' link in the page header.</p>
+  <p><code>webui.feed.localresolve = false</code></p>
+  <p>By default, the RSS feed will return global handle server-based URLs to items, collections and communities (e.g. http://hdl.handle.net/123456789/1). This means if you have not registered your DSpace installation with the CNRI Handle Server (e.g. development or testing instance) the URLs returned by the feed will return an error if accessed. Setting <code>webui.feed.localresolve = true</code> will result in the RSS feed returning localised URLs (e.g. http://myserver.myorg/handle/123456789/1). If <code>webui.feed.localresolve</code> is set to <code>false</code> or not present the default global handle URL form is used.</p>
   <hr>
 
   <address>
