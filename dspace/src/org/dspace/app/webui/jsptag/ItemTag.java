@@ -300,7 +300,7 @@ public class ItemTag extends TagSupport
 
         while (st.hasMoreTokens())
         {
-            String field = st.nextToken().toLowerCase().trim();
+        	String field = st.nextToken().trim();
             boolean isDate = false;
             boolean isLink = false;
 

@@ -12,6 +12,7 @@
 - Close thumbnail file stream after use - fix for leak that left open files
 
 (Scott Yeadon)
+- Remove lowercase conversion for metadata field matching
 - Fix Oracle compatibility bug in Browse.java
 
 (Gabriela Mircea)
