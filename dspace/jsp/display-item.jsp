@@ -190,6 +190,13 @@
     </form>
 <%
         }
+        if (ConfigurationManager.getBooleanProperty("webui.suggest.enable"))
+        {
+%>
+    <a href="<%= request.getContextPath() %>/suggest?handle=<%= handle %>" target="new_window">
+       <fmt:message key="jsp.display-item.suggest"/></a>
+<%
+        }
 %>
     </div>
 <%
