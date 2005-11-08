@@ -715,6 +715,25 @@ dstat-report-monthly
   in the community and collection home page, as well as an 'autodiscovery' link in the page header.</p>
   <p><code>webui.feed.localresolve = false</code></p>
   <p>By default, the RSS feed will return global handle server-based URLs to items, collections and communities (e.g. http://hdl.handle.net/123456789/1). This means if you have not registered your DSpace installation with the CNRI Handle Server (e.g. development or testing instance) the URLs returned by the feed will return an error if accessed. Setting <code>webui.feed.localresolve = true</code> will result in the RSS feed returning localised URLs (e.g. http://myserver.myorg/handle/123456789/1). If <code>webui.feed.localresolve</code> is set to <code>false</code> or not present the default global handle URL form is used.</p>
+  
+  <h2><a name="suggest" id="suggest">Configuring Item Recommendations</a></h2>
+  <p>The 'suggest an item' service is a convenient way for DSpace users to notify others via email about
+     content they discover in the repository. If enabled, a link appears on the simple item display page leading
+     to a form where the user can enter an email address, and additional optional information. Upon completion of the form, the system transmits a pre-formatted
+     message about the item to that address. Item recommendation can be configured by setting the following properties
+     in <code>dspace.cfg</code>:</p>
+  <p><code>webui.suggest.enable</code> = true</code></p>
+  <p>Set the value of this property to <code>true</code> to expose the link to the recommendation form. If <code>false</code>, the link will not display.</p>
+  <p><code>webui.suggest.sender</code> = A DSpace user</code></p>
+  <p>The form includes an optional field for the name of the person making the recommendation. The value of this property will be used if the sender is not specified. Note that
+  if the user has been authenticated to DSpace, the e-person record will be used to set the default value of this field, and will also be used to set
+  the 'reply-to' email header to the e-person's address.</p>
+  <p><code>webui.suggest.recipient</code> = colleague</code></p>
+  <p>In addition to the required destination email address, the form includes an optional field for the name of person to whom the recommendation is to be sent. The value of this property will be used if the recipient name is not specified.</p>
+  <p>The wording and layout of the email message is governed by the template file <code><i>[dspace]</i>/config/emails/suggest</code>. You may edit this file
+  to alter the language, layout, type, or amount of information contained in the email, but note that the values passed to the template are limited to those enumerated at the
+  top of the template file and represented in the body of the message with 'placeholders' {0}, {1}, etc. A general description of DSpace is included as
+  a footer to the email, which may be replaced with site-specific content.
   <hr>
 
   <address>
