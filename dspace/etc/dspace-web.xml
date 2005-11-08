@@ -338,6 +338,11 @@
     <servlet-name>subscribe</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SubscribeServlet</servlet-class>
   </servlet>
+  
+  <servlet>
+    <servlet-name>suggest</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.SuggestServlet</servlet-class>
+  </servlet>
 
   <servlet>
     <servlet-name>supervise</servlet-name>
@@ -549,6 +554,11 @@
   <servlet-mapping>
     <servlet-name>subscribe</servlet-name>
     <url-pattern>/subscribe</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>suggest</servlet-name>
+    <url-pattern>/suggest</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
