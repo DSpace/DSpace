@@ -94,6 +94,6 @@ public class GroupListServlet extends DSpaceServlet
 			request.setAttribute("multiple", new Boolean(true));
 		}
 		
-		JSPManager.showJSP(request, response, "/tools/groups-select-list.jsp");
+		JSPManager.showJSP(request, response, "/tools/group-select-list.jsp");
 	}
 }

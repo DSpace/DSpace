@@ -1,5 +1,5 @@
 <%--
-  - groups-select-list.jsp
+  - group-select-list.jsp
   -
   - Version: $Revision$
   -
@@ -92,15 +92,15 @@
 	String sortByParam = "name";
 	if (sortBy == Group.ID)   sortByParam = "id";
 
-	String jumpLink = request.getContextPath() + "/tools/groups-select-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first=";
-	String sortLink = request.getContextPath() + "/tools/groups-select-list?multiple=" + multiple + "&first=" + first + "&sortby=";
+	String jumpLink = request.getContextPath() + "/tools/group-select-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first=";
+	String sortLink = request.getContextPath() + "/tools/group-select-list?multiple=" + multiple + "&first=" + first + "&sortby=";
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
     <head>
         <%-- <title>Select Groups</title> --%>
-        <title><fmt:message key="jsp.tools.groups-select-list.title"/></title>
+        <title><fmt:message key="jsp.tools.group-select-list.title"/></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp" type="text/css"/>
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
@@ -130,7 +130,7 @@ function clearGroups()
 	<body class="pageContents">
 
     <%-- <h3>Groups <%= first + 1 %>-<%= last + 1 %> of <%= groups.length %></h3> --%>
-	<h3><fmt:message key="jsp.tools.groups-select-list.heading">
+	<h3><fmt:message key="jsp.tools.group-select-list.heading">
         <fmt:param><%= first + 1 %></fmt:param>
         <fmt:param><%= last + 1 %></fmt:param>
         <fmt:param><%= groups.length %></fmt:param>
@@ -141,7 +141,7 @@ function clearGroups()
 	{ %>
 		<%-- <p class="submitFormHelp">Clicking on the 'Add' button next to a group will add that
 			 group to the list on the main form. </p> --%>
-		<p class="submitFormHelp"><fmt:message key="jsp.tools.groups-select-list.info1"/></p>
+		<p class="submitFormHelp"><fmt:message key="jsp.tools.group-select-list.info1"/></p>
 <%  } %>
     
 <%-- Controls for jumping around list--%>
@@ -155,12 +155,12 @@ function clearGroups()
 			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td>
 			--%>
 		
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.groups-select-list.jump.first"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.groups-select-list.jump.five-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.groups-select-list.jump.one-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.groups-select-list.jump.one-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.groups-select-list.jump.five-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.groups-select-list.jump.last"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.group-select-list.jump.first"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.group-select-list.jump.five-back"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.group-select-list.jump.one-back"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.group-select-list.jump.one-forward"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.group-select-list.jump.five-forward"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.group-select-list.jump.last"/></a></strong></small></td>
 		</tr>
 	</table>
 <br/>
@@ -173,21 +173,21 @@ function clearGroups()
 			<th id="t2" class="oddRowEvenCol"><%
                 if (sortBy == Group.ID)
                 {
-                    %><strong><fmt:message key="jsp.tools.groups-select-list.th.id.sortedby" /></strong><%
+                    %><strong><fmt:message key="jsp.tools.group-select-list.th.id.sortedby" /></strong><%
                 }
                 else
                 {
-                    %><a href="<%= sortLink %>id"><fmt:message key="jsp.tools.groups-select-list.th.id" /></a><%
+                    %><a href="<%= sortLink %>id"><fmt:message key="jsp.tools.group-select-list.th.id" /></a><%
                 }
             %></th>
             <th id="t3" class="oddRowOddCol"><%
                 if (sortBy == Group.NAME)
                 {
-                    %><strong><fmt:message key="jsp.tools.groups-select-list.th.name.sortedby" /></strong><%
+                    %><strong><fmt:message key="jsp.tools.group-select-list.th.name.sortedby" /></strong><%
                 }
                 else
                 {
-                    %><a href="<%= sortLink %>name"><fmt:message key="jsp.tools.groups-select-list.th.name" /></a><%
+                    %><a href="<%= sortLink %>name"><fmt:message key="jsp.tools.group-select-list.th.name" /></a><%
                 }
             %></th>
         </tr>
@@ -235,17 +235,17 @@ function clearGroups()
 			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td>
 			--%>
 		
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.groups-select-list.jump.first"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.groups-select-list.jump.five-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.groups-select-list.jump.one-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.groups-select-list.jump.one-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.groups-select-list.jump.five-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.groups-select-list.jump.last"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.group-select-list.jump.first"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.group-select-list.jump.five-back"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.group-select-list.jump.one-back"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.group-select-list.jump.one-forward"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.group-select-list.jump.five-forward"/></a></strong></small></td>
+			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.group-select-list.jump.last"/></a></strong></small></td>
 		</tr>
 	</table>
 
 	<%-- <p align="center"><input type="button" value="Close" onClick="window.close();"></p> --%>
-	<p align="center"><input type="button" value="<fmt:message key="jsp.tools.groups-select-list.close.button"/>" onclick="window.close();"/></p>
+	<p align="center"><input type="button" value="<fmt:message key="jsp.tools.group-select-list.close.button"/>" onclick="window.close();"/></p>
 
 	</form>
 	
