@@ -657,16 +657,28 @@ public class DSpaceOAICatalog extends AbstractCatalog
             context = new Context();
 
             Collection[] allCols = Collection.findAll(context);
-
+            StringBuffer spec = null;
             for (int i = 0; i < allCols.length; i++)
             {
-                String spec = "<set><setSpec>hdl_"
-                        + allCols[i].getHandle().replace('/', '_')
-                        + "</setSpec><setName>"
-                        + Utils.addEntities(allCols[i].getMetadata("name"))
-                        + "</setName></set>";
-
-                sets.add(spec);
+                spec = new StringBuffer("<set><setSpec>hdl_");
+                spec.append(allCols[i].getHandle().replace('/', '_'));
+                spec.append("</setSpec>");
+                String collName = allCols[i].getMetadata("name");
+                if(collName != null)
+                {
+                	spec.append("<setName>");
+                	spec.append(Utils.addEntities(collName));
+                	spec.append("</setName>");
+                }
+                else
+                {
+                	spec.append("<setName />");
+                    // Warn that there is an error of a null set name
+                	log.info(LogManager.getHeader(null, "oai_error",
+                			       "null_set_name_for_set_id_" + allCols[i].getHandle()));
+                }
+                spec.append("</set>");
+                sets.add(spec.toString());
             }
         }
         catch (SQLException se)
