@@ -1,5 +1,11 @@
 1.4 beta 1
 ==========
+(Stuart Lewis)
+- SF Patch #1348291 Patch for SF Bug #1348276 (null causes OAI-PMH failure)
+
+(Arnaldo Dantas)
+- SF Patch #1160726 Suggest an Item
+
 (Claudia Jürgen/Scott Yeadon)
 - SF Patch #1228949 & #1340327 - new cmdline scope restrictions for MediaFilter:
   By maximum number processed
