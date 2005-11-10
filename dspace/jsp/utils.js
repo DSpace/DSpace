@@ -87,9 +87,19 @@ function addGroup(id, name)
     // First we check to see if group is already there
     for (var i = 0; i < window.document.forms[0].group_ids.options.length; i++)
     {
-        if ((window.document.forms[0].group_ids.options[i].value == id)  || (window.document.forms[0].group_id.value == id))
+        // is it in the list already
+        if (window.document.forms[0].group_ids.options[i].value == id)
         {
             newplace = -1;
+        }
+
+        // are we trying to add the new group to the new group on an Edit Group page (recursive)
+        if (window.document.forms[0].group_id)
+        {
+            if (window.document.forms[0].group_id.value == id)
+            {
+                newplace = -1;
+            }
         }
     }
 
