@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Dorothea Salo)
+- SF Patch #1351620 Add "Submit an item" button to Submission Complete page
+
 (Stuart Lewis)
 - SF Patch #1348291 Patch for SF Bug #1348276 (null causes OAI-PMH failure)
 

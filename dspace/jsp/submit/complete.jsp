@@ -49,6 +49,8 @@
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.content.InProgressSubmission" %>
+<%@ page import="org.dspace.content.Collection"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -56,6 +58,9 @@
 <%
     SubmissionInfo si =
         (SubmissionInfo) request.getAttribute("submission.info");
+
+    InProgressSubmission ip = si.submission;
+    Collection collection = ip.getCollection();
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.complete.title">
@@ -78,5 +83,12 @@
 	<p><fmt:message key="jsp.submit.complete.info"/></p> 
     <%--  <p><a href="<%= request.getContextPath() %>/mydspace">Go to My DSpace</a></p> --%>
     <p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.complete.link"/></a></p>
-
+     
+    <p><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.community-list.title"/></a></p>
+     
+    <form action="<%= request.getContextPath() %>/submit" method="POST">
+        <input type="hidden" name="collection" value="<%= collection.getID() %>">
+	    <input type="submit" name="submit" value="<fmt:message key="jsp.collection-home.submit.button"/>">
+    </form>
+     
 </dspace:layout>
