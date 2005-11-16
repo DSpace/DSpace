@@ -103,10 +103,10 @@
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/dc-registry") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/metadata-schema-registry") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/dspace-admin/dc-registry"><fmt:message key="jsp.layout.navbar-admin.dcregistry"/></a>
+      <a href="<%= request.getContextPath() %>/dspace-admin/metadata-schema-registry"><fmt:message key="jsp.layout.navbar-admin.metadataregistry"/></a>
     </td>
   </tr>
   

@@ -45,7 +45,7 @@
   -    item        - item to edit
   -    collections - collections the item is in, if any
   -    handle      - item's Handle, if any (String)
-  -    dc.types    - DCType[] - all DC types in the registry
+  -    dc.types    - MetadataField[] - all metadata fields in the registry
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -60,7 +60,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 
-<%@ page import="org.dspace.administer.DCType" %>
+<%@ page import="org.dspace.content.MetadataField" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.AuthorizeAdminServlet" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
 <%@ page import="org.dspace.content.Bitstream" %>
@@ -76,7 +76,7 @@
     Item item = (Item) request.getAttribute("item");
     String handle = (String) request.getAttribute("handle");
     Collection[] collections = (Collection[]) request.getAttribute("collections");
-    DCType[] dcTypes = (DCType[])  request.getAttribute("dc.types");
+    MetadataField[] dcTypes = (MetadataField[])  request.getAttribute("dc.types");
 %>
 
 
@@ -219,7 +219,7 @@
                 <th id="t5" class="oddRowOddCol">&nbsp;</th>
             </tr>
 <%
-    DCValue[] dcv = item.getDC(Item.ANY, Item.ANY, Item.ANY);
+    DCValue[] dcv = item.getDC(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
     String row = "even";
     
     // Keep a count of the number of values of each element+qualifier
@@ -231,7 +231,7 @@
     {
         // Find out how many values with this element/qualifier we've found
 
-        String key = dcv[i].element +
+        String key = dcv[i].schema + "_" + dcv[i].element +
             (dcv[i].qualifier == null ? "" : "_" + dcv[i].qualifier);
 
         Integer count = (Integer) dcCounter.get(key);
@@ -277,7 +277,7 @@
                 <td headers="t1" colspan="2" class="<%= row %>RowEvenCol">
                     <select name="addfield_dctype">
 <%  for (int i = 0; i < dcTypes.length; i++) { %>
-                        <option value="<%= dcTypes[i].getID() %>"><%= dcTypes[i].getElement() %><%= (dcTypes[i].getQualifier() == null ? "" : "." + dcTypes[i].getQualifier()) %></option>
+                        <option value="<%= dcTypes[i].getFieldID() %>"><%= dcTypes[i].getElement() %><%= (dcTypes[i].getQualifier() == null ? "" : "." + dcTypes[i].getQualifier()) %></option>
 <%  } %>
                     </select>
                 </td>

@@ -192,11 +192,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>dc-registry</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.admin.DCTypeRegistryServlet</servlet-class>
-  </servlet>
-
-  <servlet>
     <servlet-name>edit-communities</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EditCommunitiesServlet</servlet-class>
   </servlet>
@@ -278,6 +273,16 @@
   <servlet>
     <servlet-name>logout</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.LogoutServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>metadata-field-registry</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>metadata-schema-registry</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.MetadataSchemaRegistryServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -407,11 +412,6 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>dc-registry</servlet-name>
-    <url-pattern>/dspace-admin/dc-registry</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
     <servlet-name>edit-communities</servlet-name>
     <url-pattern>/tools/edit-communities</url-pattern>
   </servlet-mapping>
@@ -499,6 +499,16 @@
   <servlet-mapping>
     <servlet-name>logout</servlet-name>
     <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>metadata-field-registry</servlet-name>
+    <url-pattern>/dspace-admin/metadata-field-registry</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>metadata-schema-registry</servlet-name>
+    <url-pattern>/dspace-admin/metadata-schema-registry</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

@@ -52,6 +52,9 @@ import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.w3c.dom.Document;
@@ -218,10 +221,12 @@ public class RegistryLoader
      *            DSpace context object
      * @param filename
      *            the filename of the XML file to load
+     * @throws NonUniqueMetadataException
      */
     public static void loadDublinCoreTypes(Context context, String filename)
             throws SQLException, IOException, ParserConfigurationException,
-            SAXException, TransformerException, AuthorizeException
+            SAXException, TransformerException, AuthorizeException,
+            NonUniqueMetadataException
     {
         Document document = loadXML(filename);
 
@@ -248,21 +253,33 @@ public class RegistryLoader
      *            DSpace context object
      * @param node
      *            the node in the DOM tree
+     * @throws NonUniqueMetadataException
      */
     private static void loadDCType(Context context, Node node)
             throws SQLException, IOException, TransformerException,
-            AuthorizeException
+            AuthorizeException, NonUniqueMetadataException
     {
         // Get the values
+        String schema = getElementData(node, "schema");
         String element = getElementData(node, "element");
         String qualifier = getElementData(node, "qualifier");
         String scopeNote = getElementData(node, "scope_note");
 
-        DCType newType = DCType.create(context);
-        newType.setElement(element);
-        newType.setQualifier(qualifier);
-        newType.setScopeNote(scopeNote);
-        newType.update();
+        // If the schema is not provided default to DC
+        if (schema == null)
+        {
+            schema = MetadataSchema.DC_SCHEMA;
+        }
+
+        // Find the matching schema object
+        MetadataSchema schemaObj = MetadataSchema.find(context, schema);
+        
+        MetadataField field = new MetadataField();
+        field.setSchemaID(schemaObj.getSchemaID());
+        field.setElement(element);
+        field.setQualifier(qualifier);
+        field.setScopeNote(scopeNote);
+        field.create(context);
     }
 
     // ===================== XML Utility Methods =========================

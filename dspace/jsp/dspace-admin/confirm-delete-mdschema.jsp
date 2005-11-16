@@ -1,5 +1,5 @@
 <%--
-  - confirm-delete-dctype.jsp
+  - confirm-delete-mdschema.jsp
   -
   - Version: $Revision$
   -
@@ -39,10 +39,10 @@
   --%>
 
 <%--
-  - Confirm deletion of a DC type
+  - Confirm deletion of a DC schema
   -
   - Attributes:
-  -    type   - DCType we may delete
+  -    schema   - schema we may delete
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -50,53 +50,48 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.administer.DCType" %>
+<%@ page import="org.dspace.content.MetadataSchema" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    DCType type = (DCType) request.getAttribute("type");
-
-    String typeName = type.getElement() +
-        (type.getQualifier() == null ? "" : "." + type.getQualifier());
+    MetadataSchema schema = (MetadataSchema) request.getAttribute("schema");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.confirm-delete-dctype.title"
+<dspace:layout titlekey="jsp.dspace-admin.confirm-delete-dcschema.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-    <%-- <h1>Delete Dublin Core Format: <code><%= typeName %></code></h1> --%>
-    <h1><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.heading">
-        <fmt:param><%= typeName %></fmt:param>
-    </fmt:message></h1>
-
-    <%-- <p>Are you sure the format <strong><%= typeName %></strong>
-    should be deleted?</p> --%>
-    <p><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.confirm">
-        <fmt:param><%= typeName %></fmt:param>
-    </fmt:message></p>
+    <%-- <H1>Delete Dublin Core Schema</H1> --%>
+    <H1><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.heading">
+        <fmt:param><%= schema.getName() %></fmt:param>
+    </fmt:message></H1>
     
-    <%-- <p>This will result in an error if any DC values have this type.</p> --%>
-    <p><fmt:message key="jsp.dspace-admin.confirm-delete-dctype.warning"/></p>
+    <%-- <P>Are you sure the schema <strong><%= schema.getNamespace() %></strong>
+    should be deleted?</P> --%> 
+    <P><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.confirm">
+        <fmt:param><%= schema.getName() %></fmt:param>
+    </fmt:message></P>
+    
+    <%-- <P>This will result in an error if any metadata fields exist within this schema.</P>  --%>
+    <P><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.warning"/></P>
 
-    <form method="post" action="">
-        <input type="hidden" name="dc_type_id" value="<%= type.getID() %>"/>
+    <form method=POST>
+        <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>">
+
         <center>
             <table width="70%">
                 <tr>
                     <td align="left">
                         <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
-                    </td>
-                    <td align="right">
-                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
+                        <%-- <input type="submit" name="submit_cancel" value="Cancel">  --%>
+                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
                     </td>
                 </tr>
             </table>
         </center>
     </form>
 </dspace:layout>
-

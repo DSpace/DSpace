@@ -52,7 +52,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.administer.DCType;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -65,6 +64,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -555,8 +556,9 @@ public class CollectionWizardServlet extends DSpaceServlet
 
             if ((dcTypeID != -1) && (value != null) && !value.equals(""))
             {
-                DCType dc = DCType.find(context, dcTypeID);
-                item.addDC(dc.getElement(), dc.getQualifier(), lang, value);
+                MetadataField field = MetadataField.find(context,dcTypeID);
+                MetadataSchema schema = MetadataSchema.find(context,field.getSchemaID());
+                item.addMetadata(schema.getName(),field.getElement(), field.getQualifier(), lang, value);
             }
         }
 
@@ -689,7 +691,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // Next page is 'default item' iff there's a default item
             if (collection.getTemplateItem() != null)
             {
-                DCType[] types = DCType.findAll(context);
+                MetadataField[] types = MetadataField.findAll(context);
                 request.setAttribute("dctypes", types);
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-default-item.jsp");

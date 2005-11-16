@@ -89,3 +89,6 @@ SELECT setval('itemsbytitle_seq', max(items_by_title_id)) FROM itemsbytitle;
 SELECT setval('itemsbydate_seq', max(items_by_date_id)) FROM itemsbydate;
 SELECT setval('itemsbydateaccessioned_seq', max(items_by_date_accessioned_id)) FROM itemsbydateaccessioned;
 SELECT setval('epersongroup2workspaceitem_seq', max(id)) FROM epersongroup2workspaceitem_seq;
+SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
+SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
+SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;

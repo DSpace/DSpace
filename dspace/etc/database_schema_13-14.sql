@@ -75,3 +75,66 @@ CREATE TABLE Group2GroupCache
   parent_id INTEGER REFERENCES EPersonGroup(eperson_group_id),
   child_id  INTEGER REFERENCES EPersonGroup(eperson_group_id)
 );
+
+
+-------------------------------------------------------
+-- New Metadata Tables and Sequences
+-------------------------------------------------------
+CREATE SEQUENCE metadataschemaregistry_seq;
+CREATE SEQUENCE metadatafieldregistry_seq;
+CREATE SEQUENCE metadatavalue_seq;
+
+-- MetadataSchemaRegistry table
+CREATE TABLE MetadataSchemaRegistry
+(
+  metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
+  namespace          VARCHAR(256),
+  short_id           VARCHAR(32)
+);
+
+-- MetadataFieldRegistry table
+CREATE TABLE MetadataFieldRegistry
+(
+  metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatafieldregistry_seq'),
+  metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
+  element             VARCHAR(64),
+  qualifier           VARCHAR(64),
+  scope_note          TEXT
+);
+
+-- MetadataValue table
+CREATE TABLE MetadataValue
+(
+  metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
+  item_id            INTEGER REFERENCES Item(item_id),
+  metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
+  text_value         TEXT,
+  text_lang          VARCHAR(24),
+  place              INTEGER
+);
+
+-- Create the DC schema
+INSERT INTO MetadataSchemaRegistry VALUES (1,'http://dublincore.org/documents/dcmi-terms/','dc');
+
+-- Migrate the existing DCTypes into the new metadata field registry
+INSERT INTO MetadataFieldRegistry
+  (metadata_schema_id, metadata_field_id, element, qualifier, scope_note)
+  SELECT '1' AS metadata_schema_id, dc_type_id, element, 
+     qualifier, scope_note FROM dctyperegistry;
+
+-- Copy the DCValues into the new MetadataValue table
+INSERT INTO MetadataValue (item_id, metadata_field_id, text_value, text_lang, place)
+  SELECT item_id, dc_type_id, text_value, text_lang, place FROM dcvalue;
+  
+ALTER TABLE dcvalue RENAME TO dcvalue_old;
+CREATE VIEW dcvalue AS
+  SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.item_id, 
+    MetadataValue.metadata_field_id AS "dc_type_id", MetadataValue.text_value, 
+    MetadataValue.text_lang, MetadataValue.place  
+  FROM MetadataValue, MetadataFieldRegistry
+  WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
+  AND MetadataFieldRegistry.metadata_schema_id = 1;
+
+SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
+SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
+SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;

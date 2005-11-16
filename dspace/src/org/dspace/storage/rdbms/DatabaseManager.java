@@ -470,6 +470,20 @@ public class DatabaseManager
     }
 
     /**
+     * Create a table row object that can be passed into the insert method, not
+     * commonly used unless the table has a referential integrity constraint.
+     * 
+     * @param table
+     *            The RDBMS table in which to create the new row
+     * @return The newly created row
+     * @throws SQLException
+     */
+    public static TableRow row(String table) throws SQLException
+    {
+        return new TableRow(canonicalize(table), getColumnNames(table));
+    }
+    
+    /**
      * Insert a table row into the RDBMS.
      * 
      * @param context

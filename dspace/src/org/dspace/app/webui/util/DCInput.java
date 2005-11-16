@@ -43,6 +43,8 @@ package org.dspace.app.webui.util;
 import java.util.List;
 import java.util.Map;
 
+import org.dspace.content.MetadataSchema;
+
 /**
  * Class representing a line in an input form.
  *
@@ -55,6 +57,8 @@ public class DCInput
 	private String dcElement = null;
 	/** the DC qualifier, if any */
 	private String dcQualifier = null;
+	/** the DC namespace schema */
+	private String dcSchema = null;
 	/** a label describing input */
 	private String label = null;
 	/** the input type */
@@ -82,6 +86,13 @@ public class DCInput
     {
     	dcElement = (String)fieldMap.get("dc-element");
        	dcQualifier = (String)fieldMap.get("dc-qualifier");
+        
+        // Default the schema to dublin core
+       	dcSchema = (String)fieldMap.get("dc-schema");
+        if (dcSchema == null) {
+            dcSchema = MetadataSchema.DC_SCHEMA;
+        }
+
        	String repStr = (String)fieldMap.get("repeatable");
        	repeatable = "true".equalsIgnoreCase(repStr) || "yes".equalsIgnoreCase(repStr);
        	label = (String)fieldMap.get("label");
@@ -136,6 +147,17 @@ public class DCInput
     {
         return dcElement;
     }
+
+    /**
+     * Get the DC namespace prefix for this form row.
+     *
+     * @return the DC namespace prefix
+     */
+    public String getSchema()
+    {
+        return dcSchema;
+    }
+    
 
     /**
      * Get the warning string for a missing required field, formatted for an HTML table.

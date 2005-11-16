@@ -1,5 +1,5 @@
 /*
- * DCValue.java
+ * NonUniqueMetadataException.java
  *
  * Version: $Revision$
  *
@@ -40,27 +40,28 @@
 package org.dspace.content;
 
 /**
- * Simple data structure-like class representing a Dublin Core value. It has an
- * element, qualifier, value and language.
+ * An exception that gets thrown when a metadata field cannot be created or
+ * saved due to an existing field with an identical element and qualifier.
  * 
- * @author Robert Tansley
  * @author Martin Hald
- * @version $Revision$
  */
-public class DCValue
+public class NonUniqueMetadataException extends Exception
 {
-    /** The DC element */
-    public String element;
+    /**
+     * Create an empty authorize exception
+     */
+    public NonUniqueMetadataException()
+    {
+        super();
+    }
 
-    /** The DC qualifier, or <code>null</code> if unqualified */
-    public String qualifier;
-
-    /** The value of the field */
-    public String value;
-
-    /** The language of the field, may be <code>null</code> */
-    public String language;
-
-    /** The schema name of the metadata element */
-    public String schema;
+    /**
+     * Create an exception with only a message
+     * 
+     * @param message
+     */
+    public NonUniqueMetadataException(String message)
+    {
+        super(message);
+    }
 }

@@ -39,59 +39,65 @@
  */
 package org.dspace.administer;
 
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Class representing a particular Dublin Core metadata type, with various
  * utility methods. In general, only used for manipulating the registry of
  * Dublin Core types in the system, so most users will not need this.
  * 
+ * <p>
+ * The DCType implementation has been deprecated, please use MetadataManager,
+ * MetadataSchema and MetadataField instead. For backward compatibility the this
+ * implementation has been updated to transparently call the new classes.
+ * </p>
+ *
  * @author Robert Tansley
+ * @author Martin Hald
  * @version $Revision$
+ * @deprecated
  */
 public class DCType
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(DCType.class);
 
-    /**
-     * For quick access in the system, an array of the elements in the registry
-     */
-    private static String[] elements = null;
-
-    /** The qualifiers in the system */
-    private static String[] qualifiers = null;
-
     /** Our context */
     private Context ourContext;
 
-    /** The row in the table representing this type */
-    private TableRow typeRow;
+    /** The matching metadata field */
+    private MetadataField field = new MetadataField();
 
     /**
-     * Class constructor for creating a BitstreamFormat object based on the
-     * contents of a DB table row.
+     * Create a DCType from an existing metadata field.
+     *
+     * @param context
+     * @param field
+     * @deprecated
+     */
+    public DCType(Context context, MetadataField field)
+    {
+        this.ourContext = context;
+        this.field = field;
+    }
+
+    /**
+     * Default constructor.
      * 
      * @param context
-     *            the context this object exists in
-     * @param row
-     *            the corresponding row in the table
+     * @deprecated
      */
-    DCType(Context context, TableRow row)
+    public DCType(Context context)
     {
-        ourContext = context;
-        typeRow = row;
+        this.ourContext = context;
     }
 
     /**
@@ -104,95 +110,42 @@ public class DCType
      *            the DC type ID
      * @return a two-String array, string 0 is the element, string 1 is the
      *         qualifier
+     * @deprecated
      */
     public static String[] quickFind(Context context, int id)
             throws SQLException
     {
-        if (elements == null)
-        {
-            loadDC(context);
-        }
-
-        // We use the ID to get the element and qualifier out of
-        // the relevant array. But should 'sanity check' first.
-        if ((id > elements.length) || (id < 0))
-        {
-            return null;
-        }
+        MetadataField field = MetadataField.find(context, id);
 
         String[] result = new String[2];
-        result[0] = elements[id];
-        result[1] = qualifiers[id];
 
+        if (field == null)
+        {
         return result;
     }
-
-    /**
-     * Load in the DC type registry for quick access via quickFind.
-     * 
-     * @param context
-     *            DSpace context object
-     */
-    public static void loadDC(Context context) throws SQLException
-    {
-        // First get the highest ID so we know how big to make the array
-        TableRow row = DatabaseManager.querySingle(context,
-                "SELECT MAX(dc_type_id) AS foo FROM dctyperegistry");
-        int numberFields = row.getIntColumn("foo") + 1;
-
-        elements = new String[numberFields];
-        qualifiers = new String[numberFields];
-
-        // Grab rows from DB
-        TableRowIterator tri = DatabaseManager.query(context,
-                "SELECT * FROM dctyperegistry");
-
-        while (tri.hasNext())
+        else
         {
-            row = tri.next();
-
-            int id = row.getIntColumn("dc_type_id");
-            elements[id] = row.getStringColumn("element");
-            qualifiers[id] = row.getStringColumn("qualifier");
+            result[0] = field.getElement();
+            result[1] = field.getQualifier();
+            return result;
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
     }
 
     /**
-     * Get a bitstream format from the database.
+     * Get a metadata field from the database.
      * 
      * @param context
      *            DSpace context object
      * @param id
-     *            ID of the bitstream format
+     *            ID of the dublin core type
      * 
-     * @return the bitstream format, or null if the ID is invalid.
+     * @return the metadata field, or null if the ID is invalid.
+     * @deprecated
      */
     public static DCType find(Context context, int id) throws SQLException
     {
-        TableRow row = DatabaseManager.find(context, "dctyperegistry", id);
-
-        if (row == null)
-        {
-            if (log.isDebugEnabled())
-            {
-                log.debug(LogManager.getHeader(context, "find_dc_type",
-                        "not_found,dc_type_id=" + id));
-            }
-
-            return null;
-        }
-        else
-        {
-            if (log.isDebugEnabled())
-            {
-                log.debug(LogManager.getHeader(context, "find_dc_type",
-                        "dc_type_id=" + id));
-            }
-
-            return new DCType(context, row);
-        }
+        MetadataField field = MetadataField.find(context, id);
+        return new DCType(context, field);
     }
 
     /**
@@ -209,67 +162,41 @@ public class DCType
      * 
      * @return the Dublin Core type, or <code>null</code> if there isn't a
      *         corresponding type in the registry
+     * @throws AuthorizeException
+     * @deprecated
      */
     public static DCType findByElement(Context context, String element,
-            String qualifier) throws SQLException
+            String qualifier) throws SQLException, AuthorizeException
     {
-        String sql = "SELECT * FROM dctyperegistry WHERE element LIKE '"
-                + element + "' AND qualifier";
+        MetadataField field = MetadataField.findByElement(context,
+                MetadataSchema.DC_SCHEMA_ID, element, qualifier);
 
-        if (qualifier == null)
+        if (field == null)
         {
-            sql = sql + " is null";
+            return null;
         }
         else
         {
-            sql = sql + " LIKE '" + qualifier + "'";
+            return new DCType(context, field);
         }
-
-        TableRowIterator tri = DatabaseManager.query(context, "dctyperegistry",
-                sql);
-
-        // Return the first matching element (if two match there's a problem,
-        // but not one dealt with here)
-        DCType retType = null;
-        if (tri.hasNext())
-        {
-            retType = new DCType(context, tri.next());
-        }
-        else
-        {
-            // No match means there's no corresponding element
-            retType = null;
-        }
-        // close the TableRowIterator to free up resources
-        tri.close();
-
-        return retType;
     }
 
     /**
      * Retrieve all Dublin Core types from the registry
      * 
      * @return an array of all the Dublin Core types
+     * @deprecated
      */
     public static DCType[] findAll(Context context) throws SQLException
     {
-        List dcTypes = new ArrayList();
 
-        // Get all the dctyperegistry rows
-        TableRowIterator tri = DatabaseManager.query(context, "dctyperegistry",
-                "SELECT * FROM dctyperegistry ORDER BY element, qualifier");
+        MetadataField field[] = MetadataField.findAll(context);
+        DCType[] typeArray = new DCType[field.length];
 
-        // Make into DC Type objects
-        while (tri.hasNext())
+        for (int ii = 0; ii < field.length; ii++)
         {
-            dcTypes.add(new DCType(context, tri.next()));
+            typeArray[ii] = new DCType(context, field[ii]);
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
-
-        // Convert list into an array
-        DCType[] typeArray = new DCType[dcTypes.size()];
-        typeArray = (DCType[]) dcTypes.toArray(typeArray);
 
         // Return the array
         return typeArray;
@@ -281,24 +208,17 @@ public class DCType
      * @param context
      *            DSpace context object
      * @return the newly created DCType
+     * @throws NonUniqueMetadataException
+     * @throws IOException
+     * @deprecated
      */
     public static DCType create(Context context) throws SQLException,
-            AuthorizeException
-    {
-        // Check authorisation: Only admins may create DC types
-        if (!AuthorizeManager.isAdmin(context))
+            AuthorizeException, IOException, NonUniqueMetadataException
         {
-            throw new AuthorizeException(
-                    "Only administrators may modify the Dublin Core registry");
-        }
-
-        // Create a table row
-        TableRow row = DatabaseManager.create(context, "dctyperegistry");
-
-        log.info(LogManager.getHeader(context, "create_dc_type", "dc_type_id="
-                + row.getIntColumn("dc_type_id")));
-
-        return new DCType(context, row);
+        MetadataField field = new MetadataField();
+        field.setSchemaID(MetadataSchema.DC_SCHEMA_ID);
+        field.create(context);
+        return new DCType(context, field);
     }
 
     /**
@@ -306,33 +226,21 @@ public class DCType
      * database of this type - they need to be updated first. An
      * <code>SQLException</code> (referential integrity violation) will be
      * thrown in this case.
+     * @deprecated
      */
     public void delete() throws SQLException, AuthorizeException
     {
-        // Check authorisation: Only admins may create DC types
-        if (!AuthorizeManager.isAdmin(ourContext))
-        {
-            throw new AuthorizeException(
-                    "Only administrators may modify the Dublin Core registry");
-        }
-
-        log.info(LogManager.getHeader(ourContext, "delete_dc_type",
-                "dc_type_id=" + getID()));
-
-        DatabaseManager.delete(ourContext, typeRow);
-
-        // Update in-memory cache of DC types
-        loadDC(ourContext);
+        field.delete(ourContext);
     }
 
     /**
-     * Get the internal identifier of this bitstream format
+     * Get the internal identifier of this metadata field
      * 
      * @return the internal identifier
      */
     public int getID()
     {
-        return typeRow.getIntColumn("dc_type_id");
+        return field.getFieldID();
     }
 
     /**
@@ -342,7 +250,7 @@ public class DCType
      */
     public String getElement()
     {
-        return typeRow.getStringColumn("element");
+        return field.getElement();
     }
 
     /**
@@ -353,7 +261,7 @@ public class DCType
      */
     public void setElement(String s)
     {
-        typeRow.setColumn("element", s);
+        field.setElement(s);
     }
 
     /**
@@ -364,7 +272,7 @@ public class DCType
      */
     public String getQualifier()
     {
-        return typeRow.getStringColumn("qualifier");
+        return field.getQualifier();
     }
 
     /**
@@ -376,7 +284,7 @@ public class DCType
      */
     public void setQualifier(String s)
     {
-        typeRow.setColumn("qualifier", s);
+        field.setQualifier(s);
     }
 
     /**
@@ -386,7 +294,7 @@ public class DCType
      */
     public String getScopeNote()
     {
-        return typeRow.getStringColumn("scope_note");
+        return field.getScopeNote();
     }
 
     /**
@@ -397,28 +305,19 @@ public class DCType
      */
     public void setScopeNote(String s)
     {
-        typeRow.setColumn("scope_note", s);
+        field.setScopeNote(s);
     }
 
     /**
      * Update the dublin core registry
+     *
+     * @throws IOException
+     * @throws NonUniqueMetadataException
+     * @deprecated
      */
-    public void update() throws SQLException, AuthorizeException
-    {
-        // Check authorisation: Only admins may update DC types
-        if (!AuthorizeManager.isAdmin(ourContext))
+    public void update() throws SQLException, AuthorizeException,
+            NonUniqueMetadataException, IOException
         {
-            throw new AuthorizeException(
-                    "Only administrators may modiffy the Dublin Core registry");
-        }
-
-        DatabaseManager.update(ourContext, typeRow);
-
-        log.info(LogManager.getHeader(ourContext, "update_dctype",
-                "dc_type_id=" + getID() + "element=" + getElement()
-                        + "qualifier=" + getQualifier()));
-
-        // Update in-memory cache of DC types
-        loadDC(ourContext);
+        field.update(ourContext);
     }
 }

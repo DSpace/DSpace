@@ -45,18 +45,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.app.webui.util.DCInputsReader;
 import org.dspace.app.webui.util.DCInput;
+import org.dspace.app.webui.util.DCInputsReader;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.SubmissionInfo;
@@ -73,6 +72,7 @@ import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -575,8 +575,8 @@ public class SubmitServlet extends DSpaceServlet
 
         if (multipleTitles == false)
         {
-            DCValue[] altTitles = subInfo.submission.getItem().getDC("title",
-                    "alternative", Item.ANY);
+            DCValue[] altTitles = subInfo.submission.getItem().getDC(
+                    "title", "alternative", Item.ANY);
 
             willRemoveTitles = altTitles.length > 0;
         }
@@ -816,7 +816,7 @@ public class SubmitServlet extends DSpaceServlet
         	{
         		dcQualifier = Item.ANY;
         	}
-        	item.clearDC(inputs[i].getElement(), dcQualifier, Item.ANY);
+            item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), dcQualifier, Item.ANY);
         }
 
         // now update the item metadata.
@@ -826,34 +826,35 @@ public class SubmitServlet extends DSpaceServlet
     	{
     	   String dcElement = inputs[j].getElement();
            String dcQualifier = inputs[j].getQualifier();
+           String dcSchema = inputs[j].getSchema();
     	   if (dcQualifier != null && ! dcQualifier.equals(Item.ANY))
     	   {
-    	   		fieldName = dcElement + '_' + dcQualifier;
+    	   		fieldName = dcSchema + "_" + dcElement + '_' + dcQualifier;
     	   }
     	   else
     	   {
-    	   		fieldName = dcElement;
+    	   		fieldName = dcSchema + "_" + dcElement;
     	   }
 
     	   String inputType = inputs[j].getInputType();
     	   if (inputType.equals("name"))
     	   {
-    	   		readNames(request, item, dcElement, dcQualifier, 
+    	   		readNames(request, item, dcSchema, dcElement, dcQualifier, 
     	   				  inputs[j].getRepeatable());
     	   }
     	   else if (inputType.equals("date"))
     	   {
-    	   		readDate(request, item, dcElement, dcQualifier);
+    	   		readDate(request, item, dcSchema, dcElement, dcQualifier);
     	   }
     	   else if (inputType.equals("series"))
     	   {
-    	   		readSeriesNumbers(request, item, dcElement, dcQualifier, 
+    	   		readSeriesNumbers(request, item, dcSchema, dcElement, dcQualifier, 
     	   						  inputs[j].getRepeatable());
     	   }
     	   else if (inputType.equals("qualdrop_value"))
     	   {
-    	      List quals = getRepeatedParameter(request, dcElement + "_qualifier");
-    	      List vals = getRepeatedParameter(request, dcElement + "_value");
+    	      List quals = getRepeatedParameter(request, dcSchema + "_" + dcElement + "_qualifier");
+    	      List vals = getRepeatedParameter(request, dcSchema + "_" + dcElement + "_value");
     	      for (int z = 0; z < vals.size(); z++)
     	      {
     	      		String thisQual = (String)quals.get(z);
@@ -862,10 +863,10 @@ public class SubmitServlet extends DSpaceServlet
     	      		    thisQual = null;
     	      		}
     	      		String thisVal = (String)vals.get(z);
-    	      		if (! buttonPressed.equals("submit_" + dcElement + "_remove_" + z) &&
+    	      		if (! buttonPressed.equals("submit_" + dcSchema + "_" + dcElement + "_remove_" + z) &&
     	      			! thisVal.equals(""))
     	      		{
-    	      			item.addDC(dcElement, thisQual, null, thisVal);
+    	      			item.addMetadata(dcSchema, dcElement, thisQual, null, thisVal);
     	      		}
     	      }
     	   }
@@ -876,14 +877,14 @@ public class SubmitServlet extends DSpaceServlet
     	      {
     	      	for (int z = 0; z < vals.length; z++)
     	      	{
-    	      		item.addDC(dcElement, dcQualifier, "en", vals[z]);
+    	      		item.addMetadata(dcSchema, dcElement, dcQualifier, "en", vals[z]);
     	      	}
     	      }
     	   }
     	   else if ((inputType.equals("onebox")) || (inputType.equals("twobox")) || 
     	   			(inputType.equals("textarea")))
     	   {
-    	   		readText(request, item, dcElement, dcQualifier, 
+    	   		readText(request, item, dcSchema, dcElement, dcQualifier, 
     	   				 inputs[j].getRepeatable(), "en");
     	   }
     	   else 
@@ -922,18 +923,20 @@ public class SubmitServlet extends DSpaceServlet
         	{
         	    String element = inputs[i].getElement();
         	    String qual = inputs[i].getQualifier();
-        	    DCValue[] valArray = item.getDC(element, qual, Item.ANY);
+                String schema = inputs[i].getSchema();
+                log.info("  inner "+schema);
+        	    DCValue[] valArray = item.getMetadata(schema, element, qual, Item.ANY);
         	    boolean isEmpty = (valArray.length == 0);
         	    if (inputs[i].isRequired() && isEmpty)
         	    {
         	    	subInfo.missingFields.add( new Integer(i) );
         	    	if (qual != null && !qual.equals("*"))
         	    	{
-        	    		gotoField = element + '_' + qual;
+        	    		gotoField = schema + "_" + element + '_' + qual;
         	    	}
         	    	else
         	    	{
-        	    		gotoField = element;
+        	    		gotoField = schema + "_" + element;
         	    	}
         	    }
         	}
@@ -2263,6 +2266,8 @@ public class SubmitServlet extends DSpaceServlet
      *            the request object
      * @param item
      *            the item to update
+     * @param schema 
+     *            the DC schema
      * @param element
      *            the DC element
      * @param qualifier
@@ -2271,14 +2276,9 @@ public class SubmitServlet extends DSpaceServlet
      *            set to true if the field is repeatable on the form
      */
     private void readNames(HttpServletRequest request, Item item,
-            String element, String qualifier, boolean repeated)
+            String schema, String element, String qualifier, boolean repeated)
     {
-        String dcname = element;
-
-        if (qualifier != null)
-        {
-            dcname = element + "_" + qualifier;
-        }
+        String dcname = MetadataField.formKey(schema,element,qualifier);
 
         // Names to add
         List firsts = new LinkedList();
@@ -2313,7 +2313,7 @@ public class SubmitServlet extends DSpaceServlet
         }
 
         // Remove existing values
-        item.clearDC(element, qualifier, Item.ANY);
+        item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
         for (int i = 0; i < lasts.size(); i++)
@@ -2348,7 +2348,7 @@ public class SubmitServlet extends DSpaceServlet
                 }
 
                 // Add to the database
-                item.addDC(element, qualifier, null, new DCPersonName(l, f)
+                item.addMetadata(schema, element, qualifier, null, new DCPersonName(l, f)
                         .toString());
             }
         }
@@ -2375,6 +2375,8 @@ public class SubmitServlet extends DSpaceServlet
      *            the request object
      * @param item
      *            the item to update
+     * @param schema 
+     *            the short schema name
      * @param element
      *            the DC element
      * @param qualifier
@@ -2384,17 +2386,12 @@ public class SubmitServlet extends DSpaceServlet
      * @param lang
      *            language to set (ISO code)
      */
-    private void readText(HttpServletRequest request, Item item,
+    private void readText(HttpServletRequest request, Item item, String schema, 
             String element, String qualifier, boolean repeated, String lang)
     {
         // FIXME: Of course, language should be part of form, or determined
         // some other way
-        String dcname = element;
-
-        if (qualifier != null)
-        {
-            dcname = element + "_" + qualifier;
-        }
+        String dcname = MetadataField.formKey(schema,element,qualifier);
 
         // Values to add
         List vals = new LinkedList();
@@ -2423,7 +2420,7 @@ public class SubmitServlet extends DSpaceServlet
         }
 
         // Remove existing values
-        item.clearDC(element, qualifier, Item.ANY);
+        item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
         for (int i = 0; i < vals.size(); i++)
@@ -2433,7 +2430,7 @@ public class SubmitServlet extends DSpaceServlet
 
             if ((s != null) && !s.equals(""))
             {
-                item.addDC(element, qualifier, lang, s);
+                item.addMetadata(schema, element, qualifier, lang, s);
             }
         }
     }
@@ -2451,20 +2448,18 @@ public class SubmitServlet extends DSpaceServlet
      *            the request object
      * @param item
      *            the item to update
+     * @param schema 
+     *            the DC schema
      * @param element
      *            the DC element
      * @param qualifier
      *            the DC qualifier, or null if unqualified
+     * @throws SQLException 
      */
     private void readDate(HttpServletRequest request, Item item,
-            String element, String qualifier) throws SQLException
-    {
-        String dcname = element;
-
-        if (qualifier != null)
+            String schema, String element, String qualifier) throws SQLException
         {
-            dcname = element + "_" + qualifier;
-        }
+        String dcname = MetadataField.formKey(schema,element,qualifier);
 
         int year = UIUtil.getIntParameter(request, dcname + "_year");
         int month = UIUtil.getIntParameter(request, dcname + "_month");
@@ -2476,12 +2471,12 @@ public class SubmitServlet extends DSpaceServlet
 
         d.setDateLocal(year, month, day, -1, -1, -1);
 
-        item.clearDC(element, qualifier, Item.ANY);
+        item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         if (year > 0)
         {
             // Only put in date if there is one!
-            item.addDC(element, qualifier, null, d.toString());
+            item.addMetadata(schema, element, qualifier, null, d.toString());
         }
     }
 
@@ -2510,6 +2505,8 @@ public class SubmitServlet extends DSpaceServlet
      *            the request object
      * @param item
      *            the item to update
+     * @param schema 
+     *            the DC schema
      * @param element
      *            the DC element
      * @param qualifier
@@ -2518,14 +2515,9 @@ public class SubmitServlet extends DSpaceServlet
      *            set to true if the field is repeatable on the form
      */
     private void readSeriesNumbers(HttpServletRequest request, Item item,
-            String element, String qualifier, boolean repeated)
-    {
-        String dcname = element;
-
-        if (qualifier != null)
+            String schema, String element, String qualifier, boolean repeated)
         {
-            dcname = element + "_" + qualifier;
-        }
+        String dcname =  MetadataField.formKey(schema,element,qualifier);
 
         // Names to add
         List series = new LinkedList();
@@ -2564,7 +2556,7 @@ public class SubmitServlet extends DSpaceServlet
         }
 
         // Remove existing values
-        item.clearDC(element, qualifier, Item.ANY);
+        item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
         for (int i = 0; i < series.size(); i++)
@@ -2575,7 +2567,7 @@ public class SubmitServlet extends DSpaceServlet
             // Only add non-empty
             if (!s.equals("") || !n.equals(""))
             {
-                item.addDC(element, qualifier, null, new DCSeriesNumber(s, n)
+                item.addMetadata(schema, element, qualifier, null, new DCSeriesNumber(s, n)
                         .toString());
             }
         }

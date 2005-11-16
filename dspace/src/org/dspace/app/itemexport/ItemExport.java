@@ -45,6 +45,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -57,6 +59,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -306,11 +309,47 @@ public class ItemExport
         }
     }
 
-    // output the item's dublin core into the item directory
+    /**
+     * Discover the different schemas in use and output a seperate metadata
+     * XML file for each schema.
+     *
+     * @param c
+     * @param i
+     * @param destDir
+     * @throws Exception
+     */
     private static void writeMetadata(Context c, Item i, File destDir)
             throws Exception
     {
-        File outFile = new File(destDir, "dublin_core.xml");
+        // Build a list of schemas for the item
+        HashMap map = new HashMap();
+        DCValue[] dcorevalues = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (int ii = 0; ii < dcorevalues.length; ii++)
+        {
+            map.put(dcorevalues[ii].schema, null);
+        }
+
+        // Save each of the schemas into it's own metadata file
+        Iterator iterator = map.keySet().iterator();
+        while (iterator.hasNext())
+        {
+            String schema = (String) iterator.next();
+            writeMetadata(c, schema, i, destDir);
+        }
+    }
+
+    // output the item's dublin core into the item directory
+    private static void writeMetadata(Context c, String schema, Item i, File destDir)
+            throws Exception
+    {
+        String filename;
+        if (schema.equals(MetadataSchema.DC_SCHEMA)) {
+            filename = "dublin_core.xml";
+        } else {
+            filename = "metadata_" + schema + ".xml";
+        }
+        
+        File outFile = new File(destDir, filename);
 
         System.out.println("Attempting to create file " + outFile);
 
@@ -319,14 +358,15 @@ public class ItemExport
             BufferedOutputStream out = new BufferedOutputStream(
                     new FileOutputStream(outFile));
 
-            DCValue[] dcorevalues = i.getDC(Item.ANY, Item.ANY, Item.ANY);
+            DCValue[] dcorevalues = i.getMetadata(schema, Item.ANY, Item.ANY, Item.ANY);
 
             // XML preamble
             byte[] utf8 = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n"
                     .getBytes("UTF-8");
             out.write(utf8, 0, utf8.length);
 
-            utf8 = "<dublin_core>\n".getBytes("UTF-8");
+            String dcTag = "<dublin_core schema=\""+schema+"\">\n";
+            utf8 = dcTag.getBytes("UTF-8");
             out.write(utf8, 0, utf8.length);
 
             for (int j = 0; j < dcorevalues.length; j++)

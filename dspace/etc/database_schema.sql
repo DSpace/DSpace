@@ -109,6 +109,10 @@ CREATE SEQUENCE itemsbytitle_seq;
 CREATE SEQUENCE itemsbydate_seq;
 CREATE SEQUENCE itemsbydateaccessioned_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
+CREATE SEQUENCE metadataschemaregistry_seq;
+CREATE SEQUENCE metadatafieldregistry_seq;
+CREATE SEQUENCE metadatavalue_seq;
+
 CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 
@@ -267,35 +271,51 @@ CREATE TABLE Bundle2Bitstream
 CREATE INDEX bundle2bitstream_bundle_idx ON Bundle2Bitstream(bundle_id);
 
 -------------------------------------------------------
--- DCTypeRegistry table
+-- Metadata Tables and Sequences
 -------------------------------------------------------
-CREATE TABLE DCTypeRegistry
+CREATE TABLE MetadataSchemaRegistry
 (
-  dc_type_id INTEGER PRIMARY KEY,
+  metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
+  namespace          VARCHAR(256),
+  short_id           VARCHAR(32)
+);
+
+CREATE TABLE MetadataFieldRegistry
+(
+  metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatafieldregistry_seq'),
+  metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
   element    VARCHAR(64),
   qualifier  VARCHAR(64),
-  scope_note TEXT,
-  UNIQUE(element, qualifier)
+  scope_note          TEXT
 );
 
--------------------------------------------------------
--- DCValue table
--------------------------------------------------------
-CREATE TABLE DCValue
+CREATE TABLE MetadataValue
 (
-  dc_value_id   INTEGER PRIMARY KEY,
+  metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
   item_id       INTEGER REFERENCES Item(item_id),
-  dc_type_id    INTEGER REFERENCES DCTypeRegistry(dc_type_id),
+  metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value TEXT,
   text_lang  VARCHAR(24),
-  place      INTEGER,
-  source_id  INTEGER
+  place              INTEGER
 );
 
+-- Create the DC schema
+INSERT INTO MetadataSchemaRegistry VALUES (getnextid('metadataschemaregistry'),'http://dublincore.org/documents/dcmi-terms/','dc');
+
+-- Create a dcvalue view for backwards compatibilty
+CREATE VIEW dcvalue AS
+  SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.item_id,
+    MetadataValue.metadata_field_id AS "dc_type_id", MetadataValue.text_value,
+    MetadataValue.text_lang, MetadataValue.place
+  FROM MetadataValue, MetadataFieldRegistry
+  WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
+  AND MetadataFieldRegistry.metadata_schema_id = 1;
+
 -- An index for item_id - almost all access is based on
--- instantiating the item object, which grabs all dcvalues
+-- instantiating the item object, which grabs all values
 -- related to that item
-CREATE INDEX dcvalue_item_idx on DCValue(item_id);
+CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
+CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
 
 -------------------------------------------------------
 -- Community table

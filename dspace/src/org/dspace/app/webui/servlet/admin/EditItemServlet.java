@@ -57,7 +57,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.administer.DCType;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -71,6 +70,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -323,12 +324,12 @@ public class EditItemServlet extends DSpaceServlet
         Collection[] collections = item.getCollections();
 
         // All DC types in the registry
-        DCType[] dcTypes = DCType.findAll(context);
+        MetadataField[] types = MetadataField.findAll(context);
 
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);
         request.setAttribute("collections", collections);
-        request.setAttribute("dc.types", dcTypes);
+        request.setAttribute("dc.types", types);
 
         JSPManager.showJSP(request, response, "/tools/edit-item-form.jsp");
     }
@@ -355,7 +356,7 @@ public class EditItemServlet extends DSpaceServlet
          * "Cancel" handled above, so whatever happens, we need to update the
          * item metadata. First, we remove it all, then build it back up again.
          */
-        item.clearDC(Item.ANY, Item.ANY, Item.ANY);
+        item.clearMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         // We'll sort the parameters by name. This ensures that DC fields
         // of the same element/qualifier are added in the correct sequence.
@@ -391,6 +392,8 @@ public class EditItemServlet extends DSpaceServlet
 
                 st.nextToken(); // Skip "value"
 
+                String schema = st.nextToken();
+
                 String element = st.nextToken();
 
                 String qualifier = null;
@@ -404,12 +407,7 @@ public class EditItemServlet extends DSpaceServlet
 
                 // Get a string with "element" for unqualified or
                 // "element_qualifier"
-                String key = element;
-
-                if (qualifier != null)
-                {
-                    key = element + "_" + qualifier;
-                }
+                String key = MetadataField.formKey(schema,element,qualifier);
 
                 // Get the language
                 String language = request.getParameter("language_" + key + "_"
@@ -431,7 +429,7 @@ public class EditItemServlet extends DSpaceServlet
                                 + sequenceNumber))
                 {
                     // Value is empty, or remove button for this wasn't pressed
-                    item.addDC(element, qualifier, language, value);
+                    item.addMetadata(schema, element, qualifier, language, value);
                 }
             }
             // only process bitstreams if admin
@@ -543,8 +541,11 @@ public class EditItemServlet extends DSpaceServlet
                 lang = null;
             }
 
-            DCType dcType = DCType.find(context, dcTypeID);
-            item.addDC(dcType.getElement(), dcType.getQualifier(), lang, value);
+            MetadataField field = MetadataField.find(context, dcTypeID);
+            MetadataSchema schema = MetadataSchema.find(context, field
+                    .getSchemaID());
+            item.addMetadata(schema.getName(), field.getElement(), field
+                    .getQualifier(), lang, value);
             item.update();
         }
 

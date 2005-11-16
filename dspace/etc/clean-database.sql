@@ -98,6 +98,9 @@ DROP TABLE Bitstream;
 DROP TABLE FileExtension;
 DROP TABLE BitstreamFormatRegistry;
 DROP TABLE EPersonGroup2WorkspaceItem;
+DROP TABLE MetadataSchemaRegistry;
+DROP TABLE MetadataFieldRegistry;
+DROP TABLE MetadataValue;
 
 -- Now drop the sequences for ID (primary key) creation
 DROP SEQUENCE bitstreamformatregistry_seq;
@@ -132,6 +135,9 @@ DROP SEQUENCE itemsbytitle_seq;
 DROP SEQUENCE itemsbydate_seq;
 DROP SEQUENCE itemsbydateaccessioned_seq;
 DROP SEQUENCE epersongroup2workspaceitem_seq;
+DROP SEQUENCE metadataschemaregistry_seq;
+DROP SEQUENCE metadatafieldregistry_seq;
+DROP SEQUENCE metadatavalue_seq;
 
 -- Drop the getnextid() function
 DROP FUNCTION getnextid(VARCHAR(40));

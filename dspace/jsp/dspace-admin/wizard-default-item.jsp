@@ -45,7 +45,7 @@
   -    collection - collection we're creating
   --%>
 
-<%@ page import="org.dspace.administer.DCType" %>
+<%@ page import="org.dspace.content.MetadataField" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.CollectionWizardServlet" %>
 <%@ page import="org.dspace.content.Collection" %>
 
@@ -58,7 +58,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%  Collection collection = (Collection) request.getAttribute("collection");
-    DCType[] dcTypes = (DCType[]) request.getAttribute("dctypes"); %>
+    MetadataField[] dcTypes = (MetadataField[]) request.getAttribute("dctypes"); %>
 
 <dspace:layout locbar="off"
                navbar="off"
@@ -107,7 +107,7 @@
 <%
 		for (int dc = 0; dc < dcTypes.length; dc++)
 		{ %>
-					<option value="<%= dcTypes[dc].getID() %>"><%= dcTypes[dc].getQualifier() == null ?
+					<option value="<%= dcTypes[dc].getFieldID() %>"><%= dcTypes[dc].getQualifier() == null ?
 			dcTypes[dc].getElement() : dcTypes[dc].getElement() + "." + dcTypes[dc].getQualifier() %></option>
 <%      } %>
 				</select></td>

@@ -52,7 +52,6 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.dspace.administer.DCType;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -81,6 +80,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * the database.
  * 
  * @author Robert Tansley
+ * @author Martin Hald
  * @version $Revision$
  */
 public class Item extends DSpaceObject
@@ -134,28 +134,41 @@ public class Item extends DSpaceObject
         dublinCore = new ArrayList();
  
         // Get Dublin Core metadata
-        TableRowIterator tri = DatabaseManager.query(ourContext, "dcvalue",
-                		"SELECT * FROM dcvalue WHERE item_id="
+        TableRowIterator tri = DatabaseManager.query(ourContext, "MetadataValue",
+                "SELECT * FROM MetadataValue WHERE item_id="
                         + itemRow.getIntColumn("item_id")
-                        + " ORDER BY dc_type_id, place");
+                        + " ORDER BY metadata_field_id, place");
 
         while (tri.hasNext())
         {
             TableRow resultRow = tri.next();
 
-            // Get the Dublin Core type
-            String[] dcType = DCType.quickFind(context, resultRow
-                    .getIntColumn("dc_type_id"));
+            // Get the associated metadata field and schema information
+            int fieldID = resultRow.getIntColumn("metadata_field_id");
+            MetadataField field = MetadataField.find(context, fieldID);
+
+            if (field == null)
+            {
+                log.error("Loading item - cannot found metadata field "
+                        + fieldID);
+            }
+            else
+            {
+                MetadataSchema schema = MetadataSchema.find(
+                        context, field.getSchemaID());
 
             // Make a DCValue object
             DCValue dcv = new DCValue();
-            dcv.element = dcType[0];
-            dcv.qualifier = dcType[1];
+                dcv.element = field.getElement();
+                dcv.qualifier = field.getQualifier();
             dcv.value = resultRow.getStringColumn("text_value");
             dcv.language = resultRow.getStringColumn("text_lang");
+                //dcv.namespace = schema.getNamespace();
+                dcv.schema = schema.getName();
 
             // Add it to the list
             dublinCore.add(dcv);
+        }
         }
         // close the TableRowIterator to free up resources
         tri.close();
@@ -175,7 +188,6 @@ public class Item extends DSpaceObject
      *            DSpace context object
      * @param id
      *            Internal ID of the item
-     * 
      * @return the item, or null if the internal ID is invalid.
      * @throws SQLException
      */
@@ -219,7 +231,6 @@ public class Item extends DSpaceObject
      * 
      * @param context
      *            DSpace context object
-     * 
      * @return the newly created item
      * @throws SQLException
      * @throws AuthorizeException
@@ -250,7 +261,6 @@ public class Item extends DSpaceObject
      * 
      * @param context
      *            DSpace context object
-     * 
      * @return an iterator over the items in the archive.
      * @throws SQLException
      */
@@ -281,7 +291,6 @@ public class Item extends DSpaceObject
      *            DSpace context object
      * @param eperson
      *            the submitter
-     * 
      * @return an iterator over the items submitted by eperson
      * @throws SQLException
      */
@@ -318,6 +327,9 @@ public class Item extends DSpaceObject
         return itemRow.getIntColumn("item_id");
     }
 
+    /**
+     * @see org.dspace.content.DSpaceObject#getHandle()
+     */
     public String getHandle()
     {
         return handle;
@@ -404,9 +416,11 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Get Dublin Core metadata for the item. Passing in a <code>null</code>
-     * value only matches Dublin Core fields where that qualifier or languages
-     * is actually <code>null</code>. Passing in <code>Item.ANY</code>
+     * Get Dublin Core metadata for the item.
+     * Passing in a <code>null</code> value for <code>qualifier</code>
+     * or <code>lang</code> only matches Dublin Core fields where that
+     * qualifier or languages is actually <code>null</code>.
+     * Passing in <code>Item.ANY</code>
      * retrieves all metadata fields with any value for the qualifier or
      * language, including <code>null</code>
      * <P>
@@ -441,10 +455,61 @@ public class Item extends DSpaceObject
      *            values with no language are returned, and
      *            <code>Item.ANY</code> means values with any country code or
      *            no country code are returned.
-     * 
      * @return Dublin Core fields that match the parameters
      */
     public DCValue[] getDC(String element, String qualifier, String lang)
+    {
+        return getMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
+    }
+
+    /**
+     * Get metadata for the item in a chosen schema.
+     * See <code>MetadataSchema</code> for more information about schemas.
+     * Passing in a <code>null</code> value for <code>qualifier</code>
+     * or <code>lang</code> only matches metadata fields where that
+     * qualifier or languages is actually <code>null</code>.
+     * Passing in <code>Item.ANY</code>
+     * retrieves all metadata fields with any value for the qualifier or
+     * language, including <code>null</code>
+     * <P>
+     * Examples:
+     * <P>
+     * Return values of the unqualified "title" field, in any language.
+     * Qualified title fields (e.g. "title.uniform") are NOT returned:
+     * <P>
+     * <code>item.getMetadata("dc", "title", null, Item.ANY );</code>
+     * <P>
+     * Return all US English values of the "title" element, with any qualifier
+     * (including unqualified):
+     * <P>
+     * <code>item.getMetadata("dc, "title", Item.ANY, "en_US" );</code>
+     * <P>
+     * The ordering of values of a particular element/qualifier/language
+     * combination is significant. When retrieving with wildcards, values of a
+     * particular element/qualifier/language combinations will be adjacent, but
+     * the overall ordering of the combinations is indeterminate.
+     *
+     * @param schema
+     *            the schema for the metadata field. <em>Must</em> match
+     *            the <code>name</code> of an existing metadata schema.
+     * @param element
+     *            the element name. <code>Item.ANY</code> matches any
+     *            element. <code>null</code> doesn't really make sense as all
+     *            metadata must have an element.
+     * @param qualifier
+     *            the qualifier. <code>null</code> means unqualified, and
+     *            <code>Item.ANY</code> means any qualifier (including
+     *            unqualified.)
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means only
+     *            values with no language are returned, and
+     *            <code>Item.ANY</code> means values with any country code or
+     *            no country code are returned.
+     * @return metadata fields that match the parameters
+     */
+    public DCValue[] getMetadata(String schema, String element, String qualifier,
+            String lang)
     {
         // Build up list of matching values
         List values = new ArrayList();
@@ -454,7 +519,7 @@ public class Item extends DSpaceObject
         {
             DCValue dcv = (DCValue) i.next();
 
-            if (match(element, qualifier, lang, dcv))
+            if (match(schema, element, qualifier, lang, dcv))
             {
                 // We will return a copy of the object in case it is altered
                 DCValue copy = new DCValue();
@@ -462,6 +527,7 @@ public class Item extends DSpaceObject
                 copy.qualifier = dcv.qualifier;
                 copy.value = dcv.value;
                 copy.language = dcv.language;
+                copy.schema = dcv.schema;
 
                 values.add(copy);
             }
@@ -494,28 +560,13 @@ public class Item extends DSpaceObject
     public void addDC(String element, String qualifier, String lang,
             String[] values)
     {
-        // We will not verify that they are valid entries in the registry
-        // until update() is called.
-        for (int i = 0; i < values.length; i++)
-        {
-            DCValue dcv = new DCValue();
-            dcv.element = element;
-            dcv.qualifier = qualifier;
-            dcv.language = lang;
-            dcv.value = (values[i] == null ? null : values[i].trim());
-            dublinCore.add(dcv);
-        }
-
-        if (values.length > 0)
-        {
-            dublinCoreChanged = true;
-        }
+        addMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang, values);
     }
 
     /**
      * Add a single Dublin Core metadata field. This is appended to existing
      * values. Use <code>clearDC</code> to remove values.
-     * 
+     *
      * @param element
      *            the Dublin Core element
      * @param qualifier
@@ -531,14 +582,80 @@ public class Item extends DSpaceObject
     public void addDC(String element, String qualifier, String lang,
             String value)
     {
-        String[] valArray = new String[1];
-        valArray[0] = value;
+        addMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang, value);
+    }
+    
+    /**
+     * Add metadata fields. These are appended to existing values.
+     * Use <code>clearDC</code> to remove values. The ordering of values
+     * passed in is maintained.
+     * @param schema
+     *            the schema for the metadata field. <em>Must</em> match
+     *            the <code>name</code> of an existing metadata schema.
+     * @param element
+     *            the metadata element name
+     * @param qualifier
+     *            the metadata qualifer name, or <code>null</code> for
+     *            unqualified
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means the
+     *            value has no language (for example, a date).
+     * @param values
+     *            the values to add.
+     */
+    public void addMetadata(String schema, String element, String qualifier, String lang,
+            String[] values)
+    {
+        // We will not verify that they are valid entries in the registry
+        // until update() is called.
+        for (int i = 0; i < values.length; i++)
+        {
+            DCValue dcv = new DCValue();
+            dcv.schema = schema;
+            dcv.element = element;
+            dcv.qualifier = qualifier;
+            dcv.language = lang;
+            dcv.value = (values[i] == null ? null : values[i].trim());
+            dublinCore.add(dcv);
+        }
 
-        addDC(element, qualifier, lang, valArray);
+        if (values.length > 0)
+        {
+            dublinCoreChanged = true;
+        }
     }
 
     /**
-     * Clear Dublin Core metadata values. As with <code>addDC</code> above,
+     * Add a single metadata field. This is appended to existing
+     * values. Use <code>clearDC</code> to remove values.
+     * 
+     * @param schema
+     *            the schema for the metadata field. <em>Must</em> match
+     *            the <code>name</code> of an existing metadata schema.
+     * @param element
+     *            the metadata element name
+     * @param qualifier
+     *            the metadata qualifer, or <code>null</code> for
+     *            unqualified
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means the
+     *            value has no language (for example, a date).
+     * @param value
+     *            the value to add.
+     */
+    public void addMetadata(String schema, String element, String qualifier,
+            String lang, String value)
+    {
+        String[] valArray = new String[1];
+        valArray[0] = value;
+
+        addMetadata(schema, element, qualifier, lang, valArray);
+    }
+
+    /**
+     * Clear Dublin Core metadata values. As with <code>getDC</code> above,
      * passing in <code>null</code> only matches fields where the qualifier or
      * language is actually <code>null</code>.<code>Item.ANY</code> will
      * match any element, qualifier or language, including <code>null</code>.
@@ -560,6 +677,36 @@ public class Item extends DSpaceObject
      */
     public void clearDC(String element, String qualifier, String lang)
     {
+        clearMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
+    }
+
+    /**
+     * Clear metadata values. As with <code>getDC</code> above,
+     * passing in <code>null</code> only matches fields where the qualifier or
+     * language is actually <code>null</code>.<code>Item.ANY</code> will
+     * match any element, qualifier or language, including <code>null</code>.
+     * Thus, <code>item.clearDC(Item.ANY, Item.ANY, Item.ANY)</code> will
+     * remove all Dublin Core metadata associated with an item.
+     *
+     * @param schema
+     *            the schema for the metadata field. <em>Must</em> match
+     *            the <code>name</code> of an existing metadata schema.
+     * @param element
+     *            the Dublin Core element to remove, or <code>Item.ANY</code>
+     * @param qualifier
+     *            the qualifier. <code>null</code> means unqualified, and
+     *            <code>Item.ANY</code> means any qualifier (including
+     *            unqualified.)
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means only
+     *            values with no language are removed, and <code>Item.ANY</code>
+     *            means values with any country code or no country code are
+     *            removed.
+     */
+    public void clearMetadata(String schema, String element, String qualifier,
+            String lang)
+    {
         // We will build a list of values NOT matching the values to clear
         List values = new ArrayList();
         Iterator i = dublinCore.iterator();
@@ -568,7 +715,7 @@ public class Item extends DSpaceObject
         {
             DCValue dcv = (DCValue) i.next();
 
-            if (!match(element, qualifier, lang, dcv))
+            if (!match(schema, element, qualifier, lang, dcv))
             {
                 values.add(dcv);
             }
@@ -580,12 +727,16 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Utility method for pattern-matching Dublin Core. This method will return
-     * <code>true</code> if the element, qualifier and language passed in
-     * match the element, qualifier and language of the Dublin Core value passed
-     * in. Any or all of the elemenent, qualifier and language passed in can be
-     * the <code>Item.ANY</code> wildcard.
-     * 
+     * Utility method for pattern-matching metadata elements.  This
+     * method will return <code>true</code> if the given schema,
+     * element, qualifier and language match the schema, element,
+     * qualifier and language of the <code>DCValue</code> object passed
+     * in.  Any or all of the elemenent, qualifier and language passed
+     * in can be the <code>Item.ANY</code> wildcard.
+     *
+     * @param schema
+     *            the schema for the metadata field. <em>Must</em> match
+     *            the <code>name</code> of an existing metadata schema.
      * @param element
      *            the element to match, or <code>Item.ANY</code>
      * @param qualifier
@@ -594,11 +745,10 @@ public class Item extends DSpaceObject
      *            the language to match, or <code>Item.ANY</code>
      * @param dcv
      *            the Dublin Core value
-     * 
      * @return <code>true</code> if there is a match
      */
-    private boolean match(String element, String qualifier, String language,
-            DCValue dcv)
+    private boolean match(String schema, String element, String qualifier,
+            String language, DCValue dcv)
     {
         // We will attempt to disprove a match - if we can't we have a match
         if (!element.equals(Item.ANY) && !element.equals(dcv.element))
@@ -639,6 +789,14 @@ public class Item extends DSpaceObject
             // Not a wildcard, so language must match exactly
             if (!language.equals(dcv.language))
             {
+                return false;
+            }
+        }
+        else if (!schema.equals(Item.ANY))
+        {
+            if (dcv.schema != null && !dcv.schema.equals(schema))
+            {
+                // The namespace doesn't match
                 return false;
             }
         }
@@ -862,7 +1020,6 @@ public class Item extends DSpaceObject
      * 
      * @param name
      *            bundle name (ORIGINAL/TEXT/THUMBNAIL)
-     * 
      * @return the newly created bundle
      * @throws SQLException
      * @throws AuthorizeException
@@ -936,6 +1093,7 @@ public class Item extends DSpaceObject
      *            the bundle to remove
      * @throws SQLException
      * @throws AuthorizeException
+     * @throws IOException
      */
     public void removeBundle(Bundle b) throws SQLException, AuthorizeException,
             IOException
@@ -1107,6 +1265,7 @@ public class Item extends DSpaceObject
      * 
      * @throws SQLException
      * @throws AuthorizeException
+     * @throws IOException
      */
     public void removeLicenses() throws SQLException, AuthorizeException,
             IOException
@@ -1228,7 +1387,7 @@ public class Item extends DSpaceObject
         if (dublinCoreChanged)
         {
             // Remove existing DC
-            removeDCFromDatabase();
+            removeMetadataFromDatabase();
 
             // Add in-memory DC
             Iterator i = dublinCore.iterator();
@@ -1238,15 +1397,24 @@ public class Item extends DSpaceObject
                 DCValue dcv = (DCValue) i.next();
 
                 // Get the DC Type
-                DCType dcType = DCType.findByElement(ourContext, dcv.element,
-                        dcv.qualifier);
+                int schemaID;
+                MetadataSchema schema = MetadataSchema.find(ourContext,dcv.schema);
+                if (schema == null) {
+                    schemaID = MetadataSchema.DC_SCHEMA_ID;
+                } else {
+                    schemaID = schema.getSchemaID();
+                }
 
-                if (dcType == null)
+                MetadataField field = MetadataField.findByElement(ourContext,
+                        schemaID, dcv.element, dcv.qualifier);
+
+                if (field == null)
                 {
                     // Bad DC field, log and throw exception
                     log.warn(LogManager
                             .getHeader(ourContext, "bad_dc",
-                                    "Bad DC field.  element: \""
+                                    "Bad DC field. SchemaID="+String.valueOf(schemaID)
+                                            + ", element: \""
                                             + ((dcv.element == null) ? "null"
                                                     : dcv.element)
                                             + "\" qualifier: \""
@@ -1256,7 +1424,9 @@ public class Item extends DSpaceObject
                                             + ((dcv.value == null) ? "null"
                                                     : dcv.value) + "\""));
 
-                    throw new SQLException("bad_dublin_core " + dcv.element
+                    throw new SQLException("bad_dublin_core "
+                            + "SchemaID="+String.valueOf(schemaID)+", "
+                            + dcv.element
                             + " " + dcv.qualifier);
                 }
 
@@ -1278,16 +1448,13 @@ public class Item extends DSpaceObject
                 elementCount.put(key, new Integer(current));
 
                 // Write DCValue
-                TableRow valueRow = DatabaseManager.create(ourContext,
-                        "dcvalue");
-
-                valueRow.setColumn("item_id", getID());
-                valueRow.setColumn("dc_type_id", dcType.getID());
-                valueRow.setColumn("text_value", dcv.value);
-                valueRow.setColumn("text_lang", dcv.language);
-                valueRow.setColumn("place", current);
-
-                DatabaseManager.update(ourContext, valueRow);
+                MetadataValue metadata = new MetadataValue();
+                metadata.setItemId(getID());
+                metadata.setFieldId(field.getFieldID());
+                metadata.setValue(dcv.value);
+                metadata.setLanguage(dcv.language);
+                metadata.setPlace(current);
+                metadata.create(ourContext);
             }
 
             dublinCoreChanged = false;
@@ -1467,7 +1634,7 @@ public class Item extends DSpaceObject
         }
 
         // Delete the Dublin Core
-        removeDCFromDatabase();
+        removeMetadataFromDatabase();
 
         // Remove bundles
         Bundle[] bunds = getBundles();
@@ -1527,7 +1694,6 @@ public class Item extends DSpaceObject
      * 
      * @param other
      *            object to compare to
-     * 
      * @return <code>true</code> if object passed in represents the same item
      *         as this object
      */
@@ -1549,9 +1715,7 @@ public class Item extends DSpaceObject
      * 
      * @param c
      *            Collection
-     * 
      * @return true if this Collection owns this item
-     *  
      */
     public boolean isOwningCollection(Collection c)
     {
@@ -1567,15 +1731,15 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Utility method to remove all Dublin Core associated with the item from
+     * Utility method to remove all descriptive metadata associated with the item from
      * the database (regardless of in-memory version)
      * 
      * @throws SQLException
      */
-    private void removeDCFromDatabase() throws SQLException
+    private void removeMetadataFromDatabase() throws SQLException
     {
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM dcvalue WHERE item_id=" + getID());
+                "DELETE FROM MetadataValue WHERE item_id=" + getID());
     }
 
     /**
@@ -1596,6 +1760,7 @@ public class Item extends DSpaceObject
      *            this will be all of the new policies for the item and its
      *            contents
      * @throws SQLException
+     * @throws AuthorizeException
      */
     public void replaceAllItemPolicies(List newpolicies) throws SQLException,
             AuthorizeException
@@ -1613,6 +1778,7 @@ public class Item extends DSpaceObject
      *            this will be all of the new policies for the bundle and
      *            bitstream contents
      * @throws SQLException
+     * @throws AuthorizeException
      */
     public void replaceAllBitstreamPolicies(List newpolicies)
             throws SQLException, AuthorizeException
@@ -1684,10 +1850,10 @@ public class Item extends DSpaceObject
      * 
      * @param c
      *            Collection
-     * 
      * @throws java.sql.SQLException
      *             if an SQL error or if no default policies found. It's a bit
      *             draconian, but default policies must be enforced.
+     * @throws AuthorizeException
      */
     public void inheritCollectionDefaultPolicies(Collection c)
             throws java.sql.SQLException, AuthorizeException

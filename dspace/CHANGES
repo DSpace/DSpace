@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Martin Hald, Larry Stone, Robert Tansley)
+- Support for multiple (flat) metadata schemas
+
 (Robert Tansley)
 - Fix XHTML for front page when no communities present
 

@@ -39,6 +39,7 @@
    <form name="traditional">
      <page number="1">
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>contributor</dc-element>
          <dc-qualifier>author</dc-qualifier>
          <repeatable>true</repeatable>
@@ -49,6 +50,7 @@
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>title</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
@@ -59,6 +61,7 @@
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>title</dc-element>
          <dc-qualifier>alternative</dc-qualifier>
          <repeatable>true</repeatable>
@@ -69,6 +72,7 @@
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>date</dc-element>
          <dc-qualifier>issued</dc-qualifier>
          <repeatable>false</repeatable>
@@ -81,6 +85,7 @@
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>publisher</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
@@ -91,6 +96,7 @@
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>identifier</dc-element>
          <dc-qualifier>citation</dc-qualifier>
          <repeatable>false</repeatable>
@@ -101,6 +107,7 @@
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>relation</dc-element>
          <dc-qualifier>ispartofseries</dc-qualifier>
          <repeatable>true</repeatable>
@@ -111,6 +118,7 @@
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>identifier</dc-element>
          <dc-qualifier></dc-qualifier>
          <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
@@ -123,6 +131,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>type</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable>true</repeatable>
@@ -133,6 +142,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>language</dc-element>
          <dc-qualifier>iso</dc-qualifier>
          <repeatable>false</repeatable>
@@ -145,6 +155,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
 
      <page number="2">
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>subject</dc-element>
          <dc-qualifier></dc-qualifier>
          <!-- An input-type of twobox MUST be marked as repeatable -->
@@ -156,6 +167,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
          <dc-qualifier>abstract</dc-qualifier>
          <repeatable>false</repeatable>
@@ -166,6 +178,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
          <dc-qualifier>sponsorship</dc-qualifier>
          <repeatable>false</repeatable>
@@ -176,6 +189,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
        </field>
 
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
@@ -190,6 +204,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
    <form name="one">
      <page number="1">
        <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>contributor</dc-element>
          <dc-qualifier>author</dc-qualifier>
          <repeatable>true</repeatable>

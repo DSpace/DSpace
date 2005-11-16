@@ -62,6 +62,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -490,26 +491,38 @@ public class DSIndexer
                 String[] dc = index.split(":");
                 String myindex = dc[0];
 
+                String schema;
+                String element;
+                String qualifier;
+
+                // Get the schema, element and qualifier for the index
                 String[] elements = dc[1].split("\\.");
-                String element = elements[0];
-                String qualifier = elements[1];
+				if (elements.length == 3) 
+                {
+					schema = elements[0];
+					element = elements[1];
+					qualifier = elements[2];
+				} 
+                else 
+                {
+					schema = MetadataSchema.DC_SCHEMA;
+					element = elements[0];
+					qualifier = elements[1];
+				}
 
                 // extract metadata (ANY is wildcard from Item class)
                 if (qualifier.equals("*"))
                 {
-                    mydc = myitem.getDC(element, Item.ANY, Item.ANY);
+                    mydc = myitem.getMetadata(schema, element, Item.ANY, Item.ANY);
                 }
                 else
                 {
-                    mydc = myitem.getDC(element, qualifier, Item.ANY);
+                    mydc = myitem.getMetadata(schema, element, qualifier, Item.ANY);
                 }
 
                 // put them all from an array of strings to one string for
-                // writing
-                // out
-                // pack all of the arrays of DCValues into plain text strings
-                // for
-                // the indexer
+                // writing out pack all of the arrays of DCValues into plain
+                // text strings for the indexer
                 String content_text = "";
 
                 for (j = 0; j < mydc.length; j++)
@@ -672,7 +685,8 @@ public class DSIndexer
                     try
                     {
                         InputStreamReader is = new InputStreamReader(
-                                myBitstreams[j].retrieve()); // get input stream
+                                myBitstreams[j].retrieve()); // get input
+                        // stream
                         StringBuffer sb = new StringBuffer();
                         char[] charBuffer = new char[1024];
 

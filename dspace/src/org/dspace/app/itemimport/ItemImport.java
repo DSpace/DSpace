@@ -45,6 +45,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -73,6 +74,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -111,6 +113,26 @@ public class ItemImport
     static boolean isResume = false;
 
     static PrintWriter mapOut = null;
+
+    // File listing filter to look for metadata files
+    static FilenameFilter metadataFileFilter = new FilenameFilter()
+    {
+        public boolean accept(File dir, String n)
+        {
+            return n.startsWith("metadata_");
+        }
+    };
+
+    // File listing filter to check for folders
+    static FilenameFilter directoryFilter = new FilenameFilter()
+    {
+        public boolean accept(File dir, String n)
+        {
+            File item = new File(dir.getAbsolutePath() + File.separatorChar + n);
+            return item.isDirectory();
+        }
+    };
+
 
     public static void main(String[] argv) throws Exception
     {
@@ -463,7 +485,7 @@ public class ItemImport
             System.exit(1);
         }
 
-        String[] dircontents = d.list();
+        String[] dircontents = d.list(directoryFilter);
 
         for (int i = 0; i < dircontents.length; i++)
         {
@@ -601,8 +623,8 @@ public class ItemImport
         }
 
         // now fill out dublin core for item
-        loadDublinCore(c, myitem, path + File.separatorChar + itemname
-                + File.separatorChar + "dublin_core.xml");
+        loadMetadata(c, myitem, path + File.separatorChar + itemname
+                + File.separatorChar);
 
         // and the bitstreams from the contents file
         // process contents file, add bistreams and bundles
@@ -749,12 +771,45 @@ public class ItemImport
         return myhash;
     }
 
+    // Load all metadata schemas into the item.
+    private void loadMetadata(Context c, Item myitem, String path)
+            throws SQLException, IOException, ParserConfigurationException,
+            SAXException, TransformerException
+    {
+        // Load the dublin core metadata
+        loadDublinCore(c, myitem, path + "dublin_core.xml");
+
+        // Load any additional metadata schemas
+        File folder = new File(path);
+        File file[] = folder.listFiles(metadataFileFilter);
+        for (int i = 0; i < file.length; i++)
+        {
+            loadDublinCore(c, myitem, file[i].getAbsolutePath());
+        }
+    }
+
     private void loadDublinCore(Context c, Item myitem, String filename)
             throws SQLException, IOException, ParserConfigurationException,
             SAXException, TransformerException //, AuthorizeException
     {
         Document document = loadXML(filename);
 
+        // Get the schema, for backward compatibility we will default to the
+        // dublin core schema if the schema name is not available in the import
+        // file
+        String schema;
+        NodeList metadata = XPathAPI.selectNodeList(document, "/dublin_core");
+        Node schemaAttr = metadata.item(0).getAttributes().getNamedItem(
+                "schema");
+        if (schemaAttr == null)
+        {
+            schema = MetadataSchema.DC_SCHEMA;
+        }
+        else
+        {
+            schema = schemaAttr.getNodeValue();
+        }
+         
         // Get the nodes corresponding to formats
         NodeList dcNodes = XPathAPI.selectNodeList(document,
                 "/dublin_core/dcvalue");
@@ -765,13 +820,16 @@ public class ItemImport
         for (int i = 0; i < dcNodes.getLength(); i++)
         {
             Node n = dcNodes.item(i);
-            addDCValue(myitem, n);
+            addDCValue(myitem, schema, n);
         }
     }
 
-    private void addDCValue(Item i, Node n) throws TransformerException
+    private void addDCValue(Item i, String schema, Node n) throws TransformerException
     {
         String value = getStringValue(n); //n.getNodeValue();
+        // compensate for empty value getting read as "null", which won't display
+        if (value == null)
+            value = "";
         // //getElementData(n, "element");
         String element = getAttributeValue(n, "element");
         String qualifier = getAttributeValue(n, "qualifier"); //NodeValue();
@@ -779,7 +837,7 @@ public class ItemImport
         // "qualifier");
         String language = getAttributeValue(n, "language");
 
-        System.out.println("\tElement: " + element + " Qualifier: " + qualifier
+        System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
                 + " Value: " + value);
 
         if (qualifier.equals("none") || "".equals(qualifier))
@@ -801,7 +859,7 @@ public class ItemImport
 
         if (!isTest)
         {
-            i.addDC(element, qualifier, language, value);
+            i.addMetadata(schema, element, qualifier, language, value);
         }
     }
 

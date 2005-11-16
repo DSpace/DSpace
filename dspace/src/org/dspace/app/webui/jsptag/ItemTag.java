@@ -333,7 +333,7 @@ public class ItemTag extends TagSupport
             }
 
             // FIXME: Still need to fix for metadata language?
-            DCValue[] values = item.getDC(element, qualifier, Item.ANY);
+            DCValue[] values = item.getMetadata("dc", element, qualifier, Item.ANY);
 
             if (values.length > 0)
             {
@@ -396,7 +396,7 @@ public class ItemTag extends TagSupport
         JspWriter out = pageContext.getOut();
 
         // Get all the metadata
-        DCValue[] values = item.getDC(Item.ANY, Item.ANY, Item.ANY);
+        DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         out.println("<p align=\"center\">"
                 + LocaleSupport.getLocalizedMessage(pageContext,
@@ -431,7 +431,8 @@ public class ItemTag extends TagSupport
             {
                 out
                         .print("<tr><td headers=\"s1\"class=\"metadataFieldLabel\">");
-                out.print(values[i].element);
+                out.print(values[i].schema);
+                out.print("." + values[i].element);
 
                 if (values[i].qualifier != null)
                 {

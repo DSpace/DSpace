@@ -81,12 +81,12 @@
 <%!
 
     void doPersonalName(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable,
       int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getDC(element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer headers = new StringBuffer();
       StringBuffer sb = new StringBuffer();
@@ -183,12 +183,12 @@
     }
 
     void doDate(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable,
       int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getDC(element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       org.dspace.content.DCDate dateIssued;
@@ -292,12 +292,12 @@
     }
 
     void doSeriesNumber(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable,
       int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getDC(element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       org.dspace.content.DCSeriesNumber sn;
@@ -369,12 +369,12 @@
     }
 
     void doTextArea(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable,
       int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getDC(element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String val;
@@ -437,12 +437,12 @@
     }
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable,
       int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getDC(element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String val;
@@ -505,11 +505,11 @@
     }
 
     void doTwoBox(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable,
       int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
-      DCValue[] defaults = item.getDC(element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       StringBuffer headers = new StringBuffer();
@@ -607,11 +607,11 @@
     }
 
     void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String element, DCInputSet inputs, boolean repeatable,
+      String fieldName, String schema, String element, DCInputSet inputs, boolean repeatable,
       int fieldCountIncr, List qualMap, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
-		DCValue[] unfiltered = item.getDC(element, Item.ANY, Item.ANY);
+		DCValue[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
 		// filter out both unqualified and qualified values occuring elsewhere in inputs
 		ArrayList filtered = new ArrayList();
 		for (int i = 0; i < unfiltered.length; i++)
@@ -623,7 +623,7 @@
 			} 
 		}
 		DCValue[] defaults = (DCValue[])filtered.toArray(new DCValue[0]);
-      //DCValue[] defaults = item.getDC(element, Item.ANY, Item.ANY);
+      //DCValue[] defaults = item.getMetadata(element, Item.ANY, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String   q, v, currentQual, currentVal;
@@ -715,11 +715,11 @@
     }
 
     void doDropDown(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable,
       List valueList, String label) 
       throws java.io.IOException 
     {
-      DCValue[] defaults = item.getDC(element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       StringBuffer sb = new StringBuffer();
       Iterator vals;
       String display, value;
@@ -820,14 +820,16 @@
      { 
        String dcElement = inputs[z].getElement();
        String dcQualifier = inputs[z].getQualifier();
+       String dcSchema = inputs[z].getSchema();
+       
        String fieldName;
        int fieldCountIncr;
        boolean repeatable;
 
        if (dcQualifier != null && !dcQualifier.equals("*"))
-          fieldName = dcElement + '_' + dcQualifier;
+          fieldName = dcSchema + "_" + dcElement + '_' + dcQualifier;
        else
-          fieldName = dcElement;
+          fieldName = dcSchema + "_" + dcElement;
 
        //if (inputs[z].isRequired()) {
          // si.jumpToField = fieldName;
@@ -863,44 +865,44 @@
        String label = inputs[z].getLabel();
        if (inputType.equals("name")) 
        {
-           doPersonalName(out, item, fieldName, dcElement, dcQualifier,
+           doPersonalName(out, item, fieldName, dcSchema, dcElement, dcQualifier,
 	     				  repeatable, fieldCountIncr, label, pageContext);
        } 
        else if (inputType.equals("date")) 
        {
-           doDate(out, item, fieldName, dcElement, dcQualifier, 
+           doDate(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
 	     		  repeatable, fieldCountIncr, label, pageContext);
        } 
        else if (inputType.equals("series")) 
        {
-           doSeriesNumber(out, item, fieldName, dcElement, dcQualifier, 
+           doSeriesNumber(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
 	                      repeatable, fieldCountIncr, label, pageContext);
 
        } 
        else if (inputType.equals("qualdrop_value")) 
        {
-           doQualdropValue(out, item, fieldName, dcElement, inputSet, repeatable,
+           doQualdropValue(out, item, fieldName, dcSchema, dcElement, inputSet, repeatable,
                            fieldCountIncr, inputs[z].getPairs(), label, pageContext);
        } 
        else if (inputType.equals("textarea")) 
        {
-	   	   doTextArea(out, item, fieldName, dcElement, dcQualifier, 
+	   	   doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
 	     			  repeatable, fieldCountIncr, label, pageContext);
 
        } 
        else if (inputType.equals("dropdown")) 
        {
-	   		doDropDown(out, item, fieldName, dcElement, dcQualifier, 
+	   		doDropDown(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
 	     			   repeatable, inputs[z].getPairs(), label);
        } 
        else if (inputType.equals("twobox")) 
        {
-	   		doTwoBox(out, item, fieldName, dcElement, dcQualifier, 
+	   		doTwoBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
 	     			 repeatable, fieldCountIncr, label, pageContext);
        } 
        else 
        {
-	   		doOneBox(out, item, fieldName, dcElement, dcQualifier, 
+	   		doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
 	     			 repeatable, fieldCountIncr, label, pageContext);
        }
 %>
