@@ -229,8 +229,13 @@ public class DIDLCrosswalk extends Crosswalk
 			 		metadata.append("\" encoding=\"base64\">");
 			 		try
 			 		{
-			 			
-			 			byte[] buffer = new byte[bitstreams[k].getSize()];
+                        /*
+                         * Assume that size of in-line bitstreams will always be
+                         * smaller than MAXINT bytes
+                         */
+			 			int intSize = (int) bitstreams[k].getSize();
+                        
+			 			byte[] buffer = new byte[intSize];
 			 			
 			 			//BufferedInputStream bis=new BufferedInputStream(bitstreams[k].retrieve());
 			 			Context contextl= new Context();

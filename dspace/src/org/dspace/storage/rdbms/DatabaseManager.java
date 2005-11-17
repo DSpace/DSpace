@@ -1148,6 +1148,10 @@ public class DatabaseManager
 
                     continue;
                 }
+                else if (jdbctype == Types.BIGINT)
+                {
+                    statement.setLong(count, row.getLongColumn(column));
+                }
                 else if (jdbctype == Types.VARCHAR)
                 {
                     statement.setString(count, row.getStringColumn(column));

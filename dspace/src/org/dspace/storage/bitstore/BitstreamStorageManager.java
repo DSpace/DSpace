@@ -343,15 +343,7 @@ public class BitstreamStorageManager
         fos.close();
         is.close();
 
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            bitstream.setColumn("size_bytes", (int) file.length());
-        }
-        else
-        {
-            // postgres default
-            bitstream.setColumn("size", (int) file.length());
-        }
+        bitstream.setColumn("size_bytes", file.length());
 
         bitstream.setColumn("checksum", Utils.toHex(dis.getMessageDigest()
                 .digest()));
@@ -500,17 +492,7 @@ public class BitstreamStorageManager
 		}
 
 		bitstream.setColumn("checksum_algorithm", "MD5");
-
-		// oracle v. postgresql - 'size' (legacy) is reserved word in oracle
-		if ("oracle".equals(ConfigurationManager.getProperty("db.name"))) 
-		{
-			bitstream.setColumn("size_bytes", (int) file.length());
-		} 
-		else 
-		{
-			bitstream.setColumn("size", (int) file.length());
-		}
-
+		bitstream.setColumn("size_bytes", (int) file.length());
 		bitstream.setColumn("deleted", false);
 		DatabaseManager.update(context, bitstream);
 
@@ -585,19 +567,10 @@ public class BitstreamStorageManager
      */
     public static void delete(Context context, int id) throws SQLException
     {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            // oracle uses 1 for true
-            DatabaseManager.updateQuery(context,
-                    "update Bitstream set deleted = 1 where bitstream_id = "
-                            + id);
-        }
-        else
-        {
-            DatabaseManager.updateQuery(context,
-                    "update Bitstream set deleted = 't' where bitstream_id = "
-                            + id);
-        }
+        DatabaseManager
+                .updateQuery(context,
+                        "update Bitstream set deleted = '1' where bitstream_id = "
+                                + id);
     }
 
     /**
@@ -618,17 +591,7 @@ public class BitstreamStorageManager
         {
             context = new Context();
 
-            String myQuery = null;
-
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            {
-                myQuery = "select * from Bitstream where deleted = 1";
-            }
-            else
-            {
-                // postgres
-                myQuery = "select * from Bitstream where deleted = 't'";
-            }
+            String myQuery = "select * from Bitstream where deleted = '1'";
 
             List storage = DatabaseManager.query(context, "Bitstream", myQuery)
                     .toList();

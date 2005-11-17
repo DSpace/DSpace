@@ -355,15 +355,9 @@ public class Bitstream extends DSpaceObject
      * 
      * @return the size in bytes
      */
-    public int getSize()
+    public long getSize()
     {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            return bRow.getIntColumn("size_bytes");
-        }
-
-        // default is column "size" for postgres
-        return bRow.getIntColumn("size");
+        return bRow.getLongColumn("size_bytes");
     }
 
     /**

@@ -308,23 +308,10 @@ public class Collection extends DSpaceObject
      */
     public ItemIterator getItems() throws SQLException
     {
-        String myQuery = null;
-
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            myQuery = "SELECT item.* FROM item, collection2item WHERE "
-                    + "item.item_id=collection2item.item_id AND "
-                    + "collection2item.collection_id=" + getID()
-                    + " AND item.in_archive=1";
-        }
-        else
-        {
-            // default postgres, use boolean
-            myQuery = "SELECT item.* FROM item, collection2item WHERE "
-                    + "item.item_id=collection2item.item_id AND "
-                    + "collection2item.collection_id=" + getID()
-                    + " AND item.in_archive=true";
-        }
+        String myQuery = "SELECT item.* FROM item, collection2item WHERE "
+                + "item.item_id=collection2item.item_id AND "
+                + "collection2item.collection_id=" + getID()
+                + " AND item.in_archive='1'";
 
         TableRowIterator rows = DatabaseManager.query(ourContext, "item",
                 myQuery);
@@ -1144,19 +1131,15 @@ public class Collection extends DSpaceObject
      {
         Statement statement = ourContext.getDBConnection().createStatement();
         final ResultSet rs;
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            rs = statement.executeQuery(
-                "SELECT count(*) FROM collection2item, item WHERE "
-                + "collection2item.collection_id = " + getID() 
-                + " AND collection2item.item_id = item.item_id "
-                + "AND in_archive =1 AND item.withdrawn=0");
-        else 
-            rs = statement.executeQuery(
-                "SELECT count(*) FROM collection2item, item WHERE "
-                + "collection2item.collection_id = " + getID() 
-                + " AND collection2item.item_id = item.item_id "
-                + "AND in_archive ='t' AND item.withdrawn='f'");
-        int itemcount = 0;
+
+        rs = statement
+                .executeQuery("SELECT count(*) FROM collection2item, item WHERE "
+                        + "collection2item.collection_id = "
+                        + getID()
+                        + " AND collection2item.item_id = item.item_id "
+                        + "AND in_archive ='1' AND item.withdrawn='0'");
+
+            int itemcount = 0;
         rs.next();
         itemcount = rs.getInt(1);
 

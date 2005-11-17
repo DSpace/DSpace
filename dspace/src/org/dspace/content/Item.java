@@ -266,17 +266,7 @@ public class Item extends DSpaceObject
      */
     public static ItemIterator findAll(Context context) throws SQLException
     {
-        String myQuery = null;
-
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            myQuery = "SELECT * FROM item WHERE in_archive=1";
-        }
-        else
-        {
-            // default postgres
-            myQuery = "SELECT * FROM item WHERE in_archive=true";
-        }
+        String myQuery = "SELECT * FROM item WHERE in_archive='1'";
 
         TableRowIterator rows = DatabaseManager.query(context, "item", myQuery);
 
@@ -297,19 +287,8 @@ public class Item extends DSpaceObject
     public static ItemIterator findBySubmitter(Context context, EPerson eperson)
             throws SQLException
     {
-        String myQuery = null;
-
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            myQuery = "SELECT * FROM item WHERE in_archive=1 AND submitter_id="
-                    + eperson.getID();
-        }
-        else
-        {
-            // default postgres
-            myQuery = "SELECT * FROM item WHERE in_archive=true AND submitter_id="
-                    + eperson.getID();
-        }
+        String myQuery = "SELECT * FROM item WHERE in_archive='1' AND submitter_id="
+                + eperson.getID();
 
         TableRowIterator rows = DatabaseManager.query(context, "item", myQuery);
 

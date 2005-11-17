@@ -1,5 +1,11 @@
 1.4 beta 1
 ==========
+(Robert Tansley)
+- Bitstream file sizes now stored in BIGINT column size_bytes.
+  Fixes SF bug #1035366
+- Queries involving booleans now have Oracle/PostgreSQL-neutral SQL syntax;
+  removes some DB-dependent code from business logic layer
+
 (Martin Hald, Larry Stone, Robert Tansley)
 - Support for multiple (flat) metadata schemas
 

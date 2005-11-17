@@ -148,7 +148,7 @@ CREATE TABLE Bitstream
    bitstream_id            INTEGER PRIMARY KEY,
    bitstream_format_id     INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),
    name                    VARCHAR(256),
-   size                    INTEGER,
+   size_bytes              BIGINT,
    checksum                VARCHAR(64),
    checksum_algorithm      VARCHAR(32),
    description             TEXT,

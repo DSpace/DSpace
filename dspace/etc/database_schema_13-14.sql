@@ -138,3 +138,12 @@ CREATE VIEW dcvalue AS
 SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
 SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
 SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
+
+
+------------------------------------------------------
+-- Bitstream table -- increase capacity of file size
+-- column, and bring in line with Oracle schema
+------------------------------------------------------
+ALTER TABLE bitstream ADD COLUMN size_bytes BIGINT;
+UPDATE bitstream SET size_bytes = size;
+ALTER TABLE bitstream DROP COLUMN size;

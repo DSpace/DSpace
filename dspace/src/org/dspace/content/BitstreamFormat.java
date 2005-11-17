@@ -305,21 +305,9 @@ public class BitstreamFormat
     {
         List formats = new ArrayList();
 
-        String myQuery = null;
-
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            myQuery = "SELECT * FROM bitstreamformatregistry WHERE internal=0 "
-                    + "AND short_description NOT LIKE 'Unknown' "
-                    + "ORDER BY support_level DESC, short_description";
-        }
-        else
-        {
-            // default postgres, use boolean
-            myQuery = "SELECT * FROM bitstreamformatregistry WHERE internal=false "
-                    + "AND short_description NOT LIKE 'Unknown' "
-                    + "ORDER BY support_level DESC, short_description";
-        }
+        String myQuery = "SELECT * FROM bitstreamformatregistry WHERE internal='0' "
+                + "AND short_description NOT LIKE 'Unknown' "
+                + "ORDER BY support_level DESC, short_description";
 
         TableRowIterator tri = DatabaseManager.query(context,
                 "bitstreamformatregistry", myQuery);
