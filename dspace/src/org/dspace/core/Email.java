@@ -47,8 +47,10 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Address;
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -238,7 +240,22 @@ public class Email
         props.put("mail.smtp.host", server);
 
         // Get session
-        Session session = Session.getDefaultInstance(props, null);
+        Session session;
+        
+        // Get the SMTP server authentication information
+        String username = ConfigurationManager.getProperty("mail.server.username");
+        String password = ConfigurationManager.getProperty("mail.server.password");
+        
+        if (username != null)
+        {
+            SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
+                    username, password);
+            session = Session.getDefaultInstance(props, smtpAuthenticator);
+        }
+        else
+        {
+            session = Session.getDefaultInstance(props);
+        }
 
         // Create message
         MimeMessage message = new MimeMessage(session);
@@ -270,5 +287,29 @@ public class Email
         }
 
         Transport.send(message);
+    }
+
+
+    /**
+     * Inner Class for SMTP authentication information
+     */
+    class SMTPAuthenticator extends Authenticator
+    {
+        // User name
+        private String name;
+        
+        // Password
+        private String password;
+        
+        public SMTPAuthenticator(String n, String p)
+        {
+            name = n;
+            password = p;
+        }
+        
+        protected PasswordAuthentication getPasswordAuthentication()
+        {
+            return new PasswordAuthentication(name, password);
+        }
     }
 }

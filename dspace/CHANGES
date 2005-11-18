@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(WeiHua HUANG)
+- Support for SMTP server username/password authentication
+
 (Robert Tansley)
 - Bitstream file sizes now stored in BIGINT column size_bytes.
   Fixes SF bug #1035366
@@ -55,7 +58,7 @@
 (Henry Jerez (LANL))
 - SF Patch #1246928 DIDL plug-in for DSpace
 
-(Robert Tansley)
+(Robert Tansley, LI XiaoYu (Rita))
 - SF Patch #1244813 Expose METS to OAI-PMH harvesters
 - SF Patch #1209318 Configurable Lucene Analyzer, Chinese search
 
