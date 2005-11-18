@@ -219,7 +219,7 @@
                 <th id="t5" class="oddRowOddCol">&nbsp;</th>
             </tr>
 <%
-    DCValue[] dcv = item.getDC(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+    DCValue[] dcv = item.getMetadata(Item.ANY, Item.ANY, Item.ANY);
     String row = "even";
     
     // Keep a count of the number of values of each element+qualifier
