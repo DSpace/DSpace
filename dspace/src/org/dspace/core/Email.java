@@ -39,6 +39,7 @@
  */
 package org.dspace.core;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,15 +47,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.mail.Address;
 import javax.mail.Authenticator;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
@@ -79,18 +86,18 @@ import javax.mail.internet.MimeMessage;
  * <P>
  * 
  * <pre>
- * 
- *  # This is a comment line which is stripped
- *  #
- *  # Parameters:   {0}  is a person's name
- *  #               {1}  is the name of a submission
- *  #
- *  Subject: Example e-mail
- * 
- *  Dear {0},
- * 
- *  Thank you for sending us your submission &quot;{1}&quot;.
- *  
+ *    
+ *     # This is a comment line which is stripped
+ *     #
+ *     # Parameters:   {0}  is a person's name
+ *     #               {1}  is the name of a submission
+ *     #
+ *     Subject: Example e-mail
+ *    
+ *     Dear {0},
+ *    
+ *     Thank you for sending us your submission &quot;{1}&quot;.
+ *     
  * </pre>
  * 
  * <P>
@@ -99,12 +106,12 @@ import javax.mail.internet.MimeMessage;
  * <P>
  * 
  * <pre>
- * 
- * 
- *  Dear John,
- * 
- *  Thank you for sending us your submission &quot;On the Testing of DSpace&quot;.
- *  
+ *    
+ *    
+ *     Dear John,
+ *    
+ *     Thank you for sending us your submission &quot;On the Testing of DSpace&quot;.
+ *     
  * </pre>
  * 
  * <P>
@@ -113,6 +120,7 @@ import javax.mail.internet.MimeMessage;
  * 
  * 
  * @author Robert Tansley
+ * @author Jim Downing - added attachment handling code
  * @version $Revision$
  */
 public class Email
@@ -120,7 +128,7 @@ public class Email
     /*
      * Implementation note: It might be necessary to add a quick utility method
      * like "send(to, subject, message)". We'll see how far we get without it -
-     * having all emails as templates in the config allows customisation and
+     * having all emails as templates in the config allows customisation and 
      * internationalisation.
      * 
      * Note that everything is stored and the run in send() so that only send()
@@ -142,13 +150,16 @@ public class Email
     /** Reply to field, if any */
     private String replyTo;
 
+    private List attachments;
+
     /**
      * Create a new email message.
      */
     Email()
     {
-        arguments = new ArrayList();
-        recipients = new ArrayList();
+        arguments = new ArrayList(50);
+        recipients = new ArrayList(50);
+        attachments = new ArrayList(10);
         subject = "";
         content = "";
         replyTo = null;
@@ -212,14 +223,20 @@ public class Email
         arguments.add(arg);
     }
 
+    public void addAttachment(File f, String name)
+    {
+        attachments.add(new FileAttachment(f, name));
+    }
+
     /**
      * "Reset" the message. Clears the arguments and recipients, but leaves the
      * subject and content intact.
      */
     public void reset()
     {
-        arguments = new ArrayList();
-        recipients = new ArrayList();
+        arguments = new ArrayList(50);
+        recipients = new ArrayList(50);
+        attachments = new ArrayList(10);
         replyTo = null;
     }
 
@@ -273,11 +290,34 @@ public class Email
         Object[] args = arguments.toArray();
         String fullMessage = MessageFormat.format(content, args);
         Date date = new Date();
-        
+
         message.setSentDate(date);
         message.setFrom(new InternetAddress(from));
         message.setSubject(subject);
-        message.setText(fullMessage);
+        if (attachments.isEmpty())
+        {
+            message.setText(fullMessage);
+        }
+        else
+        {
+            Multipart multipart = new MimeMultipart();
+            // create the first part of the email
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setText(fullMessage);
+            multipart.addBodyPart(messageBodyPart);
+
+            for (Iterator iter = attachments.iterator(); iter.hasNext();)
+            {
+                FileAttachment f = (FileAttachment) iter.next();
+                // add the file
+                messageBodyPart = new MimeBodyPart();
+                messageBodyPart.setDataHandler(new DataHandler(
+                        new FileDataSource(f.file)));
+                messageBodyPart.setFileName(f.name);
+                multipart.addBodyPart(messageBodyPart);
+            }
+            message.setContent(multipart);
+        }
 
         if (replyTo != null)
         {
@@ -289,11 +329,29 @@ public class Email
         Transport.send(message);
     }
 
+    /**
+     * Utility struct class for handling file attachments.
+     * 
+     * @author ojd20
+     * 
+     */
+    private class FileAttachment
+    {
+        public FileAttachment(File f, String n)
+        {
+            this.file = f;
+            this.name = n;
+        }
 
+        File file;
+
+        String name;
+    }
+    
     /**
      * Inner Class for SMTP authentication information
      */
-    class SMTPAuthenticator extends Authenticator
+    private class SMTPAuthenticator extends Authenticator
     {
         // User name
         private String name;
