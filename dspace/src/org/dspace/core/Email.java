@@ -265,6 +265,7 @@ public class Email
         
         if (username != null)
         {
+            props.put("mail.smtp.auth", "true");
             SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
                     username, password);
             session = Session.getDefaultInstance(props, smtpAuthenticator);
