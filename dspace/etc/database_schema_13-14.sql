@@ -147,3 +147,12 @@ SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metada
 ALTER TABLE bitstream ADD COLUMN size_bytes BIGINT;
 UPDATE bitstream SET size_bytes = size;
 ALTER TABLE bitstream DROP COLUMN size;
+
+------------------------------------------------------
+-- Drop unique community name constraint
+-- 
+-- FIXME:  Needs testing; the constraint name is not 
+-- guaranteed to be the same as below.  This step may
+-- need to be performed by hand.
+------------------------------------------------------
+ALTER TABLE community DROP CONSTRAINT community_name_key;

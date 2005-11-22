@@ -1,6 +1,9 @@
 1.4 beta 1
 ==========
 (Robert Tansley)
+- Drop unique community name constraint
+
+(Robert Tansley)
 - Scripts for Windows support
 
 (WeiHua HUANG)

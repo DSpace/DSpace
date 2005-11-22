@@ -323,7 +323,7 @@ CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_i
 CREATE TABLE Community
 (
   community_id      INTEGER PRIMARY KEY,
-  name              VARCHAR(128) UNIQUE,
+  name              VARCHAR(128),
   short_description VARCHAR(512),
   introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
