@@ -1,7 +1,7 @@
 1.4 beta 1
 ==========
 (Robert Tansley)
-- Drop unique community name constraint
+- Drop unique community name constraint.  Also fixes SF bug #1284055.
 
 (Robert Tansley)
 - Scripts for Windows support
