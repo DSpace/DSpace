@@ -64,13 +64,15 @@ DROP VIEW CollectionItemsByTitle;
 DROP VIEW CommunityItemsByAuthor;
 DROP VIEW CollectionItemsByAuthor;
 DROP VIEW Community2Item;
+DROP VIEW DCValue;
 
 -- Then the tables
-DROP TABLE Communities2Item;
 DROP TABLE ItemsByDateAccessioned;
 DROP TABLE ItemsByDate;
 DROP TABLE ItemsByTitle;
 DROP TABLE ItemsByAuthor;
+DROP TABLE Communities2Item;
+DROP TABLE EPersonGroup2WorkspaceItem;
 DROP TABLE HistoryState;
 DROP TABLE History;
 DROP TABLE Subscription;
@@ -86,21 +88,20 @@ DROP TABLE Community2Collection;
 DROP TABLE Community2Community;
 DROP TABLE Collection;
 DROP TABLE Community;
-DROP TABLE DCValue;
-DROP TABLE DCTypeRegistry;
+DROP TABLE MetadataValue;
+DROP TABLE MetadataFieldRegistry;
+DROP TABLE MetadataSchemaRegistry;
 DROP TABLE Bundle2Bitstream;
 DROP TABLE Item2Bundle;
 DROP TABLE Bundle;
 DROP TABLE Item;
+DROP TABLE Group2GroupCache;
+DROP TABLE Group2Group;
 DROP TABLE EPersonGroup;
 DROP TABLE EPerson;
 DROP TABLE Bitstream;
 DROP TABLE FileExtension;
 DROP TABLE BitstreamFormatRegistry;
-DROP TABLE EPersonGroup2WorkspaceItem;
-DROP TABLE MetadataSchemaRegistry;
-DROP TABLE MetadataFieldRegistry;
-DROP TABLE MetadataValue;
 
 -- Now drop the sequences for ID (primary key) creation
 DROP SEQUENCE bitstreamformatregistry_seq;
@@ -138,6 +139,8 @@ DROP SEQUENCE epersongroup2workspaceitem_seq;
 DROP SEQUENCE metadataschemaregistry_seq;
 DROP SEQUENCE metadatafieldregistry_seq;
 DROP SEQUENCE metadatavalue_seq;
+DROP SEQUENCE group2group_seq;
+DROP SEQUENCE group2groupcache_seq;
 
 -- Drop the getnextid() function
 DROP FUNCTION getnextid(VARCHAR(40));
