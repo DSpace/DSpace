@@ -111,8 +111,8 @@ public class UIUtil
                 log.debug("Adding Special Group id="+String.valueOf(groupIDs[i]));
             }
 
-            // Set the session ID
-            c.setExtraLogInfo("session_id=" + request.getSession().getId());
+            // Set the session ID and IP address
+            c.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + request.getRemoteAddr());
 
             // Store the context in the request
             request.setAttribute("dspace.context", c);
