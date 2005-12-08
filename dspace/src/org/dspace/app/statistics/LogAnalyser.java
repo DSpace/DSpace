@@ -1173,11 +1173,11 @@ public class LogAnalyser
         if (type != null)
         {
             typeQuery = "SELECT item_id " +
-                        "FROM dcvalue " +
+                        "FROM metadatavalue " +
                         "WHERE text_value LIKE '%" + type + "%' " +
-                        "AND dc_type_id = (" +
-                        " SELECT dc_type_id " +
-                        " FROM dctyperegistry " +
+                        "AND metadata_field_id = (" +
+                        " SELECT metadata_field_id " +
+                        " FROM metadatafieldregistry " +
                         " WHERE element = 'type' " +
                         " AND qualifier IS NULL) ";
         }
@@ -1185,10 +1185,10 @@ public class LogAnalyser
         // start the date constraint query buffer
         StringBuffer dateQuery = new StringBuffer();
         dateQuery.append("SELECT item_id " +
-                          "FROM dcvalue " +
-                          "WHERE dc_type_id = (" +
-                          " SELECT dc_type_id " +
-                          " FROM dctyperegistry " +
+                          "FROM metadatavalue " +
+                          "WHERE metadata_field_id = (" +
+                          " SELECT metadata_field_id " +
+                          " FROM metadatafieldregistry " +
                           " WHERE element = 'date' " +
                           " AND qualifier = 'accessioned') ");
       
