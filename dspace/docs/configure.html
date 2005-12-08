@@ -324,11 +324,11 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
 
   <p>The metadata in <code>dspace.cfg</code> can be specified in the form <code>&lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*][(date)|(link)], ...</code>. For example, 
      <ul>
-		<li>dc.title refers to unqualifed Dublin Core (DC) 'title' element</li>
-		<li>dc.title.alternative refers to the qualified DC element 'title.alternative'</li>
-		<li>dc.title.* refers to all DC 'title' elements (i.e. any or no qualifier)</li>
-		<li>dc.identifier.url refers to DC 'identifier.uri' and render as a link</li>
-		<li>dc.identifier.url refers to DC 'date.issued' and render as a date</li>
+		<li><code>dc.title</code> refers to unqualifed Dublin Core (DC) 'title' element</li>
+		<li><code>dc.title.alternative</code> refers to the qualified DC element 'title.alternative'</li>
+		<li><code>dc.title.*</code> refers to all DC 'title' elements (i.e. any or no qualifier)</li>
+		<li><code>dc.identifier.uri(link)</code> refers to DC 'identifier.uri' and render as a link</li>
+		<li><code>dc.date.issued(date)</code> refers to DC 'date.issued' and render as a date</li>
 	 </ul>
   </p>
 
