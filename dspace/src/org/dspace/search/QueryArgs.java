@@ -41,6 +41,7 @@ package org.dspace.search;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
@@ -141,36 +142,49 @@ public class QueryArgs
     public String buildQuery(HttpServletRequest request)
     {
         String newquery = "(";
-        String query1 = request.getParameter("query1");
-        String query2 = request.getParameter("query2");
-        String query3 = request.getParameter("query3");
-
-        String field1 = request.getParameter("field1");
-        String field2 = request.getParameter("field2");
-        String field3 = request.getParameter("field3");
-
-        String conjunction1 = request.getParameter("conjunction1");
-        String conjunction2 = request.getParameter("conjunction2");
-
-        if (query1.length() > 0)
-        {
-            newquery = newquery + buildQueryPart(query1, field1);
+        String numFieldStr = request.getParameter("num_search_field");
+        // for backward compatibility
+        if (numFieldStr == null) numFieldStr ="3";
+        int numField = Integer.parseInt(numFieldStr);
+        ArrayList query = new ArrayList();
+        ArrayList field = new ArrayList();
+        ArrayList conjunction = new ArrayList();
+        
+        for (int i = 1; i <= numField; i++)
+        {        	
+        	String tmp_query = request.getParameter("query"+i).trim();
+        	String tmp_field = request.getParameter("field"+i).trim();
+        	if (tmp_query != null && !tmp_query.equals(""))
+        	{
+        		query.add(tmp_query);
+        		if (tmp_field == null)        		        			
+        			field.add("ANY");
+        		else  			
+        			field.add(tmp_field);
+        		if (i != numField)
+            	{
+            		conjunction.add(request.getParameter("conjunction"+i) != null?
+            				request.getParameter("conjunction"+i):"AND");
+            	}
+        	}
         }
-
-        if (query2.length() > 0)
-        {
-            newquery = newquery + " " + conjunction1 + " ";
-            newquery = newquery + buildQueryPart(query2, field2);
+        Iterator iquery = query.iterator();
+        Iterator ifield = field.iterator();
+        Iterator iconj = conjunction.iterator();
+        
+        String conj_curr = "";
+        while (iquery.hasNext())
+        {	newquery = newquery + conj_curr;
+        	String query_curr = (String) iquery.next();
+        	String field_curr = (String) ifield.next();
+        	newquery = newquery + buildQueryPart(query_curr,field_curr);
+        	if (iconj.hasNext())
+        	{
+        		conj_curr = " " + (String)iconj.next() + " ";        	    
+        	}
         }
-
+        
         newquery = newquery + ")";
-
-        if (query3.length() > 0)
-        {
-            newquery = newquery + " " + conjunction2 + " ";
-            newquery = newquery + buildQueryPart(query3, field3);
-        }
-
         return (newquery);
     }
 
@@ -187,7 +201,6 @@ public class QueryArgs
     {
         Perl5Util util = new Perl5Util();
         String newquery = "(";
-        String pattern = "";
 
         if (!myfield.equals("ANY"))
         {
@@ -217,30 +230,29 @@ public class QueryArgs
     public HashMap buildQueryHash(HttpServletRequest request)
     {
         HashMap queryHash = new HashMap();
-        queryHash.put("query1", (request.getParameter("query1") == null) ? ""
-                : request.getParameter("query1"));
-        queryHash.put("query2", (request.getParameter("query2") == null) ? ""
-                : request.getParameter("query2"));
-        queryHash.put("query3", (request.getParameter("query3") == null) ? ""
-                : request.getParameter("query3"));
-
-        queryHash.put("field1",
-                (request.getParameter("field1") == null) ? "ANY" : request
-                        .getParameter("field1"));
-        queryHash.put("field2",
-                (request.getParameter("field2") == null) ? "ANY" : request
-                        .getParameter("field2"));
-        queryHash.put("field3",
-                (request.getParameter("field3") == null) ? "ANY" : request
-                        .getParameter("field3"));
-
-        queryHash.put("conjunction1",
-                (request.getParameter("conjunction1") == null) ? "AND"
-                        : request.getParameter("conjunction1"));
-        queryHash.put("conjunction2",
-                (request.getParameter("conjunction2") == null) ? "AND"
-                        : request.getParameter("conjunction1"));
-
+        String numFieldStr = request.getParameter("num_search_field");
+        // for backward compatibility
+        if (numFieldStr == null) numFieldStr = "3"; 
+        int numField = Integer.parseInt(numFieldStr);
+        for (int i = 1; i < numField; i++)
+        {
+        	queryHash.put("query"+i, (request.getParameter("query"+i) == null) ? ""
+                    : request.getParameter("query"+i));
+        	queryHash.put("field"+i,
+                    (request.getParameter("field"+i) == null) ? "ANY" : request
+                            .getParameter("field"+i));
+            queryHash.put("conjunction1",
+                    (request.getParameter("conjunction"+i) == null) ? "AND"
+                            : request.getParameter("conjunction"+i));            
+        }
+        
+        queryHash.put("query"+numField, (request.getParameter("query"+numField) == null) ? ""
+                : request.getParameter("query"+numField));
+        
+        queryHash.put("field"+numField,
+                (request.getParameter("field"+numField) == null) ? "ANY" 
+                : request.getParameter("field"+numField));
+        
         return (queryHash);
     }
 
@@ -282,6 +294,10 @@ public class QueryArgs
             querystring = querystring + "&" + key + "="
                     + URLEncoder.encode(value, Constants.DEFAULT_ENCODING);
         }
+        if (request.getParameter("num_search_field") != null)
+        {
+        	querystring = querystring + "&num_search_field="+request.getParameter("num_search_field");	
+        }        
 
         // return the result with the leading "&" removed
         return (querystring.substring(1));
