@@ -3,9 +3,9 @@ Libraries used by DSpace:
 activation.jar:      The Java Activation Framework, used by JavaMail (v1.0.2)
 commons-cli.jar:     Jakarta Commons command line processing (v1.0)
 commons-collections.jar: Jakarta Commons collections API (v3.0)
+commons-fileupload.jar: Jakarta Commons file upload package (v1.0)
 commons-dbcp.jar:    Jakarta Commons database connection pool (v1.2.1)
 commons-pool.jar:    Jakarta Commons object pooling API (v1.2)
-cos.jar:             com.oreilly.servlet - multipart HTTP requests. 05Nov2002
 handle.jar:          CNRI Handle Server (version 5.3.3)
 jakarta-poi.jar:     MS file reader, used by text extraction v2.0
 jdom.jar             Java DOM API library (version 1.0)

@@ -1,5 +1,9 @@
 1.4 beta 1
 ==========
+(Scott Yeadon)
+- Now uses Jakarta Commons FileUpload instead of com.oreilly.servlet.
+  Patch SF #1380118.
+
 (Robert Tansley)
 - Drop unique community name constraint.  Also fixes SF bug #1284055.
 

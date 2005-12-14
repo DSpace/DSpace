@@ -44,13 +44,21 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.dspace.core.ConfigurationManager;
 
-import com.oreilly.servlet.MultipartRequest;
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.FileItem;
 
 /**
  * Based on the com.oreilly.servlet.MultipartWrapper object, this is an HTTP
@@ -64,13 +72,16 @@ import com.oreilly.servlet.MultipartRequest;
 public class FileUploadRequest extends HttpServletRequestWrapper
 {
     /** Multipart request */
-    private MultipartRequest mreq = null;
+	private List items = null;
+	private HashMap parameters = new HashMap();
+	private HashMap fileitems = new HashMap();
+	private Vector filenames = new Vector();
+	private String tempDir = null;
 
     /** Original request */
     private HttpServletRequest original = null;
-
     /**
-     * Wraps a multipart request and extracts the files
+     * Parse a multipart request and extracts the files
      * 
      * @param req
      *            the original request
@@ -81,26 +92,55 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
         original = req;
 
-        String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
+        tempDir = ConfigurationManager.getProperty("upload.temp.dir");
         int maxSize = ConfigurationManager.getIntProperty("upload.max");
 
-        mreq = new MultipartRequest(req, tempDir, maxSize, "UTF-8");
+        DiskFileUpload upload = new DiskFileUpload();
+        
+        try
+        {
+        	upload.setRepositoryPath(tempDir);
+        	upload.setSizeMax(maxSize);
+        	items = upload.parseRequest(req);
+        	for (Iterator i = items.iterator(); i.hasNext();)
+        	{
+        		FileItem item = (FileItem)i.next();
+        		if (item.isFormField())
+        		{
+        			parameters.put(item.getFieldName(), item.getString("UTF-8"));
+        		}
+        		else
+        		{
+        			parameters.put(item.getFieldName(), item.getName());
+        			fileitems.put(item.getFieldName(), item);
+        			filenames.add(item.getName());
+
+        			String filename = getFilename(item.getName());
+        			item.write(new File(tempDir + File.separator + filename));
+        		}
+        	}
+        }
+        catch (Exception e)
+        {
+        	throw new IOException(e.getMessage());
+        }
     }
 
     // Methods to replace HSR methods
     public Enumeration getParameterNames()
     {
-        return mreq.getParameterNames();
+    	Collection c = parameters.keySet();
+    	return Collections.enumeration(c);
     }
 
     public String getParameter(String name)
     {
-        return mreq.getParameter(name);
+        return (String)parameters.get(name);
     }
 
     public String[] getParameterValues(String name)
     {
-        return mreq.getParameterValues(name);
+        return (String[])parameters.values().toArray();
     }
 
     public Map getParameterMap()
@@ -111,31 +151,32 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         while (eNum.hasMoreElements())
         {
             String name = (String) eNum.nextElement();
-            map.put(name, mreq.getParameterValues(name));
+            map.put(name, getParameterValues(name));
         }
 
         return map;
     }
 
-    // Methods only in MultipartRequest
-    public Enumeration getFileNames()
-    {
-        return mreq.getFileNames();
-    }
-
     public String getFilesystemName(String name)
     {
-        return mreq.getFilesystemName(name);
+    	String filename = getFilename(((FileItem)fileitems.get(name)).getName());
+    	return tempDir + File.separator + filename;
     }
-
+    
     public String getContentType(String name)
     {
-        return mreq.getContentType(name);
+    	return ((FileItem)fileitems.get(name)).getContentType();
     }
 
     public File getFile(String name)
     {
-        return mreq.getFile(name);
+    	String filename = getFilename(((FileItem)fileitems.get(name)).getName());
+    	return new File(tempDir + File.separator + filename);
+    }
+    
+    public Enumeration getFileNames()
+    {
+        return filenames.elements();
     }
 
     /**
@@ -146,5 +187,19 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     public HttpServletRequest getOriginalRequest()
     {
         return original;
+    }
+    
+    // Required due to the fact the contents of getName() may vary based on browser 
+    private String getFilename(String filepath)
+    {
+    	String filename = filepath;
+    	
+		int index = filepath.lastIndexOf(File.separator);
+		if (index > -1)
+		{
+			filename = filepath.substring(index);
+		}
+		
+		return filename;
     }
 }
