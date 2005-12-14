@@ -3,6 +3,7 @@
 (Andrea Bollini)
 - QueryArgs class can support any number of fields in advanced search.
   (Existing advanced-search.jsp not changed)
+  SF Patch #1363809
 
 (Scott Yeadon)
 - Now uses Jakarta Commons FileUpload instead of com.oreilly.servlet.
