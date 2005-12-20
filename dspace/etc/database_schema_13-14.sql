@@ -126,7 +126,7 @@ INSERT INTO MetadataFieldRegistry
 INSERT INTO MetadataValue (item_id, metadata_field_id, text_value, text_lang, place)
   SELECT item_id, dc_type_id, text_value, text_lang, place FROM dcvalue;
   
-ALTER TABLE dcvalue RENAME TO dcvalue_old;
+DROP TABLE dcvalue;
 CREATE VIEW dcvalue AS
   SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.item_id, 
     MetadataValue.metadata_field_id AS "dc_type_id", MetadataValue.text_value, 
@@ -139,6 +139,7 @@ SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadata
 SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
 SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
 
+DROP TABLE dctyperegistry;
 
 ------------------------------------------------------
 -- Bitstream table -- increase capacity of file size
