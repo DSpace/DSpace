@@ -41,24 +41,21 @@ package org.dspace.app.webui.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-import java.util.Set;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.dspace.core.ConfigurationManager;
-
 import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.FileItem;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * Based on the com.oreilly.servlet.MultipartWrapper object, this is an HTTP
@@ -71,15 +68,21 @@ import org.apache.commons.fileupload.FileItem;
  */
 public class FileUploadRequest extends HttpServletRequestWrapper
 {
+
     /** Multipart request */
-	private List items = null;
-	private HashMap parameters = new HashMap();
-	private HashMap fileitems = new HashMap();
-	private Vector filenames = new Vector();
-	private String tempDir = null;
+    private List items = null;
+
+    private HashMap parameters = new HashMap();
+
+    private HashMap fileitems = new HashMap();
+
+    private Vector filenames = new Vector();
+
+    private String tempDir = null;
 
     /** Original request */
     private HttpServletRequest original = null;
+
     /**
      * Parse a multipart request and extracts the files
      * 
@@ -96,51 +99,58 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         int maxSize = ConfigurationManager.getIntProperty("upload.max");
 
         DiskFileUpload upload = new DiskFileUpload();
-        
+
         try
         {
-        	upload.setRepositoryPath(tempDir);
-        	upload.setSizeMax(maxSize);
-        	items = upload.parseRequest(req);
-        	for (Iterator i = items.iterator(); i.hasNext();)
-        	{
-        		FileItem item = (FileItem)i.next();
-        		if (item.isFormField())
-        		{
-        			parameters.put(item.getFieldName(), item.getString("UTF-8"));
-        		}
-        		else
-        		{
-        			parameters.put(item.getFieldName(), item.getName());
-        			fileitems.put(item.getFieldName(), item);
-        			filenames.add(item.getName());
+            upload.setRepositoryPath(tempDir);
+            upload.setSizeMax(maxSize);
+            items = upload.parseRequest(req);
+            for (Iterator i = items.iterator(); i.hasNext();)
+            {
+                FileItem item = (FileItem) i.next();
+                if (item.isFormField())
+                {
+                    parameters
+                            .put(item.getFieldName(), item.getString("UTF-8"));
+                }
+                else
+                {
+                    parameters.put(item.getFieldName(), item.getName());
+                    fileitems.put(item.getFieldName(), item);
+                    filenames.add(item.getName());
 
-        			String filename = getFilename(item.getName());
-        			item.write(new File(tempDir + File.separator + filename));
-        		}
-        	}
+                    String filename = getFilename(item.getName());
+                    if (filename != null && !"".equals(filename))
+                    {
+                        item.write(new File(tempDir + File.separator
+                                        + filename));
+                    }
+                }
+            }
         }
         catch (Exception e)
         {
-        	throw new IOException(e.getMessage());
+            IOException t = new IOException(e.getMessage());
+            t.initCause(e);
+            throw t;
         }
     }
 
     // Methods to replace HSR methods
     public Enumeration getParameterNames()
     {
-    	Collection c = parameters.keySet();
-    	return Collections.enumeration(c);
+        Collection c = parameters.keySet();
+        return Collections.enumeration(c);
     }
 
     public String getParameter(String name)
     {
-        return (String)parameters.get(name);
+        return (String) parameters.get(name);
     }
 
     public String[] getParameterValues(String name)
     {
-        return (String[])parameters.values().toArray();
+        return (String[]) parameters.values().toArray();
     }
 
     public Map getParameterMap()
@@ -159,21 +169,27 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
     public String getFilesystemName(String name)
     {
-    	String filename = getFilename(((FileItem)fileitems.get(name)).getName());
-    	return tempDir + File.separator + filename;
+        String filename = getFilename(((FileItem) fileitems.get(name))
+                .getName());
+        return tempDir + File.separator + filename;
     }
-    
+
     public String getContentType(String name)
     {
-    	return ((FileItem)fileitems.get(name)).getContentType();
+        return ((FileItem) fileitems.get(name)).getContentType();
     }
 
     public File getFile(String name)
     {
-    	String filename = getFilename(((FileItem)fileitems.get(name)).getName());
-    	return new File(tempDir + File.separator + filename);
+        String filename = getFilename(((FileItem) fileitems.get(name))
+                .getName());
+        if ("".equals(filename.trim()))
+        {
+            return null;
+        }
+        return new File(tempDir + File.separator + filename);
     }
-    
+
     public Enumeration getFileNames()
     {
         return filenames.elements();
@@ -188,18 +204,18 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     {
         return original;
     }
-    
-    // Required due to the fact the contents of getName() may vary based on browser 
+
+    // Required due to the fact the contents of getName() may vary based on
+    // browser
     private String getFilename(String filepath)
     {
-    	String filename = filepath;
-    	
-		int index = filepath.lastIndexOf(File.separator);
-		if (index > -1)
-		{
-			filename = filepath.substring(index);
-		}
-		
-		return filename;
+        String filename = filepath.trim();
+
+        int index = filepath.lastIndexOf(File.separator);
+        if (index > -1)
+        {
+            filename = filepath.substring(index);
+        }
+        return filename;
     }
 }
