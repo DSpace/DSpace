@@ -554,6 +554,11 @@ public class HandleServlet extends DSpaceServlet
             // Redirect to browse authors
             url = request.getContextPath() + prefix + "browse-author";
         }
+        else if (button.equals("submit_subjects"))
+        {
+            // Redirect to browse by date
+            url = request.getContextPath() + prefix + "browse-subject";
+        }
         else if (button.equals("submit_dates"))
         {
             // Redirect to browse by date

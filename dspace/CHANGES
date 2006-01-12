@@ -1,5 +1,8 @@
 1.4 alpha 1
 ===========
+(Aneesh Joy)
+- Browse by subject feature; SF Patch #1193600
+
 (Andrea Bollini)
 - QueryArgs class can support any number of fields in advanced search.
   (Existing advanced-search.jsp not changed)

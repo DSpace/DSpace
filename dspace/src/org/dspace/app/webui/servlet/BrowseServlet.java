@@ -93,6 +93,9 @@ public class BrowseServlet extends DSpaceServlet
     /** Is this servlet for browsing items by date? */
     private boolean browseDates;
 
+    /** Is this servlet for browsing items by subject? */
+    private boolean browseSubjects;
+
     public void init()
     {
         // Sort out what we're browsing - default is titles
@@ -102,7 +105,10 @@ public class BrowseServlet extends DSpaceServlet
                 .equalsIgnoreCase("authors"));
         browseDates = ((browseWhat != null) && browseWhat
                 .equalsIgnoreCase("dates"));
-        browseTitles = (!browseAuthors && !browseDates);
+        browseSubjects = ((browseWhat != null) && browseWhat
+                .equalsIgnoreCase("subjects"));
+
+        browseTitles = ((!browseAuthors && !browseDates)&& !browseSubjects );
     }
 
     protected void doDSGet(Context context, HttpServletRequest request,
@@ -170,7 +176,7 @@ public class BrowseServlet extends DSpaceServlet
             // ----------------------------------------------
             // Browse should start at a specified focus point
             // ----------------------------------------------
-            if (browseAuthors)
+            if (browseAuthors||browseSubjects)
             {
                 // For browsing authors, focus is just a text value
                 scope.setFocus(focus);
@@ -265,7 +271,7 @@ public class BrowseServlet extends DSpaceServlet
                 isTop = true;
             }
 
-            if (browseAuthors)
+            if (browseAuthors || browseSubjects)
             {
                 // Value will be a text value for author browse
                 scope.setFocus(val);
@@ -344,6 +350,10 @@ public class BrowseServlet extends DSpaceServlet
         {
             browseInfo = Browse.getItemsByDate(scope, oldestFirst);
         }
+        else if (browseSubjects)
+        {
+            browseInfo = Browse.getSubjects(scope);
+        }
         else
         {
             browseInfo = Browse.getItemsByTitle(scope);
@@ -355,6 +365,10 @@ public class BrowseServlet extends DSpaceServlet
         if (browseAuthors)
         {
             what = "author";
+        }
+        else if (browseSubjects)
+        {
+            what = "subject";
         }
         else if (browseDates)
         {
@@ -383,7 +397,7 @@ public class BrowseServlet extends DSpaceServlet
                 // entry of the "previous page"
                 String s;
 
-                if (browseAuthors)
+                if (browseAuthors || browseSubjects) //aneesh
                 {
                     s = (browseInfo.getStringResults())[0];
                 }
@@ -421,6 +435,11 @@ public class BrowseServlet extends DSpaceServlet
                     String[] authors = browseInfo.getStringResults();
                     s = authors[authors.length - 1];
                 }
+                else if (browseSubjects)
+                {
+                    String[] subjects = browseInfo.getStringResults();
+                    s = subjects[subjects.length - 1];
+                }
                 else
                 {
                     Item[] items = browseInfo.getItemResults();
@@ -451,6 +470,10 @@ public class BrowseServlet extends DSpaceServlet
             if (browseAuthors)
             {
                 JSPManager.showJSP(request, response, "/browse/authors.jsp");
+            }
+            else if (browseSubjects)
+            {
+                JSPManager.showJSP(request, response, "/browse/subjects.jsp");
             }
             else if (browseDates)
             {

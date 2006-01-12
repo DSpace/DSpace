@@ -108,6 +108,7 @@ CREATE SEQUENCE itemsbyauthor_seq;
 CREATE SEQUENCE itemsbytitle_seq;
 CREATE SEQUENCE itemsbydate_seq;
 CREATE SEQUENCE itemsbydateaccessioned_seq;
+CREATE SEQUENCE itemsbysubject_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
 CREATE SEQUENCE metadataschemaregistry_seq;
 CREATE SEQUENCE metadatafieldregistry_seq;
@@ -702,6 +703,38 @@ CREATE VIEW CommunityItemsByDateAccession as
 SELECT Communities2Item.community_id, ItemsByDateAccessioned.* 
 FROM ItemsByDateAccessioned, Communities2Item
 WHERE ItemsByDateAccessioned.item_id = Communities2Item.item_id
+;
+
+-------------------------------------------------------
+--  ItemsBySubject table
+-------------------------------------------------------
+CREATE TABLE ItemsBySubject
+(
+   items_by_subject_id INTEGER PRIMARY KEY,
+   item_id             INTEGER REFERENCES Item(item_id),
+   subject             TEXT,
+   sort_subject        TEXT
+);
+
+-- index by sort_subject
+CREATE INDEX sort_subject_idx on ItemsBySubject(sort_subject);
+
+-------------------------------------------------------
+--  CollectionItemsBySubject view
+-------------------------------------------------------
+CREATE VIEW CollectionItemsBySubject as
+SELECT Collection2Item.collection_id, ItemsBySubject.* 
+FROM ItemsBySubject, Collection2Item
+WHERE ItemsBySubject.item_id = Collection2Item.item_id
+;
+
+-------------------------------------------------------
+--  CommunityItemsBySubject view
+-------------------------------------------------------
+CREATE VIEW CommunityItemsBySubject as
+SELECT Communities2Item.community_id, ItemsBySubject.* 
+FROM ItemsBySubject, Communities2Item
+WHERE ItemsBySubject.item_id = Communities2Item.item_id
 ;
 
 
