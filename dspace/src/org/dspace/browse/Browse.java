@@ -976,16 +976,19 @@ public class Browse
         // Browses without a focus have no parameters to bind
         if (scope.hasFocus())
         {
-            String value = (subqueryValue != null) ? subqueryValue
-                    : (String) scope.getFocus();
+        	String value = subqueryValue;
+        	if (value == null && scope.getFocus() instanceof String)
+        	{
+        		value = (String)scope.getFocus();
+        	}
 
-            statement.setString(1, value);
+        	statement.setString(1, value);
 
-            // Binds the parameter in the subquery clause
-            if (subqueryValue != null)
-            {
-                statement.setString(2, value);
-            }
+        	// Binds the parameter in the subquery clause
+        	if (subqueryValue != null)
+        	{
+        		statement.setString(2, value);
+        	}
         }
 
         if (log.isDebugEnabled())
