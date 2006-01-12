@@ -160,7 +160,7 @@
                   <select name="location" id="tlocation">
 		    <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
                     <option selected="selected" value="<%= community.getHandle() %>"><%= communityName %></option>
-                    <option selected="selected" value="<%= collection.getHandle() %>/"><%= name %></option>
+                    <option selected="selected" value="<%= collection.getHandle() %>"><%= name %></option>
                   </select>
               </td>
             </tr>
