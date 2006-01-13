@@ -40,10 +40,15 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.servlet.http.HttpServlet;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.xml.DOMConfigurator;
+
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -55,6 +60,9 @@ import org.dspace.core.ConfigurationManager;
  */
 public class LoadDSpaceConfig extends HttpServlet
 {
+	/** log4j logger */
+	private static Logger log = Logger.getLogger(LoadDSpaceConfig.class);
+	
     public void init()
     {
         // Get config parameter
@@ -63,11 +71,33 @@ public class LoadDSpaceConfig extends HttpServlet
         // Load in DSpace config
         ConfigurationManager.loadConfig(config);
 
-        // Load in log4j config
-        String log4jConf = ConfigurationManager.getProperty("dspace.dir")
-                + File.separator + "config" + File.separator
-                + "log4j.properties";
-
-        PropertyConfigurator.configure(log4jConf);
+        // Load the log4j config, if a log4j.xml version exists use that
+        // configuration format over the log4j.properties version
+        String log4jConfProp = ConfigurationManager.getProperty("dspace.dir")
+                         + File.separator + "config" + File.separator
+                         + "log4j.properties";
+        String log4jConfXml = ConfigurationManager.getProperty("dspace.dir")
+                        + File.separator + "config" + File.separator + "log4j.xml";
+        
+        File xmlFile = new File(log4jConfXml);
+        if (xmlFile.exists()) 
+        {
+        	try 
+            {
+        		DOMConfigurator.configure(xmlFile.toURL());
+                log.info("DSpace logging installed using log4j.xml");
+            } 
+            catch (MalformedURLException e) 
+            {
+            	PropertyConfigurator.configure(log4jConfProp);
+                log.error("Logger failed to load log4j.xml, defaulted to "
+                           + "log4j.properties: " + e);
+            }
+        } 
+        else 
+        {
+        	PropertyConfigurator.configure(log4jConfProp);
+            log.info("DSpace logging installed using log4j.properties");
+        }
     }
 }
