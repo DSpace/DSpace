@@ -1,5 +1,18 @@
 1.4 alpha 1
 ===========
+(Martin Hald)
+- Log4J enhancement to use XML configuration
+  SF Patch #1224389
+  
+(Dorothea Salo)
+- Prevent ClassCastException for withdrawn items
+  Fixes SF Bug #1333678
+  SF Patch #1353368
+  
+(Larry Stone)
+- Fix for extraneous '/' browse links
+  SF Patch #1393365
+  
 (Aneesh Joy)
 - Browse by subject feature; SF Patch #1193600
 
