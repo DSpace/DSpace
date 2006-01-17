@@ -173,10 +173,7 @@
             <tr>
               <td align="center" class="standard">
                 <small><fmt:message key="jsp.general.orbrowse"/>&nbsp;</small>
-                <input type="submit" name="submit_titles" value="<fmt:message key="jsp.general.titles.button"/>" />&nbsp;
-                <input type="submit" name="submit_authors" value="<fmt:message key="jsp.general.authors.button"/>" />&nbsp;
-                <input type="submit" name="submit_subjects" value="<fmt:message key="jsp.general.subjects.button"/>" />&nbsp;
-                <input type="submit" name="submit_dates" value="<fmt:message key="jsp.general.date.button"/>" />
+                <input type="submit" name="submit_titles" value="<fmt:message key="jsp.general.titles.button"/>" />&nbsp;<input type="submit" name="submit_authors" value="<fmt:message key="jsp.general.authors.button"/>" />&nbsp;<input type="submit" name="submit_subjects" value="<fmt:message key="jsp.general.subjects.button"/>" />&nbsp;<input type="submit" name="submit_dates" value="<fmt:message key="jsp.general.date.button"/>" />
 	      </td>
             </tr>
           </table>

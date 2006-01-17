@@ -497,13 +497,14 @@ public class Browse
 
         Map table2dc = new HashMap();
         table2dc.put("ItemsByTitle", item.getDC("title", null, Item.ANY));
-        table2dc.put("ItemsByAuthor", item.getDC("creator", null,
+        table2dc.put("ItemsByAuthor", item.getDC("contributor", Item.ANY,
                 Item.ANY));
         table2dc.put("ItemsByDate", item.getDC("date", "issued", Item.ANY));
         table2dc.put("ItemsByDateAccessioned", item.getDC("date",
                 "accessioned", Item.ANY));
-        // TODO: Get from config?  (Richard Jones patch?)
-        table2dc.put("ItemsBySubject", item.getDC("subject", Item.ANY, Item.ANY));
+        // TODO: Get from config? (Richard Jones patch?)
+        table2dc.put("ItemsBySubject", item
+                .getDC("subject", Item.ANY, Item.ANY));
 
         for (Iterator iterator = table2dc.keySet().iterator(); iterator
                 .hasNext();)
@@ -638,46 +639,37 @@ public class Browse
             return cachedInfo;
         }
 
-        int transactionIsolation = setTransactionIsolation(scope);
+        // Run the Browse queries
+        // If the focus is an Item, this returns the value
+        String itemValue = getItemValue(scope);
+        List results = new ArrayList();
+        results.addAll(getResultsBeforeFocus(scope, itemValue));
 
-        try
-        {
-            // Run the Browse queries
-            // If the focus is an Item, this returns the value
-            String itemValue = getItemValue(scope);
-            List results = new ArrayList();
-            results.addAll(getResultsBeforeFocus(scope, itemValue));
+        int beforeFocus = results.size();
+        results.addAll(getResultsAfterFocus(scope, itemValue, beforeFocus));
 
-            int beforeFocus = results.size();
-            results.addAll(getResultsAfterFocus(scope, itemValue, beforeFocus));
+        // Find out the total in the index, and the number of
+        // matches for the query
+        int total = countTotalInIndex(scope, results.size());
+        int matches = countMatches(scope, itemValue, total, results.size());
 
-            // Find out the total in the index, and the number of
-            // matches for the query
-            int total = countTotalInIndex(scope, results.size());
-            int matches = countMatches(scope, itemValue, total, results.size());
-
-            if (log.isDebugEnabled())
+        if (log.isDebugEnabled())
             {
-                log.debug("Number of matches " + matches);
-            }
+            log.debug("Number of matches " + matches);
+        }
 
-            int position = getPosition(total, matches, beforeFocus);
+        int position = getPosition(total, matches, beforeFocus);
 
-            sortResults(scope, results);
+        sortResults(scope, results);
 
             BrowseInfo info = new BrowseInfo(results, position, total,
                     beforeFocus);
 
-            logInfo(info);
+        logInfo(info);
 
-            BrowseCache.add(scope, info);
+        BrowseCache.add(scope, info);
 
-            return info;
-        }
-        finally
-        {
-            restoreTransactionIsolation(scope, transactionIsolation);
-        }
+        return info;
     }
 
     /**
@@ -772,12 +764,8 @@ public class Browse
         // ItemsByAuthor. Since this is an exact match, it
         // does not make sense to return values before the
         // query.
-        if (scope.getBrowseType() == ITEMS_BY_AUTHOR_BROWSE)
-        {
-            return Collections.EMPTY_LIST;
-        }
-	//aneesh
-	if (scope.getBrowseType() == ITEMS_BY_SUBJECT_BROWSE)
+        if (scope.getBrowseType() == ITEMS_BY_AUTHOR_BROWSE
+                || scope.getBrowseType() == ITEMS_BY_SUBJECT_BROWSE)
         {
             return Collections.EMPTY_LIST;
         }
@@ -877,8 +865,8 @@ public class Browse
                 hasWhere = true;
                 buffer.append(" where sort_author = ?");
             }
-	    //aneesh
-	    if (browseType == ITEMS_BY_SUBJECT_BROWSE)
+
+            if (browseType == ITEMS_BY_SUBJECT_BROWSE)
             {
                 hasWhere = true;
                 buffer.append(" where sort_subject = ?");
@@ -899,8 +887,8 @@ public class Browse
             {
                 statement.setString(1, (String) scope.getFocus());
             }
-	    //aneesh
-	    if (browseType == ITEMS_BY_SUBJECT_BROWSE)
+
+            if (browseType == ITEMS_BY_SUBJECT_BROWSE)
             {
                 statement.setString(1, (String) scope.getFocus());
             }
@@ -985,8 +973,8 @@ public class Browse
     private static void sortResults(BrowseScope scope, List results)
     {
         // Currently we only sort ItemsByAuthor, Advisor, Subjects browses
-        if ( (scope.getBrowseType() != ITEMS_BY_AUTHOR_BROWSE ) ||
-			(scope.getBrowseType() != ITEMS_BY_SUBJECT_BROWSE)) //aneesh
+        if ((scope.getBrowseType() != ITEMS_BY_AUTHOR_BROWSE)
+                || (scope.getBrowseType() != ITEMS_BY_SUBJECT_BROWSE))
         {
             return;
         }
@@ -1020,21 +1008,21 @@ public class Browse
         }
 
         List theResults = new ArrayList();
-        boolean hasLimit = !scope.hasNoLimit(); //aneesh
+        boolean hasLimit = !scope.hasNoLimit();
         boolean isAuthorsBrowse = scope.getBrowseType() == AUTHORS_BROWSE;
-	boolean isSubjectsBrowse = scope.getBrowseType() == SUBJECTS_BROWSE;
+        boolean isSubjectsBrowse = scope.getBrowseType() == SUBJECTS_BROWSE;
 
         for (Iterator iterator = results.iterator(); iterator.hasNext();)
         {
             TableRow row = (TableRow) iterator.next();
             Object theValue = null;
 
-			if (isAuthorsBrowse) //aneesh
-					theValue= (Object) row.getStringColumn("author");
-			else if (isSubjectsBrowse)
-				theValue= (Object) row.getStringColumn("subject");
-			else
-				theValue= (Object) new Integer(row.getIntColumn("item_id"));
+			if (isAuthorsBrowse)
+                theValue = (Object) row.getStringColumn("author");
+            else if (isSubjectsBrowse)
+                theValue = (Object) row.getStringColumn("subject");
+            else
+                theValue = (Object) new Integer(row.getIntColumn("item_id"));
 
             // Should not happen
             if (theValue == null)
@@ -1055,7 +1043,7 @@ public class Browse
                 log.debug("Adding result " + theValue);
             }
         }
-	//aneesh
+
         return (isAuthorsBrowse||isSubjectsBrowse)
 				 ? theResults : toItems(scope.getContext(), theResults);
     }
@@ -1252,8 +1240,8 @@ public class Browse
         {
             afterOperator = "=";
         }
-	//aneesh
-	if (browseType == ITEMS_BY_SUBJECT_BROWSE)
+
+        if (browseType == ITEMS_BY_SUBJECT_BROWSE)
         {
             afterOperator = "=";
         }
@@ -1290,12 +1278,8 @@ public class Browse
         String afterSubqueryOperator = ">=";
 
         // For authors, only equality is relevant
-        if (browseType == ITEMS_BY_AUTHOR_BROWSE)
-        {
-            afterSubqueryOperator = "=";
-        }
-	//aneesh
-        if (browseType == ITEMS_BY_SUBJECT_BROWSE)
+        if (browseType == ITEMS_BY_AUTHOR_BROWSE
+                || browseType == ITEMS_BY_SUBJECT_BROWSE)
         {
             afterSubqueryOperator = "=";
         }
@@ -1366,12 +1350,12 @@ public class Browse
     {
         int browseType = scope.getBrowseType();
 
-	if( browseType == AUTHORS_BROWSE )
-        	return "distinct sort_author";
-	else if( browseType == SUBJECTS_BROWSE ) //aneesh
-        	return "distinct sort_subject";
-	else
-		return "*";
+        if (browseType == AUTHORS_BROWSE)
+            return "distinct sort_author";
+        else if (browseType == SUBJECTS_BROWSE)
+            return "distinct sort_subject";
+        else
+            return "*";
     }
 
     /**
@@ -1434,59 +1418,6 @@ public class Browse
         Connection connection = scope.getContext().getDBConnection();
 
         return connection.prepareStatement(sql);
-    }
-
-    /**
-     * Set the JDBC transaction isolation level. Multiple SQL statements can be
-     * made transactionally safe by setting the transaction level appropriately.
-     * Essentially, the database guarantees that the application's view of the
-     * database is isolated from changes by anyone else. In our case, we are
-     * only doing multiple queries, so there are no updating issues.
-     * 
-     * @param scope
-     *            The current Browse scope
-     * @return The transaction isolation level of the database
-     * @exception SQLException
-     *                If a database error occurs
-     */
-    private static int setTransactionIsolation(BrowseScope scope)
-            throws SQLException
-    {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            return 1;
-        }
-
-        // postgres
-        Connection connection = scope.getContext().getDBConnection();
-        int level = connection.getTransactionIsolation();
-        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-
-        return level;
-    }
-
-    /**
-     * Restore the Database's transaction isolation level.
-     * 
-     * @param scope
-     *            The current Browse scope
-     * @param level
-     *            The transaction isolation level to set
-     * @exception SQLException
-     *                If a database error occurs
-     */
-    private static void restoreTransactionIsolation(BrowseScope scope, int level)
-            throws SQLException
-    {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-        }
-        else
-        {
-            // postgres
-            Connection connection = scope.getContext().getDBConnection();
-            connection.setTransactionIsolation(level);
-        }
     }
 
     /**
@@ -2054,8 +1985,7 @@ class BrowseTables
 {
     private static final String[] BROWSE_TABLES = new String[] {
             "Communities2Item", "ItemsByAuthor", "ItemsByDate",
-            "ItemsByDateAccessioned", "ItemsByTitle",
-	    "ItemsBySubject" }; //aneesh3
+            "ItemsByDateAccessioned", "ItemsByTitle", "ItemsBySubject" };
 
     /**
      * Return the browse tables. This only returns true tables, views are
