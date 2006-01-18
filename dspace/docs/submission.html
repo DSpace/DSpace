@@ -165,6 +165,23 @@
     <CODE>&lt;required&gt;You must enter a title.&lt;/required&gt;<BR>
     Note that leaving the</CODE> required element empty will <EM>not</EM> mark a field as required, e.g.:<BR>
     <CODE>&lt;required&gt;&lt;/required&gt;</CODE></DD>
+
+    <DT><STRONG><CODE>visibility</CODE></STRONG></DT>
+
+    <DD>When this optional element is included with a value, it restricts the visibility of the field to the 
+    scope defined by that value. If the element is missing or empty, the field is visible in all scopes.
+    Currently supported scopes are:
+    <ul>
+       <li><strong>workflow</strong>: the field will only be visible in the workflow stages of submission. This
+           is good for hiding difficult fields for users, such as subject classifications, thereby easing the
+           use of the submission system.</li>
+       <li><strong>submit</strong>: the field will only be visible in the initial submission, and not in the
+           workflow stages.</li>
+    </ul>
+    For example:<br/>
+    <CODE>&lt;visibility&gt;workflow&lt;/visibility&gt;</CODE><br/>
+    Note that it is considered a configuration error to limit a field's scope while also requiring it -
+    an exception will be generated when this combination is detected.</DD>
   </DL>
 
   <P>Look at the example <CODE>input-forms.xml</CODE> and experiment with a a trial custom form to learn this specification language thoroughly. It is a very simple way to express the layout of data-entry forms, but the only way to learn all its subtleties is to use it.</P>
