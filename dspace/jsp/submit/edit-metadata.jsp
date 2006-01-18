@@ -776,6 +776,9 @@
     Integer pageNumStr =
         (Integer) request.getAttribute("submission.page");
     int pageNum = pageNumStr.intValue();
+    
+    // for later use, determine whether we are in submit or workflow mode
+    String scope = SubmitServlet.isWorkflow(si) ? "workflow" : "submit";
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
@@ -817,7 +820,12 @@
      DCInput[] inputs = inputSet.getPageRows(pageIdx, si.submission.hasMultipleTitles(),
                                                 si.submission.isPublishedBefore() );
      for (int z = 0; z < inputs.length; z++) 
-     { 
+     {
+       // ignore inputs invisible in this scope
+       if (!inputs[z].isVisible(scope))
+       {
+           continue;
+       }
        String dcElement = inputs[z].getElement();
        String dcQualifier = inputs[z].getQualifier();
        String dcSchema = inputs[z].getSchema();

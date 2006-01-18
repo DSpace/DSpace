@@ -574,6 +574,7 @@ public class DCInputsReader
 
     /**
      * Check that all referenced value-pairs are present
+     * and field is consistent
      *
      * Throws ServletException if detects a missing value-pair.
      */
@@ -593,6 +594,7 @@ public class DCInputsReader
     			for (int j = 0; j < page.size(); j++)
     			{
     				HashMap fld = (HashMap)page.get(j);
+    				// verify reference in certain input types
     				String type = (String)fld.get("input-type");
     				if (type.equals("dropdown") || type.equals("qualdrop_value"))
     				{
@@ -601,6 +603,18 @@ public class DCInputsReader
     					if (v == null)
     					{
     						String errString = "Cannot find value pairs for " + pairsName;
+    						throw new ServletException(errString);
+    					}
+    				}
+    				// if visibility restricted, make sure field is not required
+    				String visibility = (String)fld.get("visibility");
+    				if (visibility != null && visibility.length() > 0 )
+    				{
+    					String required = (String)fld.get("required");
+    					if (required != null && required.length() > 0)
+    					{
+    						String errString = "Field '" + (String)fld.get("label") + 
+   						                   	"' is required but invisible";
     						throw new ServletException(errString);
     					}
     				}
