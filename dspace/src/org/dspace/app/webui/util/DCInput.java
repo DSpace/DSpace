@@ -75,6 +75,8 @@ public class DCInput
 	private String valueListName = null;
 	/** if input list-controlled, the list itself */
 	private List valueList = null;
+	/** if non-null, visibility scope restriction */
+	private String visibility = null;
 	
     /**
      * Class constructor for creating a DCInput object
@@ -106,6 +108,23 @@ public class DCInput
        	hint = (String)fieldMap.get("hint");
        	warning = (String)fieldMap.get("required");
        	required = ( warning != null && warning.length() > 0 );
+       	visibility = (String)fieldMap.get("visibility");
+    }
+    
+    /**
+     * Is this DCInput for display in the given scope?  The scope should
+     * be either "workflow" or "submit", as per the input forms definition.
+     * If the internal visibility is set to "null" then this will always
+     * return true.
+     * 
+     * @param scope String identifying the scope that this input's visibility
+     * 				should be tested for
+     * 
+     * @return whether the input should be displayed or not
+     */
+    public boolean isVisible(String scope)
+    {
+    	return (visibility == null || visibility.equals(scope));
     }
 
     /**
