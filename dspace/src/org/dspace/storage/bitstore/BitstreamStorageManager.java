@@ -326,7 +326,7 @@ public class BitstreamStorageManager
 
 		GeneralFileOutputStream fos = FileFactory.newFileOutputStream(file);
 
-        // Read through a digest input stream that will work out the MD5
+		// Read through a digest input stream that will work out the MD5
         DigestInputStream dis = null;
 
         try

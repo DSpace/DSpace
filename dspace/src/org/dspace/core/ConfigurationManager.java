@@ -50,11 +50,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.xml.DOMConfigurator;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
@@ -82,7 +84,7 @@ import org.apache.log4j.Logger;
 public class ConfigurationManager
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(ConfigurationManager.class);
+    private static Logger log = null;
 
     /** The configuration properties */
     private static Properties properties = null;
@@ -137,25 +139,22 @@ public class ConfigurationManager
             }
             catch (NumberFormatException e)
             {
-                getLog()
-                        .warn(
-                                "Warning: Number format error in property: "
-                                        + property);
+                warn("Warning: Number format error in property: " + property);
             }
         }
 
         return intValue;
     }
 
-    private static Category getLog()
-    {
-        if (!log.getAllAppenders().hasMoreElements())
-        {
-            log = Logger.getLogger(ConfigurationManager.class);
-        }
-
-        return log;
-    }
+    // private static Category getLog()
+    // {
+    // if (!log.getAllAppenders().hasMoreElements())
+    // {
+    // log = Logger.getLogger(ConfigurationManager.class);
+    // }
+    //
+    // return log;
+    // }
 
     /**
      * Get a configuration property as a boolean. True is indicated if the value
@@ -204,7 +203,7 @@ public class ConfigurationManager
     {
         return properties.propertyNames();
     }
-    
+
     /**
      * Get the template for an email message. The message is suitable for
      * inserting values using <code>java.text.MessageFormat</code>.
@@ -290,7 +289,7 @@ public class ConfigurationManager
 
     /**
      * Get the path for the news files.
-     *  
+     * 
      */
     public static String getNewsFilePath()
     {
@@ -324,7 +323,7 @@ public class ConfigurationManager
 
         try
         {
-            //retrieve existing news from file
+            // retrieve existing news from file
             FileInputStream fir = new FileInputStream(fileName);
             InputStreamReader ir = new InputStreamReader(fir, "UTF-8");
             BufferedReader br = new BufferedReader(ir);
@@ -340,7 +339,7 @@ public class ConfigurationManager
         }
         catch (IOException e)
         {
-            getLog().warn("news_read: " + e.getLocalizedMessage());
+            warn("news_read: " + e.getLocalizedMessage());
         }
 
         return text;
@@ -371,18 +370,18 @@ public class ConfigurationManager
 
         try
         {
-            //write the news out to the appropriate file
+            // write the news out to the appropriate file
             FileOutputStream fos = new FileOutputStream(fileName);
             OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
 
-            //            BufferedWriter bw = new BufferedWriter( osr );
+            // BufferedWriter bw = new BufferedWriter( osr );
             PrintWriter out = new PrintWriter(osr);
             out.print(news);
             out.close();
         }
         catch (IOException e)
         {
-            getLog().warn("news_write: " + e.getLocalizedMessage());
+            warn("news_write: " + e.getLocalizedMessage());
         }
 
         return news;
@@ -391,9 +390,9 @@ public class ConfigurationManager
     private static File loadedFile = null;
 
     /**
-     * Return the file that configuration was actually loaded from.
-     * Only returns a valid File after configuration has been loaded.
-     *
+     * Return the file that configuration was actually loaded from. Only returns
+     * a valid File after configuration has been loaded.
+     * 
      * @return File naming configuration data file, or null if not loaded yet.
      */
     public static File getConfigurationFile()
@@ -443,13 +442,13 @@ public class ConfigurationManager
                 // Load configuration from default location
                 is = ConfigurationManager.class
                         .getResourceAsStream("/dspace.cfg");
-                loadedFile = new File(ConfigurationManager.class
-                        .getResource("/dspace.cfg").getPath());
+                loadedFile = new File(ConfigurationManager.class.getResource(
+                        "/dspace.cfg").getPath());
             }
 
             if (is == null)
             {
-                getLog().fatal("Cannot find dspace.cfg");
+                fatal("Cannot find dspace.cfg");
                 System.exit(1);
             }
             else
@@ -472,10 +471,47 @@ public class ConfigurationManager
             }
 
             is.close();
+
+            // Load in log4j config
+            // Load the log4j config, if a log4j.xml version exists use that
+            // configuration format over the log4j.properties version
+            String log4jConfProp = ConfigurationManager
+                    .getProperty("dspace.dir")
+                    + File.separator
+                    + "config"
+                    + File.separator
+                    + "log4j.properties";
+            String log4jConfXml = ConfigurationManager
+                    .getProperty("dspace.dir")
+                    + File.separator + "config" + File.separator + "log4j.xml";
+
+            File xmlFile = new File(log4jConfXml);
+            if (xmlFile.exists())
+            {
+                try
+                {
+                    DOMConfigurator.configure(xmlFile.toURL());
+                    initLog();
+                    info("DSpace logging installed using log4j.xml");
+                }
+                catch (MalformedURLException e)
+                {
+                    PropertyConfigurator.configure(log4jConfProp);
+                    initLog();
+                    error("Logger failed to load log4j.xml, defaulted to "
+                            + "log4j.properties: " + e);
+                }
+            }
+            else
+            {
+                PropertyConfigurator.configure(log4jConfProp);
+                initLog();
+                info("DSpace logging installed using log4j.properties");
+            }
         }
         catch (IOException e)
         {
-            getLog().fatal("Can't load configuration", e);
+            fatal("Can't load configuration", e);
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
@@ -538,17 +574,15 @@ public class ConfigurationManager
         if (destination == null)
         {
             // If no destination is specified
-            getLog().info(
-                    "Not processing config file template " + template
-                            + " because no destination specified (no property "
-                            + "config.template." + template + ")");
+            info("Not processing config file template " + template
+                    + " because no destination specified (no property "
+                    + "config.template." + template + ")");
 
             return;
         }
 
-        getLog().info(
-                "Installing configuration file template " + template + " to "
-                        + destination);
+        info("Installing configuration file template " + template + " to "
+                + destination);
 
         // Open the template
         BufferedReader in = new BufferedReader(new FileReader(
@@ -590,15 +624,10 @@ public class ConfigurationManager
 
                         if (propValue == null)
                         {
-                            getLog()
-                                    .warn(
-                                            template
-                                                    + " line "
-                                                    + lineNumber
-                                                    + ": Property "
-                                                    + propName
-                                                    + " not defined in DSpace configuration - "
-                                                    + "using empty string");
+                            warn(template + " line " + lineNumber
+                                    + ": Property " + propName
+                                    + " not defined in DSpace configuration - "
+                                    + "using empty string");
 
                             propValue = "";
                         }
@@ -610,9 +639,8 @@ public class ConfigurationManager
                     else
                     {
                         // There's a "@@" with no second one... just leave as-is
-                        getLog().warn(
-                                template + " line " + lineNumber
-                                        + ": Single @@ - leaving as-is");
+                        warn(template + " line " + lineNumber
+                                + ": Single @@ - leaving as-is");
                         moreValues = false;
                     }
                 }
@@ -651,13 +679,13 @@ public class ConfigurationManager
         {
             try
             {
-                getLog().info("Installing configuration files for other tools");
+                info("Installing configuration files for other tools");
                 installConfigurations();
                 System.exit(0);
             }
             catch (IOException ie)
             {
-                getLog().warn("Error installing configuration files", ie);
+                warn("Error installing configuration files", ie);
             }
         }
         else if ((argv.length == 2) && argv[0].equals("-property"))
@@ -683,4 +711,84 @@ public class ConfigurationManager
 
         System.exit(1);
     }
+
+    private static void info(String string)
+    {
+        if (log == null)
+        {
+            System.out.println("INFO: " + string);
+        }
+        else
+        {
+            log.info(string);
+        }
+    }
+
+    private static void warn(String string, Exception e)
+    {
+        if (log == null)
+        {
+            System.out.println("WARN: " + string);
+            e.printStackTrace();
+        }
+        else
+        {
+            log.warn(string, e);
+        }
+    }
+
+    private static void warn(String string)
+    {
+        if (log == null)
+        {
+            System.out.println("WARN: " + string);
+        }
+        else
+        {
+            log.warn(string);
+        }
+    }
+
+    private static void error(String string)
+    {
+        if (log == null)
+        {
+            System.err.println("ERROR: " + string);
+        }
+        else
+        {
+            log.error(string);
+        }
+    }
+
+    private static void fatal(String string, Exception e)
+    {
+        if (log == null)
+        {
+            System.out.println("FATAL: " + string);
+            e.printStackTrace();
+        }
+        else
+        {
+            log.fatal(string, e);
+        }
+    }
+
+    private static void fatal(String string)
+    {
+        if (log == null)
+        {
+            System.out.println("FATAL: " + string);
+        }
+        else
+        {
+            log.fatal(string);
+        }
+    }
+
+    private static void initLog()
+    {
+        log = Logger.getLogger(ConfigurationManager.class);
+    }
+
 }
