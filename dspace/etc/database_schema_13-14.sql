@@ -149,6 +149,179 @@ ALTER TABLE bitstream ADD COLUMN size_bytes BIGINT;
 UPDATE bitstream SET size_bytes = size;
 ALTER TABLE bitstream DROP COLUMN size;
 
+-------------------------------------------------------
+-- Create the checksum checker tables
+-------------------------------------------------------
+-- list of the possible results as determined
+-- by the system or an administrator
+
+CREATE TABLE checksum_results
+(
+    result_code VARCHAR PRIMARY KEY,
+    result_description VARCHAR
+);
+
+
+-- This table has a one-to-one relationship
+-- with the bitstream table. A row will be inserted
+-- every time a row is inserted into the bitstream table, and
+-- that row will be updated every time the checksum is
+-- re-calculated.
+
+CREATE TABLE most_recent_checksum 
+(
+    bitstream_id INTEGER PRIMARY KEY REFERENCES bitstream(bitstream_id),
+    to_be_processed BOOLEAN NOT NULL,
+    last_checksum VARCHAR NOT NULL,
+    current_checksum VARCHAR NOT NULL,
+    last_process_start_date TIMESTAMP NOT NULL,
+    last_process_end_date TIMESTAMP NOT NULL,
+    checksum_algorithm VARCHAR NOT NULL,
+    matched_prev_checksum BOOLEAN NOT NULL,
+    result VARCHAR REFERENCES checksum_results(result_code)
+);
+
+
+-- A row will be inserted into this table every
+-- time a checksum is re-calculated.
+
+CREATE TABLE checksum_history 
+(
+    check_id BIGSERIAL PRIMARY KEY,  
+    bitstream_id INTEGER,
+    process_start_date TIMESTAMP,
+    process_end_date TIMESTAMP,
+    checksum_expected VARCHAR,
+    checksum_calculated VARCHAR,
+    result VARCHAR REFERENCES checksum_results(result_code)
+);
+
+-- this will insert into the result code
+-- the initial results 
+
+insert into checksum_results
+values
+( 
+    'INVALID_HISTORY',
+    'Install of the cheksum checking code do not consider this history as valid' 
+);
+
+insert into checksum_results
+values
+( 
+    'BITSTREAM_NOT_FOUND',
+    'The bitstream could not be found' 
+);
+
+insert into checksum_results
+values
+( 
+    'CHECKSUM_MATCH',
+    'Current checksum matched previous checksum' 
+);
+
+insert into checksum_results
+values
+(
+    'CHECKSUM_NO_MATCH',
+    'Current checksum does not match previous checksum' 
+);
+
+insert into checksum_results
+values
+( 
+    'CHECKSUM_PREV_NOT_FOUND',
+    'Previous checksum was not found: no comparison possible' 
+);
+
+insert into checksum_results
+values
+( 
+    'BITSTREAM_INFO_NOT_FOUND',
+    'Bitstream info not found' 
+);
+
+insert into checksum_results
+values
+( 
+    'CHECKSUM_ALGORITHM_INVALID',
+    'Invalid checksum algorithm' 
+);
+insert into checksum_results
+values
+( 
+    'BITSTREAM_NOT_PROCESSED',
+    'Bitstream marked to_be_processed=false' 
+);
+insert into checksum_results
+values
+( 
+    'BITSTREAM_MARKED_DELETED',
+    'Bitstream marked deleted in bitstream table' 
+);
+
+-- this will insert into the most recent checksum
+-- on install all existing bitstreams
+-- setting all bitstreams already set as 
+-- deleted to not be processed
+
+insert into most_recent_checksum 
+(
+    bitstream_id,  
+    to_be_processed,
+    expected_checksum,
+    current_checksum,
+    last_process_start_date,
+    last_process_end_date,
+    checksum_algorithm,
+    matched_prev_checksum
+)
+select 
+    bitstream.bitstream_id, 
+    true, 
+    CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, 
+    CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, 
+    date_trunc('milliseconds', now()),
+    date_trunc('milliseconds', now()),
+    CASE WHEN bitstream.checksum_algorithm IS NULL THEN 'MD5' ELSE bitstream.checksum_algorithm END,
+    true
+from bitstream; 
+
+-- Update all the deleted checksums
+-- to not be checked
+-- because they have since been
+-- deleted from the system
+
+update most_recent_checksum
+set to_be_processed = false
+where most_recent_checksum.bitstream_id in (
+select bitstream_id
+from bitstream where deleted = true );
+
+-- this will insert into history table
+-- for the initial start 
+-- we want to tell the users to disregard the initial
+-- inserts into the checksum history table
+
+insert into checksum_history
+(
+    bitstream_id,
+    process_start_date,
+    process_end_date,
+    checksum_expected,
+    checksum_calculated
+)
+select most_recent_checksum.bitstream_id,
+     most_recent_checksum.last_process_end_date,
+     date_trunc('milliseconds', now()),
+      most_recent_checksum.last_checksum,
+      most_recent_checksum.last_checksum;
+
+-- update the history to indicate that this was 
+-- the first time the software was installed
+update checksum_history 
+set result = 'INVALID_HISTORY';  
+
 ------------------------------------------------------
 -- Drop unique community name constraint
 -- 

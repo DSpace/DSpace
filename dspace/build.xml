@@ -181,7 +181,14 @@ Common usage:
   <target name="update"
           depends="install_code,build_wars"
           description="Update installed code (without clobbering data/config)">
+    <copy todir="${dspace.dir}/config" preservelastmodified="true">
+      <fileset dir="config/language-packs"/>
+    </copy>    
+          
     <echo>
+====================================================================
+Copied language packs into ${dspace.dir}/config    
+    
 ====================================================================
  Updated Web application (.war) files are in the 'build' directory.
 
@@ -241,9 +248,12 @@ Common usage:
   <target name="init_configs">
     <copy todir="${dspace.dir}/config" preservelastmodified="true">
       <fileset dir="config">
-    	<exclude name="language-packs/**" />
+    	<exclude name="language-packs/**"/>
       </fileset>
     </copy>
+    <copy todir="${dspace.dir}/config" preservelastmodified="true">
+      <fileset dir="config/language-packs"/>
+    </copy>    
     <copy file="etc/log4j.build.properties"
           tofile="${dspace.dir}/config/log4j.properties"
           preservelastmodified="true"/>

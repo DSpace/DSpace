@@ -218,14 +218,19 @@ alert.recipient (not essential but very useful!)</PRE>
     <PRE># Send out subscription e-mails at 01:00 every day
 0 1 * * * <i>[dspace]</i>/bin/sub-daily
 # Run the media filter at 02:00 every day
-0 2 * * * <i>[dspace]</i>/bin/filter-media</PRE>
+0 2 * * * <i>[dspace]</i>/bin/filter-media
+# Run the checksum checker at 03:00
+0 3 * * * <i>[dspace]</i>/bin/checker -lp
+# Mail the results to the sysadmin at 04:00
+0 4 * * * <i>[dspace]</i>/bin/dsrun org.dspace.app.checker.DailyReportEmailer -c
+</PRE>
 
     <P>Naturally you should change the frequencies to suit your environment.</P>
 
     <P>PostgreSQL also benefits from regular 'vacuuming', which optimizes the indices and clears out any deleted data.  Become the <code>postgres</code> UNIX user, run <code>crontab -e</code> and add (for example):
 
-    <pre># Clean up the database nightly at 2.40am
-40 2 * * * vacuumdb --analyze dspace > /dev/null 2>&1</pre>
+    <pre># Clean up the database nightly at 4.20am
+20 4 * * * vacuumdb --analyze dspace > /dev/null 2>&1</pre>
 
     <p>In order that statistical reports are generated regularly and thus kept up to date you should set up the following cron jobs:</p>
 

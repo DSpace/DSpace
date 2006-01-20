@@ -48,7 +48,10 @@ import java.math.BigInteger;
 import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility functions for DSpace.
@@ -58,6 +61,21 @@ import java.util.Random;
  */
 public class Utils
 {
+    private static final Pattern DURATION_PATTERN = Pattern
+            .compile("(\\d+)([smhdwy])");
+
+    private static final long MS_IN_SECOND = 1000L;
+
+    private static final long MS_IN_MINUTE = 60000L;
+
+    private static final long MS_IN_HOUR = 3600000L;
+
+    private static final long MS_IN_DAY = 86400000L;
+
+    private static final long MS_IN_WEEK = 604800000L;
+
+    private static final long MS_IN_YEAR = 31536000000L;
+
     private static int counter = 0;
 
     private static Random random = new Random();
@@ -216,8 +234,8 @@ public class Utils
             output.write(buffer, 0, count);
         }
 
-        //needed to flush cache
-        //output.flush();
+        // needed to flush cache
+        // output.flush();
     }
 
     /**
@@ -263,10 +281,70 @@ public class Utils
 
         // actually, &apos; is an XML entity, not in HTML.
         // that's why it's commented out.
-        //value = value.replaceAll("'", "&apos;");
+        // value = value.replaceAll("'", "&apos;");
         value = value.replaceAll("<", "&lt;");
         value = value.replaceAll(">", "&gt;");
 
         return value;
+    }
+
+    /**
+     * Utility method to parse durations defined as \d+[smhdwy] (seconds,
+     * minutes, hours, days, weeks, years)
+     * 
+     * @param duration
+     *            specified duration
+     * 
+     * @return number of milliseconds equivalent to duration.
+     * 
+     * @throws ParseException
+     *             if the duration is of incorrect format
+     */
+    public static long parseDuration(String duration) throws ParseException
+    {
+        Matcher m = DURATION_PATTERN.matcher(duration.trim());
+        if (!m.matches())
+        {
+            throw new ParseException("'" + duration
+                    + "' is not a valid duration definition", 0);
+        }
+
+        String units = m.group(2);
+        long multiplier = MS_IN_SECOND;
+
+        if ("s".equals(units))
+        {
+            multiplier = MS_IN_SECOND;
+        }
+        else if ("m".equals(units))
+        {
+            multiplier = MS_IN_MINUTE;
+        }
+        else if ("h".equals(units))
+        {
+            multiplier = MS_IN_HOUR;
+        }
+        else if ("d".equals(units))
+        {
+            multiplier = MS_IN_DAY;
+        }
+        else if ("w".equals(units))
+        {
+            multiplier = MS_IN_WEEK;
+        }
+        else if ("y".equals(units))
+        {
+            multiplier = MS_IN_YEAR;
+        }
+        else
+        {
+            throw new ParseException(units
+                    + " is not a valid time unit (must be 'y', "
+                    + "'w', 'd', 'h', 'm' or 's')", duration.indexOf(units));
+        }
+
+        long qint = Long.parseLong(m.group(1));
+
+        return qint * multiplier;
     }
 }

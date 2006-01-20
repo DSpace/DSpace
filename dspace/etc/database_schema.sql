@@ -745,3 +745,120 @@ WHERE ItemsBySubject.item_id = Communities2Item.item_id
 -- We don't use getnextid() for 'anonymous' since the sequences start at '1'
 INSERT INTO epersongroup VALUES(0, 'Anonymous');
 INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator');
+
+
+-------------------------------------------------------
+-- Create the checksum checker tables
+-------------------------------------------------------
+-- list of the possible results as determined
+-- by the system or an administrator
+
+CREATE TABLE checksum_results
+(
+    result_code VARCHAR PRIMARY KEY,
+    result_description VARCHAR
+);
+
+
+-- This table has a one-to-one relationship
+-- with the bitstream table. A row will be inserted
+-- every time a row is inserted into the bitstream table, and
+-- that row will be updated every time the checksum is
+-- re-calculated.
+
+CREATE TABLE most_recent_checksum 
+(
+    bitstream_id INTEGER PRIMARY KEY REFERENCES bitstream(bitstream_id),
+    to_be_processed BOOLEAN NOT NULL,
+    expected_checksum VARCHAR NOT NULL,
+    current_checksum VARCHAR NOT NULL,
+    last_process_start_date TIMESTAMP NOT NULL,
+    last_process_end_date TIMESTAMP NOT NULL,
+    checksum_algorithm VARCHAR NOT NULL,
+    matched_prev_checksum BOOLEAN NOT NULL,
+    result VARCHAR REFERENCES checksum_results(result_code)
+);
+
+-- A row will be inserted into this table every
+-- time a checksum is re-calculated.
+
+CREATE TABLE checksum_history 
+(
+    check_id BIGSERIAL PRIMARY KEY,  
+    bitstream_id INTEGER,
+    process_start_date TIMESTAMP,
+    process_end_date TIMESTAMP,
+    checksum_expected VARCHAR,
+    checksum_calculated VARCHAR,
+    result VARCHAR REFERENCES checksum_results(result_code)
+);
+
+
+-- this will insert into the result code
+-- the initial results that should be 
+-- possible
+
+insert into checksum_results
+values
+( 
+    'INVALID_HISTORY',
+    'Install of the cheksum checking code do not consider this history as valid' 
+);
+
+insert into checksum_results
+values
+( 
+    'BITSTREAM_NOT_FOUND',
+    'The bitstream could not be found' 
+);
+
+insert into checksum_results
+values
+( 
+    'CHECKSUM_MATCH',
+    'Current checksum matched previous checksum' 
+);
+
+insert into checksum_results
+values
+(
+    'CHECKSUM_NO_MATCH',
+    'Current checksum does not match previous checksum' 
+);
+
+insert into checksum_results
+values
+( 
+    'CHECKSUM_PREV_NOT_FOUND',
+    'Previous checksum was not found: no comparison possible' 
+);
+
+insert into checksum_results
+values
+( 
+    'BITSTREAM_INFO_NOT_FOUND',
+    'Bitstream info not found' 
+);
+
+insert into checksum_results
+values
+( 
+    'CHECKSUM_ALGORITHM_INVALID',
+    'Invalid checksum algorithm' 
+);
+insert into checksum_results
+values
+( 
+    'BITSTREAM_NOT_PROCESSED',
+    'Bitstream marked to_be_processed=false' 
+);
+insert into checksum_results
+values
+( 
+    'BITSTREAM_MARKED_DELETED',
+    'Bitstream marked deleted in bitstream table' 
+);
+
+
+
+

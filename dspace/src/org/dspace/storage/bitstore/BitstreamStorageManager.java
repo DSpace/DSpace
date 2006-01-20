@@ -51,6 +51,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.checker.BitstreamInfoDAO;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -83,8 +84,14 @@ import edu.sdsc.grid.io.srb.SRBFileSystem;
  * Mods by David Little, UCSD Libraries 12/21/04 to allow the registration of
  * files (bitstreams) into DSpace.
  * </P>
+ * 
+ * <p>Cleanup integration with checker package by Nate Sarr 2006-01. N.B. The 
+ * dependency on the checker package isn't ideal - a Listener pattern would be 
+ * better but was considered overkill for the purposes of integrating the checker.
+ * It would be worth re-considering a Listener pattern if another package needs to 
+ * be notified of BitstreamStorageManager actions.</p> 
  *
- * @author Peter Breton, Robert Tansley
+ * @author Peter Breton, Robert Tansley, David Little, Nathan Sarr
  * @version $Revision$
  */
 public class BitstreamStorageManager
@@ -578,14 +585,17 @@ public class BitstreamStorageManager
      * which are more than 1 hour old and marked deleted. The deletions cannot
      * be undone.
      * 
+     * @param deleteDbRecords if true deletes the database records otherwise it
+     * 	           only deletes the files and directories in the assetstore  
      * @exception IOException
      *                If a problem occurs while cleaning up
      * @exception SQLException
      *                If a problem occurs accessing the RDBMS
      */
-    public static void cleanup() throws SQLException, IOException
+    public static void cleanup(boolean deleteDbRecords) throws SQLException, IOException
     {
         Context context = null;
+        BitstreamInfoDAO bitstreamInfoDAO = new BitstreamInfoDAO();
 
         try
         {
@@ -606,8 +616,13 @@ public class BitstreamStorageManager
                 // Make sure entries which do not exist are removed
                 if (file == null)
                 {
-                    DatabaseManager.delete(context, "Bitstream", bid);
-
+                    log.debug("file is null");
+                    if (deleteDbRecords)
+                    {
+                        log.debug("deleting record");
+                        bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
+                        DatabaseManager.delete(context, "Bitstream", bid);
+                    }
                     continue;
                 }
 
@@ -615,10 +630,16 @@ public class BitstreamStorageManager
                 // being stored -- get it next time.
                 if (isRecent(file))
                 {
+                	log.debug("file is recent");
                     continue;
                 }
 
-                DatabaseManager.delete(context, "Bitstream", bid);
+                if (deleteDbRecords)
+                {
+                    log.debug("deleting db record");
+                    bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
+                    DatabaseManager.delete(context, "Bitstream", bid);
+                }
 
 				if (isRegisteredBitstream(row.getStringColumn("internal_id"))) {
 				    continue;			// do not delete registered bitstreams
@@ -633,7 +654,17 @@ public class BitstreamStorageManager
                             + success);
                 }
 
-                deleteParents(file);
+                // if the file was deleted then
+                // try deleting the parents
+                // Otherwise the cleanup script is set to 
+                // leave the db records then the file
+                // and directories have already been deleted
+                // if this is turned off then it still looks like the
+                // file exists
+                if( success )
+                {
+                    deleteParents(file);
+                }
             }
 
             context.complete();
@@ -686,11 +717,11 @@ public class BitstreamStorageManager
      */
     private synchronized static void deleteParents(GeneralFile file)
     {
-        if (file == null)
+        if (file == null )
         {
             return;
         }
-
+ 
 		GeneralFile tmp = file;
 
         for (int i = 0; i < directoryLevels; i++)
