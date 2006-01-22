@@ -19,17 +19,17 @@ public class I18N {
 	 * @param stack
 	 * @return classname 
 	 */
-	private static String callerClassName(StackTraceElement[] stack) {
-		for (int i = 0; i < stack.length; i++) {
-			String currentClass = stack[i].getClassName();
-			if (currentClass.indexOf("java.") == 0)
-				continue;
-			if (I18N.class.getName().equals(currentClass))
-				continue;
-			return currentClass;
-		}
-		return "";
-	}
+//	private static String callerClassName(StackTraceElement[] stack) {
+//		for (int i = 0; i < stack.length; i++) {
+//			String currentClass = stack[i].getClassName();
+//			if (currentClass.indexOf("java.") == 0)
+//				continue;
+//			if (I18N.class.getName().equals(currentClass))
+//				continue;
+//			return currentClass;
+//		}
+//		return "";
+//	}
 
 	/**
 	 * Super convenience method that works out the calling class by examining
@@ -42,9 +42,9 @@ public class I18N {
 	 *            class name
 	 * @return message for the JVM default Locale
 	 */
-	public static String message(String msg) {
-		return DEFAULT.getMessage(msg);
-	}
+//	public static String message(String msg) {
+//		return DEFAULT.getMessage(msg);
+//	}
 
 	/**
 	 * Convenience method to get localized messages in code
@@ -120,10 +120,10 @@ public class I18N {
 	 *            class name
 	 * @return message 
 	 */
-	public String getMessage(String msg) {
-		return getMessage(msg, callerClassName(Thread.currentThread()
-				.getStackTrace()));
-	}
+//	public String getMessage(String msg) {
+//		return getMessage(msg, callerClassName(Thread.currentThread()
+//				.getStackTrace()));
+//	}
 
 	/**
 	 * Convenience method to get localized messages in code
@@ -174,9 +174,9 @@ public class I18N {
 	 *            fully qualified class name.
 	 * @return Localized message
 	 */
-	public String getMessage(String msg, String classname) {
-		return messages.getString(new StringBuilder(50).append(classname)
-				.append(".").append(msg).toString());
-	}
+//	public String getMessage(String msg, String classname) {
+//		return messages.getString(new StringBuilder(50).append(classname)
+//				.append(".").append(msg).toString());
+//	}
 
 }

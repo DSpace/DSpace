@@ -42,7 +42,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.I18N;
-import org.dspace.core.PluginManager;
 
 /**
  * 
@@ -318,7 +317,7 @@ public class SimpleReporterImpl implements SimpleReporter
         while (iter.hasNext())
         {
             ChecksumHistory historyInfo = (ChecksumHistory) iter.next();
-            StringBuilder buf = new StringBuilder(1000);
+            StringBuffer buf = new StringBuffer(1000);
             buf.append("------------------------------------------------ \n");
             buf.append(msg("bitstream-id")).append(" = ").append(
                     historyInfo.getBitstreamId()).append("\n");
@@ -358,7 +357,7 @@ public class SimpleReporterImpl implements SimpleReporter
         while (iter.hasNext())
         {
             DSpaceBitstreamInfo info = (DSpaceBitstreamInfo) iter.next();
-            StringBuilder buf = new StringBuilder(1000);
+            StringBuffer buf = new StringBuffer(1000);
             buf.append("------------------------------------------------ \n");
             buf.append(msg("format-id")).append(" =  ").append(
                     info.getBitstreamFormatId()).append("\n");
