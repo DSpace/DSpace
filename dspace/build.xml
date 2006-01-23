@@ -418,6 +418,7 @@ Copied language packs into ${dspace.dir}/config
       <package name="org.dspace.administer"/>
       <package name="org.dspace.authorize"/>
       <package name="org.dspace.browse"/>
+      <package name="org.dspace.checker"/>
       <package name="org.dspace.content"/>
       <package name="org.dspace.core"/>
       <package name="org.dspace.eperson"/>
