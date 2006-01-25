@@ -79,6 +79,7 @@ import org.apache.log4j.xml.DOMConfigurator;
  * details.
  * 
  * @author Robert Tansley
+ * @author Larry Stone - Interpolated values.
  * @version $Revision$
  */
 public class ConfigurationManager
@@ -91,6 +92,10 @@ public class ConfigurationManager
 
     /** The default license */
     private static String license;
+
+    // limit of recursive depth of property variable interpolation in
+    // configuration; anything greater than this is very likely to be a loop.
+    private final static int RECURSION_LIMIT = 9;
 
     /**
      * Get a configuration property
@@ -145,16 +150,6 @@ public class ConfigurationManager
 
         return intValue;
     }
-
-    // private static Category getLog()
-    // {
-    // if (!log.getAllAppenders().hasMoreElements())
-    // {
-    // log = Logger.getLogger(ConfigurationManager.class);
-    // }
-    //
-    // return log;
-    // }
 
     /**
      * Get a configuration property as a boolean. True is indicated if the value
@@ -455,6 +450,15 @@ public class ConfigurationManager
             {
                 properties = new Properties();
                 properties.load(is);
+
+                // walk values, interpolating any embedded references.
+                for (Enumeration pe = properties.propertyNames(); pe.hasMoreElements(); )
+                {
+                    String key = (String)pe.nextElement();
+                    String value = interpolate(key, 1);
+                    if (value != null)
+                        properties.setProperty(key, value);
+                }
             }
 
             // Load in default license
@@ -517,6 +521,58 @@ public class ConfigurationManager
             // configuration we can't do anything
             System.exit(1);
         }
+    }
+
+    /**
+     * Recursively interpolate variable references in value of
+     * property named "key".
+     * @return new value if it contains interpolations, or null
+     *   if it had no variable references.
+     */
+    private static String interpolate(String key, int level)
+    {
+        if (level > RECURSION_LIMIT)
+            throw new IllegalArgumentException("ConfigurationManager: Too many levels of recursion in configuration property variable interpolation, property="+key);
+        String value = (String)properties.get(key);
+        int from = 0;
+        StringBuffer result = null;
+        while (from < value.length())
+        {
+            int start = value.indexOf("${", from);
+            if (start >= 0)
+            {
+                int end = value.indexOf("}", start);
+                if (end < 0)
+                    break;
+                String var = value.substring(start+2, end);
+                if (result == null)
+                    result = new StringBuffer(value.substring(from, start));
+                else
+                    result.append(value.substring(from, start));
+                if (properties.containsKey(var))
+                {
+                    String ivalue = interpolate(var, level+1);
+                    if (ivalue != null)
+                    {
+                        result.append(ivalue);
+                        properties.setProperty(var, ivalue);
+                    }
+                    else
+                        result.append((String)properties.getProperty(var));
+                }
+                else
+                {
+                    log.warn("Interpolation failed in value of property \""+key+
+                             "\", there is no property named \""+var+"\"");
+                }
+                from = end+1;
+            }
+            else
+                break;
+        }
+        if (result != null && from < value.length())
+            result.append(value.substring(from));
+        return (result == null) ? null : result.toString();
     }
 
     /**

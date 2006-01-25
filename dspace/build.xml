@@ -79,6 +79,20 @@ Common usage:
        (and without typing -D each time s/he compiles it) -->
   <property file="${user.home}/.dspace.properties" />
 
+  <!-- First, set the dspace.dir property so it can be
+       interpolated when loading the config file.
+       This crudely mimics the way ConfigurationManager interpolates properties.
+       Note that it ONLY works for directories that interpolate ${dspace.dir}
+       but that _should_ cover all cases used in this build configuration.
+    -->
+  <loadproperties srcFile="${config}">
+    <filterchain>
+      <linecontainsregexp>
+         <regexp pattern="^\s*dspace\.dir\s+"/>
+      </linecontainsregexp>
+    </filterchain>
+  </loadproperties>
+
   <!-- Load the configuration -->
   <property file="${config}" />
 

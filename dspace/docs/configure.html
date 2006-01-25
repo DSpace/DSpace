@@ -165,6 +165,15 @@ property.name = property value
     </tbody>
   </table>
 
+  <p>Property values can include other, previously defined values, by enclosing the property name in ${...}. For example, if your dspace.cfg contains: -</p>
+  
+  <pre>
+  dspace.dir = /dspace
+  dspace.history = ${dspace.dir}/history
+  </pre>
+  
+  <p>Then the value of the <code>dspace.history</code> property is expanded to be <code>/dspace/history</code>. This method is especially useful for handling commonly used file paths.</p>
+
   <p>Whenever you edit <code>dspace.cfg</code>, you should then run <code><i>[dspace]</i>/bin/install-configs</code> so that any changes you may have made are reflected in the configuration files of other applications, for example Apache. You may then need to restart those applications, depending on what you changed.</p>
 
   <h2><a name="email" id="email">Wording of E-mail Messages</a></h2>
