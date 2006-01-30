@@ -57,6 +57,9 @@ import org.dspace.core.Utils;
  * and can use a different configuration file if it is passed in.
  * 
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  * 
  */
 public final class ResultsPruner

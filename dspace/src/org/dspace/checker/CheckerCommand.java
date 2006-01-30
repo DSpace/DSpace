@@ -54,9 +54,10 @@ import org.dspace.core.Utils;
  * against the last calculated checksum for that bitstream.
  * </p>
  * 
- * @author Nate Sarr
- * @author Grace Carpenter
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  * 
  * @todo the accessor methods are currently unused - are they useful?
  * @todo check for any existing resource problems
@@ -96,8 +97,8 @@ public final class CheckerCommand
      */
     private ChecksumResultsCollector collector = null;
 
-    /** Report only errors */
-    private boolean reportErrorsOnly = false;
+    /** Report all processing */
+    private boolean reportVerbose = false;
 
     /**
      * Default constructor uses DSpace plugin manager to construct dependencies.
@@ -135,37 +136,25 @@ public final class CheckerCommand
             collector = new ResultsLogger(processStartDate);
         }
 
-        // loop through bitstreams and check
-        try
-        {
-            bitstreamInfoDAO.updateMissingBitstreams();
-            int id = dispatcher.next();
-            LOG.debug("Processing bitstream id = " + id);
-            while (id != BitstreamDispatcher.SENTINEL)
-            {
-                BitstreamInfo info = checkBitstream(id);
-
-                if (reportErrorsOnly
-                        && (info.getChecksumCheckResult() == ChecksumCheckResults.CHECKSUM_MATCH))
-                {
-                    // NO-OP do not report good checksums
-                }
-                else
-                {
-                    collector.collect(info);
-                }
-
-                id = dispatcher.next();
-            }
-        }
-        catch (SQLException e)
-        {
-            LOG.error("Next bitstream metadata could not be retrieved. ", e);
-        }
-
         // update missing bitstreams that were entered into the
         // bitstream table - this always done.
         bitstreamInfoDAO.updateMissingBitstreams();
+
+        int id = dispatcher.next();
+
+        while (id != BitstreamDispatcher.SENTINEL)
+        {
+            LOG.debug("Processing bitstream id = " + id);
+            BitstreamInfo info = checkBitstream(id);
+
+            if (reportVerbose
+                    || (info.getChecksumCheckResult() != ChecksumCheckResults.CHECKSUM_MATCH))
+            {
+                collector.collect(info);
+            }
+
+            id = dispatcher.next();
+        }
     }
 
     /**
@@ -180,15 +169,6 @@ public final class CheckerCommand
     {
         // get bitstream info from bitstream table
         BitstreamInfo info = bitstreamInfoDAO.findByBitstreamId(id);
-
-        // make sure bitstream and most_recent_checksum in sync for the id
-        if (info == null)
-        {
-            if (bitstreamInfoDAO.updateMissingBitstream(id))
-            {
-                info = bitstreamInfoDAO.findByBitstreamId(id);
-            }
-        }
 
         // requested id was not found in bitstream
         // or most_recent_checksum table
@@ -480,9 +460,9 @@ public final class CheckerCommand
      * 
      * @return true if only errors reported
      */
-    public boolean isReportErrorsOnly()
+    public boolean isReportVerbose()
     {
-        return reportErrorsOnly;
+        return reportVerbose;
     }
 
     /**
@@ -491,8 +471,8 @@ public final class CheckerCommand
      * @param reportErrorsOnly
      *            true to report only errors in the logs.
      */
-    public void setReportErrorsOnly(boolean reportErrorsOnly)
+    public void setReportVerbose(boolean reportVerbose)
     {
-        this.reportErrorsOnly = reportErrorsOnly;
+        this.reportVerbose = reportVerbose;
     }
 }

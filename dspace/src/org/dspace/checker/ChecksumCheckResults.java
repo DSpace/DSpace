@@ -37,8 +37,10 @@ package org.dspace.checker;
  * Enumeration of ChecksumCheckResults containing constants for checksum
  * comparison result that must correspond to values in checksum_result table.
  * 
- * @author Grace Carpenter
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  * 
  * @todo Refactor these as properties of ChecksumChecker?
  */

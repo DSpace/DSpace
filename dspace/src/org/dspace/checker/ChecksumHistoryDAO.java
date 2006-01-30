@@ -19,7 +19,9 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * </p>
  * 
  * @author Jim Downing
+ * @author Grace Carpenter
  * @author Nathan Sarr
+ * 
  * 
  */
 public class ChecksumHistoryDAO extends DAOSupport
@@ -149,7 +151,7 @@ public class ChecksumHistoryDAO extends DAOSupport
     /**
      * @param conn
      */
-    protected void updateMissingBitstreams(Connection conn)
+    protected void updateMissingBitstreams(Connection conn) throws SQLException
     {
         PreparedStatement stmt = null;
         try
@@ -163,10 +165,9 @@ public class ChecksumHistoryDAO extends DAOSupport
             throw new RuntimeException("Problem updating missing history. "
                     + e.getMessage(), e);
         }
-
         finally
         {
-            cleanup(stmt, conn);
+            cleanup(stmt);
         }
     }
 

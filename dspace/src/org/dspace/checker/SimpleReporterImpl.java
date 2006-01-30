@@ -47,7 +47,10 @@ import org.dspace.core.I18N;
  * 
  * Simple Reporter implementation.
  * 
- * @author Nate Sarr
+ * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  * @todo estimate string buffer sizes.
  */
 public class SimpleReporterImpl implements SimpleReporter

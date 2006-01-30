@@ -42,7 +42,9 @@ import java.util.Date;
  * </p>
  * 
  * @author Jim Downing
- * @author Nate Sarr
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public final class BitstreamInfo
 {

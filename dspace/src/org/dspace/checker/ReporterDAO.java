@@ -47,7 +47,10 @@ import org.dspace.storage.rdbms.DatabaseManager;
 /**
  * This class will report information on the checksum checker process.
  * 
- * @author Nate Sarr
+ * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  * 
  */
 public class ReporterDAO extends DAOSupport

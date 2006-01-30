@@ -40,7 +40,10 @@ import java.util.Date;
  * Represents a history record for the bitstream.
  * </p>
  * 
- * @author Nate Sarr
+ * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public class ChecksumHistory
 {

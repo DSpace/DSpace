@@ -46,6 +46,9 @@ import org.dspace.storage.bitstore.BitstreamStorageManager;
  * </p>
  * 
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public class BitstreamDAO
 {

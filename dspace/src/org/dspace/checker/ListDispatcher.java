@@ -33,7 +33,6 @@
  */
 package org.dspace.checker;
 
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.List;
@@ -43,6 +42,9 @@ import java.util.Stack;
  * Really simple dispatcher that just iterates over a pre-defined list of ids.
  * 
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public class ListDispatcher implements BitstreamDispatcher
 {
@@ -74,7 +76,7 @@ public class ListDispatcher implements BitstreamDispatcher
     /**
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
-    public synchronized int next() throws SQLException
+    public synchronized int next()
     {
         try
         {

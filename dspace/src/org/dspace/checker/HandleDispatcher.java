@@ -33,9 +33,6 @@
  */
 package org.dspace.checker;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,21 +48,12 @@ import org.dspace.handle.HandleManager;
  * item, collection or community referred to by Handle.
  * 
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public class HandleDispatcher implements BitstreamDispatcher
 {
-    /** SQL query to retrieve bitstreams for a given item. */
-    private static final String ITEM_BITSTREAMS = "SELECT b2b.bitstream_id "
-            + "FROM bundle2bitstream b2b, item2bundle i2b WHERE "
-            + "b2b.bundle_id=i2b.bundle_id AND i2b.item_id=?";
-
-    /** SQL query to retrieve bitstreams for a given collection. */
-    private static final String COLLECTION_BITSTREAMS = "SELECT b2b.bitstream_id "
-            + "FROM bundle2bitstream b2b, item2bundle i2b, collection2item c2i WHERE "
-            + "b2b.bundle_id=i2b.bundle_id AND c2i.item_id=i2b.item_id AND c2i.collection_id=?";
-
-    /** SQL query to retrieve bitstreams for a given community. */
-    private static final String COMMUNITY_BITSTREAMS = "SELECT b2b.bitstream_id FROM bundle2bitstream b2b, item2bundle i2b, collection2item c2i, community2collection c2c WHERE b2b.bundle_id=i2b.bundle_id AND c2i.item_id=i2b.item_id AND c2c.collection_id=c2i.collection_id AND c2c.community_id=?";
 
     /** Log 4j logger. */
     private static final Logger LOG = Logger.getLogger(HandleDispatcher.class);
@@ -78,6 +66,11 @@ public class HandleDispatcher implements BitstreamDispatcher
 
     /** the delegate to dispatch to. */
     ListDispatcher delegate = null;
+
+    /**
+     * Database access for retrieving bitstreams
+     */
+    BitstreamInfoDAO bitstreamInfoDAO;
 
     /**
      * Blanked off, no-op constructor.
@@ -93,8 +86,9 @@ public class HandleDispatcher implements BitstreamDispatcher
      * @param hdl
      *            the handle to get bitstreams from.
      */
-    public HandleDispatcher(String hdl)
+    public HandleDispatcher(BitstreamInfoDAO bitInfoDAO, String hdl)
     {
+        bitstreamInfoDAO = bitInfoDAO;
         handle = hdl;
     }
 
@@ -104,41 +98,26 @@ public class HandleDispatcher implements BitstreamDispatcher
      * @throws SQLException
      *             if database access fails.
      */
-    private void init() throws SQLException
+    private void init()
     {
         Context context = null;
+        int dsoType = -1;
 
+        int id = -1;
         try
         {
             context = new Context();
             DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+            id = dso.getID();
+            dsoType = dso.getType();
             context.abort();
 
-            List ids = new ArrayList();
+        }
+        catch (SQLException e)
+        {
+            LOG.error("init error " + e.getMessage(), e);
+            throw new RuntimeException("init error" + e.getMessage(), e);
 
-            switch (dso.getType())
-            {
-            case Constants.BITSTREAM:
-                ids.add(new Integer(dso.getID()));
-
-                break;
-
-            case Constants.ITEM:
-                ids = getItemIds(dso.getID());
-
-                break;
-
-            case Constants.COLLECTION:
-                ids = getCollectionIds(dso.getID());
-
-                break;
-
-            case Constants.COMMUNITY:
-                ids = getCommunityIds(dso.getID());
-            }
-
-            delegate = new ListDispatcher(ids);
-            init = Boolean.TRUE;
         }
         finally
         {
@@ -148,6 +127,30 @@ public class HandleDispatcher implements BitstreamDispatcher
                 context.abort();
             }
         }
+
+        List ids = new ArrayList();
+
+        switch (dsoType)
+        {
+        case Constants.BITSTREAM:
+            ids.add(new Integer(id));
+            break;
+
+        case Constants.ITEM:
+            ids = bitstreamInfoDAO.getItemBitstreams(id);
+            break;
+
+        case Constants.COLLECTION:
+            ids = bitstreamInfoDAO.getCollectionBitstreams(id);
+            break;
+
+        case Constants.COMMUNITY:
+            ids = bitstreamInfoDAO.getCommunityBitstreams(id);
+            break;
+        }
+
+        delegate = new ListDispatcher(ids);
+        init = Boolean.TRUE;
     }
 
     /**
@@ -155,7 +158,7 @@ public class HandleDispatcher implements BitstreamDispatcher
      * 
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
-    public int next() throws SQLException
+    public int next()
     {
         synchronized (init)
         {
@@ -166,101 +169,5 @@ public class HandleDispatcher implements BitstreamDispatcher
         }
 
         return delegate.next();
-    }
-
-    /**
-     * Utility query method to get item ids.
-     * 
-     * @param id
-     *            the item id
-     * @return a list of bitstream ids for items.
-     * @throws SQLException
-     *             if database access fails
-     */
-    private List getItemIds(int id) throws SQLException
-    {
-        return getIdList(id, ITEM_BITSTREAMS);
-    }
-
-    /**
-     * Utility query method.
-     * 
-     * @param id
-     *            Collection id
-     * @return a list of bitstream ids for collection
-     * @throws SQLException
-     *             if database access error occurs.
-     */
-    private List getCollectionIds(int id) throws SQLException
-    {
-        return getIdList(id, COLLECTION_BITSTREAMS);
-    }
-
-    /**
-     * Utility query method.
-     * 
-     * @param id
-     *            the community id
-     * @return the bitstream ids.
-     * @throws SQLException
-     *             if a database access error occurs.
-     */
-    private List getCommunityIds(int id) throws SQLException
-    {
-        return getIdList(id, COMMUNITY_BITSTREAMS);
-    }
-
-    /**
-     * Utility query method.
-     * 
-     * @param arg
-     *            community/collection/item id.
-     * @param query
-     *            query to be excuted
-     * @return list of bitstream ids.
-     * @throws SQLException
-     *             if database access occurs.
-     */
-    private List getIdList(int arg, String query) throws SQLException
-    {
-        List ids = new ArrayList();
-
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        Context ctx = new Context();
-
-        try
-        {
-            conn = ctx.getDBConnection();
-            ps = conn.prepareStatement(query);
-            ps.setInt(1, arg);
-
-            rs = ps.executeQuery();
-
-            while (rs.next())
-            {
-                ids.add(new Integer(rs.getInt(1)));
-            }
-
-            LOG.debug("Returned " + ids.size() + " ids for handle " + handle);
-        }
-        finally
-        {
-            if (rs != null)
-            {
-                rs.close();
-            }
-
-            if (ps != null)
-            {
-                ps.close();
-            }
-
-            ctx.complete();
-        }
-
-        return ids;
     }
 }

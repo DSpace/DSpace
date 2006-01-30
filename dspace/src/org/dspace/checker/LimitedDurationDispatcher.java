@@ -33,7 +33,6 @@
  */
 package org.dspace.checker;
 
-import java.sql.SQLException;
 import java.util.Date;
 
 /**
@@ -48,6 +47,9 @@ import java.util.Date;
  * </p>
  * 
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public class LimitedDurationDispatcher implements BitstreamDispatcher
 {
@@ -90,7 +92,7 @@ public class LimitedDurationDispatcher implements BitstreamDispatcher
     /**
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
-    public int next() throws SQLException
+    public int next()
     {
         return (System.currentTimeMillis() > end) ? SENTINEL : delegate.next();
     }

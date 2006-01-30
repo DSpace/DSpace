@@ -45,7 +45,10 @@ import org.dspace.core.I18N;
  * </p>
  * 
  * 
+ * @author Jim Downing
  * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  * 
  */
 public class ResultsLogger implements ChecksumResultsCollector
@@ -131,7 +134,7 @@ public class ResultsLogger implements ChecksumResultsCollector
                 .info(msg("checksum-algorithm") + ": "
                         + info.getChecksumAlgorithm());
         LOG.info(msg("previous-checksum") + ": " + info.getStoredChecksum());
-        LOG.info(msg("previous-checksum-data")
+        LOG.info(msg("previous-checksum-date")
                 + ": "
                 + ((info.getProcessEndDate() != null) ? DATE_FORMAT.format(info
                         .getProcessEndDate()) : "unknown"));

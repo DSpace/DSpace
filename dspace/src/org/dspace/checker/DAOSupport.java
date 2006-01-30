@@ -8,6 +8,14 @@ import java.sql.Statement;
 import org.apache.log4j.Logger;
 import org.dspace.storage.rdbms.DatabaseManager;
 
+/**
+ * Database Helper Class to cleanup database resources
+ * 
+ * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
+ */
 public class DAOSupport
 {
 

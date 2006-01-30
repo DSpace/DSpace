@@ -42,6 +42,9 @@ import org.dspace.core.PluginManager;
  * dispatcher.
  * 
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public class LimitedCountDispatcher implements BitstreamDispatcher
 {
@@ -92,7 +95,7 @@ public class LimitedCountDispatcher implements BitstreamDispatcher
      * @throws SQLException
      *             if database error occurs.
      */
-    public int next() throws SQLException
+    public int next()
     {
         if (remaining > 0)
         {

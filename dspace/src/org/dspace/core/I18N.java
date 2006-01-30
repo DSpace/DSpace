@@ -135,7 +135,9 @@ public class I18N {
 	 * @return Localized message 
 	 */
 	public String getMessage(String msg, Class clazz) {
-		return getMessage(msg, clazz.getName());
+		String className = clazz.getName();
+		return messages.getString(new StringBuilder(50).append(className)
+				.append(".").append(msg).toString());
 	}
 
 	/**

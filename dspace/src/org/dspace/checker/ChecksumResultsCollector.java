@@ -37,6 +37,9 @@ package org.dspace.checker;
  * Component that receives BitstreamInfo results from a checker.
  * 
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public interface ChecksumResultsCollector
 {

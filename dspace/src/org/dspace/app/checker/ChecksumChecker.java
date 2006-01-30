@@ -49,6 +49,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.dspace.checker.BitstreamDispatcher;
+import org.dspace.checker.BitstreamInfoDAO;
 import org.dspace.checker.CheckerCommand;
 import org.dspace.checker.HandleDispatcher;
 import org.dspace.checker.LimitedCountDispatcher;
@@ -113,14 +114,14 @@ public class ChecksumChecker
         // create an options object and populate it
         Options options = new Options();
 
-        options.addOption("l", "looping", false, "Loop through bitstreams");
+        options.addOption("l", "looping", false, "Loop once through bitstreams");
         options.addOption("L", "continuous", false,
-                "Continuously loop through bitstreams");
+                "Loop continuously through bitstreams");
         options.addOption("h", "help", false, "Help");
         options.addOption("d", "duration", true, "Checking duration");
         options.addOption("c", "count", true, "Check count");
         options.addOption("a", "handle", true, "Specify a handle to check");
-        options.addOption("e", "errors", false, "Report Errors Only");
+        options.addOption("v", "verbose", false, "Report all processing");
 
         OptionBuilder.withArgName("bitstream-ids").hasArgs().withDescription(
                 "Space separated list of bitstream ids");
@@ -176,88 +177,81 @@ public class ChecksumChecker
         Date processStart = Calendar.getInstance().getTime();
 
         BitstreamDispatcher dispatcher = null;
-        if (line.getOptions().length == 0)
+        
+        // process should loop infinitely through
+        // most_recent_checksum table
+        if (line.hasOption('l'))
         {
-            dispatcher = new LimitedCountDispatcher(new SimpleDispatcher(
-                    processStart, false), 1);
+            dispatcher = new SimpleDispatcher(new BitstreamInfoDAO(), processStart, false); 
         }
-        else
+        else if (line.hasOption('L'))
         {
-            // process should loop infinitely through
-            // most_recent_checksum table
-            if (line.hasOption('l'))
-            {
-                dispatcher = new SimpleDispatcher(processStart, false); 
-            }
-            else if (line.hasOption('L'))
-            {
-                dispatcher = new SimpleDispatcher(processStart, true);
-            }
-            else if (line.hasOption('b'))
-            {
-                // check only specified bitstream(s)
-                String[] ids = line.getOptionValues('b');
-                List idList = new ArrayList(ids.length);
+            dispatcher = new SimpleDispatcher(new BitstreamInfoDAO(), processStart, true);
+        }
+        else if (line.hasOption('b'))
+        {
+            // check only specified bitstream(s)
+            String[] ids = line.getOptionValues('b');
+            List idList = new ArrayList(ids.length);
 
-                for (int i = 0; i < ids.length; i++)
-                {
-                    try
-                    {
-                        idList.add(new Integer(ids[i]));
-                    }
-                    catch (NumberFormatException nfe)
-                    {
-                        System.err.println("The following argument: " + ids[i]
-                                + " is not an integer");
-                        System.exit(0);
-                    }
-                }
-                dispatcher = new ListDispatcher(idList);
-            }
-
-            else if (line.hasOption('a'))
+            for (int i = 0; i < ids.length; i++)
             {
-                dispatcher = new HandleDispatcher(line.getOptionValue('a'));
-            }
-            else if (line.hasOption('d'))
-            {
-                // run checker process for specified duration
                 try
                 {
-                    dispatcher = new LimitedDurationDispatcher(
-                            new SimpleDispatcher(processStart, true), new Date(
-                                    System.currentTimeMillis()
-                                            + Utils.parseDuration(line
-                                                    .getOptionValue('d'))));
+                    idList.add(new Integer(ids[i]));
                 }
-                catch (Exception e)
+                catch (NumberFormatException nfe)
                 {
-                    LOG.fatal("Couldn't parse " + line.getOptionValue('d')
-                            + " as a duration: ", e);
+                    System.err.println("The following argument: " + ids[i]
+                            + " is not an integer");
                     System.exit(0);
                 }
             }
-            else if (line.hasOption('c'))
+            dispatcher = new ListDispatcher(idList);
+        }
+
+        else if (line.hasOption('a'))
+        {
+            dispatcher = new HandleDispatcher(new BitstreamInfoDAO(), line.getOptionValue('a'));
+        }
+        else if (line.hasOption('d'))
+        {
+            // run checker process for specified duration
+            try
             {
-                // run checker process for specified number of bitstreams
-                dispatcher = new LimitedCountDispatcher(new SimpleDispatcher(
-                        processStart, false));
+                dispatcher = new LimitedDurationDispatcher(
+                        new SimpleDispatcher(new BitstreamInfoDAO(), processStart, true), new Date(
+                                System.currentTimeMillis()
+                                        + Utils.parseDuration(line
+                                                .getOptionValue('d'))));
+            }
+            catch (Exception e)
+            {
+                LOG.fatal("Couldn't parse " + line.getOptionValue('d')
+                        + " as a duration: ", e);
+                System.exit(0);
             }
         }
-
-        if (dispatcher == null)
+        else if (line.hasOption('c'))
         {
-            System.out
-                    .println("Error: insufficient option commands to run checker.");
-            printHelp(options);
+        	int count = new Integer(line.getOptionValue('c')).intValue();
+            
+        	// run checker process for specified number of bitstreams
+            dispatcher = new LimitedCountDispatcher(new SimpleDispatcher(
+                    new BitstreamInfoDAO(), processStart, false), count);
         }
-
+        else
+        {
+            dispatcher = new LimitedCountDispatcher(new SimpleDispatcher(
+                    new BitstreamInfoDAO(), processStart, false), 1);
+        }
+        
         ResultsLogger logger = new ResultsLogger(processStart);
         CheckerCommand checker = new CheckerCommand();
-        // report errors only
-        if (line.hasOption('e'))
+        // verbose reporting
+        if (line.hasOption('v'))
         {
-            checker.setReportErrorsOnly(true);
+            checker.setReportVerbose(true);
         }
         checker.configureLog();
         checker.setProcessStartDate(processStart);
@@ -283,14 +277,14 @@ public class ChecksumChecker
                         + " OR ChecksumChecker -d 2h");
         System.out
                 .println("\nSpecify bitstream IDs: ChecksumChecker -b 13 15 17 20");
-        System.out.println("\nLoop through all bitstreams: "
+        System.out.println("\nLoop once through all bitstreams: "
                 + "ChecksumChecker -l");
         System.out
-                .println("\nLoop through all bitstreams continuously: ChecksumChecker -L");
+                .println("\nLoop continuously through all bitstreams: ChecksumChecker -L");
         System.out
                 .println("\nCheck a defined number of bitstreams: ChecksumChecker -c 10");
-        System.out.println("Default (no arguments) is '-c 1'");
-        System.out.println("\nReport errors only in logs: ChecksumChecker -e");
+        System.out.println("\nReport all processing (verbose)(default reports only errors): ChecksumChecker -v");
+        System.out.println("\nDefault (no arguments) is equivalent to '-c 1'");
         System.exit(0);
     }
 

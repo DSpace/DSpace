@@ -37,7 +37,10 @@ package org.dspace.checker;
  * Value Object that holds bitstream information that will be used for dspace
  * bitstream.
  * 
- * @author Nate Sarr
+ * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public final class DSpaceBitstreamInfo
 {

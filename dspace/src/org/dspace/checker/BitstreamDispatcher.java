@@ -33,7 +33,6 @@
  */
 package org.dspace.checker;
 
-import java.sql.SQLException;
 
 /**
  * <p>
@@ -54,8 +53,10 @@ import java.sql.SQLException;
  * </ol>
  * 
  * 
- * @author Nate Sarr
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public interface BitstreamDispatcher
 {
@@ -72,10 +73,6 @@ public interface BitstreamDispatcher
      * @return the next bitstream id, or BitstreamDispatcher.SENTINEL if there
      *         isn't another value
      * 
-     * @throws SQLException
-     *             if there is some problem querying a database
-     * 
-     * @todo This should probably wrap the SQL exception
      */
-    public int next() throws SQLException;
+    public int next();
 }

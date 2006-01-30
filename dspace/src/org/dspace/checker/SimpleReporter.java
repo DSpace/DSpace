@@ -41,7 +41,10 @@ import java.util.Date;
  * 
  * Simple Reporting Class which can return several different reports.
  * 
- * @author Nate Sarr
+ * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public interface SimpleReporter
 {

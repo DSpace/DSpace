@@ -49,7 +49,10 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * Database Access for the checksum results information.
  * </p>
  * 
- * @author Nate Sarr
+ * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public final class ChecksumResultDAO extends DAOSupport
 {

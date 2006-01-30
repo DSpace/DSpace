@@ -33,45 +33,19 @@
  */
 package org.dspace.checker;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
-
-import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
  * An implementation of the selection strategy that selects bitstreams in the
  * order that they were last checked, looping endlessly.
  * 
- * @author Nate Sarr
  * @author Jim Downing
+ * @author Grace Carpenter
+ * @author Nathan Sarr
+ * 
  */
 public class SimpleDispatcher implements BitstreamDispatcher
 {
-    /**
-     * This selects the next bitstream that is to be processed, in order of last
-     * processing end date. The timestamp is truncated to milliseconds this is
-     * because the Date for java does not support nanoseconds and milliseconds
-     * were considered accurate enough
-     */
-    public static final String FIND_BITSTREAMS_LOOP = "select bitstream_id  "
-            + "from most_recent_checksum " + "where to_be_processed = true "
-            + "order by date_trunc('milliseconds', last_process_end_date), "
-            + "bitstream_id " + "ASC LIMIT 1";
-
-    /**
-     * Selects the next bitstream in order of last processing end date, ensuring
-     * that no bitstream is checked more than once since the date parameter
-     * used.
-     */
-    public static final String FIND_BITSTREAMS_NO_LOOP = "select bitstream_id  "
-            + "from most_recent_checksum "
-            + "where to_be_processed = true "
-            + "and last_process_start_date < ? "
-            + "order by date_trunc('milliseconds', last_process_end_date), "
-            + "bitstream_id " + "ASC LIMIT 1";
 
     /**
      * Should this dispatcher keep on dispatching around the collection?
@@ -90,6 +64,11 @@ public class SimpleDispatcher implements BitstreamDispatcher
     private int bitstreamId = -1;
 
     /**
+     * Access for bitstream information
+     */
+    private BitstreamInfoDAO bitstreamInfoDAO;
+
+    /**
      * Creates a new SimpleDispatcher.
      * 
      * @param startTime
@@ -98,8 +77,10 @@ public class SimpleDispatcher implements BitstreamDispatcher
      *            indicates whether checker should loop infinitely through
      *            most_recent_checksum table
      */
-    public SimpleDispatcher(Date startTime, boolean looping)
+    public SimpleDispatcher(BitstreamInfoDAO bitstreamInfoDAO, Date startTime,
+            boolean looping)
     {
+        this.bitstreamInfoDAO = bitstreamInfoDAO;
         this.processStartTime = startTime;
         this.loopContinuously = looping;
     }
@@ -117,57 +98,19 @@ public class SimpleDispatcher implements BitstreamDispatcher
      * 
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
-    public synchronized int next() throws SQLException
+    public synchronized int next()
     {
-        Connection conn = null;
-        PreparedStatement prepStmt = null;
-        ResultSet rs = null;
-
-        try
+        // should process loop infinitely through the
+        // bitstreams in most_recent_checksum table?
+        if (!loopContinuously && (processStartTime != null))
         {
-            // create the connection and execute the statement
-            conn = DatabaseManager.getConnection();
-
-            // should process loop infinitely through the
-            // bitstreams in most_recent_checksum table?
-            if (!loopContinuously && (processStartTime != null))
-            {
-                prepStmt = conn.prepareStatement(FIND_BITSTREAMS_NO_LOOP);
-                prepStmt.setTimestamp(1, new java.sql.Timestamp(
-                        processStartTime.getTime()));
-            }
-            else
-            {
-                prepStmt = conn.prepareStatement(FIND_BITSTREAMS_LOOP);
-            }
-
-            rs = prepStmt.executeQuery();
-
-            if (rs.next())
-            {
-                return rs.getInt(1);
-            }
-            else
-            {
-                return SENTINEL;
-            }
+            return bitstreamInfoDAO.getOldestBitstream(new java.sql.Timestamp(
+                    processStartTime.getTime()));
         }
-        finally
+        else
         {
-            if (rs != null)
-            {
-                rs.close();
-            }
-
-            if (prepStmt != null)
-            {
-                prepStmt.close();
-            }
-
-            if (conn != null)
-            {
-                DatabaseManager.freeConnection(conn);
-            }
+            return bitstreamInfoDAO.getOldestBitstream();
         }
+
     }
 }
