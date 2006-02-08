@@ -164,6 +164,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <input-type>twobox</input-type>
          <hint> Enter appropriate subject keywords or phrases below. </hint>
          <required></required>
+         <vocabulary>srsc</vocabulary>
        </field>
 
        <field>

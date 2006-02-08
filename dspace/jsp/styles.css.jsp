@@ -329,6 +329,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-size: 8pt;
            text-align: center }
+           
 
 .submitFormWarn {  margin-left: 10px;
            margin-right: 10px;
@@ -588,3 +589,33 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 .help td.leftAlign{font-size:10pt;}
 .help td.rightAlign{text-align:right;
                     font-size:10pt;}
+                    
+
+<%-- The following rules are used by the controlled-vocabulary add-on --%>
+
+ul.controlledvocabulary  {
+		list-style-type:none; }
+
+	
+.controlledvocabulary ul  li ul {
+	     list-style-type:none;
+		display:none; }
+
+input.controlledvocabulary  {
+		border:0px; }
+
+img.controlledvocabulary {
+		margin-right:8px ! important;
+		margin-left:11px ! important;
+		cursor:hand; }                    
+
+.submitFormHelpControlledVocabularies {  
+		   margin-left: 10px;
+           margin-right: 10px;
+           font-family: "verdana", "Arial", "Helvetica", sans-serif;
+           font-size: 8pt;
+           text-align: left; }           
+
+.controlledVocabularyLink {  
+           font-family: "verdana", "Arial", "Helvetica", sans-serif;
+           font-size: 8pt; }   

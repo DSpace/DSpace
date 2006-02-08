@@ -742,8 +742,100 @@ dstat-report-monthly
   <p>The wording and layout of the email message is governed by the template file <code><i>[dspace]</i>/config/emails/suggest</code>. You may edit this file
   to alter the language, layout, type, or amount of information contained in the email, but note that the values passed to the template are limited to those enumerated at the
   top of the template file and represented in the body of the message with 'placeholders' {0}, {1}, etc. A general description of DSpace is included as
-  a footer to the email, which may be replaced with site-specific content.
+  a footer to the email, which may be replaced with site-specific content.</p>
+
+    
+  <h2><a name="controlledvocabulary" id="controlledvocabulary">Configuring Controlled Vocabularies</a></h2>
+  <p>
+  DSpace now supports controlled vocabularies to confine the set of keywords that users can use 
+  while describing items.
   </p>
+  <p>
+  The need for a limited set of keywords is important since it eliminates the 
+  ambiguity of a free description system, consequently simplifying the task of finding specific 
+  items of information.
+  </p>
+  <p>
+  The controlled vocabulary add-on allows the user to choose from a defined set of keywords organised 
+  in an tree (taxonomy) and then use these keywords to describe items while they are being submitted.
+  </p>
+  <p>
+  We have also developed a small search engine that displays the classification tree (or taxonomy) 
+  allowing the user to select the branches that best describe the information that he/she seeks.
+  </p>
+  <p>
+  The taxonomies are described in XML following this (very simple) structure:
+  </p>
+
+<code>
+
+&lt;node id="acmccs98" label="ACMCCS98"&gt;<br/>
+&nbsp;  &lt;isComposedBy&gt;<br/>
+&nbsp;&nbsp;    &lt;node id="A." label="General Literature"&gt;<br/>
+&nbsp;&nbsp;&nbsp;	&lt;isComposedBy&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;	  &lt;node id="A.0" label="GENERAL"/&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;	  &lt;node id="A.1" label="INTRODUCTORY AND SURVEY"/&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;	  ...<br/>
+&nbsp;&nbsp;&nbsp;	&lt;/isComposedBy&gt;<br/>
+&nbsp;&nbsp;    &lt;/node&gt;<br/>
+&nbsp;&nbsp;    ...<br/>
+&nbsp;  &lt;/isComposedBy&gt;<br/>
+&lt;/node&gt;<br/>
+</code>
+<p>
+Your are free to use any application you want to create your controlled vocabularies. A simple 
+text editor should be enough for small projects. Bigger projects will require more complex
+tools. You may use Proteg&eacute; to create your taxonomies, save them as OWL and then use a 
+XML Stylesheet (XSLT) to transform your documents to the appropriate format. Future enhancements
+to this add-on should make it compatible with standard schemas such as OWL or RDF.
+</p>
+<p>
+In order to make DSpace compatible with WAI 2.0, the add-on is <b>turned off</b> by default 
+(the add-on relies strongly on Javascript to function).
+ It can be activated by setting the following property in <code>dspace.cfg</code>:
+<p>
+<code>
+   webui.controlledvocabulary.enable = true
+</code> 
+</p>
+<p>
+New vocabularies should be placed in <code><i>[dspace]/config/controlled-vocabularies/</i></code> and must be 
+according to the structure described. A validation XML Schema can be downloaded <a href="controlledvocabulary.xsd">here</a>.
+</p>
+<p>
+Vocabularies need to be associated with the correspondant DC metadata fields.
+Edit the file <code><i>[dspace]/config/input-forms.xml</i></code> and place
+a <code>"vocabulary"</code> tag under the <code>"field"</code> element that you
+want to control. Set value of the <code>"vocabulary"</code> element to 
+the name of the file that contains the vocabulary, leaving out the extension 
+(the add-on will only load files with extension "*.xml").
+For example:
+</p>
+<p>
+<code>
+       &lt;field&gt;<br/>
+         &nbsp;&nbsp;&nbsp;&nbsp;&lt;dc-schema&gt;dc&lt;/dc-schema&gt;<br/>
+         &nbsp;&nbsp;&nbsp;&nbsp;&lt;dc-element&gt;subject&lt;/dc-element&gt;<br/>
+         &nbsp;&nbsp;&nbsp;&nbsp;&lt;dc-qualifier&gt;&lt;/dc-qualifier&gt;<br/>
+         &nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- An input-type of twobox MUST be marked as repeatable --&gt;<br/>
+         &nbsp;&nbsp;&nbsp;&nbsp;&lt;repeatable&gt;true&lt;/repeatable&gt;<br/>
+         &nbsp;&nbsp;&nbsp;&nbsp;&lt;label&gt;Subject Keywords&lt;/label&gt;<br/>
+         &nbsp;&nbsp;&nbsp;&nbsp;&lt;input-type&gt;twobox&lt;/input-type&gt;<br/>
+         &nbsp;&nbsp;&nbsp;&nbsp;&lt;hint&gt; Enter appropriate subject keywords or phrases below. &lt;/hint&gt;<br/>
+         &nbsp;&nbsp;&lt;required&gt;&lt;/required&gt;<br/>
+         <b>&nbsp;&nbsp;&lt;vocabulary&gt;nsi&lt;/vocabulary&gt;</b><br/>
+       &lt;/field&gt;<br/>
+</code>
+</p>
+
+<p>
+The following vocabularies are currently available by default:
+</p>
+<ul>
+	<!-- <li><strong>acmccs98-1.2.4</strong> - <em>acmccs98-1.2.4.xml</em> - ACM Computing Classification System</li> -->
+	<li><strong>nsi</strong> - <em>nsi.xml</em> - The Norwegian Science Index</li>
+	<li><strong>srsc</strong> - <em>srsc.xml</em> - Swedish Research Subject Categories</li>
+</ul>
   
   <h2><a name="checker">Checksum Checker</a></h2>
   <p>There are two main aspects of the checksum checker's operation that can be configured. Firstly the strategy and duration of the checker's duration can be
@@ -848,6 +940,7 @@ bin/checker -L	    # Loops through the repository forever</pre>
   <p>By default, these properties should go in dspace.cfg. By passing an argument to the -p option you can pass another properties file to the checker instead, for example: -</p>
   
   <pre>bin/checker -lp temporaryRetentionPolicy.properties</pre>
+>>>>>>> 1.18
   <hr>
 
   <address>

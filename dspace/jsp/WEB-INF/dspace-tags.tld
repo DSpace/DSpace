@@ -360,5 +360,47 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
+  
+  
+    
+  
+  <tag>
+    <name>controlledvocabulary</name>
+    <tagclass>org.dspace.app.webui.jsptag.ControlledVocabularyTag</tagclass>
+    <bodycontent>empty</bodycontent>
+    <info>
+    	Lays out a html tree with a set of controlled vocabularies.
+    	This tag receives 3 possible parameters:
+    		- filter
+    			A filter specification to prune branches of the loaded vocabularies
+    		- allowMultipleSelection
+    			Specifies if we want to be able the select multiple terms
+    			from the taxonomy. This will diplay checkboxes close to the 
+    			vocabulary terms.
+    		- vocabulary
+    			The name of the vocabulary to be displayed. If no vocabulary
+    			is provided, all existing taxonomies will be rendered and 
+    			displayed.	
+    </info>
+
+   <attribute>
+      <name>filter</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+
+   <attribute>
+      <name>allowMultipleSelection</name>
+      <required>no</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+
+   <attribute>
+      <name>vocabulary</name>
+      <required>no</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    	  
+  </tag>  
+
 
 </taglib>

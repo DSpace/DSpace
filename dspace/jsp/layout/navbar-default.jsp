@@ -40,13 +40,13 @@
 
 <%--
   - Default navigation bar
-  --%>
+--%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
-<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="/WEB-INF/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
@@ -54,6 +54,8 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
+
 
 <%
     // Is anyone logged in?
@@ -106,6 +108,14 @@
               <%-- <input type="text" name="query" id="tequery" size="10"/><input type=image border="0" src="<%= request.getContextPath() %>/image/search-go.gif" name="submit" alt="Go" value="Go"/> --%>
               <input type="text" name="query" id="tequery" size="8"/><input type="submit" name="submit" value="<fmt:message key="jsp.layout.navbar-default.go"/>" />
               <br/><a href="<%= request.getContextPath() %>/advanced-search"><fmt:message key="jsp.layout.navbar-default.advanced"/></a>
+<%
+			if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
+			{
+%>        
+              <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></A>
+<%
+            }
+%>
             </td>
           </tr>
         </table>

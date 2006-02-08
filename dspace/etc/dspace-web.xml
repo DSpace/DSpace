@@ -382,6 +382,18 @@
     <servlet-name>workspace</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.WorkspaceServlet</servlet-class>
   </servlet>
+  
+    
+  <servlet>
+    <servlet-name>controlledvocabulary</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.ControlledVocabularyServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>subject-search</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.ControlledVocabularySearchServlet</servlet-class>
+  </servlet>  
+  
 
   <!-- Servlet Mappings -->
 
@@ -614,6 +626,17 @@
     <servlet-name>workspace</servlet-name>
     <url-pattern>/workspace</url-pattern>
   </servlet-mapping>
+  
+    
+  <servlet-mapping>
+    <servlet-name>controlledvocabulary</servlet-name>
+    <url-pattern>/controlledvocabulary</url-pattern>
+  </servlet-mapping>  
+  
+  <servlet-mapping>
+    <servlet-name>subject-search</servlet-name>
+    <url-pattern>/subject-search</url-pattern>
+  </servlet-mapping> 
 
   <!-- Icon MIME type -->
   <mime-mapping>

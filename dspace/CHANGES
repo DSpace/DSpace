@@ -1,5 +1,14 @@
 1.4 alpha 1
 ===========
+(Miguel Ferreira)
+- Controlled vocabulary patch to provide search on classification terms, and
+  addition of terms during submission.
+  SF Patch: #1244559
+
+(Richard Jones) 
+- Add 'visibility' element to input-forms.xml
+  SF Patch #1368160
+
 (Martin Hald)
 - Log4J enhancement to use XML configuration
   SF Patch #1224389
