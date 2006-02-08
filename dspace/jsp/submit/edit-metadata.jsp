@@ -75,10 +75,53 @@
 <%@ page import="javax.servlet.jsp.tagext.TagSupport" %>
 <%@ page import="javax.servlet.jsp.PageContext" %>
 
+<%@ page import="org.dspace.core.ConfigurationManager" %>
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%!
+	// required by Controlled Vocabulary  add-on
+	String contextPath;
+
+    // This method is resposible for showing a link next to an input box 
+    // that pops up a window that to display a controlled vocabulary. 
+    // It should be called from the doOneBox and doTwoBox methods. 
+    // It must be extended to work with doTextArea.
+    String doControlledVocabulary(String fieldName, PageContext pageContext, String vocabulary) 
+    {
+    	String link = "";
+    	boolean enabled = ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable");
+    	boolean useWithCurrentField = vocabulary != null && ! "".equals(vocabulary);
+    	
+        if (enabled && useWithCurrentField) 
+        {
+        	link = "<br/>" + 
+			"<a href='javascript:void(null);' onclick='javascript:popUp(\"" + 
+				contextPath + "/controlledvocabulary/controlledvocabulary.jsp?ID=" + 
+				fieldName + "&vocabulary=" + vocabulary + "\")'>" +
+					"<span class='controlledVocabularyLink'>" + 
+						LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.controlledvocabulary") + 
+					"</span>" + 
+			"</a>";
+		} 
+		return link;
+
+    }
+
+	boolean hasVocabulary(String vocabulary)
+	{
+		boolean enabled = ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable");
+    	boolean useWithCurrentField = vocabulary != null && !"".equals(vocabulary);
+    	boolean has = false;
+    	
+        if (enabled && useWithCurrentField) 
+        {
+        	has = true;
+        }
+        return has;
+	}
+
 
     void doPersonalName(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
@@ -141,8 +184,8 @@
            .append(last.toString())
            .append("\" size=\"23\" value=\"")
            .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
-	   .append("\"/></td>\n<td><input type=\"text\" name=\"")
-	   .append(first.toString())
+	   	   .append("\"/></td>\n<td><input type=\"text\" name=\"")
+	   	   .append(first.toString())
            .append("\" size=\"23\" value=\"")
            .append(dpn.getFirstNames()).append("\"/></td>\n");
 
@@ -438,7 +481,7 @@
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext) 
+      int fieldCountIncr, String label, PageContext pageContext, String vocabulary) 
       throws java.io.IOException 
     {
 
@@ -468,9 +511,13 @@
            .append(fieldName);
          if (repeatable)
            sb.append("_").append(i);
+         
          sb.append("\" size=\"50\" value=\"")
            .append(val)
-	   .append("\"/></td>\n");
+	   	.append("\"/>")
+	   .append(doControlledVocabulary(fieldName, pageContext, vocabulary))
+	   .append("</td>\n");
+	   
 
 	 if (repeatable && i < defaults.length) 
 	 {
@@ -506,7 +553,7 @@
 
     void doTwoBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext) 
+      int fieldCountIncr, String label, PageContext pageContext, String vocabulary) 
       throws java.io.IOException 
     {
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
@@ -560,9 +607,10 @@
          else 
 	 {
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
-             .append(fieldName)
-             .append("_").append(i)
-             .append("\" size=\"15\"/></td>\n");
+             .append(fieldName).append("_").append(i)
+             .append("\" size=\"15\">")
+             .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
+             .append("</td>\n");             
 	 }
 	 i++;
 	 if (i < defaults.length)
@@ -584,7 +632,10 @@
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldName)
              .append("_").append(i)
-             .append("\" size=\"15\"/></td>");
+             //.append("\" size=\"15\"/></td>");
+             .append("\" size=\"15\">") 
+             .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
+             .append("</td>\n");             
 
 	   if (i+1 >= fieldCount) 
 	   {
@@ -605,6 +656,8 @@
 
       out.write(sb.toString());
     }
+    
+    
 
     void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, DCInputSet inputs, boolean repeatable,
@@ -783,8 +836,11 @@
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
 
-  <form action="<%= request.getContextPath() %>/submit#<%= si.jumpToField%>" method="post">
+<%
+	contextPath = request.getContextPath();
+%>
 
+  <form action="<%= request.getContextPath() %>/submit#<%= si.jumpToField%>" method="post" name="edit_metadata">
     <jsp:include page="/submit/progressbar.jsp">
       <jsp:param name="current_stage" value="<%= pageNum %>"/>
       <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
@@ -833,11 +889,16 @@
        String fieldName;
        int fieldCountIncr;
        boolean repeatable;
+       String vocabulary;
 
+       vocabulary = inputs[z].getVocabulary();
+       
+       
        if (dcQualifier != null && !dcQualifier.equals("*"))
           fieldName = dcSchema + "_" + dcElement + '_' + dcQualifier;
        else
           fieldName = dcSchema + "_" + dcElement;
+
 
        //if (inputs[z].isRequired()) {
          // si.jumpToField = fieldName;
@@ -864,7 +925,7 @@
        { 
          fieldCountIncr = 1;
          if (si.moreBoxesFor != null && si.moreBoxesFor.equals(fieldName)) 
-	 {
+	     {
            fieldCountIncr = 2;
          }
        }
@@ -885,7 +946,6 @@
        {
            doSeriesNumber(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
 	                      repeatable, fieldCountIncr, label, pageContext);
-
        } 
        else if (inputType.equals("qualdrop_value")) 
        {
@@ -896,7 +956,6 @@
        {
 	   	   doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
 	     			  repeatable, fieldCountIncr, label, pageContext);
-
        } 
        else if (inputType.equals("dropdown")) 
        {
@@ -906,15 +965,29 @@
        else if (inputType.equals("twobox")) 
        {
 	   		doTwoBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label, pageContext);
+	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary);
        } 
        else 
        {
 	   		doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label, pageContext);
+	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary);
        }
+       
+       if (hasVocabulary(vocabulary))
+       {
 %>
 
+		<br/>
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="3" class="submitFormHelpControlledVocabularies">
+				<object><dspace:popup page="/help/index.html#controlledvocabulary"><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.help-link"/></dspace:popup></object>
+			</td>
+		</tr>
+
+<%
+		}
+%>
 <%-- HACK: Using this line to give the browser hints as to the widths of cells --%>
        <tr>
          <td width="40%">&nbsp;</td>
