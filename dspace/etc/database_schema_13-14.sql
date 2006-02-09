@@ -269,7 +269,7 @@ insert into most_recent_checksum
 (
     bitstream_id,  
     to_be_processed,
-    expected_checksum,
+    last_checksum,
     current_checksum,
     last_process_start_date,
     last_process_end_date,
