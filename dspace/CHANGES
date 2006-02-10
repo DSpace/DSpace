@@ -1,5 +1,8 @@
 1.4 alpha 1
 ===========
+(Scott Yeadon)
+- Script for updating handle prefixes (e.g. for moving from development to production)
+
 (Miguel Ferreira)
 - Controlled vocabulary patch to provide search on classification terms, and
   addition of terms during submission.

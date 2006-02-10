@@ -341,6 +341,12 @@ alert.recipient (not essential but very useful!)</PRE>
 
     <P>Note that since the DSpace code manages individual Handles, administrative operations such as Handle creation and modification aren't supported by DSpace's Handle server.</P>
 
+	<p>If you need to update the handle prefix on items created before the CNRI registration process you can run the <code><i>[dspace]</i>/bin/update-handle-prefix script</code>. You may need to do this if you loaded items prior to CNRI registration (e.g. setting up a demonstration system prior to migrating it to production). The script takes the current and new prefix as parameters. For example:</p>
+
+	<p><code><i>[dspace]</i>/bin/update-handle-prefix 123456789 1303</code></p>
+
+	<p>will change any handles currently assigned prefix 123456789 to prefix 1303, so for example handle 123456789/23 will be updated to 1303/23 in the database.</p>
+
 
     <H2><A NAME="checking">Checking Your Installation</A></H2>
     <p>TODO</p>
