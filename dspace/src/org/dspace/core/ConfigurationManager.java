@@ -166,27 +166,42 @@ public class ConfigurationManager
      */
     public static boolean getBooleanProperty(String property)
     {
+        return getBooleanProperty(property, false);
+    }
+
+    /**
+     * Get a configuration property as a boolean, with default.
+     * True is indicated if the value
+     * of the property is <code>TRUE</code> or <code>YES</code> (case
+     * insensitive.)
+     *
+     * @param property
+     *            the name of the property
+     *
+     * @param defaultValue
+     *            value to return if property is not found.
+     *
+     * @return the value of the property. <code>default</code> is returned if
+     *         the property does not exist. To differentiate between this case
+     *         and when the property actually is false, use
+     *         <code>getProperty</code>.
+     */
+    public static boolean getBooleanProperty(String property, boolean defaultValue)
+    {
         if (properties == null)
         {
             loadConfig(null);
         }
 
         String stringValue = properties.getProperty(property);
-        boolean boolValue = false;
 
         if (stringValue != null)
         {
-            if (stringValue.equalsIgnoreCase("true"))
-            {
-                boolValue = true;
+            return  stringValue.equalsIgnoreCase("true") ||
+                    stringValue.equalsIgnoreCase("yes");
             }
-            else if (stringValue.equalsIgnoreCase("yes"))
-            {
-                boolValue = true;
-            }
-        }
-
-        return boolValue;
+        else
+            return defaultValue;
     }
 
     /**
@@ -196,6 +211,9 @@ public class ConfigurationManager
      */
     public static Enumeration propertyNames()
     {
+        if (properties == null)
+            loadConfig(null);
+
         return properties.propertyNames();
     }
 

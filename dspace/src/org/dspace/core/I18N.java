@@ -136,7 +136,7 @@ public class I18N {
 	 */
 	public String getMessage(String msg, Class clazz) {
 		String className = clazz.getName();
-		return messages.getString(new StringBuilder(50).append(className)
+		return messages.getString(new StringBuffer(50).append(className)
 				.append(".").append(msg).toString());
 	}
 

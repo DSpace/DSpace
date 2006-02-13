@@ -434,6 +434,8 @@ Copied language packs into ${dspace.dir}/config
       <package name="org.dspace.browse"/>
       <package name="org.dspace.checker"/>
       <package name="org.dspace.content"/>
+      <package name="org.dspace.content.packager"/>
+      <package name="org.dspace.content.crosswalk"/>
       <package name="org.dspace.core"/>
       <package name="org.dspace.eperson"/>
       <package name="org.dspace.handle"/>

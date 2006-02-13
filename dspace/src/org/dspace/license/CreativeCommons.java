@@ -39,6 +39,7 @@
  */
 package org.dspace.license;
 
+import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class CreativeCommons
     /**
      * The Bundle Name
      */
-    private static final String CC_BUNDLE_NAME = "CC-LICENSE";
+    public static final String CC_BUNDLE_NAME = "CC-LICENSE";
 
     private static final String CC_BS_SOURCE = "org.dspace.license.CreativeCommons";
 
@@ -106,6 +107,21 @@ public class CreativeCommons
         return enabled_p;
     }
 
+        // create the CC bundle if it doesn't exist
+        // If it does, remove it and create a new one.
+    private static Bundle getCcBundle(Item item)
+        throws SQLException, AuthorizeException, IOException
+    {
+        Bundle[] bundles = item.getBundles(CC_BUNDLE_NAME);
+
+        if ((bundles.length > 0) && (bundles[0] != null))
+        {
+            item.removeBundle(bundles[0]);
+        }
+        return item.createBundle(CC_BUNDLE_NAME);
+    }
+
+
     /**
      * This is a bit of the "do-the-right-thing" method for CC stuff in an item
      */
@@ -113,22 +129,7 @@ public class CreativeCommons
             String cc_license_url) throws SQLException, IOException,
             AuthorizeException
     {
-        // only if CC is enabled
-        if (!CreativeCommons.isEnabled())
-        {
-            return;
-        }
-
-        // create the CC bundle if it doesn't exist
-        // If it does, remove it and create a new one.
-        Bundle[] bundles = item.getBundles(CC_BUNDLE_NAME);
-
-        if ((bundles.length > 0) && (bundles[0] != null))
-        {
-            item.removeBundle(bundles[0]);
-        }
-
-        Bundle bundle = item.createBundle(CC_BUNDLE_NAME);
+        Bundle bundle = getCcBundle(item);
 
         // get some more information
         String license_text = fetchLicenseText(cc_license_url);
@@ -168,15 +169,29 @@ public class CreativeCommons
                 document_rdf.getBytes());
     }
 
+    public static void setLicense(Context context, Item item,
+                                  InputStream licenseStm, String mimeType)
+            throws SQLException, IOException, AuthorizeException
+    {
+        Bundle bundle = getCcBundle(item);
+
+        // generic "License" format -- change for CC?
+        BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(
+                context, "License");
+
+        Bitstream bs = bundle.createBitstream(licenseStm);
+        bs.setSource(CC_BS_SOURCE);
+        bs.setName((mimeType != null &&
+                    (mimeType.equalsIgnoreCase("text/xml") ||
+                     mimeType.equalsIgnoreCase("text/rdf"))) ?
+                   BSN_LICENSE_RDF : BSN_LICENSE_TEXT);
+        bs.setFormat(bs_format);
+        bs.update();
+        }
+
     public static void removeLicense(Context context, Item item)
             throws SQLException, IOException, AuthorizeException
     {
-        // only if CC is enabled
-        if (!CreativeCommons.isEnabled())
-        {
-            return;
-        }
-
         // remove CC license bundle if one exists
         Bundle[] bundles = item.getBundles(CC_BUNDLE_NAME);
 
@@ -189,12 +204,6 @@ public class CreativeCommons
     public static boolean hasLicense(Context context, Item item)
             throws SQLException, IOException
     {
-        // only if CC is enabled
-        if (!CreativeCommons.isEnabled())
-        {
-            return false;
-        }
-
         // try to find CC license bundle
         Bundle[] bundles = item.getBundles(CC_BUNDLE_NAME);
 
@@ -237,6 +246,27 @@ public class CreativeCommons
     {
         return getStringFromBitstream(item, BSN_LICENSE_RDF);
     }
+
+    /**
+     * Get Creative Commons license RDF, returning Bitstream object.
+     * @return bitstream or null.
+     */
+    public static Bitstream getLicenseRdfBitstream(Item item) throws SQLException,
+            IOException, AuthorizeException
+    {
+        return getBitstream(item, BSN_LICENSE_RDF);
+    }
+
+    /**
+     * Get Creative Commons license Text, returning Bitstream object.
+     * @return bitstream or null.
+     */
+    public static Bitstream getLicenseTextBitstream(Item item) throws SQLException,
+            IOException, AuthorizeException
+    {
+        return getBitstream(item, BSN_LICENSE_TEXT);
+    }
+
 
     /**
      * Get a few license-specific properties. We expect these to be cached at
@@ -289,11 +319,6 @@ public class CreativeCommons
             String bitstream_name) throws SQLException, IOException,
             AuthorizeException
     {
-        if (!CreativeCommons.isEnabled())
-        {
-            return null;
-        }
-
         byte[] bytes = getBytesFromBitstream(item, bitstream_name);
 
         if (bytes == null)
@@ -308,7 +333,7 @@ public class CreativeCommons
      * This helper method retrieves the bytes of a bitstream for an item under
      * the CC bundle, with the given bitstream name
      */
-    private static byte[] getBytesFromBitstream(Item item, String bitstream_name)
+    private static Bitstream getBitstream(Item item, String bitstream_name)
             throws SQLException, IOException, AuthorizeException
     {
         Bundle cc_bundle = null;
@@ -334,7 +359,13 @@ public class CreativeCommons
             return null;
         }
 
-        Bitstream bs = cc_bundle.getBitstreamByName(bitstream_name);
+        return cc_bundle.getBitstreamByName(bitstream_name);
+    }
+
+    private static byte[] getBytesFromBitstream(Item item, String bitstream_name)
+            throws SQLException, IOException, AuthorizeException
+    {
+        Bitstream bs = getBitstream(item, bitstream_name);
 
         // no such bitstream
         if (bs == null)

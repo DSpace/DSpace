@@ -174,6 +174,34 @@ public class BitstreamFormat
     }
 
     /**
+     * Find a bitstream format by its (unique) MIME type.
+     * If more than one bitstream format has the same MIME type, the
+     * one returned is unpredictable.
+     *
+     * @param context
+     *            DSpace context object
+     * @param mimeType
+     *            MIME type value
+     *
+     * @return the corresponding bitstream format, or <code>null</code> if
+     *         there's no bitstream format with the given MIMEtype.
+     * @throws SQLException
+     */
+    public static BitstreamFormat findByMIMEType(Context context,
+            String mimeType) throws SQLException
+    {
+        // NOTE: Avoid internal formats since e.g. "License" also has
+        // a MIMEtype of text/plain.
+        TableRow formatRow = DatabaseManager.querySingle(context,
+            "SELECT * FROM bitstreamformatregistry "+
+            "WHERE mimetype LIKE '"+mimeType+"' AND internal = '0';");
+
+        if (formatRow == null)
+            return null;
+        return findByFinish(context, formatRow);
+    }
+
+    /**
      * Find a bitstream format by its (unique) short description
      * 
      * @param context
@@ -196,6 +224,15 @@ public class BitstreamFormat
             return null;
         }
 
+        return findByFinish(context, formatRow);
+    }
+
+    // shared final logic in findBy... methods;
+    // use context's cache for object mapped from table row.
+    private static BitstreamFormat findByFinish(Context context,
+                                                TableRow formatRow)
+        throws SQLException
+    {
         // not null
         if (log.isDebugEnabled())
         {

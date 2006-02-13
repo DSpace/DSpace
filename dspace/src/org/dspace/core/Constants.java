@@ -78,6 +78,31 @@ public class Constants
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM",
             "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON", };
 
+    /**
+     * Special Bundle and Bitstream Names:
+     */
+
+    /** Magic name of item license, as bitstream in LICENSE_BUNDLE_NAME  */
+    public static final String LICENSE_BITSTREAM_NAME = "license.txt";
+
+    /** Magic name of bundle containing item license */
+    public static final String LICENSE_BUNDLE_NAME = "LICENSE";
+
+    /**
+     * Default bundle name for the "original" item content;
+     * "derived" content such as thumbnails goes in other bundles.
+     */
+    public static final String DEFAULT_BUNDLE_NAME = "ORIGINAL";
+
+    /**
+     * Name of bundle for user-visible "content" (same as default for now).
+     */
+    public static final String CONTENT_BUNDLE_NAME = "ORIGINAL";
+
+    /** Bundle name for structured metadata bitstreams. */
+    public static final String METADATA_BUNDLE_NAME = "METADATA";
+
+
     /** Action of reading, viewing or downloading something */
     public static final int READ = 0;
 
