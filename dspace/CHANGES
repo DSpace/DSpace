@@ -2,6 +2,7 @@
 ===========
 (Scott Yeadon)
 - Script for updating handle prefixes (e.g. for moving from development to production)
+- Configurable boolean search operator
 
 (Miguel Ferreira)
 - Controlled vocabulary patch to provide search on classification terms, and

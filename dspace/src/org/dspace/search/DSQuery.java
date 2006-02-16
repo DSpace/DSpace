@@ -81,7 +81,7 @@ public class DSQuery
     private static Searcher searcher;
 
     private static long lastModified;
-
+    
     /** log4j logger */
     private static Logger log = Logger.getLogger(DSQuery.class);
 
@@ -92,7 +92,7 @@ public class DSQuery
         if (maxClauses != null)
         {
             BooleanQuery.setMaxClauseCount(Integer.parseInt(maxClauses));
-        }
+        } 
     }
 
     /**
@@ -135,6 +135,17 @@ public class DSQuery
 
             QueryParser qp = new QueryParser("default", DSIndexer.getAnalyzer());
             log.info("Final query string: " + querystring);
+            
+            String operator = ConfigurationManager.getProperty("search.operator");   
+            if (operator == null || operator.equals("OR"))
+            {
+            	qp.setOperator(QueryParser.DEFAULT_OPERATOR_OR);
+            }
+            else
+            {
+            	qp.setOperator(QueryParser.DEFAULT_OPERATOR_AND);
+            }
+            
             Query myquery = qp.parse(querystring);
             Hits hits = searcher.search(myquery);
 
