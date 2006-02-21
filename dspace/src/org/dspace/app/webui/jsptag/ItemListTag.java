@@ -63,6 +63,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import java.sql.SQLException;
+import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
 
@@ -99,6 +100,15 @@ public class ItemListTag extends TagSupport
 
     /** Config browse/search thumbnail link behaviour */
     private boolean linkToBitstream = false;
+    
+    /** The default fields to be displayed when listing items */
+    private static String listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
+    
+    /** The default field which is bound to the browse by date */
+    private static String dateField = "dc.date.issued";
+    
+    /** The default field which is bound to the browse by title */
+    private static String titleField = "dc.title";
 
     public ItemListTag()
     {
@@ -109,7 +119,8 @@ public class ItemListTag extends TagSupport
     public int doStartTag() throws JspException
     {
         JspWriter out = pageContext.getOut();
-
+        HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
+        
         boolean emphasiseDate = false;
         boolean emphasiseTitle = false;
 
@@ -118,128 +129,199 @@ public class ItemListTag extends TagSupport
             emphasiseDate = emphColumn.equalsIgnoreCase("date");
             emphasiseTitle = emphColumn.equalsIgnoreCase("title");
         }
-
-        try
+        
+        // get the elements to display
+        String configLine = ConfigurationManager.getProperty("webui.itemlist.columns");
+        if (configLine != null)
+        {
+            listFields = configLine;
+        }
+        
+        // get the date and title fields
+        String dateLine = ConfigurationManager.getProperty("webui.browse.index.date");
+        if (dateLine != null)
+        {
+            dateField = dateLine;
+        }
+        
+        String titleLine = ConfigurationManager.getProperty("webui.browse.index.title");
+        if (titleLine != null)
+        {
+            titleField = titleLine;
+        }
+        
+        StringTokenizer st = new StringTokenizer(listFields, ",");
+        
+//      make an array to hold all the frags that we will use
+        int columns = st.countTokens();
+        String[] frags = new String[columns * items.length];
+        
+        try 
         {
             out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browse all dspace content\">");
-
-            // Write column headings
-            out.print("<tr><th id=\"t1\" class=\"oddRowOddCol\">"
-                    + (emphasiseDate ? "<strong>" : "")
-                    + LocaleSupport.getLocalizedMessage(pageContext,
-                            "org.dspace.app.webui.jsptag.ItemListTag.issueDate")
-                    + (emphasiseDate ? "</strong>" : "") + "</th>");
-
-            out.println("<th id=\"t2\" class=\"oddRowEvenCol\">"
-                    + (emphasiseTitle ? "<strong>" : "")
-                    + LocaleSupport.getLocalizedMessage(pageContext,
-                            "org.dspace.app.webui.jsptag.ItemListTag.title")
-                    + (emphasiseTitle ? "</strong>" : "") + "</th>");
-
-            out.println("<th id=\"t3\" class=\"oddRowOddCol\">"
-                    + LocaleSupport.getLocalizedMessage(pageContext,
-                            "org.dspace.app.webui.jsptag.ItemListTag.authors")
-                    + "</th></tr>");
-
-            // Row: toggles between Odd and Even
-            String row = "even";
-
-            for (int i = 0; i < items.length; i++)
+            out.println("<tr>");
+            
+            //      Write the column headings
+            int colCount = 1;
+            boolean isDate = false;
+            boolean emph = false;
+            
+            while (st.hasMoreTokens())
             {
-                // Title - we just use the first one
-                DCValue[] titleArray = items[i].getDC("title", null, Item.ANY);
-                String title = LocaleSupport.getLocalizedMessage(pageContext,
-                                "jsp.general.untitled");
-
-                if (titleArray.length > 0)
+                String field = st.nextToken().toLowerCase().trim();
+                String cOddOrEven = ((colCount % 2) == 0 ? "Odd" : "Even");
+                
+                // find out if the field is a date
+                if (field.indexOf("(date)") > 0)
                 {
-                    title = titleArray[0].value;
+                    field = field.replaceAll("\\(date\\)", "");
+                    isDate = true;
                 }
-
-                // Authors....
-                DCValue[] authors = items[i].getDC("contributor", Item.ANY,
-                        Item.ANY);
-
-                // Date issued
-                DCValue[] dateIssued = items[i].getDC("date", "issued",
-                        Item.ANY);
-                DCDate dd = null;
-
-                if (dateIssued.length > 0)
+                
+                // get the schema and the element qualifier pair
+                // (Note, the schema is not used for anything yet)
+                // (second note, I hate this bit of code.  There must be
+                // a much more elegant way of doing this.  Tomcat has
+                // some weird problems with variations on this code that 
+                // I tried, which is why it has ended up the way it is)
+                StringTokenizer eq = new StringTokenizer(field, ".");
+                
+                String[] tokens = { "", "", "" };
+                int k = 0;
+                while(eq.hasMoreTokens())
                 {
-                    dd = new DCDate(dateIssued[0].value);
+                    tokens[k] = eq.nextToken().toLowerCase().trim();
+                    k++;
                 }
-
-                // First column is date
-                out.print("<tr><td headers=\"t1\" nowrap=\"nowrap\" class=\"");
-                out.print((i == highlightRow) ? "highlight" : row);
-                out.print("RowOddCol\" align=\"right\">");
-
-                if (emphasiseDate)
+                String schema = tokens[0];
+                String element = tokens[1];
+                String qualifier = tokens[2];
+                
+                // find out if we are emphasising this field
+                if ((field.equals(dateField) && emphasiseDate) || 
+                        (field.equals(titleField) && emphasiseTitle))
                 {
-                    out.print("<strong>");
+                    emph = true;
                 }
-
-                out.print(UIUtil.displayDate(dd, false, false));
-
-                if (emphasiseDate)
+                
+                // prepare the strings for the header
+                String id = "t" + Integer.toString(colCount);
+                String css = "oddRow" + cOddOrEven + "Col";
+                String message = "itemlist." + field;
+                
+                // output the header
+                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                        + (emph ? "<strong>" : "")
+                        + LocaleSupport.getLocalizedMessage(pageContext, message)
+                        + (emph ? "</strong>" : "") + "</th>");
+                
+                // now prepare the frags for each of the table elements
+                for (int i = 0; i < items.length; i++)
                 {
-                    out.print("</strong>");
-                }
-
-                HttpServletRequest hrq = (HttpServletRequest) pageContext
-                        .getRequest();
-
-                // display thumbnails if required
-                if (showThumbs)
-                {
-                    out.print(getThumbMarkup(hrq, items[i]));
-                }
-
-                // Second column is title
-                out.print("</td><td headers=\"t2\" class=\"");
-                out.print((i == highlightRow) ? "highlight" : row);
-                out.print("RowEvenCol\">");
-
-                if (emphasiseTitle)
-                {
-                    out.print("<strong>");
-                }
-
-                out.print("<a href=\"");
-                out.print(hrq.getContextPath());
-                out.print("/handle/");
-                out.print(items[i].getHandle());
-                out.print("\">");
-                out.print(Utils.addEntities(title));
-                out.print("</a>");
-
-                if (emphasiseTitle)
-                {
-                    out.print("</strong>");
-                }
-
-                // Third column is authors
-                out.print("</td><td headers=\"t3\" class=\"");
-                out.print((i == highlightRow) ? "highlight" : row);
-                out.print("RowOddCol\">");
-
-                for (int j = 0; j < authors.length; j++)
-                {
-                    out.print("<em>" + Utils.addEntities(authors[j].value)
-                            + "</em>");
-
-                    if (j < (authors.length - 1))
+                    // first get hold of the relevant metadata for this column
+                    DCValue[] metadataArray;
+                    if (qualifier.equals("*"))
                     {
-                        out.print("; ");
+                        metadataArray = items[i].getDC(element, Item.ANY, Item.ANY);
                     }
+                    else if (qualifier.equals(""))
+                    {
+                        metadataArray = items[i].getDC(element, null, Item.ANY);
+                    }
+                    else
+                    {
+                        metadataArray = items[i].getDC(element, qualifier, Item.ANY);
+                    }
+                    
+                    // now prepare the content of the table division
+                    String metadata = "-";
+                    if (metadataArray.length > 0)
+                    {
+                        // format the date field correctly
+                        if (isDate)
+                        {
+                            // this is to be consistent with the existing setup.
+                            // seems like an odd place to put it though (FIXME)
+                            String thumbs = "";
+                            if (showThumbs)
+                            {
+                                thumbs = getThumbMarkup(hrq, items[i]);
+                            }
+                            DCDate dd = new DCDate(metadataArray[0].value);
+                            metadata = UIUtil.displayDate(dd, false, false) + thumbs;
+                        }
+                        // format the title field correctly
+                        else if (field.equals(titleField))
+                        {
+                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/" 
+                            + items[i].getHandle() + "\">" 
+                            + Utils.addEntities(metadataArray[0].value)
+                            + "</a>";
+                        }
+                        // format all other fields
+                        else
+                        {
+                            StringBuffer sb = new StringBuffer();
+                            for (int j = 0; j < metadataArray.length; j++)
+                            {
+                                sb.append(Utils.addEntities(metadataArray[j].value));
+                                if (j < (metadataArray.length - 1))
+                                {
+                                    sb.append("; ");
+                                }
+                            }
+                            metadata = "<em>" + sb.toString() + "</em>";
+                        }
+                    }
+                    
+                    // now prepare the XHTML frag for this division
+                    String rOddOrEven;
+                    if (i == highlightRow)
+                    {
+                        rOddOrEven = "highlight";
+                    }
+                    else
+                    {
+                        rOddOrEven = ((i % 2) == 1 ? "odd" : "even");
+                    }
+                    
+                    // prepare extra special layout requirements for dates
+                    String extras = "";
+                    if (isDate)
+                    {
+                        extras = "nowrap=\"nowrap\" align=\"right\"";
+                    }
+                    
+                    int idx = ((i + 1) * columns) - columns + colCount - 1;
+                    frags[idx] = "<td headers=\"" + id + "\" class=\"" 
+                    	+ rOddOrEven + "Row" + cOddOrEven + "Col\" " + extras + ">"
+                    	+ (emph ? "<strong>" : "") + metadata + (emph ? "</strong>" : "")
+                    	+ "</td>";
+                    
                 }
-
-                out.println("</td></tr>");
-
-                row = (row.equals("odd") ? "even" : "odd");
+                
+                colCount++;
+                isDate = false;
+                emph = false;
             }
-
+            
+            out.println("</tr>");
+            
+            // now output all the frags in the right order for the page
+            for (int i = 0; i < frags.length; i++)
+            {
+                if ((i + 1) % columns == 1)
+                {
+                    out.println("<tr>");
+                }
+                out.println(frags[i]);
+                if ((i + 1) % columns == 0)
+                {
+                    out.println("</tr>");
+                }
+            }
+            
+            // close the table
             out.println("</table>");
         }
         catch (IOException ie)

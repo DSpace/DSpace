@@ -55,6 +55,8 @@
 DROP INDEX dcvalue_dc_type_id_idx;
 
 -- Drop the views
+DROP VIEW CommunityItemsBySubject;
+DROP VIEW CollectionItemsBySubject;
 DROP VIEW CommunityItemsByDateAccession;
 DROP VIEW CollectionItemsByDateAccession;
 DROP VIEW CommunityItemsByDate;
@@ -67,6 +69,7 @@ DROP VIEW Community2Item;
 DROP VIEW DCValue;
 
 -- Then the tables
+DROP TABLE ItemsBySubject;
 DROP TABLE ItemsByDateAccessioned;
 DROP TABLE ItemsByDate;
 DROP TABLE ItemsByTitle;

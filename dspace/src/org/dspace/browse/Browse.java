@@ -51,6 +51,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 
@@ -495,16 +496,47 @@ public class Browse
             DatabaseManager.update(context, row);
         }
 
+        // get the metadata fields to index in the title and date tables
+        
+        // get the date, title and author fields
+        String dateField = ConfigurationManager.getProperty("webui.browse.index.date");
+        if (dateField == null)
+        {
+            dateField = "dc.date.issued";
+        }
+        
+        String titleField = ConfigurationManager.getProperty("webui.browse.index.title");
+        if (titleField == null)
+        {
+            titleField = "dc.title";
+        }
+        
+        String authorField = ConfigurationManager.getProperty("webui.browse.index.author");
+        if (authorField == null)
+        {
+            authorField = "dc.contributor.*";
+        }
+        
+        String subjectField = ConfigurationManager.getProperty("webui.browse.index.subject");
+        if (subjectField == null)
+        {
+            subjectField = "dc.subject.*";
+        }
+        
+        // get the DC values for each of these fields
+        DCValue[] titleArray = getDCField(item, titleField);
+        DCValue[] dateArray = getDCField(item, dateField);
+        DCValue[] authorArray = getDCField(item, authorField);
+        DCValue[] subjectArray = getDCField(item, subjectField);
+        
+        // now build the data map
         Map table2dc = new HashMap();
-        table2dc.put("ItemsByTitle", item.getDC("title", null, Item.ANY));
-        table2dc.put("ItemsByAuthor", item.getDC("contributor", Item.ANY,
-                Item.ANY));
-        table2dc.put("ItemsByDate", item.getDC("date", "issued", Item.ANY));
+        table2dc.put("ItemsByTitle", titleArray);
+        table2dc.put("ItemsByAuthor", authorArray);
+        table2dc.put("ItemsByDate", dateArray);
         table2dc.put("ItemsByDateAccessioned", item.getDC("date",
                 "accessioned", Item.ANY));
-        // TODO: Get from config? (Richard Jones patch?)
-        table2dc.put("ItemsBySubject", item
-                .getDC("subject", Item.ANY, Item.ANY));
+        table2dc.put("ItemsBySubject", subjectArray);
 
         for (Iterator iterator = table2dc.keySet().iterator(); iterator
                 .hasNext();)
@@ -622,6 +654,38 @@ public class Browse
     // Private methods
     ////////////////////////////////////////
 
+    private static DCValue[] getDCField(Item item, String dc)
+    {
+        StringTokenizer dcf = new StringTokenizer(dc, ".");
+        
+        String[] tokens = { "", "", "" };
+        int i = 0;
+        while(dcf.hasMoreTokens())
+        {
+            tokens[i] = dcf.nextToken().toLowerCase().trim();
+            i++;
+        }
+        String schema = tokens[0];
+        String element = tokens[1];
+        String qualifier = tokens[2];
+        
+        DCValue[] values;
+        if ("*".equals(qualifier))
+        {
+            values = item.getDC(element, Item.ANY, Item.ANY);
+        }
+        else if ("".equals(qualifier))
+        {
+            values = item.getDC(element, null, Item.ANY);
+        }
+        else
+        {
+            values = item.getDC(element, qualifier, Item.ANY);
+        }
+        
+        return values;
+    }
+    
     /**
      * Workhorse method for browse functionality.
      * 
@@ -1772,7 +1836,7 @@ class BrowseCache
 
             if (results != null)
             {
-                //use getIntColumn for Oracle count data
+                // use getIntColumn for Oracle count data
                 if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
                 {
                     count = results.getIntColumn("count");              

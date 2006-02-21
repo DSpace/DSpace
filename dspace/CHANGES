@@ -1,5 +1,8 @@
 1.4 alpha 1
 ===========
+(Richard Jones)
+- Customisable item listing columns and browse indices (SF patch #1324631)
+
 (Scott Yeadon)
 - Script for updating handle prefixes (e.g. for moving from development to production)
 - Configurable boolean search operator
