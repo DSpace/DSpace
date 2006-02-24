@@ -122,11 +122,40 @@ public class WorkflowManager
     public static final int WFSTATE_ARCHIVE = 7; // probably don't need this one
                                                  // either
 
+    /** Symbolic names of workflow steps. */
+    public static final String workflowText[] =
+    {
+        "SUBMIT",           // 0
+        "STEP1POOL",        // 1
+        "STEP1",            // 2
+        "STEP2POOL",        // 3
+        "STEP2",            // 4
+        "STEP3POOL",        // 5
+        "STEP3",            // 6
+        "ARCHIVE"           // 7
+    };
+
     /* support for 'no notification' */
     private static Map noEMail = new HashMap();
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(WorkflowManager.class);
+
+    /**
+     * Translate symbolic name of workflow state into number.
+     * The name is case-insensitive.  Returns -1 when name cannot
+     * be matched.
+     * @param state symbolic name of workflow state, must be one of
+     *        the elements of workflowText array.
+     * @return numeric workflow state or -1 for error.
+     */
+    public static int getWorkflowID(String state)
+    {
+        for (int i = 0; i < workflowText.length; ++i)
+            if (state.equalsIgnoreCase(workflowText[i]))
+                return i;
+        return -1;
+    }
 
     /**
      * startWorkflow() begins a workflow - in a single transaction do away with
