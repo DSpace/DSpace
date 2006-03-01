@@ -77,6 +77,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
+import org.dspace.license.CreativeCommons;
 
 /**
  * Servlet for editing and deleting (expunging) items
@@ -153,7 +154,6 @@ public class EditItemServlet extends DSpaceServlet
         {
             // now check to see if person can edit item
             checkEditAuthorization(context, itemToEdit);
-
             showEditForm(context, request, response, itemToEdit);
         }
         else
@@ -202,6 +202,7 @@ public class EditItemServlet extends DSpaceServlet
 
         Item item = Item.find(context, UIUtil.getIntParameter(request,
                 "item_id"));
+ 
         String handle = HandleManager.findHandle(context, item);
 
         // now check to see if person can edit item
@@ -317,6 +318,14 @@ public class EditItemServlet extends DSpaceServlet
             HttpServletResponse response, Item item) throws ServletException,
             IOException, SQLException, AuthorizeException
     {
+        if ( request.getParameter("cc_license_url") != null )
+        {
+        	// set or replace existing CC license
+        	CreativeCommons.setLicense( context, item,
+                   request.getParameter("cc_license_url") );
+        	context.commit();
+        }
+  
         // Get the handle, if any
         String handle = HandleManager.findHandle(context, item);
 
@@ -351,7 +360,6 @@ public class EditItemServlet extends DSpaceServlet
             IOException, SQLException, AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit");
-
         /*
          * "Cancel" handled above, so whatever happens, we need to update the
          * item metadata. First, we remove it all, then build it back up again.
@@ -549,6 +557,14 @@ public class EditItemServlet extends DSpaceServlet
             item.update();
         }
 
+        if (button.equals("submit_addcc"))
+        {
+            // Show cc-edit page 
+            request.setAttribute("item", item);
+            JSPManager
+                    .showJSP(request, response, "/tools/creative-commons-edit.jsp");
+        }
+        
         if (button.equals("submit_addbitstream"))
         {
             // Show upload bitstream page
@@ -561,7 +577,7 @@ public class EditItemServlet extends DSpaceServlet
             // Show edit page again
             showEditForm(context, request, response, item);
         }
-
+        
         // update the item index
         DSIndexer.reIndexContent(context, item);
 

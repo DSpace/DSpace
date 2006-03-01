@@ -1,5 +1,8 @@
 1.4 alpha 1
 ===========
+(Navalkishore Sarda, Scott Yeadon)
+- Add/replace Creative Commons in 'edit item' tool (SF patch #1172755)
+
 (Richard Jones)
 - Customisable item listing columns and browse indices (SF patch #1324631)
 

@@ -60,6 +60,9 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="javax.servlet.jsp.PageContext" %>
+
 <%@ page import="org.dspace.content.MetadataField" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.AuthorizeAdminServlet" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
@@ -379,8 +382,30 @@
 %>
         </table>
 
+        <p>&nbsp;</p>
+
         <%-- <p align="center"><input type="submit" name="submit_addbitstream" value="Add Bitstream"></p> --%>
-		<p align="center"><input type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/></p>
+        <center>
+            <table width="70%" align="center">
+                <tr>
+						<input type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/>
+		<%
+
+			if (ConfigurationManager.getBooleanProperty("webui.submit.enable-cc"))
+			{
+				String s;
+				Bundle[] ccBundle = item.getBundles("CC-LICENSE");
+				s = ccBundle.length > 0 ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.replacecc.button") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.addcc.button");
+		%>
+                    <input type="submit" name="submit_addcc" value="<%= s %>" />
+                    <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>"/>
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
+       <%
+			}
+%>
+                </tr>
+            </table>
+        </center>
 
         <p>&nbsp;</p>
 
@@ -401,5 +426,5 @@
                 </tr>
             </table>
         </center>
-    </form>
+    </form>    
 </dspace:layout>
