@@ -211,7 +211,21 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
-
+ 
+  <tag>
+    <name>item-preview</name>
+    <tagclass>org.dspace.app.webui.jsptag.PreviewTag</tagclass>
+    <info>
+      Tag for displaying an item preview image.  "item" must always be an
+      org.dspace.content.Item
+    </info>
+    <attribute>
+      <name>item</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+  </tag>
 
   <tag>
     <name>itemlist</name>
