@@ -1,5 +1,9 @@
 1.4 alpha 1
 ===========
+(Scott Yeadon)
+- Add support for branded preview image
+  SF Patches: #1330829, #1430437
+
 (Navalkishore Sarda, Scott Yeadon)
 - Add/replace Creative Commons in 'edit item' tool (SF patch #1172755)
 
