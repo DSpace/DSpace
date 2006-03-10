@@ -186,64 +186,77 @@ public class LDAPAuthentication
         {
             if (ldap.ldapAuthenticate(netid, password, context))
             {
-                if (canSelfRegister(context, request, netid))
-                {
-                    // Register the new user automatically
-                    log.info(LogManager.getHeader(context,
-                                    "autoregister", "netid=" + netid));
+                // Register the new user automatically
+                log.info(LogManager.getHeader(context,
+                                "autoregister", "netid=" + netid));
 
-                    if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals("")))
-                    {
-                        try
-                        {
-                            eperson = EPerson.findByEmail(context, ldap.ldapEmail);
-                        }
-                        catch (AuthorizeException e)
-                        {
-                            eperson = null;
-                        }
-                        if (eperson!=null)
-                        {
-                            log.info(LogManager.getHeader(context,
-                                    "failed_autoregister", "type=ldap_but_already_email"));
-                            return SUCCESS;
-                        }
-                    }
-                    // TEMPORARILY turn off authorisation
+                if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals("")))
+                {
                     try
                     {
-                        context.setIgnoreAuthorization(true);
-                        eperson = EPerson.create(context);
-                        if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals(""))) eperson.setEmail(ldap.ldapEmail);
-                        else eperson.setEmail(netid);
-                        if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals(""))) eperson.setFirstName(ldap.ldapGivenName);
-                        if ((ldap.ldapSurname!=null)&&(!ldap.ldapSurname.equals(""))) eperson.setLastName(ldap.ldapSurname);
-                        if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals(""))) eperson.setMetadata("phone", ldap.ldapPhone);
-                        eperson.setNetid(netid);
-                        eperson.setCanLogIn(true);
-                        AuthenticationManager.initEPerson(context, request, eperson);
-                        eperson.update();
-                        context.commit();
+                        eperson = EPerson.findByEmail(context, ldap.ldapEmail);
+	                    if (eperson!=null)
+	                    {
+	                        log.info(LogManager.getHeader(context,
+	                                "type=ldap-login", "type=ldap_but_already_email"));
+	                        context.setIgnoreAuthorization(true);
+	                        eperson.setNetid(netid);
+	                        eperson.update();
+	                        context.commit();
+	                        context.setIgnoreAuthorization(false);
+	                        context.setCurrentUser(eperson);
+	                        return SUCCESS;
+	                    }
+	                    else
+	                    {
+	                        if (canSelfRegister(context, request, netid))
+	                        {
+	                            // TEMPORARILY turn off authorisation
+	                            try
+	                            {
+	                                context.setIgnoreAuthorization(true);
+	                                eperson = EPerson.create(context);
+	                                if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals(""))) eperson.setEmail(ldap.ldapEmail);
+	                                else eperson.setEmail(netid);
+	                                if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals(""))) eperson.setFirstName(ldap.ldapGivenName);
+	                                if ((ldap.ldapSurname!=null)&&(!ldap.ldapSurname.equals(""))) eperson.setLastName(ldap.ldapSurname);
+	                                if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals(""))) eperson.setMetadata("phone", ldap.ldapPhone);
+	                                eperson.setNetid(netid);
+	                                eperson.setCanLogIn(true);
+	                                AuthenticationManager.initEPerson(context, request, eperson);
+	                                eperson.update();
+	                                context.commit();
+	                            }
+	                            catch (AuthorizeException e)
+	                            {
+	                                return NO_SUCH_USER;
+	                            }
+	                            finally
+	                            {
+	                                context.setIgnoreAuthorization(false);
+	                            }
+
+	                            log.info(LogManager.getHeader(context, "authenticate",
+	                                        "type=ldap-login, created ePerson"));
+	                            return SUCCESS;
+	                        }
+	                        else
+	                        {
+	                            // No auto-registration for valid certs
+	                            log.info(LogManager.getHeader(context,
+	                                            "failed_login", "type=ldap_but_no_record"));
+	                            return NO_SUCH_USER;
+	                        }
+	                    }
                     }
                     catch (AuthorizeException e)
                     {
-                        return NO_SUCH_USER;
+                        eperson = null;
                     }
                     finally
                     {
                         context.setIgnoreAuthorization(false);
                     }
-
-                    log.info(LogManager.getHeader(context, "authenticate",
-                                "type=ldap-login, created ePerson"));
-                    return SUCCESS;
-                }
-                else
-                {
-                    // No auto-registration for valid certs
-                    log.info(LogManager.getHeader(context,
-                                    "failed_login", "type=ldap_but_no_record"));
-                    return NO_SUCH_USER;
                 }
             }
         }
@@ -402,7 +415,7 @@ public class LDAPAuthentication
                             HttpServletResponse response)
     {
         return response.encodeRedirectURL(request.getContextPath() +
-                                          "/password-login");
+                                          "/ldap-login");
     }
 
     /**
