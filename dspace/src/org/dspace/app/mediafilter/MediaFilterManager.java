@@ -40,18 +40,26 @@
 
 package org.dspace.app.mediafilter;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -80,7 +88,11 @@ public class MediaFilterManager
     public static int max2Process = Integer.MAX_VALUE;  // maximum number to process
     
     public static int processed = 0;   // number processed
-
+    
+    private static MediaFilter[] filterClasses = null;
+    
+    private static Map filterFormats = new HashMap();
+    
     public static void main(String[] argv) throws Exception
     {
         // set headless for non-gui workstations
@@ -144,6 +156,20 @@ public class MediaFilterManager
         	}
         }
 
+        // set up filters
+        filterClasses =
+        	(MediaFilter[])PluginManager.getPluginSequence(MediaFilter.class);
+        for (int i = 0; i < filterClasses.length; i++)
+        {
+        	String filterName = filterClasses[i].getClass().getName();
+        	String formats = ConfigurationManager.getProperty( 
+        					"filter." + filterName + ".inputFormats");
+        	if (formats != null)
+        	{
+        		filterFormats.put(filterName, Arrays.asList(formats.split(",")));
+        	}
+        }
+        
         Context c = null;
 
         try
@@ -286,29 +312,33 @@ public class MediaFilterManager
     public static boolean filterBitstream(Context c, Item myItem,
             Bitstream myBitstream) throws Exception
     {
-        // do we have a filter for that format?
-        MediaFilter myFilter = (MediaFilter)PluginManager.getNamedPlugin(
-                                  MediaFilter.class,
-                                  myBitstream.getFormat().getShortDescription());
-        if (myFilter != null)
-        {
-            try
-            {
+    	boolean filtered = false;
+    	
+    	// iterate through filter classes. A single format may be actioned
+    	// by more than one filter
+    	for (int i = 0; i < filterClasses.length; i++)
+    	{
+    		List fmts = (List)filterFormats.get(filterClasses[i].getClass().getName());
+    		if (fmts.contains(myBitstream.getFormat().getShortDescription()))
+    		{
                 // only update item if bitstream not skipped
-                if (myFilter.processBitstream(c, myItem, myBitstream))
+                if (filterClasses[i].processBitstream(c, myItem, myBitstream))
                 {
-                    myItem.update(); // Make sure new bitstream has a sequence
-                                     // number
-                    return true;
+                	try
+                	{
+                		myItem.update(); // Make sure new bitstream has a sequence
+                                     	// number
+                		filtered = true;
+                	}
+                    catch (Exception e)
+                    {
+                        System.out.println("ERROR filtering, skipping bitstream #"
+                                + myBitstream.getID() + " " + e);
+                        e.printStackTrace();
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                System.out.println("ERROR filtering, skipping bitstream #"
-                        + myBitstream.getID() + " " + e);
-                e.printStackTrace();
-            }
-        }
-        return false;
+    		}
+    	}
+        return filtered;
     }
 }
