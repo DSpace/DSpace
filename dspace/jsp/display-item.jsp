@@ -134,6 +134,7 @@
 
     String displayStyle = (displayAll ? "full" : "");
 %>
+    <dspace:item-preview item="<%= item %>" />
     <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
 
 <%
