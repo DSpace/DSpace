@@ -625,8 +625,26 @@ dstat-report-monthly
   <pre>[dspace]/bin/dsrun ac.ed.dspace.stats.LogAnalyser -help
 [dspace]/bin/dsrun ac.ed.dspace.stats.ReportGenerator -help</pre>
 
+  <h2><a name="preview" id="preview">Displaying Image Item Preview</a></h2>
 
-
+  <p>For particular types of objects (currently various image formats), a preview feature can be activated. This provides a branded version of the DSpace bitstream for display on the Item Display page.
+  <p>To activate this feature and display a preview image on the item page (all properties mentioned below
+     are found in <code>dspace.cfg</code>):
+  <ol>
+	<li>Uncomment the lines defining the list of configured mediafilters at
+<code>plugin.sequence.org.dspace.app.mediafilter.MediaFilter</code> to include <code>org.dspace.app.mediafilter.BrandedPreviewJPEGFilter</code>.</li>
+	<li>Set the maximum pixel dimensions for the preview image by altering the <code>webui.preview.maxwidth</code> and <code>webui.preview.maxheight</code> (default is 600) config items.</li>
+	<li>Set the <code>webui.preview.brand</code> to the text you want to brand the image with. The brand will appear as white text on a black background strip across the base of the image. For example you might set the text to the owning organisation. The handle is also displayed as part of the branding.</li>
+	<li>Set the <code>webui.preview.brand.abbrev</code>. This is an abbreviated form of the  <code>webui.preview.brand</code> text and will be shown where the brand text is longer than the image width (e.g. for narrow images).</li>
+	<li>Set the <code>webui.preview.brand.height</code> to the height in pixels of the appended branding (default 20).</li>
+	<li>Set the <code>webui.preview.brand.font</code> to the font for the brand text (default is SansSerif).</li>
+	<li>Set the <code>webui.preview.brand.fontpoint</code> to the font size for the brand text (default is 12).</li>
+	<li>Run <code>[dspace]/bin/filter-media</code> to generate the preview images. These will be stored in a BRANDED_PREVIEW bundle so won't interfere with existing bundles.</li>
+	<li>Set <code>webui.preview.enabled = true</code>.</li>
+	<li>Set <code>webui.preview.dc</code>. if a metadata value is to appear just below the preview. For example, to highlight item rights you might set <code>webui.preview.dc = rights</code> or to show the description as part of the preview set <code>webui.preview.dc = description.abstract</code>. This is disabled by default.</li>
+	<li>Restart Tomcat.</li>
+  </ol>
+  </p>
 
   <h2><a name="webuithumbs" id="webuithumbs">Displaying Image Thumbnails</a></h2>
 
