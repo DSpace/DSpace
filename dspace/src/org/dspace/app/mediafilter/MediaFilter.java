@@ -49,6 +49,8 @@ import org.dspace.core.Context;
 
 public abstract class MediaFilter
 {
+	protected Item item = null;
+	
     /* To create your own filter, implement the following virtual methods */
 
     /**
@@ -111,6 +113,8 @@ public abstract class MediaFilter
             throws Exception
     {
         boolean overWrite = MediaFilterManager.isForce;
+        
+        this.item = item;
 
         // get bitstream filename, calculate destination filename
         String newName = getFilteredName(source.getName());
