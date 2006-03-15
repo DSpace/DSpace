@@ -349,7 +349,7 @@ sub DirectorySize
 sub FindCollectionSizes
 {
     my $arg =
-        "SELECT c1.name, SUM(bs.size) FROM " .
+        "SELECT c1.name, SUM(bs.size_bytes) FROM " .
             "collection c1, collection2item c2i1, item2bundle i2b1, " .
             "bundle2bitstream b2b1, bitstream bs " .
         "WHERE " .
@@ -419,7 +419,7 @@ sub FindDeletedBitstreams
     my $arg = "SELECT COUNT(*) from bitstream where deleted=true";
     my @deleted_count = ExecuteSQL( $arg );
 
-    $arg = "SELECT SUM(size) from bitstream where deleted=true";
+    $arg = "SELECT SUM(size_bytes) from bitstream where deleted=true";
     my @deleted_size = ExecuteSQL( $arg );
 
     return ($deleted_count[0], $deleted_size[0]);
