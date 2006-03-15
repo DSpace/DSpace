@@ -75,7 +75,7 @@ public class PackageUtils
      *
      * @param item - item to test.
      */
-    protected static void checkMetadata(Item item)
+    public static void checkMetadata(Item item)
         throws PackageValidationException
     {
         DCValue t[] = item.getDC( "title", null, Item.ANY);
@@ -94,7 +94,7 @@ public class PackageUtils
      * @param item - the item.
      * @param collection - get the default license from here.
      */
-    protected static void addDepositLicense(Context context, String license,
+    public static void addDepositLicense(Context context, String license,
                                        Item item, Collection collection)
         throws SQLException, IOException, AuthorizeException
     {

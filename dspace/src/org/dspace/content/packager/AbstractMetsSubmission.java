@@ -93,7 +93,7 @@ import org.jdom.Element;
  * @see org.dspace.app.mets.MetsManifest
  */
 public abstract class AbstractMetsSubmission
-       implements SubmissionPackage, MetsManifest.Mdref
+       implements SubmissionPackage
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(AbstractMetsSubmission.class);
@@ -109,22 +109,59 @@ public abstract class AbstractMetsSubmission
     private static final boolean preserveManifest =
         ConfigurationManager.getBooleanProperty("mets.submission.preserveManifest", false);
 
-    // accumulate files referenced in manifest for integrity check.
-    private HashSet manifestFiles = new HashSet();
-
-    // accumulate files referenced in package for integrity check.
-    private HashSet packageFiles = new HashSet();
-
-    // hooks to Bundles within the new Item, because
-    // getInputStream() needs to get at them too.
-    private Bundle contentBundle = null;
+    /**
+     * An instance of MdrefManager holds the state needed to
+     * retrieve the contents (or bitstream corresponding to) an
+     * external metadata stream referenced by an <code>mdRef</code>
+     * element in the METS manifest.
+     * <p>
+     * Initialize it with the DSpace Bundle containing all of the
+     * metadata bitstreams.  Match an mdRef by finding the bitstream
+     * with the same name.
+     */
+    protected class MdrefManager
+        implements MetsManifest.Mdref
+    {
     private Bundle mdBundle = null;
 
-    /** METS Manifest data model */
-    protected MetsManifest manifest = null;
+        // constructor initializes metadata bundle.
+        private MdrefManager(Bundle mdBundle)
+        {
+            super();
+            this.mdBundle = mdBundle;
+        }
 
-    /** New item being created. */
-    protected Item item = null;
+        /**
+         * Find the local Bitstream referenced in
+         * an <code>mdRef</code> element.
+         * @param mdref the METS mdRef element to locate the bitstream for.
+         * @return bitstream or null if none found.
+         */
+        public Bitstream getBitstreamForMdRef(Element mdref)
+            throws MetadataValidationException, IOException, SQLException, AuthorizeException
+        {
+            String path = MetsManifest.getFileName(mdref);
+            if (mdBundle == null)
+                throw new MetadataValidationException("Failed referencing mdRef element, because there were no metadata files.");
+            return mdBundle.getBitstreamByName(path);
+        }
+         
+        /**
+         * Make the contents of an external resource mentioned in
+         * an <code>mdRef</code> element available as an <code>InputStream</code>.
+         * See the <code>MetsManifest.MdRef</code> interface for details.
+         * @param mdref the METS mdRef element to locate the input for.
+         * @return the input stream of its content.
+         */
+        public InputStream getInputStream(Element mdref)
+            throws MetadataValidationException, IOException, SQLException, AuthorizeException
+        {
+            Bitstream mdbs = getBitstreamForMdRef(mdref);
+            if (mdbs == null)
+                throw new MetadataValidationException("Failed dereferencing bitstream for mdRef element="+mdref.toString());
+            return mdbs.retrieve();
+        }
+    }
 
     /**
      * Create a new DSpace item out of a METS content package.
@@ -147,11 +184,10 @@ public abstract class AbstractMetsSubmission
                AuthorizeException, SQLException, IOException
     {
         ZipInputStream zip = new ZipInputStream(pkg);
-        manifestFiles = new HashSet();
-        packageFiles = new HashSet();
         HashMap fileIdToBitstream = new HashMap();
         WorkspaceItem wi = null;
         boolean success = false;
+        HashSet packageFiles = new HashSet();
 
         boolean validate = params.getBooleanProperty("validate", true);
 
@@ -163,10 +199,11 @@ public abstract class AbstractMetsSubmission
              *  to the same names they had in the Zip, since those MUST
              *  match the URL references in <Flocat> and <mdRef> elements.
              */
-            manifest = null;
+            MetsManifest manifest = null;
             wi = WorkspaceItem.create(context, collection, false);
-            item = wi.getItem();
-            contentBundle = item.createBundle(Constants.CONTENT_BUNDLE_NAME);
+            Item item = wi.getItem();
+            Bundle contentBundle = item.createBundle(Constants.CONTENT_BUNDLE_NAME);
+            Bundle mdBundle = null;
             ZipEntry ze;
             while ((ze = zip.getNextEntry()) != null)
             {
@@ -214,7 +251,7 @@ public abstract class AbstractMetsSubmission
                 throw new PackageValidationException("No METS Manifest found (filename="+MANIFEST_FILE+").  Package is unacceptable.");
 
             // initial sanity checks on manifest (in subclass)
-            checkManifest();
+            checkManifest(manifest);
 
             /* 2. Grovel a file list out of METS Manifest and compare
              *  it to the files in package, as an integrity test.
@@ -318,7 +355,7 @@ public abstract class AbstractMetsSubmission
 
             // Give subclass a chance to refine the lists of in-package
             // and missing files, delete extraneous files, etc.
-            checkPackageFiles(packageFiles, missingFiles);
+            checkPackageFiles(packageFiles, missingFiles, manifest);
 
             // Any discrepency in file lists is a fatal error:
             if (!(packageFiles.isEmpty() && missingFiles.isEmpty()))
@@ -341,8 +378,10 @@ public abstract class AbstractMetsSubmission
 
             /* 3. crosswalk the metadata
              */
-            Element dmds[] = manifest.getItemDmds();
-            chooseItemDmd(context, dmds);
+            // get mdref'd streams from "callback" object.
+            MdrefManager callback = new MdrefManager(mdBundle);
+
+            chooseItemDmd(context, item, manifest, callback, manifest.getItemDmds());
 
             // crosswalk content bitstreams too.
             for (Iterator ei = fileIdToBitstream.entrySet().iterator();
@@ -350,7 +389,7 @@ public abstract class AbstractMetsSubmission
             {
                 Map.Entry ee = (Map.Entry)ei.next();
                 manifest.crosswalkBitstream(context, (Bitstream)ee.getValue(),
-                                        (String)ee.getKey(), this);
+                                        (String)ee.getKey(), callback);
             }
 
             // Take a second pass over files to correct names of derived files
@@ -401,10 +440,10 @@ public abstract class AbstractMetsSubmission
             }
 
             // have subclass manage license since it may be extra package file.
-            addLicense(context, collection, license );
+            addLicense(context, collection, item, manifest, callback, license );
 
             // subclass hook for final checks and rearrangements
-            finishItem(context);
+            finishItem(context, item);
 
             // commit any changes to bundles
             Bundle allBn[] = item.getBundles();
@@ -414,19 +453,27 @@ public abstract class AbstractMetsSubmission
             }
 
             wi.update();
-            context.commit();
             success = true;
             log.info(LogManager.getHeader(context, "ingest",
                 "Created new Item, db ID="+String.valueOf(item.getID())+
                 ", WorkspaceItem ID="+String.valueOf(wi.getID())));
             return wi;
         }
+        catch (SQLException se)
+        {
+            // disable attempt to delete the workspace object, since
+            // database may have suffered a fatal error and the
+            // transaction rollback will get rid of it anyway.
+            wi = null;
+
+            // Pass this exception on to the next handler.
+            throw se;
+        }
         finally
         {
             // kill item (which also deletes bundles, bitstreams) if ingest fails
             if (!success && wi != null)
                 wi.deleteAll();
-            context.commit();
         }
     }
 
@@ -457,43 +504,12 @@ public abstract class AbstractMetsSubmission
     }
 
     /**
-     * Find the local Bitstream referenced in
-     * an <code>mdRef</code> element.
-     * @param mdref the METS mdRef element to locate the bitstream for.
-     * @return bitstream or null if none found.
-     */
-    public Bitstream getBitstreamForMdRef(Element mdref)
-        throws MetadataValidationException, IOException, SQLException, AuthorizeException
-    {
-        String path = MetsManifest.getFileName(mdref);
-        if (mdBundle == null)
-            throw new MetadataValidationException("Failed referencing mdRef element, because there were no metadata files.");
-        return mdBundle.getBitstreamByName(path);
-    }
-
-    /**
-     * Make the contents of an external resource mentioned in
-     * an <code>mdRef</code> element available as an <code>InputStream</code>.
-     * See the <code>MetsManifest.MdRef</code> interface for details.
-     * @param mdref the METS mdRef element to locate the input for.
-     * @return the input stream of its content.
-     */
-    public InputStream getInputStream(Element mdref)
-        throws MetadataValidationException, IOException, SQLException, AuthorizeException
-    {
-        Bitstream mdbs = getBitstreamForMdRef(mdref);
-        if (mdbs == null)
-            throw new MetadataValidationException("Failed dereferencing bitstream for mdRef element="+mdref.toString());
-        return mdbs.retrieve();
-    }
-
-    /**
      * Profile-specific tests to validate manifest.  The implementation
      * can access the METS document through the <code>manifest</code>
      * variable, an instance of <code>MetsManifest</code>.
      * @throws MetadataValidationException if there is a fatal problem with the METS document's conformance to the expected profile.
      */
-    abstract void checkManifest()
+    abstract void checkManifest(MetsManifest manifest)
         throws MetadataValidationException;
 
     /**
@@ -522,7 +538,8 @@ public abstract class AbstractMetsSubmission
      * @param missingFiles files referenced by manifest but not in package
      *
      */
-    abstract public void checkPackageFiles(Set packageFiles, Set missingFiles)
+    abstract public void checkPackageFiles(Set packageFiles, Set missingFiles,
+                                           MetsManifest manifest)
         throws PackageValidationException, CrosswalkException;
 
     /**
@@ -531,7 +548,7 @@ public abstract class AbstractMetsSubmission
      * (if any) of the metadata sections to crosswalk to get the
      * descriptive metadata for the item being ingested.  It is
      * responsible for calling the crosswalk, using the manifest's helper
-     * i.e. <code>manifest.crosswalkItem(context,item,dmdElement,this);</code>
+     * i.e. <code>manifest.crosswalkItem(context,item,dmdElement,callback);</code>
      * (The final argument is a reference to itself since the
      * class also implements the <code>MetsManifest.MdRef</code> interface
      * to fetch package files referenced by mdRef elements.)
@@ -543,7 +560,9 @@ public abstract class AbstractMetsSubmission
      * @param dmds array of Elements, each a METS dmdSec that applies to the Item as a whole.
      *
      */
-    abstract public void chooseItemDmd(Context context, Element dmds[])
+    abstract public void chooseItemDmd(Context context, Item item,
+                                       MetsManifest manifest, MdrefManager cb,
+                                       Element dmds[])
         throws CrosswalkException,
                AuthorizeException, SQLException, IOException;
 
@@ -564,7 +583,9 @@ public abstract class AbstractMetsSubmission
      * @param collection DSpace Collection to which the item is being submitted.
      * @param license optional user-supplied Deposit License text (may be null)
      */
-    abstract public void addLicense(Context context, Collection collection, String license)
+    abstract public void addLicense(Context context, Collection collection,
+                                    Item item, MetsManifest manifest,
+                                    MdrefManager callback, String license)
         throws PackageValidationException, CrosswalkException,
                AuthorizeException, SQLException, IOException;
 
@@ -577,7 +598,7 @@ public abstract class AbstractMetsSubmission
      *
      * @param context the DSpace context
      */
-    abstract public void finishItem(Context context)
+    abstract public void finishItem(Context context, Item item)
         throws PackageValidationException, CrosswalkException,
          AuthorizeException, SQLException, IOException;
 

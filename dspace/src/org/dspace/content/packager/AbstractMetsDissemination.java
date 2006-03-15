@@ -114,6 +114,14 @@ import edu.harvard.hul.ois.mets.helper.PreformedXML;
  * other metadata (such as licenses) will be encoded inline.
  * Default is <code>false</code>.
  *
+ *   <code>unauthorized</code> -- this determines what is done when the
+ *   packager encounters a Bundle or Bitstream it is not authorized to
+ *   read.  By default, it just quits with an AuthorizeException.
+ *   If this option is present, it must be one of the following values:
+ *     <code>skip</code> -- simply exclude unreadable content from package.
+ *     <code>zero</code> -- include unreadable bitstreams as 0-length files;
+ *       unreadable Bundles will still cause authorize errors.
+ *
  * @author Larry Stone
  * @author Robert Tansley
  * @version $Revision$
@@ -176,6 +184,10 @@ public abstract class AbstractMetsDissemination
         if (dso.getType() == Constants.ITEM)
         {
             Item item = (Item)dso;
+            long lmTime = item.getLastModified().getTime();
+
+            // how to handle unauthorized bundle/bitstream:
+            String unauth = (params == null) ? null : params.getProperty("unauthorized");
 
             if (params != null && params.getProperty("manifestOnly") != null)
             {
@@ -190,6 +202,7 @@ public abstract class AbstractMetsDissemination
 
                 // write manifest first.
                 ZipEntry me = new ZipEntry(MANIFEST_FILE);
+                me.setTime(lmTime);
                 zip.putNextEntry(me);
                 writeManifest(context, item, params, zip);
                 zip.closeEntry();
@@ -200,6 +213,7 @@ public abstract class AbstractMetsDissemination
                 {
                     String fname = (String)fi.next();
                     ZipEntry ze = new ZipEntry(fname);
+                    ze.setTime(lmTime);
                     zip.putNextEntry(ze);
                     Utils.copy((InputStream)extraFiles.get(fname), zip);
                     zip.closeEntry();
@@ -211,18 +225,46 @@ public abstract class AbstractMetsDissemination
                 {
                     if (!PackageUtils.isMetaInfoBundle(bundles[i]))
                     {
+                        // unauthorized bundle?
+                        if (!AuthorizeManager.authorizeActionBoolean(context,
+                                    bundles[i], Constants.READ))
+                        {
+                            if (unauth != null &&
+                                (unauth.equalsIgnoreCase("skip")))
+                            {
+                                log.warn("Skipping Bundle[\""+bundles[i].getName()+"\"] because you are not authorized to read it.");
+                                continue;
+                            }
+                            else
+                                throw new AuthorizeException("Not authorized to read Bundle named \""+bundles[i].getName()+"\"");
+                        }
                         Bitstream[] bitstreams = bundles[i].getBitstreams();
                         for (int k = 0; k < bitstreams.length; k++)
                         {
-                            if (AuthorizeManager.authorizeActionBoolean(context,
-                                    bitstreams[k], Constants.READ))
+                            boolean auth = AuthorizeManager.authorizeActionBoolean(context,
+                                    bitstreams[k], Constants.READ);
+                            if (auth ||
+                                (unauth != null && unauth.equalsIgnoreCase("zero")))
                             {
                                 ZipEntry ze = new ZipEntry(
                                     makeBitstreamName(bitstreams[k]));
-                                ze.setSize(bitstreams[k].getSize());
+                                ze.setTime(lmTime);
+                                ze.setSize(auth ? bitstreams[k].getSize() : 0);
                                 zip.putNextEntry(ze);
+                                if (auth)
                                 Utils.copy(bitstreams[k].retrieve(), zip);
+                                else
+                                    log.warn("Adding zero-length file for Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID())+", not authorized for READ.");
                                 zip.closeEntry();
+                            }
+                            else if (unauth != null &&
+                                     unauth.equalsIgnoreCase("skip"))
+                            {
+                                log.warn("Skipping Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID())+", not authorized for READ.");
+                            }
+                            else
+                            {
+                                throw new AuthorizeException("Not authorized to read Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID()));
                             }
                         }
                     }
@@ -340,8 +382,12 @@ public abstract class AbstractMetsDissemination
                 mets.getContent().add(dmdSec);
             }
          
-            // only add license AMD section if there are any licenses.
+            // Only add license AMD section if there are any licenses.
+            // Catch authorization failures accessing license bitstreams
+            // only if we are skipping unauthorized bitstreams.
             String licenseID = null;
+            try
+            {
             AmdSec amdSec = new AmdSec();
             addRightsMd(context, item, amdSec);
             if (amdSec.getContent().size() > 0)
@@ -349,6 +395,15 @@ public abstract class AbstractMetsDissemination
                 licenseID = gensym("license");
                 amdSec.setID(licenseID);
                 mets.getContent().add(amdSec);
+            }
+            }
+            catch (AuthorizeException e)
+            {
+                String unauth = (params == null) ? null : params.getProperty("unauthorized");
+                if (!(unauth != null && unauth.equalsIgnoreCase("skip")))
+                    throw e;
+                else
+                    log.warn("Skipping license metadata because of access failure: "+e.toString());
             }
 
             // FIXME: History data???? Nooooo!!!!
@@ -381,11 +436,26 @@ public abstract class AbstractMetsDissemination
             // accumulate content DIV items to put in structMap later.
             List contentDivs = new ArrayList();
 
+            // how to handle unauthorized bundle/bitstream:
+            String unauth = (params == null) ? null : params.getProperty("unauthorized");
+
             Bundle[] bundles = item.getBundles();
             for (int i = 0; i < bundles.length; i++)
             {
                 if (PackageUtils.isMetaInfoBundle(bundles[i]))
                     continue;
+
+                // unauthorized bundle?
+                // NOTE: This must match the logic in disseminate()
+                if (!AuthorizeManager.authorizeActionBoolean(context,
+                            bundles[i], Constants.READ))
+                {
+                    if (unauth != null &&
+                        (unauth.equalsIgnoreCase("skip")))
+                        continue;
+                    else
+                        throw new AuthorizeException("Not authorized to read Bundle named \""+bundles[i].getName()+"\"");
+                }
 
                 Bitstream[] bitstreams = bundles[i].getBitstreams();
 
@@ -408,8 +478,22 @@ public abstract class AbstractMetsDissemination
 
                 for (int bits = 0; bits < bitstreams.length; bits++)
                 {
-                    String sid = String.valueOf(bitstreams[bits].getSequenceID());
+                    // Check for authorization.  Handle unauthorized
+                    // bitstreams to match the logic in disseminate(),
+                    // i.e. "unauth=zero" means include a 0-length bitstream,
+                    // "unauth=skip" means to ignore it (and exclude from
+                    // manifest).
+                    boolean auth = AuthorizeManager.authorizeActionBoolean(context,
+                            bitstreams[bits], Constants.READ);
+                    if (!auth)
+                    {
+                        if (unauth != null && unauth.equalsIgnoreCase("skip"))
+                            continue;
+                        else if (!(unauth != null && unauth.equalsIgnoreCase("zero")))
+                            throw new AuthorizeException("Not authorized to read Bitstream, SID="+String.valueOf(bitstreams[bits].getSequenceID()));
+                    }
 
+                    String sid = String.valueOf(bitstreams[bits].getSequenceID());
          
                     edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
          
@@ -464,12 +548,12 @@ public abstract class AbstractMetsDissemination
          
                     // FIXME: CREATED: no date
 
-                    file.setSIZE(bitstreams[bits].getSize());
+                    file.setSIZE(auth ? bitstreams[bits].getSize() : 0);
 
                     // translate checksum and type to METS, if available.
                     String csType = bitstreams[bits].getChecksumAlgorithm();
                     String cs = bitstreams[bits].getChecksum();
-                    if (cs != null && csType != null)
+                    if (auth && cs != null && csType != null)
                     {
                         try
                         {

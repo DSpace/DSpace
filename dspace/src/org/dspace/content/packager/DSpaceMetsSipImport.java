@@ -50,6 +50,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.Context;
@@ -81,7 +82,7 @@ public class DSpaceMetsSipImport
     private final static String PROFILE_START = "DSpace METS SIP Profile";
 
     // just check the profile name.
-    void checkManifest()
+    void checkManifest(MetsManifest manifest)
         throws MetadataValidationException
     {
         String profile = manifest.getProfile();
@@ -92,7 +93,8 @@ public class DSpaceMetsSipImport
     }
 
     // nothing needed.
-    public void checkPackageFiles(Set packageFiles, Set missingFiles)
+    public void checkPackageFiles(Set packageFiles, Set missingFiles,
+                                  MetsManifest manifest)
         throws PackageValidationException, CrosswalkException
     {
         // This is where a subclass would arrange to use or ignore
@@ -109,7 +111,10 @@ public class DSpaceMetsSipImport
      *    same GROUPID<br>
      * 3. Crosswalk remaining DMDs not eliminated already.
      */
-    public void chooseItemDmd(Context context, Element dmds[])
+    public void chooseItemDmd(Context context, Item item,
+                              MetsManifest manifest,
+                              AbstractMetsSubmission.MdrefManager callback,
+                              Element dmds[])
         throws CrosswalkException,
                AuthorizeException, SQLException, IOException
     {
@@ -131,7 +136,7 @@ public class DSpaceMetsSipImport
         String groupID = null;
         if (found >= 0)
         {
-            manifest.crosswalkItem(context, item, dmds[found], this);
+            manifest.crosswalkItem(context, item, dmds[found], callback);
             groupID = dmds[found].getAttributeValue("GROUPID");
 
             if (groupID != null)
@@ -140,7 +145,7 @@ public class DSpaceMetsSipImport
                 {
                     String g = dmds[i].getAttributeValue("GROUPID");
                     if (g != null && !g.equals(groupID))
-                        manifest.crosswalkItem(context, item, dmds[i], this);
+                        manifest.crosswalkItem(context, item, dmds[i], callback);
                 }
             }
         }
@@ -150,7 +155,7 @@ public class DSpaceMetsSipImport
         else
         {
             if (dmds.length > 0)
-                manifest.crosswalkItem(context, item, dmds[0], this);
+                manifest.crosswalkItem(context, item, dmds[0], callback);
         }
     }
 
@@ -161,7 +166,10 @@ public class DSpaceMetsSipImport
      * default deposit license.
      * For Creative Commons, look for a rightsMd containing a CC license.
      */
-    public void addLicense(Context context, Collection collection, String license)
+    public void addLicense(Context context, Collection collection,
+                           Item item, MetsManifest manifest,
+                           AbstractMetsSubmission.MdrefManager callback,
+                           String license)
         throws PackageValidationException, CrosswalkException,
                AuthorizeException, SQLException, IOException
     {
@@ -176,7 +184,7 @@ public class DSpaceMetsSipImport
             {
                 log.debug("Got Creative Commons license in rightsMD");
                 CreativeCommons.setLicense(context, item,
-                            manifest.getMdContentAsStream(rmds[i], this),
+                            manifest.getMdContentAsStream(rmds[i], callback),
                             manifest.getMdContentMimeType(rmds[i]));
 
                 // if there was a bitstream, get rid of it, since
@@ -184,7 +192,7 @@ public class DSpaceMetsSipImport
                 Element mdRef = rmds[i].getChild("mdRef", MetsManifest.metsNS);
                 if (mdRef != null)
                 {
-                    Bitstream bs = getBitstreamForMdRef(mdRef);
+                    Bitstream bs = callback.getBitstreamForMdRef(mdRef);
                     if (bs != null)
                     {
                         Bundle parent[] = bs.getBundles();
@@ -200,7 +208,7 @@ public class DSpaceMetsSipImport
     }
 
     // last change to fix up Item.
-    public void finishItem(Context context)
+    public void finishItem(Context context, Item item)
         throws PackageValidationException, CrosswalkException,
          AuthorizeException, SQLException, IOException
     {
