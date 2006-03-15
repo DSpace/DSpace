@@ -214,7 +214,7 @@
  
   <tag>
     <name>item-preview</name>
-    <tagclass>org.dspace.app.webui.jsptag.PreviewTag</tagclass>
+    <tagclass>org.dspace.app.webui.jsptag.ItemPreviewTag</tagclass>
     <info>
       Tag for displaying an item preview image.  "item" must always be an
       org.dspace.content.Item
