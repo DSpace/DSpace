@@ -1,5 +1,9 @@
 1.4 alpha 1
 ===========
+(Anonymous)
+- ResourcePolicy.setEPerson(null) now works (was previously setting
+  epersongroup_id column to null).  Closes SF bug #1255264.
+
 (Robert Tansley)
 - search.index.* configuration lines must now include the schema
   (e.g. dc.title.*).  Note search.index.* no longer backwards compatible. Can

@@ -266,7 +266,7 @@ public class ResourcePolicy
         }
         else
         {
-            myRow.setColumnNull("epersongroup_id");
+            myRow.setColumnNull("eperson_id");
         }
     }
 
