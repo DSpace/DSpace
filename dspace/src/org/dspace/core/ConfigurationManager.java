@@ -140,7 +140,7 @@ public class ConfigurationManager
         {
             try
             {
-                intValue = Integer.parseInt(stringValue);
+                intValue = Integer.parseInt(stringValue.trim());
             }
             catch (NumberFormatException e)
             {
@@ -197,11 +197,14 @@ public class ConfigurationManager
 
         if (stringValue != null)
         {
+        	stringValue = stringValue.trim();
             return  stringValue.equalsIgnoreCase("true") ||
                     stringValue.equalsIgnoreCase("yes");
-            }
+        }
         else
+        {
             return defaultValue;
+        }
     }
 
     /**
