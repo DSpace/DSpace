@@ -1,5 +1,11 @@
 1.4 alpha 1
 ===========
+(Robert Tansley)
+- search.index.* configuration lines must now include the schema
+  (e.g. dc.title.*).  Note search.index.* no longer backwards compatible. Can
+  now also specify unqualified elements (e.g. dc.creator).  Also fixes SF bug
+  #1443649.
+
 (Scott Yeadon)
 - Add support for branded preview image
   SF Patches: #1330829, #1430437

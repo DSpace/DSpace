@@ -460,6 +460,8 @@ public class DSIndexer
     private static void writeItemIndex(Context c, IndexWriter writer,
             Item myitem) throws SQLException, IOException
     {
+        // FIXME: config reading should happen just once & be cached?  
+        
         // get the location string (for searching by collection & community)
         String location_text = buildItemLocationString(c, myitem);
 
@@ -488,30 +490,34 @@ public class DSIndexer
             {
                 String index = (String) indexes.get(i);
 
-                String[] dc = index.split(":");
-                String myindex = dc[0];
+                String[] configLine = index.split(":");
+                String indexName = configLine[0];
 
                 String schema;
                 String element;
-                String qualifier;
+                String qualifier = null;
 
                 // Get the schema, element and qualifier for the index
-                String[] elements = dc[1].split("\\.");
-				if (elements.length == 3) 
+                // TODO: Should check valid schema, element, qualifier?
+                String[] parts = configLine[1].split("\\.");
+                
+                switch (parts.length)
                 {
-					schema = elements[0];
-					element = elements[1];
-					qualifier = elements[2];
-				} 
-                else 
-                {
-					schema = MetadataSchema.DC_SCHEMA;
-					element = elements[0];
-					qualifier = elements[1];
-				}
-
+                case 3:
+                    qualifier = parts[2];
+                case 2:
+                    schema = parts[0];
+                    element = parts[1];
+                    break;
+                default:
+                    log.warn("Malformed configuration line: search.index." + i);
+                    // FIXME: Can't proceed here, no suitable exception to throw
+                    throw new RuntimeException(
+                            "Malformed configuration line: search.index." + i);
+                }
+                
                 // extract metadata (ANY is wildcard from Item class)
-                if (qualifier.equals("*"))
+                if (qualifier!= null && qualifier.equals("*"))
                 {
                     mydc = myitem.getMetadata(schema, element, Item.ANY, Item.ANY);
                 }
@@ -534,11 +540,11 @@ public class DSIndexer
                 // arranges content with fields in ArrayLists with same index to
                 // put
                 // into hash later
-                k = fields.indexOf(myindex);
+                k = fields.indexOf(indexName);
 
                 if (k < 0)
                 {
-                    fields.add(myindex);
+                    fields.add(indexName);
                     content.add(content_text);
                 }
                 else
@@ -722,6 +728,12 @@ public class DSIndexer
         // lastly, get the handle
         String itemhandle = HandleManager.findHandle(c, myitem);
         textvalues.put("handletext", itemhandle);
+
+        if (log.isDebugEnabled())
+        {
+            log.debug(LogManager.getHeader(c, "write_index", "handle=" +itemhandle));
+            log.debug(textvalues.toString());
+        }
 
         // write out the metatdata (for scalability, using hash instead of
         // individual strings)
