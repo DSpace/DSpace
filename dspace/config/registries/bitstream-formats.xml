@@ -92,6 +92,16 @@
     <internal>false</internal>
     <extension>htm</extension>
     <extension>html</extension>
+    <extension>jsp</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>text/css</mimetype>
+    <short_description>CSS</short_description>
+    <description>Cascading Style Sheets</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>css</extension>
   </bitstream-type>
 
   <bitstream-type>
