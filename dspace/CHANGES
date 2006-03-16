@@ -1,6 +1,10 @@
 1.4 alpha 1
 ===========
 (Robert Tansley)
+- Fix logic in EditItemServlet to enable removal of blank metadata values.
+  Fixes bug #1358197.
+
+(Robert Tansley)
 - Error displayed on 'choose collection' submit screen instead of blank
   collection list and 'next >' control (which led to error).  Fixes SF bug
   #1363633.

@@ -432,9 +432,8 @@ public class EditItemServlet extends DSpaceServlet
 
                 // If remove button pressed for this value, we don't add it
                 // back to the item. We also don't add empty values.
-                if (value.equals("")
-                        || !button.equals("submit_remove_" + key + "_"
-                                + sequenceNumber))
+                if (!(value.equals("") || button.equals("submit_remove_" + key
+                        + "_" + sequenceNumber)))
                 {
                     // Value is empty, or remove button for this wasn't pressed
                     item.addMetadata(schema, element, qualifier, language, value);
