@@ -1,5 +1,10 @@
 1.4 alpha 1
 ===========
+(Robert Tansley)
+- Error displayed on 'choose collection' submit screen instead of blank
+  collection list and 'next >' control (which led to error).  Fixes SF bug
+  #1363633.
+
 (Anonymous)
 - ResourcePolicy.setEPerson(null) now works (was previously setting
   epersongroup_id column to null).  Closes SF bug #1255264.

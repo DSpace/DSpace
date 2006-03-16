@@ -72,15 +72,14 @@
         <jsp:param name="md_pages" value="1"/>
     </jsp:include>
 
-    <%-- <h1>Submit: Choose Collection</h1> --%>
     <h1><fmt:message key="jsp.submit.select-collection.heading"/></h1>
-
-    <%-- <p>Select the collection you wish to submit an item to from the list
-    below, then click "Next".  
-    <object><dspace:popup page="/help/index.html#choosecollection">(More Help...)</dspace:popup></object></p> --%>
 
 	<p><fmt:message key="jsp.submit.select-collection.info1"/> 
     <object><dspace:popup page="/help/index.html#choosecollection"><fmt:message key="jsp.morehelp"/> </dspace:popup></object></p>
+
+<%  if (collections.length > 0)
+    {
+%>
 
     <form action="<%= request.getContextPath() %>/submit" method="post">
 <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
@@ -125,5 +124,7 @@
             </table>
         </center>
     </form>
-    
+<%  } else { %>
+	<p class="submitFormWarn"><fmt:message key="jsp.submit.select-collection.none-authorized"/></p>
+<%  } %>	
 </dspace:layout>
