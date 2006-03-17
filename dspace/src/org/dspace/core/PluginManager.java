@@ -121,13 +121,13 @@ public class PluginManager
     private static boolean cacheMe(Class implClass)
     {
         if (cacheMeCache.containsKey(implClass))
+        {
             return ((Boolean)cacheMeCache.get(implClass)).booleanValue();
+        }
         else
         {
-            boolean reusable = true;
-            String key = REUSABLE_PREFIX+implClass.getName();
-            if (ConfigurationManager.getProperty(key) != null)
-                reusable = ConfigurationManager.getBooleanProperty(key);
+        	String key = REUSABLE_PREFIX+implClass.getName();
+            boolean reusable = ConfigurationManager.getBooleanProperty(key, true);
             cacheMeCache.put(implClass, new Boolean(reusable));
             return reusable;
         }
@@ -233,7 +233,8 @@ public class PluginManager
         }
         catch (ClassNotFoundException e)
         {
-            throw new PluginInstantiationException("Cannot load plugin class!",e);
+            throw new PluginInstantiationException("Cannot load plugin class: " +
+            		                               e.toString(), e);
         }
         catch (InstantiationException e)
         {
@@ -301,9 +302,9 @@ public class PluginManager
                 String classnames[] = selfNamedVal.split("\\s*,\\s*");
                 for (int i = 0; i < classnames.length; ++i)
                 {
-                    Class pluginClass = Class.forName(classnames[i]);
                     try
                     {
+                    	Class pluginClass = Class.forName(classnames[i]);
                         String names[] = (String[])pluginClass.getMethod("getPluginNames", null).
                                                    invoke(null, null);
                         if (names == null || names.length == 0)
@@ -317,7 +318,7 @@ public class PluginManager
                     }
                     catch (Exception e)
                     {
-                        log.error(e.toString());
+                        log.error("While configuring self-named plugin: " + e.toString());
                     }
                 }
             }
@@ -359,7 +360,6 @@ public class PluginManager
     public static Object getNamedPlugin(Class intfc, String name)
          throws PluginInstantiationException
     {
-
         try
         {
             String iname = intfc.getName();
@@ -377,6 +377,9 @@ public class PluginManager
                     Object cached = namedInstanceCache.get(nkey);
                     if (cached == null)
                     {
+                    	log.debug("Creating cached instance of: " + cname + 
+                    			  " for interface=" + iname + 
+                    			  " pluginName=" + name );
                         cached = pluginClass.newInstance();
                         if (cached instanceof SelfNamedPlugin)
                             ((SelfNamedPlugin)cached).setPluginInstanceName(name);
@@ -386,15 +389,20 @@ public class PluginManager
                 }
                 else
                 {
+                	log.debug("Creating UNcached instance of: " + cname + 
+              			  " for interface=" + iname + 
+              			  " pluginName=" + name );
                     Object result = pluginClass.newInstance();
                     if (result instanceof SelfNamedPlugin)
                         ((SelfNamedPlugin)result).setPluginInstanceName(name);
+                    return result;
                 }
             }
         }
         catch (ClassNotFoundException e)
         {
-            throw new PluginInstantiationException("Cannot load plugin class!",e);
+            throw new PluginInstantiationException("Cannot load plugin class: " +
+            		                               e.toString(), e);
         }
         catch (InstantiationException e)
         {
