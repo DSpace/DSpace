@@ -296,26 +296,26 @@ See the <code>dspace.cfg</code> file for examples.
 
     <P><strong>To enable the HTTPS support in Tomcat 5.0:</strong>
 
-    <ol type="A"><li><b>For Production use:</b><br> Follow this procedure to
+    <ol><li><b>For Production use:</b> Follow this procedure to
       set up SSL on your server.  Using a "real" server certificate
       ensures your users' browsers will accept it without complaints.
       <p>
       In the examples below, <code>$CATALINA_BASE</code> is the directory
       under which your Tomcat is installed.
-      <ol type="1">
-        <p><LI>Create a Java keystore for your server with the password
+      <ol>
+        <li><p>Create a Java keystore for your server with the password
             <code>changeit</code>, and install your server certificate
             under the alias <code>"tomcat"</code>.
-            This assumes the certificate was put in the file <code>server.pem</code>:
-        <pre> $JAVA_HOME/bin/keytool -import -noprompt -v -storepass changeit -keystore $CATALINA_BASE/conf/keystore -alias tomcat -file myserver.pem</pre>
+            This assumes the certificate was put in the file <code>server.pem</code>:</p>
+        <pre> $JAVA_HOME/bin/keytool -import -noprompt -v -storepass changeit -keystore $CATALINA_BASE/conf/keystore -alias tomcat -file myserver.pem</pre></li>
 
-        <p><LI>Install the CA (Certifying Authority) certificate for the CA that
+        <LI><p>Install the CA (Certifying Authority) certificate for the CA that
         granted your server cert, if necessary.  This
-        assumes    the server CA certificate is in <code>ca.pem</code>:
+        assumes    the server CA certificate is in <code>ca.pem</code>:</p>
         <pre> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore $CATALINA_BASE/conf/keystore -alias ServerCA -file ca.pem</pre>
       </LI>
 
-        <p><li>Optional -- ONLY if you need to accept client certificates
+        <li><p>Optional -- ONLY if you need to accept client certificates
             for the X.509 certificate stackable authentication module
             See the
           <A HREF="configure.html#authenticate">configuration section</A>
@@ -323,15 +323,15 @@ See the <code>dspace.cfg</code> file for examples.
             Load the keystore with the CA (certifying authority)
             certificates for
             the authorities of any clients whose certificates you wish to accept.
-            For example, assuming the client CA certificate is in <code>client1.pem</code>:
+            For example, assuming the client CA certificate is in <code>client1.pem</code>:</p>
             <pre> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1 -file client1.pem</pre>
       </LI>
 
-        <p><LI>Now add another Connector tag to your <code>server.xml</code>
+        <LI><p>Now add another Connector tag to your <code>server.xml</code>
         Tomcat configuration file, like the example below.  The parts
         affecting or specific to SSL are shown in bold.
         (You may wish to change
-      some details such as the port, pathnames, and keystore password)
+      some details such as the port, pathnames, and keystore password)</p>
       <pre>
     &lt;Connector port="8443"
                maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
@@ -365,18 +365,18 @@ See the <code>dspace.cfg</code> file for examples.
       <p>
       In the examples below, <code>$CATALINA_BASE</code> is the directory
       under which your Tomcat is installed.
-      <ol type="1">
-        <p><LI>Create a Java keystore for your server with the password
+      <ol>
+        <LI><p>Create a Java keystore for your server with the password
             <code>changeit</code>, and install your server certificate
             under the alias <code>"tomcat"</code>.
-            This assumes the certificate was put in the file <code>server.pem</code>:
+            This assumes the certificate was put in the file <code>server.pem</code>:</p>
         <pre> $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keystore $CATALINA_BASE/conf/keystore -storepass changeit</pre>
-        When answering the questions to identify the certificate, be
+        <p>When answering the questions to identify the certificate, be
         sure to respond to "First and last name" with the fully-qualified
         domain name of your server (e.g. <code>test-dspace.myuni.edu</code>).
-        The other questions are not important.
+        The other questions are not important.</p></li>
 
-        <p><li>Optional -- ONLY if you need to accept client certificates
+        <li><p>Optional -- ONLY if you need to accept client certificates
             for the X.509 certificate stackable authentication module
             See the
           <A HREF="configure.html#authenticate">configuration section</A>
@@ -384,12 +384,12 @@ See the <code>dspace.cfg</code> file for examples.
             Load the keystore with the CA (certifying authority)
             certificates for
             the authorities of any clients whose certificates you wish to accept.
-            For example, assuming the client CA certificate is in <code>client1.pem</code>:
+            For example, assuming the client CA certificate is in <code>client1.pem</code>:</p>
             <pre> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1 -file client1.pem</pre>
         </LI>
 
-        <p><li>Follow the procedure in the section above to
-          add another Connector tag, for the HTTPS port, to your <code>server.xml</code> file.
+        <li><p>Follow the procedure in the section above to
+          add another Connector tag, for the HTTPS port, to your <code>server.xml</code> file.</p></li>
         </ol>
     </ol>
 

@@ -16,18 +16,50 @@
 
 <ul>
    <li>Content verification through periodic checksum checking</li>
-   <li>Multiple metadata schema support</li>
-   <li>Searchable controlled vocabularies in submission workflow</li>
-   <li>METS, DIDL exposed to OAI-PMH harvesters</li>
-   <li>'Plugin' API for MediaFilters, Packagers, Crosswalks, and Authentication</li>
-   <li>RSS feeds for collections</li>
-   <li>Subject browse support</li>
-   <li>EPerson groups may contain groups</li>
-   <li>EMail Item recommendation</li>
-   <li>Branded Item image previews</li>
-   <li>Administrative edit of Creative Commons licenses</li>
-   <li>UI performance improvements</li>
+   <li>Support for branded preview image</li>
+   <li>Add/replace Creative Commons in 'edit item' tool</li>
+   <li>Customisable item listing columns and browse indices</li>
+   <li>Script for updating handle prefixes (e.g. for moving from development to production)</li>
+   <li>Configurable boolean search operator</li>
+   <li>Controlled vocabulary patch to provide search on classification terms, and addition of terms during submission.</li>
+   <li>Add 'visibility' element to input-forms.xml</li>
+   <li>Browse by subject feature</li>
+   <li>Log4J enhancement to use XML configuration</li>
+   <li>QueryArgs class can support any number of fields in advanced search.</li>
+   <li>Community names no longer have to be unique</li>
+   <li>Enhanced Windows support</li>
+   <li>Support for multiple (flat) metadata schemas</li>
+   <li>Suggest an item page</li>
+   <li>RSS Feeds</li>
+   <li>Performance enhancements</li>
+   <li>Stackable authentication methods</li>
+   <li>Plug-in manager</li>
+   <li>Pluggable SIP/DIP support and metadata crosswalks</li>
+   <li>Nested groups of e-people</li>
+   <li>Expose METS and MPEG-21 DIDL DIPs via OAI-PMH</li>
+   <li>Configurable Lucene search analyzer (e.g. for Chinese metadata)</li>
+   <li>Support for SMTP servers requiring authentication</li>
 </ul>
+
+<h3>Bug fixes</h3>
+
+<ul>
+   <li>1358197 - Edit Item, empty DC fields not removable</li>
+   <li>1363633 - Submission step 1 fails when there are no collections</li>
+   <li>1255264 - Resource policy eperson value was set to wrong column</li>
+   <li>1380494 - Error deleting an item with multiple metadata schema support</li>
+   <li>1443649 - Cannot configure unqualified elements for advanced search index</li>
+   <li>1333687 - Browse-(title|date) fails on withdrawn item</li>
+   <li>1066713 - Two (sub)communities cannot have one name</li>
+   <li>1284055 - Two Communities of same name throws error</li>
+   <li>1035366 - Bitstream size column should be bigint</li>
+   <li>1352257 - Selecting a Group for GroupToGroup while Creating Collection</li>
+   <li>1352226 - Navigation and Sorting in Group List (Select Groups) fails</li>
+   <li>1348276 - Null in collection name causes OAI ListSets to fail</li>
+   <li>1160898 - dspace_migrate removes Date.Issued from prev published items</li>
+   <li>1261191 - Malformed METS metadata exported</li>
+</ul>
+
 
 <h2><a name="version1_3_2">Changes in DSpace 1.3.2</a></h2>
 

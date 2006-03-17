@@ -12,6 +12,126 @@
 
     <P>This section describes how to update a DSpace installation from one version to the next.  Details of the differences between the functionality of each version are given in the <A HREF="history.html">Version History</A> section.</P>
 
+    <h2><a name="132_14">Updating From 1.3.2 to 1.4.x</a></h2>
+
+    <ol>
+      <li>
+        <p>First and foremost, <strong>make a complete backup</strong> of your system, including:</P>
+        <ul>
+          <li>A snapshot of the database</li>
+          <li>The asset store (<code><i>[dspace]</i>/assetstore</code> by default)</li>
+          <li>Your configuration files and localized JSPs</li>
+        </ul>
+      </li>
+
+      <li>
+        <p>Download the <A HREF="http://sourceforge.net/projects/dspace/">latest DSpace 1.4 source bundle</A> and unpack it in a suitable location (<em>not</em> over your existing DSpace installation or source tree!)</p>
+      </li>
+
+      <li><p>Copy the PostgreSQL driver JAR to the source tree.  For example:</p>
+
+      <pre>cd <i>[dspace]</i>/lib
+cp postgresql.jar <i>[dspace-1.4-source]</i>/lib</pre></li>
+
+      <li><p>Take down Tomcat (or whichever servlet container you're using).</p></li>
+
+      <li><p>Your DSpace configuration will need some updating:</p>
+
+        <ul>
+          <li><p>In <code>dspace.cfg</code>, paste in the following lines for the new stackable authentication feature, the new method for managing Media Filters, and the Checksum Checker.</p>
+
+<pre>#### Stackable Authentication Methods #####
+# Stack of authentication methods
+#  (See org.dspace.eperson.AuthenticationManager)
+plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
+	  org.dspace.eperson.PasswordAuthentication
+
+#### Example of configuring X.509 authentication
+#### (to use it, add org.dspace.eperson.X509Authentication to stack)
+
+## method 1, using keystore
+#authentication.x509.keystore.path = /var/local/tomcat/conf/keystore
+#authentication.x509.keystore.password = changeit
+
+## method 2, using CA certificate
+#authentication.x509.ca.cert = ${dspace.dir}/config/mitClientCA.der
+
+## Create e-persons for unknown names in valid certificates?
+#authentication.x509.autoregister = true
+
+
+#### Media Filter plugins (through PluginManager) ####
+
+plugin.sequence.org.dspace.app.mediafilter.MediaFilter = \
+    org.dspace.app.mediafilter.PDFFilter, org.dspace.app.mediafilter.HTMLFilter, \
+    org.dspace.app.mediafilter.WordFilter, org.dspace.app.mediafilter.JPEGFilter
+# to enable branded preview: remove last line above, and uncomment 2 lines below
+#   org.dspace.app.mediafilter.WordFilter, org.dspace.app.mediafilter.JPEGFilter, \
+#   org.dspace.app.mediafilter.BrandedPreviewJPEGFilter
+
+filter.org.dspace.app.mediafilter.PDFFilter.inputFormats = Adobe PDF
+filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats = HTML, Text
+filter.org.dspace.app.mediafilter.WordFilter.inputFormats = Microsoft Word
+filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats = GIF, JPEG, image/png
+filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats = GIF, JPEG, image/png
+
+
+#### Checksum Checker Settings ####
+# Default dispatcher in case none specified
+plugin.single.org.dspace.checker.BitstreamDispatcher=org.dspace.checker.SimpleDispatcher
+# Standard interface implementations. You shouldn't need to tinker with these.
+plugin.single.org.dspace.checker.ReporterDAO=org.dspace.checker.ReporterDAOImpl
+
+# check history retention
+checker.retention.default=10y
+checker.retention.CHECKSUM_MATCH=8w</pre></li>
+
+          <li><p>If you have customised advanced search fields (<code>search.index.<i>n</i></code> fields, note that you now need to include the schema in the values.  Dublin Core is specifed as <code>dc</code>.  So for example, if in 1.3.2 you had:</p>
+
+            <pre>search.index.1 = title.alternative</pre>
+
+            <p>That needs to be changed to:</p>
+
+            <pre>search.index.1 = dc.title.alternative</pre>
+          </li>
+
+          <li><p>If you use LDAP or X509 authentication, you'll need to add <code>org.dspace.eperson.LDAPAuthentication</code> or <code>org.dspace.eperson.X509Authentication</code> respectively.  See also <A HREF="configure.html#authenticate">configuring custom authentication code</A>.</p></li>
+
+          <li><p>If you have custom Media Filters, note that these are now configured through <code>dspace.cfg</code> (instead of <code>mediafilter.cfg</code> which is obsolete.)</p></li>
+
+          <li><p>Also, take a look through the default <code>dspace.cfg</code> file supplied with DSpace 1.4, as this contains configuration options for various new features you might like to use.  In general, these new features default to 'off' and you'll need to add configuration properties as described in the default 1.4 <code>dspace.cfg</code> to activate them.</P></li>
+        </ul>
+      </li>
+
+      <li><p>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <code><i>[dspace]</i>/jsp/local</code> directory, you will need to merge the changes in the new 1.4 versions into your locally modified ones.</p></li>
+
+      <li><p>In <code><i>[dspace-1.4-source]</i></code> run:</p>
+
+      <pre>ant -Dconfig=<i>[dspace]</i>/config/dspace.cfg update</pre></li>
+
+      <li><P>The database schema needs updating.  SQL files containing the relevant file are provided.  If you've modified the schema locally, you may need to check over this and make alterations.</p>
+
+        <dl>
+          <dt>For PostgreSQL</dt>
+          <dd><p><code><i>[dspace-1.4-source]</i>/etc/database_schema_13-14.sql</code> contains the SQL commands to achieve this for PostgreSQL.  To apply the changes, go to the source directory, and run:</P>
+          <p><code>psql -f etc/database_schema_12-13.sql [DSpace database name] -h localhost</code></p></dd>
+
+          <dt>For Oracle</dt>
+          <dd><p><code><i>[dspace-1.4-source]</i>/etc/oracle/database_schema_13-14.sql</code> should be run on the DSpace database to update the schema.</p></dd>
+        </dl>
+      </li>
+
+      <li><p>Copy the <code>.war</code> Web application files in <code><i>[dspace-1.4-source]</i>/build</code> to the <code>webapps</code> sub-directory of your servlet container (e.g. Tomcat).  e.g.:</p>
+
+      <pre>cp <i>[dspace-1.4-source]</i>/build/*.war <i>[tomcat]</i>/webapps</pre>
+
+      <p>If you're using Tomcat, you need to delete the directories corresponding to the old <code>.war</code> files.  For example, if <code>dspace.war</code> is installed in <code><i>[tomcat]</i>/webapps/dspace.war</code>, you should delete the <code><i>[tomcat]</i>/webapps/dspace</code> directory.  Otherwise, Tomcat will continue to use the old code in that directory. </p></li>
+
+      <li><p>Restart Tomcat.</p></li>
+    </ol>
+
+
+
     <h2><a name="131_132">Updating From 1.3.1 to 1.3.2</a></h2>
 
      <p>The changes in 1.3.2 are only code changes so the update is simply a matter of rebuilding the wars.</p>
