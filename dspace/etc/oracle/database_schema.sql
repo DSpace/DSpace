@@ -69,7 +69,11 @@ CREATE SEQUENCE itemsbyauthor_seq;
 CREATE SEQUENCE itemsbytitle_seq;
 CREATE SEQUENCE itemsbydate_seq;
 CREATE SEQUENCE itemsbydateaccessioned_seq;
+CREATE SEQUENCE itemsbysubject_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
+CREATE SEQUENCE metadataschemaregistry_seq;
+CREATE SEQUENCE metadatafieldregistry_seq;
+CREATE SEQUENCE metadatavalue_seq;
 CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 
@@ -229,35 +233,51 @@ CREATE TABLE Bundle2Bitstream
 CREATE INDEX bundle2bitstream_bundle_idx ON Bundle2Bitstream(bundle_id);
 
 -------------------------------------------------------
--- DCTypeRegistry table
+-- Metadata Tables and Sequences
 -------------------------------------------------------
-CREATE TABLE DCTypeRegistry
+CREATE TABLE MetadataSchemaRegistry
 (
-  dc_type_id INTEGER PRIMARY KEY,
-  element    VARCHAR2(64),
-  qualifier  VARCHAR2(64),
-  scope_note VARCHAR2(2000),
-  UNIQUE(element, qualifier)
+  metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
+  namespace          VARCHAR(256),
+  short_id           VARCHAR(32)
 );
 
--------------------------------------------------------
--- DCValue table
--------------------------------------------------------
-CREATE TABLE DCValue
+CREATE TABLE MetadataFieldRegistry
 (
-  dc_value_id   INTEGER PRIMARY KEY,
-  item_id       INTEGER REFERENCES Item(item_id),
-  dc_type_id    INTEGER REFERENCES DCTypeRegistry(dc_type_id),
-  text_value VARCHAR2(2000),
-  text_lang  VARCHAR2(24),
-  place      INTEGER,
-  source_id  INTEGER
+  metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatafieldregistry_seq'),
+  metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
+  element    VARCHAR(64),
+  qualifier  VARCHAR(64),
+  scope_note          TEXT
 );
+
+CREATE TABLE MetadataValue
+(
+  metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
+  item_id       INTEGER REFERENCES Item(item_id),
+  metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
+  text_value TEXT,
+  text_lang  VARCHAR(24),
+  place              INTEGER
+);
+
+-- Create the DC schema
+INSERT INTO MetadataSchemaRegistry VALUES (getnextid('metadataschemaregistry'),'http://dublincore.org/documents/dcmi-terms/','dc');
+
+-- Create a dcvalue view for backwards compatibilty
+CREATE VIEW dcvalue AS
+  SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.item_id,
+    MetadataValue.metadata_field_id AS "dc_type_id", MetadataValue.text_value,
+    MetadataValue.text_lang, MetadataValue.place
+  FROM MetadataValue, MetadataFieldRegistry
+  WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
+  AND MetadataFieldRegistry.metadata_schema_id = 1;
 
 -- An index for item_id - almost all access is based on
--- instantiating the item object, which grabs all dcvalues
+-- instantiating the item object, which grabs all values
 -- related to that item
-CREATE INDEX dcvalue_item_idx on DCValue(item_id);
+CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
+CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
 
 -------------------------------------------------------
 -- Community table
@@ -265,7 +285,7 @@ CREATE INDEX dcvalue_item_idx on DCValue(item_id);
 CREATE TABLE Community
 (
   community_id      INTEGER PRIMARY KEY,
-  name              VARCHAR2(128) UNIQUE,
+  name              VARCHAR2(128),
   short_description VARCHAR2(512),
   introductory_text VARCHAR2(2000),
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
@@ -650,9 +670,156 @@ WHERE ItemsByDateAccessioned.item_id = Communities2Item.item_id
 
 
 -------------------------------------------------------
+--  ItemsBySubject table
+-------------------------------------------------------
+CREATE TABLE ItemsBySubject
+(
+   items_by_subject_id INTEGER PRIMARY KEY,
+   item_id             INTEGER REFERENCES Item(item_id),
+   subject             TEXT,
+   sort_subject        TEXT
+);
+
+-- index by sort_subject
+CREATE INDEX sort_subject_idx on ItemsBySubject(sort_subject);
+
+-------------------------------------------------------
+--  CollectionItemsBySubject view
+-------------------------------------------------------
+CREATE VIEW CollectionItemsBySubject as
+SELECT Collection2Item.collection_id, ItemsBySubject.* 
+FROM ItemsBySubject, Collection2Item
+WHERE ItemsBySubject.item_id = Collection2Item.item_id
+;
+
+-------------------------------------------------------
+--  CommunityItemsBySubject view
+-------------------------------------------------------
+CREATE VIEW CommunityItemsBySubject as
+SELECT Communities2Item.community_id, ItemsBySubject.* 
+FROM ItemsBySubject, Communities2Item
+WHERE ItemsBySubject.item_id = Communities2Item.item_id
+;
+
+-------------------------------------------------------
 --  Create 'special' groups, for anonymous access
 --  and administrators
 -------------------------------------------------------
 -- We don't use getnextid() for 'anonymous' since the sequences start at '1'
 INSERT INTO epersongroup VALUES(0, 'Anonymous');
 INSERT INTO epersongroup VALUES(1, 'Administrator');
+
+
+-------------------------------------------------------
+-- Create the checksum checker tables
+-------------------------------------------------------
+-- list of the possible results as determined
+-- by the system or an administrator
+
+CREATE TABLE checksum_results
+(
+    result_code VARCHAR PRIMARY KEY,
+    result_description VARCHAR
+);
+
+
+-- This table has a one-to-one relationship
+-- with the bitstream table. A row will be inserted
+-- every time a row is inserted into the bitstream table, and
+-- that row will be updated every time the checksum is
+-- re-calculated.
+
+CREATE TABLE most_recent_checksum 
+(
+    bitstream_id INTEGER PRIMARY KEY REFERENCES bitstream(bitstream_id),
+    to_be_processed BOOLEAN NOT NULL,
+    expected_checksum VARCHAR NOT NULL,
+    current_checksum VARCHAR NOT NULL,
+    last_process_start_date TIMESTAMP NOT NULL,
+    last_process_end_date TIMESTAMP NOT NULL,
+    checksum_algorithm VARCHAR NOT NULL,
+    matched_prev_checksum BOOLEAN NOT NULL,
+    result VARCHAR REFERENCES checksum_results(result_code)
+);
+
+-- A row will be inserted into this table every
+-- time a checksum is re-calculated.
+
+CREATE SEQUENCE checksum_history_seq;
+
+CREATE TABLE checksum_history 
+(
+    check_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('checksum_history_seq'),
+    bitstream_id INTEGER,
+    process_start_date TIMESTAMP,
+    process_end_date TIMESTAMP,
+    checksum_expected VARCHAR,
+    checksum_calculated VARCHAR,
+    result VARCHAR REFERENCES checksum_results(result_code)
+);
+
+
+-- this will insert into the result code
+-- the initial results that should be 
+-- possible
+
+insert into checksum_results
+values
+( 
+    'INVALID_HISTORY',
+    'Install of the cheksum checking code do not consider this history as valid' 
+);
+
+insert into checksum_results
+values
+( 
+    'BITSTREAM_NOT_FOUND',
+    'The bitstream could not be found' 
+);
+
+insert into checksum_results
+values
+( 
+    'CHECKSUM_MATCH',
+    'Current checksum matched previous checksum' 
+);
+
+insert into checksum_results
+values
+(
+    'CHECKSUM_NO_MATCH',
+    'Current checksum does not match previous checksum' 
+);
+
+insert into checksum_results
+values
+( 
+    'CHECKSUM_PREV_NOT_FOUND',
+    'Previous checksum was not found: no comparison possible' 
+);
+
+insert into checksum_results
+values
+( 
+    'BITSTREAM_INFO_NOT_FOUND',
+    'Bitstream info not found' 
+);
+
+insert into checksum_results
+values
+( 
+    'CHECKSUM_ALGORITHM_INVALID',
+    'Invalid checksum algorithm' 
+);
+insert into checksum_results
+values
+( 
+    'BITSTREAM_NOT_PROCESSED',
+    'Bitstream marked to_be_processed=false' 
+);
+insert into checksum_results
+values
+( 
+    'BITSTREAM_MARKED_DELETED',
+    'Bitstream marked deleted in bitstream table' 
+);

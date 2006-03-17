@@ -44,15 +44,8 @@
 --    all tables etc. so the database is completely empty and ready for a
 --    fresh installation.  Of course, this means all data is lost.
 --
---    Caution: THIS IS POSTGRESQL-SPECIFC
---    * The sequences dropped below are automatically created by PostgreSQL
---      for the SERIAL typed fields.
---
 --    This should be kept in sync if database_schema.sql is updated.
 
-
--- Drop indices
-DROP INDEX dcvalue_dc_type_id_idx;
 
 -- Drop the views
 DROP VIEW CommunityItemsBySubject;
@@ -69,6 +62,9 @@ DROP VIEW Community2Item;
 DROP VIEW DCValue;
 
 -- Then the tables
+DROP TABLE checksum_history
+DROP TABLE most_recent_checksum
+DROP TABLE checksum_results
 DROP TABLE ItemsBySubject;
 DROP TABLE ItemsByDateAccessioned;
 DROP TABLE ItemsByDate;
