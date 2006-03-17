@@ -62,9 +62,9 @@ DROP VIEW Community2Item;
 DROP VIEW DCValue;
 
 -- Then the tables
-DROP TABLE checksum_history
-DROP TABLE most_recent_checksum
-DROP TABLE checksum_results
+DROP TABLE checksum_history;
+DROP TABLE most_recent_checksum;
+DROP TABLE checksum_results;
 DROP TABLE ItemsBySubject;
 DROP TABLE ItemsByDateAccessioned;
 DROP TABLE ItemsByDate;
@@ -137,6 +137,7 @@ DROP SEQUENCE itemsbyauthor_seq;
 DROP SEQUENCE itemsbytitle_seq;
 DROP SEQUENCE itemsbydate_seq;
 DROP SEQUENCE itemsbydateaccessioned_seq;
+DROP SEQUENCE itemsbysubject_seq;
 DROP SEQUENCE epersongroup2workspaceitem_seq;
 DROP SEQUENCE metadataschemaregistry_seq;
 DROP SEQUENCE metadatafieldregistry_seq;
