@@ -33,6 +33,16 @@
 property.name = property value
 </pre>
 
+  <p>The <cite>property value</cite> may contain <em>references</em> to other
+  configuration properties, in the form
+  <code><b>${</b></code><cite>property.name</cite><code><b>}</b></code>.
+  This follows the <code>ant</code> convention of allowing references
+  in property files.  A property may not refer to itself. Examples:
+  <pre>
+property.name = word1 ${other.property.name} more words
+property2.name = ${dspace.dir}/rest/of/path
+</pre>
+
   <p>Due to time constraints, this document does not contain an exhaustive list of properties; they are all listed in the supplied <code>dspace.cfg</code>. Below are some particularly relevant properties with notes for their use:</p>
 
   <table>
@@ -363,11 +373,20 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
 
   <h2><a name="authenticate" id="authenticate">Custom Authentication Code</a></h2>
 
-  <p>Since many institutions and organizations have exisiting authentication systems, DSpace has been designed to allow these to be easily integrated.
+  <p>Since many institutions and organizations have exisiting
+     authentication systems, DSpace has been designed to allow these to
+     be easily integrated into an existing authentication infrastructure.
      It keeps a series, or "stack", of <em>authentication methods</em>, so
      each one can be tried in turn.  This makes it easy to add new
      authentication methods or rearrange the order without changing any
      existing code.  You can also share authentication code with other sites.</p>
+
+  <p>The configuration property
+     <code>plugin.sequence.org.dspace.eperson.AuthenticationMethod</code>
+     defines the authentication stack.  It is a comma-separated list of
+     class names.  Each of these classes implements a different
+     <em>authentication method</em>, or way of determining the identity of
+     the user.  They are invoked in the order specified until one succeeds.
 
   <p>An authentication method is a class that implements the
      interface <code>org.dspace.eperson.AuthenticationMethod</code>.
@@ -434,9 +453,37 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
 
   <h3>X.509 Certificate Authentication</h3>
 
-  <p>The X509 certificate authentication method has an extra feature: If the <code>authentication.x509.autoregister</code> configuration property is <code>true</code>, it will automatically register the user with the system.</p>
+  The X.509 authentication method uses an X.509 certificate sent by
+  the client to establish his/her identity.  It requires the client to
+  have a personal Web certificate installed on their browser (or other client
+  software) which is issued by a Certifying Authority (CA) recognized
+  by the web server.
+  <p>
+  First, see the <a href="install.html#https">HTTPS installation
+  instructions</a> to configure your Web server.  If you are using
+  HTTPS with Tomcat, note that the <code>&lt;Connector&gt;</code> tag
+  <em>must</em> include the attribute <code><b>clientAuth="true"</b></code>
+  so the server requests a personal Web certificate from the client.
+  <p>
+  You must also configure DSpace with the same CA certificates as the
+  web server, so it can accept and interpret the clients' certificates.
+  It can share the same keystore file as the web server, or a
+  separate one, or a CA certificate in a file by itself.  These are
+  the relevant DSpace configuration properties:
 
-  <h3>Example of Custom Authentication</h3>
+ <pre>
+  authentication.x509.keystore.path = <em>path to Java keystore file</em>
+  authentication.x509.keystore.password = <em>password to access the keystore</em>
+  authentication.x509.ca.cert = <em>path to certificate file for CA whose client certs to accept.</em>
+ </pre>
+
+  This authentication method has an extra feature:  If the
+  <code>authentication.x509.autoregister</code> configuration property
+  is <code>true</code>, it will automatically register the user with the
+  system.  This lets you automatically accept all users with valid
+  personal certificates.
+
+  <h3>Example of a Custom Authentication Method</h3>
 
   <p>Also included in the source is an implementation of an authentication method used at MIT, <code>edu.mit.dspace.MITSpecialGroup</code>.
      This does not actually authenticate a user, it <em>only</em>

@@ -22,7 +22,7 @@
 
       <li><P><A HREF="http://java.sun.com/">Java 1.4</A> or later (standard SDK is fine, you don't need J2EE)</P></li>
 
-      <li><P><A HREF="http://ant.apache.org/">Apache Ant 1.5</A> or later (Java make-like tool)</P></li>
+      <li><P><A HREF="http://ant.apache.org/">Apache Ant 1.6.2</A> or later (Java make-like tool)</P></li>
 
       <li>
         <P><A HREF="http://www.postgresql.org/">PostgreSQL 7.3</A> or later, an open source relational database, or <a href="http://www.oracle.com/database/">Oracle 9 or higher</A>.</P>
@@ -151,17 +151,33 @@ you installed Tomcat--also known as $CATALINA_HOME). This directory is generated
       </li>
 
       <li>
-        <P>Edit <code><i>[dspace-source]</i>/config/dspace.cfg</code>, in particular you'll need to set these properties:</P>
+        <P>Edit <code><i>[dspace-source]</i>/config/dspace.cfg</code>, in particular you'll need to set these properties:
 
-        <PRE>dspace.url
-dspace.hostname
-dspace.name
-db.password   (the password you entered in the previous step)
-mail.server
-mail.from.address
-feedback.recipient
-mail.admin
-alert.recipient (not essential but very useful!)</PRE>
+<br><code>dspace.dir</code> -- must be set to the <code>[dspace]</code> (installation) directory.
+
+<br><code>dspace.url</code> -- complete URL of this server's DSpace home page.
+
+<br><code>dspace.hostname</code> -- fully-qualified domain name of web server.
+
+<br><code>dspace.name</code> -- "Proper" name of your server, e.g. "My Digital Library".
+
+<br><code>db.password</code> --  the database password you entered in the previous step.
+
+<br><code>mail.server</code> -- fully-qualified domain name of your outgoing mail server.
+
+<br><code>mail.from.address</code> -- the "From:" address to put on email sent by DSpace.
+
+<br><code>feedback.recipient</code> -- mailbox for feedback mail.
+
+<br><code>mail.admin</code> -- mailbox for DSpace site administrator.
+
+<br><code>alert.recipient</code> --  mailbox for server errors/alerts (not essential but very useful!)
+<p>
+<b>NOTE:</b> You can interpolate the value of one configuration variable
+in the value of another one.  For example, to set <code>feedback.recipient</code>
+to the same value as <code>mail.admin</code>, the line would look like:
+<pre>    feedback.recipient = ${mail.admin}</pre>
+See the <code>dspace.cfg</code> file for examples.
 
       </li>
 
@@ -244,50 +260,138 @@ alert.recipient (not essential but very useful!)</PRE>
     <P>For information on customising the output of this see <A HREF="configure.html#statistics">configuring system statistical reports</A>.</P>
 
 
-    <H3>DSpace over HTTPS</H3>
+    <H3><A NAME="https">DSpace over HTTPS</a></H3>
 
-    <P>Plain old HTTP is totally insecure, and if your DSpace uses username/password authentication or stores some restricted content, running it over HTTPS (HTTP over a Secure Socket Layer (SSL)) is advisable.  There are two options for this:  Using Apache HTTPD, or Tomcat/Jetty's in-built HTTPS support.</P>
+    <P>If your DSpace is configured to have users login with a username
+    and password (as opposed to, say, client Web certificates), then you
+    should consider using HTTPS.  Whenever a user logs in with the Web
+    form (e.g. <code>dspace.myuni.edu/dspace/password-login</code>)
+    their DSpace password is exposed in plain text on the network.  This
+    is a very serious security risk since network traffic monitoring is
+    very common, especially at universities.  If the risk seems minor, then
+    consider that your DSpace administrators also login this way and they
+    have ultimate control over the archive.
 
-    <P><strong>To use the HTTPS support in Tomcat 5.0:</strong>
+    <p>
+    The solution is to use <em>HTTPS</em> (HTTP over SSL, i.e. Secure
+    Socket Layer, an encrypted transport), which keeps your passwords
+    from being captured.  You can configure DSpace to require SSL on
+    all "authenticated" transactions so it only accepts passwords
+    on SSL connections.
+    <p>
+    The steps are:
 
-    <UL>
-      <LI>Create a Java keystore for your server with the password
-          <code>changeit</code>, loaded with the CA certificates for
-          the authorities of any clients whose certificates you wish to accept.
-          For example, if your server is installed under <b><code>/tomcat</code></b>
-          <br><code> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore /tomcat/conf/keystore  -alias client1 -file client1.pem</code>
-          </LI>
+    <ol><li>Configure DSpace to require SSL from the webserver.  Add or
+    uncomment this line in <code>[dspace-source]/conf/dspace.cfg</code>:
+    <pre>webui.require.confidential = true</pre>
 
-      <LI>Install your server certificate under the alias "tomcat":
-      <br><code> $JAVA_HOME/bin/keytool -import -noprompt -v -storepass changeit -keystore /tomcat/conf/keystore -alias tomcat -file myserver.pem</code>
+    (Note that you are chaning this in the <em>source</em> directory's
+    configuration; changing the installed <code>dspace.cfg</code> has no
+    effect.)  Now, rebuild and redeploy the webapp WAR files, e.g.
+    <pre>ant build_wars</pre>
+
+    <p><li>Configure your Web server or servlet container to support HTTPS,
+    using one of the options below.
+    </ol>
+
+    <P><strong>To enable the HTTPS support in Tomcat 5.0:</strong>
+
+    <ol type="A"><li><b>For Production use:</b><br> Follow this procedure to
+      set up SSL on your server.  Using a "real" server certificate
+      ensures your users' browsers will accept it without complaints.
+      <p>
+      In the examples below, <code>$CATALINA_BASE</code> is the directory
+      under which your Tomcat is installed.
+      <ol type="1">
+        <p><LI>Create a Java keystore for your server with the password
+            <code>changeit</code>, and install your server certificate
+            under the alias <code>"tomcat"</code>.
+            This assumes the certificate was put in the file <code>server.pem</code>:
+        <pre> $JAVA_HOME/bin/keytool -import -noprompt -v -storepass changeit -keystore $CATALINA_BASE/conf/keystore -alias tomcat -file myserver.pem</pre>
+
+        <p><LI>Install the CA (Certifying Authority) certificate for the CA that
+        granted your server cert, if necessary.  This
+        assumes    the server CA certificate is in <code>ca.pem</code>:
+        <pre> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore $CATALINA_BASE/conf/keystore -alias ServerCA -file ca.pem</pre>
       </LI>
 
-      <LI>Install the CA (Certifying Authority) certificate for the CA that
-      granted your server cert, if necessary:
-      <br><code> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore /tomcat/conf/keystore -alias ServerCA -file ca.pem</code>
+        <p><li>Optional -- ONLY if you need to accept client certificates
+            for the X.509 certificate stackable authentication module
+            See the
+          <A HREF="configure.html#authenticate">configuration section</A>
+          for instructions on enabling the X.509 authentication method.
+            Load the keystore with the CA (certifying authority)
+            certificates for
+            the authorities of any clients whose certificates you wish to accept.
+            For example, assuming the client CA certificate is in <code>client1.pem</code>:
+            <pre> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1 -file client1.pem</pre>
       </LI>
 
-      <LI>Now add another Connector tag to your <code>server.xml</code>
-      Tomcat configuration file, like this example: (You may wish to change
+        <p><LI>Now add another Connector tag to your <code>server.xml</code>
+        Tomcat configuration file, like the example below.  The parts
+        affecting or specific to SSL are shown in bold.
+        (You may wish to change
       some details such as the port, pathnames, and keystore password)
       <pre>
     &lt;Connector port="8443"
                maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
                enableLookups="false" disableUploadTimeout="true"
-               acceptCount="100" debug="0" scheme="https" secure="true"
+                 acceptCount="100" debug="0"
+                 <b>scheme="https"
+                 secure="true"
                sslProtocol="TLS"
-               keystoreFile="/tomcat/conf/keystore"
+                 keystoreFile="conf/keystore"
                keystorePass="changeit"
-               clientAuth="true"
-               truststoreFile="/tomcat/conf/keystore"
-               trustedstorePass="changeit" /&gt;</pre></LI>
+                 clientAuth="true" </b><i>- ONLY if using client X.509 certs for authentication!</i><b>
+                 truststoreFile="conf/keystore"
+                 trustedstorePass="changeit"</b> /&gt;</pre>
+        Also, check that the default Connector is set up to redirect
+        "secure" requests to the same port as your SSL connector, e.g.:
+       <pre>&lt;Connector port="8080"
+                 maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
+                 enableLookups="false" <b>redirectPort="8443"</b>
+                 acceptCount="100" debug="0" /&gt;</pre>
 
-      <LI>See the
-        <A HREF="configure.html#dspacecfg">configuration section</A>
-        for instructions on enabling the X.509 authentication method.
         </LI>
 
-    </UL>
+      </OL>
+
+      <p><li><b>Quick-and-dirty Procedure for Testing:</b><br>
+      If you are just setting up a DSpace server for testing, or to
+      experiment with HTTPS, then you don't need to get a real server
+      certificate.  You can create a "self-signed" certificate for testing;
+      web browsers will issue warnings before accepting it but they will
+      function exactly the same after that as with a "real" certificate.
+      <p>
+      In the examples below, <code>$CATALINA_BASE</code> is the directory
+      under which your Tomcat is installed.
+      <ol type="1">
+        <p><LI>Create a Java keystore for your server with the password
+            <code>changeit</code>, and install your server certificate
+            under the alias <code>"tomcat"</code>.
+            This assumes the certificate was put in the file <code>server.pem</code>:
+        <pre> $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keystore $CATALINA_BASE/conf/keystore -storepass changeit</pre>
+        When answering the questions to identify the certificate, be
+        sure to respond to "First and last name" with the fully-qualified
+        domain name of your server (e.g. <code>test-dspace.myuni.edu</code>).
+        The other questions are not important.
+
+        <p><li>Optional -- ONLY if you need to accept client certificates
+            for the X.509 certificate stackable authentication module
+            See the
+          <A HREF="configure.html#authenticate">configuration section</A>
+        for instructions on enabling the X.509 authentication method.
+            Load the keystore with the CA (certifying authority)
+            certificates for
+            the authorities of any clients whose certificates you wish to accept.
+            For example, assuming the client CA certificate is in <code>client1.pem</code>:
+            <pre> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit -trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1 -file client1.pem</pre>
+        </LI>
+
+        <p><li>Follow the procedure in the section above to
+          add another Connector tag, for the HTTPS port, to your <code>server.xml</code> file.
+        </ol>
+    </ol>
 
     <P><strong>To use Apache HTTPD:</strong> The DSpace source bundle includes a partial Apache configuration <code>apache13.conf</code>, which contains most of the DSpace-specific configuration required.  It assumes you're using <A HREF="http://jakarta.apache.org/tomcat/tomcat-4.1-doc/config/webapp.html">mod_webapp</A>, which is deprecated and tricky to compile but a lot easier to configure than <code>mod_jk2</code> which is the current recommendation from Tomcat.   Use of this is optional, you might just want to use it as an example.  To use it directly, in the main Apache <code>httpd.conf</code>, you should:</P>
 
