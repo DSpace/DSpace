@@ -1,5 +1,5 @@
 /*
- * AbstractMetsDissemination.java
+ * AbstractMETSDisseminator.java
  *
  * Version: $Revision$
  *
@@ -126,11 +126,11 @@ import edu.harvard.hul.ois.mets.helper.PreformedXML;
  * @author Robert Tansley
  * @version $Revision$
  */
-public abstract class AbstractMetsDissemination
-    implements DisseminationPackage
+public abstract class AbstractMETSDisseminator
+    implements PackageDisseminator
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(AbstractMetsDissemination.class);
+    private static Logger log = Logger.getLogger(AbstractMETSDisseminator.class);
 
     /** Filename of manifest, relative to package toplevel. */
     public static final String MANIFEST_FILE = "mets.xml";
@@ -198,7 +198,7 @@ public abstract class AbstractMetsDissemination
             {
                 extraFiles = new HashMap();
                 ZipOutputStream zip = new ZipOutputStream(pkg);
-                zip.setComment("METS archive created by DSpace MetsDissemination");
+                zip.setComment("METS archive created by DSpace METSDisseminationCrosswalk");
 
                 // write manifest first.
                 ZipEntry me = new ZipEntry(MANIFEST_FILE);

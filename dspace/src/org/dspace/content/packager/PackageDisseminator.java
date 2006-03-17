@@ -1,5 +1,5 @@
 /*
- * DisseminationPackage.java
+ * PackageDisseminator.java
  *
  * Version: $Revision$
  *
@@ -77,7 +77,7 @@ import org.dspace.core.Context;
  * @version $Revision$
  * @see PackageParameters
  */
-public interface DisseminationPackage
+public interface PackageDisseminator
 {
     /**
      * Export the object (Item, Collection, or Community) as a

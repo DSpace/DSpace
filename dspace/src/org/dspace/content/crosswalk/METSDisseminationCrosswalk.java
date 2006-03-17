@@ -1,5 +1,5 @@
 /*
- * MetsDissemination.java
+ * METSDisseminationCrosswalk.java
  *
  * Version: $Revision$
  *
@@ -63,7 +63,7 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.packager.PackageParameters;
-import org.dspace.content.packager.DisseminationPackage;
+import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -85,11 +85,11 @@ import org.jdom.input.JDOMParseException;
  * @author Larry Stone
  * @version $Revision$
  */
-public class MetsDissemination
+public class METSDisseminationCrosswalk
     implements DisseminationCrosswalk
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(MetsDissemination.class);
+    private static Logger log = Logger.getLogger(METSDisseminationCrosswalk.class);
 
     // Plugin Name of METS packager to use for manifest;
     // maybe make  this configurable.
@@ -145,11 +145,11 @@ public class MetsDissemination
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
-            throw new CrosswalkObjectNotSupported("MetsDissemination can only crosswalk an Item.");
+            throw new CrosswalkObjectNotSupported("METSDisseminationCrosswalk can only crosswalk an Item.");
         Item item = (Item)dso;
 
-        DisseminationPackage dip = (DisseminationPackage)
-          PluginManager.getNamedPlugin(DisseminationPackage.class, METS_PACKAGER_PLUGIN);
+        PackageDisseminator dip = (PackageDisseminator)
+          PluginManager.getNamedPlugin(PackageDisseminator.class, METS_PACKAGER_PLUGIN);
         if (dip == null)
             throw new CrosswalkInternalException("Cannot find a disseminate plugin for package="+METS_PACKAGER_PLUGIN);
 

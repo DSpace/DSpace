@@ -1,5 +1,5 @@
 /*
- * PDFPackage.java
+ * PDFPackager.java
  *
  * Version: $Revision$
  *
@@ -83,12 +83,12 @@ import org.pdfbox.pdmodel.PDDocumentInformation;
  * @author Larry Stone
  * @version $Revision$
  */
-public class PDFPackage
+public class PDFPackager
        extends SelfNamedPlugin
-       implements SubmissionPackage, DisseminationPackage
+       implements PackageIngester, PackageDisseminator
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(PDFPackage.class);
+    private static Logger log = Logger.getLogger(PDFPackager.class);
 
     private final static String BITSTREAM_FORMAT_NAME = "Adobe PDF";
 

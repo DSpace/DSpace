@@ -80,7 +80,7 @@ import org.jdom.output.Format;
  * It, in turn, could be found in the DSpace configuration in a line like:
  * <pre>
  *  plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk = \
- *    org.dspace.content.crosswalk.SimpleDCCrosswalk = DC
+ *    org.dspace.content.crosswalk.SimpleDCDisseminationCrosswalk = DC
  * </pre>
  *
  * <p>

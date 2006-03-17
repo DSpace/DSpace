@@ -1,5 +1,5 @@
 /*
- * NullSubmissionCrosswalk.java
+ * NullIngestionCrosswalk.java
  *
  * Version: $Revision$
  *
@@ -59,7 +59,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
 /**
- * "Null" Submission crosswalk
+ * "Null" ingestion crosswalk
  * <p>
  * Use this crosswalk to ignore a metadata record on ingest.  It was
  * intended to be used with a package importer such as the METS
@@ -71,16 +71,16 @@ import org.jdom.output.Format;
  * <pre>
  * # ignore LOM metadata when it comes up:
  * plugin.named.org.dspace.content.crosswalk.SubmissionCrosswalk = \
- *   org.dspace.content.crosswalk.NullSubmissionCrosswalk = NULL, LOM
+ *   org.dspace.content.crosswalk.NullIngestionCrosswalk = NULL, LOM
  * </pre>
  * @author Larry Stone
  * @version $Revision$
  */
-public class NullSubmissionCrosswalk
-    implements SubmissionCrosswalk
+public class NullIngestionCrosswalk
+    implements IngestionCrosswalk
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(NullSubmissionCrosswalk.class);
+    private static Logger log = Logger.getLogger(NullIngestionCrosswalk.class);
 
     private static XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
 

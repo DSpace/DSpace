@@ -1,5 +1,5 @@
 /*
- * MetsManifest.java
+ * METSManifest.java
  *
  * Version: $Revision$
  *
@@ -38,7 +38,7 @@
  * DAMAGE.
  */
 
-package org.dspace.app.mets;
+package org.dspace.content.packager;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -59,7 +59,7 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.MetadataValidationException;
-import org.dspace.content.crosswalk.SubmissionCrosswalk;
+import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -116,7 +116,7 @@ import org.jdom.xpath.XPath;
  * @see org.dspace.content.packager.MetsSubmission
  * @see org.dspace.app.mets.FederatedMETSImport
  */
-public class MetsManifest
+public class METSManifest
 {
     /**
      * Callback interface to retrieve data streams in mdRef elements.
@@ -148,7 +148,7 @@ public class MetsManifest
     }
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(MetsManifest.class);
+    private static Logger log = Logger.getLogger(METSManifest.class);
 
     /** Canonical filename of METS manifest within a package or as a bitstream. */
     public final static String MANIFEST_FILE = "mets.xml";
@@ -247,7 +247,7 @@ public class MetsManifest
      * @param builder XML parser (for parsing mdRef'd files and binData)
      * @param mets parsed METS document
      */
-    private MetsManifest(SAXBuilder builder, Element mets)
+    private METSManifest(SAXBuilder builder, Element mets)
     {
         super();
         this.mets = mets;
@@ -262,9 +262,9 @@ public class MetsManifest
      *   in document.  Also validates any sub-documents.
      * @throws MetadataValidationException if there is any error parsing
      *          or validating the METS.
-     * @return new MetsManifest object.
+     * @return new METSManifest object.
      */
-    public static MetsManifest create(InputStream is, boolean validate)
+    public static METSManifest create(InputStream is, boolean validate)
             throws IOException,
             MetadataValidationException
     {
@@ -302,7 +302,7 @@ public class MetsManifest
                     + is.toString(),  je);
         }
 
-        return new MetsManifest(builder, metsDocument.getRootElement());
+        return new METSManifest(builder, metsDocument.getRootElement());
     }
 
     /**
@@ -660,7 +660,7 @@ public class MetsManifest
     // It's a lot like getMdContentAsXml but cannot use that because xwalk
     // should be called with root element OR list depending on what was given.
     private void crosswalkMdContent(Element mdSec, Mdref callback,
-                SubmissionCrosswalk xwalk, Context context, DSpaceObject dso)
+                IngestionCrosswalk xwalk, Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         List xml = getMdContentAsXml(mdSec,callback);
@@ -710,11 +710,11 @@ public class MetsManifest
             else if (result instanceof Element)
                 return (Element)result;
             else
-                throw new MetadataValidationException("MetsManifest: Failed to resolve XPath, path=\""+path+"\"");
+                throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\""+path+"\"");
         }
         catch (JDOMException je)
         {
-            throw new MetadataValidationException("MetsManifest: Failed to resolve XPath, path=\""+path+"\"", je);
+            throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\""+path+"\"", je);
         }
     }
 
@@ -724,13 +724,13 @@ public class MetsManifest
     //  mets.submission.crosswalk.{mdType} = {pluginName}
     //   e.g.
     //  mets.submission.crosswalk.DC = mysite-QDC
-    private SubmissionCrosswalk getCrosswalk(String type)
+    private IngestionCrosswalk getCrosswalk(String type)
     {
         String xwalkName = ConfigurationManager.getProperty(CONFIG_METADATA_PREFIX + type);
         if (xwalkName == null)
             xwalkName = type;
-        return (SubmissionCrosswalk)
-          PluginManager.getNamedPlugin(SubmissionCrosswalk.class, xwalkName);
+        return (IngestionCrosswalk)
+          PluginManager.getNamedPlugin(IngestionCrosswalk.class, xwalkName);
     }
 
     /**
@@ -792,7 +792,7 @@ public class MetsManifest
                CrosswalkException, IOException, SQLException, AuthorizeException
     {
         String type = getMdType(dmd);
-        SubmissionCrosswalk xwalk = getCrosswalk(type);
+        IngestionCrosswalk xwalk = getCrosswalk(type);
 
         if (xwalk == null)
             throw new MetadataValidationException("Cannot process METS Manifest: "+
@@ -837,7 +837,7 @@ public class MetsManifest
                 if (techMD != null)
                 {
                     String type = getMdType(techMD);
-                    SubmissionCrosswalk xwalk = getCrosswalk(type);
+                    IngestionCrosswalk xwalk = getCrosswalk(type);
                     log.debug("Got bitstream techMD of type="+type+", for file ID="+fileId);
                      
                     if (xwalk == null)

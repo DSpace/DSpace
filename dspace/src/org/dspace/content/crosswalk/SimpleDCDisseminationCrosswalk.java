@@ -1,5 +1,5 @@
 /*
- * SimpleDCCrosswalk.java
+ * SimpleDCDisseminationCrosswalk.java
  *
  * Version: $Revision$
  *
@@ -68,7 +68,7 @@ import org.jdom.*;
  * @author Larry Stone
  * @version $Revision$
  */
-public class SimpleDCCrosswalk extends SelfNamedPlugin
+public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
     implements DisseminationCrosswalk
 {
     // namespaces of interest.
@@ -118,7 +118,7 @@ public class SimpleDCCrosswalk extends SelfNamedPlugin
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
-            throw new CrosswalkObjectNotSupported("SimpleDCCrosswalk can only crosswalk an Item.");
+            throw new CrosswalkObjectNotSupported("SimpleDCDisseminationCrosswalk can only crosswalk an Item.");
 
         Item item = (Item)dso;
         DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);

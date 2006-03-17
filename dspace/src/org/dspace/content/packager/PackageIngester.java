@@ -1,5 +1,5 @@
 /*
- * SubmissionPackage.java
+ * PackageIngester.java
  *
  * Version: $Revision$
  *
@@ -73,7 +73,7 @@ import org.dspace.core.Context;
  * @version $Revision$
  * @see PackageParameters
  */
-public interface SubmissionPackage
+public interface PackageIngester
 {
     /**
      * Create new Item out of the ingested package.

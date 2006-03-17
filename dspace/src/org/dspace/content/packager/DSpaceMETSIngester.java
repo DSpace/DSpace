@@ -1,5 +1,5 @@
 /*
- * DSpaceMetsSipImport
+ * DSpaceMETSIngester
  *
  * Version: $Revision$
  *
@@ -45,7 +45,6 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.mets.MetsManifest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -70,19 +69,19 @@ import org.jdom.Element;
  *
  * @author Larry Stone
  * @version $Revision$
- * @see org.dspace.app.mets.MetsManifest
+ * @see org.dspace.content.packager.METSManifest
  */
-public class DSpaceMetsSipImport
-       extends AbstractMetsSubmission
+public class DSpaceMETSIngester
+       extends AbstractMETSIngester
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceMetsSipImport.class);
+    private static Logger log = Logger.getLogger(DSpaceMETSIngester.class);
 
     // first part of required mets@PROFILE value
     private final static String PROFILE_START = "DSpace METS SIP Profile";
 
     // just check the profile name.
-    void checkManifest(MetsManifest manifest)
+    void checkManifest(METSManifest manifest)
         throws MetadataValidationException
     {
         String profile = manifest.getProfile();
@@ -94,7 +93,7 @@ public class DSpaceMetsSipImport
 
     // nothing needed.
     public void checkPackageFiles(Set packageFiles, Set missingFiles,
-                                  MetsManifest manifest)
+                                  METSManifest manifest)
         throws PackageValidationException, CrosswalkException
     {
         // This is where a subclass would arrange to use or ignore
@@ -112,8 +111,8 @@ public class DSpaceMetsSipImport
      * 3. Crosswalk remaining DMDs not eliminated already.
      */
     public void chooseItemDmd(Context context, Item item,
-                              MetsManifest manifest,
-                              AbstractMetsSubmission.MdrefManager callback,
+                              METSManifest manifest,
+                              AbstractMETSIngester.MdrefManager callback,
                               Element dmds[])
         throws CrosswalkException,
                AuthorizeException, SQLException, IOException
@@ -167,8 +166,8 @@ public class DSpaceMetsSipImport
      * For Creative Commons, look for a rightsMd containing a CC license.
      */
     public void addLicense(Context context, Collection collection,
-                           Item item, MetsManifest manifest,
-                           AbstractMetsSubmission.MdrefManager callback,
+                           Item item, METSManifest manifest,
+                           AbstractMETSIngester.MdrefManager callback,
                            String license)
         throws PackageValidationException, CrosswalkException,
                AuthorizeException, SQLException, IOException
@@ -189,7 +188,7 @@ public class DSpaceMetsSipImport
 
                 // if there was a bitstream, get rid of it, since
                 // it's just an artifact now that the CC license is installed.
-                Element mdRef = rmds[i].getChild("mdRef", MetsManifest.metsNS);
+                Element mdRef = rmds[i].getChild("mdRef", METSManifest.metsNS);
                 if (mdRef != null)
                 {
                     Bitstream bs = callback.getBitstreamForMdRef(mdRef);

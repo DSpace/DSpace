@@ -1,5 +1,5 @@
 /*
- * XsltCrosswalk.java
+ * XSLTCrosswalk.java
  *
  * Version: $Revision$
  *
@@ -124,7 +124,7 @@ import org.jdom.transform.XSLTransformException;
  * <p>
  * You must use the <code>PluginManager</code> to instantiate an
  * XSLT crosswalk plugin, e.g.
- * <pre> SubmissionCrosswalk xwalk = PluginManager.getPlugin(SubmissionCrosswalk.class, "LOM");</pre>
+ * <pre> IngestionCrosswalk xwalk = PluginManager.getPlugin(IngestionCrosswalk.class, "LOM");</pre>
  * <p>
  * Since there is significant overhead in reading the properties file to
  * configure the crosswalk, and a crosswalk instance may be used any number
@@ -135,10 +135,10 @@ import org.jdom.transform.XSLTransformException;
  * @author Larry Stone
  * @version $Revision$
  */
-public abstract class XsltCrosswalk extends SelfNamedPlugin
+public abstract class XSLTCrosswalk extends SelfNamedPlugin
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(XsltCrosswalk.class);
+    private static Logger log = Logger.getLogger(XSLTCrosswalk.class);
 
     /**
      * DSpace XML Namespace in JDOM form.
@@ -165,7 +165,7 @@ public abstract class XsltCrosswalk extends SelfNamedPlugin
         List aliasList = new ArrayList();
         Enumeration pe = ConfigurationManager.propertyNames();
 
-        log.debug("XsltCrosswalk: Looking for config prefix = "+prefix);
+        log.debug("XSLTCrosswalk: Looking for config prefix = "+prefix);
         while (pe.hasMoreElements())
         {
             String key = (String)pe.nextElement();
@@ -195,7 +195,7 @@ public abstract class XsltCrosswalk extends SelfNamedPlugin
             String myAlias = getPluginInstanceName();
             if (myAlias == null)
             {
-                log.error("Must use PluginManager to instantiate XsltCrosswalk so the class knows its name.");
+                log.error("Must use PluginManager to instantiate XSLTCrosswalk so the class knows its name.");
                 return null;
             }
             String cmPropName = CONFIG_PREFIX+direction+"."+myAlias+CONFIG_STYLESHEET;
@@ -227,7 +227,7 @@ public abstract class XsltCrosswalk extends SelfNamedPlugin
             }
             catch (XSLTransformException e)
             {
-                log.error("Failed to initialize XsltCrosswalk("+getPluginInstanceName()+"):"+e.toString());
+                log.error("Failed to initialize XSLTCrosswalk("+getPluginInstanceName()+"):"+e.toString());
             }
         }
         return transformer;

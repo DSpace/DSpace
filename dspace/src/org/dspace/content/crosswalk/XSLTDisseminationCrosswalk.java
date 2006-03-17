@@ -1,5 +1,5 @@
 /*
- * XsltDisseminationCrosswalk.java
+ * XSLTDisseminationCrosswalk.java
  *
  * Version: $Revision$
  *
@@ -77,9 +77,9 @@ import org.jdom.transform.XSLTransformer;
 import org.jdom.transform.XSLTransformException;
 
 /**
- * Configurable XSLT-driven Submission Crosswalk
+ * Configurable XSLT-driven dissemination Crosswalk
  * <p>
- * See the XsltCrosswalk superclass for details on configuration.
+ * See the XSLTCrosswalk superclass for details on configuration.
  * <p>
  * <h3>Additional Configuration of Dissemination crosswalk:</h3>
  * The disseminator also needs to be configured with an XML Namespace
@@ -101,14 +101,14 @@ import org.jdom.transform.XSLTransformException;
  *
  * @author Larry Stone
  * @version $Revision$
- * @see XsltCrosswalk
+ * @see XSLTCrosswalk
  */
-public class XsltDisseminationCrosswalk
-    extends XsltCrosswalk
+public class XSLTDisseminationCrosswalk
+    extends XSLTCrosswalk
     implements DisseminationCrosswalk
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(XsltDisseminationCrosswalk.class);
+    private static Logger log = Logger.getLogger(XSLTDisseminationCrosswalk.class);
 
     private final static String DIRECTION = "dissemination";
 
@@ -140,8 +140,8 @@ public class XsltDisseminationCrosswalk
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
-            log.error("Must use PluginManager to instantiate XsltDisseminationCrosswalk so the class knows its name.");
-            throw new CrosswalkInternalException("Must use PluginManager to instantiate XsltDisseminationCrosswalk so the class knows its name.");
+            log.error("Must use PluginManager to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
+            throw new CrosswalkInternalException("Must use PluginManager to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
         }
 
         // all configs for this plugin instance start with this:
@@ -209,7 +209,7 @@ public class XsltDisseminationCrosswalk
         init();
 
         if (dso.getType() != Constants.ITEM)
-            throw new CrosswalkObjectNotSupported("XsltDisseminationCrosswalk can only crosswalk an Item.");
+            throw new CrosswalkObjectNotSupported("XSLTDisseminationCrosswalk can only crosswalk an Item.");
         Item item = (Item)dso;
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)
@@ -235,7 +235,7 @@ public class XsltDisseminationCrosswalk
         init();
 
         if (dso.getType() != Constants.ITEM)
-            throw new CrosswalkObjectNotSupported("XsltDisseminationCrosswalk can only crosswalk an Item.");
+            throw new CrosswalkObjectNotSupported("XSLTDisseminationCrosswalk can only crosswalk an Item.");
         Item item = (Item)dso;
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)

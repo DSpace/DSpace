@@ -1,5 +1,5 @@
 /*
- * AbstractMetsSubmission
+ * AbstractMETSIngester
  *
  * Version: $Revision$
  *
@@ -54,7 +54,6 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.mediafilter.MediaFilter;
-import org.dspace.app.mets.MetsManifest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -90,13 +89,13 @@ import org.jdom.Element;
  *
  * @author Larry Stone
  * @version $Revision$
- * @see org.dspace.app.mets.MetsManifest
+ * @see org.dspace.content.packager.METSManifest
  */
-public abstract class AbstractMetsSubmission
-       implements SubmissionPackage
+public abstract class AbstractMETSIngester
+       implements PackageIngester
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(AbstractMetsSubmission.class);
+    private static Logger log = Logger.getLogger(AbstractMETSIngester.class);
 
     /** Filename of manifest, relative to package toplevel. */
     public static final String MANIFEST_FILE = "mets.xml";
@@ -120,7 +119,7 @@ public abstract class AbstractMetsSubmission
      * with the same name.
      */
     protected class MdrefManager
-        implements MetsManifest.Mdref
+        implements METSManifest.Mdref
     {
     private Bundle mdBundle = null;
 
@@ -140,7 +139,7 @@ public abstract class AbstractMetsSubmission
         public Bitstream getBitstreamForMdRef(Element mdref)
             throws MetadataValidationException, IOException, SQLException, AuthorizeException
         {
-            String path = MetsManifest.getFileName(mdref);
+            String path = METSManifest.getFileName(mdref);
             if (mdBundle == null)
                 throw new MetadataValidationException("Failed referencing mdRef element, because there were no metadata files.");
             return mdBundle.getBitstreamByName(path);
@@ -149,7 +148,7 @@ public abstract class AbstractMetsSubmission
         /**
          * Make the contents of an external resource mentioned in
          * an <code>mdRef</code> element available as an <code>InputStream</code>.
-         * See the <code>MetsManifest.MdRef</code> interface for details.
+         * See the <code>METSManifest.MdRef</code> interface for details.
          * @param mdref the METS mdRef element to locate the input for.
          * @return the input stream of its content.
          */
@@ -199,7 +198,7 @@ public abstract class AbstractMetsSubmission
              *  to the same names they had in the Zip, since those MUST
              *  match the URL references in <Flocat> and <mdRef> elements.
              */
-            MetsManifest manifest = null;
+            METSManifest manifest = null;
             wi = WorkspaceItem.create(context, collection, false);
             Item item = wi.getItem();
             Bundle contentBundle = item.createBundle(Constants.CONTENT_BUNDLE_NAME);
@@ -227,11 +226,11 @@ public abstract class AbstractMetsSubmission
                              MANIFEST_BITSTREAM_FORMAT+" package manifest");
                         bs.setFormat(manifestFormat);
 
-                        manifest = MetsManifest.create(bs.retrieve(), validate);
+                        manifest = METSManifest.create(bs.retrieve(), validate);
                     }
                     else
                     {
-                        manifest = MetsManifest.create(new PackageUtils.UnclosableInputStream(zip), validate);
+                        manifest = METSManifest.create(new PackageUtils.UnclosableInputStream(zip), validate);
                         continue;
                     }
                 }
@@ -269,7 +268,7 @@ public abstract class AbstractMetsSubmission
                 String mfileId = mfile.getAttributeValue("ID");
                 if (mfileId == null)
                     throw new PackageValidationException("Invalid METS Manifest: file element without ID attribute.");
-                String path = MetsManifest.getFileName(mfile);
+                String path = METSManifest.getFileName(mfile);
                 Bitstream bs = contentBundle.getBitstreamByName(path);
                 if (bs == null)
                 {
@@ -328,7 +327,7 @@ public abstract class AbstractMetsSubmission
             for (Iterator mi = manifest.getMdFiles().iterator(); mi.hasNext(); )
             {
                 Element mdref = (Element)mi.next();
-                String path = MetsManifest.getFileName(mdref);
+                String path = METSManifest.getFileName(mdref);
 
                 // finally, build compare lists by deleting matches.
                 if (packageFiles.contains(path))
@@ -506,10 +505,10 @@ public abstract class AbstractMetsSubmission
     /**
      * Profile-specific tests to validate manifest.  The implementation
      * can access the METS document through the <code>manifest</code>
-     * variable, an instance of <code>MetsManifest</code>.
+     * variable, an instance of <code>METSManifest</code>.
      * @throws MetadataValidationException if there is a fatal problem with the METS document's conformance to the expected profile.
      */
-    abstract void checkManifest(MetsManifest manifest)
+    abstract void checkManifest(METSManifest manifest)
         throws MetadataValidationException;
 
     /**
@@ -539,7 +538,7 @@ public abstract class AbstractMetsSubmission
      *
      */
     abstract public void checkPackageFiles(Set packageFiles, Set missingFiles,
-                                           MetsManifest manifest)
+                                           METSManifest manifest)
         throws PackageValidationException, CrosswalkException;
 
     /**
@@ -550,7 +549,7 @@ public abstract class AbstractMetsSubmission
      * responsible for calling the crosswalk, using the manifest's helper
      * i.e. <code>manifest.crosswalkItem(context,item,dmdElement,callback);</code>
      * (The final argument is a reference to itself since the
-     * class also implements the <code>MetsManifest.MdRef</code> interface
+     * class also implements the <code>METSManifest.MdRef</code> interface
      * to fetch package files referenced by mdRef elements.)
      * <p>
      * Note that <code>item</code> and <code>manifest</code> are available
@@ -561,7 +560,7 @@ public abstract class AbstractMetsSubmission
      *
      */
     abstract public void chooseItemDmd(Context context, Item item,
-                                       MetsManifest manifest, MdrefManager cb,
+                                       METSManifest manifest, MdrefManager cb,
                                        Element dmds[])
         throws CrosswalkException,
                AuthorizeException, SQLException, IOException;
@@ -584,7 +583,7 @@ public abstract class AbstractMetsSubmission
      * @param license optional user-supplied Deposit License text (may be null)
      */
     abstract public void addLicense(Context context, Collection collection,
-                                    Item item, MetsManifest manifest,
+                                    Item item, METSManifest manifest,
                                     MdrefManager callback, String license)
         throws PackageValidationException, CrosswalkException,
                AuthorizeException, SQLException, IOException;

@@ -1,5 +1,5 @@
 /*
- * PremisCrosswalk.java
+ * PREMISCrosswalk.java
  *
  * Version: $Revision$
  *
@@ -78,11 +78,11 @@ import org.jdom.*;
  * @author Larry Stone
  * @version $Revision$
  */
-public class PremisCrosswalk
-    implements SubmissionCrosswalk, DisseminationCrosswalk
+public class PREMISCrosswalk
+    implements IngestionCrosswalk, DisseminationCrosswalk
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(PremisCrosswalk.class);
+    private static Logger log = Logger.getLogger(PREMISCrosswalk.class);
 
     private static final Namespace PREMIS_NS =
         Namespace.getNamespace("premis", "http://www.loc.gov/standards/premis");
@@ -111,7 +111,7 @@ public class PremisCrosswalk
     {
         // we only understand how to crosswalk PREMIS to a Bitstream.
         if (dso.getType() != Constants.BITSTREAM)
-            throw new CrosswalkObjectNotSupported("Wrong target object type, PremisCrosswalk can only crosswalk to a Bitstream.");
+            throw new CrosswalkObjectNotSupported("Wrong target object type, PREMISCrosswalk can only crosswalk to a Bitstream.");
 
         Bitstream bitstream = (Bitstream)dso;
         String MIMEType = null;
@@ -232,7 +232,7 @@ public class PremisCrosswalk
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.BITSTREAM)
-            throw new CrosswalkObjectNotSupported("PremisCrosswalk can only crosswalk a Bitstream.");
+            throw new CrosswalkObjectNotSupported("PREMISCrosswalk can only crosswalk a Bitstream.");
         Bitstream bitstream = (Bitstream)dso;
 
         Element premis = new Element("premis", PREMIS_NS);

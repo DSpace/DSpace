@@ -1,5 +1,5 @@
 /*
- * PackageManager.java
+ * Packager.java
  *
  * Version: $Revision$
  *
@@ -54,9 +54,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InstallItem;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.packager.DisseminationPackage;
+import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageParameters;
-import org.dspace.content.packager.SubmissionPackage;
+import org.dspace.content.packager.PackageIngester;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -80,7 +80,7 @@ import org.dspace.workflow.WorkflowManager;
  * 
  * <pre>
  *  1. To submit a SIP:
- *   java org.dspace.content.packager.PackageManager
+ *   java org.dspace.app.packager.Packager
  *       -e {ePerson}
  *       -t {PackagerType}
  *       -c {collection-handle} [ -c {collection} ...]
@@ -96,7 +96,7 @@ import org.dspace.workflow.WorkflowManager;
  *   (e.g. &quot;metadataOnly&quot; to a DIP packager).
  * 
  *  2. To write out a DIP:
- *   java org.dspace.content.packager.PackageManager
+ *   java org.dspace.content.packager.Packager
  *       -d
  *       -e {ePerson}
  *       -t {PackagerType}
@@ -137,7 +137,7 @@ public class Packager
                         "w",
                         "install",
                         false,
-                        "dsiable workflow; install immediately without going through collection's workflow");
+                        "disable workflow; install immediately without going through collection's workflow");
         options.addOption("t", "type", true, "package type or MIMEtype");
         options
                 .addOption("o", "option", true,
@@ -162,16 +162,16 @@ public class Packager
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("PackageManager  [options]  package-file|-\n",
+            myhelp.printHelp("Packager  [options]  package-file|-\n",
                     options);
             System.out.println("\nAvailable Submission Package (SIP) types:");
             String pn[] = PluginManager
-                    .getAllPluginNames(SubmissionPackage.class);
+                    .getAllPluginNames(PackageIngester.class);
             for (int i = 0; i < pn.length; ++i)
                 System.out.println("  " + pn[i]);
             System.out
                     .println("\nAvailable Dissemination Package (DIP) types:");
-            pn = PluginManager.getAllPluginNames(DisseminationPackage.class);
+            pn = PluginManager.getAllPluginNames(PackageDisseminator.class);
             for (int i = 0; i < pn.length; ++i)
                 System.out.println("  " + pn[i]);
             System.exit(0);
@@ -234,8 +234,8 @@ public class Packager
             InputStream source = (sourceFile.equals("-")) ? System.in
                     : new FileInputStream(sourceFile);
 
-            SubmissionPackage sip = (SubmissionPackage) PluginManager
-                    .getNamedPlugin(SubmissionPackage.class, packageType);
+            PackageIngester sip = (PackageIngester) PluginManager
+                    .getNamedPlugin(PackageIngester.class, packageType);
             if (sip == null)
                 usageError("Error, Unknown package type: " + packageType);
 
@@ -299,8 +299,8 @@ public class Packager
             OutputStream dest = (sourceFile.equals("-")) ? (OutputStream) System.out
                     : (OutputStream) (new FileOutputStream(sourceFile));
 
-            DisseminationPackage dip = (DisseminationPackage) PluginManager
-                    .getNamedPlugin(DisseminationPackage.class, packageType);
+            PackageDisseminator dip = (PackageDisseminator) PluginManager
+                    .getNamedPlugin(PackageDisseminator.class, packageType);
             if (dip == null)
                 usageError("Error, Unknown package type: " + packageType);
 

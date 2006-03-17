@@ -1,5 +1,5 @@
 /*
- * DSpaceMetsSipExport.java
+ * DSpaceMETSDisseminator.java
  *
  * Version: $Revision$
  *
@@ -77,17 +77,17 @@ import edu.harvard.hul.ois.mets.helper.MetsException;
  * beyond the requirements of a SIP (e.g. deposit licenses), anticipating
  * the DIP specification.
  * <p>
- * DSpaceMetsSipExport was intended to be an useful example of a packager
+ * DSpaceMETSDisseminator was intended to be an useful example of a packager
  * plugin, and a way to create packages acceptable to the METS SIP importer.
  *
  * @author Larry Stone
  * @version $Revision$
  */
-public class DSpaceMetsSipExport
-    extends AbstractMetsDissemination
+public class DSpaceMETSDisseminator
+    extends AbstractMETSDisseminator
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceMetsSipExport.class);
+    private static Logger log = Logger.getLogger(DSpaceMETSDisseminator.class);
 
     /**
      * Identifier for the package we produce, i.e. DSpace METS SIP

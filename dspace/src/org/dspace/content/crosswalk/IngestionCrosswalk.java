@@ -1,5 +1,5 @@
 /*
- * SubmissionCrosswalk.java
+ * IngestionCrosswalk.java
  *
  * Version: $Revision$
  *
@@ -52,7 +52,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.jdom.Element;
 
 /**
- * Submission Crosswalk plugin -- translate an external metadata format
+ * Ingestion Crosswalk plugin -- translate an external metadata format
  * into DSpace native metadata.
  * <p>
  * This describes a plugin that translates an external XML
@@ -66,7 +66,7 @@ import org.jdom.Element;
  * @author Larry Stone
  * @version $Revision$
  */
-public interface SubmissionCrosswalk
+public interface IngestionCrosswalk
 {
     /**
      * Crosswalk metadata from external XML representation to DSpace

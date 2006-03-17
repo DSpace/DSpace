@@ -1,5 +1,5 @@
 /*
- * ModsCrosswalk.java
+ * MODSDisseminationCrosswalk.java
  *
  * Version: $Revision$
  *
@@ -108,11 +108,11 @@ import org.jdom.xpath.XPath;
  * @author Larry Stone
  * @version $Revision$
  */
-public class ModsCrosswalk extends SelfNamedPlugin
+public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     implements DisseminationCrosswalk
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(ModsCrosswalk.class);
+    private static Logger log = Logger.getLogger(MODSDisseminationCrosswalk.class);
 
     private final static String CONFIG_PREFIX = "crosswalk.mods.properties.";
 
@@ -246,7 +246,7 @@ public class ModsCrosswalk extends SelfNamedPlugin
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
-            log.error("Must use PluginManager to instantiate ModsCrosswalk so the class knows its name.");
+            log.error("Must use PluginManager to instantiate MODSDisseminationCrosswalk so the class knows its name.");
             return;
         }
         String cmPropName = CONFIG_PREFIX+myAlias;
@@ -312,7 +312,7 @@ public class ModsCrosswalk extends SelfNamedPlugin
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
-            throw new CrosswalkObjectNotSupported("ModsCrosswalk can only crosswalk an Item.");
+            throw new CrosswalkObjectNotSupported("MODSDisseminationCrosswalk can only crosswalk an Item.");
         Item item = (Item)dso;
         initMap();
 

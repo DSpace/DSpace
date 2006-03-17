@@ -127,7 +127,7 @@ import org.jdom.input.JDOMParseException;
  * @version $Revision$
  */
 public class QDCCrosswalk extends SelfNamedPlugin
-    implements DisseminationCrosswalk, SubmissionCrosswalk
+    implements DisseminationCrosswalk, IngestionCrosswalk
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(QDCCrosswalk.class);
