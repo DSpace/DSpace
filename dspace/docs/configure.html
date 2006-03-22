@@ -897,74 +897,96 @@ The following vocabularies are currently available by default:
 </ul>
 
   <h2><a name="checker">Checksum Checker</a></h2>
-  <p>There are two main aspects of the checksum checker's operation that can be configured. Firstly the strategy and duration of the checker's duration can be
-  controlled on the command line, and secondly the policy for removing old check results can be configured in <code>dspace.cfg</code> or some other properties file.</p>
+  <p>There are three aspects of the Checksum Checker's operation that can be configured:<p>
+<ol>
+	<li>the execution mode</li>
+  	<li>the logging output</li>
+  	<li>the policy for removing old checksum results from the database</li>
+	
+</ol>
+  
+  <h3>Checker Execution Mode</h3>
+  
+  <p>Execution mode can be configured using command line options. Information on the options can be found at any time by running <code><i>[dspace]</i>/bin/checker --help</code>. The different modes are described below; see the "Which to use" section that follows for details on the various pros and cons.</p>
 
-  <p>Information on the command line options can be found at any time by running <code>$DSPACE_HOME/bin/checker --help</code>. The different modes are described below, see the "Which to use" section that follows for detail of teh various pros and cons.</p>
+<p>Unless a particular bitstream or handle is specified, the Checksum Checker will always check bitstreams in order of the least recently checked bitstream. (Note that this means that the most recently ingested bitstreams will be the last ones checked by the Checksum Checker.)</p>
 
-  <h3>Limited Count Mode</h3>
+  <strong>Limited Count Mode</strong>
+  
+  <p>To check a specific number of bitstreams, use the -c option followed by an integer number of bitstreams to check:</p>
 
-  <p>Limited count mode is obtained using the -c option with an integer number of bitstreams to check. e.g.</p>
+  <pre>bin/checker -c 10</pre>
+				
 
-  <pre>bin/checker -c 1</pre>
+  <p>Limited count mode is particularly useful for checking that the checker is executing properly. The Checksum Checker's default execution mode is to check a single bitstream, as if the -c 1 option had been given.</p>
 
-
-  <p>Limited count mode is particularly useful for checking that the checker is executing properly. The default execution mode for the checker is to check a single bitstream, as if the -c 1 option had been given.</p>
-
-  <h3>Limited Duration Mode</h3>
-
-  <p>Limited duration mode is obtained using the -d option with a time argument. e.g.</p>
+  <strong>Limited Duration Mode</strong>
+	
+  <p>To run the Checker for a specific period of time, use the -d option with a time argument:</p>
 
   <pre>bin/checker -d 10m
 bin/checker -d 2h</pre>
 
-  <p>The checker will keep on starting new bitstream checks for the specified duration, so actual execution duration will be slightly longer than the specified duration. Bear this in mind when scheduling checks.</p>
+<p>Valid options for specifying duration are <code>s</code> for seconds, <code>m</code> for minutes, <code>h</code> for hours, <code>d</code> for days, <code>w</code> for weeks, and <code>y</code> for years (OK, so we're optimists).</p>
 
-  <h3>Specific Bitstream checking</h3>
+  <p>The checker will keep starting new bitstream checks for the specified duration, so actual execution duration will be slightly longer than the specified duration. Bear this in mind when scheduling checks.</p>
 
-  <p>Specific bitstream checking mode is obtained using the -b option. e.g.</p>
+  <strong>Check Specific Bitstreams</strong>
+
+  <p>To check one or more particular bitstreams by ID, use the -b option followed by one or more bitstream IDs:</p>
 
   <pre>bin/checker -b 1 2 3 4</pre>
-
+				
   <p>This mode is useful when analyzing problems reported in the logs and when verifying that a resolution has been successful.</p>
+  
+  <strong>Check Specific Handles</strong>
 
-  <h3>Check specific Handles</h3>
+  <p>Use the -a option followed by a handle:</p>
 
-  <p>To check all the bitstreams inside an item, collection or community use the -a option. e.g.</p>
+  <pre>bin/checker -a 123456/123</pre>	
+  
+  <p>This will check all the bitstreams inside an item, collection or community.</p>
+				
+				
+  <strong>Continuous Looping</strong>
 
-  <pre>bin/checker -a 123456/123</pre>
+  <p>There are two looping modes:</p>
 
-  <h3>Continuous looping</h3>
-
-  <p>Continuous looping mode is obtained using either the -l or the -L options. e.g.</p>
-
-<pre>bin/checker -l     # Loops through the repository once
-bin/checker -L	    # Loops through the repository forever</pre>
-
+<pre>bin/checker -l     # Loops once through the repository  
+bin/checker -L	    # Loops continuously through the repository</pre>
+				
   <p>The -l option can be used if your repository is relatively small and your backup strategy requires it to be completely validated at a particular point. The -L option might be useful if you have a large repository, and you don't mind (or can avoid) the IO load caused by the checker.</p>
 
-  <h3>Report Errors Only</h3>
+<strong>Which to Use</strong>
 
-  <p>Reporting only errors to the log using -e option.</p>
+  <p>The Checksum Checker was designed with the idea that most sys admins will run it from the cron. For small repositories we recommend using the -l option in the cron. For larger repositories that cannot be completely checked in a couple of hours, we recommend the -d option in the cron.</p>  
+  
+  <h3>Checker Reporting</h3>
+  
+  <p>Checksum Checker uses log4j to report its results. By default it will report to a log called <code><i>[dspace]</i>/log/checker.log</code>, and it will report only on bitstreams for which the newly calculated checksum does not match the stored checksum. To report on all bitstreams checked regardless of outcome, use the <code>-v</code> (verbose) command line option:</p> 
+  
+  <pre>bin/checker -l -v    #Loop through the repository once and
+  report in detail about every bitstream checked.</pre> 
 
-  <pre>bin/checker -e -l    # Report errors only and loop through the repository once</pre>
+<p>To change the location of the log, or to modify the prefix used on each line of output, edit the <code><i>[dspace]</i>/config/templates/log4j.properties</code> file and run <code><i>[dspace]</i>/bin/install_configs</code>. </p>			
+  
+  
+  <h3>Checker Results Pruning</h3>
+  
+  <p>The Checksum Checker will store the result of every check in the checksum_history table. By default, successful checksum matches that are eight weeks old or older will be deleted when the -p command line option is used (unsuccessful ones will be retained indefinitely). The amount of time for which results are retained in the checksum_history table can be modified by one of two methods: </p>
 
-  <p>The -e is an option you may want to consider when running your checker. This will cause only the errors to be reported to your logs. Otherwise all bitstreams checked will be reported to your logs possibly causing very large log files.</p>
+<ol>
+<li>editing the retention policies in <code><i>[dspace]/</i>config/dspace.cfg</code> OR
+</li>
+<li>passing in a properties file containing retention policies when using the -p option. </li>
+</ol>
 
-
-  <h3>Which to use</h3>
-
-  <p>For standard hardware installations of DSpace, we recommend the use of the -l for small repositories (that take less than an hour to iterate through completely) and the -d option and cron (as described in the installation guide) for larger repositories.</p>
-
-  <h3>Checker results pruning</h3>
-  <p>Passing the <code>-p</code> option to the checker tool will cause old results from the checker to be pruned before the main execution commences. It is recommended that this option is used regularly -  the results table can grow large without it.</p>
-
-  <p>Pruning is controlled by a number of properties, each of which describes a checksum result code, and the length of time results with that code should be retained for. The format is <code>checker.retention.[RESULT CODE]=[duration]</code>. For example: -</p>
-
+  <p>Pruning is controlled by a number of properties, each of which describes a checksum result code, and the length of time for which results with that code should be retained. The format is <code>checker.retention.[RESULT CODE]=[duration]. For example: -</p>
+  
   <pre>checker.retention.CHECKSUM_MATCH=8w</pre>
-
-  <p>Indicates that successful checksum matches will be retained for eight weeks. Supported units of time are</p>
-
+  
+  <p>indicates that successful checksum matches will be retained for eight weeks. Supported units of time are</p>
+  
   <table>
     <tr>
       <td>s</td>
@@ -991,14 +1013,14 @@ bin/checker -L	    # Loops through the repository forever</pre>
       <td>Years</td>
     </tr>
   </table>
-
-  <p>These units are also used for describing durations for the <code>-d</code> limited duration mode.</p>
-
+  
+  <p>(Note that these units are also used for describing durations for the <code>-d</code> limited duration mode.)</p>
+  
   <p>There is a special property, <code>checker.retention.default</code>, that is used to assign a default retention period.</p>
+  
+  <p>To execute the pruning you must use the -p command line option (with or without a properties file). Checksum Checker will prune the history table before beginning new checks. We recommend that you use this option regularly, as the checksum_history table can grow very large without it.</p>
 
-  <p>By default, these properties should go in dspace.cfg. By passing an argument to the -p option you can pass another properties file to the checker instead, for example: -</p>
 
-  <pre>bin/checker -lp temporaryRetentionPolicy.properties</pre>
   <hr>
 
   <address>
