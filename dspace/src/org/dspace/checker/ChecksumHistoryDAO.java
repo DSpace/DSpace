@@ -227,6 +227,7 @@ public class ChecksumHistoryDAO extends DAOSupport
                 Long dur = (Long) interests.get(result);
                 count += deleteHistoryByDateAndCode(new Date(now
                         - dur.longValue()), result, conn);
+                conn.commit();
             }
             return count;
         }
