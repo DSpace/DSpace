@@ -219,6 +219,7 @@ public class FeedServlet extends DSpaceServlet
         WireFeedOutput feedWriter = new WireFeedOutput();
         try
         {
+        	response.setContentType("text/xml; charset=UTF-8");
         	feedWriter.output(channel, response.getWriter());
         }
         catch( FeedException fex )

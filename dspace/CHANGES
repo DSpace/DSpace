@@ -1,5 +1,9 @@
 1.4 beta 1
 ==========
+(Zuki Ebetsu)
+- Fix malformed Japanese texts in RSS feed
+  SF Patch #1455790, fixes SF bug #1456585
+  
 (Stuart Lewis)
 - Fix problem with make-handle-config throwing NullPointerException
   SF Patch #1455463, fixes SF bug #1455457
