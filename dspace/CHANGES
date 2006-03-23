@@ -1,5 +1,9 @@
 1.4 beta 1
 ==========
+(Larry Stone)
+- Documentation updates
+  SF Patch #1455780 - Improve doc for configuring x.509 authentication in 1.4
+  
 (Zuki Ebetsu)
 - Fix malformed Japanese texts in RSS feed
   SF Patch #1455790, fixes SF bug #1456585

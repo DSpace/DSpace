@@ -457,29 +457,54 @@ metadata.dc.description.abstract = Abstract</pre>
   software) which is issued by a Certifying Authority (CA) recognized
   by the web server.</p>
 
-  <p>First, see the <a href="install.html#https">HTTPS installation
+  <ol>
+  <li>See the <a href="install.html#https">HTTPS installation
   instructions</a> to configure your Web server.  If you are using
   HTTPS with Tomcat, note that the <code>&lt;Connector&gt;</code> tag
   <em>must</em> include the attribute <code><b>clientAuth="true"</b></code>
   so the server requests a personal Web certificate from the client.</p>
+  </li>
+  <p><li>
+  Add the <code>org.dspace.eperson.X509Authentication</code> plugin
+  to the list of stackable authentication methods in the value
+  of the configuration key <code>plugin.sequence.org.dspace.eperson.AuthenticationMethod</code>
+  <i>E.g.:</i>
+  </p>
+  <pre>
+    plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
+        org.dspace.eperson.PasswordAuthentication, \
+        org.dspace.eperson.X509Authentication
+  </pre>
 
-  <p>You must also configure DSpace with the same CA certificates as the
+  </li>
+  <p><li>
+  You must also configure DSpace with the same CA certificates as the
   web server, so it can accept and interpret the clients' certificates.
   It can share the same keystore file as the web server, or a
-  separate one, or a CA certificate in a file by itself.  These are
-  the relevant DSpace configuration properties:</p>
+  separate one, or a CA certificate in a file by itself.
+  Configure it by <em>one</em> of these methods, either the Java keystore
 
  <pre>
   authentication.x509.keystore.path = <em>path to Java keystore file</em>
   authentication.x509.keystore.password = <em>password to access the keystore</em>
-  authentication.x509.ca.cert = <em>path to certificate file for CA whose client certs to accept.</em>
  </pre>
 
-  <p>This authentication method has an extra feature:  If the
+ ...or the separate CA certificate file (in PEM or DER format):
+ <pre>
+  authentication.x509.ca.cert = <em>path to certificate file for CA whose client certs to accept.</em>
+ </pre>
+  </p>
+  </li>
+  <p><li>
+  <p>Choose whether to enable auto-registration:  If you want users who
+  authenticate successfully to be automatically registered as new E-Persons
+  if they are not already, set the
   <code>authentication.x509.autoregister</code> configuration property
-  is <code>true</code>, it will automatically register the user with the
-  system.  This lets you automatically accept all users with valid
-  personal certificates.</p>
+  to <code>true</code>.
+  This lets you automatically accept all users with valid
+  personal certificates.  The default is <code>false</code>.</p>
+  </li>
+  </ol>
 
   <h3>Example of a Custom Authentication Method</h3>
 
