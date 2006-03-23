@@ -1,6 +1,9 @@
 1.4 beta 1
 ==========
 (Larry Stone)
+- SF Patch #1453425 1.4alpha1, fix crosswalk + packager configurations
+
+(Larry Stone)
 - Documentation updates
   SF Patch #1455780 - Improve doc for configuring x.509 authentication in 1.4
   
