@@ -1,3 +1,9 @@
+1.4 beta 1
+==========
+(Stuart Lewis)
+- Fix problem with make-handle-config throwing NullPointerException
+  SF Patch #1455463, fixes SF bug #1455457
+
 1.4 alpha 1
 ===========
 (Robert Tansley)
