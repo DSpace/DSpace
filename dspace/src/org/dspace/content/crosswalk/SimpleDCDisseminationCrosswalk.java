@@ -78,13 +78,10 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
     private static final Namespace DC_NS =
         Namespace.getNamespace("dc", "http://purl.org/dc/elements/1.1/");
 
-
-    private static final Namespace XSI_NS =
-        Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-
     // simple DC schema for OAI
     private static final String DC_XSD =
-                "http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
+                "http://dublincore.org/schemas/xmls/simpledc20021212.xsd";
+                //"http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
 
     private static final String schemaLocation =
         DC_NS.getURI()+" "+DC_XSD;
@@ -104,7 +101,8 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
                IOException, SQLException, AuthorizeException
     {
         Element root = new Element("simpledc", DC_NS);
-        root.addContent(disseminateList(dso));
+        root.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+        root.addContent(disseminateListInternal(dso, false));
         return root;
     }
 
@@ -114,6 +112,13 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
      * "creator" but otherwise just grab element name without qualifier.
      */
     public List disseminateList(DSpaceObject dso)
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
+    {
+        return disseminateListInternal(dso, true);
+    }
+
+    public List disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -142,6 +147,8 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
                     element = allDC[i].element;
                 Element field = new Element(element, DC_NS);
                 field.addContent(allDC[i].value);
+                if (addSchema)
+                    field.setAttribute("schemaLocation", schemaLocation, XSI_NS);
                 dcl.add(field);
             }
         }

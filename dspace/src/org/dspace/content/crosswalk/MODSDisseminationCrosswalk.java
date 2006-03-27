@@ -116,7 +116,6 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
     private final static String CONFIG_PREFIX = "crosswalk.mods.properties.";
 
-
     /**
      * Fill in the plugin alias table from DSpace configuration entries
      * for configuration files for flavors of MODS crosswalk:
@@ -305,9 +304,26 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     }
 
     /**
-     * Returns object's metadata in MODS format, as XML structure node.
+     * Returns object's metadata in MODS format, as List of XML structure nodes.
      */
     public List disseminateList(DSpaceObject dso)
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
+    {
+        return disseminateListInternal(dso, true);
+    }
+
+    public Element disseminateElement(DSpaceObject dso)
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
+    {
+        Element root = new Element("mods", MODS_NS);
+        root.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+        root.addContent(disseminateListInternal(dso,false));
+        return root;
+    }
+
+    private List disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -334,6 +350,8 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 try
                 {
                     Element me = (Element)trip.xml.clone();
+                    if (addSchema)
+                        me.setAttribute("schemaLocation", schemaLocation, XSI_NS);
                     Iterator ni = trip.xpath.selectNodes(me).iterator();
                     if (!ni.hasNext())
                         log.warn("XPath \""+trip.xpath.getXPath()+
@@ -364,15 +382,6 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             }
         }
         return result;
-    }
-
-    public Element disseminateElement(DSpaceObject dso)
-        throws CrosswalkException,
-               IOException, SQLException, AuthorizeException
-    {
-        Element root = new Element("mods", MODS_NS);
-        root.addContent(disseminateList(dso));
-        return root;
     }
 
     public boolean canDisseminate(DSpaceObject dso)

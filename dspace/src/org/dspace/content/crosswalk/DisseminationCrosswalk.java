@@ -68,6 +68,10 @@ import org.jdom.Namespace;
  */
 public interface DisseminationCrosswalk
 {
+    /** XSI namespace, required for xsi:schemalocation attributes */
+    static final Namespace XSI_NS =
+        Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+
     /**
      * Get XML namespaces of the elements this crosswalk may return.
      * Returns the XML namespaces (as JDOM objects) of the root element.

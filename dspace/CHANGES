@@ -1,6 +1,7 @@
 1.4 beta 1
 ==========
 (Larry Stone)
+- SF Patch #1455904 - fix crosswalk validation in 1.4alpha1
 - SF Patch #1453425 1.4alpha1, fix crosswalk + packager configurations
 
 (Larry Stone)

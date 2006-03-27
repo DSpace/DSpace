@@ -329,6 +329,13 @@ public class QDCCrosswalk extends SelfNamedPlugin
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
+        return disseminateListInternal(dso, true);
+    }
+
+    private List disseminateListInternal(DSpaceObject dso, boolean addSchema)
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
+    {
         if (dso.getType() != Constants.ITEM)
             throw new CrosswalkObjectNotSupported("QDCCrosswalk can only crosswalk an Item.");
         Item item = (Item)dso;
@@ -356,6 +363,8 @@ public class QDCCrosswalk extends SelfNamedPlugin
             {
                 Element qe = (Element)elt.clone();
                 qe.setText(dc[i].value);
+                if (addSchema && schemaLocation != null)
+                    qe.setAttribute("schemaLocation", schemaLocation, XSI_NS);
                 if (dc[i].language != null)
                     qe.setAttribute("lang", dc[i].language, Namespace.XML_NAMESPACE);
                 result.add(qe);
@@ -368,8 +377,11 @@ public class QDCCrosswalk extends SelfNamedPlugin
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
+        init();
         Element root = new Element("qualifieddc", DCTERMS_NS);
-        root.addContent(disseminateList(dso));
+        if (schemaLocation != null)
+            root.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+        root.addContent(disseminateListInternal(dso, false));
         return root;
     }
 
