@@ -1,0 +1,1187 @@
+# Version: $Revision$
+# Date:    $Date$
+
+jsp.adminhelp = Ajuda do Admin...
+jsp.administer = Administrador
+jsp.admintools = Ferramentas Administrativas
+
+jsp.general.authors.button = Autores
+jsp.general.date.button = Por Data
+jsp.general.edit.button = Alterar
+jsp.general.titles.button = T&iacute;tulos
+jsp.general.go = Enviar
+jsp.general.search.button = Enviar
+jsp.general.gohome = Ir para a p&aacute;gina principal
+jsp.general.location = Em:
+jsp.general.genericScope = Em todo Reposit&oacute;rio
+jsp.general.searchfor = <strong>Pesquisar</strong>&nbsp;por
+jsp.general.orbrowse = ou&nbsp;<strong>percorrer</strong>
+jsp.general.untitled = Sem T&iacute;tulo
+
+jsp.browse.general.next = Pr&oacute;xima
+jsp.browse.general.previous = Anterior
+jsp.browse.general.go = Enviar
+
+jsp.browse.authors.enter = ou insira as primeiras letras:
+jsp.browse.authors.jump = Saltar para:
+jsp.browse.authors.show = Autores {0}-{1} de {2}.
+jsp.browse.authors.title = Percorrer por Autor
+
+jsp.browse.items-by-author.heading1 = Registos por Autor
+jsp.browse.items-by-author.return = Voltar a percorrer por Autor
+jsp.browse.items-by-author.show = Mostrar {0} registos.
+jsp.browse.items-by-author.sort1 = Ordena&ccedil;&atilde;o por t&iacute;tulo
+jsp.browse.items-by-author.sort2 = Ordena&ccedil;&atilde;o por data
+jsp.browse.items-by-author.sort3 = Ordena&ccedil;&atilde;o por t&iacute;tulo
+jsp.browse.items-by-author.sort4 = Ordena&ccedil;&atilde;o por data
+jsp.browse.items-by-author.title = Registos por Autor
+
+jsp.browse.items-by-date.jump = Salte para um ponto no &iacute;ndice: 
+jsp.browse.items-by-date.month = (Seleccione m&ecirc;s)
+jsp.browse.items-by-date.old = Ordenar por mais antigos
+jsp.browse.items-by-date.order1 = Ordenado por mais recentes
+jsp.browse.items-by-date.order2 = Ordenado por mais antigos
+jsp.browse.items-by-date.recent = Ordenar por mais recentes
+jsp.browse.items-by-date.show = Registos {0}-{1} de {2}.
+jsp.browse.items-by-date.title = Percorrer por Data
+jsp.browse.items-by-date.type = ou insira ano:
+jsp.browse.items-by-date.year = (Seleccione ano)
+jsp.browse.items-by-title.enter = ou insira as primeiras letras:
+jsp.browse.items-by-title.jump = Saltar para:
+jsp.browse.items-by-title.show = Registos {0}-{1} de {2}.
+jsp.browse.items-by-title.title = Percorrer por T&iacute;tulo
+
+jsp.browse.no-results.col = Colec&ccedil;&atilde;o
+jsp.browse.no-results.com = Comunidade
+jsp.browse.no-results.genericScope = N&atilde;o existem registos no &iacute;ndice em todo o Reposit�riUM
+jsp.browse.no-results.title = N&atilde;o existem registos no &iacute;ndice
+
+jsp.collection-home.editsub.button = Editar Depositantes
+jsp.collection-home.heading1 = P&aacute;gina principal da Colec&ccedil;&atilde;o
+jsp.collection-home.info = Ver alertas
+jsp.collection-home.item.button = Mapeador de Registo
+jsp.collection-home.recentsub = Entradas Recentes
+jsp.collection-home.submit.button = Depositar nesta Colec&ccedil;&atilde;o
+jsp.collection-home.subscribe = Activar Alerta
+jsp.collection-home.subscribe.msg = Active um alerta nesta colec��o para receber notifica��es por correio electr&oacute;nico de novos registos 
+jsp.collection-home.subscribed = Tem um alerta activo nesta colec&ccedil;&atilde;o.
+jsp.collection-home.unsub = Desactivar Alerta
+
+jsp.community-home.create1.button = Criar Colec&ccedil;&atilde;o
+jsp.community-home.create2.button = Criar Sub-Comunidade
+jsp.community-home.heading1 = P�gina Principal da Comunidade
+jsp.community-home.heading2 = Colec&ccedil;&otilde;es da Comunidade
+jsp.community-home.heading3 = Sub-Comunidades da Comunidade 
+jsp.community-home.recentsub = Entradas Recentes
+
+jsp.community-list.create.button = Criar Comunidade de Topo...
+jsp.community-list.text1 = Seleccione uma comunidade ou colec&ccedil;&atilde;o para aceder &agrave; respectiva p&aacute;gina.
+jsp.community-list.title = Comunidades &amp; Colec&ccedil;&otilde;es
+
+jsp.components.contact-info.details = Contacto de administra&ccedil;&atilde;o do Reposit&oacute;rio {0}: 
+jsp.components.contact-info.email = Endere&ccedil;o de correio electr&oacute;nico:
+
+jsp.components.login-form.newuser = Utilizador Novo? Clique aqui para se registar.
+jsp.components.login-form.email = Endere&ccedil;o de correio electr&oacute;nico:
+jsp.components.login-form.enter = Introduza o seu endere&ccedil;o de correio electr&oacute;nico e palavra de acesso no formul&aacute;rio em baixo.
+jsp.components.login-form.forgot = Esqueceu a sua Palavra de Acesso?
+jsp.components.login-form.login = Entrar
+jsp.components.login-form.password = Palavra de Acesso:
+
+jsp.components.ldap-form.newuser = Utilizador Novo? Clique aqui para se registar.
+jsp.components.ldap-form.enter = Introduza o seu Username ou endere&ccedil;o de correio electr&oacute;nico e palavra de acesso no formul&aacute;rio em baixo.
+jsp.components.ldap-form.username-or-email = Username ou endere&ccedil;o de correio electr&oacute;nico:
+jsp.components.ldap-form.password = Palavra de Acesso:
+jsp.components.ldap-form.login.button = Entrar
+
+jsp.display-item.copyright = Todos os registos no Reposit&oacute;rio est&atilde;o protegidos por leis de copyright, com todos os direitos reservados.
+jsp.display-item.identifier = Utilize este identificador para referenciar este registo:
+jsp.display-item.license = Licen&ccedil;a Creative Commons
+jsp.display-item.text1 = Mostrar registo em formato simples
+jsp.display-item.text2 = Mostrar registo em formato completo
+jsp.display-item.text3 = Este registo est&aacute; protegido por
+jsp.display-item.back_to_workspace = Voltar para o Meu DSpace
+
+jsp.dspace-admin.general.action = Tarefa
+jsp.dspace-admin.general.action-colon = Tarefa:
+jsp.dspace-admin.general.addpolicy = Adicionar Nova Pol&iacute;tica
+jsp.dspace-admin.general.addnew = Adicionar Nova
+jsp.dspace-admin.general.delete = Remover
+jsp.dspace-admin.general.delete-w-confirm = Remover...
+jsp.dspace-admin.general.remove = Remover
+jsp.dspace-admin.general.edit = Editar
+jsp.dspace-admin.general.editpolicy = Editar Pol&iacute;ticas
+jsp.dspace-admin.general.group = Grupo
+jsp.dspace-admin.general.group-colon = Grupo:
+jsp.dspace-admin.general.cancel = Cancelar
+jsp.dspace-admin.general.abort = Abortar
+jsp.dspace-admin.general.abort-w-confirm = Abortar...
+jsp.dspace-admin.general.save = Guardar
+jsp.dspace-admin.general.update = Actualizar
+jsp.dspace-admin.general.upload = Carregar
+jsp.dspace-admin.general.next.button = Pr&oacute;xima
+
+jsp.dspace-admin.authorize-advanced.add = Adicionar Pol&iacute;tica
+jsp.dspace-admin.authorize-advanced.advanced = Editor Avan&ccedil;ado de Pol&iacute;ticas
+jsp.dspace-admin.authorize-advanced.clear = Limpar Pol&iacute;ticas
+jsp.dspace-admin.authorize-advanced.col = Colec&ccedil;&atilde;o:
+jsp.dspace-admin.authorize-advanced.text = Permite adicionar "wildcards" e limpar pol&iacute;ticas para tipos de conte&uacute;dos de uma colec&ccedil;&atilde;o. Aten&ccedil;&atilde;o, perigo! - remover permiss&otilde;es READ de itens faz com que os mesmos fiquem invis&iacute;veis!
+jsp.dspace-admin.authorize-advanced.type = Tipo de Conte&uacute;do:
+jsp.dspace-admin.authorize-advanced.type1 = registo
+jsp.dspace-admin.authorize-advanced.type2 = bitstream
+jsp.dspace-admin.authorize-advanced.warning = (aviso: limpa todas as pol&iacute;ticas de um dado conjunto de objectos)
+
+jsp.dspace-admin.authorize-collection-edit.policies = Pol&iacute;ticas para a Colec&ccedil;&atilde;o "
+jsp.dspace-admin.authorize-collection-edit.title = Alterar Pol&iacute;ticas de Colec&ccedil;&atilde;o
+
+jsp.dspace-admin.authorize-community-edit.policies = Pol&iacute;ticas para a Comunidade "
+jsp.dspace-admin.authorize-community-edit.title = Alterar Pol&iacute;ticas de Comunidade
+
+jsp.dspace-admin.authorize-item-edit.bitstream = Bitstream {0} ({1})
+jsp.dspace-admin.authorize-item-edit.bundle = Pol&iacute;tica para pacote (bundle)
+jsp.dspace-admin.authorize-item-edit.eperson = Utilizador
+jsp.dspace-admin.authorize-item-edit.item = Pol&iacute;ticas de Registo
+jsp.dspace-admin.authorize-item-edit.policies = Pol&iacute;ticas para Registo
+jsp.dspace-admin.authorize-item-edit.text1 = Com este editor  pode visualizar e alterar as pol&iacute;ticas de um registo, poder&aacute; tamb&eacute;m  alterar as pol&iacute;ticas individuais dos seus componentes: bundles e bitstreams. Resumidamente, um item &eacute;  um &quot;container&quot; com bundles, e bundles s&atilde;o &quot;containers&quot; de bitstreams. &quot;Containers&quot; geralmente usualmente  possuem pol&iacute;ticas ADD/REMOVE/READ/WRITE, enquanto bitstreams apenas possuem pol&iacute;ticas READ/WRITE.
+jsp.dspace-admin.authorize-item-edit.text2 = Vai notar  um bundle e um bistream extra para cada item, os mesmos possuem o texto com a licen&ccedil;a do item.
+jsp.dspace-admin.authorize-item-edit.title = Alterar Pol&iacute;ticas de Registo
+
+jsp.dspace-admin.authorize-main.adm = Gerir Pol&iacute;ticas de Permiss&atilde;o
+jsp.dspace-admin.authorize-main.advanced = Gest&atilde;o Avan&ccedil;ado de Pol&iacute;ticas de um Registo (wildcard) 
+jsp.dspace-admin.authorize-main.choose = Escolha um recurso em que pretenda administrar as pol&iacute;ticas:
+jsp.dspace-admin.authorize-main.manage1 = Gerir Pol&iacute;ticas de uma Comunidade
+jsp.dspace-admin.authorize-main.manage2 = Gerir Pol&iacute;ticas de uma Colec&ccedil;&atilde;o
+jsp.dspace-admin.authorize-main.manage3 = Gerir Pol&iacute;ticas de um Registo
+jsp.dspace-admin.authorize-main.title = Gerir Pol&iacute;ticas de Permiss&atilde;o 
+jsp.dspace-admin.authorize-policy-edit.heading = Alterar Pol&iacute;tica para
+jsp.dspace-admin.authorize-policy-edit.title = Alterar Pol&iacute;ticas
+
+jsp.dspace-admin.collection-select.col = Colec&ccedil;&otilde;es:
+jsp.dspace-admin.collection-select.title = Seleccionar Colec&ccedil;&atilde;o
+
+jsp.dspace-admin.community-select.com = Comunidades:
+jsp.dspace-admin.community-select.title = Seleccionar Comunidade
+
+jsp.dspace-admin.confirm-delete-dctype.confirm = Tem certeza que o formato <strong>{0}</strong> deve ser removido?
+jsp.dspace-admin.confirm-delete-dctype.heading = Remover formato Dublin Core:
+jsp.dspace-admin.confirm-delete-dctype.title = Remover tipo Dublin Core
+jsp.dspace-admin.confirm-delete-dctype.warning = Isto vai originar um erro, caso algum valor DC possua este tipo.
+
+jsp.dspace-admin.confirm-delete-format.confirm = Tem certeza que o formato <strong>{0}</strong> deve ser removido?
+jsp.dspace-admin.confirm-delete-format.heading = Remover formato Bitstream:
+jsp.dspace-admin.confirm-delete-format.title = Remover formato Bitstream
+jsp.dspace-admin.confirm-delete-format.warning = Quaisquer bitstreams pr&eacute;-existentes com este formato ser&atilde;o reconvertidos para o formato bitstream &lt;em&gt;unknown&lt;/em&gt;.
+jsp.dspace-admin.confirm-delete-format.returntoedit = Voltar para a P&aacute;gina de Administra&ccedil;&atilde;o de EPeople
+
+jsp.dspace-admin.eperson.general.firstname = &Uacute;ltimo Nome
+jsp.dspace-admin.eperson.general.lastname = Primeiro Nome
+
+jsp.dspace-admin.eperson-browse.email = Endere&ccedil;o de Correio Electr&oacute;nico:
+jsp.dspace-admin.eperson-browse.canlogin = Pode entrar?
+jsp.dspace-admin.eperson-browse.heading = Percorrer por EPeople {0}-{1} de {2}
+jsp.dspace-admin.eperson-browse.mustusecert = Necessita certificado?
+jsp.dspace-admin.eperson-browse.phone = Telefone
+jsp.dspace-admin.eperson-browse.self = Auto registado 
+jsp.dspace-admin.eperson-browse.title = Utilizadores
+
+jsp.dspace-admin.eperson-confirm-delete.confirm = Tem certeza que quer remover este utilizador?
+jsp.dspace-admin.eperson-confirm-delete.heading = Remover Utilizador: {0} ({1})
+jsp.dspace-admin.eperson-confirm-delete.title = Remover Utilizador
+
+jsp.dspace-admin.eperson-deletion-error.title = Erro na remo&ccedil;&atilde;o de utilizador 
+jsp.dspace-admin.eperson-deletion-error.heading = N&atilde;o foi poss&iacute;vel remover utilizador 
+jsp.dspace-admin.eperson-deletion-error.errormsg = O Utilizador {0} n&atilde;o pode ser removido porque est&aacute; referenciado na(s) seguinte(s) tabela(s):
+
+jsp.dspace-admin.eperson-edit.can = Pode entrar:
+jsp.dspace-admin.eperson-edit.email = Endere&ccedil;o de correio electr&oacute;nico:
+jsp.dspace-admin.eperson-edit.emailexists = Esse endere&ccedil;o de correio electr&oacute;nico est&aacute; a ser utilizado por outra pessoa. Os endere&ccedil;os de correio electr&oacute;nico devem ser &uacute;nicos.
+
+jsp.dspace-admin.eperson-edit.heading = Editar EPerson {0}:
+jsp.dspace-admin.eperson-edit.phone = Telefone:
+jsp.dspace-admin.eperson-edit.require = Necessita Certificado:
+jsp.dspace-admin.eperson-edit.title = Editar Utilizador
+
+jsp.dspace-admin.eperson-main.add = Adicionar Utilizador...
+jsp.dspace-admin.eperson-main.choose = Escolher uma ac&ccedil;&atilde;o:
+jsp.dspace-admin.eperson-main.heading = Administrar Utilizadores
+jsp.dspace-admin.eperson-main.or = OU
+jsp.dspace-admin.eperson-main.then = ent&atilde;o
+jsp.dspace-admin.eperson-main.title = Administra&ccedil;&atilde;o de Utilizador 
+
+jsp.dspace-admin.group-eperson-select.add = Adicionar Utilizador
+jsp.dspace-admin.group-eperson-select.heading = Seleccionar Utilizador
+jsp.dspace-admin.group-eperson-select.title = Seleccionar Utilizador
+
+jsp.dspace-admin.index.heading = Ferramentas Administrativas
+jsp.dspace-admin.index.text = Seleccione uma opera&ccedil;&atilde;o na barra de navega&ccedil;&atilde;o &agrave; esquerda.
+
+jsp.dspace-admin.item-select.enter = Insira o Handle ou ID interno do registo que deseja alterar ou remover.
+jsp.dspace-admin.item-select.find = Procurar
+jsp.dspace-admin.item-select.handle = Handle:
+jsp.dspace-admin.item-select.heading = Seleccionar um Registo
+jsp.dspace-admin.item-select.id = ID interno:
+jsp.dspace-admin.item-select.text = O ID que inseriu n&atilde;o &eacute; v&aacute;lido.</strong>  Se est&aacute; a tentar editar uma comunidade ou colec&ccedil;&atilde;o precisa usar o <a href="{0}">P&aacute;gina de Admnistra&ccedil;&atilde;o de Comunidades &amp; Colec&ccedil;&otilde;es</a>.
+jsp.dspace-admin.item-select.title = Seleccionar Registo
+
+jsp.dspace-admin.list-dc-types.element = Elemento
+jsp.dspace-admin.list-dc-types.note = Nota: Adicionando um novo elemento ao registo DC n&atilde;o adiciona o campo correspondente nos formul&aacute;rios de dep&oacute;sito!
+jsp.dspace-admin.list-dc-types.qualifier = Qualificador
+jsp.dspace-admin.list-dc-types.scope = Notas
+jsp.dspace-admin.list-dc-types.title = Registo de Tipos Dublin Core
+
+jsp.dspace-admin.list-formats.description = Descri&ccedil;&atilde;o Completa
+jsp.dspace-admin.list-formats.extensions = Extens&otilde;es
+jsp.dspace-admin.list-formats.internal = Interno?
+jsp.dspace-admin.list-formats.known = Conhecido
+jsp.dspace-admin.list-formats.mime = Tipo MIME
+jsp.dspace-admin.list-formats.name = Nome
+jsp.dspace-admin.list-formats.support = N&iacute;vel de Suporte
+jsp.dspace-admin.list-formats.supported = Suportado 
+jsp.dspace-admin.list-formats.text1 = <strong>Extens&otilde;es</strong> s&atilde;o listas de extens&otilde;es de arquivos, separadas por v&iacute;rgula, usadas para identificar os formatos dos arquivos enviados (ex. txt). N&atilde;o inclua o ponto.
+jsp.dspace-admin.list-formats.text2 = Quando um novo formato bitstream &eacute; adicionado inicialmente &eacute; definido como &quot;interno&quot; de modo a que n&atilde;o apare&ccedil;a na interface de dep&oacute;sito antes de terminar a edi&ccedil;&atilde;o de metadados. Certifique-se  de desmarcar o campo &quot;interno&quot; caso tal formato deva aparecer na lista de formatos.
+jsp.dspace-admin.list-formats.title = Registo de Formatos de Bitstreams
+jsp.dspace-admin.list-formats.unknown = Desconhecido
+
+jsp.dspace-admin.news-edit.heading = Editor de Not&iacute;cias
+jsp.dspace-admin.news-edit.news = Not&iacute;cias:
+jsp.dspace-admin.news-edit.text.topbox = Not&iacute;cias no Topo
+jsp.dspace-admin.news-edit.text.sidebar = Not&iacute;cias na Barra Lateral
+jsp.dspace-admin.news-edit.text3 = Adicione ou edite o texto na caixa em abaixo para que apare&ccedil;a na p&aacute;gina principal do Reposit&oacute;rio. Pode formatar o texto usando tags HTML, mas lembre-se que o HTML n&atilde;o ser&aacute; validado aqui.
+jsp.dspace-admin.news-edit.title = Formul&aacute;rio de Edi&ccedil;&atilde;o de Not&iacute;cias
+
+jsp.dspace-admin.news-main.heading = Editor de Not&iacute;cias
+jsp.dspace-admin.news-main.news.top = Not&iacute;cias Principais
+jsp.dspace-admin.news-main.news.sidebar = Not&iacute;cias Barra Lateral
+
+jsp.dspace-admin.supervise-confirm-remove.title = Ordens de Administra&ccedil;&atilde;o da Supervis&atilde;o
+jsp.dspace-admin.supervise-confirm-remove.heading = Confirmar Remo&ccedil;&atilde;o
+jsp.dspace-admin.supervise-confirm-remove.subheading = Pediu que a seguinte ordem de supervis&atilde;o fosse removida:
+jsp.dspace-admin.supervise-confirm-remove.titleheader = T&iacute;tulo
+jsp.dspace-admin.supervise-confirm-remove.authorheader = Autor
+jsp.dspace-admin.supervise-confirm-remove.supervisorgroupheader = Grupo de Supervis&atilde;o
+jsp.dspace-admin.supervise-confirm-remove.confirm = Tem que certeza que pretende remover esta ordem de supervis&atilde;o?
+
+jsp.dspace-admin.supervise-duplicate.title = Ordens de Administra&ccedil;&atilde;o da Supervis&atilde;o
+jsp.dspace-admin.supervise-duplicate.heading = Opera&ccedil;&atilde;o Falhou 
+jsp.dspace-admin.supervise-duplicate.errormsg = A ordem de supervis&atilde;o n&atilde;o foi aplicada ao registo na &aacute;rea de trabalho uma vez que o seu grupo seleccionado j&aacute; supervisiona o seu registo seleccionado.
+jsp.dspace-admin.supervise-duplicate.return = Voltar para a p&aacute;gina de Administra&ccedil;&atilde;o do Supervisor 
+
+jsp.dspace-admin.supervise-link.title = Ordens de Administra&ccedil;&atilde;o da Supervis&atilde;o
+jsp.dspace-admin.supervise-link.heading = Ordens de Administra&ccedil;&atilde;o da Supervis&atilde;o
+jsp.dspace-admin.supervise-link.choose = Escolha um Grupo, registo na &aacute;rea de trabalho e a pol&iacute;tica inicial a aplicar:
+jsp.dspace-admin.supervise-link.group = Grupo:
+jsp.dspace-admin.supervise-link.policy = Defini&ccedil;&atilde;o da Pol&iacute;tica Inicial: 
+jsp.dspace-admin.supervise-link.policynone = Nenhuma
+jsp.dspace-admin.supervise-link.policyeditor = Editor
+jsp.dspace-admin.supervise-link.policyobserver = Observador
+jsp.dspace-admin.supervise-link.workspace = &Aacute;rea de Trabalho para Supervis&atilde;o:
+jsp.dspace-admin.supervise-link.id = ID
+jsp.dspace-admin.supervise-link.submittedby = Submetido por
+jsp.dspace-admin.supervise-link.title = Registo
+jsp.dspace-admin.supervise-link.submittedto = Submetido a
+jsp.dspace-admin.supervise-link.select = Seleccionar
+jsp.dspace-admin.supervise-link.submit.button = Enviar Ordem de Supervis&atilde;o
+
+jsp.dspace-admin.supervise-list.title = Ordens de Administra&ccedil;&atilde;o da Supervis&atilde;o 
+jsp.dspace-admin.supervise-list.heading = Ordens de Supervis&atilde;o Actuais
+jsp.dspace-admin.supervise-list.subheading = Esta p&aacute;gina lista todas defini&ccedil;&atilde;o de supervis&atilde;o, com a op&ccedil;&atilde;o para remover qualquer defini&ccedil;&atilde;o
+jsp.dspace-admin.supervise-list.add.button = Adicionar uma ordem de Supervis&atilde;o
+jsp.dspace-admin.supervise-list.back.button = Voltar
+jsp.dspace-admin.supervise-list.group = Grupo de Supervis&atilde;o
+jsp.dspace-admin.supervise-list.author = Autor
+jsp.dspace-admin.supervise-list.title = Registo 
+jsp.dspace-admin.supervise-list.policies.button = Pol&iacute;ticas
+
+jsp.dspace-admin.supervise-main.title = Ordens de Administra&ccedil;&atilde;o da Supervis&atilde;o 
+jsp.dspace-admin.supervise-main.heading = Ordens de Administra&ccedil;&atilde;o da Supervis&atilde;o 
+jsp.dspace-admin.supervise-main.subheading = Seleccione uma das op&ccedil;&otilde;es nesta p&aacute;gina
+jsp.dspace-admin.supervise-main.add.button = Adicionar Ordem de Supervis&atilde;o
+jsp.dspace-admin.supervise-main.view.button = Ver Ordens de Supervis&atilde;o actuais
+jsp.dspace-admin.supervise-main.clean.button = Limpar Ordens de Supervis&atilde;o 
+
+jsp.dspace-admin.upload-logo.select.col = colec&ccedil;&atilde;o <strong>{0}</strong>
+jsp.dspace-admin.upload-logo.select.com = comunidade <strong>{0}</strong>
+jsp.dspace-admin.upload-logo.title = Carregar Log&oacute;tipo
+
+jsp.dspace-admin.wizard-basicinfo.choose = Escolha um log&oacute;tipo no formato JPEG ou GIF para a p&aacute;gina principal da colec&ccedil;&atilde;o. Dever&aacute; ser pequeno.
+jsp.dspace-admin.wizard-basicinfo.copyright = Texto de Copyright:
+jsp.dspace-admin.wizard-basicinfo.description = Breve Descri��o:
+jsp.dspace-admin.wizard-basicinfo.html1 = HTML, inserido no centro da p&amp;aacute;gina da cole&amp;ccedil;&amp;atilde;o. Certifique-se de utilizar as tags &amp;lt;P&amp;gt; &amp;lt;/P&amp;gt;!
+jsp.dspace-admin.wizard-basicinfo.html2 = HTML, inserido no lado direito da p&amp;aacute;gina da cole&amp;ccedil;&amp;atilde;o. Certifique-se de utilizar as tags &amp;lt;P&amp;gt; &amp;lt;/P&amp;gt;!
+jsp.dspace-admin.wizard-basicinfo.intro = Texto introdut&oacute;rio:
+jsp.dspace-admin.wizard-basicinfo.license1 = Licen&ccedil;a que os depositantes devem conceder. Deixe em branco para utilizar a licen&ccedil;a gen&eacute;rica.
+jsp.dspace-admin.wizard-basicinfo.license2 = Licen&ccedil;a:
+jsp.dspace-admin.wizard-basicinfo.logo = Log&oacute;tipo:
+jsp.dspace-admin.wizard-basicinfo.name = Nome:
+jsp.dspace-admin.wizard-basicinfo.plain = Texto simples, v&iacute;sivel no fundo da p&aacute;gina principal da colec&ccedil;&atilde;o
+jsp.dspace-admin.wizard-basicinfo.plain2 = Texto simples, qualquer informa&ccedil;&atilde;o de proveni&ecirc;ncia acerca desta colec&ccedil;&atilde;o. N&atilde;o &eacute; v&iacute;sivel nas p&aacute;ginas da colec&ccedil;&atilde;o.
+jsp.dspace-admin.wizard-basicinfo.provenance = Proveni&ecirc;ncia:
+jsp.dspace-admin.wizard-basicinfo.shown = V&iacute;sivel na lista da p&aacute;gina principal da comunidade
+jsp.dspace-admin.wizard-basicinfo.side = Texto da barra lateral:
+jsp.dspace-admin.wizard-basicinfo.title = Descreva a Colec&ccedil;&atilde;o
+
+jsp.dspace-admin.wizard-default-item.dcore = Campo Dublin Core
+jsp.dspace-admin.wizard-default-item.enter = Insira os metadados padr&atilde;o
+jsp.dspace-admin.wizard-default-item.language = Idioma
+jsp.dspace-admin.wizard-default-item.select = Seleccione o campo...
+jsp.dspace-admin.wizard-default-item.text1 = Sempre que um novo dep&oacute;sito &eacute; iniciado nesta colec&ccedil;&atilde;o, os metadados inseridos em abaixo j&aacute; estar&atilde;o preenchidos.
+jsp.dspace-admin.wizard-default-item.text2 = Pode deixar em branco os campos que quiser.
+jsp.dspace-admin.wizard-default-item.title = Insira os metadados padr&atilde;o
+jsp.dspace-admin.wizard-default-item.value = Valor
+
+jsp.dspace-admin.wizard-permissions.change = Pode modificar isto posteriormente, utilizando as respectivas se&amp;ccedil;&amp;otilde;es na administra&amp;ccedil;&amp;atilde;o do sistema. 
+jsp.dspace-admin.wizard-permissions.click = Clique no bot&amp;atilde;o 'Seleccionar Utilizadores' para escolher o utilizador a ser adicionado na lista.
+jsp.dspace-admin.wizard-permissions.heading1 = Permiss&atilde;o para ler (READ)
+jsp.dspace-admin.wizard-permissions.heading2 = Permiss&atilde;o para depositar (SUBMIT)
+jsp.dspace-admin.wizard-permissions.heading3 = Processo de de dep&oacute;sito (WORKFLOW_Step_1) - Passo Aceitar/Rejeitar
+jsp.dspace-admin.wizard-permissions.heading4 = Processo de de dep&oacute;sito (WORKFLOW_Step_2) - Passo Aceitar/Rejeitar/Editar Metadados 
+jsp.dspace-admin.wizard-permissions.heading5 = Processo de de dep&oacute;sito (WORKFLOW_Step_3) - Passo Editar Metadados 
+jsp.dspace-admin.wizard-permissions.heading6 = Administradores de Cole&amp;ccedil;&amp;atilde;o Designados
+jsp.dspace-admin.wizard-permissions.mit = Todos os utilizadores do MIT
+jsp.dspace-admin.wizard-permissions.or = OU
+jsp.dspace-admin.wizard-permissions.text1 = Quem tem (por defeito) permiss&atilde;o para ler  registos novos depositados nesta colec&ccedil;&atilde;o?
+jsp.dspace-admin.wizard-permissions.text2 = Quem tem permiss&atilde;o para depositar novos items nesta colec&ccedil;&atilde;o?
+jsp.dspace-admin.wizard-permissions.text3 = Quem &eacute; respons&aacute;vel pela execu&ccedil;&atilde;o do passo de <strong>Aceita&ccedil;&atilde;o / Rejei&ccedil;&atilde;o</strong>? Ser&atilde;o capazes de aceitar ou rejeitar novos dep&oacute;sitos. Contudo, n&atilde;o poder&atilde;o editar os metadados dos dep&oacute;sitos. Apenas uma pessoa do grupo necessita efectuar o passo para cada novo dep&oacute;sito. 
+jsp.dspace-admin.wizard-permissions.text4 = Quem &eacute; respons&aacute;vel pela execu&ccedil;&atilde;o do passo de <strong>Aceita&ccedil;&atilde;o / Rejei&ccedil;&atilde;o / Edi&ccedil;&atilde;o de Metadados</strong>? Ser&atilde;o capazes de editar os metadados de novos dep&oacute;sitos e aceitar ou rejeita-los. Apenas uma pessoa do grupo necessita efectuar o passo para cada novo dep&oacute;sito.
+jsp.dspace-admin.wizard-permissions.text5 = Quem &eacute; respons&aacute;vel pela execu&ccedil;&atilde;o do passo de <strong>Edi&ccedil;&atilde;o de Metadados</strong>? Ser&atilde;o capazes de editar os metadados de novos dep&oacute;sitos, mas n&atilde;o poder&atilde;o rejeita-los.
+jsp.dspace-admin.wizard-permissions.text6 = Quem s&atilde;o os administradores para esta colec&ccedil;&atilde;o? Poder&atilde;o decidir quem pode depositar items na cole&amp;ccedil;&amp;atilde;o, retirar registos, alterar os metadados de registos (depois de depositados) e adicionar (map) registos existentes de outras colec&ccedil;&otilde;es para esta colec&ccedil;&atilde;o (sujeita a permiss&atilde;o da mesma).
+jsp.dspace-admin.wizard-permissions.title = Permiss&otilde;es da Colec&ccedil;&atilde;o
+
+jsp.dspace-admin.wizard-questions.check1 = Novos registos devem ser disponibilizados publicamente
+jsp.dspace-admin.wizard-questions.check2 = Alguns utilizadores poder&atilde;o depositar nesta colec&ccedil;&atilde;o
+jsp.dspace-admin.wizard-questions.check3 = O processo de dep&oacute;sito incluir&aacute; um passo de <em>aceita&ccedil;&atilde;o / rejei&ccedil;&atilde;o</em>
+jsp.dspace-admin.wizard-questions.check4 = O processo de dep&oacute;sito incluir&aacute; um passo de <em>Aceita&ccedil;&atilde;o / Rejei&ccedil;&atilde;o / Edi&ccedil;&atilde;o de Metadados</em>
+jsp.dspace-admin.wizard-questions.check5 = O processo de dep&oacute;sito incluir&aacute; um passo de <em>Edi&ccedil;&atilde;o de Metadados</em>
+jsp.dspace-admin.wizard-questions.check6 = Esta colec&ccedil;&atilde;o ter&aacute; administradores designados
+jsp.dspace-admin.wizard-questions.check7 = Novos dep&oacute;sitos j&aacute; ter&atilde;o alguns metadados padr&atilde;o preenchidos  
+jsp.dspace-admin.wizard-questions.text = Por favor verifique os campos pr&oacute;ximos das condi&ccedil;&otilde;es que se aplicam &agrave; colec&ccedil;&atilde;o.
+jsp.dspace-admin.wizard-questions.title = Descrever a Colec&ccedil;&atilde;o
+
+jsp.dspace-admin.workflow-abort-confirm.collection = Colec&ccedil;&atilde;o: {0}
+jsp.dspace-admin.workflow-abort-confirm.heading = Remover: {0}
+jsp.dspace-admin.workflow-abort-confirm.submitter = Depositante: {0}
+jsp.dspace-admin.workflow-abort-confirm.title = T&iacute;tulo
+jsp.dspace-admin.workflow-abort-confirm.item-title = T&iacute;tulo: {0}
+jsp.dspace-admin.workflow-abort-confirm.warning = Tem certeza que pretende abortar este dep&oacute;sito? Ser&aacute; reenviado para a &aacute;rea de trabalho (Meu DSpace) do depositante.
+
+jsp.dspace-admin.workflow-list.collection = Colec&ccedil;&atilde;o
+jsp.dspace-admin.workflow-list.heading = Dep&oacute;sitos em Workflow 
+jsp.dspace-admin.workflow-list.submitter = Depositante
+jsp.dspace-admin.workflow-list.item-title = Registo
+jsp.dspace-admin.workflow-list.title = T&iacute;tulo
+
+jsp.error.404.title = Erro: Documento n&atilde;o encontrado
+jsp.error.404.text1 = O documento que est&aacute; a tentar aceder n&atilde;o foi encontrado no servidor.
+jsp.error.404.text2 = Se chegou aqui atrav&eacute;s de um link ou atalho de outro local, o link pode estar incorrecto ou com um erro de digita&ccedil;&atilde;o. Por favor verifique o link e tente novamente.  Se continuar a receber este erro tente ir para a <a href="{0}">p&aacute;gina principal do Reposit&oacute;rio</a> e procurar o que pretende. 
+jsp.error.404.text3 = Se este erro surgiu de um link do Reposit&oacute;rio, por favor informe-nos para que o possamos corrigir!
+
+jsp.error.authorize.title = Necess&aacute;rio Permiss&atilde;o
+jsp.error.authorize.text1 = N&atilde;o possui as permiss&otilde;es necess&aacute;rias para executar a opera&ccedil;&atilde;o que efectou.
+jsp.error.authorize.text2 = Se considerar que deve ter permiss&atilde;o, por favor contacte o administrador do Reposit&oacute;rio:
+
+jsp.error.integrity.heading = Erro do Sistema: Pedido mal formulado
+jsp.error.integrity.list1 = Por vezes, caso tenha utilizado o bot&atilde;o &quot;retroceder&quot; ou &quot;back&quot;, do seu browser durante uma opera&ccedil;&atilde;o, por exemplo um dep&oacute;sito, pode ocasionar uma repeti&ccedil;&atilde;o de uma ac&ccedil;&atilde;o j&aacute; realizada, tal como o envio do dep&oacute;sito para o sistema. Clicar no bot&atilde;o &quot;actualizar&quot; ou &quot;refresh&quot; pode ter o mesmo efeito.
+jsp.error.integrity.list2 = Se chegou aqui atrav&eacute;s de um link ou atalho de outro local, o link pode estar incorrecto ou com um erro de digita&ccedil;&atilde;o. Por favor verifique o link e tente novamente.
+jsp.error.integrity.list3 = Se tiver mais do que uma janela do browser aberta neste sistema, podem ocorrer os mesmos efeitos, porque um bot&atilde;o clicado numa janela pode tornar o mesmo bot&atilde;o da outra janela inv&aacute;lido.
+jsp.error.integrity.list4 = Por outro lado, pode ter encontrado um problema no sistema. Todos os erros s&atilde;o registrados e estes s&atilde;o verificados periodicamente para aferir se existem problemas.
+jsp.error.integrity.text1 = Verificou-se uma inconsist&ecirc;ncia nos dados recebidos do seu browser. Isto pode ser devido a uma de v&aacute;rias hip&oacute;teses:
+jsp.error.integrity.text2 = Se o problema persistir, por favor contacte o administrador do Reposit&oacute;rio:
+jsp.error.integrity.title = Pedido mal formulado
+
+jsp.error.internal.text1 = Ocorreu um erro interno do sistema. Por favor tente efectuar a tarefa novamente, se o problema persistir por favor contacte-nos para que o possamos resolver.
+jsp.error.internal.title = Erro interno do sistema
+
+jsp.error.invalid-id.title = Identificador Inv&aacute;lido
+jsp.error.invalid-id.list1 = O URL desta p&aacute;gina est&aacute; errado - se seguiu um link fora do Reposit&oacute;rio pode estar mal digitado ou corrompido.
+jsp.error.invalid-id.list2 = Inseriu um ID inv&aacute;lido num formul&aacute;rio - Por favor tente novamente.
+jsp.error.invalid-id.text1 = O identificador {0} n&atilde;o corresponde a um v&aacute;lido {1} no Reposit&oacute;rio.  Isto pode ser devido a uma das seguintes situa&ccedil;&otilde;es:
+jsp.error.invalid-id.text2 = O identificador {0} n&atilde;o corresponde a um v&aacute;lido {1} no Reposit&oacute;rio. Se ocorrerem problemas ou se o ID n&atilde;o funcionou, por favor contacte a administra&ccedil;&atilde;o do Reposit&oacute;rio.
+
+jsp.error.require-certificate.title = Certificado Necess&aacute;rio 
+jsp.error.require-certificate.text = A configura&amp;ccedil;&amp;atilde;o do sistema requer um certificado Web v&amp;aacute;lido para entrar. Caso tenha problemas contacte-nos.
+
+jsp.feedback.acknowledge.title = Obrigado pelos seus Coment&aacute;rios!
+jsp.feedback.acknowledge.text = Os seus Coment&aacute;rios foram recebidos. <a class="style1" href="" onClick="window.close();"> Fechar.</a>
+
+jsp.feedback.form.comment = Os seus Coment&aacute;rios:
+jsp.feedback.form.email = O seu endere&ccedil;o de correio electr&oacute;nico:
+jsp.feedback.form.title = Coment&aacute;rios
+jsp.feedback.form.send = Enviar
+jsp.feedback.form.text1 = Obrigado por nos enviar os seus coment&aacute;rios. Eles s&atilde;o bem-vindos!</span>
+jsp.feedback.form.text2 = Por favor preencha toda a informa&ccedil;&atilde;o em baixo. 
+
+jsp.help = Ajuda...
+jsp.help.formats.contact1 = Por favor contacte a 
+jsp.help.formats.contact2 = Administra&ccedil;&atilde;o do Reposit&oacute;rio
+jsp.help.formats.contact3 = caso tenha d&amp;uacute;vidas sobre algum formato em particular.
+jsp.help.formats.extensions = Extens&otilde;es
+jsp.help.formats.policy = POL&Iacute;TICAS DE SUPORTE AO FORMATO
+jsp.help.formats.support-levels = N&amp;iacute;veis de Suporte ao Formato
+jsp.help.formats.whattodo = O que fazer se o seu formato n&amp;atilde;o aparecer listado
+jsp.help.formats.title = Formatos Suportados pelo Reposit&oacute;rio
+jsp.help.formats.here = (Pol&amp;iacute;tica de suporte aos formatos de arquivos: TODO)
+jsp.help.formats.mime = Tipo MIME 
+jsp.help.formats.name = Nome
+jsp.help.formats.return = Voltar &amp;agrave; ajuda principal
+jsp.help.formats.support = N&amp;iacute;vel de Suporte
+jsp.help.formats.support.supported = suportado
+jsp.help.formats.support.known = conhecido
+jsp.help.formats.support.unknown = desconhecido
+jsp.help.formats.top = topo
+
+jsp.home.com1 = Comunidades no Reposit&oacute;rio
+jsp.home.com2 = Seleccione uma comunidade para percorrer as suas colec&ccedil;&otilde;es.
+jsp.home.search1 = Pesquisa Simples
+jsp.home.search2 = Pesquisa Avan&ccedil;ada
+jsp.home.title = Sobre o Reposit&oacute;rio
+
+jsp.layout.footer-default.text = <a target=_blank href="http://www.dspace.org/">DSpace Software</a> Copyright&nbsp;&copy;&nbsp;2002-2004&nbsp;<a target=_blank href="http://web.mit.edu/">MIT</a>&nbsp;and&nbsp;<a target=_blank href="http://www.hp.com/">Hewlett-Packard</a>
+jsp.layout.footer-default.feedback = Vers&atilde;o portuguesa: <a target=_blank href="http://www.sdum.uminho.pt/">Universidade do Minho - Servi&ccedil;os de Documenta&ccedil;&atilde;o</a>
+
+jsp.layout.header-default.about = Sobre o Software DSpace 
+jsp.layout.header-default.alt = DSpace
+
+jsp.layout.navbar-admin.communities-collections = Comunidades&amp;Colec&ccedil;&otilde;es
+jsp.layout.navbar-admin.epeople = Utilizadores
+jsp.layout.navbar-admin.groups = Grupos
+jsp.layout.navbar-admin.items = Registos
+jsp.layout.navbar-admin.dcregistry = Registo Dublin Core
+jsp.layout.navbar-admin.formatregistry = Registo de Formatos Bitstream
+jsp.layout.navbar-admin.workflow = Dep&oacute;sitos em Workflow
+jsp.layout.navbar-admin.authorization = Permiss&otilde;es
+jsp.layout.navbar-admin.editnews = Editar Not&iacute;cias
+jsp.layout.navbar-admin.supervisors = Supervisores
+jsp.layout.navbar-admin.statistics = Estat&iacute;sticas
+jsp.layout.navbar-admin.help = Ajuda
+jsp.layout.navbar-admin.logout = Sair
+
+jsp.layout.navbar-default.about = Guias
+jsp.layout.navbar-default.advanced = Pesquisa Avan&ccedil;ada
+jsp.layout.navbar-default.authors = Autores
+jsp.layout.navbar-default.browse = Percorrer:
+jsp.layout.navbar-default.communities-collections = Comunidades<br/>&amp;&nbsp;Colec&ccedil;&otilde;es
+jsp.layout.navbar-default.date = Por Data
+jsp.layout.navbar-default.edit = Editar Conta
+jsp.layout.navbar-default.go = Enviar
+jsp.layout.navbar-default.help = FAQs
+jsp.layout.navbar-default.home = Sobre o Reposit&oacute;rio:
+jsp.layout.navbar-default.loggedin = Ligado&nbsp;como {0}
+jsp.layout.navbar-default.logout = Sair
+jsp.layout.navbar-default.receive = Servi&ccedil;o de Alertas
+jsp.layout.navbar-default.search = Pesquisa r&aacute;pida
+jsp.layout.navbar-default.sign = Entrar:
+jsp.layout.navbar-default.titles = T&iacute;tulos
+jsp.layout.navbar-default.users = Meu DSpace</a>
+jsp.layout.navbar-default.users-authorized = <small>utilizadores autorizados</small>
+
+jsp.login.incorrect.heading = Entrar no Reposit&oacute;rio
+jsp.login.incorrect.text = O endere&ccedil;o de correio electr&oacute;nico e a palavra de acesso que forneceu n&atilde;o s&atilde;o v&aacute;lidos. Por favor tente novamente. Ou <a href="{0}">esqueceu a sua palavra de acesso</a>?
+jsp.login.incorrect.title = Entrar
+
+jsp.login.ldap.title = Entrar
+jsp.login.ldap.heading = Entrar no Reposit&oacute;rio
+
+jsp.login.ldap-incorrect.title = Entrar
+jsp.login.ldap-incorrect.heading = Entrar no Reposit&oacute;rio
+jsp.login.ldap-incorrect.errormsg = O username e a palavra de acesso que forneceu n&atilde;o s&atilde;o v&aacute;lidos. Por favor tente novamente.
+
+jsp.login.logged-out.title = Desligado
+jsp.login.logged-out.thank = Obrigado por utilizar o Reposit&oacute;rio!
+
+jsp.login.no-valid-cert.heading = Entrar no Reposit&oacute;rio
+jsp.login.no-valid-cert.text = <strong>N&atilde;o tem um cerfificado WEB v&aacute;lido.</strong> Por favor tente novamente.
+jsp.login.no-valid-cert.title = Ligar-se
+
+jsp.login.not-in-records.register = Registo no Reposit&oacute;rio
+jsp.login.not-in-records.text = Tem um cerfificado WEB v&aacute;lido, mas no Reposit&oacute;rio n&atilde;o existe um registo seu. &Eacute; necess&amp;aacute;rio que se <a href="{0}">registe no Reposit&oacute;rio</a> antes de aceder a &amp;aacute;reas que requerem um registo como utilizador.
+jsp.login.not-in-records.title = Registo de Utilizador N&amp;atilde;o Dispon&amp;iacute;vel
+
+jsp.login.password.heading = Entrar no Reposit&oacute;rio
+jsp.login.password.title = Entrar
+
+jsp.morehelp = Mais ajuda...
+
+jsp.mydspace = Meu DSpace
+jsp.mydspace.general.remove = Remover
+jsp.mydspace.general.approve = Aprovar
+jsp.mydspace.general.reject =Rejeitar
+jsp.mydspace.general.cancel =Cancelar
+jsp.mydspace.general.goto-mydspace = Ir para o Meu DSpace
+jsp.mydspace.general.backto-mydspace = Ir para o Meu DSpace
+jsp.mydspace.general.returnto-mydspace =Ir para o Meu DSpace
+
+jsp.mydspace.in-archive.heading1 = Obrigado
+jsp.mydspace.in-archive.return.link = Ir para o Meu DSpace
+jsp.mydspace.in-archive.text1 = O Dep&oacute;sito foi adicionado ao arquivo principal. Foi-lhe atribu&iacute;do o seguinte identificador:
+jsp.mydspace.in-archive.text2 = Foi enviado um alerta &agrave;s pessoas com rela&ccedil;&atilde;o o mesmo.
+jsp.mydspace.in-archive.title = Dep&oacute;sito Arquivado
+
+jsp.mydspace.main.elem1 = Registo
+jsp.mydspace.main.elem2 = Submetido a
+jsp.mydspace.main.heading2 = Tarefas Seleccionadas
+jsp.mydspace.main.heading3 = Tarefas a Executar
+jsp.mydspace.main.heading4 = Dep&oacute;sitos por terminar 
+jsp.mydspace.main.heading5 = Dep&oacute;sitos em Processo de Aceita&ccedil;&atilde;o
+jsp.mydspace.main.item = Registo
+jsp.mydspace.main.link = Ver os seus Alertas
+jsp.mydspace.main.perform.button = Executar Tarefa
+jsp.mydspace.main.return.button = Voltar &agrave;s Tarefas a Executar
+jsp.mydspace.main.start.button = Iniciar Novo Dep&oacute;sito
+jsp.mydspace.main.sub1 = Rever Dep&oacute;sito
+jsp.mydspace.main.sub2 = Verificar Dep&oacute;sito
+jsp.mydspace.main.sub3 = Edi&ccedil;&atilde;o Final do Dep&oacute;sito
+jsp.mydspace.main.subby = Submetido por
+jsp.mydspace.main.subto = Submetido a
+jsp.mydspace.main.take.button = Seleccionar Tarefa
+jsp.mydspace.main.task = Tarefa
+jsp.mydspace.main.text1 = Em baixo encontram-se as tarefas que lhe foram atribuidas.
+jsp.mydspace.main.text2 = Em baixo encontram-se as tarefas que seleccionou para executar.
+jsp.mydspace.main.text4 = Esta sec&ccedil;&atilde;o &eacute; utilizada para verifica&ccedil;&atilde;o cont&iacute;nua do seu documento.
+jsp.mydspace.main.view.button = Ver Dep&oacute;sitos Aceites
+jsp.mydspace.main.authoring = Autoria
+jsp.mydspace.main.supervising = Supervis&atilde;o
+
+jsp.mydspace.own-submissions.text1 = N&atilde;o existem registos no Reposit&oacute;rio que tenham sido depositados por si.
+jsp.mydspace.own-submissions.text2 = Em baixo est&atilde;o listados dep&oacute;sitos que efectuou e que foram aceites no Reposit&oacute;rio.
+jsp.mydspace.own-submissions.text3 = Existe <strong>1</strong> registo no sistema que foi submetido por si. 
+jsp.mydspace.own-submissions.text4 = Existem <strong>{0}</strong> registos no sistema que foram submetidos por si.
+jsp.mydspace.own-submissions.title = Os seus dep&oacute;sitos
+
+jsp.mydspace.perform-task.commit.button = Enviar para Reposit&oacute;rio
+jsp.mydspace.perform-task.edit.button = Editar Metadados
+jsp.mydspace.perform-task.instruct1 = Se reviu o registo e se estiver satisfat&oacute;rio para ser inclu&iacute;do na colec&ccedil;&atilde;o, seleccione "Aprovar".
+jsp.mydspace.perform-task.instruct2 = Depois de editar o registo, utilize esta op&ccedil;&atilde;o para o enviar para o Reposit&oacute;rio.
+jsp.mydspace.perform-task.instruct3 = Se reviu o registo e verificou que <strong>n&atilde;o</strong> � satisfat&oacute;rio para ser inclu&iacute;do na colec&ccedil;&atilde;o, seleccione "Rejeitar". Ent&atilde;o ser-lhe-&aacute; pedido para inserir uma mensagem informando as raz&otilde;es pelas quais o registo n&atilde;o satisfaz as normas e padr&otilde;es da colec&ccedil;&atilde;o e o que deve ser alterado para o depositante o poder depositar novamente.
+jsp.mydspace.perform-task.instruct4 = Seleccione esta op&ccedil;&atilde;o para corrigir, emendar ou efectuar outras altera&ccedil;&otilde;es aos metadados.
+jsp.mydspace.perform-task.instruct5 = Sair da tarefa e voltar ao Meu DSpace.
+jsp.mydspace.perform-task.instruct6 = Para enviar a tarefa para a lista de tarefas para que outra pessoa a possa executar, utilize esta op&ccedil;&atilde;o.
+jsp.mydspace.perform-task.later.button = Sair
+jsp.mydspace.perform-task.return.button = Libertar Tarefa
+jsp.mydspace.perform-task.text1 = O seguinte registo foi submetido para a colec&ccedil;&atilde;o 
+jsp.mydspace.perform-task.text3 = Fa&ccedil;a a revis&atilde;o ao registo e verifique se satisfaz as normas e padr&otilde;es da colec&ccedil;&atilde;o <strong>{0}</strong>. Depois da revis&atilde;o, envie para o Reposit&oacute;rio utilizando os bot&otilde;es no final desta p&aacute;gina.
+jsp.mydspace.perform-task.text4 = O seguinte registo foi aceite para ser inclu&iacute;do na colec&ccedil;&atilde;o <strong>{0}</strong>
+jsp.mydspace.perform-task.title = Executar Tarefa
+
+jsp.mydspace.preview-task.accept.button = Aceitar tarefa 
+jsp.mydspace.preview-task.text1 = O seguinte registo foi submetido para a colec&ccedil;&atilde;o <strong>{0}</strong>
+jsp.mydspace.preview-task.text3 = Para aceitar a tarefa de verifica&ccedil;&atilde;o deste registo, por favor clique em baixo no bot&atilde;o &quot;Aceitar Tarefa&quot;.
+jsp.mydspace.preview-task.text4 = O seguinte registo foi aceite para ser inclu&iacute;do na colec&ccedil;&atilde;o <strong>{0}</strong>
+jsp.mydspace.preview-task.title = Antever Tarefa
+
+jsp.mydspace.reject-reason.cancel.button = Cancelar 
+jsp.mydspace.reject-reason.reject.button = Rejeitar 
+jsp.mydspace.reject-reason.text1 = Por favor indique na caixa em baixo, a raz&atilde;o pela qual o dep&oacute;sito foi rejeitado. Indique na se o depositante deve resolver o problema e depositar novamente.
+jsp.mydspace.reject-reason.title = Indique a Raz&atilde;o da Rejei&ccedil;&atilde;o
+
+jsp.mydspace.remove-item.cancel.button = Cancelar 
+jsp.mydspace.remove-item.confirmation = Tem certeza que quer remover o seguinte registo incompleto?
+jsp.mydspace.remove-item.remove.button = Remover 
+jsp.mydspace.remove-item.title = Remover Registo
+
+jsp.mydspace.subscriptions.info1 = Os seus alertas foram actualizados.
+jsp.mydspace.subscriptions.info2 = Para activar um alerta numa colec&ccedil;&atilde;o, v&aacute; at&eacute; &agrave; p&aacute;gina principal da colec&ccedil;&atilde;o e clique no bot&atilde;o &quot;Activar Alerta&quot;. 
+jsp.mydspace.subscriptions.info3 = Em baixo tem os alertas activos. Ser-lhe-&aacute; enviado uma mensagem di&aacute;ria com os detalhes dos novos registos disponibilizados nestas colec&ccedil;&otilde;es. Em dias que n&atilde;o existam novos registos n&atilde;o ser&aacute; enviado o alerta.
+jsp.mydspace.subscriptions.info4 = Actualmente n&atilde;o possui alertas activos.
+jsp.mydspace.subscriptions.remove.button = Desactivar todos os alertas
+jsp.mydspace.subscriptions.title = Servi&ccedil;o de Alertas
+jsp.mydspace.subscriptions.unsub.button = Desactivar
+
+jsp.mydspace.task-complete.title = Obrigado
+jsp.mydspace.task-complete.text1 = A tarefa est&aacute; completa e foi enviada uma mensagem &agrave;s pessoas relacionadas com a mesma.
+
+jsp.register.general.return-home = Ir para a p&aacute;gina principal.
+
+jsp.register.already-registered.info1 = O sistema indica que j&aacute; se encontra registado no Reposit&oacute;rio e que a sua conta est&aacute; activa.
+jsp.register.already-registered.info2 = Pode <a href="{0}">  inserir uma nova Palavra de Acesso caso tenha esquecido a antiga.
+jsp.register.already-registered.info4 = Se tiver problemas em entrar, por favor contacte-nos. 
+jsp.register.already-registered.title = J&aacute; est&aacute; registado
+
+jsp.register.cannot-register.msg = A configura&ccedil;&atilde;o do sistema n&atilde;o permite que se auto-registe. Por favor contacte-nos sobre qualquer quest&atilde;o.
+jsp.register.cannot-register.title = N&atilde;o pode Registar-se
+
+jsp.register.edit-profile.info1 = Preencha todos os campos obrigat&oacute;rios.
+jsp.register.edit-profile.info2 = As palavras de acesso que inseriu em baixo t&ecirc;m de ser iguais e devem ter  pelo menos 6 caracteres de comprimento.
+jsp.register.edit-profile.info3 = Por favor introduza ou altere a seguinte informa&ccedil;&atilde;o. Os campos assinalados com * s&atilde;o obrigat&oacute;rios.
+jsp.register.edit-profile.info5 = <strong>Se desejar</strong>, pode alterar a sua palavra de acesso introduzindo-a na caixa em baixo, e confirmando-a na segunda caixa. Deve ter pelo menos seis caracteres de comprimento.
+jsp.register.edit-profile.pswd.field = Nova Palavra de Acesso:
+jsp.register.edit-profile.confirm.field = Confirma&ccedil;&atilde;o:
+jsp.register.edit-profile.title = Editar Conta
+jsp.register.edit-profile.update.button = Actualizar Conta
+
+jsp.register.forgot-password.email.field = Endere&ccedil;o de correio electr&oacute;nico:
+jsp.register.forgot-password.forgot.button = Esqueci a minha Palavra de Acesso
+jsp.register.forgot-password.info1 = O endere&ccedil;o de correio electr&oacute;nico e a palavra de acesso que forneceu n&atilde;o s&atilde;o v&aacute;lidos. Por favor tente novamente.
+jsp.register.forgot-password.info2 = Introduza o seu endere&ccedil;o de correio electr&oacute;nico na caixa em baixo e clique "Esqueci a minha Palavra de Acesso". Receber&aacute; uma mensagem que lhe permitir&aacute; definir uma nova Palavra de Acesso.
+jsp.register.forgot-password.title = Esqueceu a Palavra de Acesso
+
+jsp.register.inactive-account.info = O endere&ccedil;o de correio electr&oacute;nico que introduziu corresponde a uma conta inactiva. Provavelmente ainda n&atilde;o est&aacute;<a href="{0}">registado</a>. Por favor contacte-nos sobre qualquer quest&atilde;o.
+jsp.register.inactive-account.title = Conta Inactiva
+
+jsp.register.invalid-token.info1 = O Registo ou o URL especial (token) com a palavra de acesso  esquecida s&atilde;o inv&aacute;lidos. Isto pode ser devido a  um dos seguintes motivos:
+jsp.register.invalid-token.info2 = O URL especial (token) que recebeu pode ter sido mal copiado para o browser. Alguns programas de correio electr&oacute;nico &quot;cortam&quot; linhas muito compridas partindo um URL em duas linhas, como este:
+jsp.register.invalid-token.info3 = Se foi este o caso,  deve copiar  manualmente  e colar a primeira linha na barra de endere&ccedil;os do browser e em seguida  copiar e colar a segunda linha junto  da primeira linha, assegurando-se de n&atilde;o deixar nenhuma linha partida. A barra endere&ccedil;os deve conter algo como:
+jsp.register.invalid-token.info4 = Depois pressione o bot&atilde;o &quot;Ir para&quot; na barra de endere&ccedil;os do browser e o URL  deve funcionar correctamente.
+jsp.register.invalid-token.info5 = Se os problemas persistirem, por favor contacte-nos.
+jsp.register.invalid-token.title = Token Inv&aacute;lido
+
+jsp.register.new-ldap-user.title = Registo do Utilizador
+jsp.register.new-ldap-user.heading = Registo do Utilizador
+jsp.register.new-ldap-user.info1 = O username, palavra de acesso ou endere&ccedil;o de correio electr&oacute;nico que introduziu n&atilde;o &eacute; v&aacute;lido.  Por favor tente novamente.
+jsp.register.new-ldap-user.info2 = Se nunca entrou no Reposit&oacute;rio, por favor insira o seu username, palavra de acesso e endere&ccedil;o correio electr&oacute;nico nos campos em baixo e clique "Registar". Se ainda n&atilde;o tem um username pode registar-se inserindo o seu endere&ccedil;o correio electr&oacute;nico.
+jsp.register.new-ldap-user.info3 = Se o seu departamento est� interessado em registar-se no Reposit&oacute;rio, por favor contacte a Administra&ccedil;&atilde;o do Reposit&oacute;rio.
+jsp.register.new-ldap-user.label.username = Username:
+jsp.register.new-ldap-user.label.password = Palavra de Acesso:
+jsp.register.new-ldap-user.label.email = Endere&ccedil;o de correio electr&oacute;nico:
+jsp.register.new-ldap-user.button.register = Registar
+
+jsp.register.new-password.confirm.field = Confirma&ccedil;&atilde;o:
+jsp.register.new-password.hello = Bem-vindo
+jsp.register.new-password.info1 = As palavras de acesso que inseriu em baixo t&ecirc;m de ser iguais e deve ter  pelo menos 6 caracteres de comprimento.
+jsp.register.new-password.info2 = Introduza a nova palavra de acesso na caixa em baixo e confirme-a na segunda caixa. Deve ter pelo menos seis caracteres de comprimento.
+jsp.register.new-password.pswd.field = Nova Palavra de Acesso:
+jsp.register.new-password.set.button = Actualizar Palavra de Acesso
+jsp.register.new-password.title = Nova Palavra de Acesso
+
+jsp.register.new-user.email.field = Endere&ccedil;o de Correio Electr&oacute;nico:
+jsp.register.new-user.info1 = <strong>O endere&ccedil;o de correio electr&oacute;nico que indicou &eacute; inv&aacute;lido.</strong> Tente novamente.</strong>
+jsp.register.new-user.info2 = Se nunca entrou no Reposit&oacute;rio antes, introduza o seu endere&ccedil;o de correio electr&oacute;nico na caixa em baixo e clique &quot;Registar&quot;.
+jsp.register.new-user.info3 = Se o seu Departamento est&aacute; interessado em registar-se no Reposit&oacute;rio, por favor contacte-nos.
+jsp.register.new-user.register.button = Registar
+jsp.register.new-user.title = Nova Conta
+
+jsp.register.password-changed.info = Obrigado, a sua nova Palavra de Acesso est� criada e activa.
+jsp.register.password-changed.link = Ir para o Meu DSpace
+jsp.register.password-changed.title = Palavra de Acesso Alterada
+
+jsp.register.password-token-sent.info = Foi-lhe enviado uma mensagem que cont&eacute;m um URL especial (token). Quando visitar este URL, poder&aacute; alterar a sua Palavra de Acesso ao Reposit&oacute;rio.
+jsp.register.password-token-sent.title = Mensagem com nova Palavra de Acesso enviada.
+
+jsp.register.profile-form.fname.field = Primeiro Nome*:
+jsp.register.profile-form.lname.field = &Uacute;ltimo Nome*:
+jsp.register.profile-form.phone.field = Contacto Telef&oacute;nico:
+
+jsp.register.profile-updated.info1 = Obrigado, as informa&ccedil;&otilde;es da sua conta   
+jsp.register.profile-updated.info2 = est&atilde;o actualizadas.
+jsp.register.profile-updated.title = Conta Actualizada
+
+jsp.register.registered.info = A partir deste momento j&aacute; est&aacute; registado e pronto para utilizar Reposit&oacute;rio. Pode activar o Servi&ccedil;o de Alertas nas colec&ccedil;&otilde;es que indicar para receber mensagens sempre que novos registos seja adicionados.
+jsp.register.registered.thank = Obrigado
+jsp.register.registered.title = Registo Completo!
+
+jsp.register.registration-form.complete.button = Registo Completo
+jsp.register.registration-form.confirm.field = Confirma&ccedil;&atilde;o:
+jsp.register.registration-form.instruct1 = Preencha todos os campos obrigat&oacute;rios.
+jsp.register.registration-form.instruct2 = As palavras de acesso que inseriu em baixo t&ecirc;m de ser iguais e t&ecirc;m de ter  pelo menos 6 caracteres de comprimento.
+jsp.register.registration-form.instruct3 = Por favor introduza ou altere a seguinte informa&ccedil;&atilde;o. Os campos assinalados com * s&atilde;o obrigat&oacute;rios.
+jsp.register.registration-form.instruct4 = Escolha a sua palavra de acesso e introduzindo-a na caixa em baixo e confirmando-a na segunda caixa. Deve ter pelo menos seis caracteres de comprimento.
+jsp.register.registration-form.pswd.field = Palavra de Acesso:
+jsp.register.registration-form.title = Informa&ccedil;&atilde;o do Registo
+jsp.register.registration-sent.info = Foi-lhe enviado uma mensagem que cont&eacute;m uma URL especial (token). Quando visitar este URL, dever&aacute; preencher alguma informa&ccedil;&atilde;o simples. Ap&oacute;s este passo, poder&aacute; entrar no Reposit&oacute;rio!
+jsp.register.registration-sent.title = Mensagem de Registo Enviada
+
+jsp.search.general.noresults = A pesquisa n&atilde;o produziu resultados.
+jsp.search.general.next = Pr&oacute;xima
+jsp.search.general.previous = Anterior
+
+jsp.search.advanced.title = Pesquisa Avan&ccedil;ada
+jsp.search.advanced.search = Pesquisar:
+jsp.search.advanced.search2 = Pesquisar 
+jsp.search.advanced.searchfor = Pesquisar por:
+jsp.search.advanced.clear = Limpar
+jsp.search.advanced.type = Tipo:
+jsp.search.advanced.type.keyword = Palavra Chave
+jsp.search.advanced.type.author = Autor
+jsp.search.advanced.type.title = T&iacute;tulo
+jsp.search.advanced.type.subject = Assunto
+jsp.search.advanced.type.abstract = Resumo
+jsp.search.advanced.type.series = S&eacute;rie
+jsp.search.advanced.type.sponsor = Patrocinador
+jsp.search.advanced.type.id = Idenficador
+jsp.search.advanced.type.language = Idioma (ISO)
+jsp.search.advanced.logical.and = E
+jsp.search.advanced.logical.or = OU
+jsp.search.advanced.logical.not = N&Atilde;O
+
+jsp.search.results.colhits = Colec&ccedil;&otilde;es:
+jsp.search.results.comhits = Comunidades:
+jsp.search.results.itemhits = Registos:
+jsp.search.results.searchin = Pesquisar:
+jsp.search.results.searchfor = por
+jsp.search.results.results = Resultados {0}-{1} de {2}.
+jsp.search.results.title = Resultados da Pesquisa
+
+jsp.statistics.no-report.title = Actualmente n�o existe nenhum  
+jsp.statistics.no-report.info1 = Actualmente n�o existem Relat&oacute;rios dispon&iacute;veis para este servi&ccedil;o. Por favor verifique mais tarde.
+
+jsp.statistics.report.title = Sum&aacute;rio de Estat&iacute;sticas
+jsp.statistics.report.info1 = Relat&oacute;rio geral mais recente
+jsp.statistics.report.info2 = Relat&oacute;rio Mensal:
+
+jsp.submit.general.submit = Depositar
+jsp.submit.general.next = Continuar
+jsp.submit.general.previous = Anterior
+jsp.submit.general.cancel-or-save.button = Cancelar/Guardar
+
+jsp.submit.cancel.continue.button = Continuar dep&oacute;sito
+jsp.submit.cancel.info = Quer remover o Dep&oacute;sito, ou quer mant&ecirc;-lo para poder terminar mais tarde? Pode tamb&aacute;m voltar para o ponto onde estava no processo de dep&oacute;sito se porventura seleccionou "Cancelar" inadvertidamente.
+jsp.submit.cancel.remove.button = Remover dep&oacute;sito
+jsp.submit.cancel.save.button = Cancelar/Gravar
+jsp.submit.cancel.title= Cancelar ou Gravar Dep&oacute;sito
+
+jsp.submit.cancelled-removed.info = O seu dep&oacute;sito foi cancelado e o registo (incompleto) foi removido do sistema.
+jsp.submit.cancelled-removed.title = Dep&oacute;sito Cancelado
+
+jsp.submit.change-file-description.file = Ficheiro
+jsp.submit.change-file-description.filedescr = Descri&ccedil;&atilde;o do ficheiro:
+jsp.submit.change-file-description.format = Formato do ficheiro
+jsp.submit.change-file-description.heading = Dep&oacute;sito: Mudar Descri&ccedil;&atilde;o do Ficheiro
+jsp.submit.change-file-description.info1 = Detalhes do ficheiro.
+jsp.submit.change-file-description.info2 = Introduza a descri&ccedil;&atilde;o correcta do ficheiro em baixo:
+jsp.submit.change-file-description.size = Tamanho
+jsp.submit.change-file-description.title = Mudar Descri&ccedil;&atilde;o do Ficheiro
+
+jsp.submit.choose-file.document = Ficheiro:
+jsp.submit.choose-file.filedescr = Descri&ccedil;&atilde;o do Ficheiro:
+jsp.submit.choose-file.heading = Dep&oacute;sito: Carregar Ficheiro
+jsp.submit.choose-file.info1 = Introduza o nome de um dos ficheiros do seu disco local correspondente ao seu registo. Se seleccionar "Procurar...", ser&aacute; aberta uma nova janela com a qual poder&aacute; localizar e seleccionar o ficheiro do seu disco local.
+jsp.submit.choose-file.info3 = <strong>Utilizadores de Netscape:</strong> Por defeito, a janela aberta com "Procurar..." mostra apenas ficheiros do tipo HTML. Se o seu ficheiro n&atilde;o &eacute; do tipo HTML seleccione na janela a op&ccedil;&atilde;o para mostrar ficheiros de outros tipos.
+jsp.submit.choose-file.info4 = Instru&ccedil;&otilde;es para utilizadores de Netscape.
+jsp.submit.choose-file.info6 = Note que o sistema DSpace &eacute; capaz de preservar melhor determinados tipos de ficheiros em rela&ccedil;&atilde;o a outros.
+jsp.submit.choose-file.info7 = Informa&ccedil&atildeo acerca de tipos de ficheiros e n&iacute;veis de suporte.
+jsp.submit.choose-file.info9 = Introduza uma breve descri&ccedil;&atilde;o sobre o conte&uacute;do deste ficheiro, por exemplo "Documento principal", ou "Dados recolhidos."
+jsp.submit.choose-file.title = Carregar Ficheiro
+
+jsp.submit.complete.heading = Dep&oacute;sito: Dep&oacute;sito Conclu&iacute;do!
+jsp.submit.complete.info = O seu dep&oacute;sito ir&aacute; percorrer o processo de aceita&ccedil;&atilde;o (workflow) implementado na colec&ccedil;&atilde;o em que depositou. Vai receber uma mensagem alertando-o logo que o seu registo passe a integrar a colec&ccedil;&atilde;o ou caso exista algum problema com o seu dep&oacute;sito.  Pode verificar a situa&ccedil;&atilde;o do seu dep&oacute;sito acedendo ao &quot;Meu DSpace&quot;.
+jsp.submit.complete.link = Ir para o Meu DSpace
+jsp.submit.complete.title = Dep&oacute;sito Conclu&iacute;do!
+
+jsp.submit.creative-commons.heading = Depositar: Utilizar Licen&amp;ccedil;a Creative Commons
+jsp.submit.creative-commons.info1 = J&amp;aacute; escolheu uma licen&amp;ccedil;a Creative Commons e aplicou-a a este registo. Pode:
+jsp.submit.creative-commons.choice1 = Pressione o bot&amp;atilde;o &quot;Pr&oacute;xima&quot;, em baixo, para <em>manter</em> a licen&amp;ccedil;a previamente escolhida.
+jsp.submit.creative-commons.choice2 = Pressione o bot&amp;atilde;o &quot;Ignorar Licen&amp;ccedil;a Creative Commons&quot;, em baixo, para <em>remover</em> a actual e deixar de utilizar uma licen&amp;ccedil;a Creative Commons.
+jsp.submit.creative-commons.choice3 = Complete o processo de selec&ccedil;&atilde;o em baixo de forma a <em>substituir</em> a actual.
+jsp.submit.creative-commons.info2 = Para licenciar seu registo sob uma licen&amp;ccedil;a Creative Commons, siga as instru&amp;ccedil;&amp;otilde;es em abaixo. Ser-lhe-&aacute; dada uma oportunidade de rever a sua escolha. Siga o link &quot;continuar&quot; para adicionar uma licen&amp;ccedil;a. Caso deseje ignorar a licen&amp;ccedil;a Creative Commons, pressione o bot&amp;atilde;o &quot;Ignorar Licen&amp;ccedil;a Creative Commons&quot;.
+jsp.submit.creative-commons.info3 = O seu browser precisa suportar IFrames para utilizar esta funcionalidade
+jsp.submit.creative-commons.skip.button = Ignorar Licen&amp;ccedil;a Creative Commons &gt;
+jsp.submit.creative-commons.title = Depositar: Utilizar Licen&amp;ccedil;a Creative Commons
+
+jsp.submit.edit-metadata.title = Descreva o seu Registo
+jsp.submit.edit-metadata.heading = Depositar: Descreva o seu Registo
+jsp.submit.edit-metadata.info1 = Por favor, introduza a informa&ccedil;&atilde;o necess&aacute;ria acerca do seu Dep&oacute;sito em baixo. Na maioria dos browsers pode usar a tecla TAB para navegar no formul&aacute;rio.
+jsp.submit.edit-metadata.info2 = Por favor preencha mais informa&ccedil;&otilde;es sobre o seu dep&oacute;sito em baixo.
+jsp.submit.edit-metadata.help = (Mais Ajuda...)
+jsp.submit.edit-metadata.previous = &lt; Anterior
+jsp.submit.edit-metadata.next = Pr&oacute;ximo &gt;
+jsp.submit.edit-metadata.cancelsave = Cancelar/Guardar
+jsp.submit.edit-metadata.lastname = &Uacute;ltimo nome<br/>ex. <strong>Silva</strong>
+jsp.submit.edit-metadata.firstname = Primeiro Nome<br/> ex. <strong>Manuel</strong>
+jsp.submit.edit-metadata.button.remove = Remover esta entrada
+jsp.submit.edit-metadata.button.remove2 = Remover
+jsp.submit.edit-metadata.button.add = Adicionar Mais
+jsp.submit.edit-metadata.month = M&ecirc;s:
+jsp.submit.edit-metadata.no_month = (Sem M&ecirc;s)   
+jsp.submit.edit-metadata.day = Dia:
+jsp.submit.edit-metadata.year = Ano:
+jsp.submit.edit-metadata.seriesname = Nome da S&eacute;rie
+jsp.submit.edit-metadata.paperno = Relat&oacute;rio ou Paper N.�
+
+jsp.submit.get-file-format.choose.button = Reconhecer automaticamente o tipo de ficheiro
+jsp.submit.get-file-format.format = Formato do Ficheiro:
+jsp.submit.get-file-format.heading = Depositar: Seleccione Formato de Ficheiro
+jsp.submit.get-file-format.info1 = Ficheiro carregado: <code>{0}</code> ({1} bytes)
+jsp.submit.get-file-format.info2 = Formato de ficheiro n&atilde;o reconhecido.
+jsp.submit.get-file-format.info3 = Formato do ficheiro reconhecido como {0}. <strong>Altere s&oacute; se tiver a certeza! </strong>
+jsp.submit.get-file-format.info5 = Seleccione o formato do ficheiro da lista em baixo, por exemplo "Adobe PDF" or "Microsoft Word", OU se o formato n&atilde;o estiver na lista, descreva o formato na caixa abaixo da lista.
+jsp.submit.get-file-format.info6 = Formato n&atilde;o listado
+jsp.submit.get-file-format.info7 = <strong>Se o formato n&atilde;o estiver na lista</strong>, descreva-o nesta caixa. Insira o nome e a vers&atilde;o da aplica&ccedil;&atilde;o que utilizou para produzir o ficheiro (por exemplo, "ACMESoft SuperApp version 1.5").
+jsp.submit.get-file-format.known = (conhecido)
+jsp.submit.get-file-format.supported =(suportado)
+jsp.submit.get-file-format.title = Seleccionar Formato de Ficheiro
+
+jsp.submit.initial-questions.elem1 = O registo tem mais do que um t&iacute;tulo, ex. um t&iacute;tulo noutra l&iacute;ngua
+jsp.submit.initial-questions.elem2 = O Registo j&aacute; foi publicado ou distribu&iacute;do publicamente
+jsp.submit.initial-questions.elem3 = O Registo &eacute; composto por <em>mais do que um</em> ficheiro
+jsp.submit.initial-questions.elem4 = O Registo &eacute; uma Tese
+jsp.submit.initial-questions.info = Por favor verifique as caixas pr&oacute;ximas das informa&ccedil;&otilde;es que se aplicam ao seu dep&oacute;sito.
+jsp.submit.initial-questions.heading = Depositar: Descreva o Registo
+jsp.submit.initial-questions.title = Descreva o Registo
+
+jsp.submit.license-rejected.heading = Depositar: Licen&ccedil;a Rejeitada
+jsp.submit.license-rejected.info1 = N&atilde;o aceitou os termos da licen&ccedil;a de forma a permitir a distribui&ccedil;&atilde;o do seu registo no Reposit&oacute;rio. O seu Dep&oacute;sito n&atilde;o foi removido podendo ser acedido pela p&aacute;gina o "Meu DSpace".
+jsp.submit.license-rejected.info2 = Se desejar contactar-nos para discutir os termos da licen&ccedil;a, pode faz&ecirc;-lo das seguintes formas:
+jsp.submit.license-rejected.title = Licen&ccedil;a Rejeitada
+
+jsp.submit.no-theses.info1 = DSpace does not currently accept individually-submitted theses, but you are encouraged to use the separate electronic thesis submission site supported by the Libraries and by MIT Information Systems to submit your thesis to the <a href="http://thesis.mit.edu">Digital Library of MIT Theses</a>.  To learn how to submit your thesis to that system, see <a href="http://web.mit.edu/etheses/www/etheses-home.html">Submitting an Electronic Thesis at MIT</a>.
+jsp.submit.no-theses.info2 = Because DSpace does not accept individually-submitted theses, your submission will not proceed; any files you have uploaded for the current item will not be stored.
+jsp.submit.no-theses.info3 = Please note that printed copies of your thesis are still the official requirement for your degree.  Due to important legal and record-keeping reasons, it is likely that in the future DSpace will work directly with the electronic thesis system to load groups of theses which have been officially vetted and approved.  Thanks for understanding.
+jsp.submit.no-theses.info4 = Para mais informa&ccedil;&otilde;es <strong>contacte a administra&ccedil;&atilde;o do DSpace</strong>: 
+jsp.submit.no-theses.info5 = Obrigado pelo seu interesse no DSpace!
+jsp.submit.no-theses.title = Teses n&atilde;o aceites no DSpace 
+
+jsp.submit.progressbar.select = Seleccionar
+jsp.submit.progressbar.describe = Descrever
+jsp.submit.progressbar.upload = Carregar
+jsp.submit.progressbar.verify = Verificar
+jsp.submit.progressbar.license = Licen&ccedil;a
+jsp.submit.progressbar.complete = Completo
+
+jsp.submit.review.title = Verificar Dep&oacute;sito
+jsp.submit.review.heading = Depositar: Verificar Dep&oacute;sito
+jsp.submit.review.info1 = <strong>Verifique os dados</strong> do seu dep&oacute;sito!
+jsp.submit.review.info2 = Por favor despenda alguns minutos a examinar o que acabou de depositar. Se alguma coisa estiver errada, volte atr&aacute;s para corrigir utilizando o bot&atilde;o ao lado do erro, ou seleccionando na barra de progresso no topo da p&aacute;gina.
+jsp.submit.review.info3 = <strong>Se tudo estiver correcto,</strong> seleccione "Pr&oacute;ximo" no bot&atilde;o ao fundo da p&aacute;gina.
+jsp.submit.review.info4 = Pode verificar os ficheiros que carregou - ser&aacute; aberta uma nova janela para os mostrar.
+jsp.submit.review.init-question1 = O Registo tem mais do que um T&iacute;tulo:
+jsp.submit.review.init-question2 = Registo Previamente Publicado:
+jsp.submit.review.init-question3 = O Registo consiste em mais do que um Ficheiro:
+jsp.submit.review.state1 = Sim
+jsp.submit.review.state2 = N&atilde;o
+jsp.submit.review.button.correct = Corrigir
+jsp.submit.review.no_md = <em>Nenhum</em>
+jsp.submit.review.unknown = (Desconhecido)
+jsp.submit.review.known = (Conhecido)
+jsp.submit.review.supported = (Suportado)
+jsp.submit.review.upload1 = Ficheiros&nbsp;Carregados:
+jsp.submit.review.upload2 = Ficheiro&nbsp;Carregado:
+jsp.submit.review.button.upload1 = Adicionar/Remover Ficheiro
+jsp.submit.review.button.upload2 = Carregar um Ficheiro Diferente
+jsp.submit.review.button.edit = Editar Detalhes do Ficheiro
+jsp.submit.review.button.previous = &lt; Anterior
+jsp.submit.review.button.next = Pr&oacute;ximo &gt;
+jsp.submit.review.button.cancelsave = Cancelar/Guardar
+
+jsp.submit.saved.info = O seu Dep&oacute;sito foi gravado. Pode continuar o Dep&oacute;sito acedendo &agrave; p&aacute;gina "Meu DSpace" e seleccionar o bot&atilde;o "Continuar" no registo respectivo.
+jsp.submit.saved.title = Dep&oacute;sito Guardado
+
+jsp.submit.select-collection.collection = Colec&ccedil;&atilde;o
+jsp.submit.select-collection.heading = Depositar: Seleccionar Colec&ccedil;&atilde;o
+jsp.submit.select-collection.info1 = Seleccione da lista em baixo a colec&ccedil;&atilde;o para a qual deseja depositar o registo.
+jsp.submit.select-collection.title = Seleccionar Colec&ccedil;&atilde;o
+
+jsp.submit.show-license.grant.button = Conceder Licen&ccedil;a 
+jsp.submit.show-license.heading1 = Depositar: Licen&ccedil;a de Distribui&ccedil;&atilde;o no Reposit&oacute;rio 
+jsp.submit.show-license.info1 = <strong>Existe um &uacute;ltimo passo:</strong> De forma a podermos dar acesso, distribuir, &nbsp;reproduzir e converter o(s) documento(s) que depositou, precisamos da sua concord&acirc;ncia nos seguintes termos. Por favor leia os termos da licen&ccedil;a, e seleccione um dos bot&otilde;es no fundo da p&aacute;gina. Seleccionando "Conceder Licen&ccedil;a", est&aacute; a concordar com os termos da mesma.
+jsp.submit.show-license.info2 = <strong>Se n&atilde;o conceder a licen&ccedil;a o seu Dep&oacute;sito n&atilde;o ser&aacute; removido.</strong> O seu registo fica na sua p&aacute;gina "Meu DSpace". Pode posteriormente remov&ecirc;-lo do sistema, ou concordar com a licen&ccedil;a logo que quaisquer d&uacute;vidas que possa ter sejam esclarecidas.
+jsp.submit.show-license.notgrant.button = N&atilde;o Conceder Licen&ccedil;a
+jsp.submit.show-license.title = Licen&ccedil;a de Distribui&ccedil;&atilde;o no Reposit&oacute;rio 
+
+jsp.submit.show-uploaded-file.click1.button = Clique aqui se este formato for errado
+jsp.submit.show-uploaded-file.click2.button = Clique aqui se este ficheiro for errado
+jsp.submit.show-uploaded-file.file = Ficheiro
+jsp.submit.show-uploaded-file.format = Formato Ficheiro
+jsp.submit.show-uploaded-file.heading1 = Depositar: Ficheiro Carregado com Sucesso
+jsp.submit.show-uploaded-file.heading2 = Depositar: Carregar Ficheiro
+jsp.submit.show-uploaded-file.info1 = O seu ficheiro foi carregado com sucesso!
+jsp.submit.show-uploaded-file.info2 = Aqui est&atilde;o os detalhes do ficheiro que acabou de carregar. Por favor despenda alguns minutos a examinar o que acabou de depositar antes de prosseguir. 
+jsp.submit.show-uploaded-file.info3 = Pode verificar se os ficheiros foram carregados correctamente da seguinte forma:
+jsp.submit.show-uploaded-file.info4 = Seleccionar o ficheiro na liga&ccedil;&atilde;o em cima. O ficheiro ser&aacute; aberto numa nova janela de forma a verificar o seu conte&uacute;do.
+jsp.submit.show-uploaded-file.info5 = Comparar a "checksum" mostrada em cima com uma gerada localmente no seu computador. Devem ser exactamente iguais.
+jsp.submit.show-uploaded-file.info6 = Clique aqui para mais informa&ccedil;&atilde;o.
+jsp.submit.show-uploaded-file.info7 = Pode verificar uma "checksum" gerada pelo sistema.
+jsp.submit.show-uploaded-file.info8 = Clique aqui para mais informa&ccedil;&atilde;o.
+jsp.submit.show-uploaded-file.known = Conhecido
+jsp.submit.show-uploaded-file.notSupported = N&atilde;o suportado
+jsp.submit.show-uploaded-file.show.button = Mostrar checksums
+jsp.submit.show-uploaded-file.checksum = Checksum
+jsp.submit.show-uploaded-file.size = Tamanho
+jsp.submit.show-uploaded-file.size-in-bytes = {0} Bytes
+jsp.submit.show-uploaded-file.supported = Suportado
+jsp.submit.show-uploaded-file.title = Ficheiro Carregado
+
+jsp.submit.thesis-removed-workaround.heading = Dep&oacute;sito Interrompido: Teses n&atilde;o aceites no Reposit&oacute;rio
+jsp.submit.thesis-removed-workaround.info = Como o DSpace n&atilde;o aceita teses, o seu dep&oacute;sito foi vedado. Para depositar outro tipo de registo, clique em baixo.
+jsp.submit.thesis-removed-workaround.link = Iniciar um Novo Dep&oacute;sito
+jsp.submit.thesis-removed-workaround.title = Dep&oacute;sito Interrompido
+
+jsp.submit.upload-error.heading = Depositar: Erro ao carregar o ficheiro
+jsp.submit.upload-error.info = Ocorreu um problema ao enviar o seu ficheiro. Ou o nome do ficheiro introduzido estava errado ou ocorreu um problema na rede que impediu o ficheiro de chegar ao sistema. Por favor, tente novamente.
+jsp.submit.upload-error.retry.button = Carregar Novamente
+jsp.submit.upload-error.title = Erro ao carregar o ficheiro
+
+jsp.submit.upload-file-list.title = Ficheiros Carregados
+jsp.submit.upload-file-list.heading1 = Depositar: Ficheiro Carregado com Sucesso
+jsp.submit.upload-file-list.heading2 = Depositar: Ficheiros Carregados
+jsp.submit.upload-file-list.info1 = <strong>O seu ficheiro foi carregado com sucesso!</strong>
+jsp.submit.upload-file-list.info2 = A tabela em baixo mostra os ficheiros que carregou para este registo.
+jsp.submit.upload-file-list.info3 = Pode verificar se os ficheiros foram carregados correctamente da seguinte forma:
+jsp.submit.upload-file-list.info4 = Seleccionar o ficheiro na liga&ccedil;&atilde;o em cima. O ficheiro ser&aacute; aberto numa nova janela de forma a verificar o seu conte&uacute;do.
+jsp.submit.upload-file-list.info5 = Comparar a "checksum" mostrada em cima com uma gerada localmente no seu computador. Devem ser exactamente iguais.
+jsp.submit.upload-file-list.info6 = Pode verificar uma "checksum" gerada pelo sistema.
+jsp.submit.upload-file-list.tableheading1 = Bitstream<br/>Prim&aacute;rio
+jsp.submit.upload-file-list.tableheading2 = Ficheiro
+jsp.submit.upload-file-list.tableheading3 = Tamanho
+jsp.submit.upload-file-list.tableheading4 = Descri&ccedil;&atilde;o
+jsp.submit.upload-file-list.tableheading5 = Formato do Ficheiro
+jsp.submit.upload-file-list.tableheading6 = Checksum
+jsp.submit.upload-file-list.empty1 = <em>Nenhum</em>
+jsp.submit.upload-file-list.supportlevel1 = suportado
+jsp.submit.upload-file-list.supportlevel2 = conhecido
+jsp.submit.upload-file-list.supportlevel1 = N&atilde;o suportado
+jsp.submit.upload-file-list.button1 = Alterar
+jsp.submit.upload-file-list.button2 = Remover
+jsp.submit.upload-file-list.button3 = Mostrar checksums
+jsp.submit.upload-file-list.button4 = Adicionar outro ficheiro
+jsp.submit.upload-file-list.button5 = &lt; Anterior
+jsp.submit.upload-file-list.button6 = Pr&oacute;xima &gt;
+jsp.submit.upload-file-list.button7 = Cancelar/Guardar
+jsp.submit.upload-file-list.help1 = Clique aqui para ver como executar a opera&ccedil;&atilde;o.
+jsp.submit.upload-file-list.help2 = Clique aqui para mais informa&ccedil;&atilde;o. 
+
+jsp.submit.verify-prune.heading = Depositar: Aten&ccedil;&atilde;o
+jsp.submit.verify-prune.info1 = As modifica&ccedil;&otilde;es efectuadas na primeira p&aacute;gina &quot;Descreva o Registot&quot; afectar&atilde;o o seu dep&oacute;sito:
+jsp.submit.verify-prune.info2 = Informou que o seu dep&oacute;sito n&atilde;o possui t&iacute;tulos alternativos, mas j&aacute; adicionou alguns. Caso continue com esta altera&ccedil;&atilde;o, os t&iacute;tulos alternativos inseridos ser&atilde;o removidos.
+jsp.submit.verify-prune.info3 = Informou que o seu dep&oacute;sito n&atilde;o foi publicado nem distribuido anteriormente, mas j&aacute; inseriu uma data de edi&ccedil;&atilde;o, publica&ccedil;&atilde;o e/ou cita&ccedil;&atilde;o. Caso continue, estas informa&ccedil;&otilde;es ser&atilde;o removidas e o pr&oacute;prio Reposit&oacute;rio ir&aacute; atribuir uma data de edi&ccedil;&atilde;o.
+jsp.submit.verify-prune.info4 = Indicou que o registo item em processo de dep&oacute;sito tem apenas um ficheiro, mas j&aacute; enviou mais do que um ficheiro. Caso continue, apenas o primeiro ficheiro enviado ser&aacute; mantido e todos os outros eliminados pelo sistema (os arquivos no seu computador n&atilde;o ser&atilde;o afectados).
+jsp.submit.verify-prune.notproceed.button = N&atilde;o efectuar as altera&ccedil;&otilde;es
+jsp.submit.verify-prune.proceed.button = Executar Altera&ccedil;&otilde;es
+jsp.submit.verify-prune.question = Tem certeza que pretende efectuar as altera&ccedil;&otilde;es?
+jsp.submit.verify-prune.title = As respostas &agrave;s perguntas iniciais mudaram
+
+jsp.tombstone.text = O Registo que est&aacute; a tentar aceder foi retirado do Reposit&oacute;rio. Se tiver quest&otilde;es contacte a administra&ccedil;&atilde;o do Reposit&oacute;rio
+jsp.tombstone.title = Item Retirado
+
+jsp.tools.general.cancel = Cancelar
+jsp.tools.general.delete = Remover
+jsp.tools.general.delete-w-confirm = Remover...
+jsp.tools.general.add = Adicionar
+jsp.tools.general.select = Seleccionar
+jsp.tools.general.update = Actualizar
+jsp.tools.general.edit = Editar
+jsp.tools.general.remove = Remover
+jsp.tools.general.view = Ver
+
+jsp.tools.confirm-delete-collection.title = Remover Colec&ccedil;&atilde;o
+jsp.tools.confirm-delete-collection.heading = Remover Colec&ccedil;&atilde;o: {0}
+jsp.tools.confirm-delete-collection.confirm = Tem certeza que a colec&ccedil;&atilde;o <strong>{0}</strong> deve ser removida? Isto vai remover:
+jsp.tools.confirm-delete-collection.info1 = Quaisquer registos e dep&oacute;sitos incompletos nessas colec&ccedil;&otilde;es e que n&atilde;o est&atilde;o contidas noutras colec&ccedil;&otilde;es.
+jsp.tools.confirm-delete-collection.info2 = O conte&uacute;do destes registos
+jsp.tools.confirm-delete-collection.info3 = Todas as pol&iacute;ticas de permiss&atilde;o associadas
+
+jsp.tools.confirm-delete-community.title = Remover Comunidade
+jsp.tools.confirm-delete-community.heading = Remover Comunidade: {0}
+jsp.tools.confirm-delete-community.confirm = Tem certeza que a colec&ccedil;&atilde;o <strong>{0}</strong> deve ser removida? Isto vai remover:
+jsp.tools.confirm-delete-community.info1 = Quaisquer colec&ccedil;&otilde;es na comunidade que n&atilde;o est&atilde;o contidas noutras comunidades.
+jsp.tools.confirm-delete-community.info2 = Quaisquer registos e dep&oacute;sitos incompletos nessas colec&ccedil;&otilde;es e que n&atilde;o est&atilde;o contidas noutras colec&ccedil;&otilde;es.
+jsp.tools.confirm-delete-community.info3 = O conte&uacute;do destes registos
+jsp.tools.confirm-delete-community.info4 = Todas as pol&iacute;ticas de permiss&atilde;o associadas
+
+jsp.tools.confirm-delete-item.info = Tem certeza que quer remover o seguinte registo? Aten&ccedil;&atilde;o: posteriormente n&amp;atilde; poder&amp;aacute; ser recolocado automaticamente.
+jsp.tools.confirm-delete-item.title = Remover Registo
+
+jsp.tools.confirm-withdraw-item.question = Tem certeza que quer retirar o seguinte registo?
+jsp.tools.confirm-withdraw-item.title = Retirar Item
+jsp.tools.confirm-withdraw-item.withdraw.button = Retirar
+
+jsp.tools.edit-collection.title = Editar Colec&ccedil;&atilde;o
+jsp.tools.edit-collection.heading1 = Criar Colec&ccedil;&atilde;o
+jsp.tools.edit-collection.heading2 = Editar Colec&ccedil;&atilde;o
+jsp.tools.edit-collection.button.delete = Remover Colec&ccedil;&atilde;o...
+jsp.tools.edit-collection.form.label1 = Nome:
+jsp.tools.edit-collection.form.label2 = Descri&ccedil;&atilde;o Breve
+jsp.tools.edit-collection.form.label3 = Texto Introdut&oacute;rio (HTML):
+jsp.tools.edit-collection.form.label4 = Texto de Copyright (Texto simples):
+jsp.tools.edit-collection.form.label5 = Texto da Barra Lateral (HTML):
+jsp.tools.edit-collection.form.label6 = Licen&ccedil;a:
+jsp.tools.edit-collection.form.label7 = Proveni&ecirc;ncia:
+jsp.tools.edit-collection.form.label8 = Log&oacute;tipo:
+jsp.tools.edit-collection.form.label9 = Processo de Dep&oacute;sito
+jsp.tools.edit-collection.form.label10 = Depositantes:
+jsp.tools.edit-collection.form.label11 = :
+jsp.tools.edit-collection.form.label12 = Administradores da Colec&ccedil;&atilde;o:
+jsp.tools.edit-collection.form.label13 = Template do Registo:
+jsp.tools.edit-collection.form.label14 = Permiss&otilde;es da Colec&ccedil;&atilde;o:
+jsp.tools.edit-collection.form.button.add-logo = Carregar...
+jsp.tools.edit-collection.form.button.delete-logo = Remover (sem log&oacute;tipo)
+jsp.tools.edit-collection.form.button.set-logo = Carregar Log&oacute;tipo...
+jsp.tools.edit-collection.form.button.create = Criar...
+jsp.tools.edit-collection.form.button.create2 = Criar
+jsp.tools.edit-collection.form.button.edit = Editar...
+jsp.tools.edit-collection.form.button.delete = Remover
+jsp.tools.edit-collection.form.button.update = Actualizar
+jsp.tools.edit-collection.form.button.cancel = Cancelar
+jsp.tools.edit-collection.wf-role1 = Aceitar/Rejeitar
+jsp.tools.edit-collection.wf-role2 = Aceitar/Rejeitar/Editar Metadados
+jsp.tools.edit-collection.wf-role3 = Editar Metadados
+ 
+jsp.tools.edit-community.title = Editar Comunidade
+jsp.tools.edit-community.heading1 = Criar Comunidade
+jsp.tools.edit-community.heading2 = Editar Comunidade {0}
+jsp.tools.edit-community.button.delete = Remover Comunidade...
+jsp.tools.edit-community.form.label1 = Nome:
+jsp.tools.edit-community.form.label2 = Descri&ccedil;&atilde;o Breve
+jsp.tools.edit-community.form.label3 = Texto Introdut&oacute;rio (HTML):
+jsp.tools.edit-community.form.label4 = Texto de Copyright (Texto simples):
+jsp.tools.edit-community.form.label5 = Texto da Barra Lateral (HTML):
+jsp.tools.edit-community.form.label6 = Log&oacute;tipo:
+jsp.tools.edit-community.form.label7 = Permiss&otilde;es da Comunidade 
+jsp.tools.edit-community.form.button.add-logo = Actualizar Log&oacute;tipo...
+jsp.tools.edit-community.form.button.delete-logo = Remover (sem log&oacute;tipo)
+jsp.tools.edit-community.form.button.set-logo = Carregar...
+jsp.tools.edit-community.form.button.edit = Editar...
+jsp.tools.edit-community.form.button.create = Criar
+jsp.tools.edit-community.form.button.cancel = Cancelar
+jsp.tools.edit-community.form.button.update = Actualizar
+
+jsp.tools.edit-item-form.addbit.button = Adicionar Bitstream
+jsp.tools.edit-item-form.collections = Nas Colec&ccedil;&otilde;es:
+jsp.tools.edit-item-form.delete-w-confirm.button = Delete (Expunge)...
+jsp.tools.edit-item-form.elem1 = Elemento
+jsp.tools.edit-item-form.elem2 = Qualificador
+jsp.tools.edit-item-form.elem3 = Valor
+jsp.tools.edit-item-form.elem4 = Idioma
+jsp.tools.edit-item-form.elem5 = Prim&aacute;rio<br/> Bitstream
+jsp.tools.edit-item-form.elem7 = Nome
+jsp.tools.edit-item-form.elem8 = Fonte
+jsp.tools.edit-item-form.elem9 = Descri&ccedil;&atilde;o
+jsp.tools.edit-item-form.elem10 = Formato
+jsp.tools.edit-item-form.elem11 = Descri&ccedil;&atilde;o de Formato     
+jsp.tools.edit-item-form.handle = Handle:
+jsp.tools.edit-item-form.heading = Bitstreams
+jsp.tools.edit-item-form.item = Permiss&otilde;es do Registo:
+jsp.tools.edit-item-form.itemID = ID interno do Registo:
+jsp.tools.edit-item-form.itempage = P&aacute;gina do Registo:
+jsp.tools.edit-item-form.modified = &Uacute;ltima Modifica&ccedil;&atilde;o:
+jsp.tools.edit-item-form.msg = Este registo foi retirado do Reposit&oacute;rio
+jsp.tools.edit-item-form.na = N/E
+jsp.tools.edit-item-form.note = LEIA COM ATEN&Ccedil;&Atilde;O: Estas mudan&ccedil;as n&atilde;o s&atilde;o verificadas nem validadas automaticamente, nem pelo sistema. &Eacute; o respons&aacute;vel pela entrada dos dados em formato correcto. Caso n&atilde;o tenha certeza quanto ao formato pedido, por favor n&atilde;o o altere.
+jsp.tools.edit-item-form.note1 = Nota: Mudan&ccedil;as nos bitstreams n&atilde;o ser&atilde;o automaticamente reflectidas nos metadados Dublin Core em cima (ex. <code>format.extent</code>, <code>format.mimetype</code>). Tem de actualizar manualmente.
+jsp.tools.edit-item-form.note3 = Note tamb&eacute;m que se o campo &quot;Descri&ccedil;&atilde;o de Formato&quot; n&atilde;o estiver vazia, o formato ser&aacute; sempre configurado para &quot;Desconhecido&quot;, dessa forma limpe o campo de descri&ccedil;&atilde;o de formato antes de editar o campo.
+jsp.tools.edit-item-form.reinstate.button = Repor
+jsp.tools.edit-item-form.title = Editar 
+jsp.tools.edit-item-form.withdraw-w-confirm.button = Retirar...
+
+jsp.tools.eperson-list.close.button = Fechar
+jsp.tools.eperson-list.heading = Utilizadores {0}-{1} de {2}
+jsp.tools.eperson-list.info1 = Clicar no bot&atilde;o &quot;Adicionar&quot; pr&oacute;ximo a um utilizador ir&aacute; adicionar o mesmo na lista do formul&aacute;rio principal.
+jsp.tools.eperson-list.title = Seleccionar Utilizadores
+jsp.tools.eperson-list.jump.one-back = &lt; 1 P&aacute;gina
+jsp.tools.eperson-list.jump.five-back = &lt; 5 P&aacute;ginas
+jsp.tools.eperson-list.jump.one-forward = 1 P&aacute;gina &gt;
+jsp.tools.eperson-list.jump.five-forward = 5 P&aacute;ginas &gt;
+jsp.tools.eperson-list.jump.first = Primeiro
+jsp.tools.eperson-list.jump.last = &Uacute;ltimo
+jsp.tools.eperson-list.th.id = ID
+jsp.tools.eperson-list.th.id.sortedby = ID &uarr;
+jsp.tools.eperson-list.th.email = Endere&ccedil;o de Correio Electr&oacute;nico
+jsp.tools.eperson-list.th.email.sortedby = Endere&ccedil;o de Correio Electr&oacute;nico &uarr;
+jsp.tools.eperson-list.th.lastname = &Uacute;ltimo Nome
+jsp.tools.eperson-list.th.lastname.sortedby = &Uacute;ltimo Nome &uarr;
+jsp.tools.eperson-list.th.firstname = Primeiro Nome
+
+jsp.tools.get-item-id.find.button = Procurar
+jsp.tools.get-item-id.handle = Handle:
+jsp.tools.get-item-id.heading = Editar ou Remover Registo
+jsp.tools.get-item-id.info1 = &lt;strong&gt;O ID inserido n&atilde;o &eacute; um ID de registo v&aacute;lido.&lt;/strong&gt; Se est&aacute; a tentar editar uma comunidade ou uma Colec&ccedil;&atilde;o, necessita utilizar a 
+jsp.tools.get-item-id.info2 = Insira o handle ou ID interno do registo que deseja editar ou remover.
+jsp.tools.get-item-id.internal = ID Interno:
+jsp.tools.get-item-id.title = Editar Registo
+
+jsp.tools.group-edit.heading = Membros Actuais do Grupo
+jsp.tools.group-edit.name = Nome:
+jsp.tools.group-edit.title = Editar Grupo
+jsp.tools.group-edit.update.button = Actualizar Grupo
+
+jsp.tools.group-list.create.button = Criar Novo Grupo
+jsp.tools.group-list.name = Nome
+jsp.tools.group-list.id = ID
+jsp.tools.group-list.note1 = Note que n&atilde;o precisa adicionar manualmente utilizadores ao grupo de &quot;anonymous&quot; - implicitamente todos os utilizadores s&atilde;o membros.
+jsp.tools.group-list.note2 = Aten&ccedil;&atilde;o: se est&aacute; a tentar remover um grupo que n&atilde;o est&aacute; referenciado por uma pol&iacute;tica de permiss&atilde;o ou que seja um grupo com workflow, ocorrer&aacute; um erro interno no servidor.
+jsp.tools.group-list.title = Editar Grupo
+
+jsp.tools.itemmap-main.collection = Colec&ccedil;&atilde;o:
+jsp.tools.itemmap-main.heading = Mapeador de Registo - Mapeia Registos de Outras Colec&ccedil;&otilde;es
+jsp.tools.itemmap-main.info1 = Existem {0} registos pertencentes a esta colec&ccedil;&atilde;o e {1} itens mapeados a partir de outras colec&ccedil;&otilde;es.
+jsp.tools.itemmap-main.info4 = Importar por semelhan&ccedil;a com o Nome de Autor
+jsp.tools.itemmap-main.info5 = Insira parte do nome do autor para uma lista de nomes encontrados
+jsp.tools.itemmap-main.info6 = Percorrer Itens Importados das Colec&ccedil;&otilde;es:
+jsp.tools.itemmap-main.info7  = Clique nos nomes das colec&ccedil;&otilde;es para percorrer os registos que foram mapeados nesta colec&ccedil;&atilde;o.
+jsp.tools.itemmap-main.info8 = Esta Colec&ccedil;&atilde;o n&atilde;o possui itens mapeados. 
+jsp.tools.itemmap-main.search.button = Procurar por Autores
+jsp.tools.itemmap-main.title = Mapeador de Registo
+
+jsp.tools.itemmap-browse.title = Percorrer Registos
+jsp.tools.itemmap-browse.heading-authors = Percorrer Registos por Autor ''{0}''
+jsp.tools.itemmap-browse.heading-collection = Percorrer Colec&ccedil;&atilde;o {0}
+jsp.tools.itemmap-browse.infomsg = Verifique a caixa ao lado dos registos que pretende remover e escolha 'adicionar' or 'remover'.
+jsp.tools.itemmap-browse.th.date = Data
+jsp.tools.itemmap-browse.th.author = Primeiro Autor
+jsp.tools.itemmap-browse.th.title = T&iacute;tulo
+jsp.tools.itemmap-browse.th.action = Tarefa
+jsp.tools.itemmap-browse.th.remove = Remover
+
+jsp.tools.itemmap-info.title = Informa&ccedil;&otilde;es de Mapeamento de Item
+jsp.tools.itemmap-info.heading = Informa&ccedil;&otilde;es de Mapeamento de Item
+jsp.tools.itemmap-info.button.continue = Continuar
+jsp.tools.itemmap-info.msg.none-selected = Sem registos seleccionados, nenhum adicionado. 
+# In the following 2 messages the only parameter is an item ID
+jsp.tools.itemmap-info.msg.remove = Remover registo {0}
+jsp.tools.itemmap-info.msg.added = Adicionar registo {0}
+
+jsp.tools.upload-bitstream.info = Seleccionar Bitstream a carregar
+jsp.tools.upload-bitstream.title = Carregar Bitstream
+jsp.tools.upload-bitstream.upload = Carregar
+
+jsp.workspace.ws-error.title = Meu DSpace - Erro na &aacute;rea de trabalho
+jsp.workspace.ws-error.heading = Erro - Registo na &aacute;rea de trabalho
+jsp.workspace.ws-error.errormsg1 = O sistema n&atilde;o p&ocirc;de processar correctamente o seu pedido. Tem de especificar um registo.
+jsp.workspace.ws-error.errormsg2 = Voltar para o Meu DSpace e seleccione &quot;Abrir&quot; para poder trabalhar no registo que pretende na sua &aacute;rea pessoal e depois seleccione &quot;Ver&quot; na lista de op&ccedil;&otilde;es. Se continuar com problemas por favor n&atilde;o hesite em contactar-nos para que possamos resolver o problema.
+
+jsp.workspace.ws-main.title = Meu DSpace
+jsp.workspace.ws-main.wsitem = Registo na &aacute;rea de trabalho
+jsp.workspace.ws-main.submitmsg = Este registo est&aacute; a ser depositado na colec&ccedil;&atilde;o:
+jsp.workspace.ws-main.optionheading = Op&ccedil;&atilde;o
+jsp.workspace.ws-main.descheading = Descri&ccedil;&atilde;o 
+jsp.workspace.ws-main.button.edit = Editar...
+jsp.workspace.ws-main.editmsg = Abrir o registo para edi&ccedil;&atilde;o e gest&atilde;o do ficheiro.
+jsp.workspace.ws-main.button.view = Ver
+jsp.workspace.ws-main.viewmsg = Ver sum&aacute;rio do processo de dep&oacute;sito do registo.
+jsp.workspace.ws-main.button.remove = Remover
+jsp.workspace.ws-main.removemsg = Remover o registo de uma s&oacute; vez.
+
+jsp.workspace.wsv-error.title = Meu DSpace - Ver o erro na &aacute;rea de trabalho do Registo
+jsp.workspace.wsv-error.heading = Erro - Ver a &aacute;rea de trabalho do Registo
+jsp.workspace.wsv-error.errormsg1 = O sistema n&atilde;o p&ocirc;de processar correctamente o seu pedido. Tem de especificar um registo.
+jsp.workspace.wsv-error.errormsg2 = Voltar para o Meu DSpace e seleccione &quot;Abrir&quot; para poder trabalhar no registo que pretende na sua &aacute;rea pessoal e depois seleccione &quot;Ver&quot; na lista de op&ccedil;&otilde;es. Se continuar com problemas por favor n&atilde;o hesite em contactar-nos para que possamos resolver o problema. 
+
+org.dspace.app.webui.jsptag.CollectionListTag.collectionName = Nome da Colec&ccedil;&atilde;o
+
+org.dspace.app.webui.jsptag.CommunityListTag.communityName = Nome da Comunidade
+
+org.dspace.app.webui.jsptag.ItemListTag.issueDate = Data 
+org.dspace.app.webui.jsptag.ItemListTag.title = T&iacute;tulo
+org.dspace.app.webui.jsptag.ItemListTag.authors = Autores
+
+org.dspace.app.webui.jsptag.ItemTag.title = T&iacute;tulo
+org.dspace.app.webui.jsptag.ItemTag.title.other = Outros T&iacute;tulos
+org.dspace.app.webui.jsptag.ItemTag.authors = Autores
+org.dspace.app.webui.jsptag.ItemTag.keywords = Palavras Chave
+org.dspace.app.webui.jsptag.ItemTag.issueDate = Data 
+org.dspace.app.webui.jsptag.ItemTag.publisher = Editora
+org.dspace.app.webui.jsptag.ItemTag.citation = Cita&ccedil;&atilde;o
+org.dspace.app.webui.jsptag.ItemTag.series = Relat&oacute;rio da S&eacute;rie N.&ordm;
+org.dspace.app.webui.jsptag.ItemTag.abstract = Resumo
+org.dspace.app.webui.jsptag.ItemTag.description = Descri&ccedil;&atilde;o 
+org.dspace.app.webui.jsptag.ItemTag.govdoc = Gov't Doc # 
+org.dspace.app.webui.jsptag.ItemTag.uri = URI
+org.dspace.app.webui.jsptag.ItemTag.isbn = ISBN
+org.dspace.app.webui.jsptag.ItemTag.issn = ISSN
+org.dspace.app.webui.jsptag.ItemTag.ismn = ISMN
+org.dspace.app.webui.jsptag.ItemTag.otherIDs = Outros Identificadores 
+org.dspace.app.webui.jsptag.ItemTag.full = Registo Completo
+org.dspace.app.webui.jsptag.ItemTag.dcfield = Campo DC
+org.dspace.app.webui.jsptag.ItemTag.value = Valor
+org.dspace.app.webui.jsptag.ItemTag.lang = Idioma
+org.dspace.app.webui.jsptag.ItemTag.appears = Aparece nas Colec&ccedil;&otilde;es:
+org.dspace.app.webui.jsptag.ItemTag.files = Ficheiros deste Registo:
+org.dspace.app.webui.jsptag.ItemTag.files.no = N&atilde;o existem ficheiros associados a este registo.
+org.dspace.app.webui.jsptag.ItemTag.file = Ficheiro
+org.dspace.app.webui.jsptag.ItemTag.filesize = Tamanho
+org.dspace.app.webui.jsptag.ItemTag.fileformat = Formato
+org.dspace.app.webui.jsptag.ItemTag.view = Ver/Abrir
+org.dspace.app.webui.jsptag.ItemTag.itemprotected = Este registo est&aacute; protegido por copyright original.
+org.dspace.app.webui.jsptag.ItemTag.viewlicence = Ver Licen&ccedil;a
+
+org.dspace.app.webui.jsptag.SelectEPersonTag.selectPeople = Seleccionar Utilizadores
+org.dspace.app.webui.jsptag.SelectEPersonTag.selectPerson = Seleccionar Utilizador
+org.dspace.app.webui.jsptag.SelectEPersonTag.removeSelected = Remover Seleccionado

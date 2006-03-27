@@ -1,0 +1,1189 @@
+# Version: $Revision$
+# Date:    $Date$
+
+metadata.dc.title = Tittel
+metadata.dc.title.alternative = Alternative titler
+metadata.dc.contributor.* = Forfattere
+metadata.dc.subject = Emneord
+metadata.dc.date.issued = Utgivelsesdato
+metadata.dc.publisher = Forlag
+metadata.dc.identifier.citation = Sitering
+metadata.dc.relation.ispartofseries = Serie/Rapport nr.
+metadata.dc.description.abstract = Abstrakt
+metadata.dc.description = Beskrivelse
+metadata.dc.identifier.govdoc = Gov't Doc # 
+metadata.dc.identifier.uri = URI
+metadata.dc.identifier.isbn = ISBN
+metadata.dc.identifier.issn = ISSN
+metadata.dc.identifier.ismn = ISMN
+metadata.dc.identifier = Andre identifikatorer
+
+jsp.adminhelp = Hjelp til administrasjon (På engelsk)
+jsp.administer = Administrasjon
+jsp.admintools = Administrasjonsverktøy
+
+jsp.general.authors.button =Forfatter
+jsp.general.date.button =Dato
+jsp.general.edit.button =Endre
+jsp.general.titles.button =Tittel
+jsp.general.untitled = Uten tittel
+jsp.general.go =Søk
+jsp.general.search.button = Søk
+jsp.general.gohome =Gå til DSpace hovedside
+jsp.general.location =I:
+jsp.general.genericScope = Hele DSpace
+jsp.general.searchfor =<strong>Søk</strong>&nbsp;etter
+jsp.general.orbrowse =eller&nbsp;<strong>sorter</strong>&nbsp;etter
+
+jsp.browse.general.next = Neste side
+jsp.browse.general.previous = Forrige side
+jsp.browse.general.go = Søk
+
+jsp.browse.authors.enter = eller søk på første bokstav i navnet:
+jsp.browse.authors.jump = Gå til:
+jsp.browse.authors.show = Forfatter {0}-{1} av {2}.
+jsp.browse.authors.title = Sortert på forfatter
+
+jsp.browse.items-by-author.heading1 = Innførsler av forfatter
+jsp.browse.items-by-author.return = Tilbake til forfatteroversikten
+jsp.browse.items-by-author.show = Viser {0} innførsler.
+jsp.browse.items-by-author.sort1 = Sortert på tittel
+jsp.browse.items-by-author.sort2 = Sorter på dato
+jsp.browse.items-by-author.sort3 = Sorter på  tittel
+jsp.browse.items-by-author.sort4 = Sortert på dato
+jsp.browse.items-by-author.title = Innførsler av forfatter
+
+jsp.browse.items-by-date.jump = Gå til et tidsrom
+jsp.browse.items-by-date.month = (Velg måned)
+jsp.browse.items-by-date.old = Vis eldste først
+jsp.browse.items-by-date.order1 = Nyeste først
+jsp.browse.items-by-date.order2 = Eldste først
+jsp.browse.items-by-date.recent = Vis nyeste først
+jsp.browse.items-by-date.show = Innførsler {0}-{1} av {2}.
+jsp.browse.items-by-date.title = Sortert på dato
+jsp.browse.items-by-date.type = Eller skriv inn årstall:
+jsp.browse.items-by-date.year = (Velg år)
+jsp.browse.items-by-title.enter = eller søk på de første bokstavene i tittelen:
+jsp.browse.items-by-title.jump = Gå til:
+jsp.browse.items-by-title.show = Innførslene {0}-{1} av {2}.
+jsp.browse.items-by-title.title = Sortert på tittel
+
+jsp.browse.no-results.col = Samlingen "{0}" inneholder foreløpig ingen innførsler.
+jsp.browse.no-results.com =Enheten "{0}" inneholder foreløpig ingen innførsler.
+jsp.browse.no-results.genericScope =  DSpace inneholder foreløpig ingen innførsler.
+jsp.browse.no-results.title = Det finnes ingen innførsler i indeksen
+
+jsp.collection-home.editsub.button =Endre registratorer
+jsp.collection-home.heading1 =Samlingens hovedside
+jsp.collection-home.info =Se&nbsp;varslinger
+jsp.collection-home.item.button =Tilknytningsverktøy
+jsp.collection-home.recentsub =Nye&nbsp;bidrag
+jsp.collection-home.submit.button =Registrer nytt dokument i denne samlingen
+jsp.collection-home.subscribe =Be om varsling
+jsp.collection-home.subscribe.msg =Abonner på e-postvarsler om nye bidrag
+jsp.collection-home.subscribed =Du abonnerer på e-post varsling for denne samlingen.
+jsp.collection-home.unsub =Avslutt e-post varsling
+
+jsp.community-home.create1.button = Opprett samling
+jsp.community-home.create2.button = Opprett under-enhet
+jsp.community-home.heading1 = Enhetens hovedside
+jsp.community-home.heading2 = Enhetens samlinger
+jsp.community-home.heading3 = Enhetens underenheter
+jsp.community-home.recentsub = Nyeste&nbsp;bidrag
+
+jsp.community-list.create.button =Opprett enhet på overordnet-nivå
+jsp.community-list.text1 =Nedenfor ser du en liste over enheter med tilhørende samlinger. Lenkene er klikkbare.
+jsp.community-list.title =Enheter og samlinger
+
+jsp.components.contact-info.details = Kontaktinformasjon om {0}:
+jsp.components.contact-info.email = E-post:
+
+jsp.components.login-form.newuser = Ny bruker? Klikk her for å registrere deg.
+jsp.components.login-form.email = e-postadresse:
+jsp.components.login-form.enter = Vennligst registrer din e-postadresse og passord i skjemaet nedenfor.
+jsp.components.login-form.forgot = Har du glemt passordet ditt?
+jsp.components.login-form.login = Logg på
+jsp.components.login-form.password = Passord:
+
+jsp.components.ldap-form.newuser = Ny bruker? Klikk her for å registrere deg.
+jsp.components.ldap-form.enter = Vennligst register din e-postadresse og passord i skjemaet nedenfor.
+jsp.components.ldap-form.username-or-email = Brukernavn eller <br/>e-postadresse:
+jsp.components.ldap-form.password = Passord:
+jsp.components.ldap-form.login.button = Logg på
+
+jsp.display-item.copyright = Alle innførsler i DSpace er beskyttet av copyright
+jsp.display-item.identifier =Denne identifikatoren kan du bruke til å sitere eller lenke til denne innførselen:
+jsp.display-item.license =Creative Commons lisens
+jsp.display-item.text1 =Vis enkel innførsel
+jsp.display-item.text2 =Vis fullstendig innførsel
+jsp.display-item.text3 =Denne innførselen er lisensiert under en
+jsp.display-item.back_to_workspace =Tilbake til arbeidsområdet
+
+jsp.dspace-admin.general.action = Handling
+jsp.dspace-admin.general.action-colon = Handling:
+jsp.dspace-admin.general.addpolicy = Lag ny retningslinje
+jsp.dspace-admin.general.addnew = Registrer ny
+jsp.dspace-admin.general.delete = Slett
+jsp.dspace-admin.general.delete-w-confirm = Slett(?)
+jsp.dspace-admin.general.remove = Fjern
+jsp.dspace-admin.general.edit = Endre
+jsp.dspace-admin.general.editpolicy = Endre retningslinjer
+jsp.dspace-admin.general.group = Gruppe
+jsp.dspace-admin.general.group-colon = Gruppe:
+jsp.dspace-admin.general.cancel = Avbryt
+jsp.dspace-admin.general.abort = Avbryt
+jsp.dspace-admin.general.abort-w-confirm = Avbryt...
+jsp.dspace-admin.general.save = Lagre
+jsp.dspace-admin.general.update = Oppdater
+jsp.dspace-admin.general.upload = Last opp
+jsp.dspace-admin.general.next.button = Neste &gt;
+
+jsp.dspace-admin.authorize-advanced.add = Lag retningslinje
+jsp.dspace-admin.authorize-advanced.advanced = Administrasjonsverktøy for universelle retningslinjer
+jsp.dspace-admin.authorize-advanced.clear = Slett retningslinjer
+jsp.dspace-admin.authorize-advanced.col = Samling:
+jsp.dspace-admin.authorize-advanced.text = Her kan du rydde i retningslinjer eller legge til nye universelle retningslinjer for typer av innhold i en samling.  Advarsel - fjerning av READ rettigheter fra innførsler vil føre til at disse ikke lenger vil vises.
+jsp.dspace-admin.authorize-advanced.type = Type innhold:
+jsp.dspace-admin.authorize-advanced.type1 = innførsel
+jsp.dspace-admin.authorize-advanced.type2 = bitstrøm
+jsp.dspace-admin.authorize-advanced.warning = (Advarsel: sletter alle retningslinjer for et gitt sett med objekter)
+
+jsp.dspace-admin.authorize-collection-edit.policies = Retningslinjer for samlingen "{0}" ({1}, DB ID {2})
+jsp.dspace-admin.authorize-collection-edit.title = Endre samlingens retningslinjer
+
+jsp.dspace-admin.authorize-community-edit.policies = Retningslinjer for enheten "{0}" ({1}, DB ID {2})
+jsp.dspace-admin.authorize-community-edit.title = Oppdater retningslinjer for enhet
+
+jsp.dspace-admin.authorize-item-edit.bitstream = Bitstrøm {0} ({1})
+jsp.dspace-admin.authorize-item-edit.bundle = Retningslinje for pakke {0}
+jsp.dspace-admin.authorize-item-edit.eperson = E-person
+jsp.dspace-admin.authorize-item-edit.item = Retningslinjer for innførsel
+jsp.dspace-admin.authorize-item-edit.policies = Retningslinjer for innførsel {0} (ID={1})
+jsp.dspace-admin.authorize-item-edit.text1 =Med dette verktøyet kan du se og endre retningslinjer for en innførsel. Du kan også endre disse for innførselens komponenter: pakker og bitstrømmer. Kort beskrevet, er en innførsel en beholder som inneholder pakker, og pakker er beholdere som inneholder bitstrømmer. Beholdere har vanligvis retningslinjer på REGISTRER/FJERN/LES/SKRIV nivå, bitstrømmer derimot har kun retningslinjer på LES/SKRIV nivå.
+jsp.dspace-admin.authorize-item-edit.text2 = Hver innførsel har en ekstra pakke og bitstrøm. Disse inneholder innførselens avtaletekst.
+jsp.dspace-admin.authorize-item-edit.title = Rediger retningslinjer for innførsel
+
+jsp.dspace-admin.authorize-main.adm = Administrer retningslinjer for autorisasjon
+jsp.dspace-admin.authorize-main.advanced = Administrasjonsverktøy for universelle retningslinjer
+jsp.dspace-admin.authorize-main.choose = Administrer retningslinjer:
+jsp.dspace-admin.authorize-main.manage1 = Retningslinjer for en enhet
+jsp.dspace-admin.authorize-main.manage2 = Retningslinjer for en samling
+jsp.dspace-admin.authorize-main.manage3 = Retningslinjer for en innførsel
+jsp.dspace-admin.authorize-main.title = Administrasjon av retningslinjer
+jsp.dspace-admin.authorize-policy-edit.heading = Rediger retningslinje for {0}:
+jsp.dspace-admin.authorize-policy-edit.title = Rediger retningslinje
+
+jsp.dspace-admin.collection-select.col = Samlinger:
+jsp.dspace-admin.collection-select.title = Velg samling
+
+jsp.dspace-admin.community-select.com = Enheter:
+jsp.dspace-admin.community-select.title = Velg enhet
+
+jsp.dspace-admin.confirm-delete-dctype.confirm = Er du sikker på at filformatet <strong>{0}</strong> skal slettes?
+jsp.dspace-admin.confirm-delete-dctype.heading = Slett Dublin Core format: <code>{0}</code>
+jsp.dspace-admin.confirm-delete-dctype.title = Slett Dublin Core type
+jsp.dspace-admin.confirm-delete-dctype.warning = Dersom det finnes DC felt av denne typen med innhold vil det genereres feil.
+
+jsp.dspace-admin.confirm-delete-format.confirm = Er du sikker på at filformatet <strong>{0}</strong> skal slettes?
+jsp.dspace-admin.confirm-delete-format.heading = Slett bitstrøm format: {0}
+jsp.dspace-admin.confirm-delete-format.title = Slett bitstrøm format
+jsp.dspace-admin.confirm-delete-format.warning = Alle bitstrømmer i dette formatet vil bli tilbakeført til <em>ukjent</em>.
+jsp.dspace-admin.confirm-delete-format.returntoedit = Tilbake til administrasjonssiden for e-personer
+
+jsp.dspace-admin.eperson.general.firstname = Etternavn
+jsp.dspace-admin.eperson.general.lastname = Fornavn
+
+jsp.dspace-admin.eperson-browse.email = e-postadresse
+jsp.dspace-admin.eperson-browse.canlogin = Kan logge på?
+jsp.dspace-admin.eperson-browse.heading = Bla igjennom e-personer {0}-{1} av {2}
+jsp.dspace-admin.eperson-browse.mustusecert = Må bruke sertifikat?
+jsp.dspace-admin.eperson-browse.phone = Telefon
+jsp.dspace-admin.eperson-browse.self = Egenregistrert
+jsp.dspace-admin.eperson-browse.title = E-personer
+
+jsp.dspace-admin.eperson-confirm-delete.confirm = Er du sikker på at du vil slette denne e-personen?
+jsp.dspace-admin.eperson-confirm-delete.heading = Slett e-person: {0} ({1})
+jsp.dspace-admin.eperson-confirm-delete.title = Slett e-person
+
+jsp.dspace-admin.eperson-deletion-error.title = Feil ved sletting av e-person
+jsp.dspace-admin.eperson-deletion-error.heading = E-person kan ikke slettes
+jsp.dspace-admin.eperson-deletion-error.errormsg = E-personen {0} kan ikke slettes da han eller hun fortsatt refereres til ifra følgende tabell(er):
+
+jsp.dspace-admin.eperson-edit.can = Kan logge på:
+jsp.dspace-admin.eperson-edit.email = E-post:
+jsp.dspace-admin.eperson-edit.heading = Oppdater informasjon om e-person {0}:
+jsp.dspace-admin.eperson-edit.phone = Telefon:
+jsp.dspace-admin.eperson-edit.require = Sertifikat kreves:
+jsp.dspace-admin.eperson-edit.title = Oppdater informasjon om e-person
+
+jsp.dspace-admin.eperson-main.add = Registrer e-person...
+jsp.dspace-admin.eperson-main.choose = Velg handling:
+jsp.dspace-admin.eperson-main.heading = Administrer e-personer
+jsp.dspace-admin.eperson-main.or = eller
+jsp.dspace-admin.eperson-main.then = og
+jsp.dspace-admin.eperson-main.title = Administrasjon av e-personer
+
+jsp.dspace-admin.group-eperson-select.add = Registrer e-person
+jsp.dspace-admin.group-eperson-select.heading = Velg e-person som skal registreres i gruppen {0}
+jsp.dspace-admin.group-eperson-select.title = Velg e-person
+
+jsp.dspace-admin.index.heading = Administrasjonsverktøy
+jsp.dspace-admin.index.text = Velg hva du ønsker å gjøre fra menyen til venstre.
+
+jsp.dspace-admin.item-select.enter = Skriv inn handle eller intern ID for innførselen du ønsker å slette.
+jsp.dspace-admin.item-select.find = Finn
+jsp.dspace-admin.item-select.handle = Handle:
+jsp.dspace-admin.item-select.heading = Velg en innførsel
+jsp.dspace-admin.item-select.id = Intern ID:
+jsp.dspace-admin.item-select.text = <strong>ID du skrev inn er ikke gyldig.</strong>  Hvis du prøver å redigere en enhet eller en samling må du bruke <a href="{0}">administrasjonssiden for enheter og samlinger</a>.
+jsp.dspace-admin.item-select.title = Velg innførsel
+
+jsp.dspace-admin.list-dc-types.element = Element
+jsp.dspace-admin.list-dc-types.note = NB! Innlegging av et nytt element i DC registeret generer ikke automatisk nye registreringsfelt i registreringsskjemaet
+jsp.dspace-admin.list-dc-types.qualifier = Kvalifikator
+jsp.dspace-admin.list-dc-types.scope = Beskrivelse av omfang
+jsp.dspace-admin.list-dc-types.title = Dublin Core type register
+
+jsp.dspace-admin.list-formats.description = Lang beskrivelse
+jsp.dspace-admin.list-formats.extensions = Filtype
+jsp.dspace-admin.list-formats.internal = Intern?
+jsp.dspace-admin.list-formats.known = Kjent
+jsp.dspace-admin.list-formats.mime = MIME type
+jsp.dspace-admin.list-formats.name = Navn
+jsp.dspace-admin.list-formats.support = Støttenivå
+jsp.dspace-admin.list-formats.supported = Støttet
+jsp.dspace-admin.list-formats.text1 = <strong>Filtype</strong> er komma-separerte lister av filnavnutvidelser (f.eks. .doc) som brukes til å automatisk gjenkjenne formatet på opplastede filer. Punktum må ikke inkluderes her.
+jsp.dspace-admin.list-formats.text2 = Når du legger til et bitstrømformat vil dette automatisk få status "intern". Dette gjøres for å hindre at formatet ikke vises i registreringsskjermbildene før du er ferdig med å oppdatere formatets metadata. Husk å fjerne krysset for "intern" hvis formatet skal vises i listen over tilgjengelige formater i registreringsskjermen.
+jsp.dspace-admin.list-formats.title = Register over bitstrømformater
+jsp.dspace-admin.list-formats.unknown = Ukjent
+
+jsp.dspace-admin.news-edit.heading = Endre forsidetekst
+jsp.dspace-admin.news-edit.news = Tekst:
+jsp.dspace-admin.news-edit.text.topbox = Du kan endre teksten i den øverste tekstboksen på forsiden ved å legge til eller endre den eksisterende teksten i boksen nedenfor.
+jsp.dspace-admin.news-edit.text.sidebar = Du kan endre teksten i høyremargen på forsiden ved å legge til eller endre den eksisterende teksten i boksen nedenfor.
+jsp.dspace-admin.news-edit.text3 = Du kan formatere teksten ved hjelp av HTML koder, men vær oppmerksom på at HTML koden vil ikke bli validert.
+jsp.dspace-admin.news-edit.title = Skjema for oppdatering av forsidetekster
+
+jsp.dspace-admin.news-main.heading = Endre forsidetekst
+jsp.dspace-admin.news-main.news.top = Øvre tekstboks 
+jsp.dspace-admin.news-main.news.sidebar = Høyremarg
+
+jsp.dspace-admin.supervise-confirm-remove.title = Administrer veiledningsoppdrag
+jsp.dspace-admin.supervise-confirm-remove.heading = Bekreft at veiledning avbrytes
+jsp.dspace-admin.supervise-confirm-remove.subheading = Du har bedt om at følgende veiledningsoppdrag kan avbrytes
+jsp.dspace-admin.supervise-confirm-remove.titleheader = Tittel
+jsp.dspace-admin.supervise-confirm-remove.authorheader = Forfatter
+jsp.dspace-admin.supervise-confirm-remove.supervisorgroupheader = Veiledergruppe
+jsp.dspace-admin.supervise-confirm-remove.confirm = Er du sikker på at du ønsker å avbryte dette veiledningsoppdraget?
+
+jsp.dspace-admin.supervise-duplicate.title = Administrer veiledningsoppdrag
+jsp.dspace-admin.supervise-duplicate.heading = Feil: Handlingen ble avbrutt
+jsp.dspace-admin.supervise-duplicate.errormsg = Veiledningsoppdraget kunne ikke tilordnes innførselen på arbeidsområdet da gruppen du har valgt allerede veileder den aktuelle innførselen.
+jsp.dspace-admin.supervise-duplicate.return = Tilbake til administrasjonssiden for veiledning
+
+jsp.dspace-admin.supervise-link.title = Administrer veiledningsoppdrag
+jsp.dspace-admin.supervise-link.heading = Administrer veiledningsoppdrag
+jsp.dspace-admin.supervise-link.choose = Velg gruppe og aktuell innførsel på arbeidsområdet og angi rettigheter for veiledere:
+jsp.dspace-admin.supervise-link.group = Gruppe:
+jsp.dspace-admin.supervise-link.policy = Angi rettigheter:
+jsp.dspace-admin.supervise-link.policynone = Ingen
+jsp.dspace-admin.supervise-link.policyeditor = Oppdatere
+jsp.dspace-admin.supervise-link.policyobserver = Observere
+jsp.dspace-admin.supervise-link.workspace = Arbeidsområde veiledning:
+jsp.dspace-admin.supervise-link.id = ID
+jsp.dspace-admin.supervise-link.submittedby = Registrert av
+jsp.dspace-admin.supervise-link.title = Tittel
+jsp.dspace-admin.supervise-link.submittedto = Registrert i
+jsp.dspace-admin.supervise-link.select = Velg
+jsp.dspace-admin.supervise-link.submit.button = Registrer veiledningsoppdrag
+
+jsp.dspace-admin.supervise-list.title = Administrer veiledningsoppdrag
+jsp.dspace-admin.supervise-list.heading = Aktuelle veiledningsoppdrag
+jsp.dspace-admin.supervise-list.subheading = Denne siden viser alle aktuelle veiledningsoppdrag. Du kan også avbryte oppdrag her.
+jsp.dspace-admin.supervise-list.add.button = Registrer veiledningsoppdrag
+jsp.dspace-admin.supervise-list.back.button = Tilbake
+jsp.dspace-admin.supervise-list.group = Veiledergruppe
+jsp.dspace-admin.supervise-list.author = Forfatter av innførsel
+jsp.dspace-admin.supervise-list.title = Tittel
+jsp.dspace-admin.supervise-list.policies.button = Retningslinjer
+
+jsp.dspace-admin.supervise-main.title = Administrer veiledningsoppdrag
+jsp.dspace-admin.supervise-main.heading = Administrer veiledningsoppdrag
+jsp.dspace-admin.supervise-main.subheading = Velg aktivitet nedenfor
+jsp.dspace-admin.supervise-main.add.button = Registrer veiledningsoppdrag
+jsp.dspace-admin.supervise-main.view.button = Vis aktuelle veiledningsoppdrag
+jsp.dspace-admin.supervise-main.clean.button = Nullstill veiledningsdatabasen
+
+jsp.dspace-admin.upload-logo.select.col = Velg logo du ønsker å laste opp for samlingen <strong>{0}</strong>
+jsp.dspace-admin.upload-logo.select.com = Velg logo du ønsker å laste opp for enheten <strong>{0}</strong>
+jsp.dspace-admin.upload-logo.title = Last opp logo
+
+jsp.dspace-admin.wizard-basicinfo.choose = Velg en JPEG eller GIF logo for hovedsiden for enheten. Filen bør være liten.
+jsp.dspace-admin.wizard-basicinfo.copyright = Informasjonstekst om copyright:
+jsp.dspace-admin.wizard-basicinfo.description = Kort beskrivelse:
+jsp.dspace-admin.wizard-basicinfo.html1 = HTML, vises midt på hovedsiden til enheten. Ikke glem å inkludere &lt;P&gt; &lt;/P&gt; tagger!
+jsp.dspace-admin.wizard-basicinfo.html2 = HTML, vises på høyre side av samlingssiden. Ikke glem å inkludere &lt;P&gt; &lt;/P&gt; tagger!
+jsp.dspace-admin.wizard-basicinfo.intro = Introduksjonstekst:
+jsp.dspace-admin.wizard-basicinfo.license1 = Registrator må godkjenne en avtale. La feltet stå tomt dersom du ønsker å bruke standardavtalen.
+jsp.dspace-admin.wizard-basicinfo.license2 = Avtale:
+jsp.dspace-admin.wizard-basicinfo.logo = Logo:
+jsp.dspace-admin.wizard-basicinfo.name = Navn:
+jsp.dspace-admin.wizard-basicinfo.plain = Ren tekst, vises nederst på samlingssiden
+jsp.dspace-admin.wizard-basicinfo.plain2 = Ren tekst, inneholder informasjon om samlingens historikk. Vises ikke på samlingssidene.
+jsp.dspace-admin.wizard-basicinfo.provenance = Historikk:
+jsp.dspace-admin.wizard-basicinfo.shown = Vises i listen over enheter og samlinger
+jsp.dspace-admin.wizard-basicinfo.side = Tekst til høyremarg:
+jsp.dspace-admin.wizard-basicinfo.title = Beskrivelse av samlingen
+
+jsp.dspace-admin.wizard-default-item.dcore = Dublin Core Felt
+jsp.dspace-admin.wizard-default-item.enter = Registrer standardiserte metadata for samling
+jsp.dspace-admin.wizard-default-item.language = Språk
+jsp.dspace-admin.wizard-default-item.select = Velg felt...
+jsp.dspace-admin.wizard-default-item.text1 = Metadata du har registrert nedenfor vil alltid være fylt ut, når du registrerer et nytt dokument i samlingen.
+jsp.dspace-admin.wizard-default-item.text2 = Du kan velge å ikke fylle ut felt dersom du ønsker det.
+jsp.dspace-admin.wizard-default-item.title = Registrer standardiserte metadata
+jsp.dspace-admin.wizard-default-item.value = Verdi
+
+jsp.dspace-admin.wizard-permissions.change = Du kan endre disse innstillingene senere i administrasjonsmodulen til DSpace 
+jsp.dspace-admin.wizard-permissions.click = Klikk på knappen "Velg e-personer" for å legge til personer i lista.
+jsp.dspace-admin.wizard-permissions.heading1 = Tillatelse til å lese
+jsp.dspace-admin.wizard-permissions.heading2 = Tillatelse til å registrere
+jsp.dspace-admin.wizard-permissions.heading3 = Registreringsprosess godkjenn/forkast steg
+jsp.dspace-admin.wizard-permissions.heading4 = Registreringsprosess godkjenn/forkast/oppdater metadata steg
+jsp.dspace-admin.wizard-permissions.heading5 = Registreringsprosess oppdater metadata steg
+jsp.dspace-admin.wizard-permissions.heading6 = Delegerte samlingsadministratorer
+Alle MIT brukere
+jsp.dspace-admin.wizard-permissions.or = ELLER
+jsp.dspace-admin.wizard-permissions.text1 = Hvem har (som standardinnstilling) tillatelse til å lese nye innførsler i denne samlingen?
+jsp.dspace-admin.wizard-permissions.text2 = Hvem skal ha tillatelse til å registrere nye innførsler i denne samlingen?
+jsp.dspace-admin.wizard-permissions.text3 = Hvem er ansvarlig for å effektuere <strong>godkjenn/forkast</strong> steget? De kan godkjenne eller forkaste nyregistrerte innførsler. De kan ikke endre metadata for innførselen. Bare en i gruppen trenger å gjøre dette for hver innførsel.
+jsp.dspace-admin.wizard-permissions.text4 = Hvem er ansvarlig for å effektuere <strong>godkjenn/forkast/oppdater metadata</strong> steget? De kan oppdatere metadata og videre godkjenne eller forkaste nyregistrerte innførsler. Bare en i gruppen trenger å gjøre dette for hver innførsel.
+jsp.dspace-admin.wizard-permissions.text5 = Hvem er ansvarlig for å effektuere <strong>oppdater metadata</strong> steget? De kan oppdatere metadata, men ikke godkjenne eller forkaste innførselen.
+jsp.dspace-admin.wizard-permissions.text6 = Hvem er lokale administratorer for denne samlingen? De kan avgjøre hvem som kan registrere innførsler, fjerne innførsler, oppdatere en innførsels metadata (etter registrering), og legge til (speile) eksisterende innførsler fra andre samlinger til denne samlingen (kun dersom samlingsadministrator er autorisert til å gjøre dette).
+jsp.dspace-admin.wizard-permissions.title = Tillatelser for samling
+
+jsp.dspace-admin.wizard-questions.check1 = Nye innførsler skal være offentlig tilgjengelige
+jsp.dspace-admin.wizard-questions.check2 = Brukere skal være i stand til å registrere nye innførsler.
+jsp.dspace-admin.wizard-questions.check3 = Registreringsprosessen skal inkludere et <em>godkjenn/forkast</em> steg
+jsp.dspace-admin.wizard-questions.check4 = Registreringsprosessen skal inkludere et <em>godkjenn/forkast/oppdater metadata</em> steg
+jsp.dspace-admin.wizard-questions.check5 = Registreringsprosessen skal inkludere et <em>oppdater metadata</em> steg
+jsp.dspace-admin.wizard-questions.check6 = Denne samlingen skal ha lokale samlingsadminstratorer
+jsp.dspace-admin.wizard-questions.check7 = Nye innførsler skal ha noen ferdig utfylte metadata
+jsp.dspace-admin.wizard-questions.text = Kryss av de boksene som passer:
+jsp.dspace-admin.wizard-questions.title = Beskriv samlingen
+
+jsp.dspace-admin.workflow-abort-confirm.collection = Samling: {0}
+jsp.dspace-admin.workflow-abort-confirm.heading = Slett arbeidsprosess: {0}
+jsp.dspace-admin.workflow-abort-confirm.submitter = Registrator: {0}
+jsp.dspace-admin.workflow-abort-confirm.title = Avbryt arbeidsprosess
+jsp.dspace-admin.workflow-abort-confirm.item-title = Tittel: {0}
+jsp.dspace-admin.workflow-abort-confirm.warning = Er du sikker på at du ønsker å avbryte denne arbeidsprosessen? Den vil bli returnert til brukerens personlige arbeidsområde.
+
+jsp.dspace-admin.workflow-list.collection = Samling
+jsp.dspace-admin.workflow-list.heading = Aktive arbeidsprosesser
+jsp.dspace-admin.workflow-list.submitter = Innlegger
+jsp.dspace-admin.workflow-list.item-title = Tittel
+jsp.dspace-admin.workflow-list.title = Avbryt arbeidsprosess
+
+jsp.error.404.title = Feil: Dokumentet ble ikke funnet
+jsp.error.404.text1 =Dokumentet du prøver å nå finnes ikke på serveren.
+jsp.error.404.text2 = Vennligst sjekk lenken ev. bokmerket du har brukt og prøv igjen. Hvis du fremdeles får denne feilmeldingen prøv å gå til <a href="{0}"> DSpace hovedside </a> og se etter dokumentet du er på jakt etter derfra.
+jsp.error.404.text3 = Fikk du denne feilmeldingen ved å klikke på en lenke på DSpace sidene? Kan du i så fall gi oss beskjed slik at vi kan fikse feilen? Takk for hjelpen!
+
+jsp.error.authorize.title = Tillatelse kreves
+jsp.error.authorize.text1 = Du har ikke rett til å gjennomføre denne handlingen.
+jsp.error.authorize.text2 = Kontakt DSpace administratorene dersom du mener at du burde ha tilgang til å gjøre dette:
+
+jsp.error.integrity.heading = Systemfeil: Feil i forespørselen
+jsp.error.integrity.list1 = Av og til kan det å klikke på tilbakeknappen i nettleseren føre til at operasjoner gjentas, som f.eks. endelig registrering i arkivet. Klikk på  oppdateringsknappen i nettleseren kan føre til samme resultat.
+jsp.error.integrity.list2 =Dersom du kom til denne siden ved å følge en lenke eller et bokmerke du har fått av andre, så kan det være feil i lenken eller du har skrevet inn feil lenke. Vennligst sjekk lenken og prøv igjen.
+jsp.error.integrity.list3 =Dersom du har flere DSpace vinduer åpne samtidig kan du få et tilsvarende problem ved at et klikk på en knapp i et vindu kan gjøre et klikk på en knapp i et annet vindu ugyldig.
+jsp.error.integrity.list4 = Du kan ha avdekket en systemfeil. Slike feil loggføres og vil bli sett nærmere på for å kartlegge eventuelle problemer.
+jsp.error.integrity.text1 = Data mottatt fra din nettleser er inkonsistente. Dette kan ha flere årsaker:
+jsp.error.integrity.text2 = Hvis problemet ikke forsvinner, vennligst kontakt DSpace adminstratorer:
+jsp.error.integrity.title = Feil i forespørselen
+
+jsp.error.internal.text1 = Intern systemfeil. Vennligst kontakt DSpace administrator dersom feilen ikke forsvinner ved neste forsøk.
+jsp.error.internal.title = Intern systemfeil
+
+jsp.error.invalid-id.title = Ugyldig identifikator
+jsp.error.invalid-id.list1 = URL-en du har benyttet er feil. Hvis du har klikket på en lenke eller bokmerke utenfor DSpace bør du sjekke dette og prøve igjen.
+jsp.error.invalid-id.list2 = Du har lagt inn en ugyldig ID i et skjema - vennligst prøv igjen.
+jsp.error.invalid-id.text1 = Identifikatoren {0} korresponderer ikke med en gyldig {1} i DSpace. Dette kan komme av følgende årsaker:
+jsp.error.invalid-id.text2 = Hvis du har problemer, eller forventet at ID-en skulle virke, kontakt DSpace administratorer.
+
+jsp.error.require-certificate.title = Sertifikat er påkrevd
+jsp.error.require-certificate.text = Denne installasjonen av DSpace krever at du har et gyldig nettsertifikat for å logge på. Kontakt oss dersom du har problemer med dette.
+
+jsp.feedback.acknowledge.title = Takk for dine kommentarer
+jsp.feedback.acknowledge.text = Dine kommentarer er mottatt.
+
+jsp.feedback.form.comment = Dine kommentarer:
+jsp.feedback.form.email = Din e-postadresse:
+jsp.feedback.form.title = Kommentarskjema
+jsp.feedback.form.send = Send
+jsp.feedback.form.text1 = Takk for at du tar deg tid til å gi oss ris og ros om DSpace-systemet. 
+jsp.feedback.form.text2 = Vennligst fyll ut feltene nedenfor.
+
+jsp.help = Hjelp (På engelsk)
+jsp.help.formats.contact1 = Kontakt
+jsp.help.formats.contact2 = DSpace Administrator
+jsp.help.formats.contact3 = hvis du har spørsmål om et bestemt format.
+jsp.help.formats.extensions = Filutvidelse
+jsp.help.formats.policy = Regler for formatstøtte 
+jsp.help.formats.support-levels = Nivåer for formatstøtte
+jsp.help.formats.whattodo = Jeg har en fil i et format som ikke er i lista. Hva gjør jeg?
+jsp.help.formats.title = Formater som støttes av DSpace
+jsp.help.formats.here = (Ditt nettsteds regler for formatstøtte her)
+jsp.help.formats.mime = MIME type
+jsp.help.formats.name = Navn
+jsp.help.formats.return = tilbake til hovedhjelp
+jsp.help.formats.support = Støttenivå
+jsp.help.formats.support.supported = støttet
+jsp.help.formats.support.known = kjent
+jsp.help.formats.support.unknown = ukjent
+jsp.help.formats.top = til toppen
+
+jsp.home.com1 = Enheter i DSpace
+jsp.home.com2 = Velg en enhet for å se på dens samlinger.
+jsp.home.search1 = Søk
+jsp.home.search2 = Skriv inn tekst i feltet nedenfor for å søke i DSpace.
+jsp.home.title = Hovedside
+
+jsp.layout.footer-default.text = <a target="_blank" href="http://www.dspace.org/">DSpace Software</a> Copyright&nbsp;&copy;&nbsp;2002-2004&nbsp;<a target="_blank" href="http://web.mit.edu/">MIT</a>&nbsp;og&nbsp;<a target="_blank" href="http://www.hp.com/">Hewlett-Packard</a>
+jsp.layout.footer-default.feedback = Kommentarskjema
+
+jsp.layout.header-default.about = Om programvaren DSpace 
+jsp.layout.header-default.alt = DSpace
+
+jsp.layout.navbar-admin.communities-collections = Enheter/<br/>samlinger
+jsp.layout.navbar-admin.epeople = E-personer
+jsp.layout.navbar-admin.groups = Grupper
+jsp.layout.navbar-admin.items = Innførsler
+jsp.layout.navbar-admin.dcregistry = Dublin Core<br/>register
+jsp.layout.navbar-admin.formatregistry = Register for bitstrømformater
+jsp.layout.navbar-admin.workflow = Arbeidsprosesser 
+jsp.layout.navbar-admin.authorization = Retningslinjer
+jsp.layout.navbar-admin.editnews = Oppdater forsiden
+jsp.layout.navbar-admin.supervisors = Veiledere
+jsp.layout.navbar-admin.statistics = Statistikk
+jsp.layout.navbar-admin.help = Hjelp (På engelsk)
+jsp.layout.navbar-admin.logout = Logg av
+
+jsp.layout.navbar-default.about = Om DSpace
+jsp.layout.navbar-default.advanced = Avansert søk
+jsp.layout.navbar-default.authors = Forfatter
+jsp.layout.navbar-default.browse = Sorter på:
+jsp.layout.navbar-default.communities-collections = Enheter<br/>og&nbsp;samlinger
+jsp.layout.navbar-default.date = Dato
+jsp.layout.navbar-default.edit = Oppdater profil
+jsp.layout.navbar-default.go = Søk
+jsp.layout.navbar-default.help = Hjelp (På engelsk)
+jsp.layout.navbar-default.home = Hovedside
+jsp.layout.navbar-default.loggedin =Du&nbsp;er&nbsp;logget&nbsp;på&nbsp;som {0}
+jsp.layout.navbar-default.logout = Logg av
+jsp.layout.navbar-default.receive = Abonner på<br/> e-postvarsling
+jsp.layout.navbar-default.search = Søk&nbsp;i&nbsp;DSpace
+jsp.layout.navbar-default.sign = Innlogging:
+jsp.layout.navbar-default.titles = Tittel
+jsp.layout.navbar-default.users = Mitt DSpace
+jsp.layout.navbar-default.users-authorized = <small>autoriserte brukere</small>
+
+jsp.login.incorrect.heading = Logg på DSpace
+jsp.login.incorrect.text = e-postadressen eller passordet du har skrevet inn er ikke gyldig. Vennligst prøv igjen, eller har du <a href="{0}">glemt passordet ditt</a>?
+jsp.login.incorrect.title = Logg på
+
+jsp.login.ldap.title = Logg på
+jsp.login.ldap.heading = Logg på DSpace
+
+jsp.login.ldap-incorrect.title = Logg på
+jsp.login.ldap-incorrect.heading = Logg på DSpace
+jsp.login.ldap-incorrect.errormsg = e-postadressen eller passordet du har skrevet inn er ikke gyldig. Vennligst prøv igjen.
+
+jsp.login.logged-out.title = Du er nå logget av
+jsp.login.logged-out.thank = Takk for at du husket å logge av!
+
+jsp.login.no-valid-cert.heading = Logg på DSpace
+jsp.login.no-valid-cert.text = <strong>Du ser ikke ut til å ha et gyldig websertifikat.</strong> Vennligst prøv igjen.
+jsp.login.no-valid-cert.title = Logg på
+
+jsp.login.not-in-records.register = Registrer deg som DSpace bruker
+jsp.login.not-in-records.text = Du har et gyldig websertifikat, men DSpace systemet ser ikke ut til å gjenkjenne din profil. Du må  <a href="{0}">registrere deg i arkivet</a> før du kan bruke de delene av systemet som krever en brukerkonto.
+jsp.login.not-in-records.title = Det finnes ingen brukerinformasjon tilgjengelig
+
+jsp.login.password.heading = Logg på DSpace
+jsp.login.password.title = Logg på
+
+jsp.morehelp = Mer hjelp (På engelsk)
+
+jsp.mydspace = Mitt DSpace
+jsp.mydspace.general.remove = Fjern
+jsp.mydspace.general.approve = Godkjenn
+jsp.mydspace.general.reject =Avvis
+jsp.mydspace.general.cancel =Avbryt
+jsp.mydspace.general.goto-mydspace = Gå til Mitt DSpace
+jsp.mydspace.general.backto-mydspace = Tilbake til Mitt DSpace
+jsp.mydspace.general.returnto-mydspace =Tilbake til Mitt DSpace
+
+jsp.mydspace.in-archive.heading1 =Takk for hjelpen
+jsp.mydspace.in-archive.return.link =Tilbake til Mitt DSpace
+jsp.mydspace.in-archive.text1 =Dokumentet ditt er nå plassert i hovedarkivet. Den har fått følgende identifikator:
+jsp.mydspace.in-archive.text2 =Melding om den nye innførselen er også sendt til samlingsadministrator
+jsp.mydspace.in-archive.title =Dokumentet er arkivert
+
+jsp.mydspace.main.elem1 =Tittel
+jsp.mydspace.main.elem2 =Registrert i
+jsp.mydspace.main.heading2 =Dine arbeidsoppgaver
+jsp.mydspace.main.heading3 = Oppgaver som skal fordeles
+jsp.mydspace.main.heading4 =Uferdige registreringer
+jsp.mydspace.main.heading5 =Registreringer som avventer neste skritt i arbeidsprosessen
+jsp.mydspace.main.item =Innførsel
+jsp.mydspace.main.link =Se dine varslinger
+jsp.mydspace.main.perform.button =Ta denne oppgaven
+jsp.mydspace.main.return.button =Tilbake til oppgavelisten
+jsp.mydspace.main.start.button =Start en ny registreringsprosess
+jsp.mydspace.main.sub1 =Evaluer innførsel
+jsp.mydspace.main.sub2 =Sjekk innførsel
+jsp.mydspace.main.sub3 =Siste kontroll av innførsel
+jsp.mydspace.main.subby =Registrert av
+jsp.mydspace.main.subto =Registrert i
+jsp.mydspace.main.take.button =Velg arbeidsoppgave
+jsp.mydspace.main.task =Arbeidsoppgave
+jsp.mydspace.main.text1 =Nedenfor ser du arbeidsoppgaver du har valgt.
+jsp.mydspace.main.text2 =Nedenfor ser du dine tildelte arbeidsoppgaver.
+jsp.mydspace.main.text4 =Her kan du arbeide videre med dokumentet ditt.
+jsp.mydspace.main.view.button =Se godkjente innførsler
+jsp.mydspace.main.authoring = Dokumenter under arbeid
+jsp.mydspace.main.supervising = Dokumenter til veiledning
+
+jsp.mydspace.own-submissions.text1 =Du har ikke registrert noe i DSpace ennå.
+jsp.mydspace.own-submissions.text2 =Nedenfor kan du se innførsler du tidligere har fått akseptert i DSpace.
+jsp.mydspace.own-submissions.text3 =Du har registrert <strong>1</strong> dokumenter i hovedarkivet.
+jsp.mydspace.own-submissions.text4 =Du har registrert <strong>{0}</strong> dokumenter i hovedarkivet.
+jsp.mydspace.own-submissions.title =Dine registreringer
+
+jsp.mydspace.perform-task.commit.button= Overfør til arkivet
+jsp.mydspace.perform-task.edit.button =Rediger metadata
+jsp.mydspace.perform-task.instruct1 =Velg "godkjenn" dersom du har evaluert innførselen og godkjent denne.
+jsp.mydspace.perform-task.instruct2 =Når du har endret innførselen, bruk dette alternativet for å legge den inn i arkivet.
+jsp.mydspace.perform-task.instruct3 =Hvis du har evaluert innførselen og funnet den upassende for samlingen, velg "avvis". Du vil da bli bedt om å skrive en melding som forklarer hvorfor innførselen er upassende, og den som registrerer bør foreta endringer og prøve igjen.
+jsp.mydspace.perform-task.instruct4 =Her kan du rette opp, endre eller på andre måter oppdatere data for denne innførselen.
+jsp.mydspace.perform-task.instruct5 =Klikk her dersom du ønsker å utsette denne oppgaven foreløpig og returnere til "Mitt DSpace".
+jsp.mydspace.perform-task.instruct6 =Klikk her for å returnere oppgaven til oppgavelisten slik at en annen bruker kan håndtere denne.
+jsp.mydspace.perform-task.later.button =Utfør senere 
+jsp.mydspace.perform-task.return.button =Returner oppgaven til oppgavelisten
+jsp.mydspace.perform-task.text1 =Følgende innførsel ønskes lagt til samlingen <strong>{0}</strong>. Vennligst se over innførselen og sjekk at gjeldende kriterier for inkludering i samlingen er oppfylt. Bruk knappene nederst på siden for å godkjenne eller avvise innførselen.
+
+jsp.mydspace.perform-task.text3 =Følgende innførsel ønskes lagt til samlingen <strong>{0}</strong>. Vennligst se over innførselen og sjekk at gjeldende kriterier for inkludering i samlingen er oppfylt. Du kan også oppdatere innførselens metadata dersom du ønsker det. Bruk knappene nederst på siden for å godkjenne eller avvise innførselen.
+jsp.mydspace.perform-task.text4 =Følgende innførsel er godkjent lagt til samlingen <strong>{0}</strong>. Om nødvendig kan du oppdatere innførselens metadata slik at denne følger standarden. Bruk knappene nederst på siden for å gjøre innførselen tilgjengelig.
+jsp.mydspace.perform-task.title =Oppgavebehandling
+
+jsp.mydspace.preview-task.accept.button =Velg denne oppgaven
+jsp.mydspace.preview-task.text1 =Følgende innførsel ønskes lagt til samlingen <strong>{0}</strong>. Klikk "Velg denne oppgaven" for å evaluere innførselen.
+jsp.mydspace.preview-task.text3 =Følgende innførsel ønskes lagt til samlingen <strong>{0}</strong>. Klikk "Velg denne oppgaven" for å evaluere innførselen.
+jsp.mydspace.preview-task.text4 =Følgende innførsel er godkjent lagt til samlingen <strong>{0}</strong>. For å gjennomføre en avsluttende evaluering av innførselen, vennligst velg ""Velg denne oppgaven"" nedenfor.
+
+jsp.mydspace.preview-task.title =Forhåndsvisning av oppgave
+
+jsp.mydspace.reject-reason.cancel.button =Avbryt avvisning
+jsp.mydspace.reject-reason.reject.button =Avvis innførselen
+jsp.mydspace.reject-reason.text1 =Du kan begrunne avvisningen av innførselen i boksen nedenfor. Dersom du ønsker at registrator skal ordne problemet og registrere innførselen på ny, skriver du dette i meldingen. 
+jsp.mydspace.reject-reason.title =Begrunnelse for avvisning
+
+jsp.mydspace.remove-item.cancel.button =Tilbake
+jsp.mydspace.remove-item.confirmation =Er du sikker på at du vil fjerne denne uferdige innførselen?
+jsp.mydspace.remove-item.remove.button =Fjern innførselen
+jsp.mydspace.remove-item.title =Fjern innførsel
+
+jsp.mydspace.subscriptions.info1 =Dine varslinger er nå oppdatert.
+jsp.mydspace.subscriptions.info2 =Ønsker du å bli varslet per e-post om nye nye bidrag i en samling?<br><br> Dette kan du ordne ved å gå til samlingens hovedside og klikke på knappen "Be om varsling". Du vil da motta e-post-meldinger som informerer om nye innførsler. På dager der det ikke registreres nye innførsler vil det ikke bli sendt e-post. 
+jsp.mydspace.subscriptions.info3 =Nedenfor ser du en oversikt over de samlingene du har bedt om varsling for. 
+jsp.mydspace.subscriptions.info4 =Du har for tiden ingen varslingstjenester.
+jsp.mydspace.subscriptions.remove.button =Avslutt alle varslinger
+jsp.mydspace.subscriptions.title =Dine e-post-varslinger
+jsp.mydspace.subscriptions.unsub.button =Avslutt
+
+jsp.mydspace.task-complete.title =Takk for hjelpen
+jsp.mydspace.task-complete.text1 =Oppgaven er avsluttet og melding om dette er sendt.
+
+jsp.register.general.return-home =Tilbake til DSpace hovedside
+
+jsp.register.already-registered.info1 =Du er allerede registrert i DSpace og har en aktiv brukerkonto.
+jsp.register.already-registered.info2 =Dersom du har glemt passordet ditt kan du<a href="{0}">velge et nytt</a>.
+jsp.register.already-registered.info4 =Vennligst kontakt DSpace adminstrator dersom du har problemer med å logge inn.
+jsp.register.already-registered.title =Du er allerede registrert
+
+jsp.register.cannot-register.msg =Oppsettet for denne DSpace nettsiden tillater ikke at du registrerer deg selv som bruker. Kontakt DSpace adminstrator dersom du har spørsmål.
+jsp.register.cannot-register.title =Du kan ikke registrere deg
+
+jsp.register.edit-profile.info1 =Vennligst fyll ut alle nødvendige felt.
+jsp.register.edit-profile.info2 =Passordet du velger må være identiske i begge feltene nedenfor, og må bestå av minst seks tegn.
+jsp.register.edit-profile.info3 =Her kan du  legge til eller oppdatere informasjon om deg selv. Felt merket med * er obligatoriske.
+jsp.register.edit-profile.info5 =Du kan også bytte passord. Passordet må bestå av minst seks tegn.
+jsp.register.edit-profile.pswd.field =Nytt passord:
+jsp.register.edit-profile.confirm.field =Bekreft:
+jsp.register.edit-profile.title =Endre din profil
+jsp.register.edit-profile.update.button =Oppdater profilen
+
+jsp.register.forgot-password.email.field =E-postadresse:
+jsp.register.forgot-password.forgot.button =Glemt passord
+jsp.register.forgot-password.info1 =E-postadressen du skrev ble ikke gjenkjent. Vennligst prøv igjen.
+jsp.register.forgot-password.info2 =Skriv inn e-postadressen din i boksen nedenfor og klikk põ "Glemt passord". Du vil kort etter motta en e-post der du vil få muligheten til å velge et nytt passord.
+jsp.register.forgot-password.title =Glemt passord
+
+jsp.register.inactive-account.info =E-postadressen du skrev inn tilsvarer inaktiv konto. Kanskje du ikke er <a href="{0}">registrert</a>. Kontakt administrator dersom du har spørsmål.
+jsp.register.inactive-account.title =Inaktiv konto
+
+jsp.register.invalid-token.info1 = Token i URL for registrering eller glemt passord er feil. Dette kan komme av følgende:
+jsp.register.invalid-token.info2 =Token kan ha blitt feilkopiert til URL'en. Noen e-postprogrammer "pakker" lange linjer med tekst i en e-post slik at din spesielle URL  deles opp i to linjer. Slik som dette:
+jsp.register.invalid-token.info3 =Hvis dette har skjedd bør du kopiere den første linjen og lime denne inn i adressefeltet på nettleseren din. Videre kopierer du den neste linjen og limer denne inn på enden av den første linjen. Sjekk at du ikke har fått med ekstra mellomrom. Adressefeltet skal da inneholde noe lignende dette:
+jsp.register.invalid-token.info4 =Denne URL'en skal virke ved å taste enter.
+jsp.register.invalid-token.info5 =Kontakt oss dersom du fremdeles har problemer.
+jsp.register.invalid-token.title =Ugyldig token
+
+jsp.register.new-ldap-user.title = Registrering av bruker
+jsp.register.new-ldap-user.heading = Registrering av bruker
+jsp.register.new-ldap-user.info1 = Brukernavnet, passordet eller e-postadressen du skrev inn er ikke gyldig. Vennligst prøv igjen.
+jsp.register.new-ldap-user.info2 =Hvis du allerede har fått et brukernavn og passord, skriver du inn disse sammen med e-postadressen din i feltene nedenfor og klikker "Registrer".  Hvis du ikke allerede har et brukernavn kan du registrere deg ved å skrive inn e-postadressen din.
+jsp.register.new-ldap-user.info3 =  
+jsp.register.new-ldap-user.label.username = Brukernavn:
+jsp.register.new-ldap-user.label.password = Passord:
+jsp.register.new-ldap-user.label.email = E-postadresse:
+jsp.register.new-ldap-user.button.register = Registrer
+
+jsp.register.new-password.confirm.field =Gjenta for å bekrefte:
+jsp.register.new-password.hello =Hei {0},
+jsp.register.new-password.info1 =Passordet du velger må være identisk i begge feltene nedenfor, og må bestå av minst seks tegn.
+jsp.register.new-password.info2 =Vennligst skriv inn passordet du ønsker i boksen nedenfor, og gjenta deretter passordet i den andre boksen. Passordet må bestå av minst seks tegn.
+jsp.register.new-password.pswd.field =Nytt passord:
+jsp.register.new-password.set.button =Velg nytt passord
+jsp.register.new-password.title =Skriv inn nytt passord
+
+jsp.register.new-user.email.field =E-postadresse:
+jsp.register.new-user.info1 =<strong>E-postadressen du skrev inn var feil.</strong> Vennligst prøv igjen.
+jsp.register.new-user.info2 =Har du alri logget på DSpace før? Vennligst skriv e-postadressen din i feltet nedenfor og klikk "Registrer". 
+jsp.register.new-user.info3 = 
+jsp.register.new-user.register.button =Registrer
+jsp.register.new-user.title =Registrering av brukere
+
+jsp.register.password-changed.info =Takk, ditt nye passord er nå oppdatert og aktivert.
+jsp.register.password-changed.link =Gå til DSpace hovedside
+jsp.register.password-changed.title =Passordet er oppdatert
+
+jsp.register.password-token-sent.info =Vi har nå sendt deg en e-post som inneholder en URL. Når du klikker på denne kan du velge et nytt passord og fortsette å bruke DSpace.
+jsp.register.password-token-sent.title =E-post om nytt passord er sendt
+
+jsp.register.profile-form.fname.field =Fornavn*:
+jsp.register.profile-form.lname.field =Etternavn*:
+jsp.register.profile-form.phone.field =Telefon:
+
+jsp.register.profile-updated.info1 =Takk for hjelpen, informasjon om din profil og ditt passord er nå oppdatert.
+jsp.register.profile-updated.info2 =Takk for hjelpen, informasjon om din profil er nå oppdatert.
+jsp.register.profile-updated.title =Profilen er oppdatert
+
+jsp.register.registered.info =Du er registrert som bruker av DSpace systemet. Du kan nå abonnere på varslinger for nye innførsler i samlingene.
+jsp.register.registered.thank =Takk for hjelpen {0},
+jsp.register.registered.title =Registreringen er fullført
+
+jsp.register.registration-form.complete.button =Fullfør registrering
+jsp.register.registration-form.confirm.field =Gjenta for å bekrefte
+jsp.register.registration-form.instruct1 =Vennligst fyll ut alle obligatoriske felt.
+jsp.register.registration-form.instruct2 =Passordet du velger må være identisk i begge feltene nedenfor, og må bestå av minst seks tegn.
+jsp.register.registration-form.instruct3 =Vennligst skriv inn følgende informasjon. Felt merket med * obligatoriske.
+jsp.register.registration-form.instruct4 =Vennligst velg et nytt passord og skriv dette inn i boksen nedenfor. For å bekrefte passordet gjentar du dette i feltet under. Passordet må bestå av minst seks tegn.
+jsp.register.registration-form.pswd.field =Passord:
+jsp.register.registration-form.title =Registreringsinformasjon
+jsp.register.registration-sent.info =Vi har sendt deg en e-post som inneholder en lenke. Når du besøker denne vil du bli bedt om å oppgi litt informasjon. Etterpå kan du logge på DSpace!
+jsp.register.registration-sent.title =E-post om registrering er sendt
+
+jsp.search.general.noresults = Ingen treff
+jsp.search.general.next = neste
+jsp.search.general.previous = forrige
+
+jsp.search.advanced.title = Avansert søk
+jsp.search.advanced.search = Søk:
+jsp.search.advanced.search2 = Søk
+jsp.search.advanced.searchfor = Søk etter:
+jsp.search.advanced.clear = Nullstill
+jsp.search.advanced.type = Søketype:
+jsp.search.advanced.type.keyword = Emneord
+jsp.search.advanced.type.author = Forfatter
+jsp.search.advanced.type.title = Tittel
+jsp.search.advanced.type.subject = Emne
+jsp.search.advanced.type.abstract = Abstrakt
+jsp.search.advanced.type.series = Serie
+jsp.search.advanced.type.sponsor = Sponsor
+jsp.search.advanced.type.id = Identifikator
+jsp.search.advanced.type.language = Språk (ISO)
+jsp.search.advanced.logical.and = OG
+jsp.search.advanced.logical.or = ELLER
+jsp.search.advanced.logical.not = IKKE
+
+jsp.search.results.colhits = Treff på samlinger:
+jsp.search.results.comhits = Treff på enheter:
+jsp.search.results.itemhits = Treff på innførsel:
+jsp.search.results.searchin = Søk:
+jsp.search.results.searchfor = etter
+jsp.search.results.results = Resultat {0}-{1} av {2}.
+jsp.search.results.title = Søkeresultater
+
+jsp.statistics.no-report.title = Det er for øyeblikket ingen tilgjengelige rapporter
+jsp.statistics.no-report.info1 = Det er for øyeblikket ingen tilgjengelige rapporter for denne tjenesten. Vennligst prøv igjen senere.
+
+jsp.statistics.report.title = Statistisk oppsummering
+jsp.statistics.report.info1 = Nyeste generelle rapport
+jsp.statistics.report.info2 = Månedlige rapporter:
+
+jsp.submit.general.submit = Registrer
+jsp.submit.general.next = Neste &gt;
+jsp.submit.general.previous = &lt; Forrige
+jsp.submit.general.cancel-or-save.button =Avbryt/Lagre
+
+jsp.submit.cancel.continue.button =Tilbake til registrering
+jsp.submit.cancel.info =Ønsker du å fjerne den halvferdige registreringen, eller vil du beholde den slik at du kan forsette å arbeide med den senere? Du kan også gå tilbake dit du var i registreringsprosessen hvis du klikket Avbryt ved en feil.
+jsp.submit.cancel.remove.button =Fjern registrering
+jsp.submit.cancel.save.button =Lagre. Jeg ønsker å arbeide med dette senere
+jsp.submit.cancel.title=Avbryt eller lagre registrering
+
+jsp.submit.cancelled-removed.info =Registreringen din er avbrutt, og dataene er fjernet fra systemet.
+jsp.submit.cancelled-removed.title =Avbrutt registrering
+
+jsp.submit.change-file-description.file =File
+jsp.submit.change-file-description.filedescr =Beskrivelse av filen:
+jsp.submit.change-file-description.format =Fil format
+jsp.submit.change-file-description.heading =Registrering: Endre beskrivelsen av filen
+jsp.submit.change-file-description.info1 =Her er informasjonen om filen.
+jsp.submit.change-file-description.info2 =Skriv inn den riktige beskrivelsen av filen i feltet nedenfor:
+jsp.submit.change-file-description.size =Størrelse
+jsp.submit.change-file-description.title =Endre beskrivelsen av filen
+
+jsp.submit.choose-file.document =Fil:
+jsp.submit.choose-file.filedescr =Beskrivelse av filen:
+jsp.submit.choose-file.heading =Registrering: Last opp filer
+jsp.submit.choose-file.info1 =Ved å klikke på "Bla gjennom...", vil et nytt vindu åpnes der du kan finne og velge riktig fil.
+jsp.submit.choose-file.info3 =<strong>For brukere av Netscape:</strong> Vinduet som åpnes ved å klikke "Bla igjennom..." vil kun vise HTML filer. Hvis filen du ønsker å laste opp ikke er en HTML fil må du velge "vis alle filtyper".
+jsp.submit.choose-file.info4 =Mer informasjon for Netscape brukere.
+jsp.submit.choose-file.info6 =Vær oppmerksom på at DSpace systemet bevarer innholdet av enkelte filtyper bedre enn andre filtyper.
+jsp.submit.choose-file.info7 =Informasjon om filtyper og nivåer av støtte.
+jsp.submit.choose-file.info9 =Her kan du legge inn en kort beskrivelse av innholdet i denne filen, for eksemplel "Hovedartikkel", eller "Analyser av data".
+jsp.submit.choose-file.title =Last opp en fil
+
+jsp.submit.complete.heading =Registrering: Registreringen er fullført!
+jsp.submit.complete.info =Registreringen din vil nå bli sendt til korrektur og bibliografisk kontroll. Du vil motta melding på e-post så snart dokumentet ditt er lagt ut, eller dersom det skulle oppstå problemstillinger. Du kan også sjekke status for registreringen på Mitt DSpace.
+jsp.submit.complete.link =Gå til Mitt DSpace
+jsp.submit.complete.title =Registreringen er fullført!
+
+jsp.submit.creative-commons.heading =Registrering: Bruk en Creative Commons lisens
+jsp.submit.creative-commons.info1 =Du har allerede valgt en Creative Commons lisens og lagt den til denne innførselen. Du kan:
+jsp.submit.creative-commons.choice1 = Velg "neste" knappen nedenfor for å  <em>beholde</em> den tidligere valgte lisensen.
+jsp.submit.creative-commons.choice2 =Velg (?) Ikke bruk Creative Commons' knappen nedenfor for å <em>fjerne</em> det nåværende valget, og ikke bruke en Creative Commons lisens.
+jsp.submit.creative-commons.choice3 =Fullfør prosessen nedenfor for å <em>erstatte</em> det nåværende valget.
+jsp.submit.creative-commons.info2 =Følg instruksjonene nedenfor for å lisensiere innførselen din under Creative Commons. Klikk på "fortsett" lenken for å legge til lisensen. Klikk "Ikke bruk Creative Commons" knappen dersom du ikke ønsker å bruke Creative Commons lisensen.
+jsp.submit.creative-commons.info3 =Din nettleser må støtte IFrames for å bruke denne funksjonen
+jsp.submit.creative-commons.skip.button =Ikke bruk Creative Commons &gt;
+jsp.submit.creative-commons.title =Bruk en Creative Commons lisens
+
+jsp.submit.edit-metadata.title = Beskriv dokumentet ditt
+jsp.submit.edit-metadata.heading = Registrering: Beskriv dokumentet ditt
+jsp.submit.edit-metadata.info1 = Fyll inn relevant informasjon i feltene nedenfor. I de fleste nettlesere kan du bruke Tab-tasten til å flytte markøren til neste felt eller knapp.
+jsp.submit.edit-metadata.info2 =  
+jsp.submit.edit-metadata.help = (Mer hjelp - på norsk)
+jsp.submit.edit-metadata.previous = &lt; Forrige
+jsp.submit.edit-metadata.next = Neste &gt;
+jsp.submit.edit-metadata.cancelsave = Avbryt/Lagre
+jsp.submit.edit-metadata.lastname = Etternavn<br/>f.eks. <strong>Nordmann</strong>
+jsp.submit.edit-metadata.firstname = Fornavn<br/> f.eks. <strong>Ola</strong>
+jsp.submit.edit-metadata.button.remove = Fjern denne innførselen
+jsp.submit.edit-metadata.button.remove2 = Fjern
+jsp.submit.edit-metadata.button.add = Registrer flere
+jsp.submit.edit-metadata.month = Måned:
+jsp.submit.edit-metadata.no_month = (Ingen måned)
+jsp.submit.edit-metadata.day = Dag:
+jsp.submit.edit-metadata.year = År:
+jsp.submit.edit-metadata.seriesname = Serietittel
+jsp.submit.edit-metadata.paperno = Rapport eller paper nr.
+
+jsp.submit.get-file-format.choose.button =Velg automatisk gjenkjent filtype
+jsp.submit.get-file-format.format =Filformat:
+jsp.submit.get-file-format.heading =Registrering: Velg filformat
+jsp.submit.get-file-format.info1 =Opplastet fil: <code>{0}</code> ({1} bytes)
+jsp.submit.get-file-format.info2 =DSpace kunne ikke identifisere formatet på denne filen.
+jsp.submit.get-file-format.info3 =DSpace har gjenkjent filformatet som {0}. <strong>Er du sikker på at du vil endre dette?</strong>
+jsp.submit.get-file-format.info5 =Velg format for filen fra listen nedenfor, for eksempel "Adobe PDF" eller "Microsoft Word".
+jsp.submit.get-file-format.info6 =Formatet er ikke i listen
+jsp.submit.get-file-format.info7 =<strong>Hvis du ikke finner formatet i ovenstående liste</strong>, så kan du beskrive det i feltet nedenfor. Skriv inn navnet og versjonsnummeret på applikasjonen du opprettet filen i.
+jsp.submit.get-file-format.known =(kjent)
+jsp.submit.get-file-format.supported =(støttet)
+jsp.submit.get-file-format.title =Velg filformat
+
+jsp.submit.initial-questions.elem1 = Dokumentet har mer enn en tittel, for eksempel en oversatt tittel.
+jsp.submit.initial-questions.elem2 = Dokumentet har vært publisert eller offentlig distribuert tidligere
+jsp.submit.initial-questions.elem3 = Dokumentet består av <em>mer enn en</em> fil
+jsp.submit.initial-questions.elem4 = Dokumentet er en PhD eller Masteravhandling
+jsp.submit.initial-questions.info =Kryss av de boksene som passer:
+jsp.submit.initial-questions.heading =Registrering: Beskriv dokumentet ditt
+jsp.submit.initial-questions.title =Beskriv dokumentet ditt
+
+jsp.submit.license-rejected.heading =Registrering: Avtalen er avvist
+jsp.submit.license-rejected.info1 =Du har valgt å ikke godkjenne avtalen om distribusjon av ditt dokument via DSpace systemet. Registreringen din er imidlertid ikke slettet og du vil finne denne på Mitt DSpace siden.
+jsp.submit.license-rejected.info2 =Ønsker du å kontakte oss for å diskutere avtalen? Vennligst bruk en av metodene du finner nedenfor:
+jsp.submit.license-rejected.title =Avtalen er avvist
+
+jsp.submit.no-theses.info1 =Du kan foreløpig ikke levere inn doktoravhandlinger i DSpace, men vi anbefaler deg å bruke den offisielle siden for innlevering av avhandlinger:<a href="http://thesis.mit.edu">Digital Library of MIT Theses</a>. Denne støttes av både biblioteket og MIT information Systems.
+jsp.submit.no-theses.info2 =Siden DSpace ikke støtter innlevering av doktoravhandlinger vil denne registreringsprosessen bli avsluttet nå. Filer du har lastet opp vil ikke bli lagret.
+jsp.submit.no-theses.info3 =Legg merke til at innlevering av trykte kopier av avvhandlingen din fremdeles er påkrevd for din grad. DSpace vil trolig bli tilpasset til å kunne hente over avhandlinger direkte fra systemet for administrasjon av avhandlinger etter at disse er offisielt evaluert og godkjent.
+jsp.submit.no-theses.info4 =Vennligst kontakt <strong>DSpace administrator</strong> for å få mer informasjon:
+jsp.submit.no-theses.info5 =Takk for din interesse for DSpace!
+jsp.submit.no-theses.title =Avhandlinger kan ikke leveres til DSpace
+
+jsp.submit.progressbar.select = Velg
+jsp.submit.progressbar.describe = Beskriv
+jsp.submit.progressbar.upload = Last opp
+jsp.submit.progressbar.verify = Kontroller
+jsp.submit.progressbar.license = Avtale
+jsp.submit.progressbar.complete = Fullfør
+
+jsp.submit.review.title = Kontroller registrering
+jsp.submit.review.heading = Registrering: Kontroller registrerte data
+jsp.submit.review.info1 = <strong>Ikke helt i mål, men du nærmer deg slutten...</strong>
+jsp.submit.review.info2 = Her kan du kontrollere informasjonen du har registrert. Hvis noe ikke stemmer kan du gå tilbake og rette på dette ved å klikke på knappen "Korriger en av disse" ved siden av feilen, eller bruke navigasjonslinjen øverst i bildet
+jsp.submit.review.info3 = <strong>Hvis alt er riktig går du videre ved å velge knappen "neste" nederst på siden.</strong>
+jsp.submit.review.info4 = Du kan trygt sjekke filene du har lastet opp. Disse vil åpnes i et nytt vindu.
+jsp.submit.review.init-question1 = Dokumentet har mer enn en tittel:
+jsp.submit.review.init-question2 = Dokumentet har vært publisert tidligere:
+jsp.submit.review.init-question3 = Dokumentet består av mer enn en fil:
+jsp.submit.review.state1 = Ja
+jsp.submit.review.state2 = Nei
+jsp.submit.review.button.correct = Korriger en av disse
+jsp.submit.review.no_md = <em>Tom</em>
+jsp.submit.review.unknown = (Ukjent)
+jsp.submit.review.known = (Kjent)
+jsp.submit.review.supported = (Støttet)
+jsp.submit.review.upload1 = Opplastede&nbsp;filer:
+jsp.submit.review.upload2 = Opplastede&nbsp;filer:
+jsp.submit.review.button.upload1 = Legg til eller fjern filer
+jsp.submit.review.button.upload2 = Last opp andre filer
+jsp.submit.review.button.edit = Endre fildetaljer
+jsp.submit.review.button.previous = &lt; Forrige
+jsp.submit.review.button.next = Neste &gt;
+jsp.submit.review.button.cancelsave = Avbryt/Lagre
+
+jsp.submit.saved.info =Registreringen din er lagret slik at du kan gjøre den ferdig senere. Du finner denne igjen under "uferdige registreringer" på "Mitt DSpace" siden.
+jsp.submit.saved.title =Registreringen er lagret
+
+jsp.submit.select-collection.collection =Samling
+jsp.submit.select-collection.heading =Registrering: Velg samling
+jsp.submit.select-collection.info1 =Velg den samlingen du vil legge dokumentet i fra listen nedenfor og klikk "Neste".
+jsp.submit.select-collection.title =Velg hvilken samling du vil registrere i
+
+jsp.submit.show-license.grant.button =Jeg godtar avtalen
+jsp.submit.show-license.heading1 =Registrering: Godta avtale
+jsp.submit.show-license.info1 =<strong>Ett siste steg: </strong> For at DSpace skal kunne gjøre dokumentet ditt åpent tilgjengelig på internett må du godta betingelsene nedenfor. Les derfor nøye igjennom disse og avgjør deretter om du kan godta disse eller ei. Du godtar betingelsene ved å klikke på knappen "Jeg godtar avtalen".
+jsp.submit.show-license.info2 =Registreringen din vil ikke bli slettet selv om du ikke godtar avtalen. Denne vil være tilgjengelig for deg fra "Mitt DSpace". Du kan senere enten fjerne registreringen fra systemet, eller godta avtalen etter at eventuelle problemstillinger er løst.
+jsp.submit.show-license.notgrant.button =Jeg godtar ikke avtalen
+jsp.submit.show-license.title =DSpace avtale
+
+jsp.submit.show-uploaded-file.click1.button =Klikk her hvis dette er feil filformat
+jsp.submit.show-uploaded-file.click2.button =Klikk her hvis dette er feil fil
+jsp.submit.show-uploaded-file.file =Fil
+jsp.submit.show-uploaded-file.format =Fileformat
+jsp.submit.show-uploaded-file.heading1 =Registrering: Vellykket opplasting av fil
+jsp.submit.show-uploaded-file.heading2 =Registrering: Opplastet fil
+jsp.submit.show-uploaded-file.info1 =Filen din ble lastet opp uten problemer.
+jsp.submit.show-uploaded-file.info2 =Her er informasjon om filen du har lastet opp. Vennligst kontroller denne før du går videre.
+jsp.submit.show-uploaded-file.info3 =Du kan kontrollere at filene ble riktig lastet ved å:
+jsp.submit.show-uploaded-file.info4 =Klikke på filnavnet ovenfor. Filen vil da åpnes i et nytt vindu slik at du kan kontrollere innholdet.
+jsp.submit.show-uploaded-file.info5 =Sammenligne sjekksummen som vises ovenfor med en sjekksum kalkulert av din datamaskin. Disse må være like.
+jsp.submit.show-uploaded-file.info6 =Klikk her for å få mer informasjon om dette (På engelsk).
+jsp.submit.show-uploaded-file.info7 =Systemet kan kalkulere en sjekksum som du kan kontrollere.
+jsp.submit.show-uploaded-file.info8 =Klikk her for å få mer informasjon om dette.
+jsp.submit.show-uploaded-file.known = kjent
+jsp.submit.show-uploaded-file.supported = Støttet
+jsp.submit.show-uploaded-file.notSupported = ikke støttet
+jsp.submit.show-uploaded-file.show.button =Vis sjekksummer
+jsp.submit.show-uploaded-file.checksum =Sjekksum
+jsp.submit.show-uploaded-file.size =Størrelse
+jsp.submit.show-uploaded-file.size-in-bytes = {0} bytes
+jsp.submit.show-uploaded-file.title =Opplastet fil
+
+jsp.submit.thesis-removed-workaround.heading =Registrering er stoppet: Avhandlinger kan ikke registreres i DSpace
+jsp.submit.thesis-removed-workaround.info =Siden DSpace ikke støtter innlevering av doktoravhandlinger har denne registreringen blitt stoppet. Klikk nedenfor dersom du ønsker å registrere annet materiale.
+jsp.submit.thesis-removed-workaround.link =Start en ny registreringsprosess
+jsp.submit.thesis-removed-workaround.title =Registrering er stoppet
+
+jsp.submit.upload-error.heading =Registrering: Feil ved opplasting av fil
+jsp.submit.upload-error.info =Det oppstod en feil under lasting av filen. Enten var filnavnet du skrev inn galt, eller nettverksfeil forårsaket problemet. Vennligst prøv igjen.
+jsp.submit.upload-error.retry.button =Prøv igjen
+jsp.submit.upload-error.title =Feil ved opplasting av fil
+
+jsp.submit.upload-file-list.title = Opplastede filer
+jsp.submit.upload-file-list.heading1 = Registrering: Vellykket opplasting av fil
+jsp.submit.upload-file-list.heading2 = Registrering: Last opp filer
+jsp.submit.upload-file-list.info1 = <strong>Filen din ble lastet opp uten problemer.</strong>
+jsp.submit.upload-file-list.info2 = Tabellen nedenfor viser hvilke filer du har lastet opp for dette dokumentet.
+jsp.submit.upload-file-list.info3 = Du kan kontrollere at filen(e) ble riktig lastet ved å:
+jsp.submit.upload-file-list.info4 = Klikke på filnavn ovenfor. Filen vil da åpnes i et nytt vindu slik at du kan kontrollere innholdet.
+jsp.submit.upload-file-list.info5 = Sammenligne sjekksummer som vises ovenfor med sjekksummer kalkulert av din datamaskin. Disse må være like.
+jsp.submit.upload-file-list.info6 = Systemet kan kalkulere en sjekksum som du kan kontrollere.
+jsp.submit.upload-file-list.tableheading1 = Primær<br/>bitstrøm
+jsp.submit.upload-file-list.tableheading2 = Fil
+jsp.submit.upload-file-list.tableheading3 = Størrelse
+jsp.submit.upload-file-list.tableheading4 = Beskrivelse
+jsp.submit.upload-file-list.tableheading5 = Filformat
+jsp.submit.upload-file-list.tableheading6 = Sjekksum
+jsp.submit.upload-file-list.empty1 = <em>Tom</em>
+jsp.submit.upload-file-list.supportlevel1 = støttet
+jsp.submit.upload-file-list.supportlevel2 = kjent
+jsp.submit.upload-file-list.supportlevel3 = ikke støttet
+jsp.submit.upload-file-list.button1 = Endre
+jsp.submit.upload-file-list.button2 = Fjern
+jsp.submit.upload-file-list.button3 = Vis sjekksummer
+jsp.submit.upload-file-list.button4 = Legg til en fil
+jsp.submit.upload-file-list.button5 = &lt; Forrige
+jsp.submit.upload-file-list.button6 = Neste &gt;
+jsp.submit.upload-file-list.button7 = Avbryt/Lagre
+jsp.submit.upload-file-list.help1 = Klikk her for å få mer informasjon om dette.
+jsp.submit.upload-file-list.help2 = Klikk her for å få mer informasjon om dette.
+
+jsp.submit.verify-prune.heading =Registrering: Advarsel
+jsp.submit.verify-prune.info1 =Endringene du har gjort på den første siden for beskrivelse vil kunne påvirke registreringen:
+jsp.submit.verify-prune.info2 =Du har oppgitt at dokumentet ditt ikke har alternative titler, men du har registrert mer enn en tittel. Hvis du velger å beholde denne endringen vil de alternative titlene du har registrert bli slettet.
+jsp.submit.verify-prune.info3 =Du har oppgitt at dokumentet ditt ikke har vært offentliggjort eller publisert tidligere. Du har imidlertid allerede registrert en utgivelsesdato, utgiver og/eller sitering. Hvis du velger å fortsette vil denne informasjonen bli slettet og DSpace vil tilordne en utgitt dato.
+jsp.submit.verify-prune.info4 =Du har oppgitt at dokumentet du registrerer kun består av en fil, men du har allerede lastet opp flere filer. Hvis du velger å forsette vil kun den første filen du lastet opp beholdes. Resten vil bli slettet av systemet. (Filer på din lokale harddisk vil ikke påvirkes.)
+jsp.submit.verify-prune.notproceed.button =Ikke endre
+jsp.submit.verify-prune.proceed.button =Endre
+jsp.submit.verify-prune.question =Er du helt sikker på at du vil forsette med disse endringene?
+jsp.submit.verify-prune.title =Endringer i første side for beskrivelse er registrert
+
+jsp.tombstone.text =Innførselen du prøver å få tilgang til er fjernet fra DSpace. Kontakt DSpace administrator dersom du har spørsmål.
+jsp.tombstone.title =Innførselen er fjernet
+
+jsp.tools.general.cancel = Avbryt
+jsp.tools.general.delete = Slett
+jsp.tools.general.delete-w-confirm = Slett...
+jsp.tools.general.add = Legg til
+jsp.tools.general.select = Velg
+jsp.tools.general.update =Oppdater
+jsp.tools.general.edit = Endre
+jsp.tools.general.remove =Fjern
+jsp.tools.general.view =Vis
+
+jsp.tools.confirm-delete-collection.title = Slett samling
+jsp.tools.confirm-delete-collection.heading = Slett samling: {0}
+jsp.tools.confirm-delete-collection.confirm = Er du sikker på at samlingen <strong>{0}</strong> skal slettes?  Da vil følgende bli slettet:
+jsp.tools.confirm-delete-collection.info1 = Alle samlingens innførsler og uferdige innførsler som ikke finnes i andre samlinger
+jsp.tools.confirm-delete-collection.info2 =Innholdet i innførslene
+jsp.tools.confirm-delete-collection.info3 = Alle retningslinjer for tillatelser
+
+jsp.tools.confirm-delete-community.title = Slett enhet
+jsp.tools.confirm-delete-community.heading = Slett enhet: {0}
+jsp.tools.confirm-delete-community.confirm = Er du sikker på at enheten <strong>{0}</strong> skal slettes? Da vil følgende bli slettet:
+jsp.tools.confirm-delete-community.info1 = Alle samlinger under enheten som ikke omfattes av andre enheter
+jsp.tools.confirm-delete-community.info2 = Alle innførsler og uferdige innførsler som ikke finnes i andre samlinger
+jsp.tools.confirm-delete-community.info3 = Innholdet i innførslene
+jsp.tools.confirm-delete-community.info4 =Alle retningslinjer for tillatelser
+
+jsp.tools.confirm-delete-item.info =Er du sikker på at du vil slette denne innførselen? NB: Det vil ikke ligge noen henvisninger til innførselen etter at denne er slettet.
+jsp.tools.confirm-delete-item.title =Slett innførsel
+
+jsp.tools.confirm-withdraw-item.question =Er du sikker på at du vil fjerne denne innførselen fra arkivet? 
+jsp.tools.confirm-withdraw-item.title =Fjern innførsel
+jsp.tools.confirm-withdraw-item.withdraw.button =Fjern
+
+jsp.tools.edit-collection.title = Oppdater samling
+jsp.tools.edit-collection.heading1 = Opprett samling
+jsp.tools.edit-collection.heading2 = Oppdater samlingen {0}
+jsp.tools.edit-collection.button.delete = Slett denne samlingen...
+jsp.tools.edit-collection.form.label1 = Navn:
+jsp.tools.edit-collection.form.label2 = Kort beskrivelse
+jsp.tools.edit-collection.form.label3 = Introduksjonstekst (HTML):
+jsp.tools.edit-collection.form.label4 = Tekst om opphavsrett (ren tekst):
+jsp.tools.edit-collection.form.label5 = Tekst til høyremarg (HTML):
+jsp.tools.edit-collection.form.label6 = Avtale:
+jsp.tools.edit-collection.form.label7 = Historikk:
+jsp.tools.edit-collection.form.label8 = Logo:
+jsp.tools.edit-collection.form.label9 = Arbeidsprosess for registrering
+jsp.tools.edit-collection.form.label10 = Registratorer:
+jsp.tools.edit-collection.form.label11 = Steg:
+jsp.tools.edit-collection.form.label12 = Samlingsadministratorer:
+jsp.tools.edit-collection.form.label13 = Mal for innførsler:
+jsp.tools.edit-collection.form.label14 = Enhetens tillatelser:
+jsp.tools.edit-collection.form.button.add-logo =Last opp ny logo...
+jsp.tools.edit-collection.form.button.delete-logo = Slett (ingen logo)
+jsp.tools.edit-collection.form.button.set-logo = Last opp en logo...
+jsp.tools.edit-collection.form.button.create = Opprett...
+jsp.tools.edit-collection.form.button.create2 = Opprett
+jsp.tools.edit-collection.form.button.edit = Endre...
+jsp.tools.edit-collection.form.button.delete = Slett
+jsp.tools.edit-collection.form.button.update = Oppdater
+jsp.tools.edit-collection.form.button.cancel = Avbryt
+jsp.tools.edit-collection.wf-role1 = Godkjenn/Forkast
+jsp.tools.edit-collection.wf-role2 = Godkjenn/Forkast/Oppdater metadata
+jsp.tools.edit-collection.wf-role3 = Oppdater metadata
+
+jsp.tools.edit-community.title = Oppdater enhet
+jsp.tools.edit-community.heading1 = Opprett enhet
+jsp.tools.edit-community.heading2 = Oppdater enheten {0}
+jsp.tools.edit-community.button.delete = Slett denne enheten
+jsp.tools.edit-community.form.label1 = Navn:
+jsp.tools.edit-community.form.label2 = Kort beskrivelse
+jsp.tools.edit-community.form.label3 = Introduksjonstekst (HTML):
+jsp.tools.edit-community.form.label4 = Tekst om copyright (ren tekst):
+jsp.tools.edit-community.form.label5 = Tekst til høyremarg (HTML):
+jsp.tools.edit-community.form.label6 = Logo:
+jsp.tools.edit-community.form.label7 = Enhetens tillatelser:
+jsp.tools.edit-community.form.button.add-logo = Last opp ny logo...
+jsp.tools.edit-community.form.button.delete-logo = Slett (ingen logo)
+jsp.tools.edit-community.form.button.set-logo = Last opp en logo...
+jsp.tools.edit-community.form.button.edit = Endre...
+jsp.tools.edit-community.form.button.create = Opprett
+jsp.tools.edit-community.form.button.cancel = Avbryt
+jsp.tools.edit-community.form.button.update = Oppdater
+
+jsp.tools.edit-item-form.addbit.button =Legg til bitstrøm
+jsp.tools.edit-item-form.collections =I samlingene:
+jsp.tools.edit-item-form.delete-w-confirm.button =Slett...
+jsp.tools.edit-item-form.elem1 =Element
+jsp.tools.edit-item-form.elem2 =Kvalifikator
+jsp.tools.edit-item-form.elem3 =Verdi
+jsp.tools.edit-item-form.elem4 =Språk
+jsp.tools.edit-item-form.elem5 =Primær<br/>bitstrøm
+jsp.tools.edit-item-form.elem7 =Navn
+jsp.tools.edit-item-form.elem8 =Kilde
+jsp.tools.edit-item-form.elem9 =Beskrivelse
+jsp.tools.edit-item-form.elem10 =Format
+jsp.tools.edit-item-form.elem11 =Brukers&nbsp;formatbeskrivelse
+jsp.tools.edit-item-form.handle =Handle:
+jsp.tools.edit-item-form.heading =Bitstrømmer
+jsp.tools.edit-item-form.item =Innførselens autorisasjoner:
+jsp.tools.edit-item-form.itemID =Intern ID for innførselen:
+jsp.tools.edit-item-form.itempage = Nettside for innførselen:
+jsp.tools.edit-item-form.modified =Sist oppdatert:
+jsp.tools.edit-item-form.msg =Denne innførselen er fjernet fra DSpace
+jsp.tools.edit-item-form.na = Ikke tilgjengelig
+jsp.tools.edit-item-form.note =Legg merke til at oppdateringer som gjøres her ikke valideres. Du er ansvarlig for at innlagte data får riktig format. IKKE foreta endringer dersom du er usikker på hvilket format som er riktig.
+jsp.tools.edit-item-form.note1 =NB: Endringer i bitstrømmene reflekteres ikke automatisk i Dublin Core metadata du finner ovenfor (f.eks. <code>format.extent, </code>, <code>format.mimetype</code>). Disse må du oppdatere manuelt.
+jsp.tools.edit-item-form.note3 =Legg også merke til at hvis feltet "Brukers formatbeskrivelse" ikke er tomt, vil formatet alltid være satt til "Ukjent".  Brukers formatbeskrivelse må derfor nullstilles før formatfeltet endres.
+jsp.tools.edit-item-form.reinstate.button =Gjenopprett
+jsp.tools.edit-item-form.title =Endre innførsel
+jsp.tools.edit-item-form.withdraw-w-confirm.button =Fjern...
+
+jsp.tools.eperson-list.close.button = Lukk
+jsp.tools.eperson-list.heading = E-personer {0}-{1} av {2}
+jsp.tools.eperson-list.info1 = Ved å klikke på "Legg til" knappen ved siden av en e-person kan du legge vedkommende til i gruppen.
+jsp.tools.eperson-list.title = Velg e-personer
+jsp.tools.eperson-list.jump.one-back = &lt; 1 side
+jsp.tools.eperson-list.jump.five-back = &lt; 5 sider
+jsp.tools.eperson-list.jump.one-forward = 1 side &gt;
+jsp.tools.eperson-list.jump.five-forward = 5 sider &gt;
+jsp.tools.eperson-list.jump.first = Første
+jsp.tools.eperson-list.jump.last = Siste
+jsp.tools.eperson-list.th.id = ID
+jsp.tools.eperson-list.th.id.sortedby = ID &uarr;
+jsp.tools.eperson-list.th.email = E-post
+jsp.tools.eperson-list.th.email.sortedby = E-post &uarr;
+jsp.tools.eperson-list.th.lastname = Etternavn
+jsp.tools.eperson-list.th.lastname.sortedby = Etternavn &uarr;
+jsp.tools.eperson-list.th.firstname = Fornavn
+
+jsp.tools.get-item-id.find.button =Finn
+jsp.tools.get-item-id.handle =Handle:
+jsp.tools.get-item-id.heading =Endre eller slette innførsel
+jsp.tools.get-item-id.info1 =<strong>ID du skrev inn er ikke gyldig for noen innførsel.</strong> Hvis du ønsker å endre en enhet eller samling må du bruke <a href="{0}">enhetens/samlingens administrasjonsside</a>.
+jsp.tools.get-item-id.info2 =Skriv inn handle eller intern ID for innførselen du ønsker å oppdatere eller slette.
+jsp.tools.get-item-id.internal =Intern ID:
+jsp.tools.get-item-id.title =Oppdatere innførsel
+
+jsp.tools.group-edit.heading =Nåværende medlemmer i gruppen
+jsp.tools.group-edit.name =Navn:
+jsp.tools.group-edit.title =Endre gruppe
+jsp.tools.group-edit.update.button =Oppdater gruppe
+
+jsp.tools.group-list.create.button =Opprett ny gruppe
+jsp.tools.group-list.name =Navn
+jsp.tools.group-list.id =ID
+jsp.tools.group-list.note1 =Legg merke til at det ikke er nødvendig å legge til brukere i "anonym" gruppen manuelt - alle brukere er automatisk medlemmer av gruppen.
+jsp.tools.group-list.note2 =Advarsel! Dersom du prøver å slette en gruppe som refereres i en retningslinje, eller er del av en arbeidsgruppe vil det genereres en intern serverfeil.
+jsp.tools.group-list.title =Administrasjon av grupper
+
+jsp.tools.itemmap-main.collection =Samling: "{0}"
+jsp.tools.itemmap-main.heading =Knytt til innførsler fra andre samlinger
+jsp.tools.itemmap-main.info1 =Det er {0} innførsler i denne samlingen, og {1} innførsler knyttet til  fra andre samlinger.
+jsp.tools.itemmap-main.info4 =Forfattersøk
+jsp.tools.itemmap-main.info5 =Skriv inn deler av forfatternavnet for å søke etter dokumentet du ønsker å knytte til denne samlingen
+jsp.tools.itemmap-main.info6 =Liste over tilknyttede innførsler fra andre samlinger:
+jsp.tools.itemmap-main.info7  =Ønsker du å fjerne innførsler som er tilknyttet denne samlingen? Klikk på lenke til en samling i listen nedenfor for å lete frem innførsler som skal fjernes.
+jsp.tools.itemmap-main.info8 =Samlingen du er i nå har ingen innførsler.
+jsp.tools.itemmap-main.search.button =Søk etter forfatter
+jsp.tools.itemmap-main.title =Tilknytningsverktøy
+
+jsp.tools.itemmap-browse.title = Bla igjennom innførsler
+jsp.tools.itemmap-browse.heading-authors = Bla igjennom innførsler for ''{0}''
+jsp.tools.itemmap-browse.heading-collection = Bla igjennom samlingen {0}
+jsp.tools.itemmap-browse.infomsg = Kryss av i boksen ved siden av innførselen du ønsker å knytte til eller fjerne, og velg "legg til til" eller "fjern".
+jsp.tools.itemmap-browse.th.date = Dato
+jsp.tools.itemmap-browse.th.author = Første forfatter
+jsp.tools.itemmap-browse.th.title = Tittel
+jsp.tools.itemmap-browse.th.action = Handling
+jsp.tools.itemmap-browse.th.remove = Fjern
+
+jsp.tools.itemmap-info.title = Informasjon om tilknytning av innførsler
+jsp.tools.itemmap-info.heading = Informasjon om tilknytning av innførsler
+jsp.tools.itemmap-info.button.continue = Fortsett
+jsp.tools.itemmap-info.msg.none-selected = Ingen innførsler ble valgt, og ingen ble knyttet til.
+# I de to neste tekstene består parameteret kun av ID for en innførsel
+jsp.tools.itemmap-info.msg.remove = Fjern innførselen {0}
+jsp.tools.itemmap-info.msg.added = Knytt til innførselen {0}
+
+jsp.tools.upload-bitstream.info =Velg bitstrøm du ønsker å laste opp
+jsp.tools.upload-bitstream.title =Last opp bitstrøm
+jsp.tools.upload-bitstream.upload =Last opp
+
+jsp.workspace.ws-error.title = Mitt DSpace - feil på arbeidsområdet
+jsp.workspace.ws-error.heading = Feil - Innføsel på arbeidsområdet
+jsp.workspace.ws-error.errormsg1 = Systemet var ute av stand til å etterkomme forespu00F8rselen din. Du mu00E5 spesifisere en innfu00F8rsel.
+jsp.workspace.ws-error.errormsg2 = Gå tilbake til "Mitt DSpace" og velg "Åpne" for innførselen du ønsker å arbeide med. Ta kontakt med DSpace administrator dersom du fremdeles har problemer.
+
+jsp.workspace.ws-main.title = Mitt DSpace
+jsp.workspace.ws-main.wsitem =Uferdige registreringer
+jsp.workspace.ws-main.submitmsg = Denne registreringen skal legges til samlingen:
+jsp.workspace.ws-main.optionheading = Alternativer
+jsp.workspace.ws-main.descheading = Beskrivelse
+jsp.workspace.ws-main.button.edit = Endre
+jsp.workspace.ws-main.editmsg = Åpne registreringen for oppdatering og filadministrasjon
+jsp.workspace.ws-main.button.view = Vis
+jsp.workspace.ws-main.viewmsg = Vis registreringen slik den ser ut på det nåværende stadium i registreringsprosessen.
+jsp.workspace.ws-main.button.remove = Fjern 
+jsp.workspace.ws-main.removemsg = Fjern registreringen fra DSpace.
+
+jsp.workspace.wsv-error.title = Mitt DSpace - registrering på arbeidsområdet
+jsp.workspace.wsv-error.heading = Feil - Registrering på arbeidsområdet
+jsp.workspace.wsv-error.errormsg1 = Systemet var ute av stand til å etterkomme forespørselen din. Du må spesifisere en registrering.
+jsp.workspace.wsv-error.errormsg2 = Gå tilbake til "Mitt DSpace" og velg "Åpne" for registreringen du ønsker å arbeide med. Velg deretter "Vis" fra listen over alternativer. Ta kontakt med DSpace administrator dersom du fremdeles har problemer.
+
+org.dspace.app.webui.jsptag.CollectionListTag.collectionName = Navn på samling
+
+org.dspace.app.webui.jsptag.CommunityListTag.communityName = Navn på enhet
+
+org.dspace.app.webui.jsptag.ItemListTag.issueDate = Utgivelsesdato
+org.dspace.app.webui.jsptag.ItemListTag.title = Tittel
+org.dspace.app.webui.jsptag.ItemListTag.authors = Forfatter
+
+org.dspace.app.webui.jsptag.ItemTag.full = Fullstendig metadatavisning
+org.dspace.app.webui.jsptag.ItemTag.dcfield = DC Felt
+org.dspace.app.webui.jsptag.ItemTag.value = Verdi
+org.dspace.app.webui.jsptag.ItemTag.lang = Språk
+org.dspace.app.webui.jsptag.ItemTag.appears = Vises i samlingene:
+org.dspace.app.webui.jsptag.ItemTag.files = Tilhørende filer:
+org.dspace.app.webui.jsptag.ItemTag.description = Beskrivelse
+org.dspace.app.webui.jsptag.ItemTag.files.no = Det er ingen filer knyttet til denne registreringen.
+org.dspace.app.webui.jsptag.ItemTag.file = Fil
+org.dspace.app.webui.jsptag.ItemTag.filesize = Størrelse
+org.dspace.app.webui.jsptag.ItemTag.fileformat = Format
+org.dspace.app.webui.jsptag.ItemTag.view = Vis/Åpne
+org.dspace.app.webui.jsptag.ItemTag.itemprotected = Dette dokumentet er beskyttet av copyright
+org.dspace.app.webui.jsptag.ItemTag.viewlicence = Vis avtale
+
+org.dspace.app.webui.jsptag.SelectEPersonTag.selectPeople = Velg e-personer (?)
+org.dspace.app.webui.jsptag.SelectEPersonTag.selectPerson = Velg e-person...
+org.dspace.app.webui.jsptag.SelectEPersonTag.removeSelected = Nullstill

@@ -1,0 +1,920 @@
+# Version: $Revision$
+# Date:    $Date$
+
+jsp.adminhelp = Admin Help...
+jsp.administer = Administer
+jsp.admintools = Admin Tools
+
+jsp.general.authors.button = Szerzők
+jsp.general.date.button = Dátum
+jsp.general.edit.button = Szerkesztés...
+jsp.general.titles.button = Cím
+jsp.general.go = Indítás
+jsp.general.search.button = Indítás
+jsp.general.gohome = A DSpace nyitóoldalára
+jsp.general.location = Keresés itt:
+jsp.general.genericScope = A teljes DSpace rendszer
+jsp.general.searchfor =<strong>Keresés</strong>&nbsp;
+jsp.general.orbrowse =<strong>Böngészhet:</strong>&nbsp;
+jsp.general.untitled = (Nincs cím)
+
+jsp.browse.general.next = Következő oldal
+jsp.browse.general.previous = Előző oldal
+jsp.browse.general.go = Indítás
+
+jsp.browse.authors.enter = vagy írjon be néhány betűt a szerző nevének kezdetéről:
+jsp.browse.authors.jump = Kezdőbetű szerint
+jsp.browse.authors.show = Szerzők listája: {0}-{1}. Összesen {2}.
+jsp.browse.authors.title = Szerzők szerinti böngészés
+
+jsp.browse.items-by-author.heading1 = Dokumentumok a szerzőtől:
+jsp.browse.items-by-author.return = Visszatérés a szerző-böngészőhöz
+jsp.browse.items-by-author.show = {0} dokumentum listája.
+jsp.browse.items-by-author.sort1 = Cím szerint rendezve
+jsp.browse.items-by-author.sort2 = Rendezés a megjelenés dátuma szerint!
+jsp.browse.items-by-author.sort3 = Rendezés a dokumentum címe szerint!
+jsp.browse.items-by-author.sort4 = Megjelenés dátuma szerint rendezve
+jsp.browse.items-by-author.title = Szerző dokumentumainak listája
+
+jsp.browse.items-by-date.jump = Ugrás a listában ide:
+jsp.browse.items-by-date.month = (Válasszon hónapot)
+jsp.browse.items-by-date.old = A legrégebbit előre!
+jsp.browse.items-by-date.order1 = Rendezve a legfrissebbel kezdődően
+jsp.browse.items-by-date.order2 = Rendezve a legrégebbivel kezdődően
+jsp.browse.items-by-date.recent = A legfrissebbet előre!
+jsp.browse.items-by-date.show = Dokumentumok listája: {0}-{1}. Összesen {2}.
+jsp.browse.items-by-date.title = Dátum szerinti böngészés
+jsp.browse.items-by-date.type = vagy adjon meg egy évszámot:
+jsp.browse.items-by-date.year = (Válasszon évet)
+
+jsp.browse.items-by-title.enter = vagy írja be a cím kezdetét:
+jsp.browse.items-by-title.jump = Kezdőbetű szerint
+jsp.browse.items-by-title.show = Dokumentumok listája: {0}-{1}. Összesen {2}.
+jsp.browse.items-by-title.title = Cím szerinti böngészés
+
+jsp.browse.no-results.col = Egyetlen elem sincs ebben a gyűjteményben: "{0}".
+jsp.browse.no-results.com = Egyetlen elem sincs ebben a kategóriában: "{0}".
+jsp.browse.no-results.genericScope =  Egyetlen bejegyzés sincs a DSpace rendszerben.
+jsp.browse.no-results.title = Nincs bejegyzés a listában.
+
+jsp.collection-home.editsub.button = Beküldésre jogosultak
+jsp.collection-home.heading1 = Kollekció kezdőoldala
+jsp.collection-home.info = Feliratokzások megtekintése
+jsp.collection-home.item.button = Item Mapper
+jsp.collection-home.recentsub = Utóbb&nbsp;beérkezett dokumentumok
+jsp.collection-home.submit.button = Dokumentum beküldése
+jsp.collection-home.subscribe = Feliratkozás
+jsp.collection-home.subscribe.msg =  Iratkozzon fel erre a gyűjteményre, hogy az új dokumantumokról naponta e-mailben tájékoztassuk.
+jsp.collection-home.subscribed = Ön már feliratkozott erre a gyűjteményre.
+jsp.collection-home.unsub = Leiratkozás
+
+jsp.community-home.create1.button = Új gyűjtemény
+jsp.community-home.create2.button = Új alkategória
+jsp.community-home.heading1 = Kategória kezdőoldala
+jsp.community-home.heading2 = Gyűjtemények ebben a kategóriában
+jsp.community-home.heading3 = A kategória alkategóriái
+jsp.community-home.recentsub = Utóbb&nbsp;beérkezett dokumentumok
+
+jsp.community-list.create.button = Felsőszintű kategória létrehozása...
+jsp.community-list.text1 = Az alábbi listában a böngészhető kategóriákat és gyűjteményeket soroltuk fel.
+jsp.community-list.title = Kategóriák és gyűjtemények
+
+jsp.components.contact-info.details = {0} kezelőinek elérhetősége:
+jsp.components.contact-info.email = E-mail:
+
+jsp.components.login-form.newuser = Új felhasználó? Kattintson ide, és regisztráljon!
+jsp.components.login-form.email = E-mail cím:
+jsp.components.login-form.enter = Az alábbi űrlapon adja meg az e-mail címét és jelszavát.
+jsp.components.login-form.forgot = Elfelejtette a jelszavát?
+jsp.components.login-form.login = Bejelentkzés
+jsp.components.login-form.password = Jelszó:
+
+jsp.components.ldap-form.newuser = Új felhasználó? Kattintson ide, és regisztráljon!
+jsp.components.ldap-form.enter = Az alábbi űrlapon adja meg az e-mail címét és jelszavát.
+jsp.components.ldap-form.username-or-email = Felhasználónév <br />vagy e-mail cím:
+jsp.components.ldap-form.password = Jelszó:
+jsp.components.ldap-form.login.button = Bejelentkezés
+
+jsp.display-item.copyright = Minden dokumentum, ami a DSpace rendszerben szerepel, szerzői jogokkal védett. Minden jog fenntartva!
+jsp.display-item.identifier = Ezzel az azonosítóval hivatkozhat erre a dokumentumra forrásmegjelölésben vagy hiperhivatkozás esetén:
+jsp.display-item.license =Creative Commons License
+jsp.display-item.text1 = Áttekintő adatok a dokumentumról
+jsp.display-item.text2 = A dokumentum részletes adatai
+jsp.display-item.text3 =This item is licensed under a
+jsp.display-item.back_to_workspace = Vissza a munkaterületre
+
+jsp.error.404.title = Hiba: a kért oldal nem található
+jsp.error.404.text1 = A dokumentum, amihez hozzá kívánt férni, nem található ezen a kiszolgálón.
+jsp.error.404.text2 = Ha valaki mástól kapott hivatkozás vagy könyvjelző használatával jutott ide, akkor az lehet hibás vagy elgépelte azt. Ellenőrizze a hivatkozást, és próbálja újra. Ha továbbra is ezt a hibaüzenetet kapja, próbáljon a <a href="{0}">DSpace kezdőoldaláról</a> indulva eljutni a kívánt elemhez.
+jsp.error.404.text3 = Ha a DSpace valamely hivatkozását követve kapta ezt a hibaüzenetet, kérjük tudassa velünk, hogy kijavíthassuk a hibát!
+
+jsp.error.authorize.title = Hiányoznak jogosultságai
+jsp.error.authorize.text1 = Nincs jogosultsága arra a tevékenységre, amit éppen végrehajtani próbált.
+jsp.error.authorize.text2 = Ha úgy gondolja, jogosult erre a tevékenységre, kérjük lépjen kapcsolatba a DSpace üzemeltetőivel:
+
+jsp.error.integrity.heading = Rendszerhiba: rossz HTTP-kérés
+jsp.error.integrity.list1 = Ha a böngészője "vissza" gombját olyan tevékenység közben használja, mint például a dokumentum beküldése, olyan tevékenység újra-elvégzését kérheti, amit valójában már elvégzett (mint például feltöltés jóváhagyása). A böngésző "újratölt" vagy "frissít" gombjai is hasonló hatást válthatnak ki.
+jsp.error.integrity.list2 = Ha valaki mástól kapott hivatkozás vagy könyvjelző használatával jutott ide, akkor az lehet hibás vagy elgépelte azt. Ellenőrizze a hivatkozást, és próbálja újra.
+jsp.error.integrity.list3 = Ha egyszerre tönn böngészőablakban használja a DSpace rendszert, akkor is szembesülhet ilyen problémával: az egyik ablakban megnyomott gomb agy másik ablakban valamely gomb hatását érvénytelenítheti.
+jsp.error.integrity.list4 = Előfordulhat az is, hogy a rendszer egy hiányosságát fedezte fel! Minden hasonló hibát naplózunk és rendszeresen ellenőrizzük, hogy kijavíthassuk a hibákat.
+jsp.error.integrity.text1 = A böngészőjétől kapott adatokkal probléma van <small>(inkonzisztencia)</small>. Ennek különféle okai lehetnek:
+jsp.error.integrity.text2 = Ha a probléma újra és újra jelentkezik, kérjük lépjen kapcsolatba a DSpace üzemeltetőivel:
+jsp.error.integrity.title = Hibás HTTP-kérés
+
+jsp.error.internal.text1 = A rendszerben belső hiba lépett fel. Kérjük, próbálja újra azt, ami az imént ebbe a hibába torkollt. Ha a probléma újra jelentkezik, lépjen kapcsolatba a DSpace üzemeltetőivel, hogy kijavíthassuk a hibát.
+jsp.error.internal.title = Belső hiba a kiszolgálóban
+
+jsp.error.invalid-id.title = Érvénytelen azonosító
+jsp.error.invalid-id.list1 = A kért oldal címe (URL) hibás. Ha egy külső oldalról követett egy linket, akkor lehetséges, hogy elgépelték azt.
+jsp.error.invalid-id.list2 = Valamely űrlapba érvénytelen azonosítót (ID) írt be. Kérjük, próbálja újra!
+jsp.error.invalid-id.text1 = A megadott azonosító ({0}) nem felel meg egyetlen valódi elemnek ({1}) sem a DSpace rendszerben. Ennek oka az alábbiak lehetnek:
+jsp.error.invalid-id.text2 = Ha a probléma továbbra is fenn áll, vagy az azonosítót (ID) a hiba ellenére valódinak találja, lépjen kapcsolatba a DSpace üzemeltetőivel.
+
+jsp.error.require-certificate.title = Tanusítvány szükséges
+jsp.error.require-certificate.text = A DSpace ezen példányának beállításai szerint egy valódi webes tanusítvány szükséges ahhoz, hogy bejelentkezzen. Ha problémája akad ezzel kapcsolatban, lépjen kapcsolatba az üzemeltetőkkel!
+
+jsp.feedback.acknowledge.title = Köszönjük a hozzászólását
+jsp.feedback.acknowledge.text = A hozzászólása megérkezett.
+
+jsp.feedback.form.comment = Hozzászólás, visszajelzés:
+jsp.feedback.form.email = Az Ön e-mail címe:
+jsp.feedback.form.title = Visszajelzési űrlap
+jsp.feedback.form.send = Elküldés
+jsp.feedback.form.text1 = Köszönjük, hogy veszi a fáradtságot, és megosztja velünk megjegyzéseit a DSpace rendszerrel kapcsolatban. A hozzászólását nagyra értékeljük!
+jsp.feedback.form.text2 = Kérjük, töltse ki az alábbi mezőket.
+
+jsp.help = Segítség...
+jsp.help.formats.contact1 = Please contact your
+jsp.help.formats.contact2 = DSpace Administrator
+jsp.help.formats.contact3 = if you have questions about a particular format.
+jsp.help.formats.extensions = Extensions
+jsp.help.formats.policy = Format Support Policy
+jsp.help.formats.support-levels = Format Support Levels
+jsp.help.formats.whattodo = What To Do If Your Format Isn't Listed
+jsp.help.formats.title = DSpace Supported Formats
+jsp.help.formats.here = (Your Site's Format Support Policy Here)
+jsp.help.formats.mime = MIME Type
+jsp.help.formats.name = Name
+jsp.help.formats.return = return to main help
+jsp.help.formats.support = Support Level
+jsp.help.formats.support.supported = supported
+jsp.help.formats.support.known = known
+jsp.help.formats.support.unknown = unknown
+jsp.help.formats.top = top
+
+jsp.home.com1 = Kategóriák a DSpace rendszerben
+jsp.home.com2 = Valamely kategória kiválasztása után böngészheti annak alkategóriáit és gyűjteményeit.
+jsp.home.search1 = Keresés
+jsp.home.search2 = A keresett kifejezést írja be az alábbi mezőbe!
+jsp.home.title = Honlap
+
+jsp.layout.footer-default.text = <a target=_blank href="http://www.dspace.org/">DSpace Software</a> Copyright&nbsp;&copy;&nbsp;2002-2004&nbsp;<a target=_blank href="http://web.mit.edu/">MIT</a>&nbsp;and&nbsp;<a target=_blank href="http://www.hp.com/">Hewlett-Packard</a>
+jsp.layout.footer-default.feedback = Visszajelzés küldése
+
+jsp.layout.header-default.about = A DSpace rendszerről
+jsp.layout.header-default.alt = DSpace
+
+jsp.layout.navbar-admin.communities-collections = Communities/<br/>Collections
+jsp.layout.navbar-admin.epeople = E-people
+jsp.layout.navbar-admin.groups = Groups
+jsp.layout.navbar-admin.items = Items
+jsp.layout.navbar-admin.dcregistry = Dublin Core<br/>Registry
+jsp.layout.navbar-admin.formatregistry = Bitstream Format<br/>Registry
+jsp.layout.navbar-admin.workflow = Workflow
+jsp.layout.navbar-admin.authorization = Authorization
+jsp.layout.navbar-admin.editnews = Edit News
+jsp.layout.navbar-admin.supervisors = Supervisors
+jsp.layout.navbar-admin.statistics = Statistics
+jsp.layout.navbar-admin.help = Help
+jsp.layout.navbar-admin.logout = Log Out
+
+jsp.layout.navbar-default.about = A rendszerről
+jsp.layout.navbar-default.advanced = Speciális keresés
+jsp.layout.navbar-default.authors = Szerzők
+jsp.layout.navbar-default.browse = Böngészés
+jsp.layout.navbar-default.communities-collections = Kategóriák és gyűjtemények
+jsp.layout.navbar-default.date = Megjelenés dátuma
+jsp.layout.navbar-default.edit = Edit Profile
+jsp.layout.navbar-default.go = Indítás
+jsp.layout.navbar-default.help = Segítség
+jsp.layout.navbar-default.home = Honlap
+jsp.layout.navbar-default.loggedin = Bejelentkezett felhasználónk: {0}
+jsp.layout.navbar-default.logout = Kijelentkezés
+jsp.layout.navbar-default.receive = E-mail értesítés<br/>frissítésekről
+jsp.layout.navbar-default.search = Keresés:
+jsp.layout.navbar-default.sign = Bejelentkezés:
+jsp.layout.navbar-default.titles = Címek
+jsp.layout.navbar-default.users = Saját DSpace
+jsp.layout.navbar-default.users-authorized = <small>hitelesített felhasználók</small>
+
+jsp.login.incorrect.heading = Bejelentkezés a rendszerbe
+jsp.login.incorrect.text = A megadott e-mail cím és jelszó páros nem érvényes. Kérjük, próbálja újra. Esetleg <a href="{0}">elfelejtette a jelszavát</a>?
+jsp.login.incorrect.title = Bejelentkezés
+
+jsp.login.ldap.title = Bejelentkezés
+jsp.login.ldap.heading = Bejelentkezés a rendszerbe
+
+jsp.login.ldap-incorrect.title = Bejelentkezés
+jsp.login.ldap-incorrect.heading = Bejelentkezés a rendszerbe
+jsp.login.ldap-incorrect.errormsg = A megadott felhasználónév és jelszó páros nem érvényes. Próbálja újra!
+
+jsp.login.logged-out.title = Sikeres kijelentkezés
+jsp.login.logged-out.thank = Köszönjük, hogy nem felejtett el kijelentezni!
+
+jsp.login.no-valid-cert.heading = Bejelentkezés a rendszerbe
+jsp.login.no-valid-cert.text = <strong>Úgy tűnik, nincs érvényes webes tanusítványa.</strong> Próbálja újra!
+jsp.login.no-valid-cert.title = Bejelentkezés
+
+jsp.login.not-in-records.register = Regisztráció a DSpace rendszerbe
+jsp.login.not-in-records.text = Bár van érvényes webes tanusítványa, a DSpace rendszerben nincs bejegyzés Önről. <a href="{0}">Regisztrálnia kell</a> mielőtt a rendszernek felhasználói fiókhoz kötött részét használja.
+jsp.login.not-in-records.title = Nem áll rendelkezésre felhasználói bejegyzés
+
+jsp.login.password.heading = Bejelentkezés a rendszerbe
+jsp.login.password.title = Bejelentkezés
+
+jsp.morehelp = További segítség...
+
+jsp.mydspace = My DSpace
+jsp.mydspace.general.remove = Remove
+jsp.mydspace.general.approve = Approve
+jsp.mydspace.general.reject =Reject
+jsp.mydspace.general.cancel =Cancel
+jsp.mydspace.general.goto-mydspace = Go to My DSpace
+jsp.mydspace.general.backto-mydspace = Back to My DSpace
+jsp.mydspace.general.returnto-mydspace =Return to My DSpace
+
+jsp.mydspace.in-archive.heading1 =Thank You
+jsp.mydspace.in-archive.return.link =Return to My DSpace
+jsp.mydspace.in-archive.text1 =The submission has been placed in the main archive.  It has been assigned the following identifier:
+jsp.mydspace.in-archive.text2 =Notification has been sent to the appropriate people.
+jsp.mydspace.in-archive.title =Submission Archived
+
+jsp.mydspace.main.elem1 =Title
+jsp.mydspace.main.elem2 =Submitted to
+jsp.mydspace.main.heading2 =Owned Tasks
+jsp.mydspace.main.heading3 = Tasks in the Pool
+jsp.mydspace.main.heading4 =Unfinished Submissions
+jsp.mydspace.main.heading5 =Submissions In Workflow Process
+jsp.mydspace.main.item =Item
+jsp.mydspace.main.link =See Your Subscriptions
+jsp.mydspace.main.perform.button =Perform This Task
+jsp.mydspace.main.return.button =Return to Pool
+jsp.mydspace.main.start.button =Start a New Submission
+jsp.mydspace.main.sub1 =Review Submission
+jsp.mydspace.main.sub2 =Check Submission
+jsp.mydspace.main.sub3 =Final Edit of Submission
+jsp.mydspace.main.subby =Submitted By
+jsp.mydspace.main.subto =Submitted To
+jsp.mydspace.main.take.button =Take Task
+jsp.mydspace.main.task =Task
+jsp.mydspace.main.text1 =Below are the current tasks that you have chosen to do.
+jsp.mydspace.main.text2 =Below are tasks in the task pool that have been assigned to you.
+jsp.mydspace.main.text4 =This section is for use in the continued authoring of your document.
+jsp.mydspace.main.view.button =View Accepted Submissions
+jsp.mydspace.main.authoring = Authoring
+jsp.mydspace.main.supervising = Supervising
+
+jsp.mydspace.own-submissions.text1 =There are no items in the main archive that have been submitted by you.
+jsp.mydspace.own-submissions.text2 =Below are listed your previous submissions that have been accepted into the archive.
+jsp.mydspace.own-submissions.text3 =There is <strong>1</strong> item in the main archive that was submitted by you.
+jsp.mydspace.own-submissions.text4 =There are <strong>{0}</strong> items in the main archive that were submitted by you.
+jsp.mydspace.own-submissions.title =Your Submissions
+
+jsp.mydspace.perform-task.commit.button=Commit to Archive
+jsp.mydspace.perform-task.edit.button =Edit Metadata
+jsp.mydspace.perform-task.instruct1 =If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".
+jsp.mydspace.perform-task.instruct2 =Once you've edited the item, use this option to commit the item to the archive.
+jsp.mydspace.perform-task.instruct3 =If you have reviewed the item and found it is <strong>not</strong> suitable for inclusion in the collection, select "Reject".  You will then be asked to enter a message indicating why the item is unsuitable, and whether the submitter should change something and re-submit.
+jsp.mydspace.perform-task.instruct4 =Select this option to correct, amend or otherwise edit the item's metadata.
+jsp.mydspace.perform-task.instruct5 =If you wish to leave this task for now, and return to your "My DSpace", use this option.
+jsp.mydspace.perform-task.instruct6 =To return the task to the pool so that another user can perform the task, use this option.
+jsp.mydspace.perform-task.later.button =Do Later
+jsp.mydspace.perform-task.return.button =Return Task to Pool
+jsp.mydspace.perform-task.text1 =The following item has been submitted to collection <strong>{0}</strong>. Please review the item, check that it meets the criteria for entry into the collection.  After reviewing the item, please approve or reject the item using the controls at the bottom of the page.
+jsp.mydspace.perform-task.text3 =The following item has been submitted to collection <strong>{0}</strong>. Please review the item, check that it meets the criteria for entry into the collection.  After reviewing the item, you may edit the metadata with the item, and then approve or reject the item using the controls at the bottom of the page.
+jsp.mydspace.perform-task.text4 =The following item has been accepted for inclusion in collection <strong>{0}</strong>. Please perform any necessary edits of the metadata to conform with the standards of the collection, and then commit the item to the archive using the controls at the bottom of the page.
+jsp.mydspace.perform-task.title =Perform Task
+
+jsp.mydspace.preview-task.accept.button =Accept This Task
+jsp.mydspace.preview-task.text1 =The following item has been submitted to collection <strong>{0}</strong>. In order to accept the task of reviewing this item, please click "Accept This Task" below.
+jsp.mydspace.preview-task.text3 =The following item has been submitted to collection <strong>{0}</strong>. In order to accept the task of checking this item, please click "Accept This Task" below.
+jsp.mydspace.preview-task.text4 =The following item has been accepted for inclusion in collection <strong>{0}</strong>. In order to accept the task of the final edit of this item, please click "Accept This Task" below.
+jsp.mydspace.preview-task.title =Preview Task
+
+jsp.mydspace.reject-reason.cancel.button =Cancel Rejection
+jsp.mydspace.reject-reason.reject.button =Reject Item
+jsp.mydspace.reject-reason.text1 =Please enter the reason you are rejecting the submission into the box below.  Please indicate in your message whether the submitter should fix a problem and resubmit.
+jsp.mydspace.reject-reason.title =Enter Reason for Rejection
+
+jsp.mydspace.remove-item.cancel.button =Cancel Removal
+jsp.mydspace.remove-item.confirmation =Are you sure you want to remove the following incomplete item?
+jsp.mydspace.remove-item.remove.button =Remove the Item
+jsp.mydspace.remove-item.title =Remove Item
+
+jsp.mydspace.subscriptions.info1 =Your subscriptions have been updated.
+jsp.mydspace.subscriptions.info2 =To subscribe to a collection, visit the collection's home page, and click on the "Subscribe" button.
+jsp.mydspace.subscriptions.info3 =Below are the collections you are subscribed to.  You will be sent an e-mail each day detailing new items that have become available in these collections.  On days that no new items have appeared, no e-mail will be sent.
+jsp.mydspace.subscriptions.info4 =You are not currently subscribed to any collections.
+jsp.mydspace.subscriptions.remove.button =Remove All Subscriptions
+jsp.mydspace.subscriptions.title =Your Subscriptions
+jsp.mydspace.subscriptions.unsub.button =Unsubscribe
+
+jsp.mydspace.task-complete.title =Thank You
+jsp.mydspace.task-complete.text1 =The task is complete, and notification has been sent to the appropriate people.
+
+jsp.register.general.return-home = Visszatérés a DSpace honlapra
+
+jsp.register.already-registered.info1 = Az adatbázisunk szerint Önnek már van aktív felhasználói fiókja a DSpace rendszerünkben.
+jsp.register.already-registered.info2 = Beállíthat <a href="{0}">új jelszót</a>, ha elfelejtette a korábbit.
+jsp.register.already-registered.info4 = Ha problémája van a bejelentkezéssel, lépjen kapcsolatba velünk!
+jsp.register.already-registered.title = Ön már regisztrált felhasználó
+
+jsp.register.cannot-register.msg = Ezen DSpace rendszer beállítása nem teszi lehetővé, hogy regisztrálja magát. Kéréseivel lépjen kapcsolatba az üzemeltetőkkel.
+jsp.register.cannot-register.title = Nem lehet regisztrálni
+
+jsp.register.edit-profile.info1 = Töltse ki az összes szükséges mezőt!
+jsp.register.edit-profile.info2 = A kétszer megadott jelszónak egyeznie kell, és legalább 6 karakterből kell állni.
+jsp.register.edit-profile.info3 = Írja be vagy helyesbítse az alábbi információkat. A *-al jelölt mezők kitöltése kötelező.
+jsp.register.edit-profile.info5 =<strong>Lehetősége van</strong> új jelszó beállítására: írja be az alábbi mezőkbe kétszer a kívánt jelszót. Legalább 6 karakter hosszú jelszót válasszon!
+jsp.register.edit-profile.pswd.field =Új jelszó:
+jsp.register.edit-profile.confirm.field = Ellenőrzésképpen mégegyszer:
+jsp.register.edit-profile.title = Profil szerkesztése
+jsp.register.edit-profile.update.button = Profil frissítése
+
+jsp.register.forgot-password.email.field = E-mail cím:
+jsp.register.forgot-password.forgot.button = Elfelejtettem a jelszavam
+jsp.register.forgot-password.info1 = A megadott e-mail címet a rendszer nem ismerte fel. Kérjük, próbálja újra.
+jsp.register.forgot-password.info2 = Kérjük írja be az e-mail címét az alábbi mezőbe és kattintson az "elfelejtettem a jelszavam" gombra. Egy e-mailt fog kapni, és az abban leírtak alapján lehetősége lesz új jelszót beállítani.
+jsp.register.forgot-password.title = Elfelejtett jelszó
+
+jsp.register.inactive-account.info = Az Ön által megadott e-mail cím egy nem aktív felhasználói fiókhoz tartozik. Talán még nem is <a href="{0}">regisztrált</a>? Ha kérése vagy kérdése van, kérjük forduljon a rendszer üzemeltetőihez.
+jsp.register.inactive-account.title = Nem aktív felhasználói fiók
+
+jsp.register.invalid-token.info1 = A regisztrációhoz vagy elfelejtett jelszó pótlásához tartozó zseton az URL-ben érvénytelen. Ennek oka az alábbiakban keresendő:
+jsp.register.invalid-token.info2 = Talán helytelenül szerepel a zseton az URL-ben. Némely elektronikus levelezőprogram széttöri a hosszú sorokat, ezért lehet, hogy az Önnek elküldött speciális címet két sorba tördelte az itt látható módon:
+jsp.register.invalid-token.info3 = Ha valóban ez a helyzet, akkor másolja az első sort a bongésző címbeviteli mezőjébe, majd másolja a második sort közvetlenül az előbbi mögé szóköz nélkül. Ekkor a címbeviteli mezőben valami ilyesmi kell, hogy szerepeljen:
+jsp.register.invalid-token.info4 = Ezt követően használja a "return" billentyűt a művelet lezárására.
+jsp.register.invalid-token.info5 = Ha továbbra is problámába ütközik, lépjen kapcsolatba az üzemeltetőkkel.
+jsp.register.invalid-token.title = Érvénytelen zseton
+
+jsp.register.new-ldap-user.title = Felhasználói regisztráció
+jsp.register.new-ldap-user.heading = Felhasználói regisztráció
+jsp.register.new-ldap-user.info1 = A beírt felhasználói név, jelszó vagy e-mail cím érvénytelen. Próbálja újra!
+jsp.register.new-ldap-user.info2 = Ha korábban nem jelentkezett be a DSpace rendszerbe, adja meg a felhasználónevét, jelszavát és e-mail címét az alábbi mezőkben, és kattintson a "regisztráció" gombra. Ha nincsen még felhasználói neve, egyszerűen az e-mail címének megadásával is regisztrálhat.
+jsp.register.new-ldap-user.info3 = Ha Ön vagy a szervezeti egysége regisztrálni szeretene a DSpace rendszerbe, forduljon a rendszer üzemeltetőihez.
+jsp.register.new-ldap-user.label.username = Felhasználói név:
+jsp.register.new-ldap-user.label.password = Jelszó:
+jsp.register.new-ldap-user.label.email = E-mail cím:
+jsp.register.new-ldap-user.button.register = Regisztráció
+
+jsp.register.new-password.confirm.field = Ellenőrzésképpen mégegyszer:
+jsp.register.new-password.hello = Üdvözlöm {0}!
+jsp.register.new-password.info1 = A kétszer beírt jelszónak egyeznie kell és legalább 6 karakter hosszúságú kell, hogy legyen.
+jsp.register.new-password.info2 = Az alábbi mezőben adjon meg egy új jelszót, és ismételje meg azt a második mezőben. Legalább 6 karakter hosszúságúnak kell lennie.
+jsp.register.new-password.pswd.field = Új jelszó:
+jsp.register.new-password.set.button = Új jelszó megadása
+jsp.register.new-password.title = Új jelszó megadása
+
+jsp.register.new-user.email.field =E-mail cím:
+jsp.register.new-user.info1 =<strong>A megadott e-mail cím érvénytelen.</strong> Kérjük, próbálja újra.
+jsp.register.new-user.info2 = Ha korábban nem jelentkezett be a DSpace rendszerbe, adja meg az e-mail címét az alábbi mezőbe és kattintson a "regisztráció" gombra.
+jsp.register.new-user.info3 = Ha Ön vagy a szervezeti egysége regisztrálni szeretene a DSpace rendszerbe, forduljon a rendszer üzemeltetőihez.
+jsp.register.new-user.register.button = Regisztráció
+jsp.register.new-user.title = Felhasználói regisztráció
+
+jsp.register.password-changed.info = Az új jelszavát beállítottuk, és azonnal aktív. Köszönjük.
+jsp.register.password-changed.link = Ugrás a DSpace kezdőoldalára
+jsp.register.password-changed.title = Jelszó megváltozott
+
+jsp.register.password-token-sent.info = Egy e-mailt küldtünk, amiben egy speciális URL van (Egy jelszóváltoztatási zsetont tartalmaz.) Amikor elátogat erre a címre, új jelszót adhat meg, hogy tovább használhassa a DSpace rendszert.
+jsp.register.password-token-sent.title = Az új jelszóhoz e-mailt küldtünk
+
+jsp.register.profile-form.fname.field = Keresztnév*:
+jsp.register.profile-form.lname.field = Vezetéknév*:
+jsp.register.profile-form.phone.field = Telefonos elérhetőség:
+
+jsp.register.profile-updated.info1 =Az Ön profil-információit és jelszavát frissítetük. Köszönjük!
+jsp.register.profile-updated.info2 =Az Ön profil-információit frissítetük. Köszönjük!
+jsp.register.profile-updated.title = Profil frissítve
+
+jsp.register.registered.info = Mostantól Ön regisztrált felhasználója a DSpace rendszernek. Feliratkozhat gyűjteményekre, hogy a bekerülő új elemekről e-mailben tájékoztatást kapjon.
+jsp.register.registered.thank =Köszönjük, {0}!
+jsp.register.registered.title =Regisztráció kész
+
+jsp.register.registration-form.complete.button =Regisztráció befejezése
+jsp.register.registration-form.confirm.field =Ellenőrzésképpen mégegyszer:
+jsp.register.registration-form.instruct1 =Kérjük, töltse ki az összes szükséges mezőt.
+jsp.register.registration-form.instruct2 =Az alább kétszer megadott jelszónak egyeznie kell és legalább 6 karakter hosszúnak kell lennie.
+jsp.register.registration-form.instruct3 =Adja meg az alábbi információkat. A *-gal jelölt mezők kitöltése kötelező.
+jsp.register.registration-form.instruct4 =Az alábbi mezőben adjon meg egy jelszót, és ismételje meg azt a második mezőben. Legalább 6 karakter hosszúságúnak kell lennie.
+jsp.register.registration-form.pswd.field =Jelszó:
+jsp.register.registration-form.title =Regisztrációs adatok
+jsp.register.registration-sent.info = Egy e-mailt küldtünk Önnek, amelyben egy speciális URL (vagy zseton) van. Amikor ellátogat erre az URL-re, meg kell adnia néhány adatot. Ezt követően bejelentkezhet a DSpace rendszerbe.
+jsp.register.registration-sent.title =Regisztrációs e-mail elküldve
+
+jsp.search.general.noresults = A keresésnek egyik dokumentum sem felelt meg.
+jsp.search.general.next = következő
+jsp.search.general.previous = előző
+
+jsp.search.advanced.title = Speciális keresés
+jsp.search.advanced.search = Keresés itt:
+jsp.search.advanced.search2 = Indítás
+jsp.search.advanced.searchfor = Keresendő
+jsp.search.advanced.clear = A mezők törlése
+jsp.search.advanced.type = Keresési kulcs:
+jsp.search.advanced.type.keyword = Kulcsszó
+jsp.search.advanced.type.author = Szerző
+jsp.search.advanced.type.title = Cím
+jsp.search.advanced.type.subject = Tárgy
+jsp.search.advanced.type.abstract = Kivonat
+jsp.search.advanced.type.series = Series
+jsp.search.advanced.type.sponsor = Sponsor
+jsp.search.advanced.type.id = Azonosító
+jsp.search.advanced.type.language = Nyelv (ISO)
+jsp.search.advanced.logical.and = ÉS
+jsp.search.advanced.logical.or = VAGY
+jsp.search.advanced.logical.not = NEM
+
+jsp.search.results.colhits = Találatok a gyűjtemények között:
+jsp.search.results.comhits = Találatok a kategóriák között:
+jsp.search.results.itemhits = A keresésre illeszkedő dokumentumok:
+jsp.search.results.searchin = Keresés itt:
+jsp.search.results.searchfor = Keresendő
+jsp.search.results.results = Találatok {0}-{1}-ig. Összesen {2}.
+jsp.search.results.title = A keresés eredménye
+
+jsp.statistics.no-report.title = Nincs elérhető jelentés
+jsp.statistics.no-report.info1 = Jelen pillanatban nincs elérhető jelentés ehhez a szolgáltatáshoz. Jöjjön vissza később!
+
+jsp.statistics.report.title = Statisztikai összefoglaló
+jsp.statistics.report.info1 = Legfrisebb általános jelentés
+jsp.statistics.report.info2 = Havi jelentések:
+
+jsp.submit.general.submit = Elküld
+jsp.submit.general.next = Következő &gt;
+jsp.submit.general.previous = &lt; Előző
+jsp.submit.general.cancel-or-save.button = Megszakítás/Mentés
+
+jsp.submit.cancel.continue.button = Bevitel folytatása
+jsp.submit.cancel.info = Szeretné a félig befejezett dokumentumbevitelt megszakítani, vagy szeretné megtartani, hogy később folytathassa? Visszatérhet a beviteli folyamatnak arra a pontjára is, ahol volt, ha véletlenül jutott ide.
+jsp.submit.cancel.remove.button = Bevitel törlése
+jsp.submit.cancel.save.button = Mentés későbbi folytatáshoz
+jsp.submit.cancel.title= Bevitel megszakítása vagy mentése
+
+jsp.submit.cancelled-removed.info = A beviteli folyamatot befejeztük, a félbehagyott dokumentumot eltávolítottuk a rendszerből.
+jsp.submit.cancelled-removed.title = Bevitel megszakítva
+
+jsp.submit.change-file-description.file = Fájl
+jsp.submit.change-file-description.filedescr = Fájl leírása:
+jsp.submit.change-file-description.format = Fájlformátum
+jsp.submit.change-file-description.heading = Bevitel: fájl leírása
+jsp.submit.change-file-description.info1 = Ezek a fájl részletes információi.
+jsp.submit.change-file-description.info2 = Az alábbi mezőben adja meg a fájl helytálló leírását.
+jsp.submit.change-file-description.size = Méret
+jsp.submit.change-file-description.title = Fájl-információk megváltoztatása
+
+jsp.submit.choose-file.document =Dokumentumfájl:
+jsp.submit.choose-file.filedescr =Fájl leírása:
+jsp.submit.choose-file.heading =Bevitel: fájl feltöltése
+jsp.submit.choose-file.info1 = Adja meg, hogy a dokumentumhoz tartozó fájl hol található a merevlemezés. Ha a "tallózás" gombra kattint, egy új ablak fog megjelenni, és ott is kiválaszthatja a megfelelő fájlt.
+jsp.submit.choose-file.info3 =<strong>Netscape felhasználók figyelmébe:</strong> Alapértelmezésben az előugró ablak csupán a HTML fájlokat mutatja meg. Ha nem HTML fájét akar feltölteni, a többi fájl megjelenítésének lehetőségét ki kell választania.
+jsp.submit.choose-file.info4 =Netscape felhasználók számára a teendők elérhetőek.
+jsp.submit.choose-file.info6 = Kérjük, vegye figyelembe, hogy a DSpace rendszer bizonyos fájltipusok tartalmát jobban képes megőrizni, mint másokat.
+jsp.submit.choose-file.info7 = Az egyes fájltipusokról információ és a támogatás mértéke elérhető.
+jsp.submit.choose-file.info9 = Adjon rövid leírást a fájl tartalmáról, mint például "A cikk törzse" vagy "Mérési eredmények".
+jsp.submit.choose-file.title = Fájl feltöltése
+
+jsp.submit.complete.heading = Bevitel: Dokumentumbevitel elkészült.
+jsp.submit.complete.info = A bevitt dokumentum most a befogadó gyüjteményhez tartozó feldolgozási folyamaton fog keresztül menni. E-mailben értesítést fog kapni, amikor a dokumentum a gyűjtemény részévé vált, vagy valami problémára derül fény. A folyamat állapotát a Saját DSpace oldalon is nyomonkövetheti.
+jsp.submit.complete.link = Ugrás a Saját DSpace-re
+jsp.submit.complete.title = Dokumentumbevitel kész
+
+jsp.submit.creative-commons.heading = Bevitel: Creative Commons licensz használata
+jsp.submit.creative-commons.info1 = Már kiválasztott egy Creative Commons licenszet, és a dokumentumhoz társította azt. Az alábbi lehetőségei vannak:
+jsp.submit.creative-commons.choice1 = Kattintson a "következő" gombra alább, hogy <em>megtartsa</em> a korábban kiválasztott licenszet.
+jsp.submit.creative-commons.choice2 = Kattintson a "Creative Commons kihagyása" gombra, hogy <em>eltávolítsa</em> a jelenleg kiválasztottat, és ne rendeljen Creative Commons licenszet a dokumentumhoz.
+jsp.submit.creative-commons.choice3 = Fejezze be az alábbi kiválasztási folyamatot, hogy <em>lecserélje</em> a jelenlegi választását.
+jsp.submit.creative-commons.info2 = Ahhoz, hogy a dokumentumot a Creative Commons szerint licenszelje, kövesse az alábbi utasításokat. Lehetősége lesz átnézni a választását. Kövesse a 'folytatás' linket, hogy hozzáadja a licenszet. A "Creative Commons kihagyása" gomb segítségével elhagyhatja a licenszet.
+jsp.submit.creative-commons.info3 = A böngészőjének támogatnia kell az IFrame-et, hogy használhassa ezt a lehetőséget.
+jsp.submit.creative-commons.skip.button = Creative Commons kihagyása &gt;
+jsp.submit.creative-commons.title =Creative Commons licensz használata
+
+jsp.submit.edit-metadata.title = A dokumentum adatai
+jsp.submit.edit-metadata.heading = Bevitel: A dokumentum adatai
+jsp.submit.edit-metadata.info1 = Kérjük, adja meg az alábbi információkat a bevitt dokumentumról. A legtöbb böngészőben használhatja a tab billentyűt, hogy a kurzort a következő beviteli mezőre vagy gombra léptesse. Így nem kell minden lépésben az egeret használnia.
+jsp.submit.edit-metadata.info2 = Kérjük, alább adjon meg további információkat a bevitt dokumentumról.
+jsp.submit.edit-metadata.help = (További segítség......)
+jsp.submit.edit-metadata.previous = &lt; Előző
+jsp.submit.edit-metadata.next = Következő &gt;
+jsp.submit.edit-metadata.cancelsave = Megszakítás/Mentés
+jsp.submit.edit-metadata.lastname = Vezetéknév <br/>pl. <strong>Kovács</strong>
+jsp.submit.edit-metadata.firstname = Keresztnév + "ifj"<br/> pl. <strong>Dezső ifj.</strong>
+jsp.submit.edit-metadata.button.remove = A bejegyzés eltávolítása
+jsp.submit.edit-metadata.button.remove2 = Eltávolítás
+jsp.submit.edit-metadata.button.add = További elem hozzáadása
+jsp.submit.edit-metadata.month = Hónap:
+jsp.submit.edit-metadata.no_month = (Nincs hónap kiválasztva)
+jsp.submit.edit-metadata.day = Nap:
+jsp.submit.edit-metadata.year = Év:
+jsp.submit.edit-metadata.seriesname = Sorozat címe
+jsp.submit.edit-metadata.paperno = Report or Paper No.
+
+jsp.submit.get-file-format.choose.button = Az automatikusan választott típus használata
+jsp.submit.get-file-format.format = Fájlformátum:
+jsp.submit.get-file-format.heading = Bevitel: Fájlformátum megadása
+jsp.submit.get-file-format.info1 = Feltöltött fájl: <code>{0}</code> ({1} bájt)
+jsp.submit.get-file-format.info2 = A rendszer nem tudta megállapítani ennek a fájlnak a formátumát.
+jsp.submit.get-file-format.info3 = A rendszer ezt a fájlt {0} formátumúnak találta. <strong>Mielőtt megváltoztatja, kérjük győződjön meg igazáról!</strong>
+jsp.submit.get-file-format.info5 = Válassza ki a fájl formátumát az alábbi listából, mint például "Adobe PDF" vagy "Microsoft Word". Amennyiben a fájlformátum nincs a listában, írja le a formátumot a lista alatti beviteli mezőben.
+jsp.submit.get-file-format.info6 = A fájlformátum nincs a listában.
+jsp.submit.get-file-format.info7 = <strong>Ha a fájlformátum nincs az előbbi listában</strong>, a következő formában írja azt le: a fájl létrehozásához használt alkalmazás neve és verziószáma (például: "ACMESoft KiválóProgram, 1.5-ös verzió").
+jsp.submit.get-file-format.known = (ismert)
+jsp.submit.get-file-format.supported = (támogatott)
+jsp.submit.get-file-format.title = Fájlformátum megadása
+
+jsp.submit.initial-questions.elem1 = A dokumentumnak egynél több címe van (például lefordított címek esetén).
+jsp.submit.initial-questions.elem2 = A dokumentumot korábban publikálták vagy terjesztették.
+jsp.submit.initial-questions.elem3 = Egynél <em>több</em> fájlból áll a dokumentum.
+jsp.submit.initial-questions.elem4 = A dokumentum diplomamunka/disszertáció
+jsp.submit.initial-questions.info = A dokumentumot jellemző állításokat jelölje meg.
+jsp.submit.initial-questions.heading = Bevitel: a dokumentum adatai
+jsp.submit.initial-questions.title = A dokumentum adatai
+
+jsp.submit.license-rejected.heading = Bevitel: elutasított licensz
+jsp.submit.license-rejected.info1 = Nem engedélyezte, hogy a licensz szerint a DSpace rendszer terjessze a bevitt dokumentumot. A dokumentumot nem töröljük, az hozzáférhető marad az Ön Saját DSpace szekciójában.
+jsp.submit.license-rejected.info2 = Az alábbi módok valamelyikén kapcsolatba léphet velünk a licensszel kapcsolatos észrevételeivel.
+jsp.submit.license-rejected.title = Elutasított licensz
+
+jsp.submit.no-theses.info1 = A DSpace rendszer jelenleg nem fogad el egyenként beküldött disszertációkat. Az MIT (Massachusetts Institute of Technology) rendszerében rendelkezésre áll a <a href="http://thesis.mit.edu">Digital Library of MIT Theses</a>, ahol gyűjti a disszertációkat. A <a href="http://web.mit.edu/etheses/www/etheses-home.html">Submitting an Electronic Thesis at MIT</a> oldalon elolvashatja, hogyan kell használni a rendszert.
+jsp.submit.no-theses.info2 = Mivel a DSpace rendszer jelenleg nem fogad el egyenként beküldött disszertációkat és diplomamunkákat, a bevitel folyamata nem folytatódik. A dokumentumhoz feltöltött fájlokat nem tároljuk.
+jsp.submit.no-theses.info3 = Vegye figyelembe, hogy a disszertáció nyomtatott változata továbbra is nélkülözhetetlen a fokozat megszerzéséhez. Fontos jogi és archiválási szempontok miatt valószínű, hogy a DSpace jövőbeni változata közvetlenül együtt fog működni (az MIT) disszertációgyűjtő rendszerével, hogy a hivatalosan elfogadott és megvédett munkákat csoportosan áttölthessük. Köszönjük a megértését.
+jsp.submit.no-theses.info4 = További információért <strong>lépjen kapcsolatba a DSpace rendszer üzemeltetőivel</strong>:
+jsp.submit.no-theses.info5 = Köszönjük, hogy foglalkozik a DSpace rendszerrel.
+jsp.submit.no-theses.title = Disszertációkat nem fogad ez a DSpace rendszer
+
+jsp.submit.progressbar.select = Választás
+jsp.submit.progressbar.describe = Leírás
+jsp.submit.progressbar.upload = Feltöltés
+jsp.submit.progressbar.verify = Ellenőrzés
+jsp.submit.progressbar.license = Licensz
+jsp.submit.progressbar.complete = Kész
+
+jsp.submit.review.title = Bevitel ellenőrzése
+jsp.submit.review.heading = Bevitel: Ellenőrzés
+jsp.submit.review.info1 = <strong>Még nincs teljesen kész,</strong> de közel jár!
+jsp.submit.review.info2 = Kérjük, fordítson néhány percet a bevitt adatok helyességének ellenőrzésére. Ha valami nem stimmel, a hibás adat melletti gombra kattintva visszamehet kijavítani azt. Használhatja az oldal tetején lévő folyamatjelzőt is, hogy visszatérjen a beviteli folyamat megfelelő pontjára.
+jsp.submit.review.info3 = <strong>Ha mindent rendben talál,</strong> kattintson az oldal alján található "Következő &gt;" gombra.
+jsp.submit.review.info4 = A feltöltött fájlok új ablakban nyílnak meg, így biztonsággal ellenőrizheti azokat.
+jsp.submit.review.init-question1 = A dokumentumnam egynél több címe van:
+jsp.submit.review.init-question2 = A dokumentumot korábban publikálták:
+jsp.submit.review.init-question3 = A dokumentum egynél több fájlból áll:
+jsp.submit.review.state1 = Igen
+jsp.submit.review.state2 = Nem
+jsp.submit.review.button.correct = Helyesbítés
+jsp.submit.review.no_md = <em>Egy sem</em>
+jsp.submit.review.unknown = (Ismeretlen)
+jsp.submit.review.known = (Ismert)
+jsp.submit.review.supported = (Támogatott)
+jsp.submit.review.upload1 = Feltöltött&nbsp;fájlok:
+jsp.submit.review.upload2 = Feltöltött&nbsp;fájl:
+jsp.submit.review.button.upload1 = Fájl hozzáadása vagy eltávolítása
+jsp.submit.review.button.upload2 = Másik fájl feltöltése
+jsp.submit.review.button.edit = Fájl adatainak szerkesztése
+jsp.submit.review.button.previous = &lt; Előző
+jsp.submit.review.button.next = Következő &gt;
+jsp.submit.review.button.cancelsave = Megszakítás/Mentés
+
+jsp.submit.saved.info = A beviteli folyamatát mentettük, hogy később befejezhesse. A folytatást az Ön "Saját DSpace" területéről kezdeményezheti a megfelelő "Folytat" gombra kattintva.
+jsp.submit.saved.title = Beviteli folyamat mentve
+
+jsp.submit.select-collection.collection = Gyűjtemény
+jsp.submit.select-collection.heading = Bevitel: Gyűjtemény kiválasztása
+jsp.submit.select-collection.info1 = Válassza ki az alábbi listából azt a gyűjteményt, amelyikbe dokumentumot szeretne bevinni, majd kattintson a "Következő &gt;" gombra.
+jsp.submit.select-collection.title = Bővítendő gyűjtemény választása
+
+jsp.submit.show-license.grant.button = Licensz elfogadása
+jsp.submit.show-license.heading1 = Bevitel: a DSpace terjesztési licensz elfogadása
+jsp.submit.show-license.info1 = <strong>Egy lépés van még hátra:</strong> ahhoz, hogy a DSpace rendszer tárolja, terjessze és fordítsa/konvertálja a dokumentumot, amelyet beküldött, el kell fogadnia az alábbi feltételeket. Olvassa el a licenszt, és kattintson az oldal alján található gombok valamelyikére. A "Licensz elfogadása" gombra kattintással jelzi, hogy az itt olvasható licensz feltételeit elfogadja.
+jsp.submit.show-license.info2 =<strong>A licensz el nem fogadása esetén sem töröljük a bevitt dokumentumot:</strong> a dokumentum az Ön "Saját DSpace" területén fog maradni. Később eltávolíthatja azt a rendszerből, vagy elfogadhatja a licenszt, amikor az esetleges kérdéseire és kéréseire választ kapott.
+jsp.submit.show-license.notgrant.button = Licensz elutasítása
+jsp.submit.show-license.title = Dspace terjesztési licensz
+
+jsp.submit.show-uploaded-file.click1.button = Kattintson ide, ha nem ez a fájlformátum
+jsp.submit.show-uploaded-file.click2.button = Kattinston ide, ha nem ez a megfelelő fájl
+jsp.submit.show-uploaded-file.file = Fájl
+jsp.submit.show-uploaded-file.format = Fájlformátum
+jsp.submit.show-uploaded-file.heading1 = Bevitel: Sikeres fájlfeltöltés
+jsp.submit.show-uploaded-file.heading2 = Bevitel: Feltöltött fájl
+jsp.submit.show-uploaded-file.info1 = A fájl feltöltése sikeres volt.
+jsp.submit.show-uploaded-file.info2 = Itt olvashatók a feltöltött fájl adatai. Kérjük, ellenőrizze a részleteket, mielőtt folytatná a beviteli folyamatot.
+jsp.submit.show-uploaded-file.info3 = Ellenőrizheti a fájl feltöltésének sikerességét az alábbi módokon:
+jsp.submit.show-uploaded-file.info4 = A fájlnévre (fentebb) kattintva egy új böngészőablakban töltheti le a fájlt és megnézheti a tartalmát.
+jsp.submit.show-uploaded-file.info5 = A fentebb megjelenített ellenörző összeget (checksum) összehasonlíthatja a saját számítógépén számítottal. Pontosan meg kell egyezniük.
+jsp.submit.show-uploaded-file.info6 = Hogyan kell ezt csinálni? Kattintson ide a részletekért.
+jsp.submit.show-uploaded-file.info7 = A rendszer ellenörző összeget tud számítani, amelynek helyességéről meggyőződhet.
+jsp.submit.show-uploaded-file.info8 = Kattintson ide további információkért.
+jsp.submit.show-uploaded-file.known = Ismert
+jsp.submit.show-uploaded-file.supported = Támogatott
+jsp.submit.show-uploaded-file.notSupported = Nem támogatott
+jsp.submit.show-uploaded-file.show.button = Ellenörző összegek megjelenítése
+jsp.submit.show-uploaded-file.checksum = Ellenörző összeg
+jsp.submit.show-uploaded-file.size = Méret
+jsp.submit.show-uploaded-file.size-in-bytes = {0} bájt
+jsp.submit.show-uploaded-file.title = Feltöltött fájl
+
+jsp.submit.thesis-removed-workaround.heading = Bevitel megszakítva: Diplomamunkákat és disszertációkat nem fogad a DSpace rendszer
+jsp.submit.thesis-removed-workaround.info = Mivel a Dspace rendszer nem fogad disszertációkat és diplomamunkákat, a beviteli folyamatot megszakítottuk. Albb új dokumentum bevitelét kezdeményezheti.
+jsp.submit.thesis-removed-workaround.link = Új bevitel indítása
+jsp.submit.thesis-removed-workaround.title = Bevitel megszakítva
+
+jsp.submit.upload-error.heading = Bevitel: Hiba a fájl feltöltésekor
+jsp.submit.upload-error.info = Probléma lépett fel a fájl feltöltése során: a megadott fájlnév helytelen volt, vagy hálózati probléma miatt nem ért el a fájl a DSpace rendszerbe helyesen. Kérjük, próbálja újra.
+jsp.submit.upload-error.retry.button = Fájlfeltöltés ismétlése
+jsp.submit.upload-error.title = Hiba a fájl feltöltésekor
+
+jsp.submit.upload-file-list.title = Feltöltött fájlok
+jsp.submit.upload-file-list.heading1 = Bevitel: sikeres fájlfeltöltés
+jsp.submit.upload-file-list.heading2 = Bevitel: feltöltött fájlok
+jsp.submit.upload-file-list.info1 = <strong>A fájl feltöltése sikeres volt.</strong>
+jsp.submit.upload-file-list.info2 = Az alábbi táblázatban láthatók a dokumentumhoz feltöltött fájlok.
+jsp.submit.upload-file-list.info3 = A feltöltött fájl(oka)t az alábbi módokon ellenőrizheti:
+jsp.submit.upload-file-list.info4 = A fájlnévre (fentebb) kattintva egy új böngészőablakban töltheti le a fájlt és megnézheti a tartalmát.
+jsp.submit.upload-file-list.info5 = A fentebb megjelenített ellenörző összeget (checksum) összehasonlíthatja a saját számítógépén számítottal. Pontosan meg kell egyezniük.
+jsp.submit.upload-file-list.info6 = A rendszer ellenörző összeget tud számítani, amelynek helyességéről meggyőződhet.
+jsp.submit.upload-file-list.tableheading1 = Elsődleges<br/>fájl
+jsp.submit.upload-file-list.tableheading2 = Fájl
+jsp.submit.upload-file-list.tableheading3 = Méret
+jsp.submit.upload-file-list.tableheading4 = Leírás
+jsp.submit.upload-file-list.tableheading5 = Fájlformátum
+jsp.submit.upload-file-list.tableheading6 = Ellenörző összeg
+jsp.submit.upload-file-list.empty1 = <em>Nincs</em>
+jsp.submit.upload-file-list.supportlevel1 = támogatott
+jsp.submit.upload-file-list.supportlevel2 = ismert
+jsp.submit.upload-file-list.supportlevel1 = nem támogatott
+jsp.submit.upload-file-list.button1 = Változtatás
+jsp.submit.upload-file-list.button2 = Eltávolítás
+jsp.submit.upload-file-list.button3 = Ellenörző összegek megjelenítése
+jsp.submit.upload-file-list.button4 = Újabb fájl hozzáadása
+jsp.submit.upload-file-list.button5 = &lt; Előző
+jsp.submit.upload-file-list.button6 = Következő &gt;
+jsp.submit.upload-file-list.button7 = Megszakítás/Mentés
+jsp.submit.upload-file-list.help1 = Hogyan kell ezt csinálni? Kattintson ide a részletekért.
+jsp.submit.upload-file-list.help2 = Kattintson ide további információkért.
+
+jsp.submit.verify-prune.heading = Bevitel: figyelmeztetés
+jsp.submit.verify-prune.info1 = A változtatások, amelyeket a kezdeti, "a dokumentum adatai" oldalon végrehajtott, a beviteli folyamatot az alábbiakban érinti:
+jsp.submit.verify-prune.info2 = Jelezte, hogy a dokumentumnak nincsenek további címei, de már írt be néhányat. Ha folytatja, akkor a további címek elvesznek.
+jsp.submit.verify-prune.info3 = Jelezte, hogy a dokumentumot korábban nem publikálták vagy terjesztették, de már adott meg kiadási dátumot, kiadót vagy idéző művet. Ha folytatja, ezek az információk elvesznek, és a DSpace rendszer egy kiadási dátumot fog hozzárendelni a dokumentumhoz.
+jsp.submit.verify-prune.info4 = Jelezte, hogy a bevitt dokumnetum egyetlen fájlból áll, de már többet töltött fel. Ha folytatja, csak az először feltöltött fájlt tároljuk, a többit figyelmen kívül hagyja a rendszer. (A számítógépe helyi merevlemezés tárolt fájlokat ez nem érinti.)
+jsp.submit.verify-prune.notproceed.button = Ne hajtsa végre a változtatásokat
+jsp.submit.verify-prune.proceed.button = Folytatás a változtatásokkal
+jsp.submit.verify-prune.question = Biztosan a megváltoztatott adatokkal akarja folytatni a beviteli folyamatot?
+jsp.submit.verify-prune.title = A dokumentum alap-adatai megváltoztak
+
+jsp.tombstone.text = A dokumentumot, amihez hozzá próbál férni, visszavonták a DSpace rendszerből. Ha kérdése van, forduljon a rendszer üzemeltetőihez.
+jsp.tombstone.title = A dokumentumot visszavonták
+
+jsp.tools.general.cancel = Mégse
+jsp.tools.general.delete = Törlés
+jsp.tools.general.delete-w-confirm = Törlés...
+jsp.tools.general.add = Hozzáadás
+jsp.tools.general.select = Választ
+jsp.tools.general.update = Frissítés
+jsp.tools.general.edit = Szerkesztés
+jsp.tools.general.remove = Eltávolítás
+jsp.tools.general.view = Megjelenítés
+
+jsp.tools.confirm-delete-collection.title = Gyűjtemény törlése
+jsp.tools.confirm-delete-collection.heading = Gyűjtemény törlése: {0}
+jsp.tools.confirm-delete-collection.confirm = Biztos abban, hogy a(z) <strong>{0}</strong> gyűjteményt törölni szertené? Ez a művelet az alábbiakat fogja törölni:
+jsp.tools.confirm-delete-collection.info1 = Az ehhez a gyűjteményhez tartozó minden dokumentumot és be nem fejezett beviteli folyamatot, amelyek nem részei más gyűjteménynek.
+jsp.tools.confirm-delete-collection.info2 = A dokumentumok tartalmát
+jsp.tools.confirm-delete-collection.info3 = Az összes jogosultság-hozzárendelést
+
+jsp.tools.confirm-delete-community.title = Kategória törlése
+jsp.tools.confirm-delete-community.heading = Kategória törlése: {0}
+jsp.tools.confirm-delete-community.confirm = Biztos abban, hogy a(z) <strong>{0}</strong> kategóriát törölni szeretné? Ez a művelet az alábbiakat fogja törölni:
+jsp.tools.confirm-delete-community.info1 = Az összes olyan gíűjteményt, amely nem része másik kategóriának.
+jsp.tools.confirm-delete-community.info2 = A másik kategóriához nem tartozó gyűjtemények dokumentumait és be nem fejezett beviteli folyamatait.
+jsp.tools.confirm-delete-community.info3 = A dokumentumok tartalmát
+jsp.tools.confirm-delete-community.info4 = Az összes jogosultság-hozzárendelést
+
+jsp.tools.confirm-delete-item.info = Biztos benne, hogy ezt a dokumentumot teljesen törölni szeretné? Vigyázat: jelenleg nem marad vissza jelzőkő.
+jsp.tools.confirm-delete-item.title = Dokumentum törlése
+
+jsp.tools.confirm-withdraw-item.question = Biztos benne, hogy ezt a dokumentumot visszavonja az archívumból?
+jsp.tools.confirm-withdraw-item.title = Dokumentum visszavonása
+jsp.tools.confirm-withdraw-item.withdraw.button = Visszavonás
+
+jsp.tools.edit-collection.title = Gyűjtemény szerkesztése
+jsp.tools.edit-collection.heading1 = Gyűjtemény létrehozása
+jsp.tools.edit-collection.heading2 = Gyűjtemény szerkesztése: {0}
+jsp.tools.edit-collection.button.delete = Gyűjtemény törlése...
+jsp.tools.edit-collection.form.label1 = Név:
+jsp.tools.edit-collection.form.label2 = Rövid leírás
+jsp.tools.edit-collection.form.label3 = Bevezető szöveg (HTML):
+jsp.tools.edit-collection.form.label4 = Copyright szöveg (egyszerű szöveg):
+jsp.tools.edit-collection.form.label5 = Információs szöveg (sidebar; HTML):
+jsp.tools.edit-collection.form.label6 = Licensz:
+jsp.tools.edit-collection.form.label7 = Eredet:
+jsp.tools.edit-collection.form.label8 = Logó:
+jsp.tools.edit-collection.form.label9 = Beviteli munkafolyamat
+jsp.tools.edit-collection.form.label10 = Bevitelre jogosultak:
+jsp.tools.edit-collection.form.label11 = Lépés:
+jsp.tools.edit-collection.form.label12 = A gyűjtemény adminisztrátorai:
+jsp.tools.edit-collection.form.label13 = Dokumentumsablon:
+jsp.tools.edit-collection.form.label14 = A gyűjteményhez tartozó jogosultságok:
+jsp.tools.edit-collection.form.button.add-logo = Új logó feltöltése...
+jsp.tools.edit-collection.form.button.delete-logo = Törlés (nem kell logó)
+jsp.tools.edit-collection.form.button.set-logo = Logó feltöltése...
+jsp.tools.edit-collection.form.button.create = Létrehozás...
+jsp.tools.edit-collection.form.button.create2 = Létrehozás
+jsp.tools.edit-collection.form.button.edit = Szerkesztés...
+jsp.tools.edit-collection.form.button.delete = Delete
+jsp.tools.edit-collection.form.button.update = Update
+jsp.tools.edit-collection.form.button.cancel = Cancel
+jsp.tools.edit-collection.wf-role1 = Efogadás/Visszautasítás
+jsp.tools.edit-collection.wf-role2 = Elfogadás/Visszautasítás/Dokumentumadatok szerkesztése
+jsp.tools.edit-collection.wf-role3 = Dokumentumadatok szerkesztése
+
+jsp.tools.edit-community.title = Kategória szerkesztése
+jsp.tools.edit-community.heading1 = Kategória létrehozása
+jsp.tools.edit-community.heading2 = Kategória szerkesztése: {0}
+jsp.tools.edit-community.button.delete = Kategória törlése...
+jsp.tools.edit-community.form.label1 = Név:
+jsp.tools.edit-community.form.label2 = Rövid leírás
+jsp.tools.edit-community.form.label3 = Bevezető szöveg (HTML):
+jsp.tools.edit-community.form.label4 = Copyright szöveg (egyszerű szöveg):
+jsp.tools.edit-community.form.label5 = Információs szöveg (sidebar; HTML):
+jsp.tools.edit-community.form.label6 = Logó:
+jsp.tools.edit-community.form.label7 = A kategóriához tartozó jogosultságok:
+jsp.tools.edit-community.form.button.add-logo = Új logó feltöltése...
+jsp.tools.edit-community.form.button.delete-logo = Törlés (nem kell logó)
+jsp.tools.edit-community.form.button.set-logo = Logó feltöltése...
+jsp.tools.edit-community.form.button.edit = Szerkesztés...
+jsp.tools.edit-community.form.button.create = Létrehozás
+jsp.tools.edit-community.form.button.cancel = Cancel
+jsp.tools.edit-community.form.button.update = Update
+
+jsp.tools.edit-item-form.addbit.button = Fájl hozzáadása
+jsp.tools.edit-item-form.collections = Ezekben a gyűjteményekben:
+jsp.tools.edit-item-form.delete-w-confirm.button = Törlés (eltávolítás)...
+jsp.tools.edit-item-form.elem1 = Elem
+jsp.tools.edit-item-form.elem2 = Qualifier
+jsp.tools.edit-item-form.elem3 = Érték
+jsp.tools.edit-item-form.elem4 = Nyelv
+jsp.tools.edit-item-form.elem5 = Elsődleges<br/>fájl
+jsp.tools.edit-item-form.elem7 = Név
+jsp.tools.edit-item-form.elem8 = Forrás
+jsp.tools.edit-item-form.elem9 = Leírás
+jsp.tools.edit-item-form.elem10 = Formátum
+jsp.tools.edit-item-form.elem11 = Felhasználói&nbsp;formátumleírás
+jsp.tools.edit-item-form.handle = Handle:
+jsp.tools.edit-item-form.heading = Fájlok
+jsp.tools.edit-item-form.item = A dokumentumhoz tartozó jogosultságok
+jsp.tools.edit-item-form.itemID = A&nbsp;dokumentum&nbsp;belső&nbsp;azonosítója&nbsp;(ID):
+jsp.tools.edit-item-form.itempage = A dokumentum:
+jsp.tools.edit-item-form.modified = Utolsó módosítás:
+jsp.tools.edit-item-form.msg = A dokumentumot visszavonták a DSpace archívumából
+jsp.tools.edit-item-form.na = Nem elérhető (N/A)
+jsp.tools.edit-item-form.note = FIGYELEM: az itt végzett változtatásokat semmilyen formában sem ellenőrizzük. Az Ön felelőssége, hogy az adatokat a megfelelő formában írja be. Ha nem tudja biztosan, hogy mi a várt formátum, NE változtasson.
+jsp.tools.edit-item-form.note1 = Fontos: a fájlokkal kapcsolatos módosítások nem jelentkleznek automatikusan a dokumentum fenti Dublin Core adataiban, mint például a <code>format.extent</code> vagy a <code>format.mimetype</code>. Azokat kézzel kell frissítenie.
+jsp.tools.edit-item-form.note3 = Fontos továbbá, hogy amennyiben a "felhasználói formátumleírás" mező nem üres, a formátum minden esetben az "ismeretlen" értékre lesz állítva. Törölje a felhasználói formátumleírást, mielőtt megváltoztatja a formátum mező tartalmát.
+jsp.tools.edit-item-form.reinstate.button = Reinstate
+jsp.tools.edit-item-form.title = Dokumentum szerkesztése
+jsp.tools.edit-item-form.withdraw-w-confirm.button = Visszavonás...
+
+jsp.tools.eperson-list.close.button = Bezár
+jsp.tools.eperson-list.heading = E-mberek: {0}-{1}, összesen {2}.
+jsp.tools.eperson-list.info1 = Valamely e-mbert a mellette lévő "hozzáadás" gombra kattintva adhatja hozzá az előbbi űrlap listájához.
+jsp.tools.eperson-list.title = E-mber kiválasztása
+jsp.tools.eperson-list.jump.one-back = &lt; 1 oldal
+jsp.tools.eperson-list.jump.five-back = &lt; 5 oldal
+jsp.tools.eperson-list.jump.one-forward = 1 oldal &gt;
+jsp.tools.eperson-list.jump.five-forward = 5 oldal &gt;
+jsp.tools.eperson-list.jump.first = Első
+jsp.tools.eperson-list.jump.last = Utolsó
+jsp.tools.eperson-list.th.id = ID
+jsp.tools.eperson-list.th.id.sortedby = ID &uarr;
+jsp.tools.eperson-list.th.email = E-mail
+jsp.tools.eperson-list.th.email.sortedby = E-mail &uarr;
+jsp.tools.eperson-list.th.lastname = Vezetéknév
+jsp.tools.eperson-list.th.lastname.sortedby = Vezetéknév &uarr;
+jsp.tools.eperson-list.th.firstname = First Name
+
+jsp.tools.get-item-id.find.button = Keresés
+jsp.tools.get-item-id.handle =Handle:
+jsp.tools.get-item-id.heading = Dokumentum szerkesztése vagy törlése
+jsp.tools.get-item-id.info1 = <strong>A megadott ID nem érvényes dokumentumazonosító.</strong> Ha egy kategóriát vagy gyűjteményt szeretne szerkeszteni, használja a <a href="{0}">kategória/gyűjtemény admin oldalt</a>.
+jsp.tools.get-item-id.info2 = Adja meg a szerkeszteni vagy törölni kívánt dokumentum handle-jét vagy belső azonosítóját (ID).
+jsp.tools.get-item-id.internal = Belső azonosító (ID):
+jsp.tools.get-item-id.title = Dokumentum szerkesztése
+
+jsp.tools.group-edit.heading = Jelenlegi csoporttagok
+jsp.tools.group-edit.name = Név:
+jsp.tools.group-edit.title = Csoport szerkesztése
+jsp.tools.group-edit.update.button = Csoportadatok frissítése
+
+jsp.tools.group-list.create.button = Új csoport létrehozása
+jsp.tools.group-list.name = Név
+jsp.tools.group-list.id = Azonosító (ID)
+jsp.tools.group-list.note1 =  Vegye figyelembe, hogy az "anonymous" csoporthoz nem kell hozzáadnia felhasználókat - abba mindenki beletartozik.
+jsp.tools.group-list.note2 = Figyelmeztetés: ha olyan csoportot próbál törölni, amelyhez jogosultság-hozzárendelés tartozik vagy munkafolyamat tartozik hozzá, belső hibát fog kapni (internal server error).
+jsp.tools.group-list.title = Csoportszerkesztő
+
+jsp.tools.itemmap-main.collection = Gyűjtemény: "{0}"
+jsp.tools.itemmap-main.heading = Dokumentumrendező - más gíűjteményekből kapcsolhat be dokumentumokat
+jsp.tools.itemmap-main.info1 = {0} dokumentum van ebben a gyűjteményben, és további {1} van bekapcsolva ide más gyűjteményekből.
+jsp.tools.itemmap-main.info4 = Szerző szerinti importálás
+jsp.tools.itemmap-main.info5 = A szerző nevének részletét beírva megkaphatja az illeszkedő dokumentumok listáját.
+jsp.tools.itemmap-main.info6 = Az importált dokumentumok gyűjtemények szerint:
+jsp.tools.itemmap-main.info7  = Valamely gyűjtemény nevére kattintva böngészheti az onnan bekapcsolt dokumentumokat.
+jsp.tools.itemmap-main.info8 = Ebben a gyűjteményben nincs bekapcsolt dokumentum.
+jsp.tools.itemmap-main.search.button = Szerzők keresése
+jsp.tools.itemmap-main.title = Dokumentumrendező
+
+jsp.tools.itemmap-browse.title = Dokumentumböngésző
+jsp.tools.itemmap-browse.heading-authors = Dokumentumok szerző szerint: ''{0}''
+jsp.tools.itemmap-browse.heading-collection = Gyűjtemény böngészése: {0}
+jsp.tools.itemmap-browse.infomsg = Jelölje a megfelelő jelölőnégyzetben azokat a dokumentumokat, amelyeket hozzáadni vagy eltávolítani szeretne, és válassza a megfelelő tevékenységet.
+jsp.tools.itemmap-browse.th.date = Dátum
+jsp.tools.itemmap-browse.th.author = Első szerző
+jsp.tools.itemmap-browse.th.title = Cím
+jsp.tools.itemmap-browse.th.action = Akció
+jsp.tools.itemmap-browse.th.remove = Eltávolítás
+
+jsp.tools.itemmap-info.title = Dokumentumrendező - információ
+jsp.tools.itemmap-info.heading = Dokumentumrendező - információ
+jsp.tools.itemmap-info.button.continue = Folytatás
+jsp.tools.itemmap-info.msg.none-selected = Egy dokumentum sincs kiválasztva, így egy sem lett hozzáadva.
+# In the following 2 messages the only parameter is an item ID
+jsp.tools.itemmap-info.msg.remove = Dokumentum eltávolítása: {0}
+jsp.tools.itemmap-info.msg.added = Dokumentum hozzáadása: {0}
+
+jsp.tools.upload-bitstream.info = Válassza ki a feltöltendő fájlt
+jsp.tools.upload-bitstream.title = Fájl feltöltése
+jsp.tools.upload-bitstream.upload = Feltöltés
+
+jsp.workspace.ws-error.title = Saját DSpace - Munkaterület hiba
+jsp.workspace.ws-error.heading = Hiba - munkaterületi dokumentum
+jsp.workspace.ws-error.errormsg1 = A rendszer képtelen volt helyesen teljesíteni a kérését. Ki kell választania egy dokumentumot!
+jsp.workspace.ws-error.errormsg2 = Menjen vissza a "Saját DSpace" területére, és válassza a "megnyitás"-t a megfelelő munkaterületi dokumentummal való munkához. Ha továbbra is problémákba ütközik, lépjen kapcsolatba a rendszer üzemeltetőivel, hogy segíthessenek.
+
+jsp.workspace.ws-main.title = Saját DSpace
+jsp.workspace.ws-main.wsitem = Munkaterületi dokumentum
+jsp.workspace.ws-main.submitmsg = Ezt a dokumentumot ebbe a gyűjteménybe viszi be:
+jsp.workspace.ws-main.optionheading = Lehetőség
+jsp.workspace.ws-main.descheading = További információ
+jsp.workspace.ws-main.button.edit = Szerkesztés
+jsp.workspace.ws-main.editmsg = Megynyitja a dokumentumot szerkesztéshez és fájlműveletekhez.
+jsp.workspace.ws-main.button.view = Megtekintés
+jsp.workspace.ws-main.viewmsg = Megmutatja a dokumentum adatait a bevitel jelenlegi fázisában.
+jsp.workspace.ws-main.button.remove = Eltávolítás
+jsp.workspace.ws-main.removemsg = Eltávolítja a dokumentumot a maga teljességében.
+
+jsp.workspace.wsv-error.title = Saját DSpace -- Munkaterületi dokumentum - megtekintési hibaView Workspace Item Error
+jsp.workspace.wsv-error.heading = Hiba munkaterületi dokumentum megtekintésekor
+jsp.workspace.wsv-error.errormsg1 = A rendszer képtelen volt helyesen teljesíteni a kérését. Ki kell választania egy dokumentumot!
+jsp.workspace.wsv-error.errormsg2 = Menjen vissza a "Saját DSpace" területére, és válassza a "megnyitás"-t a megfelelő munkaterületi dokumentummal való munkához, majd válassza a "megtekintés"-t a lehetőségek közül. Ha továbbra is problémákba ütközik, lépjen kapcsolatba a rendszer üzemeltetőivel, hogy segíthessenek.
+
+org.dspace.app.webui.jsptag.CollectionListTag.collectionName = Gyűjtemény neve
+
+org.dspace.app.webui.jsptag.CommunityListTag.communityName = Kategória neve
+
+org.dspace.app.webui.jsptag.ItemListTag.issueDate = Kiadás&nbsp;dátuma
+org.dspace.app.webui.jsptag.ItemListTag.title = Cím
+org.dspace.app.webui.jsptag.ItemListTag.authors = Szerzők
+
+org.dspace.app.webui.jsptag.ItemTag.title = Cím
+org.dspace.app.webui.jsptag.ItemTag.title.other = További címek
+org.dspace.app.webui.jsptag.ItemTag.authors = Szerzők
+org.dspace.app.webui.jsptag.ItemTag.keywords = Kulcsszavak
+org.dspace.app.webui.jsptag.ItemTag.issueDate = Kiadás dátuma
+org.dspace.app.webui.jsptag.ItemTag.publisher = Kiadó
+org.dspace.app.webui.jsptag.ItemTag.citation = Idézetek
+org.dspace.app.webui.jsptag.ItemTag.series = Sorozat/Report no.
+org.dspace.app.webui.jsptag.ItemTag.abstract = Kivonat
+org.dspace.app.webui.jsptag.ItemTag.description = Leírás
+org.dspace.app.webui.jsptag.ItemTag.govdoc = Gov't Doc # 
+org.dspace.app.webui.jsptag.ItemTag.uri = URI
+org.dspace.app.webui.jsptag.ItemTag.isbn = ISBN
+org.dspace.app.webui.jsptag.ItemTag.issn = ISSN
+org.dspace.app.webui.jsptag.ItemTag.ismn = ISMN
+org.dspace.app.webui.jsptag.ItemTag.otherIDs = További azonosítók
+org.dspace.app.webui.jsptag.ItemTag.full = Összes dokumentumadat
+org.dspace.app.webui.jsptag.ItemTag.dcfield = DC mező
+org.dspace.app.webui.jsptag.ItemTag.value = Érték
+org.dspace.app.webui.jsptag.ItemTag.lang = Nyelv
+org.dspace.app.webui.jsptag.ItemTag.appears = Ebben a gyűjteményben:
+org.dspace.app.webui.jsptag.ItemTag.files = Fájlok a dokumentumban:
+org.dspace.app.webui.jsptag.ItemTag.files.no = Nem tartozik fájl ehhez a dokumentumhoz.
+org.dspace.app.webui.jsptag.ItemTag.file = Fájl
+org.dspace.app.webui.jsptag.ItemTag.filesize = Méret
+org.dspace.app.webui.jsptag.ItemTag.fileformat = Formátum
+org.dspace.app.webui.jsptag.ItemTag.view = Megtekintés/Megnyitás
+org.dspace.app.webui.jsptag.ItemTag.itemprotected = Ezt a dokumentumot szerzői jog védi. (This item is protected by original copyright)
+org.dspace.app.webui.jsptag.ItemTag.viewlicence = Licensz megtekintése
+
+org.dspace.app.webui.jsptag.SelectEPersonTag.selectPeople = E-mberek kiválasztása...
+org.dspace.app.webui.jsptag.SelectEPersonTag.selectPerson = E-mber kiválasztása...
+org.dspace.app.webui.jsptag.SelectEPersonTag.removeSelected = A kiválasztott(ak) eltávolítása

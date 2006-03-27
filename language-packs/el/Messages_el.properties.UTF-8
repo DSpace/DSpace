@@ -1,0 +1,1177 @@
+﻿# Version: $Revision$
+# Date:    $Date$
+
+jsp.adminhelp = Βοήθεια διαχειριστή
+jsp.administer =Διαχείριση
+jsp.admintools =Εργαλεία διαχειριστή
+
+jsp.general.authors.button =Συγγραφείς
+jsp.general.date.button =Ανά ημερομηνία
+jsp.general.edit.button =Επεξεργασία
+jsp.general.titles.button =Τίτλους
+jsp.general.go =Εύρεση
+jsp.general.search.button = Αναζήτηση
+jsp.general.gohome = Αρχική σελίδα
+jsp.general.location =Σε:
+jsp.general.genericScope = Ολόκληρο το δικτυακό τόπο
+jsp.general.searchfor =Αναζητήστε
+jsp.general.orbrowse = ή εμφανίστε τις εγγραφές (σύμφωνα με)
+jsp.general.untitled = Χωρίς τίτλο
+
+jsp.browse.general.next =Επόμενη σελίδα
+jsp.browse.general.previous =Προηγούμενη σελίδα
+jsp.browse.general.go = Εύρεση!
+
+jsp.browse.authors.enter = ή εισάγετε τα πρώτα γράμματα
+jsp.browse.authors.jump = Μεταπήδηση σε:
+jsp.browse.authors.show = Εμφάνιση συγγραφέων {0}-{1} από {2}.
+jsp.browse.authors.title = Πλοήγηση ανά συγγραφέα
+
+jsp.browse.items-by-author.heading1 = Τεκμήρια για συγγραφέα
+jsp.browse.items-by-author.return = Επιστροφή στην πλοήγηση ανά συγγραφέα
+jsp.browse.items-by-author.show = Εμφάνιση {0} τεκμηρίων.
+jsp.browse.items-by-author.sort1 = Ταξινόμηση ανά τίτλο
+jsp.browse.items-by-author.sort2 = Ταξινόμηση ανά ημερομηνία
+jsp.browse.items-by-author.sort3 = Ταξινόμηση ανά τίτλο
+jsp.browse.items-by-author.sort4 = Ταξινόμηση ανά ημερομηνία
+jsp.browse.items-by-author.title = Τεκμήρια για συγγραφέα
+
+jsp.browse.items-by-date.jump = Μεταπηδήστε σε ένα σημείο του ευρετηρίου:
+jsp.browse.items-by-date.month = (Επιλέξτε μήνα)
+jsp.browse.items-by-date.old = Δείξε το πιο παλιό πρώτα
+jsp.browse.items-by-date.order1 = Ταξινόμηση με πρώτο το πιο πρόσφατο
+jsp.browse.items-by-date.order2 = Ταξινόμηση με πρώτο το πιο παλιό
+jsp.browse.items-by-date.recent =Δείξε τα πιο πρόσφατα πρώτα
+jsp.browse.items-by-date.show = Εμφάνιση τεκμηρίων {0}-{1} από {2}.
+jsp.browse.items-by-date.title = Πλοήγηση ανά ημερομηνία
+jsp.browse.items-by-date.type = Ή εισάγετε τη χρονιά:
+jsp.browse.items-by-date.year = (επιλέξτε έτος)
+jsp.browse.items-by-title.enter = ή εισάγετε τα πρώτα γράμματα:
+jsp.browse.items-by-title.jump = Μεταπήδηση σε:
+jsp.browse.items-by-title.show = Εμφάνιση τεκμηρίων {0}-{1} από {2}.
+jsp.browse.items-by-title.title = Πλοήγηση ανά τίτλο
+
+jsp.browse.no-results.col = Δεν υπάρχουν εγγραφές στο ευρετήριο για τη συλλογή '{0}'.
+jsp.browse.no-results.com = Δεν υπάρχουν εγγραφές στο ευρετήριο για την Συλλογή '{0}'.
+jsp.browse.no-results.genericScope =  Δεν υπάρχουν εγγραφές στο ευρετήριο για 'Ολόκληρο το δικτυακό τόπο'.
+jsp.browse.no-results.title = Δεν υπάρχουν εγγραφές στο ευρετήριο
+jsp.collection-home.editsub.button =Επεξεργαστείτε τους υποβάλλοντες
+jsp.collection-home.heading1 =Αρχική σελίδα συλλογής
+jsp.collection-home.info =Δείτε τις συνδρομές σας
+jsp.collection-home.item.button =Αντιγραφή τεκμηρίων
+jsp.collection-home.recentsub =Πρόσφατες υποβολές
+jsp.collection-home.submit.button =Υποβάλλετε σε αυτήν τη συλλογή
+jsp.collection-home.subscribe =Εγγραφείτε
+jsp.collection-home.subscribe.msg =Εγγραφείτε σε αυτήν τη συλλογή για να λαμβάνετε καθημερινά ειδοποιήσεις μέσω ηλεκτρονικής αλληλογραφίας για νέες προσθήκες
+jsp.collection-home.subscribed =Είστε εγγεγραμμένος/η σε αυτήν τη συλλογή
+jsp.collection-home.unsub =Διαγραφείτε
+
+jsp.community-home.create1.button = Δημιουργήστε μια συλλογή
+jsp.community-home.create2.button = Δημιουργήστε μια υπο-συλλογή
+jsp.community-home.heading1 = Αρχική σελίδα συλλογής
+jsp.community-home.heading2 = Συλλογές σε αυτήν την συλλογή
+jsp.community-home.heading3 = Υπο-συλλογές σε αυτήν την συλλογή
+jsp.community-home.recentsub = Πρόσφατες υποβολές
+
+jsp.community-list.create.button =Δημιουργήστε Συλλογή <br /> Πρώτου Επιπέδου
+jsp.community-list.text1 =Παρακάτω εμφανίζεται μία λίστα συλλογών και υπο-συλλογές που υπάγονται σε αυτές. Κάντε κλικ στον τίτλο μιας συλλογής για να δείτε την αρχική σελίδα της.
+jsp.community-list.title =Συλλογές
+jsp.components.contact-info.details = {0} στοιχεία επικοινωνίας διαχειριστών:
+jsp.components.contact-info.email = E-mail:
+
+jsp.components.login-form.newuser = Νέος χρήστης; Εγγραφείτε εδώ.
+jsp.components.login-form.email = Διεύθυνση e-mail:
+jsp.components.login-form.enter = Παρακαλώ εισάγετε τη διεύθυνση e-mail σας και τον κωδικό πρόσβασής σας στην παρακάτω φόρμα:
+jsp.components.login-form.forgot = Έχετε ξεχάσει τον κωδικό πρόσβασής σας;
+jsp.components.login-form.login = Εισέλθετε στο δικτυακό τόπο
+jsp.components.login-form.password = Κωδικός πρόσβασης:
+
+jsp.components.ldap-form.newuser = Νέος χρήστης; Εγγραφείτε εδώ.
+jsp.components.ldap-form.enter = Παρακαλώ εισάγετε το όνομα χρήστη και τον κωδικό πρόσβασής σας στην παρακάτω φόρμα.
+jsp.components.ldap-form.username-or-email = Όνομα λογαριασμού<br/>ή διεύθυνση e-mail:
+jsp.components.ldap-form.password = Κωδικός πρόσβασης:
+jsp.components.ldap-form.login.button = Εισέλθετε
+
+jsp.display-item.copyright = Όλα τα τεκμήρια του δικτυακού τόπου προστατεύονται από πνευματικά δικαιώματα
+jsp.display-item.identifier =Παρακαλώ χρησιμοποιήστε αυτό το αναγνωριστικό για να παραπέμψετε ή να δημιουργήσετε σύνδεσμο προς αυτό το τεκμήριο:
+jsp.display-item.license =Άδεια Creative Commons
+jsp.display-item.text1 =Δείξε τη σύντομη περιγραφή του τεκμηρίου
+jsp.display-item.text2 =Δείξε την πλήρη περιγραφή του τεκμηρίου
+jsp.display-item.text3 =Αυτό το τεκμήριο προστατεύεται από άδεια
+jsp.display-item.back_to_workspace =Πίσω στο Workspace
+
+jsp.dspace-admin.general.action = Action
+jsp.dspace-admin.general.action-colon = Action:
+jsp.dspace-admin.general.addpolicy = Add New Policy
+jsp.dspace-admin.general.addnew = Add New
+jsp.dspace-admin.general.delete = Delete
+jsp.dspace-admin.general.delete-w-confirm = Delete...
+jsp.dspace-admin.general.remove = Remove
+jsp.dspace-admin.general.edit = Edit
+jsp.dspace-admin.general.editpolicy = Edit Policies
+jsp.dspace-admin.general.group = Group
+jsp.dspace-admin.general.group-colon = Group:
+jsp.dspace-admin.general.cancel = Cancel
+jsp.dspace-admin.general.abort = Abort
+jsp.dspace-admin.general.abort-w-confirm = Abort...
+jsp.dspace-admin.general.save = Save
+jsp.dspace-admin.general.update = Update
+jsp.dspace-admin.general.upload = Upload
+jsp.dspace-admin.general.next.button = Next &gt;
+
+jsp.dspace-admin.authorize-advanced.add = Add Policy
+jsp.dspace-admin.authorize-advanced.advanced = Advanced Policy Manager
+jsp.dspace-admin.authorize-advanced.clear = Clear Policies
+jsp.dspace-admin.authorize-advanced.col = Collection:
+jsp.dspace-admin.authorize-advanced.text = Allows you to do wildcard additions to and clearing of policies for types of content contained in a collection. Warning, dangerous - removing READ permissions from items will make them not viewable!
+jsp.dspace-admin.authorize-advanced.type = Content Type:
+jsp.dspace-admin.authorize-advanced.type1 = item
+jsp.dspace-admin.authorize-advanced.type2 = bitstream
+jsp.dspace-admin.authorize-advanced.warning = (warning: clears all policies for a given set of objects)
+
+jsp.dspace-admin.authorize-collection-edit.policies = Policies for Collection '{0}' ({1}, DB ID {2})
+jsp.dspace-admin.authorize-collection-edit.title = Edit collection policies
+
+jsp.dspace-admin.authorize-community-edit.policies = Policies for Community '{0}' ({1}, DB ID {2})
+jsp.dspace-admin.authorize-community-edit.title = Edit community policies
+
+jsp.dspace-admin.authorize-item-edit.bitstream = Bitstream {0} ({1})
+jsp.dspace-admin.authorize-item-edit.bundle = Policies for Bundle {0}
+jsp.dspace-admin.authorize-item-edit.eperson = EPerson
+jsp.dspace-admin.authorize-item-edit.item = Item Policies
+jsp.dspace-admin.authorize-item-edit.policies = Policies for Item {0} (ID={1})
+jsp.dspace-admin.authorize-item-edit.text1 = With this editor you can view and alter the policies of an item, plus alter policies of individual item components:  bundles and bitstreams. Briefly, an item is a container of bundles, and bundles, are containers of bitstreams.  Containers usually have ADD/REMOVE/READ/WRITE policies, while bitstreams only have READ/WRITE policies.
+jsp.dspace-admin.authorize-item-edit.text2 = You will notice an extra bundle and bitstream for each item, and those contain the license text for the item.
+jsp.dspace-admin.authorize-item-edit.title = Edit item policies
+
+jsp.dspace-admin.authorize-main.adm = Administer Authorization Policies
+jsp.dspace-admin.authorize-main.advanced = Advanced/Item Wildcard Policy Admin Tool
+jsp.dspace-admin.authorize-main.choose = Choose a resource to manage policies for:
+jsp.dspace-admin.authorize-main.manage1 = Manage a Community's Policies
+jsp.dspace-admin.authorize-main.manage2 = Manage Collection's Policies
+jsp.dspace-admin.authorize-main.manage3 = Manage An Item's Policies
+jsp.dspace-admin.authorize-main.title = Administer Authorization Policies
+jsp.dspace-admin.authorize-policy-edit.heading = Edit Policy for {0}:
+jsp.dspace-admin.authorize-policy-edit.title = Edit Policy
+
+jsp.dspace-admin.collection-select.col = Collections:
+jsp.dspace-admin.collection-select.title = Select Collection
+
+jsp.dspace-admin.community-select.com = Communities:
+jsp.dspace-admin.community-select.title = Select Community
+
+jsp.dspace-admin.confirm-delete-dctype.confirm = Are you sure the format <strong>{0}</strong> should be deleted?
+jsp.dspace-admin.confirm-delete-dctype.heading = Delete Dublin Core Format: <code>{0}</code>
+jsp.dspace-admin.confirm-delete-dctype.title = Delete Dublin Core Type
+jsp.dspace-admin.confirm-delete-dctype.warning = This will result in an error if any DC values have this type.
+
+jsp.dspace-admin.confirm-delete-format.confirm = Are you sure the format <strong>{0}</strong> should be deleted?
+jsp.dspace-admin.confirm-delete-format.heading = Delete Bitstream Format: {0}
+jsp.dspace-admin.confirm-delete-format.title = Delete Bitstream Format
+jsp.dspace-admin.confirm-delete-format.warning = Any existing bitstreams of this format will be reverted to the <em>unknown</em> bitstream format.
+jsp.dspace-admin.confirm-delete-format.returntoedit = Return to the Administer EPeople page
+
+jsp.dspace-admin.eperson.general.firstname = Last Name
+jsp.dspace-admin.eperson.general.lastname = First Name
+
+jsp.dspace-admin.eperson-browse.email = E-mail Address
+jsp.dspace-admin.eperson-browse.canlogin = Can Log In?
+jsp.dspace-admin.eperson-browse.heading = Browse EPeople {0}-{1} of {2}
+jsp.dspace-admin.eperson-browse.mustusecert = Must Use Cert?
+jsp.dspace-admin.eperson-browse.phone = Telephone
+jsp.dspace-admin.eperson-browse.self = Self Registered
+jsp.dspace-admin.eperson-browse.title = E-People
+
+jsp.dspace-admin.eperson-confirm-delete.confirm = Are you sure this e-person should be deleted?
+jsp.dspace-admin.eperson-confirm-delete.heading = Delete e-person: {0} ({1})
+jsp.dspace-admin.eperson-confirm-delete.title = Delete E-Person
+
+jsp.dspace-admin.eperson-deletion-error.title = EPerson deletion error
+jsp.dspace-admin.eperson-deletion-error.heading = Cannot Delete EPerson
+jsp.dspace-admin.eperson-deletion-error.errormsg = The EPerson {0} cannot be deleted because a reference to it exists in the following table(s):
+
+jsp.dspace-admin.eperson-edit.can = Can Log In:
+jsp.dspace-admin.eperson-edit.email = Email:
+jsp.dspace-admin.eperson-edit.emailexists = That email address is in use by another EPerson.  Emails must be unique.
+
+jsp.dspace-admin.eperson-edit.heading = Edit EPerson {0}:
+jsp.dspace-admin.eperson-edit.phone = Phone:
+jsp.dspace-admin.eperson-edit.require = Require Certificate:
+jsp.dspace-admin.eperson-edit.title = Edit EPerson
+
+jsp.dspace-admin.eperson-main.add = Add EPerson...
+jsp.dspace-admin.eperson-main.choose = Choose an action:
+jsp.dspace-admin.eperson-main.heading = Administer EPeople
+jsp.dspace-admin.eperson-main.or = OR
+jsp.dspace-admin.eperson-main.then = then
+jsp.dspace-admin.eperson-main.title = EPerson Administrations
+
+jsp.dspace-admin.group-eperson-select.add = Add EPerson
+jsp.dspace-admin.group-eperson-select.heading = Select EPerson to Add to Group {0}
+jsp.dspace-admin.group-eperson-select.title = Select EPerson
+
+jsp.dspace-admin.index.heading = Administration Tools
+jsp.dspace-admin.index.text = Please select an operation from the navigation bar on the left.
+
+jsp.dspace-admin.item-select.enter = Enter the Handle or internal item ID of the item you wish to select.
+jsp.dspace-admin.item-select.find = Find
+jsp.dspace-admin.item-select.handle = Handle:
+jsp.dspace-admin.item-select.heading = Select an Item
+jsp.dspace-admin.item-select.id = Internal ID:
+jsp.dspace-admin.item-select.text = <strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to edit a community or collection, you need to use the <a href='{0}'>communities/collections admin page</a>.
+jsp.dspace-admin.item-select.title = Select Item
+
+jsp.dspace-admin.list-dc-types.element = Element
+jsp.dspace-admin.list-dc-types.note = Note: Adding a new element to the DC Registry does not add a corresponding input field to the submit forms!
+jsp.dspace-admin.list-dc-types.qualifier = Qualifier
+jsp.dspace-admin.list-dc-types.scope = Scope Note
+jsp.dspace-admin.list-dc-types.title = Dublin Core Type Registry
+
+jsp.dspace-admin.list-formats.description = Long Description
+jsp.dspace-admin.list-formats.extensions = Extensions
+jsp.dspace-admin.list-formats.internal = Internal?
+jsp.dspace-admin.list-formats.known = Known
+jsp.dspace-admin.list-formats.mime = MIME Type
+jsp.dspace-admin.list-formats.name = Name
+jsp.dspace-admin.list-formats.support = Support Level
+jsp.dspace-admin.list-formats.supported = Supported
+jsp.dspace-admin.list-formats.text1 = <strong>Extensions</strong> are comma-separated lists of filename extensions used to automatically identify the formats of uploaded files. Do not include the dot.
+jsp.dspace-admin.list-formats.text2 = When you add a bitstream format, it is initially made 'internal' so that it does not appear in the submission UI before you've finished editing the format metadata.  Be sure to uncheck 'internal' if the format should appear in the submission UI list of formats.
+jsp.dspace-admin.list-formats.title = Bitstream Format Registry
+jsp.dspace-admin.list-formats.unknown = Unknown
+
+jsp.dspace-admin.news-edit.heading = News Editor
+jsp.dspace-admin.news-edit.news = News:
+jsp.dspace-admin.news-edit.text.topbox = Add or edit text in the box below to have it appear in the <strong>top box</strong> of the DSpace home page.
+jsp.dspace-admin.news-edit.text.sidebar = Add or edit text in the box below to have it appear in the <strong>sidebar</strong> of the DSpace home page.
+jsp.dspace-admin.news-edit.text3 = You may format the text using HTML tags, but please note that the HTML will not be validated here.
+jsp.dspace-admin.news-edit.title = News Edit Form
+
+jsp.dspace-admin.news-main.heading = News Editor
+jsp.dspace-admin.news-main.news.top = Top News
+jsp.dspace-admin.news-main.news.sidebar = Sidebar News
+
+jsp.dspace-admin.supervise-confirm-remove.title = Administer Supervision Orders
+jsp.dspace-admin.supervise-confirm-remove.heading = Confirm Remove
+jsp.dspace-admin.supervise-confirm-remove.subheading = You have requested that the following supervision order be removed:
+jsp.dspace-admin.supervise-confirm-remove.titleheader = Title
+jsp.dspace-admin.supervise-confirm-remove.authorheader = Author
+jsp.dspace-admin.supervise-confirm-remove.supervisorgroupheader = Supervisor Group
+jsp.dspace-admin.supervise-confirm-remove.confirm = Are you sure you wish to remove this supervision order?
+
+jsp.dspace-admin.supervise-duplicate.title = Administer Supervision Orders
+jsp.dspace-admin.supervise-duplicate.heading = Operation Failed
+jsp.dspace-admin.supervise-duplicate.errormsg = The supervision order could not be applied to the WorkSpace item as your selected group is already supervising your selected item.
+jsp.dspace-admin.supervise-duplicate.return = Return to the Supervisor Admin page
+
+jsp.dspace-admin.supervise-link.title = Administer Supervision Orders
+jsp.dspace-admin.supervise-link.heading = Administer Supervision Orders
+jsp.dspace-admin.supervise-link.choose = Choose a Group, WorkSpace Item, and Initial Policy Setting to apply:
+jsp.dspace-admin.supervise-link.group = Group:
+jsp.dspace-admin.supervise-link.policy = Initial Policy Setting:
+jsp.dspace-admin.supervise-link.policynone = None
+jsp.dspace-admin.supervise-link.policyeditor = Editor
+jsp.dspace-admin.supervise-link.policyobserver = Observer
+jsp.dspace-admin.supervise-link.workspace = WorkSpace to be Supervised:
+jsp.dspace-admin.supervise-link.id = ID
+jsp.dspace-admin.supervise-link.submittedby = Υποβλήθηκε από
+jsp.dspace-admin.supervise-link.title = Τίτλος
+jsp.dspace-admin.supervise-link.submittedto = Υποβλήθηκε σε
+jsp.dspace-admin.supervise-link.select = Select
+jsp.dspace-admin.supervise-link.submit.button = Submit Supervision Order
+
+jsp.dspace-admin.supervise-list.title = Administer Supervision Orders
+jsp.dspace-admin.supervise-list.heading = Current Supervision Orders
+jsp.dspace-admin.supervise-list.subheading = This page lists all current supervisory settings, with the option to remove any setting
+jsp.dspace-admin.supervise-list.add.button = Add a Supervision Order
+jsp.dspace-admin.supervise-list.back.button = Go Back
+jsp.dspace-admin.supervise-list.group = Supervising Group
+jsp.dspace-admin.supervise-list.author = Item Author
+jsp.dspace-admin.supervise-list.title = Item Title
+jsp.dspace-admin.supervise-list.policies.button = Policies
+
+jsp.dspace-admin.supervise-main.title = Administer Supervision Orders
+jsp.dspace-admin.supervise-main.heading = Administer Supervision Orders
+jsp.dspace-admin.supervise-main.subheading = Select one of the options on this page
+jsp.dspace-admin.supervise-main.add.button = Add a Supervision Order
+jsp.dspace-admin.supervise-main.view.button = View Current Supervision Orders
+jsp.dspace-admin.supervise-main.clean.button = Clean Supervision Order Database
+
+jsp.dspace-admin.upload-logo.select.col = Select the logo to upload for collection <strong>{0}</strong>
+jsp.dspace-admin.upload-logo.select.com = Select the logo to upload for community <strong>{0}</strong>
+jsp.dspace-admin.upload-logo.title = Upload Logo
+
+jsp.dspace-admin.wizard-basicinfo.choose = Choose a JPEG or GIF logo for the collection home page.  Should be quite small.
+jsp.dspace-admin.wizard-basicinfo.copyright = Copyright text:
+jsp.dspace-admin.wizard-basicinfo.description = Short Description:
+jsp.dspace-admin.wizard-basicinfo.html1 = HTML, shown in center of collection home page.  Be sure to enclose in &lt;P&gt; &lt;/P&gt; tags!
+jsp.dspace-admin.wizard-basicinfo.html2 = HTML, shown on right-hand side of collection home page.  Be sure to enclose in &lt;P&gt; &lt;/P&gt; tags!
+jsp.dspace-admin.wizard-basicinfo.intro = Introductory text:
+jsp.dspace-admin.wizard-basicinfo.license1 = License that submitters must grant.  Leave this blank to use the default license.
+jsp.dspace-admin.wizard-basicinfo.license2 = License:
+jsp.dspace-admin.wizard-basicinfo.logo = Logo:
+jsp.dspace-admin.wizard-basicinfo.name = Name:
+jsp.dspace-admin.wizard-basicinfo.plain = Plain text, shown at bottom of collection home page
+jsp.dspace-admin.wizard-basicinfo.plain2 = Plain text, any provenance information about this collection.  Not shown on collection pages.
+jsp.dspace-admin.wizard-basicinfo.provenance = Provenance:
+jsp.dspace-admin.wizard-basicinfo.shown = Shown in list on community home page
+jsp.dspace-admin.wizard-basicinfo.side = Side bar text:
+jsp.dspace-admin.wizard-basicinfo.title = Describe the Collection
+
+jsp.dspace-admin.wizard-default-item.dcore = Dublin Core Field
+jsp.dspace-admin.wizard-default-item.enter = Enter Default Item Metadata
+jsp.dspace-admin.wizard-default-item.language = Language
+jsp.dspace-admin.wizard-default-item.select = Select field...
+jsp.dspace-admin.wizard-default-item.text1 = Whenever a new submission is started in this collection, it will have the metadata you entered below already filled out.
+jsp.dspace-admin.wizard-default-item.text2 = You can leave as many fields blank as you like.
+jsp.dspace-admin.wizard-default-item.title = Enter Default Metadata
+jsp.dspace-admin.wizard-default-item.value = Value
+
+jsp.dspace-admin.wizard-permissions.change = You can change this later using the relevant sections of the DSpace admin UI.
+jsp.dspace-admin.wizard-permissions.click = Click on the 'Select E-people'button to choose e-people to add to the list.
+jsp.dspace-admin.wizard-permissions.heading1 = Authorization to Read
+jsp.dspace-admin.wizard-permissions.heading2 = Authorization to Submit
+jsp.dspace-admin.wizard-permissions.heading3 = Submission Workflow Accept/Reject Step
+jsp.dspace-admin.wizard-permissions.heading4 = Submission Workflow Accept/Reject/Edit Metadata Step
+jsp.dspace-admin.wizard-permissions.heading5 = Submission Workflow Edit Metadata Step
+jsp.dspace-admin.wizard-permissions.heading6 = Delegated Collection Administrators
+jsp.dspace-admin.wizard-permissions.mit = All MIT users
+jsp.dspace-admin.wizard-permissions.or = OR
+jsp.dspace-admin.wizard-permissions.text1 = Who has (by default) permission to read new items submitted to this collection?
+jsp.dspace-admin.wizard-permissions.text2 = Who has permission to submit new items to this collection?
+jsp.dspace-admin.wizard-permissions.text3 = Who is responsible for performing the <strong>accept/reject</strong> step? They will be able to accept or reject incoming submissions.  They will not be able to edit the submission's metadata, however.  Only one of the group need perform the step for each submission.
+jsp.dspace-admin.wizard-permissions.text4 = Who is responsible for performing the <strong>accept/reject/edit metadata</strong> step? They will be able to edit the metadata of incoming submissions, and then accept or reject them.  Only one of the group need perform the step for each submission.
+jsp.dspace-admin.wizard-permissions.text5 = Who is responsible for performing the <strong>edit metadata</strong> step? They will be able to edit the metadata of incoming submissions, but will not be able to reject them.
+jsp.dspace-admin.wizard-permissions.text6 = Who are the collection administrators for this collection?  They will be able to decide who can submit items to the collection, withdraw items, edit item metadata (after submission), and add (map) existing items from other collections to this collection (subject to authorization from that collection).
+jsp.dspace-admin.wizard-permissions.title = Collection Authorization
+
+jsp.dspace-admin.wizard-questions.check1 = New items should be publicly readable
+jsp.dspace-admin.wizard-questions.check2 = Some users will be able to submit to this collection
+jsp.dspace-admin.wizard-questions.check3 = The submission workflow will include an <em>accept/reject</em> step
+jsp.dspace-admin.wizard-questions.check4 = The submission workflow will include an <em>accept/reject/edit metadata</em> step
+jsp.dspace-admin.wizard-questions.check5 = The submission workflow will include an <em>edit metadata</em> step
+jsp.dspace-admin.wizard-questions.check6 = This collection will have delegated collection administrators
+jsp.dspace-admin.wizard-questions.check7 = New submissions will have some metadata already filled out with defaults
+jsp.dspace-admin.wizard-questions.text = Please check the boxes next to the statements that apply to the collection.
+jsp.dspace-admin.wizard-questions.title = Describe the Collection
+
+jsp.dspace-admin.workflow-abort-confirm.collection = Collection: {0}
+jsp.dspace-admin.workflow-abort-confirm.heading = Delete Workflow: {0}
+jsp.dspace-admin.workflow-abort-confirm.submitter = Submitter: {0}
+jsp.dspace-admin.workflow-abort-confirm.title = Abort Workflow
+jsp.dspace-admin.workflow-abort-confirm.item-title = Title: {0}
+jsp.dspace-admin.workflow-abort-confirm.warning = Are you sure you want to abort this workflow?  It will return to the user's personal workspace.
+jsp.dspace-admin.workflow-list.collection = Collection
+jsp.dspace-admin.workflow-list.heading = Currently Active Workflows
+jsp.dspace-admin.workflow-list.submitter = Submitter
+jsp.dspace-admin.workflow-list.item-title = Title
+jsp.dspace-admin.workflow-list.title = Workflow Abort
+
+jsp.error.404.title = Σφάλμα: το έγγραφο δε βρέθηκε
+jsp.error.404.text1 = Το έγγραφο που προσπαθείτε να προσπελάσετε δεν έχει βρεθεί στον εξυπηρετητή
+jsp.error.404.text2 = Αν έχετε έρθει εδώ ακολουθώντας ένα σύνδεσμο που σας έχει δώσει κάποιος τρίτος, είτε ο σύνδεσμος δεν αντιστοιχεί σε τεκμήριο είτε δεν τον εισήγατε σωστά. Παρακαλώ ελέγξτε το σύνδεσμο και δοκιμάστε ξανά. Εάν πάλι λαμβάνετε αυτό το σφάλμα, δοκιμάστε να πάτε στη σελίδα <a href='{0}'>Αρχική σελίδα του δικτυακού τόπου</a>και να ψάξετε από εκεί αυτό που ζητάτε.
+jsp.error.404.text3 = Εάν σάς προέκυψε αυτό το σφάλμα κάνοντας κλικ σε ένα σύνδεσμο του δικτυακού τόπου, παρακαλώ ενημερώστε μας για να το διορθώσουμε.
+
+jsp.error.authorize.title =Απαιτείται άδεια πρόσβασης
+jsp.error.authorize.text1 = Δεν έχετε την άδεια για να εκτελέσετε την ενέργεια που μόλις προσπαθήσατε.
+jsp.error.authorize.text2 = Εάν νομίζετε ότι θα έπρεπε να έχετε άδεια πρόσβασης, παρακαλώ επικοινωνήστε με τους διαχειριστές του συστήματος:
+
+jsp.error.integrity.heading = Σφάλμα συστήματος: Λάθος αίτηση
+jsp.error.integrity.list1 =Μερικές φορές, αν χρησιμοποιήσατε το κουμπί 'Πίσω' του φυλλομετρητή σας κατά τη διάρκεια μιας υποβολής, το πάτημα ενός κουμπιού μπορεί να δοκιμάσει να επαναλάβει μια ενέργεια, όπως η αποστολή της υποβολής στο αρχείο. Το πάτημα του κουμπιού 'Ανανέωση' (reload/refresh) μπορεί να έχει παρόμοια αποτελέσματα.
+jsp.error.integrity.list2 = Αν έχετε έρθει εδώ ακολουθώντας ένα σύνδεσμο που σάς έχει δώσει κάποιος τρίτος, είτε ο σύνδεσμος δεν αντιστοιχεί σε τεκμήριο ή δεν τον εισήγατε σωστά. Παρακαλώ ελέγξτε το σύνδεσμο και δοκιμάστε ξανά.
+jsp.error.integrity.list3 = Εάν έχετε πάνω από ένα 'παράθυρα' του συστήματος ανοιχτά, αυτό μπορεί να προκαλέσει παρόμοιο πρόβλημα, ενώ το πάτημα ενός κουμπιού στο ένα 'παράθυρο' μπορεί να ακυρώσει την ίδια ενέργεια στο άλλο 'παράθυρο'.
+jsp.error.integrity.list4 = Βέβαια, μπορεί να έχετε ανακαλύψει ένα πρόβλημα του συστήματος! Όλα τα σφάλματα καταγράφονται, και θα τα ελέγχουμε συχνά για τυχόν αντιμετώπιση προβλημάτων.
+jsp.error.integrity.text1 = Υπήρξε πρόβλημα με τα δεδομένα που λήφθηκαν από το φυλλομετρητή σας. Αυτό μπορεί να οφείλεται σε διάφορες αιτίες:
+jsp.error.integrity.text2 = Εάν το πρόβλημα παραμένει, παρακαλώ επικοινωνήστε με τους διαχειριστές του συστήματος:
+jsp.error.integrity.title = Εσφαλμένη αίτηση
+
+jsp.error.internal.text1 = Το σύστημα αντιμετώπισε εσωτερικό σφάλμα. Παρακαλώ δοκιμάστε να επαναλάβετε την ενέργειά σας και αν το πρόβλημα παραμένει, παρακαλώ επικοινωνήστε μαζί μας για να το διορθώσουμε.
+jsp.error.internal.title = Εσωτερικό σφάλμα συστήματος
+
+jsp.error.invalid-id.title = Άκυρο αναγνωριστικό
+jsp.error.invalid-id.list1 = Το URL της παρούσας σελίδας είναι εσφαλμένο-αν ακολουθήσατε σύνδεσμο εκτός του συστήματος μπορεί να έχει γραφτεί λάθος.
+jsp.error.invalid-id.list2 = Έχετε εισάγει άκυρο αναγνωριστικό σε φόρμα-παρακαλώ δοκιμάστε ξανά.
+jsp.error.invalid-id.text1 = Το αναγνωριστικό {0} δεν ανταποκρίνεται σε έγκυρο {1} στο σύστημα. Αυτό μπορεί να οφείλεται σε μία από τις ακόλουθες αιτίες:
+jsp.error.invalid-id.text2 = Αν αντιμετωπίζετε προβλήματα, ή αναμένατε να λειτουργήσει το ID, παρακαλώ επικοινωνήστε με τους διαχειριστές του συστήματος.
+
+jsp.error.require-certificate.title = Απαιτείται Πιστοποιητικό
+jsp.error.require-certificate.text = Η παραμετροποίηση του συστήματος απαιτεί ένα έγκυρο πιστοποιητικό Ιστού για να εισέλθετε. Αν αντιμετωπίζετε πρόβλημα με το συγκεκριμένο, παρακαλώ επικοινωνήστε μαζί μας.
+
+jsp.feedback.acknowledge.title = Ευχαριστούμε για τα σχόλιά σας.
+jsp.feedback.acknowledge.text = Τα σχόλιά σας έχουν παραληφθεί.
+
+jsp.feedback.form.comment = Τα σχόλιά σας:
+jsp.feedback.form.email = Το E-mail σας
+jsp.feedback.form.title = Φόρμα Επικοινωνίας
+jsp.feedback.form.send = Απόστειλε
+jsp.feedback.form.text1 = Ευχαριστούμε για το χρόνο που αφιερώνετε να μοιραστείτε τα σχόλιά σας για το σύστημα μαζί μας. Η ενέργειά σας εκτιμάται ιδιαιτέρως!
+jsp.feedback.form.text2 = Παρακαλώ συμπληρώστε τις παρακάτω πληροφορίες.
+
+
+jsp.help = Βοήθεια...
+jsp.help.formats.contact1 = Παρακαλώ επικοινωνήστε με τον
+jsp.help.formats.contact2 = Διαχειριστή Συστήματος
+jsp.help.formats.contact3 = αν έχετε ερωτήσεις για ένα συγκεκριμένο μορφότυπο
+jsp.help.formats.extensions = Επεκτάσεις
+jsp.help.formats.policy = Πολιτική Υποστήριξης Μορφότυπων
+jsp.help.formats.support-levels = Επίπεδα Υποστήριξης Μορφότυπων
+jsp.help.formats.whattodo = Τι να κάνετε αν δεν είναι καταχωρημένος ο μορφότυπός σας
+jsp.help.formats.title = Μορφότυποι που υποστηρίζονται από το σύστημα
+jsp.help.formats.here = (Εδώ εισάγετε τους μορφότυπους που υποστηρίζει το ίδρυμά σας)
+jsp.help.formats.mime = Τύπος MIME
+jsp.help.formats.name = Όνομα
+jsp.help.formats.return = επιστροφή στη βασική βοήθεια
+jsp.help.formats.support = Επίπεδο Υποστήριξης
+jsp.help.formats.support.supported = υποστηρίζεται
+jsp.help.formats.support.known = γνωστός
+jsp.help.formats.support.unknown = άγνωστος
+jsp.help.formats.top = επάνω
+
+jsp.home.com1 = Συλλογές στο σύστημα
+jsp.home.com2 = Επιλέξτε μια συλλογή για να πλοηγηθείτε στις υποσυλλογές της.
+jsp.home.search1 = Αναζητήστε
+jsp.home.search2 = Εισάγετε κείμενο στο πλαίσιο παρακάτω για να αναζητήσετε στο σύστημα.
+jsp.home.title = Αρχική
+
+jsp.layout.footer-default.text = <a target=_blank href='http://www.dspace.org/'>DSpace Software</a> Copyright&nbsp;&copy;&nbsp;2002-2004&nbsp;<a target=_blank href='http://web.mit.edu/'>MIT</a>&nbsp;and&nbsp;<a target=_blank  href='http://www.hp.com/'>Hewlett-Packard</a>
+jsp.layout.footer-default.feedback = Επικοινωνία
+
+jsp.layout.header-default.about = Σχετικά με το DSpace
+jsp.layout.header-default.alt = DSpace
+
+jsp.layout.navbar-admin.communities-collections = Συλλογές
+jsp.layout.navbar-admin.epeople = E-people
+jsp.layout.navbar-admin.groups = Groups
+jsp.layout.navbar-admin.items = Items
+jsp.layout.navbar-admin.dcregistry = Dublin Core<br/>Registry
+jsp.layout.navbar-admin.formatregistry = Bitstream Format<br/>Registry
+jsp.layout.navbar-admin.workflow = Workflow
+jsp.layout.navbar-admin.authorization = Authorization
+jsp.layout.navbar-admin.editnews = Edit News
+jsp.layout.navbar-admin.supervisors = Supervisors
+jsp.layout.navbar-admin.statistics = Statistics
+jsp.layout.navbar-admin.help = Help
+jsp.layout.navbar-admin.logout = Log Out
+
+jsp.layout.navbar-default.about = Σχετικά με το DSpace
+jsp.layout.navbar-default.advanced = Σύνθετη Αναζήτηση
+jsp.layout.navbar-default.authors = Συγγραφείς
+jsp.layout.navbar-default.browse = Πλοήγηση
+jsp.layout.navbar-default.communities-collections = Συλλογές
+jsp.layout.navbar-default.date = Ανά ημερομηνία
+jsp.layout.navbar-default.edit = Επεξεργαστείτε το λογαριασμό σας
+jsp.layout.navbar-default.go = Εύρεση
+jsp.layout.navbar-default.help = Βοήθεια
+jsp.layout.navbar-default.home = Αρχική
+jsp.layout.navbar-default.loggedin = Έχετε εισέλθει ως {0}
+jsp.layout.navbar-default.logout = Αποσύνδεση
+jsp.layout.navbar-default.receive = Λάβετε ενημερώσεις μέσω e-mail
+jsp.layout.navbar-default.search = Αναζητήστε
+jsp.layout.navbar-default.sign = Εγγραφείτε στο:
+jsp.layout.navbar-default.titles = Τίτλοι
+jsp.layout.navbar-default.users = Το DSpace μου
+jsp.layout.navbar-default.users-authorized = <small>εξουσιοδοτημένοι χρήστες</small>
+
+jsp.login.incorrect.heading = Εισέλθετε στο σύστημα
+jsp.login.incorrect.text = Η διεύθυνση e-mail και ο κωδικός πρόσβασης που εισήγατε δεν είναι έγκυρα. Παρακαλώ δοκιμάστε ξανά, ή μήπως έχετε <a href='{0}'>ξεχάσει τον κωδικό σας</a>;
+jsp.login.incorrect.title = Εισέλθετε
+
+jsp.login.ldap.title = Εισέλθετε
+jsp.login.ldap.heading = Εισέλθετε στο σύστημα
+
+jsp.login.ldap-incorrect.title = Εισέλθετε
+jsp.login.ldap-incorrect.heading = Εισέλθετε στο σύστημα
+jsp.login.ldap-incorrect.errormsg = Το όνομα χρήστη και ο κωδικός πρόσβασης που εισήγατε δεν είναι έγκυρα. Παρακαλώ δοκιμάστε ξανά.
+
+jsp.login.logged-out.title = Έχετε αποσυνδεθεί
+jsp.login.logged-out.thank = Ευχαριστούμε που θυμηθήκατε να αποσυνδεθείτε!
+
+jsp.login.no-valid-cert.heading = Εισέλθετε στο σύστημα
+jsp.login.no-valid-cert.text = <strong>Δε διαθέτετε έγκυρο πιστοποιητικό Ιστού.</strong> Παρακαλώ δοκιμάστε ξανά.
+jsp.login.no-valid-cert.title = Εισέλθετε
+
+jsp.login.not-in-records.register = Εγγραφείτε στο σύστημα
+jsp.login.not-in-records.text = Έχετε έγκυρο πιστοποιητικό Ιστού, αλλά το σύστημα δε σας έχει καταγράψει. Θα πρέπει πριν μπορέσετε να χρησιμοποιήσετε οποιαδήποτε υπηρεσία του συστήματος που απαιτεί λογαριασμό χρήστη. <a href='{0}'> εγγραφείτε</a>.
+jsp.login.not-in-records.title = Δεν υπάρχει διαθέσιμο αρχείο χρήστη
+
+jsp.login.password.heading = Εισέλθετε στο σύστημα
+jsp.login.password.title = Εισέλθετε
+
+jsp.morehelp = Περισσότερη βοήθεια...
+
+jsp.mydspace = Το DSpace μου
+jsp.mydspace.general.remove = Διέγραψε
+jsp.mydspace.general.approve = Αποδέξου
+jsp.mydspace.general.reject =Απόρριψε
+jsp.mydspace.general.cancel =Ακύρωσε
+jsp.mydspace.general.goto-mydspace = Πήγαινε στο My DSpace μου
+jsp.mydspace.general.backto-mydspace = Πίσω στο DSpace μου
+jsp.mydspace.general.returnto-mydspace =Επιστροφή στο DSpace μου
+
+jsp.mydspace.in-archive.heading1 =Ευχαριστούμε
+jsp.mydspace.in-archive.return.link =Επιστροφή στο DSpace μου
+jsp.mydspace.in-archive.text1 =Η υποβολή έχει τοποθετηθεί στο κυρίως αρχείο. Τής έχει δοθεί το ακόλουθο αναγνωριστικό:
+jsp.mydspace.in-archive.text2 =Έχει σταλεί ειδοποίηση στο αρμόδιο προσωπικό.
+jsp.mydspace.in-archive.title =Η υποβολή έχει αρχειοθετηθεί
+
+jsp.mydspace.main.elem1 =Τίτλος
+jsp.mydspace.main.elem2 =Υποβλήθηκε σε
+jsp.mydspace.main.heading2 =Τα καθήκοντά σας
+jsp.mydspace.main.heading3 = Καθήκοντα σε αναμονή
+jsp.mydspace.main.heading4 =Ημιτελείς υποβολές
+jsp.mydspace.main.heading5 =Υποβολές σε διαδικασία εισαγωγής στοιχείων
+jsp.mydspace.main.item =Τεκμήριο
+jsp.mydspace.main.link =Δείτε τις συνδρομές σας
+jsp.mydspace.main.perform.button =Εκτελέστε αυτήν την εργασία
+jsp.mydspace.main.return.button =Επιστροφή στη 'δεξαμενή' εργασιών
+jsp.mydspace.main.start.button =Ξεκινήστε μια νέα υποβολή
+jsp.mydspace.main.sub1 =Επεξεργαστείτε την υποβολή
+jsp.mydspace.main.sub2 =Ελέγξτε την υποβολή
+jsp.mydspace.main.sub3 =Τελική επεξεργασία της υποβολής
+jsp.mydspace.main.subby =Υποβλήθηκε από
+jsp.mydspace.main.subto =Υποβλήθηκε σε
+jsp.mydspace.main.take.button =Δεχτείτε την εργασία
+jsp.mydspace.main.task =Εργασία
+jsp.mydspace.main.text1 =Παρακάτω βρίσκονται οι παρούσες εργασίες που έχετε επιλέξει να κάνετε.
+jsp.mydspace.main.text2 =Παρακάτω βρίσκονται οι εργασίες που σας έχουν ανατεθεί.
+jsp.mydspace.main.text4 =This section is for use in the continued authoring of your document.
+jsp.mydspace.main.view.button =Δείτε τις υποβολές που έχουν γίνει αποδεκτές
+jsp.mydspace.main.authoring = Authoring
+jsp.mydspace.main.supervising = Supervising
+
+jsp.mydspace.own-submissions.text1 =Δεν υπάρχουν τεκμήρια στο κυρίως αρχείο που να έχουν υποβληθεί από εσάς.
+jsp.mydspace.own-submissions.text2 =Παρακάτω υπάρχει μια λίστα των προηγούμενων υποβολών σας που έχουν γίνει αποδεκτές στο αρχείο.
+jsp.mydspace.own-submissions.text3 =Υπάρχει <strong>1</strong> τεκμήριο στο κυρίως αρχείο που έχει υποβληθεί από εσάς.
+jsp.mydspace.own-submissions.text4 =Υπάρχουν <strong>{0}</strong> τεκμήρια στο κυρίως αρχείο που έχουν υποβληθεί από εσάς.
+jsp.mydspace.own-submissions.title =Οι υποβολές σας
+
+jsp.mydspace.perform-task.commit.button=Αποστείλετε στο αρχείο
+jsp.mydspace.perform-task.edit.button =Επεξεργαστείτε τα μεταδεδομένα
+jsp.mydspace.perform-task.instruct1 =Αν έχετε επεξεργασθεί το τεκμήριο και είναι κατάλληλο για να συμπεριληφθεί στη συλλογή, επιλέξτε 'Αποδέχομαι'.
+jsp.mydspace.perform-task.instruct2 =Όταν τελειώσετε την επεξεργασία του τεκμηρίου, χρησιμοποιήστε αυτήν την επιλογή για να αποστείλετε το τεκμήριο στο αρχείο.
+jsp.mydspace.perform-task.instruct3 =Αν έχετε επεξεργαστεί το τεκμήριο και βρήκατε πως <strong>δεν</strong> είναι κατάλληλο για να συμπεριληφθεί στη συλλογή, επιλέξτε 'Απόρριψε'. Θα σας ζητηθεί να συντάξετε ένα μήνυμα υποδεικνύοντας τους λόγους που το τεκμήριο δεν είναι κατάλληλο, και αν ο υποβάλλων θα πρέπει να αλλάξει κάτι και να το ξανα-υποβάλει.
+jsp.mydspace.perform-task.instruct4 =Επιλέξτε αυτήν την επιλογή για να διορθώσετε, τροποποιήσετε ή να επεξεργαστείτε τα μεταδεδομένα του τεκμηρίου.
+jsp.mydspace.perform-task.instruct5 =Αν επιθυμείτε να αφήσετε αυτήν την εργασία προς το παρόν και να επιστρέψετε στο 'DSpace μου', χρησιμοποιήστε αυτήν την επιλογή.
+jsp.mydspace.perform-task.instruct6 =Για να επιστρέψετε την εργασία στη 'δεξαμενή' ώστε να μπορέσει να την εκτελέσει ένας άλλος χρήστης, χρησιμοποιήστε αυτήν την επιλογή.
+jsp.mydspace.perform-task.later.button =Εκτελέστε αργότερα
+jsp.mydspace.perform-task.return.button =Επιστρέψτε την εργασία στη 'δεξαμενή'
+jsp.mydspace.perform-task.text1 =Το παρακάτω τεκμήριο έχει υποβληθεί στη συλλογή <strong>{0}</strong>. Παρακαλώ ελέγξτε αν έχει πετύχει τα κριτήρια εισαγωγής στη συλλογή. Μετά την επεξεργασία, παρακαλώ αποδεχτείτε ή απορρίψτε το τεκμήριο χρησιμοποιώντας τα κουμπιά ελέγχου στο κάτω μέρος της σελίδας.
+jsp.mydspace.perform-task.text3 =Το παρακάτω τεκμήριο έχει υποβληθεί στη συλλογή<strong>{0}</strong>. Παρακαλώ ελέγξτε αν έχει πετύχει τα κριτήρια εισαγωγής στη συλλογή. Μετά τον έλεγχο, μπορείτε να επεξεργαστείτε τα μεταδεδομένα του τεκμηρίου, και έπειτα να αποδεχτείτε ή να απορρίψετε το τεκμήριο χρησιμοποιώντας τα κουμπιά ελέγχου στο κάτω μέρος της σελίδας.
+jsp.mydspace.perform-task.text4 =Το παρακάτω τεκμήριο έχει γίνει αποδεκτό για συμπερίληψή του στη  συλλογή <strong>{0}</strong>. Παρακαλώ εκτελέστε τυχόν απαραίτητες αλλαγές στα μεταδεδομένα ώστε να είναι συμβατό με τα πρότυπα της συλλογής, και έπειτα αποστείλετέ το στο αρχείο χρησιμοποιώντας τα κουμπιά ελέγχου στο κάτω μέρος της σελίδας.
+jsp.mydspace.perform-task.title =Εκτελέστε μια εργασία
+
+jsp.mydspace.preview-task.accept.button =Αποδεχτείτε αυτήν την εργασία
+jsp.mydspace.preview-task.text1 =Το παρακάτω τεκμήριο έχει υποβληθεί στη συλλογή <strong>{0}</strong>. Για να αποδεχτείτε την εργασία επεξεργασίας του τεκμηρίου, παρακαλώ κάντε κλικ στο 'Αποδεχτείτε αυτήν την εργασία' παρακάτω.
+jsp.mydspace.preview-task.text3 =Το παρακάτω τεκμήριο έχει υποβληθεί στη συλλογή <strong>{0}</strong>. Για να αποδεχτείτε την εργασία ελέγχου του τεκμηρίου, παρακαλώ κάντε κλικ στο 'Αποδεχτείτε αυτήν την εργασία' παρακάτω.
+jsp.mydspace.preview-task.text4 =Το παρακάτω τεκμήριο έχει γίνει αποδεκτό για συμπερίληψή του στη συλλογή  <strong>{0}</strong>. Για να αποδεχτείτε την εργασία της τελικής επεξεργασίας του τεκμηρίου, παρακαλώ κάντε κλικ στο 'Αποδεχτείτε αυτήν την εργασία' παρακάτω.
+jsp.mydspace.preview-task.title =Προεπισκόπηση εργασίας
+
+jsp.mydspace.reject-reason.cancel.button =Ακυρώστε την απόρριψη
+jsp.mydspace.reject-reason.reject.button =Απορρίψτε το τεκμήριο
+jsp.mydspace.reject-reason.text1 =Παρακαλώ εισάγετε την αιτία για την οποία απορρίπτετε την υποβολή στο παρακάτω πλαίσιο. Παρακαλώ δώστε μία ένδειξη στο μήνυμά σας για το αν ο υποβάλλων θα πρέπει να διορθώσει το πρόβλημα και να ξαναϋποβάλει.
+jsp.mydspace.reject-reason.title =Εισάγετε αιτία για απόρριψη
+
+jsp.mydspace.remove-item.cancel.button =Ακυρώστε την απόρριψη
+jsp.mydspace.remove-item.confirmation =Είστε σίγουρος/η ότι θέλετε να αφαιρέσετε το παρακάτω ημιτελές τεκμήριο;
+jsp.mydspace.remove-item.remove.button =Αφαιρέστε το τεκμήριο
+jsp.mydspace.remove-item.title =Αφαιρέστε ένα τεκμήριο
+
+jsp.mydspace.subscriptions.info1 =Οι συνδρομές σας έχουν ανανεωθεί.
+jsp.mydspace.subscriptions.info2 =Για να εγγραφείτε σε μια συλλογή, επισκεφτείτε την αρχική σελίδα της συλλογής και κάντε κλικ στο κουμπί 'Εγγραφείτε'
+jsp.mydspace.subscriptions.info3 =Παρακάτω βρίσκονται οι συλλογές στις οποίες είστε εγγεγραμμένος/η. Θα σάς αποστέλλεται e-mail καθημερινά με την περιγραφή νέων τεκμηρίων που είναι διαθέσιμα από αυτές τις συλλογές. Τις ημέρες που δεν εμφανίζονται νέα τεκμήρια, δε θα αποστέλλεται e-mail.
+jsp.mydspace.subscriptions.info4 =Προς το παρόν δεν είστε εγγεγραμμένος/η σε καμία συλλογή.
+jsp.mydspace.subscriptions.remove.button =Αφαιρέστε όλες τις συνδρομές.
+jsp.mydspace.subscriptions.title =Οι συνδρομές σας
+jsp.mydspace.subscriptions.unsub.button =Διαγραφείτε
+
+jsp.mydspace.task-complete.title =Ευχαριστούμε
+jsp.mydspace.task-complete.text1 =Η εργασία έχει ολοκληρωθεί και έχει σταλεί ειδοποίηση στο αρμόδιο προσωπικό.
+
+jsp.register.general.return-home =Επιστροφή στην αρχική σελίδα
+
+jsp.register.already-registered.info1 =Τα αρχεία μας δείχνουν ότι έχετε ήδη εγγραφεί στο σύστημα και διατηρείτε ενεργό λογαριασμό σε μας.
+jsp.register.already-registered.info2 =Μπορείτε να <a href='{0}'>ορίσετε νέο κωδικό πρόσβασης αν τον έχετε ξεχάσει</a>.
+jsp.register.already-registered.info4 =Αν έχετε προβλήματα εισαγωγής στο σύστημα, παρακαλώ επικοινωνήστε μαζί μας.
+jsp.register.already-registered.title =Είστε ήδη εγγεγραμμένος/η
+
+jsp.register.cannot-register.msg =Η παραμετροποίηση του συστήματος δε σάς επιτρέπει να εγγραφείτε. Παρακαλώ επικοινωνήστε μαζί μας για τυχόν απορίες.
+jsp.register.cannot-register.title =Δεν μπορείτε να εγγραφείτε
+
+jsp.register.edit-profile.info1 =Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.
+jsp.register.edit-profile.info2 =Οι κωδικοί πρόσβασης που θα εισάγετε πρέπει να συμφωνούν και να έχουν έκταση τουλάχιστον 6 χαρακτήρων.
+jsp.register.edit-profile.info3 =Παρακαλώ εισάγετε ή τροποποιήστε τις παρακάτω πληροφορίες. Τα πεδία με * είναι απαραίτητα.
+jsp.register.edit-profile.info5 =<strong>Προαιρετικά</strong>, μπορείτε να επιλέξετε νέο κωδικό πρόσβασης και να τον εισάγετε στο πλαίσιο παρακάτω, και έπειτα να τον επιβεβαιώσετε πληκτρολογώντάς τον πάλι στο δεύτερο πλαίσιο. Θα πρέπει να έχει έκταση τουλάχιστον 6 χαρακτήρων.
+jsp.register.edit-profile.pswd.field =Νέος κωδικός πρόσβασης
+jsp.register.edit-profile.confirm.field =Πληκτρολογήστε πάλι για επιβεβαίωση:
+jsp.register.edit-profile.title =Επεξεργαστείτε το προφίλ σας
+jsp.register.edit-profile.update.button =Ενημερώστε το προφίλ σας
+
+jsp.register.forgot-password.email.field =Διεύθυνση e-mail:
+jsp.register.forgot-password.forgot.button =Ξέχασα τον κωδικό πρόσβασής μου
+jsp.register.forgot-password.info1 =Η διεύθυνση e-mail που εισήγατε δεν έχει αναγνωριστεί. Παρακαλώ δοκιμάστε ξανά.
+jsp.register.forgot-password.info2 =Παρακαλώ εισάγετε το e-mail σας στο πλαίσιο παρακάτω και κάντε κλικ στο 'Ξέχασα τον κωδικό πρόσβασής μου'. Θα σάς αποσταλεί e-mail που θα σας δώσει τη δυνατότητα να ορίσετε νέο κωδικό πρόσβασης.
+jsp.register.forgot-password.title =Ξέχασα τον κωδικό πρόσβασης
+
+jsp.register.inactive-account.info =Η διεύθυνση e-mail που εισήγατε αντιστοιχεί σε ανενεργό λογαριασμό. Ίσως δεν έχετε  <a href='{0}'>εγγραφεί</a> ακόμη. Παρακαλώ επικοινωνήστε με τους διαχειριστές του δικτυακού τόπου για τυχόν απορίες.
+jsp.register.inactive-account.title =Ανενεργός λογαριασμός
+
+jsp.register.invalid-token.info1 =The registration or forgotten password 'token' in the URL is invalid. This may be because of one of the following reasons:
+
+jsp.register.invalid-token.info2 =The token might be incorrectly copied into the URL.  Some e-mail programs will 'wrap' long lines of text in an email, so maybe it split your special URL up into two lines, like this:
+
+jsp.register.invalid-token.info3 =Αν είναι έτσι, θα πρέπει να αντιγράψετε και να επικολλήσετε την πρώτη γραμμή στη μπάρα διευθύνσεων του φυλλομετρητή σας, έπειτα να αντιγράψετε τη δεύτερη γραμμή και να την επικολλήσετε  στη μπάρα διευθύνσεων ακριβώς στο τέλος της πρώτης γραμμής προσέχοντας αν τυχόν υπάρχουν κενά. Η μπάρα διευθύνσεων θα περιέχει τότε κείμενο όπως αυτό:
+jsp.register.invalid-token.info4 =Έπειτα πιέστε 'Enter' στη μπάρα διευθύνσεων και το URL θα πρέπει να δουλέψει σωστά.
+jsp.register.invalid-token.info5 =Αν εξακολουθείτε να έχετε προβλήματα, παρακαλώ επικοινωνήστε μαζί μας.
+jsp.register.invalid-token.title =Invalid Token
+
+jsp.register.new-ldap-user.title = Εγγραφή χρήστη
+jsp.register.new-ldap-user.heading = Εγγραφή χρήστη
+jsp.register.new-ldap-user.info1 = Το όνομα χρήστη, ο κωδικός πρόσβασης ή το e-mail που εισήγατε δεν ήταν έγκυρα. Παρακαλώ, δοκιμάστε ξανά.
+jsp.register.new-ldap-user.info2 = Αν δεν έχετε εισέλθει στο σύστημα άλλη φορά, παρακαλώ εισάγετε το όνομα χρήστη, τον κωδικό πρόσβασης και το e-mail σας στα πεδία παρακάτω και κάντε κλικ στο 'Εγγραφείτε'. Αν δεν έχετε ήδη όνομα χρήστη, μπορείτε να εγγραφείτε απλά με την εισαγωγή του e-mail σας.
+jsp.register.new-ldap-user.info3 =Αν εσείς ή το Τμήμά σας ενδιαφέρεστε να εγγραφείτε στο σύστημα, παρακαλώ επικοινωνήστε με τους διαχειριστές του συστήματος.
+jsp.register.new-ldap-user.label.username = Όνομα χρήστη:
+jsp.register.new-ldap-user.label.password = Κωδικός πρόσβασης:
+jsp.register.new-ldap-user.label.email = E-mail:
+jsp.register.new-ldap-user.button.register = Εγγραφείτε
+
+jsp.register.new-password.confirm.field =Πάλι για επιβεβαίωση:
+jsp.register.new-password.hello =Γεια σου {0},
+jsp.register.new-password.info1 =Οι κωδικοί πρόσβασης που θα εισάγετε παρακάτω θα πρέπει να ταιριάζουν και να έχουν έκταση τουλάχιστον 6 χαρακτήρων.
+jsp.register.new-password.info2 =Παρακαλώ εισάγετε έναν κωδικό πρόσβασης στο παρακάτω πλαίσιο, και επιβεβαιώστε τον πληκτρολογώντας τον πάλι στο δεύτερο πλαίσιο. Θα πρέπει να έχει έκταση τουλάχιστον 6 χαρακτήρων.
+jsp.register.new-password.pswd.field =Νέος κωδικός πρόσβασης:
+jsp.register.new-password.set.button =Ορίστε νέο κωδικό πρόσβασης
+jsp.register.new-password.title =Εισάγετε νέο κωδικό πρόσβασης
+
+jsp.register.new-user.email.field =Διεύθυνση e-mail:
+jsp.register.new-user.info1 =<strong>Η διεύθυνση e-mail που εισήγατε δεν ήταν έγκυρη.</strong> Παρακαλώ δοκιμάστε ξανά.
+jsp.register.new-user.info2 =Αν δεν έχετε συνδεθεί στο σύστημα άλλη φορά, παρακαλώ εισάγετε τη διεύθυνση e-mail σας στο παρακάτω πλαίσιο και κάντε κλικ στο 'Εγγραφείτε'.
+jsp.register.new-user.info3 =Αν εσείς ή το Τμήμά σας ενδιαφέρεστε να εγγραφείτε στο σύστημα, παρακαλώ επικοινωνήστε με τους διαχειριστές του συστήματος.
+jsp.register.new-user.register.button =Εγγραφείτε
+jsp.register.new-user.title =Εγγραφή χρήστη
+
+jsp.register.password-changed.info =Ευχαριστούμε, ο νέος κωδικός πρόσβασής σας έχει οριστεί και είναι ενεργός.
+jsp.register.password-changed.link =Αρχική σελίδα
+jsp.register.password-changed.title =Ο κωδικός πρόσβασης έχει αλλάξει
+
+jsp.register.password-token-sent.info =Σάς έχει αποσταλεί e-mail που περιέχει ένα ειδικό URL. Όταν επισκεφτείτε αυτό το URL, θα έχετε τη δυνατότητα να ορίσετε νέο κωδικό πρόσβασης για να συνεχίσετε να χρησιμοποιείτε το σύστημα.
+jsp.register.password-token-sent.title =Το e-mail με τον νέο κωδικό πρόσβασης έχει αποσταλεί.
+
+jsp.register.profile-form.fname.field =Όνομα*:
+jsp.register.profile-form.lname.field =Επίθετο*:
+jsp.register.profile-form.phone.field =Τηλέφωνο επικοινωνίας:
+
+jsp.register.profile-updated.info1 =Ευχαριστούμε, το προφίλ σας και ο κωδικός πρόσβασής σας έχουν ενημερωθεί.
+jsp.register.profile-updated.info2 =Ευχαριστούμε, το προφίλ σας έχει ενημερωθεί.
+jsp.register.profile-updated.title =Το προφίλ ενημερώθηκε
+
+jsp.register.registered.info =Είστε πλέον εγγεγραμμένος χρήστης του συστήματος. Μπορείτε να εγγραφείτε σε συλλογές για να λαμβάνετε ενημερώσεις μέσω e-mail για νέα τεκμήρια.
+jsp.register.registered.thank =Ευχαριστούμε {0},
+jsp.register.registered.title =Η εγγραφή ολοκληρώθηκε
+
+jsp.register.registration-form.complete.button =Ολοκληρώστε την εγγραφή
+jsp.register.registration-form.confirm.field =Πάλι για επιβεβαίωση:
+jsp.register.registration-form.instruct1 =Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.
+jsp.register.registration-form.instruct2 =Οι κωδικοί πρόσβασης που θα εισάγετε παρακάτω θα πρέπει να ταιριάζουν και να έχουν έκταση τουλάχιστον 6 χαρακτήρων.
+jsp.register.registration-form.instruct3 =Παρακαλώ εισάγετε τις παρακάτω πληροφορίες. Τα πεδία με * είναι απαιτούμενα.
+jsp.register.registration-form.instruct4 =Παρακαλώ επιλέξτε έναν κωδικό πρόσβασης και εισάγετέ τον στο πλαίσιο παρακάτω, έπειτα επιβεβαιώστε τον πληκτρολογώντας τον πάλι στο δεύτερο πλαίσιο. Θα πρέπει να έχει έκταση τουλάχιστον 6 χαρακτήρων.
+jsp.register.registration-form.pswd.field =Κωδικός πρόσβασης:
+jsp.register.registration-form.title =Πληροφορίες εγγραφής
+jsp.register.registration-sent.info =Σάς έχει αποσταλεί e-mail που περιέχει ένα ειδικό URL. Όταν επισκεφτείτε αυτό το URL, θα πρέπει να συμπληρώσετε κάποιες απλές πληροφορίες. Έπειτα, θα είστε έτοιμοι να εισέλθετε στο σύστημα!
+jsp.register.registration-sent.title =Το e-mail εγγραφής έχει αποσταλεί
+
+jsp.search.general.noresults = Η αναζήτηση δεν έφερε αποτελέσματα.
+jsp.search.general.next = επόμενη
+jsp.search.general.previous = προηγούμενη
+
+jsp.search.advanced.title = Σύνθετη αναζήτηση
+jsp.search.advanced.search = Αναζητήστε:
+jsp.search.advanced.search2 = Αναζήτηση
+jsp.search.advanced.searchfor = Αναζητήστε για
+jsp.search.advanced.clear = Καθαρισμός πεδίων
+jsp.search.advanced.type = Τύπος αναζήτησης
+jsp.search.advanced.type.subject = Θέμα
+jsp.search.advanced.type.keyword = Λέξη-κλειδί
+jsp.search.advanced.type.author = Συγγραφέας/Συντελεστής
+jsp.search.advanced.type.title = Τίτλος
+jsp.search.advanced.type.abstract = Επιτομή (abstract)
+jsp.search.advanced.type.series = Σειρά
+jsp.search.advanced.type.sponsor = Χορηγός
+jsp.search.advanced.type.id = Αναγνωριστικό (URL, ISSN, κτλ)
+jsp.search.advanced.type.language = Γλώσσα (ISO)
+
+jsp.search.advanced.logical.and = ΚΑΙ
+jsp.search.advanced.logical.or = Ή
+jsp.search.advanced.logical.not = ΌΧΙ
+
+jsp.search.results.colhits = Αποτελέσματα εντός συλλογής:
+jsp.search.results.comhits = Αποτελέσματα εντός συλλογής:
+jsp.search.results.itemhits = Αριθμός τεκμηρίων:
+jsp.search.results.searchin = Αναζητήστε:
+jsp.search.results.searchfor = για
+jsp.search.results.results =Αποτελέσματα για {0}-{1} από {2}.
+jsp.search.results.title = Αποτελέσματα αναζήτησης
+
+jsp.statistics.no-report.title = No reports currently available
+jsp.statistics.no-report.info1 = There are currently no reports available for this service.  Please check back later.
+
+jsp.statistics.report.title = Statistical Summary
+jsp.statistics.report.info1 = Most recent general report
+jsp.statistics.report.info2 = Monthly reports:
+
+jsp.submit.general.submit = Υποβάλλετε
+jsp.submit.general.next = Επόμενη
+jsp.submit.general.previous = Προηγούμενη
+jsp.submit.general.cancel-or-save.button =Ακυρώστε/ Αποθηκεύστε
+
+jsp.submit.cancel.continue.button =Λάθος, θα συνεχίσω την υποβολή
+jsp.submit.cancel.info =Θέλετε να αφαιρέσετε την ημιτελή υποβολή ή να την κρατήσετε για να τη συνεχίσετε αργότερα; Μπορείτε, επίσης, να επιστρέψετε εκεί που ήσασταν κατά τη διάρκεια της υποβολής αν κατά λάθος κάνατε κλικ στο 'Ακυρώστε'.
+jsp.submit.cancel.remove.button =Αφαίρεσε την υποβολή
+jsp.submit.cancel.save.button =Αποθήκευσέ την, θα τη συνεχίσω αργότερα
+jsp.submit.cancel.title=Ακυρώστε ή αποθηκεύστε την υποβολή
+
+jsp.submit.cancelled-removed.info =Η υποβολή σας έχει ακυρωθεί, και το ημιτελές τεκμήριο έχει αφαιρεθεί από το σύστημα.
+jsp.submit.cancelled-removed.title =Η υποβολή ακυρώθηκε
+
+jsp.submit.change-file-description.file =Αρχείο
+jsp.submit.change-file-description.filedescr =Περιγραφή αρχείου:
+jsp.submit.change-file-description.format =Μορφότυπος αρχείου
+jsp.submit.change-file-description.heading =Υποβάλλετε: Αλλάξτε την περιγραφή του αρχείου
+jsp.submit.change-file-description.info1 =Παρακάτω εμφανίζονται οι πληροφορίες του αρχείου.
+jsp.submit.change-file-description.info2 =Εισάγετε τη σωστή περιγραφή του αρχείου στο πλαίσιο παρακάτω:
+jsp.submit.change-file-description.size =Μέγεθος
+jsp.submit.change-file-description.title =Αλλάξτε την περιγραφή του αρχείου
+
+jsp.submit.choose-file.document =Αρχείο εγγράφου:
+jsp.submit.choose-file.filedescr =Περιγραφή αρχείου:
+jsp.submit.choose-file.heading =Υποβάλλετε: Φορτώστε ένα αρχείο
+jsp.submit.choose-file.info1 =Παρακαλώ εισάγετε το όνομα του αρχείου στο σκληρό σας δίσκο που αντιστοιχεί στο τεκμήριό σας. Αν κάνετε κλικ στο 'Πλοήγηση...', θα εμφανιστεί ένα καινούργιο παράθυρο από το οποίο μπορείτε να εντοπίσετε και να επιλέξετε το αρχείο στο σκληρό σας δίσκο.
+jsp.submit.choose-file.info3 =<strong>Χρήστες Netscape παρακαλώ σημειώστε:</strong> εξ ορισμού, το παράθυρο που θα εμφανιστεί κάνοντας κλικ στο 'Πλοήγηση...' θα εμφανίσει μόνο αρχεία τύπου HTML. Αν το αρχείο που 'ανεβάζετε' δεν είναι HTML, θα πρέπει να επιλέξετε να εμφανιστούν τα αρχεία και άλλων τύπων.
+jsp.submit.choose-file.info4 =Υπάρχουν διαθέσιμες οδηγίες για χρήστες Netscape.
+jsp.submit.choose-file.info6 =Παρακαλώ σημειώστε, επίσης, ότι το σύστημα έχει τη δυνατότητα να διατηρεί το περιεχόμενο ορισμένων τύπων αρχείων καλύτερα από κάποιους άλλους τύπους.
+jsp.submit.choose-file.info7 =Υπάρχουν διαθέσιμες πληροφορίες για τους τύπους αρχείων και τα επίπεδα υποστήριξης που διατίθενται για τον καθένα.
+jsp.submit.choose-file.info9 =Παρακαλώ δώστε μια σύντομη περιγραφή των περιεχομένων του αρχείου, π.χ. 'Κυρίως άρθρο' ή 'Αναγνώσματα πειραματικών δεδομένων'.
+jsp.submit.choose-file.title ='Φορτώστε' ένα αρχείο
+
+jsp.submit.complete.heading =Υποβάλλετε: η υποβολή ολοκληρώθηκε!
+jsp.submit.complete.info =Η υποβολή σας θα περάσει τώρα από τη διαδικασία ροής που έχει καθοριστεί για τη συλλογή στην οποία υποβάλλετε. Θα λάβετε ειδοποίηση μέσω e-mail μόλις η υποβολή σας αποτελέσει μέρος της συλλογής, ή αν για κάποιο λόγο υπάρχει πρόβλημα με την υποβολή σας. Μπορείτε, επίσης, να ελέγξετε την κατάσταση της υποβολής σας πηγαίνοντας στο 'DSpace μου'.
+jsp.submit.complete.link =Πήγαινε στο 'DSpace μου'
+jsp.submit.complete.title =Η υποβολή ολοκληρώθηκε!
+
+jsp.submit.creative-commons.heading =Υποβάλλετε: χρησιμοποιήστε μια άδεια Creative Commons
+jsp.submit.creative-commons.info1 =Έχετε ήδη επιλέξει μια άδεια Creative Commons και την έχετε προσθέσει στο τεκμήριο. Μπορείτε να:
+jsp.submit.creative-commons.choice1 =Πατήστε το κουμπί 'Επόμενη' παρακάτω για να <em>διατηρήσετε</em>την άδεια που επιλέχθηκε προηγουμένως.
+jsp.submit.creative-commons.choice2 =Πατήστε το κουμπί 'Αγνόησε την άδεια Creative Commons' για να <em>αφαιρέσετε</em> την τρέχουσα επιλογή και να αρνηθείτε την άδεια Creative Commons.
+jsp.submit.creative-commons.choice3 =Ολοκληρώστε τη διαδικασία επιλογής παρακάτω για να <em>αντικαταστήσετε</em> την τρέχουσα επιλογή.
+jsp.submit.creative-commons.info2 =Για να αποδώσετε στο τεκμήριό σας άδεια Creative Commons, ακολουθήστε τις παρακάτω οδηγίες. Θα σάς δοθεί η ευκαιρία να αναθεωρήσετε την επιλογή σας. Ακολουθήστε το σύνδεσμο 'Συνεχίστε' για να προσθέσετε την άδεια. Αν θέλετε να παραλείψετε την άδεια Creative Commons, πατήστε το κουμπί 'Αγνόησε την άδεια Creative Commons'.
+jsp.submit.creative-commons.info3 =Ο φυλλομετρητής σας πρέπει να υποστηρίζει IFrames για να χρησιμοποιήσετε αυτή τη λειτουργία.
+jsp.submit.creative-commons.skip.button =Αγνόησε την άδεια Creative Commons
+jsp.submit.creative-commons.title =Χρησιμοποίησε άδεια Creative Commons
+
+jsp.submit.edit-metadata.title = Περιγράψτε το τεκμήριο
+jsp.submit.edit-metadata.heading = Υποβάλλετε: Περιγράψτε το τεκμήριο
+jsp.submit.edit-metadata.info1 = Παρακαλώ συμπληρώστε παρακάτω τις απαραίτητες πληροφορίες για την υποβολή σας. Στους περισσότερους φυλλομετρητές, μπορείτε να χρησιμοποιήστε το πλήκτρο tab για να μετακινείτε τον δείκτη στο επόμενο πλαίσιο ή κουμπί για να αποφύγετε τη χρήση του ποντικιού κάθε φορά.
+jsp.submit.edit-metadata.info2 = Παρακαλώ συμπληρώστε παρακάτω περισσότερες πληροφορίες για την υποβολή σας.
+jsp.submit.edit-metadata.help = (Περισσότερη βοήθεια...)
+jsp.submit.edit-metadata.previous = Προηγούμενη
+jsp.submit.edit-metadata.next = Επόμενη
+jsp.submit.edit-metadata.cancelsave = Ακυρώστε/ Aποθηκεύστε
+jsp.submit.edit-metadata.lastname = Επίθετο<br/>π.χ. <strong>Παπαδοπούλου</strong>
+jsp.submit.edit-metadata.firstname = Όνομα (ονόματα), + τίτλος<br/> π.χ.<strong>Δρ.</strong>
+jsp.submit.edit-metadata.button.remove = Αφαιρέστε αυτήν την εισαγωγή
+jsp.submit.edit-metadata.button.remove2 = Αφαιρέστε
+jsp.submit.edit-metadata.button.add = Προσθέστε περισσότερα
+jsp.submit.edit-metadata.month = Μήνας:
+jsp.submit.edit-metadata.no_month = (Χωρίς μήνα)
+jsp.submit.edit-metadata.day = Ημερομηνία:
+jsp.submit.edit-metadata.year = Έτος:
+jsp.submit.edit-metadata.seriesname =Τίτλος σειράς
+jsp.submit.edit-metadata.paperno = Αριθμός αναφοράς ή φύλλου
+
+jsp.submit.get-file-format.choose.button =Επιλέξτε αυτόματα αναγνωρίσιμο μορφότυπο
+jsp.submit.get-file-format.format =Μορφότυπος αρχείου:
+jsp.submit.get-file-format.heading =Υποβάλλετε: Επιλέξτε μορφότυπο αρχείου
+jsp.submit.get-file-format.info1 =Φορτώθηκε αρχείο: <code>{0}</code> ({1} bytes)
+jsp.submit.get-file-format.info2 =Το σύστημα δεν μπόρεσε να αναγνωρίσει το μορφότυπο αυτού του αρχείου.
+jsp.submit.get-file-format.info3 =Το σύστημα αναγνώρισε το μορφότυπο ως {0}. <strong>Παρακαλώ βεβαιωθείτε προτού τον αλλάξετε!</strong>
+jsp.submit.get-file-format.info5 =Επιλέξτε το μορφότυπο του αρχείου από την παρακάτω λίστα, για παράδειγμα 'Adobe PDF' ή 'Microsoft Word', <strong>Ή</strong> αν ο μορφότυπος δεν υπάρχει στη λίστα, παρακαλώ περιγράψτε τον στο πλαίσιο εισαγωγής κειμένου κάτω από τη λίστα.
+jsp.submit.get-file-format.info6 =Ο μορφότυπος δεν υπάρχει στη λίστα
+jsp.submit.get-file-format.info7 =<strong>Αν ο μορφότυπος δεν υπάρχει στην παραπάνω λίστα </strong>, περιγράψτε τον παρακάτω. Εισάγετε το όνομα της εφαρμογής που χρησιμοποιήσατε για να δημιουργήσετε το αρχείο και τον αριθμό έκδοσης της εφαρμογής (για παράδειγμα, 'ACMESoft SuperApp έκδοση1.5').
+jsp.submit.get-file-format.known =(γνωστός)
+jsp.submit.get-file-format.supported =(υποστηρίζεται)
+jsp.submit.get-file-format.title =Επιλέξτε μορφότυπο
+
+jsp.submit.initial-questions.elem1 =Το τεκμήριο έχει περισσότερους από έναν τίτλους, π.χ. έναν μεταφρασμένο τίτλο
+jsp.submit.initial-questions.elem2 =Το τεκμήριο έχει δημοσιευτεί ή διανεμηθεί δημόσια στο παρελθόν
+jsp.submit.initial-questions.elem3 =Το τεκμήριο περιέχει <em>περισσότερα από ένα</em> αρχεία
+jsp.submit.initial-questions.elem4 =Το τεκμήριο είναι διατριβή
+jsp.submit.initial-questions.info =Παρακαλώ επιλέξτε τα κουτιά δίπλα από τις δηλώσεις που ισχύουν για την υποβολή σας
+jsp.submit.initial-questions.heading =Υποβάλλετε: Περιγράψτε το τεκμήριό σας
+jsp.submit.initial-questions.title =Περιγράψτε το τεκμήριό σας
+jsp.submit.license-rejected.heading =Υποβάλλετε: η άδεια απορρίφθηκε
+jsp.submit.license-rejected.info1 =Έχετε επιλέξει να μη χορηγήσετε την άδεια για διάθεση της υποβολής σας μέσω του συστήματος. Η υποβολή σας δεν έχει διαγραφεί και μπορεί να προσπελαστεί από τη σελίδα 'Το DSpace μου'
+jsp.submit.license-rejected.info2 =Αν επιθυμείτε να επικοινωνήσετε μαζί μας για να συζητήσουμε σχετικά με την άδεια, παρακαλώ χρησιμοποιήστε μια από τις παρακάτω μεθόδους:
+jsp.submit.license-rejected.title =Η άδεια απορρίφθηκε
+jsp.submit.no-theses.info1 =DSpace does not currently accept individually-submitted theses, but you are encouraged to use the separate electronic thesis submission site supported by the Libraries and by MIT Information Systems to submit your thesis to the <a href='http://thesis.mit.edu'>Digital Library of MIT Theses</a>.  To learn how to submit your thesis to that system, see <a href='http://web.mit.edu/etheses/www/etheses-home.html'>Submitting an Electronic Thesis at MIT</a>.
+jsp.submit.no-theses.info2 =Επειδή το σύστημα δεν αποδέχεται διατριβές που έχουν υποβληθεί μεμονωμένα, η υποβολή σας δε θα συνεχιστεί. Οποιαδήποτε αρχεία έχετε 'ανεβάσει' για το τρέχον τεκμήριο δε θα αποθηκευτούν.
+jsp.submit.no-theses.info3 =Please note that printed copies of your thesis are still the official requirement for your degree. Due to important legal and record-keeping reasons, it is likely that in the future DSpace will work directly with the electronic thesis system to load groups of theses which have been officially vetted and approved. Thanks for understanding.
+jsp.submit.no-theses.info4 =Για περισσότερες πληροφορίες παρακαλώ <strong>επικοινωνήστε με τους διαχειριστές του συστήματος</strong>:
+jsp.submit.no-theses.info5 =Ευχαριστούμε για το ενδιαφέρον σας για το σύστημα!
+jsp.submit.no-theses.title =Η διατριβή δεν έγινε αποδεκτή στο σύστημα
+jsp.submit.progressbar.select = Επιλέξτε
+jsp.submit.progressbar.describe = Περιγράψτε
+jsp.submit.progressbar.upload = Φορτώστε
+jsp.submit.progressbar.verify = Επιβεβαιώστε
+jsp.submit.progressbar.license = Χορηγήστε άδεια
+jsp.submit.progressbar.complete = Ολοκληρώστε
+
+jsp.submit.review.title = Επιβεβαιώστε την υποβολή
+jsp.submit.review.heading = Υποβάλλετε: επιβεβαιώστε την υποβολή
+jsp.submit.review.info1 = <strong>Δεν έχετε ολοκληρώσει ακόμα,</strong> αλλά έχετε σχεδόν τελειώσει!
+jsp.submit.review.info2 = Παρακαλώ ελέγξτε την υποβολή σας. Αν υπάρχει κάποιο λάθος, παρακαλώ πηγαίνετε πίσω και διορθώστε το χρησιμοποιώντας τα κουμπιά δίπλα από την εσφαλμένη πληροφορία ή κάνοντας κλικ στη μπάρα προόδου στο πάνω μέρος της σελίδας.
+jsp.submit.review.info3 = <strong>Αν όλα είναι εντάξει,</strong> παρακαλώ κάντε κλικ στο κουμπί 'Επόμενη' στο κάτω μέρος της σελίδας.
+jsp.submit.review.info4 = Μπορείτε με ασφάλεια να ελέγξετε τα αρχεία που έχετε 'φορτώσει'- ένα νέο 'παράθυρο' θα ανοίξει για να τα εμφανίσει
+jsp.submit.review.init-question1 = Το τεκμήριο έχει περισσότερους από έναν τίτλους:
+jsp.submit.review.init-question2 = Το τεκμήριο έχει δημοσιευτεί στο παρελθόν:
+jsp.submit.review.init-question3 = Το τεκμήριο περιέχει περισσότερα από ένα αρχεία:
+jsp.submit.review.state1 = Ναι
+jsp.submit.review.state2 = Όχι
+jsp.submit.review.button.correct = Διορθώστε ένα από αυτά
+jsp.submit.review.no_md = <em>Κανένας</em>
+jsp.submit.review.unknown = (Αγνωστος)
+jsp.submit.review.known = (Γνωστός)
+jsp.submit.review.supported = (Υποστηρίζεται)
+jsp.submit.review.upload1 = 'Φορτώθηκαν' αρχεία:
+jsp.submit.review.upload2 = 'Φορτώθηκε' αρχείο:
+jsp.submit.review.button.upload1 = Προσθέστε ή αφαιρέστε ένα αρχείο
+jsp.submit.review.button.upload2 = Φορτώστε ένα διαφορετικό αρχείο
+jsp.submit.review.button.edit = Επεξεργαστείτε τις πληροφορίες του αρχείου
+jsp.submit.review.button.previous = Προηγούμενη
+jsp.submit.review.button.next = Επόμενη
+jsp.submit.review.button.cancelsave = Ακυρώστε/ Αποθηκεύστε
+jsp.submit.saved.info =Η υποβολή σας έχει αποθηκευτεί ώστε να την ολοκληρώσετε αργότερα. Μπορείτε να συνεχίσετε την υποβολή πηγαίνοντας στο 'DSpace μου' και κάνοντας κλικ στο αντίστοιχο κουμπί 'Συνεχίστε'
+jsp.submit.saved.title =Η υποβολή έχει αποθηκευτεί
+
+jsp.submit.select-collection.collection =Συλλογή
+jsp.submit.select-collection.heading =Υποβάλλετε: Επιλέξτε συλλογή
+jsp.submit.select-collection.info1 =Επιλέξτε από την παρακάτω λίστα τη συλλογή στην οποία επιθυμείτε να υποβάλετε το τεκμήριο, έπειτα πατήστε 'Επόμενη'
+jsp.submit.select-collection.title =Επιλέξτε συλλογή για να υποβάλετε
+jsp.submit.show-license.grant.button =Χορηγώ την άδεια
+jsp.submit.show-license.heading1 =Υποβάλλετε: χορηγήστε την άδεια διανομής του συστήματος
+jsp.submit.show-license.info1 =<strong>Υπάρχει ένα τελευταίο βήμα:</strong> Για να αναπαράγει, να μεταφράσει και να διανέμει το σύστημα την υποβολή σας παγκοσμίως, είναι απαραίτητο να συμφωνήσετε στους παρακάτω όρους. Παρακαλώ διαβάστε τους όρους της άδειας, και κάντε κλικ σε ένα από τα κουμπιά στο κάτω μέρος της σελίδας. Κάνοντας κλικ στο κουμπί 'Χορηγήστε την άδεια', συμφωνείτε με τους όρους της άδειας.
+jsp.submit.show-license.info2 =<strong>Η μη χορήγηση της άδειας δε θα διαγράψει την υποβολή σας.</strong> Το τεκμήριό σας θα παραμείνει στη σελίδα 'Το DSpace μου'. Μπορείτε, έπειτα, είτε να αφαιρέσετε την υποβολή από το σύστημα, είτε να συμφωνήσετε αργότερα στους όρους της άδειας αφού λυθούν οποιεσδήποτε απορίες έχετε.
+jsp.submit.show-license.notgrant.button =Δε χορηγώ την άδεια
+jsp.submit.show-license.title =Αδεια διανομής του συστήματος
+
+jsp.submit.show-uploaded-file.click1.button =Κάντε κλικ εδώ αν αυτός είναι ο λάθος μορφότυπος
+jsp.submit.show-uploaded-file.click2.button =Κάντε κλικ εδώ αν αυτό είναι το λάθος αρχείο
+jsp.submit.show-uploaded-file.file =Αρχείο
+jsp.submit.show-uploaded-file.format =Μορφότυπος
+jsp.submit.show-uploaded-file.heading1 =Υποβάλλετε: Το αρχείο 'φορτώθηκε' επιτυχώς
+jsp.submit.show-uploaded-file.heading2 =Υποβάλλετε: Το αρχείο φορτώθηκε
+jsp.submit.show-uploaded-file.info1 =Το αρχείο σας φορτώθηκε επιτυχώς
+jsp.submit.show-uploaded-file.info2 =Παρακάτω βρίσκονται οι πληροφορίες του αρχείου που έχετε 'φορτώσει'. Παρακαλώ ελέγξτε τις πληροφορίες πριν προχωρήσετε στο επόμενο βήμα.
+jsp.submit.show-uploaded-file.info3 =Μπορείτε να επιβεβαιώσετε ότι το αρχείο έχει 'φορτωθεί' επιτυχώς:
+jsp.submit.show-uploaded-file.info4 =Κάνοντας κλικ στο όνομα του αρχείου παραπάνω. Αυτό θα 'μεταφορτώσει' το αρχείο σε ένα νέο 'παράθυρο' φυλλομετρητή, ώστε να μπορέσετε να ελέγξετε τα περιεχόμενα.
+jsp.submit.show-uploaded-file.info5 =Συγκρίνοντας το checksum που εμφανίζεται παραπάνω με το checksum στον υπολογιστή σας. Θα πρέπει να είναι ακριβώς το ίδιο.
+jsp.submit.show-uploaded-file.info6 =Κάντε κλικ εδώ για να δείτε πώς μπορείτε να το κάνετε.
+jsp.submit.show-uploaded-file.info7 =Το σύστημα μπορεί να υπολογίσει ένα checksum για να το επιβεβαιώσετε.
+jsp.submit.show-uploaded-file.info8 =Κάντε κλικ εδώ για περισσότερες πληροφορίες.
+jsp.submit.show-uploaded-file.known = γνωστός
+jsp.submit.show-uploaded-file.supported = Υποστηρίζεται
+jsp.submit.show-uploaded-file.notSupported = δεν υποστηρίζεται
+jsp.submit.show-uploaded-file.show.button =Δείξε τα checksums
+jsp.submit.show-uploaded-file.checksum =Checksum
+jsp.submit.show-uploaded-file.size =Μέγεθος
+jsp.submit.show-uploaded-file.size-in-bytes = {0} bytes
+jsp.submit.show-uploaded-file.title =Το αρχείο 'φορτώθηκε'
+
+jsp.submit.thesis-removed-workaround.heading =Η υποβολή έχει σταματήσει: η διατριβή δεν έγινε αποδεκτή στο σύστημα
+jsp.submit.thesis-removed-workaround.info =Εφόσον το σύστημα δεν αποδέχεται διατριβές, η υποβολή σας έχει σταματήσει. Για να ξεκινήσετε μια καινούργια υποβολή κάντε κλικ παρακάτω.
+jsp.submit.thesis-removed-workaround.link =Ξεκινήστε μια νέα υποβολή
+jsp.submit.thesis-removed-workaround.title =Η υποβολή έχει σταματήσει
+
+jsp.submit.upload-error.heading =Υποβάλλετε: σφάλμα κατά τη 'φόρτωση' του αρχείου
+jsp.submit.upload-error.info =Υπήρξε ένα πρόβλημα με τη 'φόρτωση' του αρχείου. Είτε το όνομα του αρχείου που υποβάλλατε ήταν εσφαλμένο, είτε υπήρξε πρόβλημα στο δίκτυο που απέτρεψε τη σωστή υποβολή του αρχείου. Παρακαλώ δοκιμάστε ξανά.
+jsp.submit.upload-error.retry.button =Ξαναπροσπαθήστε να 'φορτώσετε' το αρχείο
+jsp.submit.upload-error.title =Σφάλμα κατά τη 'φόρτωση' του αρχείου
+
+jsp.submit.upload-file-list.title = Τα αρχεία έχουν 'φορτωθεί'
+jsp.submit.upload-file-list.heading1 = Υποβάλλετε: το αρχείο έχει 'φορτωθεί' επιτυχώς
+jsp.submit.upload-file-list.heading2 = Υποβάλλετε: τα αρχεία έχουν 'φορτωθεί'
+jsp.submit.upload-file-list.info1 = <strong>Το αρχείο σας 'φορτώθηκε' επιτυχώς.</strong>
+jsp.submit.upload-file-list.info2 = Ο πίνακας παρακάτω δείχνει τα αρχεία που έχετε 'φορτώσει' για το τεκμήριο.
+jsp.submit.upload-file-list.info3 =Μπορείτε να επιβεβαιώσετε ότι το αρχείο/ τα αρχεία έχουν 'φορτωθεί' επιτυχώς:
+jsp.submit.upload-file-list.info4 =Κάνοντας κλικ στα ονόματα αρχείων παραπάνω. Αυτό θα μεταφορτώσει το αρχείο σε ένα νέο παράθυρο φυλλομετρητή, ώστε να μπορέσετε να ελέγξετε το περιεχόμενο.
+jsp.submit.upload-file-list.info5 = Συγκρίνοντας τα checksums που εμφανίζονται παραπάνω με τα checksums στον υπολογιστή σας. Θα πρέπει να είναι ακριβώς τα ίδια.
+jsp.submit.upload-file-list.info6 = Το σύστημα μπορεί να υπολογίσει ένα checksum για να το επιβεβαιώσετε.
+jsp.submit.upload-file-list.tableheading1 = Primary<br/>bitstream
+jsp.submit.upload-file-list.tableheading2 = Αρχείο
+jsp.submit.upload-file-list.tableheading3 = Μέγεθος
+jsp.submit.upload-file-list.tableheading4 = Περιγραφή
+jsp.submit.upload-file-list.tableheading5 = Μορφότυπος
+jsp.submit.upload-file-list.tableheading6 = Checksum
+jsp.submit.upload-file-list.empty1 = <em>Κανένας</em>
+jsp.submit.upload-file-list.supportlevel1 = υποστηρίζεται
+jsp.submit.upload-file-list.supportlevel2 = γνωστός
+jsp.submit.upload-file-list.supportlevel1 = άγνωστος
+jsp.submit.upload-file-list.button1 = Αλλάξτε
+jsp.submit.upload-file-list.button2 = Διαγράψτε
+jsp.submit.upload-file-list.button3 = Show checksums
+jsp.submit.upload-file-list.button4 = Προσθέστε κι άλλο αρχείο
+jsp.submit.upload-file-list.button5 = Προηγούμενη
+jsp.submit.upload-file-list.button6 = Επόμενη
+jsp.submit.upload-file-list.button7 = Ακυρώστε/ Αποθηκεύστε
+jsp.submit.upload-file-list.help1 = Κάντε κλικ εδώ για να μάθετε πώς να το κάνετε
+jsp.submit.upload-file-list.help2 = Κάντε κλικ εδώ για περισσότερες πληροφορίες
+jsp.submit.verify-prune.heading =Υποβάλλετε: προσοχή
+jsp.submit.verify-prune.info1 =Οι αλλαγές που κάνατε στην πρώτη σελίδα 'Περιγράψτε το τεκμήριό σας' θα επηρρεάσουν την υποβολή σας:
+jsp.submit.verify-prune.info2 =Έχετε δηλώσει πως η υποβολή σας δεν έχει εναλλακτικούς τίτλους, αλλά έχετε ήδη εισάγει κάποιους. Αν προχωρήσετε σε αυτήν την αλλαγή, οι εναλλακτικοί τίτλοι που έχετε εισάγει θα αφαιρεθούν.
+jsp.submit.verify-prune.info3 =Έχετε δηλώσει πως η υποβολή σας δεν έχει δημοσιευτεί ή διανεμηθεί στο παρελθόν, αλλά έχετε ήδη εισάγει ημερομηνία έκδοσης, εκδότη και/ή βιβλιογραφική παραπομπή. Αν συνεχίσετε, αυτές οι πληροφορίες θα αφαιρεθούν και το σύστημα θα καθορίσει ημερομηνία έκδοσης.
+jsp.submit.verify-prune.info4 =Έχετε δηλώσει πως το τεκμήριο που υποβάλλετε περιέχει ένα μόνο αρχείο, αλλά έχετε ήδη 'φορτώσει' περισσότερα από ένα αρχεία. Αν συνεχίσετε, μόνο το πρώτο αρχείο που 'φορτώσατε' θα κρατηθεί και τα υπόλοιπα θα διαγραφούν από το σύστημα. (Τα αρχεία στο σκληρό σας δίσκο δε θα επηρρεαστούν).
+jsp.submit.verify-prune.notproceed.button =Μην κάνεις τις αλλαγές
+jsp.submit.verify-prune.proceed.button =Προχωρήστε με τις αλλαγές
+jsp.submit.verify-prune.question =Είστε σίγουροι πως θέλετε να προχωρήσετε με τις αλλαγές;
+jsp.submit.verify-prune.title =Οι απαντήσεις στις αρχικές ερωτήσεις έχουν αλλάξει
+
+jsp.tombstone.text =Το τεκμήριο που προσπαθείτε να προσπελάσετε έχει αφαιρεθεί από το σύστημα. Αν έχετε τυχόν ερωτήσεις, παρακαλώ επικοινωνήστε με τους διαχειριστές.
+jsp.tombstone.title =Το τεκμήριο έχει αποσυρθεί
+
+jsp.tools.general.cancel =Ακυρώστε
+jsp.tools.general.delete =Διαγράψτε
+jsp.tools.general.delete-w-confirm = Διαγράψτε...
+jsp.tools.general.add = Προσθέστε
+jsp.tools.general.select = Επιλέξτε
+jsp.tools.general.update =Ενημερώστε
+jsp.tools.general.edit = Επεξεργαστείτε
+jsp.tools.general.remove =Αφαιρέστε
+jsp.tools.general.view =Δείτε
+jsp.tools.confirm-delete-collection.title = Διαγράψτε μια συλλογή
+jsp.tools.confirm-delete-collection.heading = Διαγράψτε τη συλλογή: {0}
+jsp.tools.confirm-delete-collection.confirm = Είστε σίγουροι πως η συλλογή <strong>{0}</strong> θα πρέπει να διαγραφεί;  Αυτό θα διαγράψει: 
+jsp.tools.confirm-delete-collection.info1 = Οποιαδήποτε τεκμήρια και ημιτελείς υποβολές σε αυτές τις συλλογές που δεν περιέχονται σε άλλες συλλογές
+jsp.tools.confirm-delete-collection.info2 = Τα περιεχόμενα αυτών των τεκμηρίων
+jsp.tools.confirm-delete-collection.info3 = Όλες τις συσχετιζόμενες πολιτικές εξουσιοδότησης πρόσβασης
+jsp.tools.confirm-delete-community.title = Διαγράψτε μια συλλογή
+jsp.tools.confirm-delete-community.heading = Διαγράψτε την συλλογή: {0}
+jsp.tools.confirm-delete-community.confirm = Είστε σίγουροι πως η συλλογή <strong>{0}</strong> θα πρέπει να διαγραφεί; Αυτό θα διαγράψει:
+jsp.tools.confirm-delete-community.info1 = Οποιεσδήποτε συλλογές σε αυτήν την συλλογή που δεν περιέχονται σε άλλες συλλογές
+jsp.tools.confirm-delete-community.info2 = Οποιαδήποτε τεκμήρια και ημιτελείς υποβολές σε αυτές τις συλλογές που δεν περιέχονται σε άλλες συλλογές
+jsp.tools.confirm-delete-community.info3 = Τα περιεχόμενα αυτών των τεκμηρίων
+jsp.tools.confirm-delete-community.info4 = Όλες τις συσχετιζόμενες πολιτικές εξουσιοδότησης
+jsp.tools.confirm-delete-item.info =Είστε σίγουροι πως αυτό το τεκμήριο θα πρέπει να διαγραφεί τελείως; 
+jsp.tools.confirm-delete-item.title =Διαγράψτε ένα τεκμήριο
+
+jsp.tools.confirm-withdraw-item.question =Είστε σίγουροι πως αυτό το τεκμήριο θα πρέπει να αποσυρθεί από το αρχείο;
+jsp.tools.confirm-withdraw-item.title =Αποσύρετε ένα τεκμήριο
+jsp.tools.confirm-withdraw-item.withdraw.button =Αποσύρετε
+jsp.tools.edit-collection.title = Επεξεργαστείτε μια συλλογή
+jsp.tools.edit-collection.heading1 = Δημιουργήστε μια συλλογή
+jsp.tools.edit-collection.heading2 = Επεξεργαστείτε τη συλλογή {0}
+jsp.tools.edit-collection.button.delete = Διαγράψτε αυτή τη συλλογή...
+jsp.tools.edit-collection.form.label1 = Όνομα:
+jsp.tools.edit-collection.form.label2 = Σύντομη περιγραφή
+jsp.tools.edit-collection.form.label3 = Εισαγωγικό κείμενο (HTML):
+jsp.tools.edit-collection.form.label4 = Κείμενο copyright (απλό κείμενο):
+jsp.tools.edit-collection.form.label5 = Κείμενο πλαϊνής μπάρας (HTML):
+jsp.tools.edit-collection.form.label6 = Αδεια:
+jsp.tools.edit-collection.form.label7 = Προέλευση:
+jsp.tools.edit-collection.form.label8 = Λογότυπο:
+jsp.tools.edit-collection.form.label9 = Ροή υποβολής:
+jsp.tools.edit-collection.form.label10 = Υποβάλλοντες:
+jsp.tools.edit-collection.form.label11 = Βήμα:
+jsp.tools.edit-collection.form.label12 = Διαχειριστές συλλογής:
+jsp.tools.edit-collection.form.label13 = Item template:
+jsp.tools.edit-collection.form.label14 = Εξουσιοδοτήσεις πρόσβασης στη συλλογή:
+jsp.tools.edit-collection.form.button.add-logo = 'Φορτώστε' νέο λογότυπο...
+jsp.tools.edit-collection.form.button.delete-logo = Διαγράψτε (χωρίς λογότυπο)
+jsp.tools.edit-collection.form.button.set-logo = 'Φορτώστε' ένα λογότυπο...
+jsp.tools.edit-collection.form.button.create = Δημιουργήστε...
+jsp.tools.edit-collection.form.button.create2 = Δημιουργήστε
+jsp.tools.edit-collection.form.button.edit = Επεξεργαστείτε...
+jsp.tools.edit-collection.form.button.delete = Διαγράψτε
+jsp.tools.edit-collection.form.button.update = Ενημερώστε
+jsp.tools.edit-collection.form.button.cancel = Ακυρώστε
+jsp.tools.edit-collection.wf-role1 = Αποδεχτείτε/ Απορρίψτε
+jsp.tools.edit-collection.wf-role2 = Αποδεχτείτε/ Απορρίψτε/ Επεξεργαστείτε μεταδεδομένα
+jsp.tools.edit-collection.wf-role3 = Επεξεργαστείτε μεταδεδομένα
+
+jsp.tools.edit-community.title = Επεξεργαστείτε μια συλλογή
+jsp.tools.edit-community.heading1 = Δημιουργήστε μια συλλογή
+jsp.tools.edit-community.heading2 = Επεξεργαστείτε την συλλογή {0}
+jsp.tools.edit-community.button.delete = Διαγράψτε αυτήν την συλλογή...
+jsp.tools.edit-community.form.label1 = Όνομα:
+jsp.tools.edit-community.form.label2 = Σύντομη περιγραφή
+jsp.tools.edit-community.form.label3 = Εισαγωγικό κείμενο (HTML):
+jsp.tools.edit-community.form.label4 = Κείμενο copyright (απλό κείμενο):
+jsp.tools.edit-community.form.label5 = Κείμενο πλαϊνής μπάρας (HTML):
+jsp.tools.edit-community.form.label6 = Λογότυπο:
+jsp.tools.edit-community.form.label7 = Εξουσιοδοτήσεις πρόσβασης της συλλογής:
+jsp.tools.edit-community.form.button.add-logo = 'Φορτώστε' νέο λογότυπο...
+jsp.tools.edit-community.form.button.delete-logo = Διαγράψτε (χωρίς λογότυπο)
+jsp.tools.edit-community.form.button.set-logo = 'Φορτώστε ένα λογότυπο'...
+jsp.tools.edit-community.form.button.edit = Επεξεργαστείτε...
+jsp.tools.edit-community.form.button.create = Δημιουργήστε
+jsp.tools.edit-community.form.button.cancel = Ακυρώστε
+jsp.tools.edit-community.form.button.update = Ενημερώστε
+
+jsp.tools.edit-item-form.addbit.button =Add Bitstream
+jsp.tools.edit-item-form.collections =In Collections:
+jsp.tools.edit-item-form.delete-w-confirm.button =Delete (Expunge)...
+jsp.tools.edit-item-form.elem1 =Element
+jsp.tools.edit-item-form.elem2 =Qualifier
+jsp.tools.edit-item-form.elem3 =Value
+jsp.tools.edit-item-form.elem4 =Language
+jsp.tools.edit-item-form.elem5 =Primary<br/>Bitstream
+jsp.tools.edit-item-form.elem7 =Name
+jsp.tools.edit-item-form.elem8 =Source
+jsp.tools.edit-item-form.elem9 =Description
+jsp.tools.edit-item-form.elem10 =Format
+jsp.tools.edit-item-form.elem11 =User&nbsp;Format&nbsp;Description
+jsp.tools.edit-item-form.handle =Handle:
+jsp.tools.edit-item-form.heading =Bitstreams
+jsp.tools.edit-item-form.item =Item's Authorizations:
+jsp.tools.edit-item-form.itemID =Item&nbsp;internal&nbsp;ID:
+jsp.tools.edit-item-form.itempage = Item page:
+jsp.tools.edit-item-form.modified =Last modified:
+jsp.tools.edit-item-form.msg =This item was withdrawn from DSpace
+jsp.tools.edit-item-form.na = N/A
+jsp.tools.edit-item-form.note =PLEASE NOTE: These changes are not validated in any way. You are responsible for entering the data in the correct format. If you are not sure what the format is, please do NOT make changes.
+jsp.tools.edit-item-form.note1 =Note: Changes to the bitstreams will not be automatically reflected in the Dublin Core metadata above (e.g. <code>format.extent</code>, <code>format.mimetype</code>). You will need to update this by hand.
+jsp.tools.edit-item-form.note3 =Also note that if the 'user format description' field isn't empty, the format will always be set to 'Unknown', so clear the user format description before changing the format field.
+jsp.tools.edit-item-form.reinstate.button =Reinstate
+jsp.tools.edit-item-form.title =Edit Item
+jsp.tools.edit-item-form.withdraw-w-confirm.button =Withdraw...
+
+jsp.tools.eperson-list.close.button = Close
+jsp.tools.eperson-list.heading = E-people {0}-{1} of {2}
+jsp.tools.eperson-list.info1 = Clicking on the 'Add' button next to an e-person will add that e-person to the list on the main form.
+jsp.tools.eperson-list.title = Select E-people
+jsp.tools.eperson-list.jump.one-back = &lt; 1 Page
+jsp.tools.eperson-list.jump.five-back = &lt; 5 Pages
+jsp.tools.eperson-list.jump.one-forward = 1 Page &gt;
+jsp.tools.eperson-list.jump.five-forward = 5 Pages &gt;
+jsp.tools.eperson-list.jump.first = First
+jsp.tools.eperson-list.jump.last = Last
+jsp.tools.eperson-list.th.id = ID
+jsp.tools.eperson-list.th.id.sortedby = ID &uarr;
+jsp.tools.eperson-list.th.email = E-mail
+jsp.tools.eperson-list.th.email.sortedby = E-mail &uarr;
+jsp.tools.eperson-list.th.lastname = Last Name
+jsp.tools.eperson-list.th.lastname.sortedby = Last Name &uarr;
+jsp.tools.eperson-list.th.firstname = First Name
+
+jsp.tools.get-item-id.find.button =Find
+jsp.tools.get-item-id.handle =Handle:
+jsp.tools.get-item-id.heading =Edit or Delete Item
+jsp.tools.get-item-id.info1 =<strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to edit a community or collection, you need to use the <a href='{0}'>communities/collections admin page</a>.
+jsp.tools.get-item-id.info2 =Enter the Handle or internal item ID of the item you want to edit or delete.
+jsp.tools.get-item-id.internal =Internal ID:
+jsp.tools.get-item-id.title =Edit Item
+
+jsp.tools.group-edit.heading =Current Group Members
+jsp.tools.group-edit.name =Name:
+jsp.tools.group-edit.title =Edit Group
+jsp.tools.group-edit.update.button =Update Group
+
+jsp.tools.group-list.create.button =Create New Group
+jsp.tools.group-list.name =Name
+jsp.tools.group-list.id =ID
+jsp.tools.group-list.note1 =Note that you do not need to manually add users to the 'anonymous' group - all users are members implicitly.
+jsp.tools.group-list.note2 =Warning - if you try to delete a group that is referred to by an authorization policy or is a workflow group you will get an internal server error.
+jsp.tools.group-list.title =Group Editor
+
+jsp.tools.itemmap-main.collection =Collection: '{0}'
+jsp.tools.itemmap-main.heading =Item Mapper - Map Items from Other Collections
+jsp.tools.itemmap-main.info1 =There are {0} items owned by this collection, and {1} items mapped in from other collections.
+jsp.tools.itemmap-main.info4 =Import By Author Match
+jsp.tools.itemmap-main.info5 =Enter part of an author's name for a list of matching items
+jsp.tools.itemmap-main.info6 =Browse Items Imported From Collections:
+jsp.tools.itemmap-main.info7  =Click on collection names to browse for items to remove that were mapped in from that collection.
+jsp.tools.itemmap-main.info8 =This collection has no items mapped into it.
+jsp.tools.itemmap-main.search.button =Search Authors
+jsp.tools.itemmap-main.title =Item Mapper
+
+jsp.tools.itemmap-browse.title = Browse Items
+jsp.tools.itemmap-browse.heading-authors = Browse Items matching author ''{0}''
+jsp.tools.itemmap-browse.heading-collection = Browse Collection {0}
+jsp.tools.itemmap-browse.infomsg = Check the box next to items you wish to add or remove, and choose 'add' or 'remove'.
+jsp.tools.itemmap-browse.th.date = Date
+jsp.tools.itemmap-browse.th.author = First Author
+jsp.tools.itemmap-browse.th.title = Title
+jsp.tools.itemmap-browse.th.action = Action
+jsp.tools.itemmap-browse.th.remove = Remove
+
+jsp.tools.itemmap-info.title = Item Map Info
+jsp.tools.itemmap-info.heading = Item Map Info
+jsp.tools.itemmap-info.button.continue = Continue
+jsp.tools.itemmap-info.msg.none-selected = No items selected, none added. # In the following 2 messages the only parameter is an item ID
+jsp.tools.itemmap-info.msg.remove = Remove item {0}
+jsp.tools.itemmap-info.msg.added = Add item {0}
+
+jsp.tools.upload-bitstream.info =Select the bitstream to upload
+jsp.tools.upload-bitstream.title =Upload Bitstream
+jsp.tools.upload-bitstream.upload =Upload
+
+jsp.workspace.ws-error.title = My DSpace - Workspace Error
+jsp.workspace.ws-error.heading = Error - Workspace Item
+jsp.workspace.ws-error.errormsg1 = The system was unable to process your request correctly.  You must specify an item.
+jsp.workspace.ws-error.errormsg2 = Go back to 'My DSpace', and select 'Open' for the WorkSpace Item that you wish to work with.  If you are still experiencing problems please do not hesitate to contact us and we will do our best to solve the problem.
+
+jsp.workspace.ws-main.title = My DSpace
+jsp.workspace.ws-main.wsitem = WorkSpace Item
+jsp.workspace.ws-main.submitmsg = This item is being submitted to the collection:
+jsp.workspace.ws-main.optionheading = Option
+jsp.workspace.ws-main.descheading = Description
+jsp.workspace.ws-main.button.edit = Edit
+jsp.workspace.ws-main.editmsg = Open the item up for editing and file management.
+jsp.workspace.ws-main.button.view = View
+jsp.workspace.ws-main.viewmsg = View the item record as it stands at this stage of submission.
+jsp.workspace.ws-main.button.remove = Remove
+jsp.workspace.ws-main.removemsg = Remove the item all together.
+
+jsp.workspace.wsv-error.title = My DSpace - View Workspace Item Error
+jsp.workspace.wsv-error.heading = Error - View Workspace Item
+jsp.workspace.wsv-error.errormsg1 = The system was unable to process your request correctly.  You must specify an item.
+jsp.workspace.wsv-error.errormsg2 = Go back to 'My DSpace', and select 'Open' for the WorkSpace Item that you wish to work with, then select 'View' from the list of options.  If you are still experiencing problems please do not hesitate to contact us and we will do our best to solve the problem.
+
+org.dspace.app.webui.jsptag.CollectionListTag.collectionName = Όνομα συλλογής
+
+org.dspace.app.webui.jsptag.CommunityListTag.communityName = Όνομα συλλογής
+
+org.dspace.app.webui.jsptag.ItemListTag.issueDate = Ημερομηνία έκδοσης
+org.dspace.app.webui.jsptag.ItemListTag.title = Τίτλος
+org.dspace.app.webui.jsptag.ItemListTag.authors = Συντελεστές
+org.dspace.app.webui.jsptag.ItemTag.title = Τίτλος
+org.dspace.app.webui.jsptag.ItemTag.title.other = Αλλοι τίτλοι
+org.dspace.app.webui.jsptag.ItemTag.authors = Συντελεστές
+org.dspace.app.webui.jsptag.ItemTag.keywords = Λέξεις-κλειδιά
+org.dspace.app.webui.jsptag.ItemTag.issueDate = Ημερομηνία έκδοσης
+org.dspace.app.webui.jsptag.ItemTag.publisher = Εκδότης
+org.dspace.app.webui.jsptag.ItemTag.citation = Βιβλιογραφική παραπομπή
+org.dspace.app.webui.jsptag.ItemTag.series = Σειρά/ Αριθμός αναφοράς
+org.dspace.app.webui.jsptag.ItemTag.abstract = Επιτομή
+org.dspace.app.webui.jsptag.ItemTag.description = Περιγραφή
+org.dspace.app.webui.jsptag.ItemTag.govdoc = Gov't Doc #
+org.dspace.app.webui.jsptag.ItemTag.uri = URI
+org.dspace.app.webui.jsptag.ItemTag.isbn = ISBN
+org.dspace.app.webui.jsptag.ItemTag.issn = ISSN
+org.dspace.app.webui.jsptag.ItemTag.ismn = ISMN
+org.dspace.app.webui.jsptag.ItemTag.otherIDs = Αλλα αναγνωριστικά
+org.dspace.app.webui.jsptag.ItemTag.full = Πλήρης εγγραφή μεταδεδομένων
+org.dspace.app.webui.jsptag.ItemTag.dcfield = Πεδίο DC
+org.dspace.app.webui.jsptag.ItemTag.value = Τιμή
+org.dspace.app.webui.jsptag.ItemTag.lang = Γλώσσα
+org.dspace.app.webui.jsptag.ItemTag.appears = Εμφανίζεται στις συλλογές:
+org.dspace.app.webui.jsptag.ItemTag.files = Αρχεία σε αυτό το τεκμήριο:
+org.dspace.app.webui.jsptag.ItemTag.files.no = Δεν υπάρχουν αρχεία συσχετισμένα με αυτό το τεκμήριο
+org.dspace.app.webui.jsptag.ItemTag.file = Αρχείο
+org.dspace.app.webui.jsptag.ItemTag.filesize = Μέγεθος
+org.dspace.app.webui.jsptag.ItemTag.fileformat = Μορφότυπος
+org.dspace.app.webui.jsptag.ItemTag.view = Δείτε/ Ανοίξτε
+org.dspace.app.webui.jsptag.ItemTag.itemprotected = Αυτό το τεκμήριο προστατεύεται από copyright γνησιότητας
+org.dspace.app.webui.jsptag.ItemTag.viewlicence = Δείτε την άδεια
+
+org.dspace.app.webui.jsptag.SelectEPersonTag.selectPeople = Select E-people...
+org.dspace.app.webui.jsptag.SelectEPersonTag.selectPerson = Select E-person...
+org.dspace.app.webui.jsptag.SelectEPersonTag.removeSelected = Remove Selected
+
