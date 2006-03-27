@@ -166,7 +166,7 @@ public class MediaFilterManager
         					"filter." + filterName + ".inputFormats");
         	if (formats != null)
         	{
-        		filterFormats.put(filterName, Arrays.asList(formats.split(",")));
+        		filterFormats.put(filterName, Arrays.asList(formats.split(",[\\s]*")));
         	}
         }
         
@@ -229,7 +229,7 @@ public class MediaFilterManager
     public static void applyFiltersAllItems(Context c) throws Exception
     {
         ItemIterator i = Item.findAll(c);
-        while (i.hasNext() && processed <= max2Process)
+        while (i.hasNext() && processed < max2Process)
         {
         	applyFiltersItem(c, i.next());
         }
@@ -255,7 +255,7 @@ public class MediaFilterManager
                                               throws Exception
     {
         ItemIterator i = collection.getItems();
-        while (i.hasNext() && processed <= max2Process)
+        while (i.hasNext() && processed < max2Process)
         {
         	applyFiltersItem(c, i.next());
         }

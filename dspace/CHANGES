@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Scott Yeadon)
+SF Patch #1455842 - minor mediafilter fixes
+
 (Tim Donohue)
 - SF Patch #1455545 - Help links do not appear in IE, fixes SF bug #1380663
 - SF Patch #1456241 - Minor fix to Submission Progress bar "Jump To"
