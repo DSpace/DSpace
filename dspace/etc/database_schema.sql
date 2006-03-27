@@ -285,7 +285,7 @@ CREATE TABLE MetadataFieldRegistry
 (
   metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatafieldregistry_seq'),
   metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
-  element    VARCHAR(64),
+  element    VARCHAR(64) UNIQUE,
   qualifier  VARCHAR(64),
   scope_note          TEXT
 );
@@ -316,8 +316,9 @@ CREATE VIEW dcvalue AS
 -- instantiating the item object, which grabs all values
 -- related to that item
 CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
+CREATE INDEX metadatavalue_item_idx2 ON MetadataValue(item_id,metadata_field_id);
 CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
-
+  
 -------------------------------------------------------
 -- Community table
 -------------------------------------------------------

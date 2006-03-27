@@ -238,7 +238,7 @@ CREATE INDEX bundle2bitstream_bundle_idx ON Bundle2Bitstream(bundle_id);
 CREATE TABLE MetadataSchemaRegistry
 (
   metadata_schema_id INTEGER PRIMARY KEY,
-  namespace          VARCHAR(256),
+  namespace          VARCHAR(256) UNIQUE,
   short_id           VARCHAR(32)
 );
 
@@ -277,6 +277,7 @@ CREATE VIEW dcvalue AS
 -- instantiating the item object, which grabs all values
 -- related to that item
 CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
+CREATE INDEX metadatavalue_item_idx2 ON MetadataValue(item_id,metadata_field_id);
 CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
 
 -------------------------------------------------------

@@ -88,7 +88,7 @@ CREATE SEQUENCE metadatavalue_seq;
 CREATE TABLE MetadataSchemaRegistry
 (
   metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
-  namespace          VARCHAR(256),
+  namespace          VARCHAR(256) UNIQUE,
   short_id           VARCHAR(32)
 );
 
@@ -112,6 +112,11 @@ CREATE TABLE MetadataValue
   text_lang          VARCHAR(24),
   place              INTEGER
 );
+
+-- Create the Metadata table indexes
+CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
+CREATE INDEX metadatavalue_item_idx2 ON MetadataValue(item_id,metadata_field_id);
+CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
 
 -- Create the DC schema
 INSERT INTO MetadataSchemaRegistry VALUES (1,'http://dublincore.org/documents/dcmi-terms/','dc');

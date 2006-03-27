@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Martin Hald)
+- SF Patch #1455107 - MetadataValue Database Index
+
 (Phillip Franks)
 - SF Patch #1456173 - updated database_schema.sql for Oracle (partially fixes SF bug #1455290)
 

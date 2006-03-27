@@ -88,7 +88,7 @@ CREATE SEQUENCE metadatavalue_seq;
 CREATE TABLE MetadataSchemaRegistry
 (
   metadata_schema_id INTEGER PRIMARY KEY,
-  namespace          VARCHAR(256),
+  namespace          VARCHAR(256) UNIQUE,
   short_id           VARCHAR(32)
 );
 
@@ -140,6 +140,12 @@ SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
 SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
 
 DROP TABLE dctyperegistry;
+
+-- create indexes for the metadata tables
+CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
+CREATE INDEX metadatavalue_item_idx2 ON MetadataValue(item_id,metadata_field_id);
+CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
+
 
 -------------------------------------------------------
 -- Create the checksum checker tables
