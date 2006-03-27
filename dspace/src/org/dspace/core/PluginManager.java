@@ -192,7 +192,7 @@ public class PluginManager
                 log.warn("No Configuration entry found for Sequence Plugin interface="+iname);
                 return new Object[0];
             }
-            classname = val.split("\\s*,\\s*");
+            classname = val.trim().split("\\s*,\\s*");
             sequenceConfig.put(iname, classname);
         }
         else
@@ -273,6 +273,7 @@ public class PluginManager
             String namedVal = ConfigurationManager.getProperty(NAMED_PREFIX+iname);
             if (namedVal != null)
             {
+                namedVal = namedVal.trim();
                 log.debug("Got Named configuration for interface="+iname+", config="+namedVal);
 
                 // match  "<classname> ="
@@ -299,7 +300,7 @@ public class PluginManager
             String selfNamedVal = ConfigurationManager.getProperty(SELFNAMED_PREFIX+iname);
             if (selfNamedVal != null)
             {
-                String classnames[] = selfNamedVal.split("\\s*,\\s*");
+                String classnames[] = selfNamedVal.trim().split("\\s*,\\s*");
                 for (int i = 0; i < classnames.length; ++i)
                 {
                     try
