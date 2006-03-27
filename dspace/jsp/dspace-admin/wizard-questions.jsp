@@ -70,8 +70,8 @@
 
     <form action="<%= request.getContextPath() %>/tools/collection-wizard" method="post">
         <%--<p>Please check the boxes next to the statements that apply to the collection. --%>
-        <p><fmt:message key="jsp.dspace-admin.wizard-questions.text"/>
-          <object><dspace:popup page="/help/site-admin.html#createcollection"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>
+        <div><fmt:message key="jsp.dspace-admin.wizard-questions.text"/>
+          	<dspace:popup page="/help/site-admin.html#createcollection"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
         <center>
             <table class="miscTable">
                 <tr class="oddRowOddCol">

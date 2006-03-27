@@ -157,8 +157,7 @@
 </tr>
 <tr>
 <td colspan="3" class="submitFormHelpControlledVocabularies">
-<object><dspace:popup page="/help/index.html#controlledvocabulary"><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.help-link"/></dspace:popup></object>
-
+	<dspace:popup page="/help/index.html#controlledvocabulary"><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.help-link"/></dspace:popup>
 </td>
 </tr>
 </table>

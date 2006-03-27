@@ -84,16 +84,16 @@
         new window will appear in which you can locate and select the file on your
         local hard drive. <object><dspace:popup page="/help/index.html#upload">(More Help...)</dspace:popup></object></p> --%>
 
-		<p><fmt:message key="jsp.submit.choose-file.info1"/>
-		<object><dspace:popup page="/help/index.html#upload"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>
+		<div><fmt:message key="jsp.submit.choose-file.info1"/>
+			<dspace:popup page="/help/index.html#upload"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
         
         <%-- <p class="submitFormHelp"><strong>Netscape users please note:</strong> By
         default, the window brought up by clicking "Browse..." will only display
         files of type HTML.  If the file you are uploading isn't an HTML file,
         you will need to select the option to display files of other types.
         <object><dspace:popup page="/help/index.html#netscapeupload">Instructions for Netscape users</dspace:popup></object> are available.</p> --%>
-		<p class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info3"/>
-        <object><dspace:popup page="${helpPage}#netscapeupload"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup></object></p>
+		<div class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info3"/>
+        <dspace:popup page="${helpPage}#netscapeupload"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup></div>
         
 <%-- FIXME: Collection-specific stuff should go here? --%>
         <%-- <p class="submitFormHelp">Please also note that the DSpace system is

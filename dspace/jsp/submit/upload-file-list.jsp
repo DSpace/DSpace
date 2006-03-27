@@ -98,7 +98,7 @@
 <%
     }
 %>
-        <p><fmt:message key="jsp.submit.upload-file-list.info2"/></p><dspace:popup page="/help/index.html#uploadedfile"><fmt:message key="jsp.morehelp"/></dspace:popup>
+        <div><fmt:message key="jsp.submit.upload-file-list.info2"/>&nbsp;&nbsp;&nbsp;<dspace:popup page="/help/index.html#uploadedfile"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
         
         <table class="miscTable" align="center" summary="Table dispalying your submitted files">
             <tr>

@@ -86,8 +86,8 @@
         submission.
         <object><dspace:popup page="/help/index.html#describe1">(More Help...)</dspace:popup></object></p> --%>
 
-        <p><fmt:message key="jsp.submit.initial-questions.info" /> 
-        <object><dspace:popup page="/help/index.html#describe1"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>
+        <div><fmt:message key="jsp.submit.initial-questions.info" /> 
+        <dspace:popup page="/help/index.html#describe1"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <center>
             <table class="miscTable">

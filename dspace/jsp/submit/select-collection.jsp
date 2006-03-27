@@ -74,8 +74,9 @@
 
     <h1><fmt:message key="jsp.submit.select-collection.heading"/></h1>
 
-	<p><fmt:message key="jsp.submit.select-collection.info1"/> 
-    <object><dspace:popup page="/help/index.html#choosecollection"><fmt:message key="jsp.morehelp"/> </dspace:popup></object></p>
+	<div><fmt:message key="jsp.submit.select-collection.info1"/>
+      <dspace:popup page="/help/index.html#choosecollection"><fmt:message key="jsp.morehelp"/> </dspace:popup> 
+	</div>
 
 <%  if (collections.length > 0)
     {

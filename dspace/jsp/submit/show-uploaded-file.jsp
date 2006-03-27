@@ -113,8 +113,8 @@
         details before going to the next step.
         &nbsp;&nbsp;&nbsp;<dspace:popup page="/help/index.html#uploadedfile">(More Help...)</dspace:popup></p> --%>
 
-		<p><fmt:message key="jsp.submit.show-uploaded-file.info2"/></p>
-        &nbsp;&nbsp;&nbsp;<dspace:popup page="/help/index.html#uploadedfile"><fmt:message key="jsp.morehelp"/></dspace:popup>
+		<div><fmt:message key="jsp.submit.show-uploaded-file.info2"/>
+        &nbsp;&nbsp;&nbsp;<dspace:popup page="/help/index.html#uploadedfile"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <table class="miscTable" align="center">
             <tr>

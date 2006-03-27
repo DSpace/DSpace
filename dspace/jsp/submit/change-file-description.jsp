@@ -80,8 +80,8 @@
 
         <%-- <p>Here are the details of the file.  
         <dspace:popup page="/help/index.html#filedescription">(More Help...)</dspace:popup></p> --%>
-		<p><fmt:message key="jsp.submit.change-file-description.info1"/> 
-          <dspace:popup page="/help/index.html#filedescription"><fmt:message key="jsp.morehelp"/></dspace:popup></p>
+		<div><fmt:message key="jsp.submit.change-file-description.info1"/> 
+          <dspace:popup page="/help/index.html#filedescription"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <table class="miscTable" align="center" summary="Change file descripton details">
             <tr>

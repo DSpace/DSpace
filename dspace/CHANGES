@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Tim Donohue)
+- SF Patch #1455545 - Help links do not appear in IE, fixes SF bug #1380663
+
 (Martin Hald)
 - SF Patch #1455107 - MetadataValue Database Index
 - SF Patch #1455605 - Submit Review Page Schema fix

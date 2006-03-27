@@ -96,8 +96,8 @@
     }
 %>
 
-	<p><fmt:message key="jsp.register.edit-profile.info3"/>
-    <object><dspace:popup page="/help/index.html#editprofile"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>
+	<div><fmt:message key="jsp.register.edit-profile.info3"/>
+    	<dspace:popup page="/help/index.html#editprofile"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
     
     <form action="<%= request.getContextPath() %>/profile" method="post">
 

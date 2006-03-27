@@ -176,8 +176,8 @@
 
         <p><fmt:message key="jsp.submit.review.info1"/></p>
 
-        <p><fmt:message key="jsp.submit.review.info2"/></p>
-        &nbsp;&nbsp;<dspace:popup page="/help/index.html#verify"><fmt:message key="jsp.morehelp"/></dspace:popup>
+        <div><fmt:message key="jsp.submit.review.info2"/>
+        &nbsp;&nbsp;<dspace:popup page="/help/index.html#verify"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <p><fmt:message key="jsp.submit.review.info3"/></p>
 

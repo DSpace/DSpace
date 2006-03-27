@@ -128,8 +128,8 @@
         the format file in the input box below the list.
         <dspace:popup page="/help/index.html#formats">(More Help...)</dspace:popup></p> --%>
 
-		<p><object><fmt:message key="jsp.submit.get-file-format.info5"/>
-        <dspace:popup page="/help/index.html#formats"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>
+		<div><fmt:message key="jsp.submit.get-file-format.info5"/>
+        <dspace:popup page="/help/index.html#formats"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
     
         <center>
             <select name="format" size="8">

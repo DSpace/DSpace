@@ -77,8 +77,8 @@
 <%  } %>
 
     <%-- <p>Enter the Handle or internal item ID of the item you wish to select. --%>
-    <p><fmt:message key="jsp.dspace-admin.item-select.enter"/>
-      <dspace:popup page="/help/site-admin.html#itempolicies"><fmt:message key="jsp.morehelp"/></dspace:popup></p>
+    <div><fmt:message key="jsp.dspace-admin.item-select.enter"/>
+      <dspace:popup page="/help/site-admin.html#itempolicies"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
     
     <form method="post" action="">
         <center>

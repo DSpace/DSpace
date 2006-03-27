@@ -77,8 +77,8 @@
              <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
         </jsp:include>
 
-	<p><fmt:message key="jsp.submit.show-license.info1"/></p>
-        &nbsp;&nbsp;<dspace:popup page="/help/index.html#license"><fmt:message key="jsp.morehelp"/></dspace:popup>
+	<div><fmt:message key="jsp.submit.show-license.info1"/>
+        &nbsp;&nbsp;<dspace:popup page="/help/index.html#license"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <%-- <p><strong>Not granting the license will not delete your submission.</strong>
         Your item will remain in your "My DSpace" page.  You can then either remove

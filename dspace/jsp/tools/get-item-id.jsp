@@ -77,7 +77,7 @@
     <%-- <p>Enter the Handle or internal item ID of the item you want to edit or
     delete.  <dspace:popup page="/help/site-admin.html#items">More help...</dspace:popup></p> --%>
 
-	<fmt:message key="jsp.tools.get-item-id.info2"/>  <dspace:popup page="/help/site-admin.html#items"><fmt:message key="jsp.morehelp"/></dspace:popup>
+	<div><fmt:message key="jsp.tools.get-item-id.info2"/>  <dspace:popup page="/help/site-admin.html#items"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
     
     <form method="get" action="">
         <center>

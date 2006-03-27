@@ -101,17 +101,25 @@ p {  margin-left: 10px;
      margin-right: 10px;
      font-family: "verdana", "Arial", "Helvetica", sans-serif;
      font-size: 10pt }
+     
+<%-- This class is here so that a "DIV" by default acts as a "P".    --%>
+<%-- This is necessary since the "dspace:popup" tag must have a "DIV" --%>
+<%-- (or block element) surrounding it in order to be valid XHTML 1.0 --%>
+DIV { margin-left: 10px;
+      margin-right: 10px;
+      margin-bottom: 15px; 
+      font-family: "verdana", "Arial", "Helvetica", sans-serif;
+      font-size: 10pt;}      
 
 UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
      font-size: 10pt }
 
-<%-- This class is here so the standard style from "P" above can be applied --%.
+<%-- This class is here so the standard style from "P" above can be applied --%>
 <%-- to anything else. --%>
-
 .standard { margin-left: 10px;
             margin-right: 10px;
             font-family: "verdana", "Arial", "Helvetica", sans-serif;
-            font-size: 10pt }
+            font-size: 10pt }                       
 
 .pageBanner { width: 100%;
               border: 0;

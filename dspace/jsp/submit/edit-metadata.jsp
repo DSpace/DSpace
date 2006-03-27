@@ -853,15 +853,15 @@
      if (pageNum == SubmitServlet.EDIT_METADATA_1) 
      {
 %>
-        <p><fmt:message key="jsp.submit.edit-metadata.info1"/>
-        <object><dspace:popup page="/help/index.html#describe2"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></object></p>
+        <div><fmt:message key="jsp.submit.edit-metadata.info1"/>
+        <dspace:popup page="/help/index.html#describe2"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
 <%
      } 
      else 
      {
 %>
-    <p><fmt:message key="jsp.submit.edit-metadata.info2"/>
-        <object><dspace:popup page="/help/index.html#describe3"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></object></p>
+    	<div><fmt:message key="jsp.submit.edit-metadata.info2"/>
+        <dspace:popup page="/help/index.html#describe3"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
     
 <%
      }
@@ -981,7 +981,7 @@
 		<tr>
 			<td>&nbsp;</td>
 			<td colspan="3" class="submitFormHelpControlledVocabularies">
-				<object><dspace:popup page="/help/index.html#controlledvocabulary"><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.help-link"/></dspace:popup></object>
+				<dspace:popup page="/help/index.html#controlledvocabulary"><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.help-link"/></dspace:popup>
 			</td>
 		</tr>
 

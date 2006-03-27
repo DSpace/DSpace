@@ -99,7 +99,7 @@
 	<p><strong><fmt:message key="jsp.tools.edit-item-form.note"/></strong></p>
     
     <%-- <p><dspace:popup page="/help/collection-admin.html#editmetadata">More help...</dspace:popup></p>  --%>
-	<p><object><dspace:popup page="/help/collection-admin.html#editmetadata"><fmt:message key="jsp.morehelp"/></dspace:popup></object></p>  
+	<div><dspace:popup page="/help/collection-admin.html#editmetadata"><fmt:message key="jsp.morehelp"/></dspace:popup></div>  
 
     <center>
         <table width="70%" summary="Edit item table">
