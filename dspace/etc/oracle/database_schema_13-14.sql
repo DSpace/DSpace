@@ -87,7 +87,7 @@ CREATE SEQUENCE metadatavalue_seq;
 -- MetadataSchemaRegistry table
 CREATE TABLE MetadataSchemaRegistry
 (
-  metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
+  metadata_schema_id INTEGER PRIMARY KEY,
   namespace          VARCHAR(256),
   short_id           VARCHAR(32)
 );
@@ -95,20 +95,20 @@ CREATE TABLE MetadataSchemaRegistry
 -- MetadataFieldRegistry table
 CREATE TABLE MetadataFieldRegistry
 (
-  metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatafieldregistry_seq'),
+  metadata_field_id   INTEGER PRIMARY KEY,
   metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
   element             VARCHAR(64),
   qualifier           VARCHAR(64),
-  scope_note          TEXT
+  scope_note          VARCHAR2(2000)
 );
 
 -- MetadataValue table
 CREATE TABLE MetadataValue
 (
-  metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
+  metadata_value_id  INTEGER PRIMARY KEY,
   item_id            INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
-  text_value         TEXT,
+  text_value         VARCHAR2(2000),
   text_lang          VARCHAR(24),
   place              INTEGER
 );
@@ -150,7 +150,7 @@ DROP TABLE dctyperegistry;
 CREATE TABLE checksum_results
 (
     result_code VARCHAR PRIMARY KEY,
-    result_description VARCHAR
+    result_description VARCHAR2(2000)
 );
 
 
@@ -162,15 +162,15 @@ CREATE TABLE checksum_results
 
 CREATE TABLE most_recent_checksum 
 (
-    bitstream_id INTEGER PRIMARY KEY REFERENCES bitstream(bitstream_id),
+    bitstream_id INTEGER PRIMARY KEY,
     to_be_processed NUMBER(1) NOT NULL,
-    last_checksum VARCHAR NOT NULL,
-    current_checksum VARCHAR NOT NULL,
+    last_checksum VARCHAR(64) NOT NULL,
+    current_checksum VARCHAR(64) NOT NULL,
     last_process_start_date TIMESTAMP NOT NULL,
     last_process_end_date TIMESTAMP NOT NULL,
-    checksum_algorithm VARCHAR NOT NULL,
+    checksum_algorithm VARCHAR(64) NOT NULL,
     matched_prev_checksum NUMBER(1) NOT NULL,
-    result VARCHAR REFERENCES checksum_results(result_code)
+    result VARCHAR(64) REFERENCES checksum_results(result_code)
 );
 
 
@@ -181,13 +181,13 @@ CREATE SEQUENCE checksum_history_seq;
 
 CREATE TABLE checksum_history 
 (
-    check_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('checksum_history_seq'),
+    check_id INTEGER PRIMARY KEY,
     bitstream_id INTEGER,
     process_start_date TIMESTAMP,
     process_end_date TIMESTAMP,
-    checksum_expected VARCHAR,
-    checksum_calculated VARCHAR,
-    result VARCHAR REFERENCES checksum_results(result_code)
+    checksum_expected VARCHAR(64),
+    checksum_calculated VARCHAR(64),
+    result VARCHAR(64) REFERENCES checksum_results(result_code)
 );
 
 -- this will insert into the result code
@@ -338,8 +338,8 @@ CREATE TABLE ItemsBySubject
 (
    items_by_subject_id INTEGER PRIMARY KEY,
    item_id             INTEGER REFERENCES Item(item_id),
-   subject             TEXT,
-   sort_subject        TEXT
+   subject             VARCHAR2(2000),
+   sort_subject        VARCHAR2(2000)
 );
 
 -- index by sort_subject

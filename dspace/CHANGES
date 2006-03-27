@@ -1,8 +1,11 @@
 1.4 beta 1
 ==========
+(Phillip Franks)
+- SF Patch #1456173 - updated database_schema.sql for Oracle (partially fixes SF bug #1455290)
+
 (Larry Stone)
 - SF Patch #1455904 - fix crosswalk validation in 1.4alpha1
-- SF Patch #1453425 1.4alpha1, fix crosswalk + packager configurations
+- SF Patch #1453425 - fix crosswalk + packager configurations
 
 (Larry Stone)
 - Documentation updates
