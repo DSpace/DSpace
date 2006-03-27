@@ -2,6 +2,7 @@
 ==========
 (Martin Hald)
 - SF Patch #1455107 - MetadataValue Database Index
+- SF Patch #1455605 - Submit Review Page Schema fix
 
 (Phillip Franks)
 - SF Patch #1456173 - updated database_schema.sql for Oracle (partially fixes SF bug #1455290)
