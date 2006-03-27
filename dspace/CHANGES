@@ -2,6 +2,7 @@
 ==========
 (Tim Donohue)
 - SF Patch #1455545 - Help links do not appear in IE, fixes SF bug #1380663
+- SF Patch #1456241 - Minor fix to Submission Progress bar "Jump To"
 
 (Martin Hald)
 - SF Patch #1455107 - MetadataValue Database Index

@@ -1740,7 +1740,7 @@ public class SubmitServlet extends DSpaceServlet
             // Button on progress bar pressed
             try
             {
-                nextStep = Integer.parseInt(buttonPressed.substring(12, 13));
+                nextStep = Integer.parseInt(buttonPressed.substring(12));
             }
             catch (NumberFormatException ne)
             {
