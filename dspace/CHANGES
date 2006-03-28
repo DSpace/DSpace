@@ -8,7 +8,7 @@ SF Patch #1455842 - minor mediafilter fixes
 - SF Patch #1456241 - Minor fix to Submission Progress bar "Jump To"
 
 (Martin Hald)
-- SF Patch #1456306 - Configuring simple item, fixes SF bugs #1455712, also SF bug #1456566
+- SF Patch #1456306 - Configuring simple item, fixes SF bugs #1455712, #1456566 and #1455691
 - SF Patch #1455107 - MetadataValue Database Index
 - SF Patch #1455605 - Submit Review Page Schema fix
 
