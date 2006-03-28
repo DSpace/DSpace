@@ -256,8 +256,8 @@ CREATE TABLE MetadataValue
   metadata_value_id  INTEGER PRIMARY KEY,
   item_id       INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
-  text_value TEXT,
-  text_lang  VARCHAR2(2000),
+  text_value VARCHAR2(2000),
+  text_lang  VARCHAR(64),
   place              INTEGER
 );
 
