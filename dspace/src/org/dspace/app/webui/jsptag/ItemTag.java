@@ -317,10 +317,10 @@ public class ItemTag extends TagSupport
                 field = field.replaceAll("\\(link\\)", "");
                 isLink = true;
             }
-            // Get the separate element + qualifier
-            // TODO: Support for non-DC
+            // Get the separate schema + element + qualifier
 
             String[] eq = field.split("\\.");
+            String schema = eq[0];
             String element = eq[1];
             String qualifier = null;
             if (eq.length > 2 && eq[2].equals("*"))
@@ -331,9 +331,8 @@ public class ItemTag extends TagSupport
             {
                 qualifier = eq[2];
             }
-
             // FIXME: Still need to fix for metadata language?
-            DCValue[] values = item.getMetadata("dc", element, qualifier, Item.ANY);
+            DCValue[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
 
             if (values.length > 0)
             {
