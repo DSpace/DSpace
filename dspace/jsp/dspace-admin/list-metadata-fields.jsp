@@ -80,7 +80,7 @@
         <h1><fmt:message key="jsp.dspace-admin.list-metadata-fields.title"/></h1>
       </td>
       <td align="right" class="standard">
-              <a href="<%=request.getContextPath()%>/dspace-admin/dc-schema">
+              <a href="<%=request.getContextPath()%>/dspace-admin/metadata-schema-registry">
                 <fmt:message key="jsp.dspace-admin.list-metadata-fields.schemas"/>
               </a> |
         <dspace:popup page="/help/site-admin.html#dublincore"><fmt:message key="jsp.help"/></dspace:popup>
