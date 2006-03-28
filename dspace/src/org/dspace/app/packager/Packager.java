@@ -52,6 +52,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.InstallItem;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.packager.PackageDisseminator;
@@ -63,6 +64,7 @@ import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowManager;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * Command-line interface to the Packager plugin.
@@ -273,9 +275,22 @@ public class Packager
                         source, pkgParams, null);
                 if (useWorkflow)
                 {
-                    WorkflowManager.startWithoutNotify(context, wi);
+                    String handle = null;
+
+                    // Check if workflow completes immediately, and
+                    // return Handle if so.
+                    WorkflowItem wfi = WorkflowManager.startWithoutNotify(context, wi);
+
+                    if (wfi.getState() == WorkflowManager.WFSTATE_ARCHIVE)
+                    {
+                        Item ni = wfi.getItem();
+                        handle = HandleManager.findHandle(context, ni);
+                    }
+                    if (handle == null)
                     System.out.println("Created Workflow item, ID="
-                            + String.valueOf(wi.getID()));
+                                + String.valueOf(wfi.getID()));
+                    else
+                        System.out.println("Created and installed item, handle="+handle);
                 }
                 else
                 {
