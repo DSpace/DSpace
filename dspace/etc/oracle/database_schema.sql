@@ -140,12 +140,6 @@ CREATE TABLE EPerson
   netid               VARCHAR2(64) UNIQUE
 );
 
--- index by email
-CREATE INDEX eperson_email_idx ON EPerson(email);
-
--- index by netid
-CREATE INDEX eperson_netid_idx ON EPerson(netid);
-
 
 -------------------------------------------------------
 -- EPersonGroup table
@@ -337,8 +331,8 @@ CREATE TABLE Community2Collection
 );
 
 -- Improve mapping tables
-CREATE INDEX Community2Collection_community_id_idx ON Community2Collection(community_id);
-CREATE INDEX Community2Collection_collection_id_idx ON Community2Collection(collection_id);
+CREATE INDEX Comm2Coll_community_id_idx ON Community2Collection(community_id);
+CREATE INDEX Comm2Coll_collection_id_idx ON Community2Collection(collection_id);
 
 -------------------------------------------------------
 -- Collection2Item table
@@ -400,11 +394,8 @@ CREATE TABLE Handle
   resource_id      INTEGER
 );
 
--- index by handle, commonly looked up
-CREATE INDEX handle_handle_idx ON Handle(handle);
-
 -- index by resource id and resource type id
-CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
+CREATE INDEX handle_resource_id_type_idx ON handle(resource_id, resource_type_id);
 
 -------------------------------------------------------
 --  WorkspaceItem table
@@ -649,7 +640,7 @@ CREATE TABLE ItemsByDateAccessioned
 );
 
 -- Indexing browse tables update/re-index performance
-CREATE INDEX ItemsByDateAccessioned_item_id_idx ON ItemsByDateAccessioned(item_id);
+CREATE INDEX ItemsByDateAcc_item_id_idx ON ItemsByDateAccessioned(item_id);
 
 -------------------------------------------------------
 --  CollectionItemsByDateAccession view
