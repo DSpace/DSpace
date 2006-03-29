@@ -1,5 +1,9 @@
 1.4 beta 1
 ==========
+(Robert Tansley)
+- UNIQUE constraint applied to schema namespace + short_id (not element).
+  Fixed bug SF #1460515.
+
 (Lester Bowser, Robert Tansley)
 - Fixes for Oracle database_schema.sql
 

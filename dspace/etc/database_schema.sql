@@ -277,26 +277,26 @@ CREATE INDEX bundle2bitstream_bundle_idx ON Bundle2Bitstream(bundle_id);
 CREATE TABLE MetadataSchemaRegistry
 (
   metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
-  namespace          VARCHAR(256),
-  short_id           VARCHAR(32)
+  namespace          VARCHAR(256) UNIQUE,
+  short_id           VARCHAR(32) UNIQUE
 );
 
 CREATE TABLE MetadataFieldRegistry
 (
   metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatafieldregistry_seq'),
   metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
-  element    VARCHAR(64) UNIQUE,
-  qualifier  VARCHAR(64),
+  element             VARCHAR(64),
+  qualifier           VARCHAR(64),
   scope_note          TEXT
 );
 
 CREATE TABLE MetadataValue
 (
   metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
-  item_id       INTEGER REFERENCES Item(item_id),
+  item_id            INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
-  text_value TEXT,
-  text_lang  VARCHAR(24),
+  text_value         TEXT,
+  text_lang          VARCHAR(24),
   place              INTEGER
 );
 

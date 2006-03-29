@@ -234,7 +234,7 @@ CREATE TABLE MetadataSchemaRegistry
 (
   metadata_schema_id INTEGER PRIMARY KEY,
   namespace          VARCHAR(256) UNIQUE,
-  short_id           VARCHAR(32)
+  short_id           VARCHAR(32) UNIQUE
 );
 
 CREATE TABLE MetadataFieldRegistry
