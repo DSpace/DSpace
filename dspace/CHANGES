@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Lester Bowser, Robert Tansley)
+- Fixes for Oracle database_schema.sql
+
 (Scott Yeadon)
 - SF bug #1456285 - Search index config and advanced search not in sync
 - SF bug #1456278 - Wrong link in jsp/dspace-admin/list-metadata-fields.jsp

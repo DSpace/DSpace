@@ -42,7 +42,8 @@ CREATE SEQUENCE bitstreamformatregistry_seq;
 CREATE SEQUENCE fileextension_seq;
 CREATE SEQUENCE bitstream_seq;
 CREATE SEQUENCE eperson_seq;
-CREATE SEQUENCE epersongroup_seq START WITH 2; -- we reserve 0 and 1
+CREATE SEQUENCE epersongroup_seq START WITH 2;
+-- we reserve 0 and 1
 CREATE SEQUENCE item_seq;
 CREATE SEQUENCE bundle_seq;
 CREATE SEQUENCE item2bundle_seq;
@@ -250,7 +251,7 @@ CREATE TABLE MetadataValue
   metadata_value_id  INTEGER PRIMARY KEY,
   item_id       INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
-  text_value VARCHAR2(2000),
+  text_value VARCHAR2(4000),
   text_lang  VARCHAR(64),
   place              INTEGER
 );
