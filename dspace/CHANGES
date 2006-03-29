@@ -25,7 +25,7 @@
 - SF Patch #1456761 - PluginManager config-reading bugs (fix patch #1455842)
 - SF Patch #1455813 - cleanup dspace.cfg for 1.4
 - SF Patch #1455904 - fix crosswalk validation in 1.4alpha1
-- SF Patch #1453425 - fix crosswalk + packager configurations
+- SF Patch #1453425 - fix crosswalk + packager configurations, fixes #1456564
 
 (Larry Stone)
 - Documentation updates
