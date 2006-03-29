@@ -104,7 +104,7 @@ sub read_keys
 
 		if ($line =~ /=/)
 		{
-			$line =~ /^([^=]+)\s?=/;
+			$line =~ /^([^\s]+)\s*=/;
 			my $propname = $1;
 			$k{$propname} = 1;
 		}
