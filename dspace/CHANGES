@@ -11,6 +11,7 @@
 - SF bug #1456285 - Search index config and advanced search not in sync
 - SF bug #1456278 - Wrong link in jsp/dspace-admin/list-metadata-fields.jsp
 - SF Patch #1455842 - minor mediafilter fixes
+- SF Patch #1461039 - Exceptions in media filter
 
 (Tim Donohue)
 - SF Patch #1455545 - Help links do not appear in IE, fixes SF bug #1380663

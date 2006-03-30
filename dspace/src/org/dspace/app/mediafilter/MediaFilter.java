@@ -152,6 +152,8 @@ public abstract class MediaFilter
             return false;
         }
 
+        InputStream destStream = getDestinationStream(source.retrieve());
+
         // create new bundle if needed
         if (bundles.length < 1)
         {
@@ -163,7 +165,6 @@ public abstract class MediaFilter
             targetBundle = bundles[0];
         }
 
-        InputStream destStream = getDestinationStream(source.retrieve());
         Bitstream b = targetBundle.createBitstream(destStream);
 
         // Now set the format and name of the bitstream

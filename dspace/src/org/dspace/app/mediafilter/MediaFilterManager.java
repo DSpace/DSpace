@@ -321,21 +321,21 @@ public class MediaFilterManager
     		List fmts = (List)filterFormats.get(filterClasses[i].getClass().getName());
     		if (fmts.contains(myBitstream.getFormat().getShortDescription()))
     		{
-                // only update item if bitstream not skipped
-                if (filterClasses[i].processBitstream(c, myItem, myBitstream))
+            	try
+            	{
+		            // only update item if bitstream not skipped
+		            if (filterClasses[i].processBitstream(c, myItem, myBitstream))
+		            {
+		           		myItem.update(); // Make sure new bitstream has a sequence
+		                                 	// number
+		           		filtered = true;
+		            }
+            	}
+                catch (Exception e)
                 {
-                	try
-                	{
-                		myItem.update(); // Make sure new bitstream has a sequence
-                                     	// number
-                		filtered = true;
-                	}
-                    catch (Exception e)
-                    {
-                        System.out.println("ERROR filtering, skipping bitstream #"
-                                + myBitstream.getID() + " " + e);
-                        e.printStackTrace();
-                    }
+                    System.out.println("ERROR filtering, skipping bitstream #"
+                            + myBitstream.getID() + " " + e);
+                    e.printStackTrace();
                 }
     		}
     	}
