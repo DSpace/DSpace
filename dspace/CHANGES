@@ -8,6 +8,7 @@
 - Fixes for Oracle database_schema.sql
 
 (Scott Yeadon)
+- SF Bug #1456305 - Bitstream Format Registry - Internal and Submitting
 - SF bug #1456285 - Search index config and advanced search not in sync
 - SF bug #1456278 - Wrong link in jsp/dspace-admin/list-metadata-fields.jsp
 - SF Patch #1455842 - minor mediafilter fixes

@@ -1061,13 +1061,21 @@ public class SubmitServlet extends DSpaceServlet
 
                     // Identify the format
                     bf = FormatIdentifier.guessFormat(context, b);
-                    b.setFormat(bf);
 
+                    b.setFormat(bf);
+                    
                     // Update to DB
                     b.update();
                     item.update();
 
-                    ok = true;
+                    if (bf == null || !bf.isInternal())
+                    {
+                    	ok = true;
+                    }
+                    else
+                    {
+                    	log.info("Attempt to upload file format marked as internal system use only");
+                    }
                 }
             }
         }
