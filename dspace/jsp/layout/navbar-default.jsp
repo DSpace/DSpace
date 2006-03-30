@@ -112,7 +112,7 @@
 			if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
 			{
 %>        
-              <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></A>
+              <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
 <%
             }
 %>
