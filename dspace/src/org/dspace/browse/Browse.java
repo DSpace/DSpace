@@ -524,10 +524,10 @@ public class Browse
         }
         
         // get the DC values for each of these fields
-        DCValue[] titleArray = getDCField(item, titleField);
-        DCValue[] dateArray = getDCField(item, dateField);
-        DCValue[] authorArray = getDCField(item, authorField);
-        DCValue[] subjectArray = getDCField(item, subjectField);
+        DCValue[] titleArray = getMetadataField(item, titleField);
+        DCValue[] dateArray = getMetadataField(item, dateField);
+        DCValue[] authorArray = getMetadataField(item, authorField);
+        DCValue[] subjectArray = getMetadataField(item, subjectField);
         
         // now build the data map
         Map table2dc = new HashMap();
@@ -654,9 +654,9 @@ public class Browse
     // Private methods
     ////////////////////////////////////////
 
-    private static DCValue[] getDCField(Item item, String dc)
+    private static DCValue[] getMetadataField(Item item, String md)
     {
-        StringTokenizer dcf = new StringTokenizer(dc, ".");
+        StringTokenizer dcf = new StringTokenizer(md, ".");
         
         String[] tokens = { "", "", "" };
         int i = 0;

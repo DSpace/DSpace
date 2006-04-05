@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Richard Jones)
+- SF Patch #1458315 - Customisable Browse Index, fixes bug #1456227
+
 (Robert Tansley)
 - UNIQUE constraint applied to schema namespace + short_id (not element).
   Fixed bug SF #1460515.
