@@ -109,7 +109,7 @@ public class ItemListTag extends TagSupport
     
     /** The default field which is bound to the browse by title */
     private static String titleField = "dc.title";
-
+    
     public ItemListTag()
     {
         super();
@@ -222,15 +222,15 @@ public class ItemListTag extends TagSupport
                     DCValue[] metadataArray;
                     if (qualifier.equals("*"))
                     {
-                        metadataArray = items[i].getDC(element, Item.ANY, Item.ANY);
+                        metadataArray = items[i].getMetadata(schema, element, Item.ANY, Item.ANY);
                     }
                     else if (qualifier.equals(""))
                     {
-                        metadataArray = items[i].getDC(element, null, Item.ANY);
+                        metadataArray = items[i].getMetadata(schema, element, null, Item.ANY);
                     }
                     else
                     {
-                        metadataArray = items[i].getDC(element, qualifier, Item.ANY);
+                        metadataArray = items[i].getMetadata(schema, element, qualifier, Item.ANY);
                     }
                     
                     // now prepare the content of the table division
@@ -250,7 +250,7 @@ public class ItemListTag extends TagSupport
                             DCDate dd = new DCDate(metadataArray[0].value);
                             metadata = UIUtil.displayDate(dd, false, false) + thumbs;
                         }
-                        // format the title field correctly
+                        // format the title field correctly                        
                         else if (field.equals(titleField))
                         {
                             metadata = "<a href=\"" + hrq.getContextPath() + "/handle/" 

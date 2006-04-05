@@ -672,15 +672,15 @@ public class Browse
         DCValue[] values;
         if ("*".equals(qualifier))
         {
-            values = item.getDC(element, Item.ANY, Item.ANY);
+            values = item.getMetadata(schema, element, Item.ANY, Item.ANY);
         }
         else if ("".equals(qualifier))
         {
-            values = item.getDC(element, null, Item.ANY);
+            values = item.getMetadata(schema, element, null, Item.ANY);
         }
         else
         {
-            values = item.getDC(element, qualifier, Item.ANY);
+            values = item.getMetadata(schema, element, qualifier, Item.ANY);
         }
         
         return values;
