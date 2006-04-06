@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.mail.MessagingException;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -61,6 +60,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.I18N;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -668,7 +668,7 @@ public class WorkflowManager
 
             // Get title
             DCValue[] titles = i.getDC("title", null, Item.ANY);
-            String title = "Untitled";
+            String title = I18N.message("untitled", WorkflowManager.class);
 
             if (titles.length > 0)
             {
@@ -852,19 +852,15 @@ public class WorkflowManager
                 switch (wi.getState())
                 {
                 case WFSTATE_STEP1POOL:
-                    message = "It requires reviewing.";
-
+                    message = I18N.message("step1", WorkflowManager.class);
                     break;
 
                 case WFSTATE_STEP2POOL:
-                    message = "The submission must be checked before inclusion in the archive.";
-
+                    message = I18N.message("step2", WorkflowManager.class);
                     break;
 
                 case WFSTATE_STEP3POOL:
-                    message = "The metadata needs to be checked to ensure compliance with the "
-                            + "collection's standards, and edited if necessary.";
-
+                    message = I18N.message("step3", WorkflowManager.class);
                     break;
                 }
 
@@ -975,7 +971,7 @@ public class WorkflowManager
         }
         else
         {
-            return "Untitled";
+            return I18N.message("untitled", WorkflowManager.class);
         }
     }
 

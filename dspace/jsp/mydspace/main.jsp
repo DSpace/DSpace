@@ -59,6 +59,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page  import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCDate" %>
@@ -140,7 +142,7 @@
             DCValue[] titleArray =
                 owned[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
-                                                  : "Untitled" );
+                                                  : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
             EPerson submitter = owned[i].getItem().getSubmitter();
 %>
         <tr>
@@ -206,7 +208,7 @@
             DCValue[] titleArray =
                 pooled[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
-                                                  : "Untitled");
+                    : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
             EPerson submitter = pooled[i].getItem().getSubmitter();
 %>
         <tr>
@@ -273,7 +275,7 @@
     <table class="miscTable" align="center" summary="Table listing unfinished submissions">
         <tr>
             <th class="oddRowOddCol">&nbsp;</th>
-            <th id="t10" class="oddRowEvenCol">Submitted by</th>
+            <th id="t10" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.subby"/></th>
             <th id="t11" class="oddRowOddCol"><fmt:message key="jsp.mydspace.main.elem1"/></th>
             <th id="t12" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.elem2"/></th>
             <th id="t13" class="oddRowOddCol">&nbsp;</th>
@@ -296,14 +298,14 @@
             DCValue[] titleArray =
                 workspaceItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
-                                                  : "Untitled");
+                    : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
             EPerson submitter = workspaceItems[i].getItem().getSubmitter();
 %>
         <tr>
             <td class="<%= row %>RowOddCol">
                 <form action="<%= request.getContextPath() %>/workspace" method="post">
                     <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>"/>
-                    <input type="submit" name="submit_open" value="Open"/>
+                    <input type="submit" name="submit_open" value="<fmt:message key="jsp.mydspace.general.open" />"/>
                 </form>
             </td>
             <td headers="t10" class="<%= row %>RowEvenCol">
@@ -342,7 +344,7 @@
             DCValue[] titleArray =
                 supervisedItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
-                                                  : "Untitled");
+                    : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
             EPerson submitter = supervisedItems[i].getItem().getSubmitter();
 %>
 
@@ -350,7 +352,7 @@
             <td class="<%= row %>RowOddCol">
                 <form action="<%= request.getContextPath() %>/workspace" method="post">
                     <input type="hidden" name="workspace_id" value="<%= supervisedItems[i].getID() %>"/>
-                    <input type="submit" name="submit_open" value="Open"/>
+                    <input type="submit" name="submit_open" value="<fmt:message key="jsp.mydspace.general.open" />"/>
                 </form>
             </td>
             <td class="<%= row %>RowEvenCol">
@@ -362,7 +364,7 @@
                 <form action="<%= request.getContextPath() %>/mydspace" method="post">
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
                     <input type="hidden" name="workspace_id" value="<%= supervisedItems[i].getID() %>"/>
-                    <input type="submit" name="submit_delete" value="Remove"/>
+                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.mydspace.general.remove" />"/>
                 </form>  
             </td>
         </tr>
@@ -395,7 +397,7 @@
             DCValue[] titleArray =
                 workflowItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
-                                                  : "Untitled" );
+                    : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
 %>
             <tr>
                 <td headers="t14" class="<%= row %>RowOddCol"><%= Utils.addEntities(title) %></td>
