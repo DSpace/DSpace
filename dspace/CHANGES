@@ -38,9 +38,10 @@
 - SF Patch #1455904 - fix crosswalk validation in 1.4alpha1
 - SF Patch #1453425 - fix crosswalk + packager configurations, fixes #1456564
 
-(Larry Stone)
+(Larry Stone, Michael Drewitz)
 - Documentation updates
   SF Patch #1455780 - Improve doc for configuring x.509 authentication in 1.4
+  SF Patch #1456135 - Update search section of business.html
   
 (Zuki Ebetsu)
 - Fix malformed Japanese texts in RSS feed
