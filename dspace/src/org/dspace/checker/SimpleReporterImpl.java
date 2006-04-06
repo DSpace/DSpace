@@ -158,7 +158,9 @@ public class SimpleReporterImpl implements SimpleReporter
         osw.write(" ");
         osw.write("\n");
         osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(" ");
         osw.write(msg("date-range-to"));
+        osw.write(" ");
         osw.write(DATE_FORMAT_MIN.format(endDate));
         osw.write("\n\n\n");
 
@@ -201,7 +203,9 @@ public class SimpleReporterImpl implements SimpleReporter
         osw.write("\n");
         osw.write(msg("bitstream-not-found-report"));
         osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(" ");
         osw.write(msg("date-range-to"));
+        osw.write(" ");
         osw.write(DATE_FORMAT_MIN.format(endDate));
         osw.write("\n\n\n");
 
@@ -246,7 +250,9 @@ public class SimpleReporterImpl implements SimpleReporter
         osw.write(msg("bitstream-will-no-longer-be-processed"));
         osw.write(" ");
         osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(" ");
         osw.write(msg("date-range-to"));
+        osw.write(" ");
         osw.write(DATE_FORMAT_MIN.format(endDate));
         osw.write("\n\n\n");
 
