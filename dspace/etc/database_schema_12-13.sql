@@ -54,8 +54,8 @@ CREATE SEQUENCE epersongroup2workspaceitem_seq;
 CREATE TABLE epersongroup2workspaceitem 
 (
   id integer DEFAULT nextval('epersongroup2workspaceitem_seq'),
-  eperson_group_id integer,
-  workspace_item_id integer,
+  eperson_group_id integer REFERENCES EPersonGroup(eperson_group_id),
+  workspace_item_id integer REFERENCES WorkspaceItem(workspace_item_id),
   CONSTRAINT epersongroup2item_pkey PRIMARY KEY (id)
 );
 

@@ -49,6 +49,7 @@
 -------------------------------------------------------------------------------
 CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
+CREATE SEQUENCE tasklistitem_seq;
 
 ------------------------------------------------------
 -- Group2Group table, records group membership in other groups
@@ -177,7 +178,7 @@ CREATE TABLE most_recent_checksum
 (
     bitstream_id INTEGER PRIMARY KEY REFERENCES bitstream(bitstream_id),
     to_be_processed BOOLEAN NOT NULL,
-    last_checksum VARCHAR NOT NULL,
+    expected_checksum VARCHAR NOT NULL,
     current_checksum VARCHAR NOT NULL,
     last_process_start_date TIMESTAMP NOT NULL,
     last_process_end_date TIMESTAMP NOT NULL,
@@ -274,7 +275,7 @@ insert into most_recent_checksum
 (
     bitstream_id,  
     to_be_processed,
-    last_checksum,
+    expected_checksum,
     current_checksum,
     last_process_start_date,
     last_process_end_date,
@@ -319,8 +320,8 @@ insert into checksum_history
 select most_recent_checksum.bitstream_id,
      most_recent_checksum.last_process_end_date,
      date_trunc('milliseconds', now()),
-      most_recent_checksum.last_checksum,
-      most_recent_checksum.last_checksum;
+      most_recent_checksum.expected_checksum,
+      most_recent_checksum.expected_checksum;
 
 -- update the history to indicate that this was 
 -- the first time the software was installed
@@ -374,3 +375,12 @@ FROM ItemsBySubject, Communities2Item
 WHERE ItemsBySubject.item_id = Communities2Item.item_id
 ;
 
+-------------------------------------------------------
+--  TasklistItem table
+-------------------------------------------------------
+CREATE TABLE TasklistItem
+(
+  tasklist_id	INTEGER PRIMARY KEY,
+  eperson_id	INTEGER REFERENCES EPerson(eperson_id),
+  workflow_id	INTEGER REFERENCES WorkflowItem(workflow_id)
+);
