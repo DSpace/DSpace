@@ -53,22 +53,7 @@
           <LI>
             <P><strong>Oracle</strong></P>
 
-            <P>Copy the Oracle JDBC driver into <code><i>[dspace-source]</i>/lib</code>.</P>
-
-            <P>Create a database for DSpace.  Make sure that the character set is one of the Unicode character sets.  DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set.  Create a user account for DSpace (e.g. <code>dspace</code>,) and ensure that it has permissions to add and remove tables in the database.</P>
-
-            <P>Edit the config/dspace.cfg file in your source directory for the  following settings:</P>
-
-<PRE>db.name   = oracle
-db.url    = jdbc.oracle.thin:@//host:port/dspace
-db.driver = oracle.jdbc.OracleDriver</PRE>
-
-            <P>Go to <code><i>[dspace-source]</i>/etc/oracle</code> and copy the contents to their parent directory, overwriting the versions in the parent:
-
-<PRE>cd dspace_source/etc/oracle
-cp * ..</PRE>
-
-            <P>You now have Oracle-specific <code>.sql</code> files in your <code>etc</code> directory, and your dspace.cfg is modified to point to your Oracle database and are ready to continue with a normal DSpace install, skipping the Postgres setup steps.</P>
+            <p>You will need to create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set. You will also need to create a user account for DSpace (e.g. <code>dspace</code>,) and ensure that it has permissions to add and remove tables in the database. Refer to the Quick Installation for more details.</p>
 
             <P><STRONG>NOTE:</STRONG> DSpace uses sequences to generate unique object IDs - beware Oracle sequences, which are said to lose their values when doing a database export/import, say restoring from a backup.  Be sure to run the script <code>etc/update-sequences.sql</code>.</P>
 
@@ -138,17 +123,44 @@ you installed Tomcat--also known as $CATALINA_HOME). This directory is generated
         </li>
 
       <li>
-        <P><A NAME="pgdriver"></A>Copy the PostgreSQL JDBC driver (<code>.jar</code> file) into
-<code><i>[dspace-source]</i>/lib</code>.  If you compiled PostgreSQL yourself, it'll be in <code>postgresql-7.x.x/src/interfaces/jdbc/jars/postgresql.jar</code>.  Alternatively you can download it directly from <A HREF="http://jdbc.postgresql.org/download.html">the PostgreSQL JDBC site</A>.  Make sure you get the driver for the version of PostgreSQL you're running and for JDBC2.</P>
+        <p>Database Setup</p>
+	<p><strong>Postgres: </strong>
+	<ol type="i">
+	<li>
+	<p><a name="pgdriver"></a>Copy the PostgreSQL JDBC driver (<code>.jar</code> file) into
+<code><i>[dspace-source]</i>/lib</code>.  If you compiled PostgreSQL yourself, it'll be in <code>postgresql-7.x.x/src/interfaces/jdbc/jars/postgresql.jar</code>.  Alternatively you can download it directly from <a href="http://jdbc.postgresql.org/download.html">the PostgreSQL JDBC site</a>.  Make sure you get the driver for the version of PostgreSQL you're running and for JDBC2.</p></li>
+        <li>
+	      <p>Create a <code>dspace</code> database, owned by the <code>dspace</code> PostgreSQL user:</p>
+
+	        <pre>createuser -U postgres -d -A -P dspace ; createdb -U dspace -E UNICODE dspace</pre>
+
+	        <p>Enter a password for the DSpace database.  (This isn't the same as the <code>dspace</code> user's UNIX password.)</p>
+	</li>
+	</ol></p>
+	<p><strong>Oracle:</strong>
+	<ol type="i">
+	   <li>
+            <p>Copy the Oracle JDBC driver into <code><i>[dspace-source]</i>/lib</code>.</p>
+	   </li>
+	   <li>
+            <p>Create a database for DSpace.  Make sure that the character set is one of the Unicode character sets.  DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set.  Create a user account for DSpace (e.g. <code>dspace</code>,) and ensure that it has permissions to add and remove tables in the database.</p>
+	   </li>
+	   <li>
+            <p>Edit the config/dspace.cfg file in your source directory for the  following settings:</p>
+		<pre>db.name   = oracle
+db.url    = jdbc.oracle.thin:@//host:port/dspace
+db.driver = oracle.jdbc.OracleDriver</pre>
+	   </li>
+	   <li>
+            <p>Go to <code><i>[dspace-source]</i>/etc/oracle</code> and copy the contents to their parent directory, overwriting the versions in the parent:
+
+<pre>cd dspace_source/etc/oracle
+cp * ..</pre>
+            <p>You now have Oracle-specific <code>.sql</code> files in your <code>etc</code> directory, and your dspace.cfg is modified to point to your Oracle database.</p>
+	   </li>
+	</ol></p>
       </li>
 
-      <li>
-        <P>Create a <code>dspace</code> database, owned by the <code>dspace</code> PostgreSQL user:</P>
-
-        <PRE>createuser -U postgres -d -A -P dspace ; createdb -U dspace -E UNICODE dspace</PRE>
-
-        <P>Enter a password for the DSpace database.  (This isn't the same as the <code>dspace</code> user's UNIX password.)</P>
-      </li>
 
       <li>
         <P>Edit <code><i>[dspace-source]</i>/config/dspace.cfg</code>, in particular you'll need to set these properties:
@@ -237,7 +249,7 @@ See the <code>dspace.cfg</code> file for examples.
 # Run the checksum checker at 03:00
 0 3 * * * <i>[dspace]</i>/bin/checker -lp
 # Mail the results to the sysadmin at 04:00
-0 4 * * * <i>[dspace]</i>/bin/dsrun org.dspace.app.checker.DailyReportEmailer -c
+0 4 * * * <i>[dspace]</i>/bin/dsrun org.dspace.checker.DailyReportEmailer -c
 </PRE>
 
     <P>Naturally you should change the frequencies to suit your environment.</P>
