@@ -11,6 +11,7 @@
 - Fixes for Oracle database_schema.sql
 
 (Scott Yeadon)
+- update-handle-prefix script changed to also update the metadatavalue table
 - SF bug #1456555 - i18n - missing tags
 - SF bug #1456533 - dspace.url inconsistency
 - SF bug #1456537 - Copyright statement year out of date

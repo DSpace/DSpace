@@ -84,6 +84,8 @@ then
 	# get the length of the old prefix for use in the overlay function
 	oldPrefixLen=`echo $1 | awk '{print length($1)}'`
 	echo "update handle set handle=overlay(handle placing '$2' from 1 for $oldPrefixLen) where handle like '$1%';" | psql
+	# update the metadatavalue table entries
+    echo "update metadatavalue set text_value=overlay(text_value placing '$2' from 23 for $oldPrefixLen) where text_value like 'http://hdl.handle.net/$1%';" | psql
 	break
 else
 	echo
