@@ -105,7 +105,7 @@ public class Supervisor {
                        "WHERE epersongroup2workspaceitem.eperson_group_id = "
                        + groupID +
                        " AND epersongroup2workspaceitem.workspace_item_id = "
-                       + wsItemID + ";";
+                       + wsItemID;
         
         TableRowIterator tri = DatabaseManager.query(context, 
                                     "epersongroup2workspaceitem", 

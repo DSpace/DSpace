@@ -11,6 +11,7 @@
 - Fixes for Oracle database_schema.sql
 
 (Scott Yeadon)
+- SF bug #1466268 - Supervisor Orders on Oracle
 - SF bug #1456801 - Typo in jsp.tools.confirm-delete-collection.info1
 - SF bug #1456586 - typo in Checksum Checker email script
 - SF bug #1456988 - database-schema.sql and database-schema_13_14.sql inconsistencies
