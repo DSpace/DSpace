@@ -76,6 +76,24 @@ filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats = GIF, JPEG, image/png
 filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats = GIF, JPEG, image/png
 
 
+#### Settings for Item Preview ####
+webui.preview.enabled = false
+# max dimensions of the preview image
+webui.preview.maxwidth = 600
+webui.preview.maxheight = 600
+# the brand text
+webui.preview.brand = My Institution Name
+# an abbreviated form of the above text, this will be used
+# when the preview image cannot fit the normal text
+webui.preview.brand.abbrev = MyOrg
+# the height of the brand
+webui.preview.brand.height = 20
+# font settings for the brand text
+webui.preview.brand.font = SansSerif
+webui.preview.brand.fontpoint = 12
+#webui.preview.dc = rights
+
+
 #### Checksum Checker Settings ####
 # Default dispatcher in case none specified
 plugin.single.org.dspace.checker.BitstreamDispatcher=org.dspace.checker.SimpleDispatcher
@@ -88,11 +106,11 @@ checker.retention.CHECKSUM_MATCH=8w</pre></li>
 
           <li><p>If you have customised advanced search fields (<code>search.index.<i>n</i></code> fields, note that you now need to include the schema in the values.  Dublin Core is specifed as <code>dc</code>.  So for example, if in 1.3.2 you had:</p>
 
-            <pre>search.index.1 = title.alternative</pre>
+            <pre>search.index.1 = title:title.alternative</pre>
 
             <p>That needs to be changed to:</p>
 
-            <pre>search.index.1 = dc.title.alternative</pre>
+            <pre>search.index.1 = title:dc.title.alternative</pre>
           </li>
 
           <li><p>If you use LDAP or X509 authentication, you'll need to add <code>org.dspace.eperson.LDAPAuthentication</code> or <code>org.dspace.eperson.X509Authentication</code> respectively.  See also <A HREF="configure.html#authenticate">configuring custom authentication code</A>.</p></li>
@@ -120,6 +138,10 @@ checker.retention.CHECKSUM_MATCH=8w</pre></li>
           <dd><p><code><i>[dspace-1.4-source]</i>/etc/oracle/database_schema_13-14.sql</code> should be run on the DSpace database to update the schema.</p></dd>
         </dl>
       </li>
+
+      <li><p>Rebuild the search indices:</p>
+            <p><code><i>[dspace]</i>/bin/index-all</code></p>
+	  </li>
 
       <li><p>Copy the <code>.war</code> Web application files in <code><i>[dspace-1.4-source]</i>/build</code> to the <code>webapps</code> sub-directory of your servlet container (e.g. Tomcat).  e.g.:</p>
 

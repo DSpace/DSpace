@@ -50,6 +50,7 @@
   SF Patch #1455780 - Improve doc for configuring x.509 authentication in 1.4
   SF Patch #1456135 - Update search section of business.html
   SF bug #1456531 - Installation doc updates
+  SF bug #1456557 - Upgrade docs modifications
   
 (Zuki Ebetsu)
 - Fix malformed Japanese texts in RSS feed
