@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Lieven Droogmans, Ben Bosman)
+- SF Patch #1468197 - Filter out mapped items from browse list, fixes bug #1455674 and addresses a symptom of bug #1456553
+
 (Richard Jones)
 - SF Patch #1458315 - Customisable Browse Index, fixes bug #1456227
 
@@ -28,6 +31,7 @@
 - SF Patch #1461039 - Exceptions in media filter
 
 (Tim Donohue)
+- SF bug #1256920 - Mapped Items not added to Community (patch included in bug comment)
 - SF Patch #1455545 - Help links do not appear in IE, fixes SF bug #1380663
 - SF Patch #1456241 - Minor fix to Submission Progress bar "Jump To"
 

@@ -1184,7 +1184,6 @@ public class Browse
         sqlb.append("select ");
         sqlb.append(isCount ? "count(" : "");
         sqlb.append(getTargetColumns(scope));
-        sqlb.append(isCount ? ")" : "");
 
         /**
          * This next bit adds another column to the query, so authors don't show
@@ -1200,8 +1199,13 @@ public class Browse
             sqlb.append(",subject");
         }
 
+        sqlb.append(isCount ? ")" : "");
+
+        sqlb.append(" from (SELECT DISTINCT * ");
+
         sqlb.append(" from ");
         sqlb.append(tablename);
+        sqlb.append(" ) as distinct_view");
 
         // If the browse uses items (or item ids) instead of String values
         // make a subquery.
