@@ -183,6 +183,7 @@
 
 %>                
         <h3><fmt:message key="jsp.dspace-admin.authorize-item-edit.bundle">
+            <fmt:param><%=myBun.getName()%></fmt:param>
             <fmt:param><%=myBun.getID()%></fmt:param>
         </fmt:message></h3>
 
