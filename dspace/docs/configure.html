@@ -466,14 +466,14 @@ metadata.dc.description.abstract = Abstract</pre>
   </li>
   <p><li>
   Add the <code>org.dspace.eperson.X509Authentication</code> plugin
-  to the list of stackable authentication methods in the value
+  <em>first</em> to the list of stackable authentication methods in the value
   of the configuration key <code>plugin.sequence.org.dspace.eperson.AuthenticationMethod</code>
   <i>E.g.:</i>
   </p>
   <pre>
     plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
-        org.dspace.eperson.PasswordAuthentication, \
-        org.dspace.eperson.X509Authentication
+        org.dspace.eperson.X509Authentication, \
+        org.dspace.eperson.PasswordAuthentication
   </pre>
 
   </li>

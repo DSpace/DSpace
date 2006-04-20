@@ -58,6 +58,7 @@
   SF Patch #1456135 - Update search section of business.html
   SF bug #1456531 - Installation doc updates
   SF bug #1456557 - Upgrade docs modifications
+  SF Patch #1470711 - Fix documentation about SSL install/config
   
 (Zuki Ebetsu)
 - Fix malformed Japanese texts in RSS feed
