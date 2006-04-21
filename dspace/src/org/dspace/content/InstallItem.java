@@ -94,11 +94,27 @@ public class InstallItem
         // set the language to default if it's not set already
         DCValue[] dc = item.getDC("language", "iso", Item.ANY);
 
+        // FIXME: May need to review this arbitrary assignment of default language. The
+        // context of the submission should probably determine if the default language
+        // should be set rather than a (somewhat arbitrary) test of whether it has been set
+        // somewhere along a submission workflow or not. Maybe it has deliberately been left
+        // unset.
+        // Also if supporting multiple schemas, the default metadata fields should probably 
+        // also be made configurable.
         if (dc.length < 1)
         {
             // Just set default language
             item.addDC("language", "iso", null, ConfigurationManager
                     .getProperty("default.language"));
+        }
+        else
+        {
+        	// N/A selected in UI sets an empty string field so remove it
+        	// Use this method for now to filter the N/A entry until FIXME above is addressed.
+        	if (dc[0].value.equals(""))
+        	{
+        		item.clearDC("language", "iso", Item.ANY);
+        	}
         }
 
         // create accession date
