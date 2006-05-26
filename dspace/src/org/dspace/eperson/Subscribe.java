@@ -95,11 +95,11 @@ public class Subscribe
                 || ((context.getCurrentUser() != null) && (context
                         .getCurrentUser().getID() == eperson.getID())))
         {
-            // already subscribed?
-            TableRowIterator r = DatabaseManager.query(context,
-                    "SELECT * FROM subscription WHERE eperson_id="
-                            + eperson.getID() + " AND collection_id="
-                            + collection.getID());
+            // already subscribed?      	
+        	TableRowIterator r = DatabaseManager.query(context,
+                    "SELECT * FROM subscription WHERE eperson_id= ? " +
+                    " AND collection_id= ? ", 
+                    eperson.getID(),collection.getID());
 
             if (!r.hasNext())
             {
@@ -113,6 +113,8 @@ public class Subscribe
                         "eperson_id=" + eperson.getID() + ",collection_id="
                                 + collection.getID()));
             }
+            
+            r.close();
         }
         else
         {
@@ -145,15 +147,15 @@ public class Subscribe
             {
                 // Unsubscribe from all
                 DatabaseManager.updateQuery(context,
-                        "DELETE FROM subscription WHERE eperson_id="
-                                + eperson.getID());
+                        "DELETE FROM subscription WHERE eperson_id= ? ",
+                        eperson.getID());
             }
             else
-            {
+            {       
                 DatabaseManager.updateQuery(context,
-                        "DELETE FROM subscription WHERE eperson_id="
-                                + eperson.getID() + " AND collection_id="
-                                + collection.getID());
+                        "DELETE FROM subscription WHERE eperson_id= ? " +
+                        "AND collection_id= ? ", 
+                        eperson.getID(),collection.getID());
 
                 log.info(LogManager.getHeader(context, "unsubscribe",
                         "eperson_id=" + eperson.getID() + ",collection_id="
@@ -180,8 +182,8 @@ public class Subscribe
             throws SQLException
     {
         TableRowIterator tri = DatabaseManager.query(context,
-                "SELECT collection_id FROM subscription WHERE eperson_id="
-                        + eperson.getID());
+                "SELECT collection_id FROM subscription WHERE eperson_id= ? ",
+                eperson.getID());
 
         List collections = new ArrayList();
 
@@ -193,6 +195,8 @@ public class Subscribe
                     .getIntColumn("collection_id")));
         }
 
+        tri.close();
+        
         Collection[] collArray = new Collection[collections.size()];
 
         return (Collection[]) collections.toArray(collArray);
@@ -212,12 +216,15 @@ public class Subscribe
     public static boolean isSubscribed(Context context, EPerson eperson,
             Collection collection) throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.query(context,
-                "SELECT * FROM subscription WHERE eperson_id="
-                        + eperson.getID() + " AND collection_id="
-                        + collection.getID());
-
-        return tri.hasNext();
+    	TableRowIterator tri = DatabaseManager.query(context,
+                "SELECT * FROM subscription WHERE eperson_id= ? " +
+                "AND collection_id= ? ", 
+                eperson.getID(),collection.getID());
+    	
+    	boolean result = tri.hasNext();
+    	tri.close();
+    	
+    	return result;
     }
 
     /**
@@ -280,7 +287,9 @@ public class Subscribe
             collections.add(Collection.find(context, row
                     .getIntColumn("collection_id")));
         }
-
+        
+        tri.close();
+        
         // Process the last person
         if (currentEPerson != null)
         {

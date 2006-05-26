@@ -423,9 +423,9 @@ public class AuthorizeManager
     public static List getPolicies(Context c, DSpaceObject o)
             throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.query(c, "resourcepolicy",
-                "SELECT * FROM resourcepolicy WHERE " + "resource_type_id="
-                        + o.getType() + " AND " + "resource_id=" + o.getID());
+    	TableRowIterator tri = DatabaseManager.queryTable(c, "resourcepolicy",
+                "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? ",
+                o.getType(),o.getID());
 
         List policies = new ArrayList();
 
@@ -446,6 +446,7 @@ public class AuthorizeManager
                 policies.add(new ResourcePolicy(c, row));
             }
         }
+        tri.close();
 
         return policies;
     }
@@ -465,10 +466,10 @@ public class AuthorizeManager
     public static List getPoliciesActionFilter(Context c, DSpaceObject o,
             int actionID) throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.query(c, "resourcepolicy",
-                "SELECT * FROM resourcepolicy WHERE " + "resource_type_id="
-                        + o.getType() + " AND " + "resource_id=" + o.getID()
-                        + " AND " + "action_id=" + actionID);
+    	TableRowIterator tri = DatabaseManager.queryTable(c, "resourcepolicy",
+                "SELECT * FROM resourcepolicy WHERE resource_type_id= ? "+
+                "AND resource_id= ? AND action_id= ? ", 
+                o.getType(), o.getID(),actionID);
 
         List policies = new ArrayList();
 
@@ -489,6 +490,7 @@ public class AuthorizeManager
                 policies.add(new ResourcePolicy(c, row));
             }
         }
+        tri.close();
 
         return policies;
     }
@@ -568,9 +570,9 @@ public class AuthorizeManager
             throws SQLException
     {
         // FIXME: authorization check?
-        DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
-                + "resource_type_id=" + o.getType() + " AND " + "resource_id="
-                + o.getID());
+    	 DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
+                 + "resource_type_id= ? AND resource_id= ? ",
+                 o.getType(), o.getID());
     }
 
     /**
@@ -597,10 +599,10 @@ public class AuthorizeManager
         }
         else
         {
-            DatabaseManager.updateQuery(context,
-                    "DELETE FROM resourcepolicy WHERE " + "resource_type_id="
-                            + dso.getType() + " AND " + "resource_id="
-                            + dso.getID() + " AND " + "action_id=" + actionID);
+        	DatabaseManager.updateQuery(context,
+                    "DELETE FROM resourcepolicy WHERE resource_type_id= ? AND "+
+                    "resource_id= ? AND action_id= ? ",
+                    dso.getType(), dso.getID(), actionID);
         }
     }
 
@@ -619,7 +621,7 @@ public class AuthorizeManager
             throws SQLException
     {
         DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
-                + "epersongroup_id=" + groupID);
+                + "epersongroup_id= ? ", groupID);
     }
 
     /**
@@ -639,8 +641,8 @@ public class AuthorizeManager
             throws SQLException
     {
         DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
-                + "resource_type_id=" + o.getType() + " AND " + "resource_id="
-                + o.getID() + " AND " + "epersongroup_id=" + g.getID());
+                + "resource_type_id= ? AND resource_id= ? AND epersongroup_id= ? ",
+                o.getType(), o.getID(), g.getID());
     }
 
     /**
@@ -662,11 +664,10 @@ public class AuthorizeManager
             int actionID) throws java.sql.SQLException
     {
         // do query matching groups, actions, and objects
-        TableRowIterator tri = DatabaseManager.query(c, "resourcepolicy",
-                "SELECT * FROM resourcepolicy WHERE " + "resource_type_id="
-                        + o.getType() + " AND " + "resource_id=" + o.getID()
-                        + " AND " + "action_id=" + actionID);
-
+        TableRowIterator tri = DatabaseManager.queryTable(c, "resourcepolicy",
+                "SELECT * FROM resourcepolicy WHERE resource_type_id= ? "+
+                "AND resource_id= ? AND action_id= ? ",o.getType(),o.getID(),actionID);
+    	
         List groups = new ArrayList();
 
         while (tri.hasNext())
@@ -696,6 +697,7 @@ public class AuthorizeManager
                 groups.add(myGroup);
             }
         }
+        tri.close();
 
         Group[] groupArray = new Group[groups.size()];
         groupArray = (Group[]) groups.toArray(groupArray);

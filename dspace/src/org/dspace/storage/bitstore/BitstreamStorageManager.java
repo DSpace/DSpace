@@ -574,10 +574,9 @@ public class BitstreamStorageManager
      */
     public static void delete(Context context, int id) throws SQLException
     {
-        DatabaseManager
-                .updateQuery(context,
-                        "update Bitstream set deleted = '1' where bitstream_id = "
-                                + id);
+        DatabaseManager.updateQuery(context,
+                        "update Bitstream set deleted = '1' where bitstream_id = ? ",
+                        id);
     }
 
     /**
@@ -603,7 +602,7 @@ public class BitstreamStorageManager
 
             String myQuery = "select * from Bitstream where deleted = '1'";
 
-            List storage = DatabaseManager.query(context, "Bitstream", myQuery)
+            List storage = DatabaseManager.queryTable(context, "Bitstream", myQuery)
                     .toList();
 
             for (Iterator iterator = storage.iterator(); iterator.hasNext();)

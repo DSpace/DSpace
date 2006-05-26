@@ -314,9 +314,8 @@ public class HandleManager
     static List getHandlesForPrefix(Context context, String prefix)
             throws SQLException
     {
-        String sql = "SELECT handle FROM handle WHERE handle LIKE " + prefix
-                + "%";
-        TableRowIterator iterator = DatabaseManager.query(context, null, sql);
+        String sql = "SELECT handle FROM handle WHERE handle LIKE ? ";
+        TableRowIterator iterator = DatabaseManager.queryTable(context, null, sql, prefix+"%");
         List results = new ArrayList();
 
         while (iterator.hasNext())
@@ -324,6 +323,8 @@ public class HandleManager
             TableRow row = (TableRow) iterator.next();
             results.add(row.getStringColumn("handle"));
         }
+        
+        iterator.close();
 
         return results;
     }
@@ -347,12 +348,11 @@ public class HandleManager
      */
     private static String getHandleInternal(Context context, int type, int id)
             throws SQLException
-    {
-        String sql = new StringBuffer().append(
-                "SELECT handle FROM Handle WHERE resource_type_id = ").append(
-                type).append(" AND resource_id = ").append(id).toString();
-
-        TableRow row = DatabaseManager.querySingle(context, null, sql);
+    {   	
+      	String sql = "SELECT handle FROM Handle WHERE resource_type_id = ? " + 
+      				 "AND resource_id = ?";
+		
+		TableRow row = DatabaseManager.querySingle(context, sql,type,id);
 
         return (row == null) ? null : row.getStringColumn("handle");
     }

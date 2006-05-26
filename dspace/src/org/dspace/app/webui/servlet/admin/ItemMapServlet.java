@@ -335,14 +335,12 @@ public class ItemMapServlet extends DSpaceServlet
             // this collection
             // sorting by date would be ideal...
             String myQuery = (String) request.getParameter("namepart");
-
-            TableRowIterator tri = DatabaseManager
-                    .query(
-                            context,
-                            "SELECT * from ItemsByAuthor WHERE sort_author like '%"
-                                    + myQuery.toLowerCase()
-                                    + "%' AND item_id NOT IN (SELECT item_id FROM collection2item WHERE collection_id="
-                                    + myCollection.getID() + ")");
+            
+            TableRowIterator tri = DatabaseManager.query(context,
+                    "SELECT * from ItemsByAuthor WHERE sort_author like ? AND " +
+                    "item_id NOT IN (SELECT item_id FROM collection2item " +
+                    "WHERE collection_id= ? ",
+                    '%'+myQuery.toLowerCase()+'%',myCollection.getID());
 
             Map items = new HashMap();
 
@@ -362,6 +360,7 @@ public class ItemMapServlet extends DSpaceServlet
                     items.put(new Integer(itemID), myItem);
                 }
             }
+            tri.close();
 
             request.setAttribute("collection", myCollection);
             request.setAttribute("browsetext", myQuery);

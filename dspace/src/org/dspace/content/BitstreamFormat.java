@@ -111,8 +111,8 @@ public class BitstreamFormat
         extensions = new ArrayList();
 
         TableRowIterator tri = DatabaseManager.query(context,
-                "SELECT * FROM fileextension WHERE bitstream_format_id="
-                        + getID());
+                "SELECT * FROM fileextension WHERE bitstream_format_id= ? ",
+                 getID());
 
         while (tri.hasNext())
         {
@@ -194,7 +194,8 @@ public class BitstreamFormat
         // a MIMEtype of text/plain.
         TableRow formatRow = DatabaseManager.querySingle(context,
             "SELECT * FROM bitstreamformatregistry "+
-            "WHERE mimetype LIKE '"+mimeType+"' AND internal = '0';");
+            "WHERE mimetype LIKE ? AND internal = '0' ",
+            mimeType);
 
         if (formatRow == null)
             return null;
@@ -294,8 +295,7 @@ public class BitstreamFormat
     {
         List formats = new ArrayList();
 
-        TableRowIterator tri = DatabaseManager
-                .query(context, "bitstreamformatregistry",
+        TableRowIterator tri = DatabaseManager.queryTable(context, "bitstreamformatregistry",
                         "SELECT * FROM bitstreamformatregistry ORDER BY bitstream_format_id");
 
         while (tri.hasNext())
@@ -346,7 +346,7 @@ public class BitstreamFormat
                 + "AND short_description NOT LIKE 'Unknown' "
                 + "ORDER BY support_level DESC, short_description";
 
-        TableRowIterator tri = DatabaseManager.query(context,
+        TableRowIterator tri = DatabaseManager.queryTable(context,
                 "bitstreamformatregistry", myQuery);
 
         while (tri.hasNext())
@@ -572,8 +572,8 @@ public class BitstreamFormat
 
         // Delete extensions
         DatabaseManager.updateQuery(bfContext,
-                "DELETE FROM fileextension WHERE bitstream_format_id="
-                        + getID());
+                "DELETE FROM fileextension WHERE bitstream_format_id= ? ",
+                getID());
 
         // Rewrite extensions
         for (int i = 0; i < extensions.size(); i++)
@@ -615,13 +615,14 @@ public class BitstreamFormat
 
         // Set bitstreams with this format to "unknown"
         int numberChanged = DatabaseManager.updateQuery(bfContext,
-                "UPDATE bitstream SET bitstream_format_id=" + unknown.getID()
-                        + " WHERE bitstream_format_id=" + getID());
+                "UPDATE bitstream SET bitstream_format_id= ? " + 
+                " WHERE bitstream_format_id= ? ", 
+                unknown.getID(),getID());
 
         // Delete extensions
         DatabaseManager.updateQuery(bfContext,
-                "DELETE FROM fileextension WHERE bitstream_format_id="
-                        + getID());
+                "DELETE FROM fileextension WHERE bitstream_format_id= ? ",
+                getID());
 
         // Delete this format from database
         DatabaseManager.delete(bfContext, bfRow);

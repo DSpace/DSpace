@@ -126,15 +126,11 @@ public class Group extends DSpaceObject
             try
             {
                 // get epeople objects
-                TableRowIterator tri = DatabaseManager
-                        .query(
-                                myContext,
-                                "eperson",
-                                "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE "
-                                        + "epersongroup2eperson.eperson_id=eperson.eperson_id AND "
-                                        + "epersongroup2eperson.eperson_group_id="
-                                        + myRow
-                                                .getIntColumn("eperson_group_id"));
+                TableRowIterator tri = DatabaseManager.queryTable(myContext,"eperson",
+                                "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
+                                "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
+                                "epersongroup2eperson.eperson_group_id= ?",
+                                myRow.getIntColumn("eperson_group_id"));
 
                 while (tri.hasNext())
                 {
@@ -154,16 +150,14 @@ public class Group extends DSpaceObject
                     }
                 }
 
+                tri.close();
+                
                 // now get Group objects
-                tri = DatabaseManager
-                        .query(
-                                myContext,
-                                "epersongroup",
-                                "SELECT epersongroup.* FROM epersongroup, group2group WHERE "
-                                        + "group2group.child_id=epersongroup.eperson_group_id AND "
-                                        + "group2group.parent_id="
-                                        + myRow
-                                                .getIntColumn("eperson_group_id"));
+                tri = DatabaseManager.queryTable(myContext,"epersongroup",
+                                "SELECT epersongroup.* FROM epersongroup, group2group WHERE " +
+                                "group2group.child_id=epersongroup.eperson_group_id AND "+
+                                "group2group.parent_id= ? ",
+                                myRow.getIntColumn("eperson_group_id"));
 
                 while (tri.hasNext())
                 {
@@ -182,6 +176,8 @@ public class Group extends DSpaceObject
                         groups.add(new Group(myContext, r));
                     }
                 }
+                
+                tri.close();
 
             }
             catch (Exception e)
@@ -428,9 +424,9 @@ public class Group extends DSpaceObject
         // two queries - first to get groups eperson is a member of
         // second query gets parent groups for groups eperson is a member of
 
-        TableRowIterator tri = DatabaseManager.query(c, "epersongroup2eperson",
-                "SELECT * FROM epersongroup2eperson WHERE eperson_id="
-                        + e.getID());
+        TableRowIterator tri = DatabaseManager.queryTable(c, "epersongroup2eperson",
+                "SELECT * FROM epersongroup2eperson WHERE eperson_id= ?",
+                 e.getID());
 
         Set groupIDs = new HashSet();
 
@@ -442,6 +438,8 @@ public class Group extends DSpaceObject
 
             groupIDs.add(new Integer(childID));
         }
+        
+        tri.close();
 
         // now we have all owning groups, also grab all parents of owning groups
         // yes, I know this could have been done as one big query and a union,
@@ -451,11 +449,16 @@ public class Group extends DSpaceObject
 
         Iterator i = groupIDs.iterator();
 
+        // Build a list of query parameters
+        Object[] parameters = new Object[groupIDs.size()];
+        int idx = 0;
         while (i.hasNext())
         {
             int groupID = ((Integer) i.next()).intValue();
 
-            groupQuery += "child_id=" + groupID;
+            parameters[idx++] = groupID;
+            
+            groupQuery += "child_id= ? ";
             if (i.hasNext())
                 groupQuery += " OR ";
         }
@@ -465,10 +468,13 @@ public class Group extends DSpaceObject
             // don't do query, isn't member of any groups
             return groupIDs;
         }
-
+        
         // was member of at least one group
-        tri = DatabaseManager.query(c, "group2groupcache",
-                "SELECT * FROM group2groupcache WHERE " + groupQuery);
+        // NOTE: even through the query is built dynamicaly all data is seperated into the
+        // the parameters array.
+        tri = DatabaseManager.queryTable(c, "group2groupcache",
+                "SELECT * FROM group2groupcache WHERE " + groupQuery,
+                parameters);
 
         while (tri.hasNext())
         {
@@ -478,6 +484,8 @@ public class Group extends DSpaceObject
 
             groupIDs.add(new Integer(parentID));
         }
+        
+        tri.close();
 
         return groupIDs;
     }
@@ -531,9 +539,9 @@ public class Group extends DSpaceObject
         Set epeopleIDs = new HashSet();
         
         // Get all groups which are a member of this group
-        TableRowIterator tri = DatabaseManager.query(c, "group2groupcache",
-                "SELECT * FROM group2groupcache WHERE parent_id="
-                        + g.getID());
+        TableRowIterator tri = DatabaseManager.queryTable(c, "group2groupcache",
+                "SELECT * FROM group2groupcache WHERE parent_id= ? ",
+                g.getID());
         
         Set groupIDs = new HashSet();
 
@@ -545,30 +553,39 @@ public class Group extends DSpaceObject
 
             groupIDs.add(new Integer(childID));
         }
+        
+        tri.close();
 
         // now we have all the groups (including this one)
         // it is time to find all the EPeople who belong to those groups
         // and filter out all duplicates
 
+        Object[] parameters = new Object[groupIDs.size()+1];
+        int idx = 0;
         Iterator i = groupIDs.iterator();
 
         // don't forget to add the current group to this query!
-        String epersonQuery = "eperson_group_id=" + g.getID();
+        parameters[idx++] = g.getID();
+        String epersonQuery = "eperson_group_id= ? ";
         if (i.hasNext())
             epersonQuery += " OR ";
         
         while (i.hasNext())
         {
             int groupID = ((Integer) i.next()).intValue();
-
-            epersonQuery += "eperson_group_id=" + groupID;
+            parameters[idx++] = groupID;
+            
+            epersonQuery += "eperson_group_id= ? ";
             if (i.hasNext())
                 epersonQuery += " OR ";
         }
 
         //get all the EPerson IDs
-        tri = DatabaseManager.query(c, "epersongroup2eperson",
-                "SELECT * FROM epersongroup2eperson WHERE " + epersonQuery);
+        // Note: even through the query is dynamicaly built all data is seperated
+        // into the parameters array.
+        tri = DatabaseManager.queryTable(c, "epersongroup2eperson",
+                "SELECT * FROM epersongroup2eperson WHERE " + epersonQuery,
+                parameters);
 
         while (tri.hasNext())
         {
@@ -578,6 +595,8 @@ public class Group extends DSpaceObject
    
             epeopleIDs.add(new Integer(epersonID));
         }
+        
+        tri.close();
 
         return epeopleIDs;
     }
@@ -684,8 +703,10 @@ public class Group extends DSpaceObject
             s = "name";
         }
 
-        TableRowIterator rows = DatabaseManager.query(context, "epersongroup",
-                "SELECT * FROM epersongroup ORDER BY " + s);
+        TableRowIterator rows = DatabaseManager.queryTable(
+        		context, "epersongroup",
+                "SELECT * FROM epersongroup ORDER BY ? ", 
+                s);
 
         List gRows = rows.toList();
 
@@ -727,18 +748,18 @@ public class Group extends DSpaceObject
 
         // Remove any group memberships first
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM EPersonGroup2EPerson WHERE eperson_group_id="
-                        + getID());
+                "DELETE FROM EPersonGroup2EPerson WHERE eperson_group_id= ? ",
+                getID());
 
         // remove any group2groupcache entries
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM group2groupcache WHERE parent_id=" + getID()
-                        + " OR child_id=" + getID());
+                "DELETE FROM group2groupcache WHERE parent_id= ? OR child_id= ? ",
+                getID(),getID());
 
         // Now remove any group2group assignments
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM group2group WHERE parent_id=" + getID()
-                        + " OR child_id=" + getID());
+                "DELETE FROM group2group WHERE parent_id= ? OR child_id= ? ",
+                getID(),getID());
 
         // don't forget the new table
         deleteEpersonGroup2WorkspaceItem();
@@ -758,8 +779,8 @@ public class Group extends DSpaceObject
     private void deleteEpersonGroup2WorkspaceItem() throws SQLException
     {
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM EPersonGroup2WorkspaceItem WHERE eperson_group_id="
-                        + getID());
+                "DELETE FROM EPersonGroup2WorkspaceItem WHERE eperson_group_id= ? ",
+                getID());
     }
 
     /**
@@ -820,8 +841,8 @@ public class Group extends DSpaceObject
         {
             // Remove any existing mappings
             DatabaseManager.updateQuery(myContext,
-                    "delete from epersongroup2eperson where eperson_group_id="
-                            + getID());
+                    "delete from epersongroup2eperson where eperson_group_id= ? ",
+                    getID());
 
             // Add new mappings
             Iterator i = epeople.iterator();
@@ -845,7 +866,8 @@ public class Group extends DSpaceObject
         {
             // Remove any existing mappings
             DatabaseManager.updateQuery(myContext,
-                    "delete from group2group where parent_id=" + getID());
+                    "delete from group2group where parent_id= ? ",
+                    getID());
 
             // Add new mappings
             Iterator i = groups.iterator();
@@ -909,7 +931,7 @@ public class Group extends DSpaceObject
     private void rethinkGroupCache() throws SQLException
     {
         // read in the group2group table
-        TableRowIterator tri = DatabaseManager.query(myContext, "group2group",
+        TableRowIterator tri = DatabaseManager.queryTable(myContext, "group2group",
                 "SELECT * FROM group2group");
 
         Map parents = new HashMap();
@@ -938,6 +960,8 @@ public class Group extends DSpaceObject
                 children.add(childID);
             }
         }
+        
+        tri.close();
 
         // now parents is a hash of all of the IDs of groups that are parents
         // and each hash entry is a hash of all of the IDs of children of those

@@ -102,23 +102,16 @@ public class Supervisor {
     {
         String query = "SELECT epersongroup2workspaceitem.* " +
                        "FROM epersongroup2workspaceitem " +
-                       "WHERE epersongroup2workspaceitem.eperson_group_id = "
-                       + groupID +
-                       " AND epersongroup2workspaceitem.workspace_item_id = "
-                       + wsItemID;
+                       "WHERE epersongroup2workspaceitem.eperson_group_id = ? " +
+                       "AND epersongroup2workspaceitem.workspace_item_id = ? ";
         
-        TableRowIterator tri = DatabaseManager.query(context, 
+        TableRowIterator tri = DatabaseManager.queryTable(context, 
                                     "epersongroup2workspaceitem", 
-                                    query);
+                                    query,groupID,wsItemID);
         
-        if (tri.hasNext())
-        {
-            return true;
-        } 
-        else
-        {
-            return false;
-        }
+        boolean result = tri.hasNext();
+        tri.close();
+        return result;
     }
     
     /**
@@ -139,10 +132,10 @@ public class Supervisor {
         
         // remove the link from the supervisory database
         String query = "DELETE FROM epersongroup2workspaceitem " +
-                       "WHERE workspace_item_id = " + wsItemID +
-                       " AND eperson_group_id = " + groupID;
+                       "WHERE workspace_item_id = ? "+
+                       "AND eperson_group_id = ? ";
         
-        DatabaseManager.updateQuery(context, query);
+        DatabaseManager.updateQuery(context, query, wsItemID, groupID);
         
         // get the item and have it remove the policies for the group
         Item item = wsItem.getItem();

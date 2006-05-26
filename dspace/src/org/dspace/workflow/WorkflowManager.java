@@ -234,15 +234,17 @@ public class WorkflowManager
     {
         ArrayList mylist = new ArrayList();
 
-        String myquery = "SELECT * FROM WorkflowItem WHERE owner=" + e.getID();
+        String myquery = "SELECT * FROM WorkflowItem WHERE owner= ? ";
 
-        TableRowIterator tri = DatabaseManager
-                .query(c, "workflowitem", myquery);
+        TableRowIterator tri = DatabaseManager.queryTable(c, 
+        		"workflowitem", myquery,e.getID());
 
         while (tri.hasNext())
         {
             mylist.add(new WorkflowItem(c, tri.next()));
         }
+        
+        tri.close();
 
         return mylist;
     }
@@ -258,19 +260,20 @@ public class WorkflowManager
     {
         ArrayList mylist = new ArrayList();
 
-        String myquery = "SELECT workflowitem.* FROM workflowitem, TaskListItem"
-                + " WHERE tasklistitem.eperson_id="
-                + e.getID()
-                + " AND tasklistitem.workflow_id=workflowitem.workflow_id";
+        String myquery = "SELECT workflowitem.* FROM workflowitem, TaskListItem" +
+        		" WHERE tasklistitem.eperson_id= ? " +
+        		" AND tasklistitem.workflow_id=workflowitem.workflow_id";
 
         TableRowIterator tri = DatabaseManager
-                .query(c, "workflowitem", myquery);
+                .queryTable(c, "workflowitem", myquery, e.getID());
 
         while (tri.hasNext())
         {
             mylist.add(new WorkflowItem(c, tri.next()));
         }
 
+        tri.close();
+        
         return mylist;
     }
 
@@ -815,10 +818,9 @@ public class WorkflowManager
     // deletes all tasks associated with a workflowitem
     static void deleteTasks(Context c, WorkflowItem wi) throws SQLException
     {
-        String myrequest = "DELETE FROM TaskListItem WHERE workflow_id="
-                + wi.getID();
-
-        DatabaseManager.updateQuery(c, myrequest);
+        String myrequest = "DELETE FROM TaskListItem WHERE workflow_id= ? ";
+       
+        DatabaseManager.updateQuery(c, myrequest, wi.getID());
     }
 
     private static void notifyGroupOfTask(Context c, WorkflowItem wi,

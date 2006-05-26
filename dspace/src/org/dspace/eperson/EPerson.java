@@ -250,7 +250,8 @@ public class EPerson extends DSpaceObject
         }
 
         TableRowIterator rows = DatabaseManager.query(context,
-                "SELECT * FROM eperson ORDER BY " + s);
+                "SELECT * FROM eperson ORDER BY ? ",
+                s);
 
         List epeopleRows = rows.toList();
 
@@ -340,11 +341,13 @@ public class EPerson extends DSpaceObject
 
         // Remove any group memberships first
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM EPersonGroup2EPerson WHERE eperson_id=" + getID());
+                "DELETE FROM EPersonGroup2EPerson WHERE eperson_id= ? ",
+                getID());
 
         // Remove any subscriptions
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM subscription WHERE eperson_id=" + getID());
+                "DELETE FROM subscription WHERE eperson_id= ? ",
+                getID());
 
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
@@ -678,31 +681,40 @@ public class EPerson extends DSpaceObject
 
         // check for eperson in item table
         TableRowIterator tri = DatabaseManager.query(myContext,
-                "SELECT * from item where submitter_id=" + getID());
+                "SELECT * from item where submitter_id= ? ",
+                getID());
 
         if (tri.hasNext())
         {
             tableList.add("item");
         }
 
+        tri.close();
+        
         // check for eperson in workflowitem table
         tri = DatabaseManager.query(myContext,
-                "SELECT * from workflowitem where owner=" + getID());
+                "SELECT * from workflowitem where owner= ? ",
+                getID());
 
         if (tri.hasNext())
         {
             tableList.add("workflowitem");
         }
 
+        tri.close();
+        
         // check for eperson in tasklistitem table
         tri = DatabaseManager.query(myContext,
-                "SELECT * from tasklistitem where eperson_id=" + getID());
+                "SELECT * from tasklistitem where eperson_id= ? ",
+                getID());
 
         if (tri.hasNext())
         {
             tableList.add("tasklistitem");
         }
 
+        tri.close();
+        
         // the list of tables can be used to construct an error message
         // explaining to the user why the eperson cannot be deleted.
         return tableList;

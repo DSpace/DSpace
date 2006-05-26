@@ -41,6 +41,7 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -256,10 +257,9 @@ public class MetadataSchema
             String namespace) throws SQLException
     {
         // Grab rows from DB
-        TableRowIterator tri = DatabaseManager.query(context,
-                "MetadataSchemaRegistry",
-                "SELECT * FROM MetadataSchemaRegistry WHERE namespace='"
-                        + namespace + "'");
+        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
+                "SELECT * FROM MetadataSchemaRegistry WHERE namespace= ? ", 
+                namespace);
 
         TableRow row = null;
         if (tri.hasNext())
@@ -357,8 +357,7 @@ public class MetadataSchema
         List schemas = new ArrayList();
 
         // Get all the metadataschema rows
-        TableRowIterator tri = DatabaseManager
-                .query(context, "MetadataSchemaRegistry",
+        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataSchemaRegistry",
                         "SELECT * FROM MetadataSchemaRegistry ORDER BY metadata_schema_id");
 
         // Make into DC Type objects
@@ -388,10 +387,15 @@ public class MetadataSchema
     {
         Connection con = context.getDBConnection();
         TableRow reg = DatabaseManager.row("MetadataSchemaRegistry");
-        ResultSet rs = con.createStatement().executeQuery(
-                "SELECT COUNT(*) FROM " + reg.getTable()
-                        + " WHERE metadata_schema_id!=" + schemaID
-                        + " AND namespace='" + namespace + "'");
+        
+        String query = "SELECT COUNT(*) FROM " + reg.getTable() + " " +
+        		"WHERE metadata_schema_id != ? " + 
+        		"AND namespace= ? ";
+        PreparedStatement statement = con.prepareStatement(query);
+        statement.setInt(1,schemaID);
+        statement.setString(2,namespace);
+        
+        ResultSet rs = statement.executeQuery();
 
         int count = 0;
         if (rs.next())
@@ -415,10 +419,16 @@ public class MetadataSchema
     {
         Connection con = context.getDBConnection();
         TableRow reg = DatabaseManager.row("MetadataSchemaRegistry");
-        ResultSet rs = con.createStatement().executeQuery(
-                "SELECT COUNT(*) FROM " + reg.getTable()
-                        + " WHERE metadata_schema_id!=" + schemaID
-                        + " AND short_id='" + name + "'");
+        
+        String query = "SELECT COUNT(*) FROM " + reg.getTable() + " " +
+        		"WHERE metadata_schema_id != ? " +
+                "AND short_id = ? ";
+        
+        PreparedStatement statement = con.prepareStatement(query);
+        statement.setInt(1,schemaID);
+        statement.setString(2,name);
+        
+        ResultSet rs = statement.executeQuery();
 
         int count = 0;
         if (rs.next())
@@ -495,8 +505,7 @@ public class MetadataSchema
         id2schema = new HashMap();
         name2schema = new HashMap();
 
-        TableRowIterator tri = DatabaseManager.query(context,
-                "MetadataSchemaRegistry",
+        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
                 "SELECT * from MetadataSchemaRegistry");
         while (tri.hasNext())
         {

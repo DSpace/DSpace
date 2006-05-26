@@ -269,7 +269,7 @@ public class Collection extends DSpaceObject
      */
     public static Collection[] findAll(Context context) throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.query(context, "collection",
+        TableRowIterator tri = DatabaseManager.queryTable(context, "collection",
                 "SELECT * FROM collection ORDER BY name");
 
         List collections = new ArrayList();
@@ -310,11 +310,11 @@ public class Collection extends DSpaceObject
     {
         String myQuery = "SELECT item.* FROM item, collection2item WHERE "
                 + "item.item_id=collection2item.item_id AND "
-                + "collection2item.collection_id=" + getID()
-                + " AND item.in_archive='1'";
+                + "collection2item.collection_id= ? "
+                + "AND item.in_archive='1'";
 
-        TableRowIterator rows = DatabaseManager.query(ourContext, "item",
-                myQuery);
+        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
+                myQuery,getID());
 
         return new ItemIterator(ourContext, rows);
     }
@@ -777,12 +777,14 @@ public class Collection extends DSpaceObject
                 "collection_id=" + getID() + ",item_id=" + item.getID()));
 
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM collection2item WHERE collection_id=" + getID()
-                        + " AND item_id=" + item.getID());
+                "DELETE FROM collection2item WHERE collection_id= ? "+
+                "AND item_id= ? ",
+                getID(), item.getID());
 
         // Is the item an orphan?
         TableRowIterator tri = DatabaseManager.query(ourContext,
-                "SELECT * FROM collection2item WHERE item_id=" + item.getID());
+                "SELECT * FROM collection2item WHERE item_id= ? ",
+                item.getID());
 
         if (!tri.hasNext())
         {
@@ -892,7 +894,8 @@ public class Collection extends DSpaceObject
 
         // remove subscriptions - hmm, should this be in Subscription.java?
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM subscription WHERE " + "collection_id=" + getID());
+                "DELETE FROM subscription WHERE collection_id= ? ", 
+                getID());
 
         // Remove items
         ItemIterator items = getItems();
@@ -982,14 +985,11 @@ public class Collection extends DSpaceObject
     public Community[] getCommunities() throws SQLException
     {
         // Get the bundle table rows
-        TableRowIterator tri = DatabaseManager
-                .query(
-                        ourContext,
-                        "community",
-                        "SELECT community.* FROM community, community2collection WHERE "
-                                + "community.community_id=community2collection.community_id "
-                                + "AND community2collection.collection_id="
-                                + getID());
+        TableRowIterator tri = DatabaseManager.queryTable(ourContext,"community",
+                        "SELECT community.* FROM community, community2collection WHERE " +
+                        "community.community_id=community2collection.community_id " +
+                        "AND community2collection.collection_id= ? ",
+                        getID());
 
         // Build a list of Community objects
         List communities = new ArrayList();
@@ -1129,19 +1129,18 @@ public class Collection extends DSpaceObject
      public int countItems()
         throws SQLException
      {
-        Statement statement = ourContext.getDBConnection().createStatement();
-        final ResultSet rs;
+        String query = "SELECT count(*) FROM collection2item, item WHERE "
+            + "collection2item.collection_id =  ? "
+            + "AND collection2item.item_id = item.item_id "
+            + "AND in_archive ='1' AND item.withdrawn='0' ";
 
-        rs = statement
-                .executeQuery("SELECT count(*) FROM collection2item, item WHERE "
-                        + "collection2item.collection_id = "
-                        + getID()
-                        + " AND collection2item.item_id = item.item_id "
-                        + "AND in_archive ='1' AND item.withdrawn='0'");
-
-            int itemcount = 0;
+        PreparedStatement statement = ourContext.getDBConnection().prepareStatement(query);
+        statement.setInt(1,getID());
+        
+        ResultSet rs = statement.executeQuery();
+        
         rs.next();
-        itemcount = rs.getInt(1);
+        int itemcount = rs.getInt(1);
 
         statement.close();
 

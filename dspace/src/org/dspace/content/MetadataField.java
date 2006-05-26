@@ -41,6 +41,7 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -303,13 +304,22 @@ public class MetadataField
             AuthorizeException
     {
         // Grab rows from DB
-        String qualifierClause = (qualifier == null ? "qualifier IS NULL"
-                : "qualifier='" + qualifier + "'");
-        TableRowIterator tri = DatabaseManager.query(context,
-                "MetadataFieldRegistry",
-                "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id="
-                        + schemaID + " AND element='" + element + "' AND "
-                        + qualifierClause);
+        TableRowIterator tri;
+        if (qualifier == null)
+        {
+        	tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
+                    "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " + 
+                    "AND element= ?  AND qualifier is NULL ",
+                    schemaID, element);
+        } 
+        else
+        {
+        	tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
+                    "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " + 
+                    "AND element= ?  AND qualifier= ? ",
+                    schemaID, element, qualifier);
+        }
+        
 
         TableRow row = null;
         if (tri.hasNext())
@@ -342,8 +352,7 @@ public class MetadataField
         List fields = new ArrayList();
 
         // Get all the metadatafieldregistry rows
-        TableRowIterator tri = DatabaseManager
-                .query(context, "MetadataFieldRegistry",
+        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
                         "SELECT * FROM MetadataFieldRegistry ORDER BY element, qualifier");
 
         // Make into DC Type objects
@@ -373,10 +382,9 @@ public class MetadataField
         List fields = new ArrayList();
 
         // Get all the metadatafieldregistry rows
-        TableRowIterator tri = DatabaseManager.query(context,
-                "MetadataFieldRegistry",
-                "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id="
-                        + schemaID + " ORDER BY element, qualifier");
+        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
+                "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
+                " ORDER BY element, qualifier", schemaID);
 
         // Make into DC Type objects
         while (tri.hasNext())
@@ -503,12 +511,19 @@ public class MetadataField
     {
         Connection con = context.getDBConnection();
         TableRow reg = DatabaseManager.row("MetadataFieldRegistry");
-        ResultSet rs = con.createStatement().executeQuery(
-                "SELECT COUNT(*) FROM " + reg.getTable()
-                        + " WHERE metadata_schema_id=" + schemaID
-                        + " and metadata_field_id != " + fieldID
-                        + " and element='" + element + "' and qualifier='"
-                        + qualifier + "'");
+        
+        String query = "SELECT COUNT(*) FROM " + reg.getTable()
+        	+ " WHERE metadata_schema_id= ? "
+        	+ " and metadata_field_id != ? "
+        	+ " and element= ? and qualifier= ? ";
+
+        PreparedStatement statement = con.prepareStatement(query);
+        statement.setInt(1,schemaID);
+        statement.setInt(2,fieldID);
+        statement.setString(3,element);
+        statement.setString(4,qualifier);
+        
+        ResultSet rs = statement.executeQuery();
 
         int count = 0;
         if (rs.next())
@@ -578,8 +593,7 @@ public class MetadataField
         log.info("Loading MetadataField elements into cache.");
 
         // Grab rows from DB
-        TableRowIterator tri = DatabaseManager.query(context,
-                "MetadataFieldRegistry",
+        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
                 "SELECT * from MetadataFieldRegistry");
 
         while (tri.hasNext())

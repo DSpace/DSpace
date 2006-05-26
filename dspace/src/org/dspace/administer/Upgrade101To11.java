@@ -70,7 +70,7 @@ public class Upgrade101To11
 
             // Deal with withdrawn items first.
             // last_modified takes the value of the deletion date
-            TableRowIterator tri = DatabaseManager.query(context, "item",
+            TableRowIterator tri = DatabaseManager.queryTable(context, "item",
                     "SELECT * FROM item WHERE withdrawal_date IS NOT NULL");
 
             while (tri.hasNext())
@@ -80,12 +80,14 @@ public class Upgrade101To11
                 row.setColumn("last_modified", d.toDate());
                 DatabaseManager.update(context, row);
             }
+            tri.close();
 
             // Next, update those items with a date.available
-            tri = DatabaseManager
-                    .query(
-                            context,
-                            "SELECT item.item_id, dcvalue.text_value FROM item, dctyperegistry, dcvalue WHERE item.item_id=dcvalue.item_id AND dcvalue.dc_type_id=dctyperegistry.dc_type_id AND dctyperegistry.element LIKE 'date' AND dctyperegistry.qualifier LIKE 'available'");
+            tri = DatabaseManager.query(context,
+                        "SELECT item.item_id, dcvalue.text_value FROM item, dctyperegistry, "+
+                        "dcvalue WHERE item.item_id=dcvalue.item_id AND dcvalue.dc_type_id="+
+                        "dctyperegistry.dc_type_id AND dctyperegistry.element LIKE 'date' "+
+                        "AND dctyperegistry.qualifier LIKE 'available'");
 
             while (tri.hasNext())
             {
@@ -98,12 +100,12 @@ public class Upgrade101To11
                 itemRow.setColumn("last_modified", d.toDate());
                 DatabaseManager.update(context, itemRow);
             }
+            tri.close();
 
             // Finally, for all items that have no date.available or withdrawal
             // date, set the update time to now!
-            DatabaseManager
-                    .updateQuery(context,
-                            "UPDATE item SET last_modified=now() WHERE last_modified IS NULL");
+            DatabaseManager.updateQuery(context,
+                        "UPDATE item SET last_modified=now() WHERE last_modified IS NULL");
 
             context.complete();
 

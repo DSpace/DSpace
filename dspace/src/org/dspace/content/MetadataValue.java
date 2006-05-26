@@ -273,9 +273,9 @@ public class MetadataValue
             throws IOException, SQLException, AuthorizeException
     {
         // Grab rows from DB
-        TableRowIterator tri = DatabaseManager.query(context, "MetadataValue",
-                "SELECT * FROM MetadataValue where metadata_value_id="
-                        + valueId);
+        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataValue",
+                "SELECT * FROM MetadataValue where metadata_value_id= ? ",
+                valueId);
 
         TableRow row = null;
         if (tri.hasNext())
@@ -310,9 +310,9 @@ public class MetadataValue
             throws IOException, SQLException, AuthorizeException
     {
         // Grab rows from DB
-        TableRowIterator tri = DatabaseManager.query(context, "MetadataValue",
-                "SELECT * FROM MetadataValue WHERE metadata_field_id="
-                        + fieldId);
+        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataValue",
+                "SELECT * FROM MetadataValue WHERE metadata_field_id= ? ",
+                fieldId);
 
         TableRow row = null;
         java.util.Collection ret = new ArrayList();

@@ -169,7 +169,7 @@ public class WorkflowItem implements InProgressSubmission
     public static WorkflowItem[] findAll(Context c) throws SQLException
     {
         List wfItems = new ArrayList();
-        TableRowIterator tri = DatabaseManager.query(c, "workflowitem",
+        TableRowIterator tri = DatabaseManager.queryTable(c, "workflowitem",
                 "SELECT * FROM workflowitem");
 
         // make a list of workflow items
@@ -179,6 +179,8 @@ public class WorkflowItem implements InProgressSubmission
             WorkflowItem wi = new WorkflowItem(c, row);
             wfItems.add(wi);
         }
+        
+        tri.close();
 
         WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
         wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
@@ -203,11 +205,12 @@ public class WorkflowItem implements InProgressSubmission
     {
         List wfItems = new ArrayList();
 
-        TableRowIterator tri = DatabaseManager.query(context, "workflowitem",
-                "SELECT workflowitem.* FROM workflowitem, item WHERE "
-                        + "workflowitem.item_id=item.item_id AND "
-                        + "item.submitter_id=" + ep.getID()
-                        + " ORDER BY workflowitem.workflow_id");
+        TableRowIterator tri = DatabaseManager.queryTable(context, "workflowitem",
+                "SELECT workflowitem.* FROM workflowitem, item WHERE " +
+                "workflowitem.item_id=item.item_id AND " +
+                "item.submitter_id= ? " + 
+                "ORDER BY workflowitem.workflow_id",
+                ep.getID());
 
         while (tri.hasNext())
         {
@@ -224,6 +227,8 @@ public class WorkflowItem implements InProgressSubmission
 
             wfItems.add(wi);
         }
+        
+        tri.close();
 
         WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
         wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
@@ -246,9 +251,10 @@ public class WorkflowItem implements InProgressSubmission
     {
         List wsItems = new ArrayList();
 
-        TableRowIterator tri = DatabaseManager.query(context, "workflowitem",
-                "SELECT workflowitem.* FROM workflowitem WHERE "
-                        + "workflowitem.collection_id=" + c.getID());
+        TableRowIterator tri = DatabaseManager.queryTable(context, "workflowitem",
+                "SELECT workflowitem.* FROM workflowitem WHERE " +
+                "workflowitem.collection_id= ? ",
+                c.getID());
 
         while (tri.hasNext())
         {
@@ -266,6 +272,8 @@ public class WorkflowItem implements InProgressSubmission
 
             wsItems.add(wi);
         }
+        
+        tri.close();
 
         WorkflowItem[] wsArray = new WorkflowItem[wsItems.size()];
         wsArray = (WorkflowItem[]) wsItems.toArray(wsArray);

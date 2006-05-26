@@ -118,7 +118,7 @@ public class SupervisedItem extends WorkspaceItem
                        "epersongroup2workspaceitem.workspace_item_id " +
                        "ORDER BY workspaceitem.workspace_item_id";
         
-        TableRowIterator tri = DatabaseManager.query(context,
+        TableRowIterator tri = DatabaseManager.queryTable(context,
                                     "workspaceitem",
                                     query);
         
@@ -129,6 +129,8 @@ public class SupervisedItem extends WorkspaceItem
             
             sItems.add(si);
         }
+        
+        tri.close();
         
         SupervisedItem[] siArray = new SupervisedItem[sItems.size()];
         siArray = (SupervisedItem[]) sItems.toArray(siArray);
@@ -151,12 +153,12 @@ public class SupervisedItem extends WorkspaceItem
         String query = "SELECT epersongroup.* " +
                        "FROM epersongroup, epersongroup2workspaceitem " +
                        "WHERE epersongroup2workspaceitem.workspace_item_id" +
-                       " = " + wi +
+                       " = ? " +
                        " AND epersongroup2workspaceitem.eperson_group_id =" +
                        " epersongroup.eperson_group_id " +
                        "ORDER BY epersongroup.name";
         
-        TableRowIterator tri = DatabaseManager.query(c,"epersongroup",query);
+        TableRowIterator tri = DatabaseManager.queryTable(c,"epersongroup",query, wi);
         
         while (tri.hasNext())
         {
@@ -165,6 +167,8 @@ public class SupervisedItem extends WorkspaceItem
             
             groupList.add(group);
         }
+        
+        tri.close();
         
         Group[] groupArray = new Group[groupList.size()];
         groupArray = (Group[]) groupList.toArray(groupArray);
@@ -189,14 +193,14 @@ public class SupervisedItem extends WorkspaceItem
         String query = "SELECT epersongroup.* " +
                        "FROM epersongroup, epersongroup2workspaceitem " +
                        "WHERE epersongroup2workspaceitem.workspace_item_id" +
-                       " = " + this.getID() +
+                       " = ? " + 
                        " AND epersongroup2workspaceitem.eperson_group_id =" +
                        " epersongroup.eperson_group_id " +
                        "ORDER BY epersongroup.name";
         
-        TableRowIterator tri = DatabaseManager.query(ourContext,
+        TableRowIterator tri = DatabaseManager.queryTable(ourContext,
                                     "epersongroup",
-                                    query);
+                                    query, this.getID());
         
         while (tri.hasNext())
         {
@@ -206,6 +210,8 @@ public class SupervisedItem extends WorkspaceItem
             
             groupList.add(group);
         }
+        
+        tri.close();
         
         Group[] groupArray = new Group[groupList.size()];
         groupArray = (Group[]) groupList.toArray(groupArray);
@@ -232,12 +238,12 @@ public class SupervisedItem extends WorkspaceItem
                         "epersongroup2workspaceitem.workspace_item_id " +
                         "AND epersongroup2workspaceitem.eperson_group_id =" +
                         " epersongroup2eperson.eperson_group_id " +
-                        "AND epersongroup2eperson.eperson_id=" + ep.getID() + 
+                        "AND epersongroup2eperson.eperson_id= ? " + 
                         " ORDER BY workspaceitem.workspace_item_id";
 
-        TableRowIterator tri = DatabaseManager.query(context,
+        TableRowIterator tri = DatabaseManager.queryTable(context,
                                     "workspaceitem",
-                                    query);
+                                    query,ep.getID());
         
         while (tri.hasNext())
         {
@@ -245,6 +251,8 @@ public class SupervisedItem extends WorkspaceItem
             SupervisedItem si = new SupervisedItem(context, row);
             sItems.add(si);
         }
+        
+        tri.close();
         
         SupervisedItem[] siArray = new SupervisedItem[sItems.size()];
         siArray = (SupervisedItem[]) sItems.toArray(siArray);

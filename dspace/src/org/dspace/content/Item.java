@@ -134,10 +134,10 @@ public class Item extends DSpaceObject
         dublinCore = new ArrayList();
  
         // Get Dublin Core metadata
-        TableRowIterator tri = DatabaseManager.query(ourContext, "MetadataValue",
-                "SELECT * FROM MetadataValue WHERE item_id="
-                        + itemRow.getIntColumn("item_id")
-                        + " ORDER BY metadata_field_id, place");
+        TableRowIterator tri = DatabaseManager.queryTable(ourContext, "MetadataValue",
+                "SELECT * FROM MetadataValue WHERE item_id= ? " +
+                " ORDER BY metadata_field_id, place",
+                itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
         {
@@ -268,7 +268,7 @@ public class Item extends DSpaceObject
     {
         String myQuery = "SELECT * FROM item WHERE in_archive='1'";
 
-        TableRowIterator rows = DatabaseManager.query(context, "item", myQuery);
+        TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
 
         return new ItemIterator(context, rows);
     }
@@ -290,7 +290,7 @@ public class Item extends DSpaceObject
         String myQuery = "SELECT * FROM item WHERE in_archive='1' AND submitter_id="
                 + eperson.getID();
 
-        TableRowIterator rows = DatabaseManager.query(context, "item", myQuery);
+        TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
 
         return new ItemIterator(context, rows);
     }
@@ -833,14 +833,11 @@ public class Item extends DSpaceObject
         List collections = new ArrayList();
 
         // Get collection table rows
-        TableRowIterator tri = DatabaseManager
-                .query(
-                        ourContext,
-                        "collection",
-                        "SELECT collection.* FROM collection, collection2item WHERE "
-                                + "collection2item.collection_id=collection.collection_id AND "
-                                + "collection2item.item_id="
-                                + itemRow.getIntColumn("item_id"));
+        TableRowIterator tri = DatabaseManager.queryTable(ourContext,"collection",
+                        "SELECT collection.* FROM collection, collection2item WHERE " +
+                        "collection2item.collection_id=collection.collection_id AND " +
+                        "collection2item.item_id= ? ",
+                        itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
         {
@@ -881,14 +878,11 @@ public class Item extends DSpaceObject
         List communities = new ArrayList();
 
         // Get community table rows
-        TableRowIterator tri = DatabaseManager
-                .query(
-                        ourContext,
-                        "community",
-                        "SELECT community.* FROM community, community2item "
-                                + "WHERE community2item.community_id=community.community_id "
-                                + "AND community2item.item_id="
-                                + itemRow.getIntColumn("item_id"));
+        TableRowIterator tri = DatabaseManager.queryTable(ourContext,"community",
+                        "SELECT community.* FROM community, community2item " +
+                        "WHERE community2item.community_id=community.community_id " +
+                        "AND community2item.item_id= ? ",
+                        itemRow.getIntColumn("item_id"));
 
         while (tri.hasNext())
         {
@@ -933,11 +927,11 @@ public class Item extends DSpaceObject
     	{
     		bundles = new ArrayList();
     		// Get bundles
-    		TableRowIterator tri = DatabaseManager.query(ourContext, "bundle",
-    					"SELECT bundle.* FROM bundle, item2bundle WHERE "
-    					+ "item2bundle.bundle_id=bundle.bundle_id AND "
-    					+ "item2bundle.item_id="
-                        + itemRow.getIntColumn("item_id"));
+    		TableRowIterator tri = DatabaseManager.queryTable(ourContext, "bundle",
+    					"SELECT bundle.* FROM bundle, item2bundle WHERE " +
+    					"item2bundle.bundle_id=bundle.bundle_id AND " +
+    					"item2bundle.item_id= ? ",
+                        itemRow.getIntColumn("item_id"));
 
     		while (tri.hasNext())
     		{
@@ -1098,12 +1092,14 @@ public class Item extends DSpaceObject
 
         // Remove mapping from DB
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM item2bundle WHERE item_id=" + getID()
-                        + " AND bundle_id=" + b.getID());
+                "DELETE FROM item2bundle WHERE item_id= ? " +
+                "AND bundle_id= ? ",
+                getID(), b.getID());
 
         // If the bundle is orphaned, it's removed
         TableRowIterator tri = DatabaseManager.query(ourContext,
-                "SELECT * FROM item2bundle WHERE bundle_id=" + b.getID());
+                "SELECT * FROM item2bundle WHERE bundle_id= ? ",
+                b.getID());
 
         if (!tri.hasNext())
         {
@@ -1631,8 +1627,9 @@ public class Item extends DSpaceObject
         // a way of doing this. Plus, deleting a Handle may have ramifications
         // that need considering.
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM handle WHERE resource_type_id=" + Constants.ITEM
-                        + " AND resource_id=" + getID());
+                "DELETE FROM handle WHERE resource_type_id= ? " +
+                "AND resource_id= ? ",
+                Constants.ITEM,getID());
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
@@ -1718,7 +1715,8 @@ public class Item extends DSpaceObject
     private void removeMetadataFromDatabase() throws SQLException
     {
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM MetadataValue WHERE item_id=" + getID());
+                "DELETE FROM MetadataValue WHERE item_id= ? ",
+                getID());
     }
 
     /**

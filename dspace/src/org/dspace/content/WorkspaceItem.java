@@ -309,11 +309,12 @@ public class WorkspaceItem implements InProgressSubmission
     {
         List wsItems = new ArrayList();
 
-        TableRowIterator tri = DatabaseManager.query(context, "workspaceitem",
-                "SELECT workspaceitem.* FROM workspaceitem, item WHERE "
-                        + "workspaceitem.item_id=item.item_id AND "
-                        + "item.submitter_id=" + ep.getID()
-                        + " ORDER BY workspaceitem.workspace_item_id");
+        TableRowIterator tri = DatabaseManager.queryTable(context, "workspaceitem",
+                "SELECT workspaceitem.* FROM workspaceitem, item WHERE " +
+                "workspaceitem.item_id=item.item_id AND " +
+                "item.submitter_id= ? " +
+                "ORDER BY workspaceitem.workspace_item_id", 
+                ep.getID());
 
         while (tri.hasNext())
         {
@@ -354,9 +355,10 @@ public class WorkspaceItem implements InProgressSubmission
     {
         List wsItems = new ArrayList();
 
-        TableRowIterator tri = DatabaseManager.query(context, "workspaceitem",
-                "SELECT workspaceitem.* FROM workspaceitem WHERE "
-                        + "workspaceitem.collection_id=" + c.getID());
+        TableRowIterator tri = DatabaseManager.queryTable(context, "workspaceitem",
+                "SELECT workspaceitem.* FROM workspaceitem WHERE " +
+                "workspaceitem.collection_id= ? ",
+                c.getID());
 
         while (tri.hasNext())
         {
@@ -395,7 +397,7 @@ public class WorkspaceItem implements InProgressSubmission
     {
         List wsItems = new ArrayList();
         String query = "SELECT * FROM workspaceitem ORDER BY item_id";
-        TableRowIterator tri = DatabaseManager.query(context,
+        TableRowIterator tri = DatabaseManager.queryTable(context,
                                     "workspaceitem",
                                     query);
 
@@ -415,6 +417,8 @@ public class WorkspaceItem implements InProgressSubmission
             
             wsItems.add(wi);
         }
+        
+        tri.close();
         
         WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
         wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
@@ -521,8 +525,8 @@ public class WorkspaceItem implements InProgressSubmission
     private void deleteEpersonGroup2WorkspaceItem() throws SQLException
     {
         
-        String removeSQL="DELETE FROM epersongroup2workspaceitem WHERE workspace_item_id = " + getID();
-        DatabaseManager.updateQuery(ourContext, removeSQL);
+        String removeSQL="DELETE FROM epersongroup2workspaceitem WHERE workspace_item_id = ?";
+        DatabaseManager.updateQuery(ourContext, removeSQL,getID());
         
     }
 

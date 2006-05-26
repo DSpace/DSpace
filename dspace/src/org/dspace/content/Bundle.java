@@ -97,15 +97,13 @@ public class Bundle extends DSpaceObject
         bitstreams = new ArrayList();
 
         // Get bitstreams
-        TableRowIterator tri = DatabaseManager
-                .query(
-                        ourContext,
-                        "bitstream",
-                        "SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE "
-                                + "bundle2bitstream.bitstream_id=bitstream.bitstream_id AND "
-                                + "bundle2bitstream.bundle_id="
-                                + bundleRow.getIntColumn("bundle_id"));
-
+        TableRowIterator tri = DatabaseManager.queryTable(
+                ourContext, "bitstream",
+                "SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE "
+                        + "bundle2bitstream.bitstream_id=bitstream.bitstream_id AND "
+                        + "bundle2bitstream.bundle_id= ? ",
+                bundleRow.getIntColumn("bundle_id"));
+        
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
@@ -306,12 +304,13 @@ public class Bundle extends DSpaceObject
         List items = new ArrayList();
 
         // Get items
-        TableRowIterator tri = DatabaseManager.query(ourContext, "item",
-                "SELECT item.* FROM item, item2bundle WHERE "
-                        + "item2bundle.item_id=item.item_id AND "
-                        + "item2bundle.bundle_id="
-                        + bundleRow.getIntColumn("bundle_id"));
-
+        TableRowIterator tri = DatabaseManager.queryTable(
+        		ourContext, "item",
+                "SELECT item.* FROM item, item2bundle WHERE " +
+                "item2bundle.item_id=item.item_id AND " +
+                "item2bundle.bundle_id= ? ",
+                bundleRow.getIntColumn("bundle_id"));
+        
         while (tri.hasNext())
         {
             TableRow r = (TableRow) tri.next();
@@ -458,13 +457,14 @@ public class Bundle extends DSpaceObject
 
         // Delete the mapping row
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM bundle2bitstream WHERE bundle_id=" + getID()
-                        + " AND bitstream_id=" + b.getID());
+                "DELETE FROM bundle2bitstream WHERE bundle_id= ? "+
+                "AND bitstream_id= ? ", 
+                getID(), b.getID());
 
         // If the bitstream is orphaned, it's removed
         TableRowIterator tri = DatabaseManager.query(ourContext,
-                "SELECT * FROM bundle2bitstream WHERE bitstream_id="
-                        + b.getID());
+                "SELECT * FROM bundle2bitstream WHERE bitstream_id= ? ",
+                b.getID());
 
         if (!tri.hasNext())
         {
