@@ -62,7 +62,6 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.Supervisor;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
  * Servlet to handle administration of the supervisory system
