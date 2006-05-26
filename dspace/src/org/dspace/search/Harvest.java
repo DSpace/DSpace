@@ -40,11 +40,11 @@
 package org.dspace.search;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -114,50 +114,64 @@ public class Harvest
             boolean items, boolean collections, boolean withdrawn)
             throws SQLException
     {
-        // SQL to add to the list of tables after the SELECT
-        String scopeTableSQL = "";
 
-        // SQL to add to the WHERE clause of the query
-        String scopeWhereSQL = "";
+        // Put together our query. Note there is no need for an
+        // "in_archive=true" condition, we are using the existence of
+        // Handles as our 'existence criterion'.
+        String query = "SELECT handle.handle, handle.resource_id, item.withdrawn, item.last_modified FROM handle, item";
+        
+        
+        // We are building a complex query that may contain a variable 
+        // about of input data points. To accomidate this while still 
+        // providing type safty we build a list of parameters to be 
+        // plugged into the query at the database level.
+        List parameters = new ArrayList();
+        
+        if (scope != null)
+        {
+        	if (scope.getType() == Constants.COLLECTION)
+        	{
+        		query += ", collection2item";
+        	}
+        	else if (scope.getType() == Constants.COMMUNITY)
+        	{
+        		query += ", community2item";
+        	}
+        }
+        
+
+        query += " WHERE handle.resource_type_id=" + Constants.ITEM + " AND handle.resource_id=item.item_id ";
 
         if (scope != null)
         {
         	if (scope.getType() == Constants.COLLECTION)
         	{
-        		scopeTableSQL = ", collection2item";
-        		scopeWhereSQL = " AND collection2item.collection_id="
-        						+ scope.getID()
-        						+ " AND collection2item.item_id=handle.resource_id";
+        		query += " AND collection2item.collection_id= ? " +
+        	             " AND collection2item.item_id=handle.resource_id ";
+        		parameters.add(Integer.valueOf(scope.getID()));
         	}
         	else if (scope.getType() == Constants.COMMUNITY)
         	{
-        		scopeTableSQL = ", community2item";
-        		scopeWhereSQL = " AND community2item.community_id="
-								+ scope.getID()
-								+ " AND community2item.item_id=handle.resource_id";
+        		query += " AND community2item.community_id= ? " +
+						 " AND community2item.item_id=handle.resource_id";
+        		parameters.add(Integer.valueOf(scope.getID()));
         	}
-        }
-
-        // Put together our query. Note there is no need for an
-        // "in_archive=true" condition, we are using the existence of
-        // Handles as our 'existence criterion'.
-        String query = "SELECT handle.handle, handle.resource_id, item.withdrawn, item.last_modified FROM handle, item"
-                + scopeTableSQL
-                + " WHERE handle.resource_type_id="
-                + Constants.ITEM
-                + " AND handle.resource_id=item.item_id"
-                + scopeWhereSQL;
-
+        }      
+                
         if (startDate != null)
         {
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
-                query = query + " AND item.last_modified >= " 
-                        + oracleTimeStampFromIsoString(startDate);
+            	
+            	startDate = oracleTimeStampFormat(startDate);
+                query += " AND item.last_modified >= " + 
+                		oracleTimeStampFunction(startDate);
+                parameters.add(startDate);
             }
             else //postgres
             {
-                query = query + " AND item.last_modified >= '" + startDate + "'";
+                query = query + " AND item.last_modified >= ? ";
+                parameters.add(startDate);
             }            
         }
 
@@ -188,12 +202,15 @@ public class Harvest
 
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
-                query = query + " AND item.last_modified <= " 
-                        + oracleTimeStampFromIsoString(endDate);
+            	endDate = oracleTimeStampFormat(endDate);
+                query += " AND item.last_modified <= ? " +
+                		oracleTimeStampFunction(endDate);
+                parameters.add(endDate);
             }
             else //postgres
             {
-                query = query + " AND item.last_modified <= '" + endDate + "'";
+                query += " AND item.last_modified <= ? ";
+                parameters.add(endDate);
             }
         }
 
@@ -202,24 +219,25 @@ public class Harvest
             // Exclude withdrawn items
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
-                query = query + " AND withdrawn=0";
+                query += " AND withdrawn=0 ";
             }
             else
             {
                 // postgres uses booleans
-                query = query + " AND withdrawn=false";
+                query += " AND withdrawn=false ";
             }
         }
 
         // Order by item ID, so that for a given harvest the order will be
         // consistent. This is so that big harvests can be broken up into
         // several smaller operations (e.g. for OAI resumption tokens.)
-        query = query + " ORDER BY handle.resource_id";
+        query += " ORDER BY handle.resource_id";
 
         log.debug(LogManager.getHeader(context, "harvest SQL", query));
-
+        
         // Execute
-        TableRowIterator tri = DatabaseManager.query(context, query);
+        Object[] parametersArray = parameters.toArray();
+        TableRowIterator tri = DatabaseManager.query(context, query, parametersArray);
         List infoObjects = new LinkedList();
         int index = 0;
 
@@ -259,6 +277,7 @@ public class Harvest
 
             index++;
         }
+        tri.close();
 
         return infoObjects;
     }
@@ -323,13 +342,10 @@ public class Harvest
             HarvestedItemInfo itemInfo) throws SQLException
     {
         // Get the collection Handles from DB
-        TableRowIterator colRows = DatabaseManager
-                .query(
-                        context,
-                        "SELECT handle.handle FROM handle, collection2item WHERE handle.resource_type_id="
-                                + Constants.COLLECTION
-                                + " AND collection2item.collection_id=handle.resource_id AND collection2item.item_id = "
-                                + itemInfo.itemID);
+        TableRowIterator colRows = DatabaseManager.query(context,
+                        "SELECT handle.handle FROM handle, collection2item WHERE handle.resource_type_id= ? " + 
+                        "AND collection2item.collection_id=handle.resource_id AND collection2item.item_id = ? ",
+                        Constants.COLLECTION, itemInfo.itemID);
 
         // Chuck 'em in the itemInfo object
         itemInfo.collectionHandles = new LinkedList();
@@ -341,34 +357,50 @@ public class Harvest
         }
     }
     
+    
+    
     /**
-     * creates an oracle format timestamp from an ISO 8601-style string
+     * Create an oracle to_timestamp function for the given iso date. It must be
+     * an ISO 8601-stlye string.
+     * 
+     * Since the date could be a possible sql injection attack vector instead 
+     * of placing the value inside the query a place holder will be used. The
+     * caller must ensure that the isoDateString parameter is bound to the query
+     * for the approprate substitution.
+     * 
      * @param isoDateString
-     * @return oracle format timestamp String
+     * @return The oracle to_timestamp function.
      */
-    private static String oracleTimeStampFromIsoString(String isoDateString)
+    private static String oracleTimeStampFunction(String isoDateString)
     {
-        String timeStampString;
-        
-        if (isoDateString.length() == 10)
+        if (isoDateString.length() == 19 )
         {
-            timeStampString = "TO_TIMESTAMP('" + isoDateString + "T00:00:00" 
-                                + "'," + "'YYYY-MM-DD\"T\"HH24:MI:SS')";
-            
-        } else if (isoDateString.length() == 19 )
-        {
-            timeStampString = "TO_TIMESTAMP('" + isoDateString  
-                                + "','YYYY-MM-DD\"T\"HH24:MI:SS')";
+            return "TO_TIMESTAMP( ? ,'YYYY-MM-DD\"T\"HH24:MI:SS')";
         } else if (isoDateString.length() > 19)
         {
-            timeStampString = "TO_TIMESTAMP('" + isoDateString  
-                                + "','YYYY-MM-DD\"T\"HH24:MI:SS.FF\"Z\"')"; 
+            return "TO_TIMESTAMP( ? ,'YYYY-MM-DD\"T\"HH24:MI:SS.FF\"Z\"')"; 
         } else
         {
             throw new IllegalArgumentException("argument does not seem to be in the expected ISO 8601 format");
         }
-                                   
-        return timeStampString;
+    }
+    
+    /**
+     * Format the isoDateString according to oracles needs. The input should be ISO-85601 style.
+     * 
+     * @param isoDateString
+     * @return a datastring format better suited to oracles needs.
+     */
+    private static String oracleTimeStampFormat(String isoDateString)
+    {
+    	if (isoDateString.length() == 10)
+    	{
+    		return isoDateString + "T00:00:00";
+    	}
+    	else
+    	{
+    		return isoDateString;
+    	}
     }
 
 }
