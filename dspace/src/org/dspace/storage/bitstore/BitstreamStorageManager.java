@@ -788,6 +788,15 @@ public class BitstreamStorageManager
 			sInternalId = sInternalId.substring(REGISTERED_FLAG.length());
 			sIntermediatePath = "";
 		} else {
+			
+			// Sanity Check: If the internal ID contains a
+			// pathname separator, it's probably an attempt to
+			// make a path traversal attack, so ignore the path
+			// prefix.  The internal-ID is supposed to be just a
+			// filename, so this will not affect normal operation.
+			if (sInternalId.indexOf(File.separator) != -1)
+				sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator)+1);
+			
 			sIntermediatePath = getIntermediatePath(sInternalId);
 		}
 
