@@ -47,6 +47,7 @@ import java.util.Enumeration;
 import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
@@ -92,14 +93,25 @@ public class UIUtil
             c = new Context();
 
             // See if a user has authentication
-            Integer userID = (Integer) request.getSession().getAttribute(
+            HttpSession session = request.getSession();
+            Integer userID = (Integer) session.getAttribute(
                     "dspace.current.user.id");
 
             if (userID != null)
             {
+                String remAddr = (String)session.getAttribute("dspace.current.remote.addr");
+                if (remAddr != null && remAddr.equals(request.getRemoteAddr()))
+                {
                 EPerson e = EPerson.find(c, userID.intValue());
 
                 Authenticate.loggedIn(c, request, e);
+            }
+                else
+                {
+                    log.warn("POSSIBLE HIJACKED SESSION: request from "+
+                             request.getRemoteAddr()+" does not match original "+
+                             "session address: "+remAddr+". Authentication rejected.");
+                }
             }
 
             // Set any special groups - invoke the authentication mgr.

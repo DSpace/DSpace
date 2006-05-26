@@ -46,10 +46,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -260,6 +258,12 @@ public class Authenticate
         // and in the session as an ID
         session.setAttribute("dspace.current.user.id", new Integer(eperson
                 .getID()));
+
+        // and the remote IP address to compare against later requests
+        // so we can detect session hijacking.
+        session.setAttribute("dspace.current.remote.addr",
+                             request.getRemoteAddr());
+
     }
 
     /**
