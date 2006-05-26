@@ -251,9 +251,8 @@ public class CommunityFiliator
         // OK remove the mappings - but leave the community, which will become
         // top-level
         DatabaseManager.updateQuery(c,
-                "DELETE FROM community2community WHERE parent_comm_id="
-                        + parent.getID() + " AND child_comm_id="
-                        + child.getID());
+                "DELETE FROM community2community WHERE parent_comm_id= ? "+
+                "AND child_comm_id= ? ", parent.getID(), child.getID());
 
         // complete the pending transaction
         c.complete();
