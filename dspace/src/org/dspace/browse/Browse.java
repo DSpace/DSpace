@@ -836,7 +836,7 @@ public class Browse
 
         PreparedStatement statement = createSql(scope, itemValue, false, false);
 
-        List qresults = DatabaseManager.query(statement).toList();
+        List qresults = DatabaseManager.queryPrepared(statement).toList();
         int numberDesired = scope.getNumberBefore();
         List results = getResults(scope, qresults, numberDesired);
 
@@ -871,7 +871,7 @@ public class Browse
 
         PreparedStatement statement = createSql(scope, itemValue, true, false);
 
-        List qresults = DatabaseManager.query(statement).toList();
+        List qresults = DatabaseManager.queryPrepared(statement).toList();
 
         // The number of results we want is either -1 (everything)
         // or the total, less the number already retrieved.
@@ -1958,8 +1958,8 @@ class BrowseCache
             log.debug("Running SQL to check whether index has changed: \""
                     + SQL + "\"");
         }
-
-        return DatabaseManager.querySingle(context, null, SQL);
+        
+        return DatabaseManager.querySingle(context, SQL);
     }
 
     /**
