@@ -46,6 +46,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Date;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -57,7 +58,6 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,13 +66,18 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
+import java.util.regex.Pattern;
 
 import org.apache.commons.dbcp.ConnectionFactory;
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDriver;
 import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.apache.commons.pool.impl.GenericKeyedObjectPoolFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
@@ -93,6 +98,18 @@ public class DatabaseManager
 
     /** True if initialization has been done */
     private static boolean initialized = false;
+    
+    /** 
+     * This regular expression is used to perform sanity checks 
+     * on database names (i.e. tables and columns). 
+     * 
+     * FIXME: Regular expressions can be slow to solve this in the future we should
+     * probably create a system where we don't pass in column and table names to these low
+     * level database methods. This approach is highly exploitable for injection 
+     * type attacks because we are unable to determine where the input came from. Instead
+     * we could pass in static integer constants which are then mapped to their sql name. 
+     */
+    private static final Pattern DB_SAFE_NAME = Pattern.compile("^[a-zA-Z_1-9]+$");
 
     /**
      * A map of database column information. The key is the table name, a
@@ -106,7 +123,7 @@ public class DatabaseManager
     protected DatabaseManager()
     {
     }
-
+    
     /**
      * Return an iterator with the results of the query. The table parameter
      * indicates the type of result. If table is null, the column names are read
@@ -118,27 +135,99 @@ public class DatabaseManager
      *            The name of the table which results
      * @param query
      *            The SQL query
+     * @param parameters
+     * 			  A set of SQL parameters to be included in query. The order of 
+     * 			  the parameters must correspond to the order of their reference  
+     * 			  within the query.
      * @return A TableRowIterator with the results of the query
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRowIterator query(Context context, String table,
-            String query) throws SQLException
+//   FIXME: Use the following prototype when we switch to java 1.5 and remove the 
+//   other varants of the methods.
+//public static TableRowIterator queryTable(Context context, String table,
+//String query, Object ... parameters ) throws SQLException
+	  public static TableRowIterator queryTable(Context context, String table,
+	  String query, Object[] parameters ) throws SQLException
     {
         if (log.isDebugEnabled())
         {
             log.debug("Running query \"" + query + "\"");
         }
-
-        Statement statement = context.getDBConnection().createStatement();
-
-        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(query),
+        
+        PreparedStatement statement = context.getDBConnection().prepareStatement(query);
+        loadParameters(statement,parameters);
+        
+        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(),
                 canonicalize(table));
 
         retTRI.setStatement(statement);
         return retTRI;
     }
 
+	// FIXME: Remove for java 1.5:
+    public static TableRowIterator queryTable(Context context, String table,
+    String query) throws SQLException
+    {
+    	return queryTable(context,table,query,new Object[0]);
+    }
+	  
+	// FIXME: Remove for java 1.5:
+    public static TableRowIterator queryTable(Context context, String table,
+    String query, String string1 ) throws SQLException
+    {
+    	Object[] parameters = {string1};
+    	return queryTable(context,table,query,parameters);
+    }
+	 
+    // FIXME: Remove for java 1.5:
+    public static TableRowIterator queryTable(Context context, String table,
+    String query, String string1, String string2 ) throws SQLException
+    {
+    	Object[] parameters = {string1, string2};
+    	return queryTable(context,table,query,parameters);
+    }
+    
+    // FIXME: Remove for java 1.5:
+    public static TableRowIterator queryTable(Context context, String table,
+    String query, int int1 ) throws SQLException
+    {
+    	Object[] parameters = { Integer.valueOf(int1) };
+    	return queryTable(context,table,query,parameters);
+    }
+    
+    // FIXME: Remove for java 1.5:
+    public static TableRowIterator queryTable(Context context, String table,
+    String query, int int1, int int2 ) throws SQLException
+    {
+    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2)};
+    	return queryTable(context,table,query,parameters);
+    }
+    
+    // FIXME: Remove for java 1.5:
+    public static TableRowIterator queryTable(Context context, String table,
+    String query, int int1, int int2, int int3) throws SQLException
+    {
+    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2), Integer.valueOf(int3)};
+    	return queryTable(context,table,query,parameters);
+    }
+    
+    // FIXME: Remove for java 1.5:
+    public static TableRowIterator queryTable(Context context, String table,
+    String query, int int1, String string2) throws SQLException
+    {
+    	Object[] parameters = {Integer.valueOf(int1), string2};
+    	return queryTable(context,table,query,parameters);
+    }
+    
+    // FIXME: Remove for java 1.5:
+    public static TableRowIterator queryTable(Context context, String table,
+    String query, int int1, String string2, String string3) throws SQLException
+    {
+    	Object[] parameters = {Integer.valueOf(int1), string2,string3};
+    	return queryTable(context,table,query,parameters);
+    }
+    
     /**
      * Return an iterator with the results of the query.
      * 
@@ -146,11 +235,19 @@ public class DatabaseManager
      *            The context object
      * @param query
      *            The SQL query
+     * @param parameters
+     * 			  A set of SQL parameters to be included in query. The order of 
+     * 			  the parameters must correspond to the order of their reference 
+     * 			  within the query.
      * @return A TableRowIterator with the results of the query
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRowIterator query(Context context, String query)
+//  FIXME: Use the following prototype when we switch to java 1.5 and remove the 
+//  other varants of the methods.
+//public static TableRowIterator query(Context context, String query, Object ... parameters)
+//throws SQLException    
+    public static TableRowIterator query(Context context, String query, Object[] parameters)
             throws SQLException
     {
         if (log.isDebugEnabled())
@@ -158,14 +255,63 @@ public class DatabaseManager
             log.debug("Running query \"" + query + "\"");
         }
 
-        Statement statement = context.getDBConnection().createStatement();
+        PreparedStatement statement = context.getDBConnection().prepareStatement(query);
+        loadParameters(statement,parameters);
+        
+        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery());
 
-        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(query));
-
+        
         retTRI.setStatement(statement);
         return retTRI;
     }
+    
+    // FIXME: remove for java 1.5.
+    public static TableRowIterator query(Context context, String query)
+    throws SQLException
+    {
+    	return query(context,query,new Object[0]);
+    }
+    
+    // FIXME: remove for java 1.5.
+    public static TableRowIterator query(Context context, String query, String string1)
+    throws SQLException
+    {
+    	Object[] parameters = {string1};
+    	return query(context,query,parameters);
+    }
+    
+    // FIXME: remove for java 1.5.
+    public static TableRowIterator query(Context context, String query, String string1, String string2)
+    throws SQLException
+    {
+    	Object[] parameters = {string1,string2};
+    	return query(context,query,parameters);
+    }
+    
+    // FIXME: remove for java 1.5.
+    public static TableRowIterator query(Context context, String query, int int1)
+    throws SQLException
+    {
+    	Object[] parameters = {Integer.valueOf(int1)};
+    	return query(context,query,parameters);
+    }    
 
+    // FIXME: remove for java 1.5.
+    public static TableRowIterator query(Context context, String query, int int1, int int2)
+    throws SQLException
+    {
+    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2)};
+    	return query(context,query,parameters);
+    }    
+    
+    // FIXME: remove for java 1.5.
+    public static TableRowIterator query(Context context, String query, String string1, int int2)
+    throws SQLException
+    {
+    	Object[] parameters = {string1,Integer.valueOf(int2)};
+    	return query(context,query,parameters);
+    }
+    
     /**
      * Return an iterator with the results of executing statement. The table
      * parameter indicates the type of result. If table is null, the column
@@ -176,11 +322,15 @@ public class DatabaseManager
      *            The prepared statement to execute.
      * @param table
      *            The name of the table which results
+     * @param parameters
+     * 			  A set of SQL parameters to be included in query. The order of 
+     * 			  the parameters must correspond to the order of their reference 
+     * 			  within the query.
      * @return A TableRowIterator with the results of the query
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRowIterator query(String table,
+    public static TableRowIterator queryPreparedTable(String table,
             PreparedStatement statement) throws SQLException
     {
         TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(),
@@ -200,7 +350,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRowIterator query(PreparedStatement statement)
+    public static TableRowIterator queryPrepared(PreparedStatement statement)
             throws SQLException
     {
         TableRowIterator retTRI = new TableRowIterator(statement.executeQuery());
@@ -217,20 +367,60 @@ public class DatabaseManager
      *            Current DSpace context
      * @param query
      *            The SQL query
+     * @param parameters
+     * 			  A set of SQL parameters to be included in query. The order of 
+     * 			  the parameters must correspond to the order of their reference 
+     * 			  within the query.
+
      * @return A TableRow object, or null if no result
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRow querySingle(Context context, String query)
+//    FIXME: Use the following prototype when we switch to java 1.5 and remove the 
+//    other varants of the methods.
+//public static TableRow querySingle(Context context, String query, Object ... parameters)
+//throws SQLException
+    public static TableRow querySingle(Context context, String query, Object[] parameters)
             throws SQLException
     {
-        TableRowIterator iterator = query(context, query);
+        TableRowIterator iterator = query(context, query, parameters);
 
         TableRow retRow = (!iterator.hasNext()) ? null : iterator.next();
         iterator.close();
         return (retRow);
     }
 
+    // FIXME: Remove for java 1.5
+    public static TableRow querySingle(Context context, String query)
+    throws SQLException
+	{
+    	return querySingle(context,query,new Object[0]);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static TableRow querySingle(Context context, String query, String string1)
+    throws SQLException
+	{
+    	Object[] parameters = {string1};
+    	return querySingle(context,query,parameters);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static TableRow querySingle(Context context, String query, int int1)
+    throws SQLException
+	{
+    	Object[] parameters = {Integer.valueOf(int1)};
+    	return querySingle(context,query,parameters);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static TableRow querySingle(Context context, String query, int int1, int int2)
+    throws SQLException
+	{
+    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2)};
+    	return querySingle(context,query,parameters);
+	}
+    
     /**
      * Return the single row result to this query, or null if no result. If more
      * than one row results, only the first is returned.
@@ -241,20 +431,58 @@ public class DatabaseManager
      *            The name of the table which results
      * @param query
      *            The SQL query
+     * @param parameters
+     * 			  A set of SQL parameters to be included in query. The order of 
+     * 			  the parameters must correspond to the order of their reference 
+     * 			  within the query.
      * @return A TableRow object, or null if no result
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRow querySingle(Context context, String table,
-            String query) throws SQLException
+//  FIXME: Use the following prototype when we switch to java 1.5 and remove the 
+//  other varants of the methods.
+//public static TableRow querySingleTable(Context context, String table,
+//String query, Object ... parameters) throws SQLException
+    public static TableRow querySingleTable(Context context, String table,
+            String query, Object[] parameters) throws SQLException
     {
-        TableRowIterator iterator = query(context, canonicalize(table), query);
+        TableRowIterator iterator = queryTable(context, canonicalize(table), query, parameters);
 
         TableRow retRow = (!iterator.hasNext()) ? null : iterator.next();
         iterator.close();
         return (retRow);
     }
 
+    // FIXME: Remove for java 1.5
+    public static TableRow querySingleTable(Context context, String table, String query) throws SQLException
+	{
+    	return querySingleTable(context,table,query,new Object[0]);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static TableRow querySingleTable(Context context, String table, String query, 
+    		String string1) throws SQLException
+	{
+    	Object[] parameters = {string1};
+    	return querySingleTable(context,table,query,parameters);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static TableRow querySingleTable(Context context, String table, String query, 
+    		int int1) throws SQLException
+	{
+    	Object[] parameters = {Integer.valueOf(int1)};
+    	return querySingleTable(context,table,query,parameters);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static TableRow querySingleTable(Context context, String table, String query, 
+    		int int1, int int2) throws SQLException
+	{
+    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2)};
+    	return querySingleTable(context,table,query,parameters);
+	}    
+    
     /**
      * Execute an update, insert or delete query. Returns the number of rows
      * affected by the query.
@@ -263,14 +491,22 @@ public class DatabaseManager
      *            Current DSpace context
      * @param query
      *            The SQL query to execute
+     * @param parameters
+     * 			  A set of SQL parameters to be included in query. The order of 
+     * 			  the parameters must correspond to the order of their reference 
+     * 			  within the query.
      * @return The number of rows affected by the query.
      * @exception SQLException
      *                If a database error occurs
      */
-    public static int updateQuery(Context context, String query)
+//  FIXME: Use the following prototype when we switch to java 1.5 and remove the 
+//  other varants of the methods.
+//public static int updateQuery(Context context, String query, Object ... parameters)
+//throws SQLException
+    public static int updateQuery(Context context, String query, Object[] parameters)
             throws SQLException
     {
-        Statement statement = null;
+        PreparedStatement statement = null;
 
         if (log.isDebugEnabled())
         {
@@ -278,10 +514,11 @@ public class DatabaseManager
         }
 
         try
-        {
-            statement = context.getDBConnection().createStatement();
-
-            return statement.executeUpdate(query);
+        {        	
+        	statement = context.getDBConnection().prepareStatement(query);
+        	loadParameters(statement,parameters);
+        	
+        	return statement.executeUpdate(query);
         }
         finally
         {
@@ -298,6 +535,44 @@ public class DatabaseManager
         }
     }
 
+    // FIXME: Remove for java 1.5
+    public static int updateQuery(Context context, String query) throws SQLException
+	{
+    	return updateQuery(context,query,new Object[0]);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static int updateQuery(Context context, String query, 
+    		String string1) throws SQLException
+	{
+    	Object[] parameters = {string1};
+    	return updateQuery(context,query,parameters);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static int updateQuery(Context context, String query, 
+    		int int1) throws SQLException
+	{
+    	Object[] parameters = { Integer.valueOf(int1) };
+    	return updateQuery(context,query,parameters);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static int updateQuery(Context context, String query, 
+    		int int1, int int2) throws SQLException
+	{
+    	Object[] parameters = { Integer.valueOf(int1), Integer.valueOf(int2) };
+    	return updateQuery(context,query,parameters);
+	}
+    
+    // FIXME: Remove for java 1.5
+    public static int updateQuery(Context context, String query, 
+    		int int1, int int2, int int3) throws SQLException
+	{
+    	Object[] parameters = { Integer.valueOf(int1), Integer.valueOf(int2) };
+    	return updateQuery(context,query,parameters);
+	}
+    
     /**
      * Create a new row in the given table, and assigns a unique id.
      * 
@@ -361,21 +636,17 @@ public class DatabaseManager
     public static TableRow findByUnique(Context context, String table,
             String column, String value) throws SQLException
     {
-        // Fix common error--value ends with \. Escape this with an extra \.
-        if (value.endsWith("\\"))
-        {
-            value = value + "\\";
-        }
-
         String ctable = canonicalize(table);
 
-        // Need a pair of single quote marks:
-        // MessageFormat treats this: '{2}' as the literal {2}
-        String sql = MessageFormat.format(
-                "select * from {0} where {1} = ''{2}''", new Object[] { ctable,
-                        column, value });
+        if ( ! DB_SAFE_NAME.matcher(ctable).matches())
+        	throw new SQLException("Unable to execute select query because table name ("+ctable+") contains non alphanumeric characters.");
 
-        return querySingle(context, ctable, sql);
+        if ( ! DB_SAFE_NAME.matcher(column).matches())
+        	throw new SQLException("Unable to execute select query because column name ("+column+") contains non alphanumeric characters.");
+        
+        String sql = "select * from " + ctable + " where "+ column +" = ? ";
+
+        return querySingleTable(context, ctable, sql, value);
     }
 
     /**
@@ -422,13 +693,15 @@ public class DatabaseManager
     {
         String ctable = canonicalize(table);
 
-        // Need a pair of single quote marks:
-        // MessageFormat treats this: '{2}' as the literal {2}
-        String sql = MessageFormat.format(
-                "delete from {0} where {1} = ''{2}''", new Object[] { ctable,
-                        column, value });
+        if ( ! DB_SAFE_NAME.matcher(ctable).matches())
+        	throw new SQLException("Unable to execute delete query because table name ("+ctable+") contains non alphanumeric characters.");
 
-        return updateQuery(context, sql);
+        if ( ! DB_SAFE_NAME.matcher(column).matches())
+        	throw new SQLException("Unable to execute delete query because column name ("+column+") contains non alphanumeric characters.");
+        
+        String sql = "delete from "+ctable+" where "+column+" = ? ";
+
+        return updateQuery(context, sql, value);
     }
 
     /**
@@ -1118,7 +1391,7 @@ public class DatabaseManager
         try
         {
             statement = connection.prepareStatement(sql);
-
+        	
             int count = 0;
 
             for (Iterator iterator = columns.iterator(); iterator.hasNext();)
@@ -1333,6 +1606,8 @@ public class DatabaseManager
             {
                 maxIdle = -1;
             }
+            
+            boolean useStatementPool = ConfigurationManager.getBooleanProperty("db.statementpool",true);
 
             // Create object pool
             ObjectPool connectionPool = new GenericObjectPool(null, // PoolableObjectFactory
@@ -1366,10 +1641,30 @@ public class DatabaseManager
                 validationQuery = "SELECT 1 FROM DUAL";
             }
 
+            GenericKeyedObjectPoolFactory statementFactory = null;
+            if (useStatementPool)
+            {
+	            // The statement Pool is used to pool prepared statements.
+	            GenericKeyedObjectPool.Config statementFactoryConfig = new GenericKeyedObjectPool.Config();
+	            // Just grow the pool size when needed. 
+	            // 
+	            // This means we will never block when attempting to 
+	            // create a query. The problem is unclosed statements, 
+	            // they can never be reused. So if we place a maximum 
+	            // cap on them, then we might reach a condition where 
+	            // a page can only be viewed X number of times. The 
+	            // downside of GROW_WHEN_EXHAUSTED is that this may 
+	            // allow a memory leak to exist. Both options are bad, 
+	            // but I'd prefer a memory leak over a failure.
+	            //
+	            // FIXME: Perhaps this decision should be derived from config parameters?
+	            statementFactoryConfig.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_GROW;
+	
+	            statementFactory = new GenericKeyedObjectPoolFactory(null,statementFactoryConfig);
+            }
+            
             PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(
-                    connectionFactory, connectionPool, null, // no
-                                                             // preparedstatement
-                    // pooling for now
+                    connectionFactory, connectionPool, statementFactory,
                     validationQuery, // validation query
                     false, // read only is not default for now
                     false); // Autocommit defaults to none
@@ -1401,6 +1696,82 @@ public class DatabaseManager
             throw new SQLException(e.toString());
         }
     }
+
+	/**
+	 * Iterate over the given parameters and add them to the given prepared statement. 
+	 * Only a select number of datatypes are supported by the JDBC driver.
+	 *
+	 * @param statement
+	 * 			The unparameterized statement.
+	 * @param parameters
+	 * 			The parameters to be set on the statement.
+	 */
+	protected static void loadParameters(PreparedStatement statement, Object[] parameters) 
+	throws SQLException{
+		
+		statement.clearParameters();
+		
+	    for(int i=0; i < parameters.length; i++)
+	    {	
+	    	// Select the object we are setting.
+	    	Object parameter = parameters[i];
+	    	int idx = i+1; // JDBC starts counting at 1.
+	    	
+	    	if (parameter == null)
+	    	{
+	    		throw new SQLException("Attempting to insert null value into SQL query.");
+	    	}
+	    	if (parameter instanceof String)
+	    	{
+	    		statement.setString(idx,(String) parameters[i]);
+	    	}
+	    	else if (parameter instanceof Integer)
+	    	{
+	    		int ii = ((Integer) parameter).intValue();
+	    		statement.setInt(idx,ii);
+	    	}
+	    	else if (parameter instanceof Double)
+	    	{
+	    		double d = ((Double) parameter).doubleValue();
+	    		statement.setDouble(idx,d);
+	    	}
+	    	else if (parameter instanceof Float)
+	    	{
+	    		float f = ((Float) parameter).floatValue();
+	    		statement.setFloat(idx,f);
+	    	}
+	    	else if (parameter instanceof Short)
+	    	{
+	    		short s = ((Short) parameter).shortValue();
+	    		statement.setShort(idx,s);
+	    	}
+	    	else if (parameter instanceof Long)
+	    	{
+	    		long l = ((Long) parameter).longValue();
+	    		statement.setLong(idx,l);
+	    	}
+	    	else if (parameter instanceof Date)
+	    	{
+	    		Date date = (Date) parameter;
+	    		statement.setDate(idx,date);
+	    	}
+	    	else if (parameter instanceof Time)
+	    	{
+	    		Time time = (Time) parameter;
+	    		statement.setTime(idx,time);
+	    	}
+	    	else if (parameter instanceof Timestamp)
+	    	{
+	    		Timestamp timestamp = (Timestamp) parameter;
+	    		statement.setTimestamp(idx,timestamp);
+	    	}
+	    	else
+	    	{
+	    		throw new SQLException("Attempting to insert unknown datatype ("+parameter.getClass().getName()+") into SQL statement.");
+	    	}        	
+	    }
+	}
+
 }
 
 /**
