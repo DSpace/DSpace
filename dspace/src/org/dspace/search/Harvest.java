@@ -148,13 +148,13 @@ public class Harvest
         	{
         		query += " AND collection2item.collection_id= ? " +
         	             " AND collection2item.item_id=handle.resource_id ";
-        		parameters.add(Integer.valueOf(scope.getID()));
+        		parameters.add(new Integer(scope.getID()));
         	}
         	else if (scope.getType() == Constants.COMMUNITY)
         	{
         		query += " AND community2item.community_id= ? " +
 						 " AND community2item.item_id=handle.resource_id";
-        		parameters.add(Integer.valueOf(scope.getID()));
+        		parameters.add(new Integer(scope.getID()));
         	}
         }      
                 

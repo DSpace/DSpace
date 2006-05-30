@@ -456,7 +456,7 @@ public class Group extends DSpaceObject
         {
             int groupID = ((Integer) i.next()).intValue();
 
-            parameters[idx++] = groupID;
+            parameters[idx++] = new Integer(groupID);
             
             groupQuery += "child_id= ? ";
             if (i.hasNext())
@@ -565,7 +565,7 @@ public class Group extends DSpaceObject
         Iterator i = groupIDs.iterator();
 
         // don't forget to add the current group to this query!
-        parameters[idx++] = g.getID();
+        parameters[idx++] = new Integer(g.getID());
         String epersonQuery = "eperson_group_id= ? ";
         if (i.hasNext())
             epersonQuery += " OR ";
@@ -573,7 +573,7 @@ public class Group extends DSpaceObject
         while (i.hasNext())
         {
             int groupID = ((Integer) i.next()).intValue();
-            parameters[idx++] = groupID;
+            parameters[idx++] = new Integer(groupID);
             
             epersonQuery += "eperson_group_id= ? ";
             if (i.hasNext())

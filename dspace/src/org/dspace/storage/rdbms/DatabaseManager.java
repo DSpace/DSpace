@@ -66,9 +66,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Pattern;
 
 import org.apache.commons.dbcp.ConnectionFactory;
@@ -192,7 +190,7 @@ public class DatabaseManager
     public static TableRowIterator queryTable(Context context, String table,
     String query, int int1 ) throws SQLException
     {
-    	Object[] parameters = { Integer.valueOf(int1) };
+    	Object[] parameters = { new Integer(int1) };
     	return queryTable(context,table,query,parameters);
     }
     
@@ -200,7 +198,7 @@ public class DatabaseManager
     public static TableRowIterator queryTable(Context context, String table,
     String query, int int1, int int2 ) throws SQLException
     {
-    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2)};
+    	Object[] parameters = {new Integer(int1), new Integer(int2)};
     	return queryTable(context,table,query,parameters);
     }
     
@@ -208,7 +206,7 @@ public class DatabaseManager
     public static TableRowIterator queryTable(Context context, String table,
     String query, int int1, int int2, int int3) throws SQLException
     {
-    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2), Integer.valueOf(int3)};
+    	Object[] parameters = {new Integer(int1), new Integer(int2), new Integer(int3)};
     	return queryTable(context,table,query,parameters);
     }
     
@@ -216,7 +214,7 @@ public class DatabaseManager
     public static TableRowIterator queryTable(Context context, String table,
     String query, int int1, String string2) throws SQLException
     {
-    	Object[] parameters = {Integer.valueOf(int1), string2};
+    	Object[] parameters = {new Integer(int1), string2};
     	return queryTable(context,table,query,parameters);
     }
     
@@ -224,7 +222,7 @@ public class DatabaseManager
     public static TableRowIterator queryTable(Context context, String table,
     String query, int int1, String string2, String string3) throws SQLException
     {
-    	Object[] parameters = {Integer.valueOf(int1), string2,string3};
+    	Object[] parameters = {new Integer(int1), string2, string3};
     	return queryTable(context,table,query,parameters);
     }
     
@@ -292,7 +290,7 @@ public class DatabaseManager
     public static TableRowIterator query(Context context, String query, int int1)
     throws SQLException
     {
-    	Object[] parameters = {Integer.valueOf(int1)};
+    	Object[] parameters = {new Integer(int1)};
     	return query(context,query,parameters);
     }    
 
@@ -300,7 +298,7 @@ public class DatabaseManager
     public static TableRowIterator query(Context context, String query, int int1, int int2)
     throws SQLException
     {
-    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2)};
+    	Object[] parameters = {new Integer(int1), new Integer(int2)};
     	return query(context,query,parameters);
     }    
     
@@ -308,7 +306,7 @@ public class DatabaseManager
     public static TableRowIterator query(Context context, String query, String string1, int int2)
     throws SQLException
     {
-    	Object[] parameters = {string1,Integer.valueOf(int2)};
+    	Object[] parameters = {string1,new Integer(int2)};
     	return query(context,query,parameters);
     }
     
@@ -409,7 +407,7 @@ public class DatabaseManager
     public static TableRow querySingle(Context context, String query, int int1)
     throws SQLException
 	{
-    	Object[] parameters = {Integer.valueOf(int1)};
+    	Object[] parameters = {new Integer(int1)};
     	return querySingle(context,query,parameters);
 	}
     
@@ -417,7 +415,7 @@ public class DatabaseManager
     public static TableRow querySingle(Context context, String query, int int1, int int2)
     throws SQLException
 	{
-    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2)};
+    	Object[] parameters = {new Integer(int1), new Integer(int2)};
     	return querySingle(context,query,parameters);
 	}
     
@@ -471,7 +469,7 @@ public class DatabaseManager
     public static TableRow querySingleTable(Context context, String table, String query, 
     		int int1) throws SQLException
 	{
-    	Object[] parameters = {Integer.valueOf(int1)};
+    	Object[] parameters = {new Integer(int1)};
     	return querySingleTable(context,table,query,parameters);
 	}
     
@@ -479,7 +477,7 @@ public class DatabaseManager
     public static TableRow querySingleTable(Context context, String table, String query, 
     		int int1, int int2) throws SQLException
 	{
-    	Object[] parameters = {Integer.valueOf(int1), Integer.valueOf(int2)};
+    	Object[] parameters = {new Integer(int1), new Integer(int2)};
     	return querySingleTable(context,table,query,parameters);
 	}    
     
@@ -553,7 +551,7 @@ public class DatabaseManager
     public static int updateQuery(Context context, String query, 
     		int int1) throws SQLException
 	{
-    	Object[] parameters = { Integer.valueOf(int1) };
+    	Object[] parameters = { new Integer(int1) };
     	return updateQuery(context,query,parameters);
 	}
     
@@ -561,7 +559,7 @@ public class DatabaseManager
     public static int updateQuery(Context context, String query, 
     		int int1, int int2) throws SQLException
 	{
-    	Object[] parameters = { Integer.valueOf(int1), Integer.valueOf(int2) };
+    	Object[] parameters = { new Integer(int1), new Integer(int2) };
     	return updateQuery(context,query,parameters);
 	}
     
@@ -569,7 +567,7 @@ public class DatabaseManager
     public static int updateQuery(Context context, String query, 
     		int int1, int int2, int int3) throws SQLException
 	{
-    	Object[] parameters = { Integer.valueOf(int1), Integer.valueOf(int2) };
+    	Object[] parameters = { new Integer(int1), new Integer(int2) };
     	return updateQuery(context,query,parameters);
 	}
     
