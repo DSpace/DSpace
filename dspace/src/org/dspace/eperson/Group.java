@@ -703,10 +703,11 @@ public class Group extends DSpaceObject
             s = "name";
         }
 
+        // NOTE: The use of 's' in the order by clause can not cause an sql 
+        // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.queryTable(
         		context, "epersongroup",
-                "SELECT * FROM epersongroup ORDER BY ? ", 
-                s);
+                "SELECT * FROM epersongroup ORDER BY "+s);
 
         List gRows = rows.toList();
 

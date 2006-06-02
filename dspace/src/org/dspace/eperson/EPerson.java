@@ -249,9 +249,10 @@ public class EPerson extends DSpaceObject
             s = "lastname";
         }
 
+        // NOTE: The use of 's' in the order by clause can not cause an sql 
+        // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.query(context,
-                "SELECT * FROM eperson ORDER BY ? ",
-                s);
+                "SELECT * FROM eperson ORDER BY "+s);
 
         List epeopleRows = rows.toList();
 
