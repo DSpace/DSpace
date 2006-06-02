@@ -516,7 +516,7 @@ public class DatabaseManager
         	statement = context.getDBConnection().prepareStatement(query);
         	loadParameters(statement,parameters);
         	
-        	return statement.executeUpdate(query);
+        	return statement.executeUpdate();
         }
         finally
         {
