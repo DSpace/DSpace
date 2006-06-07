@@ -14,6 +14,7 @@
 - Fixes for Oracle database_schema.sql
 
 (Scott Yeadon)
+- Fix to QDCCrosswalk so type attribute is not ignored
 - SF Patch #1469235 - default language is not applied, fixes bug #1358144 
 - Show bundle names on item authorization page
 - SF bug #1456540 - incorrect link in list-metadata-fields.jsp

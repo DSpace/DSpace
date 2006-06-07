@@ -196,7 +196,28 @@ public class QDCCrosswalk extends SelfNamedPlugin
         Namespace ns = element.getNamespace();
         if (ns != null)
             prefix = ns.getPrefix() + ":";
-        return prefix+element.getName();
+        
+        String tagName;
+        String nsQualifier = element.getAttributeValue("type", DisseminationCrosswalk.XSI_NS);
+        
+        if (nsQualifier == null || nsQualifier.length() < 1)
+        {
+            String qualifier = element.getAttributeValue("type");
+            if (qualifier == null || qualifier.length() < 1)
+            {
+            	tagName = prefix+element.getName();
+            }
+            else
+            {
+            	tagName = prefix+element.getName()+qualifier;
+            }
+        }
+        else
+        {
+        	tagName = prefix+element.getName()+nsQualifier;
+        }
+        
+        return tagName;
     }
 
     /**
