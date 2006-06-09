@@ -1,5 +1,8 @@
 1.4 beta 1
 ==========
+(Scott Phillips)
+- Rework of DB code to use prepared statements for improved security and performance
+
 (Lieven Droogmans, Ben Bosman)
 - SF Patch #1468197 - Filter out mapped items from browse list, fixes bug #1455674 and addresses a symptom of bug #1456553
 
