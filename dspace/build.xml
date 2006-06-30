@@ -271,6 +271,9 @@ Copied language packs into ${dspace.dir}/config
     <copy file="etc/log4j.build.properties"
           tofile="${dspace.dir}/config/log4j.properties"
           preservelastmodified="true"/>
+  	<copy file="${config}"
+  			tofile="${dspace.dir}/config/dspace.cfg"
+  			preservelastmodified="true" />
   </target>
 
 
