@@ -307,6 +307,7 @@ public class Packager
                 context.abort();
                 e.printStackTrace();
                 System.out.println(e);
+                System.exit(1);
             }
         }
         else
