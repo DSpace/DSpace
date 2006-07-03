@@ -49,7 +49,6 @@
 -------------------------------------------------------------------------------
 CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
-CREATE SEQUENCE tasklistitem_seq;
 
 ------------------------------------------------------
 -- Group2Group table, records group membership in other groups
@@ -321,7 +320,8 @@ select most_recent_checksum.bitstream_id,
      most_recent_checksum.last_process_end_date,
      date_trunc('milliseconds', now()),
       most_recent_checksum.expected_checksum,
-      most_recent_checksum.expected_checksum;
+      most_recent_checksum.expected_checksum
+from most_recent_checksum;
 
 -- update the history to indicate that this was 
 -- the first time the software was installed
@@ -374,13 +374,3 @@ SELECT Communities2Item.community_id, ItemsBySubject.*
 FROM ItemsBySubject, Communities2Item
 WHERE ItemsBySubject.item_id = Communities2Item.item_id
 ;
-
--------------------------------------------------------
---  TasklistItem table
--------------------------------------------------------
-CREATE TABLE TasklistItem
-(
-  tasklist_id	INTEGER PRIMARY KEY,
-  eperson_id	INTEGER REFERENCES EPerson(eperson_id),
-  workflow_id	INTEGER REFERENCES WorkflowItem(workflow_id)
-);

@@ -1,3 +1,6 @@
+(Scott Yeadon)
+- Fixed typo in 13-14 upgrade docs and checksum checker sql, and removed tasklist sql
+
 (Claudia Jürgen)
 - SF patch #1514965 fixes SF bug #1505422. fix typo in SQL for item mapper
 
