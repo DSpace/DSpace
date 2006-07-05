@@ -209,22 +209,15 @@ public class EPerson extends DSpaceObject
 
     /**
      * Retrieve all e-person records from the database, sorted by a particular
-     * field. Fields are: <<<<<<< EPerson.java
+     * field. Fields are:
      * <ul>
      * <li><code>ID</code></li>
      * <li><code>LASTNAME</code></li>
      * <li><code>EMAIL</code></li>
      * <li><code>NETID</code></li>
      * </ul>
-     * =======
-     * <UL>
-     * <LI><code>ID</code></LI>
-     * <LI><code>LASTNAME</code></LI>
-     * <LI><code>EMAIL</code></LI>
-     * <LI><code>NETID</code></LI>
-     * </UL>
      * 
-     * @return array of EPerson objects >>>>>>> 1.27
+     * @return array of EPerson objects
      */
     public static EPerson[] findAll(Context context, int sortField)
             throws SQLException
