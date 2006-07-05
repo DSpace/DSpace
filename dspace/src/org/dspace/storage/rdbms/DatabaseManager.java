@@ -567,7 +567,7 @@ public class DatabaseManager
     public static int updateQuery(Context context, String query, 
     		int int1, int int2, int int3) throws SQLException
 	{
-    	Object[] parameters = { new Integer(int1), new Integer(int2) };
+    	Object[] parameters = { new Integer(int1), new Integer(int2), new Integer(int3) };
     	return updateQuery(context,query,parameters);
 	}
     
