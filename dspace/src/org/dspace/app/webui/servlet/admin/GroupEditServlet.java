@@ -261,7 +261,6 @@ public class GroupEditServlet extends DSpaceServlet
                 group.delete();
 
                 showMainPage(c, request, response);
-                c.complete();
             }
             else
             {
