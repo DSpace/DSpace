@@ -54,6 +54,14 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 
+/**
+ * A command-line tool for setting/removing community/sub-community
+ * relationships. Takes community DB Id or handle arguments as inputs.
+ * 
+ * @author rrodgers
+ * @version $Revision$
+ */
+
 public class CommunityFiliator
 {
     public static void main(String[] argv) throws Exception
