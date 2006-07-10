@@ -38,19 +38,22 @@
           <li><code>bin/</code> - Some shell and Perl scripts for running DSpace command-line tasks</li>
           <li><code>config/</code> - configuration files
             <ul>
+              <li><code>controlled-vocabularies/</code> - Fixed, limited vocabularies used in metadata entry</li>
+              <li><code>crosswalks/</code> - Metadata crosswalks - property files or XSL stylesheets</li>
               <li><code>dspace.cfg</code> - main DSpace configuration file</li>
               <li><code>dc2mods.cfg</code> - Mappings from Dublin Core metadata to <A HREF="http://www.loc.gov/standards/mods/">MODS</A> for the METS export</li>
               <li><code>default.license</code>  - default license that users must grant when submitting items</li>
-              <li><code>dstat.cfg</code>, <code>dspace.map</code> - statistical report configuration</li>
+              <li><code>dstat.cfg</code>, <code>dstat.map</code> - statistical report configuration</li>
               <li><code>input-forms.xml</code> - Submission UI metadata field configuration</li>
               <li><code>news-side.html</code> - Text of the front-page news in the sidebar</li>
               <li><code>news-top.html</code> - Text of the front-page news in the top box</li>
-              <li><code>emails/</code> - Texts of emails sent out by the system</li>
+              <li><code>emails/</code> - Text and layout templates for emails sent out by the system</li>
               <li><code>language-packs/</code> - contains "dictionary files" -- Java properties files that contain user interface text in different languages</li>
               <li><code>registries/</code> - <strong>initial</strong> contents of the bitstream format registry and Dublin Core element/qualifier registry.  These are only used on initial system setup, after which they are maintained in the database.</li>
               <li><code>templates/</code> - configuration files for libraries and external applications (e.g. Apache, Tomcat) are kept and edited here.  They can refer to properties in the main DSpace configuration - have a look at a couple.  When they're updated, a command line tool fills out these files with appropriate values from dspace.cfg, and copies them to their appropriate location (hence "templates".)</li>
             </ul>
           </li>
+          <li><code>docs/</code> - DSpace system documentation. The technical documentation for functionality, installation, configuration, etc.</li>
           <li><code>etc/</code> - miscelleanous stuff need to install DSpace that isn't really to do with system configuration - e.g. the PostgreSQL database schema, and a couple of configuration files that are used during the build process but not by the live system.  Also contains the deployment descriptors (<code>web.xml</code> files) for the Web UI and OAI-PMH support <code>.war</code> files.
             <ul>
               <li><code>oracle/</code> - versions of the database schema and updater SQL scripts for Oracle</li>
