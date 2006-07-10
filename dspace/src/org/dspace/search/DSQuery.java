@@ -66,6 +66,11 @@ import org.dspace.core.LogManager;
 // issues
 // need to filter query string for security
 // cmd line query needs to process args correctly (seems to split them up)
+/**
+ * DSIndexer contains various static methods for performing queries on indices,
+ * for collections and communities.
+ *
+ */
 public class DSQuery
 {
     // Result types
