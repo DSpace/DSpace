@@ -126,6 +126,12 @@
     </tbody>
   </table>
 
+  <h2><a name="plugin" id="plugin">Plugin Manager</a></h2>
+
+  <p>The PluginManager is a very simple component container. It creates and organizes components (plugins), and helps select a plugin in the cases where there are many possible choices. It also gives some limited control over the lifecycle of a plugin.</p>
+  <p>A plugin is defined by a Java interface. The consumer of a plugin asks for its plugin by interface. A Plugin is an instance of any class that implements the plugin interface. It is interchangeable with other implementations, so that any of them may be "plugged in".</p>
+  <p>The mediafilter is a simple example of a plugin implementation. Refer to the <a href="business.html#plugin">Business Logic Layer<a> for more details on Plugins.</p>
+
   <h2><a name="metadata" id="metadata">Metadata</a></h2>
 
   <p>Broadly speaking, DSpace holds three sorts of metadata about archived content:</p>
@@ -134,9 +140,9 @@
     <dt>Descriptive Metadata</dt>
 
     <dd>
-      <p>Each <em>Item</em> has one qualified Dublin Core metadata record. The <a href="http://dspace.org/technology/metadata.html">set of elements and qualifiers used by MIT Libraries</a> is the default configuration included in the DSpace source code. These are loosely based on the <a href="http://www.dublincore.org/documents/library-application-profile/">Library Application Profile</a> set of elements and qualifiers, though there are some differences.</p>
+	<p>DSpace can support multiple flat metadata schemas for describing an item. <p>A qualified Dublin Core metadata schema loosely based on the <a href="http://www.dublincore.org/documents/library-application-profile/">Library Application Profile</a> set of elements and qualifiers is provided by default. The <a href="http://dspace.org/technology/metadata.html">set of elements and qualifiers used by MIT Libraries</a> comes pre-configured with the DSpace source code. However, you can configure multiple schemas and select metadata fields from a mix of configured schemas to describe your items.</p>
 
-      <p>Other descriptive metadata about items may be held in serialized bitstreams. <em>Communities</em> and <em>collections</em> have some simple descriptive metadata (a name, and some descriptive prose), held in the DBMS.</p>
+      <p>Other descriptive metadata about items (e.g. metadata described in a hierarchical schema) may be held in serialized bitstreams. <em>Communities</em> and <em>collections</em> have some simple descriptive metadata (a name, and some descriptive prose), held in the DBMS.</p>
     </dd>
 
     <dt>Administrative Metadata</dt>
@@ -179,6 +185,15 @@
   </ul>
 
   <p>E-people authenticate with username/password pairs, X509 certificates (by configuring the X509 certificate authentication module) or LDAP. E-people can be members of 'groups' to make administrator's lives easier when manipulating authorization policies.</p>
+
+  <h2><a name="authentication" id="authentication">Authentication</a></h2>
+
+  <p>DSpace provides a Stackable Authentication mechanism where authenticators are deployed in a "stack" and tried each in order, instead of configuring a single authentication method. This meachanism provides:
+  <ul>
+	<li>Separate authentication from the Web user interface so the same code can be used for e.g. non-interactive Web Services</li>
+	<li>Improved modularity: No authenticator needs to know about any other authenticator. Custom authentication methods can be "stacked" with the default DSpace username/password method</li>
+	<li>Cleaner support for "implicit" authentication where username is found in the environment of a Web request, e.g. in an X.509 client certificate</li>
+  </ul></p>
 
   <h2><a name="auth" id="auth">Authorization</a></h2>
 
