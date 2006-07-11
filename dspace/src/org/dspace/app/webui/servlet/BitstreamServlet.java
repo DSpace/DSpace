@@ -70,7 +70,7 @@ import org.dspace.handle.HandleManager;
 public class BitstreamServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(RetrieveServlet.class);
+    private static Logger log = Logger.getLogger(BitstreamServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
