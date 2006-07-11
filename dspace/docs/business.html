@@ -325,6 +325,365 @@ NS1234</PRE>
     </TABLE>
 
 
+    <h2><a name="plugin">Plugin Manager</a></h2>
+
+    <p>The PluginManager is a very simple component container. It creates and organizes components (plugins), and helps select a plugin in the cases where there are many possible choices. It also gives some limited control over the lifecycle of a plugin.</p>
+
+    <h3>Concepts</h3>
+
+    <p>The following terms are important in understanding the rest of this section:
+
+    <ul>
+    <li><strong>Plugin Interface</strong>
+    <p>A Java interface, the defining characteristic of a plugin. The consumer of a plugin asks for its plugin by interface.</p></li>
+    <li><strong>Plugin</strong>
+
+    <p>a.k.a. Component, this is an instance of a class that implements a certain interface. It is interchangeable with other implementations, so that any of them may be "plugged in", hence the name. A Plugin is an instance of any class that implements the plugin interface.</p></li>
+
+    <li><strong>Implementation class</strong>
+
+    <p>The actual class of a plugin. It may implement several plugin interfaces, but must implement at least one.</p></li>
+
+   <li><strong>Name</strong>
+
+    <p>Plugin implementations can be distinguished from each other by name, a short String meant to symbolically represent the implementation class. They are called "named plugins". Plugins only need to be named when the caller has to make an active choice between them.</p></li>
+
+    <li><strong>SelfNamedPlugin class</strong>
+
+    <p>Plugins that extend the <code>SelfNamedPlugin</code> class can take advantage of additional features of the Plugin Manager. Any class can be managed as a plugin, so it is not necessary, just possible.</p></li>
+
+    <li><strong>Reusable</strong>
+
+    <p>Reusable plugins are only instantiated once, and the Plugin Manager returns the same (cached) instance whenever that same plugin is requested again. This behavior can be turned off if desired.</p></li>
+    </ul></p>
+
+    <h3>Using the Plugin Manager</h3>
+
+    <h4>Types of Plugin</h4>
+
+    <p>The Plugin Manager supports three different patterns of usage: 
+    <ol>
+    <li><strong>Singleton Plugins</strong>
+
+    <p>There is only one implementation class for the plugin. It is indicated in the configuration. This type of plugin chooses an implementations of a service, for the entire system, at configuration time. Your application just fetches the plugin for that interface and gets the configured-in choice. See the <a href="#pluginmethods">getSinglePlugin()</a> method.</p></li>
+
+    <li><strong>Sequence Plugins</strong>
+
+    <p>You need a sequence or series of plugins, to implement a mechanism like Stackable Authentication or a pipeline, where each plugin is called in order to contribute its implementation of a process to the whole. The Plugin Manager supports this by letting you configure a sequence of plugins for a given interface. See the <a href="#pluginmethods">getPluginSequence()</a> method.</p></li>
+
+    <li><strong>Named Plugins</strong>
+
+    <p>Use a named plugin when the application has to choose one plugin implementation out of many available ones. Each implementation is bound to one or more names (symbolic identifiers) in the configuration.</p>
+
+    <p>The name is just a string to be associated with the combination of implementation class and interface. It may contain any characters except for comma (,) and equals (=). It may contain embedded spaces. Comma is a special character used to separate names in the configuration entry.</p>
+
+    <p>Names must be unique within an interface: No plugin classes implementing the same interface may have the same name.</p>
+
+    <p>Think of plugin names as a controlled vocabulary -- for a given plugin interface, there is a set of names for which plugins can be found. The designer of a Named Plugin interface is responsible for deciding what the name means and how to derive it; for example, names of metadata crosswalk plugins may describe the target metadata format.</p>
+
+    <p>See the <a href="#pluginmethods">getNamedPlugin()</a> method and the getPluginNames() methods.</p></li>
+    </ol></p>
+
+    <h4>Self-Named Plugins</h4>
+
+    <p>Named plugins can get their names either from the configuration or, for a variant called self-named plugins, from within the plugin itself.</p>
+
+    <p>Self-named plugins are necessary because one plugin implementation can be configured itself to take on many "personalities", each of which deserves its own plugin name. It is already managing its own configuration for each of these personalities, so it makes sense to allow it to export them to the Plugin Manager rather than expecting the plugin configuration to be kept in sync with it own configuration.</p>
+
+   <p>An example helps clarify the point: There is a named plugin that does crosswalks, call it <code>CrosswalkPlugin</code>. It has several implementations that crosswalk some kind of metadata. Now we add a new plugin which uses XSL stylesheet transformation (XSLT) to crosswalk many types of metadata -- so the single plugin can act like many different plugins, depending on which stylesheet it employs.</p>
+
+   <p>This XSLT-crosswalk plugin has its own configuration that maps a Plugin Name to a stylesheet -- it has to, since of course the Plugin Manager doesn't know anything about stylesheets. It becomes a self-named plugin, so that it reads its configuration data, gets the list of names to which it can respond, and passes those on to the Plugin Manager.</p>
+
+   <p>When the Plugin Manager creates an instance of the XSLT-crosswalk, it records the Plugin Name that was responsible for that instance. The plugin can look at that Name later in order to configure itself correctly for the Name that created it. This mechanism is all part of the SelfNamedPlugin class which is part of any self-named plugin.</p>
+
+   <h4>Obtaining a Plugin Instance</h4>
+
+   <p>The most common thing you will do with the Plugin Manager is obtain an instance of a plugin. To request a plugin, you must always specify the plugin interface you want. You will also supply a name when asking for a named plugin.</p>
+
+  <p>A sequence plugin is returned as an array of <code>Object</code>s since it is actually an ordered list of plugins.</p>
+
+  <p>See the <a href="#pluginmethods">getSinglePlugin(), getPluginSequence(), getNamedPlugin()</a> methods.<p>
+
+  <h4>Lifecycle Management</h4>
+
+  <p>When <code>PluginManager</code> fulfills a request for a plugin, it checks whether the implementation class is reusable; if so, it creates one instance of that class and returns it for every subsequent request for that interface and name. If it is not reusable, a new instance is always created.</p>
+
+  <p>For reasons that will become clear later, the manager actually caches a separate instance of an implementation class for each name under which it can be requested.</p>
+
+  <p>You can ask the <code>PluginManager</code> to forget about (decache) a plugin instance, by releasing it. See the <a href="#pluginmethods">PluginManager.releasePlugin()</a> method. The manager will drop its reference to the plugin so the garbage collector can reclaim it. The next time that plugin/name combination is requested, it will create a new instance.</p>
+
+  <h4>Getting Meta-Information</h4>
+
+  <p>The <code>PluginManager</code> can list all the names of the Named Plugins which implement an interface. You may need this, for example, to implement a menu in a user interface that presents a choice among all possible plugins. See the <a href="#pluginmethods">getPluginNames()</a> method.</p>
+
+  <p>Note that it only returns the plugin name, so if you need a more sophisticated or meaningful "label" (i.e. a key into the I18N message catalog) then you should add a method to the plugin itself to return that.</p>
+
+  <h3>Implementation</h3>
+
+  <p>Note: The <code>PluginManager</code> refers to interfaces and classes internally only by their names whenever possible, to avoid loading classes until absolutely necessary (i.e. to create an instance). As you'll see below, self-named classes still have to be loaded to query them for names, but for the most part it can avoid loading classes. This saves a lot of time at start-up and keeps the JVM memory footprint down, too. As the Plugin Manager gets used for more classes, this will become a greater concern.</code>
+
+  <p>The only downside of "on-demand" loading is that errors in the configuration don't get discovered right away. The solution is to call the <code>checkConfiguration()</code> method after making any changes to the configuration.</p>
+
+  <h4><a name="pluginmethods">PluginManager Class</a></h4>
+
+  <p>The <code>PluginManager</code> class is your main interface to the Plugin Manager. It behaves like a factory class that never gets instantiated, so its public methods are static.</p>
+
+  <p>Here are the public methods, followed by explanations:
+  <ul>
+  <li><pre>static Object getSinglePlugin(Class intface)
+    throws PluginConfigurationError;</pre>
+
+  <p>Returns an instance of the singleton (single) plugin implementing the given interface. There must be exactly one single plugin configured for this interface, otherwise the <code>PluginConfigurationError</code> is thrown.</p>
+
+  <p>Note that this is the only "get plugin" method which throws an exception. It is typically used at initialization time to set up a permanent part of the system so any failure is fatal.</p>
+
+  <p>See the <code>plugin.single</code> configuration key for configuration details.</p></li>
+
+  <li><code>static Object[] getPluginSequence(Class intface);</code>
+
+  <p>Returns instances of all plugins that implement the interface <code>intface</code>, in an <code>Array</code>. Returns an empty array if no there are no matching plugins.</p>
+
+  <p>The order of the plugins in the array is the same as their class names in the configuration's value field.</p>
+
+  <p>See the <code>plugin.sequence</code> configuration key for configuration details.</p></li>
+
+  <li><code>static Object getNamedPlugin(Class intface, String name);</code>
+
+  <p>Returns an instance of a plugin that implements the interface <code>intface</code> and is bound to a name matching name. If there is no matching plugin, it returns null. The names are matched by <code>String.equals()</code>.
+
+  <p>See the <code>plugin.named</code> and <code>plugin.selfnamed</code> configuration keys for configuration details.</p></li>
+
+  <li><code>static void releasePlugin(Object plugin);</code>
+
+  <p>Tells the Plugin Manager to let go of any references to a reusable plugin, to prevent it from being given out again and to allow the object to be garbage-collected. Call this when a plugin instance must be taken out of circulation.</p></li>
+
+  <li><code>static String[] getAllPluginNames(Class intface);</code>
+
+  <p>Returns all of the names under which a named plugin implementing the interface <code>intface</code> can be requested (with <code>getNamedPlugin()</code>). The array is empty if there are no matches. Use this to populate a menu of plugins for interactive selection, or to document what the possible choices are.</p>
+
+  <p>The names are NOT returned in any predictable order, so you may wish to sort them first.</p>
+
+  <p>Note: Since a plugin may be bound to more than one name, the list of names this returns does not represent the list of plugins. To get the list of unique implementation classes corresponding to the names, you might have to eliminate duplicates (i.e. create a Set of classes).</p></li>
+
+  <li><code>static void checkConfiguration();</code>
+
+  <p>Validates the keys in the DSpace <code>ConfigurationManager</code> pertaining to the Plugin Manager and reports any errors by logging them. This is intended to be used interactively by a DSpace administrator, to check the configuration file after modifying it. See the section about <a href="#confval">validating configuration</a> for details.</p></li>
+  </ul></p>
+
+  <h4>SelfNamedPlugin Class</h4>
+
+  <p>A named plugin implementation must extend this class if it wants to supply its own Plugin Name(s). See Self-Named Plugins for why this is sometimes necessary.</p>
+
+<pre>abstract class SelfNamedPlugin
+{
+    // Your class must override this:
+    // Return all names by which this plugin should be known.
+    public static String[] getPluginNames();
+
+    // Returns the name under which this instance was created.
+    // This is implemented by SelfNamedPlugin and should NOT be overridden.
+    public String getPluginInstanceName();
+}</pre>
+
+  <h4>Errors and Exceptions</h4>
+
+<pre>public class PluginConfigurationError extends Error
+{
+    public PluginConfigurationError(String message);
+}</pre>
+
+  <p>An error of this type means the caller asked for a single plugin, but either there was no single plugin configured matching that interface, or there was more than one. Either case causes a fatal configuration error.</p>
+
+<pre>public class PluginInstantiationException extends RuntimeException
+{
+    public PluginInstantiationException(String msg, Throwable cause)
+}</pre>
+
+  <p>This exception indicates a fatal error when instantiating a plugin class. It should only be thrown when something unexpected happens in the course of instantiating a plugin, e.g. an access error, class not found, etc. Simply not finding a class in the configuration is not an exception.</p>
+
+  <p>This is a <code>RuntimeException</code> so it doesn't have to be declared, and can be passed all the way up to a generalized fatal exception handler.</p>
+
+  <h3>Configuring Plugins</h3>
+
+  <p>All of the Plugin Manager's configuration comes from the DSpace Configuration Manager, which is a Java Properties map. You can configure these characteristics of each plugin:
+  <ol>
+  <li><strong>Interface</strong>: Classname of the Java interface which defines the plugin, including package name. e.g. <code>org.dspace.app.mediafilter.MediaFilter</code></li>
+  <li><strong>Implementation Class</strong>: Classname of the implementation class, including package. e.g. <code>org.dspace.app.mediafilter.PDFFilter</code></li>
+  <li><strong>Names</strong>: (Named plugins only) There are two ways to bind names to plugins: listing them in the value of a plugin.named.interface key, or configuring a class in <code>plugin.selfnamed.<i>interface</i></code> which extends the <code>SelfNamedPlugin</code> class.</li>
+  <li><strong>Reusable option</strong>: (Optional) This is declared in a <code>plugin.reusable</code> configuration line. Plugins are reusable by default, so you only need to configure the non-reusable ones.</li>
+  </ol></p>
+
+  <h4>Configuring Singleton (Single) Plugins</h4>
+
+  <p>This entry configures a Single Plugin for use with getSinglePlugin():</p>
+
+  <p><code>plugin.single.interface = classname</code></p>
+
+  <p>For example, this configures the class <code>org.dspace.app.webui.SimpleAuthenticator</code> as the plugin for interface <code>org.dspace.app.webui.SiteAuthenticator</code>:</p>
+
+  <p><code>plugin.single.org.dspace.app.webui.SiteAuthenticator = org.dspace.app.webui.SimpleAuthenticator</code></p>
+
+  <h4>Configuring Sequence of Plugins</h4>
+
+  <p>This kind of configuration entry defines a Sequence Plugin, which is bound to a sequence of implementation classes. The key identifies the interface, and the value is a comma-separated list of classnames:</p>
+
+  <code>plugin.sequence.interface = classname, ... </code>
+
+  <p>The plugins are returned by <code>getPluginSequence()</code> in the same order as their classes are listed in the configuration value.</p>
+
+  <p>For example, this entry configures Stackable Authentication with three implementation classes:</p>
+
+  <p><pre>plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
+            org.dspace.eperson.X509Authentication, \
+            org.dspace.eperson.PasswordAuthentication, \
+            edu.mit.dspace.MITSpecialGroup</pre></p>
+
+  <h4>Configuring Named Plugins</h4>
+
+  <p>There are two ways of configuring named plugins:
+  <ol>
+  <li><strong>Plugins Named in the Configuration</strong>
+
+  <p>A named plugin which gets its name(s) from the configuration is listed in this kind of entry:</p>
+
+  <p><code>plugin.named.interface = classname = name [ , name.. ] [ classname = name.. ]</code></p>
+
+  <p>The syntax of the configuration value is: classname, followed by an equal-sign and then at least one plugin name. Bind more names to the same implementation class by by adding them here, separated by commas. Names may include any character other than comma (,) and equal-sign (=).</p>
+
+  <p>For example, this entry creates one plugin with the names GIF, JPEG, and image/png, and another with the name TeX:</p>
+
+  <p><pre>plugin.named.org.dspace.app.mediafilter.MediaFilter = \
+        org.dspace.app.mediafilter.JPEGFilter = GIF, JPEG, image/png \
+        org.dspace.app.mediafilter.TeXFilter = TeX</pre></p>
+
+  <p>This example shows a plugin name with an embedded whitespace character. Since comma (,) is the separator character between plugin names, spaces are legal (between words of a name; leading and trailing spaces are ignored).</p>
+
+  <p>This plugin is bound to the names "Adobe PDF", "PDF", and "Portable Document Format".</p>
+
+  <p><pre>plugin.named.org.dspace.app.mediafilter.MediaFilter = \
+      org.dspace.app.mediafilter.TeXFilter = TeX \
+      org.dspace.app.mediafilter.PDFFilter =  Adobe PDF, PDF, Portable Document Format</pre></p>
+
+  <p>NOTE: Since there can only be one key with plugin.named. followed by the interface name in the configuration, all of the plugin implementations must be configured in that entry.</p></li>
+
+  <li><strong>Self-Named Plugins</strong>
+
+  <p>Since a self-named plugin supplies its own names through a static method call, the configuration only has to include its interface and classname:</p>
+
+  <p><code>plugin.selfnamed.interface = classname [ , classname.. ]</code></p>
+
+  <p>The following example first demonstrates how the plugin class, <code>XsltDisseminationCrosswalk</code> is configured to implement its own names "MODS" and "DublinCore". These come from the keys starting with <code>crosswalk.dissemination.stylesheet.</code>. The value is a stylesheet file.</p>
+
+  <p>The class is then configured as a self-named plugin:</p>
+
+<p><pre>crosswalk.dissemination.stylesheet.DublinCore = xwalk/TESTDIM-2-DC_copy.xsl
+crosswalk.dissemination.stylesheet.MODS = xwalk/mods.xsl
+
+plugin.selfnamed.crosswalk.org.dspace.content.metadata.DisseminationCrosswalk = \
+        org.dspace.content.metadata.MODSDisseminationCrosswalk, \
+        org.dspace.content.metadata.XsltDisseminationCrosswalk</pre></p>
+
+  <p>NOTE: Since there can only be one key with plugin.selfnamed. followed by the interface name in the configuration, all of the plugin implementations must be configured in that entry. The <code>MODSDisseminationCrosswalk</code> class is only shown to illustrate this point.</p></li>
+  </ol></p>
+
+  <h4>Configuring the Reusable Status of a Plugin</h4>
+
+  <p>Plugins are assumed to be reusable by default, so you only need to configure the ones which you would prefer not to be reusable. The format is as follows:</p>
+
+  <p><code>plugin.reusable.classname = ( true | false )</code></p>
+
+  <p>For example, this marks the PDF plugin from the example above as non-reusable:</p>
+
+  <p><code>plugin.reusable.org.dspace.app.mediafilter.PDFFilter = false</code></p>
+
+  <h3><a name="confval">Validating the Configuration</a></h3>
+
+  <p>The Plugin Manager is very sensitive to mistakes in the DSpace configuration. Subtle errors can have unexpected consequnces that are hard to detect: for example, if there are two "plugin.single" entries for the same interface, one of them will be silently ignored.</p>
+
+  <p>To validate the Plugin Manager configuration, call the <code>PluginManager.checkConfiguration()</code> method. It looks for the following mistakes:
+  <ul>
+  <li>Any duplicate keys starting with "plugin.".</li>
+  <li>Keys starting <code>plugin.single</code>, <code>plugin.sequence</code>, <code>plugin.named</code>, and <code>plugin.selfnamed</code> that don't include a valid interface.</li>
+  <li>Classnames in the configuration values that don't exist, or don't implement the plugin interface in the key.</li>
+  <li>Classes declared in plugin.selfnamed lines that don't extend the <code>SelfNamedPlugin</code> class.</li>
+  <li>Any name collisions among named plugins for a given interface.</li>
+  <li>Named plugin configuration entries without any names.</li>
+  <li>Classnames mentioned in <code>plugin.reusable</code> keys must exist and have been configured as a plugin implementation class.</li>
+  </ul></p>
+
+  <p>The <code>PluginManager</code> class also has a <code>main()</code> method which simply runs <code>checkConfiguration()</code>, so you can invoke it from the command line to test the validity of plugin configuration changes.</p>
+
+  <p>Eventually, someone should develop a general configuration-file sanity checker for DSpace, which would just call <code>PluginManager.checkConfiguration().</code></p>
+
+  <h3>Use Cases<h3>
+
+  <p>Here are some usage examples to illustrate how the Plugin Manager works.</p>
+
+  <h4>Managing the MediaFilter plugins transparently</h4>
+
+  <p>The existing DSpace 1.3 MediaFilterManager implementation have been largely replaced by the Plugin Manager. The MediaFilter classes become plugins named in the configuration. Refer to the <a href="configure.html#mediafilters">configuration guide</a> for further details.</p>
+
+  <h4>A Singleton Plugin</h4>
+
+  <p>This shows how to configure and access a single anonymous plugin, such as the SiteAuthenticator plugin:</p>
+
+   <p>Configuration:</p>
+
+   <p><code>plugin.single.org.dspace.app.webui.SiteAuthenticator = edu.mit.dspace.MITAuthenticator</code><p>
+
+   <p>The following code fragment shows how siteAuth, the service object, is initialized and used:</p>
+
+   <p><pre>SiteAuthenticator siteAuth =
+    (SiteAuthenticator)PluginManager.getSinglePlugin(SiteAuthenticator.class);
+
+  siteAuth.startAuthentication(context, request, response);</pre></p>
+
+  <h4>Plugin that Names Itself</h4>
+
+  <p>This crosswalk plugin acts like many different plugins since it is configured with different XSL translation stylesheets. Since it already gets each of its stylesheets out of the DSpace configuration, it makes sense to have the plugin give PluginManager the names to which it answers instead of forcing someone to configure those names in two places (and try to keep them synchronized).</p>
+
+  <p>NOTE: Remember how <code>getPlugin()</code> caches a separate instance of an implementation class for every name bound to it? This is why: the instance can look at the name under which it was invoked and configure itself specifically for that name. Since the instance for each name might be different, the Plugin Manager has to cache a separate instance for each name.</p>
+
+  <p>Here is the configuration file listing both the plugin's own configuration and the <code>PluginManager</code> config line:</p>
+
+<p><pre>crosswalk.dissemination.stylesheet.DublinCore = xwalk/TESTDIM-2-DC_copy.xsl
+crosswalk.dissemination.stylesheet.MODS = xwalk/mods.xsl
+
+plugin.selfnamed.org.dspace.content.metadata.DisseminationCrosswalk = \
+  org.dspace.content.metadata.XsltDisseminationCrosswalk</pre></p>
+
+<p>This look into the implementation shows how it finds configuration entries to populate the array of plugin names returned by the <code>getPluginNames()</code> method. Also note, in the <code>getStylesheet()</code> method, how it uses the plugin name that created the current instance (returned by <code>getPluginInstanceName()</code>) to find the correct stylesheet.</p>
+
+<p><pre>public class XsltDisseminationCrosswalk extends SelfNamedPlugin
+{
+    ....
+    private final String prefix = "crosswalk.dissemination.stylesheet.";
+    ....
+    public static String[] getPluginNames()
+    {
+        List aliasList = new ArrayList();
+        Enumeration pe = ConfigurationManager.propertyNames();
+
+        while (pe.hasMoreElements())
+        {
+            String key = (String)pe.nextElement();
+            if (key.startsWith(prefix))
+                aliasList.add(key.substring(prefix.length()));
+        }
+        return (String[])aliasList.toArray(new String[aliasList.size()]);
+    }
+
+    // get the crosswalk stylesheet for an instance of the plugin:
+    private String getStylesheet()
+    {
+        return ConfigurationManager.getProperty(prefix + getPluginInstanceName());
+    }
+}</pre></p>
+
+  <h4>Stackable Authentication</h4>
+
+  <p>The Stackable Authentication mechanism needs to know all of the plugins configured for the interface, in the order of configuration, since order is significant. It gets a Sequence Plugin from the Plugin Manager. Refer to the <a href="configure.html#authenticate">configuration guide</a> for further details.</p>
+  
     <H2><A NAME="workflow">Workflow System</A></H2>
 
     <P>The primary classes are:</P>

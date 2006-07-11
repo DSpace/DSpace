@@ -603,6 +603,29 @@ search.index.11 = id:dc.identifier.*
 
   <p><strong>NOTE:</strong> While the indexes are created, this only affects the search results and has no effect on the search components of the user interface. To add new search capability (e.g. to add a new search category to the Advanced Search) requires local customisation to the user interface.</p>
 
+  <h2><a name="mediafilters" id="mediafilters">Media Filters</a></h2>
+  
+  <p>Media Filters are classes used to generate derivative or alternative versions of master bitstreams. For example, the PDF Media Filter will extract textual content from PDF bitstreams, the JPEG Media Filter can create thumbnails from image bitstreams.</p>
+
+  <p>Media Filters are configured as a <a href="business.html#plugin">Sequence Plugin</a>, with each filter also having a separate config item indicating which formats it can process. The default configuration is shown below.</p>
+
+<p><pre>#### Media Filter plugins (through PluginManager) ####
+
+plugin.sequence.org.dspace.app.mediafilter.MediaFilter = \
+    org.dspace.app.mediafilter.PDFFilter, org.dspace.app.mediafilter.HTMLFilter, \
+    org.dspace.app.mediafilter.WordFilter, org.dspace.app.mediafilter.JPEGFilter
+# to enable branded preview: remove last line above, and uncomment 2 lines below
+#   org.dspace.app.mediafilter.WordFilter, org.dspace.app.mediafilter.JPEGFilter, \
+#   org.dspace.app.mediafilter.BrandedPreviewJPEGFilter
+
+filter.org.dspace.app.mediafilter.PDFFilter.inputFormats = Adobe PDF
+filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats = HTML, Text
+filter.org.dspace.app.mediafilter.WordFilter.inputFormats = Microsoft Word
+filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats = GIF, JPEG, image/png
+filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats = GIF, JPEG, image/png</pre></p>
+
+<p>To add a new Media Filter, add the new filter class to the <code>plugin.sequence.org.dspace.app.mediafilter.MediaFilter</code> config item and add a corresponding <code>filter.<i>&lt;class path&gt;</i>.inputFormats</code> config item. Note the input formats must match the <code>short_description</code> field in the <code>bitstreamformatregistry</code> table.</p>
+
   <h2><a name="statistics" id="statistics">Configuring System Statistical Reports</a></h2>
 
   <p>Statistics for the system can be made available at <code>http://www.mydspaceinstance.edu/statistics</code>. To use the system statistics you will have to initialise them as per the installation documentation, but before you do so you need to perform the customisations discussed here in order to ensure that the reports are generated correctly.</p>
