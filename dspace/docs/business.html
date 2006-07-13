@@ -265,7 +265,7 @@ context.complete();</PRE>
 
     <H3><A NAME="dublincore">Dublin Core Metadata</A></H3>
 
-    <P>The <code>DCValue</code> class is a simple container that represents a single Dublin Core element, optional qualifier, value and language.  The other classes starting with <code>DC</code> are utility classes for handling types of data in Dublin Core, such as people's names and dates.  As supplied, the DSpace registry of elements and qualifiers corresponds to the <A HREF="http://www.dublincore.org/documents/2002/09/24/library-application-profile/">Library Application Profile</A> for Dublin Core.  It should be noted that these utility classes assume that the values will be in a certain syntax, which will be true for all data generated within the DSpace system, but since Dublin Core does not always define strict syntax, this may not be true for Dublin Core originating outside DSpace.</P>
+    <P>The <code>DCValue</code> class is a simple container that represents a single Dublin Core element, optional qualifier, value and language.  Note that as of DSpace 1.4 the <code>MetadataValue</code> and associated classes are preferred (see <a href="#otherschemas">Support for Other Metadata Schemas</a>). The other classes starting with <code>DC</code> are utility classes for handling types of data in Dublin Core, such as people's names and dates.  As supplied, the DSpace registry of elements and qualifiers corresponds to the <A HREF="http://www.dublincore.org/documents/2002/09/24/library-application-profile/">Library Application Profile</A> for Dublin Core.  It should be noted that these utility classes assume that the values will be in a certain syntax, which will be true for all data generated within the DSpace system, but since Dublin Core does not always define strict syntax, this may not be true for Dublin Core originating outside DSpace.</P>
 
     <P>Below is the specific syntax that DSpace expects various fields to adhere to:</P>
 
@@ -323,6 +323,12 @@ NS1234</PRE>
         <TD><code>DCSeriesNumber</code></TD>
       </TR>
     </TABLE>
+
+   <h3><a name="otherschemas">Support for Other Metadata Schemas</a></h3>
+
+   <p>To support additional metadata schemas a new set of metadata classes have been added. These are backwards compatible with the DC classes and should be used rather than the DC specific classes whereever possible. Note that hierarchical metadata schemas are not currently supported, only flat schemas (such as DC) are able to be defined.</p>
+
+   <p>The <code>MetadataField</code> class describes a metadata field by schema, element and optional qualifier. The value of a <code>MetadataField</code> is described by a <code>MetadataValue</code> which is roughly equivalent to the older <code>DCValue</code> class. Finally the <code>MetadataSchema</code> class is used to describe supported schemas. The DC schema is supported by default. Refer to the javadoc for method details.</p>
 
 
     <h2><a name="plugin">Plugin Manager</a></h2>
