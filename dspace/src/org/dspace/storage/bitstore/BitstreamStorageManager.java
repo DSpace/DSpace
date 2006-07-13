@@ -499,7 +499,7 @@ public class BitstreamStorageManager
 		}
 
 		bitstream.setColumn("checksum_algorithm", "MD5");
-		bitstream.setColumn("size_bytes", (int) file.length());
+		bitstream.setColumn("size_bytes", file.length());
 		bitstream.setColumn("deleted", false);
 		DatabaseManager.update(context, bitstream);
 
