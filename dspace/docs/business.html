@@ -330,6 +330,41 @@ NS1234</PRE>
 
    <p>The <code>MetadataField</code> class describes a metadata field by schema, element and optional qualifier. The value of a <code>MetadataField</code> is described by a <code>MetadataValue</code> which is roughly equivalent to the older <code>DCValue</code> class. Finally the <code>MetadataSchema</code> class is used to describe supported schemas. The DC schema is supported by default. Refer to the javadoc for method details.</p>
 
+  <h3><a name="packager">Packager Plugins</a></h3>
+
+  <p>The Packager plugins let you <em>ingest</em> a package to create a new DSpace Object, and <em>disseminate</em> a content Object as a package. A package is simply a data stream; its contents are defined by the
+packager plugin's implementation.</p>
+
+  <p>To ingest an object, which is currently only implemented for Items, the sequence of operations is:
+    <ol>
+       <li>Get an instance of the chosen <code>PackageIngester</code> plugin.</li>
+       <li>Locate a Collection in which to create the new Item.</li>
+       <li>Call its <code>ingest</code> method, and get back a <code>WorkspaceItem</code>.</li>
+    </ol>
+
+  <p>The packager also takes a <code>PackageParameters</code> object, which is a property list of parameters specific to that packager which might be passed in from the user interface.</p>
+
+  <p>Here is an example package ingestion code fragment:
+  <pre>    Collection collection = <em>find target collection</em>
+     InputStream source = ...;
+     PackageParameters params = ...;
+     String license = null;
+
+    PackageIngester sip = (PackageIngester) PluginManager
+            .getNamedPlugin(PackageIngester.class, packageType);
+
+    WorkspaceItem wi = sip.ingest(context, collection, source, params, license);</pre></p>
+
+    <p>Here is an example of a package dissemination:
+    <pre>    OutputStream destination = ...;
+     PackageParameters params = ...;
+     DSpaceObject dso = ...;
+
+     PackageIngester dip = (PackageDisseminator) PluginManager
+             .getNamedPlugin(PackageDisseminator.class, packageType);
+
+     dip.disseminate(context, dso, params, destination);</pre></p>
+
 
     <h2><a name="plugin">Plugin Manager</a></h2>
 
