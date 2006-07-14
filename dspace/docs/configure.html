@@ -215,13 +215,37 @@ property2.name = ${dspace.dir}/rest/of/path
   <p>DSpace comes with an unqualified DC Crosswalk used in the default OAI-PMH data provider. There are also other Crosswalks bundled with the DSpace distribution which can be activated by editing one or more configuration files. How to do this for each available Crosswalk is described below.</p>
 
   <h3>METS</h3>
-  <p>The METS Crosswalk can be activated as follows:</p>
-	<ul>
-		<li>Uncomment the METS Crosswalk entry from the <code>config/templates/oaicat.properties</code> file</li>
-		<li>Run	the <code>bin/install-configs</code> script</li>
-		<li>Restart Tomcat</li>
-		<li>Verify the Crosswalk is activated by accessing a URL such as <code>http://mydspace/dspace-oai/request?verb=ListRecords&amp;metadataPrefix=mets</code></li>
-	</ul>
+  <p>The old DSpace 1.3 METS Crosswalk can be activated as follows:</p>
+       <ol>
+	<li>Uncomment the METS Crosswalk entry from the <code>config/templates/oaicat.properties</code> file</li>
+	<li>Run	the <code>bin/install-configs</code> script</li>
+	<li>Restart Tomcat</li>
+	<li>Verify the Crosswalk is activated by accessing a URL such as <code>http://mydspace/dspace-oai/request?verb=ListRecords&amp;metadataPrefix=mets</code></li>
+       </ol>
+  <h3>Crosswalk Plugins</h3>
+ <p>OAI-PMH crosswalks based on Crosswalk Plugins, including the new  (DSpace 1.4) METS crosswalk, are activated as follows:</p>
+  <ol>
+    <li>Ensure the crosswalk plugin has a <em>lower-case</em> name (possibly
+in addition to its upper-case name) in the plugin configuration.</li>
+    <li>Add a line to the file <code>config/templates/oaicat.properties</code> of
+the form:<br>
+<code>Crosswalks.</code><i>plugin_name</i><code>=org.dspace.app.oai.PluginCrosswalk</code><br>
+    substituting the plugin's name, e.g. <code>"mets"</code> or <code>"qdc"</code>for <i>plugin_name</i>.</li>
+    <li>Run the <code>bin/install-configs</code> script</li>
+    <li>Restart your servlet container, e.g. Tomcat, for the change to take effect.</li>
+  </ol>
+
+The DSpace 1.4 source includes the following crosswalk plugins available
+for use with OAI-PMH:
+   <ul>
+    <li><b><code>mets</code></b> - The manifest document from a DSpace METS SIP.</li>
+    <li><b><code>mods</code></b> - MODS metadata, produced by the <a href="mods">table-driven MODS dissemination crosswalk</a>.</li>
+    <li><b><code>qdc</code></b> - Qualfied Dublin Core, produced by the <a href="qdc">configurable QDC crosswalk</a>.
+        Note that this QDC does <em>not</em> include all of the
+        DSpace "dublin core"
+        metadata fields, since the XML standard for QDC is
+        defined for a different set of elements and qualifiers.</li>
+   </ul>
 
   <h3>DIDL</h3>
   <p>By activating the DIDL provider, DSpace items are represented as MPEG-21 DIDL objects. These DIDL objects are XML documents that wrap both the Dublin Core metadata that describes the DSpace item and its actual bitstreams. A bitstream is provided inline in the DIDL object in a base64 encoded manner, and/or by means of a pointer to the bitstream. The data provider exposes DIDL objects via the metadataPrefix didl.</p>
@@ -1067,6 +1091,190 @@ bin/checker -L	    # Loops continuously through the repository</pre>
   <p>There is a special property, <code>checker.retention.default</code>, that is used to assign a default retention period.</p>
   
   <p>To execute the pruning you must use the -p command line option (with or without a properties file). Checksum Checker will prune the history table before beginning new checks. We recommend that you use this option regularly, as the checksum_history table can grow very large without it.</p>
+
+<h2><a name="packager">Configuring Packager Plugins</a></h2>
+
+<p>Package ingester plugins are configured as <a href="business.html#plugin">named or self-named plugins</a>
+for the interface <code>org.dspace.content.packager.PackageIngester</code>. Package disseminator plugins are configured as <a href="business.html#plugin">named or self-named plugins</a>
+for the interface <code>org.dspace.content.packager.PackageDisseminator</code>.</p>
+
+<p>You can add names for the existing plugins, and add new plugins, by altering these configuration properties.  See the <a href="business.html#plugin">Plugin Manager</a> architecture for more information about plugins.</p>
+
+<h2><a name="crosswalk">Configuring Crosswalk Plugins</a></h2>
+<p>Ingestion crosswalk plugins are configured as <a href="business.html#plugin">named or self-named plugins</a>
+for the interface <code>org.dspace.content.crosswalk.IngestionCrosswalk</code>.
+Dissemination crosswalk plugins are configured as <a href="business.html#plugin">named or self-named plugins</a>
+for the interface <code>org.dspace.content.crosswalk.DisseminationCrosswalk</code>.</p>
+
+<p>You can add names for existing crosswalks, add new plugin classes, and add new configurations for the configurable crosswalks as noted below.</p>
+
+<h3>Configurable MODS dissemination crosswalk</h3>
+
+<p>The MODS crosswalk is a self-named plugin.  To configure an instance of
+the MODS crosswalk, add a property to the DSpace configuration starting
+with <code>"crosswalk.mods.properties."</code>; the final word of the
+property name becomes the plugin's name.  For example, a property name
+<code>crosswalk.mods.properties.MODS</code> defines a crosswalk plugin
+named <code>"MODS"</code>.</p>
+
+<p> The value of this property is a path to a separate properties file
+containing the configuration for this crosswalk.  The pathname is relative to the DSpace configuration directory, i.e. the <code>config</code> subdirectory of the DSpace install directory.
+So, a line like:<pre> crosswalk.mods.properties.MODS = crosswalks/mods.properties</pre>
+defines a crosswalk named <code>MODS</code> whose configuration comes from
+the file <code>[dspace]/config/crosswalks/mods.properties</code>.</p>
+
+<p>The MODS crosswalk properties file is a list of properties describing how DSpace metadata elements are to be turned into elements of the MODS XML output document.  The property name is a concatenation of the metadata schema, element name, and optionally the qualifier.  For example, the <code>contributor.author</code> element
+in the native Dublin Core schema would be: <code>dc.contributor.author</code>. The value of the property is a line containing two segments separated by the vertical bar (<code>"|"</code>): The first part is an XML fragment
+which is copied into the output document.  The second is an XPath expression describing where in that fragment to put the value of the metadata element.  For example, in this property:
+<pre>
+dc.contributor.author = &lt;mods:name&gt;&lt;mods:role&gt;&lt;mods:roleTerm type="text"&gt;author&lt;/mods:roleTerm&gt;&lt;/mods:role&gt;&lt;mods:namePart&gt;%s&lt;/mods:namePart&gt;&lt;/mods:name&gt; | mods:namePart/text()
+</pre>
+Some of the examples include the string <code>"%s"</code> in the prototype
+XML where the text value is to be inserted, but don't pay any attention to
+it, it is an artifact that the crosswalk ignores.
+
+<p>For example, given an author named <em>Jack Florey</em>, the crosswalk will insert</p>
+<pre><code>
+&lt;mods:name&gt;
+  &lt;mods:role&gt;
+    &lt;mods:roleTerm type="text"&gt;author&lt;/mods:roleTerm&gt;
+  &lt;/mods:role&gt;
+  &lt;mods:namePart&gt;</code><em>Jack Florey</em><code>&lt;/mods:namePart&gt;
+&lt;/mods:name&gt; </code></pre>
+into the output document.  Read the example configuration file for more
+details.
+
+<h3>Configurable Qualified Dublin Core (QDC) dissemination  crosswalk</h3>
+
+<p>The QDC crosswalk is a self-named plugin.  To configure an instance of
+the QDC crosswalk, add a property to the DSpace configuration starting
+with <code>"crosswalk.qdc.properties."</code>; the final word of the
+property name becomes the plugin's name.  For example, a property name
+<code>crosswalk.qdc.properties.QDC</code> defines a crosswalk plugin
+named <code>"QDC"</code>.</p>
+
+<p>The value of this property is a path to a separate properties file
+containing the configuration for this crosswalk.  The pathname is relative to the DSpace configuration directory, i.e. the <code>config</code> subdirectory of the DSpace install directory. So, a line like:<pre>  crosswalk.qdc.properties.QDC = crosswalks/qdc.properties</pre> defines a crosswalk named <code>QDC</code> whose configuration comes from the file <code>[dspace]/config/crosswalks/qdc.properties</code>.</p>
+
+<p>You'll also need to configure the namespaces and schema location strings for the XML output generated by this crosswalk.  The namespaces property names are of the format: <br>
+<code>crosswalk.qdc.namespace.</code><em>prefix</em> = <em>uri</em>
+<br>where <em>prefix</em> is the namespace prefix and <em>uri</em> is the namespace URI.</p>
+
+<p>For example, this shows how a crosswalk named "QDC" would be configured:
+<pre>crosswalk.qdc.properties.QDC = crosswalks/QDC.properties
+crosswalk.qdc.namespace.QDC.dc = http://purl.org/dc/elements/1.1/
+crosswalk.qdc.namespace.QDC.dcterms = http://purl.org/dc/terms/
+crosswalk.qdc.schemaLocation.QDC  = \
+  http://purl.org/dc/terms/ http://dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd</pre></p>
+
+<p>The QDC crosswalk properties file is a list of properties
+describing how DSpace metadata elements are to be turned into elements of the Qualified DC XML output document.  The property name is a concatenation of the metadata schema, element name, and optionally
+the qualifier.  For example, the <code>contributor.author</code> element in the native Dublin Core schema would be: <code>dc.contributor.author</code>. The value of the property is an XML fragment, the element whose value
+will be set to the value of the metadata field in the property key.</p>
+
+<p> For example, in this property:
+<pre>  dc.coverage.temporal = &lt;dcterms:temporal /&gt;</pre>
+the generated XML in the output document would look like, e.g.:
+<pre>  &lt;dcterms:temporal&gt;Fall, 2005&lt;/dcterms:temporal&gt;</pre></p>
+
+<h3>XSLT-based crosswalks</h3>
+
+<p>The XSLT crosswalks use XSL stylesheet transformation (XSLT) to
+ transform an XML-based external metadata format to or from DSpace's
+ internal metadata.  XSLT crosswalks are much more powerful and
+ flexible than the configurable MODS and QDC crosswalks, but they
+ demand some esoteric knowledge (XSL stylesheets).  Given that, you can
+ create all the crosswalks you need just by adding stylesheets and
+ configuration lines, without touching any of the Java code.</p>
+<p>A submission crosswalk is described by a configuration key starting with '<code>crosswalk.submission.</code>", like <pre>  crosswalk.submission.<i>PluginName</i>.stylesheet = <i>path</i></pre>
+ The <em>PluginName</em> is, of course, the plugin's name.  The <em>path</em> value is the path to the file containing the crosswalk stylesheet (relative to <code><em>dspace.dir</em>/config</code>).</p>
+<p>Here is an example that configures a crosswalk named "LOM" using a stylesheet
+ in <code>[dspace]/config/crosswalks/d-lom.xsl</code>:
+ <pre>  crosswalk.submission.stylesheet.LOM = crosswalks/d-lom.xsl</pre></p>
+
+<p>A dissemination crosswalk is described by a configuration key starting with '<code>crosswalk.dissemination.</code>", like <pre>  crosswalk.dissemination.<i>PluginName</i>.stylesheet = <i>path</i></pre>
+ The <em>PluginName</em> is, of course, the plugin's name. The <em>path</em> value is the path to the file containing
+ the crosswalk stylesheet (relative to <code><em>dspace.dir</em>/config</code>).</p>
+
+<p>You can make two different plugin names point to the same crosswalk,
+ by adding two configuration entries with the same path, e.g.
+ <pre>
+    crosswalk.submission.MyFormat.stylesheet = crosswalks/myformat.xslt
+    crosswalk.submission.almost_DC.stylesheet = crosswalks/myformat.xslt
+ </pre></p>
+
+<p>The dissemination crosswalk must also be configured with an XML Namespace
+ (including prefix and URI) and an XML Schema for its output format.  This
+ is configured on additional properties in the DSpace Configuration, i.e.:
+ <pre>   crosswalk.dissemination.<i>PluginName</i>.namespace.<i>Prefix</i> = <i>namespace-URI</i>
+   crosswalk.dissemination.<i>PluginName</i>.schemaLocation = <i>schemaLocation value</i> </pre>
+ For example:
+ <pre>   crosswalk.dissemination.qdc.namespace.dc = http://purl.org/dc/elements/1.1/
+   crosswalk.dissemination.qdc.namespace.dcterms = http://purl.org/dc/terms/
+   crosswalk.dissemination.qdc.schemaLocation = \
+      http://purl.org/dc/elements/1.1/ http://dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd </pre></p>
+
+<h3>DSpace Intermediate Metadata (DIM) format</h3>
+ XSLT crosswalk plugins translate between the external metadata format
+ and an XML format called <em>DSpace Intermediate Metadata</em>,
+ which exists <em>only</em> for the purpose of XSLT crosswalks.
+ It is <em>never</em> to be exported from DSpace, since it is not an
+ acknowledged metadata format, it is simply an expression of the way
+ DSpace stores its metadata fields internally.
+ <p>All the elements in a DIM document are in the namespace
+ <code>http://www.dspace.org/xmlns/dspace/dim</code>.</p>
+ <p>The root element is named <code>dim</code>.  It has zero or more
+ children, all <code>field</code> elements.  It may have an
+ attribute <code>dspaceType</code>, which identifies the type of
+ object ("ITEM", "COLLECTION", or "COMMUNITY") this metadata describes.  This attribute
+ is only guaranteed to be set for dissemination crosswalks.</p>
+ <p>Each <code>field</code> element may have the following attributes:
+ <ul>
+   <li><code>mdschema</code> (Required) The metadata schema, e.g. <code>"dc"</code>.</li>
+   <li><code>element</code> (Required) Element name, such as "contributor".</li>
+   <li><code>qualifier</code> Qualifier name, such as "author".</li>
+   <li><code>lang</code> Language code describing language of this entry.</li>
+ </ul>
+ The value of <code>field</code> is the value of that metadata field.
+ Fields with the same qualifiers may be repeated.
+
+<p>Here is an example of the DIM format:
+<pre>    &lt;dim:dim xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" dspaceType="ITEM"&gt;
+      &lt;dim:field mdschema="dc" element="title" lang="en_US"&gt;
+        The Endochronic Properties of Resublimated Thiotimonline
+      &lt;/dim:field&gt;
+      &lt;dim:field mdschema="dc" element="contributor" qualifier="author"&gt;
+        Isaac Asimov
+      &lt;/dim:field&gt;
+      &lt;dim:field mdschema="dc" element="language" qualifier="iso"&gt;
+        eng
+      &lt;/dim:field&gt;
+      &lt;dim:field mdschema="dc" element="subject" qualifier="other" lang="en_US"&gt;
+        time-travel scifi hoax
+      &lt;/dim:field&gt;
+      &lt;dim:field element="publisher"&gt;
+        Boston University Department of Biochemistry
+      &lt;/dim:field&gt;
+    &lt;/dim:dim&gt;
+</pre></p>
+
+<h3>Testing XSLT Crosswalks</h3>
+ The XSLT crosswalks will automatically reload an XSL stylesheet that
+ has been modified, so you can edit and test
+ stylesheets without restarting DSpace.
+
+ <p>You can test a dissemination crosswalk by hooking it up to an OAI-PMH
+ crosswalk and using an OAI request to get the metadata for a known item.</p>
+
+ <p>Testing the submission crosswalk is more difficult, so we have supplied
+ a command-line utility to help.  It calls the crosswalk plugin to
+ translate an XML document you submit, and displays the resulting
+ intermediate XML (DIM).  Invoke it with:
+ <pre><em>[dspace]</em>/bin/dsrun org.dspace.content.crosswalk.XSLTIngestionCrosswalk [-l] <em>plugin input-file</em></pre>
+ ..where <em>plugin</em> is the name of the crosswalk plugin to test (e.g.
+  "LOM"), and <em>input-file</em> is a file containing an XML document
+  of metadata in the appropriate format.</p>
+  <p> Add the <code>-l</code> option to to pass the ingestion crosswalk a list of elements instead of a whole document, as if the List form of the ingest() method had been called. This is needed to test ingesters for formats like DC that get called with lists of elements instead of a root element.</p>
 
 
   <hr>
