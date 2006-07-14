@@ -162,10 +162,59 @@
     </dd>
   </dl>
 
-  <h2><a name="epeople" id="epeople">E-people</a></h2>
+  <h2><a name="packager" id="packager">Packager Plugins</a></h2>
 
-  <p>Many of DSpace's features such as document discovery and retrieval can be used anonymously, but users must be authenticated to perform functions such as submission, email notification ('subscriptions') or administration. Users are also grouped for easier administration. DSpace calls users <em>e-people</em>, to reflect that some users may be machines rather than actual people.</p>
+  <p><em>Packagers</em> are software modules that translate between
+  DSpace Item objects and a self-contained external representation,
+  or "package".  A <em>Package Ingester</em> interprets, or <em>ingests</em>,
+  the package and creates an Item.  A <em>Package Disseminator</em>
+  writes out the contents of an Item in the package format.</p>
 
+  <p>A package is typically an archive file such as a Zip or "tar" file,
+  including a <em>manifest</em> document which contains metadata and
+  a description of the package contents. The <a href="http://www.imsglobal.org/content/packaging/">IMS Content       Package</a> is a typical packaging standard.  A package might also be a single
+  document or media file that contains its own metadata, such as a PDF
+  document with embedded descriptive metadata.</p>
+
+  <p>Package ingesters and package disseminators are each a type of named
+  plugin (see <a href="#plugin">Plugin Manager</a>), so it is easy to
+  add new packagers specific to the needs of your site.  You do not have
+  to supply both an ingester and disseminator for each format; it is
+  perfectly acceptable to just implement one of them.</p>
+
+  <p>Most packager plugins call upon Crosswalk plugins to translate
+  the metadata between DSpace's object model and the package format.</p>
+
+  <h2><a name="crosswalk" id="crosswalk">Crosswalk Plugins</a></h2>
+
+  <p><em>Crosswalks</em> are software modules that translate between
+  DSpace object metadata and a specific external representation.
+  An <em>Ingestion Crosswalk</em> interprets the external format
+  and crosswalks it to DSpace's internal data structure, while a
+  <em>Dissemination Crosswalk</em> does the opposite.</p>
+
+  <p>For example, a MODS ingestion crosswalk translates descriptive metadata
+  from the MODS format to the metadata fields on a DSpace Item.
+  A MODS dissemination crosswalk generates a MODS document from the
+  metadata on a DSpace Item.</p>
+
+  <p>Crosswalk plugins are named plugins see <a href="#plugin">Plugin Manager</a>), so it is easy to add
+  new crosswalks. You do not have to supply both an ingester and disseminator for each format; it is
+  perfectly acceptable to just implement one of them.</p>
+
+  <p>There is also a special pair of crosswalk plugins which use XSL
+  stylesheets to translate the external metadata to or from an internal
+  DSpace format.  You can add and modify XSLT crosswalks simply by editing
+  the DSpace configuration and the stylesheets, which are stored in
+  files in the DSpace installation directory.</p>
+
+  <p>The <a href="#packager">Packager plugins</a> and <a href="#oai">OAH-PMH server</a> make use of crosswalk plugins.</p>
+
+  <h2><a name="epeople" id="epeople">E-People and Groups</a></h2>
+
+  <p>Although many of DSpace's functions such as document discovery and retrieval can be used anonymously, some features (and perhaps some documents) are only available to certain "privileged" users. E-People and Groups are the way DSpace identifies application users for the purpose of granting privileges. This identity is bound to a session of a DSpace application such as the Web UI or one of the command-line batch programs. Both E-People and Groups are granted privileges by the <a href="#auth">authorization</a> system described below.</p>
+
+  <h3>E-Person</h3>
   <p>DSpace hold the following information about each e-person:</p>
 
   <ul>
@@ -184,15 +233,29 @@
     <li>The network ID for the corresponding LDAP record</li>
   </ul>
 
-  <p>E-people authenticate with username/password pairs, X509 certificates (by configuring the X509 certificate authentication module) or LDAP. E-people can be members of 'groups' to make administrator's lives easier when manipulating authorization policies.</p>
+  <h3>Groups</h3>
+
+  <p>Groups are another kind of entity that can be granted permissions in the <a href="#auth">authorization</a> system.  A group is usually an explicit list of E-People; anyone identified as one of those E-People
+also gains the privileges granted to the group.</p>
+
+  <p>However, an application session can be assigned membership in a group <em>without</em> being identified as an E-Person.  For example, some sites use this feature to identify users of a local network so they can read
+restricted materials not open to the whole world.  Sessions originating from the local network are given membership in the "LocalUsers" group and gain the corresonding privileges.</p>
+
+  <p>Administrators can also use groups as "roles" to manage the granting
+     of privileges more efficiently.</p>
 
   <h2><a name="authentication" id="authentication">Authentication</a></h2>
 
-  <p>DSpace provides a Stackable Authentication mechanism where authenticators are deployed in a "stack" and tried each in order, instead of configuring a single authentication method. This meachanism provides:
+  <p><em>Authentication</em> is when an application session positively identifies itself as belonging to an E-Person and/or Group. In DSpace 1.4, it is implemented by a mechanism called <em>Stackable Authentication</em>:
+the DSpace configuration declares a "stack" of authentication methods.  An application (like the Web UI)
+calls on the Authentication Manager, which tries each of these methods in turn to identify the E-Person to which
+the session belongs, as well as any extra Groups. The E-Person authentication methods are tried in turn until one succeeds. Every authenticator in the stack is given a chance to assign extra Groups.
+This mechanism offers the following advantages:
   <ul>
-	<li>Separate authentication from the Web user interface so the same code can be used for e.g. non-interactive Web Services</li>
-	<li>Improved modularity: No authenticator needs to know about any other authenticator. Custom authentication methods can be "stacked" with the default DSpace username/password method</li>
-	<li>Cleaner support for "implicit" authentication where username is found in the environment of a Web request, e.g. in an X.509 client certificate</li>
+	<li>Separates authentication from the Web user interface so the same authentication methods are used for other applications such as non-interactive Web Services</li>
+        <li>Improved modularity: The authentication methods are all independent of each other.
+Custom authentication methods can be "stacked" on top of the default DSpace username/password method.</li>
+        <li>Cleaner support for "implicit" authentication where username is found in the environment of a Web request, e.g. in an X.509 client certificate.</li>
   </ul></p>
 
   <h2><a name="auth" id="auth">Authorization</a></h2>
@@ -455,12 +518,12 @@ https://dspace.myu.edu/bitstream/123.456/789/24/foo.html
 
     <li>Searching for one or more keywords in metadata or extracted full-text</li>
 
-    <li>Browsing though title, date and author indices, with optional image thumbnails</li>
+    <li>Browsing though title, author, date or subject indices, with optional image thumbnails</li>
   </ul>
 
   <p>Search is an essential component of discovery in DSpace. Users' expectations from a search engine are quite high, so a goal for DSpace is to supply as many search features as possible. DSpace's indexing and search module has a very simple API which allows for indexing new content, regenerating the index, and performing searches on the entire corpus, a community, or collection. Behind the API is the Java freeware search engine <a href="http://jakarta.apache.org/lucene/">Lucene</a>. Lucene gives us fielded searching, stop word removal, stemming, and the ability to incrementally add new indexed content without regenerating the entire index. As of DSpace 1.2.1 the Lucene search indexes are configurable, enabling institutions to customise which DSpace metadata fields are indexed.</p>
 
-  <p>Another important mechanism for discovery in DSpace is the browse. This is the process whereby the user views a particular index, such as the title index, and navigates around it in search of interesting items. The browse subsystem provides a simple API for achieving this by allowing a caller to specify an index, and a subsection of that index. The browse subsystem then discloses the portion of the index of interest. Indices that may be browsed are item title, item issue date and authors. Additionally, the browse can be limited to items within a particular collection or community.</p>
+  <p>Another important mechanism for discovery in DSpace is the browse. This is the process whereby the user views a particular index, such as the title index, and navigates around it in search of interesting items. The browse subsystem provides a simple API for achieving this by allowing a caller to specify an index, and a subsection of that index. The browse subsystem then discloses the portion of the index of interest. Indices that may be browsed are item title, item issue date, item author, and subject terms. Additionally, the browse can be limited to items within a particular collection or community.</p>
 
   <h2><a name="html" id="html">HTML Support</a></h2>
 
@@ -508,6 +571,8 @@ https://dspace.myu.edu/bitstream/123.456/789/24/foo.html
   <p>The <a href="http://www.openarchives.org/">Open Archives Initiative</a> has developed a <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html">protocol for metadata harvesting</a>. This allows sites to programmatically retrieve or 'harvest' the metadata from several sources, and offer services using that metadata, such as indexing or linking services. Such a service could allow users to access information from a large number of sites from one place.</p>
 
   <p>DSpace exposes the Dublin Core metadata for items that are publicly (anonymously) accessible. Additionally, the collection structure is also exposed via the OAI protocol's 'sets' mechanism. OCLC's open source <a href="http://www.oclc.org/research/software/oai/cat.shtm">OAICat</a> framework is used to provide this functionality.</p>
+
+  <p>You can also configure the OAI service to make use of any <a href="#crosswalk">crosswalk plugin</a> to offer additional metadata formats, such as MODS.</p>
 
   <p>DSpace's OAI service does support the exposing of deletion information for withdrawn items, but not for items that are 'expunged' (<a href="#deletions">see above</a>). DSpace also supports OAI-PMH resumption tokens.</p>
 
