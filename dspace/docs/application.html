@@ -446,9 +446,9 @@ http://dspace.myu.edu/dspace-oai/request
 
   <p>DSpace provides implementations of the OAICat interfaces <code>AbstractCatalog</code>, <code>RecordFactory</code> and <code>Crosswalk</code> that interface with the DSpace content management API and harvesting API (in the search subsystem).</p>
 
-  <p>Only the basic <code>oai_dc</code> unqualified Dublin Core metadata set is exported at present; this is particularly easy since all items have qualified Dublin Core metadata. When this metadata is harvested, the qualifiers are simply stripped; for example, <code>description.abstract</code> is exposed as unqualified <code>description</code>. The <code>description.provenance</code> field is hidden, as this contains private information about the submitter and workflow reviewers of the item, including their e-mail addresses. Additionally, to keep in line with OAI community practices, values of <code>contributor.author</code> are exposed as <code>creator</code> values.</p>
+  <p>Only the basic <code>oai_dc</code> unqualified Dublin Core metadata set export is enabled by default; this is particularly easy since all items have qualified Dublin Core metadata. When this metadata is harvested, the qualifiers are simply stripped; for example, <code>description.abstract</code> is exposed as unqualified <code>description</code>. The <code>description.provenance</code> field is hidden, as this contains private information about the submitter and workflow reviewers of the item, including their e-mail addresses. Additionally, to keep in line with OAI community practices, values of <code>contributor.author</code> are exposed as <code>creator</code> values.</p>
 
-  <p>To add support for other metadata sets is simply a matter of creating another <code>Crosswalk</code> implementation, and adding it to the <code>oaicat.properties</code> file described below.</p>
+  <p>Other metadata formats are supported as well, using other <code>Crosswalk</code> implementations; consult the <code>oaicat.properties</code> file described below. To enable a format, simply uncomment the lines beginning with <code>Crosswalks.*</code>. Multiple formats are allowed, and the current list includes, in addition to unqualified DC: MPEG DIDL, METS, MODS. There is also an incomplete, experimental qualified DC.</p>
 
   <p>Note that the current simple DC implementation (<code>org.dspace.app.oai.OAIDCCrosswalk</code>) does not currently strip out any invalid XML characters that may be lying around in the data. If your database contains a DC value with, for example, some ASCII control codes (form feed etc.) this may cause OAI harvesters problems. This should rarely occur, however. XML entities (such as <code>&gt;</code>) are encoded (e.g. to <code>&amp;gt;</code>)</p>
 
@@ -631,6 +631,8 @@ archive_directory/
 </pre>
 
   <p>(Note the optional language tag which notifies the system that the optional title is in French.)</p>
+
+  <p>The <code>contents</code> file simply enumerates, one file per line, the bitstream file names. The bitstream name may optionally be followed by the sequence:<br><br> <code>\tbundle:bundlename</code><br><br> where '\t' is the tab character and 'bundlename' is replaced by the name of the bundle to which the bitstream should be added. If no bundle is specified, the bitstream will be added to the 'ORIGINAL' bundle.<p> 
 
   <h3><a name="importingitems" id="importingitems">Importing Items</a></h3>
 
