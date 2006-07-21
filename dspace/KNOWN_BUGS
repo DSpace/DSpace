@@ -3,24 +3,47 @@ bug tracker:
 
 http://sourceforge.net/tracker/?group_id=19984&atid=119984
 
-1284055  	Two Communities of same name throws error
-1261191 	Malformed METS metadata exported
+Oracle compatibility: this release does not support Oracle. Check for patches or updates
+to this release to restore Oracle compatibility.
+
+1520527		PluginManager messy fail
+1517528		Finishing a submission as a supervisor fails
+1506556		Textareas in Oracle (VARCHAR datatype)
+1490162		Malformed OAI-PMH response: illegal bytes in UTF-8
+1480496		Cannot turn off "ignore authorization" flag
+1472729		Permissions for Approval Users
+1461607		errors on Oracle -- database_schema_13_14.sql
+1460754		Problems with Long Java datatype and Oracle
+1456594		Collection administrator can delete any item
+1456590		Values of templates not visible to user
+1456588		Adding new internal bitstream causes upload error
+1456580		admin redirected after item withdrawn
+1456568		input-forms.xml validation required
+1456551		search index config and advanced search not in sync	
+1456459		Certain item-level DC fields describe bitstreams
+1456321		Initial questions and Collection template not in sync
+1456317		Edit Item as Collection Admin - but Admin Buttons displayed
+1456311		Communities and Collections without names
+1456257		restricted access and cc licenses
+1456231		Possible to lack access to items from browse
+1455320		Unnecessary ldap.enable
+1452262		4th item highlighted on browse-by-author
+1451749		MetadataField has inconsistent lifecycle methods
+1445573		Stats not working on Oracle
+1442292		Item submitter w/null Submitter not prevented
+1415166		Missing Access Control in WorkFlow, WorkSpace Objects
+1408373		Can still access bitstreams in withdrawn items
+1358131		Non-authorized users can perform WFStep with back button 
+1333269		Error deleting collections with withdrawn items
+1324358		Dates disappear in browsing oldest first
 1256920 	Mapped Items not added to Community (DSpace 1.3.1)
-1255264 	value was set to wrong column
 1242527 	Duplicate Items during submission
 1238166 	Multi Media and D-Space
-1221954 	Community and Collection page validation
 1217068 	Failed to complete review in workflow
 1196724 	Deleting owner of mapped items
 1174342 	Potencial Memory Issue for a large collection
 1173600 	Items Mapper has memory issue for a large collection
 1169975 	workspace item policy not updated after workflow change
-1160898 	dspace_migrate removes Date.Issued from prev published items
 1155173 	Forms in custom 'skin' break group admin tool
-1120726 	Performance bottlekneck in Group.update()
+1120726 	Performance bottleneck in Group.update()
 1076506 	Templates applied to imported items
-1066771 	Metadata edit form dropping DC qualified element
-1066713 	Two (sub)communities can not have one name
-1035366 	size column should be bigint
-
-Oracle compatibility: a problem with input-forms.xml using blank fields can be fixed by applying the sourceforge patch to input-forms.xml at http://sourceforge.net/tracker/index.php?func=detail&aid=1297575&group_id=19984&atid=319984
