@@ -476,6 +476,54 @@ See the <code>dspace.cfg</code> file for examples.
 	<p>will change any handles currently assigned prefix 123456789 to prefix 1303, so for example handle 123456789/23 will be updated to 1303/23 in the database.</p>
 
 
+	<h2><a name="windows">Windows Installation</a></h2>
+
+	<h3>Pre-requisite Software</h3>
+
+	<p>You'll need to install this pre-requisite software:
+
+	<ul>
+	<li><p><a href="http://java.sun.com/">Java SDK 1.4</a> or later (standard SDK is fine, you don't need J2EE)</p></li>
+	<li><p><a href="http://www.postgresql.org/ftp/">PostgreSQL 8.x for Windows</a>. This comes with an installer application now, so Cygwin is no longer required. Make sure the ODBC + JDBC options are selected, as well as the pgAdmin III tool<p></li>
+	<li><p><a href="http://ant.apache.org/">Apache Ant 1.6.x</a>. Unzip the package in <code>C:\</code> and add <code>C:\apache-ant-1.6.2\bin</code> to the <code>PATH</code> environment variable. For Ant to work properly, you should ensure that <code>JAVA_HOME</code> is set.</p></li>
+	<li><p><a href="http://tomcat.apache.org/">Jakarta Tomcat 5.x+<p></a>
+	</ul></p>
+
+	<h3>Installation Steps</h3>
+
+	<p><ol>
+	<li><p>Download the DSpace source from <a href="http://sourceforge.net/projects/dspace">SourceForge</a> and untar it (<a href="http://www.winzip.com/">WinZip</a> will do this)</p></li>
+	<li><p>Copy the PostgreSQL JDBC driver across to the DSpace source tree. The drivers will be in <code>C:\Program Files\PostgreSQL\8.x\jdbc\</code>. The <code>postgresql-8.x-yyy.jdbc2.jar</code> is the jar file you need. Copy it to <code>[dspace-source]/lib</code>.</p></li>
+	<li><p>Ensure the PostgreSQL service is running, and then run pgAdmin III (Start -> PostgreSQL 8.0 -> pgAdmin III). Connect to the local database as the postgres user and:
+		<ul>
+		<li>Create a 'Login Role' (user) called <code>dspace</code> with the password <code>dspace</code></li>
+		<li>Create a database called <code>dspace</code> owned by the user <code>dspace</code>, with UTF-8 encoding
+		</ul></p></li>
+	<li><p>Update paths in <code>[dspace-source]\config\dspace.cfg</code>. <strong>Note:</strong> Use forward slashes / for path separators, though you can still use drive letters, e.g.:
+		<p><code>dspace.dir = C:/DSpace</code><p>
+      Make sure you change all of the parameters with file paths to suit, specifically:
+		<p><pre>
+	dspace.dir
+	config.template.log4j.properties
+	config.template.log4j-handle-plugin.properties
+	config.template.oaicat.properties
+	assetstore.dir
+	history.dir
+	log.dir
+	upload.temp.dir
+	report.dir
+	handle.dir</pre></p></p>
+	</li>
+	<li><p>Create the directory for the DSpace installation (e.g. <code>C:\DSpace</code>)</p></li>
+	<li><p>Run:<p><code>ant fresh_install</code></p></p></li>
+	<li><p>Create an administrator account, e.g. assuming <code>C:\dspace</code> is where your DSpace installation is:<p><code>C:\dspace\bin\dsrun org.dspace.administer.CreateAdministrator</code></p>
+	<p>and enter the required information</p></p></li>
+	<li><p>Copy the <code>.war</code> Web application files from <code>[dspace-source]\build</code> to Tomcat's webapps dir, which should be somewhere like <code>C:\Program Files\Apache Software Foundation\Tomcat 5.5\webapps</code></p></li>
+	<li><p>Start the Tomcat service</p></li>
+	<li><p>Browse <code>http://localhost:8080/dspace</code>. You should see the DSpace home page</p></li>
+	</ol></p>
+
+
     <H2><A NAME="checking">Checking Your Installation</A></H2>
     <p>TODO</p>
 
