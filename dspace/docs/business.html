@@ -945,12 +945,12 @@ http://hdl.handle.net/1721.123/4567</PRE>
 
     <H2><A NAME="browse">Browse API</A></H2>
 
-    <P>The browse API maintains indices of dates, authors and titles, and allows callers to extract parts of these:</P>
+    <P>The browse API maintains indices of dates, authors, titles and subjects, and allows callers to extract parts of these:</P>
 
     <DL>
       <DT>Title</DT>
 
-      <DD><P>Values of the Dublin Core lement <strong><code>title</code></strong> (unqualified) are indexed.  These are sorted in a case-insensitive fashion, with any leading article removed. For example:</P>
+      <DD><P>Values of the Dublin Core element <strong><code>title</code></strong> (unqualified) are indexed.  These are sorted in a case-insensitive fashion, with any leading article removed. For example:</P>
 
       <PRE>The DSpace System</PRE>
 
@@ -1001,13 +1001,18 @@ Doe, John S.</PRE>
 
       <DT>Items by a Particular Author</DT>
 
-      <DD><P>One last operation the browse API can perform is to extract items by a particular author.  They do not have to be primary author of an item for that item to be extracted.  You can specify a scope, too; that is, you can ask for items by author X in collection Y, for example.</P>
+      <DD><P>The browse API can perform is to extract items by a particular author.  They do not have to be primary author of an item for that item to be extracted.  You can specify a scope, too; that is, you can ask for items by author X in collection Y, for example.</P>
 
       <P>This particular flavour of browse is slightly simpler than the others.  You cannot presently specify a particular subset of results to be returned.  The API call will simply return all of the items by a particular author within a certain scope.</P>
 
       <P>Note that the author of the item must <em>exactly</em> match the author passed in to the API; see the explanation about the caveats of the author index browsing to see why this is the case.</P></DD>
 
+	<dt>Subject</dt>
+	
+     <dd><p>Values of the Dublin Core element <strong><code>subject</code></strong> (both unqualified and with any qualifier) are indexed.  These are sorted in a case-insensitive fashion.</p></dd>
     </DL>
+
+    <h3>Using the API</h3>
 
     <P>The API is generally invoked by creating a <code>BrowseScope</code> object, and setting the parameters for which particular part of an index you want to extract.  This is then passed to the relevent <code>Browse</code> method call, which returns a <code>BrowseInfo</code> object which contains the results of the operation.  The parameters set in the <code>BrowseScope</code> object are:</P>
 
