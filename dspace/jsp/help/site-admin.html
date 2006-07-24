@@ -296,20 +296,20 @@
 	You can then select the Action that you want to perform and hit <em>Save Policy</em>.
 
 
-    <h3><a name="dublincore"></a>Dublin Core Registry</h3>
+    <h3><a name="dublincore"></a>Metadata Registry</h3>
 
-    <p>DSpace uses a qualified version of the Dublin Core schema based on the <a href="http://dublincore.org/documents/library-application-profile/">Dublin Core Libraries Working Group Application Profile (LAP)</a>. This registry provides a list of the elements and qualifiers, with comments.</p>
+    <p>By default DSpace uses a qualified version of the Dublin Core schema based on the <a href="http://dublincore.org/documents/library-application-profile/">Dublin Core Libraries Working Group Application Profile (LAP)</a>. You can also configure other flat metadata schemas in the registry. The metadata registry provides a list of the elements and qualifiers, with comments.</p>
 
     <p>You can edit the registry to suit your needs with this tool, but note that:</p>
 
     <ul>
       <li>You can only edit one element/qualifier at a time.  Make the edits to one row, and click the relevant 'update' button.  Only edits you've made to that row will be saved.</li>
-      <li>If you delete a DC element and qualifier, all instances of that element and qualifier in items' metadata will be deleted</li>
+      <li>If you delete an element and qualifier, all instances of that element and qualifier in items' metadata will be deleted</li>
       <li>If you update an element or qualifier, for example changing 'contributor' to 'creator' and clicking 'Update', all instances of 'contributor' in items' metadata will be changed to 'creator'.</li>
-      <li>Some elements/qualifiers are used by the system for various functions, such as <code>date.available</code> for OAI harvesting, and <code>title</code> for the item display and search index.  You can change the scope notes for these but you shouldn't change or remove the element or qualifier.  To see which elements/qualifiers are used by the system, check out the <code><em>[dspace-source]</em>/config/registries/dublin-core.xml</code> file.</li>
+      <li>Some Dublin Core elements/qualifiers are used by the system for various functions, such as <code>date.available</code> for OAI harvesting, and <code>title</code> for the item display and search index.  You can change the scope notes for these but you shouldn't change or remove the element or qualifier.  To see which elements/qualifiers are used by the system, check out the <code><em>[dspace-source]</em>/config/registries/dublin-core.xml</code> file.</li>
     </ul>
 
-    <p>Also note that the <code>dublin-core-types.xml</code> is only used during the build process to populate the Dublin Core registry in the database, which is the 'live' version.  Changes you make with this UI will only be reflected in the database registry, and not the XML file (and vice versa.)</p>
+    <p>Also note that the <code>dublin-core-types.xml</code> is only used during the build process to populate the metadata registry in the database, which is the 'live' version.  Changes you make with this UI will only be reflected in the database registry, and not the XML file (and vice versa.)</p>
 
 
     <h3><a name="bitstream"></a>Bitstream Format Registry</h3>
