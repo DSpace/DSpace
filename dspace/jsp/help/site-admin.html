@@ -22,6 +22,7 @@
       <li><a href="#subcommunity">Creating a Sub-community</a></li>
       <li><a href="#editcommunity">Editing a Community</a></li>
       <li><a href="#createcollection">Creating a Collection</a></li>
+      <li><a href="#editcollection">Editing a Collection</a></li>
       <li><a href="#epeople">E-people</a></li>
       <li><a href="#groups">Groups</a></li>
       <li><a href="#items">Items</a></li>
@@ -72,7 +73,7 @@
 
     <p>Creating a collection is done with a 'wizard' style tool that should be familiar to most people who've used modern operating systems user interfaces.  It's rather similar to the submission interface in DSpace.</p>
 
-    <p><strong>Note:  You cannot add new e-people records with this wizard.</strong>  All the e-person records must be loaded into the system first.  However, you will be able to add more e-people to each group associated with the collection later if required.</p>
+    <p><strong>Note:  You cannot add new e-people records with this wizard.</strong>  All the e-person records must be loaded into the system first.  However, you will be able to add more e-people and/or groups to each group associated with the collection later if required.</p>
 
     <p>To create a collection, ensure you're logged in, go to the community home page for the community in which the collection is to appear, and click 'Create Collection' on the top-right hand corner of the page.  This will start the wizard.</p>
 
@@ -104,16 +105,36 @@
 
     <h4><a name="wizard_permissions"></a>Collection Authorization</h4>
 
-    <p>Depending on the boxes you checked on the first page of the wizard, you will go through a number of screens asking you which e-people can or should perform which actions, for example who submit, and who should perform the <em>accept/reject</em> submission workflow step.  These pages work exactly the same as the <a href="collection-admin.html#groupeditor">group editor</a>.  Click 'Next&nbsp;&gt;' when you have selected all the e-people to appear in the relevant permissions group.</p>
+    <p>Depending on the boxes you checked on the first page of the wizard, you will go through a number of screens asking you which e-people and/or groups can or should perform which actions, for example who can submit, and who should perform the <em>accept/reject</em> submission workflow step.  These pages work exactly the same as the <a href="collection-admin.html#groupeditor">group editor</a>.  Click 'Next&nbsp;&gt;' when you have selected all the e-people and/or groups to appear in the relevant permissions group.</p>
 
-    <p>Note:  You cannot add new e-people records with this wizard.  All the e-person records must be loaded into the system first.  You can add more e-people to each group later if required.</p>
+    <p>Note:  You cannot add new e-people records with this wizard.  All the e-person records must be loaded into the system first.  You can add more e-people and/or groups to each group later if required.</p>
 
 
     <h4><a name="wizard_default"></a>Enter Default Item Metadata</h4>
 
     <p>On this screen you can specify some Dublin Core values that new submissions will have pre-filled out.  Some of the values you can set here do not appear in the submission UI, so end-users may not have the chance to edit them.  This can be a good or a bad thing!  (FIXME?)  Also note that these Dublin Core values will be added to items imported via the batch importer.</p>
 
+    
+    <h3><a name="editcollection"></a>Editing a Collection</h3>
+    <p>The Edit Collection page allows you to change collection metadata (such as name and introductory text), configure authorization and workflow, or delete the collection entirely.</p>
 
+    <p>The 'Delete' button (located at the top of the page) will remove the collection (including all its items) from the repository.</p>
+
+    <p>The <strong>Name</strong>, <strong>Short Description</strong> and <strong>Introductory Text</strong> fields are mandatory, the others are not. Note that this is not enforced, but is highly recommended.</p>
+
+    <p><strong>Copyright Text</strong> is simply text that will appear at the bottom of the collection's home page.</p>
+
+    <p><strong>License</strong> is the <em>deposit license</em> (the license that submitters must grant when they submit an item) for this collection.  This overrides the site default (which is stored in <em>[dspace]</em>/config/default.license and must be edited by a systems adminstrator).  If you leave this field blank, the site default license is used.</p>
+
+    <p><strong>Provenance</strong> is a free-text field you can put any provenance information in you feel like.  It is not visible to end-users.</p>
+
+    <p>To add or change the logo to be displayed on the collection's home page, click on the Upload Logo button. On the next screen either type in a path to the logo file or browse to the logo file, then click on the Upload button.</p>
+
+    <p>To add or change <a href="#authorize">authorisations</a>, <a href="collection-admin.html#submitters">submitters</a> or collection administrators click on the appropriate buttons to create/edit groups and their actions.</p>
+
+    <p>To edit the workflow groups, select the workflow step whose group you want to create or change and follow the <a href="collection-admin.html#groupeditor">group edit</a> process</p>
+
+    <p>Click on the 'Item Template' button to display the <a href="#wizard_default">default item metadata page</a> where you can set default values for metadata fields for all items added to the collection.
 
     <h3><a name="epeople"></a>E-people</h3>
 
@@ -141,13 +162,15 @@
 
     <h3><a name="groups"></a>Groups</h3>
 
-    <p>Use this section to create, edit and delete groups of e-persons who can be authorized for specific functions in the system.</p>
+    <p>Use this section to create, edit and delete groups of e-persons and/or groups who can be authorized for specific functions in the system.</p>
 
     <p>The 'Anonymous' group is a 'special' group that represents every person using the system.  This group exists so that authorization policies can be specified for anonymous access ('everyone in the world can read this item').</p>
 
     <p>Members of the 'Administrator' group are allowed to perform any action in the system, so be careful who you put in this group!</p>
 
     <p>Other groups can be used for a variety of purposes.  Groups may represent e-people who are allowed to submit to a particular collection; e-people who are responsible for performing a particular workflow step such as reviewing incoming submissions; or groups of e-people who have permission to access some restricted content.  Information about what each group is allowed to do is controlled using the <a href="#authorize">authorization section</a>.</p>
+
+    <p>Groups may contain other groups to provide greater flexibility in assigning actions and to simplify maintenance. This is useful for reflecting hierarchical group structures, where a group of e-people with particular responsibilties are also part of a larger group with differing reponsibilities and/or scope of responsibility.</p>
 
     <p>Groups can have names.  Names automatically created by the system follow a convention depending on the what the group is for.  The general form of this is:</p>
 

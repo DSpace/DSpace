@@ -162,6 +162,9 @@
                 <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.button.delete"/>" />
               </form>
             </td>
+            <td align="right" class="standard">
+               <dspace:popup page="/help/site-admin.html#editcollection"><fmt:message key="jsp.help"/></dspace:popup>
+            </td>
           </tr>
         </table>
       </center>
