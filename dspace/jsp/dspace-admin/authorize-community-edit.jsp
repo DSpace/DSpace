@@ -105,6 +105,7 @@
             <%-- <input type="submit" name="submit_community_add_policy" value="Add New"> --%>
             <input type="submit" name="submit_community_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
     </p>
+  </form>
 
     <table class="miscTable" align="center" summary="Community Policy Edit Form">
         <tr>
@@ -126,7 +127,6 @@
     {
         ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
-    <!-- <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">-->
         <tr>
             <td headers="t1" class="<%= row %>RowOddCol"><%= rp.getID() %></td>
             <td headers="t2" class="<%= row %>RowEvenCol">
@@ -136,23 +136,26 @@
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
              </td>
              <td headers="t4" class="<%= row %>RowEvenCol">
+                <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">-->
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                     <%-- <input type="submit" name="submit_community_edit_policy" value="Edit"> --%>
                     <input type="submit" name="submit_community_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
+                </form>
              </td>
              <td headers="t5" class="<%= row %>RowOddCol">
+                <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">-->
+                    <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
+                    <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                     <%-- <input type="submit" name="submit_community_delete_policy" value="Delete"> --%>
                     <input type="submit" name="submit_community_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+                </form>
              </td>
          </tr>
-      <!--</form>-->
 
 <%
         row = (row.equals("odd") ? "even" : "odd");
     }
 %>
     </table>
-
- </form>
 </dspace:layout>
