@@ -1191,12 +1191,12 @@ public class Browse
          */
         if ((browseType == AUTHORS_BROWSE) && !isCount)
         {
-            sqlb.append(",author");
+            sqlb.append(",sort_author");
         }
 
         if ((browseType == SUBJECTS_BROWSE) && !isCount)
         {
-            sqlb.append(",subject");
+            sqlb.append(",sort_subject");
         }
 
         sqlb.append(isCount ? ")" : "");
@@ -1419,9 +1419,9 @@ public class Browse
         int browseType = scope.getBrowseType();
 
         if (browseType == AUTHORS_BROWSE)
-            return "distinct sort_author";
+            return "distinct author";
         else if (browseType == SUBJECTS_BROWSE)
-            return "distinct sort_subject";
+            return "distinct subject";
         else
             return "*";
     }
