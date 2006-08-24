@@ -1,3 +1,6 @@
+(Jonathan Champ)
+- SF patch #1544089 fixes SF bug #1515148 community policies not deleting correctly
+
 (Scott Yeadon)
 - Fixed typo in 13-14 upgrade docs and checksum checker sql, and removed tasklist sql
 
