@@ -1,3 +1,6 @@
+(Tim Donohue)
+- SF patch #1544829  fixes SF bug #1544807 Browse-by-Subject/Author paging mechanism broken
+
 (Jonathan Champ)
 - SF patch #1544089 fixes SF bug #1515148 community policies not deleting correctly
 
