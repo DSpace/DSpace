@@ -1,3 +1,6 @@
+(Mark Diggory)
+- SF patch #1523824 robots.txt to limit bots navigating author and date pages
+
 (Tim Donohue)
 - SF patch #1544829  fixes SF bug #1544807 Browse-by-Subject/Author paging mechanism broken
 
