@@ -1038,7 +1038,7 @@ public class Browse
     {
         // Currently we only sort ItemsByAuthor, Advisor, Subjects browses
         if ((scope.getBrowseType() != ITEMS_BY_AUTHOR_BROWSE)
-                || (scope.getBrowseType() != ITEMS_BY_SUBJECT_BROWSE))
+                && (scope.getBrowseType() != ITEMS_BY_SUBJECT_BROWSE))
         {
             return;
         }
