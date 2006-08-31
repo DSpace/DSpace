@@ -1,3 +1,6 @@
+(Michael Judd)
+- SF patch #1528040  Fixes minor bug in Harvest.java for Oracle users
+
 (Stuart Lewis)
 - SF patch #1541383 Browse-by-date and browse-by-title not working
 
