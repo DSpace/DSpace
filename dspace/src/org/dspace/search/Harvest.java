@@ -203,7 +203,7 @@ public class Harvest
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
             	endDate = oracleTimeStampFormat(endDate);
-                query += " AND item.last_modified <= ? " +
+                query += " AND item.last_modified <= " +
                 		oracleTimeStampFunction(endDate);
                 parameters.add(endDate);
             }
