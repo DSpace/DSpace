@@ -66,7 +66,7 @@
 	String field3 			= request.getParameter("field3") == null ? "ANY" : request.getParameter("field3");
 
 	String conjunction1 	= request.getParameter("conjunction1") == null ? "AND" : request.getParameter("conjunction1");
-	String conjunction2 	= request.getParameter("conjunction2") == null ? "AND" : request.getParameter("conjunction1");
+	String conjunction2 	= request.getParameter("conjunction2") == null ? "AND" : request.getParameter("conjunction2");
 
         QueryResults qResults = (QueryResults)request.getAttribute("queryresults");
 

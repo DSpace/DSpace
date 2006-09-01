@@ -241,7 +241,7 @@ public class QueryArgs
         	queryHash.put("field"+i,
                     (request.getParameter("field"+i) == null) ? "ANY" : request
                             .getParameter("field"+i));
-            queryHash.put("conjunction1",
+            queryHash.put("conjunction"+i,
                     (request.getParameter("conjunction"+i) == null) ? "AND"
                             : request.getParameter("conjunction"+i));            
         }
