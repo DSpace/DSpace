@@ -12,9 +12,12 @@
 
 (Mark Diggory)
 - SF patch #1523824 robots.txt to limit bots navigating author and date pages
+- SF patch #1547987 Small Messages.properties modification (change of DSpace copyright text)
 
 (Tim Donohue)
+- SF patch #1550606  more configurable RSS feeds, also moves text to Messages.properties
 - SF patch #1544829  fixes SF bug #1544807 Browse-by-Subject/Author paging mechanism broken
+- SF patch #1543969  fixes SF bug #1543966 "Special" groups inside groups bug
 
 (Jonathan Champ)
 - SF patch #1544089 fixes SF bug #1515148 community policies not deleting correctly
