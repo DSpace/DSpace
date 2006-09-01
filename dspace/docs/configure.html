@@ -857,6 +857,17 @@ dstat-report-monthly
   <p><code>webui.feed.localresolve = false</code></p>
   <p>By default, the RSS feed will return global handle server-based URLs to items, collections and communities (e.g. http://hdl.handle.net/123456789/1). This means if you have not registered your DSpace installation with the CNRI Handle Server (e.g. development or testing instance) the URLs returned by the feed will return an error if accessed. Setting <code>webui.feed.localresolve = true</code> will result in the RSS feed returning localised URLs (e.g. http://myserver.myorg/handle/123456789/1). If <code>webui.feed.localresolve</code> is set to <code>false</code> or not present the default global handle URL form is used.</p>
 
+  <p><code>webui.feed.item.title = dc.title<br/>
+	webui.feed.item.date = dc.date.issued</code></p>
+  <p>Specify which metadata field you want to be displayed as an item's title and date in the RSS feed.  You can only specify a <em>single</em> metadata field for each of these properties.</p>
+  
+  <p><code>webui.feed.item.description = dc.title, dc.contributor.author, \<br/>
+							  dc.contributor.editor, dc.description.abstract, \<br/>
+							  dc.description</code></p>
+  <p>Specify which metadata fields should be displayed in an item's description field in the RSS feed.  You can specify as many fields as you wish here.  The fields will be listed in the RSS feed in the order they appear, and will only be listed if they have values.
+   Similar to the item display UI, the name of the field displayed in the feed will be drawn from the current UI dictionary, using the key: <code>"metadata.&lt;field&gt;"</code> (e.g. <code>"metadata.dc.title"</code>, <code>"metadata.dc.contributor.author"</code>, <code>"metadata.dc.description.*"</code>)</p>
+  
+
   <h2><a name="suggest" id="suggest">Configuring Item Recommendations</a></h2>
   <p>The 'suggest an item' service is a convenient way for DSpace users to notify others via email about
      content they discover in the repository. If enabled, a link appears on the simple item display page leading
