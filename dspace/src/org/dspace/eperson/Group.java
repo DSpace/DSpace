@@ -441,6 +441,12 @@ public class Group extends DSpaceObject
         
         tri.close();
 
+        // Also need to get all "Special Groups" user is a member of!
+        // Otherwise, you're ignoring the user's membership to these groups!
+        Group[] specialGroups = c.getSpecialGroups();
+        for(int j=0; j<specialGroups.length;j++)
+            groupIDs.add(new Integer(specialGroups[j].getID()));
+        
         // now we have all owning groups, also grab all parents of owning groups
         // yes, I know this could have been done as one big query and a union,
         // but doing the Oracle port taught me to keep to simple SQL!
