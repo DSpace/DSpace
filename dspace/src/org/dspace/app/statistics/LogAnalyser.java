@@ -843,7 +843,7 @@ public class LogAnalyser
         singleRX = Pattern.compile("( . |^. | .$)");
         
         // set up the standard log file line regular expression
-        String logLine = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:([^:]+):(.*)";
+        String logLine = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:[^:]+:([^:]+):(.*)";
         valid = Pattern.compile(logLine);
         
         // set up the pattern for validating log file names
