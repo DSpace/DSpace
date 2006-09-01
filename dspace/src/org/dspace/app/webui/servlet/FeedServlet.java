@@ -42,12 +42,16 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -94,6 +98,8 @@ public class FeedServlet extends DSpaceServlet
 	private static final long HOUR_MSECS = 60 * 60 * 1000;
     /** log4j category */
     private static Logger log = Logger.getLogger(FeedServlet.class);
+    private String clazz = "org.dspace.app.webui.servlet.FeedServlet";
+
     
     // are syndication feeds enabled?
     private static boolean enabled = false;
@@ -107,6 +113,13 @@ public class FeedServlet extends DSpaceServlet
     private static int cacheAge = 0;
     // supported syndication formats
     private static List formats = null;
+    
+    // localized resource bundle
+    private static ResourceBundle labels = null;
+    
+    //default fields to display in item description
+    private static String defaultDescriptionFields = "dc.title, dc.contributor.author, dc.contributor.editor, dc.description.abstract, dc.description";
+
     
     static
     {
@@ -146,6 +159,13 @@ public class FeedServlet extends DSpaceServlet
         String feedType = null;
         String handle = null;
 
+        if(labels==null)
+        {    
+            // Get access to the localized resource bundle
+            Locale locale = request.getLocale();
+            labels = ResourceBundle.getBundle("Messages", locale);
+        }
+        
         if (path != null)
         {
             // substring(1) is to remove initial '/'
@@ -273,7 +293,7 @@ public class FeedServlet extends DSpaceServlet
     	
     	if (dso.getType() == Constants.COLLECTION)
     	{
-    		type = "collection";
+    		type = labels.getString(clazz + ".feed-type.collection");
     		Collection col = (Collection)dso;
            	description = col.getMetadata("short_description");
            	title = col.getMetadata("name");
@@ -282,7 +302,7 @@ public class FeedServlet extends DSpaceServlet
         }
     	else if (dso.getType() == Constants.COMMUNITY)
     	{
-    		type = "community";
+    		type = labels.getString(clazz + ".feed-type.community");
     		Community comm = (Community)dso;
            	description = comm.getMetadata("short_description");
            	title = comm.getMetadata("name");
@@ -293,14 +313,17 @@ public class FeedServlet extends DSpaceServlet
 		// put in container-level data
         channel.setDescription(description);
         channel.setLink(objectUrl);
-        channel.setTitle("DSpace " + type + ": " + title);
+        //build channel title by passing in type and title
+        String channelTitle = MessageFormat.format(labels.getString(clazz + ".feed.title"),
+                                                    new Object[]{type, title});
+        channel.setTitle(channelTitle);
     	if (logo != null)
     	{
     		// we use the path to the logo for this, the logo itself cannot
     	    // be contained in the rdf. Not all RSS-viewers show this logo.
     		Image image = new Image();
     		image.setLink(objectUrl);
-    		image.setTitle("The Channel Image");
+    		image.setTitle(labels.getString(clazz + ".logo.title"));
     		image.setUrl(dspaceUrl + "/retrieve/" + logo.getID());
     	    channel.setImage(image);
     	}
@@ -310,9 +333,12 @@ public class FeedServlet extends DSpaceServlet
     	// version until this bug is fixed.
     	TextInput input = new TextInput();
     	input.setLink(dspaceUrl + "/simple-search");
-    	input.setDescription( "Search the Channel" );
-    	input.setTitle("The " + type + "'s search engine");
-    	input.setName("s");
+    	input.setDescription( labels.getString(clazz + ".search.description") );
+    	//build search title by passing in type
+        String searchTitle = MessageFormat.format(labels.getString(clazz + ".search.title"),
+                                                    new Object[]{type});
+    	input.setTitle(searchTitle);
+    	input.setName(labels.getString(clazz + ".search.name"));
     	channel.setTextInput(input);
 		   		
        	// gather & add items to the feed.
@@ -344,111 +370,125 @@ public class FeedServlet extends DSpaceServlet
         com.sun.syndication.feed.rss.Item rssItem = 
         	new com.sun.syndication.feed.rss.Item();
         
+        //get the title and date fields
+        String titleField = ConfigurationManager.getProperty("webui.feed.item.title");
+        if (titleField == null)
+        {
+            titleField = "dc.title";
+        }
+        
+        String dateField = ConfigurationManager.getProperty("webui.feed.item.date");
+        if (dateField == null)
+        {
+            dateField = "dc.date.issued";
+        }   
+        
+        //Set item handle
     	String itHandle = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
 		? HandleManager.resolveToURL(context, dspaceItem.getHandle())
 		: HandleManager.getCanonicalForm(dspaceItem.getHandle());
 
         rssItem.setLink(itHandle);
         
-    	String title = getDC(dspaceItem, "title", null, Item.ANY);
-    	if (title == null)
-    	{
-    		title = "no_title";
-    	}
+        //get first title
+        String title = null;
+        try
+        {
+            title = dspaceItem.getMetadata(titleField)[0].value;
+           
+        }
+        catch (ArrayIndexOutOfBoundsException e)
+        { 
+            title = labels.getString(clazz + ".notitle");
+        }
         rssItem.setTitle(title);
+        
         // We put some metadata in the description field. This field is
         // displayed by most RSS viewers
-        StringBuffer descBuf = new StringBuffer();
-        if ( ! "no_title".equals(title) )
-        {
-        	descBuf.append("title: ");
-        	descBuf.append(title);
-        	descBuf.append(" ");
-        }
-        DCValue[] authors = dspaceItem.getDC("contributor", "author", Item.ANY);
-        if (authors.length > 0)
-        {
-        	descBuf.append("authors: ");
-            for (int i = 0; i < authors.length; i++)
-            {
-            	descBuf.append(authors[i].value);
-            	if (i < authors.length - 1)
-            	{
-            		descBuf.append("; ");
-            	}
-            }
-            descBuf.append("\n<br>");
-        }
-        DCValue[] editors = dspaceItem.getDC("contributor", "editor", Item.ANY);
-        if (editors.length > 0)
-        {
-        	descBuf.append("editors: ");
-            for (int i = 0; i < editors.length; i++)
-            {
-            	descBuf.append(editors[i].value);
-            	if (i < editors.length - 1)
-            	{
-            		descBuf.append("; ");
-            	}
-            }
-            descBuf.append("\n<br>");
-        }
-        String abstr = getDC(dspaceItem, "description", "abstract", Item.ANY);
-        if (abstr != null)
-        {
-        	descBuf.append("abstract: ");
-        	descBuf.append(abstr);
-        	descBuf.append("\n<br>");
-        }
-        String desc = getDC(dspaceItem, "description", null, Item.ANY);
-        if (desc != null)
-        {
-        	descBuf.append("description: ");
-        	descBuf.append(desc);
-        	descBuf.append("\n<br>");
-        }
+        String descriptionFields = ConfigurationManager
+                                        .getProperty("webui.feed.item.description");
 
+        if (descriptionFields == null)
+        {     
+            descriptionFields = defaultDescriptionFields;
+        }
+        
+        //loop through all the metadata fields to put in the description
+        StringBuffer descBuf = new StringBuffer();  
+        StringTokenizer st = new StringTokenizer(descriptionFields, ",");
+
+        while (st.hasMoreTokens())
+        {
+            String field = st.nextToken().trim();
+            boolean isDate = false;
+         
+            // Find out if the field should rendered as a date
+            if (field.indexOf("(date)") > 0)
+            {
+                field = field.replaceAll("\\(date\\)", "");
+                isDate = true;
+            }
+
+            
+            //print out this field, along with its value(s)
+            DCValue[] values = dspaceItem.getMetadata(field);
+           
+            if(values != null && values.length>0)
+            {
+                //as long as there is already something in the description
+                //buffer, print out a few line breaks before the next field
+                if(descBuf.length() > 0)
+                {
+                    descBuf.append("\n<br/>");
+                    descBuf.append("\n<br/>");
+                }
+                    
+                String fieldLabel = null;
+                try
+                {
+                    fieldLabel = labels.getString("metadata." + field);
+                }
+                catch(java.util.MissingResourceException e) {}
+                
+                if(fieldLabel !=null && fieldLabel.length()>0)
+                    descBuf.append(fieldLabel + ": ");
+                
+                for(int i=0; i<values.length; i++)
+                {    
+                    String fieldValue = values[i].value;
+                    if(isDate)
+                        fieldValue = (new DCDate(fieldValue)).toString();
+                    descBuf.append(fieldValue);
+                    if (i < values.length - 1)
+                    {
+                        descBuf.append("; ");
+                    }
+                }
+            }
+            
+        }//end while   
         Description descrip = new Description();
         descrip.setValue(descBuf.toString());
         rssItem.setDescription(descrip);
             
-        String dcDate = getDC(dspaceItem, "date", "issued", Item.ANY);
-        if (dcDate == null)
+        
+        // set date field
+        String dcDate = null;
+        try
         {
-        	dcDate = getDC(dspaceItem, "date", Item.ANY, Item.ANY);
+            dcDate = dspaceItem.getMetadata(dateField)[0].value;
+           
+        }
+        catch (ArrayIndexOutOfBoundsException e)
+        { 
         }
         if (dcDate != null)
         {
-        	rssItem.setPubDate((new DCDate(dcDate)).toDate());
+            rssItem.setPubDate((new DCDate(dcDate)).toDate());
         }
+        
         return rssItem;
     }
-    
-    /**
-      * @param item
-      *            The item from which the metadata fields are used
-      * @param element
-      *            The Dublin Core element
-      * @param qualifier
-      *            The Dublin Core qualifier
-      * @param lang
-      *            The Dublin Core language
-      * @return If there exists a Dublin Core value with the given element,
-      *         qualifier and language, return it, else null
-      */
-     private String getDC(Item item, String element, String qualifier, String lang)
-     {
-    	 String dcVal = null;
-         try
-         {
-             dcVal = item.getDC(element, qualifier, lang)[0].value;
-         }
-         catch (ArrayIndexOutOfBoundsException e)
-         {
-             dcVal = null;
-         }
-         return dcVal;
-     }
 
     /************************************************
      * private cache management classes and methods *

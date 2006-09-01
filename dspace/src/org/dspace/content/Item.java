@@ -50,6 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -517,6 +518,46 @@ public class Item extends DSpaceObject
         valueArray = (DCValue[]) values.toArray(valueArray);
 
         return valueArray;
+    }
+    
+    /**
+     * Retrieve metadata field values from a given metadata string
+     * of the form <schema prefix>.<element>[.<qualifier>|.*]
+     *
+     * @param mdString
+     *            The metadata string of the form
+     *            <schema prefix>.<element>[.<qualifier>|.*]
+     */
+    public DCValue[] getMetadata(String mdString)
+    {
+        StringTokenizer dcf = new StringTokenizer(mdString, ".");
+        
+        String[] tokens = { "", "", "" };
+        int i = 0;
+        while(dcf.hasMoreTokens())
+        {
+            tokens[i] = dcf.nextToken().toLowerCase().trim();
+            i++;
+        }
+        String schema = tokens[0];
+        String element = tokens[1];
+        String qualifier = tokens[2];
+        
+        DCValue[] values;
+        if ("*".equals(qualifier))
+        {
+            values = getMetadata(schema, element, Item.ANY, Item.ANY);
+        }
+        else if ("".equals(qualifier))
+        {
+            values = getMetadata(schema, element, null, Item.ANY);
+        }
+        else
+        {
+            values = getMetadata(schema, element, qualifier, Item.ANY);
+        }
+        
+        return values;
     }
 
     /**
