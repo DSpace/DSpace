@@ -595,6 +595,7 @@ public class BitstreamStorageManager
     {
         Context context = null;
         BitstreamInfoDAO bitstreamInfoDAO = new BitstreamInfoDAO();
+        int commit_counter = 0;
 
         try
         {
@@ -663,6 +664,16 @@ public class BitstreamStorageManager
                 if( success )
                 {
                     deleteParents(file);
+                }
+                
+                // Make sure to commit our outstanding work every 100
+                // iterations. Otherwise you risk losing the entire transaction
+                // if we hit an exception, which isn't useful at all for large
+                // amounts of bitstreams.
+                commit_counter++;
+                if (commit_counter % 100 == 0)
+                {
+                	context.commit();
                 }
             }
 

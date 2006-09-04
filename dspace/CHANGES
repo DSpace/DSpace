@@ -1,5 +1,6 @@
 (Jeroen Ruigrok)
 - SF patch #1549758 Make sure cleanup() doesn't fail with NullPointerException
+- SF patch #1549867  Make cleanup() commit outstanding work every 100 iterations
 
 (Flavio Botelho)
 - SF patch #1529326 Bug in new code at QueryArgs with fixed typo in jsp/search/advanced.jsp
