@@ -902,7 +902,24 @@ public class Collection extends DSpaceObject
 
         while (items.hasNext())
         {
-            removeItem(items.next());
+            Item item = items.next();
+            
+            if (item.isOwningCollection(this))
+            {
+            // the collection to be deletd is the owning collection, thus remove
+            // the item from all collections it belongs to
+                Collection[] collections = item.getCollections();
+                for (int i=0; i< collections.length; i++)
+                {
+                    collections[i].removeItem(item);
+                }
+                    
+            } 
+            // the item was only mapped to this collection, so just remove it
+            else
+            {
+                removeItem(item);
+            }
         }
 
         // Delete bitstream logo
