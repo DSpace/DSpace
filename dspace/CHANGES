@@ -29,6 +29,7 @@
 (Claudia Juergen)
 - SF patch #1514965 fixes SF bug #1505422. fix typo in SQL for item mapper
 - SF patch #1516988  Deleting owner of mapped items SF bug #1196724
+- SF patch #1517488  Access Bitstreams in Withdrawn Items SF bug #1408373
 
 (Richard Jones)
 - SF bug #1515075. minor build file fix to copy correct config file

@@ -77,6 +77,7 @@ public class BitstreamServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
         Bitstream bitstream = null;
+        boolean isWithdrawn = false;
 
         // Get the ID from the URL
         String idString = request.getPathInfo();
@@ -121,7 +122,7 @@ public class BitstreamServlet extends DSpaceServlet
             {
                 Item item = (Item) HandleManager.resolveToObject(context,
                         handle);
-
+                
                 if (item == null)
                 {
                     log.info(LogManager.getHeader(context, "invalid_id",
@@ -131,6 +132,9 @@ public class BitstreamServlet extends DSpaceServlet
 
                     return;
                 }
+                
+                // determine whether the item the bitstream belongs to has been withdrawn
+                isWithdrawn = item.isWithdrawn();
 
                 int sid = Integer.parseInt(sequence);
                 boolean found = false;
@@ -156,35 +160,45 @@ public class BitstreamServlet extends DSpaceServlet
                 // Invalid ID - this will be dealt with below
             }
         }
-
-        // Did we get a bitstream?
-        if (bitstream != null)
+        
+        if (!isWithdrawn)
         {
-            log.info(LogManager.getHeader(context, "view_bitstream",
+            // Did we get a bitstream?
+            if (bitstream != null)
+            {
+                log.info(LogManager.getHeader(context, "view_bitstream",
                     "bitstream_id=" + bitstream.getID()));
 
-            // Set the response MIME type
-            response.setContentType(bitstream.getFormat().getMIMEType());
+                // Set the response MIME type
+                response.setContentType(bitstream.getFormat().getMIMEType());
 
-            // Response length
-            response.setHeader("Content-Length", String.valueOf(bitstream
+                // Response length
+                response.setHeader("Content-Length", String.valueOf(bitstream
                     .getSize()));
 
-            // Pipe the bits
-            InputStream is = bitstream.retrieve();
+                // Pipe the bits
+                InputStream is = bitstream.retrieve();
 
-            Utils.bufferedCopy(is, response.getOutputStream());
-            is.close();
-            response.getOutputStream().flush();
+                Utils.bufferedCopy(is, response.getOutputStream());
+                is.close();
+                response.getOutputStream().flush();
+            }
+            // display the tombstone instead of the bitstream if the item is withdrawn
+            else
+            {
+                // No bitstream - we got an invalid ID
+                log.info(LogManager.getHeader(context, "view_bitstream",
+                    "invalid_bitstream_id=" + idString));
+
+                JSPManager.showInvalidIDError(request, response, idString,
+                    Constants.BITSTREAM);
+            }
         }
         else
         {
-            // No bitstream - we got an invalid ID
-            log.info(LogManager.getHeader(context, "view_bitstream",
-                    "invalid_bitstream_id=" + idString));
-
-            JSPManager.showInvalidIDError(request, response, idString,
-                    Constants.BITSTREAM);
+            log.info(LogManager.getHeader(context, "view_bitstream", "item has been withdrawn"));
+            JSPManager.showJSP(request, response, "/tombstone.jsp");
         }
+       
     }
 }
