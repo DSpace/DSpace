@@ -613,7 +613,7 @@ public class BitstreamStorageManager
 				GeneralFile file = getFile(row);
 
                 // Make sure entries which do not exist are removed
-                if (file == null)
+                if (file == null || !file.exists())
                 {
                     log.debug("file is null");
                     if (deleteDbRecords)

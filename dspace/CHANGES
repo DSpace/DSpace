@@ -1,8 +1,8 @@
+(Jeroen Ruigrok)
+- SF patch #1549758 Make sure cleanup() doesn't fail with NullPointerException
+
 (Flavio Botelho)
 - SF patch #1529326 Bug in new code at QueryArgs with fixed typo in jsp/search/advanced.jsp
-
-(Stuart Lewis)
-- SF patch #1548020 robots.txt to limit bots navigating browse by subject
 
 (Michael Judd)
 - SF patch #1528040  Fixes minor bug in Harvest.java for Oracle users
@@ -10,6 +10,7 @@
 (Stuart Lewis)
 - SF patch #1543856 Statistics do not work in 1.4 - patch to fix SF bug #1543853
 - SF patch #1541383 Browse-by-date and browse-by-title not working
+- SF patch #1548020 robots.txt to limit bots navigating browse by subject
 
 (Mark Diggory)
 - SF patch #1523824 robots.txt to limit bots navigating author and date pages
