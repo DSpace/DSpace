@@ -248,6 +248,14 @@ public class Bundle extends DSpaceObject
         bundleRow.setColumn("primary_bitstream_id", bitstreamID);
     }
 
+    /**
+     * Unset the primary bitstream ID of the bundle
+     */
+    public void unsetPrimaryBitstreamID()
+    {
+    	bundleRow.setColumnNull("primary_bitstream_id");
+    }
+    
     public String getHandle()
     {
         // No Handles for bundles
@@ -428,6 +436,11 @@ public class Bundle extends DSpaceObject
     /**
      * Remove a bitstream from this bundle - the bitstream is only deleted if
      * this was the last reference to it
+     * <p>
+     * If the bitstream in question is the primary bitstream recorded for the
+     * bundle the primary bitstream field is unset in order to free the
+     * bitstream from the foreign key constraint so that the
+     * <code>cleanup</code> process can run normally.
      * 
      * @param b
      *            the bitstream to remove
@@ -452,6 +465,13 @@ public class Bundle extends DSpaceObject
             {
                 // We've found the bitstream to remove
                 li.remove();
+                
+                // In the event that the bitstream to remove is actually
+                // the primary bitstream, be sure to unset the primary
+                // bitstream.
+                if (b.getID() == getPrimaryBitstreamID()) {
+                	unsetPrimaryBitstreamID();
+                }
             }
         }
 
