@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -52,6 +53,7 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18N;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
@@ -360,9 +362,21 @@ public class Collection extends DSpaceObject
      * 
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
+     * @exception MissingResourceException
      */
-    public void setMetadata(String field, String value)
+    public void setMetadata(String field, String value) throws MissingResourceException
     {
+        if ((field.trim()).equals("name") && (value.trim()).equals(""))
+        {
+            try
+            {
+                value = I18N.message("untitled", Collection.class);
+            }
+            catch (MissingResourceException e)
+            {
+                value = "Untitled";
+            }
+        }
         collectionRow.setColumn(field, value);
     }
 
