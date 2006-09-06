@@ -105,7 +105,7 @@ if (error!=null) {
            <tr>
               <th class="oddRowOddCol">
                  <strong>
-                            ID 
+                            <fmt:message key="jsp.general.id" /> 
                             / <fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/> 
                             / <fmt:message key="jsp.dspace-admin.list-metadata-fields.qualifier"/> 
                             / <fmt:message key="jsp.dspace-admin.list-metadata-fields.scope"/>

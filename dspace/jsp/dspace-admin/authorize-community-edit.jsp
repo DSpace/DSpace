@@ -86,7 +86,6 @@
   <table width="95%">
     <tr>
       <td align="left">
-    <%-- <h1>Policies for Community "<%= community.getMetadata("name") %>" (hdl:<%= community.getHandle() %>, DB ID <%=community.getID()%>)</h1> --%>
 	<h1><fmt:message key="jsp.dspace-admin.authorize-community-edit.policies">
         <fmt:param><%= community.getMetadata("name") %></fmt:param>
         <fmt:param>hdl:<%= community.getHandle() %></fmt:param>
@@ -102,7 +101,6 @@
   <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
     <p align="center">
             <input type="hidden" name="community_id" value="<%=community.getID()%>" />
-            <%-- <input type="submit" name="submit_community_add_policy" value="Add New"> --%>
             <input type="submit" name="submit_community_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
     </p>
   </form>
@@ -110,10 +108,8 @@
     <table class="miscTable" align="center" summary="Community Policy Edit Form">
         <tr>
 
-            <th id="t1" class="oddRowOddCol"><strong>ID</strong></th>
-            <%-- <th class="oddRowEvenCol"><strong>Action</strong></th> --%>
+            <th id="t1" class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
             <th id="t2" class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
-            <%-- <th class="oddRowOddCol"><strong>Group</strong></th> --%>
             <th id="t3" class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
             <th id="t4" class="oddRowEvenCol">&nbsp;</th>
             <th id="t5" class="oddRowOddCol">&nbsp;</th>
@@ -139,7 +135,6 @@
                 <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">-->
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="community_id" value="<%= community.getID() %>" />
-                    <%-- <input type="submit" name="submit_community_edit_policy" value="Edit"> --%>
                     <input type="submit" name="submit_community_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
                 </form>
              </td>
@@ -147,7 +142,6 @@
                 <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">-->
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="community_id" value="<%= community.getID() %>" />
-                    <%-- <input type="submit" name="submit_community_delete_policy" value="Delete"> --%>
                     <input type="submit" name="submit_community_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
                 </form>
              </td>

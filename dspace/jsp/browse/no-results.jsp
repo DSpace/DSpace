@@ -52,6 +52,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page  import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 
@@ -61,7 +63,7 @@
     Collection collection = (Collection) request.getAttribute("collection");
 
     // Description of what the user is actually browsing, and where link back
-    String linkText = "DSpace Home";
+    String linkText = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.home");
     String linkBack = "/";
 
     if(collection != null)

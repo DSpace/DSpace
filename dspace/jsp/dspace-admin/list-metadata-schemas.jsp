@@ -91,7 +91,7 @@ if (error!=null) {
 
     <table class="miscTable" align="center" width="500">
         <tr>
-            <th class="oddRowOddCol"><strong>ID</strong></th>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.list-metadata-schemas.namespace"/></strong></th> 
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.list-metadata-schemas.name"/></strong></th> 
             <th class="oddRowOddCol">&nbsp;</th>

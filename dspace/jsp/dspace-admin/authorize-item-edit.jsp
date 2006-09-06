@@ -133,7 +133,7 @@
 
     <table class="miscTable" align="center" summary="Item Policy Edit Form">
         <tr>
-            <th class="oddRowOddCol"><strong>ID</strong></th>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.eperson"/></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
@@ -197,9 +197,9 @@
         
     <table class="miscTable" align="center" summary="Bundle Policy Edit Form">
         <tr>
-            <th class="oddRowOddCol"><strong>ID</strong></th>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
-            <th class="oddRowOddCol"><strong>EPerson</strong></th>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.general.eperson" /></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
@@ -264,7 +264,7 @@
             </form>
             <table class="miscTable" align="center" summary="This table displays the bitstream data">
             <tr>
-                <th class="oddRowOddCol"><strong>ID</strong></th>
+                <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
                 <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
                 <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.eperson" /></strong></th>
                 <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>

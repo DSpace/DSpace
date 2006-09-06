@@ -106,7 +106,6 @@
  <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post"> 
     <p align="center">
             <input type="hidden" name="collection_id" value="<%=collection.getID()%>" />
-            <%-- <input type="submit" name="submit_collection_add_policy" value="Add New"> --%>
             <input type="submit" name="submit_collection_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
     </p>
  </form>
@@ -122,7 +121,7 @@
       <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
         <table class="miscTable" align="center" summary="Collection Policy Edit Form">
             <tr>
-               <th class="oddRowOddCol"><strong>ID</strong></th>
+               <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
                <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
                <th class="oddRowEvenCol">&nbsp;</th>

@@ -87,7 +87,7 @@
             <tr>
                 <th class="oddRowOddCol">
                     <strong>
-                            ID
+                            <fmt:message key="jsp.general.id" />
                             / <fmt:message key="jsp.dspace-admin.list-formats.mime"/>
                             / <fmt:message key="jsp.dspace-admin.list-formats.name"/>
                             / <fmt:message key="jsp.dspace-admin.list-formats.description"/>
