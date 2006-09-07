@@ -85,6 +85,22 @@ public class UIUtil
     public static Context obtainContext(HttpServletRequest request)
             throws SQLException
     {
+        
+        //Set encoding to UTF-8, if not set yet
+        //This avoids problems of using the HttpServletRequest
+        //in the getSpecialGroups() for an AuthenticationMethod,  
+        //which causes the HttpServletRequest to default to 
+        //non-UTF-8 encoding.
+        try
+        {
+            if(request.getCharacterEncoding()==null)
+                request.setCharacterEncoding(Constants.DEFAULT_ENCODING);
+        }
+        catch(Exception e)
+        {
+            log.error("Unable to set encoding to UTF-8.", e);
+        }
+        
         Context c = (Context) request.getAttribute("dspace.context");
 
         if (c == null)
