@@ -48,14 +48,7 @@
 
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <center>
-  <p><fmt:message key="jsp.components.contact-info.details">
+  <p><a href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.components.contact-info.details">
     <fmt:param><%= ConfigurationManager.getProperty("dspace.name") %></fmt:param>
-  </fmt:message></p>
-
-    <table>
-        <tr>
-            <td class="standard"><fmt:message key="jsp.components.contact-info.email"/></td>
-            <td class="standard"><a href="mailto:<%= ConfigurationManager.getProperty("mail.admin") %>"><%= ConfigurationManager.getProperty("mail.admin") %></a></td>
-        </tr>
-    </table>
+  </fmt:message></a></p>
 </center>

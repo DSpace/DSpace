@@ -1,3 +1,6 @@
+(Dorothea Salo)
+- SF patch #1544124  Remove admin email from contact info
+
 (Jeroen Ruigrok)
 - SF patch #1549758 Make sure cleanup() doesn't fail with NullPointerException
 - SF patch #1549867  Make cleanup() commit outstanding work every 100 iterations
