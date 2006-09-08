@@ -52,23 +52,23 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 
 <head> 
 <title><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.title"/></title>
-<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 
 
-<link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon">
-<link type="text/css" rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp">
+<link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
+<link type="text/css" rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp"/>
 
 <style type="text/css">
 	body {background-color: #ffffff}
 </style>
 
 
-<SCRIPT LANGUAGE="JavaScript" src="<%= request.getContextPath() %>/utils.js"></script>
+<script type="text/javascript" language="JavaScript" src="<%= request.getContextPath() %>/utils.js"></script>
 
 
   <script type="text/javascript">
@@ -103,7 +103,7 @@
 		return false;
 	}
   </script>
-</header>
+</head>
 
 
 
@@ -138,20 +138,20 @@
 		  method="post" 
 		  action="<%= request.getContextPath()%>/controlledvocabulary">
 	  
-	  <input style="border-width:1px;border-style:solid;" name="filter" type="text" id="filter" size="35" value="<%= filter %>">
-	  <input type="submit" name="submit" value="<fmt:message key='jsp.controlledvocabulary.controlledvocabulary.trimbutton'/>">
-	  <input type="hidden" name="ID" value="<%= ID %>">
-	  <input type="hidden" name="action" value="filter">
-	  <input type="hidden" name="callerUrl" value="<%= request.getContextPath()%>/controlledvocabulary/controlledvocabulary.jsp">
+	  <input style="border-width:1px;border-style:solid;" name="filter" type="text" id="filter" size="35" value="<%= filter %>"/>
+	  <input type="submit" name="submit" value="<fmt:message key='jsp.controlledvocabulary.controlledvocabulary.trimbutton'/>"/>
+	  <input type="hidden" name="ID" value="<%= ID %>"/>
+	  <input type="hidden" name="action" value="filter"/>
+	  <input type="hidden" name="callerUrl" value="<%= request.getContextPath()%>/controlledvocabulary/controlledvocabulary.jsp"/>
 	</form>
 </td>
 <td>
 	<form name="clearFilter" method="post" action="<%= request.getContextPath() %>/controlledvocabulary">
-	  <input type="hidden" name="ID" value="<%= ID %>">
+	  <input type="hidden" name="ID" value="<%= ID %>"/>
 	  <input type="hidden" name="filter" value=""/>
 	  <input type="submit" name="submit" value="<fmt:message key='jsp.controlledvocabulary.controlledvocabulary.clearbutton'/>"/>
 	  <input type="hidden" name="action" value="filter"/> 
-	  <input type="hidden" name="callerUrl" value="<%= request.getContextPath()%>/controlledvocabulary/controlledvocabulary.jsp">
+	  <input type="hidden" name="callerUrl" value="<%= request.getContextPath()%>/controlledvocabulary/controlledvocabulary.jsp"/>
     </form>
 </td>
 </tr>
@@ -170,7 +170,7 @@
 
 <br/>
 <center>
-	<input type="BUTTON" name="cancel" onClick="window.close();" value="<fmt:message key="jsp.controlledvocabulary.controlledvocabulary.closebutton"/>" >
+	<input type="button" name="cancel" onclick="window.close();" value="<fmt:message key="jsp.controlledvocabulary.controlledvocabulary.closebutton"/>" />
 </center>
 </body>
 </html>

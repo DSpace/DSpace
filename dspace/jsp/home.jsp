@@ -90,11 +90,14 @@
             <td class="oddRowEvenCol">
                <h3><fmt:message key="jsp.home.com1"/></h3>
                 <p><fmt:message key="jsp.home.com2"/></p>
-                <table border="0" cellpadding="2">
+
 
 <%
  if (communities.length != 0)
  {
+%>
+    <table border="0" cellpadding="2">
+<% 	                 
 
     for (int i = 0; i < communities.length; i++)
     {
@@ -114,9 +117,12 @@
                     </tr>
 <%
     }
+%>
+    </table>
+<%                
  }
 %>  
-                </table>
+
             </td>
         </tr>
     </table>

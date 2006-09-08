@@ -29,7 +29,7 @@ an HTML tree. Its basically a preety-printer.
 				<xsl:when test="./isComposedBy/node">
 					<img class="controlledvocabulary">
 						<xsl:attribute name="src"><xsl:value-of select="$contextPath"/>/image/controlledvocabulary/p.gif</xsl:attribute>
-						<xsl:attribute name="onClick">ec(this, '<xsl:value-of select="$contextPath"/>');</xsl:attribute>
+						<xsl:attribute name="onclick">ec(this, '<xsl:value-of select="$contextPath"/>');</xsl:attribute>
 					</img>
 				</xsl:when>
 				<xsl:otherwise>
@@ -50,7 +50,7 @@ an HTML tree. Its basically a preety-printer.
 					<xsl:value-of select="@label"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<a class="value" onClick="javascript: i(this);" href="javascript:void(null);">
+					<a class="value" onclick="javascript: i(this);" href="javascript:void(null);">
 						<xsl:value-of select="@label"/>
 					</a>
 				</xsl:otherwise>

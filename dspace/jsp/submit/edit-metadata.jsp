@@ -99,7 +99,7 @@
         	link = "<br/>" + 
 			"<a href='javascript:void(null);' onclick='javascript:popUp(\"" + 
 				contextPath + "/controlledvocabulary/controlledvocabulary.jsp?ID=" + 
-				fieldName + "&vocabulary=" + vocabulary + "\")'>" +
+				fieldName + "&amp;vocabulary=" + vocabulary + "\")'>" +
 					"<span class='controlledVocabularyLink'>" + 
 						LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.controlledvocabulary") + 
 					"</span>" + 
@@ -312,7 +312,7 @@
 //	      .append("\" value=\"Remove This Entry\"/> </td></tr>");
 		  .append("\" value=\"")
 		  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-		  .append("\"> </td></tr>");
+		  .append("\"/> </td></tr>");
 	 } 
 	 else if (repeatable && i == fieldCount - 1) 
 	 {
@@ -608,7 +608,7 @@
 	 {
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldName).append("_").append(i)
-             .append("\" size=\"15\">")
+             .append("\" size=\"15\"/>")
              .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
              .append("</td>\n");             
 	 }
@@ -633,7 +633,7 @@
              .append(fieldName)
              .append("_").append(i)
              //.append("\" size=\"15\"/></td>");
-             .append("\" size=\"15\">") 
+             .append("\" size=\"15\"/>") 
              .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
              .append("</td>\n");             
 
@@ -977,7 +977,6 @@
        {
 %>
 
-		<br/>
 		<tr>
 			<td>&nbsp;</td>
 			<td colspan="3" class="submitFormHelpControlledVocabularies">

@@ -388,6 +388,7 @@
         <center>
             <table width="70%" align="center">
                 <tr>
+                  <td>
 						<input type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/>
 		<%
 
@@ -403,6 +404,7 @@
        <%
 			}
 %>
+                  </td>
                 </tr>
             </table>
         </center>
