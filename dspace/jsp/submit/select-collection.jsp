@@ -74,13 +74,13 @@
 
     <h1><fmt:message key="jsp.submit.select-collection.heading"/></h1>
 
-	<div><fmt:message key="jsp.submit.select-collection.info1"/>
-      <dspace:popup page="/help/index.html#choosecollection"><fmt:message key="jsp.morehelp"/> </dspace:popup> 
-	</div>
-
+	
 <%  if (collections.length > 0)
     {
 %>
+	<div><fmt:message key="jsp.submit.select-collection.info1"/>
+      <dspace:popup page="/help/index.html#choosecollection"><fmt:message key="jsp.morehelp"/> </dspace:popup> 
+	</div>
 
     <form action="<%= request.getContextPath() %>/submit" method="post">
 <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
@@ -128,4 +128,8 @@
 <%  } else { %>
 	<p class="submitFormWarn"><fmt:message key="jsp.submit.select-collection.none-authorized"/></p>
 <%  } %>	
+	   <p><fmt:message key="jsp.general.goto"/><br />
+	   <a href="<%= request.getContextPath() %>"><fmt:message key="jsp.general.home"/></a><br />
+	   <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.general.mydspace" /></a>
+	   </p>	
 </dspace:layout>
