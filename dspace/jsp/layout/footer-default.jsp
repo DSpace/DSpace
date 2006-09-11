@@ -75,10 +75,6 @@
             </tr>
 
             <%-- Page footer --%>
-<%
-    String fromPage = UIUtil.getOriginalURL(request);
-    fromPage = URLEncoder.encode(fromPage);
-%>
              <tr class="pageFooterBar">
                 <td colspan="<%= overallColSpan %>" class="pageFootnote">
                     <table class="pageFooterBar" width="100%">
@@ -90,7 +86,7 @@
                             </td>
                             <td class="pageFootnote">
                                 <fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
-                                <a target="_blank" href="<%= request.getContextPath() %>/feedback?fromPage=<%= fromPage %>"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
+                                <a target="_blank" href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
                             </td>
                             <td nowrap="nowrap" valign="middle"> <%-- nowrap, valign for broken NS 4.x --%>
                             </td>

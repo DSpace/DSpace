@@ -47,10 +47,8 @@
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
-
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
-    prefix="fmt" %>
-
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
@@ -61,7 +59,7 @@
     {
         email = (String) request.getAttribute("authenticated.email");
     }
-    
+
     if (email == null)
     {
         email = "";
@@ -72,16 +70,22 @@
     {
         feedback = "";
     }
+
+    String fromPage = request.getParameter("fromPage");
+    if (fromPage == null)
+    {
+		fromPage = "";
+    }
 %>
 
 <dspace:layout titlekey="jsp.feedback.form.title">
     <%-- <h1>Feedback Form</h1> --%>
     <h1><fmt:message key="jsp.feedback.form.title"/></h1>
-    
+
     <%-- <p>Thanks for taking the time to share your feedback about the
     DSpace system. Your comments are appreciated!</p> --%>
     <p><fmt:message key="jsp.feedback.form.text1"/></p>
-    
+
 <%
     if (problem)
     {
@@ -96,15 +100,14 @@
             <table>
                 <tr>
                     <td class="submitFormLabel"><label for="temail"><fmt:message key="jsp.feedback.form.email"/></label></td>
-                    <td><input type="text" name="email" id="temail" size="50" value="<%= email %>" /></td>
+                    <td><input type="text" name="email" id="temail" size="50" value="<%=StringEscapeUtils.escapeHtml(email)%>" /></td>
                 </tr>
                 <tr>
                     <td class="submitFormLabel"><label for="tfeedback"><fmt:message key="jsp.feedback.form.comment"/></label></td>
-                    <td><textarea name="feedback" id="tfeedback" rows="6" cols="50"><%= feedback %></textarea></td>
+                    <td><textarea name="feedback" id="tfeedback" rows="6" cols="50"><%=StringEscapeUtils.escapeHtml(feedback)%></textarea></td>
                 </tr>
                 <tr>
                     <td colspan="2" align="center">
-                    <input type="hidden" name="fromPage" value="<%= request.getParameter("fromPage") %>"/>
                     <input type="submit" name="submit" value="<fmt:message key="jsp.feedback.form.send"/>" />
                     </td>
                 </tr>

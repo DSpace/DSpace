@@ -49,13 +49,13 @@
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
-
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
 	request.setCharacterEncoding("UTF-8");
-	
+
     boolean problem = (request.getAttribute("suggest.problem") != null);
 
     String sender_email = request.getParameter("sender_email");
@@ -83,25 +83,25 @@
     {
         handle = "";
     }
-	
+
 	String title = (String) request.getAttribute("suggest.title");
 	if (title == null)
 	{
 		title = "";
 	}
-		
+
     String recip_email = request.getParameter("recip_email");
     if (recip_email == null)
     {
         recip_email = "";
     }
-    
+
     String recip_name = request.getParameter("recip_name");
     if (recip_name == null)
     {
         recip_name = "";
     }
-    
+
     String message = request.getParameter("message");
     if (message == null)
     {
@@ -132,25 +132,25 @@
 %>
 				<tr>
                     <td class="submitFormLabel"><fmt:message key="jsp.suggest.recipname"/></td>
-                    <td><input type="TEXT" name="recip_name" size="50" value=<%= recip_name %> ></td>
+                    <td><input type="TEXT" name="recip_name" size="50" value=<%=StringEscapeUtils.escapeHtml(recip_name)%> ></td>
                 </tr>
 				<tr>
                     <td class="submitFormLabel"><fmt:message key="jsp.suggest.recipemail"/></td>
-                    <td><input type="TEXT" name="recip_email" size="50" value="<%= recip_email %>"></td>
+                    <td><input type="TEXT" name="recip_email" size="50" value="<%=StringEscapeUtils.escapeHtml(recip_email)%>"></td>
                 </tr>
 				<tr>
                     <td class="submitFormLabel"><fmt:message key="jsp.suggest.sendername"/></td>
-                    <td><input type="TEXT" name="sender_name" size="50" value="<%= sender_name %>"></td>
+                    <td><input type="TEXT" name="sender_name" size="50" value="<%=StringEscapeUtils.escapeHtml(sender_name)%>"></td>
                 </tr>
                 <tr>
                     <td class="submitFormLabel"><fmt:message key="jsp.suggest.senderemail"/></td>
-                    <td><input type="TEXT" name="sender_email" size="50" value="<%= sender_email %>"></td>
+                    <td><input type="TEXT" name="sender_email" size="50" value="<%=StringEscapeUtils.escapeHtml(sender_email)%>"></td>
                 </tr>
                 <tr>
                     <td class="submitFormLabel"><fmt:message key="jsp.suggest.message"/></td>
-                    <td><textarea name="message" rows="6" cols="46" wrap=soft><%= message %></textarea></td>
+                    <td><textarea name="message" rows="6" cols="46" wrap=soft><%=StringEscapeUtils.escapeHtml(message)%></textarea></td>
                 </tr>
-				
+
                 <tr>
                     <td colspan="2" align="center">
                     <input type="HIDDEN" name="handle" value='<%= handle %>'>

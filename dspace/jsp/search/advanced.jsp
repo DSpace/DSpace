@@ -41,26 +41,24 @@
 <%--
   - Advanced Search JSP
   -
-  - 
-  -   
+  -
+  -
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
-
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
-    prefix="fmt" %>
-
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.search.QueryResults" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.content.Community"   %>
-<%@ page import="org.dspace.search.QueryResults" %>
 
 <%
     Community [] communityArray = (Community[] )request.getAttribute("communities");
 	String query1 			= request.getParameter("query1") == null ? "" : request.getParameter("query1");
 	String query2 			= request.getParameter("query2") == null ? "" : request.getParameter("query2");
 	String query3 			= request.getParameter("query3") == null ? "" : request.getParameter("query3");
-    	
+
 	String field1 			= request.getParameter("field1") == null ? "ANY" : request.getParameter("field1");
 	String field2 			= request.getParameter("field2") == null ? "ANY" : request.getParameter("field2");
 	String field3 			= request.getParameter("field3") == null ? "ANY" : request.getParameter("field3");
@@ -114,11 +112,11 @@
                     <option value="language" <%= field1.equals("language") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.language"/></option>
                   </select>
             </td>
-            
+
             <td align="left" valign="top" nowrap="nowrap" width="68%">
                 <%-- Search for: <br> --%>
               	<label for="tquery1"><fmt:message key="jsp.search.advanced.searchfor"/></label> <br/>
-                <input type="text" name="query1" id="tquery1" value='<%= query1 %>' size="30" />
+                <input type="text" name="query1" id="tquery1" value='<%=StringEscapeUtils.escapeHtml(query1)%>' size="30" />
                 <br/>
               <p/>
             </td>
@@ -145,7 +143,7 @@
                   </select>
            </td>
             <td align="left" valign="top" nowrap="nowrap" width="68%">
-              <input type="text" name="query2" value="<%= query2 %>" size="30"/>
+              <input type="text" name="query2" value="<%=StringEscapeUtils.escapeHtml(query2)%>" size="30"/>
             </td>
           </tr>
           <tr>
@@ -172,7 +170,7 @@
                   <br/>
             </td>
             <td align="left" valign="top" nowrap="nowrap" width="68%">
-              <input type="text" name="query3" value="<%= query3 %>" size="30"/>
+              <input type="text" name="query3" value="<%=StringEscapeUtils.escapeHtml(query3)%>" size="30"/>
             </td>
 
   </tr>
@@ -200,7 +198,7 @@
     if( qResults.getErrorMsg()!=null )
     {%>
         <p align="center" class="submitFormWarn"><%= qResults.getErrorMsg() %></p>
-     <% 
+     <%
     }else
     { %>
         <p align="center"><fmt:message key="jsp.search.general.noresults"/></p>

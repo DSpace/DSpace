@@ -66,7 +66,7 @@
     prefix="fmt" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.net.URLEncoder"            %>
 <%@ page import="org.dspace.content.Community"   %>
 <%@ page import="org.dspace.content.Collection"  %>
@@ -79,7 +79,7 @@
     Collection  collection       = (Collection  ) request.getAttribute("collection");
     Community[] communityArray   = (Community[] ) request.getAttribute("community.array");
     Collection[] collectionArray = (Collection[]) request.getAttribute("collection.array");
-    
+
     Item      [] items       = (Item[]      )request.getAttribute("items");
     Community [] communities = (Community[] )request.getAttribute("communities");
     Collection[] collections = (Collection[])request.getAttribute("collections");
@@ -97,9 +97,9 @@
 <dspace:layout titlekey="jsp.search.results.title">
 
     <%-- <h1>Search Results</h1> --%>
-    
+
 <h1><fmt:message key="jsp.search.results.title"/></h1>
-    
+
     <%-- Controls for a repeat search --%>
     <form action="simple-search" method="get">
         <table class="miscTable" align="center" summary="Table displaying your search results">
@@ -158,7 +158,7 @@
                         </tr>
                         <tr>
                             <td align="center">
-                                <fmt:message key="jsp.search.results.searchfor"/>&nbsp;<input type="text" name="query" value='<%= (query==null ? "" : query) %>'/>&nbsp;<input type="submit" value="<fmt:message key="jsp.general.go"/>" />
+                                <fmt:message key="jsp.search.results.searchfor"/>&nbsp;<input type="text" name="query" value='<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>'/>&nbsp;<input type="submit" value="<fmt:message key="jsp.general.go"/>" />
                             </td>
                         </tr>
                     </table>
@@ -198,7 +198,7 @@ else
     <dspace:communitylist  communities="<%= communities %>" />
 <% } %>
 
-<% if (collections.length > 0 ) { %>   
+<% if (collections.length > 0 ) { %>
     <br/>
     <%-- <h3>Collection hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.colhits"/></h3>
@@ -216,18 +216,18 @@ else
 
 <%
     // retain scope when navigating result sets
-    String searchScope = ""; 
+    String searchScope = "";
     if (community == null && collection == null) {
 	searchScope = "";
     } else if (collection == null) {
 	searchScope = "/handle/" + community.getHandle();
     } else {
 	searchScope = "/handle/" + collection.getHandle();
-    } 
+    }
 
     // create the URLs accessing the previous and next search result pages
     String prevURL =  request.getContextPath()
-                    + searchScope 
+                    + searchScope
                     + "/simple-search?query="
                     + URLEncoder.encode(query)
                     + "&amp;start=";
@@ -239,8 +239,8 @@ else
 
     nextURL = nextURL
             + (pageCurrent) * qResults.getPageSize();
-    
-    
+
+
 if (pageFirst != pageCurrent)
 {
     %><a href="<%= prevURL %>"><fmt:message key="jsp.search.general.previous" /></a><%
@@ -251,7 +251,7 @@ for( int q = pageFirst; q <= pageLast; q++ )
 {
     String myLink = "<a href=\""
                     + request.getContextPath()
-                    + searchScope 
+                    + searchScope
                     + "/simple-search?query="
                     + URLEncoder.encode(query)
                     + "&amp;start=";
