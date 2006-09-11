@@ -63,7 +63,7 @@
 
 %>
 
-<dspace:layout titlekey ="news-main.title"
+<dspace:layout titlekey ="jsp.dspace-admin.news-main.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
