@@ -691,6 +691,7 @@ public class ItemTag extends TagSupport
             					if ((thumbs.length > 0) && showThumbs)
             					{
             						String tName = bitstreams[k].getName() + ".jpg";
+                                  String tAltText = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.ItemTag.thumbnail");
             						Bitstream tb = thumbs[0]
                                         .	getBitstreamByName(tName);
 
@@ -706,7 +707,7 @@ public class ItemTag extends TagSupport
 
             							out.print(bsLink);
             							out.print("<img src=\"" + myPath + "\" ");
-            							out.print("alt=\"" + tName
+            							out.print("alt=\"" + tAltText
             									+ "\" /></a><br />");
             						}
             					}
