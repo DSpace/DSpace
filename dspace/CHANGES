@@ -2,7 +2,9 @@
 - SF patch #1490857  XHTML Compliance of 1.4 alpha 1
 
 (Dorothea Salo)
-- SF patch #1544124  Remove admin email from contact info
+- SF patch #1544124 Remove admin email from contact info
+- SF patch #1533133 Remove thumbnail filename from alt-text
+- SF patch #1533114 Item title in HTML <title>
 
 (Jeroen Ruigrok)
 - SF patch #1549758 Make sure cleanup() doesn't fail with NullPointerException
@@ -26,6 +28,7 @@
 (Mark Diggory)
 - SF patch #1523824 robots.txt to limit bots navigating author and date pages
 - SF patch #1547987 Small Messages.properties modification (change of DSpace copyright text)
+- SF patch #1542830 Patch to limit Referer Spam capabilities
 
 (Tim Donohue)
 - SF patch #1550606  more configurable RSS feeds, also moves text to Messages.properties
