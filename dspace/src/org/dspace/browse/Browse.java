@@ -1205,7 +1205,7 @@ public class Browse
 
         sqlb.append(" from ");
         sqlb.append(tablename);
-        sqlb.append(" ) as distinct_view");
+        sqlb.append(" ) distinct_view");
 
         // If the browse uses items (or item ids) instead of String values
         // make a subquery.

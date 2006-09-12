@@ -46,6 +46,7 @@
 - included some missing i18n tags
 - SF patch #1490891  Submission Step 1 not authorized note and navigation back
 - SF patch #1556316  for SF bugs #1552807, #1333269 and general deletion of Collection
+- SF patch #1554669 Oracle fixes for Browse.java
 
 (Richard Jones)
 - SF bug #1515075. minor build file fix to copy correct config file
