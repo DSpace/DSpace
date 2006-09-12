@@ -11,6 +11,7 @@
 
 (Flavio Botelho)
 - SF patch #1529326 Bug in new code at QueryArgs with fixed typo in jsp/search/advanced.jsp
+- SF patch #1529221 Treat wrong emails friendly
 
 (Michael Judd)
 - SF patch #1528040  Fixes minor bug in Harvest.java for Oracle users

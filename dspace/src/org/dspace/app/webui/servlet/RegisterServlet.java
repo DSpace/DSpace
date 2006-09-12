@@ -42,8 +42,10 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,6 +61,9 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.AuthenticationManager;
+
+import com.sun.mail.smtp.SMTPAddressFailedException;
+
 import java.util.Hashtable;
 import javax.naming.*;
 import javax.naming.directory.*;
@@ -274,7 +279,27 @@ public class RegisterServlet extends DSpaceServlet
                             log.info(LogManager.getHeader(context,
                                 "sendtoken_register", "email=" + email));
 
-                            AccountManager.sendRegistrationInfo(context, email);
+                            try
+                            {
+                            	AccountManager.sendRegistrationInfo(context, email);
+                            }
+                            catch (javax.mail.SendFailedException e)
+                            {
+                            	if (e.getNextException() instanceof SMTPAddressFailedException)
+                            	{
+                                    // If we reach here, the email is email is invalid for the SMTP server (i.e. fbotelho).
+                                    log.info(LogManager.getHeader(context,
+                                        "invalid_email",
+                                        "email=" + email));
+                                    request.setAttribute("retry", new Boolean(true));
+                                    JSPManager.showJSP(request, response, "/register/new-user.jsp");
+                                    return;
+                            	}
+                            	else
+                            	{
+                            		throw e;
+                            	}
+                            }
                             JSPManager.showJSP(request, response,
                                 "/register/registration-sent.jsp");
 
