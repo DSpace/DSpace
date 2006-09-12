@@ -64,6 +64,7 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.handle.HandleManager" %>
@@ -90,14 +91,22 @@
 
     // Full title needs to be put into a string to use as tag argument
     String title = "";
-    if (handle != null)
-    {
-        title = "Item " + handle;
-    }
-    else
-    {
-        title = "Workspace Item";
-    }
+    if (handle == null)
+ 	{
+		title = "Workspace Item";
+	}
+	else 
+	{
+		DCValue[] titleValue = item.getDC("title", null, Item.ANY);
+		if (titleValue.length != 0)
+		{
+			title = titleValue[0].value;
+		}
+		else
+		{
+			title = "Item " + handle;
+		}
+	}
 %>
 
 <dspace:layout title="<%= title %>">
