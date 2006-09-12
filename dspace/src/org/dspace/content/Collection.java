@@ -303,7 +303,7 @@ public class Collection extends DSpaceObject
     }
 
     /**
-     * Get all the items in this collection. The order is indeterminate.
+     * Get the in_archive items in this collection. The order is indeterminate.
      * 
      * @return an iterator over the items in the collection.
      * @throws SQLException
@@ -322,6 +322,24 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Get all the items in this collection. The order is indeterminate.
+     * 
+     * @return an iterator over the items in the collection.
+     * @throws SQLException
+     */
+    public ItemIterator getAllItems() throws SQLException
+    {
+        String myQuery = "SELECT item.* FROM item, collection2item WHERE "
+                + "item.item_id=collection2item.item_id AND "
+                + "collection2item.collection_id= ? ";
+
+        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
+                myQuery,getID());
+
+        return new ItemIterator(ourContext, rows);
+    }
+
+     /**
      * Get the internal ID of this collection
      * 
      * @return the internal identifier
@@ -911,8 +929,11 @@ public class Collection extends DSpaceObject
                 "DELETE FROM subscription WHERE collection_id= ? ", 
                 getID());
 
+        // Remove Template Item
+        removeTemplateItem();
+        
         // Remove items
-        ItemIterator items = getItems();
+        ItemIterator items = getAllItems();
 
         while (items.hasNext())
         {
