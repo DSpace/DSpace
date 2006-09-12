@@ -38,7 +38,8 @@
   - main page for eperson admin
   -
   - Attributes:
-  -   none
+  -   no_eperson_selected - if a user tries to edit or delete an EPerson without
+  -                         first selecting one
   -
   - Returns:
   -   submit_add    - admin wants to add an eperson
@@ -53,6 +54,10 @@
 
 	
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
+<%
+   boolean noEPersonSelected = (request.getAttribute("no_eperson_selected") != null);
+%>
 
 <dspace:layout titlekey="jsp.dspace-admin.eperson-main.title"
                navbar="admin"
@@ -73,6 +78,12 @@
       </td>
     </tr>
   </table>
+
+<% if (noEPersonSelected)
+	{ %><p><strong>
+	     <fmt:message key="jsp.dspace-admin.eperson-main.noepersonselected"/>
+	   </strong></p>
+<%  } %>
     
     <form method="post" action="">    
 

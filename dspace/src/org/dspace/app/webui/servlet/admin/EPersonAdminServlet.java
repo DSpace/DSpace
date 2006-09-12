@@ -101,17 +101,26 @@ public class EPersonAdminServlet extends DSpaceServlet
             // edit an eperson
             EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
                     "eperson_id"));
-
-            // what groups is this person a member of?
-            Group[] groupMemberships = Group.allMemberGroups(context, e);
-
-            request.setAttribute("eperson", e);
-            request.setAttribute("group.memberships", groupMemberships);
-
-            JSPManager.showJSP(request, response,
-                    "/dspace-admin/eperson-edit.jsp");
-
-            context.complete();
+            
+            // Check the EPerson exists
+            if (e == null)
+            {
+            	request.setAttribute("no_eperson_selected", new Boolean(true));
+            	showMain(context, request, response);
+            }
+            else 
+            {            
+	            // what groups is this person a member of?
+	            Group[] groupMemberships = Group.allMemberGroups(context, e);
+	
+	            request.setAttribute("eperson", e);
+	            request.setAttribute("group.memberships", groupMemberships);
+	
+	            JSPManager.showJSP(request, response,
+	                    "/dspace-admin/eperson-edit.jsp");
+	
+	            context.complete();
+            }
         }
         else if (button.equals("submit_save"))
         {
@@ -227,11 +236,20 @@ public class EPersonAdminServlet extends DSpaceServlet
             // Start delete process - go through verification step
             EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
                     "eperson_id"));
-
-            request.setAttribute("eperson", e);
-
-            JSPManager.showJSP(request, response,
-                    "/dspace-admin/eperson-confirm-delete.jsp");
+            
+            // Check the EPerson exists
+            if (e == null)
+            {
+            	request.setAttribute("no_eperson_selected", new Boolean(true));
+            	showMain(context, request, response);
+            }
+            else 
+            {       
+	            request.setAttribute("eperson", e);
+	
+	            JSPManager.showJSP(request, response,
+	                    "/dspace-admin/eperson-confirm-delete.jsp");
+            }
         }
         else if (button.equals("submit_confirm_delete"))
         {
