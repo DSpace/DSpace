@@ -65,21 +65,29 @@ import org.dspace.core.ConfigurationManager;
  * and footer to render the page appropriately:
  * <P>
  * <ul>
- * <li><code>dspace.layout.title</code>- title of page</li>
- * <li><code>dspace.layout.locbar</code>- value will Boolean true or false
+ * <li><code>dspace.layout.title</code> - title of page</li>
+ * <li><code>dspace.layout.locbar</code> - value will Boolean true or false
  * </li>
- * <li><code>dspace.layout.parenttitles</code>- a <code>List</code> of
- * <code>String</code> s corresponding with titles to put in the location bar.
+ * <li><code>dspace.layout.parenttitles</code> - a <code>List</code> of
+ * <code>String</code>s corresponding with titles to put in the location bar.
  * Only set if <code>dspace.layout.locbar</code> is true</li>
- * <li><code>dspace.layout.parentlinks</code>- a <code>List</code> of
- * <code>String</code> s corresponding with links to put in the location bar.
+ * <li><code>dspace.layout.parentlinks</code> - a <code>List</code> of
+ * <code>String</code>s corresponding with links to put in the location bar.
  * Empty strings mean no link. Will only be set if
  * <code>dspace.layout.locbar</code> is true.</li>
- * <li><code>dspace.layout.navbar</code>- value will be "off", or the
+ * <li><code>dspace.layout.navbar</code> - value will be "off", or the
  * navigation bar to include, e.g. "/layout/navbar_default.jsp"</li>
- * <li><code>dspace.layout.sidebar</code>- contents of the sidebar</li>
- * <li><code>dspace.current.user</code>- the EPerson currently logged in, or
+ * <li><code>dspace.layout.sidebar</code> - contents of the sidebar</li>
+ * <li><code>dspace.current.user</code> - the EPerson currently logged in, or
  * <code>null</code> if anonymous access</li>
+ * <li><code>dspace.layout.feeddata</code> - <code>String</code>. "NONE"
+ * means no feed from this page; otherwise the Handle of object (community or
+ * collection) the feed is from</li>
+ * <li><code>dspace.layout.linkparts</code> - <code>String[]</code>. A
+ * cycling sequence of: 2nd part of MIME type (e.g. <code>rdf+rss</code>);
+ * title of feed; path component to go after /feed/ for the actual feed URL
+ * (e.g. <code>rss_1.0</code>). Hence, this array will have 3<i>n</i>
+ * elements where <i>n</i> is the number of feeds.</li>
  * </ul>
  * <p>
  * Furthermore it sets the content type of the response to text/html using UTF-8
