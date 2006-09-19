@@ -191,9 +191,11 @@ function expandCollapse(node, contextPath) {
 	if(childNode.style.display != "block") {
 		childNode.style.display  = "block";
 		image.src = contextPath + "/image/controlledvocabulary/m.gif";
+		image.alt = "Collapse search term category";
 	} else {
 		childNode.style.display  = "none";
 		image.src = contextPath + "/image/controlledvocabulary/p.gif";
+		image.alt = "Expand search term category";
 	}
 	
 	return false;

@@ -5,7 +5,7 @@ an HTML tree. Its basically a preety-printer.
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<!-- ************************************ -->
-	<xsl:output method="html" version="1.0" indent="yes" encoding="utf-8"/>
+	<xsl:output method="xml" version="1.0" omit-xml-declaration="yes" indent="yes" encoding="utf-8"/>
 	<!-- ************************************ -->
 	<xsl:param name="allowMultipleSelection"/>
 	<xsl:param name="contextPath"/>
@@ -15,6 +15,7 @@ an HTML tree. Its basically a preety-printer.
 	<xsl:template match="/">
 		<ul class="controlledvocabulary">
 			<xsl:apply-templates/>
+			<li/>
 		</ul>
 	</xsl:template>
 	<!-- ************************************ -->
@@ -30,11 +31,13 @@ an HTML tree. Its basically a preety-printer.
 					<img class="controlledvocabulary">
 						<xsl:attribute name="src"><xsl:value-of select="$contextPath"/>/image/controlledvocabulary/p.gif</xsl:attribute>
 						<xsl:attribute name="onclick">ec(this, '<xsl:value-of select="$contextPath"/>');</xsl:attribute>
+						<xsl:attribute name="alt">expand search term category</xsl:attribute>
 					</img>
 				</xsl:when>
 				<xsl:otherwise>
 					<img class="dummyclass">
 						<xsl:attribute name="src"><xsl:value-of select="$contextPath"/>/image/controlledvocabulary/f.gif</xsl:attribute>
+						<xsl:attribute name="alt">search term</xsl:attribute>
 					</img>
 				</xsl:otherwise>
 			</xsl:choose>

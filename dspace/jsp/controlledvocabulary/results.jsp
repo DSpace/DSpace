@@ -217,13 +217,13 @@ if (pageTotal > pageCurrent)
 }
 %>
 
-
-<div align="center">
+<object>
+ <div align="center">
   <a href="<%= request.getContextPath() %>/subject-search">
   	<fmt:message key="jsp.controlledvocabulary.results.newsearch"/>
   </a>
-</div>
-
+ </div>
+</object>
 </p>
 
 </dspace:layout>

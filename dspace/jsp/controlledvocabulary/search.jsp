@@ -56,7 +56,7 @@
 %>
 
 
-<dspace:layout locbar="nolink" title='<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.title") %>'>
+<dspace:layout locbar="nolink" title="<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.title") %>">
 
 <h1><fmt:message key="jsp.controlledvocabulary.search.heading"/></h1>
 
@@ -84,9 +84,9 @@
 	  <input style="border-width:1px;border-style:solid;" 
 	  		 name="filter" type="text" id="filter" 
 	  		 size="15" value="<%= filter %>" 
-	  		 title='<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.trimmessage") %>'>
-	  <input type="submit" name="submit" value="<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.trimbutton") %>">
-	  <input type="hidden" name="action" value="filter">
+	  		 title="<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.trimmessage") %>"/>
+	  <input type="submit" name="submit" value="<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.trimbutton") %>"/>
+	  <input type="hidden" name="action" value="filter"/>
 	</form>
 </td>
 <td>
@@ -106,8 +106,8 @@
 		<dspace:controlledvocabulary filter="<%= filter %>" allowMultipleSelection="true"/> 
 			
 		<br/>
-		<input type="hidden" name="action" value="search">
-		<input type="submit" name="submit" value="<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.searchbutton") %>">
+		<input type="hidden" name="action" value="search"/>
+		<input type="submit" name="submit" value="<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.searchbutton") %>"/>
 	</form>
 </div>
 
