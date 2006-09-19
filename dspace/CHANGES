@@ -25,6 +25,7 @@
 - SF patch #1548020 robots.txt to limit bots navigating browse by subject
 - SF patch #1556183  Missing title for news editor page
 - SF patch #1556950  for SF bug #1556947 NPE when no user selected to del/edit
+- SF patch #1561292 for SF bug #1554064
 
 (Mark Diggory)
 - SF patch #1523824 robots.txt to limit bots navigating author and date pages
@@ -52,6 +53,7 @@
 - SF patch #1490891  Submission Step 1 not authorized note and navigation back
 - SF patch #1556316  for SF bugs #1552807, #1333269 and general deletion of Collection
 - SF patch #1554669 Oracle fixes for Browse.java
+- SF patch #1561292 for SF bug #1554064
 
 (Richard Jones)
 - SF bug #1515075. minor build file fix to copy correct config file

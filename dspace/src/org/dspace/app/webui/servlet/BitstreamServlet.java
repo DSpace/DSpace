@@ -159,6 +159,11 @@ public class BitstreamServlet extends DSpaceServlet
             {
                 // Invalid ID - this will be dealt with below
             }
+            catch (ClassCastException cce)
+            {
+            	// Asking for a bitstream from a collection or community 
+            	// - this will be dealt with below
+            }
         }
         
         if (!isWithdrawn)

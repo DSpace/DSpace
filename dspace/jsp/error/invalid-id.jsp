@@ -52,10 +52,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.dspace.core.Constants" %>
+
 <%@ page isErrorPage="true" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-
-<%@ page import="org.dspace.core.Constants" %>
 
 <%
     String badID = (String) request.getAttribute("bad.id");
@@ -68,48 +69,31 @@
     }
 
     // Get text for the type
-    //String typeString = "object";
-   // if (type != null)
-   // {
-   //     typeString = Constants.typeText[type.intValue()].toLowerCase();
-   // }
 
-
-    String typeString = "constants.object";
-    if (type != null)
+    String typeString = LocaleSupport.getLocalizedMessage(pageContext, "jsp.error.invalid-id.type.object");
+    if (type != null && type.intValue() > -1 && type.intValue() < 8)
     {
-        typeString = "constants.type" + type.intValue();
+        typeString = LocaleSupport.getLocalizedMessage(pageContext, "jsp.error.invalid-id.constants.type." + type.intValue());
     }
-
 
 %>
 
 <dspace:layout locbar="off" titlekey="jsp.error.invalid-id.title">
-    <%-- <h1>Invalid Identifier</h1> --%>
     <h1><fmt:message key="jsp.error.invalid-id.title"/></h1>
-    <%-- <p>The identifier <%= badID %> does not correspond to a valid
-    reasons:</p> --%>
 	<p><fmt:message key="jsp.error.invalid-id.text1">
         <fmt:param><%= badID %></fmt:param>
         <fmt:param><%= typeString %></fmt:param>
     </fmt:message></p>
 
     <ul>
-        <%-- <li>The URL of the current page is incorrect - if you followed a link
-        from outside of DSpace it may be mistyped or corrupt.</li> --%>
         <li><fmt:message key="jsp.error.invalid-id.list1"/></li>
-        <%-- <li>You entered an invalid ID into a form - please try again.</li> --%>
         <li><fmt:message key="jsp.error.invalid-id.list2"/></li>
     </ul>
-    
-    <%-- <p>If you're having problems, or you expected the ID to work, feel free to
-    contact the site administrators.</p> --%>
     <p><fmt:message key="jsp.error.invalid-id.text2"/></p>
 
     <dspace:include page="/components/contact-info.jsp" />
 
     <p align="center">
-        <%-- <a href="<%= request.getContextPath() %>/">Go to the DSpace home page</a> --%>
         <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a>
     </p>
 	
