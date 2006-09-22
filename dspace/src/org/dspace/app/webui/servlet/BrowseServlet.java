@@ -341,22 +341,31 @@ public class BrowseServlet extends DSpaceServlet
 
         BrowseInfo browseInfo;
 
-        // Query the browse index
-        if (browseAuthors)
+        try 
         {
-            browseInfo = Browse.getAuthors(scope);
+        	// Query the browse index
+        	if (browseAuthors)
+        	{
+        		browseInfo = Browse.getAuthors(scope);
+        	}
+        	else if (browseDates)
+        	{
+        		browseInfo = Browse.getItemsByDate(scope, oldestFirst);
+        	}
+        	else if (browseSubjects)
+        	{
+        		browseInfo = Browse.getSubjects(scope);
+        	}
+        	else
+        	{
+        		browseInfo = Browse.getItemsByTitle(scope);
+        	}
         }
-        else if (browseDates)
+        catch (SQLException sqle)
         {
-            browseInfo = Browse.getItemsByDate(scope, oldestFirst);
-        }
-        else if (browseSubjects)
-        {
-            browseInfo = Browse.getSubjects(scope);
-        }
-        else
-        {
-            browseInfo = Browse.getItemsByTitle(scope);
+        	// An invalid scope was given
+        	JSPManager.showIntegrityError(request, response);
+        	return;
         }
 
         // Write log entry

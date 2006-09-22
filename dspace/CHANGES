@@ -24,8 +24,9 @@
 - SF patch #1541383 Browse-by-date and browse-by-title not working
 - SF patch #1548020 robots.txt to limit bots navigating browse by subject
 - SF patch #1556183  Missing title for news editor page
-- SF patch #1556950  for SF bug #1556947 NPE when no user selected to del/edit
+- SF patch #1556950 for SF bug #1556947 NPE when no user selected to del/edit
 - SF patch #1561292 for SF bug #1554064
+- SF patch #1563523 for SF bug #1548865 Browse errors on withdrawn item
 
 (Mark Diggory)
 - SF patch #1523824 robots.txt to limit bots navigating author and date pages
