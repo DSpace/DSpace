@@ -365,6 +365,46 @@ See the <code>dspace.cfg</code> file for examples.
       In the examples below, <code>$CATALINA_BASE</code> is the directory
       under which your Tomcat is installed.
       <ol>
+      <li><p>Optional -- ONLY if you don't already have a server certificate.
+        Follow this sub-procedure to request a new, signed server certificate
+        from your Certifying Authority (CA):
+        <ul>
+          <li><p>Create a new key pair under the alias name <code>"tomcat"</code>.
+              When generating your key, give the Distinguished
+              Name fields the appropriate values for your server and
+              institution.  CN should be the fully-qualified domain name of your server host.
+              Here is an example:
+              <pre>
+$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
+  -keystore $CATALINA_BASE/conf/keystore -storepass changeit -validity 365 \
+  -dname 'CN=dspace.myuni.edu, OU=MIT Libraries, O=Massachusetts Institute of Technology, L=Cambridge, S=MA, C=US'
+       </pre>
+          <li><p>Then, create a <em>CSR</em> (Certificate Signing Request)
+            and send it to your Certifying Authority.  They will send you
+            back a signed Server Certificate.  This example command creates a CSR
+            in the file <code>tomcat.csr</code>
+            <pre>
+ $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore -storepass changeit \
+   -certreq -alias tomcat -v -file tomcat.csr</pre>
+
+          <li><p>Before importing the signed certificate, you must have
+             the CA's certificate in your keystore as a <em>trusted certificate</em>.
+             Get their certificate, and import it with a command like
+             this (for the example <code>mitCA.pem</code>):<pre>
+ $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore -storepass changeit \
+     -import -alias mitCA -trustcacerts -file mitCA.pem</pre>
+
+          <li><p>Finally, when you get the signed certificate from your CA,
+          import it into the keystore with a command like the following
+          example: (cert is in the file <code>signed-cert.pem</code>)<pre>
+ $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore -storepass changeit \
+     -import -alias tomcat -trustcacerts -file signed-cert.pem</pre>
+
+          Since you now have a signed server certificate in your keystore,
+          you can, obviously, skip the next steps of installing a signed
+          server certificate and the server CA's certificate.
+        </ul>
+        </li>
         <LI><p>Create a Java keystore for your server with the password
             <code>changeit</code>, and install your server certificate
             under the alias <code>"tomcat"</code>.
