@@ -187,7 +187,7 @@ public class HandleServlet extends DSpaceServlet
                     true));
 
             // home page, or forward to another page?
-            if (extraPathInfo == null)
+            if ((extraPathInfo == null) || (extraPathInfo.equals("/")))
             {
                 collectionHome(context, request, response, parents[0], c);
             }
@@ -211,7 +211,7 @@ public class HandleServlet extends DSpaceServlet
             request.setAttribute("dspace.communities", getParents(c, false));
 
             // home page, or forward to another page?
-            if (extraPathInfo == null)
+            if ((extraPathInfo == null) || (extraPathInfo.equals("/")))
             {
                 communityHome(context, request, response, c);
             }
