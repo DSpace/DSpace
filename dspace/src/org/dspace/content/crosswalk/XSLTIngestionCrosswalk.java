@@ -63,6 +63,8 @@ import org.dspace.content.Item;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.SelfNamedPlugin;
@@ -215,6 +217,11 @@ public class XSLTIngestionCrosswalk
         }
         IngestionCrosswalk xwalk = (IngestionCrosswalk)PluginManager.getNamedPlugin(
                 IngestionCrosswalk.class, argv[i]);
+        if (xwalk == null)
+        {
+            System.err.println("Error, cannot find an IngestionCrosswalk plugin for: \""+argv[i]+"\"");
+            System.exit(1);
+        }
 
         XSLTransformer xform = ((XSLTIngestionCrosswalk)xwalk).getTransformer(DIRECTION);
         if (xform == null)
@@ -223,14 +230,63 @@ public class XSLTIngestionCrosswalk
         SAXBuilder builder = new SAXBuilder();
         Document inDoc = builder.build(new FileInputStream(argv[i+1]));
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+        Document dimDoc = null;
+        List dimList = null;
         if (list)
         {
-            outputter.output(xform.transform(inDoc.getRootElement().getChildren()),
-                             System.out);
+            dimList = xform.transform(inDoc.getRootElement().getChildren());
+            outputter.output(dimList, System.out);
         }
         else
         {
-            outputter.output(xform.transform(inDoc), System.out);
+            dimDoc = xform.transform(inDoc);
+            outputter.output(dimDoc, System.out);
+            dimList = dimDoc.getRootElement().getChildren();
+        }
+
+        // Sanity-check the generated DIM, make sure it would load.
+        Context context = new Context();
+        Iterator di = dimList.iterator();
+        while (di.hasNext())
+        {
+            // skip over comment, text and other trash some XSLs generate..
+            Object o = di.next();
+            if (!(o instanceof Element))
+                continue;
+
+            Element elt = (Element)o;
+            if (elt.getName().equals("field") && elt.getNamespace().equals(DIM_NS))
+            {
+                String schema = elt.getAttributeValue("mdschema");
+                String element = elt.getAttributeValue("element");
+                String qualifier = elt.getAttributeValue("qualifier");
+                MetadataSchema ms = MetadataSchema.find(context, schema);
+                if (ms == null )
+                {
+                    System.err.println("DIM Error, Cannot find metadata schema for: schema=\""+schema+
+                        "\" (... element=\""+element+"\", qualifier=\""+qualifier+"\")");
+    }
+                else
+                {
+                    if (qualifier != null && qualifier.equals(""))
+                    {
+                        System.err.println("DIM Warning, qualifier is empty string: "+
+                              " schema=\""+schema+"\", element=\""+element+"\", qualifier=\""+qualifier+"\"");
+                        qualifier = null;
+                    }
+                    MetadataField mf = MetadataField.findByElement(context,
+                                  ms.getSchemaID(), element, qualifier);
+                    if (mf == null)
+                        System.err.println("DIM Error, Cannot find metadata field for: schema=\""+schema+
+                            "\", element=\""+element+"\", qualifier=\""+qualifier+"\"");
+                }
+            }
+            else
+            {
+                // ("Got unexpected element in DIM list: "+elt.toString());
+                throw new MetadataValidationException("Got unexpected element in DIM list: "+elt.toString());
+            }
         }
     }
+
 }
