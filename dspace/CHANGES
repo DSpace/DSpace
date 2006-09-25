@@ -40,6 +40,7 @@
 - SF patch #1544829  fixes SF bug #1544807 Browse-by-Subject/Author paging mechanism broken
 - SF patch #1543969  fixes SF bug #1543966 "Special" groups inside groups bug
 - SF patch #1550161  Fix HttpServletRequest encoding issues in 1.4
+- SF patch #1562284  System-wide RSS Feed
 
 (Jonathan Champ)
 - SF patch #1544089 fixes SF bug #1515148 community policies not deleting correctly

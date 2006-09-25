@@ -57,6 +57,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.app.webui.servlet.FeedServlet;
 
 /**
  * Tag for HTML page layout ("skin").
@@ -293,16 +294,22 @@ public class LayoutTag extends TagSupport
         {
             // set the links' reference - community or collection
         	boolean commLinks = feedData.startsWith("comm:");
+        	boolean collLinks = feedData.startsWith("coll:");
         	if ( commLinks )
         	{
                 Community com = (Community)request.getAttribute("dspace.community");
         		request.setAttribute("dspace.layout.feedref", com.getHandle());
         	}
-        	else
+        	else if( collLinks )
         	{
         		Collection col = (Collection)request.getAttribute("dspace.collection");
         		request.setAttribute("dspace.layout.feedref", col.getHandle());
         	}
+        	else //feed is across all of DSpace and not Community/Collection specific
+        	{
+        		request.setAttribute("dspace.layout.feedref", FeedServlet.SITE_FEED_KEY);
+        	}
+        	
         	// build a list of link attributes for each link format
         	String[] formats = feedData.substring(feedData.indexOf(":")+1).split(",");
         	List linkParts = new ArrayList();
@@ -317,14 +324,20 @@ public class LayoutTag extends TagSupport
         		{
         			linkParts.add("rss+xml");
         		}
+        		
         		if (commLinks)
         		{
         			linkParts.add("Items in Community");
         		}
-        		else
+        		else if(collLinks)
         		{
         			linkParts.add("Items in Collection");
         		}
+        		else
+        		{
+        			linkParts.add("Items in " + ConfigurationManager.getProperty("dspace.name"));
+        		}
+        		
         		linkParts.add(formats[i]);
         	}
         	request.setAttribute("dspace.layout.linkparts", linkParts);

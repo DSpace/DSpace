@@ -94,6 +94,9 @@ import org.dspace.search.Harvest;
  */
 public class FeedServlet extends DSpaceServlet
 {
+	//	key for site-wide feed
+	public static final String SITE_FEED_KEY = "site";
+	
 	// one hour in milliseconds
 	private static final long HOUR_MSECS = 60 * 60 * 1000;
     /** log4j category */
@@ -178,10 +181,18 @@ public class FeedServlet extends DSpaceServlet
             }
         }
 
-        // Determine if handle is a valid reference
-        DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-        if (! enabled || dso == null || 
-        	(dso.getType() != Constants.COLLECTION && dso.getType() != Constants.COMMUNITY) )
+        DSpaceObject dso = null;
+        
+        //as long as this is not a site wide feed, 
+        //attempt to retrieve the Collection or Community object
+        if(!handle.equals(SITE_FEED_KEY))
+        { 	
+        	// Determine if handle is a valid reference
+        	dso = HandleManager.resolveToObject(context, handle);
+        }
+        
+        if (! enabled || (dso != null && 
+        	(dso.getType() != Constants.COLLECTION && dso.getType() != Constants.COMMUNITY)) )
         {
             log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
             JSPManager.showInvalidIDError(request, response, path, -1);
@@ -277,10 +288,7 @@ public class FeedServlet extends DSpaceServlet
     private Channel generateFeed(Context context, DSpaceObject dso)
     		throws IOException, SQLException
     {
-    	// container-level elements
-    	String objectUrl = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
-    		? HandleManager.resolveToURL(context, dso.getHandle())
-    		: HandleManager.getCanonicalForm(dso.getHandle());   	
+    	// container-level elements  	
     	String dspaceUrl = ConfigurationManager.getProperty("dspace.url");
     	String type = null;
     	String description = null;
@@ -291,42 +299,60 @@ public class FeedServlet extends DSpaceServlet
     	// the feed
     	Channel channel = new Channel();
     	
-    	if (dso.getType() == Constants.COLLECTION)
+    	//Special Case: if DSpace Object passed in is null, 
+    	//generate a feed for the entire DSpace site!
+    	if(dso == null)
     	{
-    		type = labels.getString(clazz + ".feed-type.collection");
-    		Collection col = (Collection)dso;
-           	description = col.getMetadata("short_description");
-           	title = col.getMetadata("name");
-           	logo = col.getLogo();
-           	scope.setScope(col); 
-        }
-    	else if (dso.getType() == Constants.COMMUNITY)
-    	{
-    		type = labels.getString(clazz + ".feed-type.community");
-    		Community comm = (Community)dso;
-           	description = comm.getMetadata("short_description");
-           	title = comm.getMetadata("name");
-           	logo = comm.getLogo();
-    		scope.setScope(comm);
+    		channel.setTitle(ConfigurationManager.getProperty("dspace.name"));
+    		channel.setLink(dspaceUrl);
+    		channel.setDescription(labels.getString(clazz + ".general-feed.description"));
     	}
+    	else //otherwise, this is a Collection or Community specific feed
+    	{
+    		if (dso.getType() == Constants.COLLECTION)
+	    	{
+	    		type = labels.getString(clazz + ".feed-type.collection");
+	    		Collection col = (Collection)dso;
+	           	description = col.getMetadata("short_description");
+	           	title = col.getMetadata("name");
+	           	logo = col.getLogo();
+	           	scope.setScope(col); 
+	        }
+	    	else if (dso.getType() == Constants.COMMUNITY)
+	    	{
+	    		type = labels.getString(clazz + ".feed-type.community");
+	    		Community comm = (Community)dso;
+	           	description = comm.getMetadata("short_description");
+	           	title = comm.getMetadata("name");
+	           	logo = comm.getLogo();
+	    		scope.setScope(comm);
+	    	}
+	    	
+    		String objectUrl = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
+    			? HandleManager.resolveToURL(context, dso.getHandle())
+    			: HandleManager.getCanonicalForm(dso.getHandle()); 
     		
-		// put in container-level data
-        channel.setDescription(description);
-        channel.setLink(objectUrl);
-        //build channel title by passing in type and title
-        String channelTitle = MessageFormat.format(labels.getString(clazz + ".feed.title"),
-                                                    new Object[]{type, title});
-        channel.setTitle(channelTitle);
-    	if (logo != null)
-    	{
-    		// we use the path to the logo for this, the logo itself cannot
-    	    // be contained in the rdf. Not all RSS-viewers show this logo.
-    		Image image = new Image();
-    		image.setLink(objectUrl);
-    		image.setTitle(labels.getString(clazz + ".logo.title"));
-    		image.setUrl(dspaceUrl + "/retrieve/" + logo.getID());
-    	    channel.setImage(image);
+			// put in container-level data
+	        channel.setDescription(description);
+	        channel.setLink(objectUrl);
+	        //build channel title by passing in type and title
+	        String channelTitle = MessageFormat.format(labels.getString(clazz + ".feed.title"),
+	                                                    new Object[]{type, title});
+	        channel.setTitle(channelTitle);
+	        
+	        //if collection or community has a logo
+	        if (logo != null)
+	    	{
+	    		// we use the path to the logo for this, the logo itself cannot
+	    	    // be contained in the rdf. Not all RSS-viewers show this logo.
+	    		Image image = new Image();
+	    		image.setLink(objectUrl);
+	    		image.setTitle(labels.getString(clazz + ".logo.title"));
+	    		image.setUrl(dspaceUrl + "/retrieve/" + logo.getID());
+	    	    channel.setImage(image);
+	    	}
     	}
+    	
     	// this is a direct link to the search-engine of dspace. It searches
     	// in the current collection. Since the current version of DSpace
     	// can't search within collections anymore, this works only in older
@@ -334,9 +360,20 @@ public class FeedServlet extends DSpaceServlet
     	TextInput input = new TextInput();
     	input.setLink(dspaceUrl + "/simple-search");
     	input.setDescription( labels.getString(clazz + ".search.description") );
-    	//build search title by passing in type
-        String searchTitle = MessageFormat.format(labels.getString(clazz + ".search.title"),
-                                                    new Object[]{type});
+    	
+        String searchTitle = ""; 
+        
+        //if a "type" of feed was specified, build search title off that
+        if(type!=null)
+        {
+        	searchTitle = MessageFormat.format(labels.getString(clazz + ".search.title"),
+        			 					new Object[]{type});
+        }
+        else //otherwise, default to a more generic search title
+        {
+        	searchTitle = labels.getString(clazz + ".search.title.default");
+        }
+        
     	input.setTitle(searchTitle);
     	input.setName(labels.getString(clazz + ".search.name"));
     	channel.setTextInput(input);

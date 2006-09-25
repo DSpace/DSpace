@@ -63,9 +63,16 @@
     String topNews = ConfigurationManager.readNewsFile(Constants.NEWS_TOP);
     String sideNews = ConfigurationManager.readNewsFile(Constants.NEWS_SIDE);
 
+    boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+    String feedData = "NONE";
+    if (feedEnabled)
+    {
+        feedData = "ALL:" + ConfigurationManager.getProperty("webui.feed.formats");
+    }
+    
 %>
 
-<dspace:layout locbar="nolink" titlekey="jsp.home.title">
+<dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
 
     <table class="miscTable" width="95%" align="center">
         <tr>
@@ -126,5 +133,43 @@
             </td>
         </tr>
     </table>
-    <dspace:sidebar><%= sideNews %></dspace:sidebar>
+    <dspace:sidebar>
+    <%= sideNews %>
+    <%
+    if(feedEnabled)
+    {
+	%>
+	    <center>
+	    <h4><fmt:message key="jsp.home.feeds"/></h4>
+	<%
+	    	String[] fmts = feedData.substring(feedData.indexOf(':')+1).split(",");
+	    	String icon = null;
+	    	int width = 0;
+	    	for (int j = 0; j < fmts.length; j++)
+	    	{
+	    		if ("rss_1.0".equals(fmts[j]))
+	    		{
+	    		   icon = "rss1.gif";
+	    		   width = 80;
+	    		}
+	    		else if ("rss_2.0".equals(fmts[j]))
+	    		{
+	    		   icon = "rss2.gif";
+	    		   width = 80;
+	    		}
+	    		else
+	    	    {
+	    	       icon = "rss.gif";
+	    	       width = 36;
+	    	    }
+	%>
+	    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/site"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
+	<%
+	    	}
+	%>
+	    </center>
+	<%
+	    }
+	%>
+    </dspace:sidebar>
 </dspace:layout>
