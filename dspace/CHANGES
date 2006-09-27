@@ -1,6 +1,11 @@
+(Robert Tansley)
+- SF patch #1565975 HandleServlet and BitstreamServlet support If-Modified-Since
+  requests
+
 (Bernadette Schlonsok)
 - SF patch #1490857  XHTML Compliance of 1.4 alpha 1
 - minor changes for XHTML/WAI compliance of controlled vocabularies addon
+
 (Larry Stone)
 - SF patch #1544273 improved sanity-checking of XSL-based ingest crosswalks
 - SF patch #1484260 another doc update for SSL, tomcat, mod_jk + config fix
@@ -46,6 +51,9 @@
 
 (Jonathan Champ)
 - SF patch #1544089 fixes SF bug #1515148 community policies not deleting correctly
+
+1.4 final
+=========
 
 (Scott Yeadon)
 - Fixed typo in 13-14 upgrade docs and checksum checker sql, and removed tasklist sql

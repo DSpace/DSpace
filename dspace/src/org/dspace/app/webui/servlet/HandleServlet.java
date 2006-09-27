@@ -79,8 +79,6 @@ import org.dspace.handle.HandleManager;
  * <P>
  * would be forwarded to <code>/simple-search</code>. If there is nothing
  * after the Handle, the community or collection home page is shown.
- * <P>
- * If the initial parameter " **FIXME**
  * 
  * @author Robert Tansley
  * @version $Revision$
@@ -89,17 +87,6 @@ public class HandleServlet extends DSpaceServlet
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(DSpaceServlet.class);
-
-    /** Is this servlet for dealing with collections? */
-    private boolean collections;
-
-    public void init()
-    {
-        // Sort out what we're dealing with default is titles
-        String param = getInitParameter("location");
-
-        collections = ((param != null) && param.equalsIgnoreCase("collections"));
-    }
 
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -160,8 +147,25 @@ public class HandleServlet extends DSpaceServlet
         // OK, we have a valid Handle. What is it?
         if (dso.getType() == Constants.ITEM)
         {
-            // Display the item page
-            displayItem(context, request, response, (Item) dso, handle);
+            Item item = (Item) dso;
+            
+            response.setDateHeader("Last-Modified", item
+                    .getLastModified().getTime());
+            
+            // Check for if-modified-since header
+            long modSince = request.getDateHeader("If-Modified-Since");
+
+            if (modSince != -1 && item.getLastModified().getTime() < modSince)
+            {
+                // Item has not been modified since requested date,
+                // hence bitstream has not; return 304
+                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            }
+            else
+            {
+                // Display the item page
+                displayItem(context, request, response, item, handle);
+            }
         }
         else if (dso.getType() == Constants.COLLECTION)
         {
