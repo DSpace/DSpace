@@ -5,6 +5,7 @@
 (Bernadette Schlonsok)
 - SF patch #1490857  XHTML Compliance of 1.4 alpha 1
 - minor changes for XHTML/WAI compliance of controlled vocabularies addon
+- minor changes for XHTML compliance of suggest item feature
 
 (Larry Stone)
 - SF patch #1544273 improved sanity-checking of XSL-based ingest crosswalks

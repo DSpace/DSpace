@@ -51,8 +51,8 @@
 
     <h1><fmt:message key="jsp.suggestok.heading"/></h1>
 
-    <form>
-     	<input type="BUTTON" name="close" onClick="window.close();" value="<fmt:message key="jsp.suggestok.button.close"/>" >
+    <form action="">
+     	<input type="button" name="close" onclick="window.close();" value="<fmt:message key="jsp.suggestok.button.close"/>" />
     </form>
 
 </dspace:layout>
