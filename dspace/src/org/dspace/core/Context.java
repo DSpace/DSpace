@@ -168,7 +168,7 @@ public class Context
      */
     public void setIgnoreAuthorization(boolean b)
     {
-        ignoreAuth = true;
+        ignoreAuth = b;
     }
 
     /**
