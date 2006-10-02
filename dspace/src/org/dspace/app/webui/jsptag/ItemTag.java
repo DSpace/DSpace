@@ -429,7 +429,7 @@ public class ItemTag extends TagSupport
             if (!hidden)
             {
                 out
-                        .print("<tr><td headers=\"s1\"class=\"metadataFieldLabel\">");
+                        .print("<tr><td headers=\"s1\" class=\"metadataFieldLabel\">");
                 out.print(values[i].schema);
                 out.print("." + values[i].element);
 

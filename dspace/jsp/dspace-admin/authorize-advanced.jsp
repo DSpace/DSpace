@@ -97,7 +97,7 @@
     <table class="miscTable" align="center" summary="Advanced policy manager">
         <tr>     
             <%-- <td>Collection:</td> --%>
-            <th id="t1"><label for ="tcollection_id"><fmt:message key="jsp.dspace-admin.authorize-advanced.col"/></label></th>
+            <th id="t1"><label for ="tcollection"><fmt:message key="jsp.dspace-admin.authorize-advanced.col"/></label></th>
             <td headers="t1">
                 <select size="10" name="collection_id" id="tcollection">
                     <%  for(int i = 0; i < collections.length; i++ ) { %>
@@ -123,7 +123,7 @@
 
         <tr>     
             <%-- <td>Group:</td> --%>
-            <th id="t3"><fmt:message key="jsp.dspace-admin.general.group-colon"/></td>
+            <th id="t3"><fmt:message key="jsp.dspace-admin.general.group-colon"/></th>
             <td headers="t3">
                 <select size="10" name="group_id" id="tgroup_id">
                     <%  for(int i = 0; i < groups.length; i++ ) { %>
@@ -137,7 +137,7 @@
         <tr>
             <%-- <tr><td>Action:</td> --%>
             <th id="t4"><label for="taction_id"><fmt:message key="jsp.dspace-admin.general.action-colon"/></label></th>
-            <td id="t4">
+            <td headers="t4">
                 <select name="action_id" id="taction_id">
                     <%  for( int i = 0; i < Constants.actionText.length; i++ ) { %>
                         <option value="<%= i %>">
