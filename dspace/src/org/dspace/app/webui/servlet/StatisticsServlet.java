@@ -42,13 +42,12 @@ package org.dspace.app.webui.servlet;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
-
-import java.text.DateFormat;
+import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -56,20 +55,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.sql.SQLException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.LogManager;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
 /** 
@@ -134,7 +128,8 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         File[] reports = reportDir.listFiles();
         File reportFile = null;
         
-        FileReader fr = null;
+        FileInputStream fir = null;
+        InputStreamReader ir = null;
         BufferedReader br = null;
         
         List monthsList = new ArrayList();
@@ -235,8 +230,9 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         
         try 
         {  
-            fr = new FileReader(reportFile.getPath());
-            br = new BufferedReader(fr);
+        	fir = new FileInputStream(reportFile.getPath());
+            ir = new InputStreamReader(fir, "UTF-8");
+            br = new BufferedReader(ir);
         } 
         catch (IOException e) 
         {

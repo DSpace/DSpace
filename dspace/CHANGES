@@ -39,6 +39,7 @@
 - SF patch #1563523 for SF bug #1548865 Browse errors on withdrawn item
 - SF patch #1556207 for SF bug #1554056 Community/collection handle URL with / redirects to homepage
 - SF patch #1571494  for SF bug  #1571490 - UTF-8 encoded characters in licence
+- SF patch #1571522  for SF  bug #1571519 - UTF-8 in statistics
 
 (Mark Diggory)
 - SF patch #1523824 robots.txt to limit bots navigating author and date pages

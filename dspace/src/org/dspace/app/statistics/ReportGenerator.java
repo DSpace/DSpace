@@ -40,15 +40,16 @@
 
 package org.dspace.app.statistics;
 
-import org.dspace.app.statistics.Stat;
-import org.dspace.app.statistics.ReportTools;
-
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.sql.SQLException;
-
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -58,18 +59,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.SortedMap;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -459,7 +451,9 @@ public class ReportGenerator
         // finally write the string into the output file
         try 
         {
-            BufferedWriter out = new BufferedWriter(new FileWriter(output));
+        	FileOutputStream fos = new FileOutputStream(output);
+            OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
+            PrintWriter out = new PrintWriter(osr);
             out.write(report.render());
             out.close();
         } 
