@@ -226,6 +226,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>edit-license</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.LicenseEditServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>eperson-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EPersonListServlet</servlet-class>
   </servlet>
@@ -465,6 +470,11 @@
   <servlet-mapping>
     <servlet-name>edit-news</servlet-name>
     <url-pattern>/dspace-admin/news-edit</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>edit-license</servlet-name>
+    <url-pattern>/dspace-admin/license-edit</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

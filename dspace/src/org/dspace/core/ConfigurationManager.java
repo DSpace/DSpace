@@ -389,8 +389,6 @@ public class ConfigurationManager
             // write the news out to the appropriate file
             FileOutputStream fos = new FileOutputStream(fileName);
             OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
-
-            // BufferedWriter bw = new BufferedWriter( osr );
             PrintWriter out = new PrintWriter(osr);
             out.print(news);
             out.close();
@@ -402,6 +400,34 @@ public class ConfigurationManager
 
         return news;
     }
+
+    /**
+     * Writes license to a text file.
+     * 
+     * @param news
+     *            the text to be written to the file.
+     */
+    public static void writeLicenseFile(String newLicense)
+    {
+        String licenseFile = getProperty("dspace.dir") + File.separator
+                             + "config" + File.separator + "default.license";
+
+        try
+        {
+            // write the news out to the appropriate file
+            FileOutputStream fos = new FileOutputStream(licenseFile);
+            OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
+            PrintWriter out = new PrintWriter(osr);
+            out.print(newLicense);
+            out.close();
+        }
+        catch (IOException e)
+        {
+            warn("license_write: " + e.getLocalizedMessage());
+        }
+
+        license = newLicense;
+     }
 
     private static File loadedFile = null;
 
@@ -485,8 +511,10 @@ public class ConfigurationManager
             // Load in default license
             String licenseFile = getProperty("dspace.dir") + File.separator
                     + "config" + File.separator + "default.license";
-
-            BufferedReader br = new BufferedReader(new FileReader(licenseFile));
+            
+            FileInputStream fir = new FileInputStream(licenseFile);
+            InputStreamReader ir = new InputStreamReader(fir, "UTF-8");
+            BufferedReader br = new BufferedReader(ir);
             String lineIn;
             license = "";
 

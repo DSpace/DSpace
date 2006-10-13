@@ -209,7 +209,34 @@ property2.name = ${dspace.dir}/rest/of/path
 
     <li><code>License</code></li>
   </ul>
-
+  
+  <h2><a name="license" id="license">The Default Submission License</a></h2>
+  <p>For each submitted item, a license must be granted. The license will be stored along with the item in the bundle LICENSE in order to keep the information under which terms an items has been published.</p>
+  <p>You may define a license for each collection seperately, when creating/editing a collection. If no collection specific license is defined, the default license is used.</p>
+  <p>The default license  can be found in <code><i>[dspace]</i>/config/default.license</code> and can be edited via the dspace-admin interface.</p>
+  <p>DSpace comes with a demo license, which you must adopt to your institutional needs and the legal regulations of your country.</p>
+  <p>If in doubt, contact the law department of your institution.</p>
+  <h3>Possible Points in a License </h3>
+  <it>Note, that this is no legal advice, just some starting thoughts for creating you own license.</it>
+  <ul>
+  	<li>Non-exclusive or exclusive right to</li>
+  	<ul>
+  		<li>capture and store</li>
+  		<li>distribute</li>
+  		<ul>
+  			<li>worldwide</li>
+  			<li>restricted (e.g. institutional wide</li>
+  		</ul>
+  		<li>translate</li>
+  		<li>transform to other formats or mediums</li>
+  		without changing the content
+  	</ul>
+  	<li>Make sure no rights (copyright or any other) are violated by this publication</li>
+  	<li>In case the type of submission (e.g. thesis) needs approval, make sure it is the final and approved version.</li>
+  	<li>Distinguish between the document itself and the metadata</li>
+  	<li>Point out that the license granted and the information who granted it will be stored.</li>
+   </ul> 
+   
   <h2><a name="crosswalks" id="crosswalks">Activating Additional OAI-PMH Crosswalks</a></h2>
 
   <p>DSpace comes with an unqualified DC Crosswalk used in the default OAI-PMH data provider. There are also other Crosswalks bundled with the DSpace distribution which can be activated by editing one or more configuration files. How to do this for each available Crosswalk is described below.</p>
