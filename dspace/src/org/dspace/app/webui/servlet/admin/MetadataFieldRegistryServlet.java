@@ -338,7 +338,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             return error(request, labels.getString(clazz + ".elemtoolong"));
         }
 
-        String qualifier = request.getParameter("prefix");
+        String qualifier = request.getParameter("qualifier");
         if (qualifier != null)
         {
             if (qualifier.length() == 0)
