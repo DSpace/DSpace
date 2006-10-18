@@ -3,6 +3,8 @@
 - removed reference to "Local DSpace Administrator Contact Information" in
   docs/index.html
   docs/configure.html
+- added a note about contact info in "The Wording of E-Mails" in
+  docs/configure.html
 
 (Robert Tansley)
 - SF patch #1565975 HandleServlet and BitstreamServlet support If-Modified-Since

@@ -188,7 +188,16 @@ property2.name = ${dspace.dir}/rest/of/path
 
   <h2><a name="email" id="email">Wording of E-mail Messages</a></h2>
 
-  <p>Sometimes DSpace automatically sends e-mail messages to users, for example to inform them of a new workflow task, or as a subscription e-mail alert. The wording of emails can be changed by editing the relevant file in <code><i>[dspace]</i>/config/emails</code>. Each file is commented. Be careful to keep the right number 'placeholders' (e.g.<code>{2}</code>).</p>
+  <p>Sometimes DSpace automatically sends e-mail messages to users, for example to inform them of a new workflow task, or as a subscription e-mail alert. 
+     The wording of emails can be changed by editing the relevant file in <code><i>[dspace]</i>/config/emails</code>. 
+     Each file is commented. Be careful to keep the right number 'placeholders' (e.g.<code>{2}</code>).<br />
+     <strong>Note:</strong> You should replace the contact-information "<code>dspace-help@myu.edu or call us at xxx-555-xxxx</code>" with your own contact details in:
+     <ul>
+     	<li><code>config/emails/change_password</code></li>
+     	<li><code>config/emails/register</code></li>
+     </ul>
+     
+  </p>
  
   <h2><a name="registries" id="registries">The Dublin Core and Bitstream Format Registries</a></h2>
 
