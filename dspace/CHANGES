@@ -5,6 +5,8 @@
   docs/configure.html
 - added a note about contact info in "The Wording of E-Mails" in
   docs/configure.html
+- config/registries/dublin-core-types.xml replaced deprecated reference to org.dspace.administer.DCType.java 
+  with the reference to the appropriate org.dspace.content.Metadata... classes
 
 (Robert Tansley)
 - SF patch #1565975 HandleServlet and BitstreamServlet support If-Modified-Since

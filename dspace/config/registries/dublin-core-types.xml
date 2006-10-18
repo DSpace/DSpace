@@ -9,8 +9,8 @@
   -
   - Initial contents for Dublin Core type registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
-  - registry must be read from the database.  Use org.dspace.administer.DCType.
-  -
+  - registry must be read from the database.
+  - Use org.dspace.content.MetadataSchema, org.dspace.content.MetadataField, org.dspace.content.MetadataValue instead.
   - Omit <qualifier> tags for unqualified elements
   - 
   - <dc-type>
@@ -37,6 +37,10 @@
     <date.created>$Date$</date.created>
     <description>
       $Log$
+      Revision 1.5  2006/10/18 15:38:34  cjuergen
+      (Claudia Juergen)
+      config/registries/dublin-core-types.xml replaced deprecated reference to org.dspace.administer.DCType.java  with the reference to the appropriate org.dspace.content.Metadata... classes
+
       Revision 1.4  2005/11/16 21:40:52  rtansley
       (Martin Hald, Larry Stone, Robert Tansley)
       - Support for multiple (flat) metadata schemas
