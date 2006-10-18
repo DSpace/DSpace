@@ -189,11 +189,7 @@ property2.name = ${dspace.dir}/rest/of/path
   <h2><a name="email" id="email">Wording of E-mail Messages</a></h2>
 
   <p>Sometimes DSpace automatically sends e-mail messages to users, for example to inform them of a new workflow task, or as a subscription e-mail alert. The wording of emails can be changed by editing the relevant file in <code><i>[dspace]</i>/config/emails</code>. Each file is commented. Be careful to keep the right number 'placeholders' (e.g.<code>{2}</code>).</p>
-
-  <h2><a name="admincontact" id="admincontact">Local DSpace Administrator Contact Information</a></h2>
-
-  <p>There are several places in DSpace in which the user will be shown contact information for the local DSpace Administrator: for instance, when an error occurs, or in the on-line help when the user is looking for more information. The contact information is displayed by <code><i>[dspace-source]</i>/jsp/components/contact-info.jsp.</code> This JSP retrieves the help e-mail in dspace.cfg, but the phone number in the JSP is a dummy phone number that needs to be edited directly in the JSP. You should be sure to edit this file (adding any additional information you feel might be useful) so that users know who to contact for further information.</p>
-
+ 
   <h2><a name="registries" id="registries">The Dublin Core and Bitstream Format Registries</a></h2>
 
   <p>The <code><i>[dspace]</i>/config/registries</code> directory contains two XML files. These are used to load the <em>initial</em> contents of the Dublin Core type registry and Bitstream Format registry. After the initial loading (performed by <code>ant fresh_install</code> above), the registries reside in the database; the XML files are not updated.</p>

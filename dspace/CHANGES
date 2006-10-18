@@ -1,5 +1,8 @@
 (Claudia Juergen)
 - SF patch 1578936 for SF bug #1066771 Metadata edit form dropping DC qualifier
+- removed reference to "Local DSpace Administrator Contact Information" in
+  docs/index.html
+  docs/configure.html
 
 (Robert Tansley)
 - SF patch #1565975 HandleServlet and BitstreamServlet support If-Modified-Since
