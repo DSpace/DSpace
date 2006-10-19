@@ -7,6 +7,10 @@
   docs/configure.html
 - config/registries/dublin-core-types.xml replaced deprecated reference to org.dspace.administer.DCType.java 
   with the reference to the appropriate org.dspace.content.Metadata... classes
+- docs/configure.html
+  updated "The Dublin Core and Bitstream Format Registries" for multiple metadata schemas
+- docs/appenx.html
+  added overviews of the default Dublin Core Metadata and Bitstream Registry
 
 (Robert Tansley)
 - SF patch #1565975 HandleServlet and BitstreamServlet support If-Modified-Since

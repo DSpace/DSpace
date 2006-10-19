@@ -199,21 +199,46 @@ property2.name = ${dspace.dir}/rest/of/path
      
   </p>
  
-  <h2><a name="registries" id="registries">The Dublin Core and Bitstream Format Registries</a></h2>
+  <h2><a name="registries" id="registries">The Metadata and Bitstream Format Registries</a></h2>
 
-  <p>The <code><i>[dspace]</i>/config/registries</code> directory contains two XML files. These are used to load the <em>initial</em> contents of the Dublin Core type registry and Bitstream Format registry. After the initial loading (performed by <code>ant fresh_install</code> above), the registries reside in the database; the XML files are not updated.</p>
-
-  <p>Currently, the system requires that every item have a Dublin Core record. The exact Dublin Core elements and qualifiers that are used can be configured by editing the Dublin Core registry. This can either be done at install-time, by editing <code><i>[dspace]</i>/config/registries/dublin-core-types.xml</code>, or at run-time using the administration Web UI. However, note that some elements and qualifiers must be present for DSpace to function correctly since they are used for various purposes by the code. Details are in the relevant <code>.xml</code> file.</p>
-
-  <p>Also note that altering the Dublin Core registry does not, at the current time, cause corresponding changes in the Web UI (e.g. the submission interface or search indices).</p>
-
-  <p>The bitstream formats recognized by the system and levels of support are similarly stored in the bitstream format registry. This can also be edited at install-time via <code><i>[dspace]</i>/config/registries/bitstream-formats.xml</code> or by the administation Web UI. The contents of the bitstream format registry are entirely up to you, though the system requires that the following two formats are present:</p>
-
-  <ul>
-    <li><code>Unknown</code></li>
-
-    <li><code>License</code></li>
-  </ul>
+  <p>
+    The <code><i>[dspace]</i>/config/registries</code> directory contains two XML files. 
+    These are used to load the <em>initial</em> contents of the <a href="appendix.html#dublincoreregistry">Dublin Core Metadata registry</a> 
+    and <a href="appendix.html#bitstreamformatregistry">Bitstream Format registry</a>. 
+    After the initial loading (performed by <code>ant fresh_install</code> above), 
+    the registries reside in the database; the XML files are not updated. 
+  </p>
+  
+  <p>
+    In order to change the registries, you may adjust the XML files before the first installation of DSpace. 
+    On an allready running instance it is recommended to change the registries via DSpace admin UI. 
+    The changes made via admin UI are not reflected in the XML files.
+  </p>
+  
+  <h3>Metadata Format Registries</h3>
+ 	
+  <p>
+    The default metadata schema is Dublin Core, so DSpace is distributed with a default Dublin Core Metadata Registry. 
+    Currently, the system requires that every item have a Dublin Core record.<br/>
+    Via the DSpace admin UI you may define new Metadata Schemas, edit existing schemas and move elements between schemas.<br/>
+    There is a set of Dublin Core Elements, which is used by the system and should not be removed or moved to another schema, 
+    see <a href="appendix.html#dublincoreregistry">Appendix: Default Dublin Core Metadata registry</a>.<br/>
+    <strong>Note</strong>: altering a Metadata Registry has no effect on corresponding parts, e.g. item submission interface, item display, 
+    item import and vice versa. Every metadata element used in submission interface or item import must be registered before using it.<br />
+    <strong>Note</strong> also that deleting a metadata element will delete all its corresponding values.
+   </p>
+ 
+  <h3>Bitstream Format Registry</h3>
+  <p>
+    The bitstream formats recognized by the system and levels of support are similarly stored in the bitstream format registry. 
+    This can also be edited at install-time via <code><i>[dspace]</i>/config/registries/bitstream-formats.xml</code> or by the administation Web UI. 
+    The contents of the bitstream format registry are entirely up to you, though the system requires that the following two formats are present:
+    <ul>
+      <li><code>Unknown</code></li>
+      <li><code>License</code></li>
+    </ul>
+    <strong>Note:</strong> Deleting a format will cause any existing bitstreams of this format to be reverted to the unknown bitstream format.
+  </p>
   
   <h2><a name="license" id="license">The Default Submission License</a></h2>
   <p>For each submitted item, a license must be granted. The license will be stored along with the item in the bundle LICENSE in order to keep the information under which terms an items has been published.</p>
