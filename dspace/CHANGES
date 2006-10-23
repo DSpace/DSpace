@@ -25,6 +25,7 @@
 (Larry Stone)
 - SF patch #1544273 improved sanity-checking of XSL-based ingest crosswalks
 - SF patch #1484260 another doc update for SSL, tomcat, mod_jk + config fix
+- SF patch #1521625  documentation updates for 1.4
 
 (Dorothea Salo)
 - SF patch #1544124 Remove admin email from contact info

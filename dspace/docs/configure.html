@@ -296,8 +296,8 @@ The DSpace 1.4 source includes the following crosswalk plugins available
 for use with OAI-PMH:
    <ul>
     <li><b><code>mets</code></b> - The manifest document from a DSpace METS SIP.</li>
-    <li><b><code>mods</code></b> - MODS metadata, produced by the <a href="mods">table-driven MODS dissemination crosswalk</a>.</li>
-    <li><b><code>qdc</code></b> - Qualfied Dublin Core, produced by the <a href="qdc">configurable QDC crosswalk</a>.
+    <li><b><code>mods</code></b> - MODS metadata, produced by the <a href="#mods">table-driven MODS dissemination crosswalk</a>.</li>
+    <li><b><code>qdc</code></b> - Qualfied Dublin Core, produced by the <a href="#qdc">configurable QDC crosswalk</a>.
         Note that this QDC does <em>not</em> include all of the
         DSpace "dublin core"
         metadata fields, since the XML standard for QDC is
@@ -1176,7 +1176,7 @@ for the interface <code>org.dspace.content.crosswalk.DisseminationCrosswalk</cod
 
 <p>You can add names for existing crosswalks, add new plugin classes, and add new configurations for the configurable crosswalks as noted below.</p>
 
-<h3>Configurable MODS dissemination crosswalk</h3>
+<h3><a name="mods">Configurable MODS dissemination crosswalk</a></h3>
 
 <p>The MODS crosswalk is a self-named plugin.  To configure an instance of
 the MODS crosswalk, add a property to the DSpace configuration starting
@@ -1212,7 +1212,7 @@ it, it is an artifact that the crosswalk ignores.
 into the output document.  Read the example configuration file for more
 details.
 
-<h3>Configurable Qualified Dublin Core (QDC) dissemination  crosswalk</h3>
+<h3><a name="qdc">Configurable Qualified Dublin Core (QDC) dissemination  crosswalk</a></h3>
 
 <p>The QDC crosswalk is a self-named plugin.  To configure an instance of
 the QDC crosswalk, add a property to the DSpace configuration starting
