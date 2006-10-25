@@ -70,6 +70,7 @@
         <title><%= siteName %>: <%= title %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/print.css" media="print" type="text/css" />
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
 <%
     if (!"NONE".equals(feedRef))
