@@ -47,6 +47,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -334,11 +335,31 @@ public class EditItemServlet extends DSpaceServlet
 
         // All DC types in the registry
         MetadataField[] types = MetadataField.findAll(context);
+        
+        // Get a HashMap of metadata field ids and a field name to display
+        HashMap metadataFields = new HashMap();
+        
+        // Get all existing Schemas
+        MetadataSchema[] schemas = MetadataSchema.findAll(context);
+        for (int i = 0; i < schemas.length; i++)
+        {
+            String schemaName = schemas[i].getName();
+            // Get all fields for the given schema
+            MetadataField[] fields = MetadataField.findAllInSchema(context, schemas[i].getSchemaID());
+            for (int j = 0; j < fields.length; j++)
+            {
+                Integer fieldID = new Integer(fields[j].getFieldID());
+                String displayName = "";
+                displayName = schemaName + "." + fields[j].getElement() + (fields[j].getQualifier() == null ? "" : "." + fields[j].getQualifier());
+                metadataFields.put(fieldID, displayName);
+            }
+        }
 
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);
         request.setAttribute("collections", collections);
         request.setAttribute("dc.types", types);
+        request.setAttribute("metadataFields", metadataFields);
 
         JSPManager.showJSP(request, response, "/tools/edit-item-form.jsp");
     }

@@ -353,8 +353,8 @@ public class MetadataField
 
         // Get all the metadatafieldregistry rows
         TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
-                        "SELECT * FROM MetadataFieldRegistry ORDER BY element, qualifier");
-
+                               "SELECT mfr.* FROM MetadataFieldRegistry mfr, MetadataSchemaRegistry msr where mfr.metadata_schema_id= msr.metadata_schema_id ORDER BY msr.short_id,  mfr.element, mfr.qualifier");
+ 
         // Make into DC Type objects
         while (tri.hasNext())
         {

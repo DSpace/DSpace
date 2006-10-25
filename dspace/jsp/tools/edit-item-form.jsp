@@ -80,6 +80,7 @@
     String handle = (String) request.getAttribute("handle");
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     MetadataField[] dcTypes = (MetadataField[])  request.getAttribute("dc.types");
+    HashMap metadataFields = (HashMap) request.getAttribute("metadataFields");
 %>
 
 
@@ -215,11 +216,12 @@
                 <th id="t2" class="oddRowOddCol"><strong>Value</strong></th>
                 <th id="t3" class="oddRowEvenCol"><strong>Language</strong></th> --%>
                 
-				<th id="t1" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem1"/></strong></th>
-                <th id="t2" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem2"/></strong></th>
-                <th id="t3" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem3"/></strong></th>
-                <th id="t4" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem4"/></strong></th>
-                <th id="t5" class="oddRowOddCol">&nbsp;</th>
+                <th id="t0" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem0"/></strong></th>
+                <th id="t1" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem1"/></strong></th>
+                <th id="t2" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem2"/></strong></th>
+                <th id="t3" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem3"/></strong></th>
+                <th id="t4" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem4"/></strong></th>
+                <th id="t5" class="oddRowEvenCol">&nbsp;</th>
             </tr>
 <%
     DCValue[] dcv = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -258,15 +260,16 @@
         }
  %>
             <tr>
-                <td headers="t1" class="<%= row %>RowOddCol"><%= dcv[i].element %>&nbsp;&nbsp;</td>
-                <td headers="t2" class="<%= row %>RowEvenCol"><%= (dcv[i].qualifier == null ? "" : dcv[i].qualifier) %></td>
-                <td headers="t3" class="<%= row %>RowOddCol">
+                <td headers="t0" class="<%= row %>RowOddCol"><%=dcv[i].schema %></td>
+                <td headers="t1" class="<%= row %>RowEvenCol"><%= dcv[i].element %>&nbsp;&nbsp;</td>
+                <td headers="t2" class="<%= row %>RowOddCol"><%= (dcv[i].qualifier == null ? "" : dcv[i].qualifier) %></td>
+                <td headers="t3" class="<%= row %>RowEvenCol">
                     <textarea name="value_<%= key %>_<%= sequenceNumber %>" rows="3" cols="50"><%= dcv[i].value %></textarea>
                 </td>
-                <td headers="t4" class="<%= row %>RowEvenCol">
+                <td headers="t4" class="<%= row %>RowOddCol">
                     <input type="text" name="language_<%= key %>_<%= sequenceNumber %>" value="<%= (dcv[i].language == null ? "" : dcv[i].language) %>" size="5"/>
                 </td>
-                <td headers="t5" class="<%= row %>RowOddCol">
+                <td headers="t5" class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="Remove" /> --%>
 					<input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="<fmt:message key="jsp.tools.general.remove"/>"/>
                 </td>
@@ -277,10 +280,15 @@
             <tr><td>&nbsp;</td></tr>
 
             <tr>
-                <td headers="t1" colspan="2" class="<%= row %>RowEvenCol">
+     	
+                <td headers="t1" colspan="3" class="<%= row %>RowEvenCol">
                     <select name="addfield_dctype">
-<%  for (int i = 0; i < dcTypes.length; i++) { %>
-                        <option value="<%= dcTypes[i].getFieldID() %>"><%= dcTypes[i].getElement() %><%= (dcTypes[i].getQualifier() == null ? "" : "." + dcTypes[i].getQualifier()) %></option>
+<%  for (int i = 0; i < dcTypes.length; i++) 
+    { 
+    	Integer fieldID = new Integer(dcTypes[i].getFieldID());
+    	String displayName = (String)metadataFields.get(fieldID);
+%>
+                        <option value="<%= fieldID.intValue() %>"><%= displayName %></option>
 <%  } %>
                     </select>
                 </td>
