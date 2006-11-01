@@ -62,6 +62,7 @@
 - SF patch #1547987 Small Messages.properties modification (change of DSpace copyright text)
 - SF patch #1542830 Patch to limit Referer Spam capabilities
 - SF patch #1576662 Add css styles for print media
+- SF patch #1581959 Patch to fix PDFBox tmp file issue
 
 (Tim Donohue)
 - SF patch #1550606  more configurable RSS feeds, also moves text to Messages.properties
