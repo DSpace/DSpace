@@ -199,15 +199,15 @@ public class BitstreamServlet extends DSpaceServlet
             return;
         }
         
-        // Set the response MIME type
+        // Pipe the bits
+        InputStream is = bitstream.retrieve();
+     
+				// Set the response MIME type
         response.setContentType(bitstream.getFormat().getMIMEType());
 
         // Response length
         response.setHeader("Content-Length", String
                 .valueOf(bitstream.getSize()));
-
-        // Pipe the bits
-        InputStream is = bitstream.retrieve();
 
         Utils.bufferedCopy(is, response.getOutputStream());
         is.close();

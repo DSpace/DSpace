@@ -1,3 +1,6 @@
+(Vlastimil Krejcir)
+- SF patch #1588008 Bitstream authorization timeout patch
+
 (Claudia Juergen)
 - SF patch 1578936 for SF bug #1066771 Metadata edit form dropping DC qualifier
 - removed reference to "Local DSpace Administrator Contact Information" in
@@ -51,7 +54,7 @@
 - SF patch #1548020 robots.txt to limit bots navigating browse by subject
 - SF patch #1556183  Missing title for news editor page
 - SF patch #1556950 for SF bug #1556947 NPE when no user selected to del/edit
-- SF patch #1561292 for SF bug #1554064
+- SF patch #1561292 for SF bug #1554064 Fix exception handling for ClassCastException
 - SF patch #1563523 for SF bug #1548865 Browse errors on withdrawn item
 - SF patch #1556207 for SF bug #1554056 Community/collection handle URL with / redirects to homepage
 - SF patch #1571494  for SF bug  #1571490 - UTF-8 encoded characters in licence
