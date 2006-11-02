@@ -38,6 +38,7 @@
 - SF patch #1544124 Remove admin email from contact info
 - SF patch #1533133 Remove thumbnail filename from alt-text
 - SF patch #1533114 Item title in HTML <title>
+- SF patch #1584035 Prevent sploggers from using feedback page
 
 (Jeroen Ruigrok)
 - SF patch #1549758 Make sure cleanup() doesn't fail with NullPointerException
