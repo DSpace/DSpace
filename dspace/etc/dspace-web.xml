@@ -347,6 +347,11 @@
     <servlet-name>simple-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SimpleSearchServlet</servlet-class>
   </servlet>
+  
+  <servlet>
+    <servlet-name>sitemap</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.SitemapServlet</servlet-class>
+  </servlet>
 
   <servlet>
     <servlet-name>statistics</servlet-name>
@@ -595,6 +600,11 @@
   <servlet-mapping>
     <servlet-name>simple-search</servlet-name>
     <url-pattern>/simple-search</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>sitemap</servlet-name>
+    <url-pattern>/sitemap</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
