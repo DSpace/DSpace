@@ -144,11 +144,11 @@ public class DSQuery
             String operator = ConfigurationManager.getProperty("search.operator");   
             if (operator == null || operator.equals("OR"))
             {
-            	qp.setOperator(QueryParser.DEFAULT_OPERATOR_OR);
+            	qp.setDefaultOperator(QueryParser.OR_OPERATOR);
             }
             else
             {
-            	qp.setOperator(QueryParser.DEFAULT_OPERATOR_AND);
+            	qp.setDefaultOperator(QueryParser.AND_OPERATOR);
             }
             
             Query myquery = qp.parse(querystring);

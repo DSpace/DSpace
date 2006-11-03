@@ -146,7 +146,7 @@ public class DSIndexer
             {
                 // we have a handle (our unique ID, so remove)
                 Term t = new Term("handle", myhandle);
-                ir.delete(t);
+                ir.deleteDocuments(t);
             }
             else
             {
@@ -293,11 +293,11 @@ public class DSIndexer
                     .getIntProperty("search.maxfieldlength");
             if (maxfieldlength == -1)
             {
-                writer.maxFieldLength = Integer.MAX_VALUE;
+                writer.setMaxFieldLength(Integer.MAX_VALUE);
             }
             else
             {
-                writer.maxFieldLength = maxfieldlength;
+                writer.setMaxFieldLength(maxfieldlength);
             }
         }
 
@@ -754,13 +754,13 @@ public class DSIndexer
         String fulltext = "";
 
         // do id, type, handle first
-        doc.add(Field.UnIndexed("type", ty.toString()));
+        doc.add(new Field("type", ty.toString(), Field.Store.YES, Field.Index.NO));
 
         // want to be able to search for handle, so use keyword
         // (not tokenized, but it is indexed)
         if (handle != null)
         {
-            doc.add(Field.Keyword("handle", handle));
+            doc.add(new Field("handle", handle, Field.Store.YES, Field.Index.UN_TOKENIZED));
         }
 
         // now iterate through the hash, building full text string
@@ -776,7 +776,7 @@ public class DSIndexer
 
             if (value != null)
             {
-                doc.add(Field.Text(key, value));
+                doc.add(new Field(key, value, Field.Store.YES, Field.Index.TOKENIZED));
             }
         }
 
@@ -784,7 +784,7 @@ public class DSIndexer
 
         //        System.out.println("Full Text:\n" + fulltext + "------------\n\n");
         // add the full text
-        doc.add(Field.Text("default", fulltext));
+        doc.add(new Field("default", fulltext, Field.Store.YES, Field.Index.TOKENIZED));
 
         // index the document
         iw.addDocument(doc);
