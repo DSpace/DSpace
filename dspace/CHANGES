@@ -1,6 +1,7 @@
 (Scott Yeadon)
 - Jar file updates (includes required code changes for DSIndexer and DSQuery and new jars
   fontbox.jar and serializer.jar)
+- SF bug #1556829 Docs mention old SiteAuthenticator class
 
 (Stuart Lewis and Rob Tansley)
 - SF Patch #1587225 Google and html sitemap generator

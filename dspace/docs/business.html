@@ -560,9 +560,9 @@ packager plugin's implementation.</p>
 
   <p><code>plugin.single.interface = classname</code></p>
 
-  <p>For example, this configures the class <code>org.dspace.app.webui.SimpleAuthenticator</code> as the plugin for interface <code>org.dspace.app.webui.SiteAuthenticator</code>:</p>
+  <p>For example, this configures the class <code>org.dspace.checker.SimpleDispatcher</code> as the plugin for interface <code>org.dspace.checker.BitstreamDispatcher</code>:</p>
 
-  <p><code>plugin.single.org.dspace.app.webui.SiteAuthenticator = org.dspace.app.webui.SimpleAuthenticator</code></p>
+  <p><code>plugin.single.org.dspace.checker.BitstreamDispatcher=org.dspace.checker.SimpleDispatcher</code></p>
 
   <h4>Configuring Sequence of Plugins</h4>
 
@@ -666,18 +666,27 @@ plugin.selfnamed.crosswalk.org.dspace.content.metadata.DisseminationCrosswalk = 
 
   <h4>A Singleton Plugin</h4>
 
-  <p>This shows how to configure and access a single anonymous plugin, such as the SiteAuthenticator plugin:</p>
+  <p>This shows how to configure and access a single anonymous plugin, such as the BitstreamDispatcher plugin:</p>
 
    <p>Configuration:</p>
 
-   <p><code>plugin.single.org.dspace.app.webui.SiteAuthenticator = edu.mit.dspace.MITAuthenticator</code><p>
+   <p><code>plugin.single.org.dspace.checker.BitstreamDispatcher=org.dspace.checker.SimpleDispatcher</code><p>
 
-   <p>The following code fragment shows how siteAuth, the service object, is initialized and used:</p>
+   <p>The following code fragment shows how dispatcher, the service object, is initialized and used:</p>
 
-   <p><pre>SiteAuthenticator siteAuth =
-    (SiteAuthenticator)PluginManager.getSinglePlugin(SiteAuthenticator.class);
+   <p><pre>BitstreamDispatcher dispatcher =
+    (BitstreamDispatcher)PluginManager.getSinglePlugin(BitstreamDispatcher.class);
 
-  siteAuth.startAuthentication(context, request, response);</pre></p>
+int id = dispatcher.next();
+
+while (id != BitstreamDispatcher.SENTINEL)
+{
+     /*
+        do some processing here
+     */
+
+     id = dispatcher.next();
+}</pre></p>
 
   <h4>Plugin that Names Itself</h4>
 

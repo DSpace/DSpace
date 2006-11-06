@@ -616,7 +616,7 @@ metadata.dc.description.abstract = Abstract</pre>
 
   <p>If LDAP is enabled in the dspace.cfg file, then new users will be able to register by entering their username and password without being sent the registration token. If users do not have a username and password, then they can still register and login with just their email address the same way they do now.</p>
 
-  <p>If you want to give any special privileges to LDAP users, you will still need to extend the SiteAuthenticator class to automatically put people who have a netid into a special group. You might also want to give certain email addresses special privileges. Refer to the <a href="#authenticate">Custom Authentication Code</a> section above for more information about how to do this.</p>
+  <p>If you want to give any special privileges to LDAP users, create a stackable authentication method to automatically put people who have a netid into a special group. You might also want to give certain email addresses special privileges. Refer to the <a href="#authenticate">Custom Authentication Code</a> section above for more information about how to do this.</p>
 
   <p>Here is an explanation of what each of the different configuration parameters are for:</p>
 
