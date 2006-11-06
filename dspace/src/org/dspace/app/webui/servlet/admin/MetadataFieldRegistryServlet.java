@@ -339,12 +339,12 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
         }
 
         String qualifier = request.getParameter("qualifier");
+        if (qualifier == "")
+        {
+            qualifier = null;
+        }
         if (qualifier != null)
         {
-            if (qualifier.length() == 0)
-            {
-                return error(request, labels.getString(clazz + ".qualempty"));
-            }
             if (qualifier.length() > 64)
             {
                 return error(request, labels.getString(clazz + ".qualtoolong"));

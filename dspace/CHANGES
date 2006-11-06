@@ -24,6 +24,7 @@
 - docs/appenx.html
   added overviews of the default Dublin Core Metadata and Bitstream Registry
 - SF patch #1584297 for SF bug #1548738 Multiple Metadata Schema, schema not shown on edit item page
+- SF patch #1589906 for SF bug #589895  Not possible to add unqualified Metadata Field
 
 (Robert Tansley)
 - SF patch #1565975 HandleServlet and BitstreamServlet support If-Modified-Since
