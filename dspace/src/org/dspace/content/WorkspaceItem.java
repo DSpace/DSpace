@@ -260,12 +260,12 @@ public class WorkspaceItem implements InProgressSubmission
 
         if (template && (templateItem != null))
         {
-            DCValue[] dc = templateItem.getDC(Item.ANY, Item.ANY, Item.ANY);
+            DCValue[] md = templateItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
-            for (int n = 0; n < dc.length; n++)
+            for (int n = 0; n < md.length; n++)
             {
-                i.addDC(dc[n].element, dc[n].qualifier, dc[n].language,
-                        dc[n].value);
+                i.addMetadata(md[n].schema, md[n].element, md[n].qualifier, md[n].language,
+                        md[n].value);
             }
         }
 
