@@ -518,40 +518,6 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 	<p>will change any handles currently assigned prefix 123456789 to prefix 1303, so for example handle 123456789/23 will be updated to 1303/23 in the database.</p>
 
 
-	<h3><a NAME="sitemaps">Google and HTML sitemaps</a></h3>
-
-    <p>To aid web crawlers index the content within your repository, you can make use of sitemaps. There are currently two forms of sitemaps included in DSpace; Google sitemaps and HTML sitemaps. Both of these are currently experimental. Whilst their use should not affect the rest of your content, their status should be considered as beta code.</p>
-    
-    <p>Sitemaps allow DSpace to expose it's content without the crawlers having to index every page. HTML sitemaps provide a list of all items, collections and communities in HTML format, whilst Google sitemaps provide the same information in gzipped XML format.</p>
-    
-    <p>To generate the sitemaps, you need to run <code>[dspace]/bin/generate-sitemaps</code> This creates the sitemaps in <code>[dspace]/sitemaps/</code></p>
-    
-    <p>The sitemaps can be accessed from the following URLs:
-    <ul>
-    	<li>http://dspace.example.com/dspace/sitemap?google=0 - Index sitemap</li>
-    	<li>http://dspace.example.com/dspace/sitemap?google=1 - First list of items (up to 50,000)</li>
-    	<li>http://dspace.example.com/dspace/sitemap?google=n - Subsequent lists of items (e.g. 50,0001 to 100,000) etc...</li>
-    	<li>http://dspace.example.com/dspace/sitemap?google=n+1 (e.g. 3) - List of communities</li>
-    	<li>http://dspace.example.com/dspace/sitemap?google=n+2 (e.g. 4) - List of collections</li>
-    </ul>
-    HTML sitemaps follow the same procedure:
-    <ul>
-    	<li>http://dspace.example.com/dspace/sitemap?html=0 - Index sitemap</li>
-    	<li>etc...</li>
-    </ul>
-    </p>
-    
-    <p>You may wish to insert a link to the index HTML sitemap somewhere on your DSpace homepage (possibly hidden) to allow indexers to easily get to every item.</p>
-    
-    <p>When running <code>[dspace]/bin/generate-sitemaps</code> the script informs Google that the sitemaps have been updated. For this update to register correctly, you must first register your Google sitemap index page (<code>/dspace/sitemap?google=0</code>) with Google at <a href="http://www.google.com/webmasters/sitemaps/">http://www.google.com/webmasters/sitemaps/</a>. If your DSpace server requires the use of a HTTP proxy to connect to the Internet, ensure that you have set <code>http.proxy.host</code> and <code>http.proxy.port</code> in <code>[dspace]/config/dspace.cfg</code></p>
-    
-    <p>You can generate the sitemaps automatically every day using an additional cron job:</p>
-    
-    <pre># Generate sitemaps
-0 6 * * * [dspace]/bin/generate-sitemaps
-	</pre>
-
-
 	<h2><a name="windows">Windows Installation</a></h2>
 
 	<h3>Pre-requisite Software</h3>

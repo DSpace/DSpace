@@ -6,10 +6,6 @@
 - SF bug #1556829 Docs mention old SiteAuthenticator class
 - SF bug #1532389 Item Templates do not work for non-dc fields
 
-(Stuart Lewis and Rob Tansley)
-- SF Patch #1587225 Google and html sitemap generator
-- SF Patch #1591871 Docs for google and html sitemaps
-
 (Vlastimil Krejcir)
 - SF patch #1588008 Bitstream authorization timeout patch
 
