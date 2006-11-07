@@ -61,7 +61,7 @@ public class GoogleSitemapGenerator
     private final static int SITEMAP_FILESIZE_LIMIT = 10 * 1024 * 1024 - 20;
 
     /** Max number of URLs in a single Sitemap */
-    private final static int SITEMAP_URL_LIMIT = 5000;
+    private final static int SITEMAP_URL_LIMIT = 50000;
 
     /** The stem of all URLs */
     private final String URL_STEM = ConfigurationManager.getProperty("dspace.url") + 

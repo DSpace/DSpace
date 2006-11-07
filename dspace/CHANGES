@@ -8,6 +8,7 @@
 
 (Stuart Lewis and Rob Tansley)
 - SF Patch #1587225 Google and html sitemap generator
+- SF Patch #1591871 Docs for google and html sitemaps
 
 (Vlastimil Krejcir)
 - SF patch #1588008 Bitstream authorization timeout patch
@@ -72,6 +73,7 @@
 - SF patch #1556207 for SF bug #1554056 Community/collection handle URL with / redirects to homepage
 - SF patch #1571494  for SF bug  #1571490 - UTF-8 encoded characters in licence
 - SF patch #1571522  for SF  bug #1571519 - UTF-8 in statistics
+- SF Patch #1591871 Docs for google and html sitemaps
 
 (Mark Diggory)
 - SF patch #1523824 robots.txt to limit bots navigating author and date pages
