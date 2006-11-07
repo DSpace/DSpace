@@ -161,7 +161,6 @@ cp * ..</pre>
 	</ol></p>
       </li>
 
-
       <li>
         <P>Edit <code><i>[dspace-source]</i>/config/dspace.cfg</code>, in particular you'll need to set these properties:
 
@@ -490,7 +489,8 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
     <P>A Handle server runs as a separate process that receives TCP requests from other Handle servers, and issues resolution requests to a global server or servers if a Handle entered locally does not correspond to some local content.  The Handle protocol is based on TCP, so it will need to be installed on a server that can broadcast and receive TCP on port 2641.</P>
 
     <P>The Handle server code is included with the DSpace code in
-<code><i>[dspace-source]</i>/lib/handle.jar</code>.  A script exists to create a simple Handle configuration - simply run <code><i>[dspace]</i>/bin/make-handle-config</code> after you've set the appropriate parameters in <code>dspace.cfg</code>.  You can also create a Handle configuration directly by following the <A HREF="http://www.handle.net/hs_manual_18jan02/server_manual_2.html">installation instructions on handle.net</A>, but with these changes:</P>
+<code><i>[dspace-source]</i>/lib/handle.jar</code>. <strong>Note:</strong> The latest version of the <code>handle.jar</code> file is not included in the release due to licensing conditions changing between the provided version and later versions. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace-source]</i>/lib with the new version and rebuild your war files.</p>
+    <p>A script exists to create a simple Handle configuration - simply run <code><i>[dspace]</i>/bin/make-handle-config</code> after you've set the appropriate parameters in <code>dspace.cfg</code>.  You can also create a Handle configuration directly by following the <A HREF="http://www.handle.net/hs_manual_18jan02/server_manual_2.html">installation instructions on handle.net</A>, but with these changes:</P>
 
     <UL>
       <LI>Instead of running:
