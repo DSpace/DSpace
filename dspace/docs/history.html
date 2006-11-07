@@ -10,6 +10,57 @@
 <h1>DSpace System Documentation: Version History</h1>
 <p><a href="index.html">Back to contents</a></p>
 
+<h2><a name="version1_4_1">Changes in DSpace 1.4.1</a></h2>
+
+<h3>General Improvements</h3>
+
+<ul>
+    <li>HandleServlet and BitstreamServlet support If-Modified-Since requests</li>
+    <li>Improved sanity-checking of XSL-based ingest crosswalks</li>
+    <li>Remove thumbnail filename from alt-text</li>
+    <li>Include item title in HTML title element</li>
+	<li>Improvements to help prevent spammers and sploggers</li>
+    <li>Make cleanup() commit outstanding work every 100 iterations</li>
+	<li>Better handling where email send failed due to wrong address for new user</li>
+    <li>Include robots.txt to limit bots navigating author, date and browse by subject pages</li>
+    <li>Add css styles for print media</li>
+    <li>RSS made more configurable and provide system-wide RSS feed, also moves text to Messages.properties</li>
+    <li>Jar file updates (includes required code changes for DSIndexer and DSQuery and new jars
+  fontbox.jar and serializer.jar)</li>
+    <li>Various documentation additions and cleanups</li>
+    <li>XHTML compliance improvements</li>
+</ul>
+
+<h3>Bug fixes</h3>
+<ul>
+    <li>1532389 - Item Templates do not work for non-dc fields</li>
+    <li>1066771 - Metadata edit form dropping DC qualifier</li>
+    <li>1548738 - Multiple Metadata Schema, schema not shown on edit item page</li>
+    <li>1589895 - Not possible to add unqualified Metadata Field</li>
+    <li>1543853 - Statistics do not work in 1.4</li>
+    <li>1541381 - Browse-by-date and browse-by-title not working</li>
+    <li>1556947 - NullPointerException when no user selected to del/edit</li>
+    <li>1554064 - Fix exception handling for ClassCastException in BitstreamServlet</li>
+    <li>1548865 - Browse errors on withdrawn item</li>
+    <li>1554056 - Community/collection handle URL with / redirects to homepage</li>
+	<li>1571490 - UTF-8 encoded characters in licence</li>
+	<li>1571519 - UTF-8 in statistics</li>
+    <li>1544807 - Browse-by-Subject/Author paging mechanism broken</li>
+    <li>1543966 - "Special" groups inside groups bug</li>
+    <li>1480496 - Cannot turn off "ignore authorization" flag!</li>
+    <li>1515148 - Community policies not deleting correctly</li>
+    <li>1556829 - Docs mention old SiteAuthenticator class</li>
+    <li>Fix for bitstream authorization timeout</li>
+    <li>Fix to make sure cleanup() doesn't fail with NullPointerException</li>
+    <li>Fix for removeBitstream() failing to update primary bitstream</li>
+	<li>Fix for Advanced Search ignoring conjunctions for arbitrary number of queries</li>
+    <li>Fix minor bug in Harvest.java for Oracle users</li>
+	<li>Fix missing title for news editor page</li>
+    <li>Small Messages.properties modification (change of DSpace copyright text)</li>
+	<li>fix PDFBox tmp file issue</li>
+    <li>Fix HttpServletRequest encoding issues</li>
+</ul>
+
 <h2><a name="version1_4">Changes in DSpace 1.4</a></h2>
 
 <h3>General Improvements</h3>

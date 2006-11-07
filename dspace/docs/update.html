@@ -12,6 +12,39 @@
 
     <P>This section describes how to update a DSpace installation from one version to the next.  Details of the differences between the functionality of each version are given in the <A HREF="history.html">Version History</A> section.</P>
 
+    <h2><a name="14_141">Updating From 1.4 to 1.4.1</a></h2>
+
+     <p>The changes in 1.4.1 are only code changes so the update is simply a matter of rebuilding the wars.</p>
+
+     <p>In the notes below <code><i>[dspace]</i></code> refers to the install directory for your existing DSpace installation, and <code><i>[dspace-1.4.1-source]</i></code> to the source directory for DSpace 1.4.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+
+     <ol>
+      <li><p>Get the new DSpace 1.4.1 source code from <a href="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</a> and unpack it somewhere.  Do not unpack it on top of your existing installation!!</p></li>
+
+      <li><p>Copy the PostgreSQL driver JAR to the source tree.  For example:</p>
+
+      <pre>cd <i>[dspace]</i>/lib
+cp postgresql.jar <i>[dspace-1.4.1-source]</i>/lib</pre></li>
+
+      <li><p>Take down Tomcat (or whichever servlet container you're using).</p></li>
+
+      <li><p>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <code><i>[dspace]</i>/jsp/local</code> directory, you will need to merge the changes in the new 1.4.1 versions into your locally modified ones. You can use the <code>diff</code> command to compare your JSPs against the 1.4.1 versions to do this. You can also check against the <a href="http://dspace.cvs.sourceforge.net/dspace/">DSpace CVS</a>.</p></li>
+
+      <li><p>In <code><i>[dspace-1.4.1-source]</i></code> run:</p>
+
+      <pre>ant -Dconfig=<i>[dspace]</i>/config/dspace.cfg update</pre></li>
+
+      <li><p>Copy the <code>.war</code> Web application files in <code><i>[dspace-1.4.1-source]</i>/build</code> to the <code>webapps</code> sub-directory of your servlet container (e.g. Tomcat).  e.g.:</p>
+
+      <pre>cp <i>[dspace-1.4.1-source]</i>/build/*.war <i>[tomcat]</i>/webapps</pre>
+
+      <p>If you're using Tomcat, you need to delete the directories corresponding to the old <code>.war</code> files.  For example, if <code>dspace.war</code> is installed in <code><i>[tomcat]</i>/webapps/dspace.war</code>, you should delete the <code><i>[tomcat]</i>/webapps/dspace</code> directory.  Otherwise, Tomcat will continue to use the old code in that directory. </p></li>
+
+      <li><p>Restart Tomcat.</p></li>
+    </ol>
+
+
+
     <h2><a name="132_14">Updating From 1.3.2 to 1.4.x</a></h2>
 
     <ol>
@@ -25,13 +58,13 @@
       </li>
 
       <li>
-        <p>Download the <A HREF="http://sourceforge.net/projects/dspace/">latest DSpace 1.4 source bundle</A> and unpack it in a suitable location (<em>not</em> over your existing DSpace installation or source tree!)</p>
+        <p>Download the <A HREF="http://sourceforge.net/projects/dspace/">latest DSpace 1.4.x source bundle</A> and unpack it in a suitable location (<em>not</em> over your existing DSpace installation or source tree!)</p>
       </li>
 
       <li><p>Copy the PostgreSQL driver JAR to the source tree.  For example:</p>
 
       <pre>cd <i>[dspace]</i>/lib
-cp postgresql.jar <i>[dspace-1.4-source]</i>/lib</pre></li>
+cp postgresql.jar <i>[dspace-1.4.x-source]</i>/lib</pre></li>
 
       <li><p>Take down Tomcat (or whichever servlet container you're using).</p></li>
 
@@ -117,13 +150,13 @@ checker.retention.CHECKSUM_MATCH=8w</pre></li>
 
           <li><p>If you have custom Media Filters, note that these are now configured through <code>dspace.cfg</code> (instead of <code>mediafilter.cfg</code> which is obsolete.)</p></li>
 
-          <li><p>Also, take a look through the default <code>dspace.cfg</code> file supplied with DSpace 1.4, as this contains configuration options for various new features you might like to use.  In general, these new features default to 'off' and you'll need to add configuration properties as described in the default 1.4 <code>dspace.cfg</code> to activate them.</P></li>
+          <li><p>Also, take a look through the default <code>dspace.cfg</code> file supplied with DSpace 1.4.x, as this contains configuration options for various new features you might like to use.  In general, these new features default to 'off' and you'll need to add configuration properties as described in the default 1.4.x <code>dspace.cfg</code> to activate them.</P></li>
         </ul>
       </li>
 
-      <li><p>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <code><i>[dspace]</i>/jsp/local</code> directory, you will need to merge the changes in the new 1.4 versions into your locally modified ones.</p></li>
+      <li><p>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <code><i>[dspace]</i>/jsp/local</code> directory, you will need to merge the changes in the new 1.4.x versions into your locally modified ones. You can use the <code>diff</code> command to compare your JSPs against the 1.4.x versions to do this. You can also check against the <a href="http://dspace.cvs.sourceforge.net/dspace/">DSpace CVS</a>.</p></li>
 
-      <li><p>In <code><i>[dspace-1.4-source]</i></code> run:</p>
+      <li><p>In <code><i>[dspace-1.4.x-source]</i></code> run:</p>
 
       <pre>ant -Dconfig=<i>[dspace]</i>/config/dspace.cfg update</pre></li>
 
@@ -131,11 +164,11 @@ checker.retention.CHECKSUM_MATCH=8w</pre></li>
 
         <dl>
           <dt>For PostgreSQL</dt>
-          <dd><p><code><i>[dspace-1.4-source]</i>/etc/database_schema_13-14.sql</code> contains the SQL commands to achieve this for PostgreSQL.  To apply the changes, go to the source directory, and run:</P>
+          <dd><p><code><i>[dspace-1.4.x-source]</i>/etc/database_schema_13-14.sql</code> contains the SQL commands to achieve this for PostgreSQL.  To apply the changes, go to the source directory, and run:</P>
           <p><code>psql -f etc/database_schema_13-14.sql [DSpace database name] -h localhost</code></p></dd>
 
           <dt>For Oracle</dt>
-          <dd><p><code><i>[dspace-1.4-source]</i>/etc/oracle/database_schema_13-14.sql</code> should be run on the DSpace database to update the schema.</p></dd>
+          <dd><p><code><i>[dspace-1.4.x-source]</i>/etc/oracle/database_schema_13-14.sql</code> should be run on the DSpace database to update the schema.</p></dd>
         </dl>
       </li>
 

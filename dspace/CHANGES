@@ -1,3 +1,5 @@
+1.4.1 beta 1
+============
 (Scott Yeadon)
 - Jar file updates (includes required code changes for DSIndexer and DSQuery and new jars
   fontbox.jar and serializer.jar)
