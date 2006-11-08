@@ -12,7 +12,7 @@ fontbox.jar:         Java library for parsing font files, required for PDFBox.ja
 handle.jar:          CNRI Handle Server (version 5.3.4)
 jakarta-poi.jar:     MS file reader, used by text extraction (v2.5.1)
 jargon.jar:          SRB server access library (v.1.4.25)
-jaxen-1.1-beta-7.jar:XPath engine (v1.1-beta11)
+jaxen.jar:           XPath engine (v1.1-beta11)
 jdom.jar             Java DOM API library (version 1.0)
 jena.jar:            The Jena RDF framework (version 1.4.0)
 jstl.jar:            Java Standard Tag Library (JSTL) API (version 1.0.6)
