@@ -92,6 +92,7 @@ public class BitstreamServlet extends DSpaceServlet
         String idString = request.getPathInfo();
         String handle = "";
         String sequenceText = "";
+        String filename = null;
         int sequenceID;
 
         // Parse 'handle' and 'sequence' (bitstream seq. number) out
@@ -117,9 +118,10 @@ public class BitstreamServlet extends DSpaceServlet
                 handle = idString.substring(0, slashIndex);
                 int slash2 = idString.indexOf('/', slashIndex + 1);
                 if (slash2 != -1)
+                {
                     sequenceText = idString.substring(slashIndex+1,slash2);
-                else
-                    sequenceText = idString.substring(slashIndex+1);
+                    filename = idString.substring(slash2+1);
+                }
             }
         }
 
@@ -167,10 +169,10 @@ public class BitstreamServlet extends DSpaceServlet
             }
         }
 
-        if (bitstream == null)
+        if (bitstream == null || filename == null
+                || !filename.equals(bitstream.getName()))
         {
-            // No bitstream found -- ID was invalid
-
+            // No bitstream found or filename was wrong -- ID invalid
             log.info(LogManager.getHeader(context, "invalid_id", "path="
                     + idString));
             JSPManager.showInvalidIDError(request, response, idString,

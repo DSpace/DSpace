@@ -102,6 +102,7 @@ public class JSPManager
     public static void showInternalError(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         showJSP(request, response, "/error/internal.jsp");
     }
 
@@ -117,6 +118,7 @@ public class JSPManager
     public static void showIntegrityError(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         showJSP(request, response, "/error/integrity.jsp");
     }
 
@@ -137,6 +139,7 @@ public class JSPManager
             throws ServletException, IOException
     {
         // FIXME: Need to work out which error message to display?
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         showJSP(request, response, "/error/authorize.jsp");
     }
 
@@ -161,6 +164,7 @@ public class JSPManager
             throws ServletException, IOException
     {
         request.setAttribute("bad.id", badID);
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         if (type != -1)
         {
