@@ -166,7 +166,7 @@ public class BitstreamFormat
         // not null, return format object
         if (log.isDebugEnabled())
         {
-            log.debug(LogManager.getHeader(context, "find_bitstream",
+            log.debug(LogManager.getHeader(context, "find_bitstream_format",
                     "bitstream_format_id=" + id));
         }
 
