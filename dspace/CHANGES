@@ -1,3 +1,6 @@
+(Mark Diggory)
+- Change "View Licence" to "View License" in Messages.properties
+
 (Robert Tansley)
 - Error pages now return appropriate HTTP status codes (e.g. 404 not found)
 - Bad filenames in /bitstream/ URLs now result in 404 error -- prevents
