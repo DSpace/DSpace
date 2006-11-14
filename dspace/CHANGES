@@ -1,3 +1,6 @@
+(Stuart Lewis)
+- SF Patch #1596113 [dspace]/bin/update-handle-prefix needs to index-all
+
 (Mark Diggory)
 - Change "View Licence" to "View License" in Messages.properties
 
