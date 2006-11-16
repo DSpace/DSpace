@@ -1,3 +1,6 @@
+(Scott Yeadon)
+- Fix bug in TableRow toString() method where NPE is thrown if tablename not set
+
 (Stuart Lewis)
 - SF Patch #1596113 [dspace]/bin/update-handle-prefix needs to index-all
 

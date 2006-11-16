@@ -491,7 +491,18 @@ public class TableRow
     public String toString()
     {
         final String NEWLINE = System.getProperty("line.separator");
-        StringBuffer result = new StringBuffer(table).append(NEWLINE);
+    	StringBuffer result;
+    	
+    	if (table==null)
+    	{
+    		result = new StringBuffer("no_table");
+    	}
+    	else
+    	{
+    		result = new StringBuffer(table);
+    	}
+    	
+    	result.append(NEWLINE);
 
         for (Iterator iterator = data.keySet().iterator(); iterator.hasNext();)
         {
