@@ -1,29 +1,5 @@
 /*
-* DSPACE DIDL CROSSWALK MODULE
-*AUTHOR
-*         Los Alamos National Laboratory
-*         Research Library
-*         Digital Library Research & Prototyping Team
-*         Henry Jerez
-*         2004, 2005
-*
-*CONTACT
-*    proto@gws.lanl.gov
-*VERSION
-*    beta1    
-*    date 07/26/2005
-*ACKNOWLEDGMENT
-*    Development of this code is part of the aDORe repository project by the Research Library of the Los Alamos National Laboratory.
-*
- *Based on:
- *
- * OAIDCCrosswalk.java
- *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2004-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,6 +41,7 @@ import java.lang.*;
 import java.sql.SQLException;
 import ORG.oclc.oai.server.crosswalk.Crosswalk;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
+import ORG.oclc.oai.server.verb.ServerVerb;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -78,12 +55,21 @@ import org.dspace.search.HarvestedItemInfo;
 import sun.misc.BASE64Encoder;
 import org.dspace.core.*;
 
+/**
+ * DSpace Item DIDL crosswalk.
+ * 
+ * Development of this code was part of the aDORe repository project 
+ * by the Research Library of the Los Alamos National Laboratory.
+ * 
+ * @author Henry Jerez
+ * @author Los Alamos National Laboratory
+ */
 
 public class DIDLCrosswalk extends Crosswalk
 {
     public DIDLCrosswalk(Properties properties)
     {
-	super("urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd ");
+    	super("urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd ");
     }
     
     
@@ -99,8 +85,8 @@ public class DIDLCrosswalk extends Crosswalk
     {
         Item item = ((HarvestedItemInfo) nativeItem).item;
        
-         Date d = ((HarvestedItemInfo) nativeItem).datestamp;
-         String ITEMDATE = new DCDate(d).toString();
+        Date d = ((HarvestedItemInfo) nativeItem).datestamp;
+        String ITEMDATE = new DCDate(d).toString();
         
         // Get all the DC
         DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
@@ -109,27 +95,27 @@ public class DIDLCrosswalk extends Crosswalk
         StringBuffer metadata1 = new StringBuffer();
         String itemhandle=item.getHandle();
         int maxsize=  Integer.parseInt(ConfigurationManager.getProperty("oai.didl.maxresponse")); 
-        String currdate=ORG.oclc.oai.server.verb.ServerVerb.createResponseDate(new Date());
+        String currdate=ServerVerb.createResponseDate(new Date());
         
         metadata.append("<didl:DIDL ")
-	        .append(" xmlns:didl=\"urn:mpeg:mpeg21:2002:02-DIDL-NS\"  ")
+            .append(" xmlns:didl=\"urn:mpeg:mpeg21:2002:02-DIDL-NS\"  ")
             .append(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
             .append("xsi:schemaLocation=\"urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd \">")
-        	.append ("<didl:DIDLInfo>")
-			.append ("<dcterms:created xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://purl.org/dc/terms/ \">")
-			.append  (currdate)
-			.append ("</dcterms:created> </didl:DIDLInfo>" )
-			.append("<didl:Item id=\"")
-		.append("uuid-" + UUIDFactory.generateUUID().toString()+"\">");
+            .append ("<didl:DIDLInfo>")
+            .append ("<dcterms:created xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://purl.org/dc/terms/ \">")
+            .append  (currdate)
+            .append ("</dcterms:created> </didl:DIDLInfo>" )
+            .append("<didl:Item id=\"")
+            .append("uuid-" + UUIDFactory.generateUUID().toString()+"\">");
         metadata.append("<didl:Descriptor>")
-        		.append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">")
-				.append("<dii:Identifier xmlns:dii=\"urn:mpeg:mpeg21:2002:01-DII-NS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd\">")
-				.append("urn:hdl:" + itemhandle)
-				.append("</dii:Identifier>")
-				.append("</didl:Statement>")
-				.append("</didl:Descriptor>");
-			metadata.append("<didl:Descriptor>")
-					.append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">");
+            .append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">")
+            .append("<dii:Identifier xmlns:dii=\"urn:mpeg:mpeg21:2002:01-DII-NS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd\">")
+            .append("urn:hdl:" + itemhandle)
+            .append("</dii:Identifier>")
+            .append("</didl:Statement>")
+            .append("</didl:Descriptor>");
+        metadata.append("<didl:Descriptor>")
+            .append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">");
 					
         for (int i = 0; i < allDC.length; i++)
         {
@@ -176,110 +162,107 @@ public class DIDLCrosswalk extends Crosswalk
                     .append(">");
             }
         }
-			metadata.append("<oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">");
-						
+        
+        metadata.append("<oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">");
+        				
         metadata.append(metadata1);
         
         metadata.append("</oai_dc:dc>")
-				.append("</didl:Statement>")
-				.append("</didl:Descriptor>");				
-				
-				/**putfirst item here**/
-			
-				
-		//**CYCLE HERE!!!!**//
+            .append("</didl:Statement>")
+            .append("</didl:Descriptor>");				
+        
+        /**putfirst item here**/
+        
+        
+        //**CYCLE HERE!!!!**//
        
         try
         {
-        	Bundle[] bundles= item.getBundles("ORIGINAL");    
-		
-			if (bundles.length == 0)
-	        {
-	            metadata.append("<P>There are no files associated with this item.</P>");
-	        }
-	        else
-	        {  
-		     
-	/**cycle bundles**/
-				for (int i = 0; i < bundles.length; i++)
-	            { 
-					int flag=0;			
-	                Bitstream[] bitstreams = bundles[i].getBitstreams();
-		/**cycle bitstreams**/
-	                for (int k = 0; k < bitstreams.length ; k++)
-	                {
-	                    // Skip internal types
-	                    if (!bitstreams[k].getFormat().isInternal())
-	                    {
-	                    if (flag==0)	
-	                    	{
-	                   		flag=1;
-	                    	}
-	               metadata.append("<didl:Component id=" + "\"uuid-"+ UUIDFactory.generateUUID().toString() + "\">");
-				   metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
-	               metadata.append("\" mimeType=\"");
-	               metadata.append(bitstreams[k].getFormat().getMIMEType());
-	               metadata.append("\">");
-		       metadata.append("</didl:Resource>");
-		 
-			  if (bitstreams[k].getSize()< maxsize){
-				
-					metadata.append("<didl:Resource mimeType=\"");
-					metadata.append(bitstreams[k].getFormat().getMIMEType());
-			 		metadata.append("\" encoding=\"base64\">");
-			 		try
-			 		{
-                        /*
-                         * Assume that size of in-line bitstreams will always be
-                         * smaller than MAXINT bytes
-                         */
-			 			int intSize = (int) bitstreams[k].getSize();
-                        
-			 			byte[] buffer = new byte[intSize];
-			 			
-			 			//BufferedInputStream bis=new BufferedInputStream(bitstreams[k].retrieve());
-			 			Context contextl= new Context();
-			 			BufferedInputStream bis=new BufferedInputStream(BitstreamStorageManager.retrieve(contextl,bitstreams[k].getID()));
-			 			int size=bis.read(buffer);
-			 		    contextl.complete();
-			 			
-			 			sun.misc.BASE64Encoder encoder=(sun.misc.BASE64Encoder) Class.forName("sun.misc.BASE64Encoder").newInstance();
-			 			 String encoding = encoder.encodeBuffer(buffer);
-			 			 metadata.append(encoding);
-			 		}
-			 		catch (Exception ex)
-			 		{
-			 			System.err.println("Caught exception:"+ex.getCause());
-			 			ex.printStackTrace();
-			 metadata.append("http://retrieve/"+ new Integer(bitstreams[k].getID()).toString()  +"bitstream=" + k +"/" );
-			 		
-			 		}
-			
-							
-	                        metadata.append("</didl:Resource>");
-	                }
-			        metadata.append("</didl:Component>");	
-	               
-			     }
-	            /*end bitstream cycle*/     
-	           }
-	           /*end bundle cycle*/
-          }
+            Bundle[] bundles= item.getBundles("ORIGINAL");    
+            
+            if (bundles.length == 0)
+            {
+                metadata.append("<P>There are no files associated with this item.</P>");
+            }
+            else
+            {  
+            	/**cycle bundles**/
+                for (int i = 0; i < bundles.length; i++)
+                { 
+                    int flag=0;			
+                    Bitstream[] bitstreams = bundles[i].getBitstreams();
+                    
+                    /**cycle bitstreams**/
+                    for (int k = 0; k < bitstreams.length ; k++)
+                    {
+                        // Skip internal types
+                        if (!bitstreams[k].getFormat().isInternal())
+                        {
+                            if (flag==0)	
+                            {
+                                flag=1;
+                            }
+                        	
+                            metadata.append("<didl:Component id=" + "\"uuid-"+ UUIDFactory.generateUUID().toString() + "\">");
+                            metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
+                            metadata.append("\" mimeType=\"");
+                            metadata.append(bitstreams[k].getFormat().getMIMEType());
+                            metadata.append("\">");
+                            metadata.append("</didl:Resource>");
+    	 
+                            if (bitstreams[k].getSize()< maxsize)
+                            {
+                                metadata.append("<didl:Resource mimeType=\"");
+                                metadata.append(bitstreams[k].getFormat().getMIMEType());
+                                metadata.append("\" encoding=\"base64\">");
+                        		
+                                try
+                                {
+                                    /*
+                                     * Assume that size of in-line bitstreams will always be
+                                     * smaller than MAXINT bytes
+                                     */
+                                    int intSize = (int) bitstreams[k].getSize();
+                                    
+                                    byte[] buffer = new byte[intSize];
+                                    
+                                    Context contextl= new Context();
+                                    BufferedInputStream bis=new BufferedInputStream(BitstreamStorageManager.retrieve(contextl,bitstreams[k].getID()));
+                                    int size=bis.read(buffer);
+                                    contextl.complete();
+                                    
+                                    BASE64Encoder encoder=(BASE64Encoder) Class.forName("sun.misc.BASE64Encoder").newInstance();
+                                    String encoding = encoder.encodeBuffer(buffer);
+                                    metadata.append(encoding);
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.err.println("Caught exception:"+ex.getCause());
+                                    ex.printStackTrace();
+                                    metadata.append("http://retrieve/"+ new Integer(bitstreams[k].getID()).toString()  +"bitstream=" + k +"/" );
+                                }
 
-      }
-     }
-     catch (SQLException sqle)
-     {
- 		System.err.println("Caught exception:"+sqle.getCause());
- 		sqle.printStackTrace();
-     }
-
-				
-		//**END CYCLE HERE **//		
-	
+                                metadata.append("</didl:Resource>");
+                            }
+                            metadata.append("</didl:Component>");	
+                        }
+                        /*end bitstream cycle*/     
+                    }
+                    /*end bundle cycle*/
+                }
+            }
+        }
+        catch (SQLException sqle)
+        {
+            System.err.println("Caught exception:"+sqle.getCause());
+            sqle.printStackTrace();
+        }
+    		
+        //**END CYCLE HERE **//		
+        
         metadata.append("</didl:Item>")
-        		.append("</didl:DIDL>");
-
+                .append("</didl:DIDL>");
+    
         return metadata.toString();
     }
 }
