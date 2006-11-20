@@ -87,7 +87,8 @@ then
 	# update the metadatavalue table entries
     echo "update metadatavalue set text_value=overlay(text_value placing '$2' from 23 for $oldPrefixLen) where text_value like 'http://hdl.handle.net/$1%';" | psql
     # Reindex the site so the indexes contain the new handles
-    ./index-all
+    BINDIR=`dirname $0`
+    $BINDIR/index-all
 	break
 else
 	echo
