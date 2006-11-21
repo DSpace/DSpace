@@ -14,7 +14,7 @@
 
     <h2><a name="14_141">Updating From 1.4 to 1.4.1</a></h2>
 
-     <p>The changes in 1.4.1 are only code changes so the update is simply a matter of rebuilding the wars.</p>
+   <p>The changes in 1.4.1 are only code and configuration changes so the update is simply a matter of rebuilding the wars and slight changes to your config file.</p>
 
      <p>In the notes below <code><i>[dspace]</i></code> refers to the install directory for your existing DSpace installation, and <code><i>[dspace-1.4.1-source]</i></code> to the source directory for DSpace 1.4.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
@@ -29,6 +29,24 @@ cp postgresql.jar <i>[dspace-1.4.1-source]</i>/lib</pre></li>
       <li><strong>Note:</strong> Licensing conditions for the <code>handle.jar</code> file have changed. As a result, the latest version of the <code>handle.jar</code> file is not included in this distribution. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace-1.4.1-source]</i>/lib with the new version.</li>
 
       <li><p>Take down Tomcat (or whichever servlet container you're using).</p></li>
+
+      <li><p>A new configuration item <code>webui.html.max-depth-guess</code> has been added to avoid infinite URL spaces. Add the following to the dspace.cfg file:</p>
+<pre>#### Multi-file HTML document/site settings #####
+#
+# When serving up composite HTML items, how deep can the request be for us to
+# serve up a file with the same name?
+#
+# e.g. if we receive a request for "foo/bar/index.html"
+# and we have a bitstream called just "index.html"
+# we will serve up that bitstream for the request if webui.html.max-depth-guess
+# is 2 or greater.  If webui.html.max-depth-guess is 1 or less, we would not
+# serve that bitstream, as the depth of the file is greater.
+#
+# If webui.html.max-depth-guess is zero, the request filename and path must
+# always exactly match the bitstream name.  Default value is 3.
+#
+webui.html.max-depth-guess = 3</pre>
+	<p>If <code>webui.html.max-depth-guess</code> is not present in <code>dspace.cfg</code> the default value is used. If archiving entire web sites or deeply nested HTML documents it is advisable to change the default to a higher value more suitable for these types of materials.</p></li>
 
       <li><p>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <code><i>[dspace]</i>/jsp/local</code> directory, you will need to merge the changes in the new 1.4.1 versions into your locally modified ones. You can use the <code>diff</code> command to compare your JSPs against the 1.4.1 versions to do this. You can also check against the <a href="http://dspace.cvs.sourceforge.net/dspace/">DSpace CVS</a>.</p></li>
 
