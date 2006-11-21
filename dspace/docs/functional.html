@@ -550,16 +550,18 @@ https://dspace.myu.edu/bitstream/123.456/789/24/foo.html
   <ul>
     <li>No dynamic content (CGI scripts and so forth)</li>
 
-    <li>All links to preserved content must be <em>relative links</em>, that do not refer to 'parents':
+    <li>All links to preserved content must be <em>relative links</em>, that do not refer to 'parents' above the 'root' of the HTML document/site:
 
       <ul>
         <li><code>diagram.gif</code> is OK</li>
 
         <li><code>image/foo.gif</code> is OK</li>
 
-        <li><code>/stylesheet.css</code> is not OK</li>
+        <li><code>../index.html</code> is only OK in a file that is at least a directory deep in the HTML document/site hierarchy</li>
 
-        <li><code>http://somedomain.com/content.html</code> is not OK</li>
+        <li><code>/stylesheet.css</code> is not OK (the link will break)</li>
+
+        <li><code>http://somedomain.com/content.html</code> is not OK (the link will continue to link to the external site which may change or disappear)</li>
       </ul>
     </li>
 

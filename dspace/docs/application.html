@@ -16,7 +16,7 @@
 
   <p>The DSpace Web UI is the largest and most-used component in the application layer. Built on Java Servlet and JavaServer Page technology, it allows end-users to access DSpace over the Web via their Web browsers. As of Dspace 1.3.2 the UI meets both XHTML 1.0 standards and Web Accessibility Initiative (WAI) level-2 standard.</p>
 
-  <p>It also features an administration section, consisting of pages intended for use by central administrators. Presently, this part of the Web UI is not particularly sophisticated; users of the administration section need to know what they are doing! Selected parts of this may also be used by collection [FIXME: administrators or editors?]</p>
+  <p>It also features an administration section, consisting of pages intended for use by central administrators. Presently, this part of the Web UI is not particularly sophisticated; users of the administration section need to know what they are doing! Selected parts of this may also be used by collection administrators.</p>
 
   <h3>Web UI Files</h3>
 
@@ -387,14 +387,12 @@ https://dspace.mit.edu/html/1721.1/12345/figure1.gif
 
   <p>The HTML document servlet can work out which item the user is looking at, and then which Bitstream in it is called <code>figure1.gif</code>, and serve up that bitstream. Similar for following links to other HTML pages. Of course all the links and image references have to be relative and not absolute.</p>
 
-  <p>This can cope with relative links that refer to a deeper path, e.g.</p>
+  <p>HTML documents must be "self-contained", as <a href="functional.html#html">explained here</a>.  Provided that full path information is known by DSpace, any depth or complexity of HTML document can be served subject to those contraints.  This is usually possible with some kind of batch import.  If, however, the document has been uploaded one file at a time using the Web UI, the path information has been stripped.  The system can cope with relative links that refer to a deeper path, e.g.</p>
   <pre>
 &lt;IMG SRC="images/figure1.gif"&gt;
 </pre>
 
-  <p>Remember that in the Bitstream table in the database we have the 'name' field, which always contains the filename with no path (<code>figure1.gif</code>). We also have the <code>source</code> field, which <em>may</em> contain the full pathname of the file as it appeared on the submitter's hard drive, but this is browser- and OS-dependent, so we can't rely on it. All we can rely on is the filename.</p>
-
-  <p>We can still work out what images/figure1.gif is by making the HTML document servlet strip any path that comes in from the URL, e.g.</p>
+  <p>If the item has been uploaded via the Web submit UI, in the Bitstream table in the database we have the 'name' field, which will contain the filename with no path (<code>figure1.gif</code>).  We can still work out what <code>images/figure1.gif</code> is by making the HTML document servlet strip any path that comes in from the URL, e.g.</p>
   <pre>
 https://dspace.mit.edu/html/1721.1/12345/images/figure1.gif
                                          ^^^^^^^
@@ -416,13 +414,11 @@ https://dspace.mit.edu/html/1721.1/12345/chapter1_images/figure.gif
 https://dspace.mit.edu/html/1721.1/12345/chapter2_images/figure.gif
 </pre>
 
-  <p>since it would just have <code>figure.gif</code> in the Bitstream table. Thus, the limitations are:</p>
+  <p>since it would just have <code>figure.gif</code> 
 
-  <ul>
-    <li>All links must be relative and not refer to parents (e.g. <code>../images/foo.gif</code> or <code>/images/foo.gif</code>)</li>
+  <p>To prevent "infinite URL spaces" appearing (e.g. if a file <code>foo.html</code> linked to <code>bar/foo.html</code>, which would link to <code>bar/bar/foo.html</code>...) this behavior can be configured by setting the configuration property <code>webui.html.max-depth-guess</code>.</p>
 
-    <li>If links refer to deeper directory levels, all the filenames must be different (as explained above)</li>
-  </ul>
+  <p>For example, if we receive a request for <code>foo/bar/index.html</code>, and we have a bitstream called just <code>index.html</code>,  we will serve up that bitstream for the request if <code>webui.html.max-depth-guess</code>  is 2 or greater.  If <code>webui.html.max-depth-guess</code> is 1 or less, we would not serve that bitstream, as the depth of the file is greater.  If <code>webui.html.max-depth-guess</code> is zero, the request filename and path must always exactly match the bitstream name.  The default value (if that property is not present in <code>dspace.cfg</code>) is 3.</p>
 
   <h3>Thesis Blocking</h3>
 

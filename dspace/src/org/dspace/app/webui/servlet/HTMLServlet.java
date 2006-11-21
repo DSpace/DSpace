@@ -54,6 +54,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -63,9 +64,21 @@ import org.dspace.handle.HandleManager;
 /**
  * Servlet for HTML bitstream support.
  * <P>
- * <code>/html/handle/filename</code>
+ * If we receive a request like this:
+ * <P>
+ * <code>http://dspace.foo.edu/html/123.456/789/foo/bar/index.html</code>
+ * <P>
+ * we first check for a bitstream with the *exact* filename
+ * <code>foo/bar/index.html</code>. Otherwise, we strip the path information
+ * (up to three levels deep to prevent infinite URL spaces occurring) and see if
+ * we have a bitstream with the filename <code>index.html</code> (with no
+ * path). If this exists, it is served up. This is because if an end user
+ * uploads a composite HTML document with the submit UI, we will not have
+ * accurate path information, and so we assume that if the browser is requesting
+ * foo/bar/index.html but we only have index.html, that this is the desired file
+ * but we lost the path information on upload.
  * 
- * @author Robert Tansley
+ * @author Austin Kim, Robert Tansley
  * @version $Revision$
  */
 public class HTMLServlet extends DSpaceServlet
@@ -73,6 +86,31 @@ public class HTMLServlet extends DSpaceServlet
     /** log4j category */
     private static Logger log = Logger.getLogger(HTMLServlet.class);
 
+    /**
+     * Default maximum number of path elements to strip when testing if a
+     * bitstream called "foo.html" should be served when "xxx/yyy/zzz/foo.html"
+     * is requested.
+     */
+    private int maxDepthGuess;
+
+    /**
+     * Create an HTML Servlet
+     */
+    public HTMLServlet()
+    {
+        super();
+
+        if (ConfigurationManager.getProperty("webui.html.max-depth-guess") != null)
+        {
+            maxDepthGuess = ConfigurationManager
+                    .getIntProperty("webui.html.max-depth-guess");
+        }
+        else
+        {
+            maxDepthGuess = 3;
+        }
+    }
+    
     // Return bitstream whose name matches the target bitstream-name
     // bsName, or null if there is no match.  Match must be exact.
     // NOTE: This does not detect duplicate bitstream names, just returns first.
@@ -108,13 +146,15 @@ public class HTMLServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+        Item item = null;
         Bitstream bitstream = null;
 
-        // Get the ID from the URL
         String idString = request.getPathInfo();
-        String filename = "";
-        String handle = "";
+        String filenameNoPath = null;
+        String fullpath = null;
+        String handle = null;
 
+        // Parse URL
         if (idString != null)
         {
             // Remove leading slash
@@ -123,51 +163,37 @@ public class HTMLServlet extends DSpaceServlet
                 idString = idString.substring(1);
             }
 
-            // Get filename
-            int slashIndex = idString.lastIndexOf('/');
-
-            if (slashIndex != -1)
-            {
-                filename = idString.substring(slashIndex + 1);
-                filename = URLDecoder.decode(filename,
-                        Constants.DEFAULT_ENCODING);
-                handle = idString.substring(0, slashIndex);
-            }
-
-            // If there's still a second slash, remove it and anything after it,
-            // it might be a relative directory name
-            slashIndex = handle.indexOf('/');
-            slashIndex = handle.indexOf('/', slashIndex + 1);
-
-            if (slashIndex != -1)
-            {
-                handle = handle.substring(0, slashIndex);
-            }
-
-            /* Get entire relative path after handle, in case it
-             * is actually the bitstream name.  e.g. for item
-             * with handle 1234.56/13, the URL for an item could be:
-             * .../dspace/1234.56/13/sub1/sub2/foo.html
-             * so return relative path: "sub1/sub2/foo.html"
-             * Also translate any encoded slashes, etc. to match bitstream name.
-             */
-            String relPath = null;
-            slashIndex = idString.indexOf('/');
+            // Get handle and full file path
+            int slashIndex = idString.indexOf('/');
             if (slashIndex != -1)
             {
                 slashIndex = idString.indexOf('/', slashIndex + 1);
                 if (slashIndex != -1)
-                    relPath = URLDecoder.decode(idString.substring(slashIndex + 1),
-                                                Constants.DEFAULT_ENCODING);
-            }
+                {
+                    handle = idString.substring(0, slashIndex);
+                    fullpath = URLDecoder.decode(idString
+                            .substring(slashIndex + 1),
+                            Constants.DEFAULT_ENCODING);
 
-            // Find the corresponding bitstream
+                    // Get filename with no path
+                    slashIndex = fullpath.indexOf('/');
+                    if (slashIndex != -1)
+                    {
+                        String[] pathComponents = fullpath.split("/");
+                        if (pathComponents.length <= maxDepthGuess + 1)
+                        {
+                            filenameNoPath = pathComponents[pathComponents.length - 1];
+                        }
+                    }
+                }
+            }
+        }
+
+        if (handle != null && fullpath != null)
+        {
+            // Find the item
             try
             {
-                boolean found = false;
-
-                Item item = null;
-
                 /*
                  * If the original item doesn't have a Handle yet (because it's
                  * in the workflow) what we actually have is a fake Handle in
@@ -186,21 +212,6 @@ public class HTMLServlet extends DSpaceServlet
                     item = (Item) HandleManager
                             .resolveToObject(context, handle);
                 }
-
-                if (item == null)
-                {
-                    log.info(LogManager.getHeader(context, "invalid_id",
-                            "path=" + handle));
-                    JSPManager
-                            .showInvalidIDError(request, response, handle, -1);
-
-                    return;
-                }
-
-                if (relPath == null ||
-                    (bitstream = getItemBitstreamByName(item, relPath)) == null)
-                    bitstream = getItemBitstreamByName(item, filename);
-
             }
             catch (NumberFormatException nfe)
             {
@@ -208,11 +219,24 @@ public class HTMLServlet extends DSpaceServlet
             }
         }
 
+        if (item != null)
+        {
+            // Try to find bitstream with exactly matching name + path
+            bitstream = getItemBitstreamByName(item, fullpath);
+            
+            if (bitstream == null && filenameNoPath != null)
+            {
+                // No match with the full path, but we can try again with
+                // only the filename
+                bitstream = getItemBitstreamByName(item, filenameNoPath);
+            }
+        }
+
         // Did we get a bitstream?
         if (bitstream != null)
         {
-            log.info(LogManager.getHeader(context, "view_bitstream",
-                    "bitstream_id=" + bitstream.getID()));
+            log.info(LogManager.getHeader(context, "view_html", "handle="
+                    + handle + ",bitstream_id=" + bitstream.getID()));
 
             // Set the response MIME type
             response.setContentType(bitstream.getFormat().getMIMEType());
@@ -231,7 +255,7 @@ public class HTMLServlet extends DSpaceServlet
         else
         {
             // No bitstream - we got an invalid ID
-            log.info(LogManager.getHeader(context, "view_bitstream",
+            log.info(LogManager.getHeader(context, "view_html",
                     "invalid_bitstream_id=" + idString));
 
             JSPManager.showInvalidIDError(request, response, idString,

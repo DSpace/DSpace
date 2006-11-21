@@ -13,6 +13,7 @@
 - Bad filenames in /bitstream/ URLs now result in 404 error -- prevents
   infinite URL spaces confusing crawlers and bad "persistent" bitstream IDs
   circulating
+- SF patch #1595902 Prevent infinite URL spaces in HTMLServlet
 
 1.4.1 beta 1
 ============
