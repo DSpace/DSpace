@@ -46,6 +46,8 @@
   --%>
 
 <%@ page import="org.dspace.content.MetadataField" %>
+<%@ page import="org.dspace.content.MetadataSchema" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.CollectionWizardServlet" %>
 <%@ page import="org.dspace.content.Collection" %>
 
@@ -108,7 +110,7 @@
 		for (int dc = 0; dc < dcTypes.length; dc++)
 		{ %>
 					<option value="<%= dcTypes[dc].getFieldID() %>"><%= dcTypes[dc].getQualifier() == null ?
-			dcTypes[dc].getElement() : dcTypes[dc].getElement() + "." + dcTypes[dc].getQualifier() %></option>
+					    MetadataSchema.find(UIUtil.obtainContext(request), dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() : MetadataSchema.find(UIUtil.obtainContext(request), dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() + "." + dcTypes[dc].getQualifier() %></option>
 <%      } %>
 				</select></td>
 				<td headers="t2" class="<%= row %>RowEvenCol">

@@ -1,4 +1,5 @@
 (Scott Yeadon)
+- SF bug #1596952 Collection Wizard create Template missing schema
 - Fix bug in TableRow toString() method where NPE is thrown if tablename not set
 - Update DIDL license and change coding style to DSpace standard
 
