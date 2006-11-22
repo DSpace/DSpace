@@ -204,20 +204,24 @@ public class DIDLCrosswalk extends Crosswalk
                             }
                         	
                             metadata.append("<didl:Component id=" + "\"uuid-"+ UUIDFactory.generateUUID().toString() + "\">");
-                            metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
-                            metadata.append("\" mimeType=\"");
-                            metadata.append(bitstreams[k].getFormat().getMIMEType());
-                            metadata.append("\">");
-                            metadata.append("</didl:Resource>");
-    	 
-                            if (bitstreams[k].getSize()< maxsize)
-                            {
-                                metadata.append("<didl:Resource mimeType=\"");
-                                metadata.append(bitstreams[k].getFormat().getMIMEType());
-                                metadata.append("\" encoding=\"base64\">");
-                        		
+                           
+                           if (bitstreams[k].getSize()> maxsize) 
+                           {
+                               metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
+                               metadata.append("\" mimeType=\"");
+                               metadata.append(bitstreams[k].getFormat().getMIMEType());
+                               metadata.append("\">");
+                               metadata.append("</didl:Resource>");
+                           }
+                           else
+                           {    
+                            
                                 try
                                 {
+                                    metadata.append("<didl:Resource mimeType=\"");
+                                    metadata.append(bitstreams[k].getFormat().getMIMEType());
+                                    metadata.append("\" encoding=\"base64\">");
+                                                                       
                                     /*
                                      * Assume that size of in-line bitstreams will always be
                                      * smaller than MAXINT bytes
@@ -237,9 +241,12 @@ public class DIDLCrosswalk extends Crosswalk
                                 }
                                 catch (Exception ex)
                                 {
-                                    System.err.println("Caught exception:"+ex.getCause());
-                                    ex.printStackTrace();
-                                    metadata.append("http://retrieve/"+ new Integer(bitstreams[k].getID()).toString()  +"bitstream=" + k +"/" );
+                                    ex.printStackTrace();                       
+                                    
+                                    metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
+                                    metadata.append("\" mimeType=\"");
+                                    metadata.append(bitstreams[k].getFormat().getMIMEType());
+                                    metadata.append("\">");
                                 }
 
                                 metadata.append("</didl:Resource>");
