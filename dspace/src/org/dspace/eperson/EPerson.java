@@ -48,6 +48,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -208,8 +209,132 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Retrieve all e-person records from the database, sorted by a particular
-     * field. Fields are:
+     * Find the epeople that match the search query across firstname, lastname or email
+     * 
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     * 
+     * @return array of EPerson objects
+     */
+    public static EPerson[] search(Context context, String query)
+            throws SQLException
+    {
+        return search(context, query, -1, -1);
+    }
+    
+    /**
+     * Find the epeople that match the search query across firstname, lastname or email. 
+     * This method also allows offsets and limits for pagination purposes. 
+     * 
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     * @param offset
+     *            Inclusive offset 
+     * @param limit
+     *            Maximum number of matches returned
+     * 
+     * @return array of EPerson objects
+     */
+    public static EPerson[] search(Context context, String query, int offset, int limit) 
+    		throws SQLException
+	{
+		String params = "%"+query.toLowerCase()+"%";
+		String dbquery = "SELECT * FROM eperson WHERE eperson_id = ? OR " + 
+			"firstname ILIKE ? OR lastname ILIKE ? OR email ILIKE ? ORDER BY lastname, firstname ASC ";
+		
+		if (offset >= 0 && limit >0) {
+			dbquery += "LIMIT " + limit + " OFFSET " + offset;
+		}
+		
+		// When checking against the eperson-id, make sure the query can be made into a number
+		Integer int_param;
+		try {
+			int_param = Integer.valueOf(query);
+		}
+		catch (NumberFormatException e) {
+			int_param = new Integer(-1);
+		}
+		
+		// Get all the epeople that match the query
+		TableRowIterator rows = DatabaseManager.query(context, dbquery, new Object[] {int_param,params,params,params});
+		
+		List epeopleRows = rows.toList();
+		EPerson[] epeople = new EPerson[epeopleRows.size()];
+		
+		for (int i = 0; i < epeopleRows.size(); i++)
+		{
+		    TableRow row = (TableRow) epeopleRows.get(i);
+		
+		    // First check the cache
+		    EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+		            .getIntColumn("eperson_id"));
+		
+		    if (fromCache != null)
+		    {
+		        epeople[i] = fromCache;
+		    }
+		    else
+		    {
+		        epeople[i] = new EPerson(context, row);
+		    }
+		}
+		
+		return epeople;
+	}
+
+    /**
+     * Returns the total number of epeople returned by a specific query, without the overhead 
+     * of creating the EPerson objects to store the results.
+     * 
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     * 
+     * @return the number of epeople mathching the query
+     */
+    public static int searchResultCount(Context context, String query)
+    	throws SQLException
+	{
+		String dbquery = "%"+query.toLowerCase()+"%";
+		Long count;
+		
+		// When checking against the eperson-id, make sure the query can be made into a number
+		Integer int_param;
+		try {
+			int_param = Integer.valueOf(query);
+		}
+		catch (NumberFormatException e) {
+			int_param = new Integer(-1);
+		}
+		
+		// Get all the epeople that match the query
+		TableRow row = DatabaseManager.querySingle(context,
+		        "SELECT count(*) as count FROM eperson WHERE eperson_id = ? OR " + 
+		        "firstname ILIKE ? OR lastname ILIKE ? OR email ILIKE ?",
+		        new Object[] {int_param,dbquery,dbquery,dbquery});
+				
+		// use getIntColumn for Oracle count data
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            count = new Long(row.getIntColumn("count"));              
+        }
+        else  //getLongColumn works for postgres
+        {
+            count = new Long(row.getLongColumn("count"));
+        }
+        
+		return count.intValue();
+	}
+    
+    
+    
+    /**
+     * Find all the epeople that match a particular query
      * <ul>
      * <li><code>ID</code></li>
      * <li><code>LASTNAME</code></li>

@@ -52,6 +52,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -739,7 +740,127 @@ public class Group extends DSpaceObject
 
         return groups;
     }
+    
+    
+    /**
+     * Find the groups that match the search query across eperson_group_id or name
+     * 
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     * 
+     * @return array of Group objects
+     */
+    public static Group[] search(Context context, String query)
+    		throws SQLException
+	{
+	    return search(context, query, -1, -1);
+	}
+    
+    /**
+     * Find the groups that match the search query across eperson_group_id or name
+     * 
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     * @param offset
+     *            Inclusive offset 
+     * @param limit
+     *            Maximum number of matches returned
+     * 
+     * @return array of Group objects
+     */
+    public static Group[] search(Context context, String query, int offset, int limit)
+    		throws SQLException
+	{
+		String params = "%"+query.toLowerCase()+"%";
+		String dbquery = "SELECT * FROM epersongroup WHERE name ILIKE ? OR eperson_group_id = ? ORDER BY name ASC ";
+		
+		if (offset >= 0 && limit > 0) {
+			dbquery += "LIMIT " + limit + " OFFSET " + offset;
+		}
+		
+		// When checking against the eperson-id, make sure the query can be made into a number
+		Integer int_param;
+		try {
+			int_param = Integer.valueOf(query);
+		}
+		catch (NumberFormatException e) {
+			int_param = new Integer(-1);
+		}
+		
+		TableRowIterator rows = 
+			DatabaseManager.query(context, dbquery, new Object[]{params, int_param});
+		
+		List groupRows = rows.toList();
+		Group[] groups = new Group[groupRows.size()];
+		
+		for (int i = 0; i < groupRows.size(); i++)
+	    {
+	        TableRow row = (TableRow) groupRows.get(i);
+	
+	        // First check the cache
+	        Group fromCache = (Group) context.fromCache(Group.class, row
+	                .getIntColumn("eperson_group_id"));
+	
+	        if (fromCache != null)
+	        {
+	            groups[i] = fromCache;
+	        }
+	        else
+	        {
+	            groups[i] = new Group(context, row);
+	        }
+	    }
+	    return groups;
+	}
 
+    /**
+     * Returns the total number of groups returned by a specific query, without the overhead 
+     * of creating the Group objects to store the results.
+     * 
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     * 
+     * @return the number of groups mathching the query
+     */
+    public static int searchResultCount(Context context, String query)
+    	throws SQLException
+	{
+		String params = "%"+query.toLowerCase()+"%";
+		String dbquery = "SELECT count(*) as count FROM epersongroup WHERE name ILIKE ? OR eperson_group_id = ? ";
+		
+		// When checking against the eperson-id, make sure the query can be made into a number
+		Integer int_param;
+		try {
+			int_param = Integer.valueOf(query);
+		}
+		catch (NumberFormatException e) {
+			int_param = new Integer(-1);
+		}
+		
+		// Get all the epeople that match the query
+		TableRow row = DatabaseManager.querySingle(context, dbquery, new Object[] {params, int_param});
+		
+		// use getIntColumn for Oracle count data
+		Long count;
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            count = new Long(row.getIntColumn("count"));              
+        }
+        else  //getLongColumn works for postgres
+        {
+            count = new Long(row.getLongColumn("count"));
+        }
+
+		return count.intValue();
+	}
+    
+    
     /**
      * Delete a group
      * 
