@@ -1,3 +1,6 @@
+(Claudia Juergen)
+- SF patch #1589930 for SF bug #1588625 Incorrect text on item mapper screen
+
 (Scott Yeadon)
 - SF bug #1596952 Collection Wizard create Template missing schema
 - Fix bug in TableRow toString() method where NPE is thrown if tablename not set

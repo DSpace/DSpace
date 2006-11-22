@@ -87,7 +87,14 @@
     </h2>
 
     <%-- <p>Check the box next to items you wish to add or remove, and choose 'add' or 'remove'.</p> --%>
-    <p><fmt:message key="jsp.tools.itemmap-browse.infomsg"/></p>
+    <% if (browsetype.equals("Add")){ %>
+    <p><fmt:message key="jsp.tools.itemmap-browse.add"/></p>
+    <% }%>
+    <% if (browsetype.equals("Remove")){ %>
+    <p><fmt:message key="jsp.tools.itemmap-browse.remove"/></p>
+    <% } %>
+    
+    <%-- %>p><fmt:message key="jsp.tools.itemmap-browse.infomsg"/></p--%>
     <form method="post" action="<%= request.getContextPath() %>/tools/itemmap">
         <input type="hidden" name="cid" value="<%=collection.getID()%>" />
 
