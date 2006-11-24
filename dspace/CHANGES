@@ -1,6 +1,3 @@
-(Stuart Lewis)
-- SF Patch #1594208 for bug #1592984 Date comparisons strip time in org.dspace.harvest.Harvest
-
 (Scott Phillips)
 - Manakin eperson.patch adds API methods for searching epeople & groups.
 
@@ -16,6 +13,7 @@
 - Update DIDL license and change coding style to DSpace standard
 
 (Stuart Lewis)
+- SF Patch #1594208 for bug #1592984 Date comparisons strip time in org.dspace.harvest.Harvest
 - SF Patch #1596113 [dspace]/bin/update-handle-prefix needs to index-all
 
 (Mark Diggory)
