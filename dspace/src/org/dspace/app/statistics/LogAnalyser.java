@@ -191,8 +191,11 @@ public class LogAnalyser
    /** single character regular expression pattern */
    private static Pattern singleRX = null;
    
-   /** a pattern to match a valid log file line */
-   private static Pattern valid = null;
+   /** a pattern to match a valid version 1.3 log file line */
+   private static Pattern valid13 = null;
+   
+   /** a pattern to match a valid version 1.4 log file line */
+   private static Pattern valid14 = null;
    
    /** pattern to match valid log file names */
    private static Pattern logRegex = null;
@@ -843,8 +846,10 @@ public class LogAnalyser
         singleRX = Pattern.compile("( . |^. | .$)");
         
         // set up the standard log file line regular expression
-        String logLine = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:[^:]+:([^:]+):(.*)";
-        valid = Pattern.compile(logLine);
+        String logLine13 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:([^:]+):(.*)";
+        String logLine14 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:[^:]+:([^:]+):(.*)";
+        valid13 = Pattern.compile(logLine13);
+        valid14 = Pattern.compile(logLine14);
         
         // set up the pattern for validating log file names
         logRegex = Pattern.compile(fileTemplate);
@@ -1120,7 +1125,6 @@ public class LogAnalyser
      * line matches the required regular expression.
      *
      * @param   line    the line to be segmented
-     *
      * @return          a Log Line object for the given line
      */
     public static LogLine getLogLine(String line)
@@ -1128,7 +1132,16 @@ public class LogAnalyser
         // FIXME: consider moving this code into the LogLine class.  To do this
         // we need to much more carefully define the structure and behaviour
         // of the LogLine class
-        Matcher match = valid.matcher(line);
+        Matcher match;
+        
+        if (line.indexOf(":ip_addr") > 0)
+        {
+            match = valid14.matcher(line);
+        }
+        else
+        {
+            match = valid13.matcher(line);
+        }
         
         if (match.matches())
         {
