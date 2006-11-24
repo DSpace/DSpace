@@ -40,6 +40,7 @@
 package org.dspace.app.oai;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -267,6 +268,10 @@ public class DSpaceOAICatalog extends AbstractCatalog
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
             throw new OAIInternalServerError(se.toString());
+        }
+        catch (ParseException pe)
+        {
+            throw new OAIInternalServerError(pe.toString());
         }
         finally
         {
@@ -620,6 +625,10 @@ public class DSpaceOAICatalog extends AbstractCatalog
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
             throw new OAIInternalServerError(se.toString());
+        }
+        catch (ParseException pe)
+        {
+        	throw new OAIInternalServerError(pe.toString());
         }
         finally
         {

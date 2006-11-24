@@ -43,6 +43,7 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
@@ -271,8 +272,15 @@ public class FeedServlet extends DSpaceServlet
         String endDate = dcEndDate.toString().substring(0, 10);
         
         // this invocation should return a non-empty list if even 1 item has changed
-        return (Harvest.harvest(context, dso, startDate, endDate,
+        try {
+        	return (Harvest.harvest(context, dso, startDate, endDate,
         		                0, 1, false, false, false).size() > 0);
+        }
+        catch (ParseException pe)
+        {
+        	// This should never get thrown as we have generated the dates ourselves
+        	return false;
+        }
     }
     
     /**

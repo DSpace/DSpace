@@ -41,6 +41,7 @@ package org.dspace.eperson;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -343,69 +344,75 @@ public class Subscribe
         {
             Collection c = (Collection) collections.get(i);
 
-            List itemInfos = Harvest.harvest(context, c, startDate, endDate, 0, // Limit
-                                                                                // and
-                                                                                // offset
-                                                                                // zero,
-                                                                                // get
-                                                                                // everything
-                    0, true, // Need item objects
-                    false, // But not containers
-                    false); // Or withdrawals
-
-            // Only add to buffer if there are new items
-            if (itemInfos.size() > 0)
-            {
-                if (!isFirst)
+            try {
+                List itemInfos = Harvest.harvest(context, c, startDate, endDate, 0, // Limit
+                                                                                    // and
+                                                                                    // offset
+                                                                                    // zero,
+                                                                                    // get
+                                                                                    // everything
+                        0, true, // Need item objects
+                        false, // But not containers
+                        false); // Or withdrawals
+    
+                // Only add to buffer if there are new items
+                if (itemInfos.size() > 0)
                 {
-                    emailText
-                            .append("\n---------------------------------------\n");
-                }
-                else
-                {
-                    isFirst = false;
-                }
-
-                emailText.append("New items in collection ").append(
-                        c.getMetadata("name")).append(": ").append(
-                        itemInfos.size()).append("\n\n");
-
-                for (int j = 0; j < itemInfos.size(); j++)
-                {
-                    HarvestedItemInfo hii = (HarvestedItemInfo) itemInfos
-                            .get(j);
-
-                    DCValue[] titles = hii.item.getDC("title", null, Item.ANY);
-                    emailText.append("      Title: ");
-
-                    if (titles.length > 0)
+                    if (!isFirst)
                     {
-                        emailText.append(titles[0].value);
+                        emailText
+                                .append("\n---------------------------------------\n");
                     }
                     else
                     {
-                        emailText.append("Untitled");
+                        isFirst = false;
                     }
-
-                    DCValue[] authors = hii.item.getDC("contributor", Item.ANY,
-                            Item.ANY);
-
-                    if (authors.length > 0)
+    
+                    emailText.append("New items in collection ").append(
+                            c.getMetadata("name")).append(": ").append(
+                            itemInfos.size()).append("\n\n");
+    
+                    for (int j = 0; j < itemInfos.size(); j++)
                     {
-                        emailText.append("\n    Authors: ").append(
-                                authors[0].value);
-
-                        for (int k = 1; k < authors.length; k++)
+                        HarvestedItemInfo hii = (HarvestedItemInfo) itemInfos
+                                .get(j);
+    
+                        DCValue[] titles = hii.item.getDC("title", null, Item.ANY);
+                        emailText.append("      Title: ");
+    
+                        if (titles.length > 0)
                         {
-                            emailText.append("\n             ").append(
-                                    authors[k].value);
+                            emailText.append(titles[0].value);
                         }
+                        else
+                        {
+                            emailText.append("Untitled");
+                        }
+    
+                        DCValue[] authors = hii.item.getDC("contributor", Item.ANY,
+                                Item.ANY);
+    
+                        if (authors.length > 0)
+                        {
+                            emailText.append("\n    Authors: ").append(
+                                    authors[0].value);
+    
+                            for (int k = 1; k < authors.length; k++)
+                            {
+                                emailText.append("\n             ").append(
+                                        authors[k].value);
+                            }
+                        }
+    
+                        emailText.append("\n         ID: ").append(
+                                HandleManager.getCanonicalForm(hii.handle)).append(
+                                "\n\n");
                     }
-
-                    emailText.append("\n         ID: ").append(
-                            HandleManager.getCanonicalForm(hii.handle)).append(
-                            "\n\n");
                 }
+            }
+            catch (ParseException pe)
+            {
+                // This should never get thrown as the Dates are auto-generated
             }
         }
 

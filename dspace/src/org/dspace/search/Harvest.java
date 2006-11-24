@@ -39,10 +39,16 @@
  */
 package org.dspace.search;
 
+import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
@@ -108,11 +114,12 @@ public class Harvest
      *            included
      * @return List of <code>HarvestedItemInfo</code> objects
      * @throws SQLException
+     * @throws ParseException If the date is not in a supported format
      */
     public static List harvest(Context context, DSpaceObject scope,
             String startDate, String endDate, int offset, int limit,
             boolean items, boolean collections, boolean withdrawn)
-            throws SQLException
+            throws SQLException, ParseException
     {
 
         // Put together our query. Note there is no need for an
@@ -170,8 +177,8 @@ public class Harvest
             }
             else //postgres
             {
-                query = query + " AND item.last_modified >= ? ";
-                parameters.add(startDate);
+            	query = query + " AND item.last_modified >= ? ";
+            	parameters.add(toTimestamp(startDate, false));
             }            
         }
 
@@ -195,9 +202,11 @@ public class Harvest
              * 
              * Got that? ;-)
              */
+        	boolean selfGenerated = false;
             if (endDate.length() == 20)
             {
                 endDate = endDate.substring(0, 19) + ".999Z";
+                selfGenerated = true;
             }
 
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
@@ -209,11 +218,11 @@ public class Harvest
             }
             else //postgres
             {
-                query += " AND item.last_modified <= ? ";
-                parameters.add(endDate);
+            	query += " AND item.last_modified <= ? ";
+                parameters.add(toTimestamp(endDate, selfGenerated));
             }
         }
-
+        
         if (withdrawn == false)
         {
             // Exclude withdrawn items
@@ -356,8 +365,43 @@ public class Harvest
             itemInfo.collectionHandles.add(r.getStringColumn("handle"));
         }
     }
+
     
-    
+    /**
+     * Convert a String to a java.sql.Timestamp object
+     * 
+     * @param t The timestamp String
+     * @param selfGenerated Is this a self generated timestamp (e.g. it has .999 on the end)
+     * @return The converted Timestamp
+     * @throws ParseException 
+     */
+    private static Timestamp toTimestamp(String t, boolean selfGenerated) throws ParseException
+    {
+        SimpleDateFormat df;
+        
+        // Choose the correct date format based on string length
+        if (t.length() == 10)
+        {
+            df = new SimpleDateFormat("yyyy-MM-dd");
+        }
+        else if (t.length() == 20)
+        {
+            df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        }
+        else if (selfGenerated)
+        {
+            df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        }
+        else {
+            // Not self generated, and not in a guessable format
+            throw new ParseException("", 0);
+        }
+        
+        // Parse the date
+        df.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+        return new Timestamp(df.parse(t).getTime());
+    }    
+
     
     /**
      * Create an oracle to_timestamp function for the given iso date. It must be
