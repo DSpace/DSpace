@@ -18,6 +18,7 @@
 - SF Patch #1596113 [dspace]/bin/update-handle-prefix needs to index-all
 
 (Mark Diggory)
+- SF Patch #1600904 Remove cases of System.out from code executed in webapp
 - Change "View Licence" to "View License" in Messages.properties
 
 (Robert Tansley)

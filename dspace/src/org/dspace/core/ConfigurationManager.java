@@ -491,7 +491,7 @@ public class ConfigurationManager
             if (is == null)
             {
                 fatal("Cannot find dspace.cfg");
-                System.exit(1);
+                throw new RuntimeException("Cannot find dspace.cfg");
             }
             else
             {
@@ -568,7 +568,7 @@ public class ConfigurationManager
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
-            System.exit(1);
+            throw new RuntimeException("Cannot find dspace.cfg",e);
         }
     }
 
