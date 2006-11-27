@@ -52,6 +52,7 @@ import javax.xml.parsers.*;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.app.webui.servlet.SubmitServlet;
 
@@ -460,40 +461,58 @@ public class DCInputsReader
      */
     private String checkForDups(String formName, HashMap field, Vector pages)
     {
-    	int matches = 0;
-    	String err = null;
-    	String elem = (String)field.get("dc-element");
-    	String qual = (String)field.get("dc-qualifier");
-
-    	for (int i = 0; i < pages.size(); i++)
-    	{
-		    Vector pg = (Vector)pages.get(i);
-		    for (int j = 0; j < pg.size(); j++)
-		    {
-		    	HashMap fld = (HashMap)pg.get(j);
-		    	if (((String)fld.get("dc-element")).equals(elem))
-		    	{
-		    		String ql = (String)fld.get("dc-qualifier");
-		    		if (qual != null)
-		    		{
-		    			if ((ql != null) && ql.equals(qual))
-		    			{
-		    				matches++;
-		    			}
-		    		}
-		    		else if (ql == null)
-		    		{
-		    			matches++;
-		    		}
-		    	}
-		    }
-    	}
-    	if (matches > 1)
-    	{
-    		err = "Duplicate field " + elem + "." + qual + " detected in form " + formName;
-    	}
-
-    	return err;
+        int matches = 0;
+        String err = null;
+        String schema = (String)field.get("dc-schema");
+        String elem = (String)field.get("dc-element");
+        String qual = (String)field.get("dc-qualifier");
+        if ((schema == null) || (schema.equals("")))
+        {
+            schema = MetadataSchema.DC_SCHEMA;
+        }
+        String schemaTest;
+        
+        for (int i = 0; i < pages.size(); i++)
+        {
+            Vector pg = (Vector)pages.get(i);
+            for (int j = 0; j < pg.size(); j++)
+            {
+                HashMap fld = (HashMap)pg.get(j);
+                if ((fld.get("dc-schema") == null) || 
+                    (((String)fld.get("dc-schema")).equals("")))
+                {
+                    schemaTest = MetadataSchema.DC_SCHEMA;
+                }
+                else
+                {
+                    schemaTest = (String)fld.get("dc-schema");
+                }
+                
+                // Are the schema and element the same? If so, check the qualifier
+                if ((((String)fld.get("dc-element")).equals(elem)) && 
+                    (schemaTest.equals(schema)))
+                {
+                    String ql = (String)fld.get("dc-qualifier");
+                    if (qual != null)
+                    {
+                        if ((ql != null) && ql.equals(qual))
+                        {
+                            matches++;
+                        }
+                    }
+                    else if (ql == null)
+                    {
+                        matches++;
+                    }
+                }
+            }
+        }
+        if (matches > 1)
+        {
+            err = "Duplicate field " + schema + "." + elem + "." + qual + " detected in form " + formName;
+        }
+        
+        return err;
     }
 
 
