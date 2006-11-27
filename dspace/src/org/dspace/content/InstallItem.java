@@ -91,32 +91,6 @@ public class InstallItem
         Item item = is.getItem();
         String handle;
 
-        // set the language to default if it's not set already
-        DCValue[] dc = item.getDC("language", "iso", Item.ANY);
-
-        // FIXME: May need to review this arbitrary assignment of default language. The
-        // context of the submission should probably determine if the default language
-        // should be set rather than a (somewhat arbitrary) test of whether it has been set
-        // somewhere along a submission workflow or not. Maybe it has deliberately been left
-        // unset.
-        // Also if supporting multiple schemas, the default metadata fields should probably 
-        // also be made configurable.
-        if (dc.length < 1)
-        {
-            // Just set default language
-            item.addDC("language", "iso", null, ConfigurationManager
-                    .getProperty("default.language"));
-        }
-        else
-        {
-        	// N/A selected in UI sets an empty string field so remove it
-        	// Use this method for now to filter the N/A entry until FIXME above is addressed.
-        	if (dc[0].value.equals(""))
-        	{
-        		item.clearDC("language", "iso", Item.ANY);
-        	}
-        }
-
         // create accession date
         DCDate now = DCDate.getCurrent();
         item.addDC("date", "accessioned", null, now.toString());
@@ -145,18 +119,6 @@ public class InstallItem
 
         // Add handle as identifier.uri DC value
         item.addDC("identifier", "uri", null, handleref);
-
-        // Add format.mimetype and format.extent DC values
-        Bitstream[] bitstreams = item.getNonInternalBitstreams();
-
-        for (int i = 0; i < bitstreams.length; i++)
-        {
-            BitstreamFormat bf = bitstreams[i].getFormat();
-            item.addDC("format", "extent", null, String.valueOf(bitstreams[i]
-                    .getSize())
-                    + " bytes");
-            item.addDC("format", "mimetype", null, bf.getMIMEType());
-        }
 
         String provDescription = "Made available in DSpace on " + now
                 + " (GMT). " + getBitstreamProvenanceMessage(item);

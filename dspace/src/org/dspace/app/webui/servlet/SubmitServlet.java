@@ -877,7 +877,10 @@ public class SubmitServlet extends DSpaceServlet
     	      {
     	      	for (int z = 0; z < vals.length; z++)
     	      	{
-    	      		item.addMetadata(dcSchema, dcElement, dcQualifier, "en", vals[z]);
+                    if (!vals[z].equals(""))
+                    {
+                        item.addMetadata(dcSchema, dcElement, dcQualifier, "en", vals[z]);
+                    }
     	      	}
     	      }
     	   }
@@ -2466,7 +2469,7 @@ public class SubmitServlet extends DSpaceServlet
      */
     private void readDate(HttpServletRequest request, Item item,
             String schema, String element, String qualifier) throws SQLException
-        {
+    {
         String dcname = MetadataField.formKey(schema,element,qualifier);
 
         int year = UIUtil.getIntParameter(request, dcname + "_year");

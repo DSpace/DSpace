@@ -27,6 +27,11 @@
   infinite URL spaces confusing crawlers and bad "persistent" bitstream IDs
   circulating
 - SF patch #1595902 Prevent infinite URL spaces in HTMLServlet
+- InstallItem no longer sets dc.format.extent, dc.format.mimetype; no longer
+  sets default value for dc.language.iso if one is not present
+- Empty values in drop-down submit fields are not added as empty metadata values
+- dspace.cfg comments changed to indicate what default.language actually means
+
 
 1.4.1 beta 1
 ============
