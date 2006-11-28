@@ -158,7 +158,7 @@
                         </tr>
                         <tr>
                             <td align="center">
-                                <fmt:message key="jsp.search.results.searchfor"/>&nbsp;<input type="text" name="query" value='<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>'/>&nbsp;<input type="submit" value="<fmt:message key="jsp.general.go"/>" />
+                                <fmt:message key="jsp.search.results.searchfor"/>&nbsp;<input type="text" name="query" value="<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>"/>&nbsp;<input type="submit" value="<fmt:message key="jsp.general.go"/>" />
                             </td>
                         </tr>
                     </table>

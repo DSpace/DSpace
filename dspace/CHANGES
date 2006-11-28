@@ -1,3 +1,6 @@
+(K. Nakagami)
+- SF bug #1597504 Search result page shows shortened query string
+
 (Scott Phillips)
 - Manakin eperson.patch adds API methods for searching epeople & groups.
 

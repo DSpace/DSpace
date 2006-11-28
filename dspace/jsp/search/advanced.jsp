@@ -116,7 +116,7 @@
             <td align="left" valign="top" nowrap="nowrap" width="68%">
                 <%-- Search for: <br> --%>
               	<label for="tquery1"><fmt:message key="jsp.search.advanced.searchfor"/></label> <br/>
-                <input type="text" name="query1" id="tquery1" value='<%=StringEscapeUtils.escapeHtml(query1)%>' size="30" />
+                <input type="text" name="query1" id="tquery1" value="<%=StringEscapeUtils.escapeHtml(query1)%>" size="30" />
                 <br/>
               <p/>
             </td>
