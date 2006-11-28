@@ -115,7 +115,8 @@ public class ViewWorkspaceItemServlet
         // get the workspace item, item and collections from the request value
         WorkspaceItem wsItem = WorkspaceItem.find(c, wsItemID);
         Item item = wsItem.getItem();
-        Collection[] collections = item.getCollections();
+        //Collection[] collections = item.getCollections();
+        Collection[] collections = {wsItem.getCollection()};
         
         // Ensure the user has authorisation
         AuthorizeManager.authorizeAction(c, item, Constants.READ);

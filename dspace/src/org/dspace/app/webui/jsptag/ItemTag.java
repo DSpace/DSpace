@@ -482,10 +482,18 @@ public class ItemTag extends TagSupport
 
         if (collections != null)
         {
-            out.print("<tr><td class=\"metadataFieldLabel\">"
-                    + LocaleSupport.getLocalizedMessage(pageContext,
-                            "org.dspace.app.webui.jsptag.ItemTag.appears")
-                    + "</td><td class=\"metadataFieldValue\">");
+            out.print("<tr><td class=\"metadataFieldLabel\">");
+            if (item.getHandle()==null)  // assume workspace item
+            {
+                out.print(LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.submitted"));
+            }
+            else
+            {
+                out.print(LocaleSupport.getLocalizedMessage(pageContext,
+                          "org.dspace.app.webui.jsptag.ItemTag.appears"));
+            }
+            out.print("</td><td class=\"metadataFieldValue\">");
 
             for (int i = 0; i < collections.length; i++)
             {
