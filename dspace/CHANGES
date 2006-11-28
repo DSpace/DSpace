@@ -36,6 +36,8 @@
   sets default value for dc.language.iso if one is not present
 - Empty values in drop-down submit fields are not added as empty metadata values
 - dspace.cfg comments changed to indicate what default.language actually means
+- UIUtil.encodeBitstream() now correctly encodes URLs (no longer incorrectly
+  substitutes '+' for spaces in non-query segment.  Fixes bug #1604037.
 
 
 1.4.1 beta 1
