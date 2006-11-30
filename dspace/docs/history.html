@@ -15,24 +15,43 @@
 <h3>General Improvements</h3>
 
 <ul>
+    <li>Error pages now return appropriate HTTP status codes (e.g. 404 not found)</li>
+    <li>Bad filenames in /bitstream/ URLs now result in 404 error -- prevents infinite URL spaces confusing crawlers and bad "persistent" bitstream IDs circulating</li>
+    <li>Prevent infinite URL spaces in HTMLServlet</li>
+    <li>InstallItem no longer sets dc.format.extent, dc.format.mimetype; no longer sets default value for dc.language.iso if one is not present</li>
+    <li>Empty values in drop-down submit fields are not added as empty metadata values</li>
+    <li>API methods for searching epeople and groups</li>
+    <li>Support stats from both 1.3 and 1.4</li>
+    <li>[dspace]/bin/update-handle-prefix now runs index-all</li>
+    <li>Remove cases of System.out from code executed in webapp</li>
+    <li>Change "View Licence" to "View License" in Messages.properties</li>
+    <li>dspace.cfg comments changed to indicate what default.language actually means</li>
     <li>HandleServlet and BitstreamServlet support If-Modified-Since requests</li>
     <li>Improved sanity-checking of XSL-based ingest crosswalks</li>
     <li>Remove thumbnail filename from alt-text</li>
     <li>Include item title in HTML title element</li>
-	<li>Improvements to help prevent spammers and sploggers</li>
+    <li>Improvements to help prevent spammers and sploggers</li>
     <li>Make cleanup() commit outstanding work every 100 iterations</li>
-	<li>Better handling where email send failed due to wrong address for new user</li>
+    <li>Better handling where email send failed due to wrong address for new user</li>
     <li>Include robots.txt to limit bots navigating author, date and browse by subject pages</li>
     <li>Add css styles for print media</li>
     <li>RSS made more configurable and provide system-wide RSS feed, also moves text to Messages.properties</li>
-    <li>Jar file updates (includes required code changes for DSIndexer and DSQuery and new jars
-  fontbox.jar and serializer.jar)</li>
+    <li>Jar file updates (includes required code changes for DSIndexer and DSQuery and new jars fontbox.jar and serializer.jar)</li>
     <li>Various documentation additions and cleanups</li>
     <li>XHTML compliance improvements</li>
 </ul>
 
 <h3>Bug fixes</h3>
 <ul>
+    <li>1604037 - UIUtil.encodeBitstream() now correctly encodes URLs (no longer incorrectly substitutes '+' for spaces in non-query segment</li>
+    <li>1592984 - Date comparisons strip time in org.dspace.harvest.Harvest</li>
+    <li>1589902 - Duplicate [field] checking error [on input-forms.xml]</li>
+    <li>1596952 - Collection Wizard create Template missing schema</li>
+    <li>1596978 - View unfinished submissions - collection empty</li>
+    <li>1588625 - Incorrect text on item mapper screen</li>
+    <li>1597805 - DIDL Crosswalk: wrong resource management</li>
+    <li>1605635 - NPE in Utils.java</li>
+    <li>1597504 - Search result page shows shortened query string</li>
     <li>1532389 - Item Templates do not work for non-dc fields</li>
     <li>1066771 - Metadata edit form dropping DC qualifier</li>
     <li>1548738 - Multiple Metadata Schema, schema not shown on edit item page</li>
@@ -43,8 +62,8 @@
     <li>1554064 - Fix exception handling for ClassCastException in BitstreamServlet</li>
     <li>1548865 - Browse errors on withdrawn item</li>
     <li>1554056 - Community/collection handle URL with / redirects to homepage</li>
-	<li>1571490 - UTF-8 encoded characters in licence</li>
-	<li>1571519 - UTF-8 in statistics</li>
+    <li>1571490 - UTF-8 encoded characters in licence</li>
+    <li>1571519 - UTF-8 in statistics</li>
     <li>1544807 - Browse-by-Subject/Author paging mechanism broken</li>
     <li>1543966 - "Special" groups inside groups bug</li>
     <li>1480496 - Cannot turn off "ignore authorization" flag!</li>
@@ -53,12 +72,14 @@
     <li>Fix for bitstream authorization timeout</li>
     <li>Fix to make sure cleanup() doesn't fail with NullPointerException</li>
     <li>Fix for removeBitstream() failing to update primary bitstream</li>
-	<li>Fix for Advanced Search ignoring conjunctions for arbitrary number of queries</li>
+    <li>Fix for Advanced Search ignoring conjunctions for arbitrary number of queries</li>
     <li>Fix minor bug in Harvest.java for Oracle users</li>
-	<li>Fix missing title for news editor page</li>
+    <li>Fix missing title for news editor page</li>
     <li>Small Messages.properties modification (change of DSpace copyright text)</li>
-	<li>fix PDFBox tmp file issue</li>
+    <li>fix PDFBox tmp file issue</li>
     <li>Fix HttpServletRequest encoding issues</li>
+    <li>Fix bug in TableRow toString() method where NPE is thrown if tablename not set</li>
+    <li>Update DIDL license and change coding style to DSpace standard</li>
 </ul>
 
 <h2><a name="version1_4">Changes in DSpace 1.4</a></h2>

@@ -6,11 +6,10 @@ http://sourceforge.net/tracker/?group_id=19984&atid=119984
 Oracle compatibility: this release does not support Oracle. Check for patches or updates
 to this release to restore Oracle compatibility.
 
-1589902 Submission form use of similar fields of diff. schemas error
-1588625 Incorrect text on item mapper screen
+1604365 Unbalanced brackets cause search error
+1596576 Stackable LDAP authentication does not work
 1583372 DCDate.toString returns invalid string when hour is zero
 1571645 NullPointerException possible in review.jsp
-1553985 Filter-media throws errors when filtering some PDF files
 1552792 Not possible to uncheck a primary bitstream
 1552760 Submit interface looks bad in Safari browser
 1550641 LDAP auth logic broken for large trees
