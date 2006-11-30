@@ -1,3 +1,6 @@
+(Ed Yu)
+- SF Bug #1605635 NPE in Utils.java
+
 (K. Nakagami)
 - SF bug #1597504 Search result page shows shortened query string
 

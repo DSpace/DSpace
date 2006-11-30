@@ -276,6 +276,9 @@ public class Utils
      */
     public static String addEntities(String value)
     {
+        if (value==null || value.length() == 0)
+            return value;
+        
         value = value.replaceAll("&", "&amp;");
         value = value.replaceAll("\"", "&quot;");
 
