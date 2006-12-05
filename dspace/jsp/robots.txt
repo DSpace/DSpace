@@ -1,6 +1,0 @@
-User-agent: *
-
-Disallow: /browse-author
-Disallow: /items-by-author
-Disallow: /browse-date
-Disallow: /browse-subject
