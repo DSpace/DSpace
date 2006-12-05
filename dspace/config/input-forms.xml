@@ -137,7 +137,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <repeatable>true</repeatable>
          <label>Type</label>
          <input-type value-pairs-name="common_types">dropdown</input-type>
-         <hint> Select the type(s) of content you are submitting. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
+         <hint> Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
          <required></required>
        </field>
 

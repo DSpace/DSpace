@@ -1,3 +1,6 @@
+(Claudia Juergen)
+- SF Patch #1606703 for SF bug #1606435 Workflow text out of context
+
 (Mark Diggory)
 - SF Patch #1605771 Remove uncessary Log4j Configuration in CheckerCommand
  
