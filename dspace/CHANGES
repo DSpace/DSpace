@@ -1,3 +1,6 @@
+(Mark Diggory)
+- SF Patch #1605771 Remove uncessary Log4j Configuration in CheckerCommand
+ 
 1.4.1 beta 2
 ============
 (Ed Yu)

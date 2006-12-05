@@ -253,7 +253,7 @@ public class ChecksumChecker
         {
             checker.setReportVerbose(true);
         }
-        checker.configureLog();
+
         checker.setProcessStartDate(processStart);
         checker.setDispatcher(dispatcher);
         checker.setCollector(logger);

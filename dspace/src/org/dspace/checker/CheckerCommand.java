@@ -443,20 +443,7 @@ public final class CheckerCommand
     }
 
     /**
-     * Configures log4j to read config info from DSpace log4j.properties file.
-     */
-    public void configureLog()
-    {
-        // Load in log4j config
-        String log4jConf = ConfigurationManager.getProperty("dspace.dir")
-                + File.separator + "config" + File.separator
-                + "log4j.properties";
-
-        PropertyConfigurator.configure(log4jConf);
-    }
-
-    /**
-     * Determine if ony erros are reported
+     * Determine if any errors are reported
      * 
      * @return true if only errors reported
      */
