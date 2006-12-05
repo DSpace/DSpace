@@ -92,7 +92,11 @@
 
         JSPManager.showInternalError(request, response);
     }
-    finally {
-      context.abort();
+    finally
+    {
+      if (context != null)
+      {
+      	context.abort();
+      }
     }
 %>
