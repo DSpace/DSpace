@@ -6,6 +6,15 @@ http://sourceforge.net/tracker/?group_id=19984&atid=119984
 Oracle compatibility: this release does not support Oracle. Check for patches or updates
 to this release to restore Oracle compatibility.
 
+1609427 OAI server doesn't generate resumption token
+1606789 When collection is deleted, mapped item remains in community
+1606458 The MyDSpace page is very unstructured
+1606456 wrong link to register
+1606447 Cache strength information
+1606445 resolving messages with apostrophe in fmt tags
+1606444 Missing notification of the submitter on workflow abort
+1606441 Moving metadata fields between schemas
+1606439 Exception handling for deleting a metadata field
 1604365 Unbalanced brackets cause search error
 1596576 Stackable LDAP authentication does not work
 1583372 DCDate.toString returns invalid string when hour is zero
