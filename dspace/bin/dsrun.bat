@@ -66,7 +66,7 @@ echo Using DSpace installation in: %cd%
 
 REM Build a CLASSPATH
 
-set DSPACE_CLASSPATH=config
+set DSPACE_CLASSPATH=%CLASSPATH%;config
 for %%f in (lib\*.jar) DO CALL bin\buildpath.bat %%f
 
 

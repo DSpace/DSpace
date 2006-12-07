@@ -1,3 +1,6 @@
+(Tim Donohue)
+- SF Patch #1609663 Include Windows CLASSPATH in dsrun.bat
+
 (Claudia Juergen)
 - SF Patch #1606703 for SF bug #1606435 Workflow text out of context
 
