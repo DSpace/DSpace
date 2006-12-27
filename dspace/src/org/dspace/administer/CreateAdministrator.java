@@ -148,15 +148,21 @@ public class CreateAdministrator
             }
 
             // Create the administrator e-person
-            EPerson eperson = EPerson.create(context);
-
-            eperson.setEmail(email);
+            EPerson eperson = EPerson.findByEmail(context,email);
+            
+            // check if the email belongs to a registered user,
+            // if not create a new user with this email
+            if (eperson == null)
+            {
+                eperson = EPerson.create(context);
+                eperson.setEmail(email);
+                eperson.setCanLogIn(true);
+                eperson.setRequireCertificate(false);
+                eperson.setSelfRegistered(false);
+            }
             eperson.setLastName(lastName);
             eperson.setFirstName(firstName);
             eperson.setPassword(password1);
-            eperson.setCanLogIn(true);
-            eperson.setRequireCertificate(false);
-            eperson.setSelfRegistered(false);
             eperson.update();
 
             admins.addMember(eperson);
