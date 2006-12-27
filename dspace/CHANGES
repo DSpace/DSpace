@@ -6,6 +6,7 @@
   belonging to an allready registered user.
 
 (Claudia Juergen)
+- SF Patch #1619455 for SF bug #1619439 MyDSpace Group Membership Special Groups
 - SF Patch #1606719 for feature request #1145371 Link to admin area
 - SF Patch #1610030 for SF Bug #1076506 Item import command line option for application of template
 

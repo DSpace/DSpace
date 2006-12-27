@@ -40,7 +40,6 @@
 package org.dspace.eperson;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -837,34 +836,5 @@ public class EPerson extends DSpaceObject
         // the list of tables can be used to construct an error message
         // explaining to the user why the eperson cannot be deleted.
         return tableList;
-    }
-
-    /**
-     * return an array of all of the groups that this EPerson is a member of
-     * 
-     * @return Group []
-     * @throws SQLException
-     */
-    public Group[] getGroupMemberships() throws SQLException
-    {
-        // special groups
-        Group[] specialGroups = myContext.getSpecialGroups();
-
-        List groupList = new ArrayList();
-
-        for (int i = 0; i < specialGroups.length; i++)
-        {
-            groupList.add(specialGroups[i]);
-        }
-
-        // primary group IDs - returned as a set of Integers
-        Group[] myGroups = Group.allMemberGroups(myContext, this);
-
-        for (int i = 0; i < myGroups.length; i++)
-        {
-            groupList.add(myGroups[i]);
-        }
-
-        return (Group[]) groupList.toArray(new Group[0]);
     }
 }

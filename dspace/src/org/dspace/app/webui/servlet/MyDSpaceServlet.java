@@ -58,6 +58,7 @@ import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowItem;
@@ -580,35 +581,32 @@ public class MyDSpaceServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
         log.info(LogManager.getHeader(context, "view_mydspace", ""));
+        EPerson currentUser = context.getCurrentUser();
 
         // FIXME: WorkflowManager should return arrays
-        List ownedList = WorkflowManager.getOwnedTasks(context, context
-                .getCurrentUser());
+        List ownedList = WorkflowManager.getOwnedTasks(context, currentUser);
         WorkflowItem[] owned = new WorkflowItem[ownedList.size()];
         owned = (WorkflowItem[]) ownedList.toArray(owned);
 
         // Pooled workflow items
-        List pooledList = WorkflowManager.getPooledTasks(context, context
-                .getCurrentUser());
+        List pooledList = WorkflowManager.getPooledTasks(context, currentUser);
         WorkflowItem[] pooled = new WorkflowItem[pooledList.size()];
         pooled = (WorkflowItem[]) pooledList.toArray(pooled);
 
         // User's WorkflowItems
-        WorkflowItem[] workflowItems = WorkflowItem.findByEPerson(context,
-                context.getCurrentUser());
+        WorkflowItem[] workflowItems = WorkflowItem.findByEPerson(context, currentUser);
 
         // User's PersonalWorkspace
-        WorkspaceItem[] workspaceItems = WorkspaceItem.findByEPerson(context,
-                context.getCurrentUser());
+        WorkspaceItem[] workspaceItems = WorkspaceItem.findByEPerson(context, currentUser);
 
         // User's authorization groups
-        Group[] memberships = context.getCurrentUser().getGroupMemberships();
+        Group[] memberships = Group.allMemberGroups(context, currentUser);
 
         SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(
-                context, context.getCurrentUser());
+                context, currentUser);
 
         // Set attributes
-        request.setAttribute("mydspace.user", context.getCurrentUser());
+        request.setAttribute("mydspace.user", currentUser);
         request.setAttribute("workspace.items", workspaceItems);
         request.setAttribute("workflow.items", workflowItems);
         request.setAttribute("workflow.owned", owned);
