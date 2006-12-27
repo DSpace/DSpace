@@ -50,6 +50,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.Browse;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -941,11 +942,14 @@ public class Collection extends DSpaceObject
             
             if (item.isOwningCollection(this))
             {
+                int itemId = item.getID();
             // the collection to be deletd is the owning collection, thus remove
             // the item from all collections it belongs to
                 Collection[] collections = item.getCollections();
                 for (int i=0; i< collections.length; i++)
                 {
+                    //notify Browse of removing item.
+                    Browse.itemRemoved(ourContext, itemId);
                     collections[i].removeItem(item);
                 }
                     
@@ -953,6 +957,8 @@ public class Collection extends DSpaceObject
             // the item was only mapped to this collection, so just remove it
             else
             {
+                //notify Browse of removing item mapping. 
+                Browse.itemChanged(ourContext, item);
                 removeItem(item);
             }
         }
