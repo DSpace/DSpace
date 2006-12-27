@@ -111,6 +111,8 @@ public class ItemImport
     static boolean isTest = false;
 
     static boolean isResume = false;
+    
+    static boolean template = false;
 
     static PrintWriter mapOut = null;
 
@@ -155,6 +157,7 @@ public class ItemImport
                 "send submission through collection's workflow");
         options.addOption("t", "test", false,
                 "test run - do not actually import items");
+        options.addOption("p", "template", false, "apply template");
         options.addOption("R", "resume", false,
                 "resume a failed import (add only)");
 
@@ -208,6 +211,11 @@ public class ItemImport
         {
             isTest = true;
             System.out.println("**Test Run** - not actually importing items.");
+        }
+        
+        if (line.hasOption('p'))
+        {
+            template = true;
         }
 
         if (line.hasOption('s')) // source
@@ -404,11 +412,11 @@ public class ItemImport
 
             if (command.equals("add"))
             {
-                myloader.addItems(c, mycollections, sourcedir, mapfile);
+                myloader.addItems(c, mycollections, sourcedir, mapfile, template);
             }
             else if (command.equals("replace"))
             {
-                myloader.replaceItems(c, mycollections, sourcedir, mapfile);
+                myloader.replaceItems(c, mycollections, sourcedir, mapfile, template);
             }
             else if (command.equals("delete"))
             {
@@ -445,7 +453,7 @@ public class ItemImport
     }
 
     private void addItems(Context c, Collection[] mycollections,
-            String sourceDir, String mapFile) throws Exception
+            String sourceDir, String mapFile, boolean template) throws Exception
     {
         Map skipItems = new HashMap(); // set of items to skip if in 'resume'
         // mode
@@ -495,14 +503,14 @@ public class ItemImport
             }
             else
             {
-                addItem(c, mycollections, sourceDir, dircontents[i], mapOut);
+                addItem(c, mycollections, sourceDir, dircontents[i], mapOut, template);
                 System.out.println(i + " " + dircontents[i]);
             }
         }
     }
 
     private void replaceItems(Context c, Collection[] mycollections,
-            String sourceDir, String mapFile) throws Exception
+            String sourceDir, String mapFile, boolean template) throws Exception
     {
         // verify the source directory
         File d = new java.io.File(sourceDir);
@@ -566,7 +574,7 @@ public class ItemImport
             
             deleteItem(c, oldItem);
             
-            newItem = addItem(c, mycollections, sourceDir, newItemName, null);
+            newItem = addItem(c, mycollections, sourceDir, newItemName, null, template);
         }
     }
 
@@ -606,7 +614,7 @@ public class ItemImport
      * we're writing
      */
     private Item addItem(Context c, Collection[] mycollections, String path,
-            String itemname, PrintWriter mapOut) throws Exception
+            String itemname, PrintWriter mapOut, boolean template) throws Exception
     {
         String mapOutput = null;
 
@@ -618,7 +626,7 @@ public class ItemImport
 
         if (!isTest)
         {
-            wi = WorkspaceItem.create(c, mycollections[0], false);
+            wi = WorkspaceItem.create(c, mycollections[0], template);
             myitem = wi.getItem();
         }
 

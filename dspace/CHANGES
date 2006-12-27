@@ -5,6 +5,9 @@
   Creation of admin via [dspace]/bin/create-administrator for a given email, irrespective of the email
   belonging to an allready registered user.
 
+(Claudia Juergen)
+- SF Patch #1610030 for SF Bug #1076506 Item import command line option for application of template
+
 (K. Nakagami)
 - SF Patch #1621889 for SF Bug #1606789 When collection is deleted, mapped item remains in community
    
