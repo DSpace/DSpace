@@ -222,7 +222,7 @@ public class DCDate
             sb.append('-').append(fleshOut(day));
         }
 
-        if (hours > 0)
+        if (hours >= 0)
         {
             sb.append("T").append(fleshOut(hours)).append(':').append(
                     fleshOut(minutes)).append(':').append(fleshOut(seconds))
