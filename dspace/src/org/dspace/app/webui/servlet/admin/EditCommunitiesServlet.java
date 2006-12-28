@@ -549,11 +549,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             int step = Integer.parseInt(button.substring(17));
 
             // Create new group
-            Group newGroup = Group.create(context);
-            newGroup.setName("COLLECTION_" + collection.getID() + "_WFSTEP_"
-                    + step);
-            newGroup.update();
-            collection.setWorkflowGroup(step, newGroup);
+            Group newGroup = collection.createWorkflowGroup(step);
             collection.update();
 
             // Forward to group edit page
