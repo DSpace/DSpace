@@ -6,6 +6,7 @@
   belonging to an allready registered user.
 
 (Claudia Juergen)
+- Added link to controlled vocabulary configuration as for SF Bug #1456593 links to controlled vocab docs required
 - SF Patch #1623599 for SF Bug #1217068 Failed to complete review in workflow
 - SF Patch #1619455 for SF bug #1619439 MyDSpace Group Membership Special Groups
 - SF Patch #1606719 for feature request #1145371 Link to admin area
