@@ -611,8 +611,18 @@ public class ItemTag extends TagSupport
             		}
 
             		out.print("<tr><td headers=\"t1\" class=\"standard\">");
-            		out.print(primaryBitstream.getName());
-
+                    out.print("<a target=\"_blank\" href=\"");
+                    out.print(request.getContextPath());
+                    out.print("/html/");
+                    out.print(handle + "/");
+                    out
+                        .print(UIUtil.encodeBitstreamName(primaryBitstream
+                                .getName(), Constants.DEFAULT_ENCODING));
+                    out.print("\">");
+                    out.print(primaryBitstream.getName());
+                    out.print("</a>");
+                    
+                    
             		if (multiFile)
             		{
             			out.print("</td><td headers=\"t2\" class=\"standard\">");
@@ -649,9 +659,37 @@ public class ItemTag extends TagSupport
             				// Skip internal types
             				if (!bitstreams[k].getFormat().isInternal())
             				{
+
+                                // Work out what the bitstream link should be
+                                // (persistent
+                                // ID if item has Handle)
+                                String bsLink = "<a target=\"_blank\" href=\""
+                                        + request.getContextPath();
+
+                                if ((handle != null)
+                                        && (bitstreams[k].getSequenceID() > 0))
+                                {
+                                    bsLink = bsLink + "/bitstream/"
+                                            + item.getHandle() + "/"
+                                            + bitstreams[k].getSequenceID() + "/";
+                                }
+                                else
+                                {
+                                    bsLink = bsLink + "/retrieve/"
+                                            + bitstreams[k].getID() + "/";
+                                }
+
+                                bsLink = bsLink
+                                        + UIUtil.encodeBitstreamName(bitstreams[k]
+                                            .getName(),
+                                            Constants.DEFAULT_ENCODING) + "\">";
+
             					out
                                     .print("<tr><td headers=\"t1\" class=\"standard\">");
+                                out.print(bsLink);
             					out.print(bitstreams[k].getName());
+                                out.print("</a>");
+                                
 
             					if (multiFile)
             					{
@@ -670,30 +708,6 @@ public class ItemTag extends TagSupport
             					out.print(bitstreams[k].getFormatDescription());
             					out
                                     .print("</td><td class=\"standard\" align=\"center\">");
-
-            					// Work out what the bitstream link should be
-            					// (persistent
-            					// ID if item has Handle)
-            					String bsLink = "<a target=\"_blank\" href=\""
-                                    	+ request.getContextPath();
-
-            					if ((handle != null)
-            							&& (bitstreams[k].getSequenceID() > 0))
-            					{
-            						bsLink = bsLink + "/bitstream/"
-                                        	+ item.getHandle() + "/"
-                                        	+ bitstreams[k].getSequenceID() + "/";
-            					}
-            					else
-            					{
-            						bsLink = bsLink + "/retrieve/"
-                                        	+ bitstreams[k].getID() + "/";
-            					}
-
-            					bsLink = bsLink
-                                    	+ UIUtil.encodeBitstreamName(bitstreams[k]
-                                            .getName(),
-                                            Constants.DEFAULT_ENCODING) + "\">";
 
             					// is there a thumbnail bundle?
             					if ((thumbs.length > 0) && showThumbs)
