@@ -17,6 +17,9 @@
 - SF Patch #1591969 for SF bug #1583372 DCDate.toString returns invalid string
 - SF Patch #1621889 for SF Bug #1606789 When collection is deleted, mapped item remains in community
    
+(Dorothea Salo)
+- SF Patch #1557948 Link subjects and authors on item pages
+
 1.4.1 final
 ===========
 (Tim Donohue)

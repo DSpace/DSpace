@@ -54,6 +54,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Utils;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -280,7 +281,8 @@ public class ItemTag extends TagSupport
     private void render() throws IOException
     {
         JspWriter out = pageContext.getOut();
-
+        HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
+        
         String configLine = ConfigurationManager
                 .getProperty("webui.itemdisplay." + style);
 
@@ -303,6 +305,8 @@ public class ItemTag extends TagSupport
         	String field = st.nextToken().trim();
             boolean isDate = false;
             boolean isLink = false;
+            boolean isAuthor = isAuthor(field);
+            boolean isSubject = isSubject(field);
 
             // Find out if the field should rendered as a date or link
 
@@ -361,6 +365,18 @@ public class ItemTag extends TagSupport
 
                         // Parse the date
                         out.print(UIUtil.displayDate(dd, false, false));
+                    }
+                    else if (isAuthor)
+                    {
+                        out.print("<a href=\"" + request.getContextPath() + "/items-by-author?author="
+                            + URLEncoder.encode(values[j].value, "UTF-8") + "\">" + values[j].value
+                            + "</a>");
+                    }
+                    else if (isSubject)
+                    {
+                        out.print("<a href=\"" + request.getContextPath() + "/items-by-subject?subject="
+                            + URLEncoder.encode(values[j].value, "UTF-8") + "\">" + values[j].value
+                            + "</a>");
                     }
                     else
                     {
@@ -876,6 +892,117 @@ public class ItemTag extends TagSupport
                 }
 
             }
+        }
+    }
+    
+    /**
+     * Is the given field name an Author field? 
+     * 
+     * If undefined in dspace.cfg (webui.browse.index.author) it defaults
+     * to using any field containing 'creator'.
+     * 
+     * @param field
+     * @return Whether or not the given String is an author 
+     */
+    private boolean isAuthor(String field)
+    {
+        // Does the user want to link to authors?
+        if (ConfigurationManager.getBooleanProperty("webui.authorlinks.enable", true) == false)
+        {
+           return false; 
+        }
+        
+        //Check whether a given metadata field should be considered an author field.
+        String authorField = ConfigurationManager.getProperty("webui.browse.index.author");
+        if (authorField == null)
+        {
+            if (field.indexOf("contributor") > 0 || field.indexOf("creator") > 0)
+                return true;
+            else
+                return false;
+        }
+        else
+        {
+            StringTokenizer st = new StringTokenizer(authorField, ",");
+
+            while (st.hasMoreTokens())
+            {
+                // does dspace.cfg allow all qualifiers for this element?
+                if (authorField.endsWith(".*"))
+                {
+                    // does the field have a qualifier?
+                    int i = field.lastIndexOf(".");
+                    if (i != field.indexOf("."))
+                    {
+                        // lop off qualifier
+                        field = field.substring(0, i);
+                    }
+                }
+                // check field against dspace.cfg
+                if (authorField.indexOf(field) > 0)
+                    return true;
+            }
+            //no match found
+            return false;
+        }
+    }
+    
+    /**
+     * Is the given field name a Subject field? 
+     * 
+     * If undefined in dspace.cfg (webui.browse.index.subject) it defaults
+     * to using any field containing 'subject'.
+     * 
+     * @param field
+     * @return Whether or not the given String is a subject 
+     */
+    private boolean isSubject(String field)
+    {
+        // Does the user want to link to subjects?
+        if (ConfigurationManager.getBooleanProperty("webui.subjectlinks.enable", false) == false)
+        {
+           return false; 
+        }
+        
+        // Check whether a given metadata field should be considered a subject field
+        String subjectField = ConfigurationManager.getProperty("webui.browse.index.subject");
+        if (subjectField == null)
+        {
+            if (field.indexOf("subject") > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            StringTokenizer st = new StringTokenizer(subjectField, ",");
+            while (st.hasMoreTokens())
+            {
+                // does dspace.cfg allow all qualifiers for this element?
+                if (subjectField.endsWith(".*"))
+                {
+                    // does the field have a qualifier?
+                    int i = field.lastIndexOf(".");
+                    if (i != field.indexOf("."))
+                    {
+                        // lop off qualifier
+                        field = field.substring(0, i);
+                    }
+                }
+
+                // check field against dspace.cfg
+                if (subjectField.indexOf(field) > 0)
+                {
+                    return true;
+                }
+            }
+            
+            //no match found
+            return false;
         }
     }
 }
