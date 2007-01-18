@@ -94,6 +94,10 @@
 
     SupervisedItem[] supervisedItems =
         (SupervisedItem[]) request.getAttribute("supervised.items");
+    
+    // Is the logged in user an admin
+    Boolean displayMembership = (Boolean)request.getAttribute("display.groupmemberships");
+    boolean displayGroupMembership = (displayMembership == null ? false : displayMembership.booleanValue());
 %>
 
 <dspace:layout titlekey="jsp.mydspace" nocache="true">
@@ -417,7 +421,7 @@
 <%
   }
 
-  if(groupMemberships.length>0)
+  if(displayGroupMembership && groupMemberships.length>0)
   {
 %>
     <h2><fmt:message key="jsp.mydspace.main.heading6"/></h2>

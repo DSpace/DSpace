@@ -456,6 +456,19 @@ metadata.dc.contributor.* = Authors
 metadata.dc.identifier.uri = Citation
 metadata.dc.description.abstract = Abstract</pre>
 
+  <h2><a name="mydspacegroupmembership" id="mydspacegroupmembership">MyDSpace Display of Group Memberships</a></h2>
+  <p>In the MyDSpace page of a user, all the groups the user is member of can be displayed by setting webui.mydspace.showgroupmemberships = true:
+  <pre>
+  ### MyDSpace display of group membership
+  #
+  # default behaviour is false
+  # 
+  # webui.mydspace.showgroupmemberships = false
+  </pre>
+  Setting this property to true will result in a list of all groups the user is explicitly or implicitly member of.<br />
+  <strong>Note: </strong>this list might not be very usable for the standard DSpace user as it displays the group names.<br />
+  If omitted the default behaviour is false.
+  </p>
   <h2><a name="authenticate" id="authenticate">Custom Authentication Code</a></h2>
 
   <p>Since many institutions and organizations have exisiting

@@ -56,6 +56,7 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -601,6 +602,9 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         // User's authorization groups
         Group[] memberships = Group.allMemberGroups(context, currentUser);
+        
+        // Should the group memberships be displayed
+        boolean displayMemberships = ConfigurationManager.getBooleanProperty("webui.mydspace.showgroupmemberships", false);
 
         SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(
                 context, currentUser);
@@ -612,6 +616,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("workflow.owned", owned);
         request.setAttribute("workflow.pooled", pooled);
         request.setAttribute("group.memberships", memberships);
+        request.setAttribute("display.groupmemberships", new Boolean(displayMemberships));
         request.setAttribute("supervised.items", supervisedItems);
 
         // Forward to main mydspace page
