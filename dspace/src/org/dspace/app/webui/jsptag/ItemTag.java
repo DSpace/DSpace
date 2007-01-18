@@ -924,11 +924,13 @@ public class ItemTag extends TagSupport
         else
         {
             StringTokenizer st = new StringTokenizer(authorField, ",");
+            String aField;
 
             while (st.hasMoreTokens())
             {
+                aField = st.nextToken().trim();
                 // does dspace.cfg allow all qualifiers for this element?
-                if (authorField.endsWith(".*"))
+                if (aField.endsWith(".*"))
                 {
                     // does the field have a qualifier?
                     int i = field.lastIndexOf(".");
@@ -939,7 +941,7 @@ public class ItemTag extends TagSupport
                     }
                 }
                 // check field against dspace.cfg
-                if (authorField.indexOf(field) > 0)
+                if (aField.indexOf(field) >= 0)
                     return true;
             }
             //no match found
@@ -966,6 +968,7 @@ public class ItemTag extends TagSupport
         
         // Check whether a given metadata field should be considered a subject field
         String subjectField = ConfigurationManager.getProperty("webui.browse.index.subject");
+        
         if (subjectField == null)
         {
             if (field.indexOf("subject") > 0)
@@ -980,10 +983,13 @@ public class ItemTag extends TagSupport
         else
         {
             StringTokenizer st = new StringTokenizer(subjectField, ",");
+            String sField;
+            
             while (st.hasMoreTokens())
             {
+                sField = st.nextToken().trim();
                 // does dspace.cfg allow all qualifiers for this element?
-                if (subjectField.endsWith(".*"))
+                if (sField.endsWith(".*"))
                 {
                     // does the field have a qualifier?
                     int i = field.lastIndexOf(".");
@@ -995,7 +1001,7 @@ public class ItemTag extends TagSupport
                 }
 
                 // check field against dspace.cfg
-                if (subjectField.indexOf(field) > 0)
+                if (sField.indexOf(field) >= 0)
                 {
                     return true;
                 }
