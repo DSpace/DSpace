@@ -74,6 +74,8 @@
     // Attributes
     Boolean displayAllBoolean = (Boolean) request.getAttribute("display.all");
     boolean displayAll = (displayAllBoolean != null && displayAllBoolean.booleanValue());
+    Boolean suggest = (Boolean)request.getAttribute("suggest.enable");
+    boolean suggestLink = (suggest == null ? false : suggest.booleanValue());
     Item item = (Item) request.getAttribute("item");
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
@@ -200,7 +202,7 @@
     </form>
 <%
         }
-        if (ConfigurationManager.getBooleanProperty("webui.suggest.enable"))
+        if (suggestLink)
         {
 %>
     <a href="<%= request.getContextPath() %>/suggest?handle=<%= handle %>" target="new_window">

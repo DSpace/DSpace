@@ -13,6 +13,7 @@
 - SF Patch #1610030 for SF Bug #1076506 Item import command line option for application of template
 - SF Patch #1624212 for SF Bug #1606449 Improve usability of bitstream list in item display
 - SF Patch #1636954 for SF feature request #1636817 MyDSpace make group display configurable
+- SF Patch #1624323 for SF feature request #1549297 Refinement of enable suggest feature
 
 (K. Nakagami)
 - SF Patch #1591969 for SF bug #1583372 DCDate.toString returns invalid string

@@ -193,8 +193,15 @@ public class SuggestServlet extends DSpaceServlet
                 {
                 	email.setReplyTo(senderAddr);
                 }
-
-                email.send();
+                
+                // Only actually send the email if feature is enabled
+                if (ConfigurationManager.getBooleanProperty("webui.suggest.enable", false))
+                {
+                    email.send();
+                } else
+                {
+                    throw new MessagingException("Suggest item email not sent - webui.suggest.enable = false");
+                }
 
                 log.info(LogManager.getHeader(context, "sent_suggest",
                 		                      "from=" + senderAddr));

@@ -61,6 +61,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -304,7 +305,31 @@ public class HandleServlet extends DSpaceServlet
             displayAll = true;
         }
 
+        // Enable suggest link or not
+        boolean suggestEnable = false;
+        if (!ConfigurationManager.getBooleanProperty("webui.suggest.enable"))
+        {
+            // do nothing, the suggestLink is allready set to false 
+        }
+        else
+        {
+            // it is in general enabled
+            suggestEnable= true;
+            
+            // check for the enable only for logged in users option
+            if(!ConfigurationManager.getBooleanProperty("webui.suggest.loggedinusers.only"))
+            {
+                // do nothing, the suggestLink stays as it is
+            }
+            else
+            {
+                // check whether there is a logged in user
+                suggestEnable = (context.getCurrentUser() == null ? false : true);
+            }
+        }
+        
         // Set attributes and display
+        request.setAttribute("suggest.enable", new Boolean(suggestEnable));
         request.setAttribute("display.all", new Boolean(displayAll));
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
