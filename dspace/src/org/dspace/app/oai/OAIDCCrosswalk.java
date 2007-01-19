@@ -109,6 +109,24 @@ public class OAIDCCrosswalk extends Crosswalk
 
                 // Escape XML chars <, > and &
                 String value = allDC[i].value;
+                
+                if (value != null)
+                {
+                    // remove control unicode char
+                    String temp = value.trim();
+                    char[] dcvalue = temp.toCharArray();
+                    for (int charPos = 0; charPos < dcvalue.length; charPos++)
+                    {
+                        if (Character.isISOControl(dcvalue[charPos]) &&
+                            !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\n") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\r"))
+                        {
+                            dcvalue[charPos] = ' ';
+                        }
+                    }
+                    value = String.valueOf(dcvalue);
+                }
 
                 // First do &'s - need to be careful not to replace the
                 // & in "&amp;" again!

@@ -1,9 +1,15 @@
 1.5 alpha 1
 ===========
+(Andrea Bollini)
+- SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
+
 (Christophe Destin)
 - SF Patch #1582754 CreateAdministrator for dummies
   Creation of admin via [dspace]/bin/create-administrator for a given email, irrespective of the email
   belonging to an allready registered user.
+
+(Mike Judd)
+- SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
 
 (Claudia Juergen)
 - Added link to controlled vocabulary configuration as for SF Bug #1456593 links to controlled vocab docs required

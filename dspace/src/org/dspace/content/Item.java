@@ -636,7 +636,27 @@ public class Item extends DSpaceObject
             dcv.element = element;
             dcv.qualifier = qualifier;
             dcv.language = lang;
-            dcv.value = (values[i] == null ? null : values[i].trim());
+            if (values[i] != null)
+            {
+                // remove control unicode char
+                String temp = values[i].trim();
+                char[] dcvalue = temp.toCharArray();
+                for (int charPos = 0; charPos < dcvalue.length; charPos++)
+                {
+                    if (Character.isISOControl(dcvalue[charPos]) &&
+                        !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
+                        !String.valueOf(dcvalue[charPos]).equals("\n") &&
+                        !String.valueOf(dcvalue[charPos]).equals("\r"))
+                    {
+                        dcvalue[charPos] = ' ';
+                    }
+                }
+                dcv.value = String.valueOf(dcvalue);
+            }
+            else
+            {
+                dcv.value = null;
+            }
             dublinCore.add(dcv);
         }
 
