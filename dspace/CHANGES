@@ -20,6 +20,7 @@
 - SF Patch #1624212 for SF Bug #1606449 Improve usability of bitstream list in item display
 - SF Patch #1636954 for SF feature request #1636817 MyDSpace make group display configurable
 - SF Patch #1624323 for SF feature request #1549297 Refinement of enable suggest feature
+- Fix for SF Bug #1653151 Checker file shows filter-media (just a typo in header)
 
 (StuartLewis)
 - SF Patch #1670110 for SF Bug #1670106 Onebox and textarea fail when visibility set to workflow
