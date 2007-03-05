@@ -21,6 +21,9 @@
 - SF Patch #1636954 for SF feature request #1636817 MyDSpace make group display configurable
 - SF Patch #1624323 for SF feature request #1549297 Refinement of enable suggest feature
 
+(StuartLewis)
+- SF Patch #1670110 for SF Bug #1670106 Onebox and textarea fail when visibility set to workflow
+
 (K. Nakagami)
 - SF Patch #1591969 for SF bug #1583372 DCDate.toString returns invalid string
 - SF Patch #1621889 for SF Bug #1606789 When collection is deleted, mapped item remains in community

@@ -2426,8 +2426,12 @@ public class SubmitServlet extends DSpaceServlet
         else
         {
             // Just a single name
-            vals.add(request.getParameter(dcname).trim());
-            ;
+            String value = request.getParameter(dcname);
+            if (value != null)
+            {
+                value.trim();
+            }
+            vals.add(value);
         }
 
         // Remove existing values
