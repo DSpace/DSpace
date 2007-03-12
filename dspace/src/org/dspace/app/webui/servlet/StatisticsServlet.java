@@ -94,6 +94,10 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         // check to see if the statistics are restricted to administrators
         boolean publicise = ConfigurationManager.getBooleanProperty("report.public");
         
+        // determine the navigation bar to be displayed
+        String navbar = (publicise == false ? "admin" : "default");
+        request.setAttribute("navbar", navbar);
+        
         // is the user a member of the Administrator (1) group
         boolean admin = Group.isMember(c, 1);
         

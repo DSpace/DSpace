@@ -55,12 +55,13 @@
     Date[] months = (Date[]) request.getAttribute("months");
     String date = (String) request.getAttribute("date");
     Boolean general = (Boolean) request.getAttribute("general");
+    String navbar = (String) request.getAttribute("navbar");
     
     SimpleDateFormat sdfDisplay = new SimpleDateFormat("MM'/'yyyy");
     SimpleDateFormat sdfLink = new SimpleDateFormat("yyyy'-'M");
 %>
 
-<dspace:layout titlekey="jsp.statistics.report.title">
+<dspace:layout navbar="<%= navbar %>" titlekey="jsp.statistics.report.title">
 
     <p>
 <%

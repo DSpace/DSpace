@@ -46,8 +46,10 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
-<dspace:layout titlekey="jsp.statistics.no-report.title">
+<%
+    String navbar = (String) request.getAttribute("navbar");
+%>
+<dspace:layout navbar="<%=  navbar %>" titlekey="jsp.statistics.no-report.title">
 
 <p><fmt:message key="jsp.statistics.no-report.info1"/></p>
 
