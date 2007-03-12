@@ -150,7 +150,16 @@ public class DatabaseManager
     {
         if (log.isDebugEnabled())
         {
-            log.debug("Running query \"" + query + "\"");
+        	StringBuffer sb = new StringBuffer();
+        	for (int i = 0; i < parameters.length; i++)
+        	{
+        		if (i > 0)
+        		{
+        			sb.append(",");
+        		}
+        		sb.append(parameters[i].toString());
+        	}
+            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
         }
         
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
@@ -248,9 +257,18 @@ public class DatabaseManager
     public static TableRowIterator query(Context context, String query, Object[] parameters)
             throws SQLException
     {
-        if (log.isDebugEnabled())
+    	if (log.isDebugEnabled())
         {
-            log.debug("Running query \"" + query + "\"");
+        	StringBuffer sb = new StringBuffer();
+        	for (int i = 0; i < parameters.length; i++)
+        	{
+        		if (i > 0)
+        		{
+        			sb.append(",");
+        		}
+        		sb.append(parameters[i].toString());
+        	}
+            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
         }
 
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
@@ -508,7 +526,16 @@ public class DatabaseManager
 
         if (log.isDebugEnabled())
         {
-            log.debug("Running query \"" + query + "\"");
+        	StringBuffer sb = new StringBuffer();
+        	for (int i = 0; i < parameters.length; i++)
+        	{
+        		if (i > 0)
+        		{
+        			sb.append(",");
+        		}
+        		sb.append(parameters[i].toString());
+        	}
+            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
         }
 
         try
