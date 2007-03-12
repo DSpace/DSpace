@@ -8,6 +8,9 @@
   Creation of admin via [dspace]/bin/create-administrator for a given email, irrespective of the email
   belonging to an allready registered user.
 
+(Richard Jones)
+- SF Patch #1659868 Improved database level debugging
+
 (Mike Judd)
 - SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
 
@@ -22,7 +25,7 @@
 - SF Patch #1624323 for SF feature request #1549297 Refinement of enable suggest feature
 - Fix for SF Bug #1653151 Checker file shows filter-media (just a typo in header)
 
-(StuartLewis)
+(Stuart Lewis)
 - SF Patch #1670110 for SF Bug #1670106 Onebox and textarea fail when visibility set to workflow
 
 (K. Nakagami)
