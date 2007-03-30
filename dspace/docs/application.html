@@ -539,6 +539,89 @@ from/until/setSpec/offset
 
   <p>This means the harvest is 'from' <code>2003-01-01</code>, has no 'until' date, is for collection hdl:1721.1/1234, and 300 records have already been sent to the harvester. (Actually, if the original OAI-PMH request doesn't specify a 'from' or 'until, OAICat fills them out automatically to '0000-00-00T00:00:00Z' and '9999-12-31T23:59:59Z' respectively. This means DSpace resumption tokens will always have from and until dates in them.)</p>
 
+
+<!-- Struct Builder -->
+<h2><a name="structbuilder" id="structbuilder">Community and Collection Structure Importer</a></h2>
+
+<p>
+This command-line tool gives you the ability to import a community and collection structure directly
+from a source XML file.  It is executed as follows:
+</p>
+
+<p><code>[dspace]/bin/structure-builder -f [source xml] -o [output xml file] -e [administrator email]</code></p>
+
+<p>
+This will examine the contents of <code>[source xml]</code>, import the structure into DSpace while logged in as the
+supplied administrator, and then output the same structure to the output file, but including the handle for each
+imported community and collection as an attribute.
+</p>
+
+<p>
+The source xml document needs to be in the following format:
+</p>
+
+<pre>
+&lt;import_structure&gt;
+ 	&lt;community&gt;
+  		&lt;name&gt;Community Name&lt;/name&gt;
+  		&lt;description&gt;Descriptive text&lt;/description&gt;
+  		&lt;intro&gt;Introductory text&lt;/intro&gt;
+  		&lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
+  		&lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+  		&lt;community&gt;
+ 			&lt;name&gt;Sub Community Name&lt;/name&gt;
+ 			&lt;community&gt; ...[ad infinitum]... &lt;/community&gt;
+ 		&lt;/community&gt;
+ 		&lt;collection&gt;
+ 			&lt;name&gt;Collection Name&lt;/name&gt;
+  			&lt;description&gt;Descriptive text&lt;/description&gt;
+  			&lt;intro&gt;Introductory text&lt;/intro&gt;
+  			&lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
+  			&lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+  			&lt;license&gt;Special licence&lt;/license&gt;
+  			&lt;provenance&gt;Provenance information&lt;/provenance&gt;
+ 		&lt;/collection&gt;
+   	&lt;/community&gt;
+&lt;/import_structure&gt;
+</pre>
+
+<p>
+The resulting output document will be as follows:
+</p>
+
+<pre>
+&lt;import_structure&gt;
+ 	&lt;community identifier="123456789/1"&gt;
+  		&lt;name&gt;Community Name&lt;/name&gt;
+  		&lt;description&gt;Descriptive text&lt;/description&gt;
+  		&lt;intro&gt;Introductory text&lt;/intro&gt;
+  		&lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
+  		&lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+  		&lt;community identifier="123456789/2"&gt;
+ 			&lt;name&gt;Sub Community Name&lt;/name&gt;
+ 			&lt;community identifier="123456789/3"&gt; ...[ad infinitum]... &lt;/community&gt;
+ 		&lt;/community&gt;
+ 		&lt;collection identifier="123456789/4"&gt;
+ 			&lt;name&gt;Collection Name&lt;/name&gt;
+  			&lt;description&gt;Descriptive text&lt;/description&gt;
+  			&lt;intro&gt;Introductory text&lt;/intro&gt;
+  			&lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
+  			&lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+  			&lt;license&gt;Special licence&lt;/license&gt;
+  			&lt;provenance&gt;Provenance information&lt;/provenance&gt;
+ 		&lt;/collection&gt;
+   	&lt;/community&gt;
+&lt;/import_structure&gt;
+</pre>
+
+<h3>Limitation</h3>
+
+<ul>
+	<li>Currently this does not export community and collection structures, although it should only be a small modification to make it do so</li>
+</ul>
+
+<!-- end Struct Builder -->
+
   <h2><a name="packager" id="packager">Package Importer and Exporter</a></h2>
 
   <p>This command-line tool gives you access to the Packager plugins. It can <em>ingest</em> a package to create a new DSpace Item, or <em>disseminate</em> an Item as a package.</p>

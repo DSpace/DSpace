@@ -10,6 +10,7 @@
 
 (Richard Jones)
 - SF Patch #1659868 Improved database level debugging
+- SF Patch #1659901 Import community and collection structure
 
 (Mike Judd)
 - SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
