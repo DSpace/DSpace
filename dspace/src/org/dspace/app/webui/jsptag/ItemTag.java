@@ -648,8 +648,8 @@ public class ItemTag extends TagSupport
             		}
 
             		out.print("</td><td headers=\"t3\" class=\"standard\">");
-            		out.print(primaryBitstream.getSize() / 1024);
-            		out.print("Kb</td><td headers=\"t4\" class=\"standard\">");
+                    out.print(UIUtil.formatFileSize(primaryBitstream.getSize()));
+                    out.print("</td><td headers=\"t4\" class=\"standard\">");
             		out.print(primaryBitstream.getFormatDescription());
             		out
                         .print("</td><td class=\"standard\"><a target=\"_blank\" href=\"");
@@ -718,9 +718,9 @@ public class ItemTag extends TagSupport
 
             					out
                                     .print("</td><td headers=\"t3\" class=\"standard\">");
-            					out.print(bitstreams[k].getSize() / 1024);
+                                out.print(UIUtil.formatFileSize(bitstreams[k].getSize()));
             					out
-                                    .print("Kb</td><td headers=\"t4\" class=\"standard\">");
+                                .print("</td><td headers=\"t4\" class=\"standard\">");
             					out.print(bitstreams[k].getFormatDescription());
             					out
                                     .print("</td><td class=\"standard\" align=\"center\">");
@@ -729,7 +729,7 @@ public class ItemTag extends TagSupport
             					if ((thumbs.length > 0) && showThumbs)
             					{
             						String tName = bitstreams[k].getName() + ".jpg";
-                                  String tAltText = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.ItemTag.thumbnail");
+                                    String tAltText = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.ItemTag.thumbnail");
             						Bitstream tb = thumbs[0]
                                         .	getBitstreamByName(tName);
 

@@ -1,4 +1,4 @@
-1.5 alpha 1
+1.4.2 beta
 ===========
 (Andrea Bollini)
 - SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
@@ -28,6 +28,7 @@
 
 (Stuart Lewis)
 - SF Patch #1670110 for SF Bug #1670106 Onebox and textarea fail when visibility set to workflow
+- SF Patch #1628889 Improve file size descriptions in ItemTag
 
 (K. Nakagami)
 - SF Patch #1591969 for SF bug #1583372 DCDate.toString returns invalid string
@@ -166,7 +167,6 @@
 - SF patch #1556207 for SF bug #1554056 Community/collection handle URL with / redirects to homepage
 - SF patch #1571494  for SF bug  #1571490 - UTF-8 encoded characters in licence
 - SF patch #1571522  for SF  bug #1571519 - UTF-8 in statistics
-- SF Patch #1591871 Docs for google and html sitemaps
 
 (Mark Diggory)
 - SF patch #1523824 robots.txt to limit bots navigating author and date pages

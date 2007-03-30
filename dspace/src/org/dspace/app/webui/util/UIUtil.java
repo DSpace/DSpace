@@ -42,8 +42,11 @@ package org.dspace.app.webui.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -658,4 +661,46 @@ public class UIUtil
 	 {
 	 	return encodeBitstreamName(stringIn, Constants.DEFAULT_ENCODING);
 	 }
+     
+     /**
+      * Formats the file size. Examples:
+      * 
+      *  - 50 = 50B
+      *  - 1024 = 1KB
+      *  - 1,024,000 = 1MB etc
+      *  
+      *  The numbers are formatted using java Locales
+      *  
+      * @param in The number to covnert
+      * @return the file size as a String
+      */
+     public static String formatFileSize(double in)
+     {
+         // Work out the size of the file, and format appropriatly
+         // FIXME: When full i18n support is available, use the user's Locale
+         // rather than the default Locale.
+         NumberFormat nf = NumberFormat.getNumberInstance(Locale.getDefault());
+         DecimalFormat df = (DecimalFormat)nf;
+         df.applyPattern("###,###.##");
+         if (in < 1024)
+         {
+             df.applyPattern("0");
+             return df.format(in) +  " " + "B";
+         }
+         else if (in < 1024000)
+         {
+             in = in / 1024;
+             return df.format(in) + " " + "kB";
+         }
+         else if (in < 1024000000)
+         {
+             in = in / 1024000;
+             return df.format(in) + " " + "MB";
+         }
+         else
+         {
+             in = in / 1024000000;
+             return df.format(in) + " " + "GB";
+         }
+     }
 }
