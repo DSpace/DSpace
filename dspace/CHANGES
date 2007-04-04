@@ -25,7 +25,8 @@
 - SF Patch #1636954 for SF feature request #1636817 MyDSpace make group display configurable
 - SF Patch #1624323 for SF feature request #1549297 Refinement of enable suggest feature
 - Fix for SF Bug #1653151 Checker file shows filter-media (just a typo in header)
-- SF Patch 1676370 Bug #1648070 Statistics does not use navbar="admin"
+- SF Patch #1676370 Bug #1648070 Statistics does not use navbar="admin"
+- Fix for SF Bug #1690573 dspace-admin, edit item trailing white spaces
 
 (Stuart Lewis)
 - SF Patch #1670110 for SF Bug #1670106 Onebox and textarea fail when visibility set to workflow

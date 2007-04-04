@@ -136,7 +136,7 @@ public class EditItemServlet extends DSpaceServlet
         else if ((handle != null) && !handle.equals(""))
         {
             // resolve handle
-            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+            DSpaceObject dso = HandleManager.resolveToObject(context, handle.trim());
 
             // make sure it's an ITEM
             if ((dso != null) && (dso.getType() == Constants.ITEM))

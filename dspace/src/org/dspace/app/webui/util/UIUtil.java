@@ -404,7 +404,7 @@ public class UIUtil
 
         try
         {
-            return Integer.parseInt(val);
+            return Integer.parseInt(val.trim());
         }
         catch (Exception e)
         {
