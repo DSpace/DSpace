@@ -1,8 +1,5 @@
 1.4.2 beta
 ===========
-(Richard Jones)
-- SF Patch #1659837 ItemIterator now deals with item ids also
-
 (Andrea Bollini)
 - SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
 
@@ -14,6 +11,7 @@
 (Richard Jones)
 - SF Patch #1659868 Improved database level debugging
 - SF Patch #1659901 Import community and collection structure
+- SF Patch #1659837 ItemIterator now deals with item ids also
 
 (Mike Judd)
 - SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
@@ -38,7 +36,10 @@
 (K. Nakagami)
 - SF Patch #1591969 for SF bug #1583372 DCDate.toString returns invalid string
 - SF Patch #1621889 for SF Bug #1606789 When collection is deleted, mapped item remains in community
-   
+
+(James Rutherford)
+- SF Patch #1694943 for SF feature request #1691277 Importing: Workaround for ext3 subdirectory limitation
+
 (Dorothea Salo)
 - SF Patch #1557948 Link subjects and authors on item pages
 

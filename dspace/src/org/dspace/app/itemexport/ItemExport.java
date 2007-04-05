@@ -44,6 +44,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -85,6 +86,8 @@ import org.dspace.handle.HandleManager;
  */
 public class ItemExport
 {
+    private static final int SUBDIR_LIMIT = 0;
+
     /*
      *  
      */
@@ -260,13 +263,39 @@ public class ItemExport
             String destDirName, int seqStart) throws Exception
     {
         int mySequenceNumber = seqStart;
+        int counter = SUBDIR_LIMIT - 1;
+        int subDirSuffix = 0;
+        String fullPath = destDirName;
+        String subdir = "";
+        File dir;
+
+        if (SUBDIR_LIMIT > 0)
+        {
+            dir = new File(destDirName);
+            if (!dir.isDirectory())
+            {
+                throw new IOException(destDirName + " is not a directory.");
+            }
+        }
 
         System.out.println("Beginning export");
 
         while (i.hasNext())
         {
+            if (SUBDIR_LIMIT > 0 && ++counter == SUBDIR_LIMIT)
+            {
+                subdir = new Integer(subDirSuffix++).toString();
+                fullPath = destDirName + dir.separatorChar + subdir;
+                counter = 0;
+
+                if (!new File(fullPath).mkdirs())
+                {
+                    throw new IOException("Error, can't make dir " + fullPath);
+                }
+            }
+
             System.out.println("Exporting item to " + mySequenceNumber);
-            exportItem(c, i.next(), destDirName, mySequenceNumber);
+            exportItem(c, i.next(), fullPath, mySequenceNumber);
             mySequenceNumber++;
         }
     }
