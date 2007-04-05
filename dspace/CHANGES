@@ -45,6 +45,7 @@
 
 (Graham Triggs)
 - SF Patch #1688523 Bug fix - OAI harvest and Oracle
+- SF Patch #1660752 Workaround Numeric/Integer handling in Oracle
 
 1.4.1 final
 ===========

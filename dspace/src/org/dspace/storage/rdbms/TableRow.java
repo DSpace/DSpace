@@ -123,7 +123,7 @@ public class TableRow
 
         return data.get(canonicalize(column)) == NULL_OBJECT;
     }
-
+    
     /**
      * Return the integer value of column.
      * 
@@ -198,9 +198,17 @@ public class TableRow
                     + " not present");
         }
 
+        // If the value is an integer, it can be represented without error as a long
+        // So, allow the return of a long. (This is needed for Oracle support).
+        if ((value instanceof Integer))
+        {
+            return ((Integer) value).longValue();
+        }
+        
         if (!(value instanceof Long))
         {
-            throw new IllegalArgumentException("Value is not an long");
+            throw new IllegalArgumentException("Value for " + column
+                    + " is not a long");
         }
 
         return ((Long) value).longValue();

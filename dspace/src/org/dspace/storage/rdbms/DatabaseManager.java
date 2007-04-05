@@ -78,7 +78,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericKeyedObjectPoolFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+import org.apache.log4j.Level;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
@@ -1200,7 +1200,7 @@ public class DatabaseManager
                     // Otherwise, we need to know!
                     else
                     {
-                        if (log.isEnabledFor(Priority.WARN))
+                        if (log.isEnabledFor(Level.WARN))
                         {
                             log.warn(msg, sqle);
                         }
@@ -1244,6 +1244,7 @@ public class DatabaseManager
     static TableRow process(ResultSet results, String table)
             throws SQLException
     {
+        String dbName =ConfigurationManager.getProperty("db.name");
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
 
@@ -1267,11 +1268,28 @@ public class DatabaseManager
             else if ((jdbctype == Types.INTEGER) || (jdbctype == Types.NUMERIC)
                     || (jdbctype == Types.DECIMAL))
             {
-                row.setColumn(name, results.getInt(i));
+                // If we are using oracle
+                if ("oracle".equals(dbName))
+                {
+                    // Test the value from the record set. If it can be represented using an int, do so.
+                    // Otherwise, store it as long
+                    long longValue = results.getLong(i);
+                    if (longValue <= (long)Integer.MAX_VALUE)
+                        row.setColumn(name, (int)longValue);
+                    else
+                        row.setColumn(name, longValue);
+                }
+                else
+                    row.setColumn(name, results.getInt(i));
             }
             else if (jdbctype == Types.BIGINT)
             {
                 row.setColumn(name, results.getLong(i));
+            }
+            else if (jdbctype == Types.CLOB && "oracle".equals(dbName))
+            {
+                // Support CLOBs in place of TEXT columns in Oracle
+                row.setColumn(name, results.getString(i));
             }
             else if (jdbctype == Types.VARCHAR)
             {
@@ -1406,6 +1424,7 @@ public class DatabaseManager
     private static int execute(Connection connection, String sql, List columns,
             TableRow row) throws SQLException
     {
+        String dbName =ConfigurationManager.getProperty("db.name");
         PreparedStatement statement = null;
 
         if (log.isDebugEnabled())
@@ -1439,16 +1458,27 @@ public class DatabaseManager
 
                     continue;
                 }
-                else if ((jdbctype == Types.INTEGER)
+                else if ((jdbctype == Types.INTEGER) || (jdbctype == Types.NUMERIC)
                         || (jdbctype == Types.DECIMAL))
                 {
-                    statement.setInt(count, row.getIntColumn(column));
+                    // If we are using Oracle, we can pass in long values, so always do so.
+                    if ("oracle".equals(dbName))
+                        statement.setLong(count, row.getLongColumn(column));
+                    else
+                        statement.setInt(count, row.getIntColumn(column));
 
                     continue;
                 }
                 else if (jdbctype == Types.BIGINT)
                 {
                     statement.setLong(count, row.getLongColumn(column));
+                }
+                else if (jdbctype == Types.CLOB && "oracle".equals(dbName))
+                {
+                    // Support CLOBs in place of TEXT columns in Oracle
+                    statement.setString(count, row.getStringColumn(column));
+
+                    continue;
                 }
                 else if (jdbctype == Types.VARCHAR)
                 {
