@@ -43,6 +43,16 @@ for now.  Note that with UTF-8 encoding that 4k could translate to 1300
 characters worst-case (every character taking up 3 bytes is the worst case
 scenario.)
 
+==UPDATE 5 April 2007==
+CLOBs are now used as follows:
+MetadataValue:text_value
+Community:introductory_text
+Community:copyright_text
+Collection:introductory_text
+Collection:license
+Collection:copyright_text
+==                   ==
+
 DatabaseManager had to have some of the type checking changed, because Oracle's
 JDBC driver is reporting INTEGERS as type DECIMAL.
 
