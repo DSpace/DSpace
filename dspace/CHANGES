@@ -1,5 +1,8 @@
 1.4.2 beta
 ===========
+(Richard Jones)
+- SF Patch #1659837 ItemIterator now deals with item ids also
+
 (Andrea Bollini)
 - SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
 
