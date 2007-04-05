@@ -243,7 +243,17 @@ public class RegisterServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        String email = request.getParameter("email").toLowerCase().trim();
+        String email = request.getParameter("email");
+        if (email == null || email.length() > 64)
+        {
+        	// Malformed request or entered value is too long.
+        	email = "";
+        }
+        else
+        {
+        	email = email.toLowerCase().trim();
+        }
+        
         String netid = request.getParameter("netid");
         String password = request.getParameter("password");
         EPerson eperson = EPerson.findByEmail(context, email);

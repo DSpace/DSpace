@@ -151,16 +151,26 @@ public class QueryArgs
         ArrayList conjunction = new ArrayList();
         
         for (int i = 1; i <= numField; i++)
-        {        	
-        	String tmp_query = request.getParameter("query"+i).trim();
-        	String tmp_field = request.getParameter("field"+i).trim();
-        	if (tmp_query != null && !tmp_query.equals(""))
+        {
+        	String tmp_query = request.getParameter("query"+i);
+        	String tmp_field = request.getParameter("field"+i);
+        	// TODO: Ensure a valid field from config
+            // Disarm fields with regexp control characters
+            if (tmp_field != null)
+            {
+                tmp_field = tmp_field.replace('/', ' ');
+                tmp_field = tmp_field.replace('<', ' ');
+                tmp_field = tmp_field.replace('\\', ' ');
+                tmp_field = tmp_field.replace(':', ' ');
+            }
+
+            if (tmp_query != null && !tmp_query.equals(""))
         	{
-        		query.add(tmp_query);
+        		query.add(tmp_query.trim());
         		if (tmp_field == null)        		        			
         			field.add("ANY");
         		else  			
-        			field.add(tmp_field);
+        			field.add(tmp_field.trim());
         		if (i != numField)
             	{
             		conjunction.add(request.getParameter("conjunction"+i) != null?
