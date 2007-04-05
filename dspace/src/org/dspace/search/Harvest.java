@@ -39,7 +39,6 @@
  */
 package org.dspace.search;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -144,8 +143,7 @@ public class Harvest
         	{
         		query += ", community2item";
         	}
-        }
-        
+        }       
 
         query += " WHERE handle.resource_type_id=" + Constants.ITEM + " AND handle.resource_id=item.item_id ";
 
@@ -167,19 +165,8 @@ public class Harvest
                 
         if (startDate != null)
         {
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            {
-            	
-            	startDate = oracleTimeStampFormat(startDate);
-                query += " AND item.last_modified >= " + 
-                		oracleTimeStampFunction(startDate);
-                parameters.add(startDate);
-            }
-            else //postgres
-            {
-            	query = query + " AND item.last_modified >= ? ";
-            	parameters.add(toTimestamp(startDate, false));
-            }            
+        	query = query + " AND item.last_modified >= ? ";
+        	parameters.add(toTimestamp(startDate, false));
         }
 
         if (endDate != null)
@@ -209,18 +196,8 @@ public class Harvest
                 selfGenerated = true;
             }
 
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            {
-            	endDate = oracleTimeStampFormat(endDate);
-                query += " AND item.last_modified <= " +
-                		oracleTimeStampFunction(endDate);
-                parameters.add(endDate);
-            }
-            else //postgres
-            {
-            	query += " AND item.last_modified <= ? ";
-                parameters.add(toTimestamp(endDate, selfGenerated));
-            }
+        	query += " AND item.last_modified <= ? ";
+            parameters.add(toTimestamp(endDate, selfGenerated));
         }
         
         if (withdrawn == false)
@@ -401,50 +378,4 @@ public class Harvest
         df.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
         return new Timestamp(df.parse(t).getTime());
     }    
-
-    
-    /**
-     * Create an oracle to_timestamp function for the given iso date. It must be
-     * an ISO 8601-stlye string.
-     * 
-     * Since the date could be a possible sql injection attack vector instead 
-     * of placing the value inside the query a place holder will be used. The
-     * caller must ensure that the isoDateString parameter is bound to the query
-     * for the approprate substitution.
-     * 
-     * @param isoDateString
-     * @return The oracle to_timestamp function.
-     */
-    private static String oracleTimeStampFunction(String isoDateString)
-    {
-        if (isoDateString.length() == 19 )
-        {
-            return "TO_TIMESTAMP( ? ,'YYYY-MM-DD\"T\"HH24:MI:SS')";
-        } else if (isoDateString.length() > 19)
-        {
-            return "TO_TIMESTAMP( ? ,'YYYY-MM-DD\"T\"HH24:MI:SS.FF\"Z\"')"; 
-        } else
-        {
-            throw new IllegalArgumentException("argument does not seem to be in the expected ISO 8601 format");
-        }
-    }
-    
-    /**
-     * Format the isoDateString according to oracles needs. The input should be ISO-85601 style.
-     * 
-     * @param isoDateString
-     * @return a datastring format better suited to oracles needs.
-     */
-    private static String oracleTimeStampFormat(String isoDateString)
-    {
-    	if (isoDateString.length() == 10)
-    	{
-    		return isoDateString + "T00:00:00";
-    	}
-    	else
-    	{
-    		return isoDateString;
-    	}
-    }
-
 }

@@ -42,6 +42,9 @@
 (Dorothea Salo)
 - SF Patch #1557948 Link subjects and authors on item pages
 
+(Graham Triggs)
+- SF Patch #1688523 Bug fix - OAI harvest and Oracle
+
 1.4.1 final
 ===========
 (Tim Donohue)
