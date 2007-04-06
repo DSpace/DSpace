@@ -36,6 +36,7 @@
 (Stuart Lewis)
 - SF Patch #1670110 for SF Bug #1670106 Onebox and textarea fail when visibility set to workflow
 - SF Patch #1628889 Improve file size descriptions in ItemTag
+- SF Patch #1641678 [dspace]/bin scripts for import and export
 
 (K. Nakagami)
 - SF Patch #1591969 for SF bug #1583372 DCDate.toString returns invalid string
