@@ -543,6 +543,10 @@ metadata.dc.description.abstract = Abstract</pre>
     <li>
       <p>Users are not members of any special (dynamic) e-person groups</p>
     </li>
+    
+    <li>
+      <p>You can restrict the domains from which new users are able to regiser. To enable this feature, uncomment the following line from dspace.cfg: <code>authentication.password.domain.valid = example.com</code> Example options might be '<code>@example.com</code>' to restrict registration to users with addresses ending in @example.com, or '<code>@example.com, .ac.uk</code>' to restrict registration to users with addresses ending in @example.com or with addresses in the .ac.uk domain.</p>
+    </li>
   </ul>
 
   <h3>LDAP Authentication</h3>
