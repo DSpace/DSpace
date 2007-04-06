@@ -113,7 +113,7 @@ public class PasswordAuthentication
                 check = options[i].trim().toLowerCase();
                 if (email.endsWith(check))
                 {
-                    // A match, so we can register thsi user
+                    // A match, so we can register this user
                     return true;
                 }
             }
