@@ -39,6 +39,9 @@
 - SF Patch #1641678 [dspace]/bin scripts for import and export
 - SF Patch #1642336 Restrict domains of self-registered users
 
+(Monika Mevenkamp)
+- SF Patch #1654469 stat scripts always return exit code 1
+
 (K. Nakagami)
 - SF Patch #1591969 for SF bug #1583372 DCDate.toString returns invalid string
 - SF Patch #1621889 for SF Bug #1606789 When collection is deleted, mapped item remains in community

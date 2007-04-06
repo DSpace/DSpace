@@ -88,6 +88,6 @@ $out = $out_directory . $out_prefix . $this_year . "-" . $this_month . "-" . $da
 
 $general = "$dsrun org.dspace.app.statistics.ReportGenerator -format html -in $in -out $out";
 
-system($general);
+$status = system($general);
 
-exit(1);
+exit($status);

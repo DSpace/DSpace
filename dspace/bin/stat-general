@@ -81,6 +81,6 @@ $out_directory = "/dspace/log/";
 
 $general = "$dsrun org.dspace.app.statistics.LogAnalyser -out $out_directory$out_prefix$this_year-$this_month-$day$out_suffix";
 
-system($general);
+$status = system($general);
 
-exit(1);
+exit($status);
