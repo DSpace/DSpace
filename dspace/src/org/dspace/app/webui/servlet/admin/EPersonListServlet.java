@@ -61,7 +61,14 @@ import org.dspace.eperson.EPerson;
  */
 public class EPersonListServlet extends DSpaceServlet
 {
-    protected void doDSGet(Context context, HttpServletRequest request,
+	protected void doDSPost(Context context, HttpServletRequest request, 
+			HttpServletResponse response) throws ServletException, IOException, 
+			SQLException, AuthorizeException 
+	{
+		doDSGet(context, request, response);
+	}
+
+	protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
@@ -88,20 +95,37 @@ public class EPersonListServlet extends DSpaceServlet
 
         // What's the index of the first eperson to show? Default is 0
         int first = UIUtil.getIntParameter(request, "first");
-
+        int offset = UIUtil.getIntParameter(request, "offset");
         if (first == -1)
         {
             first = 0;
         }
+        if (offset == -1)
+        {
+            offset = 0;
+        }
+        
 
-        // Retrieve the e-people in the specified order
-        EPerson[] epeople = EPerson.findAll(context, sortBy);
-
+        EPerson[] epeople;
+        String search = request.getParameter("search");
+        if (search != null && !search.equals(""))
+        {
+            epeople = EPerson.search(context, search);
+            request.setAttribute("offset", new Integer(offset));
+        }
+        else
+        {
+            // Retrieve the e-people in the specified order
+            epeople = EPerson.findAll(context, sortBy);
+            request.setAttribute("offset", new Integer(0));            
+        }        
+        
         // Set attributes for JSP
         request.setAttribute("sortby", new Integer(sortBy));
         request.setAttribute("first", new Integer(first));
         request.setAttribute("epeople", epeople);
-
+        request.setAttribute("search", search);
+        
         if (multiple)
         {
             request.setAttribute("multiple", new Boolean(true));
