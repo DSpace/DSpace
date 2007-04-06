@@ -421,6 +421,11 @@ public class DCInputsReader
     					}			
     				}
     			}
+    			else if (tagName.equals("vocabulary"))
+    			{
+    				String closedVocabularyString = getAttribute(nd, "closed");
+    			    field.put("closedVocabulary", closedVocabularyString);
+    			}
     		}
     	}
     	String missing = null;

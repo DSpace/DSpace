@@ -92,6 +92,9 @@ public class DCInput
     /** the name of the controlled vocabulary to use */
     private String vocabulary = null;
 
+    /** is the entry closed to vocabulary terms? */
+    private boolean closedVocabulary = false;
+    
     /**
      * Class constructor for creating a DCInput object based on the contents of
      * a HashMap
@@ -127,6 +130,9 @@ public class DCInput
         required = (warning != null && warning.length() > 0);
         visibility = (String) fieldMap.get("visibility");
         vocabulary = (String) fieldMap.get("vocabulary");
+        String closedVocabularyStr = (String) fieldMap.get("closedVocabulary");
+        closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
+                            || "yes".equalsIgnoreCase(closedVocabularyStr);
     }
 
     /**
@@ -348,5 +354,22 @@ public class DCInput
         }
         return null;
     }
+
+	/**
+	 * The closed attribute of the vocabulary tag for this field as set in 
+	 * input-forms.xml
+	 * 
+	 * <code> 
+	 * <field>
+	 *     .....
+	 *     <vocabulary closed="true">nsrc</vocabulary>
+	 * </field>
+	 * </code>
+	 * @return the closedVocabulary flags: true if the entry should be restricted 
+	 *         only to vocabulary terms, false otherwise
+	 */
+	public boolean isClosedVocabulary() {
+		return closedVocabulary;
+	}
 
 }

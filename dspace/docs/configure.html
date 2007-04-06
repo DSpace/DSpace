@@ -1041,11 +1041,16 @@ For example:
          &nbsp;&nbsp;&nbsp;&nbsp;&lt;input-type&gt;twobox&lt;/input-type&gt;<br/>
          &nbsp;&nbsp;&nbsp;&nbsp;&lt;hint&gt; Enter appropriate subject keywords or phrases below. &lt;/hint&gt;<br/>
          &nbsp;&nbsp;&lt;required&gt;&lt;/required&gt;<br/>
-         <b>&nbsp;&nbsp;&lt;vocabulary&gt;nsi&lt;/vocabulary&gt;</b><br/>
+         <b>&nbsp;&nbsp;&lt;vocabulary [closed="false"]&gt;nsi&lt;/vocabulary&gt;</b><br/>
        &lt;/field&gt;<br/>
 </code>
 </p>
-
+<p>
+The vocabulary element has an optional boolean attribute <b>closed</b> that can be used to force input only with 
+the javascript of controlled-vocabulary add-on. 
+The default behaviour (i.e. without this attribute) is as set <b>closed="false"</b>.
+This allow the user also to enter the value in free way.
+</p>
 <p>
 The following vocabularies are currently available by default:
 </p>

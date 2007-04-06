@@ -413,7 +413,7 @@
 
     void doTextArea(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext) 
+      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
 
@@ -443,9 +443,13 @@
            .append(fieldName);
          if (repeatable)
            sb.append("_").append(i);
-         sb.append("\" rows=\"4\" cols=\"45\" >")
+         sb.append("\" rows=\"4\" cols=\"45\"")
+           .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+           .append(" >")
            .append(val)
-	   .append("</textarea></td>\n");
+	   .append("</textarea>")
+	   .append(doControlledVocabulary(fieldName + (repeatable?"_" + i:""), pageContext, vocabulary))
+	   .append("</td>\n");
 
 	 if (repeatable && i < defaults.length) 
 	 {
@@ -481,7 +485,7 @@
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary) 
+      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
 
@@ -513,9 +517,10 @@
            sb.append("_").append(i);
          
          sb.append("\" size=\"50\" value=\"")
-           .append(val)
-	   	.append("\"/>")
-	   .append(doControlledVocabulary(fieldName, pageContext, vocabulary))
+           .append(val +"\"")
+           .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+	   	.append("/>")
+	   .append(doControlledVocabulary(fieldName + (repeatable?"_" + i:""), pageContext, vocabulary))
 	   .append("</td>\n");
 	   
 
@@ -553,7 +558,7 @@
 
     void doTwoBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary) 
+      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
@@ -596,19 +601,25 @@
              .append("_").append(i)
              .append("\" size=\"15\" value=\"")
              .append(defaults[i].value.replaceAll("\"", "&quot;"))
-	     .append("\"/>&nbsp;<input type=\"submit\" name=\"submit_")
+             .append("\"")
+       	     .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+             .append("/>&nbsp;<input type=\"submit\" name=\"submit_")
 	     .append(fieldName)
 	     .append("_remove_")
 	     .append(i)
 //	     .append("\" value=\"Remove\"/></td>\n");
 	     .append("\" value=\"")
 	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-	     .append("\"/></td>\n");
+	     .append("\"/>")
+         .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
+	     .append("</td>\n");
          else 
 	 {
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldName).append("_").append(i)
-             .append("\" size=\"15\"/>")
+             .append("\" size=\"15\"")
+             .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+             .append("/>")
              .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
              .append("</td>\n");             
 	 }
@@ -619,21 +630,27 @@
              .append("_").append(i)
              .append("\" size=\"15\" value=\"")
              .append(defaults[i].value.replaceAll("\"", "&quot;"))
-	     .append("\"/>&nbsp;<input type=\"submit\" name=\"submit_")
+	         .append("\"")
+	         .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+	         .append("/>&nbsp;<input type=\"submit\" name=\"submit_")
 	     .append(fieldName)
 	     .append("_remove_")
 	     .append(i)
 //	     .append("\" value=\"Remove\"/></td></tr>\n");
 	     .append("\" value=\"")
 	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-	     .append("\"/></td></tr>\n");
+	     .append("\"/>")
+         .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
+	     .append("</td></tr>\n");
 	 else 
 	 {
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldName)
              .append("_").append(i)
              //.append("\" size=\"15\"/></td>");
-             .append("\" size=\"15\"/>") 
+             .append("\" size=\"15\"")
+             .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+             .append("/>")
              .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
              .append("</td>\n");             
 
@@ -932,6 +949,8 @@
 
        String inputType = inputs[z].getInputType();
        String label = inputs[z].getLabel();
+       boolean closedVocabulary = inputs[z].isClosedVocabulary();
+       
        if (inputType.equals("name")) 
        {
            doPersonalName(out, item, fieldName, dcSchema, dcElement, dcQualifier,
@@ -955,7 +974,8 @@
        else if (inputType.equals("textarea")) 
        {
 	   	   doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			  repeatable, fieldCountIncr, label, pageContext);
+	     			  repeatable, fieldCountIncr, label, pageContext, vocabulary,
+	     			  closedVocabulary);
        } 
        else if (inputType.equals("dropdown")) 
        {
@@ -965,12 +985,14 @@
        else if (inputType.equals("twobox")) 
        {
 	   		doTwoBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary);
+	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary, 
+	     			 closedVocabulary);
        } 
        else 
        {
 	   		doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary);
+	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary, 
+	     			 closedVocabulary);
        }
        
        if (hasVocabulary(vocabulary))
