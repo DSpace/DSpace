@@ -322,6 +322,14 @@ public class Context
     }
 
     /**
+     * Remove all the objects from the object cache
+     */
+    public void clearCache()
+    {
+    	objectCache.clear();
+    }
+    
+    /**
      * set membership in a special group
      * 
      * @param groupID
