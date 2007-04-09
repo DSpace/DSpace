@@ -40,6 +40,7 @@
 - SF Patch #1628889 Improve file size descriptions in ItemTag
 - SF Patch #1641678 [dspace]/bin scripts for import and export
 - SF Patch #1642336 Restrict domains of self-registered users
+- SF Patch #1587225 Google and html sitemap generator
 
 (Monika Mevenkamp)
 - SF Patch #1654469 stat scripts always return exit code 1

@@ -8,7 +8,7 @@
  -
  - Date: $Date$
  -
- - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ - Copyright (c) 2002-2006, Hewlett-Packard Company and Massachusetts
  - Institute of Technology.  All rights reserved.
  -
  - Redistribution and use in source and binary forms, with or without
@@ -275,6 +275,15 @@
   </servlet>
 
   <servlet>
+    <servlet-name>htmlmap</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.SitemapServlet</servlet-class>
+    <init-param>
+      <param-name>type</param-name>
+      <param-value>html</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet>
     <servlet-name>internal-error</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.InternalErrorServlet</servlet-class>
   </servlet>
@@ -347,6 +356,15 @@
     <servlet-name>simple-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SimpleSearchServlet</servlet-class>
   </servlet>
+  
+  <servlet>
+    <servlet-name>sitemap</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.SitemapServlet</servlet-class>
+    <init-param>
+      <param-name>type</param-name>
+      <param-value>sitemaps.org</param-value>
+    </init-param>
+  </servlet>
 
   <servlet>
     <servlet-name>statistics</servlet-name>
@@ -387,8 +405,7 @@
     <servlet-name>workspace</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.WorkspaceServlet</servlet-class>
   </servlet>
-  
-    
+
   <servlet>
     <servlet-name>controlledvocabulary</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ControlledVocabularyServlet</servlet-class>
@@ -528,6 +545,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>htmlmap</servlet-name>
+    <url-pattern>/htmlmap</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>internal-error</servlet-name>
     <url-pattern>/internal-error</url-pattern>
   </servlet-mapping>
@@ -596,6 +618,11 @@
     <servlet-name>simple-search</servlet-name>
     <url-pattern>/simple-search</url-pattern>
   </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>sitemap</servlet-name>
+    <url-pattern>/sitemap</url-pattern>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>statistics</servlet-name>
@@ -637,7 +664,6 @@
     <url-pattern>/workspace</url-pattern>
   </servlet-mapping>
   
-    
   <servlet-mapping>
     <servlet-name>controlledvocabulary</servlet-name>
     <url-pattern>/controlledvocabulary</url-pattern>
@@ -647,6 +673,7 @@
     <servlet-name>subject-search</servlet-name>
     <url-pattern>/subject-search</url-pattern>
   </servlet-mapping> 
+
 
   <!-- Icon MIME type -->
   <mime-mapping>

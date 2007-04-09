@@ -87,6 +87,7 @@
                             <td class="pageFootnote">
                                 <fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
                                 <a target="_blank" href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
+                                <a href="<%= request.getContextPath() %>/htmlmap"></a>
                             </td>
                             <td nowrap="nowrap" valign="middle"> <%-- nowrap, valign for broken NS 4.x --%>
                             </td>
