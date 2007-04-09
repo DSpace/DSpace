@@ -52,8 +52,7 @@ if [ "$#" != "1" ]; then
     exit 1
 fi
 
-# Assume we're in the bin subdirectory of the DSpace installation directory
+# Get the DSPACE/bin directory
 BINDIR=`dirname $0`
-DSPACEDIR=`cd "$BINDIR/.." ; pwd`
 
-$DSPACEDIR/bin/dsrun org.dspace.core.ConfigurationManager -property "$1"
+$BINDIR/dsrun org.dspace.core.ConfigurationManager -property "$1"

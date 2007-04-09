@@ -47,4 +47,4 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-$BINDIR/dsrun org.dspace.administer.CreateAdministrator
+$BINDIR/dsrun org.dspace.administer.CreateAdministrator "$@"
