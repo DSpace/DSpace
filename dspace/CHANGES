@@ -41,6 +41,7 @@
 
 (Monika Mevenkamp)
 - SF Patch #1654469 stat scripts always return exit code 1
+- SF Patch #1654466 dsprop convenience script
 
 (K. Nakagami)
 - SF Patch #1591969 for SF bug #1583372 DCDate.toString returns invalid string
