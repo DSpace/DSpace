@@ -45,11 +45,9 @@
   - Attributes:
   -
   -   epeople    - EPerson[] - all epeople to browse
-  -   sortby     - Integer - field to sort by (constant from EPerson.java) (when show all)
-  -   first      - Integer - index of first eperson to display (when show all)
+  -   sortby     - Integer - field to sort by (constant from EPerson.java)
+  -   first      - Integer - index of first eperson to display
   -   multiple   - if non-null, this is for selecting multiple epeople
-  -   search     - String - query string for search eperson
-  -   offset     - Integer - offset in a search result set
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -69,68 +67,25 @@
     int sortBy = ((Integer)request.getAttribute("sortby" )).intValue();
     int first = ((Integer)request.getAttribute("first")).intValue();
 	boolean multiple = (request.getAttribute("multiple") != null);
-	String search = (String) request.getAttribute("search");
-	if (search == null) search = "";
-	int offset = ((Integer)request.getAttribute("offset")).intValue();
 
 	// Make sure we won't run over end of list
-	int last;
-	if (search != null && !search.equals(""))
-	{
-		last = offset + PAGESIZE;	
-	}
-	else 
-	{
-	  last = first + PAGESIZE;
-	}
+	int last = first + PAGESIZE;
 	if (last >= epeople.length) last = epeople.length - 1;
 
 	// Index of first eperson on last page
 	int jumpEnd = ((epeople.length - 1) / PAGESIZE) * PAGESIZE;
 
 	// Now work out values for next/prev page buttons
-	int jumpFiveBack;
-	if (search != null && !search.equals(""))
-	{
-	    jumpFiveBack = offset - PAGESIZE * 5;
-	}
-	else
-	{
-		jumpFiveBack = first - PAGESIZE * 5;
-	}
+	int jumpFiveBack = first - PAGESIZE * 5;
 	if (jumpFiveBack < 0) jumpFiveBack = 0;
 
-	int jumpOneBack;
-	if (search != null && !search.equals(""))
-	{
-		jumpOneBack = offset - PAGESIZE;		
-	}
-	else
-	{
-	   jumpOneBack = first - PAGESIZE;
-	}
+	int jumpOneBack = first - PAGESIZE;
 	if (jumpOneBack < 0) jumpOneBack = 0;
-	
-	int jumpOneForward;
-	if (search != null && !search.equals(""))
-	{
-		jumpOneForward = offset + PAGESIZE;
-	}
-	else
-	{
-		jumpOneForward = first + PAGESIZE;
-	}
-	if (jumpOneForward > epeople.length) jumpOneForward = jumpEnd;
 
-	int jumpFiveForward;
-	if (search != null && !search.trim().equals(""))
-	{
-		jumpFiveForward = offset + PAGESIZE * 5;
-	}
-	else 
-	{
-		jumpFiveForward = first + PAGESIZE * 5;
-	}
+	int jumpOneForward = first + PAGESIZE;
+	if (jumpOneForward > epeople.length) jumpOneForward = first;
+
+	int jumpFiveForward = first + PAGESIZE * 5;
 	if (jumpFiveForward > epeople.length) jumpFiveForward = jumpEnd;
 
 	// What's the link?
@@ -138,16 +93,8 @@
 	if (sortBy == EPerson.EMAIL) sortByParam = "email";
 	if (sortBy == EPerson.ID) sortByParam = "id";
 
-	String jumpLink;
-	if (search != null && !search.equals(""))
-	{
-		jumpLink = request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first="+first+"&search="+search+"&offset=";
-	}
-	else
-	{
-		jumpLink = request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first=";
-	}
-	String sortLink = request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&first=" + first + "&sortby=";
+	String jumpLink = request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&amp;sortby=" + sortByParam + "&amp;first=";
+	String sortLink = request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&amp;first=" + first + "&amp;sortby=";
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -182,9 +129,10 @@ function clearEPeople()
 </script>
 	</head>
 	<body class="pageContents">
+
     <%-- <h3>E-people <%= first + 1 %>-<%= last + 1 %> of <%= epeople.length %></h3> --%>
 	<h3><fmt:message key="jsp.tools.eperson-list.heading">
-        <fmt:param><%= ((search != null && !search.equals(""))?offset:first) + 1 %></fmt:param>
+        <fmt:param><%= first + 1 %></fmt:param>
         <fmt:param><%= last + 1 %></fmt:param>
         <fmt:param><%= epeople.length %></fmt:param>
     </fmt:message></h3>
@@ -196,23 +144,7 @@ function clearEPeople()
 	e-person to the list on the main form. </p> --%>
 	<p class="submitFormHelp"><fmt:message key="jsp.tools.eperson-list.info1"/></p>
 <%  } %>
-<center>
-<form method="get">
-    <input type="hidden" name="first" value="<%= first %>" />
-    <input type="hidden" name="sortby" value="<%= sortBy %>" />
-    <input type="hidden" name="multiple" value="<%= multiple %>" />    
-    <label for="search"><fmt:message key="jsp.tools.eperson-list.search.query" /></label><input type="text" name="search" value="<%= search %>"/>
-    <input type="submit" value="<fmt:message key="jsp.tools.eperson-list.search.submit" />" />
-<%
-    if (search != null && !search.equals(""))
-    {   %>
-    <br/>
-    <a href="<%= request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first="+first %>"><fmt:message key="jsp.tools.eperson-list.search.return-browse" /></a>	
-<%
-    }    
-%>
-</form>
-</center>
+
 <%-- Controls for jumping around list--%>
 	<table width="99%">
 		<tr>
@@ -236,18 +168,6 @@ function clearEPeople()
 	<form method="get" action=""> <%-- Will never actually be posted, it's just so buttons will appear --%>
 
     <table class="miscTable" align="center" summary="Epeople list">
-<% if (search != null && !search.equals(""))
-   {  %>
-       <tr>
-            <th class="oddRowOddCol">&nbsp;</th>
-            <th class="oddRowEvenCol"><fmt:message key="jsp.tools.eperson-list.th.id" /></th>
-            <th class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.th.email" /></th>
-            <th class="oddRowEvenCol"><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>
-            <th class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>
-        </tr>
-<% }
-   else 
-   {  %>
         <tr>
             <th id="t1" class="oddRowOddCol">&nbsp;</th>
             <th id="t2" class="oddRowEvenCol"><%
@@ -285,7 +205,7 @@ function clearEPeople()
             <%-- <th class="oddRowOddCol">First Name</th> --%>
             <th id="t5" class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.th.firstname"/></th>
         </tr>
-<%  }
+<%
     String row = "even";
 
 	// If this is a dialogue to select a *single* e-person, we want
@@ -295,7 +215,7 @@ function clearEPeople()
 	String closeWindow = (multiple ? "" : "window.close();");
 
 
-    for (int i = (search != null && !search.equals(""))?offset:first; i <= last; i++)
+    for (int i = first; i <= last; i++)
     {
         EPerson e = epeople[i];
 		// Make sure no quotes in full name will mess up our Javascript

@@ -539,119 +539,36 @@ from/until/setSpec/offset
 
   <p>This means the harvest is 'from' <code>2003-01-01</code>, has no 'until' date, is for collection hdl:1721.1/1234, and 300 records have already been sent to the harvester. (Actually, if the original OAI-PMH request doesn't specify a 'from' or 'until, OAICat fills them out automatically to '0000-00-00T00:00:00Z' and '9999-12-31T23:59:59Z' respectively. This means DSpace resumption tokens will always have from and until dates in them.)</p>
 
-
-<!-- Struct Builder -->
-<h2><a name="structbuilder" id="structbuilder">Community and Collection Structure Importer</a></h2>
-
-<p>
-This command-line tool gives you the ability to import a community and collection structure directly
-from a source XML file.  It is executed as follows:
-</p>
-
-<p><code>[dspace]/bin/structure-builder -f [source xml] -o [output xml file] -e [administrator email]</code></p>
-
-<p>
-This will examine the contents of <code>[source xml]</code>, import the structure into DSpace while logged in as the
-supplied administrator, and then output the same structure to the output file, but including the handle for each
-imported community and collection as an attribute.
-</p>
-
-<p>
-The source xml document needs to be in the following format:
-</p>
-
-<pre>
-&lt;import_structure&gt;
- 	&lt;community&gt;
-  		&lt;name&gt;Community Name&lt;/name&gt;
-  		&lt;description&gt;Descriptive text&lt;/description&gt;
-  		&lt;intro&gt;Introductory text&lt;/intro&gt;
-  		&lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
-  		&lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
-  		&lt;community&gt;
- 			&lt;name&gt;Sub Community Name&lt;/name&gt;
- 			&lt;community&gt; ...[ad infinitum]... &lt;/community&gt;
- 		&lt;/community&gt;
- 		&lt;collection&gt;
- 			&lt;name&gt;Collection Name&lt;/name&gt;
-  			&lt;description&gt;Descriptive text&lt;/description&gt;
-  			&lt;intro&gt;Introductory text&lt;/intro&gt;
-  			&lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
-  			&lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
-  			&lt;license&gt;Special licence&lt;/license&gt;
-  			&lt;provenance&gt;Provenance information&lt;/provenance&gt;
- 		&lt;/collection&gt;
-   	&lt;/community&gt;
-&lt;/import_structure&gt;
-</pre>
-
-<p>
-The resulting output document will be as follows:
-</p>
-
-<pre>
-&lt;import_structure&gt;
- 	&lt;community identifier="123456789/1"&gt;
-  		&lt;name&gt;Community Name&lt;/name&gt;
-  		&lt;description&gt;Descriptive text&lt;/description&gt;
-  		&lt;intro&gt;Introductory text&lt;/intro&gt;
-  		&lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
-  		&lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
-  		&lt;community identifier="123456789/2"&gt;
- 			&lt;name&gt;Sub Community Name&lt;/name&gt;
- 			&lt;community identifier="123456789/3"&gt; ...[ad infinitum]... &lt;/community&gt;
- 		&lt;/community&gt;
- 		&lt;collection identifier="123456789/4"&gt;
- 			&lt;name&gt;Collection Name&lt;/name&gt;
-  			&lt;description&gt;Descriptive text&lt;/description&gt;
-  			&lt;intro&gt;Introductory text&lt;/intro&gt;
-  			&lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
-  			&lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
-  			&lt;license&gt;Special licence&lt;/license&gt;
-  			&lt;provenance&gt;Provenance information&lt;/provenance&gt;
- 		&lt;/collection&gt;
-   	&lt;/community&gt;
-&lt;/import_structure&gt;
-</pre>
-
-<h3>Limitation</h3>
-
-<ul>
-	<li>Currently this does not export community and collection structures, although it should only be a small modification to make it do so</li>
-</ul>
-
-<!-- end Struct Builder -->
-
   <h2><a name="packager" id="packager">Package Importer and Exporter</a></h2>
 
   <p>This command-line tool gives you access to the Packager plugins. It can <em>ingest</em> a package to create a new DSpace Item, or <em>disseminate</em> an Item as a package.</p>
 
- <p>To see all the options, invoke it as: <pre><em>[dspace]</em>/bin/packager --help</pre> This mode also displays a list of the names of package ingesters and disseminators that are available.</p>
+ <p>To see all the options, invoke it as: <pre><em>[dspace]</em>/bin/dsrun org.dspace.app.packager.Packager --help</pre> This mode also displays a list of the names of package ingesters and disseminators that are available.</p>
 
  <h3>Ingesting</h3>
 
- <p>To ingest a package from a file, give the command: <pre><em>[dspace]</em>/bin/packager -e <em>user</em> -c <em>handle</em> -t <em>packager</em> <em>path</em></pre>
+ <p>To ingest a package from a file, give the command: <pre><em>[dspace]</em>/bin/dsrun org.dspace.app.packager.Packager -e <em>user</em> -c <em>handle</em> -t <em>packager</em> <em>path</em></pre>
 Where <em>user</em> is the e-mail address of the E-Person under whose authority this runs; <em>handle</em> is the Handle of the collection into which the Item is added, <em>packager</em> is the plugin name of the
 package ingester to use, and <em>path</em> is the path to the file to ingest (or <code>"-"</code> to read from the standard input).</p>
 
  <p>Here is an example that loads a PDF file with internal metadata as a package:
- <pre>/dspace/bin/packager -e florey@mit.edu -c 1721.2/13  -t pdf thesis.pdf</pre>
+ <pre>/dspace/bin/dsrun org.dspace.app.packager.Packager -e florey@mit.edu -c 1721.2/13  -t pdf thesis.pdf</pre>
  </p>
 
  <p>This example takes the result of retrieving a URL and ingests it:
 <pre>wget -O - http://alum.mit.edu/jarandom/my-thesis.pdf | \
-/dspace/bin/packager -e florey@mit.edu -c 1721.2/13  -t pdf -</pre></p>
+/dspace/bin/dsrun org.dspace.app.packager.Packager -e florey@mit.edu -c 1721.2/13  -t pdf -</pre></p>
 
  <h3>Disseminating</h3>
 
  <p>To disseminate an Item as a package, give the command:
- <pre><em>[dspace]</em>/bin/packager -e <em>user</em> -d -i <em>handle</em> -t   <em>packager</em> <em>path</em></pre> Where <em>user</em> is the e-mail address of the E-Person under whose
+ <pre><em>[dspace]</em>/bin/dsrun org.dspace.app.packager.Packager -e <em>user</em> -d -i <em>handle</em> -t   <em>packager</em> <em>path</em></pre> Where <em>user</em> is the e-mail address of the E-Person under whose
 authority this runs; <em>handle</em> is the Handle of the Item to disseminate;
 <em>packager</em> is the plugin name of the package disseminator to use; and <em>path</em> is the path to the file to
 create (or <code>"-"</code> to write to the standard output).
 
 This example writes an Item out as a METS package in the file "454.zip":
-<pre>/dspace/bin/packager -e florey@mit.edu -d -i 1721.2/454 -t METS 454.zip</pre></p>
+<pre>/dspace/bin/dsrun org.dspace.app.packager.Packager -e florey@mit.edu -d -i 1721.2/454 -t METS 454.zip</pre></p>
 
  <h3>METS packages</h3>
 
@@ -717,22 +634,22 @@ archive_directory/
 
   <p>To add items to a collection with an EPerson as the submitter, type:</p>
   <pre>
-[dspace]/bin/import --add --eperson=joe@user.com  --collection=collectionID --source=items_dir --mapfile=mapfile
+[dspace]/bin/dsrun org.dspace.app.itemimport.ItemImport --add --eperson=joe@user.com  --collection=collectionID --source=items_dir --mapfile=mapfile
 </pre>
 
   <p>(or by using the short form)</p>
   <pre>
-[dspace]/bin/import -a -e joe@user.com  -c collectionID -s items_dir -m mapfile
+[dspace]/bin/dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c collectionID -s items_dir -m mapfile
 </pre>
 
   <p>which would then cycle through the archive directory's items, import them, and then generate a map file which stores the mapping of item directories to item handles. Save this map file! Using the map file you can then 'unimport' with the command:</p>
   <pre>
-[dspace]/bin/import --delete --mapfile=mapfile
+[dspace]/bin/dsrun org.dspace.app.itemimport.ItemImport --delete --mapfile=mapfile
 </pre>
 
   <p>The imported items listed in the map file would then be deleted. If you wish to replace previously imported items, you can give the command:</p>
   <pre>
-[dspace]/bin/import --replace --eperson=joe@user.com --collection=collectID --source=items_dir --mapfile=mapfile
+[dspace]/bin/dsrun org.dspace.app.itemimport.ItemImport --replace --eperson=joe@user.com --collection=collectID --source=items_dir --mapfile=mapfile
 </pre>
 
   <p>Replacing items uses the map file to replace the old items and still retain their handles.</p>
@@ -745,12 +662,12 @@ archive_directory/
 
   <p>The item exporter can export a single item or a collection of items, and creates a DSpace simple archive for each item to be exported. To export a collection's items you type:</p>
   <pre>
-[dspace]/bin/export --type=COLLECTION --id=collID --dest=dest_dir --number=seq_num
+[dspace]/bin/dsrun org.dspace.app.itemexport.ItemExport --type=COLLECTION --id=collID --dest=dest_dir --number=seq_num
 </pre>
 
   <p>The keyword <code>COLLECTION</code> means that you intend to export an entire collection. The ID can either be the database ID or the handle. The exporter will begin numbering the simple archives with the sequence number that you supply. To export a single item use the keyword <code>ITEM</code> and give the item ID as an argument:</p>
   <pre>
-[dspace]/bin/export --type=ITEM --id=itemID --dest=dest_dir --number=seq_num
+[dspace]/bin/dsrun org.dspace.app.itemexport.ItemExport --type=ITEM --id=itemID --dest=dest_dir --number=seq_num
 </pre>
 
   <p>Each exported item will have an additional file in its directory, named 'handle'. This will contain the handle that was assigned to the item, and this file will be read by the importer so that items exported and then imported to another machine will retain the item's original handle.</p>
