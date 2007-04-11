@@ -40,6 +40,7 @@
 package org.dspace.search;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -82,22 +83,32 @@ public class DSQuery
 
     static final String COMMUNITY = "" + Constants.COMMUNITY;
 
+    private static IndexReader reader = null;
+    
     // cache a Lucene IndexSearcher for more efficient searches
-    private static Searcher searcher;
+    private static Searcher searcher = null;
 
+    private static String indexDir = null;
+    
+    private static String operator = null;
+    
     private static long lastModified;
     
     /** log4j logger */
     private static Logger log = Logger.getLogger(DSQuery.class);
 
+    
     static
     {
-        String maxClauses = ConfigurationManager
-                .getProperty("search.max-clauses");
+        String maxClauses = ConfigurationManager.getProperty("search.max-clauses");
         if (maxClauses != null)
         {
             BooleanQuery.setMaxClauseCount(Integer.parseInt(maxClauses));
         } 
+        
+        indexDir = ConfigurationManager.getProperty("search.dir");
+        
+        operator = ConfigurationManager.getProperty("search.operator");   
     }
 
     /**
@@ -135,13 +146,11 @@ public class DSQuery
         try
         {
             // grab a searcher, and do the search
-            Searcher searcher = getSearcher(ConfigurationManager
-                    .getProperty("search.dir"));
+            Searcher searcher = getSearcher(c);
 
             QueryParser qp = new QueryParser("default", DSIndexer.getAnalyzer());
             log.info("Final query string: " + querystring);
             
-            String operator = ConfigurationManager.getProperty("search.operator");   
             if (operator == null || operator.equals("OR"))
             {
             	qp.setDefaultOperator(QueryParser.OR_OPERATOR);
@@ -379,6 +388,25 @@ public class DSQuery
             System.out.println("Exception caught: " + e);
         }
     }
+    
+    /**
+     * Close any IndexSearcher that is currently open.
+     */
+    public static void close()
+    {
+        if (searcher != null)
+        {
+            try
+            {
+                searcher.close();
+                searcher = null;
+            }
+            catch (IOException ioe)
+            {
+                log.error("DSQuery: Unable to close open IndexSearcher", ioe);
+            }
+        }
+    }
 
     public static void main(String[] args)
     {
@@ -395,12 +423,39 @@ public class DSQuery
      * performance.) checks to see if the index has been modified - if so, it
      * creates a new IndexSearcher
      */
-    private static synchronized Searcher getSearcher(String indexDir)
+    protected static synchronized Searcher getSearcher(Context c)
             throws IOException
     {
-        if (lastModified != IndexReader.getCurrentVersion(indexDir))
+       
+        // If we have already opened a searcher, check to see if the index has been updated
+        // If it has, we need to close the existing searcher - we will open a new one later
+        if (searcher != null)
         {
-            // there's a new index, open it
+            try
+            {
+                if (lastModified != IndexReader.getCurrentVersion(indexDir))
+                {
+                    // Close the cached IndexSearcher
+                    close();
+                }
+            }
+            catch (IOException ioe)
+            {
+                // Index is probably corrupt. Log the error, but continue to either:
+                // 1) Return existing searcher (may yet throw exception, no worse than throwing here)
+                // 2) May switch in alternate index below that isn't corrupt
+                log.warn("DSQuery: Unable to check for updated index", ioe);
+            }
+        }
+
+        // There is no existing searcher - either this is the first execution,
+        // or the index has been updated and we closed the old index.
+        // Also check that we can open the index (ie. that there were no errors above)
+        if (searcher == null)
+        {
+            // So, open a new searcher - even if we are loading an index that
+            // was created in an offline directory, by this stage it will have
+            // been moved into the 'online' index directory.
             lastModified = IndexReader.getCurrentVersion(indexDir);
             searcher = new IndexSearcher(indexDir);
         }

@@ -39,13 +39,20 @@
  */
 package org.dspace.search;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Date;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -53,7 +60,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.dspace.authorize.AuthorizeException;
+import org.apache.lucene.index.TermDocs;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -62,10 +69,10 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 
@@ -74,48 +81,201 @@ import org.dspace.handle.HandleManager;
  * collections, communities, etc. It is meant to either be invoked from the
  * command line (see dspace/bin/index-all) or via the indexContent() methods
  * within DSpace.
+ * 
+ * As of 1.4.2 this class has new incremental update of index functionality
+ * and better detection of locked state thanks to Lucene 2.1 moving write.lock.
+ * It will attempt to attain a lock on the index in the event that an update
+ * is requested and will wait a maximum of 30 seconds (a worst case scenario)
+ * to attain the lock before giving up and logging the failure to log4j and 
+ * to the DSpace administrator email account. 
+ * 
+ * The Administraor can choose to run DSIndexer in a cron that
+ * repeats regularly, a failed attempt to index from the UI will be "caught" up
+ * on in that cron.
+ * 
+ * @author Mark Diggory
+ * @author Graham Triggs
  */
 public class DSIndexer
 {
     private static final Logger log = Logger.getLogger(DSIndexer.class);
 
+    private static final String LAST_INDEXED_FIELD = "DSIndexer.lastIndexed";
+    
+    private static final long WRITE_LOCK_TIMEOUT = 30000 /* 30 sec */;
+ 	
+    private static IndexReader reader = null;
+    
+    private static long lastModified = -1;
+    
+    // Class to hold the index configuration (one instance per config line)
+    private static class IndexConfig
+    {
+        String indexName;
+        String schema;
+        String element;
+        String qualifier = null;
+    }
+    
+    private static String index_directory = ConfigurationManager.getProperty("search.dir");
+    
+    private static int maxfieldlength = -1;
+    	
     // TODO: Support for analyzers per language, or multiple indices
     /** The analyzer for this DSpace instance */
     private static Analyzer analyzer = null;
-    
-    /**
-     * IndexItem() adds a single item to the index
-     */
-    public static void indexContent(Context c, DSpaceObject dso)
-            throws SQLException, IOException
-    {
-        IndexWriter writer = openIndex(c, false);
 
+    // Static initialisation of index configuration /
+    private static IndexConfig[] indexConfigArr = new IndexConfig[0];
+    
+    static {
+    	
+    	// calculate maxfieldlength
+    	if (ConfigurationManager.getProperty("search.maxfieldlength") != null)
+        {
+            maxfieldlength = ConfigurationManager.getIntProperty("search.maxfieldlength");
+        }
+    	
+        // read in indexes from the config
+        ArrayList indexConfigList = new ArrayList();
+
+        // read in search.index.1, search.index.2....
+        for (int i = 1; ConfigurationManager.getProperty("search.index." + i) != null; i++)
+        {
+            indexConfigList.add(ConfigurationManager.getProperty("search.index." + i));
+        }
+    
+        if (indexConfigList.size() > 0)
+        {
+            indexConfigArr = new IndexConfig[indexConfigList.size()];
+            
+            for (int i = 0; i < indexConfigList.size(); i++)
+            {
+                indexConfigArr[i] = new IndexConfig();
+                String index = (String) indexConfigList.get(i);
+    
+                String[] configLine = index.split(":");
+                
+                indexConfigArr[i].indexName = configLine[0];
+    
+                // Get the schema, element and qualifier for the index
+                // TODO: Should check valid schema, element, qualifier?
+                String[] parts = configLine[1].split("\\.");
+    
+                switch (parts.length)
+                {
+                case 3:
+                    indexConfigArr[i].qualifier = parts[2];
+                case 2:
+                    indexConfigArr[i].schema  = parts[0];
+                    indexConfigArr[i].element = parts[1];
+                    break;
+                default:
+                    log.warn("Malformed configuration line: search.index." + i);
+                    // FIXME: Can't proceed here, no suitable exception to throw
+                    throw new RuntimeException(
+                            "Malformed configuration line: search.index." + i);
+                }
+            }
+        }
+        
+        /*
+         * Increase the default write lock so that Indexing can be interupted.
+         */
+        IndexWriter.setDefaultWriteLockTimeout(WRITE_LOCK_TIMEOUT);
+    
+        /*
+         * Create the index directory if it doesn't already exist.
+         */
+        if(!IndexReader.indexExists(index_directory))
+    	{
+    		try {
+    			new File(index_directory).mkdirs();
+				openIndex(null,true).close();
+			} catch (IOException e) {
+                throw new RuntimeException(
+                        "Could not create search index: " + e.getMessage(),e);
+               }
+    	}
+    }
+
+    /**
+     * If the handle for the "dso" already exists in the index, and
+     * the "dso" has a lastModified timestamp that is newer than 
+     * the document in the index then it is updated, otherwise a 
+     * new document is added.
+     * 
+     * @param context Users Context
+     * @param dso DSpace Object (Item, Collection or Community
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void indexContent(Context context, DSpaceObject dso)
+    throws SQLException, IOException
+    {
+    	indexContent(context, dso, false);
+    }
+    /**
+     * If the handle for the "dso" already exists in the index, and
+     * the "dso" has a lastModified timestamp that is newer than 
+     * the document in the index then it is updated, otherwise a 
+     * new document is added.
+     * 
+     * @param context Users Context
+     * @param dso DSpace Object (Item, Collection or Community
+     * @param force Force update even if not stale.
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void indexContent(Context context, DSpaceObject dso, boolean force)
+    throws SQLException, IOException
+    {
+        
+        Term t = new Term("handle", dso.getHandle());
+        
+        IndexWriter writer = null;
+        
         try
         {
             switch (dso.getType())
             {
-            case Constants.ITEM:
-                writeItemIndex(c, writer, (Item) dso);
-
+            case Constants.ITEM :
+                if(requiresIndexing((Item) dso) || force)
+                {
+                	Document doc = buildDocument(context, (Item) dso);
+                	
+                	/* open inside stale block, after building doc
+                	 * to limit the total time spent in a lock.
+                	 */
+                	writer = openIndex(context, false); 
+                	writer.updateDocument(t, doc);
+                	
+                    log.info("Wrote Item: " + dso.getHandle() + " to Index");
+                }
                 break;
+                
+            case Constants.COLLECTION :
+            	writer = openIndex(context, false);
+            	writer.updateDocument(t, buildDocument(context, (Collection) dso));
+            	log.info("Wrote Collection: " + dso.getHandle() + " to Index");
+            	break;
 
-            case Constants.COLLECTION:
-                writeCollectionIndex(c, writer, (Collection) dso);
-
+            case Constants.COMMUNITY :
+            	writer = openIndex(context, false);
+            	writer.updateDocument(t, buildDocument(context, (Community) dso));
+                log.info("Wrote Community: " + dso.getHandle() + " to Index");
                 break;
-
-            case Constants.COMMUNITY:
-                writeCommunityIndex(c, writer, (Community) dso);
-
-                break;
-
-            // FIXME: should probably default unknown type exception
+                
+            default :
+                log.error("Only Items, Collections and Communities can be Indexed");
             }
+
         }
         finally
         {
-            closeIndex(c, writer);
+        	/* drop the lock */
+            if(writer != null)
+            	writer.close();
         }
     }
 
@@ -123,30 +283,46 @@ public class DSIndexer
      * unIndex removes an Item, Collection, or Community only works if the
      * DSpaceObject has a handle (uses the handle for its unique ID)
      * 
-     * @param dso
-     *            DSpace Object, can be Community, Item, or Collection
+     * @param context
+     * @param dso DSpace Object, can be Community, Item, or Collection
+     * @throws SQLException
+     * @throws IOException
      */
-    public static void unIndexContent(Context c, DSpaceObject dso)
+    public static void unIndexContent(Context context, DSpaceObject dso)
             throws SQLException, IOException
     {
-        String h = HandleManager.findHandle(c, dso);
-
-        unIndexContent(c, h);
-    }
-
-    public static void unIndexContent(Context c, String myhandle)
-            throws SQLException, IOException
-    {
-        String index_directory = ConfigurationManager.getProperty("search.dir");
-        IndexReader ir = IndexReader.open(index_directory);
-
         try
         {
-            if (myhandle != null)
+        	unIndexContent(context, dso.getHandle());
+        }
+        catch(Exception exception)
+        {
+            log.error(exception.getMessage(),exception);
+            emailException(exception);
+        }
+    }
+
+    /**
+     * Unindex a Docment in the Lucene Index.
+     * 
+     * @param context
+     * @param handle 
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void unIndexContent(Context context, String handle)
+            throws SQLException, IOException
+    {
+        
+        IndexWriter writer = openIndex(context, false);
+        
+        try
+        {
+            if (handle != null)
             {
                 // we have a handle (our unique ID, so remove)
-                Term t = new Term("handle", myhandle);
-                ir.deleteDocuments(t);
+                Term t = new Term("handle", handle);
+                writer.deleteDocuments(t);
             }
             else
             {
@@ -159,80 +335,336 @@ public class DSIndexer
         }
         finally
         {
-            ir.close();
+            writer.close();
         }
     }
+    
+    
 
     /**
      * reIndexContent removes something from the index, then re-indexes it
-     * 
-     * @param c context object
+     *
+     * @param context context object
      * @param dso  object to re-index
      */
-    public static void reIndexContent(Context c, DSpaceObject dso)
+    public static void reIndexContent(Context context, DSpaceObject dso)
             throws SQLException, IOException
     {
-        unIndexContent(c, dso);
-        indexContent(c, dso);
-    }
-
-    /**
-     * create full index - wiping old index
-     * 
-     * @param c   context to use
-     */
-    public static void createIndex(Context c) throws SQLException, IOException
-    {
-        IndexWriter writer = openIndex(c, true);
-
         try
         {
-            indexAllCommunities(c, writer);
-            indexAllCollections(c, writer);
-            indexAllItems(c, writer);
+        	indexContent(context, dso);
+        }
+        catch(Exception exception)
+        {
+            log.error(exception.getMessage(),exception);
+            emailException(exception);
+        }
+    }
+    
+    /**
+	 * create full index - wiping old index
+	 * 
+	 * @param c context to use
+	 */
+    public static void createIndex(Context c) throws SQLException, IOException
+    {
+    	/* Intialize a new index */
+        //openIndex(c, true).close();
+        //updateIndex(c);
+        
+        IndexWriter writer = openIndex(c, true);
+        
+        try
+        {
+        	
+        	Community[] communities = Community.findAll(c);
+            for (int i = 0; i < communities.length; i++)
+            {
+                writer.addDocument(buildDocument(c, communities[i]));
+                log.info("Wrote Community: " + communities[i].getHandle() + " to Index");
+            }
 
+            Collection[] collections = Collection.findAll(c);
+            for (int i = 0; i < collections.length; i++)
+            {
+                writer.addDocument(buildDocument(c, collections[i]));
+                log.info("Wrote Collection: " + collections[i].getHandle() + " to Index");
+            }
+
+            ItemIterator iter = Item.findAll(c);
+            while (iter.hasNext())
+            {
+                Item target = (Item) iter.next();
+
+                try
+                {
+                	writer.addDocument(buildDocument(c, target));
+                	log.info("Wrote Item: " + target.getHandle() + " to Index");
+                } catch (SQLException e) {
+                	log.error(e.getMessage(),e);
+    			} catch (IOException e) {
+    				log.error(e.getMessage(),e);
+    			}
+                finally
+                {
+                	
+                }
+                target.decache();
+            }
             // optimize the index - important to do regularly to reduce
-            // filehandle
-            // usage
-            // and keep performance fast!
+            // filehandle usage and keep performance fast!
             writer.optimize();
         }
         finally
         {
-            closeIndex(c, writer);
+            writer.close();
+        }
+
+    }
+    
+    /**
+     * Optimize the existing index. Iimportant to do regularly to reduce 
+     * filehandle usage and keep performance fast!
+     * 
+     * @param c Users Context
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void optimizeIndex(Context c) throws SQLException, IOException
+    {
+        IndexWriter writer = openIndex(c, false);
+
+        try
+        {
+            writer.optimize();
+        }
+        finally
+        {
+            writer.close();
         }
     }
 
     /**
-     * When invoked as a command-line tool, (re)-builds the whole index
-     * 
+     * When invoked as a command-line tool, creates, updates, removes 
+     * content from the whole index
+     *
      * @param args
      *            the command-line arguments, none used
+     * @throws IOException 
+     * @throws SQLException 
      */
-    public static void main(String[] args) throws Exception
+    public static void main(String[] args) throws SQLException, IOException
     {
-        Context c = new Context();
-
-        // for testing, pass in a handle of something to remove...
+    	
+        Context context = new Context();
+        context.setIgnoreAuthorization(true);
+        
+        // TODO remove this if statement in 1.5
         if ((args.length == 2) && (args[0].equals("remove")))
         {
-            unIndexContent(c, args[1]);
+            unIndexContent(context, args[1]);
         }
         else
         {
-            c.setIgnoreAuthorization(true);
+        	
+        	String usage = "org.dspace.search.DSIndexer [-houf[d <item handle>]] or nothing to update an existing index.";
+            Options options = new Options();
+            HelpFormatter formatter = new HelpFormatter();
+            CommandLine line = null;
 
-            createIndex(c);
+            options.addOption(
+            	OptionBuilder
+            		.withArgName("item handle")
+            		.hasArg(true)
+            		.withDescription("delete an Item, Collection or Community from index based on its handle")
+            		.create( "d" ));
+            
+    		options.addOption(
+    			OptionBuilder
+    				.isRequired(false)
+    				.withDescription("optimize existing index")
+    				.create("o"));
 
-            System.out.println("Done with indexing");
+    		options.addOption(
+    				OptionBuilder
+    					.isRequired(false)
+    					.withDescription("clean existing index removing any documents that no longer exist in the db")
+    					.create("c"));
+    		
+    		options.addOption(
+    			OptionBuilder
+    				.isRequired(false)
+    				.withDescription("(re)build index, wiping out current one if it exists")
+    				.create("b"));
+    		
+    		options.addOption(
+    				OptionBuilder
+    					.isRequired(false)
+    					.withDescription("if updating existing index, force each handle to be reindexed even if uptodate")
+    					.create("f"));
+    	
+    		options.addOption(
+    			OptionBuilder
+    				.isRequired(false)
+    				.withDescription("print this help message")
+    				.create("h"));
+    	
+            try
+            {
+            	line = new PosixParser().parse(options, args);
+            }
+            catch( Exception e)
+            {
+            	// automatically generate the help statement
+                formatter.printHelp(usage, e.getMessage(), options, "" );
+                System.exit(1);
+            }
+            
+            if(line.hasOption("h"))
+            {
+                // automatically generate the help statement
+                formatter.printHelp(usage, options );
+                System.exit(1);
+            }
+            
+
+            if (line.hasOption("r") )
+            {
+                log.info("Removing " + line.getOptionValue("r") + " from Index");
+                unIndexContent(context, line.getOptionValue("r"));
+            } 
+            else if (line.hasOption("o"))
+            {
+                log.info("Optimizing Index");
+                optimizeIndex(context);
+            }
+            else if (line.hasOption("c"))
+            {
+                log.info("Cleaning Index");
+                cleanIndex(context);
+            }
+            else if (line.hasOption("u"))
+            {
+            	log.info("Updating Index");
+            	updateIndex(context,line.hasOption("f"));
+            }
+            else
+            {
+            	log.info("(Re)building index from scratch.");
+             	createIndex(context);
+            }
+            
+            
         }
+
+        log.info("Done with indexing");
     }
 
     /**
+     * Iterates over all Items, Collections and Communities. And updates
+     * them in the index. Uses decaching to control memory footprint.
+     * Uses indexContent and isStale ot check state of item in index.
+     * 
+     * @param context
+     */
+    public static void updateIndex(Context context) {
+    	updateIndex(context,false);
+    }
+    
+    /**
+     * Iterates over all Items, Collections and Communities. And updates
+     * them in the index. Uses decaching to control memory footprint.
+     * Uses indexContent and isStale ot check state of item in index.
+     * 
+     * At first it may appear counterintuitive to have an IndexWriter/Reader
+     * opened and closed on each DSO. But this allows the UI processes
+     * to step in and attain a lock and write to the index even if other
+     * processes/jvms are running a reindex.
+     * 
+     * @param context
+     * @param force 
+     */
+    public static void updateIndex(Context context, boolean force) {
+
+    		try
+    		{
+    			
+    			for(ItemIterator i = Item.findAll(context);i.hasNext();)
+    	        {
+    	            Item item = (Item) i.next();
+    	            indexContent(context,item,force);
+    	            item.decache();
+    	        }
+    			
+    			Collection[] collections = Collection.findAll(context);
+    	        for (int i = 0; i < collections.length; i++)
+    	        {
+    	            indexContent(context,collections[i],force);
+    	            context.removeCached(collections[i], collections[i].getID());
+    	            
+    	        }
+    		
+    			Community[] communities = Community.findAll(context);
+    	        for (int i = 0; i < communities.length; i++)
+    	        {
+    	            indexContent(context,communities[i],force);
+    	            context.removeCached(communities[i], communities[i].getID());
+    	        }
+    			
+    	        optimizeIndex(context);
+    			
+    		}
+    		catch(Exception e)
+    		{
+    			log.error(e.getMessage(), e);
+    		}
+
+	}
+    
+    /**
+     * Iterates over all documents in the Lucene index and verifies they 
+     * are in database, if not, they are removed.
+     * 
+     * @param context
+     * @throws IOException 
+     * @throws SQLException 
+     */
+    public static void cleanIndex(Context context) throws IOException, SQLException {
+
+    	IndexReader reader = openReader();
+    	
+    	for(int i = 0 ; i < reader.numDocs(); i++)
+    	{
+    		if(!reader.isDeleted(i))
+    		{
+    			Document doc = reader.document(i);
+        		String handle = doc.get("handle");
+        		
+        		DSpaceObject o = HandleManager.resolveToObject(context, handle);
+
+                if (o == null)
+                {
+                	log.info("Deleting: " + handle);
+                	DSIndexer.unIndexContent(context, handle);
+                }
+                else
+                {
+                	context.removeCached(o, o.getID());
+                	log.debug("Keeping: " + handle);
+                }
+    		}
+    		else
+    		{
+    			log.debug("Encountered deleted doc: " + i);
+    		}
+    	}
+	}
+    
+	/**
      * Get the Lucene analyzer to use according to current configuration (or
      * default). TODO: Should have multiple analyzers (and maybe indices?) for
      * multi-lingual DSpaces.
-     * 
+     *
      * @return <code>Analyzer</code> to use
      * @throws IllegalStateException
      *             if the configured analyzer can't be instantiated
@@ -242,8 +674,7 @@ public class DSIndexer
         if (analyzer == null)
         {
             // We need to find the analyzer class from the configuration
-            String analyzerClassName = ConfigurationManager
-                    .getProperty("search.analyzer");
+            String analyzerClassName = ConfigurationManager.getProperty("search.analyzer");
 
             if (analyzerClassName == null)
             {
@@ -267,11 +698,120 @@ public class DSIndexer
 
         return analyzer;
     }
-    
+
     
     ////////////////////////////////////
     //      Private
     ////////////////////////////////////
+
+    private static void emailException(Exception exception) {
+		// Also email an alert, system admin may need to check for stale lock
+		try {
+			String recipient = ConfigurationManager
+					.getProperty("alert.recipient");
+
+			if (recipient != null) {
+				Email email = ConfigurationManager.getEmail("internal_error");
+				email.addRecipient(recipient);
+				email.addArgument(ConfigurationManager
+						.getProperty("dspace.url"));
+				email.addArgument(new Date());
+
+				String stackTrace;
+
+				if (exception != null) {
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					exception.printStackTrace(pw);
+					pw.flush();
+					stackTrace = sw.toString();
+				} else {
+					stackTrace = "No exception";
+				}
+
+				email.addArgument(stackTrace);
+				email.send();
+			}
+		} catch (Exception e) {
+			// Not much we can do here!
+			log.warn("Unable to send email alert", e);
+		}
+
+	}
+
+    private static synchronized IndexReader openReader() 
+    throws IOException
+    {
+
+        if (reader != null)
+        {
+            try
+            {
+                if (lastModified != IndexReader.getCurrentVersion(index_directory))
+                {
+                    reader.close();
+                    reader = null;
+                }
+            }
+            catch (IOException ioe)
+            {
+                log.warn("DSQuery: Unable to check for updated index", ioe);
+            }
+        }
+
+        if (reader == null)
+        {
+            lastModified = IndexReader.getCurrentVersion(index_directory);
+            reader = IndexReader.open(index_directory);
+        }
+
+        return reader;
+    }
+    
+    /**
+	 * Is stale checks the lastModified time stamp in the database and the index
+	 * to determine if the index is stale.
+	 * 
+	 * @param handle
+	 * @param dso
+	 * @return
+	 * @throws SQLException
+	 * @throws IOException
+	 */
+    private static boolean requiresIndexing(Item dso)
+    throws SQLException, IOException
+    {
+		
+		boolean reindexItem = false;
+		boolean inIndex = false;
+
+		if(dso.getHandle() == null)
+		{
+			return false;
+		}
+		
+		IndexReader ir = openReader();
+		
+		// we have a handle (our unique ID, so remove)
+		Term t = new Term("handle", dso.getHandle());
+		TermDocs docs = ir.termDocs(t);
+						
+		while(docs.next())
+		{
+			inIndex = true;
+			int id = docs.doc();
+			Document doc = ir.document(id);
+
+			Field lastModified = doc.getField(LAST_INDEXED_FIELD);
+
+			if (lastModified == null || Long.valueOf(lastModified.stringValue()) < 
+					dso.getLastModified().getTime()) {
+				reindexItem = true;
+			}
+		}
+
+		return reindexItem || !inIndex;
+	}
 
     /**
      * prepare index, opening writer, and wiping out existing index if necessary
@@ -279,43 +819,29 @@ public class DSIndexer
     private static IndexWriter openIndex(Context c, boolean wipe_existing)
             throws IOException
     {
-        IndexWriter writer;
-
-        String index_directory = ConfigurationManager.getProperty("search.dir");
-
-        writer = new IndexWriter(index_directory, getAnalyzer(),
-                wipe_existing);
+    	
+    	IndexWriter writer = new IndexWriter(index_directory, getAnalyzer(), wipe_existing);
 
         /* Set maximum number of terms to index if present in dspace.cfg */
-        if (ConfigurationManager.getProperty("search.maxfieldlength") != null)
+        if (maxfieldlength == -1)
         {
-            int maxfieldlength = ConfigurationManager
-                    .getIntProperty("search.maxfieldlength");
-            if (maxfieldlength == -1)
-            {
-                writer.setMaxFieldLength(Integer.MAX_VALUE);
-            }
-            else
-            {
-                writer.setMaxFieldLength(maxfieldlength);
-            }
+            writer.setMaxFieldLength(Integer.MAX_VALUE);
         }
-
+        else
+        {
+            writer.setMaxFieldLength(maxfieldlength);
+        }
+        
         return writer;
     }
 
     /**
-     * close up the indexing engine
+     * 
+     * @param c
+     * @param myitem
+     * @return
+     * @throws SQLException
      */
-    private static void closeIndex(Context c, IndexWriter writer)
-            throws IOException
-    {
-        if (writer != null)
-        {
-            writer.close();
-        }
-    }
-
     private static String buildItemLocationString(Context c, Item myitem)
             throws SQLException
     {
@@ -355,175 +881,93 @@ public class DSIndexer
     }
 
     /**
-     * iterate through the communities, and index each one
+     * Build a Lucene document for a DSpace Community.
+     * 
+     * @param context Users Context
+     * @param community Community to be indexed
+     * @return
+     * @throws SQLException
+     * @throws IOException
      */
-    private static void indexAllCommunities(Context c, IndexWriter writer)
-            throws SQLException, IOException
+    private static Document buildDocument(Context context, Community community) 
+    throws SQLException, IOException
     {
-        Community[] targets = Community.findAll(c);
-
-        int i;
-
-        for (i = 0; i < targets.length; i++)
-            writeCommunityIndex(c, writer, targets[i]);
-    }
-
-    /**
-     * iterate through collections, indexing each one
-     */
-    private static void indexAllCollections(Context c, IndexWriter writer)
-            throws SQLException, IOException
-    {
-        Collection[] targets = Collection.findAll(c);
-
-        int i;
-
-        for (i = 0; i < targets.length; i++)
-            writeCollectionIndex(c, writer, targets[i]);
-    }
-
-    /**
-     * iterate through all items, indexing each one
-     */
-    private static void indexAllItems(Context c, IndexWriter writer)
-            throws SQLException, IOException
-    {
-        ItemIterator i = Item.findAll(c);
-
-        while (i.hasNext())
-        {
-            Item target = (Item) i.next();
-
-            writeItemIndex(c, writer, target);
-        }
-    }
-
-    /**
-     * write index record for a community
-     */
-    private static void writeCommunityIndex(Context c, IndexWriter writer,
-            Community target) throws SQLException, IOException
-    {
-        // build a hash for the metadata
-        HashMap textvalues = new HashMap();
-
-        // get the handle
-        String myhandle = HandleManager.findHandle(c, target);
+        // Create Lucene Document
+        Document doc = buildDocument(Constants.COMMUNITY, community.getHandle(), null);
 
         // and populate it
-        String name = target.getMetadata("name");
-
-        //        String description = target.getMetadata("short_description");
-        //        String intro_text = target.getMetadata("introductory_text");
-        textvalues.put("name", name);
-
-        //        textvalues.put("description", description);
-        //        textvalues.put("intro_text", intro_text );
-        textvalues.put("handletext", myhandle);
-
-        writeIndexRecord(writer, Constants.COMMUNITY, myhandle, textvalues, "");
-    }
-
-    /**
-     * write an index record for a collection
-     */
-    private static void writeCollectionIndex(Context c, IndexWriter writer,
-            Collection target) throws SQLException, IOException
-    {
-        String location_text = buildCollectionLocationString(c, target);
-
-        // get the handle
-        String myhandle = HandleManager.findHandle(c, target);
-
-        // build a hash for the metadata
-        HashMap textvalues = new HashMap();
-
-        // and populate it
-        String name = target.getMetadata("name");
-
-        //        String description = target.getMetadata("short_description");
-        //        String intro_text = target.getMetadata("introductory_text");
-        textvalues.put("name", name);
-
-        //        textvalues.put("description",description );
-        //        textvalues.put("intro_text", intro_text );
-        textvalues.put("location", location_text);
-        textvalues.put("handletext", myhandle);
-
-        writeIndexRecord(writer, Constants.COLLECTION, myhandle, textvalues, "");
-    }
-
-    /**
-     * writes an index record - the index record is a set of name/value hashes,
-     * which are sent to Lucene.
-     */
-    private static void writeItemIndex(Context c, IndexWriter writer,
-            Item myitem) throws SQLException, IOException
-    {
-        // FIXME: config reading should happen just once & be cached?  
+        String name = community.getMetadata("name");
+        doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("default", name, Field.Store.YES, Field.Index.TOKENIZED));
         
-        // get the location string (for searching by collection & community)
-        String location_text = buildItemLocationString(c, myitem);
+        return doc;
+    }
 
-        // read in indexes from the config
-        ArrayList indexes = new ArrayList();
+    /**
+     * Build a Lucene document for a DSpace Collection.
+     * 
+     * @param context Users Context
+     * @param collection Collection to be indexed
+     * @return
+     * @throws SQLException
+     * @throws IOException
+     */
+    private static Document buildDocument(Context context, Collection collection) 
+    throws SQLException, IOException
+    {
+        String location_text = buildCollectionLocationString(context, collection);
 
-        // read in search.index.1, search.index.2....
-        for (int i = 1; ConfigurationManager.getProperty("search.index." + i) != null; i++)
-        {
-            indexes.add(ConfigurationManager.getProperty("search.index." + i));
-        }
+        // Create Lucene Document
+        Document doc = buildDocument(Constants.COLLECTION, collection.getHandle(), location_text);
+
+        // and populate it
+        String name = collection.getMetadata("name");
+        doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
+        doc.add(new Field("default", name, Field.Store.YES, Field.Index.TOKENIZED));
+
+        return doc;
+        
+    }
+
+    /**
+     * Build a Lucene document for a DSpace Item.
+     * 
+     * @param context Users Context
+     * @param item The DSpace Item to be indexed
+     * @return
+     * @throws SQLException
+     * @throws IOException
+     */
+    private static Document buildDocument(Context context, Item item) 
+    throws SQLException, IOException
+    {
+    
+    	// get the location string (for searching by collection & community)
+        String location = buildItemLocationString(context, item);
+
+        Document doc = buildDocument(Constants.ITEM, item.getHandle(), location);
+
+        log.debug("Building Item: " + item.getHandle());
 
         int j;
         int k = 0;
 
-        // initialize hash to be built
-        HashMap textvalues = new HashMap();
-
-        if (indexes.size() > 0)
+        if (indexConfigArr.length > 0)
         {
             ArrayList fields = new ArrayList();
             ArrayList content = new ArrayList();
             DCValue[] mydc;
 
-            for (int i = 0; i < indexes.size(); i++)
+            for (int i = 0; i < indexConfigArr.length; i++)
             {
-                String index = (String) indexes.get(i);
-
-                String[] configLine = index.split(":");
-                String indexName = configLine[0];
-
-                String schema;
-                String element;
-                String qualifier = null;
-
-                // Get the schema, element and qualifier for the index
-                // TODO: Should check valid schema, element, qualifier?
-                String[] parts = configLine[1].split("\\.");
-                
-                switch (parts.length)
-                {
-                case 3:
-                    qualifier = parts[2];
-                case 2:
-                    schema = parts[0];
-                    element = parts[1];
-                    break;
-                default:
-                    log.warn("Malformed configuration line: search.index." + i);
-                    // FIXME: Can't proceed here, no suitable exception to throw
-                    throw new RuntimeException(
-                            "Malformed configuration line: search.index." + i);
-                }
-                
                 // extract metadata (ANY is wildcard from Item class)
-                if (qualifier!= null && qualifier.equals("*"))
+                if (indexConfigArr[i].qualifier!= null && indexConfigArr[i].qualifier.equals("*"))
                 {
-                    mydc = myitem.getMetadata(schema, element, Item.ANY, Item.ANY);
+                    mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, Item.ANY, Item.ANY);
                 }
                 else
                 {
-                    mydc = myitem.getMetadata(schema, element, qualifier, Item.ANY);
+                    mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY);
                 }
 
                 // put them all from an array of strings to one string for
@@ -533,18 +977,17 @@ public class DSIndexer
 
                 for (j = 0; j < mydc.length; j++)
                 {
-                    content_text = new String(content_text + mydc[j].value
-                            + " ");
+                    content_text = new String(content_text + mydc[j].value + " ");
                 }
 
                 // arranges content with fields in ArrayLists with same index to
                 // put
                 // into hash later
-                k = fields.indexOf(indexName);
+                k = fields.indexOf(indexConfigArr[i].indexName);
 
                 if (k < 0)
                 {
-                    fields.add(indexName);
+                    fields.add(indexConfigArr[i].indexName);
                     content.add(content_text);
                 }
                 else
@@ -558,235 +1001,189 @@ public class DSIndexer
             // build the hash
             for (int i = 0; i < fields.size(); i++)
             {
-                textvalues.put((String) fields.get(i), (String) content.get(i));
+            
+            	doc.add(
+            		new Field(
+                                    (String) fields.get(i),
+            			(String) content.get(i),
+            			Field.Store.YES, Field.Index.TOKENIZED
+                    ));
+    
+            	doc.add(new Field("default", (String) content.get(i), Field.Store.YES, Field.Index.TOKENIZED));
             }
-
-            textvalues.put("location", location_text);
         }
         else
         // if no search indexes found in cfg file, for backward compatibility
         {
             // extract metadata (ANY is wildcard from Item class)
-            DCValue[] authors = myitem.getDC("contributor", Item.ANY, Item.ANY);
-            DCValue[] creators = myitem.getDC("creator", Item.ANY, Item.ANY);
-            DCValue[] titles = myitem.getDC("title", Item.ANY, Item.ANY);
-            DCValue[] keywords = myitem.getDC("subject", Item.ANY, Item.ANY);
-
-            DCValue[] abstracts = myitem.getDC("description", "abstract",
-                    Item.ANY);
-            DCValue[] sors = myitem.getDC("description",
-                    "statementofresponsibility", Item.ANY);
-            DCValue[] series = myitem.getDC("relation", "ispartofseries",
-                    Item.ANY);
-            DCValue[] tocs = myitem.getDC("description", "tableofcontents",
-                    Item.ANY);
-            DCValue[] mimetypes = myitem.getDC("format", "mimetype", Item.ANY);
-            DCValue[] sponsors = myitem.getDC("description", "sponsorship",
-                    Item.ANY);
-            DCValue[] identifiers = myitem.getDC("identifier", Item.ANY,
-                    Item.ANY);
-
-            // put them all from an array of strings to one string for writing
-            // out
-            String author_text = "";
-            String title_text = "";
-            String keyword_text = "";
-
-            String abstract_text = "";
-            String series_text = "";
-            String mime_text = "";
-            String sponsor_text = "";
-            String id_text = "";
-
-            // pack all of the arrays of DCValues into plain text strings for
-            // the
-            // indexer
+            DCValue[] authors = item.getDC("contributor", Item.ANY, Item.ANY);
             for (j = 0; j < authors.length; j++)
             {
-                author_text = new String(author_text + authors[j].value + " ");
+            	doc.add(new Field("author", authors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+            	doc.add(new Field("default", authors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] creators = item.getDC("creator", Item.ANY, Item.ANY);
             for (j = 0; j < creators.length; j++) //also authors
             {
-                author_text = new String(author_text + creators[j].value + " ");
+                doc.add(new Field("author", creators[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field("default", creators[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] sors = item.getDC("description", "statementofresponsibility", Item.ANY);
             for (j = 0; j < sors.length; j++) //also authors
             {
-                author_text = new String(author_text + sors[j].value + " ");
+                doc.add(new Field("author", sors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+                doc.add(new Field("default", sors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] titles = item.getDC("title", Item.ANY, Item.ANY);
             for (j = 0; j < titles.length; j++)
             {
-                title_text = new String(title_text + titles[j].value + " ");
+            	doc.add(new Field("title", titles[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+            	doc.add(new Field("default", titles[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] keywords = item.getDC("subject", Item.ANY, Item.ANY);
             for (j = 0; j < keywords.length; j++)
             {
-                keyword_text = new String(keyword_text + keywords[j].value
-                        + " ");
+            	doc.add(new Field("keyword", keywords[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+            	doc.add(new Field("default", keywords[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] abstracts = item.getDC("description", "abstract", Item.ANY);
             for (j = 0; j < abstracts.length; j++)
             {
-                abstract_text = new String(abstract_text + abstracts[j].value
-                        + " ");
+            	doc.add(new Field("abstract", abstracts[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+            	doc.add(new Field("default", abstracts[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] tocs = item.getDC("description", "tableofcontents", Item.ANY);
             for (j = 0; j < tocs.length; j++)
             {
-                abstract_text = new String(abstract_text + tocs[j].value + " ");
+            	doc.add(new Field("abstract", tocs[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+            	doc.add(new Field("default", tocs[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] series = item.getDC("relation", "ispartofseries", Item.ANY);
             for (j = 0; j < series.length; j++)
             {
-                series_text = new String(series_text + series[j].value + " ");
+            	doc.add(new Field("series", series[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+            	doc.add(new Field("default", series[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] mimetypes = item.getDC("format", "mimetype", Item.ANY);
             for (j = 0; j < mimetypes.length; j++)
             {
-                mime_text = new String(mime_text + mimetypes[j].value + " ");
+            	doc.add(new Field("mimetype", mimetypes[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+            	doc.add(new Field("default", mimetypes[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] sponsors = item.getDC("description", "sponsorship", Item.ANY);
             for (j = 0; j < sponsors.length; j++)
             {
-                sponsor_text = new String(sponsor_text + sponsors[j].value
-                        + " ");
+            	doc.add(new Field("sponsor", sponsors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+            	doc.add(new Field("default", sponsors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
 
+            DCValue[] identifiers = item.getDC("identifier", Item.ANY, Item.ANY);
             for (j = 0; j < identifiers.length; j++)
             {
-                id_text = new String(id_text + identifiers[j].value + " ");
+            	doc.add(new Field("identifier", identifiers[j].value, Field.Store.YES, Field.Index.TOKENIZED));
+            	doc.add(new Field("default", identifiers[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
-
-            // build the hash
-            textvalues.put("author", author_text);
-            textvalues.put("title", title_text);
-            textvalues.put("keyword", keyword_text);
-            textvalues.put("location", location_text);
-            textvalues.put("abstract", abstract_text);
-
-            textvalues.put("series", series_text);
-            textvalues.put("mimetype", mime_text);
-            textvalues.put("sponsor", sponsor_text);
-            textvalues.put("identifier", id_text);
         }
 
-        // now get full text of any bitstreams in the TEXT bundle
-        String extractedText = "";
+        log.debug("  Added Metadata");
 
-        // trundle through the bundles
-        Bundle[] myBundles = myitem.getBundles();
-
-        for (int i = 0; i < myBundles.length; i++)
+        try
         {
-            if ((myBundles[i].getName() != null)
-                    && myBundles[i].getName().equals("TEXT"))
+        	// now get full text of any bitstreams in the TEXT bundle
+            // trundle through the bundles
+            Bundle[] myBundles = item.getBundles();
+
+            for (int i = 0; i < myBundles.length; i++)
             {
-                // a-ha! grab the text out of the bitstreams
-                Bitstream[] myBitstreams = myBundles[i].getBitstreams();
-
-                for (j = 0; j < myBitstreams.length; j++)
+                if ((myBundles[i].getName() != null)
+                        && myBundles[i].getName().equals("TEXT"))
                 {
-                    try
-                    {
-                        InputStreamReader is = new InputStreamReader(
-                                myBitstreams[j].retrieve()); // get input
-                        // stream
-                        StringBuffer sb = new StringBuffer();
-                        char[] charBuffer = new char[1024];
+                    // a-ha! grab the text out of the bitstreams
+                    Bitstream[] myBitstreams = myBundles[i].getBitstreams();
 
-                        while (true)
+                    for (j = 0; j < myBitstreams.length; j++)
+                    {
+                        try
                         {
-                            int bytesIn = is.read(charBuffer);
+                            InputStreamReader is = new InputStreamReader(
+                                    myBitstreams[j].retrieve()); // get input
 
-                            if (bytesIn == -1)
-                            {
-                                break;
-                            }
+                            // Add each InputStream to the Indexed Document (Acts like an Append)
+                            doc.add(new Field("default", is));
 
-                            if (bytesIn > 0)
-                            {
-                                sb.append(charBuffer, 0, bytesIn);
-                            }
+                            log.debug("  Added BitStream: " + myBitstreams[j].getStoreNumber() + "	" + myBitstreams[j].getSequenceID() + "   " + myBitstreams[j].getName());
+
                         }
-
-                        // now sb has the full text - tack on to fullText string
-                        extractedText = extractedText.concat(new String(sb));
-
-                        //                        System.out.println("Found extracted text!\n" + new
-                        // String(sb));
-                    }
-                    catch (AuthorizeException e)
-                    {
-                        // this will never happen, but compiler is now happy.
+                        catch (Exception e)
+                        {
+                            // this will never happen, but compiler is now happy.
+                        	log.error(e.getMessage(),e);
+                        }
                     }
                 }
             }
         }
-
-        // lastly, get the handle
-        String itemhandle = HandleManager.findHandle(c, myitem);
-        textvalues.put("handletext", itemhandle);
-
-        if (log.isDebugEnabled())
+        catch(Exception e)
         {
-            log.debug(LogManager.getHeader(c, "write_index", "handle=" +itemhandle));
-            log.debug(textvalues.toString());
+        	log.error(e.getMessage(),e);
         }
 
-        // write out the metatdata (for scalability, using hash instead of
-        // individual strings)
-        writeIndexRecord(writer, Constants.ITEM, itemhandle, textvalues,
-                extractedText);
+
+        return doc;
     }
 
     /**
-     * writeIndexRecord() creates a document from its args and writes it out to
-     * the index that is opened
+     * Create Lucene document with all the shared fields initialized.
+     * 
+     * @param type Type of DSpace Object
+     * @param handle
+     * @param location
+     * @return
      */
-    private static void writeIndexRecord(IndexWriter iw, int type,
-            String handle, HashMap textvalues, String extractedText)
-            throws IOException
+    private static Document buildDocument(int type, String handle, String location)
     {
         Document doc = new Document();
-        Integer ty = new Integer(type);
-        String fulltext = "";
 
-        // do id, type, handle first
-        doc.add(new Field("type", ty.toString(), Field.Store.YES, Field.Index.NO));
+        // want to be able to check when last updated
+        // (not tokenized, but it is indexed)
+        doc.add(new Field(LAST_INDEXED_FIELD, Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+
+        
+        // do location, type, handle first
+        doc.add(new Field("type", Integer.toString(type), Field.Store.YES, Field.Index.NO));
 
         // want to be able to search for handle, so use keyword
         // (not tokenized, but it is indexed)
         if (handle != null)
         {
+            // ??? not sure what the "handletext" field is but it was there in writeItemIndex ???
+            doc.add(new Field("handletext", handle, Field.Store.YES, Field.Index.TOKENIZED));
+
+            // want to be able to search for handle, so use keyword
+            // (not tokenized, but it is indexed)
             doc.add(new Field("handle", handle, Field.Store.YES, Field.Index.UN_TOKENIZED));
+
+            // add to full text index
+            doc.add(new Field("default", handle, Field.Store.YES, Field.Index.TOKENIZED));
         }
 
-        // now iterate through the hash, building full text string
-        // and index all values
-        Iterator i = textvalues.keySet().iterator();
-
-        while (i.hasNext())
+        if(location != null)
         {
-            String key = (String) i.next();
-            String value = (String) textvalues.get(key);
-
-            fulltext = fulltext + " " + value;
-
-            if (value != null)
-            {
-                doc.add(new Field(key, value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
+            doc.add(new Field("location", location, Field.Store.YES, Field.Index.TOKENIZED));
+    	    doc.add(new Field("default", location, Field.Store.YES, Field.Index.TOKENIZED));
         }
 
-        fulltext = fulltext.concat(extractedText);
-
-        //        System.out.println("Full Text:\n" + fulltext + "------------\n\n");
-        // add the full text
-        doc.add(new Field("default", fulltext, Field.Store.YES, Field.Index.TOKENIZED));
-
-        // index the document
-        iw.addDocument(doc);
+        return doc;
     }
+
+
 }

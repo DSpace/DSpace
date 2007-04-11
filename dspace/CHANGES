@@ -1,5 +1,10 @@
 1.4.2 beta
 ===========
+
+(Mark Diggory/Graham Triggs)
+- SF Patch 1655583 Fixes issues with FilterMedia, the UI and Index locking, includes 
+  a lucene upgrade to support better management of index locking.
+  
 (Robert Tansley)
 - Fixes to QueryArgs and RegisterServlet that cause NullPointerExceptions on
   invalid input
@@ -47,6 +52,7 @@
 - SF Patch #1688523 Bug fix - OAI harvest and Oracle
 - SF Patch #1660752 Workaround Numeric/Integer handling in Oracle
 - SF Patch #1665400 Oracle schema changes for CLOB columns
+- SF Patch #1655583 Avoid index lock with filter-media
 
 1.4.1 final
 ===========
