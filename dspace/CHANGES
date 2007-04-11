@@ -41,6 +41,7 @@
 
 (James Rutherford)
 - SF Patch #1694943 for SF feature request #1691277 Importing: Workaround for ext3 subdirectory limitation
+- SF Patch #1695702 Update SubmitServlet to use default.language instead of "en" for SF bug 1636792 default.language not applied to new submissions
 
 (Graham Triggs)
 - SF Patch #1688523 Bug fix - OAI harvest and Oracle
