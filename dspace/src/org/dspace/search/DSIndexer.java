@@ -804,7 +804,7 @@ public class DSIndexer
 
 			Field lastModified = doc.getField(LAST_INDEXED_FIELD);
 
-			if (lastModified == null || Long.valueOf(lastModified.stringValue()) < 
+			if (lastModified == null || Long.parseLong(lastModified.stringValue()) < 
 					dso.getLastModified().getTime()) {
 				reindexItem = true;
 			}
