@@ -103,10 +103,6 @@ public class DSIndexer
     private static final String LAST_INDEXED_FIELD = "DSIndexer.lastIndexed";
     
     private static final long WRITE_LOCK_TIMEOUT = 30000 /* 30 sec */;
- 	
-    private static IndexReader reader = null;
-    
-    private static long lastModified = -1;
     
     // Class to hold the index configuration (one instance per config line)
     private static class IndexConfig
@@ -368,10 +364,7 @@ public class DSIndexer
 	 */
     public static void createIndex(Context c) throws SQLException, IOException
     {
-    	/* Intialize a new index */
-        //openIndex(c, true).close();
-        //updateIndex(c);
-        
+
         IndexWriter writer = openIndex(c, true);
         
         try
@@ -631,7 +624,7 @@ public class DSIndexer
      */
     public static void cleanIndex(Context context) throws IOException, SQLException {
 
-    	IndexReader reader = openReader();
+    	IndexReader reader = DSQuery.getIndexReader();
     	
     	for(int i = 0 ; i < reader.numDocs(); i++)
     	{
@@ -645,6 +638,7 @@ public class DSIndexer
                 if (o == null)
                 {
                 	log.info("Deleting: " + handle);
+                	/* Use IndexWriter to delete, its easier to manage write.lock */
                 	DSIndexer.unIndexContent(context, handle);
                 }
                 else
@@ -738,35 +732,6 @@ public class DSIndexer
 		}
 
 	}
-
-    private static synchronized IndexReader openReader() 
-    throws IOException
-    {
-
-        if (reader != null)
-        {
-            try
-            {
-                if (lastModified != IndexReader.getCurrentVersion(index_directory))
-                {
-                    reader.close();
-                    reader = null;
-                }
-            }
-            catch (IOException ioe)
-            {
-                log.warn("DSQuery: Unable to check for updated index", ioe);
-            }
-        }
-
-        if (reader == null)
-        {
-            lastModified = IndexReader.getCurrentVersion(index_directory);
-            reader = IndexReader.open(index_directory);
-        }
-
-        return reader;
-    }
     
     /**
 	 * Is stale checks the lastModified time stamp in the database and the index
@@ -790,7 +755,7 @@ public class DSIndexer
 			return false;
 		}
 		
-		IndexReader ir = openReader();
+		IndexReader ir = DSQuery.getIndexReader();
 		
 		// we have a handle (our unique ID, so remove)
 		Term t = new Term("handle", dso.getHandle());

@@ -83,10 +83,8 @@ public class DSQuery
 
     static final String COMMUNITY = "" + Constants.COMMUNITY;
 
-    private static IndexReader reader = null;
-    
     // cache a Lucene IndexSearcher for more efficient searches
-    private static Searcher searcher = null;
+    private static IndexSearcher searcher = null;
 
     private static String indexDir = null;
     
@@ -388,25 +386,6 @@ public class DSQuery
             System.out.println("Exception caught: " + e);
         }
     }
-    
-    /**
-     * Close any IndexSearcher that is currently open.
-     */
-    public static void close()
-    {
-        if (searcher != null)
-        {
-            try
-            {
-                searcher.close();
-                searcher = null;
-            }
-            catch (IOException ioe)
-            {
-                log.error("DSQuery: Unable to close open IndexSearcher", ioe);
-            }
-        }
-    }
 
     public static void main(String[] args)
     {
@@ -416,14 +395,24 @@ public class DSQuery
         }
     }
 
-    /*---------  private methods ----------*/
+    /*---------  protected methods ----------*/
 
+    /**	
+     * get an IndexReader.
+     * @throws IOException 
+     */
+    protected static IndexReader getIndexReader() 
+    	throws IOException
+    {
+    	return getSearcher(null).getIndexReader();
+    }
+    
     /**
      * get an IndexSearcher, hopefully a cached one (gives much better
      * performance.) checks to see if the index has been modified - if so, it
      * creates a new IndexSearcher
      */
-    protected static synchronized Searcher getSearcher(Context c)
+    protected static synchronized IndexSearcher getSearcher(Context c)
             throws IOException
     {
        
@@ -436,28 +425,39 @@ public class DSQuery
                 if (lastModified != IndexReader.getCurrentVersion(indexDir))
                 {
                     // Close the cached IndexSearcher
-                    close();
+                	searcher.close();
                 }
             }
             catch (IOException ioe)
             {
                 // Index is probably corrupt. Log the error, but continue to either:
                 // 1) Return existing searcher (may yet throw exception, no worse than throwing here)
-                // 2) May switch in alternate index below that isn't corrupt
                 log.warn("DSQuery: Unable to check for updated index", ioe);
+            }
+            finally
+            {
+            	searcher = null;
             }
         }
 
         // There is no existing searcher - either this is the first execution,
         // or the index has been updated and we closed the old index.
-        // Also check that we can open the index (ie. that there were no errors above)
         if (searcher == null)
         {
-            // So, open a new searcher - even if we are loading an index that
-            // was created in an offline directory, by this stage it will have
-            // been moved into the 'online' index directory.
+            // So, open a new searcher
             lastModified = IndexReader.getCurrentVersion(indexDir);
-            searcher = new IndexSearcher(indexDir);
+            searcher = new IndexSearcher(indexDir){
+            	/* 
+            	 * TODO: Has Lucene fixed this bug yet?
+            	 * Lucene doesn't release read locks in 
+            	 * windows properly on finalize. Our hack
+            	 * extend IndexSearcher to force close().
+            	 */
+                protected void finalize() throws Throwable {
+            		this.close();
+            		super.finalize();
+            	}
+            };
         }
 
         return searcher;
