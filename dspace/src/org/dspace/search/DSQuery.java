@@ -418,15 +418,12 @@ public class DSQuery
        
         // If we have already opened a searcher, check to see if the index has been updated
         // If it has, we need to close the existing searcher - we will open a new one later
-        if (searcher != null)
+        if (searcher != null && lastModified != IndexReader.getCurrentVersion(indexDir))
         {
             try
             {
-                if (lastModified != IndexReader.getCurrentVersion(indexDir))
-                {
-                    // Close the cached IndexSearcher
-                	searcher.close();
-                }
+                // Close the cached IndexSearcher
+                searcher.close();
             }
             catch (IOException ioe)
             {
