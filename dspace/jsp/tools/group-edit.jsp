@@ -87,7 +87,7 @@
   </table>
 
   <center>
-    <form method="post" action="">
+    <form name="epersongroup" method="post" action="">
 	<p><label for="tgroup_name"><fmt:message key="jsp.tools.group-edit.name"/></label><input name="group_name" id="tgroup_name" value="<%=group.getName()%>"/></p>
    	    <h3><fmt:message key="jsp.tools.group-edit.heading"/></h3>
 

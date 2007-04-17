@@ -52,17 +52,17 @@ var popupWindow;
 // Add to list of e-people on this page -- invoked by eperson popup window
 function addEPerson(id, email, name)
 {
-    var newplace = window.document.forms[0].eperson_id.options.length;
+    var newplace = window.document.epersongroup.eperson_id.options.length;
 
-    if (newplace > 0 && window.document.forms[0].eperson_id.options[0].value == "")
+    if (newplace > 0 && window.document.epersongroup.eperson_id.options[0].value == "")
     {
         newplace = 0;
     }
 
     // First we check to see if e-person is already there
-    for (var i = 0; i < window.document.forms[0].eperson_id.options.length; i++)
+    for (var i = 0; i < window.document.epersongroup.eperson_id.options.length; i++)
     {
-        if (window.document.forms[0].eperson_id.options[i].value == id)
+        if (window.document.epersongroup.eperson_id.options[i].value == id)
         {
             newplace = -1;
         }
@@ -70,33 +70,33 @@ function addEPerson(id, email, name)
 
     if (newplace > -1)
     {
-        window.document.forms[0].eperson_id.options[newplace] = new Option(name + " (" + email + ")", id);
+        window.document.epersongroup.eperson_id.options[newplace] = new Option(name + " (" + email + ")", id);
     }
 }
 
 // Add to list of groups on this page -- invoked by eperson popup window
 function addGroup(id, name)
 {
-    var newplace = window.document.forms[0].group_ids.options.length;
+    var newplace = window.document.epersongroup.group_ids.options.length;
 
-	if (newplace > 0 && window.document.forms[0].group_ids.options[0].value == "")
+	if (newplace > 0 && window.document.epersongroup.group_ids.options[0].value == "")
     {
         newplace = 0;
     }
 
     // First we check to see if group is already there
-    for (var i = 0; i < window.document.forms[0].group_ids.options.length; i++)
+    for (var i = 0; i < window.document.epersongroup.group_ids.options.length; i++)
     {
         // is it in the list already
-        if (window.document.forms[0].group_ids.options[i].value == id)
+        if (window.document.epersongroup.group_ids.options[i].value == id)
         {
             newplace = -1;
         }
 
         // are we trying to add the new group to the new group on an Edit Group page (recursive)
-        if (window.document.forms[0].group_id)
+        if (window.document.epersongroup.group_id)
         {
-            if (window.document.forms[0].group_id.value == id)
+            if (window.document.epersongroup.group_id.value == id)
             {
                 newplace = -1;
             }
@@ -105,7 +105,7 @@ function addGroup(id, name)
 
     if (newplace > -1)
     {
-        window.document.forms[0].group_ids.options[newplace] = new Option(name + " (" + id + ")", id);
+        window.document.epersongroup.group_ids.options[newplace] = new Option(name + " (" + id + ")", id);
     }
 }
 
@@ -113,7 +113,7 @@ function addGroup(id, name)
 // on pages with a dspace:selecteperson element in them
 function finishEPerson()
 {
-    selectAll(window.document.forms[0].eperson_id);
+    selectAll(window.document.epersongroup.eperson_id);
 
 	if (popupWindow != null)
 	{
@@ -125,7 +125,7 @@ function finishEPerson()
 // on pages with a dspace:selecteperson element in them
 function finishGroups()
 {
-    selectAll(window.document.forms[0].group_ids);
+    selectAll(window.document.epersongroup.group_ids);
 
     if (popupWindow != null)
     {

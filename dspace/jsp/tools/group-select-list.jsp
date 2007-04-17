@@ -117,7 +117,7 @@ function addGroup(id, name)
 // Clear selected items from main group list
 function clearGroups()
 {
-	var list = self.opener.document.forms[0].group_ids;
+	var list = self.opener.document.epersongroup.group_ids;
 	while (list.options.length > 0)
 	{
 		list.options[0] = null;

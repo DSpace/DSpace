@@ -181,7 +181,7 @@ public class SelectGroupTag extends TagSupport
                 out.print("<input type=\"button\" value=\""
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                 "org.dspace.app.webui.jsptag.SelectGroupTag.removeSelected")
-                                + "\" onclick=\"javascript:removeSelected(window.document.forms[0].group_ids);\"/>");
+                                + "\" onclick=\"javascript:removeSelected(window.document.epersongroup.group_ids);\"/>");
 			}
 
             out.println("</td></tr></table>");

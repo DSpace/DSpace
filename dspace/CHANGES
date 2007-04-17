@@ -12,6 +12,9 @@
 (Andrea Bollini)
 - SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
 
+(Flavio Botelho)
+- SF Patch #1601946 for SF Bug #1601875 - Makes javascript idependent to form position
+
 (Christophe Destin)
 - SF Patch #1582754 CreateAdministrator for dummies
   Creation of admin via [dspace]/bin/create-administrator for a given email, irrespective of the email
