@@ -1,0 +1,200 @@
+*** /dspace/orig-1.2.1/dspace-1.2-source/src/org/dspace/app/webui/servlet/RegisterServlet.java	Wed Jun 11 17:36:42 2003
+--- /dspace/dev-1.2/dspace-1.2-source/src/org/dspace/app/webui/servlet/RegisterServlet.java	Fri Dec 17 12:11:18 2004
+***************
+*** 36,41 ****
+--- 36,56 ----
+   * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+   * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   * DAMAGE.
++  *
++  * <pre>
++  * Revision History
++  *
++  *   2004/12/17: Ben
++  *     - make notifyRegistration() static so it can be used
++  *       externally [impetus - ldap auto registration]
++  *
++  *   2004/10/12: Ben
++  *     - additional logging
++  *
++  *   2004/05/28: Ben
++  *     - add notifyRegistration()
++  *
++  * </pre>
+   */
+  
+  package org.dspace.app.webui.servlet;
+***************
+*** 57,62 ****
+--- 72,78 ----
+  import org.dspace.authorize.AuthorizeException;
+  import org.dspace.core.ConfigurationManager;
+  import org.dspace.core.Context;
++ import org.dspace.core.Email;
+  import org.dspace.core.LogManager;
+  import org.dspace.eperson.AccountManager;
+  import org.dspace.eperson.EPerson;
+***************
+*** 89,98 ****
+  
+      /** The "enter e-mail" step */
+      public static final int ENTER_EMAIL_PAGE = 1;
+! 	
+      /** The "enter personal info" page, for a registering user */
+      public static final int PERSONAL_INFO_PAGE = 2;
+! 	
+      /** The simple "enter new password" page, for user who's forgotten p/w */
+      public static final int NEW_PASSWORD_PAGE = 3;
+  
+--- 105,114 ----
+  
+      /** The "enter e-mail" step */
+      public static final int ENTER_EMAIL_PAGE = 1;
+!    
+      /** The "enter personal info" page, for a registering user */
+      public static final int PERSONAL_INFO_PAGE = 2;
+!    
+      /** The simple "enter new password" page, for user who's forgotten p/w */
+      public static final int NEW_PASSWORD_PAGE = 3;
+  
+***************
+*** 388,394 ****
+  
+          // Get the email address
+          String email = AccountManager.getEmail(context, token);
+! 		
+          // If the token isn't valid, show an error
+          if (email == null)
+          {
+--- 404,410 ----
+  
+          // Get the email address
+          String email = AccountManager.getEmail(context, token);
+!       
+          // If the token isn't valid, show an error
+          if (email == null)
+          {
+***************
+*** 402,408 ****
+                  "/register/invalid-token.jsp");
+              return;
+          }
+! 		
+          // If the token is valid, we create an eperson record if need be
+          EPerson eperson = EPerson.findByEmail(context, email);
+          
+--- 418,424 ----
+                  "/register/invalid-token.jsp");
+              return;
+          }
+!       
+          // If the token is valid, we create an eperson record if need be
+          EPerson eperson = EPerson.findByEmail(context, email);
+          
+***************
+*** 451,460 ****
+  
+              // delete the token
+              AccountManager.deleteToken(context, token);
+! 			
+              // Update user record
+              eperson.update();
+! 			
+              request.setAttribute("eperson", eperson);
+              JSPManager.showJSP(request, response, "/register/registered.jsp");
+              context.complete();
+--- 467,479 ----
+  
+              // delete the token
+              AccountManager.deleteToken(context, token);
+!          
+              // Update user record
+              eperson.update();
+! 
+!             // Send an email that the user has registered
+!             notifyRegistration(context, eperson, "self registered");
+! 
+              request.setAttribute("eperson", eperson);
+              JSPManager.showJSP(request, response, "/register/registered.jsp");
+              context.complete();
+***************
+*** 512,518 ****
+                  "/register/invalid-token.jsp");
+              return;
+          }
+! 		
+          // If the token is valid, we set the current user of the context
+          // to the user associated with the token, so they can update their
+          // info
+--- 531,537 ----
+                  "/register/invalid-token.jsp");
+              return;
+          }
+!       
+          // If the token is valid, we set the current user of the context
+          // to the user associated with the token, so they can update their
+          // info
+***************
+*** 530,536 ****
+  
+              eperson.update();
+              AccountManager.deleteToken(context, token);
+! 			
+              JSPManager.showJSP(request,
+                  response,
+                  "/register/password-changed.jsp");
+--- 549,555 ----
+  
+              eperson.update();
+              AccountManager.deleteToken(context, token);
+!          
+              JSPManager.showJSP(request,
+                  response,
+                  "/register/password-changed.jsp");
+***************
+*** 547,550 ****
+--- 566,609 ----
+                  "/register/new-password.jsp");
+          }
+      }
++ 
++ 
++     /**
++      * Send an email that a user has successfully registered.
++      *
++      * @param context   current DSpace context
++      * @param eperson   newly registered user  
++      * @param type      type of registration; to be included in the email subject
++      */
++     public static void notifyRegistration(Context context, EPerson eperson, String type)
++     {
++         // Get the email recipient
++         String email = ConfigurationManager.getProperty("mail.registered");
++         if (email == null) {
++             email = ConfigurationManager.getProperty("mail.admin");
++         }
++ 
++         if (email != null) {
++             try {
++                 // Send the email
++                 Email bean = ConfigurationManager.getEmail("registered");
++                 bean.addRecipient(email);
++                 bean.addArgument(eperson.getFullName());
++                 bean.addArgument(eperson.getEmail());
++                 bean.addArgument(eperson.getMetadata("phone"));
++ 		bean.addArgument(type);
++                 bean.send();
++                 log.info(LogManager.getHeader(context,
++                                               "registered_notification",
++                                               "to " + email + " about " +
++ 					      eperson.getEmail()));
++             }
++             catch (Exception e) {
++                 log.info(LogManager.getHeader(context,
++                                               "error_emailing",
++                                               "email=" + email),
++                          e);
++             }
++         }
++     }
+  }

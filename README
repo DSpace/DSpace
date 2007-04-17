@@ -1,0 +1,23 @@
+DSpace Version 1.2.2, 04-May-2005
+
+Installation instructions for packaged downloads are included in the
+'docs' directory.
+
+Documentation for the most recent stable release may also be viewed 
+online at dspace.org:
+
+http://dspace.org/technology/system-docs/
+
+Installation instructions for other version may be different, so you
+are encouraged to use the documentation included with a downloaded
+package, or obtain the corresponding documentation from CVS.
+
+Please also read the KNOWN_BUGS file.
+
+Please refer any further problems to the dspace-tech@lists.sourceforge.net 
+mailing list. 
+
+http://sourceforge.net/mail/?group_id=19984
+
+Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+Institute of Technology.  All rights reserved.

@@ -1,0 +1,630 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<HTML>
+  <HEAD>
+    <TITLE>DSpace System Documentation: Application Layer</TITLE>
+    <LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" >
+  </HEAD>
+  <BODY>
+    <H1>DSpace System Documentation: Application Layer</H1>
+
+    <P><A HREF="index.html">Back to contents</A><BR><A HREF="architecture.html">Back to architecture overview</A></P>
+
+    <H2><A NAME="webui">Web User Interface</A></H2>
+
+    <P>The DSpace Web UI is the largest and most-used component in the application layer.  Built on Java Servlet and JavaServer Page technology, it allows end-users to access DSpace over the Web via their Web browsers.</P>
+
+    <P>It also features an administration section, consisting of pages intended for use by central administrators.  Presently, this part of the Web UI is not particularly sophisticated; users of the administration section need to know what they are doing!  Selected parts of this may also be used by collection [FIXME: administrators or editors?]</P>
+
+    <H3>Web UI Files</H3>
+
+    <P>The Web UI-related files are located in a variety of directories in the DSpace source tree.  Note that as of DSpace version 1.2, the deployment mechanism has changed; the build process creates easy-to-deploy Web application archives (<code>.war</code> files).</P>
+
+    <TABLE>
+      <CAPTION>Locations of Web UI Source Files</CAPTION>
+      <TR>
+        <TH>Location</TH>
+        <TH>Description</TH>
+      </TR>
+      <TR>
+        <TD><code>org.dspace.app.webui</code></TD>
+        <TD>Web UI source files</TD>
+      </TR>
+      <TR>
+        <TD><code>org.dspace.app.webui.filter</code></td>
+        <TD>Servlet Filters (Servlet 2.3 spec)</TD>
+      </TR>
+      <TR>
+        <TD><code>org.dspace.app.webui.jsptag</code></td>
+        <TD>Custom JSP tag class files</TD>
+      </TR>
+      <TR>
+        <TD><code>org.dspace.app.webui.servlet</code></td>
+        <TD>Servlets for main Web UI (controllers)</TD>
+      </TR>
+      <TR>
+        <TD><code>org.dspace.app.webui.servlet.admin</code></td>
+        <TD>Servlets that comprise the administration part of the Web UI</TD>
+      </TR>
+      <TR>
+        <TD><code>org.dspace.app.webui.util</code></td>
+        <TD>Miscellaneous classes used by the servlets and filters</TD>
+      </TR>
+      <TR>
+        <TD><code><em>[dspace-source]</em>/jsp</code></td>
+        <TD>The JSP files</TD>
+      </TR>
+      <TR>
+        <TD><code><em>[dspace-source]</em>/jsp/local</code></td>
+        <TD>This is where you can place customized versions of JSPs -- see <A HREF="configure.html#customui">the configuration section</A></TD>
+      </TR>
+      <TR>
+        <TD><code><em>[dspace-source]</em>/jsp/WEB-INF/dspace-tags.tld</code></td>
+        <TD>Custom DSpace JSP tag descriptor</TD>
+      </TR>
+      <TR>
+        <TD><code><em>[dspace-source]</em>/etc/dspace-web.xml</code></td>
+        <TD>The Web application deployment descriptor.  Before including in the <code>.war</code> file, the text <code>@@dspace.dir@@</code> will be replaced with the DSpace installation directory (referred to as <em>[dspace]</em> elsewhere in this system documentation).  This allows the Web application to pick up the DSpace configuration and environment.</TD>
+      </TR>
+    </TABLE>
+
+    <H3><A NAME="webui_build">The Build Process</A></H3>
+
+    <P>The DSpace build process constructs a Web application archive, which is placed in <code><em>[dspace-source]</em>/build/dspace.war</code>.  The <code>build_wars</code> Ant target does the work.  The process works as follows:</P>
+
+    <UL>
+      <LI>All the DSpace source code is compiled.</LI>
+      <LI><code><em>[dspace-source]</em>/etc/dspace-web.xml</code> is copied to <code><em>[dspace-source]</em>/build</code> and the <code>@@dspace.dir@@</code> token inside it replaced with the DSpace installation directory (<code>dspace.dir</code> property from <code>dspace.cfg</code></LI>
+      <LI>The JSPs are all copied to <code><em>[dspace-source]</em>/build/jsp</code></LI>
+      <LI>Customized JSPs from <code><em>[dspace-source]</em>/jsp/local</code> are copied on top of these, thus 'overriding' the default versions</LI>
+      <LI><code><em>[dspace-source]</em>/build/dspace.war</code> is built</LI>
+    </UL>
+
+    <P>The contents of <code>dspace.war</code> are:</P>
+
+    <UL>
+      <LI>(Top level) -- the JSPs (customized versions from <code><em>[dspace-source]</em>/jsp/local</code> will have overwritten the defaults from the DSpace source distribution)</LI>
+      <LI><code>WEB-INF/classes</code> -- the compiled DSpace classes</LI>
+      <LI><code>WEB-INF/lib</code> -- the third party library JAR files from <code><em>[dspace-source]</em>/lib</code>, minus <code>servlet.jar</code> which will be available as part of Tomcat (or other servlet engine)</LI>
+      <LI><code>WEB-INF/web.xml</code> -- web deployment descriptor, copied from <code><em>[dspace-source]</em>/build/dspace-web.xml</code></LI>
+      <LI><code>WEB-INF/dspace-tags.tld</code> -- tag descriptor</LI>
+    </UL>
+
+    <P>Note that this does mean there are multiple copies of the compiled DSpace code and third-party libraries in the system, so care must be taken to ensure that they are all in sync.  (The storage overhead is a few megabytes, totally insignificant these days.)  In general, when you change any DSpace code or JSP, it's best to do a complete update of both the installation (<code><em>[dspace]</em></code>), and to rebuild and redeploy the Web UI and OAI <code>.war</code> files, by running this in <code><em>[dspace-source]</em></code>:</P>
+
+    <PRE>ant -D<em>[dspace]</em>/config/dspace.cfg update</PRE>
+
+    <P>and then following the instructions that command writes to the console.</P>
+
+
+    <H3>Servlets and JSPs</H3>
+
+    <P>The Web UI is loosely based around the MVC (model, view, controller) model.  The content management API corresponds to the model, the Java Servlets are the controllers, and the JSPs are the views.  Interactions take the following basic form:</P>
+
+    <OL>
+      <LI>An HTTP request is received from a browser</LI>
+      <LI>The appropriate servlet is invoked, and processes the request by invoking the DSpace business logic layer public API</LI>
+      <LI>Depending on the outcome of the processing, the servlet invokes the appropriate JSP</LI>
+      <LI>The JSP is processed and sent to the browser</LI>
+    </OL>
+
+    <P>The reasons for this approach are:</P>
+
+    <UL>
+      <LI>All of the processing is done before the JSP is invoked, so any error or problem that occurs does not occur halfway through HTML rendering</LI>
+      <LI>The JSPs contain as little code as possible, so they can be customized without having to delve into Java code too much</LI>
+    </UL>
+
+    <P>The <code>org.dspace.app.webui.servlet.LoadDSpaceConfig</code> servlet is always loaded first.  This is a very simple servlet that checks the <code>dspace-config</code> context parameter from the DSpace deployment descriptor, and uses it to locate <code>dspace.cfg</code>.  It also loads up the Log4j configuration.  It's important that this servlet is loaded first, since if another servlet is loaded up, it will cause the system to try and load DSpace and Log4j configurations, neither of which would be found.</P>
+
+    <P>All DSpace servlets are subclasses of the <code>DSpaceServlet</code> class.  The <code>DSpaceServlet</code> class handles some basic operations such as creating a DSpace <code>Context</code> object (opening a database connection etc.), authentication and error handling.  Instead of overriding the <code>doGet</code> and <code>doPost</code> methods as one normally would for a servlet, DSpace servlets implement <code>doDSGet</code> or <code>doDSPost</code> which have an extra context parameter, and allow the servlet to throw various exceptions that can be handled in a standard way.</P>
+
+    <P>The DSpace servlet processes the contents of the HTTP request.  This might involve retrieving the results of a search with a query term, accessing the current user's eperson record, or updating a submission in progress.  According to the results of this processing, the servlet must decide which JSP should be displayed.  The servlet then fills out the appropriate attributes in the <code>HttpRequest</code> object that represents the HTTP request being processed.  This is done by invoking the <code>setAttribute</code> method of the <code>javax.servlet.http.HttpServletRequest</code> object that is passed into the servlet from Tomcat.  The servlet then forwards control of the request to the appropriate JSP using the <code>JSPManager.showJSP</code> method.</P>
+
+    <P>The <code>JSPManager.showJSP</code> method uses the standard Java servlet forwarding mechanism is then used to forward the HTTP request to the JSP.  The JSP is processed by Tomcat and the results sent back to the user's browser.</P>
+
+    <P>There is an exception to this servlet/JSP style:  <code>index.jsp</code>, the 'home page', receives the HTTP request directly from Tomcat without a servlet being invoked first.  This is because in the servlet 2.3 specification, there is no way to map a servlet to handle only requests made to '<code>/</code>'; such a mapping results in every request being directed to that servlet.  By default, Tomcat forwards requests to '<code>/</code>' to <code>index.jsp</code>.  To try and make things as clean as possible, <code>index.jsp</code> contains some simple code that would normally go in a servlet, and then forwards to <code>home.jsp</code> using the <code>JSPManager.showJSP</code> method.  This means localized versions of the 'home page' can be created by placing a customized <code>home.jsp</code> in <code><em>[dspace-source]</em>/jsp/local</code>, in the same manner as other JSPs.</P>
+
+    <P><code><em>[dspace-source]</em>/jsp/dspace-admin/index.jsp</code>, the administration UI index page, is invoked directly by Tomcat and not through a servlet for similar reasons.</P>
+
+    <P>At the top of each JSP file, right after the license and copyright header, is documented the appropriate attributes that a servlet must fill out prior to forwarding to that JSP.  No validation is performed; if the servlet does not fill out the necessary attributes, it is likely that an internal server error will occur.</P>
+
+    <P>Many JSPs containing forms will include hidden parameters that tell the servlets which form has been filled out.  The submission UI servlet (<code>SubmitServlet</code> is a prime example of a servlet that deals with the input from many different JSPs.  The <code>step</code> hidden parameter is used to inform the servlet which form has been filled out (which step of submission the user has just completed.)</P>
+
+    <P>Below is a detailed, scary diagram depicting the flow of control during the whole process of processing and responding to an HTTP request.  More information about the authentication mechanism is mostly <A HREF="configure.html#authenticate">described in the configuration section</A>.</P>
+
+    <P class="figure"><img src="image/web-ui-flow.gif" alt="Web UI Control Flow"></P>
+    <P CLASS="caption">Flow of Control During HTTP Request Processing</P>
+
+
+    <H3>Custom JSP Tags</H3>
+
+    <P>The DSpace JSPs all use some custom tags defined in <code>/dspace/jsp/WEB-INF/dspace-tags.tld</code>, and the corresponding Java classes reside in <code>org.dspace.app.webui.jsptag</code>.  The tags are listed below.  The <code>dspace-tags.tld</code> file contains detailed comments about how to use the tags, so that information is not repeated here.</P>
+
+    <DL>
+      <DT><code>layout</code></DT>
+      <DD><P>Just about every JSP uses this tag.  It produces the standard HTML header and <code>&lt;BODY&gt;</code>tag.  Thus the content of each JSP is nested inside a <code>&lt;dspace:layout&gt;</code> tag.  The (XML-style)attributes of this tag are slightly complicated--see <code>dspace-tags.tld</code>.  The JSPs in the source code bundle also provide plenty of examples.</P></DD>
+
+      <DT><code>sidebar</code></DT>
+      <DD><P>Can only be used inside a <code>layout</code> tag, and can only be used once per JSP.  The content between the start and end <code>sidebar</code> tags is rendered in a column on the right-hand side of the HTML page.  The contents can contain further JSP tags and Java 'scriptlets'.</P></DD>
+
+      <DT><code>date</code></DT>
+      <DD><P>Displays the date represented by an <code>org.dspace.content.DCDate</code> object.  Just the one representation of date is rendered currently, but this could use the user's browser preferences to display a localized date in the future.</P></DD>
+
+      <DT><code>include</code></DT>
+      <DD><P>Obsolete, simple tag, similar to <code>jsp:include</code>.  In versions prior to DSpace 1.2, this tag would use the locally modified version of a JSP if one was installed in jsp/local.  As of 1.2, the build process now performs this function, however this tag is left in for backwards compatibility.</P></DD>
+
+      <DT><code>item</code></DT>
+      <DD><P>Displays an item record, including Dublin Core metadata and links to the bitstreams within it.  Note that the displaying of the bitstream links is simplistic, and does not take into account any of the bundling structure.  This is because DSpace does not have a fully-fledged dissemination architectural piece yet.</P>
+
+      <P>Displaying an item record is done by a tag rather than a JSP for two reasons:  Firstly, it happens in several places (when verifying an item record during submission or workflow review, as well as during standard item accesses), and secondly, displaying the item turns out to be mostly code-work rather than HTML anyway.  Of course, the disadvantage of doing it this way is that it is slightly harder to customize exactly what is displayed from an item record; it is necessary to edit the tag code (<code>org.dspace.app.webui.jsptag.ItemTag</code>).  Hopefully a better solution can be found in the future.</P></DD>
+
+      <DT><code>itemlist</code>, <code>collectionlist</code>, <code>communitylist</code></DT>
+      <DD><P>These tags display ordered sequences of items, collections and communities, showing minimal information but including a link to the page containing full details.  These need to be used in HTML tables.</P></DD>
+
+      <DT><code>popup</code></DT>
+      <DD><P>This tag is used to render a link to a pop-up page (typically a help page.)  If Javascript is available, the link will either open or pop to the front any existing DSpace pop-up window.  If Javascript is not available, a standard HTML link is displayed that renders the link destination in a window named '<code>dspace.popup</code>'.  In graphical browsers, this usually opens a new window or re-uses an existing window of that name, but if a window is re-used it is not 'raised' which might confuse the user.  In text browsers, following this link will simply replace the current page with the destination of the link.  This obviously means that Javascript offers the best functionality, but other browsers are still supported.</P></DD>
+
+      <DT><code>selecteperson</code></DT>
+      <DD><P>A tag which produces a widget analogous to HTML <code>&lt;SELECT&gt;</code>, that allows a user to select one or multiple e-people from a pop-up list.</P></DD>
+
+      <DT><code>sfxlink</code></DT>
+      <DD><P>Using an item's Dublin Core metadata DSpace can display an SFX link, if an SFX server is available.  This tag does so for a particular item if the <code>sfx.server.url</code> property is defined in <code>dspace.cfg</code>.</P></DD>
+    </DL>
+
+
+    <H3>HTML Support</H3>
+
+    <P>For the most part, the DSpace item display just gives a link that allows an end-user to download a bitstream.  However, if a bundle has a primary bitstream whose format is of MIME type <code>text/html</code>, instead a link to the HTML servlet is given.</P>
+
+    <P>So if we had an HTML document like this:</P>
+
+    <PRE>contents.html
+chapter1.html
+chapter2.html
+chapter3.html
+figure1.gif
+figure2.jpg
+figure3.gif
+figure4.jpg
+figure5.gif
+figure6.gif</PRE>
+
+    <P>The Bundle's primary bitstream field would point to the contents.html Bitstream, which we know is HTML (check the format MIME type) and so we know which to serve up first.</P>
+
+    <P>The HTML servlet employs a trick to serve up HTML documents without actually modifying the HTML or other files themselves.  Say someone is looking at <code>contents.html</code> from the above example, the URL in their browser will look like this:</P>
+
+    <PRE>https://dspace.mit.edu/html/1721.1/12345/contents.html</PRE>
+
+    <P>If there's an image called <code>figure1.gif</code> in that HTML page, the browser will do HTTP GET on this URL:</P>
+
+    <PRE>https://dspace.mit.edu/html/1721.1/12345/figure1.gif</PRE>
+
+    <P>The HTML document servlet can work out which item the user is looking at, and then which Bitstream in it is called <code>figure1.gif</code>, and serve up that bitstream.  Similar for following links to other HTML pages.  Of course all the links and image references have to be relative and not absolute.</P>
+
+    <P>This can cope with relative links that refer to a deeper path, e.g.</P>
+
+    <PRE>&lt;IMG SRC="images/figure1.gif"&gt;</PRE>
+
+    <P>Remember that in the Bitstream table in the database we have the 'name' field, which always contains the filename with no path (<code>figure1.gif</code>).  We also have the <code>source</code> field, which <em>may</em> contain the full pathname of the file as it appeared on the submitter's hard drive, but this is browser- and OS-dependent, so we can't rely on it.  All we can rely on is the filename.</P>
+
+    <P>We can still work out what images/figure1.gif is by making the HTML document servlet strip any path that comes in from the URL, e.g.</P>
+
+<PRE>https://dspace.mit.edu/html/1721.1/12345/images/figure1.gif
+                                         ^^^^^^^
+                                        Strip this</PRE>
+
+    <P>BUT all the filenames (regardless of directory names) must be unique.  For example, this wouldn't work:</P>
+
+    <PRE>contents.html
+chapter1.html
+chapter2.html
+chapter1_images/figure.gif
+chapter2_images/figure.gif</PRE>
+
+    <P>since the HTML document servlet wouldn't know which bitstream to serve up for:</P>
+
+<PRE>https://dspace.mit.edu/html/1721.1/12345/chapter1_images/figure.gif
+https://dspace.mit.edu/html/1721.1/12345/chapter2_images/figure.gif</PRE>
+
+    <P>since it would just have <code>figure.gif</code> in the Bitstream table.  Thus, the limitations are:</P>
+
+    <UL>
+      <LI>All links must be relative and not refer to parents (e.g. <code>../images/foo.gif</code> or <code>/images/foo.gif</code>)</LI>
+      <LI>If links refer to deeper directory levels, all the filenames must be different (as explained above)</LI>
+    </UL>
+
+
+
+    <H3>Thesis Blocking</H3>
+
+    <P>The submission UI has an optional feature that came about as a result of MIT Libraries policy.  If the <code>block.theses</code> parameter in <code>dspace.cfg</code> is <code>true</code>, an extra checkbox is included in the first page of the submission UI.  This asks the user if the submission is a thesis.  If the user checks this box, the submission is halted (deleted) and an error message displayed, explaining that DSpace should not be used to submit theses.  This feature can be turned off and on, and the message displayed (<code>/dspace/jsp/submit/no-theses.jsp</code> can be localized as necessary.</P>
+
+
+    <H2><A NAME="oai">OAI-PMH Data Provider</A></H2>
+
+    <P>The DSpace platform supports the <A HREF="http://www.openarchives.org/">Open Archives Initiative Protocol for Metadata Harvesting</A> (OAI-PMH) version 2.0 as a data provider.  This is accomplished using the <A HREF="http://www.oclc.org/research/software/oai/cat.shtm">OAICat framework from OCLC</A>.</P>
+
+    <P>The DSpace build process builds a Web application archive, <code><em>[dspace-source]</em>/build/dspace-oai.war</code>), in much the same way as <A HREF="#webui_build">the Web UI build process</A> described above.  The only differences are that the JSPs are not included, and <code><em>[dspace-source]</em>/etc/oai-web.xml</code> is used as the deployment descriptor.  This 'webapp' is deployed to receive and respond to OAI-PMH requests via HTTP.  Note that typically it should <em>not</em> be deployed on SSL (<code>https:</code> protocol).  In a typical configuration, this is deployed at <code>dspace-oai</code>, for example:</P>
+
+    <PRE>http://dspace.myu.edu/dspace-oai/request?verb=Identify</PRE>
+
+    <P>The 'base URL' of this DSpace deployment would be:</P>
+
+    <PRE>http://dspace.myu.edu/dspace-oai/request</PRE>
+
+    <P>It is this URL that should be registered with <A HREF="http://www.openarchives.org/">www.openarchives.org</A>.  Note that you can easily change the '<code>request</code>' portion of the URL by editing <code><em>[dspace-source]</em>/etc/oai-web.xml</code> and rebuilding and deploying <code>dspace-oai.war</code>.</P>
+
+    <P>DSpace provides implementations of the OAICat interfaces <code>AbstractCatalog</code>, <code>RecordFactory</code> and <code>Crosswalk</code> that interface with the DSpace content management API and harvesting API (in the search subsystem).</P>
+
+    <P>Only the basic <code>oai_dc</code> unqualified Dublin Core metadata set is exported at present; this is particularly easy since all items have qualified Dublin Core metadata.  When this metadata is harvested, the qualifiers are simply stripped; for example, <code>description.abstract</code> is exposed as unqualified <code>description</code>.  The <code>description.provenance</code> field is hidden, as this contains private information about the submitter and workflow reviewers of the item, including their e-mail addresses.  Additionally, to keep in line with OAI community practices, values of <code>contributor.author</code> are exposed as <code>creator</code> values.</P>
+
+    <P>To add support for other metadata sets is simply a matter of creating another <code>Crosswalk</code> implementation, and adding it to the <code>oaicat.properties</code> file described below.</P>
+
+    <P>Note that the current simple DC implementation (<code>org.dspace.app.oai.OAIDCCrosswalk</code>) does not currently strip out any invalid XML characters that may be lying around in the data.  If your database contains a DC value with, for example, some ASCII control codes (form feed etc.) this may cause OAI harvesters problems.  This should rarely occur, however.  XML entities (such as <code>&gt;</code>) are encoded (e.g. to <code>&amp;gt;</code>)</P>
+
+    <P>In addition to the implementations of the OAICat interfaces, there are two configuration files relevant to OAI support:</P>
+
+    <DL>
+      <DT><code>oaicat.properties</code></DT>
+
+      <DD><P>This resides as a template in <code><em>[dspace]</em>/config/templates</code>, and the live version is written to <code><em>[dspace]</em>/config</code>.  You probably won't need to edit this; the <code>install-configs</code> script fills out the relevant deployment-specific parameters.  You might want to change the <code>earliestDatestamp</code> field to accurately reflect the oldest datestamp in the system.  (Note that this is the value of the <code>last_modified</code> column in the <code>Item</code> database table.)</P></DD>
+
+      <DT><code>oai-web.xml</code></DT>
+
+      <DD><P>This standard Java Servlet 'deployment descriptor' is stored in the source as <code><em>[dspace-source]</em>/etc/oai-web.xml</code>, and is written to <code>/dspace/oai/WEB-INF/web.xml</code>.</P></DD>
+    </DL>
+
+
+    <H3>Sets</H3>
+
+    <P>OAI-PMH allows repositories to expose an hierarchy of sets in which records may be placed.  A record can be in zero or more sets.</P>
+
+    <P>DSpace exposes collections as sets.  The organization of communities is likely to change over time, and is therefore a less stable basis for selective harvesting.</P>
+
+    <P>Each collection has a corresponding OAI set, discoverable by harvesters via the ListSets verb.  The setSpec is the Handle of the collection, with the ':' and '/' converted to underscores so that the Handle is a legal setSpec, for example:</P>
+
+    <PRE>hdl_1721.1_1234</PRE>
+
+    <P>Naturally enough, the collection name is also the name of the corresponding set.</P>
+
+
+    <H3>Unique Identifier</H3>
+
+    <P>Every item in OAI-PMH data repository must have an unique identifier, which must conform to the URI syntax.  As of DSpace 1.2, Handles are not used; this is because in OAI-PMH, the OAI identifier identifies the <em>metadata record</em> associated with the <em>resource</em>.  The <em>resource</em> is the DSpace item, whose <em>resource identifier</em> is the Handle.  In practical terms, using the Handle for the OAI identifier may cause problems in the future if DSpace instances share items with the same Handles; the OAI metadata record identifiers should be different as the different DSpace instances would need to be harvested separately and may have different metadata for the item.</P>
+
+    <P>The OAI identifiers that DSpace uses are of the form:</P>
+
+    <P><code>oai:<em>host name</em>:<em>handle</em></code></P>
+
+    <P>For example:</P>
+
+    <P><code>oai:dspace.myu.edu:123456789/345</code></P>
+
+    <P>If you wish to use a different scheme, this can easily be changed by editing the value of <code>OAI_ID_PREFIX</code> at the top of the <code>org.dspace.app.oai.DSpaceOAICatalog</code> class.  (You do not need to change the code if the above scheme works for you; the code picks up the host name and Handles automatically from the DSpace configuration.)</P>
+
+
+    <H3>Access control</H3>
+
+    <P>OAI provides no authentication/authorisation details, although these could be implemented using standard HTTP methods.  It is assumed that all access will be anonymous for the time being.</P>
+
+    <P>A question is, "is all metadata public?"  Presently the answer to this is yes; all metadata is exposed via OAI-PMH, even if the item has restricted access policies.  The reasoning behind this is that people who do actually have permission to read a restricted item should still be able to use OAI-based services to discover the content.</P>
+
+    <P>If in the future, this 'expose all metadata' approach proves unsatisfactory for any reason, it should be possible to expose only publicly readable metadata.  The authorisation system has separate permissions for READing and item and READing the content (bitstreams) within it.  This means the system can differentiate between an item with public metadata and hidden content, and an item with hidden metadata as well as hidden content.  In this case the OAI data repository should only expose items those with anonymous READ access, so it can hide the existence of records to the outside world completely.  In this scenario, one should be wary of protected items that are made public after a time.  When this happens, the items are "new" from the OAI-PMH perspective.</P>
+
+
+    <H3>Modification Date (OAI Date Stamp)</H3>
+
+    <P>OAI-PMH harvesters need to know when a record has been created, changed or deleted.  DSpace keeps track of a 'last modified' date for each item in the system, and this date is used for the OAI-PMH date stamp.  This means that any changes to the metadata (e.g. admins correcting a field, or a withdrawal) will be exposed to harvesters.</P>
+
+
+    <H3>'About' Information</H3>
+
+    <P>As part of each record given out to a harvester, there is an optional, repeatable "about" section which can be filled out in any (XML-schema conformant) way.  Common uses are for provenance and rights information, and there are schemas in use by OAI communities for this.  Presently DSpace does not provide any of this information.</P>
+
+
+    <H3>Deletions</H3>
+
+    <P>DSpace keeps track of deletions (withdrawals).  These are exposed via OAI, which has a specific mechansim for dealing with this.  Since DSpace keeps a permanent record of withdrawn items, in the OAI-PMH sense DSpace supports deletions 'persistently'.  This is as opposed to 'transient' deletion support, which would mean that deleted records are forgotten after a time.</P>
+
+    <P>Once an item has been withdrawn, OAI-PMH harvests of the date range in which the withdrawal occurred will find the 'deleted' record header.  Harvests of a date range prior to the withdrawal will <em>not</em> find the record, despite the fact that the record did exist at that time.</P>
+
+    <P>As an example of this, consider an item that was created on 2002-05-02 and withdrawn on 2002-10-06.  A request to harvest the month 2002-10 will yield the 'record deleted' header.  However, a harvest of the month 2002-05 will not yield the original record.</P>
+
+    <P>Note that presently, the deletion of 'expunged' items is not exposed through OAI.</P>
+
+
+    <H3>Flow Control (Resumption Tokens)</H3>
+
+    <P>An OAI data provider can prevent any performance impact caused by harvesting by forcing a harvester to receive data in time-separated chunks.  If the data provider receives a request for a lot of data, it can send part of the data with a resumption token.  The harvester can then return later with the resumption token and continue.</P>
+
+    <P>DSpace supports resumption tokens for 'ListRecords' OAI-PMH requests.  ListIdentifiers and ListSets requests do not produce a particularly high load on the system, so resumption tokens are not used for those requests.</P>
+
+    <P>Each OAI-PMH ListRecords request will return at most 100 records.  This limit is set at the top of <code>org.dspace.app.oai.DSpaceOAICatalog.java</code> (<code>MAX_RECORDS</code>).  A potential issue here is that if a harvest yields an exact multiple of <code>MAX_RECORDS</code>, the last operation will result in a harvest with no records in it.  It is unclear from the OAI-PMH specification if this is acceptable.</P>
+
+    <P>When a resumption token is issued, the optional <code>completeListSize</code> and <code>cursor</code> attributes are not included.  OAICat sets the <code>expirationDate</code> of the resumption token to one hour after it was issued, though in fact since DSpace resumption tokens contain all the information required to continue a request they do not actually expire.</P>
+
+    <P>Resumption tokens contain all the state information required to continue a request.  The format is:</P>
+
+    <PRE>from/until/setSpec/offset</PRE>
+
+    <P><code>from</code> and <code>until</code> are the ISO 8601 dates passed in as part of the original request, and <code>setSpec</code> is also taken from the original request.  <code>offset</code> is the number of records that have already been sent to the harvester.  For example:</P>
+
+    <PRE>2003-01-01//hdl_1721_1_1234/300</PRE>
+
+    <P>This means the harvest is 'from' <code>2003-01-01</code>, has no 'until' date, is for collection hdl:1721.1/1234, and 300 records have already been sent to the harvester.  (Actually, if the original OAI-PMH request doesn't specify a 'from' or 'until, OAICat fills them out automatically to '0000-00-00T00:00:00Z' and '9999-12-31T23:59:59Z' respectively.  This means DSpace resumption tokens will always have from and until dates in them.)</P>
+
+
+    <H2><A NAME="itemimporter">Item Importer and Exporter</A></H2>
+
+    <P>DSpace has a set of command line tools for importing and exporting items in batches,
+     using the DSpace simple archive format.  The tools are not terribly robust, but
+     are useful and are easily modified.  They also give a good demonstration of
+     how to implement your own item importer if desired.</P>
+
+    <h3>Warning:  templates may be applied</h3>
+    <P>Due to a bug as of 1.2 beta 2, if you have an Item template in your Collection, then those default values may be added to Items that you import.  Be sure to remove the template if this is unwanted behavior.</P>
+
+    <H3>DSpace simple archive format</H3>
+
+    <P>The basic concept behind the DSpace's simple archive format is to create
+    an archive, which is directory full of items, with a subdirectory per item.
+    Each item directory contains a file for the item's descriptive metadata,
+    and the files that make up the item.</P>
+
+    <PRE>archive_directory/
+    item_000/
+        dublin_core.xml -- qualified Dublin Core metadata
+        contents        -- text file containing one line per filename
+        file_1.doc      -- files to be added as bitstreams to the item
+        file_2.pdf
+    item_001/
+        dublin_core.xml
+        contents
+        file_1.png
+        ...</PRE>
+
+    <P>The <code>dublin_core.xml</code> file has the following format,
+     where each Dublin Core element has it's own entry within
+      a <code>&lt;dcvalue&gt;</code> tagset.  There are currently
+      three tag elements available in the <code>&lt;dcvalue&gt;</code>
+      tagset:</P>
+     <UL>
+        <LI><code>&lt;element&gt;</code> - the Dublin Core element
+        <LI><code>&lt;qualifier&gt;</code> - the element's qualifier
+        <LI><code>&lt;language&gt;</code> - (optional)ISO language code for element
+     </UL>
+
+<PRE>&lt;dublin_core&gt;
+    &lt;dcvalue element="title" qualifier="none"&gt;A Tale of Two Cities&lt;/dcvalue&gt;
+    &lt;dcvalue element="date" qualifier="issued"&gt;1990&lt;/dcvalue&gt;&lt;/dublin_core&gt;
+    &lt;dcvalue element="title" qualifier="alternate" language="fr" "&gt;J'aime les Printemps&lt;/dcvalue&gt;
+&lt;/dublin_core&gt;
+    </PRE>
+
+    <P>(Note the optional language tag which notifies the system that the
+    optional title is in French.)</P>
+
+    <H3>Importing Items</H3>
+
+    <p><strong>Note:</strong> Before running the item importer over items previously exported from a DSpace instance, please first refer to <a href="application.html#transferitem">Transferring Items Between DSpace Instances</a>.</p>
+    <p>The item importer is in <code>org.dspace.app.itemimport.ItemImport</code>, and is run with the
+<code>dsrun</code> utility in the <code>dspace/bin</code> directory.  Running it with -h gets
+ the current command-line arguments.  Another very important flag is the --test flag, which you
+ can use with any command to simulate all of the actions it will perform without actually making
+ any changes to your DSpace instance - very useful for validating your item directories before
+ doing an import.  In the importer's arguments you can use either the user's database ID or email address
+ and the eperson ID, and the collection's database ID or handle as arguments.  Currently with
+ the importer you can add, remove, and replace items in a collection.   If you specify more
+ than one collection argument then the items will be imported to multiple collections,
+ and the first collection specified becomes the "owning" collection.  If there is an error and
+ the import is aborted, there is a --resume flag that you can try to resume the import where you
+ left off after you fix the error.</p>
+ <p>To add items to a collection with an EPerson as the submitter, type:</p>
+
+    <PRE>dsrun org.dspace.app.itemimport.ItemImport --add --eperson=joe@user.com  --collection=collectionID --source=items_dir --mapfile=mapfile</PRE>
+
+    <P>(or by using the short form)</P>
+
+    <PRE>dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c collectionID -s items_dir -m mapfile</PRE>
+
+    <P>which would then cycle through the archive directory's items,
+     import them, and then generate a map file which
+     stores the mapping of item directories to item handles.
+     Save this map file!  Using the map file you can then
+      'unimport' with the command:</P>
+
+    <PRE>dsrun org.dspace.app.itemimport.ItemImport --delete --mapfile=mapfile</PRE>
+
+    <P>The imported items listed in the map file would then be deleted.
+     If you wish to replace previously imported items, you can give
+      the command:</P>
+
+    <PRE>dsrun org.dspace.app.itemimport.ItemImport --replace --eperson=joe@user.com --collection=collectID --source=items_dir --mapfile=mapfile</PRE>
+
+    <P>Replacing items uses the map file to replace the old items and still retain their handles.</P>
+
+    <P>The importer usually bypasses any workflow assigned to a collection, but adding the --workflow option will route the imported items through the workflow system.</P>
+
+    <p>The importer also has a --test flag that will simulate the entire import process without actually doing the import.  This is extremely useful for verifying your import files before doing the import step.</p>
+
+    <H3>Exporting Items</H3>
+
+    <P>The item exporter can export a single item or a collection of items, and creates a DSpace simple archive for each item to be exported.  To export a collection's items you type:</P>
+
+    <PRE>dsrun org.dspace.app.itemexport.ItemExport --type=COLLECTION --id=collID --dest=dest_dir --number=seq_num</PRE>
+
+    <P>The keyword <code>COLLECTION</code> means that you intend to export an entire collection.  The ID can either be the database ID or the handle.  The exporter will begin numbering the simple archives with the sequence number that you supply.  To export a single item use the keyword <code>ITEM</code> and give the item ID as an argument:</P>
+
+    <PRE>dsrun org.dspace.app.itemexport.ItemExport --type=ITEM --id=itemID --dest=dest_dir --number=seq_num</PRE>
+
+    <P>Each exported item will have an additional file in its directory, named 'handle'.  This will contain the handle that was assigned to the item, and this file will be read by the importer so that items exported and then imported to another machine will retain the item's original handle.</P>
+
+    <h3><a name="transferitem">Transferring Items Between DSpace Instances</a></h3>
+    <p>Where items are to be moved between DSpace instances (for example from a test DSpace into a production DSpace) the item exporter and item importer can be used in conjunction with a script to assist in this process.</p>
+    <p>After running the item exporter each <code>dublin_core.xml</code> file will contain metadata that was automatically added by DSpace. These fields are as follows:</p>
+    <ul>
+        <li>date.accessioned</li>
+        <li>date.available</li>
+        <li>date.issued</li>
+        <li>description.provenance</li>
+        <li>format.extent</li>
+        <li>format.mimetype</li>
+        <li>identifier.uri</li>
+    </ul>
+    <p>In order to avoid duplication of this metadata, run</p>
+    <p><code>dspace_migrate &lt;exported item directory&gt;</code><p>
+    <p>prior to running the item importer. This will remove the above metadata items from the <code>dublin_core.xml</code> file and remove all <code>handle</code> files. It will then be safe to run the item exporter. Use</p>
+    <p><code>dspace_migrate --help</code></p>
+    <p>for instructions on use of the script.</p>
+
+    <H2><A NAME="mets">METS Tools</A></H2>
+
+    <P>The experimental (incomplete) METS export tool writes DSpace items to a filesystem with the metadata held in a more standard format based on METS.</P>
+
+    <H3>The Export Tool</H3>
+
+    <P>The METS export tool is invoked via the command line like this:</P>
+
+    <PRE><em>[dspace]</em>/bin/dsrun org.dspace.app.mets.METSExport --help</PRE>
+
+    <P>The tool can export an individual item, the items within a given collection, or everything in the DSpace instance.  To export an individual item, use:</P>
+
+    <PRE><em>[dspace]</em>/bin/dsrun org.dspace.app.mets.METSExport --item <em>[handle]</em></PRE>
+
+    <P>To export the items in collection <code>hdl:123.456/789</code>, use:</P>
+
+    <PRE><em>[dspace]</em>/bin/dsrun org.dspace.app.mets.METSExport --collection hdl:123.456/789</PRE>
+
+    <P>To export all the items DSpace, use:</P>
+
+    <PRE><em>[dspace]</em>/bin/dsrun org.dspace.app.mets.METSExport --all</PRE>
+
+    <P>With any of the above forms, you can specify the base directory into which the items will be exported, using <code>--destination <em>[directory]</em></code>.  If this parameter is omitted, the current directory is used.</P>
+
+    <H3>The AIP Format</H3>
+
+    <P>Each exported item is written to a separate directory, created under the base directory specified in the command-line arguments, or in the current directory if <code>--destination</code> is omitted.  The name of each directory is the Handle, URL-encoded so that the directory name is 'legal'.</P>
+
+    <P>Within each item directory is a <code>mets.xml</code> file which contains the METS-encoded metadata for the item.  Bitstreams in the item are also stored in the directory.  Their filenames are their MD5 checksums, firstly for easy integrity checking, and also to avoid any problems with 'special characters' in the filenames that were legal on the original filing system they came from but are illegal in the server filing system.  The <code>mets.xml</code> file includes XLink pointers to these bitstream files.</P>
+
+    <P>An example AIP might look like this:</P>
+
+    <UL>
+      <LI><code>hdl%3A123456789%2F8/</code>
+        <UL>
+          <LI><code>mets.xml</code>  -- METS metadata</LI>
+          <LI><code>184BE84F293342</code>  -- bitstream</LI>
+          <LI><code>3F9AD0389CB821</code></LI>
+          <LI><code>135FB82113C32D</code></LI>
+        </UL>
+      </LI>
+    </UL>
+
+    <P>The contents of the METS in the <code>mets.xml</code> file are as follows:</P>
+
+    <UL>
+      <LI><P>A <code>dmdSec</code> (descriptive metadata section) containing the item's metadata in <A HREF="http://www.loc.gov/standards/mods/">Metadata Object Description Schema (MODS)</A> XML.  The Dublin Core descriptive metadata is mapped to MODS since there is no official qualified Dublin Core XML schema in existence as of yet, and the Library Application Profile of DC that DSpace uses includes some qualifiers that are not part of the <A HREF="http://dublincore.org/documents/dcmi-terms/">DCMI Metadata Terms</A>.</P></LI>
+
+      <LI><P>An <code>amdSec</code> (administrative metadata section), which contains the a rights metadata element, which in turn contains the base64-encoded deposit license (the license the submitter granted as part of the submission process).</P></LI>
+
+      <LI><P>A <code>fileSec</code> containing a list of the bitstreams in the item.  Each bundle constitutes a <code>fileGrp</code>.  Each bitstream is represented by a <code>file</code> element, which contains an <code>FLocat</code> element with a simple XLink to the bitstream in the same directory as the <code>mets.xml</code> file.  The <code>file</code> attributes consist of most of the basic technical metadata for the bitstream.  Additionally, for those bitstreams that are thumbnails or text extracted from another bitstream in the item, those 'derived' bitstreams have the same <code>GROUPID</code> as the bitstream they were derived from, in order that clients understand that there is a relationship.</P>
+
+      <P>The <code>OWNERID</code> of each <code>file</code> is the <A HREF="functional.html#bitstream_ids">'persistent' bitstream identifier</A> assigned by the DSpace instance.  The <code>ID</code> and <code>GROUPID</code> attributes consist of the item's Handle, together with the bitstream's sequence ID, which underscores used in place of dots and slashes.  For example, a bitstream with sequence ID 24, in the item <code>hdl:123.456/789</code> will have the <code>ID</code> <code>123_456_789_24</code>.  This is because <code>ID</code> and <code>GROUPID</code> attributes must be of type <code>xsd:id</code>.</P>
+    </UL>
+
+    <H3>Limitations</H3>
+
+    <UL>
+      <LI>No corresponding import tool yet</LI>
+      <LI>No <code>structmap</code> section</LI>
+      <LI>Some technical metadata not written, e.g. the primary bitstream in a bundle, original filenames or descriptions.</LI>
+      <LI>Only the MIME type is stored, not the (finer grained) bitstream format.</LI>
+      <LI>Dublin Core to MODS mapping is very simple, probably needs verification</LI>
+    </UL>
+
+<h2><a name="mediafilters">MediaFilters:  Transforming DSpace Content</a></h2>
+
+    <p>DSpace can apply filters to content/bitstreams, creating new content.  Filters are included that extract text for <strong>full-text searching</strong>, and create <strong>thumbnails</strong> for items that contain images.  The media filters are controlled by the <code>MediaFilterManager</code> which traverses the asset store, invoking the <code>MediaFilter</code> subclasses on bitstreams.  The file config/mediafilter.cfg contains a list of bitstream format types and the filters that operate on bitstreams of that type.  The media filter system is intended to be run from the command line (or regularly as a cron task):</p>
+
+    <pre>dspace/bin/filter-media</pre>
+
+    <P>Traverse the asset store, applying media filters to bitstreams, skipping bitstreams that have already been filtered.</P>
+
+    <pre>dspace/bin/filter-media -f</pre>
+    <P>Apply filters to ALL bitstreams, even if they've already been filtered.</P>
+
+    <pre>dspace/bin/filter-media -v</pre>
+    <P>Verbose mode - print all extracted text and other filter details to STDOUT.</P>
+
+    <pre>dspace/bin/filter-media -n</pre>
+    <P>Suppress index creation - by default, a new search index is created for full-text searching.  This option suppresses index creation if you intend to run <code>index-all</code> elsewhere.</P>
+
+    <p>Adding your own filters is done by creating a sub-class of the <code>MediaFilter</code> class.  See the comments in the source file MediaFilter.java for more information.  In theory filters could be implemented in any language (C, Perl, etc.)
+ They only need to be invoked by the Java code in the <code>MediaFilter</code> class that you create.</p>
+
+    <H2><A NAME="filiator">Sub-Community Management</A></H2>
+
+    <P>DSpace provides an administrative tool - 'CommunityFiliator' - for managing community sub-structure.
+     Normally this structure seldom changes, but prior to the 1.2 release sub-communities were
+     not supported, so this tool could be used to place existing pre-1.2 communities into a hierarchy.
+     It has two operations, either establishing a community to sub-community
+     relationship, or dis-establishing an existing relationship.</P>
+
+     <P>The familiar parent/child
+     metaphor can be used to explain how it works. Every community in DSpace can be either a
+     'parent' community - meaning it has at least one sub-community,
+     or a 'child' community - meaning it is a sub-community of another community, or both or
+     neither. In these terms, an 'orphan' is a community that lacks a parent
+     (although it can be a parent); 'orphans' are referred to as 'top-level' communities in the
+     DSpace user-interface, since there is no parent community 'above' them.
+     The first operation - establishing a parent/child relationship -
+     can take place between any community and an orphan. The second operation - removing
+     a parent/child relationship - will make the child an orphan.</P>
+
+     <P>Using the dsrun utility in the dspace/bin directory, the establish operation looks like this:</P>
+
+     <PRE>dsrun org.dspace.administer.CommunityFiliator --set --parent=parentID --child=childID</PRE>
+
+     <P>(or using the short form)</P>
+
+     <PRE>dsrun org.dspace.administer.CommunityFiliator -s -p parentID -c childID</PRE>
+
+     <P>where '-s' or '--set' means establish a relationship whereby the community identified
+     by the '-p' parameter becomes the parent of the community identified by the '-c' parameter.
+     Both the 'parentID' and 'childID' values may be handles or database IDs.</P>
+
+     <P>The reverse operation looks like this:</P>
+
+     <PRE>dsrun org.dspace.administer.CommunityFiliator --remove --parent=parentID --child=childID</PRE>
+
+     <P>(or using the short form)</P>
+
+     <PRE>dsrun org.dspace.administer.CommunityFiliator -r -p parentID -c childID</PRE>
+
+     <P>where '-r' or '--remove' means dis-establish the current relationship in which the community
+     identified by 'parentID' is the parent of the community identified by 'childID'. The
+     outcome will be that the 'childID' community will become an orphan, i.e. a top-level
+     community.</P>
+
+     <P>If the required constraints of operation are violated, an error message will appear
+     explaining the problem, and no change will be made. An example in a removal operation,
+     where the stated child community does not have the stated parent community as its parent:
+     "Error, child community not a child of parent community".</P>
+
+     <P>It is possible to effect arbitrary changes to the community hierarchy by chaining the basic
+     operations together. For example, to move a child community from one parent to another, simply
+     perform a 'remove' from its current parent (which will leave it an orphan), followed by a 'set'
+     to its new parent.</P>
+
+     <P>It is important to understand that when any operation is performed, all the sub-structure of
+     the child community follows it. Thus, if a child has itself children (sub-communities), or
+     collections, they will all move with it to its new 'location' in the community tree.</P>
+
+    <HR>
+
+    <ADDRESS>
+     Copyright &copy; 2002-2004 MIT and Hewlett Packard
+    </ADDRESS>
+  </BODY>
+</HTML>

@@ -1,0 +1,34 @@
+This version of DSpace has the following known problems.  Please follow the
+provided links to learn more about the problem, and to see if it has been
+subsequently fixed.
+
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1174342&group_id=19984&atid=119984
+Potential Memory Issue for a large collection
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1173600&group_id=19984&atid=119984
+Items Mapper has memory issue for a large collection
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1169975&group_id=19984&atid=119984
+workspace item policy not updated after workflow change
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1161459&group_id=19984&atid=119984
+ItemExporter fails with Too many open files
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1155173&group_id=19984&atid=119984
+Forms in custom 'skin' break group admin tool
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1120726&group_id=19984&atid=119984
+Performance bottlekneck in Group.update()
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1066771&group_id=19984&atid=119984
+Metadata edit form dropping DC qualified element
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1066713&group_id=19984&atid=119984
+Two (sub)communities can not have one name
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1160898&group_id=19984&atid=119984
+dspace_migrate removes Date.Issued from prev published items
+
+http://sourceforge.net/tracker/index.php?func=detail&aid=1076506&group_id=19984&atid=119984
+Templates applied to imported items

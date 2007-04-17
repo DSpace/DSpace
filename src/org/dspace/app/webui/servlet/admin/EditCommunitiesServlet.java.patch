@@ -1,0 +1,65 @@
+*** /dspace/orig-1.2.1/dspace-1.2-source/src/org/dspace/app/webui/servlet/admin/EditCommunitiesServlet.java	Tue Jun 15 13:29:08 2004
+--- /dspace/dev-1.2/dspace-1.2-source/src/org/dspace/app/webui/servlet/admin/EditCommunitiesServlet.java	Wed Jan 19 12:51:24 2005
+***************
+*** 63,68 ****
+--- 63,69 ----
+  import org.dspace.content.BitstreamFormat;
+  import org.dspace.content.Collection;
+  import org.dspace.content.Community;
++ import org.dspace.content.CommunityGroup;
+  import org.dspace.content.FormatIdentifier;
+  import org.dspace.content.Item;
+  import org.dspace.core.Context;
+***************
+*** 79,84 ****
+--- 80,98 ----
+   */
+  public class EditCommunitiesServlet extends DSpaceServlet
+  {
++     /**
++      *
++      * <pre>
++      * Revision History
++      *
++      *   2004/10/21: Ben
++      *     - use new CommunityGroup class
++      *
++      *   2004/10/20: Ben
++      *     - add group function
++      * </pre>
++      */
++ 
+      /** User wants to edit a community */
+      public static final int START_EDIT_COMMUNITY = 1;
+  
+***************
+*** 151,156 ****
+--- 165,171 ----
+           * get null if we try and find something with ID -1, we'll just try
+           * and find both here to save hassle later on
+           */
++ 	CommunityGroup[] groups = CommunityGroup.findAll(context);
+          Community community = Community.find(context,
+              UIUtil.getIntParameter(request, "community_id"));
+          Community parentCommunity = Community.find(context,
+***************
+*** 159,164 ****
+--- 174,180 ----
+              UIUtil.getIntParameter(request, "collection_id"));
+  
+          // Just about every JSP will need the values we received
++ 	request.setAttribute("groups", groups);
+          request.setAttribute("community", community);
+          request.setAttribute("parent", parentCommunity);
+          request.setAttribute("collection", collection);
+***************
+*** 342,347 ****
+--- 358,365 ----
+          }
+  
+          community.setMetadata("name", request.getParameter("name"));
++ 	int group_id = (new Integer(request.getParameter("group"))).intValue();
++ 	community.setMetadata("group_id", group_id);
+          community.setMetadata("short_description",
+              request.getParameter("short_description"));
+  

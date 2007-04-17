@@ -1,0 +1,112 @@
+*** /dspace/orig-1.2.1/dspace-1.2-source/src/org/dspace/app/oai/OAIDCCrosswalk.java	Mon Jan 26 15:01:11 2004
+--- /dspace/dev-1.2/dspace-1.2-source/src/org/dspace/app/oai/OAIDCCrosswalk.java	Fri Oct  8 17:21:15 2004
+***************
+*** 36,41 ****
+--- 36,48 ----
+   * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+   * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   * DAMAGE.
++  *
++  * <pre>
++  * Revision History:
++  * 
++  *   2004/07/13: Ben
++  *     - make the xml escaping into a static method
++  * </pre>
+   */
+  
+  package org.dspace.app.oai;
+***************
+*** 60,66 ****
+  {
+      public OAIDCCrosswalk(Properties properties)
+      {
+! 	super("http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
+      }
+      
+      
+--- 67,73 ----
+  {
+      public OAIDCCrosswalk(Properties properties)
+      {
+!    super("http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
+      }
+      
+      
+***************
+*** 108,137 ****
+              	// Escape XML chars <, > and &
+                  String value = allDC[i].value;
+  
+!                 // First do &'s - need to be careful not to replace the
+!                 // & in "&amp;" again!
+!                 int c = -1;
+!                 while ((c = value.indexOf("&", c + 1)) > -1)
+!                 {
+!                     value = value.substring(0, c) +
+!                         "&amp;" +
+!                         value.substring(c + 1);
+!                 }
+  
+-                 while ((c = value.indexOf("<")) > -1)
+-                 {
+-                     value = value.substring(0, c) +
+-                         "&lt;" +
+-                         value.substring(c + 1);
+-                 }
+-                 
+-                 while ((c = value.indexOf(">")) > -1)
+-                 {
+-                     value = value.substring(0, c) +
+-                         "&gt;" +
+-                         value.substring(c + 1);
+-                 }
+- 
+                  metadata.append("<dc:")
+                      .append(element)
+                      .append(">")
+--- 115,122 ----
+              	// Escape XML chars <, > and &
+                  String value = allDC[i].value;
+  
+!                 value = escapeXml(value);
+  
+                  metadata.append("<dc:")
+                      .append(element)
+                      .append(">")
+***************
+*** 146,149 ****
+--- 131,163 ----
+  
+          return metadata.toString();
+      }
++ 
++     public static String escapeXml(String value)
++     {
++         // First do &'s - need to be careful not to replace the
++         // & in "&amp;" again!
++         int c = -1;
++         while ((c = value.indexOf("&", c + 1)) > -1)
++         {
++             value = value.substring(0, c) +
++                 "&amp;" +
++                 value.substring(c + 1);
++         }
++         
++         while ((c = value.indexOf("<")) > -1)
++         {
++             value = value.substring(0, c) +
++                 "&lt;" +
++                 value.substring(c + 1);
++         }
++         
++         while ((c = value.indexOf(">")) > -1)
++         {
++             value = value.substring(0, c) +
++                 "&gt;" +
++                 value.substring(c + 1);
++         }
++ 
++ 		  return value;
++ 	 }
+  }

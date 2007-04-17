@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<HTML>
+<HEAD>
+  <META name="generator" content="HTML Tidy for Windows (vers 1st December 2004), see www.w3.org">
+
+  <TITLE>DSpace System Documentation: Submission Forms Customization</TITLE>
+  <LINK rel="StyleSheet" href="style.css" type="text/css">
+  <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+</HEAD>
+
+<BODY>
+  <H1>Custom Metadata-entry Pages for Submission</H1>
+
+  <P><A href="index.html">Back to contents</A></P>
+
+  <H2>Introduction</H2>
+
+  <P>This section explains how to customize the Web forms used by submitters and editors to enter and modify the metadata for a new item.</P>
+
+  <P>You can customize the "default" metadata forms used by all collections, and also create alternate sets of metadata forms and assign them to specific collections. In creating custom metadata forms, you can choose:</P>
+
+  <UL>
+    <LI>The number of metadata-entry pages.</LI>
+
+    <LI>Which fields appear on each page, and their sequence.</LI>
+
+    <LI>Labels, prompts, and other text associated with each field.</LI>
+
+    <LI>List of available choices for each menu-driven field.</LI>
+  </UL>
+
+  <P><STRONG>N.B.</STRONG>The cosmetic and ergonomic details of metadata entry fields remain the same as the fixed metadata pages in previous DSpace releases, and can only be altered by modifying the appropriate stylesheet and JSP pages.</P>
+
+  <P>All of the custom metadata-entry forms for a DSpace instance are controlled by a single XML file, <CODE>input-forms.xml</CODE>, in the <CODE>config</CODE> subdirectory under the DSpace home. DSpace comes with a sample configuration that implements the traditional metadata-entry forms, which also serves as a well-documented example. The rest of this section explains how to create your own sets of custom forms.</P>
+
+  <H2>Describing Custom Metadata Forms</H2>
+
+  <P>The description of a set of pages through which submitters enter their metadata is called a <EM>form</EM> (although it is actually a set of forms, in the HTML sense of the term). A form is identified by a unique symbolic <EM>name</EM>. In the XML structure, the <EM>form</EM> is broken down into a series of <EM>pages</EM>: each of these represents a separate Web page for collecting metadata elements.</P>
+
+  <P>To set up one of your DSpace collections with customized submission forms, first you make an entry in the <EM>form-map</EM>. This is effectively a table that relates a collection to a form set, by connecting the collection's <EM>Handle</EM> to the form name. Collections are identified by handle because their names are mutable and not necessarily unique, while handles are unique and persistent.</P>
+
+  <P>A special map entry, for the collection handle "default", defines the <EM>default</EM> form set. It applies to all collections which are not explicitly mentioned in the map. In the example XML this form set is named <CODE>traditional</CODE> (for the "traditional" DSpace user interface) but it could be named anything.</P>
+
+  <H2>The Structure of <CODE>input-forms.xml</CODE></H2>
+
+  <P>The XML configuration file has a single top-level element, <CODE>input-forms</CODE>, which contains three elements in a specific order. The outline is as follows:</P>
+  <PRE>
+&lt;input-forms&gt;
+
+  &lt;-- <EM>Map of Collections to Form Sets</EM> --&gt;
+  &lt;form-map&gt;
+    &lt;name-map collection-handle="default" form-name="traditional" /&gt;
+    ...
+  &lt;/form-map&gt;
+
+  &lt;-- <EM>Form Set Definitions</EM> --&gt;
+  &lt;form-definitions&gt;
+    &lt;form name="traditional"&gt;
+    ...
+  &lt;/form-definitions&gt;
+
+  &lt;-- <EM>Name/Value Pairs used within Multiple Choice Widgets</EM> --&gt;
+  &lt;form-value-pairs&gt;
+    &lt;value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso"&gt;
+    ...
+  &lt;/form-value-pairs&gt;
+&lt;/input-forms&gt;
+</PRE>
+
+  <H3>Adding a Collection Map</H3>
+
+  <P>Each <CODE>name-map</CODE> element within <CODE>form-map</CODE> associates a collection with the name of a form set. Its <CODE>collection-handle</CODE> attribute is the Handle of the collection, and its <CODE>form-name</CODE> attribute is the form set name, which must match the <CODE>name</CODE> attribute of a <CODE>form</CODE> element.</P>
+
+  <P>For example, the following fragment shows how the collection with handle "12345.6789/42" is attached to the "TechRpt" form set:</P>
+  <PRE>
+  &lt;form-map&gt;
+    &lt;name-map collection-handle="<STRONG>12345.6789/42</STRONG>" form-name="<STRONG>TechRpt</STRONG>" /&gt;
+    ...
+  &lt;/form-map&gt;
+
+  &lt;form-definitions&gt;
+    &lt;form name="<STRONG>TechRept</STRONG>"&gt;
+    ...
+  &lt;/form-definitions&gt;
+</PRE>
+
+  <P>It's a good idea to keep the definition of the <CODE><STRONG>default</STRONG></CODE> name-map from the example <CODE>input-forms.xml</CODE> so there is always a default for collections which do not have a custom form set.</P>
+
+  <H4>Getting A Collection's Handle</H4>
+
+  <P>You will need the <EM>handle</EM> of a collection in order to assign it a custom form set. To discover the handle, go to the "Communities &amp; Collections" page under "<STRONG>Browse</STRONG>" in the left-hand menu on your DSpace home page. Then, find the link to your collection. It should look something like:</P>
+  <PRE>
+    http://myhost.my.edu/dspace/handle/<U><STRONG>12345.6789/42</STRONG></U>
+</PRE>
+
+  <P>The underlined part of the URL is the handle. It should look familiar to any DSpace administrator. That is what goes in the <CODE>collection-handle</CODE> attribute of your <CODE>name-map</CODE> element.</P>
+
+  <H3>Adding a Form Set</H3>
+
+  <P>You can add a new form set by creating a new <CODE>form</CODE> element within the <CODE>form-definitions</CODE> element. It has one attribute, <CODE>name</CODE>, which as seen above must match the value of the <CODE>name-map</CODE> for the collections it is to be used for.</P>
+
+  <H4>Forms and Pages</H4>
+
+  <P>The content of the <CODE>form</CODE> is a sequence of <CODE>page</CODE> elements. Each of these corresponds to a Web page of forms for entering metadata elements, presented in sequence between the initial "Describe" page and the final "Verify" page (which presents a summary of all the metadata collected).</P>
+
+  <P>A <CODE>form</CODE> must contain at least one and at most six pages. They are presented in the order they appear in the XML. Each <CODE>page</CODE> element must include a <CODE>number</CODE> attribute, that should be its sequence number, e.g.</P>
+  <PRE>
+&lt;page number="1"&gt;
+</PRE>
+
+  <P>The <CODE>page</CODE> element, in turn, contains a sequence of <CODE>field</CODE> elements. Each field defines an interactive dialog where the submitter enters one of the Dublin Core metadata items.</P>
+
+  <H4>Composition of a Field</H4>
+
+  <P>Each <CODE>field</CODE> contains the following elements, in the order indicated. The required sub-elements are so marked:</P>
+
+  <DL>
+    <DT><STRONG><CODE>dc-element</CODE></STRONG> <EM>(Required)</EM></DT>
+
+    <DD>Name of the Dublin Core element entered in this field, e.g. <CODE>contributor</CODE>.</DD>
+
+    <DT><STRONG><CODE>dc-qualifier</CODE></STRONG></DT>
+
+    <DD>Qualifier of the Dublin Core element entered in this field, e.g. when the field is <CODE>contributor.advisor</CODE> the value of this element would be <CODE>advisor</CODE>. Leaving this out means the input is for an unqualified DC element.</DD>
+
+    <DT><STRONG><CODE>repeatable</CODE></STRONG></DT>
+
+    <DD>Value is <CODE>true</CODE> when multiple values of this field are allowed, <CODE>false</CODE> otherwise. When you mark a field repeatable, the UI servlet will add a control to let the user ask for more fields to enter additional values. Intended to be used for arbitrarily-repeating fields such as subject keywords, when it is impossible to know in advance how many input boxes to provide.</DD>
+
+    <DT><STRONG><CODE>label</CODE></STRONG> <EM>(Required)</EM></DT>
+
+    <DD>Text to display as the label of this field, describing what to enter, e.g. "<CODE>Your Advisor's Name</CODE>".</DD>
+
+    <DT><STRONG><CODE>input-type</CODE></STRONG> <EM>(Required)</EM></DT>
+
+    <DD>
+      Defines the kind of interactive widget to put in the form to collect the Dublin Core value. Content must be one of the following keywords:
+
+      <UL>
+        <LI><STRONG>onebox</STRONG> -- A single text-entry box.</LI>
+
+        <LI><STRONG>twobox</STRONG> -- A pair of simple text-entry boxes, used for <EM>repeatable</EM> values such as the DC <CODE>subject</CODE> item.</LI>
+
+        <LI><STRONG>textarea</STRONG> -- Large block of text that can be entered on multiple lines, e.g. for an abstract.</LI>
+
+        <LI><STRONG>name</STRONG> -- Personal name, with separate fields for family name and first name.</LI>
+
+        <LI><STRONG>date</STRONG> -- Calendar date. when required, demands that at least the year be entered.</LI>
+
+        <LI><STRONG>dropdown</STRONG> -- Choose value(s) from a "drop-down" menu list. <STRONG>Note:</STRONG> You must also include a value for the <CODE>value-pairs-name</CODE> attribute to specify a list of menu entries, from which to choose, for this item. Use this to make a choice from a restricted set of options, such as for the <CODE>language</CODE> item.</LI>
+
+        <LI><STRONG>qualdrop_value</STRONG> -- Enter a "qualified value", which includes <EM>both</EM> a qualifier from a drop-down menu and a free-text value. Used to enter items like alternate identifers and codes for a submitted item, e.g. the DC <CODE>identifier</CODE> field. <STRONG>Note:</STRONG> As for the <CODE>dropdown</CODE> type, you must include the <CODE>value-pairs-name</CODE> attribute to specify a menu choice list.</LI>
+      </UL>
+    </DD>
+
+    <DT><STRONG><CODE>hint</CODE></STRONG> <EM>(Required)</EM></DT>
+
+    <DD>Content is the text that will appear as a "hint", or instructions, next to the input fields. Can be left empty, but it must be present.</DD>
+
+    <DT><STRONG><CODE>required</CODE></STRONG></DT>
+
+    <DD>When this element is included with any content, it marks the field as a required input. If the user tries to leave the page without entering a value for this field, that text is displayed as a warning message. For example,<BR>
+    <CODE>&lt;required&gt;You must enter a title.&lt;/required&gt;<BR>
+    Note that leaving the</CODE> required element empty will <EM>not</EM> mark a field as required, e.g.:<BR>
+    <CODE>&lt;required&gt;&lt;/required&gt;</CODE></DD>
+  </DL>
+
+  <P>Look at the example <CODE>input-forms.xml</CODE> and experiment with a a trial custom form to learn this specification language thoroughly. It is a very simple way to express the layout of data-entry forms, but the only way to learn all its subtleties is to use it.</P>
+
+  <H4>Automatically Elided Fields</H4>
+
+  <P>You may notice that some fields are automatically skipped when a custom form page is displayed, depending on the kind of item being submitted. This is because the DSpace user-interface engine skips Dublin Core fields which are not needed, according to the initial description of the item. For example, if the user indicates there are no alternate titles on the first "Describe" page (the one with a few checkboxes), the input for the <CODE>title.alternative</CODE> DC element is automatically elided, <EM>even on custom submission pages.</EM></P>When a user initiates a submission, DSpace first displays what we'll call the "initial-questions page". By default, it contains three questions with check-boxes:
+
+  <OL>
+    <LI><STRONG>The item has more than one title, e.g. a translated title</STRONG><BR>
+    Controls <CODE>title.alternative</CODE> field.</LI>
+
+    <LI>
+      <STRONG>The item has been published or publicly distributed before</STRONG><BR>
+      Controls DC fields:
+
+      <UL>
+        <LI><CODE>date.issued</CODE></LI>
+
+        <LI><CODE>publisher</CODE></LI>
+
+        <LI><CODE>identifier.citation</CODE></LI>
+      </UL>
+    </LI>
+
+    <LI><STRONG>The item consists of more than one file</STRONG><BR>
+    <EM>Does not affect any metadata input fields.</EM></LI>
+  </OL>The answers to the first two questions control whether inputs for certain of the DC metadata fields will displayed, even if they are defined as fields in a custom page.
+
+  <P>Conversely, if the metadata fields controlled by a checkbox are not mentioned in the custom form, the checkbox is elided from the initial page to avoid confusing or misleading the user.</P>
+
+  <P>The two relevant checkbox entries are "The item has more than one title, e.g. a translated title", and "The item has been published or publicly distributed before". The checkbox for multiple titles trigger the display of the field with dc-element equal to 'title' and dc-qualifier equal to 'alternative'. If the controlling collection's form set does not contain this field, then the multiple titles question will not appear on the initial questions page.</P>
+
+  <H3>Adding <CODE>Value-Pairs</CODE></H3>Finally, your custom form description needs to define the "value pairs" for any fields with input types that refer to them. Do this by adding a <CODE>value-pairs</CODE> element to the contents of <CODE>form-value-pairs</CODE>. It has the following required attributes:
+
+  <UL>
+    <LI><STRONG><CODE>value-pairs-name</CODE></STRONG> -- Name by which an <CODE>input-type</CODE> refers to this list.</LI>
+
+    <LI><STRONG><CODE>dc-term</CODE></STRONG> -- Qualified Dublin Core field for which this choice list is selecting a value.</LI>
+  </UL>Each <CODE>value-pairs</CODE> element contains a sequence of <CODE>pair</CODE> sub-elements, each of which in turn contains two elements:
+
+  <UL>
+    <LI><STRONG><CODE>displayed-value</CODE></STRONG> -- Name shown (on the web page) for the menu entry.</LI>
+
+    <LI><STRONG><CODE>stored-value</CODE></STRONG> -- Value stored in the DC element when this entry is chosen.</LI>
+  </UL>
+
+  <P>Unlike the HTML <CODE>select</CODE> tag, there is no way to indicate one of the entries should be the default, so the first entry is always the default choice.</P>
+
+  <H4>Example</H4>
+
+  <P>Here is a menu of types of common identifiers:</P>
+  <PRE>
+   &lt;value-pairs value-pairs-name="common_identifiers" dc-term="identifier"&gt;
+     &lt;pair&gt;
+       &lt;displayed-value&gt;Gov't Doc #&lt;/displayed-value&gt;
+       &lt;stored-value&gt;govdoc&lt;/stored-value&gt;
+     &lt;/pair&gt;
+     &lt;pair&gt;
+       &lt;displayed-value&gt;URI&lt;/displayed-value&gt;
+       &lt;stored-value&gt;uri&lt;/stored-value&gt;
+     &lt;/pair&gt;
+     &lt;pair&gt;
+       &lt;displayed-value&gt;ISBN&lt;/displayed-value&gt;
+       &lt;stored-value&gt;isbn&lt;/stored-value&gt;
+     &lt;/pair&gt;
+   &lt;/value-pairs&gt;
+</PRE>It generates the following HTML, which results in the menu widget below. (Note that there is no way to indicate a default choice in the custom input XML, so it cannot generate the HTML <CODE>SELECTED</CODE> attribute to mark one of the options as a pre-selected default.)
+  <PRE>
+&lt;select name="identifier_qualifier_0"&gt;
+&lt;option VALUE="govdoc"&gt;Gov't Doc #&lt;/option&gt;
+&lt;option VALUE="uri"&gt;URI&lt;/option&gt;
+&lt;option VALUE="isbn"&gt;ISBN&lt;/option&gt;
+&lt;/select&gt;
+</PRE>
+
+  <FORM ACTION="submission.html">
+    <STRONG>Identifiers:</STRONG> <SELECT name="identifier_qualifier_0">
+      <OPTION value="govdoc">
+        Gov't Doc #
+      </OPTION>
+
+      <OPTION value="uri">
+        URI
+      </OPTION>
+
+      <OPTION value="isbn">
+        ISBN
+      </OPTION>
+    </SELECT>
+  </FORM>
+
+  <H2>Deploying Your Custom Forms</H2>The DSpace web application only reads your custom form definitions when it starts up, so it is important to remember:
+
+  <BLOCKQUOTE>
+    <EM><STRONG>You must always restart Tomcat</STRONG> (or whatever servlet container you are using) for changes made to the <CODE>input-forms.xml</CODE> file take effect.</EM>
+  </BLOCKQUOTE>
+
+  <P>Any mistake in the syntax or semantics of the form definitions, such as poorly formed XML or a reference to a nonexistent field name, will cause a fatal error in the DSpace UI. The exception message (at the top of the stack trace in the <CODE>dspace.log</CODE> file) usually has a concise and helpful explanation of what went wrong. Don't forget to stop and restart the servlet container before testing your fix to a bug.</P>
+
+  <HR>
+
+  <ADDRESS>
+    Copyright &copy; 2002-2005 MIT and Hewlett Packard
+  </ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+BINDIR=../bin
+DSPACEDIR=..
+
+# Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
+JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
+
+# Class path for DSpace will be:
+#   Any existing classpath
+#   The JARs (WEB-INF/lib/*.jar)
+#   The WEB-INF/classes directory
+FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
+
+# Now invoke Java
+java -Xbootclasspath/p:xercesImpl.jar:xalan.jar:xml-apis.jar:serializer.jar -Xmx256m -classpath $FULLPATH RetroThesDiss /dspace/test /drum1/extract | 2>&1 tee retro2.log
+

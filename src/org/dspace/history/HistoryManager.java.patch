@@ -1,0 +1,34 @@
+*** /dspace/orig-1.2.1/dspace-1.2-source/src/org/dspace/history/HistoryManager.java	Fri Nov  1 12:59:13 2002
+--- /dspace/dev-1.2/dspace-1.2-source/src/org/dspace/history/HistoryManager.java	Wed Sep  8 16:22:52 2004
+***************
+*** 71,76 ****
+--- 71,81 ----
+   *
+   * @author  Peter Breton
+   * @version $Revision: 1.8 $
++  * <pre>
++  * Revision History:
++  *
++  *   2004/09/08: Ben
++  *     - use DatabaseManager.freeConnection()
+   */
+  public class HistoryManager
+  {
+***************
+*** 574,581 ****
+          {
+              if (statement != null)
+                  statement.close();
+!             if (connection != null)
+!                 connection.close();
+          }
+      }
+  
+--- 579,585 ----
+          {
+              if (statement != null)
+                  statement.close();
+!             DatabaseManager.freeConnection(connection);
+          }
+      }
+  

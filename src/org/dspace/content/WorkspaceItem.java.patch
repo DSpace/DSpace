@@ -1,0 +1,62 @@
+*** /dspace/orig-1.2.2/dspace-1.2.1-source/src/org/dspace/content/WorkspaceItem.java	Wed Dec 22 12:48:40 2004
+--- /dspace/orig-1.2.2/dspace-1.2.2-source/src/org/dspace/content/WorkspaceItem.java	Wed Feb  9 11:52:22 2005
+***************
+*** 1,9 ****
+  /*
+   * WorkspaceItem.java
+   *
+!  * Version: $Revision: 1.24 $
+   *
+!  * Date: $Date: 2004/12/22 17:48:40 $
+   *
+   * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+   * Institute of Technology.  All rights reserved.
+--- 1,9 ----
+  /*
+   * WorkspaceItem.java
+   *
+!  * Version: $Revision: 1.25 $
+   *
+!  * Date: $Date: 2005/02/09 16:52:22 $
+   *
+   * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+   * Institute of Technology.  All rights reserved.
+***************
+*** 61,67 ****
+   * Class representing an item in the process of being submitted by a user
+   * 
+   * @author Robert Tansley
+!  * @version $Revision: 1.24 $
+   */
+  public class WorkspaceItem implements InProgressSubmission
+  {
+--- 61,67 ----
+   * Class representing an item in the process of being submitted by a user
+   * 
+   * @author Robert Tansley
+!  * @version $Revision: 1.25 $
+   */
+  public class WorkspaceItem implements InProgressSubmission
+  {
+***************
+*** 330,335 ****
+--- 330,337 ----
+  
+              wsItems.add(wi);
+          }
++         // close the TableRowIterator to free up resources
++         tri.close();
+  
+          WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
+          wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
+***************
+*** 372,377 ****
+--- 374,381 ----
+  
+              wsItems.add(wi);
+          }
++         // close the TableRowIterator to free up resources
++         tri.close();
+  
+          WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
+          wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
