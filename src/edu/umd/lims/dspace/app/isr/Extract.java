@@ -1,238 +1,237 @@
+package edu.umd.lims.dspace.app.isr;
 
-import java.sql.*;
-import java.util.*;
+import java.util.HashMap;
 
-import net.handle.hdllib.*;
-import net.handle.util.StreamTable;
+import java.io.FileOutputStream;
+
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
 
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.xml.sax.helpers.AttributesImpl;
 
-import org.dspace.handle.HandleManager;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
+/**
+ * Extract ISR tech reports from the rdbms outputting to xml.
+ */
 
-public class CollectionReorg
-{
-  public static Connection connection = null;
+public class Extract {
 
-  public static String
-  escape(String x)
-  {
-    if (x == null) {
-      return "";
-    }
+  private static Logger log = Logger.getLogger(Extract.class);
 
-    // escape for sql
-    int i = x.indexOf('\'');
-    while (i > -1) {
-      x =
-        x.substring(0,i) +
-        "\\" +
-        x.substring(i)
-        ;
-      i = x.indexOf('\'', i+2);
-    }
-    return x;
-  }
+  public static Connection conn = null;
 
+  public static void main(String[] args) throws Exception {
 
-  public static boolean
-  getSubcomm(Community subcomm)
-  {
-    String subcommName = escape(subcomm.getMetadata("name"));
-    
-    try {
-      // Get metadata from the dev site
-      if (connection == null) {
-        DriverManager.registerDriver(new org.postgresql.Driver());
-        connection = DriverManager.getConnection("jdbc:postgresql://localhost:8021/dspace", "dspace", null);
-      }
+    // dspace properties
+    String strDspace     = ConfigurationManager.getProperty("dspace.dir");
 
-      Statement st = connection.createStatement();
-      String strQuery = 
-        "SELECT * " +
-        "FROM community " +
-        "WHERE " +
-        "    name = '" + subcommName + "'"
-        ;
-      
-      ResultSet rs = st.executeQuery(strQuery);
-      if (rs.next()) {
-        subcomm.setMetadata("short_description", escape(rs.getString("short_description")));
-        subcomm.setMetadata("introductory_text", escape(rs.getString("introductory_text")));
-      } else {
-        System.out.println("Error: no subocommunity match in dev");
-        System.exit(1);
-      }
+    // Log4j configuration
+    PropertyConfigurator.configure(strDspace + "/config/log4j-app.properties");
 
-      // Close the ResultSet and Statement
-      rs.close();
-      st.close();
+    // jdbc connection
+    log.info("Setting up JDBC connection");
+    Class driverClass = Class.forName(ConfigurationManager.getProperty("db.driver"));
+    Driver driver = (Driver) driverClass.newInstance();
+    DriverManager.registerDriver(driver);
+
+    conn = DriverManager.getConnection(ConfigurationManager.getProperty("isr.url"), "dspace", null);
+
+    // Setup the output xml
+    FileOutputStream fos = new FileOutputStream(args[0]);
+    OutputFormat format = OutputFormat.createPrettyPrint();
+    XMLWriter out = new XMLWriter(fos, format);
+
+    out.startDocument();
+    out.startElement("","","collection",new AttributesImpl());
  
-    }
-    catch (SQLException e) {
-      System.out.println("Error: SQL exception handling " + subcommName + ":\n" + e.getMessage());
-      System.exit(1);
-    }
-      
-    return true;
-  }
-
-
-  public static boolean
-  getColl(Collection coll)
-  {
-    String collName = escape(coll.getMetadata("name"));
+    Statement st = conn.createStatement();
+    String strQuery = 
+      "SELECT title,author,year,submitteruid,isrnum,published,papertype,advisoruid,advisors,filename,keywords,center,abstract,intelprop"
+      + " FROM isr_report"
+      ;
     
-    try {
-      // Get metadata from the dev site
-      if (connection == null) {
-        DriverManager.registerDriver(new org.postgresql.Driver());
-        connection = DriverManager.getConnection("jdbc:postgresql://localhost:8021/dspace", "dspace", null);
-      }
+    ResultSet rs = st.executeQuery(strQuery);
+    ResultSetMetaData rsm = rs.getMetaData();
 
-      Statement st = connection.createStatement();
-      String strQuery = 
-        "SELECT * " +
-        "FROM collection " +
-        "WHERE " +
-        "    name='" + collName + "'"
-        ;
-      
-      ResultSet rs = st.executeQuery(strQuery);
-      if (rs.next()) {
-        coll.setMetadata("short_description", escape(rs.getString("short_description")));
-        coll.setMetadata("introductory_text", escape(rs.getString("introductory_text")));
-      } else {
-        System.out.println("Error: no collection match in dev");
-        System.exit(1);
-      }
+    while (rs.next()) {
+      out.startElement("","","record",new AttributesImpl());
 
-      // Close the ResultSet and Statement
-      rs.close();
-      st.close();
- 
-    }
-    catch (SQLException e) {
-      System.out.println("Error: SQL exception handling " + collName + ":\n" + e.getMessage());
-      System.exit(1);
-    }
-      
-    return true;
-  }
+      String strCenterKey = "";
 
+      for (int i=1; i <= rsm.getColumnCount(); i++) {
+	String strName = rsm.getColumnName(i);
+	String strValue = rs.getString(i);
 
-  public static void
-  main(String[] args)
-    throws Exception
-    {
-      PropertyConfigurator.configure("log4j.properties");
+	AttributesImpl attr = new AttributesImpl();
 
-      // Setup the context
-      Context context = new Context();
-      context.setIgnoreAuthorization(true);
-
-      // Change the name of the community
-      {
-        Community comms[] = Community.findAll(context);
-        for (int j=0; j < comms.length; j++) {
-          Community comm = comms[j];
-          if (comm.getMetadata("name").equals("School of Architecture, Planning, & Preservation")) {
-            comm.setMetadata("name", "College of Architecture, Planning, & Preservation");
-            comm.update();
-          }
-        }
-      }
-      context.commit();
-
-      // Get Collection list
-      Collection colls[] = Collection.findAll(context);
-      for (int i=0; i < colls.length; i++) {
-        Collection coll = colls[i];
-        String collName = coll.getMetadata("name");
-        System.out.println("Collection: " + collName);
-
-        // Renaming
-        if (collName.equals("Materials Science & Engineering")) {
-          collName = "Materials & Science Engineering";
-        } else if (collName.equals("Biological Resources Engineering")) {
-          collName = "Biological Resources & Engineering";
-        } else if (collName.equals("Natural Resource Sciences & Landscape Architecture")) {
-          collName = "Natural Resources & Engineering";
-        } else if (collName.equals("Nutrition & Food Science")) {
-          collName = "Nutrition & Food Sciences";
-        } else if (collName.equals("Communication")) {
-          collName = "Communications";
-        } else if (collName.equals("Languages, Literatures & Cultures")) {
-          collName = "Languages, Literature & Culture";
-        } else if (collName.equals("University Libraries (faculty)")) {
-          collName = "Library Faculty";
-        } else if (collName.equals("Logistics, Business, & Public Policy")) {
-          collName = "Logistics, Business & Public Policy";
-        }
-
-        String subcommName = collName;
-        if (collName.equals("UMIACS Technical Reports")) {
-          collName = "Technical Reports from UMIACS";
-        } else if (! collName.equals("UM Theses and Dissertations") &&
-                   ! collName.equals("Computer Science Department Technical Reports")) {
-          collName += " Research Works";
-        }
-
-        // Get the community
-        Community comms[] = coll.getCommunities();
-        if (comms.length != 1) {
-          System.out.println("Error: collection has <> 1 communities");
-          continue;
-        }
-        Community comm = comms[0];
-        String commName = comm.getMetadata("name");
-
-        // Create the new subcommunity
-        Community subcomm = comm.createSubcommunity();
-        subcomm.setMetadata("name", subcommName);
-        subcomm.setMetadata("group_id", comm.getIntMetadata("group_id"));
-        subcomm.update();
-        
-
-        // Get subcommunity metadata from dev
-        if (!getSubcomm(subcomm)) {
-          System.out.println("Error: Unable to get metadata for " + subcommName);
-          continue;
-        }
-        subcomm.update();
-
-        // Move the collection to the subcommunity
-        subcomm.addCollection(coll);
-        comm.removeCollection(coll);
-        
-        // Rename the collection
-        coll.setMetadata("name", collName);
-        coll.update();
-        
-	// Get collection metadata from dev
-	if (!getColl(coll)) {
-	  System.out.println("Error: Unable to get metadata for " + collName);
-	  continue;
+	// add user info
+	if ((strName.equals("submitteruid") || 
+	     (strName.equals("advisoruid")))
+	    && strValue != null) {
+	  addUser(strValue, attr);
 	}
-	coll.update();
 
-        context.commit();
+	// build the center key
+	if (strName.equals("year") ||
+	    strName.equals("isrnum") ||
+	    strName.equals("papertype"))
+	{
+	  strCenterKey += strValue;
+	}
+
+	// add center number
+	if (strName.equals("center") && !strValue.equalsIgnoreCase("ISR")) {
+	  strCenterKey = strValue.toLowerCase() + strCenterKey;
+	  addCenterNumber(strCenterKey, attr);
+	}
+
+	// fixups
+	if (strValue == null) {
+	  strValue = "null";
+	}
+	if (strName.equals("year")) {
+	  strValue = strValue.substring(0,4);
+	}
+	if (strName.equals("center")) {
+	  strValue = strValue.toUpperCase();
+	}
+
+	// strip out control characters
+	StringBuffer sb = new StringBuffer(strValue);
+	for (int j=0; j < sb.length(); j++) {
+	  if (Character.isISOControl(sb.charAt(j))) {
+	    sb.setCharAt(j, '?');
+	  }
+	}
+	strValue = sb.toString();
+
+	// output the field
+	out.startElement("","",strName,attr);
+	out.characters(strValue.toCharArray(), 0, strValue.length());
+	out.endElement("","",strName);
       }
 
-      context.complete();
-
+      out.endElement("","","record");
     }
+
+    rs.close();
+    st.close();
+
+    // Close the xml output
+    out.endElement("","","collection");
+    out.endDocument();
+    out.close();
+  }
+
+
+  /**
+   * Add user information to the attributes.
+   */
+
+  private static HashMap hUser = null;
+
+  public static void addUser(String strUserid, AttributesImpl attr) throws Exception {
+    if (hUser == null) {
+      log.info("Getting user information");
+      hUser = new HashMap();
+
+      Statement st = conn.createStatement();
+      String strQuery = 
+	"SELECT *"
+	+ " FROM users"
+	;
+      
+      ResultSet rs = st.executeQuery(strQuery);
+
+      while (rs.next()) {
+	String strUseridd = rs.getString("userid");
+	String strFname = rs.getString("fname");
+	String strLname = rs.getString("lname");
+	String strUserType = rs.getString("usertype");
+
+	hUser.put(strUseridd, new String[] {strFname, strLname, strUserType});
+      }
+
+      rs.close();
+      st.close();
+    }
+
+
+    if (!hUser.containsKey(strUserid)) {
+      throw new Exception("Unknown userid: " + strUserid);
+    }
+
+    String s[] = (String [])hUser.get(strUserid);
+
+    attr.addAttribute("","","fname","",s[0]);
+    attr.addAttribute("","","lname","",s[1]);
+    attr.addAttribute("","","usertype","",s[2]);
+  }
+
+
+  /**
+   * Add the center specific number
+   */
+
+  private static HashMap hCenter = null;
+
+  public static void addCenterNumber(String strCenterKey, AttributesImpl attr) throws Exception {
+    if (hCenter == null) {
+      log.info("Getting center information");
+      hCenter = new HashMap();
+
+      String sCenter[] = new String[] {"caar","cdcss","cshcn","nextor","seil"};
+      for (int i = 0; i < sCenter.length; i++) {
+
+	Statement st = conn.createStatement();
+	String strQuery = 
+	  "SELECT year,isrnum,papertype,centernum"
+	  + " FROM " + sCenter[i]
+	  ;
+
+	ResultSet rs = st.executeQuery(strQuery);
+
+	while (rs.next()) {
+	  String strKey = 
+	    sCenter[i]
+	    + rs.getString(1)
+	    + rs.getString(2)
+	    + rs.getString(3)
+	    ;
+
+	  hCenter.put(strKey, rs.getString(4));
+	}
+
+	rs.close();
+	st.close();
+      }
+    }
+
+    
+    if (!hCenter.containsKey(strCenterKey)) {
+      throw new Exception("Unknown center key: " + strCenterKey);
+    }
+    
+    String sCenterNum = (String)hCenter.get(strCenterKey);
+    
+    attr.addAttribute("","","centernum","",sCenterNum);
+  }
+
 
 }
+
+
 
 
 
