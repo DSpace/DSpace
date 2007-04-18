@@ -121,8 +121,8 @@ Common usage:
     <javac srcdir="src"
            destdir="build/classes"
            debug="on"
-    	       source="1.4"
-  	       target="1.4">
+   	       source="1.5"
+           target="1.5">
       <include name="**/*.java"/>
       <classpath refid="build.class.path"/>
     </javac>
