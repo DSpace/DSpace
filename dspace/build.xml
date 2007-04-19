@@ -112,6 +112,34 @@ Common usage:
 
   
   <!-- ============================================================= -->
+  <!-- Print some useful help text                                  -->
+  <!-- ============================================================= -->
+  <target name="help">
+      <echo message=""/>
+      <echo message="DSpace build file"/>
+      <echo message="-----------------------------------"/>
+      <echo message=""/>
+      <echo message="Available targets are:"/>
+      <echo message=""/>
+      <echo message="compile         --> Compile all Java files"/>
+      <echo message="update          --> Update installed code without touching your config or data"/>
+      <echo message=""/>
+      <echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config"/>
+      <echo message="install_code    --> Install compiled code into ${dspace.dir}"/>
+      <echo message="build_wars      --> Build WAR files"/>
+      <echo message=""/>
+      <echo message="fresh_install   --> Perform a fresh installation of the software, including the databases &amp; config"/>
+      <echo message="setup_database  --> Create database tables"/>
+      <echo message="load_registries --> Load metadata &amp; file format registries into the database"/>
+      <echo message=""/>
+      <echo message="clean           --> Delete compiled classes and WARs"/>
+      <echo message="clean_database  --> Remove DSpace database tables, destroying data"/>
+      <echo message=""/>
+      <echo message="public_api      --> Create the DSpace public API documentation with javadoc"/>
+      <echo message="javadoc         --> Create javadoc for everything"/>
+  </target>
+  
+  <!-- ============================================================= -->
   <!-- Compile the source code                                       -->
   <!-- ============================================================= -->
 
@@ -121,7 +149,7 @@ Common usage:
     <javac srcdir="src"
            destdir="build/classes"
            debug="on"
-   	       source="1.5"
+           source="1.5"
            target="1.5">
       <include name="**/*.java"/>
       <classpath refid="build.class.path"/>
