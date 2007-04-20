@@ -35,6 +35,7 @@
 - Fix for SF Bug #1653151 Checker file shows filter-media (just a typo in header)
 - SF Patch #1676370 Bug #1648070 Statistics does not use navbar="admin"
 - Fix for SF Bug #1690573 dspace-admin, edit item trailing white spaces
+- SF Patch #1702177 For SF bug #1638605 bin/cleanup fails on deleted primary bitstream
 
 (Stuart Lewis)
 - SF Patch #1670110 for SF Bug #1670106 Onebox and textarea fail when visibility set to workflow
