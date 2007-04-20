@@ -1174,6 +1174,12 @@ public class LogAnalyser
     public static Integer getNumItems(Context context, String type)
         throws SQLException
     {
+        boolean oracle = false;
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            oracle = true;
+        }
+
         // FIXME: this method is clearly not optimised
         
         // FIXME: we don't yet collect total statistics, such as number of items
@@ -1207,23 +1213,41 @@ public class LogAnalyser
       
         if (startDate != null)
         {
-           dateQuery.append(" AND text_value::timestamp > '" +
-                          unParseDate(startDate) + "'::timestamp ");
+            if (oracle)
+            {
+                dateQuery.append(" AND TO_TIMESTAMP( TO_CHAR(text_value), "+
+                        "'yyyy-mm-dd\"T\"hh24:mi:ss\"Z\"' ) > TO_DATE('" +
+                        unParseDate(startDate) + "', 'yyyy-MM-dd') ");
+            }
+            else
+            {
+                dateQuery.append(" AND text_value::timestamp > '" +
+                        unParseDate(startDate) + "'::timestamp ");
+            }
         }
-        
+
         if (endDate != null)
         {
-            dateQuery.append(" AND text_value::timestamp < ' " +
-                          unParseDate(endDate) + "'::timestamp ");
+            if (oracle)
+            {
+                dateQuery.append(" AND TO_TIMESTAMP( TO_CHAR(text_value), "+
+                        "'yyyy-mm-dd\"T\"hh24:mi:ss\"Z\"' ) < TO_DATE('" +
+                        unParseDate(endDate) + "', 'yyyy-MM-dd') ");
+            }
+            else
+            {
+                dateQuery.append(" AND text_value::timestamp < '" +
+                        unParseDate(endDate) + "'::timestamp ");
+            }
         }
         
         // build the final query
         StringBuffer query = new StringBuffer();
         
-        query.append("SELECT COUNT(*) AS number " +
+        query.append("SELECT COUNT(*) AS num " +
                   "FROM item " +
-                  "WHERE in_archive = true " + 
-                  "AND withdrawn = false ");
+                  "WHERE in_archive = " + (oracle ? "1 " : "true ") +
+                  "AND withdrawn = " + (oracle ? "0 " : "false "));
         
         if (startDate != null || endDate != null)
         {
@@ -1239,9 +1263,18 @@ public class LogAnalyser
         
         TableRow row = DatabaseManager.querySingle(context, query.toString());
 
-        // for some reason the number column is of "long" data type!
-        Long count = new Long(row.getLongColumn("number"));
-        return new Integer(count.intValue());
+        Integer numItems;
+        if (oracle)
+        {
+            numItems = new Integer(row.getIntColumn("num"));
+        }
+        else
+        {
+            // for some reason the number column is of "long" data type!
+            Long count = new Long(row.getLongColumn("num"));
+            numItems = new Integer(count.intValue());
+        }
+        return numItems;
     }
     
     

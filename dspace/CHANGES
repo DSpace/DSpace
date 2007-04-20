@@ -59,6 +59,9 @@
 - SF Patch #1665400 Oracle schema changes for CLOB columns
 - SF Patch #1655583 Avoid index lock with filter-media
 
+(Phillip Franks, Gramham Triggs, Stuart Lewis, Chris Yates, James Rutherford)
+- SF Patch #1445573 Stats not working in Oracle
+
 1.4.1 final
 ===========
 (Tim Donohue)
