@@ -77,7 +77,7 @@ import org.dspace.search.DSIndexer;
  */
 public class MediaFilterManager
 {
-    public static boolean createIndex = true; // default to creating index
+    public static boolean updateIndex = true; // default to updating index
 
     public static boolean isVerbose = false; // default to not verbose
 
@@ -108,7 +108,7 @@ public class MediaFilterManager
         options.addOption("f", "force", false,
                 "force all bitstreams to be processed");
         options.addOption("n", "noindex", false,
-                "do NOT re-create search index after filtering bitstreams");
+                "do NOT update the search index after filtering bitstreams");
         options.addOption("i", "identifier", true,
         		"ONLY process bitstreams belonging to identifier");
         options.addOption("m", "maximum", true,
@@ -132,7 +132,7 @@ public class MediaFilterManager
 
         if (line.hasOption('n'))
         {
-            createIndex = false;
+            updateIndex = false;
         }
 
         if (line.hasOption('f'))
@@ -207,11 +207,11 @@ public class MediaFilterManager
             	}
             }
           
-            // create search index?
-            if (createIndex)
+            // update search index?
+            if (updateIndex)
             {
-                System.out.println("Creating search index:");
-                DSIndexer.createIndex(c);
+                System.out.println("Updating search index:");
+                DSIndexer.updateIndex(c);
             }
 
             c.complete();

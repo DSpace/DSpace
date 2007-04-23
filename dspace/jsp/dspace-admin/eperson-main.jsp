@@ -85,7 +85,7 @@
 	   </strong></p>
 <%  } %>
     
-    <form method="post" action="">    
+    <form name="epersongroup" method="post" action="">    
 
     <center>
         <table width="90%">

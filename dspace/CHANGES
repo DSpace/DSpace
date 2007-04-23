@@ -1,11 +1,19 @@
 1.4.2 beta
 ===========
+
+(Mark Diggory/Graham Triggs)
+- SF Patch 1655583 Fixes issues with FilterMedia, the UI and Index locking, includes 
+  a lucene upgrade to support better management of index locking.
+  
 (Robert Tansley)
 - Fixes to QueryArgs and RegisterServlet that cause NullPointerExceptions on
   invalid input
 
 (Andrea Bollini)
 - SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
+
+(Flavio Botelho)
+- SF Patch #1601946 for SF Bug #1601875 - Makes javascript idependent to form position
 
 (Christophe Destin)
 - SF Patch #1582754 CreateAdministrator for dummies
@@ -34,12 +42,11 @@
 - Fix for SF Bug #1653151 Checker file shows filter-media (just a typo in header)
 - SF Patch #1676370 Bug #1648070 Statistics does not use navbar="admin"
 - Fix for SF Bug #1690573 dspace-admin, edit item trailing white spaces
+- SF Patch #1702177 For SF bug #1638605 bin/cleanup fails on deleted primary bitstream
 
 (Stuart Lewis)
 - SF Patch #1670110 for SF Bug #1670106 Onebox and textarea fail when visibility set to workflow
 - SF Patch #1628889 Improve file size descriptions in ItemTag
-- SF Patch #1641678 [dspace]/bin scripts for import and export
-- SF Patch #1642336 Restrict domains of self-registered users
 - SF Patch #1587225 Google and html sitemap generator
 
 (Monika Mevenkamp)
@@ -52,14 +59,17 @@
 
 (James Rutherford)
 - SF Patch #1694943 for SF feature request #1691277 Importing: Workaround for ext3 subdirectory limitation
-
-(Dorothea Salo)
-- SF Patch #1557948 Link subjects and authors on item pages
+- SF Patch #1695702 Update SubmitServlet to use default.language instead of "en" for SF bug 1636792 default.language not applied to new submissions
+- SF Patch #1699903 for SF Bug #1695692 make-release-package still uses CVS commands
 
 (Graham Triggs)
 - SF Patch #1688523 Bug fix - OAI harvest and Oracle
 - SF Patch #1660752 Workaround Numeric/Integer handling in Oracle
 - SF Patch #1665400 Oracle schema changes for CLOB columns
+- SF Patch #1655583 Avoid index lock with filter-media
+
+(Philip Franks, Gramham Triggs, Stuart Lewis, Chris Yates, James Rutherford)
+- SF Patch #1445573 Stats not working in Oracle
 
 1.4.1 final
 ===========

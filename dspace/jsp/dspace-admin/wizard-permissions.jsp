@@ -146,7 +146,7 @@
 	<%-- <p>You can change this later using the relevant sections of the DSpace admin UI.</p> --%>
 	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.change"/></p>
 
-    <form action="<%= request.getContextPath() %>/tools/collection-wizard" method="post">
+    <form name="epersongroup" action="<%= request.getContextPath() %>/tools/collection-wizard" method="post">
 		<center>
 			<table>
 <%

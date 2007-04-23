@@ -1,39 +1,69 @@
 #!/bin/sh
 
-USAGE="$0 cvs-tag version"
+USAGE="Usage: $0 <path> <svn_revision> <version>
+  * <path> is relative to the SVN root (eg: branches/dspace-1_4_x/dspace)
+  * <svn_revision> is the revision you want to build the release from
+  * <version> is the version number to release as (eg: 1.4.2)
+Example:
+./make-release-package branches/dspace-1_4_x/dspace 1795 1.4.2"
 
-# Just in case you need to 'socksify' etc
-CVS_COMMAND="cvs"
+SVN="svn"
+SVN_BASE_URL="https://dspace.svn.sourceforge.net/svnroot/dspace"
 
 # Check we have required command-line arguments
-if [ "$#" != "2" ]; then
-        echo $USAGE
-        exit 1
+if [ "$#" != "3" ]; then
+	echo "${USAGE}"
+	exit 1
 fi
 
-FILENAME="dspace-$2-source"
-
 mkdir tmp
+
+if [ $? -eq 1 ]; then
+	# If mkdir failed, then tmp/ already exists, and we don't want to overwrite
+	# anything in there.
+	exit 1
+fi
+
 cd tmp
+FILENAME="dspace-$3-source"
 
 echo "Checking out core code..."
-$CVS_COMMAND -Q export -r $1 dspace
+$SVN export -r $2 "$SVN_BASE_URL/$1" dspace
 
-# Don't need to include this script!
-rm -f dspace/make-release-package
+if [ $? -eq 1 ] || [ ! -d "dspace" ]; then
+	# SVN export failed
+	echo "SVN export failed. Check your path & revision number and try again."
+	cd ..
+	rmdir tmp
+	exit 1
+fi
 
-# Or silly cvsignore files
-rm -f `find dspace -name .cvsignore`
+if [ ! -f "dspace/make-release-package" ]; then
+	cat <<-EOF
+	ERROR: The file dspace/make-release-package doesn't exist. There must have
+	been a problem with the export. Check the contents of tmp/ to find out what
+	the problem was.
+	EOF
+	exit 1
+else
+	# Don't need to include this script!
+	rm -f dspace/make-release-package
+fi
 
 echo "Creating tarball..."
 mv dspace $FILENAME
 
-tar -cf - $FILENAME | gzip -c > $FILENAME.tar.gz
+tar czf $FILENAME.tgz $FILENAME
+tar cjf $FILENAME.tbz2 $FILENAME
+zip -r $FILENAME.zip $FILENAME
 
 echo "Cleaning up..."
 
 cd ..
-mv tmp/$FILENAME.tar.gz .
+mv tmp/$FILENAME.* .
 rm -r tmp
 
-echo "Package created as $FILENAME.tar.gz"
+echo "Packages created:
+  * $FILENAME.tgz
+  * $FILENAME.tbz2
+  * $FILENAME.zip"

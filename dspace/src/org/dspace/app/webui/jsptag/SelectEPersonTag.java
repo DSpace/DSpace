@@ -185,7 +185,7 @@ public class SelectEPersonTag extends TagSupport
                 out.print("<input type=\"button\" value=\""
                                         + LocaleSupport.getLocalizedMessage(pageContext,
                                                 "org.dspace.app.webui.jsptag.SelectEPersonTag.removeSelected")
-                                        + "\" onclick=\"javascript:removeSelected(window.document.forms[0].eperson_id);\"/>");
+                                        + "\" onclick=\"javascript:removeSelected(window.document.epersongroup.eperson_id);\"/>");
             }
 
             out.println("</td></tr></table>");

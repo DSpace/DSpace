@@ -478,6 +478,12 @@ public class Bitstream extends DSpaceObject
      */
     void delete() throws SQLException
     {
+        boolean oracle = false;
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            oracle = true;
+        }
+
         // changed to a check on remove
         // Check authorisation
         //AuthorizeManager.authorizeAction(bContext, this, Constants.DELETE);
@@ -489,6 +495,12 @@ public class Bitstream extends DSpaceObject
 
         // Remove policies
         AuthorizeManager.removeAllPolicies(bContext, this);
+
+        // Remove references to primary bitstreams in bundle
+        String query = "update bundle set primary_bitstream_id = ";
+        query += (oracle ? "''" : "Null") + " where primary_bitstream_id = ? ";
+        DatabaseManager.updateQuery(bContext,
+                query, bRow.getIntColumn("bitstream_id"));
 
         // Remove bitstream itself
         BitstreamStorageManager.delete(bContext, bRow

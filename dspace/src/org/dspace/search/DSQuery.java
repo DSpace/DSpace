@@ -40,6 +40,7 @@
 package org.dspace.search;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -83,21 +84,29 @@ public class DSQuery
     static final String COMMUNITY = "" + Constants.COMMUNITY;
 
     // cache a Lucene IndexSearcher for more efficient searches
-    private static Searcher searcher;
+    private static IndexSearcher searcher = null;
 
+    private static String indexDir = null;
+    
+    private static String operator = null;
+    
     private static long lastModified;
     
     /** log4j logger */
     private static Logger log = Logger.getLogger(DSQuery.class);
 
+    
     static
     {
-        String maxClauses = ConfigurationManager
-                .getProperty("search.max-clauses");
+        String maxClauses = ConfigurationManager.getProperty("search.max-clauses");
         if (maxClauses != null)
         {
             BooleanQuery.setMaxClauseCount(Integer.parseInt(maxClauses));
         } 
+        
+        indexDir = ConfigurationManager.getProperty("search.dir");
+        
+        operator = ConfigurationManager.getProperty("search.operator");   
     }
 
     /**
@@ -135,13 +144,11 @@ public class DSQuery
         try
         {
             // grab a searcher, and do the search
-            Searcher searcher = getSearcher(ConfigurationManager
-                    .getProperty("search.dir"));
+            Searcher searcher = getSearcher(c);
 
             QueryParser qp = new QueryParser("default", DSIndexer.getAnalyzer());
             log.info("Final query string: " + querystring);
             
-            String operator = ConfigurationManager.getProperty("search.operator");   
             if (operator == null || operator.equals("OR"))
             {
             	qp.setDefaultOperator(QueryParser.OR_OPERATOR);
@@ -388,21 +395,66 @@ public class DSQuery
         }
     }
 
-    /*---------  private methods ----------*/
+    /*---------  protected methods ----------*/
 
+    /**	
+     * get an IndexReader.
+     * @throws IOException 
+     */
+    protected static IndexReader getIndexReader() 
+    	throws IOException
+    {
+    	return getSearcher(null).getIndexReader();
+    }
+    
     /**
      * get an IndexSearcher, hopefully a cached one (gives much better
      * performance.) checks to see if the index has been modified - if so, it
      * creates a new IndexSearcher
      */
-    private static synchronized Searcher getSearcher(String indexDir)
+    protected static synchronized IndexSearcher getSearcher(Context c)
             throws IOException
     {
-        if (lastModified != IndexReader.getCurrentVersion(indexDir))
+       
+        // If we have already opened a searcher, check to see if the index has been updated
+        // If it has, we need to close the existing searcher - we will open a new one later
+        if (searcher != null && lastModified != IndexReader.getCurrentVersion(indexDir))
         {
-            // there's a new index, open it
+            try
+            {
+                // Close the cached IndexSearcher
+                searcher.close();
+            }
+            catch (IOException ioe)
+            {
+                // Index is probably corrupt. Log the error, but continue to either:
+                // 1) Return existing searcher (may yet throw exception, no worse than throwing here)
+                log.warn("DSQuery: Unable to check for updated index", ioe);
+            }
+            finally
+            {
+            	searcher = null;
+            }
+        }
+
+        // There is no existing searcher - either this is the first execution,
+        // or the index has been updated and we closed the old index.
+        if (searcher == null)
+        {
+            // So, open a new searcher
             lastModified = IndexReader.getCurrentVersion(indexDir);
-            searcher = new IndexSearcher(indexDir);
+            searcher = new IndexSearcher(indexDir){
+            	/* 
+            	 * TODO: Has Lucene fixed this bug yet?
+            	 * Lucene doesn't release read locks in 
+            	 * windows properly on finalize. Our hack
+            	 * extend IndexSearcher to force close().
+            	 */
+                protected void finalize() throws Throwable {
+            		this.close();
+            		super.finalize();
+            	}
+            };
         }
 
         return searcher;

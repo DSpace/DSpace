@@ -5,7 +5,7 @@
  *
  * Date: $Date$
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -792,6 +792,8 @@ public class SubmitServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_next");
+		String defaultLanguage =
+			ConfigurationManager.getProperty("default.language");
 
         // Firstly, check for a click of the cancel button.
         if (buttonPressed.equals("submit_cancel"))
@@ -879,7 +881,8 @@ public class SubmitServlet extends DSpaceServlet
     	      	{
                     if (!vals[z].equals(""))
                     {
-                        item.addMetadata(dcSchema, dcElement, dcQualifier, "en", vals[z]);
+                        item.addMetadata(dcSchema, dcElement, dcQualifier,
+								defaultLanguage, vals[z]);
                     }
     	      	}
     	      }
@@ -888,7 +891,7 @@ public class SubmitServlet extends DSpaceServlet
     	   			(inputType.equals("textarea")))
     	   {
     	   		readText(request, item, dcSchema, dcElement, dcQualifier, 
-    	   				 inputs[j].getRepeatable(), "en");
+    	   				 inputs[j].getRepeatable(), defaultLanguage);
     	   }
     	   else 
     	   {
