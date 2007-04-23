@@ -48,6 +48,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -81,17 +82,45 @@ public class PasswordAuthentication
     private static Logger log = Logger.getLogger(PasswordAuthentication.class);
 
     /**
-     * Just return true since anyone can self-register by creating new
-     * EPerson.
-     * <p>NOTE:  It may be desireable to have this consult a
-     * configuration parameter first.
+     * Look to see if this email address is allowed to register.
+     * <p>
+     * The configuration key authentication.password.domain.valid is examined
+     * in dspace.cfg to see what doamins are valid.
+     * <p>
+     * Example - aber.ac.uk domains : @aber.ac.uk
+     * Example - MIT domain and all .ac.uk domains: @mit.edu, .ac.uk
      */
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
-                                   String username)
-        throws SQLException
+                                   String email)
+                                                 throws SQLException
     {
-        return true;
+        // Is there anything set in authentication.password.domain.valid?
+        String domains = ConfigurationManager.getProperty("authentication.password.domain.valid");
+        if ((domains == null) || (domains.trim().equals("")))
+        {
+            // No conditions set, so must be able to self register
+            return true;
+        }
+        else
+        {
+            // Itterate through all domains
+            String[] options = domains.trim().split(",");
+            String check;
+            email = email.trim().toLowerCase();
+            for (int i = 0; i < options.length; i++)
+            {
+                check = options[i].trim().toLowerCase();
+                if (email.endsWith(check))
+                {
+                    // A match, so we can register this user
+                    return true;
+                }
+            }
+            
+            // No match
+            return false;
+        }    
     }
 
     /**
