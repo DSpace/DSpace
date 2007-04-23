@@ -141,12 +141,8 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-//   FIXME: Use the following prototype when we switch to java 1.5 and remove the 
-//   other varants of the methods.
-//public static TableRowIterator queryTable(Context context, String table,
-//String query, Object ... parameters ) throws SQLException
-	  public static TableRowIterator queryTable(Context context, String table,
-	  String query, Object[] parameters ) throws SQLException
+    public static TableRowIterator queryTable(Context context, String table,
+            String query, Object... parameters ) throws SQLException
     {
         if (log.isDebugEnabled())
         {
@@ -171,69 +167,6 @@ public class DatabaseManager
         retTRI.setStatement(statement);
         return retTRI;
     }
-
-	// FIXME: Remove for java 1.5:
-    public static TableRowIterator queryTable(Context context, String table,
-    String query) throws SQLException
-    {
-    	return queryTable(context,table,query,new Object[0]);
-    }
-	  
-	// FIXME: Remove for java 1.5:
-    public static TableRowIterator queryTable(Context context, String table,
-    String query, String string1 ) throws SQLException
-    {
-    	Object[] parameters = {string1};
-    	return queryTable(context,table,query,parameters);
-    }
-	 
-    // FIXME: Remove for java 1.5:
-    public static TableRowIterator queryTable(Context context, String table,
-    String query, String string1, String string2 ) throws SQLException
-    {
-    	Object[] parameters = {string1, string2};
-    	return queryTable(context,table,query,parameters);
-    }
-    
-    // FIXME: Remove for java 1.5:
-    public static TableRowIterator queryTable(Context context, String table,
-    String query, int int1 ) throws SQLException
-    {
-    	Object[] parameters = { new Integer(int1) };
-    	return queryTable(context,table,query,parameters);
-    }
-    
-    // FIXME: Remove for java 1.5:
-    public static TableRowIterator queryTable(Context context, String table,
-    String query, int int1, int int2 ) throws SQLException
-    {
-    	Object[] parameters = {new Integer(int1), new Integer(int2)};
-    	return queryTable(context,table,query,parameters);
-    }
-    
-    // FIXME: Remove for java 1.5:
-    public static TableRowIterator queryTable(Context context, String table,
-    String query, int int1, int int2, int int3) throws SQLException
-    {
-    	Object[] parameters = {new Integer(int1), new Integer(int2), new Integer(int3)};
-    	return queryTable(context,table,query,parameters);
-    }
-    
-    // FIXME: Remove for java 1.5:
-    public static TableRowIterator queryTable(Context context, String table,
-    String query, int int1, String string2) throws SQLException
-    {
-    	Object[] parameters = {new Integer(int1), string2};
-    	return queryTable(context,table,query,parameters);
-    }
-    
-    // FIXME: Remove for java 1.5:
-    public static TableRowIterator queryTable(Context context, String table,
-    String query, int int1, String string2, String string3) throws SQLException
-    {
-    	Object[] parameters = {new Integer(int1), string2, string3};
-    	return queryTable(context,table,query,parameters);
-    }
     
     /**
      * Return an iterator with the results of the query.
@@ -250,12 +183,8 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-//  FIXME: Use the following prototype when we switch to java 1.5 and remove the 
-//  other varants of the methods.
-//public static TableRowIterator query(Context context, String query, Object ... parameters)
-//throws SQLException    
-    public static TableRowIterator query(Context context, String query, Object[] parameters)
-            throws SQLException
+    public static TableRowIterator query(Context context, String query,
+            Object... parameters) throws SQLException    
     {
     	if (log.isDebugEnabled())
         {
@@ -279,53 +208,6 @@ public class DatabaseManager
         
         retTRI.setStatement(statement);
         return retTRI;
-    }
-    
-    // FIXME: remove for java 1.5.
-    public static TableRowIterator query(Context context, String query)
-    throws SQLException
-    {
-    	return query(context,query,new Object[0]);
-    }
-    
-    // FIXME: remove for java 1.5.
-    public static TableRowIterator query(Context context, String query, String string1)
-    throws SQLException
-    {
-    	Object[] parameters = {string1};
-    	return query(context,query,parameters);
-    }
-    
-    // FIXME: remove for java 1.5.
-    public static TableRowIterator query(Context context, String query, String string1, String string2)
-    throws SQLException
-    {
-    	Object[] parameters = {string1,string2};
-    	return query(context,query,parameters);
-    }
-    
-    // FIXME: remove for java 1.5.
-    public static TableRowIterator query(Context context, String query, int int1)
-    throws SQLException
-    {
-    	Object[] parameters = {new Integer(int1)};
-    	return query(context,query,parameters);
-    }    
-
-    // FIXME: remove for java 1.5.
-    public static TableRowIterator query(Context context, String query, int int1, int int2)
-    throws SQLException
-    {
-    	Object[] parameters = {new Integer(int1), new Integer(int2)};
-    	return query(context,query,parameters);
-    }    
-    
-    // FIXME: remove for java 1.5.
-    public static TableRowIterator query(Context context, String query, String string1, int int2)
-    throws SQLException
-    {
-    	Object[] parameters = {string1,new Integer(int2)};
-    	return query(context,query,parameters);
     }
     
     /**
@@ -392,12 +274,8 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-//    FIXME: Use the following prototype when we switch to java 1.5 and remove the 
-//    other varants of the methods.
-//public static TableRow querySingle(Context context, String query, Object ... parameters)
-//throws SQLException
-    public static TableRow querySingle(Context context, String query, Object[] parameters)
-            throws SQLException
+    public static TableRow querySingle(Context context, String query,
+            Object... parameters) throws SQLException
     {
         TableRowIterator iterator = query(context, query, parameters);
 
@@ -405,37 +283,6 @@ public class DatabaseManager
         iterator.close();
         return (retRow);
     }
-
-    // FIXME: Remove for java 1.5
-    public static TableRow querySingle(Context context, String query)
-    throws SQLException
-	{
-    	return querySingle(context,query,new Object[0]);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static TableRow querySingle(Context context, String query, String string1)
-    throws SQLException
-	{
-    	Object[] parameters = {string1};
-    	return querySingle(context,query,parameters);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static TableRow querySingle(Context context, String query, int int1)
-    throws SQLException
-	{
-    	Object[] parameters = {new Integer(int1)};
-    	return querySingle(context,query,parameters);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static TableRow querySingle(Context context, String query, int int1, int int2)
-    throws SQLException
-	{
-    	Object[] parameters = {new Integer(int1), new Integer(int2)};
-    	return querySingle(context,query,parameters);
-	}
     
     /**
      * Return the single row result to this query, or null if no result. If more
@@ -455,12 +302,8 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-//  FIXME: Use the following prototype when we switch to java 1.5 and remove the 
-//  other varants of the methods.
-//public static TableRow querySingleTable(Context context, String table,
-//String query, Object ... parameters) throws SQLException
     public static TableRow querySingleTable(Context context, String table,
-            String query, Object[] parameters) throws SQLException
+            String query, Object... parameters) throws SQLException
     {
         TableRowIterator iterator = queryTable(context, canonicalize(table), query, parameters);
 
@@ -468,36 +311,6 @@ public class DatabaseManager
         iterator.close();
         return (retRow);
     }
-
-    // FIXME: Remove for java 1.5
-    public static TableRow querySingleTable(Context context, String table, String query) throws SQLException
-	{
-    	return querySingleTable(context,table,query,new Object[0]);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static TableRow querySingleTable(Context context, String table, String query, 
-    		String string1) throws SQLException
-	{
-    	Object[] parameters = {string1};
-    	return querySingleTable(context,table,query,parameters);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static TableRow querySingleTable(Context context, String table, String query, 
-    		int int1) throws SQLException
-	{
-    	Object[] parameters = {new Integer(int1)};
-    	return querySingleTable(context,table,query,parameters);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static TableRow querySingleTable(Context context, String table, String query, 
-    		int int1, int int2) throws SQLException
-	{
-    	Object[] parameters = {new Integer(int1), new Integer(int2)};
-    	return querySingleTable(context,table,query,parameters);
-	}    
     
     /**
      * Execute an update, insert or delete query. Returns the number of rows
@@ -515,12 +328,8 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-//  FIXME: Use the following prototype when we switch to java 1.5 and remove the 
-//  other varants of the methods.
-//public static int updateQuery(Context context, String query, Object ... parameters)
-//throws SQLException
-    public static int updateQuery(Context context, String query, Object[] parameters)
-            throws SQLException
+    public static int updateQuery(Context context, String query,
+            Object... parameters) throws SQLException
     {
         PreparedStatement statement = null;
 
@@ -559,44 +368,6 @@ public class DatabaseManager
             }
         }
     }
-
-    // FIXME: Remove for java 1.5
-    public static int updateQuery(Context context, String query) throws SQLException
-	{
-    	return updateQuery(context,query,new Object[0]);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static int updateQuery(Context context, String query, 
-    		String string1) throws SQLException
-	{
-    	Object[] parameters = {string1};
-    	return updateQuery(context,query,parameters);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static int updateQuery(Context context, String query, 
-    		int int1) throws SQLException
-	{
-    	Object[] parameters = { new Integer(int1) };
-    	return updateQuery(context,query,parameters);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static int updateQuery(Context context, String query, 
-    		int int1, int int2) throws SQLException
-	{
-    	Object[] parameters = { new Integer(int1), new Integer(int2) };
-    	return updateQuery(context,query,parameters);
-	}
-    
-    // FIXME: Remove for java 1.5
-    public static int updateQuery(Context context, String query, 
-    		int int1, int int2, int int3) throws SQLException
-	{
-    	Object[] parameters = { new Integer(int1), new Integer(int2), new Integer(int3) };
-    	return updateQuery(context,query,parameters);
-	}
     
     /**
      * Create a new row in the given table, and assigns a unique id.
