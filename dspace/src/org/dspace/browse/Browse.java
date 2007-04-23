@@ -434,8 +434,7 @@ public class Browse
 
         for (int i = 0; i < browseTables.length; i++)
         {
-            String query = MessageFormat.format(sql,
-                    new String[] { browseTables[i] });
+            String query = MessageFormat.format(sql, browseTables[i]);
             DatabaseManager.updateQuery(context, query);
         }
     }

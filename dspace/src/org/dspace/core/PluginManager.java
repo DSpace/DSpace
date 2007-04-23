@@ -306,8 +306,8 @@ public class PluginManager
                     try
                     {
                     	Class pluginClass = Class.forName(classnames[i]);
-                        String names[] = (String[])pluginClass.getMethod("getPluginNames", null).
-                                                   invoke(null, null);
+                        String names[] = (String[])pluginClass.getMethod("getPluginNames").
+                                                   invoke(null);
                         if (names == null || names.length == 0)
                             log.error("Self-named plugin class \""+classnames[i]+"\" returned null or empty name list!");
                         else
