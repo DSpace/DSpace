@@ -1,6 +1,8 @@
 Libraries used by DSpace - Release 1.4:
 
 activation.jar:      The Java Activation Framework, used by JavaMail (v1.1)
+bcmail-jdk15-136.jar: Bouncy Castle Crypto Package Mail (v1.36)
+bcprov-jdk15-136.jar: Bouncy Castle Crypto Package Provider (v1.36)
 commons-cli.jar:     Jakarta Commons command line processing (v1.0)
 commons-codec-1.3.jar: Jakarta Commons Codec (v1.3)
 commons-collections.jar: Jakarta Commons collections API (v3.2)
