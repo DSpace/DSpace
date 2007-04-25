@@ -47,6 +47,7 @@ package org.dspace.content;
  * @author Martin Hald
  * @version $Revision$
  */
+@Deprecated
 public class DCValue
 {
     /** The DC element */

@@ -437,6 +437,7 @@ public class Item extends DSpaceObject
      *            no country code are returned.
      * @return Dublin Core fields that match the parameters
      */
+    @Deprecated
     public DCValue[] getDC(String element, String qualifier, String lang)
     {
         return getMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
@@ -577,6 +578,7 @@ public class Item extends DSpaceObject
      * @param values
      *            the values to add.
      */
+    @Deprecated
     public void addDC(String element, String qualifier, String lang,
             String[] values)
     {
@@ -599,6 +601,7 @@ public class Item extends DSpaceObject
      * @param value
      *            the value to add.
      */
+    @Deprecated
     public void addDC(String element, String qualifier, String lang,
             String value)
     {
@@ -715,6 +718,7 @@ public class Item extends DSpaceObject
      *            means values with any country code or no country code are
      *            removed.
      */
+    @Deprecated
     public void clearDC(String element, String qualifier, String lang)
     {
         clearMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
