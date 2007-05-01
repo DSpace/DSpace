@@ -226,9 +226,16 @@ public class DSIndexer
     public static void indexContent(Context context, DSpaceObject dso, boolean force)
     throws SQLException, IOException
     {
-        
-        Term t = new Term("handle", dso.getHandle());
-        
+    	
+    	String handle = dso.getHandle();
+    	
+    	if(handle == null)
+    	{
+    		handle = HandleManager.findHandle(context, dso);   
+    	}
+
+		Term t = new Term("handle", handle);
+		
         IndexWriter writer = null;
         
         try
@@ -236,7 +243,7 @@ public class DSIndexer
             switch (dso.getType())
             {
             case Constants.ITEM :
-                if(requiresIndexing((Item) dso) || force)
+                if(requiresIndexing(handle, ((Item)dso).getLastModified()) || force)
                 {
                 	Document doc = buildDocument(context, (Item) dso);
                 	
@@ -246,27 +253,29 @@ public class DSIndexer
                 	writer = openIndex(context, false); 
                 	writer.updateDocument(t, doc);
                 	
-                    log.info("Wrote Item: " + dso.getHandle() + " to Index");
+                    log.info("Wrote Item: " + handle + " to Index");
                 }
                 break;
                 
             case Constants.COLLECTION :
             	writer = openIndex(context, false);
             	writer.updateDocument(t, buildDocument(context, (Collection) dso));
-            	log.info("Wrote Collection: " + dso.getHandle() + " to Index");
+            	log.info("Wrote Collection: " + handle + " to Index");
             	break;
 
             case Constants.COMMUNITY :
             	writer = openIndex(context, false);
             	writer.updateDocument(t, buildDocument(context, (Community) dso));
-                log.info("Wrote Community: " + dso.getHandle() + " to Index");
+                log.info("Wrote Community: " + handle + " to Index");
                 break;
                 
             default :
                 log.error("Only Items, Collections and Communities can be Indexed");
             }
 
-        }
+        } catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
         finally
         {
         	/* drop the lock */
@@ -365,53 +374,11 @@ public class DSIndexer
     public static void createIndex(Context c) throws SQLException, IOException
     {
 
-        IndexWriter writer = openIndex(c, true);
+    	/* Create a new index, blowing away the old. */
+        openIndex(c, true).close();
         
-        try
-        {
-        	
-        	Community[] communities = Community.findAll(c);
-            for (int i = 0; i < communities.length; i++)
-            {
-                writer.addDocument(buildDocument(c, communities[i]));
-                log.info("Wrote Community: " + communities[i].getHandle() + " to Index");
-            }
-
-            Collection[] collections = Collection.findAll(c);
-            for (int i = 0; i < collections.length; i++)
-            {
-                writer.addDocument(buildDocument(c, collections[i]));
-                log.info("Wrote Collection: " + collections[i].getHandle() + " to Index");
-            }
-
-            ItemIterator iter = Item.findAll(c);
-            while (iter.hasNext())
-            {
-                Item target = (Item) iter.next();
-
-                try
-                {
-                	writer.addDocument(buildDocument(c, target));
-                	log.info("Wrote Item: " + target.getHandle() + " to Index");
-                } catch (SQLException e) {
-                	log.error(e.getMessage(),e);
-    			} catch (IOException e) {
-    				log.error(e.getMessage(),e);
-    			}
-                finally
-                {
-                	
-                }
-                target.decache();
-            }
-            // optimize the index - important to do regularly to reduce
-            // filehandle usage and keep performance fast!
-            writer.optimize();
-        }
-        finally
-        {
-            writer.close();
-        }
+        /* Reindex all content preemptively. */
+        DSIndexer.updateIndex(c, true);
 
     }
     
@@ -743,22 +710,16 @@ public class DSIndexer
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-    private static boolean requiresIndexing(Item dso)
+    private static boolean requiresIndexing(String handle, Date lastModified)
     throws SQLException, IOException
     {
 		
 		boolean reindexItem = false;
 		boolean inIndex = false;
-
-		if(dso.getHandle() == null)
-		{
-			return false;
-		}
 		
 		IndexReader ir = DSQuery.getIndexReader();
 		
-		// we have a handle (our unique ID, so remove)
-		Term t = new Term("handle", dso.getHandle());
+		Term t = new Term("handle", handle);
 		TermDocs docs = ir.termDocs(t);
 						
 		while(docs.next())
@@ -767,10 +728,10 @@ public class DSIndexer
 			int id = docs.doc();
 			Document doc = ir.document(id);
 
-			Field lastModified = doc.getField(LAST_INDEXED_FIELD);
+			Field lastIndexed = doc.getField(LAST_INDEXED_FIELD);
 
-			if (lastModified == null || Long.parseLong(lastModified.stringValue()) < 
-					dso.getLastModified().getTime()) {
+			if (lastIndexed == null || Long.parseLong(lastIndexed.stringValue()) < 
+					lastModified.getTime()) {
 				reindexItem = true;
 			}
 		}
@@ -907,12 +868,19 @@ public class DSIndexer
     throws SQLException, IOException
     {
     
+    	String handle = item.getHandle();
+    	
+    	if(handle == null)
+    	{
+    		handle = HandleManager.findHandle(context, item);   
+    	}
+    	
     	// get the location string (for searching by collection & community)
         String location = buildItemLocationString(context, item);
 
-        Document doc = buildDocument(Constants.ITEM, item.getHandle(), location);
+        Document doc = buildDocument(Constants.ITEM, handle, location);
 
-        log.debug("Building Item: " + item.getHandle());
+        log.debug("Building Item: " + handle);
 
         int j;
         int k = 0;
