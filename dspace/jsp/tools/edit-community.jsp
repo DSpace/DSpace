@@ -77,6 +77,11 @@
         intro = community.getMetadata("introductory_text");
         copy = community.getMetadata("copyright_text");
         side = community.getMetadata("side_bar_text");
+       
+       	if (shortDesc == null)
+        {
+            shortDesc = "";
+        }
         
         if (copy == null)
         {

@@ -100,6 +100,11 @@
             license = collection.getLicense();
         }
         
+        if (shortDesc == null)
+        {
+            shortDesc = "";
+        }
+        
         if (copy == null)
         {
             copy = "";

@@ -59,8 +59,12 @@
 - SF Patch #1665400 Oracle schema changes for CLOB columns
 - SF Patch #1655583 Avoid index lock with filter-media
 
-(Philip Franks, Gramham Triggs, Stuart Lewis, Chris Yates, James Rutherford)
+(Phillip Franks, Gramham Triggs, Stuart Lewis, Chris Yates, James Rutherford)
 - SF Patch #1445573 Stats not working in Oracle
+
+(Chris Yates)
+- SF Patch #1711982 Updates to short_description (null) field when editing/creat
+
 
 1.4.1 final
 ===========
