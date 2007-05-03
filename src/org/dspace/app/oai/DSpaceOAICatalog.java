@@ -82,6 +82,15 @@ import ORG.oclc.oai.server.verb.OAIInternalServerError;
  */
 public class DSpaceOAICatalog extends AbstractCatalog
 {
+  /**
+   * <pre>
+   * Revision History
+   *
+   *   2006/06/29: Ben
+   *     - add back in xml escaping of the set names
+   * </pre>
+   */
+
     /** log4j logger */
     private static Logger log = Logger.getLogger(DSpaceOAICatalog.class);
 
@@ -659,7 +668,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 String spec = "<set><setSpec>hdl_"
                         + allCols[i].getHandle().replace('/', '_')
                         + "</setSpec><setName>"
-                        + allCols[i].getMetadata("name") + "</setName></set>";
+                        + OAIDCCrosswalk.escapeXml(allCols[i].getMetadata("name")) + "</setName></set>";
 
                 sets.add(spec);
             }

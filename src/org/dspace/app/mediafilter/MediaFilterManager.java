@@ -80,7 +80,7 @@ public class MediaFilterManager
         options.addOption("n", "noindex", false,
                 "do NOT re-create search index after filtering bitstreams");
         options.addOption("h", "help", false, "help");
-	options.addOption("i", "item", true, "process a single item (handle or id)");
+        options.addOption("i", "item", true, "process a single item (handle or id)");
 
         CommandLine line = parser.parse(options, argv);
 
@@ -107,10 +107,10 @@ public class MediaFilterManager
             isForce = true;
         }
 
-	if (line.hasOption('i')) {
-	    isSingle = true;
-	    itemid = line.getOptionValue('i');
-	}
+        if (line.hasOption('i')) {
+            isSingle = true;
+            itemid = line.getOptionValue('i');
+        }
 
         // get path to config file
         String myPath = ConfigurationManager.getProperty("dspace.dir")
@@ -180,26 +180,30 @@ public class MediaFilterManager
             is.close();
 
             // now apply the filters
-	    if (isSingle) {
-		applyFiltersSingleItem(c);
-	    } else {
-		applyFiltersAllItems(c);
-	    }
+            if (isSingle) {
+                applyFiltersSingleItem(c);
+            } else {
+                applyFiltersAllItems(c);
+            }
 
-	    System.out.println("Completing DSpace transactions");
+            System.out.println("Completing DSpace transactions");
             c.complete();
-	    System.out.println("Completing done");
+            System.out.println("Completing done");
             c = null;
         }
+		  catch (Throwable t) {
+				System.out.println("Uncaught Error:");
+				t.printStackTrace();
+		  }
         finally
         {
             if (c != null)
             {
-		System.out.println("Aborting DSpace transactions");
+                System.out.println("Aborting DSpace transactions");
                 c.abort();
-		System.exit(1);
+                System.exit(1);
             }
-	    System.exit(0);
+            System.exit(0);
         }
     }
 
@@ -213,16 +217,16 @@ public class MediaFilterManager
 
             if (filterItem(c, myItem)) {
 
-		// commit changes after each filtered item
-		c.commit();
+                // commit changes after each filtered item
+                c.commit();
 
-		// create search index?
-		if (createIndex)
-		{
-		    System.out.println("indexing");
-		    DSIndexer.reIndexContent(c, myItem);
-		}
-	    }
+                // create search index?
+                if (createIndex)
+                {
+                    System.out.println("indexing");
+                    DSIndexer.reIndexContent(c, myItem);
+                }
+            }
         }
     }
 
@@ -233,40 +237,40 @@ public class MediaFilterManager
       // Try handle first
       Object o = HandleManager.resolveToObject(c, itemid);
       if (o != null) {
-	if (o instanceof Item) {
-	  myItem = (Item)o;
-	} else {
-	  throw new Exception("Error: '" + itemid + "' is a handle for an object which is not an Item");
-	}
+        if (o instanceof Item) {
+          myItem = (Item)o;
+        } else {
+          throw new Exception("Error: '" + itemid + "' is a handle for an object which is not an Item");
+        }
       }
 
       // Try item id next
       if (myItem == null) {
-	try {
-	  int id = Integer.parseInt(itemid);
+        try {
+          int id = Integer.parseInt(itemid);
 
-	  myItem = Item.find(c, id);
-	}
-	catch (Exception e) {};
+          myItem = Item.find(c, id);
+        }
+        catch (Exception e) {};
       }
 
       // Get anything?
       if (myItem == null) {
-	throw new Exception("Error: could not find item for '" + itemid + "'");
+        throw new Exception("Error: could not find item for '" + itemid + "'");
       }
 
       // Filter the item
       if (filterItem(c, myItem)) {
 
-	  // commit changes
-	  c.commit();
+          // commit changes
+          c.commit();
 
-	  // create search index?
-	  if (createIndex)
-	  {
-	      System.out.println("indexing");
-	      DSIndexer.reIndexContent(c, myItem);
-	  }
+          // create search index?
+          if (createIndex)
+          {
+              System.out.println("indexing");
+              DSIndexer.reIndexContent(c, myItem);
+          }
       }
 
     }
@@ -292,14 +296,14 @@ public class MediaFilterManager
 
                 for (int k = 0; k < myBitstreams.length; k++)
                 {
-		    if (filterBitstream(c, myItem, myBitstreams[k])) {
-			bUpdate = true;
-		    }
+                    if (filterBitstream(c, myItem, myBitstreams[k])) {
+                        bUpdate = true;
+                    }
                 }
             }
         }
 
-	return bUpdate;
+        return bUpdate;
     }
 
     /**
@@ -339,21 +343,21 @@ public class MediaFilterManager
                 {
                     myItem.update(); // Make sure new bitstream has a sequence
                                      // number
-		    bUpdate = true;
+                    bUpdate = true;
                 }
             }
             catch (Exception e)
             {
                 System.out.println("ERROR filtering: "
-				   + "item " + myItem.getHandle()
-				   + " (" + myItem.getID() + ")"
-				   + ", bitstream " + myBitstream.getName()
-				   + " (" + myBitstream.getID() + ")"
-				   );
-		e.printStackTrace();
+                                   + "item " + myItem.getHandle()
+                                   + " (" + myItem.getID() + ")"
+                                   + ", bitstream " + myBitstream.getName()
+                                   + " (" + myBitstream.getID() + ")"
+                                   );
+                e.printStackTrace();
             }
         }
 
-	return bUpdate;
+        return bUpdate;
     }
 }

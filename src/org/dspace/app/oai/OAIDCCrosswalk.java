@@ -40,6 +40,9 @@
  * <pre>
  * Revision History:
  * 
+ *   2006/06/29: Ben
+ *     - make escapeXml more efficient
+ *
  *   2004/07/13: Ben
  *     - make the xml escaping into a static method
  * </pre>
@@ -128,33 +131,33 @@ public class OAIDCCrosswalk extends Crosswalk
 
         return metadata.toString();
     }
+  
 
-    public static String escapeXml(String value)
-    {
-        // First do &'s - need to be careful not to replace the
-        // & in "&amp;" again!
-        int c = -1;
-        while ((c = value.indexOf("&", c + 1)) > -1)
-        {
-            value = value.substring(0, c) +
-                "&amp;" +
-                value.substring(c + 1);
-        }
-        
-        while ((c = value.indexOf("<")) > -1)
-        {
-            value = value.substring(0, c) +
-                "&lt;" +
-                value.substring(c + 1);
-        }
-        
-        while ((c = value.indexOf(">")) > -1)
-        {
-            value = value.substring(0, c) +
-                "&gt;" +
-                value.substring(c + 1);
-        }
+  /************************************************************ escapeXml */
+  /**
+   * XML escape the input text.
+   *
+   * @param strMsg input text
+   * @return XML escaped version of input
+   */
 
-		  return value;
-	 }
+  public static String escapeXml(String strMsg) {
+    if (strMsg == null)
+      return null;
+
+    StringBuffer sb = new StringBuffer();
+    for (int i=0; i < strMsg.length(); i++) {
+      char ch = strMsg.charAt(i);
+      
+      switch (ch) {
+      case '&':   sb.append("&amp;");    break;
+      case '<':   sb.append("&lt;");     break;
+      case '>':   sb.append("&gt;");     break;
+      default:    sb.append(ch);         break;
+      }
+    }
+
+    return sb.toString();
+  }
+
 }

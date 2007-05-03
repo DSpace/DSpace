@@ -16,6 +16,12 @@ public class CommunityGroup
     /**
      * <pre>
      * Revision History
+     *   2005/09/26: Gary
+     *     - changed name of "UM Faculty..." group 
+     *
+     *   2005/09/26: Ben
+     *     - remove 'Managed by Libraries'; vestiges are in place 
+     *       but findAll does not return it
      *
      *   2004/10/21: Ben
      *     - initial version
@@ -50,7 +56,6 @@ public class CommunityGroup
     {
 	return new CommunityGroup[]{
 	    new CommunityGroup(context, FACULTY),
-	    new CommunityGroup(context, LIBRARIES),
 	    new CommunityGroup(context, UM)
 		};
     }
@@ -78,7 +83,7 @@ public class CommunityGroup
     {
 	switch (id) {
 	case FACULTY:
-	    return "UM Faculty: Individual Deposit Collections Organized by Department";
+	    return "Collections Organized by Department";
 	case LIBRARIES:
 	    return "Collections Managed by UM Libraries";
 	case UM:

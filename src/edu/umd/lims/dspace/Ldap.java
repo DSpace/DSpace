@@ -43,6 +43,10 @@ import org.dspace.eperson.Group;
  <pre>
  Revision History:
 
+   2005/10/17: Ben
+     - in main(), try to create the ldap twice.  The first attempt
+       is now always failing
+
    2005/04/13: Ben
      - add status of EA to isFaculty()
 
@@ -82,7 +86,7 @@ public class Ldap {
 
   private static final String[] strRequestAttributes = 
   new String[]{"givenname", "sn", "mail", "umfaculty", "telephonenumber", 
-	       "ou", "umappointment"};
+               "ou", "umappointment"};
 
 
   /******************************************************************* Ldap */
@@ -145,37 +149,37 @@ public class Ldap {
     // Make sure we got something
     if (entries == null) {
       log.warn(LogManager.getHeader(context,
-				    "null returned on ctx.search for " + strFilter,
-				    ""));
+                                    "null returned on ctx.search for " + strFilter,
+                                    ""));
       return false;
     }
 
     // Check for a match
     if (!entries.hasMore()) {
       log.debug(LogManager.getHeader(context,
-				     "no matching entries for " + strFilter,
-				     ""));
+                                     "no matching entries for " + strFilter,
+                                     ""));
       return false;
     }
 
     // Get entry
     entry = (SearchResult)entries.next();
     log.debug(LogManager.getHeader(context,
-				   "matching entry for " + strUid + ": " + entry.getName(),
-				   ""));
+                                   "matching entry for " + strUid + ": " + entry.getName(),
+                                   ""));
 
     // Check for another match
     if (entries.hasMore()) {
       entry = null;
       log.warn(LogManager.getHeader(context,
-				    "multiple matching entries for " + strFilter,
-				    ""));
+                                    "multiple matching entries for " + strFilter,
+                                    ""));
       return false;
     }
 
     log.debug(LogManager.getHeader(context,
-				   "ldap entry:\n" + entry,
-				   ""));
+                                   "ldap entry:\n" + entry,
+                                   ""));
 
     return true;
   }
@@ -207,8 +211,8 @@ public class Ldap {
     // Make sure we got something
     if (compare == null) {
       log.warn(LogManager.getHeader(context,
-				    "compare on userpassword failed for " + strUid,
-				    ""));
+                                    "compare on userpassword failed for " + strUid,
+                                    ""));
       return checkAdmin(strPassword);
     }
 
@@ -227,25 +231,25 @@ public class Ldap {
     try {
       int i;
       if ((i = strLdapPassword.indexOf(':')) > -1) {
-	// Extract email, password
-	String strEmail = strLdapPassword.substring(0,i);
-	String strPassword = strLdapPassword.substring(i+1);
+        // Extract email, password
+        String strEmail = strLdapPassword.substring(0,i);
+        String strPassword = strLdapPassword.substring(i+1);
 
-	// Find the eperson
-	EPerson eperson = EPerson.findByEmail(context, strEmail.toLowerCase());
-	if (eperson != null && eperson.checkPassword(strPassword)) {
-	  // Is the eperson an admin?
-	  Group g = Group.find(context, 1);
-	  if (g.isMember(eperson)) {
-	    return true;
-	  }
-	}
+        // Find the eperson
+        EPerson eperson = EPerson.findByEmail(context, strEmail.toLowerCase());
+        if (eperson != null && eperson.checkPassword(strPassword)) {
+          // Is the eperson an admin?
+          Group g = Group.find(context, 1);
+          if (g.isMember(eperson)) {
+            return true;
+          }
+        }
       }
     }
     catch (Exception e) {
       log.error(LogManager.getHeader(context,
-				     "Error looking up eperson: " + e,
-				     ""));
+                                     "Error looking up eperson: " + e,
+                                     ""));
     }
 
     return false;
@@ -262,8 +266,8 @@ public class Ldap {
   {
     if (ctx != null) {
       try {
-	ctx.close();
-	ctx = null;
+        ctx.close();
+        ctx = null;
       }
       catch (NamingException e) {};
     }
@@ -297,11 +301,11 @@ public class Ldap {
       Attribute a = as.get(strName);
 
       if (a != null) {
-	NamingEnumeration e = a.getAll();
+        NamingEnumeration e = a.getAll();
 
-	while (e.hasMore()) {
-	  vRet.add((String)e.next());
-	}
+        while (e.hasMore()) {
+          vRet.add((String)e.next());
+        }
       }
     }
 
@@ -401,31 +405,31 @@ public class Ldap {
       
       while (i.hasNext()) {
 
-	String strAppt = (String)i.next();
-	String strInst = strAppt.substring(0,2);
-	String strCat = strAppt.substring(24,26);
-	String strStatus = strAppt.substring(27,28);
+        String strAppt = (String)i.next();
+        String strInst = strAppt.substring(0,2);
+        String strCat = strAppt.substring(24,26);
+        String strStatus = strAppt.substring(27,28);
 
-	if ((strCat.equals("01") ||
-	     strCat.equals("02") ||
-	     strCat.equals("03") ||
-	     strCat.equals("15") ||
-	     strCat.equals("25") ||
-	     strCat.equals("36") ||
-	     strCat.equals("37") ||
-	     strCat.equals("EA"))
-	    &&
-	    ((strStatus.equals("A") ||
-	      strStatus.equals("E") ||
-	      strStatus.equals("N") ||
-	      strStatus.equals("Q") ||
-	      strStatus.equals("T") ||
-	      strStatus.equals("F")))
-	    &&
-	    (strInst.equals("01")))
-	{
-	  return true;
-	}
+        if ((strCat.equals("01") ||
+             strCat.equals("02") ||
+             strCat.equals("03") ||
+             strCat.equals("15") ||
+             strCat.equals("25") ||
+             strCat.equals("36") ||
+             strCat.equals("37") ||
+             strCat.equals("EA"))
+            &&
+            ((strStatus.equals("A") ||
+              strStatus.equals("E") ||
+              strStatus.equals("N") ||
+              strStatus.equals("Q") ||
+              strStatus.equals("T") ||
+              strStatus.equals("F")))
+            &&
+            (strInst.equals("01")))
+        {
+          return true;
+        }
       }
     }
 
@@ -450,7 +454,13 @@ public class Ldap {
     //String strPassword = in.readLine();
 
     org.dspace.core.Context context = new org.dspace.core.Context();
-    Ldap ldap = new Ldap(context);
+         Ldap ldap = null;
+         try {
+                ldap = new Ldap(context);
+         }
+         catch (Exception e) {
+                ldap = new Ldap(context);
+         }
 
     System.out.println("uid: " + ldap.checkUid(strUid));
 
@@ -468,8 +478,8 @@ public class Ldap {
 
       int x[] = Authenticator.getAuthorization(context, ldap);
       for (int i=0; i < x.length; i++) {
-	Group group = Group.find(context, x[i]);
-	System.out.println("  " + group.getName());
+        Group group = Group.find(context, x[i]);
+        System.out.println("  " + group.getName());
       }
     }
   }

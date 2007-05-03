@@ -96,6 +96,9 @@ import org.dspace.core.ConfigurationManager;
  <pre>
  Revision History:
 
+   2006/06/14: Ben
+     - send the log file on the command line
+
    2006/03/23: Ben
      - initial version
  </pre>
@@ -129,7 +132,7 @@ public class Etd2Marc
   {
 
     MarcStreamWriter marcwriter = null;
-    PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream("/dev/tty"), "UTF-8"));
+    PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(args[1]), "UTF-8"));
 
     try {
 

@@ -144,10 +144,12 @@ public abstract class MediaFilter
         }
 
         // if exists and overwrite = false, exit
-        if (!overWrite && (existingBitstream != null) && MediaFilterManager.isVerbose)
+        if (!overWrite && (existingBitstream != null))
         {
-            System.out.println("SKIPPED: bitstream " + source.getID()
-                    + " because '" + newName + "' already exists");
+				if (MediaFilterManager.isVerbose) {
+					 System.out.println("SKIPPED: bitstream " + source.getID()
+											  + " because '" + newName + "' already exists");
+				}
 
             return false;
         }
