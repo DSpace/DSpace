@@ -305,6 +305,7 @@ public class Loader  implements ElementHandler {
       // Fixups
       fixAuthor(doc, "/record/author");
       fixAuthor(doc, "/record/advisors");
+      fixKeywords(doc);
 
       // Transform to dublin core
       DocumentSource source = new DocumentSource(record);
@@ -386,7 +387,7 @@ public class Loader  implements ElementHandler {
 
   /************************************************************ fixAuthor */
 
-  static Pattern pAuthor = Pattern.compile(", ");
+  static Pattern pAuthor = Pattern.compile(", |\\s+and\\s+");
   static Pattern pName = Pattern.compile("(.*)\\s+(\\S+)");
 
   /**
@@ -430,6 +431,31 @@ public class Loader  implements ElementHandler {
       }
     }
     
+  }
+
+
+  /*********************************************************** fixKeywords */
+
+  /**
+   * Fix the keywords:
+   * <ul>
+   * <li> eliminate prepended comma </li>
+   * </ul>
+   */
+
+  public static void fixKeywords(Document doc) {
+    Element e = (Element)getXPath("/record/keywords").selectSingleNode(doc);
+    String strText = e.getText().trim();
+
+    if (strText.startsWith(",")) {
+      strText = strText.substring(1).trim();
+    }
+
+    if (strText.equals("")) {
+      e.detach();
+    } else {
+      e.setText(strText);
+    }
   }
 
 

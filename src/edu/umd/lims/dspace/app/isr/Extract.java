@@ -111,7 +111,7 @@ public class Extract {
 	StringBuffer sb = new StringBuffer(strValue);
 	for (int j=0; j < sb.length(); j++) {
 	  if (Character.isISOControl(sb.charAt(j))) {
-	    sb.setCharAt(j, '?');
+	    sb.setCharAt(j, ' ');
 	  }
 	}
 	strValue = sb.toString();
