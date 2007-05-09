@@ -3,11 +3,7 @@ bug tracker:
 
 http://sourceforge.net/tracker/?group_id=19984&atid=119984
 
-Oracle compatibility: this release does not support Oracle. Check for patches or updates
-to this release to restore Oracle compatibility.
-
 1609427 OAI server doesn't generate resumption token
-1606789 When collection is deleted, mapped item remains in community
 1606458 The MyDSpace page is very unstructured
 1606456 wrong link to register
 1606447 Cache strength information
@@ -17,7 +13,6 @@ to this release to restore Oracle compatibility.
 1606439 Exception handling for deleting a metadata field
 1604365 Unbalanced brackets cause search error
 1596576 Stackable LDAP authentication does not work
-1583372 DCDate.toString returns invalid string when hour is zero
 1571645 NullPointerException possible in review.jsp
 1552792 Not possible to uncheck a primary bitstream
 1552760 Submit interface looks bad in Safari browser
@@ -29,13 +24,11 @@ to this release to restore Oracle compatibility.
 1520527 PluginManager messy fail
 1517528 Finishing a submission as a supervisor fails
 1506556 Textareas in Oracle (VARCHAR datatype)
-1490162 Malformed OAI-PMH response: illegal bytes in UTF-8
 1472729 Permissions for Approval Users
 1461607 errors on oracle -- database_schema_13-14.sql
 1461606 oracle errors on-- database_schema.sql (ORACLE version!)
 1460754 Problems with Long Java datatype and Oracle
 1456594 Collection Administrator can delete any item
-1456593 links to controlled vocab docs required
 1456590 Values of templates are not visible for the user
 1456587 Authorisation Policies
 1456580 admin redirected after item withdrawn
@@ -60,10 +53,8 @@ to this release to restore Oracle compatibility.
 1256920 Mapped Items not added to Community (DSpace 1.3.1)
 1242527 Duplicate Items during submission
 1238166 Multi Media and D-Space
-1217068 Failed to complete review in workflow
 1174342 Potencial Memory Issue for a large collection
 1173600 Items Mapper has memory issue for a large collection
 1169975 workspace item policy not updated after workflow change
 1155173 Forms in custom 'skin' break group admin tool
 1120726 Performance bottlekneck in Group.update()
-1076506 Templates applied to imported items

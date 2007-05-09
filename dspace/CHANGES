@@ -1,3 +1,8 @@
+1.4.2 final
+===========
+(Mark Diggory)
+- Fixed a bug introduced in patch 1655583
+
 1.4.2 beta
 ===========
 
@@ -8,9 +13,6 @@
 (Robert Tansley)
 - Fixes to QueryArgs and RegisterServlet that cause NullPointerExceptions on
   invalid input
-
-(Andrea Bollini)
-- SF Patch #1528142 Malformed OAI-PMH response: illegal bytes in UTF-8 for SF Bug #1490162
 
 (Flavio Botelho)
 - SF Patch #1601946 for SF Bug #1601875 - Makes javascript idependent to form position
