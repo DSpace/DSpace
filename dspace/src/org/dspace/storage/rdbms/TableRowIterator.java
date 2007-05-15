@@ -162,6 +162,7 @@ public class TableRowIterator
     {
         if (results == null)
         {
+            close();
             return false;
         }
 
@@ -214,9 +215,11 @@ public class TableRowIterator
     {
         try
         {
-            results.close();
             if (results != null)
+            {
                 results.close();
+                results = null;
+            }
         }
         catch (SQLException sqle)
         {
@@ -226,8 +229,10 @@ public class TableRowIterator
         try
         {
             if (statemt != null)
+            {
                 statemt.close();
-            statemt = null;
+                statemt = null;
+            }
         }
         catch (SQLException sqle)
         {
