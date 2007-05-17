@@ -39,41 +39,30 @@
  */
 package org.dspace.eperson;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.KeyStore;
-import java.security.SignatureException;
-import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.StringTokenizer;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
-import org.dspace.core.LogManager;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.AuthenticationMethod;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.LogManager;
 
 /**
  * Implicit authentication method that gets credentials from the X.509

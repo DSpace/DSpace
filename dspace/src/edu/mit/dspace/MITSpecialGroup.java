@@ -39,22 +39,17 @@
  */
 package edu.mit.dspace;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.AuthenticationMethod;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.AuthenticationMethod;
-import org.dspace.authorize.AuthorizeException;
 
 /**
  * Identify members of "MIT Community" and give them membership in
