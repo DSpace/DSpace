@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.File;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -35,6 +36,30 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+// XML
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentFactory;
+import org.dom4j.Element;
+import org.dom4j.ElementHandler;
+import org.dom4j.ElementPath;
+import org.dom4j.InvalidXPathException;
+import org.dom4j.Namespace;
+import org.dom4j.Node;
+import org.dom4j.QName;
+import org.dom4j.Text;
+import org.dom4j.XPath;
+
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.DocumentSource;
+import org.dom4j.io.DocumentResult;
+import org.dom4j.io.DocumentInputSource;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+
+import org.xml.sax.InputSource;
+
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -44,30 +69,13 @@ import org.dspace.eperson.Group;
 
 import org.dspace.app.webui.SimpleAuthenticator;
 
-import edu.umd.lims.dspace.Ldap;
+import edu.umd.lims.util.ErrorHandling;
 
 
 /*********************************************************************
  DRUM Authentication.
 
  @author  Ben Wallberg
-
- <pre>
- Revision History:
-
-   2005/01/25: Ben
-     - reread ldap.authorization.config if it has changed
-
-   2005/01/19: Ben
-     - use ldap.authorization.config file to map ldap ou to Group
-
-   2004/12/22: Ben
-     - get the entire ldap object
-     - move authorizations into getAuthorization
-
-   2004/12/14: Ben
-     - initial version
- </pre>
 
 *********************************************************************/
 
@@ -77,7 +85,7 @@ public class Authenticator extends SimpleAuthenticator
   /** log4j category */
   private static Logger log = Logger.getLogger(Authenticator.class);
 
-  private static Map auth = null;
+  private static List lAuth = null;
   private static Date dOldFileDate = null;
 
 
@@ -112,36 +120,34 @@ public class Authenticator extends SimpleAuthenticator
     Set sGroups = new HashSet();
 
     try {
-      // Check if the user is faculty
-      if (ldap.isFaculty()) {
-	loadAuthorizationTable(context);
+      loadAuthorizationTable(context);
 
-	// Loop through each ou
-	Iterator i = ldap.getUnits().iterator();
-	while (i.hasNext()) {
-	  String strUnit = (String)i.next();
+      // Loop through each ou
+      Iterator iUnits = ldap.getUnits().iterator();
+      while (iUnits.hasNext()) {
+        String strUnit = (String)iUnits.next();
 
-	  // Loop through the auth table
-	  Iterator j = auth.keySet().iterator();
-	  while (j.hasNext()) {
-	    Pattern p = (Pattern)j.next();
-	    Matcher m = p.matcher(strUnit);
+        // Loop through the lAuth table
+        Iterator iMaps = lAuth.iterator();
+        while (iMaps.hasNext()) {
+          LdapMap map = (LdapMap)iMaps.next();
 
-	    // Check for a match
-	    if (m.matches()) {
-	      sGroups.add(auth.get(p));
-	      break;
-	    }
-	  }
-	}
+          // Check for a match
+          if (map.strOU.equals(strUnit) &&
+              (!map.bFaculty || ldap.isFaculty()))
+          {
+            sGroups.add(map.group);
+          }
+        }
       }
     }
     catch (Exception e) {
       log.error(LogManager.getHeader(null,
-				     "ldap_authorization",
-				     "unable to get authorization information for ldap user"),
-		e);
-      
+                                     "ldap_authorization",
+                                     "unable to get authorization information for ldap user"),
+                e);
+      log.error(ErrorHandling.getStackTrace(e));
+
       return new int[]{};
     }
       
@@ -168,61 +174,74 @@ public class Authenticator extends SimpleAuthenticator
   {
     boolean bSuccess = true;
 
+    log.info("Loading ldap.authorization.conf map");
+
     // Open the file
     String strFile = ConfigurationManager.getProperty("ldap.authorization.config");
     File fFile = new File(strFile);
     Date dNewFileDate = new Date(fFile.lastModified());
 
     try {
-      if (auth == null || 
-	  (dOldFileDate != null && dNewFileDate.after(dOldFileDate))) 
+      if (lAuth == null || 
+          (dOldFileDate != null && dNewFileDate.after(dOldFileDate))) 
       {
-	bSuccess = false;
-	dOldFileDate = dNewFileDate;
-	auth = new LinkedHashMap();
+        bSuccess = false;
+        dOldFileDate = dNewFileDate;
+        lAuth = new ArrayList();
 
-	BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fFile)));
-	
-	// Read through the file
-	String strLine = null;
-	while ((strLine = br.readLine()) != null) {
-	  strLine = strLine.trim();
-	  if (strLine.equals("") || strLine.startsWith("#")) {
-	    continue;
-	  }
+        // open the file
+        FileInputStream is = new FileInputStream(fFile);
+
+        // read the xml document
+        SAXReader reader = new SAXReader();
+        Document doc = reader.read(is);
+
+        List lNodes = doc.selectNodes("/maps/map");
+
+        // loop through the nodes
+        for (Iterator iNodes = lNodes.iterator(); iNodes.hasNext(); ) {
+          Element map = (Element)iNodes.next();
 
 	  try {
-	    // Parse the line
-	    StringTokenizer st = new StringTokenizer(strLine, ":");
-	    if (st.countTokens() != 2) {
-	      throw new Exception("Incorrect number of fields in line: " + strLine);
-	    }
+	    // Get values
+	    String strOU = map.attributeValue("ou");
+	    String strGroup = map.attributeValue("group");
+	    String strFaculty = map.attributeValue("faculty");
 
-	    String strRegex = st.nextToken().trim();
-	    String strGroup = st.nextToken().trim();
+	    boolean bFaculty = (strFaculty != null && 
+				strFaculty.equals("false")
+				? false
+				: true);
+
 	    Group group = Group.findByName(context, strGroup);
 	    if (group == null) {
 	      throw new Exception("Unrecognized group: " + strGroup);
 	    }
-
-	    // Add the line
-	    auth.put(Pattern.compile(strRegex), group);
+	
+	    // Add the map
+	    lAuth.add(new LdapMap(strOU, group, bFaculty));
 	  }
+
 	  catch (Exception e) {
 	    log.error(LogManager.getHeader(null,
 					   "ldap_authorization",
-					   "Error reading line from ldap auth file: " + strLine + "\n" + e.getMessage()));
+					   "Error reading line from ldap auth file: " + e.getMessage()));
 	  }
- 
 	}
-	bSuccess = true;
       }
+
+      bSuccess = true;
     }
+
     finally {
-      if (! bSuccess) {
-	auth = null;
-      }
+        if (! bSuccess) {
+          lAuth = null;
+        } else {
+	  log.info("map size=" + lAuth.size());
+	}
     }
+
+
   }
 
 
@@ -248,6 +267,7 @@ public class Authenticator extends SimpleAuthenticator
       System.out.println(group.getName());
     }
   }
+
 
 }
 

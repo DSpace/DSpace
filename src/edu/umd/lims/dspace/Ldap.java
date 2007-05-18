@@ -40,37 +40,6 @@ import org.dspace.eperson.Group;
 
  @author  Ben Wallberg
 
- <pre>
- Revision History:
-
-   2005/10/17: Ben
-     - in main(), try to create the ldap twice.  The first attempt
-       is now always failing
-
-   2005/04/13: Ben
-     - add status of EA to isFaculty()
-
-   2005/04/12: Ben
-     - add display of umappointment to test program
-
-   2005/01/25: Ben
-     - make main() into an ldap test program
-
-   2005/01/19: Ben
-     - set correct isFaculty() 
-
-   2004/12/22: Ben
-     - change getOu() to getUnits()
-     - set ctx to null after close()
-
-   2004/12/20: Ben
-     - make the ou information available
-     - change isFaculty() to use umappointment
-
-   2004/10/22: Ben
-     - initial version
- </pre>
-
 *********************************************************************/
 
 
@@ -446,40 +415,53 @@ public class Ldap {
     main(String[] args)
     throws Exception
   {
-    PropertyConfigurator.configure("log4j.properties");
-
-    String strUid = args[0];
-    //System.out.print("password for " + strUid + ": ");
-    //BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-    //String strPassword = in.readLine();
-
     org.dspace.core.Context context = new org.dspace.core.Context();
-         Ldap ldap = null;
-         try {
-                ldap = new Ldap(context);
-         }
-         catch (Exception e) {
-                ldap = new Ldap(context);
-         }
 
-    System.out.println("uid: " + ldap.checkUid(strUid));
+    String strDspace     = ConfigurationManager.getProperty("dspace.dir");
 
-    ldap.close();
+    PropertyConfigurator.configure(strDspace + "/config/log4j-app.properties");
 
-    //System.out.println("password: " + ldap.checkPassword(strPassword));
-    System.out.println("name:     " + ldap.getLastName()+", "+ldap.getFirstName());
-    System.out.println("email:    " + ldap.getEmail());
-    System.out.println("phone:    " + ldap.getPhone());
-    System.out.println("faculty:  " + ldap.isFaculty());
-    System.out.println("  umappt: " + ldap.getAttributeAll("umappointment"));
+    for (int j=0; j < args.length; j++) {
+      String strUid = args[j];
+      //System.out.print("password for " + strUid + ": ");
+      //BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+      //String strPassword = in.readLine();
 
-    if (ldap.isFaculty()) {
+      Ldap ldap = null;
+      try {
+	ldap = new Ldap(context);
+      }
+      catch (Exception e) {
+	ldap = new Ldap(context);
+      }
+
+      System.out.println("*************************************");
+      System.out.println("uid:      " + strUid);
+      System.out.println("uid chk:  " + ldap.checkUid(strUid));
+
+      ldap.close();
+
+      //System.out.println("password: " + ldap.checkPassword(strPassword));
+      System.out.println("name:     " + ldap.getLastName()+", "+ldap.getFirstName());
+      System.out.println("email:    " + ldap.getEmail());
+      System.out.println("phone:    " + ldap.getPhone());
+      System.out.println("faculty:  " + ldap.isFaculty());
+      System.out.println("umappt:   " + ldap.getAttributeAll("umappointment"));
+
+      System.out.println("\nunits:");
+      Iterator iUnits = ldap.getUnits().iterator();
+      while (iUnits.hasNext()) {
+	String strUnit = (String)iUnits.next();
+
+	System.out.println("  " + strUnit);
+      }
+
       System.out.println("\ngroups:");
 
       int x[] = Authenticator.getAuthorization(context, ldap);
       for (int i=0; i < x.length; i++) {
-        Group group = Group.find(context, x[i]);
-        System.out.println("  " + group.getName());
+	Group group = Group.find(context, x[i]);
+	System.out.println("  " + group.getName());
       }
     }
   }
