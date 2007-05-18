@@ -50,6 +50,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 <%@ page import="org.dspace.content.Bitstream" %>
@@ -81,7 +83,7 @@
         <%-- <p>Here are the details of the file.  
         <dspace:popup page="/help/index.html#filedescription">(More Help...)</dspace:popup></p> --%>
 		<div><fmt:message key="jsp.submit.change-file-description.info1"/> 
-          <dspace:popup page="/help/index.html#filedescription"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+          <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#filedescription\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <table class="miscTable" align="center" summary="Change file descripton details">
             <tr>

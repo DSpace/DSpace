@@ -55,9 +55,12 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.core.Context"%>
 <%@ page import="org.dspace.app.webui.util.UIUtil"%>
+
 
 
 <%
@@ -76,7 +79,7 @@
     <p><fmt:message key="jsp.dspace-admin.list-formats.text1"/></p>
     <p><fmt:message key="jsp.dspace-admin.list-formats.text2"/></p>
 
-    &nbsp;&nbsp;<dspace:popup page="/help/site-admin.html#bitstream"><fmt:message key="jsp.help"/></dspace:popup>
+    &nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#bitstream\"%>"><fmt:message key="jsp.help"/></dspace:popup>
 
 <%
     Context context = UIUtil.obtainContext(request);

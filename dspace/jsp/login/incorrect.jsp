@@ -50,6 +50,9 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
+
 <dspace:layout navbar="off"
                locbar="nolink"
                titlekey="jsp.login.incorrect.title">
@@ -61,7 +64,7 @@
                 <h1><fmt:message key="jsp.login.incorrect.heading"/></h1>
             </td>
             <td align="right" class="standard">
-                <dspace:popup page="/help/index.html#login"><fmt:message key="jsp.help"/></dspace:popup>
+                <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#login\"%>"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>

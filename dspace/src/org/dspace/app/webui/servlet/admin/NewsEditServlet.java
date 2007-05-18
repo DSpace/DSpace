@@ -45,6 +45,7 @@ import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.servlet.DSpaceServlet;
@@ -52,6 +53,7 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 /**
@@ -81,15 +83,15 @@ public class NewsEditServlet extends DSpaceServlet
         String news = "";
 
         //Are we editing the top news or the sidebar news?
-        int position = UIUtil.getIntParameter(request, "position");
-
+        String position = request.getParameter("position");
+        
         if (button.equals("submit_edit"))
         {
             //get the existing text from the file
             news = ConfigurationManager.readNewsFile(position);
 
             //pass the position back to the JSP
-            request.setAttribute("position", new Integer(position));
+            request.setAttribute("position", position);
 
             //pass the existing news back to the JSP
             request.setAttribute("news", news);

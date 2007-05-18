@@ -55,11 +55,13 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.administer.DCType" %>
-<%@ page import="org.dspace.workflow.WorkflowManager" %>
-<%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.workflow.WorkflowManager" %>
+<%@ page import="org.dspace.workflow.WorkflowItem" %>
 
 <%
     WorkflowItem[] workflows =
@@ -79,7 +81,7 @@
       <td align="left"><h1><fmt:message key="jsp.dspace-admin.workflow-list.heading"/></h1>   
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#workflow"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#workflow\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

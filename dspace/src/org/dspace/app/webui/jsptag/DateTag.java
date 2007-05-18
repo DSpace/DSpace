@@ -41,6 +41,7 @@ package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
@@ -107,7 +108,7 @@ public class DateTag extends TagSupport
 
     public int doStartTag() throws JspException
     {
-        String toDisplay = UIUtil.displayDate(date, displayTime, true);
+        String toDisplay = UIUtil.displayDate(date, displayTime, true, (HttpServletRequest)pageContext.getRequest());
 
         try
         {

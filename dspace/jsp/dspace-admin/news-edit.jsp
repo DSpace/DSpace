@@ -50,7 +50,7 @@
 <%@ page import="org.dspace.core.Constants" %>
 
 <%
-    Integer position = (Integer)request.getAttribute("position");
+    String position = (String)request.getAttribute("position");
 
     //get the existing news
     String news = (String)request.getAttribute("news");
@@ -76,7 +76,7 @@
  <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="post">
 
     <p>
-<% if (position.intValue() == Constants.NEWS_TOP)
+<% if (position.contains("top"))
    { %>
     <fmt:message key="jsp.dspace-admin.news-edit.text.topbox"/>
 <% }
@@ -96,7 +96,7 @@
                 </tr>
                 <tr>
                     <td colspan="2" align="center">
-                    <input type="hidden" name="position" value='<%= position.intValue()%>'/>
+                    <input type="hidden" name="position" value='<%= position %>'/>
                     <%-- <input type="submit" name="submit_save" value="Save"> --%>
                     <input type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
                     <%-- <input type="submit" name="cancel" value="Cancel"> --%>

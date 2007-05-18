@@ -45,16 +45,17 @@
   -    collection - collection we're creating
   --%>
 
-<%@ page import="org.dspace.app.webui.servlet.admin.CollectionWizardServlet" %>
-<%@ page import="org.dspace.content.Collection" %>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
+<%@ page import="org.dspace.app.webui.servlet.admin.CollectionWizardServlet" %>
+<%@ page import="org.dspace.content.Collection" %>
 
 <%  Collection collection = (Collection) request.getAttribute("collection"); %>
 
@@ -71,7 +72,7 @@
     <form action="<%= request.getContextPath() %>/tools/collection-wizard" method="post">
         <%--<p>Please check the boxes next to the statements that apply to the collection. --%>
         <div><fmt:message key="jsp.dspace-admin.wizard-questions.text"/>
-          	<dspace:popup page="/help/site-admin.html#createcollection"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+          	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#createcollection\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
         <center>
             <table class="miscTable">
                 <tr class="oddRowOddCol">

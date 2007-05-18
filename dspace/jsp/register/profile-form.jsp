@@ -55,14 +55,19 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="java.util.Locale"%>
+
+<%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 
 <%
+    Locale[] supportedLocales = I18nUtil.getSupportedLocales();
     EPerson epersonForm = (EPerson) request.getAttribute("eperson");
 
     String lastName = "";
     String firstName = "";
     String phone = "";
+    String language = "";
 
     if (epersonForm != null)
     {
@@ -75,6 +80,9 @@
 
         phone = epersonForm.getMetadata("phone");
         if (phone == null) phone = "";
+
+        language = epersonForm.getMetadata("language");
+        if (language == null) language = "";
     }
 %>
 
@@ -94,4 +102,31 @@
 		<td align="right" class="standard"><label for="tphone"><strong><fmt:message key="jsp.register.profile-form.phone.field"/></strong></label></td>
         <td class="standard"><input type="text" name="phone" id="tphone" size="40" maxlength="32" value="<%= phone %>"/></td>
     </tr>
+        <tr>
+ 		<td align="right" class="standard"><label for="tlanguage"><strong><fmt:message key="jsp.register.profile-form.language.field"/></strong></label></td>
+ 		<td class="standard">
+        <select name="language" id="tlanguage">
+<%
+        for (int i = supportedLocales.length-1; i >= 0; i--)
+        {
+        	String lang = supportedLocales[i].toString();
+        	String selected = "";
+        	
+        	if (language.equals(""))
+        	{ if(lang.equals(I18nUtil.getSupportedLocale(request.getLocale()).getLanguage()))
+        		{
+        			selected = "selected=\"selected\"";
+        		}
+        	}
+        	else if (lang.equals(language))
+        	{ selected = "selected=\"selected\"";}
+%>
+           <option <%= selected %>
+                value="<%= lang %>"><%= supportedLocales[i].getDisplayName(I18nUtil.getSupportedLocale(request.getLocale())) %></option>
+<%
+        }
+%>
+        </select>
+        </td>
+     </tr>
 </table>

@@ -47,7 +47,10 @@
 <%@ page import="java.util.LinkedList" %>
 <%@ page import="java.util.List" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -182,7 +185,7 @@
          <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16"/>
      </td>
      <td nowrap="nowrap" class="navigationBarItem">
-         <dspace:popup page="/help/site-admin.html"><fmt:message key="jsp.layout.navbar-admin.help"/></dspace:popup>
+         <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\")%>"><fmt:message key="jsp.layout.navbar-admin.help"/></dspace:popup>
      </td>
  </tr>
 

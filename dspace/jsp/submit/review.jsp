@@ -50,23 +50,22 @@
 
 <%@ page import="java.io.IOException" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="javax.servlet.jsp.PageContext" %>
+
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
-<%@ page import="org.dspace.content.InProgressSubmission" %>
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.app.webui.util.DCInputSet" %>
 <%@ page import="org.dspace.app.webui.util.DCInput" %>
+<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.content.DCLanguage" %>
 <%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.InProgressSubmission" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.Utils" %>
-
-<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
-<%@ page import="javax.servlet.jsp.PageContext" %>
-
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -129,7 +128,7 @@
                 if (inputType.equals("date"))
                 {
                    DCDate date = new DCDate(values[i].value);
-                   row.append(UIUtil.displayDate(date, false, true));
+                   row.append(UIUtil.displayDate(date, false, true, request));
                 }
                 else if (inputType.equals("dropdown"))
                 {
@@ -177,7 +176,7 @@
         <p><fmt:message key="jsp.submit.review.info1"/></p>
 
         <div><fmt:message key="jsp.submit.review.info2"/>
-        &nbsp;&nbsp;<dspace:popup page="/help/index.html#verify"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+        &nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#verify\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <p><fmt:message key="jsp.submit.review.info3"/></p>
 

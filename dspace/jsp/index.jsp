@@ -55,9 +55,14 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.sql.SQLException" %>
+<%@ page import="java.util.Locale"%>
+
+<%@ page import="javax.servlet.jsp.jstl.core.*" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
 <%@ page import="org.apache.log4j.Logger" %>
 
+<%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Community" %>
@@ -66,7 +71,10 @@
 
 <%
     Context context = null;
-
+    
+    Locale sessionLocale = UIUtil.getSessionLocale(request);
+    Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
+    
     try
     {
         // Obtain a context so that the location bar can display log in status

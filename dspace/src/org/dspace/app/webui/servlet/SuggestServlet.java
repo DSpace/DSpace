@@ -56,6 +56,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
@@ -175,10 +176,8 @@ public class SuggestServlet extends DSpaceServlet
             // All data is there, send the email
             try
             {
-                Email email = ConfigurationManager.getEmail("suggest");
-                
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "suggest"));
                 email.addRecipient(recipAddr);	 // recipient address
-                
                 email.addArgument(recipName);    // 1st arg - recipient name
                 email.addArgument(senderName);   // 2nd arg - sender name
                 email.addArgument(siteName);     // 3rd arg - repository name

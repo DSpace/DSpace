@@ -177,7 +177,8 @@ CREATE TABLE EPerson
   last_active         TIMESTAMP,
   sub_frequency       INTEGER,
   phone	              VARCHAR(32),
-  netid               VARCHAR(64)
+  netid               VARCHAR(64),
+  language            VARCHAR(64)
 );
 
 -- index by email

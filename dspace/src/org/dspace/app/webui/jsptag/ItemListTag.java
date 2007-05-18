@@ -248,7 +248,7 @@ public class ItemListTag extends TagSupport
                                 thumbs = getThumbMarkup(hrq, items[i]);
                             }
                             DCDate dd = new DCDate(metadataArray[0].value);
-                            metadata = UIUtil.displayDate(dd, false, false) + thumbs;
+                            metadata = UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest()) + thumbs;
                         }
                         // format the title field correctly                        
                         else if (field.equals(titleField))

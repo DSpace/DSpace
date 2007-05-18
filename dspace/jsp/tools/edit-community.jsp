@@ -48,6 +48,8 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
@@ -145,7 +147,7 @@
 %>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#editcommunity"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#editcommunity\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

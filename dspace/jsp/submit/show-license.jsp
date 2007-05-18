@@ -50,7 +50,8 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
-    
+ 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
@@ -78,7 +79,7 @@
         </jsp:include>
 
 	<div><fmt:message key="jsp.submit.show-license.info1"/>
-        &nbsp;&nbsp;<dspace:popup page="/help/index.html#license"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+        &nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#license\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <%-- <p><strong>Not granting the license will not delete your submission.</strong>
         Your item will remain in your "My DSpace" page.  You can then either remove

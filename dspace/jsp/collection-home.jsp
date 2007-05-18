@@ -68,6 +68,7 @@
 <%@ page import="org.dspace.eperson.Group"     %>
 
 
+
 <%
     // Retrieve attributes
     Collection collection = (Collection) request.getAttribute("collection");
@@ -274,7 +275,7 @@
 <% } %>
             <tr>
               <td headers="t1" class="standard" align="center">
-                 <dspace:popup page="/help/collection-admin.html"><fmt:message key="jsp.adminhelp"/></dspace:popup>
+                 <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.collection-admin\")%>"><fmt:message key="jsp.adminhelp"/></dspace:popup>
               </td>
             </tr>
 <% } %>

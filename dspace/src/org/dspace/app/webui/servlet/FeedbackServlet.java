@@ -55,6 +55,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
@@ -136,7 +137,7 @@ public class FeedbackServlet extends DSpaceServlet
             // All data is there, send the email
             try
             {
-                Email email = ConfigurationManager.getEmail("feedback");
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
                 email.addRecipient(ConfigurationManager
                         .getProperty("feedback.recipient"));
 

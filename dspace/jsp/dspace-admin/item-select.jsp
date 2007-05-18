@@ -53,7 +53,10 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+
 
 <dspace:layout titlekey="jsp.dspace-admin.item-select.title"
                navbar="admin"
@@ -78,7 +81,7 @@
 
     <%-- <p>Enter the Handle or internal item ID of the item you wish to select. --%>
     <div><fmt:message key="jsp.dspace-admin.item-select.enter"/>
-      <dspace:popup page="/help/site-admin.html#itempolicies"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+      <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#itempolicies\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
     
     <form method="post" action="">
         <center>

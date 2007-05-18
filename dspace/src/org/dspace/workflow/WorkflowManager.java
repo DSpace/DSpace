@@ -44,7 +44,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
 import org.apache.log4j.Logger;
@@ -60,7 +63,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
-import org.dspace.core.I18N;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -666,25 +669,33 @@ public class WorkflowManager
     {
         try
         {
+            // Get submitter
+            EPerson ep = i.getSubmitter();
+            // Get the Locale
+            Locale epLocale = new Locale(ep.getLanguage());
+            Locale supportedLocale = I18nUtil.getSupportedLocale(epLocale);
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
+            
             // Get the item handle to email to user
             String handle = HandleManager.findHandle(c, i);
 
             // Get title
             DCValue[] titles = i.getDC("title", null, Item.ANY);
-            String title = I18N.message("untitled", WorkflowManager.class);
-
+            String title = "";
+            try
+            {
+                title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+            }
+            catch (MissingResourceException e)
+            {
+                title = "Untitled";
+            }
             if (titles.length > 0)
             {
                 title = titles[0].value;
             }
 
-            // Get submitter
-            EPerson ep = i.getSubmitter();
-
-            Email email = ConfigurationManager.getEmail("submit_archive");
-
             email.addRecipient(ep.getEmail());
-
             email.addArgument(title);
             email.addArgument(coll.getMetadata("name"));
             email.addArgument(HandleManager.getCanonicalForm(handle));
@@ -851,30 +862,39 @@ public class WorkflowManager
 
                 String message = "";
 
-                switch (wi.getState())
+                for (int i = 0; i < epa.length; i++)
                 {
-                case WFSTATE_STEP1POOL:
-                    message = I18N.message("step1", WorkflowManager.class);
-                    break;
+                    Locale epersonLocale = new Locale(epa[i].getLanguage());
+                    Locale supportedLocale = I18nUtil.getSupportedLocale(epersonLocale);
+                    Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
+                    email.addArgument(title);
+                    email.addArgument(coll.getMetadata("name"));
+                    email.addArgument(submitter);
 
-                case WFSTATE_STEP2POOL:
-                    message = I18N.message("step2", WorkflowManager.class);
-                    break;
-
-                case WFSTATE_STEP3POOL:
-                    message = I18N.message("step3", WorkflowManager.class);
-                    break;
+                    ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
+                    log.info("Locale des Resource Bundles: " + messages.getLocale().getDisplayName());
+                    switch (wi.getState())
+                    {
+                        case WFSTATE_STEP1POOL:
+                            message = messages.getString("org.dspace.workflow.WorkflowManager.step1");
+                            
+                            break;
+                            
+                        case WFSTATE_STEP2POOL:
+                            message = messages.getString("org.dspace.workflow.WorkflowManager.step2");
+                            
+                            break;
+                            
+                        case WFSTATE_STEP3POOL:
+                            message = messages.getString("org.dspace.workflow.WorkflowManager.step3");
+                            
+                            break;
+                    }
+                    email.addArgument(message);
+                    email.addArgument(getMyDSpaceLink());
+                    email.addRecipient(epa[i].getEmail());
+                    email.send();
                 }
-
-                Email email = ConfigurationManager.getEmail("submit_task");
-
-                email.addArgument(title);
-                email.addArgument(coll.getMetadata("name"));
-                email.addArgument(submitter);
-                email.addArgument(message);
-                email.addArgument(getMyDSpaceLink());
-
-                emailRecipients(c, epa, email);
             }
             catch (MessagingException e)
             {
@@ -925,8 +945,9 @@ public class WorkflowManager
 
             // Get rejector's name
             String rejector = getEPersonName(e);
-
-            Email email = ConfigurationManager.getEmail("submit_reject");
+            Locale eLocale = new Locale(e.getLanguage());
+            Locale supportedLocale = I18nUtil.getSupportedLocale(eLocale);
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
 
             email.addRecipient(getSubmitterEPerson(wi).getEmail());
             email.addArgument(title);
@@ -973,7 +994,7 @@ public class WorkflowManager
         }
         else
         {
-            return I18N.message("untitled", WorkflowManager.class);
+            return I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled ");
         }
     }
 

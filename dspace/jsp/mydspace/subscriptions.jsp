@@ -54,6 +54,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 
@@ -76,8 +78,7 @@
 				<h1><fmt:message key="jsp.mydspace.subscriptions.title"/></h1>
             </td>
             <td align="right" class="standard">
-                <%-- <dspace:popup page="/help/index.html#subscribe">Help...</dspace:popup> --%>
-		<dspace:popup page="/help/index.html#subscribe"><fmt:message key="jsp.help"/></dspace:popup>
+		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#subscribe\" %>"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>

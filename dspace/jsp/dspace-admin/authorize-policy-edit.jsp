@@ -65,11 +65,14 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.authorize.ResourcePolicy" %>
 <%@ page import="org.dspace.content.Collection"       %>
 <%@ page import="org.dspace.core.Constants"           %>
 <%@ page import="org.dspace.eperson.EPerson"          %>
 <%@ page import="org.dspace.eperson.Group"            %>
+
 
 <%
     ResourcePolicy policy = (ResourcePolicy) request.getAttribute("policy"    );
@@ -101,7 +104,7 @@
         </fmt:message></h1>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#authorize"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#authorize\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

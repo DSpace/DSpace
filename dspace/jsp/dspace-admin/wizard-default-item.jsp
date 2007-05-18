@@ -45,19 +45,20 @@
   -    collection - collection we're creating
   --%>
 
-<%@ page import="org.dspace.content.MetadataField" %>
 <%@ page import="org.dspace.content.MetadataSchema" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.app.webui.servlet.admin.CollectionWizardServlet" %>
-<%@ page import="org.dspace.content.Collection" %>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
-    
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
+<%@ page import="org.dspace.app.webui.servlet.admin.CollectionWizardServlet" %>
+<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.MetadataField" %>
 
 <%  Collection collection = (Collection) request.getAttribute("collection");
     MetadataField[] dcTypes = (MetadataField[]) request.getAttribute("dctypes"); %>
@@ -75,7 +76,7 @@
 	<h1><fmt:message key="jsp.dspace-admin.wizard-default-item.enter"/></h1>
       </td>
       <td class="standard" align="right">
-        <dspace:popup page="/help/site-admin.html#wizard_default"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#wizard_default\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

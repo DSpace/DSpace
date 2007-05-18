@@ -53,6 +53,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <dspace:layout titlekey="jsp.tools.get-item-id.title"
@@ -77,7 +79,7 @@
     <%-- <p>Enter the Handle or internal item ID of the item you want to edit or
     delete.  <dspace:popup page="/help/site-admin.html#items">More help...</dspace:popup></p> --%>
 
-	<div><fmt:message key="jsp.tools.get-item-id.info2"/>  <dspace:popup page="/help/site-admin.html#items"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+	<div><fmt:message key="jsp.tools.get-item-id.info2"/>  <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#items\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
     
     <form method="get" action="">
         <center>

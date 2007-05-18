@@ -50,12 +50,12 @@
 
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-
 
 <%
     // Is anyone logged in?
@@ -254,7 +254,7 @@
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/help" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
-      <dspace:popup page="/help/index.html"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup>
+            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\")%>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup>
     </td>
   </tr>
 

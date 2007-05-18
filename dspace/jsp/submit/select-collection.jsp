@@ -47,12 +47,13 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
-    
 	
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -79,7 +80,7 @@
     {
 %>
 	<div><fmt:message key="jsp.submit.select-collection.info1"/>
-      <dspace:popup page="/help/index.html#choosecollection"><fmt:message key="jsp.morehelp"/> </dspace:popup> 
+      <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#choosecollection\"%>"><fmt:message key="jsp.morehelp"/> </dspace:popup> 
 	</div>
 
     <form action="<%= request.getContextPath() %>/submit" method="post">

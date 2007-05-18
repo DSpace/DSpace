@@ -64,12 +64,14 @@
 <%@ page import="java.util.List"     %>
 <%@ page import="java.util.Iterator" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.authorize.ResourcePolicy" %>
 <%@ page import="org.dspace.content.Community"        %>
 <%@ page import="org.dspace.core.Constants"           %>
 <%@ page import="org.dspace.eperson.EPerson"          %>
 <%@ page import="org.dspace.eperson.Group"            %>
+
 
 <%
     Community community = (Community) request.getAttribute("community");
@@ -93,7 +95,7 @@
     </fmt:message></h1>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#communitypolicies"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#communitypolicies\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

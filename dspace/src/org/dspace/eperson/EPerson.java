@@ -77,6 +77,9 @@ public class EPerson extends DSpaceObject
     /** The netid field (for sorting) */
     public static final int NETID = 4;
 
+    /** The e-mail field (for sorting) */
+    public static final int LANGUAGE = 5;
+    
     /** log4j logger */
     private static Logger log = Logger.getLogger(EPerson.class);
 
@@ -358,6 +361,9 @@ public class EPerson extends DSpaceObject
             s = "email";
             break;
 
+        case LANGUAGE:
+            s = "language";
+            break;
         case NETID:
             s = "netid";
             break;
@@ -483,6 +489,35 @@ public class EPerson extends DSpaceObject
     {
         return myRow.getIntColumn("eperson_id");
     }
+    
+    /**
+     * Get the e-person's language
+     * 
+     * @return  language
+     */
+     public String getLanguage()
+     {
+         return myRow.getStringColumn("language");
+     }
+     
+     /**
+     * Set the EPerson's laguage
+     * 
+     * @param s
+     *            language
+     */
+     public void setLanguage(String language)
+     {
+         if (language != null)
+         {
+             language = language.toLowerCase();
+         }
+
+         myRow.setColumn("language", language);
+     }
+  
+
+
 
     public String getHandle()
     {

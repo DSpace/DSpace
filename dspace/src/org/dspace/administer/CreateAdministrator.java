@@ -41,12 +41,16 @@ package org.dspace.administer;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -92,14 +96,17 @@ public class CreateAdministrator
     	options.addOption("e", "email", true, "administrator email address");
     	options.addOption("f", "first", true, "administrator first name");
     	options.addOption("l", "last", true, "administrator lastt name");
+    	options.addOption("c", "language", true, "administrator language");
     	options.addOption("p", "password", true, "administrator password");
     	
     	CommandLine line = parser.parse(options, argv);
     	
-    	if (line.hasOption("e") && line.hasOption("f") && line.hasOption("l") && line.hasOption("p"))
+    	if (line.hasOption("e") && line.hasOption("f") && line.hasOption("l") &&
+    			line.hasOption("c") && line.hasOption("p"))
     	{
-    		ca.createAdministrator(line.getOptionValue("e"), line.getOptionValue("f"), 
-    				line.getOptionValue("l"), line.getOptionValue("p"));
+    		ca.createAdministrator(line.getOptionValue("e"),
+    				line.getOptionValue("f"), line.getOptionValue("l"),
+    				line.getOptionValue("c"), line.getOptionValue("p"));
     	}
     	else
     	{
@@ -139,6 +146,7 @@ public class CreateAdministrator
     	String lastName = null;
     	String password1 = null;
     	String password2 = null;
+    	String language = I18nUtil.DEFAULTLOCALE.getLanguage();
     	
     	while (!dataOK)
     	{
@@ -156,7 +164,17 @@ public class CreateAdministrator
     		System.out.flush();
     		
     		lastName = input.readLine().trim();
-    		
+   		
+            if (ConfigurationManager.getProperty("webui.supported.locales") != null)
+            {
+                System.out.println("Select one of the following languages: " + ConfigurationManager.getProperty("webui.supported.locales"));
+                System.out.print("Language: ");
+                System.out.flush();
+            
+    		    language = input.readLine().trim();
+    		    language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
+            }
+            
     		System.out.println("WARNING: Password will appear on-screen.");
     		System.out.print("Password: ");
     		System.out.flush();
@@ -188,7 +206,7 @@ public class CreateAdministrator
     	}
     	
     	// if we make it to here, we are ready to create an administrator
-    	createAdministrator(email, firstName, lastName, password1);
+    	createAdministrator(email, firstName, lastName, language, password1);
     }
     
     /**
@@ -202,7 +220,8 @@ public class CreateAdministrator
      * 
      * @throws Exception
      */
-    private void createAdministrator(String email, String first, String last, String pw)
+    private void createAdministrator(String email, String first, String last,
+    		String language, String pw)
     	throws Exception
     {
     	// Of course we aren't an administrator yet so we need to
@@ -233,6 +252,7 @@ public class CreateAdministrator
     	
     	eperson.setLastName(last);
     	eperson.setFirstName(first);
+    	eperson.setLanguage(language);
     	eperson.setPassword(pw);
     	eperson.update();
     	

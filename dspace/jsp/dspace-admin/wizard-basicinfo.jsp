@@ -45,9 +45,6 @@
   -    collection - collection we're creating
   --%>
 
-<%@ page import="org.dspace.app.webui.servlet.admin.CollectionWizardServlet" %>
-<%@ page import="org.dspace.content.Collection" %>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
@@ -55,6 +52,11 @@
 
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
+<%@ page import="org.dspace.app.webui.servlet.admin.CollectionWizardServlet" %>
+<%@ page import="org.dspace.content.Collection" %>
 
 <%  Collection collection = (Collection) request.getAttribute("collection"); %>
 
@@ -70,7 +72,7 @@
         <h1><fmt:message key="jsp.dspace-admin.wizard-basicinfo.title"/></h1>
       </td>
       <td class="standard" align="right">
-        <dspace:popup page="/help/site-admin.html#wizard_description"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#wizard_description\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

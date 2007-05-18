@@ -48,6 +48,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -77,6 +78,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.license.CreativeCommons;
@@ -199,15 +201,10 @@ public class SubmitServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(SubmitServlet.class);
     
     /** hash of all submission forms details */
-    private DCInputsReader inputsReader;
+    private DCInputsReader inputsReader = null;
     
-    public SubmitServlet()
-    	throws ServletException
-    {
-	// read configurable submissions forms data
-	inputsReader = new DCInputsReader();
-    }
-
+    private Locale langForm = null;
+    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -321,6 +318,17 @@ public class SubmitServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+        Locale locale = context.getCurrentLocale();
+     	
+       	if (inputsReader == null || !langForm.equals(locale))
+    	{
+    		log.info("Dateiname="+I18nUtil.getInputFormsFileName(locale));
+    		
+    	    // read configurable submissions forms data
+    		inputsReader = new DCInputsReader(I18nUtil.getInputFormsFileName(locale));
+    		langForm = locale;
+    	}
+       	
         // First of all, we need to work out if this is a multipart request
         // The file upload page uses those
         String contentType = request.getContentType();
@@ -1859,7 +1867,7 @@ public class SubmitServlet extends DSpaceServlet
             break;
 
         case GRANT_LICENSE:
-            request.setAttribute("license", c.getLicense());
+            request.setAttribute("license", getLicense(c, context));
             showProgressAwareJSP(request, response, subInfo,
             		         "/submit/show-license.jsp");
             break;
@@ -2590,7 +2598,27 @@ public class SubmitServlet extends DSpaceServlet
             }
         }
     }
+    
+    /**
+     * Get the license that users must grant before submitting to this
+     * collection. If the collection does not have a specific license, the
+     * site-wide default is returned.
+     * 
+     * @return the license for this collection
+     */
+     public String getLicense(Collection c, Context context)
+     {
+         // FIXME: attributes of collections are not yet i18n
+         String license = c.getLicenseCollection();
 
+         if ((license == null) || license.equals(""))
+         {
+             // Fallback to site-wide default for current Locale
+             license = ConfigurationManager.getLicenseText(I18nUtil.getDefaultLicense(context));
+         }
+         return license;
+     }
+     
     /**
      * Get repeated values from a form. If "foo" is passed in, values in the
      * form of parameters "foo_0", "foo_1", etc. are returned.

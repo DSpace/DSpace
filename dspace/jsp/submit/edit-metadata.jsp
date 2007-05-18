@@ -49,18 +49,23 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.net.URLEncoder" %>
+
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="javax.servlet.jsp.tagext.TagSupport" %>
+<%@ page import="javax.servlet.jsp.PageContext" %>
 <%@ page import="javax.servlet.ServletException" %>
 
 <%@ page import="org.dspace.app.webui.jsptag.PopupTag" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.DCInput" %>
 <%@ page import="org.dspace.app.webui.util.DCInputSet" %>
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
+<%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
@@ -70,11 +75,6 @@
 <%@ page import="org.dspace.content.DCSeriesNumber" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
-
-<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
-<%@ page import="javax.servlet.jsp.tagext.TagSupport" %>
-<%@ page import="javax.servlet.jsp.PageContext" %>
-
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -227,7 +227,7 @@
 
     void doDate(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext) 
+      int fieldCountIncr, String label, PageContext pageContext, HttpServletRequest request) 
       throws java.io.IOException 
     {
 
@@ -274,7 +274,7 @@
 	      .append(j)
 	      .append((dateIssued.getMonth() == j ? "\" selected=\"selected\"" : "\"" ))
 	      .append(">")
-	      .append(org.dspace.content.DCDate.getMonthName(j))
+	      .append(org.dspace.content.DCDate.getMonthName(j,I18nUtil.getSupportedLocale(request.getLocale())))
 	      .append("</option>");
          }
     
@@ -871,14 +871,14 @@
      {
 %>
         <div><fmt:message key="jsp.submit.edit-metadata.info1"/>
-        <dspace:popup page="/help/index.html#describe2"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe2\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
 <%
      } 
      else 
      {
 %>
     	<div><fmt:message key="jsp.submit.edit-metadata.info2"/>
-        <dspace:popup page="/help/index.html#describe3"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe3\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
     
 <%
      }
@@ -959,7 +959,7 @@
        else if (inputType.equals("date")) 
        {
            doDate(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     		  repeatable, fieldCountIncr, label, pageContext);
+	     		  repeatable, fieldCountIncr, label, pageContext, request);
        } 
        else if (inputType.equals("series")) 
        {

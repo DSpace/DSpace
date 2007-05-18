@@ -56,8 +56,12 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.lang.String" %>
+
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.content.MetadataField" %>
 <%@ page import="org.dspace.content.MetadataSchema" %>
+
 
 <%
     MetadataField[] types =
@@ -83,7 +87,7 @@
               <a href="<%=request.getContextPath()%>/dspace-admin/metadata-schema-registry">
                 <fmt:message key="jsp.dspace-admin.list-metadata-fields.schemas"/>
               </a> |
-        <dspace:popup page="/help/site-admin.html#dublincore"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#dublincore\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

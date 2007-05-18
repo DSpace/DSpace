@@ -51,6 +51,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
@@ -87,7 +88,7 @@
         <object><dspace:popup page="/help/index.html#describe1">(More Help...)</dspace:popup></object></p> --%>
 
         <div><fmt:message key="jsp.submit.initial-questions.info" /> 
-        <dspace:popup page="/help/index.html#describe1"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe1\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <center>
             <table class="miscTable">

@@ -45,6 +45,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
 
@@ -58,6 +60,7 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.Harvest;
@@ -323,6 +326,11 @@ public class Subscribe
             List collections) throws IOException, MessagingException,
             SQLException
     {
+        // Get a resource bundle according to the eperson language preferences
+        Locale epersonLocale = new Locale(eperson.getLanguage());
+        Locale supportedLocale = I18nUtil.getSupportedLocale(epersonLocale);
+        ResourceBundle labels =  ResourceBundle.getBundle("Messages", supportedLocale);
+        
         // Get the start and end dates for yesterday
         Date thisTimeYesterday = new Date(System.currentTimeMillis()
                 - (24 * 60 * 60 * 1000));
@@ -368,7 +376,7 @@ public class Subscribe
                         isFirst = false;
                     }
     
-                    emailText.append("New items in collection ").append(
+                    emailText.append(labels.getString("org.dspace.eperson.Subscribe.new-items")).append(
                             c.getMetadata("name")).append(": ").append(
                             itemInfos.size()).append("\n\n");
     
@@ -378,7 +386,7 @@ public class Subscribe
                                 .get(j);
     
                         DCValue[] titles = hii.item.getDC("title", null, Item.ANY);
-                        emailText.append("      Title: ");
+                        emailText.append("      ").append(labels.getString("org.dspace.eperson.Subscribe.title")).append(" ");
     
                         if (titles.length > 0)
                         {
@@ -386,7 +394,7 @@ public class Subscribe
                         }
                         else
                         {
-                            emailText.append("Untitled");
+                            emailText.append(labels.getString("org.dspace.eperson.Subscribe.untitled"));
                         }
     
                         DCValue[] authors = hii.item.getDC("contributor", Item.ANY,
@@ -394,7 +402,7 @@ public class Subscribe
     
                         if (authors.length > 0)
                         {
-                            emailText.append("\n    Authors: ").append(
+                            emailText.append("\n    ").append(labels.getString("org.dspace.eperson.Subscribe.authors")).append(
                                     authors[0].value);
     
                             for (int k = 1; k < authors.length; k++)
@@ -404,7 +412,7 @@ public class Subscribe
                             }
                         }
     
-                        emailText.append("\n         ID: ").append(
+                        emailText.append("\n         ").append(labels.getString("org.dspace.eperson.Subscribe.id")).append(
                                 HandleManager.getCanonicalForm(hii.handle)).append(
                                 "\n\n");
                     }
@@ -419,7 +427,7 @@ public class Subscribe
         // Send an e-mail if there were any new items
         if (emailText.length() > 0)
         {
-            Email email = ConfigurationManager.getEmail("subscription");
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscription"));
 
             email.addRecipient(eperson.getEmail());
             email.addArgument(emailText.toString());

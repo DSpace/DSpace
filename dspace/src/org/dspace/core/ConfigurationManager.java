@@ -152,6 +152,42 @@ public class ConfigurationManager
     }
 
     /**
+     * Get the License
+     * 
+     * @param
+     *         license file name
+     *  
+     *  @return
+     *         license text
+     * 
+     */
+    public static String getLicenseText(String licenseFile)
+    {
+    // Load in default license
+
+        try
+        {
+            BufferedReader br = new BufferedReader(new FileReader(licenseFile));
+            String lineIn;
+            license = "";
+            while ((lineIn = br.readLine()) != null)
+            {
+                license = license + lineIn + '\n';
+            }
+        }
+        catch (IOException e)
+        {
+            fatal("Can't load configuration", e);
+
+            // FIXME: Maybe something more graceful here, but with the
+           // configuration we can't do anything
+            System.exit(1);
+        }
+        return license;
+    }
+     
+
+    /**
      * Get a configuration property as a boolean. True is indicated if the value
      * of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
@@ -224,8 +260,8 @@ public class ConfigurationManager
      * Get the template for an email message. The message is suitable for
      * inserting values using <code>java.text.MessageFormat</code>.
      * 
-     * @param template
-     *            name for the email template, for example "register".
+     * @param emailFile
+     *            full name for the email template, for example "/dspace/config/emails/register".
      * 
      * @return the email object, with the content and subject filled out from
      *         the template
@@ -234,7 +270,7 @@ public class ConfigurationManager
      *             if the template couldn't be found, or there was some other
      *             error reading the template
      */
-    public static Email getEmail(String template) throws IOException
+    public static Email getEmail(String emailFile) throws IOException
     {
         String subject = "";
         StringBuffer contentBuffer = new StringBuffer();
@@ -243,11 +279,7 @@ public class ConfigurationManager
         BufferedReader reader = null;
         try
         {
-            reader = new BufferedReader(new FileReader(
-                    getProperty("dspace.dir") +
-
-                    File.separator + "config" + File.separator + "emails"
-                            + File.separator + template));
+            reader = new BufferedReader(new FileReader(emailFile));
 
             boolean more = true;
 
@@ -322,19 +354,12 @@ public class ConfigurationManager
      *            a constant indicating which file (top or side) should be read
      *            in.
      */
-    public static String readNewsFile(int position)
+    public static String readNewsFile(String newsFile)
     {
         String fileName = getNewsFilePath();
-
-        if (position == Constants.NEWS_TOP)
-        {
-            fileName += "news-top.html";
-        }
-        else
-        {
-            fileName += "news-side.html";
-        }
-
+        
+        fileName += newsFile;
+        
         String text = "";
 
         try
@@ -371,18 +396,11 @@ public class ConfigurationManager
      * @param news
      *            the text to be written to the file.
      */
-    public static String writeNewsFile(int position, String news)
+    public static String writeNewsFile(String newsFile, String news)
     {
         String fileName = getNewsFilePath();
 
-        if (position == Constants.NEWS_TOP)
-        {
-            fileName += "news-top.html";
-        }
-        else
-        {
-            fileName += "news-side.html";
-        }
+        fileName += newsFile;
 
         try
         {
@@ -895,5 +913,7 @@ public class ConfigurationManager
     {
         log = Logger.getLogger(ConfigurationManager.class);
     }
+    
+    
 
 }

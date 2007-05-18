@@ -57,6 +57,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
 
 <%
@@ -97,7 +99,7 @@
 %>
 
 	<div><fmt:message key="jsp.register.edit-profile.info3"/>
-    	<dspace:popup page="/help/index.html#editprofile"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+    	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#editprofile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
     
     <form action="<%= request.getContextPath() %>/profile" method="post">
 

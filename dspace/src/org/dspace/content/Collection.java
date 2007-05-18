@@ -54,7 +54,7 @@ import org.dspace.browse.Browse;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.I18N;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
@@ -389,7 +389,7 @@ public class Collection extends DSpaceObject
         {
             try
             {
-                value = I18N.message("untitled", Collection.class);
+                value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
             }
             catch (MissingResourceException e)
             {
@@ -660,6 +660,18 @@ public class Collection extends DSpaceObject
             license = ConfigurationManager.getDefaultSubmissionLicense();
         }
 
+        return license;
+    }
+
+    /**
+     * Get the license that users must grant before submitting to this
+     * collection. 
+     * 
+     * @return the license for this collection
+     */
+    public String getLicenseCollection()
+    {
+        String license = collectionRow.getStringColumn("license");
         return license;
     }
 

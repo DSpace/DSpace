@@ -57,8 +57,10 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.content.Collection" %>
+
 
 <%
 // this space intentionally left blank
@@ -79,7 +81,7 @@
 		  <h3><fmt:message key="jsp.dspace-admin.authorize-main.choose"/></h3>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#authorize"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#authorize\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

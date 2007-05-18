@@ -46,10 +46,12 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.Iterator" %>
+
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
+<%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.eperson.AuthenticationManager" %>
 <%@ page import="org.dspace.eperson.AuthenticationMethod" %>
-<%@ page import="org.dspace.core.Context" %>
-
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
@@ -65,7 +67,7 @@
                 <h1><fmt:message key="jsp.login.chooser.heading"/></h1>
             </td>
             <td align="right" class="standard">
-                <dspace:popup page="/help/index.html#login"><fmt:message key="jsp.help"/></dspace:popup>
+                <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#login\" %>"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>

@@ -164,7 +164,10 @@ public class EPersonAdminServlet extends DSpaceServlet
                     // FIXME: More data-driven?
                     e.setMetadata("phone", request.getParameter("phone")
                             .equals("") ? null : request.getParameter("phone"));
-
+ 
+                    e.setMetadata("language", request.getParameter("language")
+                           .equals("") ? null : request.getParameter("language"));
+                    
                     e.setCanLogIn((request.getParameter("can_log_in") != null)
                             && request.getParameter("can_log_in")
                                     .equals("true"));
@@ -216,7 +219,10 @@ public class EPersonAdminServlet extends DSpaceServlet
                 e.setMetadata("phone",
                         request.getParameter("phone").equals("") ? null
                                 : request.getParameter("phone"));
-
+                
+                e.setMetadata("language", request.getParameter("language")
+                        .equals("") ? null : request.getParameter("language"));
+                         
                 e.setCanLogIn((request.getParameter("can_log_in") != null)
                         && request.getParameter("can_log_in").equals("true"));
 

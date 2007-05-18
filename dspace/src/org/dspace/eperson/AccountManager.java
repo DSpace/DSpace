@@ -43,17 +43,21 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Locale;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.app.webui.util.UIUtil;
 
 /**
  * Methods for handling registration by email and forgotten passwords. When
@@ -92,11 +96,11 @@ public class AccountManager
      * @param email
      *            Email address to send the registration email to
      */
-    public static void sendRegistrationInfo(Context context, String email)
+    public static void sendRegistrationInfo(HttpServletRequest request, Context context, String email)
             throws SQLException, IOException, MessagingException,
             AuthorizeException
     {
-        sendInfo(context, email, true, true);
+        sendInfo(request, context, email, true, true);
     }
 
     /**
@@ -112,11 +116,11 @@ public class AccountManager
      * @param email
      *            Email address to send the forgot-password email to
      */
-    public static void sendForgotPasswordInfo(Context context, String email)
+    public static void sendForgotPasswordInfo(HttpServletRequest request, Context context, String email)
             throws SQLException, IOException, MessagingException,
             AuthorizeException
     {
-        sendInfo(context, email, false, true);
+        sendInfo(request, context, email, false, true);
     }
 
     /**
@@ -218,7 +222,7 @@ public class AccountManager
      * registration; otherwise, it is for forgot-password @param send If true,
      * send email; otherwise do not send any email
      */
-    protected static TableRow sendInfo(Context context, String email,
+    protected static TableRow sendInfo(HttpServletRequest request, Context context, String email,
             boolean isRegister, boolean send) throws SQLException, IOException,
             MessagingException, AuthorizeException
     {
@@ -251,7 +255,7 @@ public class AccountManager
 
         if (send)
         {
-            sendEmail(email, isRegister, rd);
+            sendEmail(request, email, isRegister, rd);
         }
 
         return rd;
@@ -275,8 +279,8 @@ public class AccountManager
      * @exception IOException
      *                If an error occurs while reading the email template.
      */
-    private static void sendEmail(String email, boolean isRegister, TableRow rd)
-            throws MessagingException, IOException
+    private static void sendEmail(HttpServletRequest request, String email, boolean isRegister, TableRow rd)
+            throws MessagingException, IOException, SQLException
     {
         String base = ConfigurationManager.getProperty("dspace.url");
 
@@ -286,9 +290,9 @@ public class AccountManager
                 isRegister ? "register" : "forgot").append("?")
                 .append("token=").append(rd.getStringColumn("token"))
                 .toString();
-
-        Email bean = ConfigurationManager.getEmail(isRegister ? "register"
-                : "change_password");
+        Locale locale = UIUtil.obtainContext(request).getCurrentLocale();
+        Email bean = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(locale, isRegister ? "register"
+                : "change_password"));
         bean.addRecipient(email);
         bean.addArgument(specialLink);
         bean.send();

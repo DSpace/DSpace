@@ -121,6 +121,16 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
             font-family: "verdana", "Arial", "Helvetica", sans-serif;
             font-size: 10pt }                       
 
+.langChangeOff { text-decoration: none;
+                 color : #bbbbbb;
+                 cursor : default;
+                 font-size: 10pt }
+
+.langChangeOn { text-decoration: underline;
+                color: #336699;
+                cursor: pointer;
+                font-size: 10pt }
+
 .pageBanner { width: 100%;
               border: 0;
               margin: 0;

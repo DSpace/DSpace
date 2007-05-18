@@ -52,16 +52,23 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.io.File" %>
-
+<%@ page import="java.util.Enumeration"%>
+<%@ page import="java.util.Locale"%>
+<%@ page import="javax.servlet.jsp.jstl.core.*" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.dspace.core.I18nUtil" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.core.Constants" %>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
 
-    String topNews = ConfigurationManager.readNewsFile(Constants.NEWS_TOP);
-    String sideNews = ConfigurationManager.readNewsFile(Constants.NEWS_SIDE);
+    Locale[] supportedLocales = I18nUtil.getSupportedLocales();
+    Locale sessionLocale = UIUtil.getSessionLocale(request);
+    Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
+    String topNews = ConfigurationManager.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-top.html"));
+    String sideNews = ConfigurationManager.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-side.html"));
 
     boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
     String feedData = "NONE";
@@ -74,8 +81,31 @@
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
 
-    <table class="miscTable" width="95%" align="center">
-        <tr>
+    <table  width="95%" align="center">
+      <tr align="right">
+        <td align="right">						
+<% if (supportedLocales != null && supportedLocales.length > 1)
+{
+%>
+        <form method="get" name="repost" action="">
+          <input type ="hidden" name ="locale"/>
+        </form>
+<%
+for (int i = supportedLocales.length-1; i >= 0; i--)
+{
+%>
+        <a class ="langChangeOn"
+                  onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
+                  document.repost.submit();">
+                 <%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>
+        </a> &nbsp;
+<%
+}
+}
+%>
+        </td>
+      </tr>
+      <tr>
             <td class="oddRowEvenCol"><%= topNews %></td>
         </tr>
     </table>

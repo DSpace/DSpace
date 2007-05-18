@@ -64,6 +64,7 @@
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
+
 <%
     // Retrieve attributes
     Community community = (Community) request.getAttribute( "community" );
@@ -318,7 +319,7 @@
             </tr>
             <tr>
               <td headers="t1" class="standard" align="center">
-                 <dspace:popup page="/help/site-admin.html"><fmt:message key="jsp.adminhelp"/></dspace:popup>
+                 <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\")%>"><fmt:message key="jsp.adminhelp"/></dspace:popup>
               </td>
             </tr>
 	  </table>

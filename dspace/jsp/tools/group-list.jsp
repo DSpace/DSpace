@@ -52,6 +52,7 @@
     
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
@@ -76,7 +77,7 @@
       </td>
       <td align="right" class="standard">
         <%-- <dspace:popup page="/help/site-admin.html#groups">Help...</dspace:popup> --%>
-		<dspace:popup page="/help/site-admin.html#groups"><fmt:message key="jsp.help"/></dspace:popup>
+		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#groups\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

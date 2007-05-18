@@ -55,6 +55,8 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
+    
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
@@ -114,7 +116,7 @@
         &nbsp;&nbsp;&nbsp;<dspace:popup page="/help/index.html#uploadedfile">(More Help...)</dspace:popup></p> --%>
 
 		<div><fmt:message key="jsp.submit.show-uploaded-file.info2"/>
-        &nbsp;&nbsp;&nbsp;<dspace:popup page="/help/index.html#uploadedfile"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+        &nbsp;&nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\")+ \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <table class="miscTable" align="center">
             <tr>
@@ -195,14 +197,14 @@
     {
 %>	
 			<li class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info5"/>
-            <dspace:popup page="/help/index.html#checksum"><fmt:message key="jsp.submit.show-uploaded-file.info6"/></dspace:popup></li>
+            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#checksum\"%>"><fmt:message key="jsp.submit.show-uploaded-file.info6"/></dspace:popup></li>
 <%
     }
     else
     {
 %>
   		<li class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info7"/>
-            <dspace:popup page="/help/index.html#checksum"><fmt:message key="jsp.submit.show-uploaded-file.info8"/></dspace:popup><input type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.show-uploaded-file.show.button"/>" /></li>
+            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#checksum\"%>"><fmt:message key="jsp.submit.show-uploaded-file.info8"/></dspace:popup><input type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.show-uploaded-file.show.button"/>" /></li>
 <%
     }
 %>

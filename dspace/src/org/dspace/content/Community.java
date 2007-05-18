@@ -52,7 +52,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.I18N;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
@@ -345,7 +345,7 @@ public class Community extends DSpaceObject
         {
             try
             {
-                value = I18N.message("untitled", Community.class);
+                value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
             }
             catch (MissingResourceException e)
             {

@@ -47,10 +47,10 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
-import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
@@ -60,6 +60,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.AuthenticationManager;
 
@@ -105,14 +106,15 @@ public class UIUtil
         }
         
         Context c = (Context) request.getAttribute("dspace.context");
+        
 
         if (c == null)
         {
             // No context for this request yet
             c = new Context();
+            HttpSession session = request.getSession();
 
             // See if a user has authentication
-            HttpSession session = request.getSession();
             Integer userID = (Integer) session.getAttribute(
                     "dspace.current.user.id");
 
@@ -148,6 +150,11 @@ public class UIUtil
             // Store the context in the request
             request.setAttribute("dspace.context", c);
         }
+        
+        // Set the locale to be used
+        Locale sessionLocale = getSessionLocale(request);
+        Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
+        c.setCurrentLocale(sessionLocale);
 
         return c;
     }
@@ -263,12 +270,16 @@ public class UIUtil
      *            if true, display the time with the date
      * @param localTime
      *            if true, adjust for local timezone, otherwise GMT
+     * @param request
+     *            the servlet request           
      * 
      * @return the date in a human-readable form.
      */
-    public static String displayDate(DCDate d, boolean time, boolean localTime)
+    public static String displayDate(DCDate d, boolean time, boolean localTime, HttpServletRequest request)
     {
         StringBuffer sb = new StringBuffer();
+        Locale locale = ((Context)request.getAttribute("dspace.context")).getCurrentLocale();
+        if (locale == null) locale = I18nUtil.DEFAULTLOCALE;
 
         if (d != null)
         {
@@ -307,7 +318,7 @@ public class UIUtil
                         sb.append(day + "-");
                     }
 
-                    sb.append(DCDate.getMonthName(month).substring(0, 3) + "-");
+                    sb.append(DCDate.getMonthName(month, locale).substring(0, 3) + "-");
                 }
 
                 sb.append(year + " ");
@@ -386,6 +397,58 @@ public class UIUtil
 
         return report;
     }
+    
+    
+    /**
+     * Get the Locale for a session according to the user's language selection or language preferences.
+     * Order of selection
+     * - language selected via UI
+     * - language as set by application
+     * - language browser default
+     * 
+     * @param request
+     *        the request Object
+     * @return supportedLocale
+     *         Locale supported by this DSpace Instance for this request
+     */
+    public static Locale getSessionLocale(HttpServletRequest request)
+
+    {
+        String paramLocale = request.getParameter("locale");
+        Locale sessionLocale = null;
+        Locale supportedLocale = null;
+
+        if (paramLocale != null && paramLocale != "")
+        {
+            /* get session locale according to user selection */
+            sessionLocale = new Locale(paramLocale);
+        }
+        
+     
+        if (sessionLocale == null)
+        {
+            /* get session locale set by application */
+            HttpSession session = request.getSession();
+            sessionLocale = (Locale) Config.get(session, Config.FMT_LOCALE);
+        }
+
+        /*
+         * if session not set by selection or application then default browser
+         * locale
+         */
+        if (sessionLocale == null)
+        {
+            sessionLocale = request.getLocale();
+        }
+        
+        if (sessionLocale == null)
+        {
+            sessionLocale = I18nUtil.DEFAULTLOCALE;
+        }
+        supportedLocale =  I18nUtil.getSupportedLocale(sessionLocale);
+        
+        return supportedLocale;
+    }    
 
     /**
      * Obtain a parameter from the given request as an int. <code>-1</code> is
@@ -523,6 +586,7 @@ public class UIUtil
     public static void sendAlert(HttpServletRequest request, Exception exception)
     {
         String logInfo = UIUtil.getRequestLogInfo(request);
+        Context c = (Context) request.getAttribute("dspace.context");
 
         try
         {
@@ -531,7 +595,7 @@ public class UIUtil
 
             if (recipient != null)
             {
-                Email email = ConfigurationManager.getEmail("internal_error");
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "internal_error"));
 
                 email.addRecipient(recipient);
                 email.addArgument(ConfigurationManager

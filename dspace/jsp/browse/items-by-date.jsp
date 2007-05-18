@@ -64,12 +64,14 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
+
 
 <%
     // Get attributes
@@ -117,7 +119,7 @@
     for (int i = 1; i <= 12; i++)
     {
 %>
-                                    <option value="<%= i %>"><%= DCDate.getMonthName(i) %></option>
+                                    <option value="<%= i %>"><%= DCDate.getMonthName(i, I18nUtil.getSupportedLocale(request.getLocale())) %></option>
 <%
     }
 %>

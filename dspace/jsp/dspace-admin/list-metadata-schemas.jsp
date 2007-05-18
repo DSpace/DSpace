@@ -55,7 +55,10 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
 <%@ page import="org.dspace.content.MetadataSchema" %>
+
 
 <%
     MetadataSchema[] schemas =
@@ -74,7 +77,7 @@
         <h1><fmt:message key="jsp.dspace-admin.list-metadata-schemas.title"/></h1>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#dublincore"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#dublincore\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>

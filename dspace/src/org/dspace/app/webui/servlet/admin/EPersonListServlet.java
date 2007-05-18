@@ -92,6 +92,10 @@ public class EPersonListServlet extends DSpaceServlet
         {
             sortBy = EPerson.ID;
         }
+        else if ((sbParam != null) && sbParam.equals("language"))
+        {
+            sortBy = EPerson.LANGUAGE;
+        }
 
         // What's the index of the first eperson to show? Default is 0
         int first = UIUtil.getIntParameter(request, "first");

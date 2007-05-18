@@ -49,12 +49,14 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
-    
+
+<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
 
-<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
     SubmissionInfo si =
@@ -85,7 +87,7 @@
         local hard drive. <object><dspace:popup page="/help/index.html#upload">(More Help...)</dspace:popup></object></p> --%>
 
 		<div><fmt:message key="jsp.submit.choose-file.info1"/>
-			<dspace:popup page="/help/index.html#upload"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+			<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#upload\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
         
         <%-- <p class="submitFormHelp"><strong>Netscape users please note:</strong> By
         default, the window brought up by clicking "Browse..." will only display

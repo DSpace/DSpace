@@ -97,8 +97,8 @@ public class MyDSpaceServlet extends DSpaceServlet
     {
         // GET displays the main page - everthing else is a POST
         showMainPage(context, request, response);
-    }
-
+     }
+    
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -326,11 +326,12 @@ public class MyDSpaceServlet extends DSpaceServlet
             showMainPage(context, request, response);
             context.complete();
         }
-        else
+        else 
         {
             // User has cancelled. Back to main page.
             showMainPage(context, request, response);
         }
+
     }
 
     /**

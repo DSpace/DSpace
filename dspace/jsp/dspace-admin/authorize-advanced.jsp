@@ -68,6 +68,7 @@
 <%@ page import="java.util.List"     %>
 <%@ page import="java.util.Iterator" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.content.Collection"       %>
 <%@ page import="org.dspace.core.Constants"           %>
@@ -90,7 +91,7 @@
        of policies for types of content contained in a collection.
        Warning, dangerous - removing READ permissions from
        items will make them not viewable!  <dspace:popup page="/help/site-admin.html#advancedpolicies">More help...</dspace:popup></p> --%>
-	<div><fmt:message key="jsp.dspace-admin.authorize-advanced.text"/> <dspace:popup page="/help/site-admin.html#advancedpolicies"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+	<div><fmt:message key="jsp.dspace-admin.authorize-advanced.text"/> <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") +\"#advancedpolicies\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
     <form method="post" action="">
 

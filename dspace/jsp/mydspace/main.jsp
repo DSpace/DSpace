@@ -110,7 +110,7 @@
                 </h1>
             </td>
             <td align="right" class="standard">
-                <dspace:popup page="/help/index.html#mydspace"><fmt:message key="jsp.help"/></dspace:popup>
+                 <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#mydspace\"%>"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>

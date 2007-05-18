@@ -46,8 +46,11 @@ import java.util.ResourceBundle;
  * message(String, Class) and getMessage(String, Class) methods should be 
  * favoured.  
  * 
+ * @deprecated
+ * 
  * @author Jim Downing
  */
+@Deprecated
 public class I18N
 {
 

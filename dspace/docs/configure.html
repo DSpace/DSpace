@@ -172,6 +172,11 @@ property2.name = ${dspace.dir}/rest/of/path
 
         <td>Enable the Creative Commons license step in the submission process. Submitters are given an opportunity to select a Creative Commons license to accompany the Item. Creative Commons licenses govern the use of the content. For more details, see <a href="http://creativecommons.org">the Creative Commons website</a>.</td>
       </tr>
+      <tr>
+        <td><code>default.locale</code></td>
+        <td><code>en</code></td>
+        <td>The default Locale your Installation is working with.</td>
+      </tr>
     </tbody>
   </table>
 
@@ -411,6 +416,58 @@ cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
   </ol>
 
   <p>When you restart the web server you should see your customized JSPs.</p>
+  
+  <h2><a name="multilingualui" id="multilingualui">Multilingual User Interface</a></h2>
+  <h3>Setting the default language for the application</h3>
+      The default language for the application is set via the <code><i>[dspace]</i>/config/dspace.cfg</code> parameter <code>default.locale</code>. <br />
+      This is a locale according to i18n and might consist of country, country_language or country_language_variant, <br />
+      e. g.: <code>default.locale=en</code>. If not default locale is specified the server locale will be used instead.
+  <h3>Supporting more than one language</h3>
+  <h4>Changes in dspace.cfg</h4>
+      With the <code><i>[dspace]</i>/config/dspace.cfg</code> parameter <code>webui.supported.locales</code> you may provide a comma seperated list of supported (including the default locale) locales. <br />
+      The locales might have the form country, country_language or country_language_variant, e. g.:<br />
+     <code>webui.supported.locales = en, de</code> or <code>webui.supported.locales = en, en_ca, de</code>.<br />
+     This will result in:
+     <ul>
+       <li>a language switch in the default header</li>
+       <li>the user will able to choose his preferred language, this will be part of his profile</li>
+       <li>wording of emails
+         <ul>
+    	   <li>mails to registered users e. g. alerting service will use the preferred language of the user</li>
+           <li>mails to unregistered users e. g. suggest an item will use the language of the session</li>
+    	</ul>
+    </li>
+	<li>according to the language selected for the session, using dspace-admin Edit News will edit the news file of the language according to session</li>
+    </ul>
+    <h4>Related files</h4>
+        If you set webui.supported.locales make sure that all the related additional files for each language are available. <code>LOCALE</code> should correspond to the locale set in <code>webui.supported.locales</code>, 
+        e. g.: for webui.supported.locales = en, de, fr, there should be:
+    <ul>
+      <li><code><i>[dspace]</i>/config/language-packs/Messages.properties</code></li>
+      <li><code><i>[dspace]</i>/config/language-packs/Messages_en.properties</code></li>
+      <li><code><i>[dspace]</i>/config/language-packs/Messages_de.properties</code></li>
+      <li><code><i>[dspace]</i>/config/language-packs/Messages_fr.properties</code></li>
+    </ul>
+    Files to be localized:
+    <ul>
+    <li><code><i>[dspace]</i>/config/language-packs/Messages_LOCALE.properties</code></li>
+      <li><code><i>[dspace]</i>/config/input-forms_LOCALE.xml</code></li>
+      <li><code><i>[dspace]</i>/config/default_LOCALE.license</code> <i>should be pure ascii</i></li>
+      <li><code><i>[dspace]</i>/config/news-top_LOCALE.html</code></li>
+      <li><code><i>[dspace]</i>/config/news-side_LOCALE.html</code></li>
+      <li><code><i>[dspace]</i>/config/emails/change_password_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/config/emails/feedback_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/config/emails/internal_error_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/config/emails/register_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/config/emails/submit_archive_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/config/emails/submit_reject_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/config/emails/submit_task_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/config/emails/subscription_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/config/emails/suggest_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/jsp/help/collection-admin_LOCALE.html</code> <i>in html keep the jump link as original</i></li>
+      <li><code><i>[dspace]</i>/jsp/help/index_LOCALE.html</code></li>
+      <li><code><i>[dspace]</i>/jsp/help/site-admin_LOCALE.html</code></li>
+    </ul>
 
   <h2><a name="customsimpleitem" id="customsimpleitem">Customizing the Simple Item Display Metadata</a></h2>
 

@@ -39,9 +39,11 @@
  */
 package org.dspace.content;
 
+import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
@@ -71,13 +73,6 @@ public class DCDate
     /** Logger */
     private static Logger cat = Logger.getLogger(DCDate.class);
 
-    /**
-     * The month names
-     */
-    private final static String[] MONTHNAMES = { "January", "February",
-            "March", "April", "May", "June", "July", "August", "September",
-            "October", "November", "December" };
-
     /** The year, or -1 if none */
     private int year;
 
@@ -102,6 +97,16 @@ public class DCDate
      */
     private GregorianCalendar localGC;
 
+   /**
+    * DateFormatSymbols for locale monthsname
+     */
+	private static DateFormatSymbols dfs = null;
+	
+   /**
+     * note the session locale
+     */
+	private static Locale langMonth = null;
+    
     /**
      * Construct a clean date
      */
@@ -511,15 +516,21 @@ public class DCDate
      * 
      * @return the month name.
      */
-    public static String getMonthName(int m)
+    public static String getMonthName(int m, Locale locale)
     {
         if ((m > 0) && (m < 13))
         {
-            return MONTHNAMES[m - 1];
+            if (dfs == null || !langMonth.equals(locale))
+       		{
+          		dfs = new DateFormatSymbols(locale);
+          		langMonth = locale;
+       		}
+           return dfs.getMonths()[m-1];
         }
         else
         {
             return "Unspecified";
-        }
+        }    
+
     }
 }

@@ -137,6 +137,7 @@
 	String sortByParam = "lastname";
 	if (sortBy == EPerson.EMAIL) sortByParam = "email";
 	if (sortBy == EPerson.ID) sortByParam = "id";
+	if (sortBy == EPerson.LANGUAGE) sortByParam = "language";
 
 	String jumpLink;
 	if (search != null && !search.equals(""))
@@ -282,8 +283,19 @@ function clearEPeople()
                 }
             %></th>
 
-            <%-- <th class="oddRowOddCol">First Name</th> --%>
             <th id="t5" class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.th.firstname"/></th>
+ 
+             <th id="t6" class="oddRowEvenCol"><%
+                if (sortBy == EPerson.LANGUAGE)
+                {
+                    %><fmt:message key="jsp.tools.eperson-list.th.language.sortedby" /><%
+                }
+                else
+                {
+                    %><a href="<%= sortLink %>language"><fmt:message key="jsp.tools.eperson-list.th.language" /></a><%
+                }
+            %></th>
+            
         </tr>
 <%  }
     String row = "even";
@@ -313,6 +325,9 @@ function clearEPeople()
             </td>
             <td headers="t5" class="<%= row %>RowOddCol">
                 <%= (e.getFirstName() == null ? "" : e.getFirstName()) %>
+            </td>
+            <td headers="t6" class="<%= row %>RowOddCol">
+                <%= (e.getLanguage() == null ? "" : e.getLanguage()) %>
             </td>
         </tr>
 <%

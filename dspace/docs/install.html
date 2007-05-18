@@ -276,6 +276,13 @@ See the <code>dspace.cfg</code> file for examples.
 
     <P>For information on customising the output of this see <A HREF="configure.html#statistics">configuring system statistical reports</A>.</P>
 
+	<h3>Multilingual Installation</h3>
+	In order to deploy a multilingual version of DSpace you have to configure two parameters in <code><i>[dspace]</i>/config/dspace.cfg:</code><br />
+	<code>default.locale</code>, e. g. default.locale = en<br />
+	<code>webui.supported locales</code>, e. g. webui.supported.locales = en, de<br />
+	The Locales might have the form country, country_language, country_language_variant.<br />
+	Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available 
+	see the <a href="configure.html#multilingualui">Multilingual User Interface</a> section in the configuration documentation.
 
     <H3><A NAME="https">DSpace over HTTPS</a></H3>
 

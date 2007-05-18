@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -79,6 +80,9 @@ public class Context
 
     /** Current user - null means anonymous access */
     private EPerson currentUser;
+    
+    /** Current Locale */
+    private Locale currentLocale;
 
     /** Extra log info */
     private String extraLogInfo;
@@ -106,6 +110,7 @@ public class Context
         connection.setAutoCommit(false);
 
         currentUser = null;
+        currentLocale = I18nUtil.DEFAULTLOCALE;
         extraLogInfo = "";
         ignoreAuth = false;
 
@@ -147,6 +152,28 @@ public class Context
         return currentUser;
     }
 
+    /**
+     *  Gets the current Locale
+     *  
+     *  @return Locale
+     *          the current Locale
+     */
+    public Locale getCurrentLocale()
+    {
+        return currentLocale;
+    }
+ 
+    /**
+     *  set the current Locale
+     *  
+     *  @param Locale
+     *          the current Locale
+     */
+    public void setCurrentLocale(Locale locale)
+    {
+        currentLocale = locale;
+    }
+        
     /**
      * Find out if the authorisation system should be ignored for this context.
      * 
@@ -196,6 +223,7 @@ public class Context
     {
         return extraLogInfo;
     }
+       
 
     /**
      * Close the context object after all of the operations performed in the

@@ -52,6 +52,7 @@
   -   firstname
   -   lastname
   -   phone
+  -   language
   -   can_log_in          - (boolean)
   -   require_certificate - (boolean)
   --%>
@@ -64,6 +65,11 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="java.util.Locale"%>
+
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
+<%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.eperson.Group"   %>
 
@@ -81,6 +87,7 @@
     String lastName  = eperson.getLastName();
     String phone     = eperson.getMetadata("phone");
     String netid = eperson.getNetid();
+    String language     = eperson.getMetadata("language");
     boolean emailExists = (request.getAttribute("email_exists") != null);
 
     boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
@@ -103,7 +110,7 @@
         </fmt:message></h1>
       </td>
       <td align="right" class="standard">
-        <dspace:popup page="/help/site-admin.html#epeople"><fmt:message key="jsp.help"/></dspace:popup>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#epeople\"%>"><fmt:message key="jsp.help"/></dspace:popup>
       </td>
     </tr>
   </table>
@@ -158,6 +165,36 @@
                 <input name="phone" id="tphone" size="24" value="<%=phone == null ? "" : phone%>"/>
             </td>
         </tr>
+        <tr>
+            <td><label for="tlanguage"><fmt:message key="jsp.register.profile-form.language.field"/></label></td>
+            <td class="standard">
+        		<select name="language" id="tlanguage">
+<%
+		Locale[] supportedLocales = I18nUtil.getSupportedLocales();
+
+        for (int i = supportedLocales.length-1; i >= 0; i--)
+        {
+        	String lang = supportedLocales[i].toString();
+        	String selected = "";
+        	
+        	if (language == null || language.equals(""))
+        	{ if(lang.equals(I18nUtil.getSupportedLocale(request.getLocale()).getLanguage()))
+        		{
+        			selected = "selected=\"selected\"";
+        		}
+        	}
+        	else if (lang.equals(language))
+        	{ selected = "selected=\"selected\"";}
+%>
+          	 <option <%= selected %>
+                value="<%= lang %>"><%= supportedLocales[i].getDisplayName(I18nUtil.getSupportedLocale(request.getLocale())) %></option>
+<%
+        }
+%>
+        	</select>
+   		     </td>
+        </tr>
+   
         <tr>
             <%-- <td>Can Log In:</td> --%>
             <td><label for="tcan_log_in"><fmt:message key="jsp.dspace-admin.eperson-edit.can"/></label></td>

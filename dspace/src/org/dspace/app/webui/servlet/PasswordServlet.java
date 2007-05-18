@@ -41,18 +41,20 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.AuthenticationManager;
 import org.dspace.eperson.AuthenticationMethod;
 
@@ -92,11 +94,18 @@ public class PasswordServlet extends DSpaceServlet
         // Locate the eperson
         int status = AuthenticationManager.authenticate(context, email, password,
                         null, request);
-
+ 
+       
         if (status == AuthenticationMethod.SUCCESS)
-            {
-                // Logged in OK.
+        {
+            // Logged in OK.
             Authenticate.loggedIn(context, request, context.getCurrentUser());
+
+            // Set the Locale according to user preferences
+            String preferredLanguage = context.getCurrentUser().getLanguage();
+            Locale epersonLocale = I18nUtil.getSupportedLocale(new Locale(preferredLanguage));
+            context.setCurrentLocale(epersonLocale);
+            Config.set(request.getSession(), Config.FMT_LOCALE, epersonLocale);
 
             log.info(LogManager.getHeader(context, "login", "type=explicit"));
 
@@ -104,7 +113,7 @@ public class PasswordServlet extends DSpaceServlet
                 Authenticate.resumeInterruptedRequest(request, response);
 
                 return;
-            }
+        }
         else if (status == AuthenticationMethod.CERT_REQUIRED)
             jsp = "/error/require-certificate.jsp";
         else

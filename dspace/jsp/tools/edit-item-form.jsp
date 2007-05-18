@@ -52,7 +52,6 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
-    
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -100,7 +99,7 @@
 	<p><strong><fmt:message key="jsp.tools.edit-item-form.note"/></strong></p>
     
     <%-- <p><dspace:popup page="/help/collection-admin.html#editmetadata">More help...</dspace:popup></p>  --%>
-	<div><dspace:popup page="/help/collection-admin.html#editmetadata"><fmt:message key="jsp.morehelp"/></dspace:popup></div>  
+	<div><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.collection-admin\") + \"#editmetadata\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>  
 
     <center>
         <table width="70%" summary="Edit item table">

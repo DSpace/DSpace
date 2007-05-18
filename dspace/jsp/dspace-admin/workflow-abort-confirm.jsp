@@ -94,7 +94,7 @@
                 <tr>
                     <td align="left">
                         <%-- <input type="submit" name="submit_abort_confirm" value="Abort"/> --%>
-                        <input type="submit" name="submit_abort_confirm" value="<fmt:message key="jsp.dspace-admin.general.abort"/>" />
+                        <input type="submit" name="submit_abort_confirm" value="<fmt:message key="jsp.dspace-admin.workflow-abort-confirm.button"/>" />
                     </td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"/> --%>

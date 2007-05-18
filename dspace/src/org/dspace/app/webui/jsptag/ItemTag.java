@@ -364,7 +364,7 @@ public class ItemTag extends TagSupport
                         DCDate dd = new DCDate(values[j].value);
 
                         // Parse the date
-                        out.print(UIUtil.displayDate(dd, false, false));
+                        out.print(UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest()));
                     }
                     else if (isAuthor)
                     {
