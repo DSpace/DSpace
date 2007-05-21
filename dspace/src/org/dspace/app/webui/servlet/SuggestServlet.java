@@ -43,6 +43,7 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.MissingResourceException;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -143,7 +144,15 @@ public class SuggestServlet extends DSpaceServlet
         	String recipName = request.getParameter("recip_name");
         	if (recipName == null || "".equals(recipName))
         	{
-        		recipName = ConfigurationManager.getProperty("webui.suggest.recipient");
+                try
+                {
+                recipName = I18nUtil.getMessage("org.dspace.app.webui.servlet.SuggestServlet.recipient", context);
+                }
+                catch (MissingResourceException e)
+                {
+                    log.warn(LogManager.getHeader(context, "show_suggest_form", "Missing Resource: org.dspace.app.webui.servlet.SuggestServlet.sender"));
+                    recipName = "colleague";
+                }
         	}
             String senderName = request.getParameter("sender_name");
             if (senderName == null || "".equals(senderName) )
@@ -155,8 +164,15 @@ public class SuggestServlet extends DSpaceServlet
             	}
             	else
             	{
-            		// use configured default
-            		senderName = ConfigurationManager.getProperty("webui.suggest.sender");
+            		try
+                    {
+            		senderName = I18nUtil.getMessage("org.dspace.app.webui.servlet.SuggestServlet.sender", context);
+                    }
+                    catch (MissingResourceException e)
+                    {
+                        log.warn(LogManager.getHeader(context, "show_suggest_form", "Missing Resource: org.dspace.app.webui.servlet.SuggestServlet.sender"));
+                        senderName = "A DSpace User";
+                    }
             	}
             }
             String senderAddr = request.getParameter("sender_email");

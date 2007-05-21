@@ -1013,11 +1013,14 @@ stat-report-monthly
      in <code>dspace.cfg</code>:</p>
   <p><code>webui.suggest.enable = true</code></p>
   <p>Set the value of this property to <code>true</code> to expose the link to the recommendation form. If <code>false</code>, the link will not display.</p>
-  <p><code>webui.suggest.sender = A DSpace user</code></p>
+  <p><code>webui.suggest.loggedinusers.only = true</code></p>
+  Enables only logged in users to suggest an item. The default value is false.
+  <p>Messages.properties:</p>
+  <p><code>org.dspace.app.webui.servlet.SuggestServlet.sender = A DSpace user</code></p>
   <p>The form includes an optional field for the name of the person making the recommendation. The value of this property will be used if the sender is not specified. Note that
   if the user has been authenticated to DSpace, the e-person record will be used to set the default value of this field, and will also be used to set
   the 'reply-to' email header to the e-person's address.</p>
-  <p><code>webui.suggest.recipient = colleague</code></p>
+   <p><code>org.dspace.app.webui.servlet.SuggestServlet.recipient = colleague</code></p>
   <p>In addition to the required destination email address, the form includes an optional field for the name of person to whom the recommendation is to be sent. The value of this property will be used if the recipient name is not specified.</p>
   <p>The wording and layout of the email message is governed by the template file <code><i>[dspace]</i>/config/emails/suggest</code>. You may edit this file
   to alter the language, layout, type, or amount of information contained in the email, but note that the values passed to the template are limited to those enumerated at the
