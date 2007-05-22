@@ -317,8 +317,10 @@ public class UIUtil
                     {
                         sb.append(day + "-");
                     }
-
-                    sb.append(DCDate.getMonthName(month, locale).substring(0, 3) + "-");
+                    String monthName = DCDate.getMonthName(month, getSessionLocale(request));
+                    int monthLength = monthName.length();
+                    monthLength = monthLength > 2 ? 3 : monthLength;
+                    sb.append(monthName.substring(0, monthLength) + "-");
                 }
 
                 sb.append(year + " ");
