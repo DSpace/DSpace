@@ -70,7 +70,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
-import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.util.Util;
 
 import edu.harvard.hul.ois.mets.Agent;
 import edu.harvard.hul.ois.mets.AmdSec;
@@ -436,7 +436,7 @@ public class METSExport
                             + "/"
                             + bitstreams[bits].getSequenceID()
                             + "/"
-                            + UIUtil.encodeBitstreamName(bitstreams[bits].getName(),
+                            + Util.encodeBitstreamName(bitstreams[bits].getName(),
                                     "UTF-8");
 
                     edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
