@@ -291,7 +291,7 @@ public class RegisterServlet extends DSpaceServlet
 
                             try
                             {
-                                AccountManager.sendRegistrationInfo(request, context, email);
+                                AccountManager.sendRegistrationInfo(context, email);
                             }
                             catch (javax.mail.SendFailedException e)
                             {
@@ -403,7 +403,7 @@ public class RegisterServlet extends DSpaceServlet
                     log.info(LogManager.getHeader(context,
                             "sendtoken_forgotpw", "email=" + email));
 
-                    AccountManager.sendForgotPasswordInfo(request, context, email);
+                    AccountManager.sendForgotPasswordInfo(context, email);
                     JSPManager.showJSP(request, response,
                             "/register/password-token-sent.jsp");
 
