@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-jspui</artifactId>
+   <packaging>war</packaging>
+   <name>DSpace JSP Based Webapplication</name>
+   <version>1.5-SNAPSHOT</version>
+   <url>http://www.dspace.org</url>
+   <description>DSpace JSP Based Webapplication</description>
+
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <relativePath>../dspace</relativePath>
+   </parent>
+
+   <scm>
+      <connection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-jspui
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-jspui
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-jspui/
+      </url>
+   </scm>
+
+   <distributionManagement>
+      <site>
+         <id>website</id>
+         <url>
+            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/dspace-jspui
+         </url>
+      </site>
+   </distributionManagement>
+
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+         <version>1.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>jstl</artifactId>
+         <version>1.1.2</version>
+      </dependency>
+      <dependency>
+         <groupId>taglibs</groupId>
+         <artifactId>standard</artifactId>
+         <version>1.1.2</version>
+      </dependency>
+   </dependencies>
+
+</project>
+

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-oai</artifactId>
+   <packaging>war</packaging>
+   <name>DSpace OAI Webapplication</name>
+   <version>1.5-SNAPSHOT</version>
+   <description>DSpace OAI Service Provider Webapplication</description>
+   <url>http://www.dspace.org</url>
+
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <relativePath>../dspace</relativePath>
+   </parent>
+
+   <scm>
+      <connection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-oai
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-oai
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-oai/
+      </url>
+   </scm>
+
+   <distributionManagement>
+      <site>
+         <id>website</id>
+         <url>
+            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/dspace-oai
+         </url>
+      </site>
+   </distributionManagement>
+
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+         <version>1.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>oaicat</artifactId>
+         <version>1.5.48</version>
+      </dependency>
+   </dependencies>
+
+</project>
+
