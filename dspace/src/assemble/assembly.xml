@@ -1,5 +1,5 @@
 <assembly>
-  <id>assembly-oracle</id>
+  <id>assembly-postgres</id>
   <formats>
   	<!-- 
   	The format of the packaged release can be controlled by adding/removing
@@ -40,7 +40,6 @@
       <scope>runtime</scope>
       <excludes>
         <exclude>junit:junit</exclude>
-        <exclude>postgresql:postgresql</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
@@ -51,7 +50,7 @@
         <include>*:jar</include>
       </includes>
       <binaries>
-         <includeDependencies>true</includeDependencies>
+        <includeDependencies>true</includeDependencies>
         <outputDirectory>lib</outputDirectory>
         <unpack>false</unpack>
       </binaries>

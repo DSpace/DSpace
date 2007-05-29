@@ -1,25 +1,145 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>dspace-maven</artifactId>
-    <groupId>org.dspace</groupId>
-    <version>1.5-SNAPSHOT</version>
-    <relativePath>../dspace-maven</relativePath>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.dspace</groupId>
-  <artifactId>dspace</artifactId>
-  <packaging>pom</packaging>
-  <name>DSpace Installation Project</name>
-  <version>1.5-SNAPSHOT</version>
-  <description>The DSpace Installer Project provides all the functionality
-		required to build, install and upgrade and dspace instance.</description>
-  <url>http://www.dspace.org</url>
-
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace</artifactId>
+   <packaging>pom</packaging>
+   <name>DSpace Installation Project</name>
+   <version>1.5-SNAPSHOT</version>
+   <description>
+      The DSpace Installer Project provides all the functionality
+      required to build, install and upgrade and dspace instance.
+   </description>
+   <url>http://www.dspace.org</url>
    <organization>
       <name>The DSpace Federation</name>
       <url>http://www.dspace.org</url>
    </organization>
+
+   <modules>
+      <module>../dspace-api</module>
+   </modules>
+   
+   <profiles>
+      <profile>
+         <id>postgres</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+            <property>
+               <name>postgres</name>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>postgresql</groupId>
+               <artifactId>postgresql</artifactId>
+               <version>8.1-407.jdbc3</version>
+               <!--<optional>true</optional>-->
+            </dependency>
+         </dependencies>
+      </profile>
+      <profile>
+         <id>oracle</id>
+         <activation>
+            <property>
+               <name>oracle</name>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.oracle</groupId>
+               <artifactId>ojdbc14</artifactId>
+               <version>10.2.0.2.0</version>
+               <optional>true</optional>
+            </dependency>
+         </dependencies>
+      </profile>
+      <profile>
+         <id>jspui</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+            <property>
+               <name>jspui</name>
+            </property>
+         </activation>
+         <modules>
+            <module>../dspace-jspui</module>
+         </modules>
+      </profile>
+      <profile>
+         <id>oai</id>
+         <activation>
+            <property>
+               <name>oai</name>
+            </property>
+         </activation>
+         <modules>
+            <module>../dspace-oai</module>
+         </modules>
+      </profile>
+      <profile>
+         <id>xmlui</id>
+         <activation>
+            <property>
+               <name>xmlui</name>
+            </property>
+         </activation>
+         <modules>
+            <module>../dspace-xmlui</module>
+         </modules>
+      </profile>
+      <profile>
+         <id>lni</id>
+         <activation>
+            <property>
+               <name>lni</name>
+            </property>
+         </activation>
+         <modules>
+            <module>../dspace-lni</module>
+         </modules>
+      </profile>
+   </profiles>
+
+   <dependencies>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>3.8.1</version>
+      </dependency>
+   </dependencies>
+   
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <source>1.5</source>
+               <target>1.5</target>
+            </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+               <descriptors>
+                  <descriptor>src/assemble/assembly.xml</descriptor>
+               </descriptors>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-maven</artifactId>
+            <configuration>
+               <dspaceConfig>/dspace</dspaceConfig>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+
+
+ 
 
    <licenses>
       <license>
@@ -117,22 +237,12 @@
       </snapshotRepository>
       <site>
          <id>website</id>
-         <url>scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/dspace</url>
+         <url>
+            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/dspace
+         </url>
       </site>
    </distributionManagement>
-
-   <build>
-      <plugins>
-         <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-               <source>1.5</source>
-               <target>1.5</target>
-            </configuration>
-         </plugin>
-      </plugins>
-   </build>
-
+   
    <repositories>
       <repository>
          <releases>
@@ -156,9 +266,7 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
                <links>
-                  <link>
-                     http://projects.dspace.org/dspace/apidocs
-                  </link>
+                  <link>http://projects.dspace.org/dspace/apidocs</link>
                   <link>
                      http://projects.dspace.org/dspace-api/apidocs
                   </link>
@@ -168,9 +276,7 @@
                   <link>
                      http://projects.dspace.org/dspace-oai/apidocs
                   </link>
-                  <link>
-                     http://java.sun.com/j2se/1.5.0/docs/api
-                  </link>
+                  <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
                   <link>
                      http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
                   </link>
@@ -190,15 +296,9 @@
                      http://jakarta.apache.org/commons/pool/apidocs/
                   </link>
                   <link>http://www.junit.org/junit/javadoc/</link>
-                  <link>
-                     http://logging.apache.org/log4j/docs/api/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/regexp/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/velocity/api/
-                  </link>
+                  <link>http://logging.apache.org/log4j/docs/api/</link>
+                  <link>http://jakarta.apache.org/regexp/apidocs/</link>
+                  <link>http://jakarta.apache.org/velocity/api/</link>
                </links>
             </configuration>
          </plugin>
@@ -228,81 +328,10 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>rat-maven-plugin</artifactId>
          </plugin>
-         
+
       </plugins>
    </reporting>
    
-  <profiles>
-    <profile>
-      <id>postgres</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>postgres</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-              <descriptors>
-                <descriptor>src/assemble/assembly-postgres.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>oracle</id>
-      <activation>
-        <property>
-          <name>oracle</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-              <descriptors>
-                <descriptor>src/assemble/assembly-oracle.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-  
-  <modules>
-    <module>../dspace-api</module>
-    <module>../dspace-oai</module>
-    <module>../dspace-jspui</module>
-  </modules>
-  
-  <dependencies>
-      <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <version>3.8.1</version>
-      </dependency>
-      <dependency>
-         <groupId>postgresql</groupId>
-         <artifactId>postgresql</artifactId>
-         <version>8.1-407.jdbc3</version>
-         <!--<optional>true</optional>-->
-      </dependency>
-      <!--
-    <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ojdbc14</artifactId>
-      <version>10.2.0.2.0</version>
-      <optional>true</optional>
-    </dependency>
-    -->
-  </dependencies>
-  
+   
 </project>
 
