@@ -101,6 +101,20 @@
             <module>../dspace-lni</module>
          </modules>
       </profile>
+      <profile>
+         <build>
+            <plugins>
+         <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+               <descriptors>
+                  <descriptor>src/assemble/assembly.xml</descriptor>
+               </descriptors>
+            </configuration>
+         </plugin>
+      </plugins>
+         </build>   
+      </profile>
    </profiles>
 
    <dependencies>
@@ -128,18 +142,8 @@
                </descriptors>
             </configuration>
          </plugin>
-         <plugin>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-maven</artifactId>
-            <configuration>
-               <dspaceConfig>/dspace</dspaceConfig>
-            </configuration>
-         </plugin>
       </plugins>
    </build>
-
-
- 
 
    <licenses>
       <license>
