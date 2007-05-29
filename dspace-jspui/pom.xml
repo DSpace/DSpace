@@ -16,6 +16,52 @@
       <url>http://www.dspace.org</url>
    </organization>
 
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <source>1.5</source>
+               <target>1.5</target>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+   
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+         <version>1.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>jstl</artifactId>
+         <version>1.1.2</version>
+      </dependency>
+      <dependency>
+         <groupId>taglibs</groupId>
+         <artifactId>standard</artifactId>
+         <version>1.1.2</version>
+      </dependency>
+   </dependencies>
+   
+   <repositories>
+      <repository>
+         <releases>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+         <id>maven.dspace.org</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org</url>
+      </repository>
+   </repositories>
+
    <licenses>
       <license>
          <name>DSpace Sourcecode License</name>
@@ -117,35 +163,7 @@
          </url>
       </site>
    </distributionManagement>
-
-   <build>
-      <plugins>
-         <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-               <source>1.5</source>
-               <target>1.5</target>
-            </configuration>
-         </plugin>
-      </plugins>
-   </build>
    
-   <repositories>
-      <repository>
-         <releases>
-            <updatePolicy>always</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <updatePolicy>never</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-         <id>maven.dspace.org</id>
-         <name>DSpace Maven Repository</name>
-         <url>http://maven.dspace.org</url>
-      </repository>
-   </repositories>
-
    <reporting>
       <excludeDefaults>true</excludeDefaults>
       <plugins>
@@ -216,24 +234,6 @@
          </plugin>
       </plugins>
    </reporting>
-   
-   <dependencies>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-api</artifactId>
-         <version>1.5-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>jstl</artifactId>
-         <version>1.1.2</version>
-      </dependency>
-      <dependency>
-         <groupId>taglibs</groupId>
-         <artifactId>standard</artifactId>
-         <version>1.1.2</version>
-      </dependency>
-   </dependencies>
 
 </project>
 

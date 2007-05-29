@@ -24,39 +24,6 @@
    
    <profiles>
       <profile>
-         <id>postgres</id>
-         <activation>
-            <activeByDefault>true</activeByDefault>
-            <property>
-               <name>postgres</name>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>postgresql</groupId>
-               <artifactId>postgresql</artifactId>
-               <version>8.1-407.jdbc3</version>
-               <!--<optional>true</optional>-->
-            </dependency>
-         </dependencies>
-      </profile>
-      <profile>
-         <id>oracle</id>
-         <activation>
-            <property>
-               <name>oracle</name>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>com.oracle</groupId>
-               <artifactId>ojdbc14</artifactId>
-               <version>10.2.0.2.0</version>
-               <optional>true</optional>
-            </dependency>
-         </dependencies>
-      </profile>
-      <profile>
          <id>jspui</id>
          <activation>
             <activeByDefault>true</activeByDefault>
@@ -102,18 +69,26 @@
          </modules>
       </profile>
       <profile>
+         <id>release</id>
+         <activation>
+            <property>
+               <name>release</name>
+            </property>
+         </activation>
          <build>
             <plugins>
-         <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-               <descriptors>
-                  <descriptor>src/assemble/assembly.xml</descriptor>
-               </descriptors>
-            </configuration>
-         </plugin>
-      </plugins>
-         </build>   
+               <plugin>
+                  <artifactId>maven-assembly-plugin</artifactId>
+                  <configuration>
+                     <descriptors>
+                        <descriptor>
+                           src/assemble/assembly-release.xml
+                        </descriptor>
+                     </descriptors>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>
       </profile>
    </profiles>
 
