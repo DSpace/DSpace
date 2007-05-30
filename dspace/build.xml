@@ -41,7 +41,7 @@
   - Date:     $Date$
   -->
 
-<project name="DSpace" default="compile">
+<project name="DSpace" default="help">
 
   <!-- ============================================================= -->
   <!-- Description                                                   -->
@@ -98,13 +98,12 @@ Common usage:
 
 
   <!-- ============================================================= -->
-  <!-- The DSpace class path for building                            -->
+  <!-- The DSpace class path for executing installation targets      -->
   <!-- ============================================================= -->
 
   <!-- We will include the environment CLASSPATH -->
-  <path id="build.class.path">
+  <path id="class.path">
     <pathelement path="${env.CLASSPATH}"/>
-    <pathelement path="build/classes"/>
     <fileset dir="lib">
       <include name="**/*.jar"/>
     </fileset>
@@ -116,113 +115,29 @@ Common usage:
   <!-- ============================================================= -->
   <target name="help">
       <echo message=""/>
-      <echo message="DSpace build file"/>
+      <echo message="DSpace configuration file"/>
       <echo message="-----------------------------------"/>
       <echo message=""/>
       <echo message="Available targets are:"/>
       <echo message=""/>
-      <echo message="compile         --> Compile all Java files"/>
       <echo message="update          --> Update installed code without touching your config or data"/>
       <echo message=""/>
       <echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config"/>
-      <echo message="install_code    --> Install compiled code into ${dspace.dir}"/>
-      <echo message="build_wars      --> Build WAR files"/>
       <echo message=""/>
       <echo message="fresh_install   --> Perform a fresh installation of the software, including the databases &amp; config"/>
       <echo message="setup_database  --> Create database tables"/>
       <echo message="load_registries --> Load metadata &amp; file format registries into the database"/>
       <echo message=""/>
-      <echo message="clean           --> Delete compiled classes and WARs"/>
       <echo message="clean_database  --> Remove DSpace database tables, destroying data"/>
-      <echo message=""/>
-      <echo message="public_api      --> Create the DSpace public API documentation with javadoc"/>
-      <echo message="javadoc         --> Create javadoc for everything"/>
   </target>
-  
-  <!-- ============================================================= -->
-  <!-- Compile the source code                                       -->
-  <!-- ============================================================= -->
-
-  <target name="compile"
-          description="Compile the source code">
-    <mkdir dir="build/classes"/>
-    <javac srcdir="src"
-           destdir="build/classes"
-           debug="on"
-           source="1.5"
-           target="1.5">
-      <include name="**/*.java"/>
-      <classpath refid="build.class.path"/>
-    </javac>
-  </target>
-
-
-  <!-- ============================================================= -->
-  <!-- Build the .war files                                          -->
-  <!-- ============================================================= -->
-
-  <target name="build_wars"
-          depends="compile"
-          description="Build the .war files">  
-    <!-- Build DSpace UI .war -->
-    <copy file="etc/dspace-web.xml"
-          tofile="build/dspace-web.xml"
-          preservelastmodified="true"/>
-    <replace file="build/dspace-web.xml"
-             token="@@dspace.dir@@"
-             value="${dspace.dir}" />
-    <!-- Make sure jsp/local exists -->
-    <mkdir dir="jsp/local" />
-    <!-- Copy original JSPs, then copy localised versions on top -->
-    <mkdir dir="build/jsp" />
-    <copy todir="build/jsp" preservelastmodified="true">
-      <fileset dir="jsp">
-        <exclude name="local/**" />
-      </fileset>
-    </copy>
-    <copy todir="build/jsp" preservelastmodified="true" overwrite="true">
-      <fileset dir="jsp/local" />
-    </copy>
-  	<!-- Copy Messages.properties files -->
-  	<copy todir="build/classes"
-  		  preservelastmodified="true">
-      <fileset dir="config/language-packs">
-  		<include name="Messages*.properties"/>
-      </fileset>
-    </copy>
-  	<!-- Build DSpace Web UI .war -->
-    <war destfile="build/dspace.war"
-         webxml="build/dspace-web.xml">
-       <fileset dir="build/jsp" />
-       <lib dir="lib">
-         <exclude name="servlet.jar" />
-       </lib>
-       <classes dir="build/classes" />
-    </war>
-    <!-- Build DSpace OAI-PMH .war -->
-    <copy file="etc/oai-web.xml"
-          tofile="build/oai-web.xml"
-          preservelastmodified="true"/>
-    <replace file="build/oai-web.xml"
-             token="@@dspace.dir@@"
-             value="${dspace.dir}" />
-    <war destfile="build/dspace-oai.war"
-         webxml="build/oai-web.xml">
-       <lib dir="lib">
-         <exclude name="servlet.jar" />
-       </lib>
-       <classes dir="build/classes" />
-    </war>
-  </target>
-  
     
   <!-- ============================================================= -->
   <!-- Update an installation (except database)                      -->
   <!-- ============================================================= -->
 
   <target name="update"
-          depends="install_code,build_wars"
           description="Update installed code (without clobbering data/config)">
+  	
     <copy todir="${dspace.dir}/config" preservelastmodified="true">
       <fileset dir="config/language-packs"/>
     </copy>    
@@ -249,34 +164,6 @@ Copied language packs into ${dspace.dir}/config
 ====================================================================
     </echo>
   </target>
-
-
-  <!-- ============================================================= -->
-  <!-- Install or update DSpace code                                 -->
-  <!-- ============================================================= -->
-
-  <target name="install_code"
-          depends="compile">
-    <mkdir dir="${dspace.dir}/config" />
-    <mkdir dir="${assetstore.dir}" />
-    <mkdir dir="${handle.dir}" />
-    <mkdir dir="${history.dir}" />
-    <mkdir dir="${search.dir}" />
-    <mkdir dir="${log.dir}" />
-    <mkdir dir="${upload.temp.dir}" />
-    <mkdir dir="${dspace.dir}/bin"/>
-    <mkdir dir="${dspace.dir}/lib"/>
-    <mkdir dir="${report.dir}"/>
-    <copy todir="${dspace.dir}/bin" preservelastmodified="true">
-      <fileset dir="bin"/>
-    </copy>
-    <chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
-    <copy todir="${dspace.dir}/lib" preservelastmodified="true">
-      <fileset dir="lib" />
-    </copy>
-    <jar jarfile="${dspace.dir}/lib/dspace.jar"
-         basedir="build/classes" />
-  </target>
   
   
   <!-- ============================================================= -->
@@ -288,20 +175,25 @@ Copied language packs into ${dspace.dir}/config
        copied to ${dspace.dir}/config so there's a simple log4j.properties
        file present for the initial run of "install-configs". -->
   <target name="init_configs">
+  	
     <copy todir="${dspace.dir}/config" preservelastmodified="true">
       <fileset dir="config">
     	<exclude name="language-packs/**"/>
       </fileset>
     </copy>
+  	
     <copy todir="${dspace.dir}/config" preservelastmodified="true">
       <fileset dir="config/language-packs"/>
-    </copy>    
+    </copy>  
+  	
     <copy file="etc/log4j.build.properties"
           tofile="${dspace.dir}/config/log4j.properties"
           preservelastmodified="true"/>
+  	
   	<copy file="${config}"
   			tofile="${dspace.dir}/config/dspace.cfg"
   			preservelastmodified="true" />
+  	
   </target>
 
 
@@ -313,16 +205,17 @@ Copied language packs into ${dspace.dir}/config
     -  file in etc/ and the DSpace configuration file using system
     -  properties -->
   <target name="setup_database"
-          depends="compile"
           description="Create database tables">
+  	
     <java classname="org.dspace.storage.rdbms.InitializeDatabase"
-          classpathref="build.class.path"
+          classpathref="class.path"
           fork="yes"
           failonerror="yes">
       <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
       <sysproperty key="dspace.configuration" value="${config}"/>
       <arg value="etc/database_schema.sql"/>
     </java>
+  	
   </target>
 
   
@@ -334,16 +227,17 @@ Copied language packs into ${dspace.dir}/config
     -  file in etc/ and the DSpace configuration file using system
     -  properties -->
   <target name="clean_database"
-          depends="compile"
           description="Removes DSpace database tables, destroying data">
+  	
     <java classname="org.dspace.storage.rdbms.InitializeDatabase"
-          classpathref="build.class.path"
+          classpathref="class.path"
           fork="yes"
           failonerror="yes">
       <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
       <sysproperty key="dspace.configuration" value="${config}"/>
       <arg value="etc/clean-database.sql"/>
     </java>
+  	
   </target>
 
 
@@ -353,10 +247,10 @@ Copied language packs into ${dspace.dir}/config
 
   <!-- Loads bitstream format and Dublin Core type registries -->
   <target name="load_registries"
-          depends="compile"
           description="Load initial contents of registries">
+  	
     <java classname="org.dspace.administer.RegistryLoader"
-          classpathref="build.class.path"
+          classpathref="class.path"
           fork="yes"
           failonerror="yes">
       <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
@@ -364,8 +258,9 @@ Copied language packs into ${dspace.dir}/config
       <arg value="-bitstream"/>
       <arg value="${dspace.dir}/config/registries/bitstream-formats.xml"/>
     </java>
+  	
     <java classname="org.dspace.administer.RegistryLoader"
-          classpathref="build.class.path"
+          classpathref="class.path"
           fork="yes"
           failonerror="yes">
       <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
@@ -373,6 +268,7 @@ Copied language packs into ${dspace.dir}/config
       <arg value="-dc"/>
       <arg value="${dspace.dir}/config/registries/dublin-core-types.xml"/>
     </java>
+  	
   </target>
 
 
@@ -381,30 +277,34 @@ Copied language packs into ${dspace.dir}/config
   <!-- ============================================================= -->
   
   <target name="fresh_install"
-          depends="install_code,build_wars,init_configs,setup_database,load_registries"
+          depends="init_configs,setup_database,load_registries"
           description="Do a fresh install of the system, overwriting any data">
+  	
     <java classname="org.dspace.core.ConfigurationManager"
-          classpathref="build.class.path"
+          classpathref="class.path"
           fork="yes"
           failonerror="yes">
       <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
       <sysproperty key="dspace.configuration" value="${config}"/>
       <arg value="-installTemplates"/>
     </java>    
+  	
     <java classname="org.dspace.browse.InitializeBrowse"
-          classpathref="build.class.path"
+          classpathref="class.path"
           fork="yes"
           failonerror="yes">
       <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
       <sysproperty key="dspace.configuration" value="${config}"/>
     </java>
+  	
     <java classname="org.dspace.search.DSIndexer"
-          classpathref="build.class.path"
+          classpathref="class.path"
           fork="yes"
           failonerror="yes">
       <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
       <sysproperty key="dspace.configuration" value="${config}"/>
     </java>
+  	
     <echo>
 ====================================================================
  The DSpace code has been installed, and the database initialized.
@@ -430,74 +330,6 @@ Copied language packs into ${dspace.dir}/config
    ${dspace.url}/dspace-admin
 ====================================================================
     </echo>
-  </target>
-
-
-  <!-- ============================================================= -->
-  <!-- Clean source code                                             -->
-  <!-- ============================================================= -->
-
-  <target name="clean"
-          description="Remove compiled files - does not affect installation">
-    <delete dir="build" />
-  </target>
-
-
-  <!-- ============================================================= -->
-  <!-- Create public API javadoc                                     -->
-  <!-- ============================================================= -->
-	
-  <target name="public_api"
-          description="Create the DSpace public API documentation with javadoc">
-    <mkdir dir="build/public-api" />
-    <javadoc sourcepath="src"
-             destdir="build/public-api"
-             author="true"
-             version="true"
-             access="public"
-             doctitle="DSpace Public API"
-             windowtitle="DSpace Public API"
-             bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved."
-             overview="src/overview.html"
-             classpathref="build.class.path">
-      <package name="org.dspace.administer"/>
-      <package name="org.dspace.authorize"/>
-      <package name="org.dspace.browse"/>
-      <package name="org.dspace.checker"/>
-      <package name="org.dspace.content"/>
-      <package name="org.dspace.content.packager"/>
-      <package name="org.dspace.content.crosswalk"/>
-      <package name="org.dspace.core"/>
-      <package name="org.dspace.eperson"/>
-      <package name="org.dspace.handle"/>
-      <package name="org.dspace.history"/>
-      <package name="org.dspace.search"/>
-      <package name="org.dspace.storage.bitstore"/>
-      <package name="org.dspace.storage.rdbms"/>
-      <package name="org.dspace.workflow"/>
-    </javadoc>
-  </target>
-
-
-  <!-- ============================================================= -->
-  <!-- Create javadoc for everything                                 -->
-  <!-- ============================================================= -->
-
-  <target name="javadoc"
-          description="Create the DSpace public API documentation with javadoc">
-    <mkdir dir="build/javadoc" />
-    <javadoc destdir="build/javadoc"
-             author="true"
-             version="true"
-             doctitle="DSpace Source Javadoc"
-             windowtitle="DSpace Source Javadoc"
-             bottom="Copyright &#169; 2002 MIT and Hewlett-Packard. All Rights Reserved."
-             overview="src/overview.html"
-             classpathref="build.class.path">
-      <packageset dir="src">
-        <include name="**" />
-      </packageset>
-    </javadoc>
   </target>
 
 </project>
