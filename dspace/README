@@ -1,6 +1,8 @@
-DSpace Version 1.4.1, 8-December-2006
+DSpace Version 1.5-Alpha, 26-May-2007
 
-Installation instructions are included in this release package.
+Installation instructions are included in this release package under
+
+docs/install.html
 
 Documentation for the most recent stable release may be viewed online at
 dspace.org:
