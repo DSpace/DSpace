@@ -1,11 +1,12 @@
 #!/bin/sh
 
 USAGE="Usage: $0 <path> <svn_revision> <version>
-  * <path> is relative to the SVN root (eg: branches/dspace-1_4_x/dspace)
+  * <path> is relative to the SVN root (eg: branches/dspace-1_4_x)
   * <svn_revision> is the revision you want to build the release from
   * <version> is the version number to release as (eg: 1.4.2)
-Example:
-./make-release-package branches/dspace-1_4_x/dspace 1795 1.4.2"
+  * IMPORTANT, no longer add the "dspace" directory onto the end of the path 
+Examples:
+./make-release-package trunk 1984 1.5"
 
 SVN="svn"
 SVN_BASE_URL="https://dspace.svn.sourceforge.net/svnroot/dspace"
@@ -28,9 +29,9 @@ cd tmp
 FILENAME="dspace-$3-source"
 
 echo "Checking out core code..."
-$SVN export -r $2 "$SVN_BASE_URL/$1" dspace
+$SVN export -r $2 "$SVN_BASE_URL/$1" release
 
-if [ $? -eq 1 ] || [ ! -d "dspace" ]; then
+if [ $? -eq 1 ] || [ ! -d "release" ]; then
 	# SVN export failed
 	echo "SVN export failed. Check your path & revision number and try again."
 	cd ..
@@ -38,20 +39,20 @@ if [ $? -eq 1 ] || [ ! -d "dspace" ]; then
 	exit 1
 fi
 
-if [ ! -f "dspace/make-release-package" ]; then
+if [ ! -f "release/make-release-package" ]; then
 	cat <<-EOF
-	ERROR: The file dspace/make-release-package doesn't exist. There must have
+	ERROR: The file release/make-release-package doesn't exist. There must have
 	been a problem with the export. Check the contents of tmp/ to find out what
 	the problem was.
 	EOF
 	exit 1
 else
 	# Don't need to include this script!
-	rm -f dspace/make-release-package
+	rm -f release/make-release-package
 fi
 
 echo "Creating tarball..."
-mv dspace $FILENAME
+mv release $FILENAME
 
 tar czf $FILENAME.tgz $FILENAME
 tar cjf $FILENAME.tbz2 $FILENAME
