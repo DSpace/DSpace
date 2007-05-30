@@ -38,6 +38,7 @@
       <profile>
          <id>oai</id>
          <activation>
+            <activeByDefault>true</activeByDefault>
             <property>
                <name>oai</name>
             </property>
@@ -86,6 +87,14 @@
                         </descriptor>
                      </descriptors>
                   </configuration>
+                  <executions>
+                     <execution>
+                        <goals>
+                           <goal>assembly</goal>
+                        </goals>
+                        <phase>package</phase>
+                     </execution>
+                  </executions>
                </plugin>
             </plugins>
          </build>
@@ -97,6 +106,7 @@
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>
          <version>3.8.1</version>
+         <scope>test</scope>
       </dependency>
    </dependencies>
    
@@ -116,6 +126,14 @@
                   <descriptor>src/assemble/assembly.xml</descriptor>
                </descriptors>
             </configuration>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>assembly</goal>
+                  </goals>
+                  <phase>package</phase>
+               </execution>
+            </executions>
          </plugin>
       </plugins>
    </build>
@@ -229,7 +247,7 @@
             <checksumPolicy>fail</checksumPolicy>
          </releases>
          <snapshots>
-            <updatePolicy>never</updatePolicy>
+            <updatePolicy>always</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
          <id>maven.dspace.org</id>
