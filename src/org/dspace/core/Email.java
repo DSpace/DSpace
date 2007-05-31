@@ -231,10 +231,14 @@ public class Email
         // Get the mail configuration properties
         String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
-
+        String localhost = ConfigurationManager.getProperty("mail.localhost");
+	
         // Set up properties for mail session
         Properties props = System.getProperties();
         props.put("mail.smtp.host", server);
+	if (localhost != null) {
+	  props.put("mail.smtp.localhost", localhost);
+	}
 
         // Get session
         Session session = Session.getDefaultInstance(props, null);
