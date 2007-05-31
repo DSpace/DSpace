@@ -4,7 +4,7 @@ USAGE="Usage: $0 <path> <svn_revision> <version>
   * <path> is relative to the SVN root (eg: branches/dspace-1_4_x)
   * <svn_revision> is the revision you want to build the release from
   * <version> is the version number to release as (eg: 1.4.2)
-  * IMPORTANT, no longer add the "dspace" directory onto the end of the path 
+  * IMPORTANT, no longer add the \"dspace\" directory onto the end of the path 
 Examples:
 ./make-release-package trunk 1984 1.5"
 
