@@ -43,11 +43,11 @@
 
 <project name="DSpace" default="help">
 
-  <!-- ============================================================= -->
-  <!-- Description                                                   -->
-  <!-- ============================================================= -->
+	<!-- ============================================================= -->
+	<!-- Description                                                   -->
+	<!-- ============================================================= -->
 
-  <description>
+	<description>
 ====================== DSpace platform build file ======================
 
 Common usage:
@@ -61,93 +61,154 @@ Common usage:
 ========================================================================
   </description>
 
-  <!-- ============================================================= -->
-  <!-- Will be using various environment variables                   -->
-  <!-- ============================================================= -->
+	<!-- ============================================================= -->
+	<!-- Will be using various environment variables                   -->
+	<!-- ============================================================= -->
 
-  <property environment="env"/>
+	<property environment="env" />
 
 
-  <!-- ============================================================= -->
-  <!-- Build parameters that are likely to need tweaking             -->
-  <!-- ============================================================= -->
-    
-  <!-- Default configuration to use.  This may be overridden. -->
-  <property name="config" value="config/dspace.cfg" />
+	<!-- ============================================================= -->
+	<!-- Build parameters that are likely to need tweaking             -->
+	<!-- ============================================================= -->
 
-  <!-- Give user a chance to override without editing this file 
+	<!-- Default configuration to use.  This may be overridden. -->
+	<property name="config" value="config/dspace.cfg" />
+
+	<!-- Give user a chance to override without editing this file 
        (and without typing -D each time s/he compiles it) -->
-  <property file="${user.home}/.dspace.properties" />
+	<property file="${user.home}/.dspace.properties" />
 
-  <!-- First, set the dspace.dir property so it can be
+	<!-- First, set the dspace.dir property so it can be
        interpolated when loading the config file.
        This crudely mimics the way ConfigurationManager interpolates properties.
        Note that it ONLY works for directories that interpolate ${dspace.dir}
        but that _should_ cover all cases used in this build configuration.
     -->
-  <loadproperties srcFile="${config}">
-    <filterchain>
-      <linecontainsregexp>
-         <regexp pattern="^\s*dspace\.dir\s+"/>
-      </linecontainsregexp>
-    </filterchain>
-  </loadproperties>
+	<loadproperties srcFile="${config}">
+		<filterchain>
+			<linecontainsregexp>
+				<regexp pattern="^\s*dspace\.dir\s+" />
+			</linecontainsregexp>
+		</filterchain>
+	</loadproperties>
 
-  <!-- Load the configuration -->
-  <property file="${config}" />
+	<!-- Load the configuration -->
+	<property file="${config}" />
 
 
-  <!-- ============================================================= -->
-  <!-- The DSpace class path for executing installation targets      -->
-  <!-- ============================================================= -->
+	<!-- ============================================================= -->
+	<!-- The DSpace class path for executing installation targets      -->
+	<!-- ============================================================= -->
 
-  <!-- We will include the environment CLASSPATH -->
-  <path id="class.path">
-    <pathelement path="${env.CLASSPATH}"/>
-    <fileset dir="lib">
-      <include name="**/*.jar"/>
-    </fileset>
-  </path>
+	<!-- We will include the environment CLASSPATH -->
+	<path id="class.path">
+		<pathelement path="${env.CLASSPATH}" />
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
 
-  
-  <!-- ============================================================= -->
-  <!-- Print some useful help text                                  -->
-  <!-- ============================================================= -->
-  <target name="help">
-      <echo message=""/>
-      <echo message="DSpace configuration file"/>
-      <echo message="-----------------------------------"/>
-      <echo message=""/>
-      <echo message="Available targets are:"/>
-      <echo message=""/>
-      <echo message="update          --> Update installed code without touching your config or data"/>
-      <echo message=""/>
-      <echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config"/>
-      <echo message=""/>
-      <echo message="fresh_install   --> Perform a fresh installation of the software, including the databases &amp; config"/>
-      <echo message="setup_database  --> Create database tables"/>
-      <echo message="load_registries --> Load metadata &amp; file format registries into the database"/>
-      <echo message=""/>
-      <echo message="clean_database  --> Remove DSpace database tables, destroying data"/>
-  </target>
-    
-  <!-- ============================================================= -->
-  <!-- Update an installation (except database)                      -->
-  <!-- ============================================================= -->
 
-  <target name="update"
-          description="Update installed code (without clobbering data/config)">
-  	
-    <copy todir="${dspace.dir}/config" preservelastmodified="true">
-      <fileset dir="config/language-packs"/>
-    </copy>    
-          
-    <echo>
+	<!-- ============================================================= -->
+	<!-- Print some useful help text                                  -->
+	<!-- ============================================================= -->
+	<target name="help">
+
+		<echo message="" />
+		<echo message="DSpace configuration file" />
+		<echo message="-----------------------------------" />
+		<echo message="" />
+		<echo message="Available targets are:" />
+		<echo message="" />
+		<echo message="update          --> Update installed code without touching your config or data" />
+		<echo message="" />
+		<echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config" />
+		<echo message="install_code    --> Install compiled code into ${dspace.dir}" />
+		<echo message="" />
+		<echo message="fresh_install   --> Perform a fresh installation of the software, including the databases &amp; config" />
+		<echo message="setup_database  --> Create database tables" />
+		<echo message="load_registries --> Load metadata &amp; file format registries into the database" />
+		<echo message="" />
+		<echo message="clean_database  --> Remove DSpace database tables, destroying data" />
+
+	</target>
+
+	<!-- ============================================================= -->
+	<!-- Update an installation (except database)                      -->
+	<!-- ============================================================= -->
+
+	<target name="update" description="Update installed code (without clobbering data/config)">
+
+		<tstamp>
+			<format property="build.date" pattern="yyyyMMdd-HHmmss" />
+		</tstamp>
+
+		<copy todir="${dspace.dir}/bin" preservelastmodified="true">
+			<fileset dir="bin" />
+		</copy>
+
+		<chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
+
+		<mkdir dir="${dspace.dir}/lib.bak-${build.date}"/>
+		<move todir="${dspace.dir}/lib.bak-${build.date}">
+			<fileset dir="${dspace.dir}/lib">
+				<include name="**/*"/>
+			</fileset>
+		</move>
+
+		<copy todir="${dspace.dir}/lib" preservelastmodified="true">
+			<fileset dir="lib" />
+		</copy>
+
+		<echo>
 ====================================================================
-Copied language packs into ${dspace.dir}/config    
+ ${dspace.dir}/lib was backed up to
+			
+ ${dspace.dir}/lib.bak-${build.date}
+			
+ Please review this directory and delete it if its no longer needed.
+====================================================================
+		</echo>
+
+		<mkdir dir="${dspace.dir}/webapps.bak-${build.date}"/>
+		<move todir="${dspace.dir}/webapps.bak-${build.date}">
+			<fileset dir="${dspace.dir}/webapps">
+				<include name="**/*.war"/>
+			</fileset>
+		</move>
+
+		<copy todir="${dspace.dir}/webapps" preservelastmodified="true">
+			<fileset dir="webapps" />
+		</copy>
+
+		<echo>
+====================================================================
+ ${dspace.dir}/webapps was backed up to
+					
+ ${dspace.dir}/webapps.bak-${build.date}
+					
+ Please review this directory and delete it if its no longer needed.
+====================================================================
+		</echo>
+
+
+		<copy todir="${dspace.dir}/config" preservelastmodified="true">
+			<fileset dir="config/language-packs" />
+		</copy>
+
+		<echo>
+====================================================================
+ Copied language packs into ${dspace.dir}/config    
     
 ====================================================================
- Updated Web application (.war) files are in the 'build' directory.
+		</echo>
+
+
+		<echo>
+====================================================================
+ Updated Web application (.war) files are in the '${dspace.dir}/webapps' 
+ directory.
 
  * Stop your Web servlet container (Tomcat, Jetty, Resin etc.)
  
@@ -162,150 +223,172 @@ Copied language packs into ${dspace.dir}/config
 
  * Start up your Web servlet container again.
 ====================================================================
-    </echo>
-  </target>
-  
-  
-  <!-- ============================================================= -->
-  <!-- Fresh install of config files                                 -->
-  <!-- ============================================================= -->
-  
-  <!-- Writes the configuration files to ${dspace.dir}/config.  It does *not*
+    	</echo>
+
+	</target>
+
+
+	<!-- ============================================================= -->
+	<!-- Install DSpace and Dependencies                               -->
+	<!-- ============================================================= -->
+
+	<target name="init_installation">
+
+		<mkdir dir="${dspace.dir}/bin" />
+
+		<mkdir dir="${dspace.dir}/config" />
+
+		<mkdir dir="${dspace.dir}/lib" />
+
+		<mkdir dir="${dspace.dir}/webapps" />
+
+		<mkdir dir="${assetstore.dir}" />
+
+		<mkdir dir="${handle.dir}" />
+
+		<mkdir dir="${history.dir}" />
+
+		<mkdir dir="${search.dir}" />
+
+		<mkdir dir="${log.dir}" />
+
+		<mkdir dir="${upload.temp.dir}" />
+
+		<mkdir dir="${report.dir}" />
+
+	</target>
+
+
+	<!-- ============================================================= -->
+	<!-- Fresh install of config files                                 -->
+	<!-- ============================================================= -->
+
+	<!-- Writes the configuration files to ${dspace.dir}/config.  It does *not*
        run the install-configs script.  The "log4j.build.properties" file is
        copied to ${dspace.dir}/config so there's a simple log4j.properties
        file present for the initial run of "install-configs". -->
-  <target name="init_configs">
-  	
-    <copy todir="${dspace.dir}/config" preservelastmodified="true">
-      <fileset dir="config">
-    	<exclude name="language-packs/**"/>
-      </fileset>
-    </copy>
-  	
-    <copy todir="${dspace.dir}/config" preservelastmodified="true">
-      <fileset dir="config/language-packs"/>
-    </copy>  
-  	
-    <copy file="etc/log4j.build.properties"
-          tofile="${dspace.dir}/config/log4j.properties"
-          preservelastmodified="true"/>
-  	
-  	<copy file="${config}"
-  			tofile="${dspace.dir}/config/dspace.cfg"
-  			preservelastmodified="true" />
-  	
-  </target>
+	<target name="init_configs" depends="init_installation">
+
+		<copy todir="${dspace.dir}/config" preservelastmodified="true">
+			<fileset dir="config">
+				<exclude name="language-packs/**" />
+			</fileset>
+		</copy>
+
+		<copy todir="${dspace.dir}/config" preservelastmodified="true">
+			<fileset dir="config/language-packs" />
+		</copy>
+
+		<copy file="etc/log4j.build.properties" tofile="${dspace.dir}/config/log4j.properties" preservelastmodified="true" />
+
+		<copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
+
+	</target>
 
 
-  <!-- ============================================================= -->
-  <!-- Create the database tables                                    -->
-  <!-- ============================================================= -->
+	<!-- ============================================================= -->
+	<!-- Create the database tables                                    -->
+	<!-- ============================================================= -->
 
-  <!-- We execute InitializeDatabase, passing in the simple log4j properties
+	<!-- We execute InitializeDatabase, passing in the simple log4j properties
     -  file in etc/ and the DSpace configuration file using system
     -  properties -->
-  <target name="setup_database"
-          description="Create database tables">
-  	
-    <java classname="org.dspace.storage.rdbms.InitializeDatabase"
-          classpathref="class.path"
-          fork="yes"
-          failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
-      <sysproperty key="dspace.configuration" value="${config}"/>
-      <arg value="etc/database_schema.sql"/>
-    </java>
-  	
-  </target>
+	<target name="setup_database" description="Create database tables">
 
-  
-  <!-- ============================================================= -->
-  <!-- Remove the database tables                                    -->
-  <!-- ============================================================= -->
+		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
+			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="dspace.configuration" value="${config}" />
+			<arg value="etc/database_schema.sql" />
+		</java>
 
-  <!-- We execute InitializeDatabase, passing in the simple log4j properties
+	</target>
+
+
+	<!-- ============================================================= -->
+	<!-- Remove the database tables                                    -->
+	<!-- ============================================================= -->
+
+	<!-- We execute InitializeDatabase, passing in the simple log4j properties
     -  file in etc/ and the DSpace configuration file using system
     -  properties -->
-  <target name="clean_database"
-          description="Removes DSpace database tables, destroying data">
-  	
-    <java classname="org.dspace.storage.rdbms.InitializeDatabase"
-          classpathref="class.path"
-          fork="yes"
-          failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
-      <sysproperty key="dspace.configuration" value="${config}"/>
-      <arg value="etc/clean-database.sql"/>
-    </java>
-  	
-  </target>
+	<target name="clean_database" description="Removes DSpace database tables, destroying data">
+
+		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
+			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="dspace.configuration" value="${config}" />
+			<arg value="etc/clean-database.sql" />
+		</java>
+
+	</target>
 
 
-  <!-- ============================================================= -->
-  <!-- Load the initial contents of the registries into the database -->
-  <!-- ============================================================= -->
+	<!-- ============================================================= -->
+	<!-- Load the initial contents of the registries into the database -->
+	<!-- ============================================================= -->
 
-  <!-- Loads bitstream format and Dublin Core type registries -->
-  <target name="load_registries"
-          description="Load initial contents of registries">
-  	
-    <java classname="org.dspace.administer.RegistryLoader"
-          classpathref="class.path"
-          fork="yes"
-          failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
-      <sysproperty key="dspace.configuration" value="${config}"/>
-      <arg value="-bitstream"/>
-      <arg value="${dspace.dir}/config/registries/bitstream-formats.xml"/>
-    </java>
-  	
-    <java classname="org.dspace.administer.RegistryLoader"
-          classpathref="class.path"
-          fork="yes"
-          failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
-      <sysproperty key="dspace.configuration" value="${config}"/>
-      <arg value="-dc"/>
-      <arg value="${dspace.dir}/config/registries/dublin-core-types.xml"/>
-    </java>
-  	
-  </target>
+	<!-- Loads bitstream format and Dublin Core type registries -->
+	<target name="load_registries" description="Load initial contents of registries">
+
+		<java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
+			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="dspace.configuration" value="${config}" />
+			<arg value="-bitstream" />
+			<arg value="${dspace.dir}/config/registries/bitstream-formats.xml" />
+		</java>
+
+		<java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
+			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="dspace.configuration" value="${config}" />
+			<arg value="-dc" />
+			<arg value="${dspace.dir}/config/registries/dublin-core-types.xml" />
+		</java>
+
+	</target>
 
 
-  <!-- ============================================================= -->
-  <!-- Do a fresh system install                                     -->
-  <!-- ============================================================= -->
-  
-  <target name="fresh_install"
-          depends="init_configs,setup_database,load_registries"
-          description="Do a fresh install of the system, overwriting any data">
-  	
-    <java classname="org.dspace.core.ConfigurationManager"
-          classpathref="class.path"
-          fork="yes"
-          failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
-      <sysproperty key="dspace.configuration" value="${config}"/>
-      <arg value="-installTemplates"/>
-    </java>    
-  	
-    <java classname="org.dspace.browse.InitializeBrowse"
-          classpathref="class.path"
-          fork="yes"
-          failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
-      <sysproperty key="dspace.configuration" value="${config}"/>
-    </java>
-  	
-    <java classname="org.dspace.search.DSIndexer"
-          classpathref="class.path"
-          fork="yes"
-          failonerror="yes">
-      <sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties"/>
-      <sysproperty key="dspace.configuration" value="${config}"/>
-    </java>
-  	
-    <echo>
+	<!-- ============================================================= -->
+	<!-- Do a fresh system install                                     -->
+	<!-- ============================================================= -->
+
+	<target name="fresh_install" depends="init_installation,init_configs,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
+
+		<delete dir="${dspace.dir}/bin" includes="**/*" />
+		
+		<copy todir="${dspace.dir}/bin" preservelastmodified="true">
+			<fileset dir="bin" />
+		</copy>
+
+		<chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
+
+		<delete dir="${dspace.dir}/lib" includes="**/*" />
+				
+		<copy todir="${dspace.dir}/lib" preservelastmodified="true">
+			<fileset dir="lib" />
+		</copy>
+
+		<delete dir="${dspace.dir}/webapps" includes="**/*" />
+				
+		<copy todir="${dspace.dir}/webapps" preservelastmodified="true">
+			<fileset dir="webapps" />
+		</copy>
+
+		<java classname="org.dspace.core.ConfigurationManager" classpathref="class.path" fork="yes" failonerror="yes">
+			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="dspace.configuration" value="${config}" />
+			<arg value="-installTemplates" />
+		</java>
+
+		<java classname="org.dspace.browse.InitializeBrowse" classpathref="class.path" fork="yes" failonerror="yes">
+			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="dspace.configuration" value="${config}" />
+		</java>
+
+		<java classname="org.dspace.search.DSIndexer" classpathref="class.path" fork="yes" failonerror="yes">
+			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="dspace.configuration" value="${config}" />
+		</java>
+
+		<echo>
 ====================================================================
  The DSpace code has been installed, and the database initialized.
  
@@ -329,7 +412,8 @@ Copied language packs into ${dspace.dir}/config
  
    ${dspace.url}/dspace-admin
 ====================================================================
-    </echo>
-  </target>
+    	</echo>
+
+	</target>
 
 </project>
