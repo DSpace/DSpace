@@ -150,8 +150,7 @@ Common usage:
 
 		<chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
 
-		<mkdir dir="${dspace.dir}/lib.bak-${build.date}"/>
-		<move todir="${dspace.dir}/lib.bak-${build.date}">
+		<move todir="${dspace.dir}/lib.bak-${build.date}" failonerror="no">
 			<fileset dir="${dspace.dir}/lib">
 				<include name="**/*"/>
 			</fileset>
@@ -171,14 +170,13 @@ Common usage:
 ====================================================================
 		</echo>
 
-		<mkdir dir="${dspace.dir}/webapps.bak-${build.date}"/>
-		<move todir="${dspace.dir}/webapps.bak-${build.date}">
+		<move todir="${dspace.dir}/webapps.bak-${build.date}" failonerror="no">
 			<fileset dir="${dspace.dir}/webapps">
 				<include name="**/*.war"/>
 			</fileset>
 		</move>
 
-		<copy todir="${dspace.dir}/webapps" preservelastmodified="true">
+		<copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
 			<fileset dir="webapps" />
 		</copy>
 
@@ -352,7 +350,9 @@ Common usage:
 
 	<target name="fresh_install" depends="init_installation,init_configs,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
 
-		<delete dir="${dspace.dir}/bin" includes="**/*" />
+		<delete failonerror="no">
+			<fileset dir="${dspace.dir}/bin" includes="**/*"/>
+		</delete>
 		
 		<copy todir="${dspace.dir}/bin" preservelastmodified="true">
 			<fileset dir="bin" />
@@ -360,13 +360,17 @@ Common usage:
 
 		<chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
 
-		<delete dir="${dspace.dir}/lib" includes="**/*" />
+		<delete failonerror="no">
+			<fileset dir="${dspace.dir}/lib" includes="**/*"/>
+		</delete>
 				
 		<copy todir="${dspace.dir}/lib" preservelastmodified="true">
 			<fileset dir="lib" />
 		</copy>
 
-		<delete dir="${dspace.dir}/webapps" includes="**/*" />
+		<delete failonerror="no">
+			<fileset dir="${dspace.dir}/webapps" includes="**/*"/>
+		</delete>
 				
 		<copy todir="${dspace.dir}/webapps" preservelastmodified="true">
 			<fileset dir="webapps" />
