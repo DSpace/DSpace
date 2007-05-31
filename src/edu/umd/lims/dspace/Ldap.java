@@ -34,6 +34,8 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
+import org.dspace.app.webui.servlet.RegisterServlet;
+
 
 /*********************************************************************
  Login a campus user.
@@ -406,6 +408,62 @@ public class Ldap {
   }
 
 
+  /****************************************************** registerEPerson */
+  /**
+   * Register this ldap user as an EPerson
+   */
+
+  public EPerson registerEPerson(String email) throws Exception {
+    // Save the current dspace user
+    EPerson user = context.getCurrentUser();
+
+    try {
+      // Use the admin account to create the eperson
+      EPerson admin = EPerson.findByEmail(context, "ldap_um@drum.umd.edu");
+      context.setCurrentUser(admin);
+
+      // Create a new eperson
+      EPerson eperson = EPerson.create(context);
+			
+      String strFirstName = getFirstName();
+      if (strFirstName == null)
+	strFirstName = "??";
+
+      String strLastName = getLastName();
+      if (strLastName == null)
+	strLastName = "??";
+
+      String strPhone = getPhone();
+      if (strPhone == null)
+	strPhone = "??";
+
+      eperson.setEmail(email);
+      eperson.setFirstName(strFirstName);
+      eperson.setLastName(strLastName);
+      eperson.setMetadata("phone", strPhone);
+      eperson.setCanLogIn(false);
+      eperson.setRequireCertificate(false);
+
+      eperson.update();
+      context.commit();
+			
+      log.info(LogManager.getHeader(context,
+				    "create_um_eperson",
+				    "eperson_id="+eperson.getID() +
+				    ", uid=" + strUid));
+
+      // Send an email that the user has registered
+      RegisterServlet.notifyRegistration(context, eperson, "ldap auto registered");
+
+      return eperson;
+    }
+
+    finally {
+      context.setCurrentUser(user);
+    }			
+  }
+
+
   /***************************************************************** main */
   /**
    * Command line interface.
@@ -421,8 +479,17 @@ public class Ldap {
 
     PropertyConfigurator.configure(strDspace + "/config/log4j-app.properties");
 
+    boolean bRegister = false;
+
     for (int j=0; j < args.length; j++) {
+
       String strUid = args[j];
+
+      if (strUid.equals("register")) {
+	bRegister = true;
+	continue;
+      }
+
       //System.out.print("password for " + strUid + ": ");
       //BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
       //String strPassword = in.readLine();
@@ -462,6 +529,21 @@ public class Ldap {
       for (int i=0; i < x.length; i++) {
 	Group group = Group.find(context, x[i]);
 	System.out.println("  " + group.getName());
+      }
+
+      if (bRegister) {
+	System.out.println();
+	String strEmail = strUid + "@umd.edu";
+        EPerson eperson = EPerson.findByEmail(context, strEmail.toLowerCase());
+
+	if (eperson != null) {
+	  System.out.println(strEmail + " already registered");
+
+	} else {
+
+	  ldap.registerEPerson(strEmail);
+	  System.out.println(strEmail + " registered");
+	}
       }
     }
   }

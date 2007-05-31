@@ -174,8 +174,6 @@ public class Authenticator extends SimpleAuthenticator
   {
     boolean bSuccess = true;
 
-    log.info("Loading ldap.authorization.conf map");
-
     // Open the file
     String strFile = ConfigurationManager.getProperty("ldap.authorization.config");
     File fFile = new File(strFile);
@@ -185,6 +183,8 @@ public class Authenticator extends SimpleAuthenticator
       if (lAuth == null || 
           (dOldFileDate != null && dNewFileDate.after(dOldFileDate))) 
       {
+	log.info("Loading ldap.authorization.conf map");
+
         bSuccess = false;
         dOldFileDate = dNewFileDate;
         lAuth = new ArrayList();
@@ -228,6 +228,8 @@ public class Authenticator extends SimpleAuthenticator
 					   "Error reading line from ldap auth file: " + e.getMessage()));
 	  }
 	}
+
+	log.info("map size=" + lAuth.size());
       }
 
       bSuccess = true;
@@ -236,8 +238,6 @@ public class Authenticator extends SimpleAuthenticator
     finally {
         if (! bSuccess) {
           lAuth = null;
-        } else {
-	  log.info("map size=" + lAuth.size());
 	}
     }
 

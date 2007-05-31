@@ -70,34 +70,6 @@ import edu.umd.lims.dspace.Ldap;
  */
 public class PasswordServlet extends DSpaceServlet
 {
-    /**
-     * <pre>
-     * Revision History:
-     *
-     *   2005/01/21: Ben
-     *     - additional logging if unable to create EPerson
-     *     - handle more missing ldap entries
-     *
-     *   2005/01/19: Ben
-     *     - handle ldap entries with no 'mail' attribute
-     *
-     *   2004/12/22: Ben
-     *     - save the entire ldap object in the session
-     *     - close the ldap connection sooner, it can be closed
-     *       and still have the ldap entry available
-     *
-     *   2004/12/20: Ben
-     *     - save ou ldap information in the session
-     *
-     *   2004/12/17: Ben
-     *     - add email notification for new ldap users registered
-     *
-     *   2004/10/25: Ben
-     *     - initial version
-     *
-     * </pre>
-     */
-
     /** log4j logger */
     private static Logger log = Logger.getLogger(PasswordServlet.class);
 
@@ -204,42 +176,7 @@ public class PasswordServlet extends DSpaceServlet
 
 		if (eperson == null) {
 		    try {
-			// Use the admin account to create the eperson
-			EPerson admin = EPerson.findByEmail(context, "ldap_um@drum.umd.edu");
-			context.setCurrentUser(admin);
-
-			// Create a new eperson
-			eperson = EPerson.create(context);
-			
-			String strFirstName = ldap.getFirstName();
-			if (strFirstName == null)
-			  strFirstName = "??";
-
-			String strLastName = ldap.getLastName();
-			if (strLastName == null)
-			  strLastName = "??";
-
-			String strPhone = ldap.getPhone();
-			if (strPhone == null)
-			  strPhone = "??";
-
-			eperson.setEmail(email);
-			eperson.setFirstName(strFirstName);
-			eperson.setLastName(strLastName);
-			eperson.setMetadata("phone", strPhone);
-			eperson.setCanLogIn(false);
-			eperson.setRequireCertificate(false);
-
-			eperson.update();
-			context.commit();
-			
-			log.info(LogManager.getHeader(context,
-						      "create_um_eperson",
-						      "eperson_id="+eperson.getID() +
-						      ", uid=" + uid));
-
-			// Send an email that the user has registered
-			RegisterServlet.notifyRegistration(context, eperson, "ldap auto registered");
+		      eperson = ldap.registerEPerson(email);
 		    }
 		    catch (Exception e) {
 			log.info(LogManager.getHeader(context,
