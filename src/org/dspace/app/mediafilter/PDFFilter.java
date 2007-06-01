@@ -38,7 +38,7 @@ package org.dspace.app.mediafilter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.pdfbox.cos.COSDocument;
+import org.apache.log4j.Logger;
 import org.pdfbox.pdfparser.PDFParser;
 import org.pdfbox.pdmodel.PDDocument;
 import org.pdfbox.util.PDFTextStripper;
@@ -51,6 +51,9 @@ import org.pdfbox.util.PDFTextStripper;
  */
 public class PDFFilter extends MediaFilter
 {
+ 
+     private static Logger log = Logger.getLogger(PDFFilter.class);
+ 
     /**
      * @param filename
      *            string filename
@@ -64,7 +67,7 @@ public class PDFFilter extends MediaFilter
 
     /**
      * @return String bundle name
-     *  
+     *
      */
     public String getBundleName()
     {
@@ -90,7 +93,7 @@ public class PDFFilter extends MediaFilter
     /**
      * @param source
      *            source input stream
-     * 
+     *
      * @return InputStream the resulting input stream
      */
     public InputStream getDestinationStream(InputStream source)
@@ -99,17 +102,26 @@ public class PDFFilter extends MediaFilter
         // get input stream from bitstream
         // pass to filter, get string back
         PDFTextStripper pts = new PDFTextStripper();
-        PDFParser parser = new PDFParser(source);
+        PDFParser parser = null;
+        String extractedText = null;
 
-        parser.parse();
-
-        COSDocument cos = parser.getDocument();
-
-        String extractedText = pts
-                .getText(new PDDocument(parser.getDocument()));
-
-        // now close the pdf
-        cos.close();
+        try
+        {
+            parser = new PDFParser(source);
+            parser.parse();
+            extractedText = pts.getText(new PDDocument(parser.getDocument()));
+        }
+        finally
+        {
+            try
+            {
+                parser.getDocument().close();
+            }
+            catch(Exception e)
+            {
+               log.error("Error closing temporary PDF file: " + e.getMessage(), e);
+            }
+        }
 
         // if verbose flag is set, print out extracted text
         // to STDOUT

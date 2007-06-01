@@ -32,21 +32,6 @@ import org.dspace.handle.HandleManager;
  */
 public class MediaFilterManager
 {
-  /**
-   * <pre>
-   * Revision History:
-   *   
-   *   2006/06/26: Ben
-   *     - more specific error messaging
-   *     - remove ITEM and BITSTREAM messages
-   *
-   *   2006/01/12: Ben
-   *     - index each updated item individually
-   *
-   *   2005/09/23: Ben
-   *     - add an option to process a single item.
-   */
-
     private static Map filterNames = new HashMap();
 
     private static Map filterCache = new HashMap();
@@ -66,7 +51,11 @@ public class MediaFilterManager
         System.setProperty("java.awt.headless", "true");
 
         // set tmpdir
-        System.setProperty("java.io.tmpdir", "/drum2/tmp");
+	String strTmpDir = ConfigurationManager.getProperty("mediafilter.tmpdir");
+	if (strTmpDir == null) {
+	  strTmpDir = "/drum2/tmp";
+	}
+        System.setProperty("java.io.tmpdir", strTmpDir);
 
         // create an options object and populate it
         CommandLineParser parser = new PosixParser();
