@@ -1,10 +1,8 @@
 <assembly>
-  <id>bin</id>
   <formats>
     <format>dir</format>
   </formats>
-  <includeBaseDirectory>true</includeBaseDirectory>
-  <baseDirectory>${artifactId}-${version}-bin</baseDirectory>
+  <includeBaseDirectory>false</includeBaseDirectory>
    <fileSets>
     <fileSet>
       <includes>
