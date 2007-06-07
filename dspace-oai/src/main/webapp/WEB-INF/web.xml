@@ -46,7 +46,7 @@
   - Web application.
   - OAICat Configuration file - see OAICat documentation for details
   -
-  - '@@dspace.dir@@' will be replaced with the directory where DSpace is installed
+  - '${dspace.dir}' will be replaced with the directory where DSpace is installed
   -->
 
 <web-app>
@@ -55,7 +55,7 @@
   <!-- DSpace configuration information -->
   <context-param>
     <param-name>dspace-config</param-name>
-    <param-value>@@dspace.dir@@/config/dspace.cfg</param-value>
+    <param-value>${dspace.dir}/config/dspace.cfg</param-value>
     <description>
       The location of the main DSpace configuration file
     </description>
@@ -63,7 +63,7 @@
 
   <context-param>
     <param-name>properties</param-name>
-    <param-value>@@dspace.dir@@/config/oaicat.properties</param-value>
+    <param-value>${dspace.dir}/config/oaicat.properties</param-value>
     <description>
       The location of the oaicat.properties file containing
       datapairs used to initialize the OAI repository software.
