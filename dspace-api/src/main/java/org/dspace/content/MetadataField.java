@@ -512,16 +512,31 @@ public class MetadataField
         Connection con = context.getDBConnection();
         TableRow reg = DatabaseManager.row("MetadataFieldRegistry");
         
+        String qualifierClause = "";
+
+        if (qualifier == null)
+        {
+            qualifierClause = "and qualifier is null";
+        }
+        else
+        {
+            qualifierClause = "and qualifier = ?";
+        }
+
         String query = "SELECT COUNT(*) FROM " + reg.getTable()
         	+ " WHERE metadata_schema_id= ? "
         	+ " and metadata_field_id != ? "
-        	+ " and element= ? and qualifier= ? ";
+        	+ " and element= ? " + qualifierClause;
 
         PreparedStatement statement = con.prepareStatement(query);
         statement.setInt(1,schemaID);
         statement.setInt(2,fieldID);
         statement.setString(3,element);
-        statement.setString(4,qualifier);
+        
+        if (qualifier != null)
+        {
+            statement.setString(4,qualifier);
+        }
         
         ResultSet rs = statement.executeQuery();
 

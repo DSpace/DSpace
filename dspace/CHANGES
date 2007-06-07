@@ -6,6 +6,9 @@
 - SF Patch #1722557 for SF Bug #1549290 Suggest Features uses hard coded strings
 - SF Patch #1450491 i18n configurable multilingualism support
 
+(James Rutherford)
+- Fixed SF bug #1727034 Method MetadataField.unique() is incorrect for null values
+
 1.4.2 beta
 ===========
 
