@@ -57,7 +57,7 @@
 
   <context-param>
     <param-name>dspace-config</param-name>
-    <param-value>@@dspace.dir@@/config/dspace.cfg</param-value>
+    <param-value>${dspace.dir}/config/dspace.cfg</param-value>
     <description>
       The location of the main DSpace configuration file
     </description>
