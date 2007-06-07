@@ -1,49 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.dspace</groupId>
-	<artifactId>dspace-api</artifactId>
-	<name>DSpace Core Library</name>
-	<version>1.5-SNAPSHOT</version>
-	<description>DSpace core data model and service APIs.</description>
-	<url>http://www.dspace.org</url>
-
-   <organization>
-      <name>The DSpace Foundation</name>
-      <url>http://www.dspace.org</url>
-   </organization>
-
-   <build>
-      <plugins>
-         <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-               <source>1.5</source>
-               <target>1.5</target>
-            </configuration>
-         </plugin>
-      </plugins>
-   </build>
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-api</artifactId>
+   <name>DSpace API and Implementation Library</name>
+   <description>DSpace core data model and service APIs.</description>
+   <url>http://www.dspace.org</url>
    
-   <repositories>
-      <repository>
-         <releases>
-            <updatePolicy>always</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <updatePolicy>never</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-         <id>maven.dspace.org</id>
-         <name>DSpace Maven Repository</name>
-         <url>http://maven.dspace.org</url>
-      </repository>
-   </repositories>
-
+   <!-- 
+      A Parent POM that Maven inherits DSpace Defaults 
+      POM atrributes from. 
+   -->
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <relativePath>../dspace</relativePath>
+   </parent>
+   
+   <!-- 
+      Profiles cause different dependencies to be included into the DSpace
+      build process
+   -->
    <profiles>
+      <profile>
+         <id>lang</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+            <property>
+               <name>lang</name>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>org.dspace</groupId>
+               <artifactId>language-packs</artifactId>
+               <version>1.5-SNAPSHOT</version>
+            </dependency>
+         </dependencies>
+      </profile>
       <profile>
          <id>postgres</id>
          <activation>
@@ -56,7 +53,7 @@
             <dependency>
                <groupId>postgresql</groupId>
                <artifactId>postgresql</artifactId>
-               <version>8.1-407.jdbc3</version>
+               <version>8.1-404.jdbc3</version>
             </dependency>
          </dependencies>
       </profile>
@@ -72,338 +69,167 @@
                <groupId>com.oracle</groupId>
                <artifactId>ojdbc14</artifactId>
                <version>10.2.0.2.0</version>
-               <optional>true</optional>
             </dependency>
          </dependencies>
       </profile>
    </profiles>
    
-	<dependencies>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>jena</artifactId>
-			<version>1.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>handle</artifactId>
-			<version>5.3.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>jargon</artifactId>
-			<version>1.4.25</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>mets</artifactId>
-			<version>1.5.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>bcprov-jdk15</artifactId>
-			<version>136</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>bcmail-jdk15</artifactId>
-			<version>136</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>lucene</artifactId>
-			<version>2.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>tm-extractors</artifactId>
-			<version>0.4</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.3</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-			<version>1.3</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.3</version>
-		</dependency>
-		<dependency>
-			<groupId>jaxen</groupId>
-			<artifactId>jaxen</artifactId>
-			<version>1.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>xom</groupId>
-					<artifactId>xom</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>jdom</groupId>
-			<artifactId>jdom</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-		</dependency>
-		<dependency>
-			<groupId>oro</groupId>
-			<artifactId>oro</artifactId>
-			<version>2.0.8</version>
-		</dependency>
-		<dependency>
-			<groupId>pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>0.7.1</version>
-		</dependency>
-		<dependency>
-			<groupId>poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>2.5.1-final-20040804</version>
-		</dependency>
-		<dependency>
-			<groupId>rome</groupId>
-			<artifactId>rome</artifactId>
-			<version>0.8</version>
-		</dependency>
-		<dependency>
-			<groupId>xalan</groupId>
-			<artifactId>xalan</artifactId>
-			<version>2.7.0</version>
-		</dependency>
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.8.1</version>
-		</dependency>
-		<dependency>
-			<groupId>xml-apis</groupId>
-			<artifactId>xmlParserAPIs</artifactId>
-			<version>2.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1</version>
-		</dependency>
-	</dependencies>
-
-   <licenses>
-      <license>
-         <name>DSpace Sourcecode License</name>
-         <url>LICENSE.txt</url>
-         <distribution>repo</distribution>
-         <comments>
-            A BSD compatable OSS license for the DSpace codebase.
-         </comments>
-      </license>
-   </licenses>
-
-   <issueManagement>
-      <system>Sourceforge Issue Tracking</system>
-      <url>http://sourceforge.net/tracker/?group_id=19984</url>
-   </issueManagement>
-
-   <mailingLists>
-      <mailingList>
-         <name>DSpace Technical Users List</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
-         </unsubscribe>
-         <post>dspace-tech AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-tech
-         </archive>
-      </mailingList>
-      <mailingList>
-         <name>DSpace Developers List</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
-         </unsubscribe>
-         <post>dspace-devel AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-devel
-         </archive>
-      </mailingList>
-      <mailingList>
-         <name>DSpace Manakin List</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
-         </unsubscribe>
-         <post>dspace-manakin AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-manakin
-         </archive>
-      </mailingList>
-      <mailingList>
-         <name>DSpace SCM Commit Change-Log</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
-         </unsubscribe>
-         <post>noreply AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-changelog
-         </archive>
-      </mailingList>
-   </mailingLists>
-   
-   <scm>
-      <connection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/${artifactId}
-      </connection>
-      <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/${artifactId}
-      </developerConnection>
-      <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/${artifactId}/
-      </url>
-   </scm>
-
-   <distributionManagement>
-      <repository>
-         <id>maven.dspace.org</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven</url>
-      </repository>
-      <snapshotRepository>
-         <id>maven.dspace.org</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven</url>
-      </snapshotRepository>
-      <site>
-         <id>website</id>
-         <url>
-            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}
-         </url>
-      </site>
-   </distributionManagement>
-   
-   <reporting>
-      <excludeDefaults>true</excludeDefaults>
-      <plugins>
-         <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-               <links>
-                  <link>
-                     http://projects.dspace.org/dspace-api/apidocs
-                  </link>
-                  <link>
-                     http://projects.dspace.org/dspace-jspui/apidocs
-                  </link>
-                  <link>
-                     http://projects.dspace.org/dspace-oai/apidocs
-                  </link>
-                  <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-                  <link>
-                     http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/dbcp/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/fileupload/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/httpclient/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/logging/api/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/pool/apidocs/
-                  </link>
-                  <link>http://www.junit.org/junit/javadoc/</link>
-                  <link>http://logging.apache.org/log4j/docs/api/</link>
-                  <link>http://jakarta.apache.org/regexp/apidocs/</link>
-                  <link>http://jakarta.apache.org/velocity/api/</link>
-               </links>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-jxr-plugin</artifactId>
-            <configuration>
-               <aggregate>true</aggregate>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-site-plugin</artifactId>
-            <configuration>
-               <moduleExcludes>
-                  <xdoc>navigation.xml,changes.xml</xdoc>
-               </moduleExcludes>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-surefire-report-plugin</artifactId>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>jdepend-maven-plugin</artifactId>
-            <version>2.0-beta-1</version>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>rat-maven-plugin</artifactId>
-         </plugin>
-      </plugins>
-   </reporting>
+   <!-- 
+      Runtime and Compile Time dependencies for DSpace.
+   -->
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>jena</artifactId>
+         <version>1.4.0</version>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>handle</artifactId>
+         <version>5.3.4</version>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>jargon</artifactId>
+         <version>1.4.25</version>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>mets</artifactId>
+         <version>1.5.2</version>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>bcprov-jdk15</artifactId>
+         <version>136</version>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>bcmail-jdk15</artifactId>
+         <version>136</version>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>lucene</artifactId>
+         <version>2.1.0</version>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>tm-extractors</artifactId>
+         <version>0.4</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-cli</groupId>
+         <artifactId>commons-cli</artifactId>
+         <version>1.0</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-codec</groupId>
+         <artifactId>commons-codec</artifactId>
+         <version>1.3</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-collections</groupId>
+         <artifactId>commons-collections</artifactId>
+         <version>3.2</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-dbcp</groupId>
+         <artifactId>commons-dbcp</artifactId>
+         <version>1.2.1</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-fileupload</groupId>
+         <artifactId>commons-fileupload</artifactId>
+         <version>1.1.1</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-io</groupId>
+         <artifactId>commons-io</artifactId>
+         <version>1.2</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-lang</groupId>
+         <artifactId>commons-lang</artifactId>
+         <version>2.2</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-pool</groupId>
+         <artifactId>commons-pool</artifactId>
+         <version>1.3</version>
+      </dependency>
+      <dependency>
+         <groupId>javax.mail</groupId>
+         <artifactId>mail</artifactId>
+         <version>1.4</version>
+      </dependency>
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+         <version>2.3</version>
+      </dependency>
+      <dependency>
+         <groupId>jaxen</groupId>
+         <artifactId>jaxen</artifactId>
+         <version>1.1</version>
+         <exclusions>
+            <exclusion>
+               <artifactId>xom</artifactId>
+               <groupId>xom</groupId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>jdom</groupId>
+         <artifactId>jdom</artifactId>
+         <version>1.0</version>
+      </dependency>
+      <dependency>
+         <groupId>log4j</groupId>
+         <artifactId>log4j</artifactId>
+         <version>1.2.14</version>
+      </dependency>
+      <dependency>
+         <groupId>oro</groupId>
+         <artifactId>oro</artifactId>
+         <version>2.0.8</version>
+      </dependency>
+      <dependency>
+         <groupId>pdfbox</groupId>
+         <artifactId>pdfbox</artifactId>
+         <version>0.7.1</version>
+      </dependency>
+      <dependency>
+         <groupId>poi</groupId>
+         <artifactId>poi</artifactId>
+         <version>2.5.1-final-20040804</version>
+      </dependency>
+      <dependency>
+         <groupId>rome</groupId>
+         <artifactId>rome</artifactId>
+         <version>0.8</version>
+      </dependency>
+      <dependency>
+         <groupId>xalan</groupId>
+         <artifactId>xalan</artifactId>
+         <version>2.7.0</version>
+      </dependency>
+      <dependency>
+         <groupId>xerces</groupId>
+         <artifactId>xercesImpl</artifactId>
+         <version>2.8.1</version>
+      </dependency>
+      <dependency>
+         <groupId>xml-apis</groupId>
+         <artifactId>xmlParserAPIs</artifactId>
+         <version>2.0.2</version>
+      </dependency>
+      <dependency>
+         <groupId>javax.activation</groupId>
+         <artifactId>activation</artifactId>
+         <version>1.1</version>
+      </dependency>
+   </dependencies>
    
 </project>
 
