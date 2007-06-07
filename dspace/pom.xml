@@ -18,100 +18,54 @@
       <url>http://www.dspace.org</url>
    </organization>
 
-   <modules>
-      <module>../dspace-api</module>
-   </modules>
-   
+   <properties>
+      <config>/dspace2/config/dspace.cfg</config>
+   </properties>
+         
    <profiles>
       <profile>
-         <id>jspui</id>
+         <id>mydspace.org</id>
          <activation>
-            <activeByDefault>true</activeByDefault>
             <property>
-               <name>jspui</name>
+               <name>mydspace.org</name>
             </property>
          </activation>
+        
          <modules>
+            <module>../dspace-api</module>
             <module>../dspace-jspui</module>
-         </modules>
-      </profile>
-      <profile>
-         <id>oai</id>
-         <activation>
-            <activeByDefault>true</activeByDefault>
-            <property>
-               <name>oai</name>
-            </property>
-         </activation>
-         <modules>
             <module>../dspace-oai</module>
+            <!-- 
+               <module>../dspace-xmlui</module>
+               <module>../dspace-lni</module>
+            -->
+
+			<!--
+               <module>../language-packs</module>
+			-->
          </modules>
-      </profile>
-      <profile>
-         <id>xmlui</id>
-         <activation>
-            <property>
-               <name>xmlui</name>
-            </property>
-         </activation>
-         <modules>
-            <module>../dspace-xmlui</module>
-         </modules>
-      </profile>
-      <profile>
-         <id>lni</id>
-         <activation>
-            <property>
-               <name>lni</name>
-            </property>
-         </activation>
-         <modules>
-            <module>../dspace-lni</module>
-         </modules>
-      </profile>
-      <profile>
-         <id>release</id>
-         <activation>
-            <property>
-               <name>release</name>
-            </property>
-         </activation>
-         <build>
-            <plugins>
-               <plugin>
-                  <artifactId>maven-assembly-plugin</artifactId>
-                  <configuration>
-                     <descriptors>
-                        <descriptor>
-                           src/assemble/assembly-release.xml
-                        </descriptor>
-                     </descriptors>
-                  </configuration>
-                  <executions>
-                     <execution>
-                        <goals>
-                           <goal>assembly</goal>
-                        </goals>
-                        <phase>package</phase>
-                     </execution>
-                  </executions>
-               </plugin>
-            </plugins>
-         </build>
       </profile>
    </profiles>
 
-   <dependencies>
-      <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <version>3.8.1</version>
-         <scope>test</scope>
-      </dependency>
-   </dependencies>
-   
    <build>
       <plugins>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <configuration>
+                     <files>
+                        <file>${config}</file>
+                     </files>
+            </configuration><executions>
+            <execution>
+                  <phase>initialize</phase>
+                  <goals>
+                     <goal>read-project-properties</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
@@ -121,19 +75,12 @@
          </plugin>
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2-beta-1</version>
             <configuration>
                <descriptors>
                   <descriptor>src/assemble/assembly.xml</descriptor>
                </descriptors>
             </configuration>
-            <executions>
-               <execution>
-                  <goals>
-                     <goal>assembly</goal>
-                  </goals>
-                  <phase>package</phase>
-               </execution>
-            </executions>
          </plugin>
       </plugins>
    </build>
@@ -141,7 +88,7 @@
    <licenses>
       <license>
          <name>DSpace Sourcecode License</name>
-         <url>LICENSE.txt</url>
+         <url>LICENSE</url>
          <distribution>repo</distribution>
          <comments>
             A BSD compatable OSS license for the DSpace codebase.
@@ -239,15 +186,15 @@
          </url>
       </site>
    </distributionManagement>
-   
+
    <repositories>
       <repository>
          <releases>
-            <updatePolicy>always</updatePolicy>
+            <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </releases>
          <snapshots>
-            <updatePolicy>always</updatePolicy>
+            <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
          <id>maven.dspace.org</id>
@@ -314,21 +261,13 @@
             </configuration>
          </plugin>
          <plugin>
-            <artifactId>maven-surefire-report-plugin</artifactId>
-         </plugin>
-         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>jdepend-maven-plugin</artifactId>
             <version>2.0-beta-1</version>
          </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>rat-maven-plugin</artifactId>
-         </plugin>
-
       </plugins>
    </reporting>
-   
-   
+
+
 </project>
 
