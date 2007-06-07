@@ -11,23 +11,39 @@
    <url>http://www.dspace.org</url>
    <description>DSpace JSP Based Webapplication</description>
 
-   <organization>
-      <name>The DSpace Foundation</name>
-      <url>http://www.dspace.org</url>
-   </organization>
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <relativePath>../dspace</relativePath>
+   </parent>
 
    <build>
       <plugins>
          <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.0</version>
             <configuration>
-               <source>1.5</source>
-               <target>1.5</target>
+               <webResources>
+                  <resource>
+                     <filtering>true</filtering>
+                     <directory>${basedir}/src/main/webapp</directory>
+                     <includes>
+                        <include>WEB-INF/web.xml</include>
+                     </includes>
+                  </resource>
+               </webResources>
             </configuration>
+            <executions>
+               <execution>
+                  <phase>prepare-package</phase>
+               </execution>
+            </executions>
          </plugin>
       </plugins>
    </build>
-   
+
    <dependencies>
       <dependency>
          <groupId>org.dspace</groupId>
@@ -45,195 +61,6 @@
          <version>1.1.2</version>
       </dependency>
    </dependencies>
-   
-   <repositories>
-      <repository>
-         <releases>
-            <updatePolicy>always</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <updatePolicy>never</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-         <id>maven.dspace.org</id>
-         <name>DSpace Maven Repository</name>
-         <url>http://maven.dspace.org</url>
-      </repository>
-   </repositories>
-
-   <licenses>
-      <license>
-         <name>DSpace Sourcecode License</name>
-         <url>LICENSE.txt</url>
-         <distribution>repo</distribution>
-         <comments>
-            A BSD compatable OSS license for the DSpace codebase.
-         </comments>
-      </license>
-   </licenses>
-
-   <issueManagement>
-      <system>Sourceforge Issue Tracking</system>
-      <url>http://sourceforge.net/tracker/?group_id=19984</url>
-   </issueManagement>
-
-   <mailingLists>
-      <mailingList>
-         <name>DSpace Technical Users List</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
-         </unsubscribe>
-         <post>dspace-tech AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-tech
-         </archive>
-      </mailingList>
-      <mailingList>
-         <name>DSpace Developers List</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
-         </unsubscribe>
-         <post>dspace-devel AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-devel
-         </archive>
-      </mailingList>
-      <mailingList>
-         <name>DSpace Manakin List</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
-         </unsubscribe>
-         <post>dspace-manakin AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-manakin
-         </archive>
-      </mailingList>
-      <mailingList>
-         <name>DSpace SCM Commit Change-Log</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
-         </unsubscribe>
-         <post>noreply AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-changelog
-         </archive>
-      </mailingList>
-   </mailingLists>
-
-   <scm>
-      <connection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/${artifactId}
-      </connection>
-      <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/${artifactId}
-      </developerConnection>
-      <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/${artifactId}/
-      </url>
-   </scm>
-
-   <distributionManagement>
-      <repository>
-         <id>maven.dspace.org</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven</url>
-      </repository>
-      <snapshotRepository>
-         <id>maven.dspace.org</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven</url>
-      </snapshotRepository>
-      <site>
-         <id>website</id>
-         <url>
-            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}
-         </url>
-      </site>
-   </distributionManagement>
-   
-   <reporting>
-      <excludeDefaults>true</excludeDefaults>
-      <plugins>
-         <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-               <links>
-                  <link>
-                     http://projects.dspace.org/dspace-api/apidocs
-                  </link>
-                  <link>
-                     http://projects.dspace.org/dspace-jspui/apidocs
-                  </link>
-                  <link>
-                     http://projects.dspace.org/dspace-oai/apidocs
-                  </link>
-                  <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-                  <link>
-                     http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/dbcp/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/fileupload/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/httpclient/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/logging/api/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/pool/apidocs/
-                  </link>
-                  <link>http://www.junit.org/junit/javadoc/</link>
-                  <link>http://logging.apache.org/log4j/docs/api/</link>
-                  <link>http://jakarta.apache.org/regexp/apidocs/</link>
-                  <link>http://jakarta.apache.org/velocity/api/</link>
-               </links>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-jxr-plugin</artifactId>
-            <configuration>
-               <aggregate>true</aggregate>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-site-plugin</artifactId>
-            <configuration>
-               <moduleExcludes>
-                  <xdoc>navigation.xml,changes.xml</xdoc>
-               </moduleExcludes>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-surefire-report-plugin</artifactId>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>jdepend-maven-plugin</artifactId>
-            <version>2.0-beta-1</version>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>rat-maven-plugin</artifactId>
-         </plugin>
-      </plugins>
-   </reporting>
 
 </project>
 
