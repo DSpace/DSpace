@@ -190,19 +190,6 @@ Common usage:
 ====================================================================
 		</echo>
 
-
-		<copy todir="${dspace.dir}/config" preservelastmodified="true">
-			<fileset dir="config/language-packs" />
-		</copy>
-
-		<echo>
-====================================================================
- Copied language packs into ${dspace.dir}/config    
-    
-====================================================================
-		</echo>
-
-
 		<echo>
 ====================================================================
  Updated Web application (.war) files are in the '${dspace.dir}/webapps' 
@@ -267,17 +254,9 @@ Common usage:
        file present for the initial run of "install-configs". -->
 	<target name="init_configs" depends="init_installation">
 
-		<copy todir="${dspace.dir}/config" preservelastmodified="true">
-			<fileset dir="config">
-				<exclude name="language-packs/**" />
-			</fileset>
+		<copy todir="${dspace.dir}/config" preservelastmodified="true" failonerror="false">
+			<fileset dir="config"/>
 		</copy>
-
-		<copy todir="${dspace.dir}/config" preservelastmodified="true">
-			<fileset dir="config/language-packs" />
-		</copy>
-
-		<copy file="etc/log4j.build.properties" tofile="${dspace.dir}/config/log4j.properties" preservelastmodified="true" />
 
 		<copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
 
