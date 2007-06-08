@@ -11,11 +11,14 @@
    <description>DSpace OAI Service Provider Webapplication</description>
    <url>http://www.dspace.org</url>
 
+   <!-- 
+      A Parent POM that Maven inherits DSpace Default 
+      POM atrributes from. 
+   -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace</artifactId>
+      <artifactId>dspace-pom</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace</relativePath>
    </parent>
    
    <build>

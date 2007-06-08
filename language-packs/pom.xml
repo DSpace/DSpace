@@ -4,20 +4,19 @@
    <groupId>org.dspace</groupId>
    <artifactId>language-packs</artifactId>
    <version>1.5-SNAPSHOT</version>
-   <name>language-packs</name>
+   <name>DSpace Language Packs</name>
    <description>
       DSpace Language Packs to support multiple languages.
    </description>
 
    <!-- 
-      A Parent POM that Maven inherits DSpace Defaults 
+      A Parent POM that Maven inherits DSpace Default 
       POM atrributes from. 
    -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace</artifactId>
+      <artifactId>dspace-pom</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace</relativePath>
    </parent>
 
    <build>

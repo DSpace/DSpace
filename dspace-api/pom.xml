@@ -15,9 +15,8 @@
    -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace</artifactId>
+      <artifactId>dspace-pom</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace</relativePath>
    </parent>
    
    <!-- 
@@ -25,22 +24,6 @@
       build process
    -->
    <profiles>
-      <profile>
-         <id>lang</id>
-         <activation>
-            <activeByDefault>false</activeByDefault>
-            <property>
-               <name>lang</name>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>org.dspace</groupId>
-               <artifactId>language-packs</artifactId>
-               <version>1.5-SNAPSHOT</version>
-            </dependency>
-         </dependencies>
-      </profile>
       <profile>
          <id>postgres</id>
          <activation>
@@ -78,6 +61,11 @@
       Runtime and Compile Time dependencies for DSpace.
    -->
    <dependencies>
+      <dependency>
+          <groupId>org.dspace</groupId>
+          <artifactId>language-packs</artifactId>
+          <version>1.5-SNAPSHOT</version>
+      </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>jena</artifactId>

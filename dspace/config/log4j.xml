@@ -59,7 +59,7 @@
 <log4j:configuration>
 	<!-- Standard DSpace file logger -->
 	<appender name="FILE" class="org.apache.log4j.RollingFileAppender">
-		<param name="File" value="@@log.dir@@/dspace.log" />
+		<param name="File" value="${log.dir}/dspace.log" />
 		<param name="MaxFileSize" value="1048576" />
 		<param name="MaxBackupIndex" value="500" />
 		<layout class="org.apache.log4j.PatternLayout">
@@ -75,9 +75,9 @@
 	     sends out email when errors level messages occur -->
 	<appender name="EMAIL" class="org.apache.log4j.net.SMTPAppender">
 		<param name="BufferSize" value="512" />
-		<param name="SMTPHost" value="@@mail.server@@" />
-		<param name="From" value="@@mail.from.address@@" />
-		<param name="To" value="@@mail.admin@@" />
+		<param name="SMTPHost" value="${mail.server}" />
+		<param name="From" value="${mail.from.address}" />
+		<param name="To" value="${mail.admin}" />
 		<param name="Subject" value="[DSpace] Application message" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" 
