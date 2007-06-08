@@ -22,6 +22,7 @@
       <groupId>org.dspace</groupId>
       <artifactId>dspace-pom</artifactId>
       <version>1.5-SNAPSHOT</version>
+      <relativePath>../dspace-pom</relativePath>
    </parent>
 
    <profiles>
