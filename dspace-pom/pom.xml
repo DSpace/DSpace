@@ -17,7 +17,7 @@
    <properties>
       <config>../dspace/config/dspace.cfg</config>
    </properties>
-   
+
    <build>
       <plugins>
          <plugin>
@@ -63,7 +63,21 @@
          <url>http://maven.dspace.org</url>
       </repository>
    </repositories>
-
+   <pluginRepositories>
+      <pluginRepository>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+         <id>maven.dspace.org</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org</url>
+      </pluginRepository>
+   </pluginRepositories>
    <licenses>
       <license>
          <name>DSpace Sourcecode License</name>
