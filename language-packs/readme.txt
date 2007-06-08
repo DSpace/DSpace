@@ -36,8 +36,10 @@ el/
    Messages_el.properties.UTF-8
 
 
-CVS tags
+SVN tags
 ========
+
+Previous Release strategy:
 
 Language packs are versioned according to the main DSpace version (1.x),
 followed by a hyphen, followed by a sequence number.  Several language pack
@@ -55,23 +57,21 @@ Note that a language file should only be tagged when it is complete for a
 particular *stable* version of DSpace.  This means tagging must be done
 carefully on individual files, and not on the whole language-packs tree.
 
+Maven Based release strategy, language packs need to be compiled into 
+<dspace.home>/lib and any <war>/WEB-INF/lib. This is done when compiling
+packaging DSpace with Maven via the following Mechanism.
+
 
 Creating a language pack for download
 =====================================
 
-The 'make-language-pack' script can be used to build these, for example to
-make dspace-language-pack-1.3.2-2.tar.gz:
+Language Packs are now a DSpace Addon. 
+They can be compiled into your dspace distro via the addition of '-P lang' 
+to the active profiles, they are inactive by default. 
 
-  create-language-pack -native2ascii language-pack-1_3_2-2 1.3.2-2
-
-This will create dspace-language-pack-1.3.2-2.tar.gz
-
-Up to version 1.3.2, any .properties files managed in UTF-8 encoding must be
-converted by native2ascii before being put in the language pack.  In this
-case use the '-native2ascii' parameter.
-
-As of version 1.4, the DSpace build process itself converts UTF-8-encoded
-.properties files, and so the '-native2ascii' parameter should be omitted.
+The Maven build process supports native2ascii conversion on packaging of 
+the Jar. When the profile is active, the jar will be a dependency compiled into all 
+lib directories where dspace-api is present.
 
 
 OTHER TOOLS
