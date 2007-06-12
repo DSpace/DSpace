@@ -51,3 +51,5 @@
 
 alter table eperson add column language VARCHAR(64);
 update eperson set language = 'en';
+
+alter table bundle drop column mets_bitstream_id; -- totally unused column

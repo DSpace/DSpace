@@ -241,7 +241,6 @@ CREATE TABLE Item
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  mets_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id),
   name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT 
   primary_bitstream_id	INTEGER REFERENCES Bitstream(bitstream_id)
 );
