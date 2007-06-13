@@ -124,7 +124,8 @@ public class Harvest
         // Put together our query. Note there is no need for an
         // "in_archive=true" condition, we are using the existence of
         // Handles as our 'existence criterion'.
-        String query = "SELECT handle.handle, handle.resource_id, item.withdrawn, item.last_modified FROM handle, item";
+        // FIXME: I think the "DISTINCT" is redundant
+        String query = "SELECT DISTINCT handle.handle, handle.resource_id, item.withdrawn, item.last_modified FROM handle, item";
         
         
         // We are building a complex query that may contain a variable 

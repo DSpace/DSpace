@@ -53,6 +53,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -234,7 +235,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             context = new Context();
 
             // Get the relevant OAIItemInfo objects to make headers
-            Collection scope = resolveSet(context, set);
+            DSpaceObject scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until, 0, 0, // Everything
                                                                                 // for
                                                                                 // now
@@ -557,7 +558,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             context = new Context();
 
             // Get the relevant HarvestedItemInfo objects to make headers
-            Collection scope = resolveSet(context, set);
+            DSpaceObject scope = resolveSet(context, set);
             List itemInfos = Harvest.harvest(context, scope, from, until,
                     offset, MAX_RECORDS, // Limit amount returned from one
                                          // request
@@ -689,6 +690,30 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 spec.append("</set>");
                 sets.add(spec.toString());
             }
+
+            Community[] allComs = Community.findAll(context);
+            for (int i = 0; i < allComs.length; i++)
+            {
+                spec = new StringBuffer("<set><setSpec>hdl_");
+                spec.append(allComs[i].getHandle().replace('/', '_'));
+                spec.append("</setSpec>");
+                String commName = allComs[i].getMetadata("name");
+                if(commName != null)
+                {
+                	spec.append("<setName>");
+                	spec.append(Utils.addEntities(commName));
+                	spec.append("</setName>");
+                }
+                else
+                {
+                	spec.append("<setName />");
+                    // Warn that there is an error of a null set name
+                	log.info(LogManager.getHeader(null, "oai_error",
+                			       "null_set_name_for_set_id_" + allComs[i].getHandle()));
+                }
+                spec.append("</set>");
+                sets.add(spec.toString());
+            }
         }
         catch (SQLException se)
         {
@@ -753,7 +778,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
      * @return the corresponding community or collection, or null if no set
      *         provided
      */
-    private Collection resolveSet(Context context, String set)
+    private DSpaceObject resolveSet(Context context, String set)
             throws SQLException, BadArgumentException
     {
         if (set == null)
@@ -774,10 +799,12 @@ public class DSpaceOAICatalog extends AbstractCatalog
             o = HandleManager.resolveToObject(context, handle);
         }
 
-        // If it corresponds to a collection, that's the set we want
-        if ((o != null) && o instanceof Collection)
+        // If it corresponds to a collection or a community, that's the set we
+        // want
+        if ((o != null) &&
+                ((o instanceof Collection) || (o instanceof Community))) 
         {
-            return (Collection) o;
+            return o;
         }
 
         // Handle is either non-existent, or corresponds to a non-collection
