@@ -9,6 +9,7 @@
 (James Rutherford)
 - Fixed SF bug #1727034 Method MetadataField.unique() is incorrect for null values
 - Fixed SF bug #1614546 get rid of unused mets_bitstream_id column
+- SF Patch #1638569 for SF Bug #1638565 Database Upgrade 12 to 13 missing content on new colums
 
 1.4.2 beta
 ===========

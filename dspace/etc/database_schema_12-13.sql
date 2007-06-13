@@ -69,6 +69,10 @@ ALTER TABLE collection ADD admin INTEGER REFERENCES EPersonGroup( eperson_group_
 
 ALTER TABLE eperson ADD netid varchar(64) UNIQUE;
 
+UPDATE collection SET submitter=(SELECT eperson_group_id FROM epersongroup WHERE epersongroup.name = 'COLLECTION_' || collection_id || '_SUBMIT'); 
+
+UPDATE collection SET admin=(SELECT eperson_group_id FROM epersongroup WHERE epersongroup.name = 'COLLECTION_' || collection_id  || '_ADMIN'); 
+
 -------------------------------------------------------------------------------
 -- Additional indices for performance
 -------------------------------------------------------------------------------
