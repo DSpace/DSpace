@@ -42,7 +42,7 @@ package org.dspace.app.oai;
 import java.util.Properties;
 import java.sql.SQLException;
 
-import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.util.Util;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.Bitstream;
@@ -214,7 +214,7 @@ public class RDFCrosswalk extends Crosswalk
 					try
 					{
 						thumbUrl = baseUrl + "/retrieve/" + tb.getID() + "/" +
-								   UIUtil.encodeBitstreamName(tb.getName(),
+								   Util.encodeBitstreamName(tb.getName(),
                 				   Constants.DEFAULT_ENCODING);
 					}
 					catch(Exception e)
