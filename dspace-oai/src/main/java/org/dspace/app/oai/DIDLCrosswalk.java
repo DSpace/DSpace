@@ -34,26 +34,26 @@
 
 package org.dspace.app.oai;
 
-import java.util.Properties;
-import java.util.Date;
-import java.io.*;
-import java.lang.*;
+import java.io.BufferedInputStream;
 import java.sql.SQLException;
-import ORG.oclc.oai.server.crosswalk.Crosswalk;
-import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
-import ORG.oclc.oai.server.verb.ServerVerb;
+import java.util.Date;
+import java.util.Properties;
+
+import org.dspace.app.didl.UUIDFactory;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.content.Bundle;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
-import org.dspace.app.didl.UUIDFactory;
-import org.dspace.core.Utils;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.search.HarvestedItemInfo;
+import org.dspace.storage.bitstore.BitstreamStorageManager;
+
 import sun.misc.BASE64Encoder;
-import org.dspace.core.*;
+import ORG.oclc.oai.server.crosswalk.Crosswalk;
+import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
+import ORG.oclc.oai.server.verb.ServerVerb;
 
 /**
  * DSpace Item DIDL crosswalk.

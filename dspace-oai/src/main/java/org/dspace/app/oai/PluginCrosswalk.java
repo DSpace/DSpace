@@ -39,23 +39,19 @@
  */
 package org.dspace.app.oai;
 
-import java.util.Properties;
-import java.io.StringWriter;
 import java.io.PrintWriter;
-
-import org.dspace.content.Item;
-import org.dspace.core.PluginManager;
-import org.dspace.search.HarvestedItemInfo;
-import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import java.io.StringWriter;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Item;
+import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.core.PluginManager;
+import org.dspace.search.HarvestedItemInfo;
+import org.jdom.output.XMLOutputter;
 
 import ORG.oclc.oai.server.crosswalk.Crosswalk;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
-
-import org.jdom.*;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 
 /**
  * An OAICat Crosswalk implementation that calls, in turn, on
