@@ -643,151 +643,9 @@ public class ConfigurationManager
     }
 
     /**
-     * Fill out of the configuration file templates in
-     * <code>dspace.dir/config/templates</code> with appropriate values from
-     * <code>dspace.cfg</code>, and copy to their appropriate destination.
-     * The destinations are defined as properties in <code>dspace.cfg</code>
-     * called <code>config.template.XXX</code> where <code>XXX</code> is the
-     * filename of the template. If this property doesn't exist, the
-     * configuration file template is skipped.
-     * 
-     * @throws IOException
-     *             if there was some problem reading the templates or writing
-     *             the filled-out configuration files
-     */
-    public static void installConfigurations() throws IOException
-    {
-        // Get the templates
-        File templateDir = new File(getProperty("dspace.dir") + File.separator
-                + "config" + File.separator + "templates");
-
-        File[] templateFiles = templateDir.listFiles();
-
-        for (int i = 0; i < templateFiles.length; i++)
-        {
-            installConfigurationFile(templateFiles[i].getName());
-        }
-    }
-
-    /**
-     * Install the given configuration file template in its required location.
-     * Configuration values in the template, specified as
-     * <code>@@property.name@@</code> are filled out with appropriate properties from
-     *                   the configuration. The filled-out configuration file is
-     *                   written to the file named by the property
-     *                   <code>config.template.XXX</code> where
-     *                   <code>XXX</code> is the name of the template as
-     *                   passed in to this method.
-     * 
-     * @param template
-     *            the name of the configuration template. This must correspond
-     *            to the filename in <code>dspace.dir/config/templates</code>
-     *            and the property starting with <code>config.template.</code>.
-     * 
-     * @throws IOException
-     *             if there was some problem reading the template or writing the
-     *             filled-out configuration file
-     */
-    private static void installConfigurationFile(String template)
-            throws IOException
-    {
-        // Get the destination: specified in property config.template.XXX
-        String destination = getProperty("config.template." + template);
-
-        if (destination == null)
-        {
-            // If no destination is specified
-            info("Not processing config file template " + template
-                    + " because no destination specified (no property "
-                    + "config.template." + template + ")");
-
-            return;
-        }
-
-        info("Installing configuration file template " + template + " to "
-                + destination);
-
-        // Open the template
-        BufferedReader in = new BufferedReader(new FileReader(
-                getProperty("dspace.dir") + File.separator + "config"
-                        + File.separator + "templates" + File.separator
-                        + template));
-
-        // Open the destination for writing
-        PrintWriter out = new PrintWriter(new FileWriter(destination));
-
-        // We'll keep track of line numbers for error messages etc.
-        int lineNumber = 0;
-        String line;
-
-        // Copy the template, filling out config values
-        while ((line = in.readLine()) != null)
-        {
-            lineNumber++;
-
-            // Find configuration values
-            boolean moreValues = true;
-
-            while (moreValues)
-            {
-                // Look for "@@"
-                int first = line.indexOf("@@");
-
-                if (first > -1)
-                {
-                    // Look for the "@@" on the other side
-                    int second = line.indexOf("@@", first + 2);
-
-                    if (second > -1)
-                    {
-                        // We have a property
-                        String propName = line.substring(first + 2, second);
-
-                        String propValue = getProperty(propName);
-
-                        if (propValue == null)
-                        {
-                            warn(template + " line " + lineNumber
-                                    + ": Property " + propName
-                                    + " not defined in DSpace configuration - "
-                                    + "using empty string");
-
-                            propValue = "";
-                        }
-
-                        // Fill in the value
-                        line = line.substring(0, first) + propValue
-                                + line.substring(second + 2);
-                    }
-                    else
-                    {
-                        // There's a "@@" with no second one... just leave as-is
-                        warn(template + " line " + lineNumber
-                                + ": Single @@ - leaving as-is");
-                        moreValues = false;
-                    }
-                }
-                else
-                {
-                    // No more @@'s
-                    moreValues = false;
-                }
-            }
-
-            // Write the line
-            out.println(line);
-        }
-
-        in.close();
-        out.close();
-    }
-
-    /**
      * Command-line interface for running configuration tasks. Possible
      * arguments:
      * <ul>
-     * <li><code>-installTemplates</code> processes and installs the
-     * configuration file templates for other tools</li>
      * <li><code>-property name</code> prints the value of the property
      * <code>name</code> from <code>dspace.cfg</code> to the standard
      * output. If the property does not exist, nothing is written.</li>
@@ -798,20 +656,7 @@ public class ConfigurationManager
      */
     public static void main(String[] argv)
     {
-        if ((argv.length == 1) && argv[0].equals("-installTemplates"))
-        {
-            try
-            {
-                info("Installing configuration files for other tools");
-                installConfigurations();
-                System.exit(0);
-            }
-            catch (IOException ie)
-            {
-                warn("Error installing configuration files", ie);
-            }
-        }
-        else if ((argv.length == 2) && argv[0].equals("-property"))
+        if ((argv.length == 2) && argv[0].equals("-property"))
         {
             String val = getProperty(argv[1]);
 
@@ -844,19 +689,6 @@ public class ConfigurationManager
         else
         {
             log.info(string);
-        }
-    }
-
-    private static void warn(String string, Exception e)
-    {
-        if (log == null)
-        {
-            System.out.println("WARN: " + string);
-            e.printStackTrace();
-        }
-        else
-        {
-            log.warn(string, e);
         }
     }
 
