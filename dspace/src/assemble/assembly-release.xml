@@ -6,7 +6,7 @@
     <format>tar.bz2</format>
   </formats>
   <includeBaseDirectory>true</includeBaseDirectory>
-  <baseDirectory>${artifactId}-${version}-bin</baseDirectory>
+  <baseDirectory>${artifactId}-${version}</baseDirectory>
   <fileSets>
     <fileSet>
       <includes>

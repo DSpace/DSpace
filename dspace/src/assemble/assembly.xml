@@ -25,10 +25,15 @@
          <outputDirectory>config</outputDirectory>
          <filtered>true</filtered>
       </file>
-      
    </files>
    
-   <fileSets>   
+   <fileSets> 
+      <fileSet>
+         <directory>${dspace.dir}</directory>
+         <includes>
+            <include>config/dspace.cfg</include>
+         </includes>
+      </fileSet>
       <fileSet>
          <includes>
             <include>bin/**</include>
@@ -59,9 +64,6 @@
          </outputFileNameMapping>
          <unpack>false</unpack>
          <scope>runtime</scope>
-         <excludes>
-            <exclude>junit:junit</exclude>
-         </excludes>
       </dependencySet>
    </dependencySets>
 
