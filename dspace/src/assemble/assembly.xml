@@ -69,11 +69,9 @@
    <dependencySets>
       <dependencySet>
          <outputDirectory>lib</outputDirectory>
-         <outputFileNameMapping>
-            ${artifactId}.${extension}
-         </outputFileNameMapping>
          <unpack>false</unpack>
          <scope>runtime</scope>
+         <useTransitiveFiltering>true</useTransitiveFiltering>
       </dependencySet>
    </dependencySets>
 
@@ -85,9 +83,6 @@
          <binaries>
             <includeDependencies>true</includeDependencies>
             <outputDirectory>lib</outputDirectory>
-            <outputFileNameMapping>
-               ${artifactId}.${extension}
-            </outputFileNameMapping>
             <unpack>false</unpack>
          </binaries>
       </moduleSet>
@@ -99,9 +94,9 @@
             <includeDependencies>false</includeDependencies>
             <outputDirectory>webapps</outputDirectory>
             <outputFileNameMapping>
-               ${artifactId}
+               ${artifactId}.${extension}
             </outputFileNameMapping>
-            <unpack>true</unpack>
+            <unpack>false</unpack>
          </binaries>
       </moduleSet>
    </moduleSets>
