@@ -5,10 +5,10 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-jspui</artifactId>
+   <name>DSpace JSP Web Application</name>
    <packaging>war</packaging>
-   <name>DSpace JSP Based Webapplication</name>
    <version>1.5-SNAPSHOT</version>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-jspui</url>
    <description>DSpace JSP Based Webapplication</description>
 
    <!-- 
@@ -29,6 +29,8 @@
             <artifactId>maven-war-plugin</artifactId>
             <version>2.0</version>
             <configuration>
+               <warName>dspace</warName>
+               <archiveClasses>true</archiveClasses>
                <webResources>
                   <resource>
                      <filtering>true</filtering>
