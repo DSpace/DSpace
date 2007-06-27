@@ -50,6 +50,9 @@
 
    <repositories>
       <repository>
+         <id>maven.dspace.org</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org</url>
          <releases>
             <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
@@ -58,13 +61,26 @@
             <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
-         <id>maven.dspace.org</id>
-         <name>DSpace Maven Repository</name>
-         <url>http://maven.dspace.org</url>
+      </repository>
+      <repository>
+         <id>central</id>
+         <url>http://repo1.maven.org/maven2</url>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
       </repository>
    </repositories>
+
    <pluginRepositories>
       <pluginRepository>
+         <id>maven.dspace.org</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org</url>
          <releases>
             <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
@@ -73,11 +89,9 @@
             <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
-         <id>maven.dspace.org</id>
-         <name>DSpace Maven Repository</name>
-         <url>http://maven.dspace.org</url>
       </pluginRepository>
    </pluginRepositories>
+
    <licenses>
       <license>
          <name>DSpace Sourcecode License</name>
@@ -149,6 +163,138 @@
       </mailingList>
    </mailingLists>
 
+   <developers>
+      <developer>
+         <name>Andrea Bollini</name>
+         <email>bollini at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Mark Diggory</name>
+         <email>mdiggory at mit.edu</email>
+         <url>http://www.linkedin.com/in/mdiggory</url>
+         <organization>MIT Libraries</organization>
+         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <roles>
+            <role>commiter</role>
+         </roles>
+         <timezone>-5</timezone>
+      </developer>
+      <developer>
+         <name>Tim Donohue</name>
+         <email>tdonohue at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Jim Downing</name>
+         <email>jimdowning at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Richard Jones</name>
+         <email>richard-jones at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Claudia Juergen</name>
+         <email>cjuergen at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Stuart Lewis</name>
+         <email>stuartlewis at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Gabriela Mircea</name>
+         <email>mirceag at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Scott Phillips</name>
+         <email>scottphillips at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Richard Rodgers</name>
+         <email>rrodgers at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>James Rutherford</name>
+         <email>jrutherford at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Robert Tansley</name>
+         <email>rtansley at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Scott Yeadon</name>
+         <email>syeadon at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+   </developers>
+
+   <contributors>
+      <contributor>
+         <name>Add Your Name Here and submit a patch!</name>
+         <email>contributor at myu.edu</email>
+         <url>http://www.myu.edu/me</url>
+         <organization>My University</organization>
+         <organizationUrl>http://www.myu.edu</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>0</timezone>
+      </contributor>
+      <contributor>
+         <name>Sands Fish</name>
+         <email>sands at mit.edu</email>
+         <organization>MIT Libraries</organization>
+         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>-5</timezone>
+      </contributor>
+      <contributor>
+         <name>Larry Stone</name>
+         <email>lcs at mit.edu</email>
+         <organization>MIT Libraries</organization>
+         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>-5</timezone>
+      </contributor>
+   </contributors>
+
    <scm>
       <connection>
          scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/${artifactId}
@@ -175,7 +321,7 @@
       <site>
          <id>website</id>
          <url>
-            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}
+            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs
          </url>
       </site>
    </distributionManagement>
@@ -231,11 +377,6 @@
          </plugin>
          <plugin>
             <artifactId>maven-site-plugin</artifactId>
-            <configuration>
-               <moduleExcludes>
-                  <xdoc>navigation.xml,changes.xml</xdoc>
-               </moduleExcludes>
-            </configuration>
          </plugin>
          <plugin>
             <groupId>org.codehaus.mojo</groupId>
