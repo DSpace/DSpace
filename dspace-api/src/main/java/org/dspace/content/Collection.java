@@ -923,7 +923,7 @@ public class Collection extends DSpaceObject
      * @throws AuthorizeException
      * @throws IOException
      */
-    void delete() throws SQLException, AuthorizeException, IOException
+    public void delete() throws SQLException, AuthorizeException, IOException
     {
         log.info(LogManager.getHeader(ourContext, "delete_collection",
                 "collection_id=" + getID()));
