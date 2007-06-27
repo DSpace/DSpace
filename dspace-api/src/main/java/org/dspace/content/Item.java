@@ -1654,7 +1654,7 @@ public class Item extends DSpaceObject
      * @throws AuthorizeException
      * @throws IOException
      */
-    public void delete() throws SQLException, AuthorizeException, IOException
+    void delete() throws SQLException, AuthorizeException, IOException
     {
         HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
                 ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
