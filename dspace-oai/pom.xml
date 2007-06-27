@@ -6,10 +6,10 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-oai</artifactId>
    <packaging>war</packaging>
-   <name>DSpace OAI Webapplication</name>
+   <name>DSpace OAI Web Application</name>
    <version>1.5-SNAPSHOT</version>
    <description>DSpace OAI Service Provider Webapplication</description>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-oai</url>
 
    <!-- 
       A Parent POM that Maven inherits DSpace Default 
