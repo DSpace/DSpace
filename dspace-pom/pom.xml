@@ -7,7 +7,7 @@
    <packaging>pom</packaging>
    <version>1.5-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-pom</url>
 
    <organization>
       <name>The DSpace Foundation</name>
@@ -297,13 +297,13 @@
 
    <scm>
       <connection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/${artifactId}
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk
       </connection>
       <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/${artifactId}
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk
       </developerConnection>
       <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/${artifactId}/
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk
       </url>
    </scm>
 
