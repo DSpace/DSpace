@@ -355,12 +355,6 @@ Common usage:
 			<fileset dir="webapps" />
 		</copy>
 
-		<java classname="org.dspace.core.ConfigurationManager" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
-			<sysproperty key="dspace.configuration" value="${config}" />
-			<arg value="-installTemplates" />
-		</java>
-
 		<java classname="org.dspace.browse.InitializeBrowse" classpathref="class.path" fork="yes" failonerror="yes">
 			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
