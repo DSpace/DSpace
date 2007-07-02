@@ -72,11 +72,7 @@ import org.apache.log4j.xml.DOMConfigurator;
  * Other configuration files are read from the <code>config</code> directory
  * of the DSpace installation directory (specified as the property
  * <code>dspace.dir</code> in the main configuration file.)
- * <P>
- * Configuration files for other tools are kept in <code>config/templates</code>
- * and can contain placeholders for configuration values from
- * <code>dspace.cfg</code>. See <code>installConfigurations</code> for
- * details.
+ *
  * 
  * @author Robert Tansley
  * @author Larry Stone - Interpolated values.
@@ -674,7 +670,7 @@ public class ConfigurationManager
         else
         {
             System.err
-                    .println("Usage: ConfigurationManager OPTION\n  -installTemplates    install config files for external tools\n  -property prop.name  get value of prop.name from dspace.cfg");
+                    .println("Usage: ConfigurationManager OPTION\n  -property prop.name  get value of prop.name from dspace.cfg");
         }
 
         System.exit(1);
