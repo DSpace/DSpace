@@ -823,8 +823,12 @@ public class DSIndexer
 
         // and populate it
         String name = community.getMetadata("name");
-        doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field("default", name, Field.Store.YES, Field.Index.TOKENIZED));
+        
+        if(name != null)
+        {
+        	doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
+        	doc.add(new Field("default", name, Field.Store.YES, Field.Index.TOKENIZED));
+        }
         
         return doc;
     }
@@ -848,9 +852,13 @@ public class DSIndexer
 
         // and populate it
         String name = collection.getMetadata("name");
-        doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field("default", name, Field.Store.YES, Field.Index.TOKENIZED));
-
+        
+        if(name != null)
+        {
+        	doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
+        	doc.add(new Field("default", name, Field.Store.YES, Field.Index.TOKENIZED));
+        }
+        
         return doc;
         
     }
