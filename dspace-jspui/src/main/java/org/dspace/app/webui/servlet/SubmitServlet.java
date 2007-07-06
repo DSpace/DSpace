@@ -55,8 +55,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.DCInput;
-import org.dspace.app.webui.util.DCInputsReader;
+import org.dspace.app.util.DCInput;
+import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.SubmissionInfo;

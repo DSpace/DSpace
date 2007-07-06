@@ -63,8 +63,8 @@
 
 <%@ page import="org.dspace.app.webui.jsptag.PopupTag" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.DCInput" %>
-<%@ page import="org.dspace.app.webui.util.DCInputSet" %>
+<%@ page import="org.dspace.app.util.DCInput" %>
+<%@ page import="org.dspace.app.util.DCInputSet" %>
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>

@@ -38,7 +38,7 @@
  * DAMAGE.
  */
 
-package org.dspace.app.webui.util;
+package org.dspace.app.util;
 
 import java.io.File;
 import java.util.Vector;
@@ -54,7 +54,6 @@ import org.apache.log4j.Logger;
 
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.app.webui.servlet.SubmitServlet;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation 
@@ -371,7 +370,14 @@ public class DCInputsReader
     			{
     				throw new ServletException("Form " + formName + " has no pages");
     			}
-    			int maxPages = SubmitServlet.EDIT_METADATA_2 - SubmitServlet.EDIT_METADATA_1 + 1;
+    			
+    			// FIXME: Because this file needed to be removed from the jspui it 
+    			// can no longer depend upon the submit servlet. There fore we're replacing this
+    			// line with a static value so that it does not depened upon this. This will be 
+    			// fixed in the future by Tim's Configurable Submission patch which reads
+    			// this value from a configuration page.
+    			//int maxPages = SubmitServlet.EDIT_METADATA_2 - SubmitServlet.EDIT_METADATA_1 + 1;
+    			int maxPages = 5;
     			if ( pages.size() > maxPages)
     			{
     				throw new ServletException("Form " + formName + " exceeds maximum pages: " + maxPages);			

@@ -38,7 +38,7 @@
  * DAMAGE.
  */
 
-package org.dspace.app.webui.util;
+package org.dspace.app.util;
 
 import java.util.ArrayList;
 import java.util.List;

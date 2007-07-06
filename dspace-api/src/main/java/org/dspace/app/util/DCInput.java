@@ -38,7 +38,7 @@
  * DAMAGE.
  */
 
-package org.dspace.app.webui.util;
+package org.dspace.app.util;
 
 import java.util.List;
 import java.util.Map;
