@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-xmlui-api</artifactId>
+   <packaging>jar</packaging>
+   <name>DSpace XMLUI (Manakin) :: API and Core Aspects</name>
+   <version>1.5-SNAPSHOT</version>
+   <url>http://www.dspace.org</url>
+   <description>DSpace/Manakin XML UI Based APIs and components using the Cocoon and Wing frameworks.</description>
+
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace-xmlui</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <relativePath>../</relativePath>
+   </parent>
+
+   <!-- FIXME: Override this from dspace-pom -->
+   <properties>
+      <config>../../dspace/config/dspace.cfg</config>
+   </properties>
+
+   <scm>
+      <connection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/api
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/api
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/api/
+      </url>
+   </scm>
+
+   <distributionManagement>
+      <site>
+         <id>website</id>
+         <url>
+            http://projects.dspace.org/dspace-xmlui/
+         </url>
+      </site>
+   </distributionManagement>
+
+   <dependencies>
+      
+      <!-- DSpace API -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+         <version>1.5-SNAPSHOT</version>
+      </dependency>
+      
+      <!-- Wing framework -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-xmlui-wing</artifactId>
+         <version>1.5-SNAPSHOT</version>
+      </dependency>
+      
+   </dependencies>
+
+</project>
+

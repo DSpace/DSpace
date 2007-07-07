@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+  Copyright 1999-2004 The Apache Software Foundation
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><!-- CVS $Id: cocoon.xconf,v 1.1 2006/01/10 05:18:10 scott Exp $ --><cocoon version="2.1">
+
+<!--+
+    |  This is the Apache Cocoon configuration file. This is the place
+    |  where you configure the components that Cocoon uses internally (stuff
+    |  like the cache) or handles to the pipeline components
+    |  (stuff like XML parsers or XSLT processors).
+    +-->
+
+<!-- =========================== Sitemap =============================== -->
+
+  <!--+
+      | New implementation of the sitemap. It is interpreted, so load times
+      | are super-fast, and request processing is slightly faster than with
+      | the compiled engine thanks to the HotSpot VM.
+      |
+      | Reloading of the sitemap:
+      |   The check-reload attribute determines if the sitemap is to be
+      |   reloaded on change.
+      |   Set to "no", the sitemap is generated once at startup.
+      |   Set to "yes", the sitemap is regenerated if it changes.
+      |
+      | For development environment, set the check-reload to yes.
+      | For production environment, it is advisable to set check-reload to no.
+      +-->
+
+  <sitemap check-reload="yes" file="context://sitemap.xmap" logger="sitemap"/>
+
+<!-- ========================= Sitemap Flowscript ========================== -->
+
+  <!--+
+      |  The <flow-interpreters> element is used to describe the flowscript
+      |  engines usedd by the current instance.
+      |
+      |  The attributes recognized by the <flow-interpreters> element are:
+      |
+      |    default (string value):
+      |
+      |       the default interpreted language assumed for <map:script>
+      |       elements which do not specify a "language" attribute. If not
+      |       present, the first language that's described within the
+      |       <flow-interpreters> element is assumed to be the default
+      |       language.
+      |
+      |  Within <flow-interpreters> only <component-instance> elements are
+      |  recognized. The attributes recognized by this element are "name"
+      |  and "class". "name" specifies the name of a scripting language,
+      |  and "class" defines the Java class that implements it. See
+      |  org.apache.cocoon.components.flow.Interpreter for the Cocoon
+      |  interface with an scripting language interpreter.
+      |
+      |  A <component-instance> element contains as subelements the
+      |  following elements:
+      |
+      |    reload-scripts (boolean value, default false):
+      |       whether to check if the scripts source files are modified.
+      |       Checking for modification is an expensive operation, so leave
+      |       it disabled in a production environment. If not present it is
+      |       assumed to be "false". When "true" *all* script files are
+      |       checked for modification on each function invocation done using
+      |       <map:call function="...">, but not more frequent than the value
+      |       of "check-time" (see below).
+      |
+      |    check-time (long value, default 1000):
+      |       time in miliseconds between the checks for the last modification
+      |       date of script files.
+      |
+      |    debugger (boolean value, default false):
+      |       whether support for the JavaScript debugger should be enabled in
+      |       the control flow.
+      +-->
+  <flow-interpreters default="javascript" logger="flow">
+    <!-- FOM (Flow Object Model) -->
+    <component-instance class="org.apache.cocoon.components.flow.javascript.fom.FOM_JavaScriptInterpreter" name="javascript">
+      <load-on-startup>resource://org/apache/cocoon/components/flow/javascript/fom/fom_system.js</load-on-startup>
+      <reload-scripts>false</reload-scripts>
+      <check-time>4000</check-time>
+      <!--  <debugger>enabled</debugger> -->  <!-- JavaScript Debugger support -->
+    </component-instance>
+  </flow-interpreters>
+
+  <!--+
+      | Configuration for the continuations manager.
+      |
+      | This section specifies the default time-to-live of continuations
+      | in miliseconds using the "time-to-live" attribute of
+      | the <continuations-manager> element.
+      |
+      | If your site is sharing continuations between sitemaps you
+      | should refactor your application to keep a continuation bound to
+      | a single sitemap. The log will contain warnings which indicate
+      | where a continuation from a different sitemap is used.
+      |
+      | When you cannot do the refactoring in one blow you can turn on
+      | compatibility with shared continuations by setting the
+      | "continuation-sharing-bug-compatible" attribute to "true".
+      |
+      | The <expirations-check> element specifies different policies for
+      | expiring continuations. Currently only the "periodic" type is
+      | supported.
+      |
+      | If you need higher security you can bind your continuations
+      | to session. This way only the session that initially created
+      | the continuation can later resume it. Also if session gets
+      | invalidated all continuations are invalidated as well.
+      | Enable this feature for web applications by setting
+      | 'session-bound-continuations' to true.
+      +-->
+  <continuations-manager continuation-sharing-bug-compatible="false" logger="flow.manager" session-bound-continuations="false" time-to-live="43200000">
+    <expirations-check type="periodic">
+      <offset>180000</offset>
+      <period>180000</period>
+    </expirations-check>
+  </continuations-manager>
+
+<!-- =================== Sitemap Input/Output Modules ====================== -->
+
+  <!--+
+      | InputModules are a replacement to reading values directly
+      | e.g. from request parameters. By using this abstraction and
+      | indirection, other components can be more generic and changes
+      | to the application logic are easier.
+      |
+      | A number of components already use InputModules: the sitemap processor,
+      | flow, some matchers, the linkrewriting transformer, database actions
+      | and more.
+      |
+      | For example the sitemap processor allows to obtain a value
+      | named "foo" from an the InputModule for request parameters by
+      | writing {request-param:foo} wherever a sitemap variable is
+      | allowed.
+      |
+      | Some InputModules need the help of other InputModules to
+      | obtain values and only apply a function to the obtained value
+      | or change the name of the attribute. These modules usually
+      | carry "Meta" in their name. An example is the ChainMetaModule
+      | which tries several other modules in turn until a non-null
+      | value is obtained or all modules are tied.
+      |
+      | For details and optional configuration parameters refer to the
+      | accompanying javadocs.
+      +-->
+  <input-modules>
+    <component-instance class="org.apache.cocoon.components.modules.input.URLEncodeModule" logger="core.modules.input" name="url-encode">
+      <encoding>UTF-8</encoding>
+    </component-instance>
+    <component-instance class="org.apache.cocoon.components.modules.input.URLDecodeModule" logger="core.modules.input" name="url-decode">
+      <encoding>UTF-8</encoding>
+    </component-instance>
+    <component-instance class="org.apache.cocoon.components.modules.input.GlobalInputModule" logger="core.modules.input" name="global"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.RequestModule" logger="core.modules.input" name="request"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.BaseLinkModule" logger="core.modules.input" name="baselink"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.SessionModule" logger="core.modules.input" name="session"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.RequestParameterModule" logger="core.modules.input" name="request-param"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.RawRequestParameterModule" logger="core.modules.input" name="raw-request-param"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.RequestAttributeModule" logger="core.modules.input" name="request-attr"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.HeaderAttributeModule" logger="core.modules.input" name="request-header"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.SessionAttributeModule" logger="core.modules.input" name="session-attr"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.SystemPropertyModule" logger="core.modules.input" name="system-property"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.StringConstantModule" logger="core.modules.input" name="constant"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.RandomNumberModule" logger="core.modules.input" name="random"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.DigestMetaModule" logger="core.modules.input" name="digest"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.DateInputModule" logger="core.modules.input" name="date">
+      <!-- <format>EEE, d MMM yyyy HH:mm:ss Z</format> -->
+      <!--Eg: Mon, 28 Oct 2002 03:08:49 +1100 -->
+    </component-instance>
+    <component-instance class="org.apache.cocoon.components.modules.input.NullInputModule" logger="core.modules.input" name="nullinput"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.RealPathModule" logger="core.modules.input" name="realpath"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.ContextPathModule" logger="core.modules.input" name="contextpath"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.NamingInputModule" logger="core.modules.input" name="naming">
+    </component-instance>
+    <component-instance class="org.apache.cocoon.components.modules.input.PropertiesFileModule" logger="core.modules.input" name="cocoon-properties">
+      <file src="resource://org/apache/cocoon/cocoon.properties"/>
+    </component-instance>
+    <component-instance class="org.apache.cocoon.components.modules.input.FlowAttributeModule" logger="core.modules.input" name="flow-attribute"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.FlowAttributeModule" logger="core.modules.input" name="flow-attr"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.FlowContinuationModule" logger="core.modules.input" name="flow-continuation"/>
+
+    <component-instance class="org.apache.cocoon.components.modules.input.XMLMetaModule" logger="core.modules.input" name="xmlmeta"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.MapMetaModule" logger="core.modules.input" name="mapmeta"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.DateMetaInputModule" logger="core.modules.input" name="datemeta"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.JXPathMetaModule" logger="core.modules.input" name="jxpath"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.SimpleMappingMetaModule" logger="core.modules.input" name="simplemap"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.LocateResource" logger="core.modules.input" name="locate"/>
+    <component-instance class="org.apache.cocoon.components.modules.input.ChainMetaModule" logger="core.modules.input" name="chain">
+      <input-module name="request-param"/>
+      <input-module name="request-attr"/>
+      <input-module name="session-attr"/>
+      <input-module name="defaults"/>
+    </component-instance>
+
+    <!-- The 'defaults', 'myxml' and 'slashdot' input modules are used
+         in the samples -->
+    <component-instance class="org.apache.cocoon.components.modules.input.DefaultsModule" logger="core.modules.input" name="defaults">
+      <values>
+        <skin>defaultSkin</skin>
+        <base-url>http://localhost:8080/cocoon</base-url>
+      </values>
+    </component-instance>
+
+    <component-instance class="org.apache.cocoon.components.modules.input.XMLFileModule" logger="core.modules.xml" name="myxml">
+      <file src="context://samples/modules/forrestconf.xml"/>
+    </component-instance>
+    <component-instance class="org.apache.cocoon.components.modules.input.XMLFileModule" logger="core.modules.xml" name="slashdot">
+      <file src="http://slashdot.org/slashdot.rss"/>
+    </component-instance>
+
+  </input-modules>
+
+  <!--+
+      | OutputModules are companion modules for InputModules.
+      |
+      | The same principles apply here, only that OutputModules allow
+      | writing data to places. Apparently, there are a lot less
+      | places to write to than to read data from, thus there are only
+      | a few OutputModules coming with Apache Cocoon.
+      |
+      | One special feature of OutputModules is, that they expose some
+      | limited transactional behaviour. Hence it does not suffice to
+      | write a value, but it is required to confirm this at the
+      | end. Until then, the value could not be read from the
+      | corresponding InputModule. This behaviour is not enfored but
+      | it should be expected. Omitting a commit or rollback is an
+      | error.
+      |
+      | OutputModules are currently used by flow, a number of actions
+      | and transformers.
+      +-->
+  <output-modules>
+    <component-instance class="org.apache.cocoon.components.modules.output.RequestAttributeOutputModule" logger="core.modules.output" name="request-attr"/>
+    <component-instance class="org.apache.cocoon.components.modules.output.RequestAttributeMap" logger="core.modules.output" name="request-attr-map"/>
+    <component-instance class="org.apache.cocoon.components.modules.output.SessionAttributeOutputModule" logger="core.modules.output" name="session-attr"/>
+  </output-modules>
+
+<!-- ================================= XML ================================ -->
+
+  <!--+
+      | Source Factories
+      |
+      | Each source factory adds a special uri schemes to the system.
+      +-->
+  <source-factories>
+    <component-instance class="org.apache.excalibur.source.impl.ResourceSourceFactory" name="resource"/>
+    <component-instance class="org.apache.cocoon.components.source.impl.ContextSourceFactory" name="context"/>
+    <component-instance class="org.apache.cocoon.components.source.impl.SitemapSourceFactory" name="cocoon"/>
+    <!--+
+        | The "file:" source protocol is modifiable (can be written to) and
+        | traversable (directory structures can be crawled).
+        +-->
+    <component-instance class="org.apache.excalibur.source.impl.FileSourceFactory" name="file"/>
+    <component-instance class="org.apache.cocoon.components.source.impl.PartSourceFactory" name="upload"/>
+    <component-instance class="org.apache.cocoon.components.source.impl.ModuleSourceFactory" name="module"/>
+    <component-instance class="org.apache.cocoon.components.source.impl.XModuleSourceFactory" name="xmodule"/>
+
+    <!--+
+        | The "*" protocol handles all uri schemes that are not explicitely
+        | specified. This includes all JDK standard protocols.
+        +-->
+    <component-instance class="org.apache.excalibur.source.impl.URLSourceFactory" name="*"/>
+  </source-factories>
+
+  <!--+
+      | Entity resolution catalogs
+      |
+      | The default catalog is distributed at WEB-INF/entities/catalog
+      | This is the contextual pathname for Cocoon resources.
+      | You can override this path, if necessary, using the "catalog" parameter:
+      |
+      |    <parameter name="catalog" value="WEB-INF/entities/catalog"/>
+      |
+      | However, it is probably desirable to leave this default catalog config
+      | and declare your own local catalogs, which are loaded in addition to
+      | the system catalog.
+      |
+      | There are various ways to do local configuration (see "Entity Catalogs"
+      | documentation). One way is via the CatalogManager.properties file.
+      | As an additional method, you can specify the "local-catalog"
+      | parameter here.
+      |
+      | local-catalog:
+      |   The full filesystem pathname to a single local catalog file.
+      |
+      |  <parameter name="local-catalog" value="/usr/local/sgml/mycatalog"/>
+      |
+      | verbosity:
+      | The level of messages for status/debug (messages go to standard output)
+      | The following messages are provided ...
+      |  0 = none
+      |  1 = ? (... not sure yet)
+      |  2 = 1+, Loading catalog, Resolved public, Resolved system
+      |  3 = 2+, Catalog does not exist, resolvePublic, resolveSystem
+      |  10 = 3+, List all catalog entries when loading a catalog
+      |    (Cocoon also logs the "Resolved public" messages.)
+      |
+      |     <parameter name="verbosity" value="2"/>
+      +-->
+  <entity-resolver logger="core.resolver">
+    <parameter name="catalog" value="WEB-INF/entities/catalog"/>
+    <parameter name="verbosity" value="1"/>
+  </entity-resolver>
+
+  <!--+
+      | XML Parser
+      |
+      | Apache Cocoon requires a JAXP 1.1 parser. The default parser is
+      | org.apache.excalibur.xml.impl.JaxpParser.
+      | Note: If you have problems because your servlet environment uses its
+      | own parser not conforming to JAXP 1.1 try using the alternative
+      | XercesParser instead of the JaxpParser. To activate the XercesParser,
+      | change the class attribute to
+      |   class="org.apache.excalibur.xml.impl.XercesParser"
+      | You will also need to add a system property to your JVM,
+      | probably on the startup of your servlet engine like this:
+      | -Dorg.apache.excalibur.xml.sax.SAXParser=org.apache.excalibur.xml.impl.XercesParser
+      |
+      | Configuration parameters for the JaxpParser (not the XercesParser!):
+      | - validate (boolean, default = false): should the parser validate
+      |     parsed documents?
+      |     Note: XML validation is only being used for the documentation build.
+      |     (If you are going to use it elsewhere, then do so with caution.)
+      |     You really should have validated all of your XML documents already,
+      |     according to their proper DTD or schema. Do not expect Cocoon
+      |     to do it.
+      | - namespace-prefixes (boolean, default = false) : do we want
+      |     namespaces declarations also as 'xmlns:' attributes?
+      |     Note : setting this to true confuses some XSL processors
+      |     (e.g. Saxon).
+      | - stop-on-warning (boolean, default = true) : should the parser
+      |     stop parsing if a warning occurs ?
+      | - stop-on-recoverable-error (boolean, default = true) : should the
+      |     parser stop parsing if a recoverable error occurs ?
+      | - reuse-parsers (boolean, default = true) : do we want to reuse
+      |     parsers or create a new parser for each parse ?
+      |     Note : even if this parameter is true, parsers are not recycled
+      |     in case of parsing errors : some parsers (e.g. Xerces) do not like
+      |     to be reused after failure.
+      | - sax-parser-factory (string, optional) : the name of the
+      |     SAXParserFactory implementation class to be used instead of using
+      |     the standard JAXP mechanism (SAXParserFactory.newInstance()). This
+      |     allows to choose unambiguously the JAXP implementation to be used
+      |     when several of them are available in the classpath.
+      | - document-builder-factory (string, optional) : the name of the
+      |     DocumentBuilderFactory implementation to be used (similar to
+      |     sax-parser-factory for DOM).
+      | - drop-dtd-comments : should comment() events from DTD's be dropped?
+      |     Note: Since this implementation does not support the DeclHandler
+      |     interface anyway, it is quite useless to only have the comments
+      |     from DTD. And the comment events from the internal DTD subset
+      |     would appear in the serialized output again.
+      +-->
+  <xml-parser class="org.apache.excalibur.xml.impl.JaxpParser" logger="core.xml-parser" pool-max="32">
+    <parameter name="validate" value="false"/>
+    <parameter name="namespace-prefixes" value="false"/>
+    <parameter name="stop-on-warning" value="true"/>
+    <parameter name="stop-on-recoverable-error" value="true"/>
+    <parameter name="reuse-parsers" value="false"/>
+    <parameter name="drop-dtd-comments" value="true"/>
+  </xml-parser>
+
+  <!--+
+      | XSLT Processor
+      |
+      | 'incremental-processing' (only works with Xalan) allows the XSLT
+      | processor to start the output of the transformation as soon as possible.
+      | if set to false, the transforer waits until the end of the
+      | transformation to deliver the output.
+      | WARNING: * if you enable incremental-processing, you should be aware of
+      |            the following bug:
+      |            http://issues.apache.org/bugzilla/show_bug.cgi?id=13186
+      |          * incremental-processing creates an additional, non-pooled thread.
+      |          * using incremental-processing does not save memory, the input
+      |            tree will still be build completely.
+      |          * incremental processing is a 'static' thing in Xalan: if you
+      |            enable it on one xslt-processor, enable it on all.
+      +-->
+  <xslt-processor logger="core.xslt-processor">
+     <parameter name="use-store" value="true"/>
+     <parameter name="incremental-processing" value="false"/>
+  </xslt-processor>
+
+  <!--+
+      | XSLT Processor using xsltc from Xalan
+      | For Interpreted Xalan use:
+      | <transformer-factory>org.apache.xalan.processor.TransformerFactoryImpl</transformer-factory>
+      +-->
+  <component class="org.apache.excalibur.xml.xslt.XSLTProcessorImpl" logger="core.xslt-processor" role="org.apache.excalibur.xml.xslt.XSLTProcessor/xsltc">
+     <parameter name="use-store" value="true"/>
+     <parameter name="transformer-factory" value="org.apache.xalan.xsltc.trax.TransformerFactoryImpl"/>
+  </component>
+
+  <!--+
+      | Xalan XSLT Processor
+      +-->
+  <component class="org.apache.excalibur.xml.xslt.XSLTProcessorImpl" logger="core.xslt-processor" role="org.apache.excalibur.xml.xslt.XSLTProcessor/xalan">
+     <parameter name="use-store" value="true"/>
+     <parameter name="incremental-processing" value="false"/>
+     <parameter name="transformer-factory" value="org.apache.xalan.processor.TransformerFactoryImpl"/>
+  </component>
+
+  <!--+
+      | Saxon XSLT Processor
+      | For old (6.5.2) Saxon use:
+      |  <parameter name="transformer-factory" value="com.icl.saxon.TransformerFactoryImpl"/>
+      | For new (7+) Saxon use:
+      |  <parameter name="transformer-factory" value="net.sf.saxon.TransformerFactoryImpl"/>
+  <component logger="core.xslt-processor"
+             role="org.apache.excalibur.xml.xslt.XSLTProcessor/saxon"
+             class="org.apache.excalibur.xml.xslt.XSLTProcessorImpl">
+     <parameter name="use-store" value="true"/>
+     <parameter name="transformer-factory" value="com.icl.saxon.TransformerFactoryImpl"/>
+  </component>
+      +-->
+
+  <!-- Xpath Processor: -->
+  <xpath-processor class="org.apache.excalibur.xml.xpath.XPathProcessorImpl" logger="core.xpath-processor"/>
+
+  <!-- The XMLizers converts different mime-types to XML -->
+  <xmlizer>
+    <parser mime-type="text/xml" role="org.apache.excalibur.xml.sax.SAXParser"/>
+  </xmlizer>
+
+<!-- ============================ Object Stores =========================== -->
+
+  <!--+
+      | Transient Store: holds objects that don't have to survive shutdown
+      |
+      | Common configuration parameters:
+      | maxobjects: Indicates how many objects will be held in the cache.
+      |    When the number of maxobjects has been reached. The last object
+      |    in the cache will be thrown out.
+      +-->
+  <transient-store logger="core.store.transient">
+    <parameter name="maxobjects" value="10000"/>
+  </transient-store>
+
+  <!--+
+      | Store: generic store. The default implementation is an in-memory store
+      | backed by a disk store (based on EHCache). This forms a two-stage
+      | cache composed of a fast in-memory MRU front-end and a persistent
+      | back-end which stores the less-used objects.
+      |
+      | Common configuration parameters:
+      | maxobjects: Indicates how many objects will be held in the cache.
+      |    When the number of maxobjects has been reached. The last object
+      |    in the cache will be thrown out.
+      +-->
+  <store logger="core.store">
+    <parameter name="maxobjects" value="10000"/>
+    <parameter name="use-cache-directory" value="true"/>
+  </store>
+
+  <!--+
+      | Store Janitor: the store garbage collector and memory usage controller.
+      |
+      | WARNING: Be careful with the heapsize and freememory parameters.
+      |           Wrong values can cause high cpu usage.
+      |
+      | Example configuration:
+      | Jvm settings:
+      |    -Xmx200000000
+      | store-janitor settings:
+      |    <parameter name="freememory" value="5000000"/>
+      |    <parameter name="heapsize" value="196000000"/>
+      |
+      | It is recommended to have heapsize equal to -Xmx, especially on Sun's
+      | JVM which are unable to shrink its heap once it grows above minimum.
+      | Freememory should be greater than amount of memory necessary for normal
+      | application operation.
+      | BUT: The heap size of the memory of the JVM is a little bit less than
+      |      the value you specify for -Xmx, so you have to set the heapsize
+      |      for the store janitor to a value which is lower (2% less seems
+      |      to be a working value).
+      +-->
+  <store-janitor logger="core.store.janitor">
+    <!--+
+        | How much free memory shall be available in the jvm?
+        | If not specified, defaults to 1Mb.
+        +-->
+    <parameter name="freememory" value="2048000"/>
+    <!--+
+        | How much memory at max jvm can consume?
+        | The default max heapsize for Sun's JVM is (almost) 64Mb,
+        | can be increased by specifying -Xmx command line parameter.
+        | If not specified, defaults to 66600000 bytes.
+        +-->
+    <parameter name="heapsize" value="66600000"/>
+    <!--+
+        | How often shall the cleanup thread check memory?
+        | If not specified, defaults to 10 seconds.
+        +-->
+    <parameter name="cleanupthreadinterval" value="10"/>
+    <!--+
+        | Experimental adaptive algorithm for cleanup interval
+    <parameter name="adaptivethreadinterval" value="true"/>
+        +-->
+    <!--+
+        | What percent of the store elements shall be dropped on low memory?
+        | If not specified, defaults to 10%
+        +-->
+    <parameter name="percent_to_free" value="10"/>
+    <!--+
+        | Shall garbage collector be invoked on low memory?
+        | If not specified, defaults to false.
+        +-->
+    <parameter name="invokegc" value="false"/>
+
+    <!--+
+        | What should be the priority of the cleanup thread?
+        | This parameter is used only by older implementation of the janitor.
+        | New implementation uses centrally configured thread pool (see
+        | thread-pools element below).
+    <parameter name="threadpriority" value="5"/>
+        +-->
+  </store-janitor>
+
+<!-- ========================= Protocol Handlers =========================== -->
+
+
+<!-- ================ Internationalization Catalogs =================== -->
+
+  <!--+
+      | I18n Bundle Factory
+      |
+      | BundleFactory loads Bundles with i18n resources for the given locale.
+      | Bundles are loaded from the 'catalogue_location'. Bundle base name is
+      | 'catalogue_name' value.
+      | If 'cache-at-startup' is true then BundleFactory preloads bundles.
+      +-->
+  <i18n-bundles logger="core.i18n-bundles">
+    <catalogue-name>messages</catalogue-name>
+    <catalogue-location>context://samples/i18n/translations</catalogue-location>
+    <cache-at-startup>true</cache-at-startup>
+  </i18n-bundles>
+
+<!-- ====================== System Components =========================== -->
+
+  <!--+
+      | The core classloader implementation
+      +-->
+  <classloader class="org.apache.cocoon.components.classloader.ClassLoaderManagerImpl" logger="core.classloader"/>
+
+  <!--+
+      | XML compiler/decompiler
+      |
+      | these components are used to process SAX events and produce a binary
+      | representation that is much more compact and efficient for
+      | subsequent parsing. These are used by the cache system to save
+      | the intermediate results of the pipeline stages reducing the overhead
+      | of xml parsing/serialization.
+      +-->
+  <xml-serializer class="org.apache.cocoon.components.sax.XMLByteStreamCompiler" logger="core.xml-serializer" pool-max="32"/>
+  <xml-deserializer class="org.apache.cocoon.components.sax.XMLByteStreamInterpreter" logger="core.xml-deserializer" pool-max="32"/>
+
+  <!--+
+      | The Cache Manager is a component that can be used to cache content.
+      | It is currently used by the cinclude transformer
+      +-->
+  <component class="org.apache.cocoon.transformation.helpers.DefaultIncludeCacheManager" role="org.apache.cocoon.transformation.helpers.IncludeCacheManager">
+    <!-- Set the preemptive-loader-url to a pipeline inside Cocoon that
+         contains the preemptive loader action. The URL must be absolute!
+    <parameter name="preemptive-loader-url"
+               value="http://localhost:8080/cocoon/samples/cinclude/loader"/>
+    -->
+  </component>
+
+  <!--+
+      | Runnable manager
+      |
+      | this component manages commands (Runnables) executed in background using
+      | preconfigured pools of worker threads
+      +-->
+  <runnable-manager logger="core.runnable">
+    <!--+
+        | This is the default configuration of the runnable-manager. More
+        | indepth information can be found at
+        | http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/PooledExecutor.html
+        | The following elements can be used:
+        |
+        | thread-factory:        specifies the fully qualified class name of an
+        |                        org.apache.cocoon.components.thread.ThreadFactory
+        |                        implementation. It is responsible to create Thread
+        |                        classes.
+        | thread-pools:          container element for thread-pool elements.
+        | name:                  required name of the pool.
+        | priority:              optional priority all threads of the pool will
+        |                        have (the ThreadFactory will be set to this
+        |                        priority).The possible values  are:
+        |                          MIN:  corresponds to Thread#MIN_PRIORITY
+        |                          NORM: corresponds to Thread#NORM_PRIORITY (default)
+        |                          MAX:  corresponds to Thread#MAX_PRIORITY
+        | daemon:                whether newly created Threads should run in
+        |                        daemon mode or not. Default to false.
+        | queue-size:            optional size of a queue to hold Runnables if the
+        |                        pool is full. Possible values are:
+        |                          less than 0:    unbounded (default)
+        |                          equal to 0:     no queue at all
+        |                          greater than 0: size of the queue
+        | max-pool-size:         optional maximum number of threads in the pool.
+        |                        Defaults to 5.
+        |                        NOTE: if a queue is specified (queue-sie != 0)
+        |                              this value will be ignored.
+        | min-pool-size:         optional minimum number of threads in the pool.
+        |                        Defaults to 5.
+        |                        NOTE: if a queue has been specified (queue-sie != 0)
+        |                              this value will be used as the maximum of
+        |                              thread running concurrently.
+        | keep-alive-time-ms:    The time in ms an idle thread should keep alive
+        |                        before it might get garbage collected. This
+        |                        defaults to 60000 ms.
+        | block-policy;          The policy to be used if all resources (thread in
+        |                        the pool and slots in the queue) are exhausted.
+        |                        Possible values are:
+        |                          ABORT:         Throw a RuntimeException
+        |                          DISCARD:       Throw away the current request
+        |                                         and return.
+        |                          DISCARDOLDEST: Throw away the oldest request
+        |                                         and return.
+        |                          RUN (default): The thread making the execute
+        |                                         request runs the task itself.
+        |                                         This policy helps guard against
+        |                                         lockup.
+        |                          WAIT:          Wait until a thread becomes
+        |                                         available. This policy should, in
+        |                                         general, not be used if the
+        |                                         minimum number of threads is zero,
+        |                                         in which case a thread may never
+        |                                         become available.
+        | shutdown-graceful:     Terminate thread pool after processing all
+        |                        Runnables currently in queue. Any Runnable entered
+        |                        after this point will be discarded. A shut down
+        |                        pool cannot be restarted. This also means that a
+        |                        pool will need keep-alive-time-ms to terminate.
+        |                        The default value not to shutdown graceful.
+        | shutdown-wait-time-ms: The time in ms to wait before issuing an
+        |                        immediate shutdown after a graceful shutdown
+        |                        has been requested.
+        +-->
+    <thread-factory>org.apache.cocoon.components.thread.DefaultThreadFactory</thread-factory>
+    <thread-pools>
+      <!--+
+          | This is the default thread pool. It's use fits best for short
+          | running background tasks.
+          +-->
+      <thread-pool>
+        <name>default</name>
+        <priority>NORM</priority>
+        <daemon>false</daemon>
+        <queue-size>-1</queue-size>
+        <max-pool-size>5</max-pool-size>
+        <min-pool-size>5</min-pool-size>
+        <keep-alive-time-ms>60000</keep-alive-time-ms>
+        <block-policy>RUN</block-policy>
+        <shutdown-graceful>false</shutdown-graceful>
+        <shutdown-wait-time-ms>-1</shutdown-wait-time-ms>
+      </thread-pool>
+      <!--+
+          | This thread pool should be used for daemons (permanently running
+          | threads).
+          +-->
+      <thread-pool>
+        <name>daemon</name>
+        <priority>NORM</priority>
+        <daemon>true</daemon>
+        <queue-size>0</queue-size>
+        <max-pool-size>-1</max-pool-size>
+        <min-pool-size>1</min-pool-size>
+        <keep-alive-time-ms>60000</keep-alive-time-ms>
+        <block-policy>ABORT</block-policy>
+        <shutdown-graceful>false</shutdown-graceful>
+        <shutdown-wait-time-ms>-1</shutdown-wait-time-ms>
+      </thread-pool>
+    </thread-pools>
+  </runnable-manager>
+<!--..... Start configuration from 'deprecated' -->
+
+
+  <!--+
+      | URL Factory
+      |
+      | The url factory adds special url protocols to the system, they are then
+      | available inside Cocoon, e.g. as a source argument for one of the sitemap
+      | components.
+      |
+      | THIS COMPONENT IS DEPRECATED AND SHOULD NOT BE USED ANYMORE
+      +-->
+  <url-factory logger="core.url-factory">
+    <!-- Allows access to resources available from the ClassLoader, using getResource() method. -->
+    <protocol class="org.apache.cocoon.components.url.ResourceURLFactory" name="resource"/>
+  </url-factory>
+
+  <!--+
+      | Source Handler
+      |
+      | The source handler adds special url protocols to the system, they are
+      | then available inside Cocoon, e.g. as a source argument for one of the
+      | sitemap components.
+      |
+      | THIS COMPONENT IS DEPRECATED AND SHOULD NOT BE USED ANYMORE
+      +-->
+  <source-handler logger="core.source-handler">
+    <!-- file protocol : this is a WriteableSource -->
+    <protocol class="org.apache.cocoon.components.source.FileSourceFactory" name="file"/>
+    <!-- Allows access to resources available from the servlet context, using getResource() method. -->
+    <protocol class="org.apache.cocoon.components.source.ContextSourceFactory" name="context"/>
+  </source-handler>
+  
+<!--..... End configuration from 'deprecated' -->
+</cocoon>

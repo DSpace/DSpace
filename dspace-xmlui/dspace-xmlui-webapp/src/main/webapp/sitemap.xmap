@@ -1,0 +1,373 @@
+<?xml version="1.0"?>
+<!--
+  sitemap.xmap
+
+  Version: $Revision: 1.18 $
+ 
+  Date: $Date: 2006/05/01 21:56:29 $
+ 
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+ 
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+ 
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+ 
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+ 
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+ 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+	<map:components>
+		<map:generators default="file">
+			<map:generator label="content" logger="sitemap.generator.file" name="file" pool-max="32"
+				src="org.apache.cocoon.generation.FileGenerator"/>
+			<map:generator label="content" logger="sitemap.generator.directory" name="directory"
+				pool-max="16" src="org.apache.cocoon.generation.DirectoryGenerator"/>
+			<map:generator name="DSpaceFeedGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator"/>
+			<map:generator name="DSpaceMETSGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceMETSGenerator"/>
+			<map:generator name="notifying" src="org.apache.cocoon.sitemap.NotifyingGenerator"/>
+			<map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
+		</map:generators>
+		<map:serializers default="xml">
+			<map:serializer logger="sitemap.serializer.xml" mime-type="text/xml; charset=utf-8" name="xml"
+				src="org.apache.cocoon.serialization.XMLSerializer">
+				<indent>yes</indent>
+				<encoding>UTF-8</encoding>
+			</map:serializer>
+			<map:serializer name="xhtml" logger="sitemap.serializer.xhtml"
+			     src="org.apache.cocoon.serialization.XMLSerializer"
+				 mime-type="text/html; charset=utf-8" 
+			     pool-grow="2" pool-max="64" pool-min="2">
+			     <doctype-public>-//W3C//DTD XHTML 1.0 Strict//EN</doctype-public>
+                 <doctype-system>http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd</doctype-system>
+                 <encoding>UTF-8</encoding>
+                 <indent>yes</indent>
+			</map:serializer>
+		    <map:serializer name="html" logger="sitemap.serializer.html"
+			     src="org.apache.cocoon.serialization.HTMLSerializer"
+		    	 mime-type="text/html; charset=utf-8" 
+			     pool-grow="2" pool-max="64" pool-min="2">
+			     <doctype-public>-//W3C//DTD XHTML 1.0 Transitional//EN</doctype-public>
+                 <doctype-system>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</doctype-system>
+                 <encoding>UTF-8</encoding>
+                 <indent>yes</indent>
+            </map:serializer>
+		</map:serializers>
+		<map:transformers default="xslt">
+			<map:transformer logger="sitemap.transformer.xslt" name="xslt" pool-max="32"
+				src="org.apache.cocoon.transformation.TraxTransformer">
+				<use-request-parameters>false</use-request-parameters>
+				<use-session-parameters>false</use-session-parameters>
+				<use-cookie-parameters>false</use-cookie-parameters>
+				<xslt-processor-role>xalan</xslt-processor-role>
+				<check-includes>true</check-includes>
+			</map:transformer>
+			<map:transformer name="i18n" src="org.apache.cocoon.transformation.I18nTransformer">
+				<catalogues default="default">
+					<catalogue id="default" name="messages" location="context:/i18n"/>
+				</catalogues>
+				<untranslated-text>untranslated</untranslated-text>
+				<cache-at-startup>true</cache-at-startup>
+			</map:transformer>
+			<map:transformer name="SAXLogger" src="org.apache.cocoon.transformation.LogTransformer"/>
+			<map:transformer name="Include" src="org.dspace.app.xmlui.wing.Include"/>
+			<map:transformer name="IncludePageMeta" src="org.dspace.app.xmlui.wing.IncludePageMeta"/>
+			<map:transformer name="stylesheet" src="org.dspace.app.xmlui.cocoon.StylesheetInstructionTransformer"/>
+			<map:transformer name="PasswordLogin" src="org.dspace.app.xmlui.aspect.eperson.PasswordLogin"/>
+			<map:transformer name="LDAPLogin" src="org.dspace.app.xmlui.aspect.eperson.LDAPLogin"/>
+			<map:transformer name="notice" src="org.dspace.app.xmlui.aspect.general.NoticeTransformer"/>
+			<map:transformer name="NamespaceFilter" src="org.dspace.app.xmlui.cocoon.NamespaceFilterTransformer"/>
+		</map:transformers>
+		<map:matchers default="wildcard">
+			<map:matcher logger="sitemap.matcher.wildcard" name="wildcard"
+				src="org.apache.cocoon.matching.WildcardURIMatcher"/>
+			<map:matcher logger="sitemap.matcher.regexp" name="regexp"
+				src="org.apache.cocoon.matching.RegexpURIMatcher"/>
+			<map:matcher logger="sitemap.matcher.request-parameter" name="request-parameter"
+				src="org.apache.cocoon.matching.RequestParameterMatcher"/>
+			<map:matcher logger="sitemap.matcher.cookie" name="cookie"
+				src="org.apache.cocoon.matching.CookieMatcher"/>
+			<map:matcher logger="sitemap.matcher.header" name="header"
+				src="org.apache.cocoon.matching.HeaderMatcher"/>
+			<map:matcher logger="sitemap.matcher.parameter" name="parameter"
+				src="org.apache.cocoon.matching.ParameterMatcher"/>
+			<map:matcher name="WildcardParameterMatcher" src="org.apache.cocoon.matching.WildcardParameterMatcher"/>
+			<map:matcher logger="sitemap.matcher.sessionstate" name="sessionstate"
+				src="org.apache.cocoon.matching.WildcardSessionAttributeMatcher">
+				<attribute-name>org.apache.cocoon.SessionState</attribute-name>
+			</map:matcher>
+			<map:matcher logger="sitemap.matcher.referer-match" name="referer-match"
+				src="org.apache.cocoon.matching.WildcardHeaderMatcher">
+				<header-name>referer</header-name>
+			</map:matcher>
+			<map:matcher name="mount-table" src="org.apache.cocoon.matching.MountTableMatcher">
+				<map:parameter name="ignore-missing-tables" value="true"/>
+			</map:matcher>
+			<map:matcher name="request" src="org.apache.cocoon.matching.RequestParameterMatcher"/>
+		</map:matchers>
+		<map:selectors>
+			<map:selector name="browser" src="org.apache.cocoon.selection.BrowserSelector"
+				logger="sitemap.selector.browser">
+				<browser name="explorer" useragent="MSIE"/>
+				<browser name="explorer6" useragent="MSIE 6"/>
+				<browser name="explorer7" useragent="MSIE 7"/>
+				<browser name="firefox" useragent="Firefox"/>
+				<browser name="firefox1" useragent="Firefox/1."/>
+				<browser name="firefox2" useragent="Firefox/2."/>
+			</map:selector>
+			<map:selector name="parameter" src="org.apache.cocoon.selection.ParameterSelector"/>
+			<map:selector logger="sitemap.selector.exception" name="exception" src="org.apache.cocoon.selection.ExceptionSelector">
+				<exception name="not-found" class="org.apache.cocoon.ResourceNotFoundException"/>
+				<exception name="invalid-continuation" class="org.apache.cocoon.components.flow.InvalidContinuationException"/>
+				<!-- The statement below tells the selector to unroll as much exceptions as possible -->
+				<exception class="java.lang.Throwable" unroll="true"/>
+			</map:selector>
+		</map:selectors>
+		<map:readers default="resource">
+			<map:reader name="resource" src="org.apache.cocoon.reading.ResourceReader"
+				logger="sitemap.reader.resource" pool-max="32">
+				<expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
+			</map:reader>
+			<map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
+		</map:readers>
+		<map:actions>
+			<map:action name="locale" src="org.apache.cocoon.acting.LocaleAction">
+				<locale-attribute>locale</locale-attribute>
+				<use-locale>true</use-locale>
+				<default-locale language="en" country="US"/>
+				<store-in-request>false</store-in-request>
+				<create-session>false</create-session>
+				<store-in-session>false</store-in-session>
+				<store-in-cookie>false</store-in-cookie>
+			</map:action>
+			<map:action name="StartAuthentication" src="org.dspace.app.xmlui.aspect.eperson.StartAuthenticationAction"/>
+			<map:action name="DSpacePropertyFileReader" src="org.dspace.app.xmlui.cocoon.DSpacePropertyFileReader" />
+			<map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
+		</map:actions>
+		<map:pipes default="caching">
+			<map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline">
+			</map:pipe>
+			<map:pipe name="caching" src="org.apache.cocoon.components.pipeline.impl.CachingProcessingPipeline">
+			</map:pipe>
+		</map:pipes>
+	</map:components>
+	
+	<map:resources>
+		
+		
+		<map:resource name="i18n-transformer">
+			<map:act type="locale">
+				<map:transform type="i18n">
+					<map:parameter name="locale" value="{locale}"/>						
+				</map:transform>
+			</map:act>
+		</map:resource>
+		
+	</map:resources>
+
+
+	<!-- =========================== Pipelines ================================= -->
+	<map:pipelines>
+		
+		
+		<!-- Bitstream pipeline -->
+		<map:pipeline type="noncaching">
+			<map:parameter name="outputBufferSize" value="8192"/>
+
+
+			<!--
+				Bitstreams for items that have a handle assigned. If the
+				sequence parameter is given then that will be used to resolve the
+				bitstream, other wise the name will attempt to be matched.
+				
+				/bitstream/handle/[handlePrefix]/[handlePostfix]/[name]?sequence=[sequence]
+			-->
+			<map:match pattern="bitstream/handle/*/*/**">
+				<map:match type="request-parameter" pattern="sequence">
+					<map:read type="BitstreamReader">
+						<map:parameter name="handle" value="{../1}/{../2}"/>
+						<map:parameter name="sequence" value="{1}"/>
+					</map:read>
+				</map:match>
+				<map:read type="BitstreamReader">
+					<map:parameter name="handle" value="{1}/{2}"/>
+					<map:parameter name="name" value="{3}"/>
+				</map:read>
+			</map:match>
+			
+			<!--
+				Bitstreams for items that do not have a handle assigned. If the
+				sequence parameter is given then that will be used to resolve the
+				bitstream, other wise the name will attempt to be matched.
+				
+				/bitstream/item/[itemID]/[name]?sequence=[sequence]
+			-->
+			<map:match pattern="bitstream/item/*/**">
+				<map:match type="request-parameter" pattern="sequence">
+					<map:read type="BitstreamReader">
+						<map:parameter name="itemID" value="{../1}"/>
+						<map:parameter name="sequence" value="{1}"/>
+					</map:read>
+				</map:match>
+				<map:read type="BitstreamReader">
+					<map:parameter name="itemID" value="{1}"/>
+					<map:parameter name="name" value="{2}"/>
+				</map:read>
+			</map:match>
+			
+			<!--
+				Bitstreams not attached to to items (community / collection logos)
+				
+				/bitstream/id/[bitstreamID]/[ignored]
+			-->
+			<map:match pattern="bitstream/id/*/**">
+				<map:read type="BitstreamReader">
+					<map:parameter name="bitstreamID" value="{1}"/>
+				</map:read>
+			</map:match>
+			
+			
+			<!--
+				For URL compatability with the JSPUI, redirect these old url to their new locations.
+				
+				/bitstream/[handlePrefix]/[handlePostfix]/[sequence]/[name]
+				/html/[handlePrefix]/[handePostfix]/[name]
+			-->
+			<map:match pattern="bitstream/*/*/*/**">
+				<map:redirect-to uri="{request:contextPath}/bitstream/handle/{1}/{2}/{4}?sequence={3}" permanent="yes"/>
+			</map:match>
+			<map:match pattern="html/*/*/**">
+				<map:redirect-to uri="{request:contextPath}/bitstream/handle/{1}/{2}/{3}" permanent="yes"/>
+			</map:match>
+		</map:pipeline>
+		
+		
+		
+		
+		
+		<!-- non-bitstream pipeline -->
+		<map:pipeline>
+			<!-- Theme pipeline -->
+			<map:match pattern="DRI/**">
+				<map:mount check-reload="no" src="aspects/aspects.xmap" uri-prefix="DRI/"/>
+			</map:match>
+			
+			
+			<map:match pattern="metadata/**">
+				<map:match pattern="metadata/handle/*/*/**">
+					<map:generate type="DSpaceMETSGenerator">
+						<map:parameter name="handle" value="{1}/{2}"/>
+						<map:parameter name="extra" value="{3}"/>
+					</map:generate>
+					<map:serialize type="xml"/>
+				</map:match>
+				
+				<map:match pattern="metadata/internal/*/*/**">
+					<map:generate type="DSpaceMETSGenerator">
+						<map:parameter name="internal" value="{1}:{2}"/>
+						<map:parameter name="extra" value="{3}"/>
+					</map:generate>
+					<map:serialize type="xml"/>
+				</map:match>
+			</map:match>
+			
+			
+			<!-- Syndication feeds for a specific community/collection -->
+			<map:match pattern="feed/*/*/*">
+				<map:generate type="DSpaceFeedGenerator">
+					<map:parameter name="handle" value="{1}/{2}"/>
+					<map:parameter name="feedFormat" value="{3}"/>
+				</map:generate>
+				<map:act type="locale">
+					<map:transform type="i18n">
+						<map:parameter name="locale" value="{locale}"/>						
+					</map:transform>
+				</map:act>
+				<map:serialize type="xml"/>
+			</map:match>
+			
+			<!-- Syndication feed for the whole repository -->
+			<map:match pattern="feed/*">
+				<map:generate type="DSpaceFeedGenerator">
+					<map:parameter name="feedFormat" value="{1}"/>
+				</map:generate>
+				<map:act type="locale">
+					<map:transform type="i18n">
+						<map:parameter name="locale" value="{locale}"/>						
+					</map:transform>
+				</map:act>
+				<map:serialize type="xml"/>
+			</map:match>
+			
+			
+			<!-- handle common theme resources, such as dri2xhtml -->
+			<map:match pattern="themes/*">
+				<map:read src="themes/{1}"/>
+			</map:match>
+			
+			<!-- handle theme specific resources static or dynamic -->
+			<map:match pattern="themes/*/**">
+               <map:mount check-reload="no" src="themes/{1}/sitemap.xmap" uri-prefix=""/>
+  			</map:match>
+			
+		</map:pipeline>
+		<map:pipeline>
+			<!--<map:match pattern="**">-->
+			<map:mount check-reload="no" src="themes/themes.xmap" uri-prefix=""/>
+			<!--</map:match>-->
+		</map:pipeline>
+		
+		<map:handle-errors>
+			<map:select type="exception">
+				
+				<map:when test="not-found">
+					<map:generate type="exception"/>
+					<map:transform src="exception2html.xslt">
+						<map:parameter name="contextPath" value="{request:contextPath}"/>
+						<map:parameter name="pageTitle" value="Resource not found"/>
+					</map:transform>
+					<map:serialize type="xhtml" status-code="404"/>
+				</map:when>
+				
+				<map:when test="invalid-continuation">
+					<map:generate type="exception"/>
+					<map:transform src="exception2html.xslt">
+						<map:parameter name="contextPath" value="{request:contextPath}"/>
+						<map:parameter name="pageTitle" value="Invalid Continuation"/>
+					</map:transform>
+					<map:serialize type="xhtml" status-code="404"/>
+				</map:when>
+				
+				<map:otherwise>
+					<map:generate type="exception"/>
+					<map:transform src="exception2html.xslt">
+						<map:parameter name="contextPath" value="{request:contextPath}"/>
+					</map:transform>
+					<map:serialize type="xhtml" status-code="500"/>
+				</map:otherwise>
+			</map:select>
+		</map:handle-errors>
+	</map:pipelines>
+</map:sitemap>

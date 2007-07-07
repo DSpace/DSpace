@@ -1,0 +1,327 @@
+<?xml version="1.0"?>
+<!--
+  sitemap.xmap
+
+  Version: $Revision: 1.19 $
+ 
+  Date: $Date: 2006/08/08 22:00:02 $
+ 
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+ 
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+ 
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+ 
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+ 
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+ 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+-->
+
+<!-- 
+
+The ArtifactBrowser Aspect is responsible for browsing communities / 
+collections / items / and bitstreams, viewing an individual item, 
+and searching the repository.
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+	<map:components>
+		
+		
+		<map:transformers>
+			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.artifactbrowser.Navigation"/>
+			<map:transformer name="CommunityBrowser" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityBrowser"/>
+			<map:transformer name="CommunityViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityViewer"/>
+			<map:transformer name="CollectionViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.CollectionViewer"/>
+			<map:transformer name="ItemViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemViewer"/>
+			<map:transformer name="BrowseTitles" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseTitles"/>
+			<map:transformer name="BrowseDates" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseDates"/>
+			<map:transformer name="BrowseAuthors" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseAuthors"/>
+			<map:transformer name="BrowseAuthorItems" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseAuthorItems"/>
+		    <map:transformer name="BrowseSubjects" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseSubjects"/>
+			<map:transformer name="BrowseSubjectItems" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseSubjectItems"/>
+			<map:transformer name="SimpleSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.SimpleSearch"/>
+			<map:transformer name="AdvancedSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.AdvancedSearch"/>
+			<map:transformer name="FeedbackForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.FeedbackForm"/>
+			<map:transformer name="FeedbackSent" src="org.dspace.app.xmlui.aspect.artifactbrowser.FeedbackSent"/>
+			<map:transformer name="Contact" src="org.dspace.app.xmlui.aspect.artifactbrowser.Contact"/>
+			<map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
+			<map:transformer name="FrontPageSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.FrontPageSearch"/>
+		</map:transformers>
+
+
+		<map:matchers default="wildcard">
+			<map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+			<map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+		</map:matchers>
+		
+		
+		<map:actions>
+			<map:action name="SendFeedbackAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SendFeedbackAction"/>
+		</map:actions>
+
+
+    <map:selectors>
+    	<map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
+    </map:selectors>
+		
+	</map:components>
+	<map:pipelines>
+		<map:pipeline>
+			
+			
+			<map:generate/>
+			
+			<!-- 
+					Add the basic navigation content to everypage. This includes:
+					
+					1) Metadata about the current page (really just what the current 
+					   context path is)
+					2) Navigation links to browse the repository.
+					   - This includes links that are relative to the currently 
+					     selected community or collection.
+					3) Metadata about the search urls.
+					-->
+			<map:transform type="Navigation"/>
+			
+			
+			<!--
+					Display the DSpace homepage. This includes the news.xml file 
+					along with a list of top level communities in DSpace. 
+					-->
+			<map:match pattern="">
+			    <!-- 
+			    	DSpacePropertyFileReader will read the DSpace property file and
+			    	place the selected properties' value in this scope 
+			    -->
+				<map:act type="DSpacePropertyFileReader">
+					<map:parameter name="dspace.dir" value="dspace.dir" />
+					<map:transform type="Include" src="{dspace.dir}/config/news.xml" /> 
+				</map:act>				
+				
+				<map:transform type="FrontPageSearch"/>
+				<map:transform type="CommunityBrowser">
+					<map:parameter name="depth" value="1"/>
+				</map:transform>
+				<map:serialize type="xml"/>
+			</map:match>
+			
+			
+			<!-- List all communities & collections in DSpace -->
+			<map:match pattern="community-list">
+				<map:transform type="CommunityBrowser">
+					<map:parameter name="depth" value="999"/>
+				</map:transform>
+				<map:serialize type="xml"/>
+			</map:match>
+	
+			
+			<!-- Search -->
+			<map:match pattern="search">
+				<map:transform type="SimpleSearch"/>
+				<map:serialize type="xml"/>
+			</map:match>		
+			<map:match pattern="simple-search">
+				<map:transform type="SimpleSearch"/>
+				<map:serialize type="xml"/>
+			</map:match>	
+			<map:match pattern="advanced-search">
+				<map:transform type="AdvancedSearch"/>
+				<map:serialize type="xml"/>
+			</map:match>	
+			
+			
+			<!-- Global browse by titles, dates, subjects or authors -->
+			<map:match pattern="browse-title">
+				<map:transform type="BrowseTitles"/>
+				<map:serialize type="xml"/>
+			</map:match>
+			<map:match pattern="browse-date">
+				<map:transform type="BrowseDates"/>
+				<map:serialize type="xml"/>
+			</map:match>
+			<!-- Browse by author -->
+			<map:match pattern="browse-author">
+				<map:transform type="BrowseAuthors"/>
+				<map:serialize type="xml"/>
+			</map:match>
+			<!-- Browse by author's items -->
+			<map:match pattern="browse-author-items">
+				<map:transform type="BrowseAuthorItems"/>
+				<map:serialize type="xml"/>
+			</map:match>
+		    <!-- Browse by subject -->
+			<map:match pattern="browse-subject">
+				<map:transform type="BrowseSubjects"/>
+				<map:serialize type="xml"/>
+			</map:match>
+			<!-- Browse by items pertaining to a subject -->
+			<map:match pattern="browse-subject-items">
+				<map:transform type="BrowseSubjectItems"/>
+				<map:serialize type="xml"/>
+			</map:match>
+			
+			<!-- Handle specific features -->
+			<map:match pattern="handle/*/**">
+
+				<!-- Scoped browse by features -->
+				<map:match type="HandleAuthorizedMatcher" pattern="READ">				
+					<map:match type="HandleTypeMatcher" pattern="community,collection">
+					
+						<!-- Browse by title -->
+						<map:match pattern="handle/*/*/browse-title">
+							<map:transform type="BrowseTitles"/>
+							<map:serialize type="xml"/>
+						</map:match>
+						
+						
+						<!-- Browse by date -->
+						<map:match pattern="handle/*/*/browse-date">
+							<map:transform type="BrowseDates"/>
+							<map:serialize type="xml"/>
+						</map:match>
+						
+						
+						<!-- Browse by author -->
+						<map:match pattern="handle/*/*/browse-author">
+							<map:transform type="BrowseAuthors"/>
+							<map:serialize type="xml"/>
+						</map:match>
+												
+						<!-- Browse by author's items -->
+						<map:match pattern="handle/*/*/browse-author-items">
+							<map:transform type="BrowseAuthorItems"/>
+							<map:serialize type="xml"/>
+						</map:match>
+					    
+					    
+					    <!-- Browse by subject -->
+					    <map:match pattern="handle/*/*/browse-subject">
+					        <map:transform type="BrowseSubjects"/>
+					        <map:serialize type="xml"/>
+					    </map:match>
+					    
+					    <!-- Browse by items pertaining to a subject -->
+					    <map:match pattern="handle/*/*/browse-subject-items">
+					        <map:transform type="BrowseSubjectItems"/>
+					        <map:serialize type="xml"/>
+					    </map:match>
+					    
+					    						
+						<!-- Simple search -->
+						<map:match pattern="handle/*/*/search">
+							<map:transform type="SimpleSearch"/>
+							<map:serialize type="xml"/>
+						</map:match>	
+						
+						<!-- Simple search again, but this time they said it -->	
+						<map:match pattern="handle/*/*/simple-search">
+							<map:transform type="SimpleSearch"/>
+							<map:serialize type="xml"/>
+						</map:match>	
+						
+						<!-- Advanced search -->
+						<map:match pattern="handle/*/*/advanced-search">
+							<map:transform type="AdvancedSearch"/>
+							<map:serialize type="xml"/>
+						</map:match>	
+					
+					</map:match> <!-- End match community or collection -->
+				</map:match> <!-- End match can read -->
+				
+					
+				<!-- Community, Collection, and Item Viewers -->
+				<map:match pattern="handle/*/*">
+					<map:match type="HandleAuthorizedMatcher" pattern="READ">
+						<map:match type="HandleTypeMatcher" pattern="community">
+							<map:transform type="CommunityViewer"/>
+							<map:serialize type="xml"/>
+						</map:match>
+						<map:match type="HandleTypeMatcher" pattern="collection">
+							<map:transform type="CollectionViewer"/>
+							<map:serialize type="xml"/>
+						</map:match>
+						<map:match type="HandleTypeMatcher" pattern="item">
+							<map:transform type="ItemViewer"/>
+							<map:serialize type="xml"/>
+						</map:match>
+					</map:match>
+
+					<map:match type="HandleAuthorizedMatcher" pattern="!READ">
+						<map:select type="AuthenticatedSelector">
+							<map:when test="eperson">
+								<map:transform type="RestrictedItem"/>
+								<map:serialize/>
+							</map:when>
+							<map:otherwise>
+								<map:act type="StartAuthentication">
+									<map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+									<map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+								</map:act>
+								<map:serialize/>								
+							</map:otherwise>
+						</map:select>						
+					</map:match>
+				</map:match>
+				
+				
+			</map:match> <!-- End match handle/*/** -->
+			
+			
+			<!--
+				A simple feedback utility that presents the user with a form to fill out,
+				the results of which are emailed to the site administrator. 
+			    -->
+			<map:match pattern="feedback">
+				<map:act type="SendFeedbackAction">
+					<map:transform type="FeedbackForm">
+						<map:parameter name="comments" value="{comments}"/>
+						<map:parameter name="email" value="{email}"/>
+						<map:parameter name="page" value="{page}"/>
+					</map:transform>
+					
+					<map:serialize type="xml"/>
+				</map:act>
+				<map:transform type="FeedbackSent"/>
+				<map:serialize type="xml"/>
+			</map:match>
+			
+			<!--
+				The most basic & generic contact us page. It is expected that most
+				themes will override this page and replace it with a more detailed 
+				version. 
+				-->
+			<map:match pattern="contact">
+				<map:transform type="Contact"/>
+				<map:serialize type="xml"/>
+			</map:match>
+			
+			
+			<!-- Not a URL we care about, so just pass it on. -->
+			<map:serialize type="xml"/>
+			
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>

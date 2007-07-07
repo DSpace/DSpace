@@ -39,9 +39,9 @@
          <modules>
             <module>../dspace-api</module>
             <module>../dspace-jspui</module>
-            <module>../dspace-oai</module>
-            <!-- 
-               <module>../dspace-xmlui</module>
+            <module>../dspace-oai</module> 
+            <module>../dspace-xmlui</module>
+            <!--
                <module>../dspace-lni</module>
             -->
          </modules>

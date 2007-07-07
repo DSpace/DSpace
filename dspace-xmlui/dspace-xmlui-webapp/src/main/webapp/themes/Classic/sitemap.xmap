@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!--
+	sitemap.xmap
+	
+	Version: $Revision: 1.6 $
+	
+	Date: $Date: 2006/04/25 21:34:27 $
+	
+	Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+	Institute of Technology.  All rights reserved.
+	
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are
+	met:
+	
+	- Redistributions of source code must retain the above copyright
+	notice, this list of conditions and the following disclaimer.
+	
+	- Redistributions in binary form must reproduce the above copyright
+	notice, this list of conditions and the following disclaimer in the
+	documentation and/or other materials provided with the distribution.
+	
+	- Neither the name of the Hewlett-Packard Company nor the name of the
+	Massachusetts Institute of Technology nor the names of their
+	contributors may be used to endorse or promote products derived from
+	this software without specific prior written permission.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+	``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+	A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+	HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+	INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+	BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+	OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+	TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+	DAMAGE.
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+	<map:pipelines>
+		
+		<map:component-configurations>
+			<global-variables>
+				<theme-path>Classic</theme-path>
+				<theme-name>A Classic DSpace inspired theme</theme-name>
+			</global-variables>
+		</map:component-configurations>
+		
+		
+		<map:pipeline>
+			
+			<!-- Static content -->
+			<map:match pattern="themes/*/**">
+				<map:read src="{2}"/>
+			</map:match>
+			
+			<!-- Aspect content -->
+			<map:match pattern="**">
+				
+				<!-- Step 1: Generate the DRI page -->
+				<map:generate type="file" src="cocoon://DRI/{1}"/>
+				
+				<!-- Step 2 Add page metadata -->
+				<map:select type="browser">
+					<!-- Internet explorer 6 -->
+					<map:when test="explorer6">
+						<map:transform type="IncludePageMeta">
+							<map:parameter name="stylesheet.screen#1" value="style.css"/>
+							<map:parameter name="stylesheet.screen#2" value="style-ie6.css"/>
+							
+							<map:parameter name="theme.path" value="{global:theme-path}"/>
+							<map:parameter name="theme.name" value="{global:theme-name}"/>
+						</map:transform>
+					</map:when>
+					<!-- The theme has been tested with firefox 2.0 & i.e. 7.0 -->
+					<map:otherwise>
+						<map:transform type="IncludePageMeta">
+							<map:parameter name="stylesheet.screen" value="style.css"/>
+							
+							<map:parameter name="theme.path" value="{global:theme-path}"/>
+							<map:parameter name="theme.name" value="{global:theme-name}"/>
+						</map:transform>
+					</map:otherwise>
+				</map:select>
+				
+				<!-- Debuging output -->
+				<map:match type="request" pattern="XML">
+					<map:serialize type="xml"/>
+				</map:match>
+				
+				<!-- Step 3: Transform to XHTML -->
+				<map:transform src="Classic.xsl"/>
+				
+				<!-- Step 4: Localize the page -->
+				<map:act type="locale">
+					<map:transform type="i18n">
+						<map:parameter name="locale" value="{locale}"/>						
+					</map:transform>
+				</map:act>
+				
+				<!-- Step 5: Serialize to the browser -->
+				<map:serialize type="xhtml"/>
+				
+			</map:match>
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>

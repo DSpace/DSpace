@@ -1,0 +1,833 @@
+﻿/*
+  style.css
+
+  Version: $Revision: 1.15 $
+ 
+  Date: $Date: 2006/07/27 22:54:53 $
+ 
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+ 
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+ 
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+ 
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+ 
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+ 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+*/
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background: white;
+    margin: 0;
+    padding: 0;
+    font-family: "verdana", Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    font-style: normal;
+}
+
+/*******************************
+ *****  General elements  ******
+ *******************************/
+a {
+	color: rgb(51, 102, 153);
+}
+
+ul {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+li {
+	margin-left: 25px;
+}
+
+p {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+h1, h2, h3, h4, h5 {
+	color: #336699;
+}
+
+span.bold {
+	font-weight: bolder;
+}
+
+span.italics,span.italic {
+	font-style: italic;
+}
+
+span.underline {
+	text-decoration: underline;
+}
+
+span.fade {
+    color: gray;
+    font-size: 90%;
+}
+
+span.fade a {
+    color: gray;
+    text-decoration: none;
+}
+
+span.fade a:hover {
+    color: blue;
+    text-decoration: underline;
+}    
+
+span.warn {
+    color: red;
+    font-weight: bolder;
+}
+
+p.hidden, span.hidden {
+    display: none;
+}
+
+
+/*******************************
+ *****  Major components  ******
+ *******************************/
+ul#ds-trail {
+    margin: 5px 0 10px 165px;
+}
+
+div#ds-body {
+    margin: 5px 0 10px 165px;
+    min-width:600px;
+}
+
+div#ds-options {
+    border-right: 1px solid gray;
+    padding: 0 5px 0 5px;
+    position: absolute;
+    top: 100px;
+    left: 0;
+    width: 125px;
+    overflow: hidden;
+}
+
+div#ds-footer {
+	clear: both;
+	margin: 100px 0 10px 165px;
+	border-top: 1px solid gray;
+}
+
+
+
+
+
+
+
+
+/*******************************
+ **********  Header  ***********
+ *******************************/
+div#ds-header a span#ds-header-logo {
+    width: 200px;
+	height: 80px;
+	float: left;
+	background-image: url("dspace-blue.gif");
+	background-repeat: no-repeat;
+}
+
+div#ds-header a {
+	text-decoration: none;
+}
+
+div#ds-header h1 {
+	display: none;
+}
+
+div#ds-header h2 {
+    clear: both;
+    height: 15px;
+    background-image: url("stripe.gif");
+    /*visibility: none;*/
+    font-size: 0.001em; /* yeah it's still there but not really visible */
+}
+
+/* User box (login / profile) */
+div#ds-user-box {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+div#ds-user-box p {
+	color: gray;
+	padding: 0px;
+	margin: 0px;
+}
+
+div#ds-user-box a {
+	text-decoration: none;
+	color: gray;
+	padding: 0px;
+	margin: 0px;
+}
+
+div#ds-user-box a:hover {
+	text-decoration: underline;
+}
+
+/* Trail */
+ul#ds-trail li.ds-trail-link {
+    list-style: none;
+    margin-left:0px;
+}
+
+ul#ds-trail li.ds-trail-link a:hover {
+    text-decoration: underline;
+}
+
+ul#ds-trail li.ds-trail-link:after {
+    content: " > ";
+}
+
+
+
+
+/*******************************
+ *******  Options list  ********
+ *******************************/
+
+div#ds-options h3 {
+	color: black;
+    font-size: 1em;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+div#ds-options h4 {
+	color: black;
+    font-size: 10pt;
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+
+div#ds-options ul {
+	margin: 0 0 0 0;
+	padding: 0;
+}
+
+div#ds-options li {
+	margin-left: 0px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding: 0;
+	font-size: 10pt;
+}
+
+div#ds-options li {
+    
+    margin-left: 25px;
+}
+
+div#ds-options div#artifactbrowser_Navigation_list_browse li {
+	list-style: none;
+	margin-left: 0px;
+}
+
+div#ds-options div#artifactbrowser_Navigation_list_browse ul ul li {
+	list-style-image: url(arrow.gif);
+	margin-left: 25px;
+}
+
+div#ds-options div#artifactbrowser_Navigation_list_account ul li {
+	list-style-image: url(arrow.gif);
+	margin-left: 25px;
+}
+
+div#ds-options div#artifactbrowser_Navigation_list_context ul li {
+	list-style-image: url(arrow.gif);
+	margin-left: 25px;
+}
+
+div.ds-option-set {
+	margin-bottom: 30px;
+}
+
+/* search box, in the option list */
+#ds-search-option-head {
+	margin: 0 !important; 
+	background-color: #fefecd;
+	padding-left: 2px;
+}
+
+div#ds-search-option {
+	background-color: #fefecd;
+	padding-top: 2px;
+	padding-bottom: 10px;
+	padding-left: 2px;
+}
+
+form#ds-search-form fieldset {
+	border: none;
+	margin: 0 0 0 0;
+	padding: 0px 0px 0px 0px;
+}
+
+div#ds-search-option input.ds-text-field {
+    width: 79px;
+    font-size: 1em;
+	margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+div#ds-search-option input.ds-button-field {
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
+}
+
+div#ds-search-option label {
+	display: none;
+}
+
+div#ds-search-option a {
+	font-weight: bold;
+	font-size: .9em;
+}
+
+/*******************************
+ **********  Footer  ***********
+ *******************************/
+ 
+div#ds-footer a span#ds-footer-logo {
+    width: 250px;
+	height: 250px;
+	float: left;
+	background-image: url("manakin_logo.png");
+	background-repeat: no-repeat;
+	margin: 5px;
+}
+
+div#ds-footer a {
+	text-decoration: none;
+}
+
+div#ds-footer a:hover {
+	text-decoration: underline;
+}
+
+
+/*******************************
+ ********  pagination  *********
+ *******************************/
+
+div.pagination {
+	position: relative;
+	margin: 10px 20px 2px 20px;
+}
+
+div.pagination-masked {
+	position: relative;
+	margin: 10px 20px 10px 20px;
+}
+
+a.previous-page-link {
+	position: absolute;
+	left: 50px;
+	bottom: 5px;
+}
+
+a.next-page-link {
+	position: absolute;
+	right: 50px;
+	bottom: 5px;
+}
+
+p.pagination-info {
+	position: relative;
+	text-align: center;
+	width: 50%;
+	margin: 0 auto 5px auto;
+}
+
+ul.pagination-links {
+	position: relative;
+	text-align: center;
+	width: 50%;
+	margin: 0 auto 5px auto;
+	padding: 0 0 0 0;
+}
+
+*.pagination-links li {
+	list-style: none;
+	display: inline;
+	margin-right: 5px;
+	font-weight: bolder;
+	font-size: 90%;
+}
+
+
+/*******************************
+ ******  Alphabet Lists  *******
+ *******************************/
+
+ul.alphabet {
+	text-align: center;
+}
+
+ul.alphabet li {
+	list-style: none;
+	display: inline;
+	padding: 0;
+	margin: 0 5px 0 5px;
+	font-weight: bolder;
+}
+
+ul.alphabet a:hover {
+	color: black;
+}
+
+/*******************************
+ ******  Progress Lists  *******
+ *******************************/
+
+ul.ds-progress-list {
+	margin: 0px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	text-align: center;
+}
+
+ul.ds-progress-list li {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: gray;
+	overflow: hidden;
+	display: inline;
+	line-height: 20px;
+}
+
+ul.ds-progress-list li.current {
+	color: black;
+}
+
+ul.ds-progress-list li.arrow {
+	font-size: 200%;
+	font-weight: bold;
+	position: relative;
+	top: 6px;
+}
+
+
+/*******************************
+ *******  Artifact List  *******
+ *******************************/
+
+ul.ds-artifact-list {
+	border: 1px solid gray;
+	list-style-type: none;
+	width: 95%;
+}
+
+ul.ds-artifact-list li.odd {
+	background-color: rgb(238, 238, 238);
+}
+
+ul.ds-artifact-list li.even {
+	background-color: rgb(255, 255, 255);
+}
+
+ul.ds-artifact-list li {
+	position: relative;
+	padding-bottom: 3px;
+	padding-top: 3px;
+	margin: 0 0 0 0;
+	padding: 2px 5px 2px 5px;
+	
+}
+
+ul.ds-artifact-list li div.artifact-description {
+	width: 80%;
+}
+
+ul.ds-artifact-list li div.artifact-preview {
+	margin: -30px 0px 0 auto;
+	width: 15%;
+}
+
+ul.ds-artifact-list li div.artifact-info {
+	font-size: 110%;
+	padding-left: 25px;
+}
+
+ul.ds-artifact-list li div.artifact-title {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 130%;
+	font-weight: bolder;
+}
+
+span.date {
+	font-style: italic;
+}
+
+/*******************************
+ *********  Tables  ************
+ *******************************/
+ 
+table {
+    clear: both;
+	border-spacing: 0px;
+	border: 1px solid gray;
+	width: 95%;
+}
+
+tr.ds-table-header-row {
+	color: inherit;
+	background-color: rgb(218, 218, 218);
+}
+
+tr.ds-table-header-row.subheader {
+    background-color: rgb(250, 250, 214);
+}
+
+th {
+    padding: 4px 10px;
+}
+.subheader th {
+    padding-left: 5px;
+	font-weight: 100;
+}
+
+tr.ds-table-row.odd {
+	color: inherit;
+	background-color: rgb(238, 238, 238);
+}
+
+tr.ds-table-row.even {
+	color: inherit;
+	background-color: rgb(255, 255, 255);
+}
+
+td {
+	padding: 3px 10px 5px 10px;
+	border: none;
+	font-size: inherit;
+	background-color: inherit;
+	color: inherit;
+}
+
+*.first-cell {
+	vertical-align: middle;
+	text-align: center;
+}
+
+.indent {
+    padding-left: 35px;
+    padding-right: 0;
+}
+.doubleIndent {
+    padding-left: 55px;
+    padding-right: 0;
+}
+
+th.indent {
+    padding-left: 30px;
+    padding-right: 0;
+}
+th.doubleIndent {
+    padding-left: 50px;
+    padding-right: 0;
+}
+
+
+
+
+/*******************************
+ ***********  forms  ***********
+ *******************************/
+
+form.ds-interactive-div {
+	width: 95%;
+}
+
+form.ds-interactive-div li.ds-form-item {
+	//display: block;
+	padding: 2px 0;
+	width: 100%;
+}
+
+form.ds-interactive-div li {
+	margin: 0;
+}
+
+form.ds-interactive-div li.odd {
+	background-color: rgb(238, 238, 238);
+}
+
+form.ds-interactive-div li.even {
+	background-color: rgb(255, 255, 255);
+}
+
+form.ds-interactive-div li.last {
+	border-top: 2px solid gray;
+	background-color: rgb(215, 215, 215);
+}
+
+li.ds-form-item {
+	float: left;
+	clear: both;
+	width: 100%;
+}
+
+div.ds-form-content {
+	float: left;
+	clear: right;
+	display: block;
+	padding: 7px;
+		width: 400px;
+}
+
+span.ds-form-label,label.ds-form-label {
+	display: block;
+	float: left;
+	clear: left;
+	padding: 5px 20px 5px 10px;
+	width: 115px;
+	font-weight: bold;
+	vertical-align: middle;
+	overflow: hidden;
+}
+
+/* Help, error, & in-line labels */
+label.ds-composite-component {
+	display: block;
+	float: left;
+	padding: 0px 5px 0 0px;
+	font-size: 80%;
+	color: black;
+	background-color: inherit;
+	text-align: left;
+}
+
+span.error {
+	display: block;
+	font-size: 100%;
+	color: red;
+	background-color: inherit;
+	margin: 0;
+}
+
+span.field-help {
+	display: block;
+	margin-left: 5px;
+	font-size: 90%;
+	color: gray;
+	background-color: inherit;
+}
+
+input.error,textarea.error,select.error {
+	color: inherit;
+	background-color: rgb(255, 245, 245);
+	border-color: red;
+}
+
+span.composite-help {
+	display: block;
+	font-size: 90%;
+	color: gray;
+	background-color: inherit;
+	text-align: left;
+}
+
+span.composite-help {
+	display: block;
+	font-size: 80%;
+	color: black;
+	background-color: inherit;
+	text-align: left;
+}
+
+div.spacer {
+	margin: 0;
+	padding: 0;
+	line-height: 0px;
+	clear: both;
+}
+
+
+/* The composite field  */
+span.ds-composite-field {
+	display: table-row;
+	padding: 2px;
+}
+
+*.ds-composite-field.ds-composite-component {
+	display: table-cell;
+	text-align: left;
+	width: auto;
+	padding-right: 10px;
+}
+
+*.ds-composite-field input,*.ds-composite-field textarea,*.ds-composite-field select {
+	margin-right: 5px;
+	margin-bottom: -2px;
+}
+
+
+/* Checkboxes and Radio buttons */
+fieldset.ds-checkbox-field,fieldset.ds-radio-field {
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+
+fieldset.ds-checkbox-field legend,fieldset.ds-radio-field legend {
+	display: none;
+}
+
+fieldset.ds-checkbox-field label,fieldset.ds-radio-field label {
+	display: block;
+}
+
+
+/* Sub sections within a form */
+
+fieldset.ds-form-list {
+	border: 2px solid gray;
+	padding: 0;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+fieldset.ds-form-list ol {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+}
+
+fieldset.ds-form-list legend {
+	color: #336699;
+	background-color: inherit;
+	font-size: 115%;
+	font-weight: bolder;
+	margin-left: 10px;
+}
+
+fieldset.thick legend {
+	color: #336699;
+	padding-left: 10px;
+	padding-right: 30px;
+}
+
+fieldset.ds-form-sublist {
+	border: 1px solid rgb(238, 238, 238);
+	padding: 0;
+	margin: 5px;
+}
+
+fieldset.ds-form-list ol {
+	list-style-type: none;
+}
+
+
+
+/*******************************
+ *   Rules for specific pages  *
+ *******************************/
+
+/** Navigation bar for browse-by pages */
+form.navigation {
+	max-width: 750px;
+	margin: 0 auto 0 auto;
+	border: 1px solid gray;
+	background-color: rgb(238, 238, 238);
+}
+
+form.navigation p {
+	text-align: center;
+}
+
+/* System wide alerts */
+div#ds-system-wide-alert {
+    background-color: rgb(255,240,220);
+    border: 2px solid rgb(213,80,40);
+    padding: 6px;
+	margin: 10px 30px 10px 30px;
+    color: rgb(213, 80, 40);
+}
+
+/* License text, used during submission to show a license */
+div.license-text {
+	border: 1px solid #666;
+	background-color: #EEE;
+	padding: 20px;
+	margin: 20px;
+	margin-top: 5px;
+	font-family: monospace;
+	font-size: 125%;
+}
+
+/** System generated notices, typicaly these follow any action in the administrative section. */
+div.notice {
+	background-color: rgb(238, 238, 238);
+	border: 2px solid gray;
+	padding: 6px;
+	text-align: center;
+	margin: 10px 30px 10px 30px;
+}
+
+
+/** Community & Collection homepage */
+
+div.search-browse {
+	border: 2px solid gray;
+	background-color: rgb(238,238,238);
+	padding: 0px 5px 0px 10px;
+	width: 350px;
+}
+
+div.detail-view div.ds-logo-wrapper {
+	text-align: right;
+	
+	margin-right: 30px;
+	margin: -150px 30px 0px auto;
+}
+
+div.detail-view p {
+	clear: both;
+}
+
+p.copyright-text {
+	margin-top: 30px;
+	width: 90%;
+	font-style: italic;
+	text-align: center;
+	
+	margin: 30px auto 0px auto;
+}
+
+
+

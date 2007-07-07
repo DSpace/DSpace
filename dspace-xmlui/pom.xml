@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-xmlui</artifactId>
+   <packaging>pom</packaging>
+   <name>DSpace XMLUI (Manakin)</name>
+   <version>1.5-SNAPSHOT</version>
+   <url>http://www.dspace.org</url>
+   <description>DSpace web-based user interface based upon Apache Cocoon.</description>
+
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace-pom</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <relativePath>../dspace-pom</relativePath>
+   </parent>
+
+   <scm>
+      <connection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/
+      </url>
+   </scm>
+
+   <distributionManagement>
+      <site>
+         <id>website</id>
+         <url>
+            http://projects.dspace.org/dspace-xmlui/
+         </url>
+      </site>
+   </distributionManagement>
+
+   <modules>
+      <module>dspace-xmlui-wing/</module>
+      <module>dspace-xmlui-api/</module>
+      <module>dspace-xmlui-webapp/</module>
+   </modules>
+
+   <dependencies>
+
+   </dependencies>
+
+</project>
+

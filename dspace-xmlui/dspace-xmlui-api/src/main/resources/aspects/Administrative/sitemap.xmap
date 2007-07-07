@@ -1,0 +1,800 @@
+<?xml version="1.0"?>
+<!--
+  sitemap.xmap
+
+  Version: $Revision: 1.1 $
+ 
+  Date: $Date: 2005/10/18 21:36:46 $
+ 
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+ 
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+ 
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+ 
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+ 
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+ 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+-->
+
+<!-- 
+
+The administrative aspect is responsible for all the features nessasary 
+to administer DSpace. 
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    
+    <map:components>
+
+		<map:transformers>
+			<map:transformer name="ManageEPeopleMain" src="org.dspace.app.xmlui.aspect.administrative.eperson.ManageEPeopleMain"/>
+			<map:transformer name="AddEPersonForm" src="org.dspace.app.xmlui.aspect.administrative.eperson.AddEPersonForm"/>
+			<map:transformer name="EditEPersonForm" src="org.dspace.app.xmlui.aspect.administrative.eperson.EditEPersonForm"/>
+			<map:transformer name="DeleteEPeopleConfirm" src="org.dspace.app.xmlui.aspect.administrative.eperson.DeleteEPeopleConfirm"/>
+			
+			<map:transformer name="ManageGroupsMain" src="org.dspace.app.xmlui.aspect.administrative.group.ManageGroupsMain"/>
+			<map:transformer name="EditGroupForm" src="org.dspace.app.xmlui.aspect.administrative.group.EditGroupForm"/>
+			<map:transformer name="DeleteGroupsConfirm" src="org.dspace.app.xmlui.aspect.administrative.group.DeleteGroupsConfirm"/>
+			
+			<map:transformer name="MetadataRegistryMain" src="org.dspace.app.xmlui.aspect.administrative.registries.MetadataRegistryMain"/>
+			<map:transformer name="EditMetadataSchema" src="org.dspace.app.xmlui.aspect.administrative.registries.EditMetadataSchema"/>
+			<map:transformer name="DeleteMetadataSchemaConfirm" src="org.dspace.app.xmlui.aspect.administrative.registries.DeleteMetadataSchemaConfirm"/>
+			<map:transformer name="DeleteMetadataFieldsConfirm" src="org.dspace.app.xmlui.aspect.administrative.registries.DeleteMetadataFieldsConfirm"/>
+			<map:transformer name="MoveMetadataFields" src="org.dspace.app.xmlui.aspect.administrative.registries.MoveMetadataFields"/>
+			
+			<map:transformer name="FormatRegistryMain" src="org.dspace.app.xmlui.aspect.administrative.registries.FormatRegistryMain"/>
+			<map:transformer name="EditBitstreamFormat" src="org.dspace.app.xmlui.aspect.administrative.registries.EditBitstreamFormat"/>
+			<map:transformer name="DeleteBitstreamFormatsConfirm" src="org.dspace.app.xmlui.aspect.administrative.registries.DeleteBitstreamFormatsConfirm"/>
+			
+			<map:transformer name="FindItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.FindItemForm"/>
+			<map:transformer name="EditItemStatusForm" src="org.dspace.app.xmlui.aspect.administrative.item.EditItemStatusForm"/>
+			<map:transformer name="ViewItem" src="org.dspace.app.xmlui.aspect.administrative.item.ViewItem"/>
+			<map:transformer name="EditItemBitstreamsForm" src="org.dspace.app.xmlui.aspect.administrative.item.EditItemBitstreamsForm"/>
+			<map:transformer name="EditItemMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.item.EditItemMetadataForm"/>
+			<map:transformer name="ConfirmItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.ConfirmItemForm"/>
+			<map:transformer name="AddBitstreamForm" src="org.dspace.app.xmlui.aspect.administrative.item.AddBitstreamForm"/>
+			<map:transformer name="EditBitstreamForm" src="org.dspace.app.xmlui.aspect.administrative.item.EditBitstreamForm"/>
+			<map:transformer name="DeleteBitstreamsConfirm" src="org.dspace.app.xmlui.aspect.administrative.item.DeleteBitstreamsConfirm"/>
+			
+			<map:transformer name="MapperMain" src="org.dspace.app.xmlui.aspect.administrative.mapper.MapperMain"/>
+			<map:transformer name="BrowseItemForm" src="org.dspace.app.xmlui.aspect.administrative.mapper.BrowseItemForm"/>
+			<map:transformer name="SearchItemForm" src="org.dspace.app.xmlui.aspect.administrative.mapper.SearchItemForm"/>
+			
+			<map:transformer name="EditCollectionMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.collection.EditCollectionMetadataForm"/>
+			<map:transformer name="AssignCollectionRoles" src="org.dspace.app.xmlui.aspect.administrative.collection.AssignCollectionRoles"/>
+			<map:transformer name="DeleteCollectionRoleConfirm" src="org.dspace.app.xmlui.aspect.administrative.collection.DeleteCollectionRoleConfirm"/>
+			<map:transformer name="DeleteCollectionConfirm" src="org.dspace.app.xmlui.aspect.administrative.collection.DeleteCollectionConfirm"/>
+			<map:transformer name="CreateCollectionForm" src="org.dspace.app.xmlui.aspect.administrative.collection.CreateCollectionForm"/>
+			
+			<map:transformer name="EditCommunityMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.community.EditCommunityMetadataForm"/>
+			<map:transformer name="DeleteCommunityConfirm" src="org.dspace.app.xmlui.aspect.administrative.community.DeleteCommunityConfirm"/>
+			<map:transformer name="CreateCommunityForm" src="org.dspace.app.xmlui.aspect.administrative.community.CreateCommunityForm"/>
+			
+			<map:transformer name="AuthorizationMain" src="org.dspace.app.xmlui.aspect.administrative.authorization.AuthorizationMain"/>
+			<map:transformer name="EditContainerPolicies" src="org.dspace.app.xmlui.aspect.administrative.authorization.EditContainerPolicies"/>
+			<map:transformer name="EditItemPolicies" src="org.dspace.app.xmlui.aspect.administrative.authorization.EditItemPolicies"/>
+			<map:transformer name="AdvacedAuthorizationsForm" src="org.dspace.app.xmlui.aspect.administrative.authorization.AdvacedAuthorizationsForm"/>
+			<map:transformer name="EditPolicyForm" src="org.dspace.app.xmlui.aspect.administrative.authorization.EditPolicyForm"/>
+			<map:transformer name="DeletePoliciesConfirm" src="org.dspace.app.xmlui.aspect.administrative.authorization.DeletePoliciesConfirm"/>
+
+			<map:transformer name="NotAuthorized" src="org.dspace.app.xmlui.aspect.administrative.NotAuthorized"/>			
+			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.administrative.Navigation"/>
+			<map:transformer name="SystemwideAlerts" src="org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts"/>
+			<map:transformer name="ControlPanel" src="org.dspace.app.xmlui.aspect.administrative.ControlPanel" />
+		</map:transformers>
+		
+		<map:matchers default="wildcard">
+			<map:matcher name="requestParameterWild"
+				src="org.apache.cocoon.matching.WildcardRequestParameterMatcher"/>
+		</map:matchers>
+				
+		
+    	<map:actions>
+    		<map:action name="ControlPanelAction" src="org.dspace.app.xmlui.aspect.administrative.ControlPanelAction" />
+    	</map:actions>		
+		
+		<map:selectors>
+    		<map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
+    	</map:selectors>
+    	
+    </map:components>
+    
+	<map:flow language="javascript">
+		<map:script src="administrative.js"/>
+	</map:flow>
+    
+	<map:pipelines>
+		<map:pipeline>
+			
+			<!-- Flow Entry points -->
+			
+			<map:select type="AuthenticatedSelector">
+				<map:when test="eperson">
+					<!--
+						This is the general entry / resume point for the 
+						management of all epeople.
+						-->
+					<map:match pattern="admin/epeople">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:call function="startManageEPeople"/>
+					</map:match>
+								
+					<!--
+						This is the general entry / resume point for the 
+						managment of all groups.
+						-->
+					<map:match pattern="admin/groups">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:call function="startManageGroups"/>
+					</map:match>
+					
+					<!--
+						This is the general entry / resume point for the 
+						management of all metadata fields and schemas. 
+						-->
+					<map:match pattern="admin/metadata-registry">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:call function="startManageMetadataRegistry"/>
+					</map:match>
+				
+					<!--
+						This is the general entry / resume point for the
+						management of all bitstream formats
+						-->
+					<map:match pattern="admin/format-registry">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:call function="startManageFormatRegistry"/>
+					</map:match>
+					
+					
+					<!--
+						This is the general entry / resume point for the
+						edit item pages
+					-->
+					<map:match pattern="admin/item">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:match type="request" pattern="itemID">
+							<map:call function="startEditItem"/>
+						</map:match>
+						<map:call function="startManageItems"/>
+					</map:match>
+					
+					
+					<!--
+						This is the general entry / resume point for the
+						edit item pages
+					-->
+					<map:match pattern="admin/mapper">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:match type="request" pattern="collectionID">
+							<map:call function="startMapItems"/>
+						</map:match>
+					</map:match>
+					
+					<!--
+						These are the general entry / resume points for the
+						editing of communities and collections pages
+					-->
+					<map:match pattern="admin/collection">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<!-- if arriving here to create a collection -->
+						<map:match type="request" pattern="createNew">
+							<map:match type="request" pattern="communityID">
+								<map:call function="startCreateCollection"/>
+							</map:match>
+						</map:match>
+						<!-- editing a collection -->
+						<map:match type="request" pattern="collectionID">
+							<map:call function="startEditCollection"/>
+						</map:match>
+					</map:match>
+					
+					
+					<map:match pattern="admin/community">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<!-- Creating a sub-community if a communityID is given, or a top-level community otherwise -->
+						<map:match type="request" pattern="createNew">
+							<map:match type="request" pattern="communityID">
+								<map:call function="startCreateCommunity"/>
+							</map:match>
+							<map:call function="startCreateCommunity"/>
+						</map:match>
+						<!-- editing an existing community -->
+						<map:match type="request" pattern="communityID">
+							<map:call function="startEditCommunity"/>
+						</map:match>
+					</map:match>
+					
+					
+		
+		
+					<!--
+						This is the general entry / resume point for the 
+						managment of all authorizations.
+						-->
+					<map:match pattern="admin/authorize">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:call function="startManageAuthorizations"/>
+					</map:match>
+				</map:when>
+			</map:select>
+						
+			<map:generate/>
+			<map:transform type="SystemwideAlerts"/>
+			<map:transform type="Navigation"/>
+		    
+		    <map:select type="AuthenticatedSelector">
+		        <map:when test="eperson">
+		        	
+		        	<!-- Flow pages
+		        	
+		        		These pages may only be reached through a flow script. While typicaly all 
+		        		the user sees in their url bar is a short url like /admin/epeople or 
+		        		/admin/groups, in reality there is another url being used. The flow scripts 
+		        		always operate on these simple url, but once the particular state is determined 
+		        		an distinquising part is appended to the url for the particular state. Below are 
+		        		all those url.
+		        		-->
+		        	<map:match type="WildcardParameterMatcher" pattern="true">
+		        		<map:parameter name="parameter-name" value="flow"/>
+		        		<map:parameter name="flow" value="{flow-attribute:flow}"/>
+		        		
+		        		
+		        	<!-- General Notices
+		        		
+		        			Sometimes notices are generated by flow parameters that are not tied to 
+		        			the specific state. In this case several flow-attributes are created that 
+		        			describe the notice, if they are present then we add them to the DRI document 
+		        			before all other flow pages.
+		        			-->
+		        		<map:match type="WildcardParameterMatcher" pattern="true">
+		        			<map:parameter name="parameter-name" value="notice"/>
+		        			<map:parameter name="notice" value="{flow-attribute:notice}"/>
+			        		<map:transform type="notice">
+			        			<map:parameter name="outcome" value="{flow-attribute:outcome}"/>
+			        			<map:parameter name="header" value="{flow-attribute:header}"/>
+			        			<map:parameter name="message" value="{flow-attribute:message}"/>
+			        			<map:parameter name="characters" value="{flow-attribute:characters}"/>
+			        		</map:transform>
+			        	</map:match>
+		        		
+		        		
+		        		<map:match pattern="admin/not-authorized">
+		        			<map:transform type="NotAuthorized"/>
+		        		</map:match>
+		        		
+		        		
+		        	<!-- EPeople management pages -->
+		        		
+		        		
+		        		<!-- 
+		        			The main eperson page allows for seaching of epeople and selecting 
+		        			them for editing or deletion.
+		        			-->
+		        		<map:match pattern="admin/epeople/main">
+		        			<map:transform type="ManageEPeopleMain">
+		        				<map:parameter name="query" value="{flow-attribute:query}"/>
+		        				<map:parameter name="page" value="{flow-attribute:page}"/>
+		        				<map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			The add eperson page allows the user to enter metadata about 
+		        			a yet-to-be-created eperson. Once completed then an eperson is
+		        			created.
+		        			-->
+		        		<map:match pattern="admin/epeople/add">
+		        			<map:transform type="AddEPersonForm">
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			The edit eperson page allows for an eperson's metadata be be edited.
+		        			-->
+		        		<map:match pattern="admin/epeople/edit">
+		        			<map:transform type="EditEPersonForm">
+		        				<map:parameter name="epersonID" value="{flow-attribute:epersonID}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			The delete eperson page just lists epeople that are about to be deleted.
+		        			-->
+		        		<map:match pattern="admin/epeople/delete">
+		        			<map:transform type="DeleteEPeopleConfirm">
+		        				<map:parameter name="epeopleIDs" value="{flow-attribute:epeopleIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		
+		        	<!-- Group management pages -->
+		        		
+		        		
+		        		<!--
+		        			The main group management page allows for groups to be searched, browsed, 
+		        			and selected for editing or deletion.
+		        			-->
+		        		<map:match pattern="admin/group/main">
+		        			<map:transform type="ManageGroupsMain">
+		        				<map:parameter name="query" value="{flow-attribute:query}"/>
+		        				<map:parameter name="page" value="{flow-attribute:page}"/>
+		        				<map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			The edit group form shows a group's data and allows the user to
+		        			edit the group's membership, edit it's name, search for new epeople/groups
+		        			to add as members. It also serves as the new group page unlike epeople where 
+		        			there are separate pages.
+		        			-->
+		        		<map:match pattern="admin/group/edit">
+		        			<map:transform type="EditGroupForm">
+		        				<map:parameter name="groupID" value="{flow-attribute:groupID}"/>
+		        				<map:parameter name="groupName" value="{flow-attribute:groupName}"/>
+		        				<map:parameter name="memberEPeopleIDs" value="{flow-attribute:memberEPeopleIDs}"/>
+		        				<map:parameter name="memberGroupIDs" value="{flow-attribute:memberGroupIDs}"/>
+		        				<map:parameter name="highlightEPersonID" value="{flow-attribute:highlightEPersonID}"/>
+		        				<map:parameter name="highlightGroupID" value="{flow-attribute:highlightGroupID}"/>
+		        				<map:parameter name="query" value="{flow-attribute:query}"/>
+		        				<map:parameter name="page" value="{flow-attribute:page}"/>
+		        				<map:parameter name="type" value="{flow-attribute:type}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			The delete group page lists all the yet-to-be-deleted pages, if the user 
+		        			clicks confirm deletetion then the groups are removed.
+		        			-->
+		        		<map:match pattern="admin/group/delete">
+		        			<map:transform type="DeleteGroupsConfirm">
+		        				<map:parameter name="groupIDs" value="{flow-attribute:groupIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+
+
+					<!-- Metadata Registry pages -->
+		        		
+		        		<!--
+		        			The main page for the metadata registry. It lists all available schemas
+		        			allowing the user to edit or delete them and also add new ones.
+		        			-->
+		        		<map:match pattern="admin/metadata-registry/main">
+		        			<map:transform type="MetadataRegistryMain">
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Confirm the deletition of metadata schemas
+		        			-->
+		        		<map:match pattern="admin/metadata-registry/delete-schemas">
+		        			<map:transform type="DeleteMetadataSchemaConfirm">
+		        				<map:parameter name="schemaIDs" value="{flow-attribute:schemaIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Edit a single schema, adding, deleteing, or updating metadata fields within
+		        			the schema. The user can also select some fields to be moved to other
+		        			schemas.
+		        			-->
+		        		<map:match pattern="admin/metadata-registry/edit-schema">
+		        			<map:transform type="EditMetadataSchema">
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        				<map:parameter name="schemaID" value="{flow-attribute:schemaID}"/>
+		        				<map:parameter name="updateID" value="{flow-attribute:updateID}"/>
+		        				<map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Confirm the deletetion of metadata fields
+		        			-->
+		        		<map:match pattern="admin/metadata-registry/delete-fields">
+		        			<map:transform type="DeleteMetadataFieldsConfirm">
+		        				<map:parameter name="fieldIDs" value="{flow-attribute:fieldIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Confirm the move of metadata fields to another schema.
+		        			-->
+		        		<map:match pattern="admin/metadata-registry/move-fields">
+		        			<map:transform type="MoveMetadataFields">
+		        				<map:parameter name="fieldIDs" value="{flow-attribute:fieldIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        	<!-- Format Registry pages -->
+		        		
+		        		<!--
+		        			The main entry point for the bitstream format registry. This page lists
+		        			all available formats allowing the user to add, delete, or update formats.
+		        			-->
+		        		<map:match pattern="admin/format-registry/main">
+		        			<map:transform type="FormatRegistryMain">
+		        				<map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Edit a single bitstream format.
+		        			-->
+		        		<map:match pattern="admin/format-registry/edit">
+		        			<map:transform type="EditBitstreamFormat">
+		        				<map:parameter name="formatID" value="{flow-attribute:formatID}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Confirm the deletetion of formats
+		        			-->
+		        		<map:match pattern="admin/format-registry/delete">
+		        			<map:transform type="DeleteBitstreamFormatsConfirm">
+		        				<map:parameter name="formatIDs" value="{flow-attribute:formatIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		
+		        	<!-- Edit item pages -->
+		        		
+		        		<!--
+		        			Allow the user to find an item by it's handle or internal ID.
+		        			-->
+		        		<map:match pattern="admin/item/find">
+		        			<map:transform type="FindItemForm">
+		        				<map:parameter name="identifier" value="{flow-attribute:identifier}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			
+		        			-->
+		        		<map:match pattern="admin/item/status">
+		        			<map:transform type="EditItemStatusForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<map:match pattern="admin/item/bitstreams">
+		        			<map:transform type="EditItemBitstreamsForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<map:match pattern="admin/item/metadata">
+		        			<map:transform type="EditItemMetadataForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<map:match pattern="admin/item/view_item">
+		        			<map:transform type="ViewItem">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Upload a new bitstream
+		        			-->
+		        		<map:match pattern="admin/item/add-bitstream">
+		        			<map:transform type="AddBitstreamForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Edit a bitstream's metadata
+		        			-->
+		        		<map:match pattern="admin/item/edit-bitstream">
+		        			<map:transform type="EditBitstreamForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="bitstreamID" value="{flow-attribute:bitstreamID}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<map:match pattern="admin/item/delete-bitstreams">
+		        			<map:transform type="DeleteBitstreamsConfirm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="bitstreamIDs" value="{flow-attribute:bitstreamIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Confirm the item's deletition
+		        			-->
+		        		<map:match pattern="admin/item/delete">
+		        			<map:transform type="ConfirmItemForm">
+		        				<map:parameter name="confirm" value="delete"/>
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Confirm the item's withdraw
+		        			-->
+		        		<map:match pattern="admin/item/withdraw">
+		        			<map:transform type="ConfirmItemForm">
+		        				<map:parameter name="confirm" value="withdraw"/>
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			Confirm the item's reinstation
+		        			-->
+		        		<map:match pattern="admin/item/reinstate">
+		        			<map:transform type="ConfirmItemForm">
+		        				<map:parameter name="confirm" value="reinstate"/>
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        	<!-- Item Mapper -->
+		        	
+		        		<map:match pattern="admin/mapper/main">
+		        			<map:transform type="MapperMain">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<map:match pattern="admin/mapper/search">
+		        			<map:transform type="SearchItemForm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        				<map:parameter name="query" value="{flow-attribute:query}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<map:match pattern="admin/mapper/browse">
+		        			<map:transform type="BrowseItemForm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        	<!-- Collection edit pages -->
+		        		
+		        		<!-- Main metadata edit form, accessible by the collection admin -->
+		        		<map:match pattern="admin/collection/editMetadata">
+		        			<map:transform type="EditCollectionMetadataForm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- Submissions, workflows, and authorization options, accessible by the global admin -->
+		        		<map:match pattern="admin/collection/assignRoles">
+		        			<map:transform type="AssignCollectionRoles">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- Confirmation screen for deleteing one of the standard authorization groups -->
+		        		<map:match pattern="admin/collection/deleteRole">
+		        			<map:transform type="DeleteCollectionRoleConfirm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        				<map:parameter name="role" value="{flow-attribute:role}"/>
+		        				<map:parameter name="groupID" value="{flow-attribute:groupID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- Confirmation screen for deleting a collection -->
+		        		<map:match pattern="admin/collection/delete">
+		        			<map:transform type="DeleteCollectionConfirm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- Collection creation form to enter the initial set of metadata -->
+		        		<map:match pattern="admin/collection/createCollection">
+		        			<map:transform type="CreateCollectionForm">
+		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+		        			</map:transform>
+		        		</map:match> 		
+		        		
+		        		
+		        		
+		        		
+
+					<!-- Community edit pages -->
+						
+						<!-- Main metadata edit form, accessible by the community admin -->
+						<map:match pattern="admin/community/editMetadata">
+		        			<map:transform type="EditCommunityMetadataForm">
+		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- Confirmation screen for deleting a community -->
+		        		<map:match pattern="admin/community/delete">
+		        			<map:transform type="DeleteCommunityConfirm">
+		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+		        			</map:transform>
+		        		</map:match>
+						
+						<!-- Community creation form to enter the initial set of metadata -->
+		        		<map:match pattern="admin/community/createCommunity">
+		        			<map:transform type="CreateCommunityForm">
+		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+		        			</map:transform>
+		        		</map:match>
+      		
+      		
+		        		
+		        	<!-- Authorization pages -->
+		        		
+		        		
+		        		<!-- 
+		        			The main authorizations page allows the user to select a community/collection or
+		        			search for an item in order to edit their policies. It also provides a link to 
+		        			the advanced/wildcard search page.
+		        			-->
+		        		<map:match pattern="admin/authorize/main">
+		        			<map:transform type="AuthorizationMain">
+		        				<map:parameter name="query" value="{flow-attribute:query}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- 
+		        			This page presents the user with a list of existing policies for selected community
+		        			or collection and provides the options to add, edit, or delete those policies. 
+		        			-->
+		        		<map:match pattern="admin/authorize/container">
+		        			<map:transform type="EditContainerPolicies">
+		        				<map:parameter name="containerType" value="{flow-attribute:containerType}"/>
+		        				<map:parameter name="containerID" value="{flow-attribute:containerID}"/>
+		        				<map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- 
+		        			This page presents the user with a list of existing policies for the selected
+		        			item, its bundles and bitstreams, and provides the options to add, edit, or 
+		        			delete those policies. 
+		        			-->
+		        		<map:match pattern="admin/authorize/item">
+		        			<map:transform type="EditItemPolicies">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- 
+		        			The advanced/wildcard policy tool allows the user to create sets of policies
+		        			that give one or more groups at a time permissions to do the specified action
+		        			to items or bitstreams or one of more communities.   
+		        			-->
+		        		<map:match pattern="admin/authorize/advanced">
+		        			<map:transform type="AdvacedAuthorizationsForm"/>
+		        		</map:match>
+		        		
+		        		<!-- 
+		        			The page to edit a specified (or newly created) policy, namely what groups it 
+		        			applies to and what actions those groups can perform.  
+		        			-->
+		        		<map:match pattern="admin/authorize/edit">
+		        			<map:transform type="EditPolicyForm">
+		        				<map:parameter name="objectType" value="{flow-attribute:objectType}"/>
+		        				<map:parameter name="objectID" value="{flow-attribute:objectID}"/>
+		        				<map:parameter name="policyID" value="{flow-attribute:policyID}"/>
+		        				<map:parameter name="groupID" value="{flow-attribute:groupID}"/>
+		        				<map:parameter name="actionID" value="{flow-attribute:actionID}"/>
+		        				<map:parameter name="query" value="{flow-attribute:query}"/>
+		        				<map:parameter name="page" value="{flow-attribute:page}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- 
+		        			The page to edit a specific policy, namely what groups it applies to and what
+		        			actions those groups can perform.  
+		        			-->
+		        		<map:match pattern="admin/authorize/delete">
+		        			<map:transform type="DeletePoliciesConfirm">
+		        				<map:parameter name="policyIDs" value="{flow-attribute:policyIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        	</map:match> <!-- if flow -->
+            	</map:when>
+		    	<map:otherwise>
+		    		<map:match pattern="admin/epeople">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    		<map:match pattern="admin/groups">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    		<map:match pattern="admin/metadata-registry">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    		<map:match pattern="admin/format-registry">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    		<map:match pattern="admin/item">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    		<map:match pattern="admin/mapper">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    		<map:match pattern="admin/collection">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    		<map:match pattern="admin/community">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    		<map:match pattern="admin/authorize">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    	</map:otherwise>
+            </map:select>
+            
+			<map:match pattern="admin/panel">
+				<map:select type="AuthenticatedSelector">
+					<map:when test="administrator">
+						<map:act type="ControlPanelAction">
+							<map:transform type="SystemwideAlerts"/>
+						</map:act>
+						<map:transform type="ControlPanel" />
+						<map:serialize type="xml"/>
+					</map:when>
+					
+					<map:otherwise>
+						<map:act type="StartAuthentication"/>
+					</map:otherwise>
+				</map:select>
+			</map:match>
+		    
+			<map:serialize type="xml"/>
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>

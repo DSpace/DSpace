@@ -1,0 +1,177 @@
+/*
+  IE Specific stylesheets
+
+  style.css
+
+  Version: $Revision: 1.2 $
+ 
+  Date: $Date: 2006/01/13 23:04:54 $
+ 
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+ 
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+ 
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+ 
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+ 
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+ 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+*/
+
+div#ds-body {
+	margin-top: 12px;
+}
+
+div.ds-option-set {
+	padding: 30px 2px 3px 2px;
+	width: 133px;
+	margin: -10px 0px 0px 0px;
+}
+
+div#ds-options h3 {
+	position: relative;
+	top: 18px;
+	font-size: 130%; 
+}
+
+div#ds-options h4 {
+    font-size: 110%;
+}
+
+div#ds-search-option input {
+	font-size: 90%;
+}
+
+div#ds-search-option input.ds-text-field {
+	width: 70%;
+	margin-left: -5px;
+	padding: 0;
+	top: -2px;
+}
+
+form#ds-search-form {
+    margin-bottom: 5px;
+}
+
+div#ds-search-option input.ds-button-field {
+	width: auto;
+	height: 20px;
+	margin: 0px;
+	padding-left: 2px;
+	padding-right: 2px;
+	position: relative;
+	top: -1px;
+	left: 10px;
+}
+
+div#ds-search-option a {
+	margin-top: -20px;
+	padding: 0;
+}
+
+div#ds-search-option label {
+	padding-left: 10px;
+}
+
+
+input.ds-button-field {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+
+ul.ds-progress-list li.button input.ds-button-field {
+	font-size: smaller;
+	padding: 1px;
+}
+
+/* admin tabs */
+form.administrative{
+  border: 1px solid rgb(240, 240, 210);
+  border-top: 0px;
+  width: inherit;
+}
+
+form.administrative fieldset{
+  margin: 7px;
+  width: auto;
+}
+form.administrative h3{
+  margin: 7px;
+}
+form.administrative table{
+  margin: 7px;
+  width: auto;
+}
+
+
+form#administrative_item_FindItemForm_div_find-item{
+  border: 0px;
+  margin-left: 0px;
+}
+
+ul.horizontal
+{
+font-weight: bold;
+list-style-type: none;
+padding: 0px;
+padding-left: 0px;
+padding-bottom: 24px;
+border-bottom: 1px solid rgb(240, 240, 210);
+border-left: 1px solid white;
+border-right: 1px solid white;
+margin: 0px;
+margin-left: -1px;
+margin-right: -1px;
+width: inherit;
+}
+
+ul.horizontal li
+{
+float: left;
+height: 21px;
+background-color: rgb(252, 252, 232);
+margin: 2px 2px 0px 2px;
+border: 1px solid rgb(240, 240, 210);
+}
+
+
+ul.horizontal a
+{
+float: left;
+display: block;
+text-decoration: none;
+padding: 4px;
+}
+
+ul.horizontal a:hover { background: white; text-decoration: underline;}
+
+ul.horizontal li span.bold a
+{
+border-bottom: 1px solid white;
+background-color: white;
+}
+
+ul.horizontal li span.bold a { color: black; }

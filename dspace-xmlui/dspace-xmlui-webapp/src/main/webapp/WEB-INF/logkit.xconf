@@ -1,0 +1,197 @@
+<?xml version="1.0"?>
+<!--
+  Copyright 1999-2004 The Apache Software Foundation
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<logkit>
+  <factories>
+    <factory type="priority-filter" class="org.apache.avalon.excalibur.logger.factory.PriorityFilterTargetFactory"/>
+    <factory type="servlet" class="org.apache.avalon.excalibur.logger.factory.ServletTargetFactory"/>
+    <factory type="cocoon" class="org.apache.cocoon.util.log.CocoonTargetFactory"/>
+    <factory type="lf5" class="org.apache.avalon.excalibur.logger.factory.LF5TargetFactory"/>
+  </factories>
+
+  <targets>
+
+    <!-- To enable the LogFactor5 graphical logkit browser, replace the cocoon factory 
+         below with the following.
+    <lf5 id="core"/>
+    -->
+
+    <cocoon id="core">
+      <filename>${context-root}/WEB-INF/logs/core.log</filename>
+      <format type="cocoon">
+        %7.7{priority} %{time}   [%{category}] (%{uri}) %{thread}/%{class:short}: %{message}\n%{throwable}
+      </format>
+      <!--
+        append=false: Will override existing log files on Cocoon startup
+        append=true: Will append to the existing log files
+      -->
+      <append>false</append>
+      <!--
+        rotation: allows you to rotate log files one they meet certain
+                  criteria. In example below, files are rotated once they
+                  are one hour old or bigger than 100 Mb.
+
+      <rotation type="revolving" init="1" max="4">
+        <or>
+          <size>100m</size>
+          <time>01:00:00</time>
+        </or>
+      </rotation>
+      -->
+    </cocoon>
+
+    <cocoon id="sitemap">
+      <filename>${context-root}/WEB-INF/logs/sitemap.log</filename>
+      <format type="cocoon">
+        %7.7{priority} %{time}   [%{category}] (%{uri}) %{thread}/%{class:short}: %{message}\n%{throwable}
+      </format>
+      <append>false</append>
+    </cocoon>
+
+    <cocoon id="handled-errors">
+      <filename>${context-root}/WEB-INF/logs/handled-errors.log</filename>
+      <format type="cocoon">
+        %7.7{priority} %{time}   [%{category}] (%{uri}) %{thread}/%{class:short}: %{message}\n%{throwable}
+      </format>
+      <append>false</append>
+    </cocoon>
+
+    <cocoon id="access">
+      <filename>${context-root}/WEB-INF/logs/access.log</filename>
+      <format type="cocoon">
+        %7.7{priority} %{time}   [%{category}] (%{uri}) %{thread}/%{class:short}: %{message}\n%{throwable}
+      </format>
+      <append>false</append>
+    </cocoon>
+
+    <!-- The logger for the flow layer -->
+    <cocoon id="flow">
+      <filename>${context-root}/WEB-INF/logs/flow.log</filename>
+      <format type="cocoon">
+        %7.7{priority} %{time}   [%{category}] (%{uri}) %{thread}/%{class:short}: %{message}\n%{throwable}
+      </format>
+      <append>false</append>
+    </cocoon>
+
+    <cocoon id="deprecation">
+      <filename>${context-root}/WEB-INF/logs/deprecation.log</filename>
+      <format type="cocoon">%7.7{priority} %{time} [%{category}] (%{uri}) %{thread}/%{class:short}: %{message}\n</format>
+      <append>true</append>
+    </cocoon>
+
+    <!--
+      This log file gets only messages with log level ERROR and below.
+    -->
+    <priority-filter id="error" log-level="ERROR">
+      <cocoon>
+        <filename>${context-root}/WEB-INF/logs/error.log</filename>
+        <format type="cocoon">
+          %7.7{priority} %{time}   [%{category}] (%{uri}) %{thread}/%{class:short}: %{message}\n%{throwable}
+        </format>
+        <append>false</append>
+      </cocoon>
+    </priority-filter>
+  </targets>
+
+  <categories>
+    <!--
+      log-level: One of DEBUG, INFO, WARN, ERROR, FATAL_ERROR.
+      Log level could be different for every category and subcategory.
+
+      Not all subcategories are defined in this file. Not defined
+      subcategories will be created automatically inheriting settings
+      of the parent subcategory.
+      When defining subcategory manually, it is required to specify log
+      targets, because they are not inherited in this case.
+    -->
+    <category name="core" log-level="ERROR">
+      <!-- Startup component manager logger -->
+      <category name="startup" log-level="ERROR">
+        <log-target id-ref="core"/>
+        <log-target id-ref="error"/>
+      </category>
+
+      <category name="roles" log-level="ERROR">
+        <log-target id-ref="core"/>
+        <log-target id-ref="error"/>
+      </category>
+
+      <category name="instrument" log-level="ERROR">
+        <category name="values" log-level="ERROR">
+          <log-target id-ref="core"/>
+          <log-target id-ref="error"/>
+        </category>
+        <log-target id-ref="core"/>
+        <log-target id-ref="error"/>
+      </category>
+
+      <!-- Cocoon component manager logger -->
+      <category name="manager" log-level="ERROR">
+        <log-target id-ref="core"/>
+        <log-target id-ref="error"/>
+      </category>
+
+      <!-- Cocoon cache and stores logger -->
+      <category name="store" log-level="ERROR">
+        <category name="janitor" log-level="ERROR">
+          <log-target id-ref="core"/>
+          <log-target id-ref="error"/>
+        </category>
+        <log-target id-ref="core"/>
+        <log-target id-ref="error"/>
+      </category>
+
+      <log-target id-ref="core"/>
+      <log-target id-ref="error"/>
+    </category>
+
+    <!--+
+        | This is the deprecation category. If this category is set to WARN
+        | the log will contain messages about deprecated stuff used by
+        | your application.
+        +-->
+    <category log-level="WARN" name="deprecation">
+      <log-target id-ref="deprecation"/>
+    </category>
+
+    <category name="sitemap" log-level="ERROR">
+      <log-target id-ref="sitemap"/>
+      <log-target id-ref="error"/>
+
+      <category name="handled-errors" log-level="ERROR">
+        <!-- Exceptions that will be handled by a sitemap errorhandler are
+             logged to this target. -->
+        <log-target id-ref="handled-errors"/>
+      </category>
+    </category>
+
+    <category name="access" log-level="ERROR">
+      <log-target id-ref="access"/>
+      <log-target id-ref="error"/>
+    </category>
+
+    <category name="flow" log-level="ERROR">
+      <log-target id-ref="flow"/>
+      <log-target id-ref="error"/>
+    </category>
+
+    <category name="" log-level="ERROR">
+      <log-target id-ref="core"/>
+      <log-target id-ref="error"/>
+    </category>
+  </categories>
+</logkit>
