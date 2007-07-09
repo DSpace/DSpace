@@ -4,4 +4,5 @@ Disallow: /browse-author
 Disallow: /items-by-author
 Disallow: /browse-date
 Disallow: /browse-subject
-Disallow: /browse-title
+# Uncomment the following line only if sitemaps.org or HTML sitemaps are used
+#Disallow: /browse-title
