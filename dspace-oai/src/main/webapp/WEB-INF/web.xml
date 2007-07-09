@@ -74,7 +74,7 @@
        other servlets. -->
   <servlet>
     <servlet-name>load-dspace-config</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.LoadDSpaceConfig</servlet-class>
+    <servlet-class>org.dspace.app.oai.LoadDSpaceOAIConfig</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
