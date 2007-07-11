@@ -6,7 +6,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-lni-client</artifactId>
    <packaging>jar</packaging>
-   <name>DSpace LNI Client</name>
+   <name>DSpace LNI :: CLI Client Application</name>
    <version>1.5-SNAPSHOT</version>
    <description>
       Example Client for working with DSpace LNI Service.
@@ -20,6 +20,18 @@
       <relativePath>..</relativePath>
    </parent>
 
+   <scm>
+      <connection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-client
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-client
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-lni/dspace-lni-client
+      </url>
+   </scm>
+   
    <build>
       <plugins>
          <plugin>

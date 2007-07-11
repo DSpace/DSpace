@@ -6,16 +6,16 @@
 	<groupId>org.dspace</groupId>
 	<artifactId>dspace-lni</artifactId>
 	<packaging>pom</packaging>
-	<name>DSpace LNI Modules</name>
+	<name>DSpace LNI</name>
 	<version>1.5-SNAPSHOT</version>
 	<description>DSpace Lightweight Network Interface Build Modules</description>
 	<url>http://www.dspace.org</url>
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-common</artifactId>
+      <artifactId>dspace-pom</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace-common</relativePath>
+      <relativePath>../dspace-pom</relativePath>
    </parent>
    
    <modules>

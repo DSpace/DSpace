@@ -6,7 +6,7 @@
 	<groupId>org.dspace</groupId>
 	<artifactId>dspace-lni-core</artifactId>
 	<packaging>jar</packaging>
-	<name>DSpace LNI Implementation</name>
+	<name>DSpace LNI :: Core Implementation</name>
 	<version>1.5-SNAPSHOT</version>
 	<description>DSpace Lightweight Network Interface</description>
 	<url>http://www.dspace.org</url>
@@ -17,8 +17,25 @@
       <version>1.5-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
-      
+
+   <scm>
+      <connection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-core
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-core
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-lni/dspace-lni-core
+      </url>
+   </scm>
+   
 	<dependencies>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+			<version>1.5-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>wsdl4j</groupId>
 			<artifactId>wsdl4j</artifactId>
