@@ -4,46 +4,15 @@
    </formats>
    <includeBaseDirectory>false</includeBaseDirectory>
  
-   <files>
-      <file>
-         <source>../dspace/config/log4j-handle-plugin.properties</source>
-         <outputDirectory>config</outputDirectory>
-         <filtered>true</filtered>
-      </file>
-      <file>
-         <source>../dspace/config/log4j.properties</source>
-         <outputDirectory>config</outputDirectory>
-         <filtered>true</filtered>
-      </file>
-      <file>
-         <source>../dspace/config/log4j.xml</source>
-         <outputDirectory>config</outputDirectory>
-         <filtered>true</filtered>
-      </file>
-      <file>
-         <source>../dspace/config/oaicat.properties</source>
-         <outputDirectory>config</outputDirectory>
-         <filtered>true</filtered>
-      </file>
-   </files>
-   
    <fileSets> 
       <fileSet>
-         <directory>${dspace.dir}</directory>
-         <outputDirectory>.</outputDirectory>
-         <includes>
-            <include>config/dspace.cfg</include>
-         </includes>
-      </fileSet>
-      <fileSet>
-         <directory>../dspace/src/main/config</directory>
+         <directory>src/main/config</directory>
          <outputDirectory>.</outputDirectory>
          <includes>
             <include>build.xml</include>
          </includes>
       </fileSet>
       <fileSet>
-         <directory>../dspace</directory>
          <outputDirectory>.</outputDirectory>
          <includes>
             <include>bin/**</include>
@@ -58,10 +27,6 @@
          </includes>
          <excludes>
             <exclude>src</exclude>
-            <exclude>config/log4j-handle-plugin.properties</exclude>
-            <exclude>config/log4j.properties</exclude>
-            <exclude>config/log4j.xml</exclude>
-            <exclude>config/oaicat.properties</exclude>
          </excludes>
       </fileSet>
    </fileSets>
@@ -71,7 +36,6 @@
          <outputDirectory>lib</outputDirectory>
          <unpack>false</unpack>
          <scope>runtime</scope>
-         <useTransitiveFiltering>true</useTransitiveFiltering>
       </dependencySet>
    </dependencySets>
 
@@ -80,6 +44,11 @@
          <includes>
             <include>*:jar</include>
          </includes>
+         <excludes>
+         	<exclude>org.dspace:dspace-xmlui-api</exclude>
+         	<exclude>org.dspace:dspace-xmlui-wing</exclude>
+         	<exclude>org.dspace:dspace-lni-core</exclude>
+         </excludes>
          <binaries>
             <includeDependencies>true</includeDependencies>
             <outputDirectory>lib</outputDirectory>
@@ -92,11 +61,11 @@
          </includes>
          <binaries>
             <includeDependencies>false</includeDependencies>
-            <outputDirectory>webapps</outputDirectory>
+            <outputDirectory>webapps/${artifactId}</outputDirectory>
             <outputFileNameMapping>
-               ${artifactId}.${extension}
+               ${artifactId}
             </outputFileNameMapping>
-            <unpack>false</unpack>
+            <unpack>true</unpack>
          </binaries>
       </moduleSet>
    </moduleSets>
