@@ -2202,6 +2202,44 @@
     
     
     
+    
+    <!-- The following options can be appended to the external metadata URL to request specific
+        sections of the METS document:
+        
+        sections:
+        
+        A comma seperated list of METS sections to included. The possible values are: "metsHdr", "dmdSec", 
+        "amdSec", "fileSec", "structMap", "structLink", "behaviorSec", and "extraSec". If no list is provided then *ALL*
+        sections are rendered.
+        
+        
+        dmdTypes:
+        
+        A comma seperated list of metadata formats to provide as descriptive metadata. The list of avaialable metadata
+        types is defined in the dspace.cfg, disseminationcrosswalks. If no formats are provided them DIM - DSpace 
+        Intermediate Format - is used.
+        
+        
+        amdTypes:
+        
+        A comma seperated list of metadata formats to provide administative metadata. DSpace does not currently
+        support this type of metadata.
+        
+        
+        fileGrpTypes:
+        
+        A comma seperated list of file groups to render. For DSpace a bundle is translated into a METS fileGrp, so
+        possible values are "THUMBNAIL","CONTENT", "METADATA", etc... If no list is provided then all groups are
+        rendered.
+        
+        
+        structTypes:
+        
+        A comma seperated list of structure types to render. For DSpace there is only one structType: LOGICAL. If this
+        is provided then the logical structType will be rendered, otherwise none will. The default operation is to
+        render all structure types.
+    -->
+    
     <!-- Then we resolve the reference tag to an external mets object --> 
     <xsl:template match="dri:reference" mode="summaryList">
         <xsl:variable name="externalMetadataURL">
@@ -2209,7 +2247,12 @@
             <xsl:value-of select="@url"/>
             <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
             <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+            <!-- An example of requesting a specific metadata standard (MODS and QDC crosswalks only work for items)->
+            <xsl:if test="@type='DSpace Item'">
+                <xsl:text>&amp;dmdTypes=DC</xsl:text>
+            </xsl:if>-->
         </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
         <li>
             <xsl:attribute name="class">
                 <xsl:text>ds-artifact-item </xsl:text>
@@ -2229,6 +2272,7 @@
             <xsl:value-of select="@url"/>
             <!-- No options selected, render the full METS document -->
         </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
         <li>
             <xsl:apply-templates select="document($externalMetadataURL)" mode="detailList"/>
             <xsl:apply-templates />
@@ -2241,6 +2285,7 @@
             <xsl:value-of select="@url"/>
             <!-- No options selected, render the full METS document -->
         </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
         <xsl:apply-templates select="document($externalMetadataURL)" mode="summaryView"/>
         <xsl:apply-templates />
     </xsl:template>  
@@ -2251,6 +2296,7 @@
             <xsl:value-of select="@url"/>
             <!-- No options selected, render the full METS document -->
         </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
         <xsl:apply-templates select="document($externalMetadataURL)" mode="detailView"/>
         <xsl:apply-templates />
     </xsl:template>  

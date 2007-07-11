@@ -156,7 +156,7 @@ div#ds-header a span#ds-header-logo {
     width: 200px;
 	height: 80px;
 	float: left;
-	background-image: url("dspace-blue.gif");
+	background-image: url("../images/dspace-blue.gif");
 	background-repeat: no-repeat;
 }
 
@@ -171,7 +171,7 @@ div#ds-header h1 {
 div#ds-header h2 {
     clear: both;
     height: 15px;
-    background-image: url("stripe.gif");
+    background-image: url("../images/stripe.gif");
     /*visibility: none;*/
     font-size: 0.001em; /* yeah it's still there but not really visible */
 }
@@ -259,17 +259,17 @@ div#ds-options div#artifactbrowser_Navigation_list_browse li {
 }
 
 div#ds-options div#artifactbrowser_Navigation_list_browse ul ul li {
-	list-style-image: url(arrow.gif);
+	list-style-image: url(../images/arrow.gif);
 	margin-left: 25px;
 }
 
 div#ds-options div#artifactbrowser_Navigation_list_account ul li {
-	list-style-image: url(arrow.gif);
+	list-style-image: url(../images/arrow.gif);
 	margin-left: 25px;
 }
 
 div#ds-options div#artifactbrowser_Navigation_list_context ul li {
-	list-style-image: url(arrow.gif);
+	list-style-image: url(../images/arrow.gif);
 	margin-left: 25px;
 }
 
@@ -326,7 +326,7 @@ div#ds-footer a span#ds-footer-logo {
     width: 250px;
 	height: 250px;
 	float: left;
-	background-image: url("manakin_logo.png");
+	background-image: url("../images/manakin_logo.png");
 	background-repeat: no-repeat;
 	margin: 5px;
 }
@@ -574,7 +574,7 @@ form.ds-interactive-div {
 }
 
 form.ds-interactive-div li.ds-form-item {
-	//display: block;
+	/*display: block;*/
 	padding: 2px 0;
 	width: 100%;
 }

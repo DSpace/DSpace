@@ -91,6 +91,8 @@ public abstract class AbstractAdapter
     public static final Namespace METS = new Namespace(METS_URI);
     public static final String XLINK_URI = "http://www.w3.org/TR/xlink/";
     public static final Namespace XLINK = new Namespace(XLINK_URI);
+    public static final String XSI_URI = "http://www.w3.org/2001/XMLSchema-instance";
+    public static final Namespace XSI = new Namespace(XSI_URI);
     public static final String DIM_URI = "http://www.dspace.org/xmlns/dspace/dim";
     public static final Namespace DIM = new Namespace(DIM_URI);    
     
@@ -269,9 +271,11 @@ public abstract class AbstractAdapter
     		namespaces.pushContext();
     		namespaces.declarePrefix("mets", METS.URI);
     		namespaces.declarePrefix("xlink", XLINK.URI);
+    		namespaces.declarePrefix("xsi", XSI.URI);
     		namespaces.declarePrefix("dim", DIM.URI);
     		contentHandler.startPrefixMapping("mets", METS.URI);
     		contentHandler.startPrefixMapping("xlink", XLINK.URI);
+    		contentHandler.startPrefixMapping("xsi", XSI.URI);
     		contentHandler.startPrefixMapping("dim", DIM.URI);
     		
     		// Send the METS element

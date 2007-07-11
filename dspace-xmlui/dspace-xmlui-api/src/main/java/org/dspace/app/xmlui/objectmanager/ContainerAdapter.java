@@ -214,6 +214,7 @@ public class ContainerAdapter extends AbstractAdapter
     	AttributeMap attributes;
     	
         String groupID = getGenericID("group_dmd_");
+        dmdSecIDS = new StringBuffer();
 
         // Add DIM descriptive metadata if it was requested or if no metadata types 
     	// were specified. Further more since this is the default type we also use a 
@@ -224,7 +225,7 @@ public class ContainerAdapter extends AbstractAdapter
         	String dmdID = getGenericID("dmd_");
         	
         	// Keep track of all descriptive sections
-            dmdSecIDS = new StringBuffer(dmdID);
+            dmdSecIDS.append(dmdID);
             
         	
             // ////////////////////////////////

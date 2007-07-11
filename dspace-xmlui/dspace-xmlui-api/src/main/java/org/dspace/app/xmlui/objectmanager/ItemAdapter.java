@@ -205,6 +205,7 @@ public class ItemAdapter extends AbstractAdapter
     {
 		AttributeMap attributes;
     	String groupID = getGenericID("group_dmd_");
+    	dmdSecIDS = new StringBuffer();
 
     	// Add DIM descriptive metadata if it was requested or if no metadata types 
     	// were specified. Further more since this is the default type we also use a 
@@ -214,7 +215,7 @@ public class ItemAdapter extends AbstractAdapter
     		// Metadata element's ID
     		String dmdID = getGenericID("dmd_");
     		// Keep track of all descriptive sections
-            dmdSecIDS = new StringBuffer(dmdID);
+            dmdSecIDS.append("" + dmdID);
     		
 			////////////////////////////////
 			// Start a metadata wrapper
@@ -301,12 +302,12 @@ public class ItemAdapter extends AbstractAdapter
     		attributes = new AttributeMap();
     		if (isDefinedMETStype(dmdType))
     		{
-    			attributes.put("MDTYPE", "dmdType");
+    			attributes.put("MDTYPE", dmdType);
     		}
     		else
     		{
     			attributes.put("MDTYPE","OTHER");
-    			attributes.put("OTHERMDTYPE", "dmdType");
+    			attributes.put("OTHERMDTYPE", dmdType);
     		}
     		startElement(METS,"mdWrap",attributes);
     		

@@ -74,7 +74,7 @@ div#ds-header  a span#ds-header-logo {
 	width: 190px;
 	height: 80px;
 	float: right;
-	background-image: url("manakin_logo.jpg");
+	background-image: url("../images/manakin_logo.jpg");
 	background-repeat: no-repeat;
 	background-position: 85% 40%;
 	color: inherit;
@@ -99,7 +99,7 @@ ul#ds-trail {
 li.ds-trail-link {
 	overflow: hidden;
 	display: inline;
-	background-image: url("trail.bmp");
+	background-image: url("../images/trail.bmp");
 	background-repeat: no-repeat;
 	background-position: 0% 60%;
 	padding-left: 16px;
@@ -958,7 +958,7 @@ span#ds-footer-logo {
 	clear: both;
 	height: 80px;
 	width: 300px;
-	background-image: url("di_logo.jpg");
+	background-image: url("../images/di_logo.jpg");
 	background-repeat: no-repeat;
 	background-position: 0% 30%;
 	color: inherit;
