@@ -27,27 +27,17 @@
 
    <scm>
       <connection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/wing
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
       </connection>
       <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/wing
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
       </developerConnection>
       <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/wing
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
       </url>
    </scm>
 
-   <distributionManagement>
-      <site>
-         <id>website</id>
-         <url>
-            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/dspace-xmlui/wing
-         </url>
-      </site>
-   </distributionManagement>
-
    <dependencies>
-
 
       <!-- Custom build DSpace cocoon -->
       <dependency>
@@ -60,15 +50,13 @@
          <artifactId>cocoon-deprecated</artifactId>
          <version>2.1.9</version>
       </dependency>
-      
-      
+
       <!-- Servlet -->
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>jstl</artifactId>
          <version>1.1.2</version>
       </dependency>
-      
       
       <!-- Avalon -->
       <dependency>
@@ -86,8 +74,7 @@
          <artifactId>avalon-logkit</artifactId>
          <version>2.1</version>
       </dependency>
-      
-      
+            
       <!-- Commons -->
       <dependency>
          <groupId>commons-beanutils</groupId>
@@ -149,7 +136,6 @@
          <artifactId>ehcache</artifactId>
          <version>1.1</version>
       </dependency>
-      
       
       <!-- excalibur -->
       <dependency>
@@ -222,16 +208,14 @@
          <artifactId>excalibur-xmlutil</artifactId>
          <version>2.1</version>
       </dependency>
-      
-      
+            
       <!-- JDOM -->
       <dependency>
          <groupId>jdom</groupId>
          <artifactId>jdom</artifactId>
          <version>1.0</version>
       </dependency>
-      
-      
+            
       <!-- Jakarta -->
       <dependency>
          <groupId>org.dspace.xmlui.jakarta</groupId>
@@ -243,8 +227,7 @@
          <artifactId>jakarta-regexp</artifactId>
          <version>1.4</version>
       </dependency>
-      
-      
+            
       <!-- javac -->
       <dependency>
          <groupId>org.dspace.xmlui.javac</groupId>

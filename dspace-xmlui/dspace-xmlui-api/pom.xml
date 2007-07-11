@@ -25,24 +25,15 @@
 
    <scm>
       <connection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/api
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-api
       </connection>
       <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/api
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-api
       </developerConnection>
       <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/api/
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/dspace-xmlui-api/
       </url>
    </scm>
-
-   <distributionManagement>
-      <site>
-         <id>website</id>
-         <url>
-            http://projects.dspace.org/dspace-xmlui/
-         </url>
-      </site>
-   </distributionManagement>
 
    <dependencies>
       

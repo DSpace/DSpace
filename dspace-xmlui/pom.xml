@@ -18,36 +18,11 @@
       <relativePath>../dspace-pom</relativePath>
    </parent>
 
-   <scm>
-      <connection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui
-      </connection>
-      <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui
-      </developerConnection>
-      <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/
-      </url>
-   </scm>
-
-   <distributionManagement>
-      <site>
-         <id>website</id>
-         <url>
-            http://projects.dspace.org/dspace-xmlui/
-         </url>
-      </site>
-   </distributionManagement>
-
    <modules>
       <module>dspace-xmlui-wing/</module>
       <module>dspace-xmlui-api/</module>
       <module>dspace-xmlui-webapp/</module>
    </modules>
-
-   <dependencies>
-
-   </dependencies>
 
 </project>
 
