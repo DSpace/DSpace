@@ -177,7 +177,18 @@ Common usage:
 		</move>
 
 		<copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
-			<fileset dir="webapps" />
+			<fileset dir="webapps">
+				<exclude name="**/web.xml" />
+			</fileset>
+		</copy>
+
+		<copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
+			<fileset dir="webapps">
+				<include name="**/web.xml" />
+			</fileset>
+			<filterchain>
+				<expandproperties />
+			</filterchain>
 		</copy>
 
 		<echo>
@@ -256,6 +267,9 @@ Common usage:
 
 		<copy todir="${dspace.dir}/config" preservelastmodified="true" failonerror="false">
 			<fileset dir="config"/>
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
 		</copy>
 
 		<copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
@@ -332,7 +346,7 @@ Common usage:
 		<delete failonerror="no">
 			<fileset dir="${dspace.dir}/bin" includes="**/*"/>
 		</delete>
-		
+
 		<copy todir="${dspace.dir}/bin" preservelastmodified="true">
 			<fileset dir="bin" />
 		</copy>
@@ -342,7 +356,7 @@ Common usage:
 		<delete failonerror="no">
 			<fileset dir="${dspace.dir}/lib" includes="**/*"/>
 		</delete>
-				
+
 		<copy todir="${dspace.dir}/lib" preservelastmodified="true">
 			<fileset dir="lib" />
 		</copy>
@@ -350,9 +364,20 @@ Common usage:
 		<delete failonerror="no">
 			<fileset dir="${dspace.dir}/webapps" includes="**/*"/>
 		</delete>
-				
-		<copy todir="${dspace.dir}/webapps" preservelastmodified="true">
-			<fileset dir="webapps" />
+
+		<copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
+			<fileset dir="webapps">
+				<exclude name="**/web.xml" />
+			</fileset>
+		</copy>
+
+		<copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
+			<fileset dir="webapps">
+				<include name="**/web.xml" />
+			</fileset>
+			<filterchain>
+				<expandproperties />
+			</filterchain>
 		</copy>
 
 		<java classname="org.dspace.browse.InitializeBrowse" classpathref="class.path" fork="yes" failonerror="yes">
