@@ -7,7 +7,6 @@
    <artifactId>dspace-jspui</artifactId>
    <name>DSpace :: JSP Web Application</name>
    <packaging>war</packaging>
-   <version>1.5-SNAPSHOT</version>
    <url>http://projects.dspace.org/dspace-jspui</url>
    <description>DSpace JSP Based Webapplication</description>
 
@@ -53,7 +52,6 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api</artifactId>
-         <version>1.5-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>

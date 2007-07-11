@@ -1,77 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>org.dspace</groupId>
-   <artifactId>dspace</artifactId>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace</groupId>
+	<artifactId>dspace</artifactId>
+	<name>DSpace :: Assembly and Configuration</name>
+	<packaging>pom</packaging>
+	<description>
+		The DSpace Project provides all the functionality required to
+		build, install and upgrade and dspace instance.
+	</description>
+	<url>http://projects.dspace.org/dspace</url>
 
-   <name>DSpace Project</name>
-   <version>1.5-SNAPSHOT</version>
-   <packaging>pom</packaging>
-   <description>
-      The DSpace Project provides all the functionality
-      required to build, install and upgrade and dspace instance.
-   </description>
-   <url>http://projects.dspace.org/dspace</url>
+	<!-- 
+		A Parent POM that Maven inherits DSpace Default 
+		POM atrributes from. 
+	-->
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-pom</artifactId>
+		<version>1.5-SNAPSHOT</version>
+		<relativePath>../dspace-pom</relativePath>
+	</parent>
 
-   <!-- 
-      A Parent POM that Maven inherits DSpace Default 
-      POM atrributes from. 
-   -->
-   <parent>
-      <groupId>org.dspace</groupId>
-      <artifactId>dspace-pom</artifactId>
-      <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace-pom</relativePath>
-   </parent>
+	<profiles>
+		<profile>
+			<id>oai</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>oai</name>
+				</property>
+			</activation>
 
-   <profiles>
-      <profile>
-         <id>mydspace.org</id>
-         <activation>
-            <activeByDefault>true</activeByDefault>
-            <property>
-               <name>mydspace.org</name>
-            </property>
-         </activation>
+			<modules>
+				<module>../language-packs</module>
+				<module>../dspace-api</module>
+				<module>../dspace-oai</module>
+			</modules>
 
-         <modules>
-            <module>../dspace-api</module>
-            <module>../dspace-jspui</module>
-            <module>../dspace-oai</module> 
-            <module>../dspace-xmlui</module>
-            <!--
-               <module>../dspace-lni</module>
-            -->
-         </modules>
-      </profile>
-   </profiles>
+		</profile>
+		
+		<profile>
+			<id>jspui</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>jspui</name>
+				</property>
+			</activation>
 
-   <build>
-      <filters>
-         <filter>${config}</filter>
-      </filters>
-      <plugins>
-         <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.2-beta-1</version>
-            <configuration>
-               <descriptors>
-                  <descriptor>../dspace/src/assemble/assembly.xml</descriptor>
-               </descriptors>
-            </configuration>
-            <executions>
-               <execution>
-                  <goals>
-                     <goal>single</goal>
-                  </goals>
-                  <phase>package</phase>
-               </execution>
-            </executions>
-         </plugin>
-      </plugins>
-   </build>
+			<modules>
+				<module>../language-packs</module>
+				<module>../dspace-api</module>
+				<module>../dspace-jspui</module>
+			</modules>
+
+		</profile>
+		
+		<profile>
+			<id>xmlui</id>
+			<activation>
+				<property>
+					<name>xmlui</name>
+				</property>
+			</activation>
+			<modules>
+				<module>../language-packs</module>
+				<module>../dspace-api</module>
+				<module>../dspace-xmlui</module>
+			</modules>
+		</profile>
+		
+		<profile>
+			<id>lni</id>
+			<activation>
+				<property>
+					<name>lni</name>
+				</property>
+			</activation>
+			<modules>
+				<module>../language-packs</module>
+				<module>../dspace-api</module>
+				<module>../dspace-lni</module>
+			</modules>
+		</profile>
+		
+	</profiles>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-2-SNAPSHOT</version>
+				<configuration>
+					<descriptors>
+						<descriptor>
+							src/assemble/assembly.xml
+						</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
 

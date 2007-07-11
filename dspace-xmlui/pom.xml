@@ -7,7 +7,6 @@
    <artifactId>dspace-xmlui</artifactId>
    <packaging>pom</packaging>
    <name>DSpace XMLUI (Manakin)</name>
-   <version>1.5-SNAPSHOT</version>
    <url>http://www.dspace.org</url>
    <description>DSpace web-based user interface based upon Apache Cocoon.</description>
 

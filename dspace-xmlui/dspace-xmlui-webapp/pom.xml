@@ -7,7 +7,6 @@
    <artifactId>dspace-xmlui-webapp</artifactId>
    <packaging>war</packaging>
    <name>DSpace XMLUI (Manakin) :: Web Application</name>
-   <version>1.5-SNAPSHOT</version>
    <url>http://www.dspace.org</url>
    <description>DSpace/Manakin XML UI Based Webapplication using the Cocoon and Wing frameworks</description>
 
@@ -17,11 +16,6 @@
       <version>1.5-SNAPSHOT</version>
       <relativePath>../</relativePath>
    </parent>
-
-   <!-- FIXME: Override this from dspace-pom -->
-   <properties>
-      <config>../../dspace/config/dspace.cfg</config>
-   </properties>
 
    <scm>
       <connection>
@@ -41,7 +35,7 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui-api</artifactId>
-         <version>1.5-SNAPSHOT</version>
+         <version>${project.version}</version>
       </dependency>
       
    </dependencies>

@@ -7,7 +7,6 @@
 	<artifactId>dspace-lni</artifactId>
 	<packaging>pom</packaging>
 	<name>DSpace LNI</name>
-	<version>1.5-SNAPSHOT</version>
 	<description>DSpace Lightweight Network Interface Build Modules</description>
 	<url>http://www.dspace.org</url>
 
