@@ -43,6 +43,14 @@
 <web-app id="dspace-lni">
   <display-name>DSpace Lightweight Network Interface</display-name>
 
+  <context-param>
+    <param-name>dspace-config</param-name>
+    <param-value>${dspace.dir}/config/dspace.cfg</param-value>
+    <description>
+      The location of the main DSpace configuration file
+    </description>
+  </context-param>
+  
   <!-- DSpace configuration initialisation.  This needs to be loaded before
        other servlets. -->
   <servlet>
