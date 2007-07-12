@@ -36,7 +36,11 @@
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api</artifactId>
       </dependency>
-      
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>language-packs</artifactId>
+      </dependency>
+            
       <!-- Wing framework -->
       <dependency>
          <groupId>org.dspace</groupId>

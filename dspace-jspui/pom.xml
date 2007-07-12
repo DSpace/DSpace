@@ -54,6 +54,10 @@
          <artifactId>dspace-api</artifactId>
       </dependency>
       <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>language-packs</artifactId>
+      </dependency>
+      <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>jstl</artifactId>
          <version>1.1.2</version>

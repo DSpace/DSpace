@@ -35,6 +35,10 @@
 			<artifactId>dspace-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>language-packs</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>wsdl4j</groupId>
 			<artifactId>wsdl4j</artifactId>
 		</dependency>

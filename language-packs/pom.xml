@@ -71,4 +71,12 @@
       </plugins>
    </build>
 
+
+	<dependencies>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+	</dependencies>
+	
 </project>
