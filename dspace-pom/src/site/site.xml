@@ -1,7 +1,7 @@
 <project name="DSpace"> 
   <bannerLeft> 
     <name>DSpace</name> 
-    <src>http://dspace.org/img/green-white-gray.gif</src> 
+    <src>images/dspace.gif</src> 
     <href>http://projects.dspace.org/dspace</href> 
   </bannerLeft> 
   <!-- bannerRight> 
@@ -31,8 +31,11 @@
     <menu name="Projects">
       <item name="DSpace" href="../dspace"/>
       <item name="DSpace API" href="../dspace-api"/>
+      <item name="DSpace I18N" href="../language=packs"/>
       <item name="DSpace JSPUI" href="../dspace-jspui"/>
       <item name="DSpace OAI" href="../dspace-oai"/>
+      <item name="DSpace LNI" href="../dspace-lni"/>
+      <item name="DSpace XMLUI" href="../dspace-xmlui"/>
     </menu> 
 
     <menu name="Quick Links"> 
