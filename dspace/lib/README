@@ -1,6 +1,8 @@
 Libraries used by DSpace - Release 1.4:
 
 activation.jar:      The Java Activation Framework, used by JavaMail (v1.1)
+bcmail-jdk14-135.jar: Bouncy Castle libs required by pdfbox.jar for reading encrypted pdf files
+bcprov-jdk14-135.jar: Bouncy Castle libs required by pdfbox.jar for reading encrypted pdf files
 commons-cli.jar:     Jakarta Commons command line processing (v1.0)
 commons-codec-1.3.jar: Jakarta Commons Codec (v1.3)
 commons-collections.jar: Jakarta Commons collections API (v3.2)
@@ -23,7 +25,7 @@ mets.jar*:           Harvard University Libraries METS toolkit (version 1.5.2)
 oaicat.jar:          OCLC's OAI data provider implementation (version 1.5.48)
 oro.jar:             Jakarta-ORO, provide regular expressions (v2.0.8)
 PDFBox.jar:          PDF Utilities, used for text extraction (v0.7.3)
-rome.jar:            RSS syndication support (version 0.7)
+rome.jar:            RSS syndication support (version 0.8)
 serializer.jar:      Serializer component of Xalan-Java, bundled with latest Xalan (??)
 servlet.jar:         Servlet interfaces (version 2.3)
 standard.jar:        Jakarta JSTL Implementation (version 1.0.6)
