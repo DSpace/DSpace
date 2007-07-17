@@ -62,6 +62,7 @@
 		<profile>
 			<id>xmlui</id>
 			<activation>
+				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>xmlui</name>
 				</property>
@@ -76,6 +77,7 @@
 		<profile>
 			<id>lni</id>
 			<activation>
+				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>lni</name>
 				</property>
