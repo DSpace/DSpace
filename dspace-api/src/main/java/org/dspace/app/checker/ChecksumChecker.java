@@ -258,6 +258,7 @@ public class ChecksumChecker
         checker.setDispatcher(dispatcher);
         checker.setCollector(logger);
         checker.process();
+        System.exit(0);
     }
 
     /**

@@ -138,6 +138,7 @@ public class FixDefaultPolicies
         }
 
         c.complete();
+        System.exit(0);
     }
 
     /**

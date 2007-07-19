@@ -52,6 +52,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.event.Event;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -80,6 +81,12 @@ public class Bitstream extends DSpaceObject
 
     /** The bitstream format corresponding to this bitstream */
     private BitstreamFormat bitstreamFormat;
+
+    /** Flag set when data is modified, for events */
+    private boolean modified;
+
+    /** Flag set when metadata is modified, for events */
+    private boolean modifiedMetadata;
 
     /**
      * Private constructor for creating a Bitstream object based on the contents
@@ -114,6 +121,9 @@ public class Bitstream extends DSpaceObject
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bitstream_id"));
+
+        modified = modifiedMetadata = false;
+        clearDetails();
     }
 
     /**
@@ -190,6 +200,8 @@ public class Bitstream extends DSpaceObject
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
 
+        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null));
+
         return bitstream;
     }
 
@@ -222,6 +234,8 @@ public class Bitstream extends DSpaceObject
         // Set the format to "unknown"
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
+
+        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, "REGISTER"));
 
         return bitstream;
     }
@@ -261,6 +275,8 @@ public class Bitstream extends DSpaceObject
     public void setSequenceID(int sid)
     {
         bRow.setColumn("sequence_id", sid);
+        modifiedMetadata = true;
+        addDetails("SequenceID");
     }
 
     /**
@@ -283,6 +299,8 @@ public class Bitstream extends DSpaceObject
     public void setName(String n)
     {
         bRow.setColumn("name", n);
+        modifiedMetadata = true;
+        addDetails("Name");
     }
 
     /**
@@ -306,6 +324,8 @@ public class Bitstream extends DSpaceObject
     public void setSource(String n)
     {
         bRow.setColumn("source", n);
+        modifiedMetadata = true;
+        addDetails("Source");
     }
 
     /**
@@ -328,6 +348,8 @@ public class Bitstream extends DSpaceObject
     public void setDescription(String n)
     {
         bRow.setColumn("description", n);
+        modifiedMetadata = true;
+        addDetails("Description");
     }
 
     /**
@@ -374,6 +396,8 @@ public class Bitstream extends DSpaceObject
         // but we need to find the unknown format!
         setFormat(null);
         bRow.setColumn("user_format_description", desc);
+        modifiedMetadata = true;
+        addDetails("UserFormatDescription");
     }
 
     /**
@@ -451,6 +475,7 @@ public class Bitstream extends DSpaceObject
 
         // Update the ID in the table row
         bRow.setColumn("bitstream_format_id", bitstreamFormat.getID());
+        modified = true;
     }
 
     /**
@@ -467,6 +492,18 @@ public class Bitstream extends DSpaceObject
 
         log.info(LogManager.getHeader(bContext, "update_bitstream",
                 "bitstream_id=" + getID()));
+
+        if (modified)
+        {
+            bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
+            modified = false;
+        }
+        if (modifiedMetadata)
+        {
+            bContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, getID(), getDetails()));
+            modifiedMetadata = false;
+            clearDetails();
+        }
 
         DatabaseManager.update(bContext, bRow);
     }
@@ -489,6 +526,8 @@ public class Bitstream extends DSpaceObject
         //AuthorizeManager.authorizeAction(bContext, this, Constants.DELETE);
         log.info(LogManager.getHeader(bContext, "delete_bitstream",
                 "bitstream_id=" + getID()));
+
+        bContext.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(), String.valueOf(getSequenceID())));
 
         // Remove from cache
         bContext.removeCached(this, getID());
@@ -541,7 +580,7 @@ public class Bitstream extends DSpaceObject
                  bRow.getIntColumn("bitstream_id"));
 
         // Build a list of Bundle objects
-        List bundles = new ArrayList();
+        List<Bundle> bundles = new ArrayList<Bundle>();
 
         while (tri.hasNext())
         {

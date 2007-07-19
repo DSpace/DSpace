@@ -99,6 +99,7 @@ public class PolicySet
                 groupID, isReplace, false);
 
         c.complete();
+        System.exit(0);
     }
 
     /**

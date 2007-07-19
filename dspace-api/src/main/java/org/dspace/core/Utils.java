@@ -52,6 +52,13 @@ import java.text.ParseException;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
+import org.apache.log4j.Logger;
 
 /**
  * Utility functions for DSpace.
@@ -61,6 +68,9 @@ import java.util.regex.Pattern;
  */
 public class Utils
 {
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(Utils.class);
+
     private static final Pattern DURATION_PATTERN = Pattern
             .compile("(\\d+)([smhdwy])");
 
@@ -81,6 +91,31 @@ public class Utils
     private static Random random = new Random();
 
     private static VMID vmid = new VMID();
+
+    // for parseISO8601Date
+    private static SimpleDateFormat parseFmt[]  =
+    {
+        // first try at parsing, has milliseconds (note General time zone)
+        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSz"),
+
+        // second try at parsing, no milliseconds (note General time zone)
+        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssz"),
+
+
+        // finally, try without any timezone (defaults to current TZ)
+        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS"),
+
+        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss")
+    };
+
+    // for formatISO8601Date
+    // output canonical format (note RFC22 time zone, easier to hack)
+    private static SimpleDateFormat outFmtSecond = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
+
+    // output format with millsecond precision
+    private static SimpleDateFormat outFmtMillisec = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
+
+    private static Calendar outCal = GregorianCalendar.getInstance();
 
     /** Private Constructor */
     private Utils()
@@ -349,5 +384,65 @@ public class Utils
         long qint = Long.parseLong(m.group(1));
 
         return qint * multiplier;
+    }
+
+    /**
+     * Translates timestamp from an ISO 8601-standard format, which
+     * is commonly used in XML and RDF documents.
+     * This method is synchronized because it depends on a non-reentrant
+     * static DateFormat (more efficient than creating a new one each call).
+     *
+     * @param s the input string
+     * @return Date object, or null if there is a problem translating.
+     */
+    public static synchronized Date parseISO8601Date(String s)
+    {
+        // attempt to normalize the timezone to something we can parse;
+        // SimpleDateFormat can't handle "Z"
+        char tzSign = s.charAt(s.length()-6);
+        if (s.endsWith("Z"))
+            s = s.substring(0, s.length()-1) + "GMT+00:00";
+
+        // check for trailing timezone
+        else if (tzSign == '-' || tzSign == '+')
+            s = s.substring(0, s.length()-6) + "GMT" + s.substring(s.length()-6);
+
+        // try to parse without millseconds
+        ParseException lastError = null;
+        for (int i = 0; i < parseFmt.length; ++i)
+        {
+            try
+            {
+                return parseFmt[i].parse(s);
+            }
+            catch (ParseException e)
+            {
+                lastError = e;
+            }
+        }
+        if (lastError != null)
+            log.error("Error parsing date:", lastError);
+        return null;
+    }
+
+    /**
+     * Convert a Date to String in the ISO 8601 standard format.
+     * The RFC822 timezone is almost right, still need to insert ":".
+     * This method is synchronized because it depends on a non-reentrant
+     * static DateFormat (more efficient than creating a new one each call).
+     *
+     * @param d the input Date
+     * @return String containing formatted date.
+     */
+    public static synchronized String formatISO8601Date(Date d)
+    {
+        String result;
+        outCal.setTime(d);
+        if (outCal.get(Calendar.MILLISECOND) == 0)
+            result = outFmtSecond.format(d);
+        else
+            result = outFmtMillisec.format(d);
+        int rl = result.length();
+        return result.substring(0, rl-2) + ":" + result.substring(rl-2);
     }
 }

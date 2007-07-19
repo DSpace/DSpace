@@ -52,7 +52,6 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.history.HistoryManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -356,9 +355,6 @@ public class WorkflowItem implements InProgressSubmission
 
         // Update ourselves
         DatabaseManager.update(ourContext, wfRow);
-
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY,
-                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
     }
 
     /**
@@ -369,9 +365,6 @@ public class WorkflowItem implements InProgressSubmission
     {
         // Remove from cache
         ourContext.removeCached(this, getID());
-
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
-                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
 
         // delete any pending tasks
         WorkflowManager.deleteTasks(ourContext, this);

@@ -41,7 +41,9 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -57,9 +59,8 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
-import org.dspace.history.HistoryManager;
-import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -98,6 +99,12 @@ public class Collection extends DSpaceObject
 
     /** Our Handle */
     private String handle;
+
+    /** Flag set when data is modified, for events */
+    private boolean modified;
+
+    /** Flag set when metadata is modified, for events */
+    private boolean modifiedMetadata;
 
     /**
      * Groups corresponding to workflow steps - NOTE these start from one, so
@@ -162,6 +169,9 @@ public class Collection extends DSpaceObject
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("collection_id"));
+
+        modified = modifiedMetadata = false;
+        clearDetails();
     }
 
     /**
@@ -250,8 +260,7 @@ public class Collection extends DSpaceObject
         myPolicy.setGroup(anonymousGroup);
         myPolicy.update();
 
-        HistoryManager.saveHistory(context, c, HistoryManager.CREATE, context
-                .getCurrentUser(), context.getExtraLogInfo());
+        context.addEvent(new Event(Event.CREATE, Constants.COLLECTION, c.getID(), c.handle));
 
         log.info(LogManager.getHeader(context, "create_collection",
                 "collection_id=" + row.getIntColumn("collection_id"))
@@ -275,7 +284,7 @@ public class Collection extends DSpaceObject
         TableRowIterator tri = DatabaseManager.queryTable(context, "collection",
                 "SELECT * FROM collection ORDER BY name");
 
-        List collections = new ArrayList();
+        List<Collection> collections = new ArrayList<Collection>();
 
         while (tri.hasNext())
         {
@@ -350,9 +359,20 @@ public class Collection extends DSpaceObject
         return collectionRow.getIntColumn("collection_id");
     }
 
+    /**
+     * @see org.dspace.content.DSpaceObject#getHandle()
+     */
     public String getHandle()
     {
-        return handle;
+        if(handle == null) {
+        	try {
+				handle = HandleManager.findHandle(this.ourContext, this);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			}
+        }
+    	return handle;
     }
 
     /**
@@ -397,6 +417,13 @@ public class Collection extends DSpaceObject
             }
         }
         collectionRow.setColumn(field, value);
+        modifiedMetadata = true;
+        addDetails(field);
+    }
+
+    public String getName()
+    {
+        return getMetadata("name");
     }
 
     /**
@@ -469,6 +496,7 @@ public class Collection extends DSpaceObject
                             + newLogo.getID()));
         }
 
+        modified = true;
         return logo;
     }
 
@@ -527,6 +555,7 @@ public class Collection extends DSpaceObject
         {
             collectionRow.setColumn("workflow_step_" + step, g.getID());
         }
+        modified = true;
     }
 
     /**
@@ -571,6 +600,7 @@ public class Collection extends DSpaceObject
         
         AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, submitters);
 
+        modified = true;
         return submitters;
     }
 
@@ -624,6 +654,7 @@ public class Collection extends DSpaceObject
                     admins);
         }
 
+        modified = true;
         return admins;
     }
 
@@ -704,6 +735,7 @@ public class Collection extends DSpaceObject
         {
             collectionRow.setColumn("license", license);
         }
+        modified = true;
     }
 
     /**
@@ -742,6 +774,7 @@ public class Collection extends DSpaceObject
                     "collection_id=" + getID() + ",template_item_id="
                             + template.getID()));
         }
+        modified = true;
     }
 
     /**
@@ -773,6 +806,7 @@ public class Collection extends DSpaceObject
             template.delete();
             template = null;
         }
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), "remove_template_item"));
     }
 
     /**
@@ -801,6 +835,8 @@ public class Collection extends DSpaceObject
         row.setColumn("item_id", item.getID());
 
         DatabaseManager.update(ourContext, row);
+
+        ourContext.addEvent(new Event(Event.ADD, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
     }
 
     /**
@@ -825,6 +861,8 @@ public class Collection extends DSpaceObject
                 "DELETE FROM collection2item WHERE collection_id= ? "+
                 "AND item_id= ? ",
                 getID(), item.getID());
+
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
 
         // Is the item an orphan?
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -864,17 +902,22 @@ public class Collection extends DSpaceObject
         // Check authorisation
         canEdit();
 
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY,
-                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
-
         log.info(LogManager.getHeader(ourContext, "update_collection",
                 "collection_id=" + getID()));
 
         DatabaseManager.update(ourContext, collectionRow);
 
-        // reindex this collection (could be smarter, to only do when name
-        // changes)
-        DSIndexer.reIndexContent(ourContext, this);
+        if (modified)
+        {
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
+            modified = false;
+        }
+        if (modifiedMetadata)
+        {
+            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, getID(), getDetails()));
+            modifiedMetadata = false;
+            clearDetails();
+        }
     }
 
     public boolean canEditBoolean() throws java.sql.SQLException
@@ -928,14 +971,10 @@ public class Collection extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "delete_collection",
                 "collection_id=" + getID()));
 
-        // remove from index
-        DSIndexer.unIndexContent(ourContext, this);
+        ourContext.addEvent(new Event(Event.DELETE, Constants.COLLECTION, getID(), getHandle()));
 
         // Remove from cache
         ourContext.removeCached(this, getID());
-
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
-                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
 
         // remove subscriptions - hmm, should this be in Subscription.java?
         DatabaseManager.updateQuery(ourContext,
@@ -1062,7 +1101,7 @@ public class Collection extends DSpaceObject
                         getID());
 
         // Build a list of Community objects
-        List communities = new ArrayList();
+        List<Community> communities = new ArrayList<Community>();
 
         while (tri.hasNext())
         {
@@ -1162,7 +1201,7 @@ public class Collection extends DSpaceObject
     public static Collection[] findAuthorized(Context context, Community comm,
             int actionID) throws java.sql.SQLException
     {
-        List myResults = new ArrayList();
+        List<Collection> myResults = new ArrayList<Collection>();
 
         Collection[] myCollections = null;
 

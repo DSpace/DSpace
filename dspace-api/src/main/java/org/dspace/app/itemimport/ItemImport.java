@@ -170,6 +170,7 @@ public class ItemImport
         String mapfile = null;
         String eperson = null; // db ID or email
         String[] collections = null; // db ID or handles
+        int status = 0;
 
         if (line.hasOption('h'))
         {
@@ -439,6 +440,7 @@ public class ItemImport
             c.abort();
             e.printStackTrace();
             System.out.println(e);
+            status = 1;
         }
 
         if (mapOut != null)
@@ -450,6 +452,7 @@ public class ItemImport
         {
             System.out.println("***End of Test Run***");
         }
+        System.exit(status);
     }
 
     private void addItems(Context c, Collection[] mycollections,

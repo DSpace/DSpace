@@ -61,11 +61,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.event.Event;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.history.HistoryManager;
-import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -104,10 +103,10 @@ public class Item extends DSpaceObject
     private EPerson submitter;
 
     /** The bundles in this item - kept in sync with DB */
-    private List bundles;
+    private List<Bundle> bundles;
 
     /** The Dublin Core metadata - a list of DCValue objects. */
-    private List dublinCore;
+    private List<DCValue> dublinCore;
 
     /** Handle, if any */
     private String handle;
@@ -117,6 +116,12 @@ public class Item extends DSpaceObject
      * update()
      */
     private boolean dublinCoreChanged;
+
+    /**
+     * True if anything else was changed since last update()
+     * (to drive event mechanism)
+     */
+    private boolean modified;
 
     /**
      * Construct an item with the given table row
@@ -132,7 +137,9 @@ public class Item extends DSpaceObject
         ourContext = context;
         itemRow = row;
         dublinCoreChanged = false;
-        dublinCore = new ArrayList();
+        modified = false;
+        dublinCore = new ArrayList<DCValue>();
+        clearDetails();
  
         // Get Dublin Core metadata
         TableRowIterator tri = DatabaseManager.queryTable(ourContext, "MetadataValue",
@@ -247,8 +254,7 @@ public class Item extends DSpaceObject
         i.update();
         context.setIgnoreAuthorization(false);
 
-        HistoryManager.saveHistory(context, i, HistoryManager.CREATE, context
-                .getCurrentUser(), context.getExtraLogInfo());
+        context.addEvent(new Event(Event.CREATE, Constants.ITEM, i.getID(), null));
 
         log.info(LogManager.getHeader(context, "create_item", "item_id="
                 + row.getIntColumn("item_id")));
@@ -312,7 +318,15 @@ public class Item extends DSpaceObject
      */
     public String getHandle()
     {
-        return handle;
+        if(handle == null) {
+        	try {
+				handle = HandleManager.findHandle(this.ourContext, this);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			}
+        }
+    	return handle;
     }
 
     /**
@@ -364,6 +378,7 @@ public class Item extends DSpaceObject
     public void setArchived(boolean isArchived)
     {
         itemRow.setColumn("in_archive", isArchived);
+        modified = true;
     }
 
     /**
@@ -375,6 +390,7 @@ public class Item extends DSpaceObject
     public void setOwningCollection(Collection c)
     {
         itemRow.setColumn("owning_collection", c.getID());
+        modified = true;
     }
 
     /**
@@ -493,13 +509,9 @@ public class Item extends DSpaceObject
             String lang)
     {
         // Build up list of matching values
-        List values = new ArrayList();
-        Iterator i = dublinCore.iterator();
-
-        while (i.hasNext())
+        List<DCValue> values = new ArrayList<DCValue>();
+        for (DCValue dcv : dublinCore)
         {
-            DCValue dcv = (DCValue) i.next();
-
             if (match(schema, element, qualifier, lang, dcv))
             {
                 // We will return a copy of the object in case it is altered
@@ -661,6 +673,8 @@ public class Item extends DSpaceObject
                 dcv.value = null;
             }
             dublinCore.add(dcv);
+            addDetails(schema+"."+element+((qualifier==null)? "": "."+qualifier));
+
         }
 
         if (values.length > 0)
@@ -752,13 +766,9 @@ public class Item extends DSpaceObject
             String lang)
     {
         // We will build a list of values NOT matching the values to clear
-        List values = new ArrayList();
-        Iterator i = dublinCore.iterator();
-
-        while (i.hasNext())
+        List<DCValue> values = new ArrayList<DCValue>();
+        for (DCValue dcv : dublinCore)
         {
-            DCValue dcv = (DCValue) i.next();
-
             if (!match(schema, element, qualifier, lang, dcv))
             {
                 values.add(dcv);
@@ -885,6 +895,7 @@ public class Item extends DSpaceObject
         {
             itemRow.setColumnNull("submitter_id");
         }
+        modified = true;
     }
 
     /**
@@ -895,7 +906,7 @@ public class Item extends DSpaceObject
      */
     public Collection[] getCollections() throws SQLException
     {
-        List collections = new ArrayList();
+        List<Collection> collections = new ArrayList<Collection>();
 
         // Get collection table rows
         TableRowIterator tri = DatabaseManager.queryTable(ourContext,"collection",
@@ -940,7 +951,7 @@ public class Item extends DSpaceObject
      */
     public Community[] getCommunities() throws SQLException
     {
-        List communities = new ArrayList();
+        List<Community> communities = new ArrayList<Community>();
 
         // Get community table rows
         TableRowIterator tri = DatabaseManager.queryTable(ourContext,"community",
@@ -990,7 +1001,7 @@ public class Item extends DSpaceObject
     {
     	if (bundles == null)
     	{
-    		bundles = new ArrayList();
+                bundles = new ArrayList<Bundle>();
     		// Get bundles
     		TableRowIterator tri = DatabaseManager.queryTable(ourContext, "bundle",
     					"SELECT bundle.* FROM bundle, item2bundle WHERE " +
@@ -1035,7 +1046,7 @@ public class Item extends DSpaceObject
      */
     public Bundle[] getBundles(String name) throws SQLException
     {
-        List matchingBundles = new ArrayList();
+        List<Bundle> matchingBundles = new ArrayList<Bundle>();
 
         // now only keep bundles with matching names
         Bundle[] bunds = getBundles();
@@ -1121,6 +1132,8 @@ public class Item extends DSpaceObject
         mappingRow.setColumn("item_id", getID());
         mappingRow.setColumn("bundle_id", b.getID());
         DatabaseManager.update(ourContext, mappingRow);
+
+        ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
     }
 
     /**
@@ -1160,6 +1173,8 @@ public class Item extends DSpaceObject
                 "DELETE FROM item2bundle WHERE item_id= ? " +
                 "AND bundle_id= ? ",
                 getID(), b.getID());
+
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
 
         // If the bundle is orphaned, it's removed
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -1238,7 +1253,7 @@ public class Item extends DSpaceObject
      */
     public Bitstream[] getNonInternalBitstreams() throws SQLException
     {
-        List bitstreamList = new ArrayList();
+        List<Bitstream> bitstreamList = new ArrayList<Bitstream>();
 
         // Go through the bundles and bitstreams picking out ones which aren't
         // of internal formats
@@ -1359,9 +1374,6 @@ public class Item extends DSpaceObject
             AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         }
 
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY,
-                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
-
         log.info(LogManager.getHeader(ourContext, "update_item", "item_id="
                 + getID()));
 
@@ -1419,7 +1431,7 @@ public class Item extends DSpaceObject
         // Keys are Strings: "element" or "element.qualifier"
         // Values are Integers indicating number of values written for a
         // element/qualifier
-        Map elementCount = new HashMap();
+        Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
         DatabaseManager.update(ourContext, itemRow);
 
@@ -1430,12 +1442,8 @@ public class Item extends DSpaceObject
             removeMetadataFromDatabase();
 
             // Add in-memory DC
-            Iterator i = dublinCore.iterator();
-
-            while (i.hasNext())
+            for (DCValue dcv : dublinCore)
             {
-                DCValue dcv = (DCValue) i.next();
-
                 // Get the DC Type
                 int schemaID;
                 MetadataSchema schema = MetadataSchema.find(ourContext,dcv.schema);
@@ -1497,11 +1505,16 @@ public class Item extends DSpaceObject
                 metadata.create(ourContext);
             }
 
+            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
             dublinCoreChanged = false;
+            clearDetails();
         }
 
-        // Update browse indices
-        Browse.itemChanged(ourContext, this);
+        if (modified)
+        {
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+            modified = false;
+        }
     }
 
     /**
@@ -1560,13 +1573,7 @@ public class Item extends DSpaceObject
         // Update item in DB
         update();
 
-        // Invoke History system
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY, e,
-                ourContext.getExtraLogInfo());
-
-        // Remove from indicies
-        Browse.itemRemoved(ourContext, getID());
-        DSIndexer.unIndexContent(ourContext, this);
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "WITHDRAW"));
 
         // and all of our authorization policies
         // FIXME: not very "multiple-inclusion" friendly
@@ -1621,14 +1628,7 @@ public class Item extends DSpaceObject
         // Update item in DB
         update();
 
-        // Invoke History system
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY, e,
-                ourContext.getExtraLogInfo());
-
-        // Add to indicies
-        // Remove - update() already performs this
-        // Browse.itemAdded(ourContext, this);
-        DSIndexer.indexContent(ourContext, this);
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "REINSTATE"));
 
         // authorization policies
         if (colls.length > 0)
@@ -1656,8 +1656,7 @@ public class Item extends DSpaceObject
      */
     void delete() throws SQLException, AuthorizeException, IOException
     {
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
-                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
+        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), getHandle()));
 
         log.info(LogManager.getHeader(ourContext, "delete_item", "item_id="
                 + getID()));
@@ -1665,12 +1664,19 @@ public class Item extends DSpaceObject
         // Remove from cache
         ourContext.removeCached(this, getID());
 
-        // Remove from indices, if appropriate
+        // Remove from browse indices, if appropriate
+        /** XXX FIXME
+         ** Although all other Browse index updates are managed through
+         ** Event consumers, removing an Item *must* be done *here* (inline)
+         ** because otherwise, tables are left in an inconsistent state
+         ** and the DB transaction will fail.
+         ** Any fix would involve too much work on Browse code that
+         ** is likely to be replaced soon anyway.   --lcs, Aug 2006
+         **/
         if (isArchived())
         {
             // Remove from Browse indices
             Browse.itemRemoved(ourContext, getID());
-            DSIndexer.unIndexContent(ourContext, this);
         }
 
         // Delete the Dublin Core
@@ -1686,15 +1692,6 @@ public class Item extends DSpaceObject
 
         // remove all of our authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
-
-        // Remove any Handle
-        // FIXME: This is sort of a "tentacle" - HandleManager should provide
-        // a way of doing this. Plus, deleting a Handle may have ramifications
-        // that need considering.
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM handle WHERE resource_type_id= ? " +
-                "AND resource_id= ? ",
-                Constants.ITEM,getID());
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
@@ -1981,5 +1978,10 @@ public class Item extends DSpaceObject
         }
 
         return false;
+    }
+    public String getName()
+    {
+        DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
+        return (t.length >= 1) ? t[0].value : null;
     }
 }

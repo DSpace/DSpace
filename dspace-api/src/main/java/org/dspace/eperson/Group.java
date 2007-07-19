@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -56,6 +57,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -83,9 +85,9 @@ public class Group extends DSpaceObject
     private TableRow myRow;
 
     /** lists of epeople and groups in the group */
-    private List epeople = new ArrayList();
+    private List<EPerson> epeople = new ArrayList<EPerson>();
 
-    private List groups = new ArrayList();
+    private List<Group> groups = new ArrayList<Group>();
 
     /** lists that need to be written out again */
     private boolean epeopleChanged = false;
@@ -94,6 +96,9 @@ public class Group extends DSpaceObject
 
     /** is this just a stub, or is all data loaded? */
     private boolean isDataLoaded = false;
+
+    /** Flag set when metadata is modified, for events */
+    private boolean modifiedMetadata;
 
     /**
      * Construct a Group from a given context and tablerow
@@ -108,6 +113,9 @@ public class Group extends DSpaceObject
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("eperson_group_id"));
+
+        modifiedMetadata = false;
+        clearDetails();
     }
 
     /**
@@ -213,6 +221,8 @@ public class Group extends DSpaceObject
         log.info(LogManager.getHeader(context, "create_group", "group_id="
                 + g.getID()));
 
+        context.addEvent(new Event(Event.CREATE, Constants.GROUP, g.getID(), null));
+
         return g;
     }
 
@@ -245,6 +255,8 @@ public class Group extends DSpaceObject
     public void setName(String name)
     {
         myRow.setColumn("name", name);
+        modifiedMetadata = true;
+        addDetails("name");
     }
 
     /**
@@ -264,6 +276,8 @@ public class Group extends DSpaceObject
 
         epeople.add(e);
         epeopleChanged = true;
+
+        myContext.addEvent(new Event(Event.ADD, Constants.GROUP, getID(), Constants.EPERSON, e.getID(), e.getEmail()));
     }
 
     /**
@@ -283,6 +297,8 @@ public class Group extends DSpaceObject
 
         groups.add(g);
         groupsChanged = true;
+
+        myContext.addEvent(new Event(Event.ADD, Constants.GROUP, getID(), Constants.GROUP, g.getID(), g.getName()));
     }
 
     /**
@@ -298,6 +314,7 @@ public class Group extends DSpaceObject
         if (epeople.remove(e))
         {
             epeopleChanged = true;
+            myContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.EPERSON, e.getID(), e.getEmail()));
         }
     }
 
@@ -313,6 +330,7 @@ public class Group extends DSpaceObject
         if (groups.remove(g))
         {
             groupsChanged = true;
+            myContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.GROUP, g.getID(), g.getName()));
         }
     }
 
@@ -397,9 +415,9 @@ public class Group extends DSpaceObject
     public static Group[] allMemberGroups(Context c, EPerson e)
             throws SQLException
     {
-        List groupList = new ArrayList();
+        List<Group> groupList = new ArrayList<Group>();
 
-        Set myGroups = allMemberGroupIDs(c, e);
+        Set<Integer> myGroups = allMemberGroupIDs(c, e);
         // now convert those Integers to Groups
         Iterator i = myGroups.iterator();
 
@@ -419,7 +437,7 @@ public class Group extends DSpaceObject
      * @return Set of Integer groupIDs
      * @throws SQLException
      */
-    public static Set allMemberGroupIDs(Context c, EPerson e)
+    public static Set<Integer> allMemberGroupIDs(Context c, EPerson e)
             throws SQLException
     {
         // two queries - first to get groups eperson is a member of
@@ -429,7 +447,7 @@ public class Group extends DSpaceObject
                 "SELECT * FROM epersongroup2eperson WHERE eperson_id= ?",
                  e.getID());
 
-        Set groupIDs = new HashSet();
+        Set<Integer> groupIDs = new HashSet<Integer>();
 
         while (tri.hasNext())
         {
@@ -513,9 +531,9 @@ public class Group extends DSpaceObject
     public static EPerson[] allMembers(Context c, Group g)
             throws SQLException
     {
-        List epersonList = new ArrayList();
+        List<EPerson> epersonList = new ArrayList<EPerson>();
 
-        Set myEpeople = allMemberIDs(c, g);
+        Set<Integer> myEpeople = allMemberIDs(c, g);
         // now convert those Integers to EPerson objects
         Iterator i = myEpeople.iterator();
 
@@ -538,19 +556,19 @@ public class Group extends DSpaceObject
      * @return Set of Integer epersonIDs
      * @throws SQLException
      */
-    public static Set allMemberIDs(Context c, Group g)
+    public static Set<Integer> allMemberIDs(Context c, Group g)
             throws SQLException
     {
         // two queries - first to get all groups which are a member of this group
         // second query gets all members of each group in the first query
-        Set epeopleIDs = new HashSet();
+        Set<Integer> epeopleIDs = new HashSet<Integer>();
         
         // Get all groups which are a member of this group
         TableRowIterator tri = DatabaseManager.queryTable(c, "group2groupcache",
                 "SELECT * FROM group2groupcache WHERE parent_id= ? ",
                 g.getID());
         
-        Set groupIDs = new HashSet();
+        Set<Integer> groupIDs = new HashSet<Integer>();
 
         while (tri.hasNext())
         {
@@ -611,7 +629,7 @@ public class Group extends DSpaceObject
     private static boolean epersonInGroup(Context c, int groupID, EPerson e)
             throws SQLException
     {
-        Set groupIDs = Group.allMemberGroupIDs(c, e);
+        Set<Integer> groupIDs = Group.allMemberGroupIDs(c, e);
 
         return groupIDs.contains(new Integer(groupID));
     }
@@ -868,6 +886,9 @@ public class Group extends DSpaceObject
     public void delete() throws SQLException
     {
         // FIXME: authorizations
+
+        myContext.addEvent(new Event(Event.DELETE, Constants.GROUP, getID(), getName()));
+
         // Remove from cache
         myContext.removeCached(this, getID());
 
@@ -963,6 +984,13 @@ public class Group extends DSpaceObject
     {
         // FIXME: Check authorisation
         DatabaseManager.update(myContext, myRow);
+
+        if (modifiedMetadata)
+        {
+            myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, getID(), getDetails()));
+            modifiedMetadata = false;
+            clearDetails();
+        }
 
         // Redo eperson mappings if they've changed
         if (epeopleChanged)
@@ -1062,7 +1090,7 @@ public class Group extends DSpaceObject
         TableRowIterator tri = DatabaseManager.queryTable(myContext, "group2group",
                 "SELECT * FROM group2group");
 
-        Map parents = new HashMap();
+        Map<Integer,Set<Integer>> parents = new HashMap<Integer,Set<Integer>>();
 
         while (tri.hasNext())
         {
@@ -1074,7 +1102,7 @@ public class Group extends DSpaceObject
             // if parent doesn't have an entry, create one
             if (!parents.containsKey(parentID))
             {
-                Set children = new HashSet();
+                Set<Integer> children = new HashSet<Integer>();
 
                 // add child id to the list
                 children.add(childID);
@@ -1084,7 +1112,7 @@ public class Group extends DSpaceObject
             {
                 // parent has an entry, now add the child to the parent's record
                 // of children
-                Set children = (Set) parents.get(parentID);
+                Set<Integer> children =  parents.get(parentID);
                 children.add(childID);
             }
         }
@@ -1103,7 +1131,7 @@ public class Group extends DSpaceObject
         {
             Integer parentID = (Integer) i.next();
 
-            Set myChildren = getChildren(parents, parentID);
+            Set<Integer> myChildren = getChildren(parents, parentID);
 
             Iterator j = myChildren.iterator();
 
@@ -1112,7 +1140,7 @@ public class Group extends DSpaceObject
                 // child of a parent
                 Integer childID = (Integer) j.next();
 
-                ((Set) parents.get(parentID)).add(childID);
+                ((Set<Integer>) parents.get(parentID)).add(childID);
             }
         }
 
@@ -1127,7 +1155,7 @@ public class Group extends DSpaceObject
         {
             Integer parent = (Integer) pi.next();
 
-            Set children = (Set) parents.get(parent);
+            Set<Integer> children =  parents.get(parent);
             Iterator ci = children.iterator(); // child iterator
 
             while (ci.hasNext())
@@ -1158,16 +1186,16 @@ public class Group extends DSpaceObject
      *            the parent you're interested in
      * @return Map whose keys are all of the children of a parent
      */
-    private Set getChildren(Map parents, Integer parent)
+    private Set<Integer> getChildren(Map<Integer,Set<Integer>> parents, Integer parent)
     {
-        Set myChildren = new HashSet();
+        Set<Integer> myChildren = new HashSet<Integer>();
 
         // degenerate case, this parent has no children
         if (!parents.containsKey(parent))
             return myChildren;
 
         // got this far, so we must have children
-        Set children = (Set) parents.get(parent);
+        Set<Integer> children =  parents.get(parent);
 
         // now iterate over all of the children
         Iterator i = children.iterator();

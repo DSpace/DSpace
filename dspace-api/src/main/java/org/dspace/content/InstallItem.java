@@ -46,7 +46,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.dspace.search.DSIndexer;
 
 /**
  * Support to install item in the archive
@@ -144,9 +143,6 @@ public class InstallItem
 
         // save changes ;-)
         item.update();
-
-        // add item to search and browse indices
-        DSIndexer.indexContent(c, item);
 
         // remove in-progress submission
         is.deleteWrapper();

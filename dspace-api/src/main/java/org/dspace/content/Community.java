@@ -55,9 +55,8 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
-import org.dspace.history.HistoryManager;
-import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -89,6 +88,12 @@ public class Community extends DSpaceObject
     /** Handle, if any */
     private String handle;
 
+    /** Flag set when data is modified, for events */
+    private boolean modified;
+
+    /** Flag set when metadata is modified, for events */
+    private boolean modifiedMetadata;
+
     /**
      * Construct a community object from a database row.
      * 
@@ -118,6 +123,9 @@ public class Community extends DSpaceObject
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("community_id"));
+
+        modified = modifiedMetadata = false;
+        clearDetails();
     }
 
     /**
@@ -198,8 +206,11 @@ public class Community extends DSpaceObject
         myPolicy.setGroup(anonymousGroup);
         myPolicy.update();
 
-        HistoryManager.saveHistory(context, c, HistoryManager.CREATE, context
-                .getCurrentUser(), context.getExtraLogInfo());
+        context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, c.getID(), c.handle));
+
+        // if creating a top-level Community, simulate an ADD event at the Site.
+        if (parent == null)
+            context.addEvent(new Event(Event.ADD, Constants.SITE, Site.SITE_ID, Constants.COMMUNITY, c.getID(), c.handle));
 
         log.info(LogManager.getHeader(context, "create_community",
                 "community_id=" + row.getIntColumn("community_id"))
@@ -222,7 +233,7 @@ public class Community extends DSpaceObject
         TableRowIterator tri = DatabaseManager.queryTable(context, "community",
                 "SELECT * FROM community ORDER BY name");
 
-        List communities = new ArrayList();
+        List<Community> communities = new ArrayList<Community>();
 
         while (tri.hasNext())
         {
@@ -268,7 +279,7 @@ public class Community extends DSpaceObject
                         + "(SELECT child_comm_id FROM community2community) "
                         + "ORDER BY name");
 
-        List topCommunities = new ArrayList();
+        List<Community> topCommunities = new ArrayList<Community>();
 
         while (tri.hasNext())
         {
@@ -306,9 +317,20 @@ public class Community extends DSpaceObject
         return communityRow.getIntColumn("community_id");
     }
 
+    /**
+     * @see org.dspace.content.DSpaceObject#getHandle()
+     */
     public String getHandle()
     {
-        return handle;
+        if(handle == null) {
+        	try {
+				handle = HandleManager.findHandle(this.ourContext, this);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			}
+        }
+    	return handle;
     }
 
     /**
@@ -353,6 +375,13 @@ public class Community extends DSpaceObject
             }
         }
         communityRow.setColumn(field, value);
+        modifiedMetadata = true;
+        addDetails(field);
+    }
+
+    public String getName()
+    {
+        return getMetadata("name");
     }
 
     /**
@@ -418,6 +447,7 @@ public class Community extends DSpaceObject
                             + newLogo.getID()));
         }
 
+        modified = true;
         return logo;
     }
 
@@ -429,16 +459,22 @@ public class Community extends DSpaceObject
         // Check authorisation
         canEdit();
 
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.MODIFY,
-                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
-
         log.info(LogManager.getHeader(ourContext, "update_community",
                 "community_id=" + getID()));
 
         DatabaseManager.update(ourContext, communityRow);
 
-        // now re-index this Community
-        DSIndexer.reIndexContent(ourContext, this);
+        if (modified)
+        {
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));
+            modified = false;
+        }
+        if (modifiedMetadata)
+        {
+            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.COMMUNITY, getID(), getDetails()));
+            modifiedMetadata = false;
+            clearDetails();
+        }
     }
 
     /**
@@ -449,7 +485,7 @@ public class Community extends DSpaceObject
      */
     public Collection[] getCollections() throws SQLException
     {
-        List collections = new ArrayList();
+        List<Collection> collections = new ArrayList<Collection>();
 
         // Get the table rows
         TableRowIterator tri = DatabaseManager.queryTable(
@@ -496,7 +532,7 @@ public class Community extends DSpaceObject
      */
     public Community[] getSubcommunities() throws SQLException
     {
-        List subcommunities = new ArrayList();
+        List<Community> subcommunities = new ArrayList<Community>();
 
         // Get the table rows
         TableRowIterator tri = DatabaseManager.queryTable(
@@ -585,7 +621,7 @@ public class Community extends DSpaceObject
      */
     public Community[] getAllParents() throws SQLException
     {
-        List parentList = new ArrayList();
+        List<Community> parentList = new ArrayList<Community>();
         Community parent = getParentCommunity();
 
         while (parent != null)
@@ -649,6 +685,8 @@ public class Community extends DSpaceObject
             mappingRow.setColumn("community_id", getID());
             mappingRow.setColumn("collection_id", c.getID());
 
+            ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
+
             DatabaseManager.update(ourContext, mappingRow);
         }
         // close the TableRowIterator to free up resources
@@ -702,6 +740,8 @@ public class Community extends DSpaceObject
             mappingRow.setColumn("parent_comm_id", getID());
             mappingRow.setColumn("child_comm_id", c.getID());
 
+            ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
+
             DatabaseManager.update(ourContext, mappingRow);
         }
         // close the TableRowIterator to free up resources
@@ -727,6 +767,8 @@ public class Community extends DSpaceObject
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM community2collection WHERE community_id= ? "+
                 "AND collection_id= ? ", getID(), c.getID());
+
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
 
         // Is the community an orphan?
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -773,6 +815,8 @@ public class Community extends DSpaceObject
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM community2community WHERE parent_comm_id= ? " +
                 " AND child_comm_id= ? ", getID(),c.getID());
+
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
 
         // Is the subcommunity an orphan?
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -834,11 +878,7 @@ public class Community extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "delete_community",
                 "community_id=" + getID()));
 
-        // remove from the search index
-        DSIndexer.unIndexContent(ourContext, this);
-
-        HistoryManager.saveHistory(ourContext, this, HistoryManager.REMOVE,
-                ourContext.getCurrentUser(), ourContext.getExtraLogInfo());
+        ourContext.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, getID(), getHandle()));
 
         // Remove from cache
         ourContext.removeCached(this, getID());

@@ -53,6 +53,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -80,7 +81,13 @@ public class Bundle extends DSpaceObject
     private TableRow bundleRow;
 
     /** The bitstreams in this bundle */
-    private List bitstreams;
+    private List<Bitstream> bitstreams;
+
+    /** Flag set when data is modified, for events */
+    private boolean modified;
+
+    /** Flag set when metadata is modified, for events */
+    private boolean modifiedMetadata;
 
     /**
      * Construct a bundle object with the given table row
@@ -94,7 +101,7 @@ public class Bundle extends DSpaceObject
     {
         ourContext = context;
         bundleRow = row;
-        bitstreams = new ArrayList();
+        bitstreams = new ArrayList<Bitstream>();
 
         // Get bitstreams
         TableRowIterator tri = DatabaseManager.queryTable(
@@ -126,6 +133,8 @@ public class Bundle extends DSpaceObject
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bundle_id"));
+
+        modified = modifiedMetadata = false;
     }
 
     /**
@@ -192,6 +201,8 @@ public class Bundle extends DSpaceObject
         log.info(LogManager.getHeader(context, "create_bundle", "bundle_id="
                 + row.getIntColumn("bundle_id")));
 
+        context.addEvent(new Event(Event.CREATE, Constants.BUNDLE, row.getIntColumn("bundle_id"), null));
+
         return new Bundle(context, row);
     }
 
@@ -225,6 +236,7 @@ public class Bundle extends DSpaceObject
     public void setName(String name)
     {
         bundleRow.setColumn("name", name);
+        modifiedMetadata = true;
     }
 
     /**
@@ -246,6 +258,7 @@ public class Bundle extends DSpaceObject
     public void setPrimaryBitstreamID(int bitstreamID)
     {
         bundleRow.setColumn("primary_bitstream_id", bitstreamID);
+        modified = true;
     }
 
     /**
@@ -309,7 +322,7 @@ public class Bundle extends DSpaceObject
      */
     public Item[] getItems() throws SQLException
     {
-        List items = new ArrayList();
+        List<Item> items = new ArrayList<Item>();
 
         // Get items
         TableRowIterator tri = DatabaseManager.queryTable(
@@ -421,6 +434,8 @@ public class Bundle extends DSpaceObject
         // Add the bitstream object
         bitstreams.add(b);
 
+        ourContext.addEvent(new Event(Event.ADD, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
+
         // copy authorization policies from bundle to bitstream
         // FIXME: multiple inclusion is affected by this...
         AuthorizeManager.inheritPolicies(ourContext, this, b);
@@ -475,6 +490,8 @@ public class Bundle extends DSpaceObject
             }
         }
 
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
+
         // Delete the mapping row
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM bundle2bitstream WHERE bundle_id= ? "+
@@ -505,6 +522,17 @@ public class Bundle extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_bundle", "bundle_id="
                 + getID()));
 
+        if (modified)
+        {
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, getID(), null));
+            modified = false;
+        }
+        if (modifiedMetadata)
+        {
+            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BUNDLE, getID(), null));
+            modifiedMetadata = false;
+        }
+
         DatabaseManager.update(ourContext, bundleRow);
     }
 
@@ -517,6 +545,8 @@ public class Bundle extends DSpaceObject
     {
         log.info(LogManager.getHeader(ourContext, "delete_bundle", "bundle_id="
                 + getID()));
+
+        ourContext.addEvent(new Event(Event.DELETE, Constants.BUNDLE, getID(), getName()));
 
         // Remove from cache
         ourContext.removeCached(this, getID());

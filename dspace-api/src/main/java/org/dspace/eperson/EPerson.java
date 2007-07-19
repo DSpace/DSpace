@@ -52,7 +52,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.history.HistoryManager;
+import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -89,6 +89,12 @@ public class EPerson extends DSpaceObject
     /** The row in the table representing this eperson */
     private TableRow myRow;
 
+    /** Flag set when data is modified, for events */
+    private boolean modified;
+
+    /** Flag set when metadata is modified, for events */
+    private boolean modifiedMetadata;
+
     /**
      * Construct an EPerson
      * 
@@ -104,6 +110,8 @@ public class EPerson extends DSpaceObject
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("eperson_id"));
+        modified = modifiedMetadata = false;
+        clearDetails();
     }
 
     /**
@@ -426,8 +434,7 @@ public class EPerson extends DSpaceObject
         log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
                 + e.getID()));
 
-        HistoryManager.saveHistory(context, e, HistoryManager.REMOVE, context
-                .getCurrentUser(), context.getExtraLogInfo());
+        context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(), null));
 
         return e;
     }
@@ -446,9 +453,6 @@ public class EPerson extends DSpaceObject
                     "You must be an admin to delete an EPerson");
         }
 
-        HistoryManager.saveHistory(myContext, this, HistoryManager.REMOVE,
-                myContext.getCurrentUser(), myContext.getExtraLogInfo());
-
         // check for presence of eperson in tables that
         // have constraints on eperson_id
         Vector constraintList = getDeleteConstraints();
@@ -460,8 +464,13 @@ public class EPerson extends DSpaceObject
             throw new EPersonDeletionException(constraintList);
         }
 
+        myContext.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail()));
+
         // Remove from cache
         myContext.removeCached(this, getID());
+
+        // XXX FIXME: This sidesteps the object model code so it won't
+        // generate  REMOVE events on the affected Groups.
 
         // Remove any group memberships first
         DatabaseManager.updateQuery(myContext,
@@ -549,6 +558,7 @@ public class EPerson extends DSpaceObject
         }
 
         myRow.setColumn("email", s);
+        modified = true;
     }
 
     /**
@@ -575,6 +585,7 @@ public class EPerson extends DSpaceObject
         }
 
         myRow.setColumn("netid", s);
+        modified = true;
     }
 
     /**
@@ -621,6 +632,7 @@ public class EPerson extends DSpaceObject
     public void setFirstName(String firstname)
     {
         myRow.setColumn("firstname", firstname);
+        modified = true;
     }
 
     /**
@@ -642,6 +654,7 @@ public class EPerson extends DSpaceObject
     public void setLastName(String lastname)
     {
         myRow.setColumn("lastname", lastname);
+        modified = true;
     }
 
     /**
@@ -653,6 +666,7 @@ public class EPerson extends DSpaceObject
     public void setCanLogIn(boolean login)
     {
         myRow.setColumn("can_log_in", login);
+        modified = true;
     }
 
     /**
@@ -674,6 +688,7 @@ public class EPerson extends DSpaceObject
     public void setRequireCertificate(boolean isrequired)
     {
         myRow.setColumn("require_certificate", isrequired);
+        modified = true;
     }
 
     /**
@@ -695,6 +710,7 @@ public class EPerson extends DSpaceObject
     public void setSelfRegistered(boolean sr)
     {
         myRow.setColumn("self_registered", sr);
+        modified = true;
     }
 
     /**
@@ -737,6 +753,8 @@ public class EPerson extends DSpaceObject
     public void setMetadata(String field, String value)
     {
         myRow.setColumn(field, value);
+        modifiedMetadata = true;
+        addDetails(field);
     }
 
     /**
@@ -751,6 +769,7 @@ public class EPerson extends DSpaceObject
         String encoded = Utils.getMD5(s);
 
         myRow.setColumn("password", encoded);
+        modified = true;
     }
 
     /**
@@ -786,8 +805,17 @@ public class EPerson extends DSpaceObject
         log.info(LogManager.getHeader(myContext, "update_eperson",
                 "eperson_id=" + getID()));
 
-        HistoryManager.saveHistory(myContext, this, HistoryManager.MODIFY,
-                myContext.getCurrentUser(), myContext.getExtraLogInfo());
+        if (modified)
+        {
+            myContext.addEvent(new Event(Event.MODIFY, Constants.EPERSON, getID(), null));
+            modified = false;
+        }
+        if (modifiedMetadata)
+        {
+            myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.EPERSON, getID(), getDetails()));
+            modifiedMetadata = false;
+            clearDetails();
+        }
     }
 
     /**
@@ -830,7 +858,7 @@ public class EPerson extends DSpaceObject
      */
     public Vector getDeleteConstraints() throws SQLException
     {
-        Vector tableList = new Vector();
+        Vector<String> tableList = new Vector<String>();
 
         // check for eperson in item table
         TableRowIterator tri = DatabaseManager.query(myContext,
@@ -872,4 +900,10 @@ public class EPerson extends DSpaceObject
         // explaining to the user why the eperson cannot be deleted.
         return tableList;
     }
+
+    public String getName()
+    {
+        return getEmail();
+    }
+
 }

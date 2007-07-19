@@ -68,7 +68,6 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.history.HistoryManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -194,10 +193,6 @@ public class WorkflowManager
         wfi.setMultipleFiles(wsi.hasMultipleFiles());
         wfi.setMultipleTitles(wsi.hasMultipleTitles());
         wfi.setPublishedBefore(wsi.isPublishedBefore());
-
-        // Write history creation event
-        HistoryManager.saveHistory(c, wfi, HistoryManager.CREATE, c
-                .getCurrentUser(), c.getExtraLogInfo());
 
         // remove the WorkspaceItem
         wsi.deleteWrapper();

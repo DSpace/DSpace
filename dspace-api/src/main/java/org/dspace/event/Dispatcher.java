@@ -1,11 +1,11 @@
 /*
- * InitializeBrowse.java
+ * Dispatcher.java
  *
  * Version: $Revision$
  *
  * Date: $Date$
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,60 +37,74 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.browse;
 
-import java.sql.SQLException;
+package org.dspace.event;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.dspace.core.Context;
 
 /**
- * Command-line tool to create Browse indexes.
+ * Interface for event dispatchers. The primary role of a dispatcher is to
+ * deliver a set of events to a configured list of consumers. It may also
+ * transform, consolidate, and otherwise optimize the event stream prior to
+ * delivering events to its consumers.
  * 
- * @author Peter Breton
  * @version $Revision$
  */
-public class InitializeBrowse
+public abstract class Dispatcher
 {
-    /** Private Constructor */
-    private InitializeBrowse()
+    protected String name;
+
+    /** unique identifer of this dispatcher - cached hash of its text Name */
+    protected int identifier;
+
+    /**
+     * Map of consumers by their configured name.
+     */
+    protected Map<String, ConsumerProfile> consumers = new HashMap<String, ConsumerProfile>();
+
+    protected Dispatcher(String name)
     {
+        super();
+        this.name = name;
+        this.identifier = name.hashCode();
+    }
+
+    public Collection getConsumers()
+    {
+        return consumers.values();
     }
 
     /**
-     * Creates Browse indexes, destroying the old ones.
-     * 
-     * @param argv
-     *            Command-line arguments
+     * @returns unique integer that identifies this Dispatcher configuration.
      */
-    public static void main(String[] argv)
+    public int getIdentifier()
     {
-        Context context = null;
-        int status = 0;
-
-        try
-        {
-            System.out.print("Indexing all Items in DSpace....");
-
-            context = new Context();
-            Browse.indexAll(context);
-            context.complete();
-
-            System.out.println(" ... Done");
-        }
-        catch (SQLException sqle)
-        {
-            status = 1;
-            if (context != null)
-            {
-                context.abort();
-            }
-
-            System.err.println("Error: Browse index NOT created");
-            sqle.printStackTrace();
-        }
-        finally
-        {
-            System.exit(status);
-        }
+        return identifier;
     }
+
+    /**
+     * Add a consumer to the end of the list.
+     * 
+     * @param consumer
+     *            the event consumer to add
+     * @param filter
+     *            the event filter to apply
+     */
+    public abstract void addConsumerProfile(ConsumerProfile cp)
+            throws IllegalArgumentException;
+
+    /**
+     * Dispatch all events added to this Context according to configured
+     * consumers.
+     * 
+     * @param ctx
+     *            the execution context object
+     */
+    public abstract void dispatch(Context ctx);
+
 }
