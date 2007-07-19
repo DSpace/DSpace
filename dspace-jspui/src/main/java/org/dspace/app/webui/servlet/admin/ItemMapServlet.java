@@ -51,7 +51,6 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.browse.Browse;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -271,7 +270,6 @@ public class ItemMapServlet extends DSpaceServlet
                 if (!myItem.isOwningCollection(myCollection))
                 {
                     myCollection.removeItem(myItem);
-                    Browse.itemChanged(context,myItem);
                 }
             }
 
@@ -312,7 +310,6 @@ public class ItemMapServlet extends DSpaceServlet
                         if (!myItem.isOwningCollection(myCollection))
                         {
                             myCollection.addItem(myItem);
-                            Browse.itemChanged(context,myItem);
                             addedItems.add(itemIDs[j]);
                         }
                     }

@@ -77,7 +77,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
-import org.dspace.search.DSIndexer;
 import org.dspace.license.CreativeCommons;
 
 /**
@@ -598,9 +597,6 @@ public class EditItemServlet extends DSpaceServlet
             showEditForm(context, request, response, item);
         }
         
-        // update the item index
-        DSIndexer.reIndexContent(context, item);
-
         // Complete transaction
         context.complete();
     }
