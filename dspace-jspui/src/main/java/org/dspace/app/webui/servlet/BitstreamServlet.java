@@ -41,14 +41,14 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.mail.internet.MimeUtility;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,6 +60,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -81,7 +82,26 @@ public class BitstreamServlet extends DSpaceServlet
     /** log4j category */
     private static Logger log = Logger.getLogger(BitstreamServlet.class);
 
-    protected void doDSGet(Context context, HttpServletRequest request,
+    /**
+     * Threshold on Bitstream size before content-disposition will be set.
+     */
+    private int threshold;
+    
+	/**
+	 * Pattern used to get file.ext from filename (which can be a path)
+	 */
+	private static Pattern p = Pattern.compile("[^/]*$");
+
+    @Override
+	public void init(ServletConfig arg0) throws ServletException {
+
+		super.init(arg0);
+		threshold = ConfigurationManager
+				.getIntProperty("webui.content_disposition_threshold");
+	}
+
+    @Override
+	protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
@@ -204,15 +224,67 @@ public class BitstreamServlet extends DSpaceServlet
         // Pipe the bits
         InputStream is = bitstream.retrieve();
      
-				// Set the response MIME type
+		// Set the response MIME type
         response.setContentType(bitstream.getFormat().getMIMEType());
 
         // Response length
         response.setHeader("Content-Length", String
                 .valueOf(bitstream.getSize()));
 
+		if(threshold != -1 && bitstream.getSize() >= threshold)
+		{
+			setBitstreamDisposition(bitstream.getName(), request, response);
+		}
+
         Utils.bufferedCopy(is, response.getOutputStream());
         is.close();
         response.getOutputStream().flush();
     }
+	
+	/**
+	 * Evaluate filename and client and encode appropriate disposition
+	 * 
+	 * @param uri
+	 * @param request
+	 * @param response
+	 * @throws UnsupportedEncodingException
+	 */
+	private void setBitstreamDisposition(String filename, HttpServletRequest request,
+			HttpServletResponse response)
+	{
+		
+		String name = filename;
+		
+		Matcher m = p.matcher(name);
+		
+		if (m.find() && !m.group().equals(""))
+		{
+			name = m.group();
+		}
+
+		try 
+		{
+			String agent = request.getHeader("USER-AGENT");
+
+			if (null != agent && -1 != agent.indexOf("MSIE")) 
+			{
+				name = URLEncoder.encode(name, "UTF8");
+			} 
+			else if (null != agent && -1 != agent.indexOf("Mozilla")) 
+			{
+				name = MimeUtility.encodeText(name, "UTF8", "B");
+			} 
+
+		} 
+		catch (UnsupportedEncodingException e) 
+		{
+			log.error(e.getMessage(),e);
+		}
+		finally
+		{
+			response.setHeader("Content-Disposition", "attachment;filename=" + name);
+		}
+		
+		
+	}
 }

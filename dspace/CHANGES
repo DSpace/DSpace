@@ -1,6 +1,10 @@
+(Conal Tuohy)
+- S.F. Patch 1751638 Set http disposition header to force download of large bitstreams
+
 (Mark Diggory/Scott Phillips)
 - Restructure Codebase and Build Process to support Addon functionality for DSpace
 - Integrate Maven build into projects
+- Add XMLUI and LNI to Endorsed Addons
 
 (Claudia Juergen)
 - SF Patch #1722557 for SF Bug #1549290 Suggest Features uses hard coded strings
