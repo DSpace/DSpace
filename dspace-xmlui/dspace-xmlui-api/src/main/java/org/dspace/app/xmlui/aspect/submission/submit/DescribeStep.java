@@ -46,20 +46,23 @@ import java.util.Locale;
 
 import javax.servlet.ServletException;
 
-import org.apache.avalon.framework.configuration.Configurable;
-import org.apache.avalon.framework.configuration.Configuration;
-import org.apache.avalon.framework.configuration.ConfigurationException;
+import org.apache.log4j.Logger;
+
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
-import org.dspace.app.xmlui.aspect.submission.FlowUtils;
+import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Composite;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Field;
 import org.dspace.app.xmlui.wing.element.List;
+import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
@@ -70,6 +73,8 @@ import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+
+
 import org.xml.sax.SAXException;
 
 /**
@@ -81,9 +86,12 @@ import org.xml.sax.SAXException;
  * submission processes.
  * 
  * @author Scott Phillips
+ * @author Tim Donohue (updated for Configurable Submission)
  */
-public class DescribeStep extends AbstractStep implements Configurable
+public class DescribeStep extends AbstractSubmissionStep
 {
+	private static Logger log = Logger.getLogger(DescribeStep.class);
+
 	
 	/** Language Strings **/
     protected static final Message T_head = 
@@ -113,32 +121,49 @@ public class DescribeStep extends AbstractStep implements Configurable
 	 * view by the end user during submission. 
 	 */
 	private static String SCOPE = "submit";
+    
+    /**
+     * A shared resource of the inputs reader. The 'inputs' are the 
+     * questions we ask the user to describe an item during the 
+     * submission process. The reader is a utility class to read 
+     * that configuration file.
+     */
+    private static DCInputsReader INPUTS_READER = null;
+    
+    /**
+     * Ensure that the inputs reader has been initialized, this method may be
+     * called multiple times with no ill-effect.
+     */
+    private static void initializeInputsReader() throws ServletException
+    {
+        if (INPUTS_READER == null)
+            INPUTS_READER = new DCInputsReader();
+    }
+    
+    /**
+     * Return the inputs reader. Note, the reader must have been
+     * initialized before the reader can be accessed.
+     * 
+     * @return The input reader.
+     */
+    private static DCInputsReader getInputsReader() 
+    {
+        return INPUTS_READER;
+    }
+    
 
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.
 	 */
-	public DescribeStep()
+	public DescribeStep() throws ServletException
 	{
 		this.requireSubmission = true;
 		this.requireStep = true;
+		
+		//Ensure that the InputsReader is initialized.
+		initializeInputsReader();
 	}
 	
-	
-	/**
-	 * Insure that the InputsReader is initialized.
-	 */
-	public void configure(Configuration conf) throws ConfigurationException
-	{
-		try 
-		{
-			FlowUtils.initializeInputsReader();
-		} 
-		catch (ServletException se) 
-		{
-			throw new ConfigurationException(se.getMessage());
-		}
-	}
-
 
 	public void addBody(Body body) throws SAXException, WingException,
 	UIException, SQLException, IOException, AuthorizeException
@@ -152,14 +177,15 @@ public class DescribeStep extends AbstractStep implements Configurable
 		DCInput[] inputs = {};
 		try 
 		{
-			inputSet = FlowUtils.getInputsReader().getInputs(submission.getCollection().getHandle());
-			inputs = inputSet.getPageRows(step-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
-
+			inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+			inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
 		} 
 		catch (ServletException se) 
 		{
 			throw new UIException(se);
 		}
+		
+		
 
 		Division div = body.addInteractiveDivision("submit-describe",actionURL,Division.METHOD_POST,"primary submission");
 		div.setHead(T_submission_head);
@@ -238,6 +264,10 @@ public class DescribeStep extends AbstractStep implements Configurable
 			{
 				renderDropdownField(form, fieldName, dcInput, dcValues);
 			}
+			else if (inputType.equals("list"))
+			{
+				renderSelectFromListField(form, fieldName, dcInput, dcValues);
+			}
 			else if (inputType.equals("onebox"))
 			{
 				renderOneboxField(form, fieldName, dcInput, dcValues);
@@ -250,13 +280,109 @@ public class DescribeStep extends AbstractStep implements Configurable
 
 		div.addHidden("submission-continue").setValue(knot.getId()); 
 
-		// The standard control actions.
-		org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
-		actions.addButton("submit_previous").setValue(T_previous);
-		actions.addButton("submit_save").setValue(T_save);
-		actions.addButton("submit_next").setValue(T_next);
+		
+		// add standard control/paging buttons
+        addControlButtons(form);
 	}
 
+    /** 
+     * Each submission step must define its own information to be reviewed
+     * during the final Review/Verify Step in the submission process.
+     * <P>
+     * The information to review should be tacked onto the passed in 
+     * List object.
+     * <P>
+     * NOTE: To remain consistent across all Steps, you should first
+     * add a sub-List object (with this step's name as the heading),
+     * by using a call to reviewList.addList().   This sublist is
+     * the list you return from this method!
+     * 
+     * @param reviewList
+     *      The List to which all reviewable information should be added
+     * @return 
+     *      The new sub-List object created by this step, which contains
+     *      all the reviewable information.  If this step has nothing to
+     *      review, then return null!   
+     */
+    public List addReviewSection(List reviewList) throws SAXException,
+        WingException, UIException, SQLException, IOException,
+        AuthorizeException
+    {    
+        //Create a new list section for this step (and set its heading)
+        List describeSection = reviewList.addList("submit-review-" + this.stepAndPage, List.TYPE_FORM);
+        describeSection.setHead(T_head);
+        
+        //Review the values assigned to all inputs 
+        //on this page of the Describe step.
+        DCInputSet inputSet = null;
+        try 
+        {
+            inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+        } 
+        catch (ServletException se) 
+        {
+            throw new UIException(se);
+        }
+        
+        DCInput[] inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
+
+        for (DCInput input : inputs)
+        {
+            if (!input.isVisible(SCOPE))
+                continue;
+
+            String inputType = input.getInputType();
+            String pairsName = input.getPairsType();
+            DCValue[] values = new DCValue[0];
+
+            if (inputType.equals("qualdrop_value"))
+            {
+                values = submission.getItem().getMetadata(input.getSchema(), input.getElement(), Item.ANY, Item.ANY);
+            }
+            else
+            {
+                values = submission.getItem().getMetadata(input.getSchema(), input.getElement(), input.getQualifier(), Item.ANY);
+            }
+
+            if (values.length == 0) 
+            {
+                describeSection.addLabel(input.getLabel());
+                describeSection.addItem().addHighlight("italic").addContent(ReviewStep.T_no_metadata);
+            }
+            else 
+            {
+                for (DCValue value : values)
+                {
+                    String displayValue = null;
+                    if (inputType.equals("date"))
+                    {
+                        DCDate date = new DCDate(value.value);
+                        displayValue = date.toString();
+                    }
+                    else if (inputType.equals("dropdown"))
+                    {
+                        displayValue = input.getDisplayString(pairsName,value.value);
+                    }
+                    else if (inputType.equals("qualdrop_value"))
+                    {
+                        String qualifier = value.qualifier;
+                        String displayQual = input.getDisplayString(pairsName,qualifier);
+                        displayValue = displayQual + ":" + value.value;
+                    }
+                    else 
+                    {
+                        displayValue = value.value;
+                    }
+                    describeSection.addLabel(input.getLabel());
+                    describeSection.addItem(displayValue);
+                } // For each DCValue
+            } // If values exist
+        }// For each input
+        
+        //return this new "describe" section
+        return describeSection;
+    }
+    
 	
 	/**
 	 * Render a Name field to the DRI document. The name field consists of two 
@@ -609,11 +735,83 @@ public class DescribeStep extends AbstractStep implements Configurable
 			select.addOption(value,display);
 		}
 		
-		// Setup the field's values
+		// Setup the field's pre-selected values
 		for (DCValue dcValue : dcValues)
 		{
 			select.setOptionSelected(dcValue.value);
 		}	
+	}
+	
+	/**
+	 * Render a select-from-list field to the DRI document. 
+	 * This field consists of either a series of checkboxes 
+	 * (if repeatable) or a series of radio buttons (if not repeatable).
+	 * <P>
+	 * Note: This is NOT the same as a List element
+	 * (org.dspace.app.xmlui.wing.element.List).  It's just unfortunately
+	 * similarly named.
+	 * 
+	 * @param form 
+	 * 			The form list to add the field too
+	 * @param fieldName
+	 * 			The field's name.
+	 * @param dcInput
+	 * 			The field's input deffinition
+	 * @param dcValues
+	 * 			The field's pre-existing values.
+	 */
+	private void renderSelectFromListField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
+	{
+		Field listField = null;
+		
+		//if repeatable, this list of fields should be checkboxes
+		if (dcInput.isRepeatable())
+		{
+			listField = form.addItem().addCheckBox(fieldName);
+		}
+		else //otherwise this is a list of radio buttons
+		{
+			listField = form.addItem().addRadio(fieldName);
+		}
+		
+		//	Setup the field
+		listField.setLabel(dcInput.getLabel());
+		listField.setHelp(cleanHints(dcInput.getHints()));
+		if (dcInput.isRequired())
+			listField.setRequired();
+		if (isFieldInError(fieldName))
+			listField.addError(T_required_field);
+		
+	
+		//Setup each of the possible options
+		java.util.List<String> pairs = dcInput.getPairs();
+		for (int i = 0; i < pairs.size(); i += 2)
+		{
+			String display = pairs.get(i);
+			String value   = pairs.get(i+1);
+			
+			if(listField instanceof CheckBox)
+			{
+				((CheckBox)listField).addOption(value, display);
+			}
+			else if(listField instanceof Radio)
+			{
+				((Radio)listField).addOption(value, display);
+			}
+		}
+		
+		// Setup the field's pre-selected values
+		for (DCValue dcValue : dcValues)
+		{
+			if(listField instanceof CheckBox)
+			{
+				((CheckBox)listField).setOptionSelected(dcValue.value);
+			}
+			else if(listField instanceof Radio)
+			{
+				((Radio)listField).setOptionSelected(dcValue.value);
+			}
+		}
 	}
 	
 	/**
@@ -630,11 +828,11 @@ public class DescribeStep extends AbstractStep implements Configurable
 	 */
 	private void renderOneboxField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
 	{
-		// Both onebox and twobox consist a a free form text field 
-		// that the user may enter any value. The diffrente between 
+		// Both onebox and twobox consist a free form text field 
+		// that the user may enter any value. The difference between 
 		// the two is that a onebox should be rendered in one column 
 		// as twobox should be listed in a two column format. Since this
-		// decision is not something the Aspect can effect we merly place 
+		// decision is not something the Aspect can effect we merely place 
 		// as a render hint.
 		Text text = form.addItem().addText(fieldName,"submit-text");
 
@@ -664,6 +862,8 @@ public class DescribeStep extends AbstractStep implements Configurable
 		}
 	}
 	
+	
+	
 	/**
 	 * Check if the given fieldname is listed as being in error.
 	 * 
@@ -672,7 +872,7 @@ public class DescribeStep extends AbstractStep implements Configurable
 	 */
 	private boolean isFieldInError(String fieldName)
 	{
-		if (errors.contains(fieldName))
+		if(this.errorFields.contains(fieldName))	
 			return true;
 		else
 			return false;
@@ -696,7 +896,7 @@ public class DescribeStep extends AbstractStep implements Configurable
 	private static final String HINT_HTML_POSTFIX = "</td></tr>";
 	private String cleanHints(String dirtyHints)
 	{
-		String clean = dirtyHints;
+		String clean = (dirtyHints!=null ? dirtyHints : "");
 
 		if (clean.startsWith(HINT_HTML_PREFIX))
 		{

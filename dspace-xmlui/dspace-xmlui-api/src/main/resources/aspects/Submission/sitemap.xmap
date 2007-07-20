@@ -54,18 +54,12 @@
       <map:transformer name="CollectionViewer" src="org.dspace.app.xmlui.aspect.submission.CollectionViewer"/>
       <map:transformer name="Submissions" src="org.dspace.app.xmlui.aspect.submission.Submissions"/>
       
-      <map:transformer name="SelectCollectionStep" src="org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/>
+      <map:transformer name="StepTransformer" src="org.dspace.app.xmlui.aspect.submission.StepTransformer"/>	
       
+      <map:transformer name="SelectCollectionStep" src="org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/>
       <map:transformer name="ResumeStep" src="org.dspace.app.xmlui.aspect.submission.submit.ResumeStep"/>
       <map:transformer name="SaveOrRemoveStep" src="org.dspace.app.xmlui.aspect.submission.submit.SaveOrRemoveStep"/>
       <map:transformer name="RemovedStep" src="org.dspace.app.xmlui.aspect.submission.submit.RemovedStep"/>
-      <map:transformer name="InitialQuestionsStep" src="org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep"/>	
-      <map:transformer name="DescribeStep" src="org.dspace.app.xmlui.aspect.submission.submit.DescribeStep"/>	
-      <map:transformer name="UploadStep" src="org.dspace.app.xmlui.aspect.submission.submit.UploadStep"/>
-      <map:transformer name="EditFileStep" src="org.dspace.app.xmlui.aspect.submission.submit.EditFileStep"/>	
-      <map:transformer name="ReviewStep" src="org.dspace.app.xmlui.aspect.submission.submit.ReviewStep"/>
-      <map:transformer name="CCLicenseStep" src="org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep"/>
-      <map:transformer name="LicenseStep" src="org.dspace.app.xmlui.aspect.submission.submit.LicenseStep"/>
       <map:transformer name="CompletedStep" src="org.dspace.app.xmlui.aspect.submission.submit.CompletedStep"/>
       
       <map:transformer name="RejectTaskStep" src="org.dspace.app.xmlui.aspect.submission.workflow.RejectTaskStep"/>
@@ -240,6 +234,23 @@
             </map:match>
           
             <!--
+              This is just a continuation of the submission workflow. The generic
+              submission step transformer determines which step we are on
+              and forwards to the appropriate step transformer class to 
+              generate the necessary DRI!
+            -->
+            <map:match pattern="handle/*/*/submit/continue">
+              <map:transform type="StepTransformer">
+                <map:parameter name="id" value="{flow-attribute:id}"/>
+                <map:parameter name="step" value="{flow-attribute:step}"/>
+                <map:parameter name="transformer" value="{flow-attribute:transformer}"/>
+                <map:parameter name="error" value="{flow-attribute:error}"/>
+                <map:parameter name="error_fields" value="{flow-attribute:error_fields}"/>
+                <map:parameter name="handle" value="{1}/{2}"/>
+              </map:transform>
+            </map:match>
+          
+            <!--
                 This step is used when resuming unfinished submissions, the user is
                 taken here after clicking the link from the submissions page.
                 -->
@@ -270,90 +281,6 @@
               <map:transform type="RemovedStep"/>
             </map:match>
             
-            <!--
-                This is the first step in the traditional submission flow, it
-                asks the user several questions that dictate how the rest of
-                the submission system will operate.
-                -->
-            <map:match pattern="handle/*/*/submit/initialQuestionsStep">
-              <map:transform type="InitialQuestionsStep">
-                <map:parameter name="id" value="{flow-attribute:id}"/>
-                <map:parameter name="step" value="{flow-attribute:step}"/>
-              </map:transform>
-            </map:match>
-            
-            <!--
-                This is the step where users enter metadata about the item they 
-                are submitted. The fields used are configured via the input-forms 
-                xml file share with the JSPUI. There may be multiple describe steps
-                depending upon the configuration of that file.
-                -->
-            <map:match pattern="handle/*/*/submit/describeStep">
-              <map:transform type="DescribeStep">
-                <map:parameter name="id" value="{flow-attribute:id}"/>
-                <map:parameter name="step" value="{flow-attribute:step}"/>
-                <map:parameter name="errors"      value="{flow-attribute:errors}"/>
-              </map:transform>
-            </map:match>
-            
-            <!--
-                This step allows the user to upload files for this submission.
-                -->
-            <map:match pattern="handle/*/*/submit/uploadStep">
-              <map:transform type="UploadStep">
-                <map:parameter name="id" value="{flow-attribute:id}"/>
-                <map:parameter name="step" value="{flow-attribute:step}"/>
-                <map:parameter name="errors"      value="{flow-attribute:errors}"/>
-              </map:transform>
-            </map:match>
-            
-            <!--
-                This step allows the user to edit metadata about the file such
-                as it's description of format.
-                -->
-            <map:match pattern="handle/*/*/submit/editFileStep">
-              <map:transform type="EditFileStep">
-                <map:parameter name="id" value="{flow-attribute:id}"/>
-                <map:parameter name="step" value="{flow-attribute:step}"/>
-                <map:parameter name="bitstreamID" value="{flow-attribute:bitstreamID}"/>
-              </map:transform>
-            </map:match>
-            
-            <!--
-                This step presents all the information that the user has entered up to
-                this point so that they can review it before moving on to the licensing
-                stage.
-                -->
-            <map:match pattern="handle/*/*/submit/reviewStep">
-              <map:transform type="ReviewStep">
-                <map:parameter name="id" value="{flow-attribute:id}"/>
-                <map:parameter name="step" value="{flow-attribute:step}"/>
-              </map:transform>
-            </map:match>
-            
-            <!--
-                This optional step presents the user with the ability to add a creative 
-                commons license to the newly submitted item.
-                -->
-            <map:match pattern="handle/*/*/submit/ccLicenseStep">
-              <map:transform type="CCLicenseStep">
-                <map:parameter name="id" value="{flow-attribute:id}"/>
-                <map:parameter name="step" value="{flow-attribute:step}"/>
-              </map:transform>
-            </map:match>
-            
-            <!--
-                This step is the final 'proper' step in the submission processes
-                where the user accepts the stanadrd distribution license for the collection.
-                -->
-            <map:match pattern="handle/*/*/submit/licenseStep">
-              <map:transform type="LicenseStep">
-                <map:parameter name="id" value="{flow-attribute:id}"/>
-                <map:parameter name="step" value="{flow-attribute:step}"/>
-                <map:parameter name="errors" value="{flow-attribute:errors}"/>
-              </map:transform>
-            </map:match>
-           
             <!--
                 This step is meurly a confirmation page letting the user 
                 know that they have completed submitting a new item to dspace.

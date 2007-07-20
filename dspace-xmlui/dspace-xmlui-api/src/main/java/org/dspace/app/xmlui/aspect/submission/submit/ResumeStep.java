@@ -44,8 +44,8 @@ import java.sql.SQLException;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -61,11 +61,15 @@ import org.xml.sax.SAXException;
  * This step is used when the a user clicks an unfinished submission 
  * from the submissions page. Here we present the full item and then 
  * give the user the option to resume the item's submission.
+ * <P>
+ * This is not a true "step" in the submission process, it just
+ * kicks off editing an unfinished submission.
  * 
  * FIXME: We should probably give the user the option to remove the 
  * submission as well.
  * 
  * @author Scott Phillips
+ * @author Tim Donohue (small updates for Configurable Submission)
  */
 public class ResumeStep extends AbstractStep
 {

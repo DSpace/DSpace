@@ -38,11 +38,17 @@
  * DAMAGE.
  */
 
+importClass(Packages.java.lang.Class);
+importClass(Packages.java.lang.ClassLoader);
+
 importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
+importClass(Packages.org.apache.cocoon.environment.http.HttpEnvironment);
+importClass(Packages.org.apache.cocoon.servlet.multipart.Part);
 
 importClass(Packages.org.dspace.handle.HandleManager);
 importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.workflow.WorkflowItem);
+importClass(Packages.org.dspace.workflow.WorkflowManager);
 importClass(Packages.org.dspace.content.WorkspaceItem);
 importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.license.CreativeCommons);
@@ -50,6 +56,16 @@ importClass(Packages.org.dspace.license.CreativeCommons);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.aspect.submission.FlowUtils);
 
+importClass(Packages.org.dspace.app.util.SubmissionConfig);
+importClass(Packages.org.dspace.app.util.SubmissionConfigReader);
+importClass(Packages.org.dspace.app.util.SubmissionInfo);
+
+importClass(Packages.org.dspace.submit.AbstractProcessingStep);
+
+/* Global variable which stores a comma-separated list of all fields 
+ * which errored out during processing of the last step.
+ */
+var ERROR_FIELDS = null;
 
 /**
  * Simple access method to access the current cocoon object model.
@@ -68,6 +84,45 @@ function getDSContext()
 {
 	return ContextUtil.obtainContext(getObjectModel());
 }
+
+
+/**
+ * Return the HTTP Request object for this request
+ */
+function getHttpRequest()
+{
+	return getObjectModel().get(HttpEnvironment.HTTP_REQUEST_OBJECT)
+}
+
+/**
+ * Return the HTTP Response object for the response
+ * (used for compatibility with DSpace configurable submission system)
+ */
+function getHttpResponse()
+{
+	return getObjectModel().get(HttpEnvironment.HTTP_RESPONSE_OBJECT)
+}
+
+/**
+ * Return the SubmissionInfo for the current submission
+ */
+function getSubmissionInfo(workspaceID)
+{
+	return FlowUtils.obtainSubmissionInfo(getObjectModel(), workspaceID);
+}
+
+/**
+ * Return an array of all step and page numbers as Java Double
+ * objects (format: #.#). 
+ * This returns all steps within the current submission process,
+ * including non-interactive steps which do not appear in 
+ * the Progress Bar
+ */
+function getSubmissionSteps(submissionInfo)
+{
+	return FlowUtils.getListOfAllSteps(getHttpRequest(), submissionInfo);
+}
+
 
 /**
  * Send the current page and wait for the flow to be continued. Use this method to add
@@ -101,10 +156,6 @@ function sendPage(uri,bizData)
 
 
 
-
-
-
-
 /**
  * Submission starting point.
  *
@@ -114,6 +165,8 @@ function sendPage(uri,bizData)
  */
 function doSubmission() 
 {
+   var step = cocoon.request.get("step"); //retrieve step number
+   
    var workspaceID = cocoon.request.get("workspaceID");
    
    if (workspaceID == null)
@@ -151,30 +204,33 @@ function doSubmission()
                      
        } while (collectionSelected == false)
       
-       // Hand off to the master thingy....
-       submissionControl(handle,"S"+workspaceID);
+       // Hand off to the master thingy.... 
+       //(specify "S" for submission item, for FlowUtils.findSubmission())
+       submissionControl(handle,"S"+workspaceID, step);
        
    }
    else
    {
        // Resume a previous submission
+       var workspace = WorkspaceItem.find(getDSContext(), workspaceID);
        
        // First check that the id is valid.
-       var submitterID = WorkspaceItem.find(getDSContext(), workspaceID).getSubmitter().getID()
+       var submitterID = workspace.getSubmitter().getID()
        var currentID = getDSContext().getCurrentUser().getID();
        if (submitterID == currentID)
        {
            // Get the collection handle for this item.
-           var handle = WorkspaceItem.find(getDSContext(), workspaceID).getCollection().getHandle();
+           var handle = workspace.getCollection().getHandle();
            
            // Record that this is a submission id, not a workflow id.
+           //(specify "S" for submission item, for FlowUtils.findSubmission())
            workspaceID = "S"+workspaceID;
            do {
                sendPageAndWait("handle/"+handle+"/submit/resumeStep",{"id":workspaceID,"step":"0"});
                
                if (cocoon.request.get("submit_resume"))
                {
-                   submissionControl(handle,workspaceID);
+                   submissionControl(handle,workspaceID, step);
                }
                else if (cocoon.request.get("submit_cancel"))
                {
@@ -201,104 +257,396 @@ function doSubmission()
  * increased accordingly. Special cases like jumping or saveing are also
  * handled here.
  *
- * FIXME: Note, this should probably read the order of the steps from a
- * configuration file. This will allow for more customized submission 
- * workflows.
+ * Parameters:
+ *     collectionHandle - the handle of the collection we are submitting to
+ *     workspaceID - the in progress submission's Workspace ID
+ *     stepAndPage - the Step and Page number to start on (e.g. "1.1")
  */
-function submissionControl(handle, workspaceID) 
+function submissionControl(collectionHandle, workspaceID, stepAndPage) 
 {
+	//load initial submission information
+	var submissionInfo = getSubmissionInfo(workspaceID);
+	 
+    var progressIterator = 0;
     
-    // First find out how many describe pages there are:
-    var numberOfDescribePages = 
-       FlowUtils.getNumberOfDescribePages(getDSContext(),workspaceID);
+    //this is array of all the steps/pages in current submission process
+    //it's used to step back and forth between pages!
+    var stepsInSubmission = getSubmissionSteps(submissionInfo);
     
-    var step = 0;
+    //if we didn't have a page passed in, go to first page in process
+    if(stepAndPage==null)
+    	stepAndPage = stepsInSubmission[0];
+    	
+    var response_flag = 0;
     
     do { 
-        // Loop forever, exit cases such as save, remove, or completed
-        // will call cocoon.exit() stoping excecution.
-        FlowUtils.setStepReached(getDSContext(),workspaceID,step);
-    
-        if ( step >= 1 && step <= numberOfDescribePages )
+     	// Loop forever, exit cases such as save, remove, or completed
+        // will call cocoon.exit() stopping execution.
+        
+  		cocoon.log.debug("Current step & page=" + stepAndPage, null);
+  		cocoon.log.debug("Current ERROR Fields=" + getErrorFields(), null);
+    	
+    	//----------------------------------------------------------
+    	// #1: Actually load the next page in the process
+    	//-----------------------------------------------------------
+    	//split out step and page (e.g. 1.2 is page 2 of step 1)
+	 	var fields = String(stepAndPage).split(".");
+		var step = fields[0];
+		var page = fields[1];
+		
+	    //Set the current page we've reached in current step
+	    FlowUtils.setPageReached(getDSContext(),workspaceID, step, page);
+	  
+	  	//Load this step's configuration
+	  	var stepConfig = submissionInfo.getSubmissionConfig().getStep(step);
+	  	 	
+    	//Pass it all the info it needs, including any response/error flags
+    	//in case an error occurred
+    	response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, response_flag); 
+    	
+    	//----------------------------------------------------------
+    	// #2: Determine which page/step the user should be sent to next
+    	//-----------------------------------------------------------
+        // User clicked "Next->" button:
+        // Only step forward to next page if no errors on this page
+        if (cocoon.request.get(AbstractProcessingStep.NEXT_BUTTON) && (response_flag==AbstractProcessingStep.STATUS_COMPLETE))
         {
-            submitStepDescribe(handle,workspaceID,step);
-        } 
-        else 
+           	progressIterator++;
+           	
+           	var totalSteps = stepsInSubmission.length;
+           	var inWorkflow = submissionInfo.isInWorkflow();
+  	
+           	//check if we've completed the submission
+           	if(progressIterator >= totalSteps)
+           	{
+           		if(inWorkflow==false)
+           		{
+           		  	//Submission is completed!
+           			cocoon.log.debug("Submission Completed!");
+           			
+           			showCompleteConfirmation(collectionHandle);
+           		}
+           		else
+           		{   //since in Workflow just break out of loop to return to Workflow process
+           			break;
+           		}
+           	}
+           	else
+           	{
+           		stepAndPage = stepsInSubmission[progressIterator];
+           		cocoon.log.debug("Next Step & Page=" + stepAndPage);
+        	}
+        }//User clicked "<- Previous" button
+        else if (cocoon.request.get(AbstractProcessingStep.PREVIOUS_BUTTON))
         {
-            switch (step)
-            {
-            case 0:
-                submitStepInitial(handle,workspaceID,step);
-                break;
-            case numberOfDescribePages+1:
-                submitStepUpload(handle,workspaceID,step);
-                break;
-            case numberOfDescribePages+2:
-                submitStepReview(handle,workspaceID,step);
-                break;
-            case numberOfDescribePages+3:
-                submitStepCCLicense(handle,workspaceID,step);
-                break;
-            case numberOfDescribePages+4:
-                submitStepLicense(handle,workspaceID,step);
-                break;
-            }
+            progressIterator--;
+            stepAndPage = stepsInSubmission[progressIterator];
+            cocoon.log.debug("Previous Step & Page=" + stepAndPage);
+        }
+        // User clicked "Save/Cancel" Button
+        else if (cocoon.request.get(AbstractProcessingStep.CANCEL_BUTTON))
+        {
+            submitStepSaveOrRemove(collectionHandle,workspaceID,step);	
         }
         
-        if (cocoon.request.get("submit_next"))
+        //User clicked on Progress Bar:
+        // only check for a 'step_jump' (i.e. click on progress bar)
+        // if there are no errors to be resolved
+        if(response_flag==AbstractProcessingStep.STATUS_COMPLETE)
         {
-            step++;
-        }
-        else if (cocoon.request.get("submit_previous"))
-        {
-            step--;
-        }
-        else if (cocoon.request.get("submit_save"))
-        {
-            submitStepSaveOrRemove(handle,workspaceID,step);
-        }
-        
-        var names = cocoon.request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-            var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
-            var name = names.nextElement(); 
-            if (name.startsWith("submit_jump_"))
-            {
-                var newStep = name.substring("submit_jump_".length);
-                newStep = parseInt(newStep);
-                if (newStep >= 0 && newStep <= maxStep)
-                {
-                   step = newStep;     
-                }
-            }
-        }
-        
+	        var names = cocoon.request.getParameterNames();
+	        while(names.hasMoreElements())
+	        {
+	            var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
+	            var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
+	            var maxStepAndPage = parseFloat(maxStep + "." + maxPage);
+	                     
+	            var name = names.nextElement(); 
+	            if (name.startsWith(AbstractProcessingStep.PROGRESS_BAR_PREFIX))
+	            {
+	                var newStepAndPage = name.substring(AbstractProcessingStep.PROGRESS_BAR_PREFIX.length());
+	                newStepAndPage = parseFloat(newStepAndPage);
+	                
+	                //only allow a jump to a page user has already been to
+	                if (newStepAndPage >= 0 && newStepAndPage <= maxStepAndPage)
+	                {
+	                   stepAndPage = newStepAndPage;
+	                   
+					   cocoon.log.debug("Jump To Step & Page=" + stepAndPage);
+	                   
+	                   //reset progress iterator
+	                   for(var i=0; i<stepsInSubmission.length; i++)
+	                   {
+	                   		if(stepAndPage==stepsInSubmission[i])
+	                   		{
+	                   			progressIterator = i;
+	                   			break;
+	                   		}
+	                   }
+	                }
+	            }//end if submit_jump pressed
+	        }//end while more elements
+        }//end if no errors
     } while ( 1 == 1)
 
 }
 
 /**
+ * This function actually starts the next page in a step,
+ * loading it's UI and then doing its processing!
+ *
+ * Parameters:
+ *     collectionHandle - the handle of the collection we are submitting to
+ *     workspaceID - the in progress submission's Workspace ID
+ *     stepConfig - the SubmissionStepConfig representing the current step config
+ *     stepAndPage - the current Step and Page number (e.g. "1.1")
+ *     response_flag - any response or errors from previous processing
+ */
+function doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, response_flag)
+{
+  	//split out step and page (e.g. 1.2 is page 2 of step 1)
+	var fields = String(stepAndPage).split(".");
+    var step = fields[0];
+	var page = fields[1];
+  
+  	//-------------------------------------
+ 	// #1: Check if this step has a UI
+ 	//-------------------------------------
+ 		
+ 	//check if this step has an XML-UI Transformer class specified
+ 	var xmlUIClassName = stepConfig.getXMLUIClassName();
+ 
+ 	var stepHasUI = false;
+ 
+	//if this step has an XML-UI, then call the generic step transformer
+ 	//(otherwise, this is just a processing step)
+ 	if((xmlUIClassName!=null) && (xmlUIClassName.length()>0))
+ 	{
+ 		stepHasUI = true;
+ 		
+ 		//prepend URI with the handle of the collection, and go there!
+ 		sendPageAndWait("handle/"+collectionHandle+ "/submit/continue",{"id":workspaceID,"step":String(stepAndPage),"transformer":xmlUIClassName,"error":String(response_flag),"error_fields":getErrorFields()});
+     }
+        
+     //-------------------------------------
+     // #2: Perform step processing
+     //-------------------------------------
+     //perform step processing (this returns null if no errors, otherwise an error string)
+     response_flag = processPage(workspaceID, stepConfig, page, stepHasUI);
+     
+     return response_flag;
+}
+
+
+/**
+ * This function calls the step processing code, which will process
+ * all user inputs for this step, or just perform backend processing
+ * (for non-interactive steps).
+ *
+ * This function returns the response_flag which is returned by the
+ * step class's doProcessing() method.  An error flag of 
+ * AbstractProcessingStep.STATUS_COMPLETE (value = 0) means no errors!
+ *
+ * Parameters:
+ *     workspaceID - the in progress submission's Workspace ID
+ *     stepConfig - the SubmissionStepConfig for the current step
+ *     page - the current page number we are on in the step
+ *     stepHasUI - whether or not this step has a user interface
+ */
+function processPage(workspaceID, stepConfig, page, stepHasUI)
+{
+	//retrieve submission info 
+	//(we cannot pass the submission info to this function, since
+	// often this processing takes place as part of a new request 
+	// and the DSpace Context is changed on each request) 
+	var submissionInfo = getSubmissionInfo(workspaceID);
+
+	var response_flag = null;
+
+	//---------------------------------------------
+    // #1: Get a reference to Step Processing class
+    //---------------------------------------------
+	//get name of processing class for this step
+	var processingClassName = stepConfig.getProcessingClassName();
+    
+	//retrieve an instance of the processing class
+	var loader = submissionInfo.getClass().getClassLoader();
+	var processingClass = loader.loadClass(processingClassName);
+	
+ 	// this processing class *must* be a valid AbstractProcessingStep, 
+	// or else we'll have problems very shortly
+	var stepClass = processingClass.newInstance();
+	
+	//------------------------------------------------
+    // #2: Perform step processing & check for errors
+    //------------------------------------------------
+    //Check if this	request is a file upload
+	//(if so, Cocoon automatically uploads the file, 
+	// so we need to let the Processing class know that)
+	var contentType = getHttpRequest().getContentType();
+	if ((contentType != null)
+                && (contentType.indexOf("multipart/form-data") != -1))
+    {
+    	//load info about uploaded file, so that it can be
+    	//saved properly by the step's doProcessing() method below
+    	loadFileUploadInfo();
+    }	
+    
+	//before beginning processing, let this step know what page to process
+	//(this is important for multi-page steps!)	
+	stepClass.setCurrentPage(getHttpRequest(), page);	
+		
+	//call the step's doProcessing() method
+	response_flag = stepClass.doProcessing(getDSContext(), getHttpRequest(), getHttpResponse(), submissionInfo);
+	
+	//if this is a non-interactive step, 
+	//we cannot do much with errors/responses other than logging them!
+    if((!stepHasUI) && (response_flag!=AbstractProcessingStep.STATUS_COMPLETE))
+    {
+    	//check to see if there is a description of this response/error in Messages!
+    	var error = stepClass.getErrorMessage(response_flag);
+    	
+    	//if no error message defined, create a dummy one
+    	if(error==null)
+    	{
+			error = "The doProcessing() method for " + processingClass.getName() + 
+      						" returned an error flag = " + response_flag + ". " +
+      						"It is recommended to define a custom error message for this error flag using the addErrorMessage() method for this class!";
+        }
+        		
+    	cocoon.log.error(error, null); //log as an error to Cocoon
+    	
+    	//clear error flag, so that processing can continue
+    	response_flag = AbstractProcessingStep.STATUS_COMPLETE;  
+    	//clear any error fields as well
+		saveErrorFields(null);
+    	
+    }//else if there is a UI, but still there were errors!
+    else if(response_flag!=AbstractProcessingStep.STATUS_COMPLETE)
+	{
+		//save error fields to global ERROR_FIELDS variable,
+		//for step-specific post-processing
+		saveErrorFields(stepClass.getErrorFields());
+	}
+	else //otherwise, no errors at all
+	{
+		//clear any previously set error fields
+		saveErrorFields(null);
+	}
+	
+    return response_flag;
+}
+
+/**
+ * This function loads information about a file automatically
+ * uploaded by Cocoon.  A file will only be automatically uploaded
+ * by Cocoon if 'enable-uploads' is set to 'true' in the web.xml
+ * (which is the default setting for Manakin).
+ *
+ * The uploaded files will be added to the Request object as two
+ * seperate attributes: [name]-path and [name]-inputstream. The first
+ * attribute contains the full path to the uploaded file on the client's
+ * Operating System. The second attribute contains an inputstream to the
+ * file. These two attributes will be created for any file uploaded.
+ */
+function loadFileUploadInfo()
+{
+	//determine the parameter which is the uploaded file
+	var paramNames = cocoon.request.getParameterNames();
+	while(paramNames.hasMoreElements())
+	{
+		var fileParam = paramNames.nextElement();
+		
+		var fileObject = cocoon.request.get(fileParam);
+        
+        //check if this is actually a file
+		if (!(fileObject instanceof Part)) 
+		{	
+			continue;
+		}
+		
+		//load uploaded file information
+		if (fileObject != null && fileObject.getSize() > 0)
+		{
+			//Now, save information to HTTP request which
+			//the step processing class will use to actually 
+			//save the file as a DSpace bitstream object.
+			
+			//save original filename to request attribute
+			getHttpRequest().setAttribute(fileParam + "-path", fileObject.getUploadName());
+			
+			//save inputstream of file contents to request attribute
+			getHttpRequest().setAttribute(fileParam + "-inputstream", fileObject.getInputStream());
+		}	
+		
+    }
+}
+
+/**
+ * Save the error fields returned by the last step processed.
+ * 
+ * The errorFields parameter is the List of strings returned by a
+ * call to AbstractProcessingStep.getErrorFields()
+ */
+function saveErrorFields(errorFields)
+{
+	if(errorFields==null || errorFields.size()==0)
+	{
+		ERROR_FIELDS=null;
+	}
+	else
+	{	
+		//iterate through the fields	
+		var i = errorFields.iterator();
+	
+		//build comma-separated list of error fields
+		while(i.hasNext())
+		{
+			var field = i.next();
+			
+			if(ERROR_FIELDS==null || ERROR_FIELDS.length==0)
+			{
+				ERROR_FIELDS = field;
+			}
+			else
+			{
+				ERROR_FIELDS = ERROR_FIELDS + "," + field;
+			}	
+		}
+	}	
+}
+
+/**
+ * Get the error fields returned by the last step processed.
+ * 
+ * This method returns a comma-separated list of field names
+ */
+function getErrorFields()
+{
+	return ERROR_FIELDS;
+}
+
+
+/**
  * This step is used when ever the user clicks save/cancel during the submission 
  * processes. We ask them if they would like to save the submission or remove it.
  */
-function submitStepSaveOrRemove(handle,workspaceID,step)
+function submitStepSaveOrRemove(collectionHandle,workspaceID,step)
 {
-    sendPageAndWait("handle/"+handle+"/submit/saveOrRemoveStep",{"id":workspaceID,"step":String(step)});
+    sendPageAndWait("handle/"+collectionHandle+"/submit/saveOrRemoveStep",{"id":workspaceID,"step":String(step)});
     
-    FlowUtils.processSaveOrRemove(getDSContext(),workspaceID,cocoon.request);
+    FlowUtils.processSaveOrRemove(getDSContext(), workspaceID, cocoon.request);
     
     if (cocoon.request.get("submit_save"))
     {
        // Allready saved, just take them back to dspace home.
        var contextPath = cocoon.request.getContextPath();
        cocoon.redirectTo(contextPath+"/submissions",true);
-       getDSContext().complete();
        cocoon.exit();
     }
     else if (cocoon.request.get("submit_remove"))
     {
-        sendPage("handle/"+handle+"/submit/removedStep");
+        sendPage("handle/"+collectionHandle+"/submit/removedStep");
         cocoon.exit(); // We're done, Stop excecution.
     }
     
@@ -306,272 +654,15 @@ function submitStepSaveOrRemove(handle,workspaceID,step)
 }
 
 /**
- * This step presents a set of initial questions to the user, such as mulitple titles,
- * or if it has been published before. Since there are no error conditions, the page 
- * only has checkboxes on it we can just return after processing.
+ * This method simply displays
+ * the "submission completed" confirmation page
  */
-function submitStepInitial(handle,workspaceID,step)
+function showCompleteConfirmation(handle)
 {
-    sendPageAndWait("handle/"+handle+"/submit/initialQuestionsStep",{"id":workspaceID,"step":String(step)});
-    
-    FlowUtils.processInitialQuestions(getDSContext(),workspaceID,cocoon.request);
+	//forward to completion page & exit cocoon
+	sendPage("handle/"+handle+"/submit/completedStep",{"handle":handle});
+    cocoon.exit(); // We're done, Stop execution.
 }
-
-/**
- * This step presents the user with a list of metadata fields to describe the item. There 
- * may be multiple describe steps in the overall submissions workflow, so when the user 
- * clicks next it will go up to the submissionControl method and may come right back here 
- * with another describe page.
- */
-function submitStepDescribe(handle,workspaceID, step)
-{
-    var errors;
-    var complete = false;
-    do {
-        
-        sendPageAndWait("handle/"+handle+"/submit/describeStep",{"id":workspaceID, "step":String(step), "errors":errors});
-        
-        // Processes the page and store the new errors in a temprorary variable and only 
-        // show them to the user if they have clicked next or previous.
-        var newerrors = FlowUtils.processDescribeItem(getDSContext(),workspaceID,step,cocoon.request);
-
-        if (cocoon.request.get("submit_next"))
-        {
-            if (newerrors != null) 
-            {
-                // The user want's to go on, but the page is in error.
-                errors = newerrors;   
-            }
-            else
-            {
-                complete = true;
-            }
-        }
-        else if (cocoon.request.get("submit_previous"))
-        {
-            complete = true;
-        }
-        else if (cocoon.request.get("submit_save"))
-        {
-            if (newerrors != null)
-            {
-                // Can not leave the page until the errors have been resolved.
-                errors = newerrors;
-            }
-            else
-            {
-                complete = true;
-            }
-        }
-        
-        // Jump submit button to another potion of the submission processes.
-        var names = cocoon.request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-            var name = names.nextElement(); 
-            if (name.startsWith("submit_jump_"))
-            {
-                if (newerrors != null)
-                {
-                    // Can not leave the page until the errors have been resolved.
-                    errors = newerrors;
-                }
-                else
-                {
-                    complete = true;
-                }
-            }
-        }
-        
-    } while (complete == false)
-}
-
-/**
- * This step allows the user to upload files to the submission item. The user is 
- * also presented with a list of existing files on the submission and may choose one of 
- * them to edit metadata about. In this case mini editFileStep is used, note this not a full 
- * step because it is not called by the submission master control.
- */
-function submitStepUpload(handle,workspaceID,step) 
-{
-    var finished = false;
-    var errors;
-    do {
-        sendPageAndWait("handle/"+handle+"/submit/uploadStep",{"id":workspaceID,"step":String(step),"errors":errors});
-        
-	    var newerrors = FlowUtils.processUpload(getDSContext(),workspaceID,cocoon.request);
-        
-        if (cocoon.request.get("submit_next"))
-        {
-            if (newerrors != null)
-            {
-                // The user may not procced until the errors are fixed.
-                errors = newerrors;
-            }
-            else
-            {
-                finished = true;
-            }
-        }
-        else if (cocoon.request.get("submit_previous"))
-        {
-            finished = true;
-        }
-        else if (cocoon.request.get("submit_save"))
-        {
-            finished = true;
-        }
-        
-        var names = cocoon.request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-            var name = names.nextElement(); 
-            if (name.startsWith("submit_edit_"))
-            {
-                var bitstreamID = name.substring("submit_edit_".length);
-                sendPageAndWait("handle/"+handle+"/submit/editFileStep",{"id":workspaceID,"step":String(step),"bitstreamID":bitstreamID});  
-                
-                if (cocoon.request.get("submit_save"))
-                {
-                    FlowUtils.processEditFile(getDSContext(),bitstreamID,cocoon.request);  
-                }           
-            }
-        }
-        
-        var names = cocoon.request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-            var name = names.nextElement(); 
-            if (name.startsWith("submit_jump_"))
-            {
-                if (newerrors != null)
-                {
-                    // may not jump until the errors are resolved.
-                    errors = newerrors;
-                }
-                else
-                {
-                    finished = true;
-                }
-            }
-        }
-        
-    } while (finished == false)
-
-}
-
-/**
- * This steps presents all the data that the user has entered up to
- * this point and gives them the option to jump back to each section
- * to edit any of the entered metadata.
- */
-function submitStepReview(handle,workspaceID,step) 
-{
-    sendPageAndWait("handle/"+handle+"/submit/reviewStep",{"id":workspaceID,"step":String(step)});
-}
-
-/**
- * This optional step allows the user to add a creative commons
- * license to the item. If they want to add one then they will be taken 
- * away from this website to the creative commons site where they will 
- * answer a few questions and select a license. Once finished at the 
- * creative commons website they will be directed back here.
- */
-function submitStepCCLicense(handle,workspaceID,step)
-{
-    // step only preforms an action if Creative commons is enabled, 
-    // other wise skip to the next step.
-    if (CreativeCommons.isEnabled())
-    {
-        var finished = false;
-        do {
-        
-            sendPageAndWait("handle/"+handle+"/submit/ccLicenseStep",{"id":workspaceID,"step":String(step)});
-            
-            FlowUtils.processCCLicense(getDSContext(),workspaceID,cocoon.request);
-            
-            if (cocoon.request.get("submit_previous"))
-            {
-                finished = true;
-            }
-            else if (cocoon.request.get("submit_save"))
-            {
-                finished = true;
-            }
-            else if (cocoon.request.get("submit_next"))
-            {
-                finished = true;
-            }
-            
-        } while (finished == false)
-    }
-}
-
-/**
- * This step is the last step in the traditional submission workflow. At this step the user is required
- * to accept the distribution license.
- */
-function submitStepLicense(handle,workspaceID,step) 
-{
-    var finished=false;
-    var errors
-    do {
-        sendPageAndWait("handle/"+handle+"/submit/licenseStep",{"id":workspaceID,"step":String(step),"errors":errors});
-   
-        var newerrors = FlowUtils.processLicense(getDSContext(),workspaceID,cocoon.request);
-        
-        if (cocoon.request.get("submit_remove"))
-        {
-            // Remove this submission
-            FlowUtils.processSaveOrRemove(getDSContext(),workspaceID,cocoon.request);
-            
-            sendPage("handle/"+handle+"/submit/removed");
-        
-            cocoon.exit(); // We're done, Stop excecution.
-        }
-        if (cocoon.request.get("submit_previous"))
-        {
-            finished = true;
-        }
-        else if (cocoon.request.get("submit_save"))
-        {
-            finished = true;
-        }
-        else if (cocoon.request.get("submit_complete"))
-        {
-            if (newerrors != null)
-            {
-                // Submission can not be completed until
-                // a license is granted.
-                errors = newerrors;
-            }
-            else
-            {
-                FlowUtils.processCompleteSubmission(getDSContext(),workspaceID,cocoon.request);
-                sendPage("handle/"+handle+"/submit/completedStep",{"handle":handle});
-                cocoon.exit(); // We're done, Stop excecution.
-            }
-        }
-        
-        var names = cocoon.request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-            var name = names.nextElement(); 
-            if (name.startsWith("submit_jump_"))
-            {
-                finished = true;
-            }
-        }
-    }
-    while (finished == false)
-}
-
-
-
-
-
-
-
 
 /**
  * This is the starting point for all workflow tasks. The id of the workflow
@@ -592,6 +683,7 @@ function doWorkflow()
     var handle = WorkflowItem.find(getDSContext(), workflowID).getCollection().getHandle();
     
     // Specify that we are working with workflows.
+    //(specify "W" for workflow item, for FlowUtils.findSubmission())
     workflowID = "W"+workflowID;
     
     do
@@ -647,8 +739,11 @@ function doWorkflow()
         }
         else if (cocoon.request.get("submit_edit"))
         {
-            // Shuttle the user into the edit workflow
-            workflowEditMetadataControl(handle,workflowID);
+        	//User is editing this submission:
+            //	Send user through the Submission Control
+            //	(NOTE: The SubmissionInfo object decides which
+            //       steps are able to be edited in a Workflow)
+            submissionControl(handle, workflowID, null);
         }
         
     } while (1==1)
@@ -662,16 +757,16 @@ function doWorkflow()
  */
 function workflowStepReject(handle,workflowID)
 {
-    var errors;
+    var error_fields;
     do {
         
-        sendPageAndWait("handle/"+handle+"/workflow/rejectTaskStep",{"id":workflowID, "step":"0", "errors":errors});
+        sendPageAndWait("handle/"+handle+"/workflow/rejectTaskStep",{"id":workflowID, "step":"0", "error_fields":error_fields});
 
         if (cocoon.request.get("submit_reject"))
         {
-            errors = FlowUtils.processRejectTask(getDSContext(),workflowID,cocoon.request);
+            error_fields = FlowUtils.processRejectTask(getDSContext(),workflowID,cocoon.request);
             
-            if (errors == null)
+            if (error_fields == null)
             {
                 // Only exit if rejection succeded, otherwise ask for a reason again.
                 return true;
@@ -684,165 +779,6 @@ function workflowStepReject(handle,workflowID)
         }
     } while (1 == 1)
     
-}
-
-
-/**
- * This flow is used during a workflow task when the user selects to edit an item's metadata.
- * The edit processes is very similar to the submission processes, in fact most of the steps 
- * are the same with just minor modifications. This control flow is quite similar but is
- * truncated in the number of steps it hase.
- */
-function workflowEditMetadataControl(handle, workflowID) 
-{
-    
-    // First find out how many describe pages there are:
-    var numberOfDescribePages = 
-      FlowUtils.getNumberOfDescribePages(getDSContext(),workflowID);
-    
-    var complete = false;
-    var step = 0;
-    do { 
-    
-        if ( step >= 1 && step <= numberOfDescribePages )
-        {
-            complete = workflowStepDescribe(handle,workflowID,step);
-        } 
-        else 
-        {
-            switch (step)
-            {
-            case 0:
-                complete = workflowStepInitial(handle,workflowID,step);
-                break;
-            case numberOfDescribePages+1:
-                complete = workflowStepUpload(handle,workflowID,step);
-                break;
-            case numberOfDescribePages+2:
-                complete = workflowStepReview(handle,workflowID,step);
-                break;
-            }
-        }
-        
-        if (cocoon.request.get("submit_next"))
-        {
-            step++;
-        }
-        else if (cocoon.request.get("submit_previous"))
-        {
-            step--;
-        }
-        else if (cocoon.request.get("submit_save"))
-        {
-            complete = true;
-        }
-        
-        var names = cocoon.request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-            var name = names.nextElement(); 
-            if (name.startsWith("submit_jump_"))
-            {
-                var newStep = name.substring("submit_jump_".length);
-                newStep = parseInt(newStep);
-                if (newStep >= 0 && newStep <= numberOfDescribePages+2)
-                {
-                   step = newStep;     
-                }
-            }
-        }
-        
-    } while ( complete == false)
-}
-
-/**
- * This step is the same as the submission version.
- */
-function workflowStepInitial(handle,workflowID,step)
-{
-    // Just use the same implementation as submission.
-    submitStepInitial(handle,workflowID,step);
-    return false;
-}
-
-/**
- * This step is the same as the submission version.
- */
-function workflowStepDescribe(handle,workflowID, step)
-{
-    // Just us the same implementation as submission
-    submitStepDescribe(handle,workflowID,step);
-    return false;
-}
-
-/**
- * This step is simplar to the submission version but
- * it does not allow the user to upload any files. The user
- * may only edit metadata on existing files.
- */
-function workflowStepUpload(handle,workflowID,step) 
-{
-    // The same implementation as submission but without the ability to upload.
-    
-    var finished = false;
-    var errors;
-    do {
-        sendPageAndWait("handle/"+handle+"/submit/uploadStep",{"id":workflowID,"step":String(step),"errors":errors});
-
-        if (cocoon.request.get("submit_next"))
-        {
-            finished = true;
-        }
-        else if (cocoon.request.get("submit_previous"))
-        {
-            finished = true;
-        }
-        else if (cocoon.request.get("submit_save"))
-        {
-            finished = true;
-        }
-        
-        var names = cocoon.request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-            var name = names.nextElement(); 
-            if (name.startsWith("submit_edit_"))
-            {
-                var bitstreamID = name.substring("submit_edit_".length);
-                sendPageAndWait("handle/"+handle+"/submit/editFileStep",{"id":workflowID,"step":String(step),"bitstreamID":bitstreamID});  
-                
-                if (cocoon.request.get("submit_save"))
-                {
-                    FlowUtils.processEditFile(getDSContext(),bitstreamID,cocoon.request);  
-                }           
-            }
-        }
-    } while (finished == false)
-    
-    return false;
-}
-
-
-/**
- * This step is the same as the submission version, with 
- * one exception. When the user click's next instead of 
- * progressing to another step they are returned to the 
- * task preview step.
- */
-function workflowStepReview(handle,workflowID,step) 
-{
-    // Just use the same implementation as submission,
-    // but if they try to go to the next page then set
-    // the exit paramater so instead they go back to
-    // the workflow view.
-    submitStepReview(handle,workflowID,step);
-    
-    if (cocoon.request.get("submit_next"))
-    {
-       return true;
-    }
-    
-    return false; 
 }
 
 

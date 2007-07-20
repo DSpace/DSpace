@@ -42,8 +42,8 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -71,8 +71,9 @@ import org.xml.sax.SAXException;
  *  - Published Before
  * 
  * @author Scott Phillips
+ * @author Tim Donohue (updated for Configurable Submission)
  */
-public class InitialQuestionsStep extends AbstractStep
+public class InitialQuestionsStep extends AbstractSubmissionStep
 {
 	/** Language Strings **/
     protected static final Message T_head= 
@@ -140,7 +141,7 @@ public class InitialQuestionsStep extends AbstractStep
     	List form = div.addList("submit-initial-questions", List.TYPE_FORM);
         form.setHead(T_head);    
         
-        CheckBox multipleTitles = form.addItem().addCheckBox("multiple-titles");
+        CheckBox multipleTitles = form.addItem().addCheckBox("multiple_titles");
         multipleTitles.setLabel(T_multiple_titles);
         multipleTitles.setHelp(T_multiple_titles_help);
         multipleTitles.addOption("true");
@@ -166,7 +167,7 @@ public class InitialQuestionsStep extends AbstractStep
 	        }
         }
         
-        CheckBox publishedBefore = form.addItem().addCheckBox("published-before");
+        CheckBox publishedBefore = form.addItem().addCheckBox("published_before");
         publishedBefore.setLabel(T_published_before);
         publishedBefore.setHelp(T_published_before_help);
         publishedBefore.addOption("true");
@@ -249,12 +250,60 @@ public class InitialQuestionsStep extends AbstractStep
 	        }
         }
         
-        // Standard action buttons
-        org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
-		actions.addButton("submit_save").setValue(T_save);
-		actions.addButton("submit_next").setValue(T_next);
+        //Since we already warn users about the metadata pruning to happen
+        //if they uncheck an already checked box, then
+        //we can let the prune process occur immediately!
+        form.addItem().addHidden("prune").setValue("true");
+        
+        //add standard control/paging buttons
+        addControlButtons(form);
         
         div.addHidden("submission-continue").setValue(knot.getId()); 
         
+    }
+    
+    /** 
+     * Each submission step must define its own information to be reviewed
+     * during the final Review/Verify Step in the submission process.
+     * <P>
+     * The information to review should be tacked onto the passed in 
+     * List object.
+     * <P>
+     * NOTE: To remain consistent across all Steps, you should first
+     * add a sub-List object (with this step's name as the heading),
+     * by using a call to reviewList.addList().   This sublist is
+     * the list you return from this method!
+     * 
+     * @param reviewList
+     *      The List to which all reviewable information should be added
+     * @return 
+     *      The new sub-List object created by this step, which contains
+     *      all the reviewable information.  If this step has nothing to
+     *      review, then return null!   
+     */
+    public List addReviewSection(List reviewList) throws SAXException,
+        WingException, UIException, SQLException, IOException,
+        AuthorizeException
+    {
+        //Create a new section for this Initial Questions information
+        List initSection = reviewList.addList("submit-review-" + this.stepAndPage, List.TYPE_FORM);
+        initSection.setHead(T_head);
+        
+        //add information to review
+        Message multipleTitles = ReviewStep.T_no;
+        if (submission.hasMultipleTitles())
+            multipleTitles = ReviewStep.T_yes;
+    
+        Message publishedBefore = ReviewStep.T_no;
+        if (submission.isPublishedBefore())
+            publishedBefore = ReviewStep.T_yes;
+        
+        initSection.addLabel(T_multiple_titles);
+        initSection.addItem(multipleTitles);
+        initSection.addLabel(T_published_before);
+        initSection.addItem(publishedBefore);
+        
+        //return this new review section
+        return initSection;
     }
 }

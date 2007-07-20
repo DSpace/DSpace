@@ -43,8 +43,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -55,14 +55,17 @@ import org.dspace.content.Collection;
 import org.xml.sax.SAXException;
 
 /**
- * This is sort-of a step of the submission processes. At any time
- * duiring submission the user may leave the processe and either
+ * This is sort-of a step of the submission processes (not
+ * an official "step", since it does not extend AbstractSubmissionStep). 
+ * <P>
+ * At any time during submission the user may leave the processe and either
  * leave it for later or remove the submission.
- * 
+ * <P>
  * This form presents three options, 1) Go back, 2) save the work, 
  * or 3) remove it.
  * 
  * @author Scott Phillips
+ * @author Tim Donohue (small updates for Configurable Submission)
  */
 public class SaveOrRemoveStep extends AbstractStep
 {

@@ -221,6 +221,11 @@ ul.ds-progress-list li.current.button input.ds-button-field {
 	color: rgb(10,175,10);
 }
 
+ul.ds-progress-list li.disabled.button input.ds-button-field {
+	color: rgb(184,184,184);
+}
+
+
 ul.ds-progress-list li.current {
 	color: rgb(80, 183, 40);
 	background-color: inherit;

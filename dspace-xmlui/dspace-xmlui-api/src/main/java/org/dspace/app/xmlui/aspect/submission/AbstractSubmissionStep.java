@@ -1,7 +1,7 @@
 /*
- * RemovedStep.java
+ * AbstractSubmissionStep.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision: 1.3 $
  *
  * Date: $Date: 2006/07/13 23:20:54 $
  *
@@ -37,50 +37,49 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.app.xmlui.aspect.submission.submit;
+
+package org.dspace.app.xmlui.aspect.submission;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
 /**
- * This is a confirmation page informing the user that they have
- * successfully removed their submission.
+ * This abstract class represents an abstract submission page.
  * <P>
- * As such, it's not a true "step" in the submission process
+ * This class only adds the required "addReviewSection()"
+ * method for a submission step.  This method is used by the
+ * ReviewStep to generate a single review/verify screen for the user.
  * 
- * @author Scott Phillips
+ * @author Tim Donohue
  */
-public class RemovedStep extends AbstractStep
+abstract public class AbstractSubmissionStep extends AbstractStep
 {
-
-	/** Language Strings **/
-    protected static final Message T_head = 
-        message("xmlui.Submission.submit.RemovedStep.head");
-    protected static final Message T_info1 = 
-        message("xmlui.Submission.submit.RemovedStep.info1");
-    protected static final Message T_go_submissions = 
-        message("xmlui.Submission.submit.RemovedStep.go_submission");
-    
-	
-	public void addBody(Body body) throws SAXException, WingException,
-	UIException, SQLException, IOException, AuthorizeException
-	{	
-		Division div = body.addInteractiveDivision("submit-removed",contextPath+"/submit", Division.METHOD_POST,"primary submission");
-		
-		div.setHead(T_head);
-		
-		div.addPara(T_info1);
-		
-		div.addPara().addXref(contextPath+"/submissions",T_go_submissions);
-	}
-
+    /** 
+     * Each submission step must define its own information to be reviewed
+     * during the final Review/Verify Step in the submission process.
+     * <P>
+     * The information to review should be tacked onto the passed in 
+     * List object.
+     * <P>
+     * NOTE: To remain consistent across all Steps, you should first
+     * add a sub-List object (with this step's name as the heading),
+     * by using a call to reviewList.addList().   This sublist is
+     * the list you return from this method!
+     * 
+     * @param reviewList
+     *      The List to which all reviewable information should be added
+     * @return 
+     *      The new sub-List object created by this step, which contains
+     *      all the reviewable information.  If this step has nothing to
+     *      review, then return null!   
+     */
+    public abstract List addReviewSection(List reviewList) throws SAXException,
+        WingException, UIException, SQLException, IOException,
+        AuthorizeException;
 }

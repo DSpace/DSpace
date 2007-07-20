@@ -42,12 +42,13 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
@@ -58,8 +59,9 @@ import org.xml.sax.SAXException;
  * or start another submission.
  * 
  * @author Scott Phillips
+ * @author Tim Donohue (updated for Configurable Submission)
  */
-public class CompletedStep extends AbstractStep
+public class CompletedStep extends AbstractSubmissionStep
 {
 
 	/** Language Strings **/ 
@@ -93,4 +95,31 @@ public class CompletedStep extends AbstractStep
 	    div.addPara().addButton("submit_again").setValue(T_submit_again);
 	    div.addHidden("handle").setValue(handle);
 	}
+    
+    /** 
+     * Each submission step must define its own information to be reviewed
+     * during the final Review/Verify Step in the submission process.
+     * <P>
+     * The information to review should be tacked onto the passed in 
+     * List object.
+     * <P>
+     * NOTE: To remain consistent across all Steps, you should first
+     * add a sub-List object (with this step's name as the heading),
+     * by using a call to reviewList.addList().   This sublist is
+     * the list you return from this method!
+     * 
+     * @param reviewList
+     *      The List to which all reviewable information should be added
+     * @return 
+     *      The new sub-List object created by this step, which contains
+     *      all the reviewable information.  If this step has nothing to
+     *      review, then return null!   
+     */
+    public List addReviewSection(List reviewList) throws SAXException,
+        WingException, UIException, SQLException, IOException,
+        AuthorizeException
+    {
+        //nothing to review, since submission is now Completed!
+        return null;
+    }
 }

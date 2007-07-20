@@ -44,8 +44,8 @@ import java.sql.SQLException;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -135,7 +135,7 @@ public class RejectTaskStep extends AbstractStep
         reason.setLabel(T_reason);
         reason.setRequired();
         reason.setSize(15, 50);
-        if (errors.contains("reason"))
+        if (this.errorFields.contains("reason"))
         	reason.addError(T_reason_required);
     	
         org.dspace.app.xmlui.wing.element.Item actions = form.addItem();

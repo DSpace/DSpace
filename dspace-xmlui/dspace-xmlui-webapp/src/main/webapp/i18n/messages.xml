@@ -469,6 +469,7 @@
 	<message key="xmlui.Submission.general.submission.previous">&lt; Previous</message>
 	<message key="xmlui.Submission.general.submission.save">Save / Cancel</message>
 	<message key="xmlui.Submission.general.submission.next">Next &gt;</message>
+	<message key="xmlui.Submission.general.submission.complete">Complete submission</message>
 	<message key="xmlui.Submission.general.workflow.title">Item submission</message>
 	<message key="xmlui.Submission.general.workflow.trail">Item submission</message>
 	<message key="xmlui.Submission.general.workflow.head">Item submission</message>
@@ -476,12 +477,13 @@
 	<message key="xmlui.Submission.general.showsimple">Show simple item record</message>
 	
 	<!-- submission progress bar messages -->
-	<message key="xmlui.Submission.general.progress.initial_questions">Initial Questions</message>
-	<message key="xmlui.Submission.general.progress.describe">Describe {0}</message>
+	<message key="xmlui.Submission.general.progress.initial-questions">Initial Questions</message>
+	<message key="xmlui.Submission.general.progress.describe">Describe</message>
 	<message key="xmlui.Submission.general.progress.upload">Upload</message>
 	<message key="xmlui.Submission.general.progress.review">Review</message>
-	<message key="xmlui.Submission.general.progress.creative_commons">Creative Commons</message>
+	<message key="xmlui.Submission.general.progress.creative-commons">Creative Commons</message>
 	<message key="xmlui.Submission.general.progress.license">License</message>
+	<message key="xmlui.Submission.general.progress.complete">Complete</message>
 	
 	<!-- org.dspace.app.xmlui.submission.CollectiovViewer -->
 	<message key="xmlui.Submission.CollectionViewer.link1">Submit a new item to this collection</message>
@@ -570,7 +572,7 @@
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.separator">, </message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.open_set"> (</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.close_set">)</message>
-	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Multipe titles</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Multiple titles</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">The item has more than one title, <i>e.g. a translated title</i></message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note">If the checkbox above is unchecked then the following title(s) will be removed from the item: </message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before">Published</message>
@@ -593,29 +595,29 @@
 	<message key="xmlui.Submission.submit.DescribeStep.report_no">Report or paper No.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
-	<message key="xmlui.Submission.submit.UploadStage.head">Upload File(s)</message>
-	<message key="xmlui.Submission.submit.UploadStage.file">File</message>
-	<message key="xmlui.Submission.submit.UploadStage.file_help">Please enter the name of the file on your local hard drive corresponding to your item. If you click "Browse...", a new window will appear in which you can locate and select the file on your local hard drive.</message>
-	<message key="xmlui.Submission.submit.UploadStage.file_error">The item must contain at least one file.</message>
-	<message key="xmlui.Submission.submit.UploadStage.description">Description</message>
-	<message key="xmlui.Submission.submit.UploadStage.description_help">Optionaly, provide a brief description of the contents of this file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
-	<message key="xmlui.Submission.submit.UploadStage.submit_upload">Upload file &amp; add another</message>
-	<message key="xmlui.Submission.submit.UploadStage.head2">Files Uploaded</message>
-	<message key="xmlui.Submission.submit.UploadStage.column1"></message>
-	<message key="xmlui.Submission.submit.UploadStage.column2">File</message>
-	<message key="xmlui.Submission.submit.UploadStage.column3">Size</message>
-	<message key="xmlui.Submission.submit.UploadStage.column4">Description</message>
-	<message key="xmlui.Submission.submit.UploadStage.column5">Format</message>
-	<message key="xmlui.Submission.submit.UploadStage.column6"></message>
-	<message key="xmlui.Submission.submit.UploadStage.unknown_name">Unknown</message>
-	<message key="xmlui.Submission.submit.UploadStage.unknown_format">unknown format</message>
-	<message key="xmlui.Submission.submit.UploadStage.supported">(Supported)</message>
-	<message key="xmlui.Submission.submit.UploadStage.known">(Known)</message>
-	<message key="xmlui.Submission.submit.UploadStage.unsupported">(Unsupported)</message>
-	<message key="xmlui.Submission.submit.UploadStage.submit_edit">Edit</message>
-	<message key="xmlui.Submission.submit.UploadStage.checksum">File checksum:</message>
-	<message key="xmlui.Submission.submit.UploadStage.submit_remove">Remove selected files</message>
-
+	<message key="xmlui.Submission.submit.UploadStep.head">Upload File(s)</message>
+	<message key="xmlui.Submission.submit.UploadStep.file">File</message>
+	<message key="xmlui.Submission.submit.UploadStep.file_help">Please enter the name of the file on your local hard drive corresponding to your item. If you click "Browse...", a new window will appear in which you can locate and select the file on your local hard drive.</message>
+	<message key="xmlui.Submission.submit.UploadStep.file_error">The item must contain at least one file.</message>
+	<message key="xmlui.Submission.submit.UploadStep.description">Description</message>
+	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionaly, provide a brief description of the contents of this file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
+	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
+	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
+	<message key="xmlui.Submission.submit.UploadStep.column1"></message>
+	<message key="xmlui.Submission.submit.UploadStep.column2">File</message>
+	<message key="xmlui.Submission.submit.UploadStep.column3">Size</message>
+	<message key="xmlui.Submission.submit.UploadStep.column4">Description</message>
+	<message key="xmlui.Submission.submit.UploadStep.column5">Format</message>
+	<message key="xmlui.Submission.submit.UploadStep.column6"></message>
+	<message key="xmlui.Submission.submit.UploadStep.unknown_name">Unknown</message>
+	<message key="xmlui.Submission.submit.UploadStep.unknown_format">unknown format</message>
+	<message key="xmlui.Submission.submit.UploadStep.supported">(Supported)</message>
+	<message key="xmlui.Submission.submit.UploadStep.known">(Known)</message>
+	<message key="xmlui.Submission.submit.UploadStep.unsupported">(Unsupported)</message>
+	<message key="xmlui.Submission.submit.UploadStep.submit_edit">Edit</message>
+	<message key="xmlui.Submission.submit.UploadStep.checksum">File checksum:</message>
+	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
+	
 	<!-- org.dspace.app.xmlui.Submission.submit.EditFileStep -->
 	<message key="xmlui.Submission.submit.EditFileStep.head">Edit File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.file">File</message>
@@ -662,9 +664,7 @@
 	<message key="xmlui.Submission.submit.LicenseStep.info3">If you have questions regarding this license please contact the system administrators.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_label">Distribution license</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">I Grant the License</message>
-	<message key="xmlui.Submission.submit.LicenseStep.decision_error">You must grant this license to complete your submission. If you are unable to grant this license at this time you may save your work and return later or remove the submission immediately by clicking the 'Remove this submission'.</message>
-	<message key="xmlui.Submission.submit.LicenseStep.submit_remove">Remove this submission</message>
-	<message key="xmlui.Submission.submit.LicenseStep.submit_complete">Complete submission</message>
+	<message key="xmlui.Submission.submit.LicenseStep.decision_error">You must grant this license to complete your submission. If you are unable to grant this license at this time you may save your work and return later or remove the submission by clicking the 'Save/Cancel' button below.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.RemovedStep -->
 	<message key="xmlui.Submission.submit.RemovedStep.head">Submission removed</message>
@@ -683,7 +683,7 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.take_submit">Take task</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">If you wish to leave this task in the pool for another to take, use this option.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_submit">Leave task</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_help1">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_help">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_submit">Approve item</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_help">Once you've edited the item, use this option to commit the item to the archive.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_submit">Commit to archive</message>
@@ -703,7 +703,7 @@
 	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_cancel">Cancel</message>
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		
+	
 		             Common Submission System Aspect
 		
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->

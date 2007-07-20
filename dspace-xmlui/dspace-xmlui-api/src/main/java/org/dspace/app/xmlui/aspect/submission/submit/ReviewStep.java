@@ -41,48 +41,44 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.Set;
 
-import javax.servlet.ServletException;
-
-import org.dspace.app.util.DCInput;
-import org.dspace.app.util.DCInputSet;
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
-import org.dspace.app.xmlui.aspect.submission.FlowUtils;
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
+import org.apache.log4j.Logger;
+import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractStep;
+import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
+import org.dspace.submit.step.UploadStep;
 import org.xml.sax.SAXException;
 
 /**
  * This is a step of the item submission processes. This is where the user
- * reviews everything they have entered about the item up to this point, all
- * the metadata & files uploaded. The next step after this is to decide upon
- * licensing.
- * 
- * This step builds a form with four parts:
- * 
- * Part A: Review of initial questions
- * Part B: Review of each describe section
- * Part C: Files uploaded.
- * Part D: Standard control actions
- * 
- * There may be multilpe sections for part B.
+ * reviews everything they have entered about the item up to this point.
+ * <P>
+ * This step is dynamic, since when using the Configurable Submission
+ * it is unknown what steps are available and in what order.
+ * <P>
+ * This step builds a form with which consists of a separate section
+ * for each step which implements the "addReviewSection()" method
+ * of AbstractSubmissionStep class.
  * 
  * @author Scott Phillips
+ * @author Tim Donohue (updated for Configurable Submission)
  */
-public class ReviewStep extends AbstractStep
+public class ReviewStep extends AbstractSubmissionStep
 {
 
 	/** Language Strings **/
@@ -94,18 +90,6 @@ public class ReviewStep extends AbstractStep
         message("xmlui.Submission.submit.ReviewStep.no");
     protected static final Message T_submit_jump = 
         message("xmlui.Submission.submit.ReviewStep.submit_jump");
-    protected static final Message T_submit_jump_files = 
-        message("xmlui.Submission.submit.ReviewStep.submit_jump_files");
-    protected static final Message T_head1 = 
-        message("xmlui.Submission.submit.ReviewStep.head1");
-    protected static final Message T_head2 = 
-        message("xmlui.Submission.submit.ReviewStep.head2");
-    protected static final Message T_head3 = 
-        message("xmlui.Submission.submit.ReviewStep.head3");
-    protected static final Message T_multiple_titles = 
-        message("xmlui.Submission.submit.ReviewStep.multiple_titles");
-    protected static final Message T_published_before = 
-        message("xmlui.Submission.submit.ReviewStep.published_before");
     protected static final Message T_no_metadata = 
         message("xmlui.Submission.submit.ReviewStep.no_metadata");
     protected static final Message T_unknown = 
@@ -115,13 +99,17 @@ public class ReviewStep extends AbstractStep
     protected static final Message T_supported = 
         message("xmlui.Submission.submit.ReviewStep.supported");
 
+    
+     /* The SourceResolver used to setup this class */
+    private SourceResolver resolver;
+    
+    /* The source string used to setup this class */
+    private String src;
+    
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(UploadStep.class);
 
-	/**
-	 * The scope for the inputs set, it may hide some fields depending 
-	 * upon it's configuration
-	 */
-	private static String SCOPE = "submit";
-
+    
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.
 	 */
@@ -130,173 +118,135 @@ public class ReviewStep extends AbstractStep
 		this.requireSubmission = true;
 		this.requireStep = true;
 	}
-	
-	
+   
+    /**
+     * Save these setup parameters, to use for loading up
+     * the previous step's review information
+     */
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) 
+    throws ProcessingException, SAXException, IOException
+    { 
+        super.setup(resolver,objectModel,src,parameters);
+
+        this.resolver = resolver;
+        this.src = src;
+    }
+        
 	public void addBody(Body body) throws SAXException, WingException,
 	UIException, SQLException, IOException, AuthorizeException
 	{
-		// Get the item, bitstreams and basic inputs set
-		Item item = submission.getItem();
+		// Get actionable URL
 		Collection collection = submission.getCollection();
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
 		
-		Bundle[] bundles = item.getBundles("ORIGINAL");
-		Bitstream[] bitstreams = new Bitstream[0];
-		if (bundles.length > 0)
-		{
-			bitstreams = bundles[0].getBitstreams();
-		}
-		DCInputSet inputSet = null;
-		try 
-		{
-			inputSet = FlowUtils.getInputsReader().getInputs(submission.getCollection().getHandle());
-		} 
-		catch (ServletException se) 
-		{
-			throw new UIException(se);
-		}
-		int numberOfDescribePages = inputSet.getNumberPages();
-
-
-
-		// Build the three part form
-		Division div = body.addInteractiveDivision("submit-upload", actionURL, Division.METHOD_MULTIPART, "primary submission");
-		div.setHead(T_submission_head);
-		addSubmissionProgressList(div);
-		
-		List review = div.addList("submit-review", List.TYPE_FORM);
-		review.setHead(T_head);   
-		
-		// Part A:
-		//  Initial Questions
-		List initial = review.addList("submit-review-initial",List.TYPE_FORM);
-		initial.setHead(T_head1);
-		
-		Message multipleTitles = T_no;
-		if (submission.hasMultipleTitles())
-			multipleTitles = T_yes;
-	
-		Message publishedBefore = T_no;
-		if (submission.isPublishedBefore())
-			publishedBefore = T_yes;
-		
-		initial.addLabel(T_multiple_titles);
-		initial.addItem(multipleTitles);
-		initial.addLabel(T_published_before);
-		initial.addItem(publishedBefore);
-		
-		Button jumpInitial = initial.addItem().addButton("submit_jump_0");
-		jumpInitial.setValue(T_submit_jump);
-		
-
-		// Part B:
-		//  Describe Pages
-		for ( int i = 0; i < numberOfDescribePages; i++ )
-		{
-			DCInput[] inputs = inputSet.getPageRows(i, submission.hasMultipleTitles(), submission.isPublishedBefore());
-
-			List describe = review.addList("submit-review-describe-"+i,List.TYPE_FORM);
-			describe.setHead(T_head2.parameterize(i+1));
-
-			for (DCInput input : inputs)
-			{
-				if (!input.isVisible(SCOPE))
-					continue;
-
-				String inputType = input.getInputType();
-				String pairsName = input.getPairsType();
-				DCValue[] values = new DCValue[0];
-
-				if (inputType.equals("qualdrop_value"))
-				{
-					values = item.getMetadata(input.getSchema(), input.getElement(), Item.ANY, Item.ANY);
-				}
-				else
-				{
-					values = item.getMetadata(input.getSchema(), input.getElement(), input.getQualifier(), Item.ANY);
-				}
-
-				if (values.length == 0) 
-				{
-					describe.addLabel(input.getLabel());
-					describe.addItem().addHighlight("italic").addContent(T_no_metadata);
-				}
-				else 
-				{
-					for (DCValue value : values)
-					{
-						String displayValue = null;
-						if (inputType.equals("date"))
-						{
-							DCDate date = new DCDate(value.value);
-							displayValue = date.toString();
-						}
-						else if (inputType.equals("dropdown"))
-						{
-							displayValue = input.getDisplayString(pairsName,value.value);
-						}
-						else if (inputType.equals("qualdrop_value"))
-						{
-							String qualifier = value.qualifier;
-							String displayQual = input.getDisplayString(pairsName,qualifier);
-							displayValue = displayQual + ":" + value.value;
-						}
-						else 
-						{
-							displayValue = value.value;
-						}
-						describe.addLabel(input.getLabel());
-						describe.addItem(displayValue);
-					} // For each DCValue
-				} // If values exist
-			}// For each input
-			
-			Button jumpDescribe = describe.addItem().addButton("submit_jump_"+(i+1));
-			jumpDescribe.setValue(T_submit_jump);
-		} // For the number of describe pages
-
-		
+        SubmissionConfig subConfig = submissionInfo.getSubmissionConfig();
+        
+        //Part A:
+        // Build the main Review Form!
+        Division div = body.addInteractiveDivision("submit-upload", actionURL, Division.METHOD_POST, "primary submission");
+        div.setHead(T_submission_head);
+        addSubmissionProgressList(div);
+        
+        List review = div.addList("submit-review", List.TYPE_FORM);
+        review.setHead(T_head); 
+        
+        // Part B:
+        // Add review section for each step
+        
+        //get a list of all pages in progress bar
+        //(this is to ensure we are no looping through non-interactive steps)
+        Set submissionPagesSet = submissionInfo.getProgressBarInfo().keySet();
+        String[] submissionPages = (String[]) submissionPagesSet.toArray(new String[submissionPagesSet.size()]);
+        
+        //loop through each page in progress bar,
+        //adding each as a separate section to the review form
+        for(int i=0; i<submissionPages.length; i++)
+        {
+            double currentStepAndPage = Double.valueOf(submissionPages[i]).doubleValue();
+            
+            //If the step we are looking at is this current
+            // Review/Verify step, exit the for loop,
+            // since we have completed all steps up to this one!
+            if(currentStepAndPage==this.stepAndPage)
+            {
+                break;
+            }
+            
+            //load up step configuration
+            SubmissionStepConfig stepConfig = subConfig.getStep(FlowUtils.getStep(currentStepAndPage));
+            
+            //load the step's XML-UI Class
+            AbstractStep stepUIClass = loadXMLUIClass(stepConfig.getXMLUIClassName());
+            
+            try
+            {
+                //initialize this class (with proper step parameter)
+                parameters.setParameter("step", Double.toString(currentStepAndPage));
+                stepUIClass.setup(resolver, objectModel, src, parameters);
+            }
+            catch(Exception e)
+            {
+                throw new UIException("Unable to initialize AbstractStep identified by " 
+                                        + stepConfig.getXMLUIClassName() + ":", e);
+            }
+            
+            //If this stepUIClass is not a value AbstractSubmissionStep,
+            //we will be unable to display its review information!
+            if(stepUIClass instanceof AbstractSubmissionStep)
+            {
+                //add the Review section for this step, 
+                //and return a reference to that newly created step section
+                List stepSection = ((AbstractSubmissionStep) stepUIClass).addReviewSection(review);
+                
+                //as long as this step has something to review
+                if(stepSection!=null)
+                {    
+                    //add a Jump To button for this section
+                    addJumpButton(stepSection, T_submit_jump, currentStepAndPage);
+                }
+            }
+            else
+            {
+                //Log a warning that this step cannot be reviewed!
+                log.warn("The Step represented by " + stepConfig.getXMLUIClassName() + " is not a valid AbstractSubmissionStep, so it cannot be reviewed during the ReviewStep!");
+            }   
+        }
+        
+      
 		// Part C:
-		//  Files uploaded
-		List files = review.addList("submit-review-files",List.TYPE_FORM);
-		files.setHead(T_head3);
+        // add standard control/paging buttons
+        addControlButtons(review);
 		
-		for (Bitstream bitstream : bitstreams)
-		{
-			BitstreamFormat bitstreamFormat = bitstream.getFormat();
-			
-			int id = bitstream.getID();
-			String name = bitstream.getName();
-			String url = contextPath+"/retrieve/"+id+"/"+name;
-			String format = bitstreamFormat.getShortDescription();
-			Message support = T_unknown;
-			if (bitstreamFormat.getSupportLevel() == BitstreamFormat.KNOWN)
-				support = T_known;
-			else if (bitstreamFormat.getSupportLevel() == BitstreamFormat.SUPPORTED)
-				support = T_supported;
-			
-			org.dspace.app.xmlui.wing.element.Item file = files.addItem();
-			file.addXref(url,name);
-			file.addContent(" - "+format + " ( ");
-			file.addContent(support);
-			file.addContent(")");
-			
-		}
-		
-		Button jumpDescribe = files.addItem().addButton("submit_jump_"+(numberOfDescribePages+1));
-		jumpDescribe.setValue(T_submit_jump_files);
-		
-		// Part D:
-		//  Standard control actions.
-		org.dspace.app.xmlui.wing.element.Item actions = review.addItem();
-		actions.addButton("submit_previous").setValue(T_previous);
-		actions.addButton("submit_save").setValue(T_save);
-		actions.addButton("submit_next").setValue(T_next);
-
 		div.addHidden("submission-continue").setValue(knot.getId()); 
-
 	}
 
+    /** 
+     * Each submission step must define its own information to be reviewed
+     * during the final Review/Verify Step in the submission process.
+     * <P>
+     * The information to review should be tacked onto the passed in 
+     * List object.
+     * <P>
+     * NOTE: To remain consistent across all Steps, you should first
+     * add a sub-List object (with this step's name as the heading),
+     * by using a call to reviewList.addList().   This sublist is
+     * the list you return from this method!
+     * 
+     * @param reviewList
+     *      The List to which all reviewable information should be added
+     * @return 
+     *      The new sub-List object created by this step, which contains
+     *      all the reviewable information.  If this step has nothing to
+     *      review, then return null!   
+     */
+    public List addReviewSection(List reviewList) throws SAXException,
+        WingException, UIException, SQLException, IOException,
+        AuthorizeException
+    {
+        //Review step cannot review itself :)
+        return null;
+    }
+    
 
 	/**
 	 * Recycle
@@ -305,4 +255,42 @@ public class ReviewStep extends AbstractStep
 	{
 		super.recycle();
 	}
+    
+    
+    /** 
+     * Loads the specified XML-UI class
+     * which will generate the review information
+     * for a given step
+     * 
+     * @return AbstractStep which references
+     *          the XML-UI Class
+     */
+    private AbstractStep loadXMLUIClass(String transformerClassName) 
+        throws UIException
+    {
+        try
+        {
+            //retrieve an instance of the transformer class
+            ClassLoader loader = this.getClass().getClassLoader();
+            Class stepClass = loader
+                    .loadClass(transformerClassName);
+    
+            // this XML-UI class *must* be a valid AbstractStep, 
+            // or else we'll have problems here
+            return (AbstractStep) stepClass
+                        .newInstance();
+        }
+        catch(ClassNotFoundException cnfe)
+        {
+            //means that we couldn't find a class by the given name
+            throw new UIException("Class Not Found: " + transformerClassName, cnfe);
+        }
+        catch(Exception e)
+        {
+            //means we couldn't instantiate the class as an AbstractStep
+            throw new UIException("Unable to instantiate class " + transformerClassName + ". " +
+                                          "Please make sure it extends org.dspace.app.xmlui.submission.AbstractSubmissionStep!", e);
+        }
+    }
+    
 }

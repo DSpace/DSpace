@@ -46,8 +46,8 @@ import java.util.Map;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -67,12 +67,15 @@ import org.xml.sax.SAXException;
  * page allows the user to edit metadata about a bitstream (aka file) 
  * that has been uploaded. The user can change the format or change 
  * the file's description.
- * 
+ * <P>
  * Since this page is a sub step, the normal control actions are not
  * present, the user only has the option of returning back to the 
  * upload step.
+ * <P>
+ * NOTE: As a sub step, it is called directly from the UploadStep class.
  * 
  * @author Scott Phillips
+ * @author Tim Donohue (updated for Configurable Submission)
  */
 public class EditFileStep extends AbstractStep
 {
@@ -105,8 +108,8 @@ public class EditFileStep extends AbstractStep
     protected static final Message T_submit_cancel = 
         message("xmlui.Submission.submit.EditFileStep.submit_cancel");
 
-    /** The internal id of the bitstream we are editing */
-	private int bitstreamID;
+    /** The bitstream we are editing */
+	private Bitstream bitstream;
 
 	
 	/**
@@ -120,14 +123,15 @@ public class EditFileStep extends AbstractStep
 	
 	
 	/**
-	 * Get the bitstream ID
+	 * Get the bitstream we are editing
 	 */
 	public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) 
 	throws ProcessingException, SAXException, IOException
 	{ 
 		super.setup(resolver,objectModel,src,parameters);
 		
-		this.bitstreamID = parameters.getParameterAsInteger("bitstreamID",-1);
+		//the bitstream should be stored in our Submission Info object
+        this.bitstream = submissionInfo.getBitstream();
 	}
 
   
@@ -138,16 +142,16 @@ public class EditFileStep extends AbstractStep
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
 		
     	// Get the bitstream and all the various formats
-		Bitstream bitstream = Bitstream.find(context, bitstreamID);
 		BitstreamFormat currentFormat = bitstream.getFormat();
         BitstreamFormat guessedFormat = FormatIdentifier.guessFormat(context, bitstream);
     	BitstreamFormat[] bitstreamFormats = BitstreamFormat.findNonInternal(context);
     	
-    	String fileUrl = contextPath + "/retrieve/" +bitstream.getID() + "/" + bitstream.getName();
+        int itemID = submissionInfo.getSubmissionItem().getItem().getID();
+    	String fileUrl = contextPath + "/bitstream/item/" + itemID + "/" + bitstream.getName();
     	String fileName = bitstream.getName();
     	
     	// Build the form that describes an item.
-    	Division div = body.addInteractiveDivision("submit-edit-file", actionURL, Division.METHOD_MULTIPART, "primary submission");
+    	Division div = body.addInteractiveDivision("submit-edit-file", actionURL, Division.METHOD_POST, "primary submission");
     	div.setHead(T_submission_head);
     	addSubmissionProgressList(div);
     	
@@ -202,18 +206,21 @@ public class EditFileStep extends AbstractStep
         edit.addItem(T_info2);
         
         // User supplied format
-        Text userFormat = edit.addItem().addText("user_format");
+        Text userFormat = edit.addItem().addText("format_description");
         userFormat.setLabel(T_format_user);
         userFormat.setHelp(T_format_user_help);
         userFormat.setValue(bitstream.getUserFormatDescription());
         
+        // add ID of bitstream we're editing
+        div.addHidden("bitstream_id").setValue(bitstream.getID()); 
         
         // Note, not standard control actions, this page just goes back to the upload step.
         org.dspace.app.xmlui.wing.element.Item actions = edit.addItem();
         actions.addButton("submit_save").setValue(T_submit_save);
-		actions.addButton("submit_cancel").setValue(T_submit_cancel);
+		actions.addButton("submit_edit_cancel").setValue(T_submit_cancel);
         
         div.addHidden("submission-continue").setValue(knot.getId()); 
         
     }
+    
 }
