@@ -53,3 +53,11 @@ alter table eperson add column language VARCHAR(64);
 update eperson set language = 'en';
 
 alter table bundle drop column mets_bitstream_id; -- totally unused column
+
+
+-------------------------------------------------------------------------------
+-- Necessary for Configurable Submission functionality:
+-- Modification to workspaceitem table to support keeping track
+-- of the last page reached within a step in the Configurable Submission Process
+-------------------------------------------------------------------------------
+ALTER TABLE workspaceitem ADD page_reached INTEGER;

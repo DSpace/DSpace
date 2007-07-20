@@ -169,7 +169,7 @@ ant -D<em>[dspace]</em>/config/dspace.cfg update
 
   <p>At the top of each JSP file, right after the license and copyright header, is documented the appropriate attributes that a servlet must fill out prior to forwarding to that JSP. No validation is performed; if the servlet does not fill out the necessary attributes, it is likely that an internal server error will occur.</p>
 
-  <p>Many JSPs containing forms will include hidden parameters that tell the servlets which form has been filled out. The submission UI servlet (<code>SubmitServlet</code> is a prime example of a servlet that deals with the input from many different JSPs. The <code>step</code> hidden parameter is used to inform the servlet which form has been filled out (which step of submission the user has just completed.)</p>
+  <p>Many JSPs containing forms will include hidden parameters that tell the servlets which form has been filled out. The submission UI servlet (<code>SubmissionController</code> is a prime example of a servlet that deals with the input from many different JSPs. The <code>step</code> and <code>page</code> hidden parameters (written out by the <code>SubmissionController.getSubmissionParameters()</code> method) are used to inform the servlet which page of which step has just been filled out (i.e. which page of the submission the user has just completed).</p>
 
   <p>Below is a detailed, scary diagram depicting the flow of control during the whole process of processing and responding to an HTTP request. More information about the authentication mechanism is mostly <a href="configure.html#authenticate">described in the configuration section</a>.</p>
 
