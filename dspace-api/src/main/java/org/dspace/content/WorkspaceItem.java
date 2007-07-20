@@ -454,6 +454,29 @@ public class WorkspaceItem implements InProgressSubmission
     }
 
     /**
+     * Get the value of the page reached column (which represents the page
+     * reached within a stage/step)
+     * 
+     * @return the value of the page reached column
+     */
+    public int getPageReached()
+    {
+        return wiRow.getIntColumn("page_reached");
+    }
+
+    /**
+     * Set the value of the page reached column (which represents the page
+     * reached within a stage/step)
+     * 
+     * @param v
+     *            the value of the page reached column
+     */
+    public void setPageReached(int v)
+    {
+        wiRow.setColumn("page_reached", v);
+    }
+
+    /**
      * Update the workspace item, including the unarchived item.
      */
     public void update() throws SQLException, AuthorizeException, IOException

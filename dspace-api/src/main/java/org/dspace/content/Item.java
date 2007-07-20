@@ -48,7 +48,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -57,7 +56,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.Browse;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -1313,6 +1311,32 @@ public class Item extends DSpaceObject
         b.setFormat(bf);
 
         b.update();
+    }
+
+    /**
+     * Remove just the DSpace license from an item This is useful to update the
+     * current DSpace license, in case the user must accept the DSpace license
+     * again (either the item was rejected, or resumed after saving)
+     * <p>
+     * This method is used by the org.dspace.submit.step.LicenseStep class
+     * 
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void removeDSpaceLicense() throws SQLException, AuthorizeException,
+            IOException
+    {
+        // get all bundles with name "LICENSE" (these are the DSpace license
+        // bundles)
+        Bundle[] bunds = getBundles("LICENSE");
+
+        for (int i = 0; i < bunds.length; i++)
+        {
+            // FIXME: probably serious troubles with Authorizations
+            // fix by telling system not to check authorization?
+            removeBundle(bunds[i]);
+        }
     }
 
     /**

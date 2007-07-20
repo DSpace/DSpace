@@ -79,8 +79,11 @@ import org.dspace.core.ConfigurationManager;
 
 public class DCInputsReader
 {
-    /** The ID of the default collection. Will never be the ID of a named collection */
-    static final String DEFAULT_COLLECTION = "default";
+    /**
+     * The ID of the default collection. Will never be the ID of a named
+     * collection
+     */
+    public static final String DEFAULT_COLLECTION = "default";
 
     /** Name of the form definition XML file  */
     static final String FORM_DEF_FILE = "input-forms.xml";
@@ -92,36 +95,44 @@ public class DCInputsReader
     private static Logger log = Logger.getLogger(DCInputsReader.class);
 
     /** The fully qualified pathname of the form definition XML file */
-    private String defsFile = ConfigurationManager.getProperty("dspace.dir") + 
-	    File.separator + "config" + File.separator + FORM_DEF_FILE;
+    private String defsFile = ConfigurationManager.getProperty("dspace.dir")
+            + File.separator + "config" + File.separator + FORM_DEF_FILE;
 
-    /** Reference to the collections to forms map,
-     *  computed from the forms definition file 
+    /**
+     * Reference to the collections to forms map, computed from the forms
+     * definition file
      */
     private HashMap whichForms = null;
 
-    /** Reference to the forms definitions map, 
-     * computed from the forms definition file 
+    /**
+     * Reference to the forms definitions map, computed from the forms
+     * definition file
      */
     private HashMap formDefns  = null;
 
-    /** Reference to the value-pairs map, 
-     * computed from the forms defition file 
+    /**
+     * Reference to the forms which allow, disallow or mandate files to be
+     * uploaded.
+     */
+    private HashMap formFileUploadDefns = null;
+
+    /**
+     * Reference to the value-pairs map, computed from the forms defition file
      */
     private HashMap valuePairs = null;    // Holds display/storage pairs
     
     /**
-     * Mini-cache of last DCInputSet requested. If submissions are not
-     * typically form-interleaved, there will be a modest win. 
+     * Mini-cache of last DCInputSet requested. If submissions are not typically
+     * form-interleaved, there will be a modest win.
      */
     private DCInputSet lastInputSet = null;
 
     /**
-     * Parse an XML encoded submission forms template file, and create
-     * a hashmap containing all the form information. This
-     * hashmap will contain three top level structures: a map between
-     * collections and forms, the definition for each page of each form,
-     * and lists of pairs of values that populate selection boxes.
+     * Parse an XML encoded submission forms template file, and create a hashmap
+     * containing all the form information. This hashmap will contain three top
+     * level structures: a map between collections and forms, the definition for
+     * each page of each form, and lists of pairs of values that populate
+     * selection boxes.
      */
 
     public DCInputsReader() 
@@ -170,11 +181,14 @@ public class DCInputsReader
     }
    
     /**
-     * Returns the set of DC inputs used for a particular collection,
-     * or the default set if no inputs defined for the collection
-     * @param  collectionHandle   collection's unique Handle
+     * Returns the set of DC inputs used for a particular collection, or the
+     * default set if no inputs defined for the collection
+     * 
+     * @param collectionHandle
+     *            collection's unique Handle
      * @return DC input set
-     * @throws ServletException if no default set defined
+     * @throws ServletException
+     *             if no default set defined
      */
     public DCInputSet getInputs(String collectionHandle)
     		throws ServletException
@@ -216,9 +230,9 @@ public class DCInputsReader
     }
     
     /**
-     * Process the top level child nodes in the passed top-level node.
-     * These should correspond to the collection-form maps, the form
-     * definitions, and the display/storage word pairs.
+     * Process the top level child nodes in the passed top-level node. These
+     * should correspond to the collection-form maps, the form definitions, and
+     * the display/storage word pairs.
      */
     private void doNodes(Node n)
 		throws SAXException, ServletException
@@ -304,11 +318,11 @@ public class DCInputsReader
     }
 
     /**
-     * Process the form-definitions section of the XML file.
-     * Each element is formed thusly: <form name="formname">...pages...</form>
-     * Each pages subsection is formed: <page number="#"> ...fields... </page>
-     * Each field is formed from: dc-element, dc-qualifier, label, hint,
-     * input-type name, required text, and repeatable flag.
+     * Process the form-definitions section of the XML file. Each element is
+     * formed thusly: <form name="formname">...pages...</form> Each pages
+     * subsection is formed: <page number="#"> ...fields... </page> Each field
+     * is formed from: dc-element, dc-qualifier, label, hint, input-type name,
+     * required text, and repeatable flag.
      */
     private void processDefinition(Node e) 
         throws SAXException, ServletException
@@ -370,18 +384,6 @@ public class DCInputsReader
     			{
     				throw new ServletException("Form " + formName + " has no pages");
     			}
-    			
-    			// FIXME: Because this file needed to be removed from the jspui it 
-    			// can no longer depend upon the submit servlet. There fore we're replacing this
-    			// line with a static value so that it does not depened upon this. This will be 
-    			// fixed in the future by Tim's Configurable Submission patch which reads
-    			// this value from a configuration page.
-    			//int maxPages = SubmitServlet.EDIT_METADATA_2 - SubmitServlet.EDIT_METADATA_1 + 1;
-    			int maxPages = 5;
-    			if ( pages.size() > maxPages)
-    			{
-    				throw new ServletException("Form " + formName + " exceeds maximum pages: " + maxPages);			
-    			}
     		}
     	}
     	if (numForms == 0)
@@ -411,7 +413,9 @@ public class DCInputsReader
     			field.put(tagName, value);
     			if (tagName.equals("input-type"))
     			{
-    				if (value.equals("dropdown") || value.equals("qualdrop_value"))
+                    if (value.equals("dropdown")
+                            || value.equals("qualdrop_value")
+                            || value.equals("list"))
     				{
     					String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
     					if (pairTypeName == null)
@@ -626,7 +630,9 @@ public class DCInputsReader
     				HashMap fld = (HashMap)page.get(j);
     				// verify reference in certain input types
     				String type = (String)fld.get("input-type");
-    				if (type.equals("dropdown") || type.equals("qualdrop_value"))
+                    if (type.equals("dropdown")
+                            || type.equals("qualdrop_value")
+                            || type.equals("list"))
     				{
     					String pairsName = (String)fld.get(PAIR_TYPE_NAME);
     					Vector v = (Vector)valuePairs.get(pairsName);

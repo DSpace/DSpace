@@ -87,8 +87,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * determined by looking at WorkflowItem.getState()
  * 
  * When a submission is complete, the WorkflowItem pointing to the item is
- * destroyed and SubmitServlet.insertItem() is called, which hooks the item up
- * to the archive.
+ * destroyed and the archive() method is called, which hooks the item up to the
+ * archive.
  * 
  * Notification: When an item enters a state that requires notification,
  * (WFSTATE_STEP1POOL, WFSTATE_STEP2POOL, WFSTATE_STEP3POOL,) the workflow needs
@@ -326,8 +326,8 @@ public class WorkflowManager
      * approveAction() sends an item forward in the workflow (reviewers,
      * approvers, and editors all do an 'approve' to move the item forward) if
      * the item arrives at the submit state, then remove the WorkflowItem and
-     * call SubmitServlet.insertItem() to put it in the archive, and email
-     * notify the submitter of a successful submission
+     * call the archive() method to put it in the archive, and email notify the
+     * submitter of a successful submission
      * 
      * @param c
      *            Context
@@ -735,9 +735,6 @@ public class WorkflowManager
         wi.setMultipleTitles(wfi.hasMultipleTitles());
         wi.setPublishedBefore(wfi.isPublishedBefore());
         wi.update();
-
-        // remove any licenses that the item may have been given
-        myitem.removeLicenses();
 
         //myitem.update();
         log.info(LogManager.getHeader(c, "return_to_workspace",

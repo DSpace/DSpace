@@ -41,7 +41,10 @@ package org.dspace.app.util;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Enumeration;
 import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Constants;
@@ -220,4 +223,120 @@ public class Util {
 	     }
 	 }
 
+    /**
+     * Obtain a parameter from the given request as an int. <code>-1</code> is
+     * returned if the parameter is garbled or does not exist.
+     * 
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     * 
+     * @return the integer value of the parameter, or -1
+     */
+    public static int getIntParameter(HttpServletRequest request, String param)
+    {
+        String val = request.getParameter(param);
+
+        try
+        {
+            return Integer.parseInt(val.trim());
+        }
+        catch (Exception e)
+        {
+            // Problem with parameter
+            return -1;
+        }
+    }
+
+    /**
+     * Obtain an array of int parameters from the given request as an int. null
+     * is returned if parameter doesn't exist. <code>-1</code> is returned in
+     * array locations if that particular value is garbled.
+     * 
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     * 
+     * @return array of integers or null
+     */
+    public static int[] getIntParameters(HttpServletRequest request,
+            String param)
+    {
+        String[] request_values = request.getParameterValues(param);
+
+        if (request_values == null)
+        {
+            return null;
+        }
+
+        int[] return_values = new int[request_values.length];
+
+        for (int x = 0; x < return_values.length; x++)
+        {
+            try
+            {
+                return_values[x] = Integer.parseInt(request_values[x]);
+            }
+            catch (Exception e)
+            {
+                // Problem with parameter, stuff -1 in this slot
+                return_values[x] = -1;
+            }
+        }
+
+        return return_values;
+    }
+
+    /**
+     * Obtain a parameter from the given request as a boolean.
+     * <code>false</code> is returned if the parameter is garbled or does not
+     * exist.
+     * 
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     * 
+     * @return the integer value of the parameter, or -1
+     */
+    public static boolean getBoolParameter(HttpServletRequest request,
+            String param)
+    {
+        return ((request.getParameter(param) != null) && request.getParameter(
+                param).equals("true"));
+    }
+
+    /**
+     * Get the button the user pressed on a submitted form. All buttons should
+     * start with the text <code>submit</code> for this to work. A default
+     * should be supplied, since often the browser will submit a form with no
+     * submit button pressed if the user presses enter.
+     * 
+     * @param request
+     *            the HTTP request
+     * @param def
+     *            the default button
+     * 
+     * @return the button pressed
+     */
+    public static String getSubmitButton(HttpServletRequest request, String def)
+    {
+        Enumeration e = request.getParameterNames();
+
+        while (e.hasMoreElements())
+        {
+            String parameterName = (String) e.nextElement();
+
+            if (parameterName.startsWith("submit"))
+            {
+                return parameterName;
+            }
+        }
+
+        return def;
+    }
+
+    
 }

@@ -120,7 +120,8 @@ public class DCInput
         label = (String) fieldMap.get("label");
         inputType = (String) fieldMap.get("input-type");
         // these types are list-controlled
-        if ("dropdown".equals(inputType) || "qualdrop_value".equals(inputType))
+        if ("dropdown".equals(inputType) || "qualdrop_value".equals(inputType)
+                || "list".equals(inputType))
         {
             valueListName = (String) fieldMap.get("value-pairs-name");
             valueList = (List) listMap.get(valueListName);
@@ -209,8 +210,7 @@ public class DCInput
      */
     public String getWarning()
     {
-        return "<tr><td colspan=\"4\" class=\"submitFormWarn\">" + warning
-                + "</td></tr>";
+        return warning;
     }
 
     /**
@@ -240,8 +240,7 @@ public class DCInput
      */
     public String getHints()
     {
-        return "<tr><td colspan=\"4\" class=\"submitFormHelp\">" + hint
-                + "</td></tr>";
+        return hint;
     }
 
     /**
