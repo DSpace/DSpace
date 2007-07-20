@@ -171,8 +171,22 @@ function removeSelected(sourceList)
 }
 
 
+// Disables accidentally submitting a form when the "Enter" key is pressed.
+// Just add "onkeydown='return disableEnterKey(event);'" to form.
+function disableEnterKey(e)
+{
+     var key;
 
+     if(window.event)
+          key = window.event.keyCode;     //Internet Explorer
+     else
+          key = e.which;     //Firefox & Netscape
 
+     if(key == 13)  //if "Enter" pressed, then disable!
+          return false;
+     else
+          return true;
+}
 
 
 //******************************************************

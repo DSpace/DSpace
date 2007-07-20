@@ -43,6 +43,7 @@
   -
   - Attributes to pass in to this page:
   -    submission.info  - the SubmissionInfo object
+  -    submission.inputs  - the DCInputSet object
   -
   - FIXME: Merely iterates through bundles, treating all bit-streams as
   -        separate documents.  Shouldn't be a problem for early adopters.
@@ -53,14 +54,21 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.app.util.DCInputSet" %>
+<%@ page import="org.dspace.app.util.DCInputsReader" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request); 
+
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 %>
 
 <dspace:layout locbar="off"
@@ -68,13 +76,9 @@
                titlekey="jsp.submit.upload-error.title"
                nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+        <jsp:include page="/submit/progressbar.jsp"/>
 
         <%-- <h1>Submit: Error Uploading File</h1> --%>
 		<h1><fmt:message key="jsp.submit.upload-error.heading"/></h1>
@@ -84,12 +88,14 @@
         reaching us correctly.  Please try again.</p> --%>
 		<p><fmt:message key="jsp.submit.upload-error.info"/></p>
 
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= SubmitServlet.UPLOAD_ERROR %>" />
+        <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
+
 <%-- HACK: <center> tag needed for broken Netscape 4.78 behaviour --%>
         <center>
-            <%-- <p><input type="submit" name="submit" value="Retry Upload" /></p> --%>
-			<p><input type="submit" name="submit" value="<fmt:message key="jsp.submit.upload-error.retry.button"/>" /></p>
+            <p>
+                <input type="submit" name="submit" value="<fmt:message key="jsp.submit.upload-error.retry.button"/>" />
+            </p>
         </center>
     </form>
 

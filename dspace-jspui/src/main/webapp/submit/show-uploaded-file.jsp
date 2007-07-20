@@ -42,7 +42,6 @@
   - Show uploaded file (single-file submission mode)
   -
   - Attributes to pass in
-  -    submission.info  - the SubmissionInfo object
   -    just.uploaded    - Boolean indicating whether the user has just
   -                       uploaded a file OK
   -    show.checksums   - Boolean indicating whether to show checksums
@@ -58,22 +57,28 @@
     
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.submit.AbstractProcessingStep" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);    
+
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 
     boolean justUploaded = ((Boolean) request.getAttribute("just.uploaded")).booleanValue();
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
 
     // Get the bitstream
-    Bitstream[] all = si.submission.getItem().getNonInternalBitstreams();
+    Bitstream[] all = subInfo.getSubmissionItem().getItem().getNonInternalBitstreams();
     Bitstream bitstream = all[0];
     BitstreamFormat format = bitstream.getFormat();
 %>
@@ -84,13 +89,9 @@
                titlekey="jsp.submit.show-uploaded-file.title"
                nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+        <jsp:include page="/submit/progressbar.jsp"/>
 
 <%
     if (justUploaded)
@@ -116,7 +117,7 @@
         &nbsp;&nbsp;&nbsp;<dspace:popup page="/help/index.html#uploadedfile">(More Help...)</dspace:popup></p> --%>
 
 		<div><fmt:message key="jsp.submit.show-uploaded-file.info2"/>
-        &nbsp;&nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\")+ \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+        &nbsp;&nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index")+ "#uploadedfile"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
 
         <table class="miscTable" align="center">
             <tr>
@@ -197,41 +198,44 @@
     {
 %>	
 			<li class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info5"/>
-            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#checksum\"%>"><fmt:message key="jsp.submit.show-uploaded-file.info6"/></dspace:popup></li>
+            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") +"#checksum"%>"><fmt:message key="jsp.submit.show-uploaded-file.info6"/></dspace:popup></li>
 <%
     }
     else
     {
 %>
   		<li class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info7"/>
-            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#checksum\"%>"><fmt:message key="jsp.submit.show-uploaded-file.info8"/></dspace:popup><input type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.show-uploaded-file.show.button"/>" /></li>
+            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#checksum"%>"><fmt:message key="jsp.submit.show-uploaded-file.info8"/></dspace:popup><input type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.show-uploaded-file.show.button"/>" /></li>
 <%
     }
 %>
         </ul>
         <br />
 
-<%-- Hidden fields needed for submit servlet to know which item to deal with --%>
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= SubmitServlet.FILE_LIST %>" />
+		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
 
 <%-- HACK: Center used to align table; CSS and align="center" ignored by some browsers --%>
         <center>
             <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
+				<%  //if not first step, show "Previous" button
+					if(!SubmissionController.isFirstStep(request, subInfo))
+					{ %>
                     <td>
                         <%-- <input type="submit" name="submit_prev" value="&lt; Previous"> --%>
-						<input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.general.previous"/>" />
+						<input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
                     </td>
+				<%  } %>
                     <td>
                        <%--  <input type="submit" name="submit_next value="Next &gt;"> --%>
-					    <input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.general.next"/>" />
+					    <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel/Save"> --%>
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
+						<input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
                     </td>
                 </tr>
             </table>

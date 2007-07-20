@@ -42,7 +42,6 @@
   - List of uploaded files
   -
   - Attributes to pass in to this page:
-  -   submission.info   - the SubmissionInfo object
   -   just.uploaded     - Boolean indicating if a file has just been uploaded
   -                       so a nice thank you can be displayed.
   -   show.checksums    - Boolean indicating whether to show checksums
@@ -55,8 +54,11 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.submit.AbstractProcessingStep" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
@@ -65,8 +67,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);    
+
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 
     boolean justUploaded = ((Boolean) request.getAttribute("just.uploaded")).booleanValue();
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
@@ -74,13 +79,9 @@
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+        <jsp:include page="/submit/progressbar.jsp"/>
 
 <%--        <h1>Submit: <%= (justUploaded ? "File Uploaded Successfully" : "Uploaded Files") %></h1> --%>
     
@@ -99,7 +100,7 @@
 <%
     }
 %>
-        <div><fmt:message key="jsp.submit.upload-file-list.info2"/>&nbsp;&nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+        <div><fmt:message key="jsp.submit.upload-file-list.info2"/>&nbsp;&nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#uploadedfile"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
         
         <table class="miscTable" align="center" summary="Table dispalying your submitted files">
             <tr>
@@ -118,7 +119,7 @@
     }
     
     // Don't display last column ("Remove") in workflow mode
-    if (!SubmitServlet.isWorkflow(si))
+    if (!subInfo.isInWorkflow())
     {
         // Whether it's an odd or even column depends on whether we're showing checksums
         String column = (showChecksums ? "Even" : "Odd");
@@ -132,7 +133,7 @@
 <%
     String row = "even";
 
-    Bitstream[] bitstreams = si.submission.getItem().getNonInternalBitstreams();
+    Bitstream[] bitstreams = subInfo.getSubmissionItem().getItem().getNonInternalBitstreams();
     Bundle[] bundles = null;
 
     if (bitstreams[0] != null) {
@@ -163,7 +164,7 @@
 		    <input type="radio" name="primary_bitstream_id" value="<%= bitstreams[i].getID() %>"
 			   <% if (bundles[0] != null) {
 				if (bundles[0].getPrimaryBitstreamID() == bitstreams[i].getID()) { %>
-			       	  <%="checked" %>
+			       	  <%="checked='checked'" %>
 			   <%   }
 			      } %> />
 		</td>
@@ -191,7 +192,7 @@
         }
 
         // Don't display "remove" button in workflow mode
-        if (!SubmitServlet.isWorkflow(si))
+        if (!subInfo.isInWorkflow())
         {
             // Whether it's an odd or even column depends on whether we're showing checksums
             String column = (showChecksums ? "Even" : "Odd");
@@ -216,7 +217,7 @@
 <%-- Show information about how to verify correct upload, but not in workflow
      mode! --%>
 <%
-    if (!SubmitServlet.isWorkflow(si))
+    if (!subInfo.isInWorkflow())
     {
 %>
         <p class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info3"/></p>
@@ -227,14 +228,14 @@
         {
 %>
             <li class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info5"/>
-            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#checksum\"%>"><fmt:message key="jsp.submit.upload-file-list.help1"/></dspace:popup></li>
+            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#checksum"%>"><fmt:message key="jsp.submit.upload-file-list.help1"/></dspace:popup></li>
 <%
         }
         else
         {
 %>
             <li class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info6"/>
-            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#checksum\"%>"><fmt:message key="jsp.submit.upload-file-list.help2"/></dspace:popup> <input type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.upload-file-list.button3"/>" /></li>
+            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#checksum"%>"><fmt:message key="jsp.submit.upload-file-list.help2"/></dspace:popup> <input type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.upload-file-list.button3"/>" /></li>
 <%
         }
 %>
@@ -244,15 +245,14 @@
     }
 %>    
 
-<%-- Hidden fields needed for submit servlet to know which item to deal with --%>
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= SubmitServlet.FILE_LIST %>" />
+        <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
 
 <%-- HACK: Center used to align table; CSS and align="center" ignored by some browsers --%>
         <center>
 <%
     // Don't allow files to be added in workflow mode
-    if (!SubmitServlet.isWorkflow(si))
+    if (!subInfo.isInWorkflow())
     {
 %>
             <p><input type="submit" name="submit_more" value="<fmt:message key="jsp.submit.upload-file-list.button4"/>" /></p>
@@ -262,15 +262,20 @@
             <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
+				<%  //if not first step, show "Previous" button
+					if(!SubmissionController.isFirstStep(request, subInfo))
+					{ %>
                     <td>
-                        <input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.upload-file-list.button5"/>" />
+                        <%-- <input type="submit" name="submit_prev" value="&lt; Previous"> --%>
+						<input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.upload-file-list.button5"/>" />
                     </td>
+				<%  } %>
                     <td>
-                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.upload-file-list.button6"/>" />
+                        <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.upload-file-list.button6"/>" />
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.upload-file-list.button7"/>" />
+                        <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.upload-file-list.button7"/>" />
                     </td>
                 </tr>
             </table>

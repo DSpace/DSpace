@@ -55,9 +55,6 @@
 
 <dspace:layout titlekey="jsp.submit.no-theses.title">
 
-<<<<<<< no-theses.jsp
-    <h1>Theses Not Accepted in DSpace</h1>
-=======
     <%-- <h1>Theses Not Accepted in DSpace</h1> --%>
 	<h1><fmt:message key="jsp.submit.no-theses.title"/></h1>
     <%-- <p>DSpace does not currently accept individually-submitted

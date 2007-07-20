@@ -50,8 +50,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
@@ -62,6 +65,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
+import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -546,9 +550,19 @@ public class MyDSpaceServlet extends DSpaceServlet
             WorkspaceItem wsi = WorkflowManager.reject(context, workflowItem,
                     context.getCurrentUser(), reason);
 
-            // Set the "stage_reached" column on the returned workspace item
-            // to the "verify" stage
-            wsi.setStageReached(SubmitServlet.REVIEW_SUBMISSION);
+            // Load the Submission Process for the collection this WSI is
+            // associated with
+            Collection c = wsi.getCollection();
+            SubmissionConfigReader subConfigReader = new SubmissionConfigReader();
+            SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c
+                    .getHandle(), false);
+
+            // Set the "stage_reached" column on the workspace item
+            // to the LAST page of the LAST step in the submission process
+            // (i.e. the page just before "Complete")
+            int lastStep = subConfig.getNumberOfSteps() - 2;
+            wsi.setStageReached(lastStep);
+            wsi.setPageReached(AbstractProcessingStep.LAST_PAGE_REACHED);
             wsi.update();
 
             JSPManager

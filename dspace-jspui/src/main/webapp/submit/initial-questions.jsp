@@ -53,18 +53,25 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.submit.AbstractProcessingStep" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.util.DCInputSet" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
-    DCInputSet inputSet =
+        DCInputSet inputSet =
         (DCInputSet) request.getAttribute("submission.inputs");
+
+	// Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
+
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 %>
 
 <dspace:layout locbar="off"
@@ -72,13 +79,9 @@
                titlekey="jsp.submit.initial-questions.title"
                nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= SubmitServlet.INITIAL_QUESTIONS %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+        <jsp:include page="/submit/progressbar.jsp" />
 
         <%-- <h1>Submit: Describe Your Item</h1> --%>
 		<h1><fmt:message key="jsp.submit.initial-questions.heading"/></h1>
@@ -101,7 +104,7 @@
                     <td class="oddRowOddCol" align="left">
                         <table border="0">
                             <tr>
-                                <td valign="top"><input type="checkbox" name="multiple_titles" value="true" <%= (si.submission.hasMultipleTitles() ? "checked" : "") %> /></td>
+                                <td valign="top"><input type="checkbox" name="multiple_titles" value="true" <%= (subInfo.getSubmissionItem().hasMultipleTitles() ? "checked='checked'" : "") %> /></td>
                                 <%-- <td class="submitFormLabel" nowrap>The item has more than one title, e.g. a translated title</td> --%>
 								<td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.submit.initial-questions.elem1"/></td>
                             </tr>
@@ -118,7 +121,7 @@
                     <td class="evenRowOddCol" align="left">
                         <table border="0">
                             <tr>
-                                <td valign="top"><input type="checkbox" name="published_before" value="true" <%= (si.submission.isPublishedBefore() ? "checked" : "") %> /></td>
+                                <td valign="top"><input type="checkbox" name="published_before" value="true" <%= (subInfo.getSubmissionItem().isPublishedBefore() ? "checked='checked'" : "") %> /></td>
                                 <%-- <td class="submitFormLabel" nowrap>The item has been published or publicly distributed before</td> --%>
 								<td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.submit.initial-questions.elem2"/></td>
                             </tr>
@@ -128,14 +131,14 @@
 <%
     }
     // Don't display file or thesis questions in workflow mode
-    if (!SubmitServlet.isWorkflow(si))
+    if (!subInfo.isInWorkflow())
     {
 %>
                 <tr class="oddRowOddCol">
                     <td class="oddRowOddCol" align="left">
                         <table border="0">
                             <tr>
-                                <td valign="top"><input type="checkbox" name="multiple_files" value="true" <%= (si.submission.hasMultipleFiles() ? "checked" : "") %> /></td>
+                                <td valign="top"><input type="checkbox" name="multiple_files" value="true" <%= (subInfo.getSubmissionItem().hasMultipleFiles() ? "checked='checked'" : "") %> /></td>
                                 <%-- <td class="submitFormLabel" nowrap>The item consists of <em>more than one</em> file</td> --%>
 								<td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.submit.initial-questions.elem3"/></td>
                             </tr>
@@ -166,22 +169,25 @@
 
         <p>&nbsp;</p>
 
-<%-- Hidden fields needed for submit servlet to know which item to deal with --%>
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= SubmitServlet.INITIAL_QUESTIONS %>" />
+		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
         <center>
             <table border="0" width="80%">
                 <tr>
-                    <td width="100%">&nbsp;                       
-                    </td>
+					<td width="100%">&nbsp;</td>
+				<%  //if not first step, show "Previous" button
+					if(!SubmissionController.isFirstStep(request, subInfo))
+					{ %>
                     <td>
-                        <%-- <input type="submit" name="submit_next" value="Next &gt;"> --%>
-						<input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.general.next"/>" />
+                        <input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
+                    </td>
+				<%  } %>
+                    <td>
+                        <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align="right">
-                        <%-- <input type="submit" name="submit_cancel" value="Cancel/Save"> --%>
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
+                        <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
                     </td>
                 </tr>
             </table>

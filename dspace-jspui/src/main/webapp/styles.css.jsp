@@ -97,6 +97,8 @@ H3 { margin-left: 10px;
      font-family: "verdana", "Arial", "Helvetica", sans-serif;
      color: black }
 
+object { display: inline; }
+
 p {  margin-left: 10px;
      margin-right: 10px;
      font-family: "verdana", "Arial", "Helvetica", sans-serif;
@@ -340,7 +342,8 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-family: "verdana", "Arial", "Helvetica", sans-serif;
                    font-weight: bold;
            font-size: 10pt;
-           text-align: right }
+           text-align: right;
+           vertical-align: top }
 
 .submitFormHelp {  margin-left: 10px;
            margin-right: 10px;
@@ -368,7 +371,8 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                         font-family: "verdana", "Arial", "Helvetica", sans-serif;
                         font-size: 10pt;
                         font-style: italic;
-                        text-align: center }
+                        text-align: center;
+                        vertical-align: top; }
 
 .submitProgressTable{ margin: 0;
                       padding: 0;

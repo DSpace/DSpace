@@ -49,8 +49,11 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.submit.AbstractProcessingStep" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
@@ -58,20 +61,21 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
+    //get collections to choose from
     Collection[] collections =
         (Collection[]) request.getAttribute("collections");
+
+	//check if we need to display the "no collection selected" error
+    Boolean noCollection = (Boolean) request.getAttribute("no.collection");
+
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
 %>
 
 <dspace:layout locbar="off"
                navbar="off"
                titlekey="jsp.submit.select-collection.title"
                nocache="true">
-
-    <jsp:include page="/submit/progressbar.jsp">
-        <jsp:param name="current_stage" value="<%= SubmitServlet.SELECT_COLLECTION %>"/>
-        <jsp:param name="stage_reached" value="0"/>
-        <jsp:param name="md_pages" value="1"/>
-    </jsp:include>
 
     <h1><fmt:message key="jsp.submit.select-collection.heading"/></h1>
 
@@ -83,16 +87,29 @@
       <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#choosecollection\"%>"><fmt:message key="jsp.morehelp"/> </dspace:popup> 
 	</div>
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
 <%--       browsers to center the table. --%>
         <center>
             <table summary="Select collection table">
+<%
+		//if no collection was selected, display an error
+		if((noCollection != null) && (noCollection.booleanValue()==true))
+		{
+%>
+                <tr>
+					<td colspan="2" class="submitFormWarn"><fmt:message key="jsp.submit.select-collection.no-collection"/></td>
+				</tr>
+<%
+		}
+%>            
+            
                 <tr>
                     <%-- <td class="submitFormLabel"><label for="tcollection">Collection</label></td> --%>
 					<td class="submitFormLabel"><label for="tcollection"><fmt:message key="jsp.submit.select-collection.collection"/></label></td>
                     <td>
                         <select name="collection" id="tcollection">
+                        	<option value="-1"></option>
 <%
         for (int i = 0; i < collections.length; i++)
         {
@@ -105,9 +122,8 @@
                     </td>
                 </tr>
             </table>
-
-            <%-- Hidden field indicating the step --%>
-            <input type="hidden" name="step" value="<%= SubmitServlet.SELECT_COLLECTION %>" />
+            <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+            <%= SubmissionController.getSubmissionParameters(context, request) %>
             <br />
 
             <table border="0" width="80%">
@@ -115,12 +131,12 @@
                     <td width="100%">&nbsp;</td>
                     <td>
                         <%-- <input type="submit" name="submit_next" value="Next &gt;"> --%>
-						<input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.general.next"/>" />
+						<input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align="right">
                         <%-- <input type="submit" name="submit_cancel" value="Cancel/Save"> --%>
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
+						<input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.select-collection.cancel"/>" />
                     </td>
                 </tr>
             </table>

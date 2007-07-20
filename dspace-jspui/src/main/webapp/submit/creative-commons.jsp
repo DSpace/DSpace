@@ -39,11 +39,9 @@
   --%>
 
 <%--
-  - Show the user a license which they may grant or reject
+  - Show the user the Creative Commons license which they may grant or reject
   -
   - Attributes to pass in:
-  -    submission.info  - the SubmissionInfo object
-  -    license          - the license text to display
   -    cclicense.exists   - boolean to indicate CC license already exists
   --%>
 
@@ -52,16 +50,22 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.submit.AbstractProcessingStep" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.license.CreativeCommons" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);    
 
-    String license = (String) request.getAttribute("license");
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
+
     String reqURL = request.getRequestURL().toString();
     int firstIndex = reqURL.indexOf("://") + 3;
     int secondIndex = reqURL.indexOf("/", firstIndex);
@@ -70,6 +74,10 @@
     String exitURL = baseURL + "/submit/cc-license.jsp?license_url=[license_url]";
     Boolean lExists = (Boolean)request.getAttribute("cclicense.exists");
     boolean licenseExists = (lExists == null ? false : lExists.booleanValue());
+	
+    String licenseURL = "";
+    if(licenseExists)
+        licenseURL = CreativeCommons.getLicenseURL(subInfo.getSubmissionItem().getItem());
 %>
 
 <dspace:layout locbar="off"
@@ -77,13 +85,9 @@
                titlekey="jsp.submit.creative-commons.title"
                nocache="true">
 
-    <form name="foo" id="license_form" action="<%= request.getContextPath() %>/submit" method="post">
+    <form name="foo" id="license_form" action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= SubmitServlet.CC_LICENSE %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+        <jsp:include page="/submit/progressbar.jsp"/>
 
         <%-- <h1>Submit: Use a Creative Commons License</h1> --%>
 		<h1><fmt:message key="jsp.submit.creative-commons.heading"/></h1>
@@ -123,37 +127,38 @@
 	<iframe src="http://creativecommons.org/license/?partner=dspace&amp;stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&amp;exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540"><fmt:message key="jsp.submit.creative-commons.info3"/>
 	</iframe>
 
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-    <input type="hidden" name="step" value="<%= SubmitServlet.CC_LICENSE %>" />
-	<input type="hidden" name="cc_license_url" value="" />
+    <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+    <%= SubmissionController.getSubmissionParameters(context, request) %>
+
+	<input type="hidden" name="cc_license_url" value="<%=licenseURL %>" />
 	<input type="hidden" name="submit_grant" value="I Grant the License" />
         <center>
             <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
+                <%  //if not first step, show "Previous" button
+					if(!SubmissionController.isFirstStep(request, subInfo))
+					{ %>
                     <td>
-                        <%-- <input type="submit" name="submit_prev" value="&lt; Previous"> --%>
-						<input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.general.previous"/>" />
+						<input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
                     </td>
+                <%  } %>
 <%
      if (licenseExists)
      {
 %>
                     <td>
-                        <%-- <input type="submit" name="submit_next" value="Next &gt;"> --%>
-						<input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.general.next"/>" />
+                        <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
                     </td>
 <%
      }
 %>
                     <td>
-                        <%-- <input type="submit" name="submit_no_cc" value="Skip Creative Commons &gt;"/> --%>
 						<input type="submit" name="submit_no_cc" value="<fmt:message key="jsp.submit.creative-commons.skip.button"/>"/>
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align="right">
-                        <%-- <input type="submit" name="submit_cancel" value="Cancel/Save"/> --%>
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>"/>
+                       <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>"/>
                     </td>
                 </tr>
             </table>

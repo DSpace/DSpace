@@ -42,7 +42,6 @@
   - Show the user a license which they may grant or reject
   -
   - Attributes to pass in:
-  -    submission.info  - the SubmissionInfo object
   -    license          - the license text to display
   --%>
 
@@ -53,14 +52,19 @@
  
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);    
+
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 
     String license = (String) request.getAttribute("license");
 %>
@@ -70,13 +74,9 @@
                titlekey="jsp.submit.show-license.title"
                nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= SubmitServlet.GRANT_LICENSE %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-             <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+        <jsp:include page="/submit/progressbar.jsp"/>
 
 	<div><fmt:message key="jsp.submit.show-license.info1"/>
         &nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#license\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
@@ -95,8 +95,8 @@
             </tr>
         </table>
 
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= SubmitServlet.GRANT_LICENSE %>" />
+        <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
 
         <center>
 	    <p><input type="submit" name="submit_grant" value="<fmt:message key="jsp.submit.show-license.grant.button"/>" /></p>

@@ -61,13 +61,15 @@
 <%@ page import="javax.servlet.jsp.PageContext" %>
 <%@ page import="javax.servlet.ServletException" %>
 
+<%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.webui.jsptag.PopupTag" %>
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
 <%@ page import="org.dspace.app.util.DCInput" %>
 <%@ page import="org.dspace.app.util.DCInputSet" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.content.DCLanguage" %>
@@ -80,8 +82,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%!
-	// required by Controlled Vocabulary  add-on
+<%!// required by Controlled Vocabulary  add-on
 	String contextPath;
 
     // This method is resposible for showing a link next to an input box 
@@ -160,12 +161,12 @@
       {
 	 first.setLength(0);
 	 first.append(fieldName).append("_first");
-	 if (repeatable)
+	 if (repeatable && i>0)
 	    first.append('_').append(i);
 
 	 last.setLength(0);
 	 last.append(fieldName).append("_last");
-	 if (repeatable)
+	 if (repeatable && i>0)
 	    last.append('_').append(i);
 	    
 	 if (i == 0) 
@@ -210,8 +211,8 @@
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-// 	      .append("_more\" value=\"Add More\"/> </td></tr>");
-	      .append("_more\" value=\"")
+// 	      .append("_add\" value=\"Add More\"/> </td></tr>");
+	      .append("_add\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
 	      .append("\"/> </td></tr>");
 	 } 
@@ -259,7 +260,7 @@
             .append("<select name=\"")
 	    .append(fieldName)
 	    .append("_month");
-         if (repeatable)
+         if (repeatable && i>0)
             sb.append('_').append(i);
          sb.append("\"><option value=\"-1\"")
             .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
@@ -284,7 +285,7 @@
 		.append("<input type=\"text\" name=\"")
 	    .append(fieldName)
 	    .append("_day");
-         if (repeatable)
+         if (repeatable && i>0)
             sb.append("_").append(i);
          sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
             .append((dateIssued.getDay() > 0 ? 
@@ -295,7 +296,7 @@
 		.append("<input type=\"text\" name=\"")
 	    .append(fieldName)
 	    .append("_year");
-         if (repeatable)
+         if (repeatable && i>0)
             sb.append("_").append(i);
          sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
             .append((dateIssued.getYear() > 0 ? 
@@ -319,8 +320,8 @@
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"/> </td></tr>");
-	      .append("_more\" value=\"")
+//	      .append("_add\" value=\"Add More\"/> </td></tr>");
+	      .append("_add\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
 	      .append("\"/> </td></tr>");
 	 } 
@@ -365,7 +366,7 @@
          sb.append("<td><input type=\"text\" name=\"")
            .append(fieldName)
 	   .append("_series");
-         if (repeatable)
+         if (repeatable && i>0)
            sb.append("_").append(i);
 
          sb.append("\" size=\"23\" value=\"")
@@ -373,7 +374,7 @@
 	   .append("\"/></td>\n<td><input type=\"text\" name=\"")
 	   .append(fieldName)
 	   .append("_number");
-         if (repeatable)
+         if (repeatable && i>0)
            sb.append("_").append(i);
          sb.append("\" size=\"23\" value=\"")
            .append(sn.getNumber().replaceAll("\"", "&quot;"))
@@ -396,8 +397,8 @@
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"/> </td></tr>");
-	      .append("_more\" value=\"")
+//	      .append("_add\" value=\"Add More\"/> </td></tr>");
+	      .append("_add\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
 	      .append("\"/> </td></tr>");	      	      
 	 } 
@@ -441,7 +442,7 @@
 
          sb.append("<td colspan=\"2\"><textarea name=\"")
            .append(fieldName);
-         if (repeatable)
+         if (repeatable && i>0)
            sb.append("_").append(i);
          sb.append("\" rows=\"4\" cols=\"45\"")
            .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
@@ -468,8 +469,8 @@
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"/> </td></tr>");
-	      .append("_more\" value=\"")
+//	      .append("_add\" value=\"Add More\"/> </td></tr>");
+	      .append("_add\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
 	      .append("\"/> </td></tr>");
 	 } 
@@ -513,7 +514,7 @@
 
          sb.append("<td colspan=\"2\"><input type=\"text\" name=\"")
            .append(fieldName);
-         if (repeatable)
+         if (repeatable && i>0)
            sb.append("_").append(i);
          
          sb.append("\" size=\"50\" value=\"")
@@ -541,8 +542,8 @@
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"/> </td></tr>");
-	      .append("_more\" value=\"")
+//	      .append("_add\" value=\"Add More\"/> </td></tr>");
+	      .append("_add\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
 	      .append("\"/> </td></tr>");
 	 } 
@@ -566,6 +567,8 @@
       StringBuffer sb = new StringBuffer();
       StringBuffer headers = new StringBuffer();
 
+      String fieldParam = "";
+      
       if (element.equals("relation") && qualifier.equals("ispartofseries"))
       {
          //Width hints used here to affect whole table 
@@ -588,17 +591,24 @@
 
       for (int i = 0; i < fieldCount; i++) 
       {
-	 if (i == 0) 
+	 if (i == 0)
+	 {	 
+	    //param is just the field name
+	    fieldParam = fieldName;
+	     
 	    sb.append("<tr><td class=\"submitFormLabel\">")
 	      .append(label)
 	      .append("</td>");
+	 }
 	 else
+	 {  
+		//param is field name and index (e.g. myfield_2) 
+	    fieldParam = fieldName + "_" + i;
 	    sb.append("<tr><td>&nbsp;</td>");
-
+	 }
          if (i < defaults.length)
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
-             .append(fieldName)
-             .append("_").append(i)
+             .append(fieldParam)
              .append("\" size=\"15\" value=\"")
              .append(defaults[i].value.replaceAll("\"", "&quot;"))
              .append("\"")
@@ -607,7 +617,6 @@
 	     .append(fieldName)
 	     .append("_remove_")
 	     .append(i)
-//	     .append("\" value=\"Remove\"/></td>\n");
 	     .append("\" value=\"")
 	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
 	     .append("\"/>")
@@ -616,7 +625,7 @@
          else 
 	 {
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
-             .append(fieldName).append("_").append(i)
+             .append(fieldParam)
              .append("\" size=\"15\"")
              .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
              .append("/>")
@@ -624,10 +633,11 @@
              .append("</td>\n");             
 	 }
 	 i++;
+	 //param is field name and index (e.g. myfield_2) 
+	 fieldParam = fieldName + "_" + i;
 	 if (i < defaults.length)
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
-             .append(fieldName)
-             .append("_").append(i)
+             .append(fieldParam)
              .append("\" size=\"15\" value=\"")
              .append(defaults[i].value.replaceAll("\"", "&quot;"))
 	         .append("\"")
@@ -636,7 +646,6 @@
 	     .append(fieldName)
 	     .append("_remove_")
 	     .append(i)
-//	     .append("\" value=\"Remove\"/></td></tr>\n");
 	     .append("\" value=\"")
 	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
 	     .append("\"/>")
@@ -645,8 +654,7 @@
 	 else 
 	 {
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
-             .append(fieldName)
-             .append("_").append(i)
+             .append(fieldParam)
              //.append("\" size=\"15\"/></td>");
              .append("\" size=\"15\"")
              .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
@@ -658,8 +666,7 @@
 	   {
 	     sb.append("<td><input type=\"submit\" name=\"submit_")
 	       .append(fieldName)
-//	       .append("_more\" value=\"Add More\"/></td>\n"); 
-	       .append("_more\" value=\"")
+	       .append("_add\" value=\"")
 	       .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
 	       .append("\"/></td>\n");
 	   } 
@@ -686,7 +693,10 @@
 		ArrayList filtered = new ArrayList();
 		for (int i = 0; i < unfiltered.length; i++)
 		{
-			String unfilteredFieldName = unfiltered[i].element + "." + unfiltered[i].qualifier;
+		    String unfilteredFieldName = unfiltered[i].element;
+		    if(unfiltered[i].qualifier != null && unfiltered[i].qualifier.length()>0)
+		        unfilteredFieldName += "." + unfiltered[i].qualifier;
+			
 			if ( ! inputs.isFieldPresent(unfilteredFieldName) )
 			{
 				filtered.add( unfiltered[i] );
@@ -707,6 +717,7 @@
          if (j < defaults.length) 
 	 {
             currentQual = defaults[j].qualifier;
+            if(currentQual==null) currentQual="";
             currentVal = defaults[j].value;
          }
 	 else 
@@ -726,7 +737,7 @@
 	 sb.append("<td colspan=\"2\"><select name=\"")
            .append(fieldName)
 	   .append("_qualifier");
-         if (repeatable) 
+         if (repeatable && j>0) 
            sb.append("_").append(j);
          sb.append("\">");
          for (int i = 0; i < qualMap.size(); i+=2)
@@ -746,7 +757,7 @@
          sb.append("</select>&nbsp;<input type=\"text\" name=\"")
            .append(fieldName)
 	   .append("_value");
-         if (repeatable)
+         if (repeatable && j>0)
            sb.append("_").append(j);
          sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
@@ -769,8 +780,8 @@
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
 	      .append(fieldName)
-//	      .append("_more\" value=\"Add More\"/> </td></tr>");
-	      .append("_more\" value=\"")
+//	      .append("_add\" value=\"Add More\"/> </td></tr>");
+	      .append("_add\" value=\"")
 	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
 	      .append("\"/> </td></tr>");
 	 } 
@@ -828,13 +839,99 @@
       sb.append("</select></td></tr>");
       out.write(sb.toString());
     }
-%>
+    
+    
+    /** Display Checkboxes or Radio buttons, depending on if repeatable! **/
+    void doList(javax.servlet.jsp.JspWriter out, Item item,
+            String fieldName, String schema, String element, String qualifier, boolean repeatable,
+            List valueList, String label) 
+            throws java.io.IOException 
+          {
+        	DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+        	int valueCount = valueList.size();
+        	
+            StringBuffer sb = new StringBuffer();
+            String display, value;
+            int j;
+
+            int numColumns = 1;
+            //if more than 3 display+value pairs, display in 2 columns to save space
+            if(valueCount > 6)
+                numColumns = 2;
+
+            //print out the field label
+            sb.append("<tr><td class=\"submitFormLabel\">")
+        	  .append(label)
+        	  .append("</td>");
+            
+            if(numColumns > 1)
+                sb.append("<td valign=\"top\">");
+            else
+                sb.append("<td valign=\"top\" colspan=\"3\">");
+            
+            //flag that lets us know when we are in Column2
+            boolean inColumn2 = false;
+            
+            //loop through all values
+            for (int i = 0; i < valueList.size(); i += 2)
+            {              
+			   //get display value and actual value
+               display = (String)valueList.get(i);
+      	 	   value = (String)valueList.get(i+1);
+   	 
+      	 	   //check if this value has been selected previously
+      	 	   for (j = 0; j < defaults.length; j++) 
+      	 	   {
+      	     		if (value.equals(defaults[j].value))
+      	         	break;
+               }
+ 	   
+				// print input field
+  	 	       sb.append("<input type=\"");
+      	 	   
+      	 	   //if repeatable, print a Checkbox, otherwise print Radio buttons
+      	 	   if(repeatable)
+      	 	      sb.append("checkbox"); 
+      	 	   else
+      	 	      sb.append("radio");
+      	 	   
+      	 	   sb.append("\" name=\"")
+      	 	     .append(fieldName)
+      	 	     .append("\"")
+      	 	     .append(j < defaults.length ? " checked=\"checked\" " : "")
+      	 	     .append(" value=\"")
+	   			 .append(value)
+	   			 .append("\">");    
+      	 	   
+      	 	   //print display name immediately after input
+      	 	   sb.append("&nbsp;")
+      	 	     .append(display)
+      	 	     .append("<br/>");
+      	 	   
+			   // if we are writing values in two columns, 
+			   // then start column 2 after half of the values
+       	 	   if((numColumns == 2) && (i+2 >= (valueList.size()/2)) && !inColumn2) 
+       	 	   {
+       	 	      	//end first column, start second column
+       	 	     	sb.append("</td>");
+       	 	     	sb.append("<td colspan=\"2\" valign=\"top\">");
+       	 	     	inColumn2 = true;
+       	 	   }
+      	 	   
+            }//end for each value
+
+            sb.append("</td></tr>");
+            
+            out.write(sb.toString());
+          }//end doList%>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
 
-    Item item = si.submission.getItem();
+    SubmissionInfo si = SubmissionController.getSubmissionInfo(context, request);
+
+    Item item = si.getSubmissionItem().getItem();
 
     final int halfWidth = 23;
     final int fullWidth = 50;
@@ -848,7 +945,7 @@
     int pageNum = pageNumStr.intValue();
     
     // for later use, determine whether we are in submit or workflow mode
-    String scope = SubmitServlet.isWorkflow(si) ? "workflow" : "submit";
+    String scope = si.isInWorkflow() ? "workflow" : "submit";
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
@@ -857,28 +954,28 @@
 	contextPath = request.getContextPath();
 %>
 
-  <form action="<%= request.getContextPath() %>/submit#<%= si.jumpToField%>" method="post" name="edit_metadata">
-    <jsp:include page="/submit/progressbar.jsp">
-      <jsp:param name="current_stage" value="<%= pageNum %>"/>
-      <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-      <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-    </jsp:include>
+
+
+  <form action="<%= request.getContextPath() %>/submit#<%= si.getJumpToField()%>" method="post" name="edit_metadata" onkeydown="return disableEnterKey(event);">
+
+	<jsp:include page="/submit/progressbar.jsp"></jsp:include>
 
     <h1><fmt:message key="jsp.submit.edit-metadata.heading"/></h1>
 
 <%
-     if (pageNum == SubmitServlet.EDIT_METADATA_1) 
+     //figure out which help page to display
+     if (pageNum <= 1) 
      {
 %>
         <div><fmt:message key="jsp.submit.edit-metadata.info1"/>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe2\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#describe2"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
 <%
      } 
      else 
      {
 %>
     	<div><fmt:message key="jsp.submit.edit-metadata.info2"/>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe3\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#describe3"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
     
 <%
      }
@@ -889,9 +986,9 @@
      <center>
      <table>
 <%
-	 int pageIdx = pageNum - SubmitServlet.EDIT_METADATA_1; 
-     DCInput[] inputs = inputSet.getPageRows(pageIdx, si.submission.hasMultipleTitles(),
-                                                si.submission.isPublishedBefore() );
+	 int pageIdx = pageNum - 1; 
+     DCInput[] inputs = inputSet.getPageRows(pageIdx, si.getSubmissionItem().hasMultipleTitles(),
+                                                si.getSubmissionItem().isPublishedBefore() );
      for (int z = 0; z < inputs.length; z++) 
      {
        // ignore inputs invisible in this scope
@@ -917,31 +1014,38 @@
           fieldName = dcSchema + "_" + dcElement;
 
 
-       //if (inputs[z].isRequired()) {
-         // si.jumpToField = fieldName;
-       //}
-
-
-       StringBuffer sb;
-       if ((si.missingFields != null) && (si.missingFields.contains(new Integer(z))))
+       if ((si.getMissingFields() != null) && (si.getMissingFields().contains(fieldName)))
        {
-          String req = inputs[z].getWarning();
-	  	  int anchor = req.indexOf("</td>");
-          sb = new StringBuffer(req);
-          sb.insert(anchor, "<a name=\""+fieldName+"\"></a>");
+    	   if(inputs[z].getWarning() != null)
+    	   {
+    		   if(si.getJumpToField()==null || si.getJumpToField().length()==0)
+    		   		si.setJumpToField(fieldName);
+
+    		   String req = "<tr><td colspan=\"4\" class=\"submitFormWarn\">" +
+    		   					inputs[z].getWarning() +
+    		   					"<a name=\""+fieldName+"\"></a></td></tr>";	   		
+    		   out.write(req);
+       		}
        }
        else
        {
-          sb = new StringBuffer(inputs[z].getHints());
+			//print out hints, if not null
+    	   if(inputs[z].getHints() != null)
+    	   { 
+    		 	String hints = "<tr><td colspan=\"4\" class=\"submitFormHelp\">" +
+    						 	inputs[z].getHints() +
+    						 	"</td></tr>";
+
+              	out.write(hints);
+       		}
        }
-       out.write(sb.toString());
 
        repeatable = inputs[z].getRepeatable();
        fieldCountIncr = 0;
        if (repeatable) 
        { 
          fieldCountIncr = 1;
-         if (si.moreBoxesFor != null && si.moreBoxesFor.equals(fieldName)) 
+         if (si.getMoreBoxesFor() != null && si.getMoreBoxesFor().equals(fieldName)) 
 	     {
            fieldCountIncr = 2;
          }
@@ -987,7 +1091,12 @@
 	   		doTwoBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
 	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary, 
 	     			 closedVocabulary);
-       } 
+       }
+       else if (inputType.equals("list")) 
+       {
+          doList(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
+           		repeatable, inputs[z].getPairs(), label);
+       }
        else 
        {
 	   		doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
@@ -1026,22 +1135,25 @@
 <%--        blank <P>? --%>
         <p>&nbsp;</p>
 
-<%-- Hidden fields needed for submit servlet to know which item to deal with --%>
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= pageNum %>"/>
+<%-- Hidden fields needed for SubmissionController servlet to know which item to deal with --%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
         <center>
             <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
+                <%  //if not first page & step, show "Previous" button
+					if(!(SubmissionController.isFirstStep(request, si) && pageNum<=1))
+					{ %>
                     <td>
-                        <input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.edit-metadata.previous"/>"/>
+						<input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.previous"/>" />
                     </td>
+				<%  } %>
                     <td>
-                        <input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.edit-metadata.next"/>"/>
+                        <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.next"/>"/>
                     </td>
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align="right">
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.edit-metadata.cancelsave"/>"/>
+                        <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.cancelsave"/>"/>
                     </td>
                 </tr>
             </table>

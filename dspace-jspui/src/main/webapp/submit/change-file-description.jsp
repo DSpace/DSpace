@@ -38,13 +38,6 @@
   - DAMAGE.
   --%>
 
-<%--
-  - Change file description form
-  -
-  - Attributes to pass in:
-  -    submission.info - the SubmissionInfo object - bitstream field must be set
-  --%>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
@@ -52,16 +45,21 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);    
+
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 %>
 
 <dspace:layout locbar="off"
@@ -69,13 +67,9 @@
                titlekey="jsp.submit.change-file-description.title"
                nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+        <jsp:include page="/submit/progressbar.jsp"/>
 
         <%-- <h1>Submit: Change File Description</h1> --%>
 		<h1><fmt:message key="jsp.submit.change-file-description.heading"/></h1>
@@ -95,16 +89,15 @@
                 <th id="t3" class="oddRowOddCol"><fmt:message key="jsp.submit.change-file-description.format"/></th>
             </tr>
             <tr>
-                <td headers="t1" class="evenRowOddCol"><%= si.bitstream.getName() %></td>
-                <td headers="t2" class="evenRowEvenCol"><%= si.bitstream.getSize() %> bytes</td>
-                <td headers="t3" class="evenRowOddCol"><%= si.bitstream.getFormatDescription() %></td>
+                <td headers="t1" class="evenRowOddCol"><%= subInfo.getBitstream().getName() %></td>
+                <td headers="t2" class="evenRowEvenCol"><%= subInfo.getBitstream().getSize() %> bytes</td>
+                <td headers="t3" class="evenRowOddCol"><%= subInfo.getBitstream().getFormatDescription() %></td>
             </tr>
         </table>
 
-        <!-- <p>Enter the correct description of the file in the box below:</p> -->
         <p><fmt:message key="jsp.submit.change-file-description.info2"/></p>
 <%
-    String currentDesc = si.bitstream.getDescription();
+    String currentDesc = subInfo.getBitstream().getDescription();
     if (currentDesc == null)
     {
         currentDesc="";
@@ -113,16 +106,15 @@
         <center>
             <table>
                 <tr>
-                    <%-- <td class="submitFormLabel">File Description:</td> --%>
 					<td class="submitFormLabel"><label for="tdescription"><fmt:message key="jsp.submit.change-file-description.filedescr"/></label></td>
                     <td><input type="text" name="description" id="tdescription" size="50" value="<%= currentDesc %>" /></td>
                 </tr>
             </table>
         </center>
 
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= SubmitServlet.CHANGE_FILE_DESCRIPTION %>" />     
-        <%-- <center><p><input type="submit" name="submit" value="Submit"></p></center> --%>
+        <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
+     
 		<center><p><input type="submit" name="submit" value="<fmt:message key="jsp.submit.general.submit"/>" /></p></center>
     </form>
 

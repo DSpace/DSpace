@@ -47,8 +47,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.content.InProgressSubmission" %>
 <%@ page import="org.dspace.content.Collection"%>
 
@@ -56,20 +58,19 @@
 
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
 
-    InProgressSubmission ip = si.submission;
-    Collection collection = ip.getCollection();
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
+
+	//get collection
+    Collection collection = subInfo.getSubmissionItem().getCollection();
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.complete.title">
 
-    <jsp:include page="/submit/progressbar.jsp">
-        <jsp:param name="current_stage" value="<%= SubmitServlet.SUBMISSION_COMPLETE %>"/>
-        <jsp:param name="stage_reached" value="<%= SubmitServlet.SUBMISSION_COMPLETE %>"/>
-        <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-    </jsp:include>
+    <jsp:include page="/submit/progressbar.jsp"/>
 
     <%-- <h1>Submit: Submission Complete!</h1> --%>
 	<h1><fmt:message key="jsp.submit.complete.heading"/></h1>
@@ -81,12 +82,11 @@
     or if for some reason there is a problem with your submission. You can also
     check on the status of your submission by going to the My DSpace page.</p> --%>
 	<p><fmt:message key="jsp.submit.complete.info"/></p> 
-    <%--  <p><a href="<%= request.getContextPath() %>/mydspace">Go to My DSpace</a></p> --%>
     <p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.complete.link"/></a></p>
      
     <p><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.community-list.title"/></a></p>
      
-    <form action="<%= request.getContextPath() %>/submit" method="POST">
+    <form action="<%= request.getContextPath() %>/submit" method="POST" onkeydown="return disableEnterKey(event);">
         <input type="hidden" name="collection" value="<%= collection.getID() %>">
 	    <input type="submit" name="submit" value="<fmt:message key="jsp.collection-home.submit.button"/>">
     </form>

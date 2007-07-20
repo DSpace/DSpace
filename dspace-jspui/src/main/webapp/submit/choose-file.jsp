@@ -38,13 +38,6 @@
   - DAMAGE.
   --%>
 
-<%--
-  - Select file to upload
-  -
-  - Attributes to pass in to this page:
-  -    submission.info  - the SubmissionInfo object
-  --%>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
@@ -54,13 +47,23 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.submit.AbstractProcessingStep" %>
+<%@ page import="org.dspace.submit.step.UploadStep" %>
+<%@ page import="org.dspace.app.util.DCInputSet" %>
+<%@ page import="org.dspace.app.util.DCInputsReader" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);    
+
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
+   
 %>
 
 
@@ -69,13 +72,13 @@
                titlekey="jsp.submit.choose-file.title"
                nocache="true">
 
-    <form method="post" action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data">
+	<form method="post" action="<%= request.getContextPath() %>/submit" onkeydown="return disableEnterKey(event);">
+		<jsp:include page="/submit/progressbar.jsp"/>
+		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
+	</form>
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+    <form method="post" action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data" onkeydown="return disableEnterKey(event);">
 
         <%-- <h1>Submit: Upload a File</h1> --%>
 		<h1><fmt:message key="jsp.submit.choose-file.heading"/></h1>
@@ -95,18 +98,18 @@
         you will need to select the option to display files of other types.
         <object><dspace:popup page="/help/index.html#netscapeupload">Instructions for Netscape users</dspace:popup></object> are available.</p> --%>
 		<div class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info3"/>
-        <dspace:popup page="${helpPage}#netscapeupload"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup></div>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#netscapeupload\"%>"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup></div>
         
 <%-- FIXME: Collection-specific stuff should go here? --%>
         <%-- <p class="submitFormHelp">Please also note that the DSpace system is
         able to preserve the content of certain types of files better than other
         types.
-        <object><dspace:popup page="/help/formats.jsp">Information about file types</dspace:popup></object> and levels of
+        <object><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.formats\")%>">Information about file types</dspace:popup></object> and levels of
         support for each are available.</p> --%>
         
-		<p class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info6"/>
-        <object><dspace:popup page="/help/formats.jsp"><fmt:message key="jsp.submit.choose-file.info7"/></dspace:popup></object>
-        </p>
+		<div class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info6"/>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.formats\")%>"><fmt:message key="jsp.submit.choose-file.info7"/></dspace:popup>
+        </div>
     
         <table border="0" align="center">
             <tr>
@@ -119,7 +122,7 @@
                 </td>
             </tr>
 <%
-    if (si.submission.hasMultipleFiles())
+    if (subInfo.getSubmissionItem().hasMultipleFiles())
     {
 %>
             <tr>
@@ -142,8 +145,8 @@
 %>
         </table>
         
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= SubmitServlet.CHOOSE_FILE %>" />
+		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
     
         <p>&nbsp;</p>
 
@@ -151,18 +154,19 @@
             <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>
+               	<%  //if not first step, show "Previous" button
+					if(!SubmissionController.isFirstStep(request, subInfo))
+					{ %>
                     <td>
-                        <!-- <input type="submit" name="submit_prev" value="&lt; Previous"> -->
-						<input type="submit" name="submit_prev" value="<fmt:message key="jsp.submit.general.previous"/>" />
+                        <input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
                     </td>
+				<%  } %>
                     <td>
-                        <!-- <input type="submit" name="submit_next" value="Next &gt;"> -->
-						<input type="submit" name="submit_next" value="<fmt:message key="jsp.submit.general.next"/>" />
-                    </td>
+                        <input type="submit" name="<%=UploadStep.SUBMIT_UPLOAD_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
+                    </td>           
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align="right">
-                        <!-- <input type="submit" name="submit_cancel" value="Cancel/Save"> -->
-						<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
+                        <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
                     </td>
                 </tr>
             </table>

@@ -42,7 +42,6 @@
   - Select type of uploaded file
   -
   - Attributes to pass in to this page:
-  -    submission.info    - the SubmissionInfo object
   -    guessed.format     - the system's guess as to the format - null if it
   -                         doesn't know (BitstreamFormat)
   -    bitstream.formats  - the (non-internal) formats known by the system
@@ -56,8 +55,10 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
@@ -66,33 +67,34 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);    
+
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
+
+	//retrieve attributes from request
     BitstreamFormat guess =
         (BitstreamFormat) request.getAttribute("guessed.format");
     BitstreamFormat[] formats =
         (BitstreamFormat[]) request.getAttribute("bitstream.formats");    
 
-    Item item = si.submission.getItem();
+    Item item = subInfo.getSubmissionItem().getItem();
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.get-file-format.title" nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= SubmitServlet.UPLOAD_FILES %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+        <jsp:include page="/submit/progressbar.jsp"/>
 
         <%-- <h1>Submit: Select File Format</h1> --%>
 		<h1><fmt:message key="jsp.submit.get-file-format.heading"/></h1>
 
         <%-- <p>Uploaded file: <code><%= si.bitstream.getName() %></code> (<%= si.bitstream.getSize() %> bytes)</p> --%>
 		<p><fmt:message key="jsp.submit.get-file-format.info1">
-            <fmt:param><%= si.bitstream.getName() %></fmt:param>
-            <fmt:param><%= String.valueOf(si.bitstream.getSize()) %></fmt:param>
+            <fmt:param><%= subInfo.getBitstream().getName() %></fmt:param>
+            <fmt:param><%= String.valueOf(subInfo.getBitstream().getSize()) %></fmt:param>
         </fmt:message></p>
 
 <%
@@ -112,14 +114,16 @@
             <fmt:param><%= guess.getShortDescription() %></fmt:param>
         </fmt:message></p>   
         <input type="hidden" name="format" value="<%= guess.getID() %>" />
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= SubmitServlet.GET_FILE_FORMAT %>" />
+
+        <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
+
         <%-- <p align="center"><input type="submit" name="submit" value="Choose automatically-recognized type"></p> --%>
 		<p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.submit.get-file-format.choose.button"/>" /></p>
     </form>
 
 <%-- Option list put in a separate form --%>
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 <%
     }
 %>
@@ -134,7 +138,7 @@
     
         <center>
             <select name="format" size="8">
-                <option value="-1" <%= si.bitstream.getFormat().getShortDescription().equals("Unknown") ? "selected=\"selected\"" : "" %>>
+                <option value="-1" <%= subInfo.getBitstream().getFormat().getShortDescription().equals("Unknown") ? "selected=\"selected\"" : "" %>>
                     <%-- Format Not in List --%>
 					<fmt:message key="jsp.submit.get-file-format.info6"/>
                 </option>
@@ -143,7 +147,7 @@
     {
 %>
                 <option
-                    <%= si.bitstream.getFormat().getID() == formats[i].getID() ? "selected=\"selected\"" : "" %>
+                    <%= subInfo.getBitstream().getFormat().getID() == formats[i].getID() ? "selected=\"selected\"" : "" %>
                     value="<%= formats[i].getID() %>">
                    <%= formats[i].getShortDescription() %>
 <%-- <%
@@ -175,7 +179,7 @@
                 </td>
                 <td>
 <%
-    String desc = si.bitstream.getUserFormatDescription();
+    String desc = subInfo.getBitstream().getUserFormatDescription();
     if (desc == null)
     {
         desc = "";
@@ -186,8 +190,8 @@
             </tr>
         </table>
 
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="step" value="<%= SubmitServlet.GET_FILE_FORMAT %>" />
+        <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
 
         <%-- <center><p><input type="submit" name="submit" value="Set File Format"></p></center> --%>
 		<center><p><input type="submit" name="submit" value="<fmt:message key="jsp.submit.general.submit"/>" /></p></center>

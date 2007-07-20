@@ -43,7 +43,6 @@
   - question on the first page
   -
   - Attributes to pass in:
-  -    submission.info  - the SubmissionInfo object
   -    multiple.titles, published.before, multiple.files - Booleans, indicating
   -                      the user's choices on the initial questions page
   -    will.remove.titles, will.remove.date, will.remove.files - Booleans,
@@ -55,14 +54,19 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);    
+
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 
     boolean multipleTitles = ((Boolean) request.getAttribute("multiple.titles")).booleanValue();
     boolean publishedBefore = ((Boolean) request.getAttribute("published.before")).booleanValue();
@@ -126,7 +130,7 @@
 
     <p>&nbsp;</p>
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
     
 <%-- Embed necessary information --%>
         <input type="hidden" name="multiple_titles" value="<%= multipleTitles %>"/>
@@ -139,8 +143,8 @@
 <%-- Pass through original button press --%>
         <input type="hidden" name="<%= buttonPressed %>" value="true"/>
 
-        <input type="hidden" name="step" value="<%= SubmitServlet.VERIFY_PRUNE %>"/>
-        <%= SubmitServlet.getSubmissionParameters(si) %>
+        <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
 
 <%-- Note: These submit buttons' names don't start with "submit", so the
   -- Previously passed in button will be picked up --%>
@@ -148,12 +152,10 @@
             <table border="0" width="70%">
                 <tr>
                     <td align="left">
-                        <%-- <input type="submit" name="proceed" value="Proceed With Changes"> --%>
-						<input type="submit" name="proceed" value="<fmt:message key="jsp.submit.verify-prune.proceed.button"/>" />
+                        <input type="submit" name="prune" value="<fmt:message key="jsp.submit.verify-prune.proceed.button"/>" />
                     </td>
                     <td align="right">
-                        <%-- <input type="submit" name="do_not_proceed" value="Do Not Make the Changes"> --%>
-						<input type="submit" name="do_not_proceed" value="<fmt:message key="jsp.submit.verify-prune.notproceed.button"/>" />
+                        <input type="submit" name="do_not_prune" value="<fmt:message key="jsp.submit.verify-prune.notproceed.button"/>" />
                     </td>
                 </tr>
             </table>

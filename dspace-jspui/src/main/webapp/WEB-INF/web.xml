@@ -373,7 +373,7 @@
 
   <servlet>
     <servlet-name>submit</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.SubmitServlet</servlet-class>
+    <servlet-class>org.dspace.app.webui.servlet.SubmissionController</servlet-class>
   </servlet>
 
   <servlet>

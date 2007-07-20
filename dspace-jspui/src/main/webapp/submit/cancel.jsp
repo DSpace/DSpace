@@ -59,19 +59,19 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.app.webui.servlet.SubmitServlet" %>
-<%@ page import="org.dspace.app.webui.util.SubmissionInfo" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    SubmissionInfo si =
-        (SubmissionInfo) request.getAttribute("submission.info");
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
 
-    String step = (String) request.getAttribute("step");
-    String displayStep = (String) request.getAttribute("display.step");
-
-    if (displayStep==null) displayStep = step;
+	//get submission information object
+    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 %>
 
 <dspace:layout locbar="off"
@@ -79,22 +79,18 @@
                titlekey="jsp.submit.cancel.title"
                nocache="true">
 
-    <form action="<%= request.getContextPath() %>/submit" method="post">
+    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
-        <jsp:include page="/submit/progressbar.jsp">
-            <jsp:param name="current_stage" value="<%= displayStep %>"/>
-            <jsp:param name="stage_reached" value="<%= SubmitServlet.getStepReached(si) %>"/>
-            <jsp:param name="md_pages" value="<%= si.numMetadataPages %>"/>
-        </jsp:include>
+        <jsp:include page="/submit/progressbar.jsp"/>
 
 
 		<h1><fmt:message key="jsp.submit.cancel.title"/></h1>
 
 		<p><fmt:message key="jsp.submit.cancel.info"/></p>
     
-        <%= SubmitServlet.getSubmissionParameters(si) %>
-        <input type="hidden" name="previous_step" value="<%= step %>" />
-        <input type="hidden" name="step" value="<%= SubmitServlet.SUBMISSION_CANCELLED %>" />
+		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+        <%= SubmissionController.getSubmissionParameters(context, request) %>
+        <input type="hidden" name="cancellation" value="true" />
 
         <table align="center" border="0" width="90%">
             <tr>
