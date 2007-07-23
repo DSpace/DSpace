@@ -44,9 +44,9 @@ importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
 
 importClass(Packages.org.dspace.core.Context);
 importClass(Packages.org.dspace.content.Collection);
-importClass(Packages.org.dspace.aspect.eperson.EPerson);
-importClass(Packages.org.dspace.aspect.eperson.AccountManager);
-importClass(Packages.org.dspace.aspect.eperson.Subscribe);
+importClass(Packages.org.dspace.eperson.EPerson);
+importClass(Packages.org.dspace.eperson.AccountManager);
+importClass(Packages.org.dspace.eperson.Subscribe);
 
 importClass(Packages.org.dspace.app.xmlui.utils.AuthenticationUtil);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
