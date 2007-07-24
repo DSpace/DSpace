@@ -60,7 +60,7 @@ public final class ChecksumResultDAO extends DAOSupport
      * Find a specified description.
      */
     private static final String FIND_CHECK_STRING = "select result_description "
-            + "from checksum_results where result_code = ?;";
+            + "from checksum_results where result_code = ?";
 
     /**
      * Usual Log4J Logger.

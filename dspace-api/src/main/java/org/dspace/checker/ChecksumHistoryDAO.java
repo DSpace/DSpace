@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -43,12 +44,26 @@ public class ChecksumHistoryDAO extends DAOSupport
             + "from most_recent_checksum, bitstream where "
             + "not exists( select 'x' from checksum_history where "
             + "most_recent_checksum.bitstream_id = checksum_history.bitstream_id ) "
-            + "and most_recent_checksum.bitstream_id = bitstream.bitstream_id;";
+            + "and most_recent_checksum.bitstream_id = bitstream.bitstream_id";
 
+    private static final String INSERT_MISSING_HISTORY_BITSTREAMS_ORACLE = "insert into checksum_history ( "
+        + "bitstream_id, process_start_date, "
+        + "process_end_date, checksum_expected, "
+        + "checksum_calculated, result ) "
+        + "select most_recent_checksum.bitstream_id, "
+        + "most_recent_checksum.last_process_start_date, "
+        + "most_recent_checksum.last_process_end_date, "
+        + "most_recent_checksum.expected_checksum, most_recent_checksum.expected_checksum, "
+        + "CASE WHEN bitstream.deleted = 1 THEN 'BITSTREAM_MARKED_DELETED' else 'CHECKSUM_MATCH' END "
+        + "from most_recent_checksum, bitstream where "
+        + "not exists( select 'x' from checksum_history where "
+        + "most_recent_checksum.bitstream_id = checksum_history.bitstream_id ) "
+        + "and most_recent_checksum.bitstream_id = bitstream.bitstream_id";
+   
     /** Query that inserts results of recent check into the history table. */
     private static final String INSERT_HISTORY = "insert into checksum_history (  bitstream_id, process_start_date, "
             + " process_end_date, checksum_expected, checksum_calculated, result ) "
-            + " values ( ?, ?, ?, ?, ?, ?);";
+            + " values ( ?, ?, ?, ?, ?, ?)";
 
     /**
      * Deletes from the most_recent_checksum where the bitstream id is found
@@ -156,7 +171,10 @@ public class ChecksumHistoryDAO extends DAOSupport
         PreparedStatement stmt = null;
         try
         {
-            stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS);
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+	            stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS_ORACLE);
+            else
+            	stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS);
             stmt.executeUpdate();
         }
         catch (SQLException e)
