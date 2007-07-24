@@ -726,8 +726,8 @@ CREATE TABLE most_recent_checksum
 (
     bitstream_id INTEGER PRIMARY KEY REFERENCES bitstream(bitstream_id),
     to_be_processed NUMBER(1) NOT NULL,
-    expected_checksum VARCHAR(64) NOT NULL,
-    current_checksum VARCHAR(64) NOT NULL,
+    expected_checksum VARCHAR(64),
+    current_checksum VARCHAR(64),
     last_process_start_date TIMESTAMP NOT NULL,
     last_process_end_date TIMESTAMP NOT NULL,
     checksum_algorithm VARCHAR(64) NOT NULL,
