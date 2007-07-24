@@ -1,5 +1,10 @@
 Post 1.4.2
 ==========
+(Graham Triggs)
+- S.F. Patch 1749196 Oracle SQL in Bitstream Checker
+  (Recommend making expected_checksum and current_checksum in
+   most_recent_checksum table allow null values)
+
 (James Rutherford)
 - Fixed SF bug #1748390 README file for DSpace library 
 

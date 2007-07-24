@@ -42,6 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -67,7 +68,7 @@ public class ReporterDAO extends DAOSupport
             + "and most_recent_checksum.result= ? "
             + "and most_recent_checksum.last_process_start_date >= ? "
             + "and most_recent_checksum.last_process_start_date < ? "
-            + "order by bitstream_id;";
+            + "order by bitstream_id";
 
     /**
      * 
@@ -84,8 +85,19 @@ public class ReporterDAO extends DAOSupport
             + "and most_recent_checksum.result = checksum_results.result_code "
             + "and most_recent_checksum.last_process_start_date >= ? "
             + "and most_recent_checksum.last_process_start_date < ? "
-            + "order by most_recent_checksum.bitstream_id;";
+            + "order by most_recent_checksum.bitstream_id";
 
+    public static final String DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE = "select most_recent_checksum.bitstream_id, "
+        + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
+        + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
+        + "result_description "
+        + "from checksum_results, most_recent_checksum "
+        + "where most_recent_checksum.to_be_processed = 0 "
+        + "and most_recent_checksum.result = checksum_results.result_code "
+        + "and most_recent_checksum.last_process_start_date >= ? "
+        + "and most_recent_checksum.last_process_start_date < ? "
+        + "order by most_recent_checksum.bitstream_id";
+    
     /**
      * Find all bitstreams that the checksum checker is unaware of
      */
@@ -97,7 +109,7 @@ public class ReporterDAO extends DAOSupport
             + "from bitstream left outer join bitstreamformatregistry on "
             + "bitstream.bitstream_format_id = bitstreamformatregistry.bitstream_format_id "
             + "where not exists( select 'x' from most_recent_checksum "
-            + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id );";
+            + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )";
 
     /**
      * Usual Log4J Logger.
@@ -195,8 +207,10 @@ public class ReporterDAO extends DAOSupport
             // create the connection and execute the statement
             conn = DatabaseManager.getConnection();
 
-            prepStmt = conn
-                    .prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS);
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            	prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE);
+           	else
+            	prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS);
 
             prepStmt.setDate(1, new java.sql.Date(startDate.getTime()));
             prepStmt.setDate(2, new java.sql.Date(endDate.getTime()));

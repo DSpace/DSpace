@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -76,7 +77,7 @@ public final class BitstreamInfoDAO extends DAOSupport
             + "bitstream.bitstream_format_id = bitstreamformatregistry.bitstream_format_id, "
             + "most_recent_checksum "
             + "where bitstream.bitstream_id = ? "
-            + "and bitstream.bitstream_id = most_recent_checksum.bitstream_id;";
+            + "and bitstream.bitstream_id = most_recent_checksum.bitstream_id";
 
     /**
      * Query that selects bitstream IDs from bitstream table that are not yet in
@@ -96,8 +97,23 @@ public final class BitstreamInfoDAO extends DAOSupport
             + "CASE WHEN bitstream.deleted = true THEN 'BITSTREAM_MARKED_DELETED' else 'CHECKSUM_MATCH' END "
             + "from bitstream where not exists( "
             + "select 'x' from most_recent_checksum "
-            + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id );";
+            + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )";
 
+    private static final String INSERT_MISSING_CHECKSUM_BITSTREAMS_ORACLE = "insert into most_recent_checksum ( "
+        + "bitstream_id, to_be_processed, expected_checksum, current_checksum, "
+        + "last_process_start_date, last_process_end_date, "
+        + "checksum_algorithm, matched_prev_checksum, result ) "
+        + "select bitstream.bitstream_id, "
+        + "CASE WHEN bitstream.deleted = 0 THEN 1 ELSE 0 END, "
+        + "CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, "
+        + "CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, "
+        + "? AS last_process_start_date, ? AS last_process_end_date, CASE WHEN bitstream.checksum_algorithm IS NULL "
+        + "THEN 'MD5' ELSE bitstream.checksum_algorithm END, 1, "
+        + "CASE WHEN bitstream.deleted = 1 THEN 'BITSTREAM_MARKED_DELETED' else 'CHECKSUM_MATCH' END "
+        + "from bitstream where not exists( "
+        + "select 'x' from most_recent_checksum "
+        + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )";
+    
     /**
      * Query that updates most_recent_checksum table with checksum result for
      * specified bitstream ID.
@@ -123,6 +139,11 @@ public final class BitstreamInfoDAO extends DAOSupport
             + "order by date_trunc('milliseconds', last_process_end_date), "
             + "bitstream_id " + "ASC LIMIT 1";
 
+    public static final String GET_OLDEST_BITSTREAM_ORACLE = "SELECT bitstream_id FROM (select bitstream_id  "
+        + "from most_recent_checksum " + "where to_be_processed = 1 "
+        + "order by date_trunc('milliseconds', last_process_end_date), "
+        + "bitstream_id " + "ASC) WHERE rownum=1";
+    
     /**
      * Selects the next bitstream in order of last processing end date, ensuring
      * that no bitstream is checked more than once since the date parameter
@@ -135,6 +156,13 @@ public final class BitstreamInfoDAO extends DAOSupport
             + "order by date_trunc('milliseconds', last_process_end_date), "
             + "bitstream_id " + "ASC LIMIT 1";
 
+    public static final String GET_OLDEST_BITSTREAM_DATE_ORACLE = "SELECT bitstream_id FROM (select bitstream_id  "
+        + "from most_recent_checksum "
+        + "where to_be_processed = 1 "
+        + "and last_process_start_date < ? "
+        + "order by date_trunc('milliseconds', last_process_end_date), "
+        + "bitstream_id " + "ASC) WHERE rownum=1";
+    
     /** SQL query to retrieve bitstreams for a given item. */
     private static final String ITEM_BITSTREAMS = "SELECT b2b.bitstream_id "
             + "FROM bundle2bitstream b2b, item2bundle i2b WHERE "
@@ -284,7 +312,10 @@ public final class BitstreamInfoDAO extends DAOSupport
         {
             LOG.debug("updating missing bitstreams");
             conn = DatabaseManager.getConnection();
-            stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS);
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+                stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS_ORACLE);
+            else
+            	stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS);
             stmt.setTimestamp(1, new java.sql.Timestamp(new Date().getTime()));
             stmt.setTimestamp(2, new java.sql.Timestamp(new Date().getTime()));
             stmt.executeUpdate();
@@ -395,7 +426,10 @@ public final class BitstreamInfoDAO extends DAOSupport
         {
 
             conn = DatabaseManager.getConnection();
-            prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM);
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_ORACLE);
+            else
+            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM);
             rs = prepStmt.executeQuery();
             if (rs.next())
             {
@@ -436,7 +470,10 @@ public final class BitstreamInfoDAO extends DAOSupport
         try
         {
             conn = DatabaseManager.getConnection();
-            prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE);
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE_ORACLE);
+            else
+            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE);
             prepStmt.setTimestamp(1, lessThanDate);
             rs = prepStmt.executeQuery();
             if (rs.next())
