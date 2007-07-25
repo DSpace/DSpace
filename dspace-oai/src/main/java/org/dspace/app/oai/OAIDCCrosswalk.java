@@ -40,7 +40,6 @@
 package org.dspace.app.oai;
 
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,11 +63,18 @@ public class OAIDCCrosswalk extends Crosswalk
 	// converting a String to xml
 	private static final Pattern invalidXmlPattern =
 		Pattern.compile("([^\\t\\n\\r\\u0020-\\ud7ff\\ue000-\\ufffd\\u10000-\\u10ffff]+|[&<>])");
-
-	public OAIDCCrosswalk(Properties properties)
+    
+    // Pattern to test for only true dc elements.
+    private static final Pattern dcElementPattern = Pattern
+            .compile("(^(title|creator|subject|description|"
+                    + "publisher|contributor|date|type|"
+                    + "format|identifier|source|language|"
+                    + "relation|coverage|rights)$)");
+	
+    public OAIDCCrosswalk(Properties properties)
     {
-        super(
-                "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
+        super("http://www.openarchives.org/OAI/2.0/oai_dc/ "
+                + "http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
     }
 
     public boolean isAvailableFor(Object nativeItem)
@@ -98,19 +104,18 @@ public class OAIDCCrosswalk extends Crosswalk
 
         for (int i = 0; i < allDC.length; i++)
         {
+            String element = allDC[i].element;
+            String qualifier = allDC[i].qualifier;
+
             // Do not include description.provenance
-            boolean description = allDC[i].element.equals("description");
-            boolean provenance = (allDC[i].qualifier != null)
-                    && allDC[i].qualifier.equals("provenance");
+            boolean provenance = "description".equals(element)
+                    && "provenance".equals(qualifier);
 
-            if (!(description && provenance))
+            // Include only OAI DC (guard against outputing invalid DC)
+            if (dcElementPattern.matcher(element).matches() && !provenance)
             {
-                String element = allDC[i].element;
-
                 // contributor.author exposed as 'creator'
-                if (allDC[i].element.equals("contributor")
-                        && (allDC[i].qualifier != null)
-                        && allDC[i].qualifier.equals("author"))
+                if ("contributor".equals(element) && "author".equals(qualifier))
                 {
                     element = "creator";
                 }
