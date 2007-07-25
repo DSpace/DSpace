@@ -40,6 +40,8 @@
 package org.dspace.app.oai;
 
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -57,10 +59,22 @@ import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
  */
 public class OAIDCCrosswalk extends Crosswalk
 {
+    // Pattern containing all the characters we want to filter out / replace
+    // converting a String to xml
+    private static final Pattern invalidXmlPattern =
+        Pattern.compile("([^\\t\\n\\r\\u0020-\\ud7ff\\ue000-\\ufffd\\u10000-\\u10ffff]+|[&<>])");
+    
+    // Pattern to test for only true dc elements.
+    private static final Pattern dcElementPattern = Pattern
+            .compile("(^(title|creator|subject|description|"
+                    + "publisher|contributor|date|type|"
+                    + "format|identifier|source|language|"
+                    + "relation|coverage|rights)$)");
+    
     public OAIDCCrosswalk(Properties properties)
     {
-        super(
-                "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
+        super("http://www.openarchives.org/OAI/2.0/oai_dc/ "
+                + "http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
     }
 
     public boolean isAvailableFor(Object nativeItem)
@@ -90,68 +104,54 @@ public class OAIDCCrosswalk extends Crosswalk
 
         for (int i = 0; i < allDC.length; i++)
         {
+            String element = allDC[i].element;
+            String qualifier = allDC[i].qualifier;
+
             // Do not include description.provenance
-            boolean description = allDC[i].element.equals("description");
-            boolean provenance = (allDC[i].qualifier != null)
-                    && allDC[i].qualifier.equals("provenance");
+            boolean provenance = "description".equals(element)
+                    && "provenance".equals(qualifier);
 
-            if (!(description && provenance))
+            // Include only OAI DC (guard against outputing invalid DC)
+            if (dcElementPattern.matcher(element).matches() && !provenance)
             {
-                String element = allDC[i].element;
-
                 // contributor.author exposed as 'creator'
-                if (allDC[i].element.equals("contributor")
-                        && (allDC[i].qualifier != null)
-                        && allDC[i].qualifier.equals("author"))
+                if ("contributor".equals(element) && "author".equals(qualifier))
                 {
                     element = "creator";
                 }
 
-                // Escape XML chars <, > and &
                 String value = allDC[i].value;
                 
+                // Escape XML chars <, > and &
+                // Also replace all invalid characters with ' '
                 if (value != null)
                 {
-                    // remove control unicode char
-                    String temp = value.trim();
-                    char[] dcvalue = temp.toCharArray();
-                    for (int charPos = 0; charPos < dcvalue.length; charPos++)
+                    StringBuffer valueBuf = new StringBuffer(value.length());
+                    Matcher xmlMatcher = invalidXmlPattern.matcher(value.trim());
+                    while (xmlMatcher.find())
                     {
-                        if (Character.isISOControl(dcvalue[charPos]) &&
-                            !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
-                            !String.valueOf(dcvalue[charPos]).equals("\n") &&
-                            !String.valueOf(dcvalue[charPos]).equals("\r"))
-                        {
-                            dcvalue[charPos] = ' ';
-                        }
+                        String group = xmlMatcher.group();
+                        
+                        // group will either contain a character that we need to encode for xml
+                        // (ie. <, > or &), or it will be an invalid character
+                        // test the contents and replace appropriately
+                        
+                        if (group.equals("&"))
+                            xmlMatcher.appendReplacement(valueBuf, "&amp;");
+                        else if (group.equals("<"))
+                            xmlMatcher.appendReplacement(valueBuf, "&lt;");
+                        else if (group.equals(">"))
+                            xmlMatcher.appendReplacement(valueBuf, "&gt;");
+                        else
+                            xmlMatcher.appendReplacement(valueBuf, " ");
                     }
-                    value = String.valueOf(dcvalue);
+                    
+                    // add bit of the string after the final match
+                    xmlMatcher.appendTail(valueBuf);
+    
+                    metadata.append("<dc:").append(element).append(">").append(
+                            valueBuf.toString()).append("</dc:").append(element).append(">");
                 }
-
-                // First do &'s - need to be careful not to replace the
-                // & in "&amp;" again!
-                int c = -1;
-
-                while ((c = value.indexOf("&", c + 1)) > -1)
-                {
-                    value = value.substring(0, c) + "&amp;"
-                            + value.substring(c + 1);
-                }
-
-                while ((c = value.indexOf("<")) > -1)
-                {
-                    value = value.substring(0, c) + "&lt;"
-                            + value.substring(c + 1);
-                }
-
-                while ((c = value.indexOf(">")) > -1)
-                {
-                    value = value.substring(0, c) + "&gt;"
-                            + value.substring(c + 1);
-                }
-
-                metadata.append("<dc:").append(element).append(">").append(
-                        value).append("</dc:").append(element).append(">");
             }
         }
 
