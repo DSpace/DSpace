@@ -1,3 +1,6 @@
+(Mark Diggory)
+- Guard against output invalid unqualified Dublin Core in OAIDCCrosswalk.
+
 (Graham Triggs / Brad Teale / Ed Yu)
 - S.F. Patch 1679972 OAIDCCrosswalk NPE and invalid character fix
 
