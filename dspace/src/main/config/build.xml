@@ -289,7 +289,7 @@ Common usage:
 		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
 			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
-			<arg value="etc/database_schema.sql" />
+			<arg value="database_schema.sql" />
 		</java>
 
 	</target>
@@ -307,7 +307,7 @@ Common usage:
 		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
 			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
-			<arg value="etc/clean-database.sql" />
+			<arg value="clean-database.sql" />
 		</java>
 
 	</target>
