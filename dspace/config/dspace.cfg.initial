@@ -1,0 +1,774 @@
+#
+# DSpace Configuration
+#
+# Revision: $Revision: 2075 $
+#
+# Date:     $Date: 2007-07-19 20:40:27 +0100 (Thu, 19 Jul 2007) $
+#
+
+##### Basic information ######
+
+# DSpace installation directory
+dspace.dir = /dspace/dspace1.5-oracle
+
+# DSpace base URL.  Include port number etc., but NOT trailing slash
+dspace.url = http://dspace.myu.edu:8080/dspace
+
+# DSpace host name - should match base URL.  Do not include port number
+dspace.hostname = dspace.myu.edu
+
+# Name of the site
+dspace.name = DSpace at My University
+
+##### Database settings #####
+
+# Database name ("oracle", or "postgres")
+#db.name = postgres
+db.name = oracle
+
+# URL for connecting to database
+#db.url = jdbc:postgresql://localhost:5432/dspace
+db.url = jdbc:oracle:thin:@//localhost:1521/xe
+
+# JDBC Driver
+#db.driver = org.postgresql.Driver
+db.driver = oracle.jdbc.OracleDriver
+
+# Database username and password
+db.username = dspace15
+db.password = dspace
+
+# Connection pool parameters
+
+# Maximum number of DB connections in pool
+db.maxconnections = 30
+
+# Maximum time to wait before giving up if all connections in pool are busy (milliseconds)
+db.maxwait = 5000
+
+# Maximum number of idle connections in pool (-1 = unlimited)
+db.maxidle = -1
+
+# Determine if prepared statement should be cached. (default is true)
+db.statementpool = false
+
+##### Email settings ######
+
+# SMTP mail server
+mail.server=smtp.myu.edu
+
+# SMTP mail server authentication username and password (if required)
+# mail.server.username = myusername
+# mail.server.password = mypassword
+
+# From address for mail
+mail.from.address = dspace-noreply@myu.edu
+
+# Currently limited to one recipient!
+feedback.recipient = dspace-help@myu.edu
+
+# General site administration (Webmaster) e-mail
+mail.admin = dspace-help@myu.edu
+
+# Recipient for server errors and alerts
+# alert.recipient = email-address-here
+
+
+##### File Storage ######
+
+# Asset (bitstream) store number 0 (zero)
+assetstore.dir = ${dspace.dir}/assetstore
+
+# Specify extra asset stores like this, counting from 1 upwards:
+# assetstore.dir.1 = /second/assetstore
+# assetstore.dir.2 = /third/assetstore
+
+# Specify the number of the store to use for new bitstreams with this property
+# The default is 0 (zero) which corresponds to the 'assetstore.dir' above
+# assetstore.incoming = 1
+
+
+##### SRB File Storage #####
+
+# The same 'assetstore.incoming' property is used to support the use of SRB 
+# (Storage Resource Broker - see http://www.sdsc.edu/srb/) as an _optional_ 
+# replacement of or supplement to conventional file storage. DSpace will work
+# with or without SRB and full backward compatibility is maintained.
+#
+# The 'assetstore.incoming' property is an integer that references where _new_
+# bitstreams will be stored.  The default (say the starting reference) is zero.
+# The value will be used to identify the storage where all new bitstreams will
+# be stored until this number is changed.  This number is stored in the 
+# Bitstream table (store_number column) in the DSpace database, so older 
+# bitstreams that may have been stored when 'asset.incoming' had a different 
+# value can be found.
+#
+# In the simple case in which DSpace uses local (or mounted) storage the
+# number can refer to different directories (or partitions).  This gives DSpace
+# some level of scalability.  The number links to another set of properties
+# 'assetstore.dir', 'assetstore.dir.1' (remember zero is default), 
+# 'assetstore.dir.2', etc., where the values are directories.
+#
+# To support the use of SRB DSpace uses this same scheme but broadened to 
+# support:
+# - using SRB instead of the local filesystem
+# - using the local filesystem (native DSpace)
+# - using a mix of SRB and local filesystem
+#
+# In this broadened use the 'asset.incoming' integer will refer one of the 
+# following storage locations
+# - a local filesystem directory (native DSpace)
+# - a set of SRB account parameters (host, port, zone, domain, username, 
+#	password, home directory, and resource)
+#
+# Should the be any conflict, like '2' refering to a local directory and 
+# to a set of SRB parameters, the program will select the local directory.
+#
+# If SRB is chosen from the first install of DSpace, it is suggested that
+# 'assetstore.dir' (no integer appended) be retained to reference a local
+# directory (as above under File Storage) because build.xml uses this value 
+# to do a mkdir. In this case, 'assetstore.incoming' can be set to 1 (i.e.
+# uncomment the line in File Storage above) and the 'assetstore.dir' will not 
+# be used.
+#
+# Here is an example set of SRB parameters:
+# Assetstore 1 - SRB
+#srb.host.1 = mysrbmcathost.myu.edu
+#srb.port.1 = 5544
+#srb.mcatzone.1 = mysrbzone
+#srb.mdasdomainname.1 = mysrbdomain
+#srb.defaultstorageresource.1 = mydefaultsrbresource
+#srb.username.1 = mysrbuser
+#srb.password.1 = mysrbpassword
+#srb.homedirectory.1 = /mysrbzone/home/mysrbuser.mysrbdomain
+#srb.parentdir.1 = mysrbdspaceassetstore
+#
+# Assetstore n, n+1, ...
+# Follow same pattern as for assetstores above (local or SRB)
+
+
+# Directory for history serializations
+history.dir = ${dspace.dir}/history
+
+# Where to put the logs
+log.dir = ${dspace.dir}/log
+
+# Where to temporarily store uploaded files
+upload.temp.dir = ${dspace.dir}/upload
+
+# Maximum size of uploaded files in bytes, negative setting will result in no limit being set
+# 512Mb
+upload.max = 536870912
+
+
+##### Search settings #####
+
+# Where to put search index files
+search.dir = ${dspace.dir}/search
+
+# Higher values of search.max-clauses will enable prefix searches to work on
+# large repositories
+# search.max-clauses = 2048
+
+# Which Lucene Analyzer implementation to use.  If this is omitted or
+# commented out, the standard DSpace analyzer (designed for English)
+# is used by default.
+# search.analyzer = org.dspace.search.DSAnalyzer
+
+# Chinese analyzer
+# search.analyzer = org.apache.lucene.analysis.cn.ChineseAnalyzer
+
+# Boolean search operator to use, current supported values are OR and AND
+# If this config item is missing or commented out, OR is used
+# AND requires all search terms to be present
+# OR requires one or more search terms to be present
+search.operator = OR
+
+
+###### Statistical Report Configuration Settings ######
+
+# should the stats be publicly available?  should be set to false if you only
+# want administrators to access the stats, or you do not intend to generate
+# any
+report.public = false
+
+# directory where live reports are stored
+report.dir = ${dspace.dir}/reports/
+
+
+##### Handle settings ######
+
+# CNRI Handle prefix
+handle.prefix = 123456789
+
+# Directory for installing Handle server files
+handle.dir = ${dspace.dir}/handle-server
+
+
+#### Stackable Authentication Methods #####
+# Stack of authentication methods
+#  (See org.dspace.eperson.AuthenticationManager)
+plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
+        org.dspace.eperson.PasswordAuthentication
+
+#### PasswordAuthentication options ####
+# Only emails ending in the following domains are allowed to self-register
+# Example - example.com domain : @example.com
+# Example - MIT domain and all .ac.uk domains: @mit.edu, .ac.uk
+# authentication.password.domain.valid = example.com
+
+#### Example of configuring X.509 authentication
+#### (to use it, add org.dspace.eperson.X509Authentication to auth stack above)
+
+## method 1, using keystore
+#authentication.x509.keystore.path = /tomcat/conf/keystore
+#authentication.x509.keystore.password = changeit
+
+## method 2, using CA certificate
+#authentication.x509.ca.cert = ${dspace.dir}/config/MyClientCA.pem
+
+## Create e-persons for unknown names in valid certificates?
+#authentication.x509.autoregister = true
+
+
+##### Web UI Settings ######
+
+## webui.ldap.autoregister ##
+#
+# This will turn LDAP autoregistration on or off.  With this
+# on, a new EPerson object will be created for any user who
+# successfully authenticates against the LDAP server when they
+# first login.  With this setting off, the user
+# must first register to get an EPerson object by
+# entering their ldap username and password and filling out
+# the forms.
+webui.ldap.autoregister = true
+
+# Should the submit UI block submissions marked as theses?
+webui.submit.blocktheses = false
+
+# whether to display thumbnails on browse and search results pages (1.2+)
+webui.browse.thumbnail.show = false
+
+# max dimensions of the browse/search thumbs. Must be <= thumbnail.maxwidth
+# and thumbnail.maxheight. Only need to be set if required to be smaller than
+# dimension of thumbnails generated by mediafilter (1.2+)
+#webui.browse.thumbnail.maxheight = 80
+#webui.browse.thumbnail.maxwidth = 80
+
+# whether to display the thumb against each bitstream (1.2+)
+webui.item.thumbnail.show = true
+
+# where should clicking on a thumbnail from browse/search take the user
+# Only values currently supported are "item" and "bitstream"
+#webui.browse.thumbnail.linkbehaviour = item
+
+#### Settings for Item Preview ####
+webui.preview.enabled = false
+# max dimensions of the preview image
+webui.preview.maxwidth = 600
+webui.preview.maxheight = 600
+# the brand text
+webui.preview.brand = My Institution Name
+# an abbreviated form of the above text, this will be used
+# when the preview image cannot fit the normal text
+webui.preview.brand.abbrev = MyOrg
+# the height of the brand
+webui.preview.brand.height = 20
+# font settings for the brand text
+webui.preview.brand.font = SansSerif
+webui.preview.brand.fontpoint = 12
+#webui.preview.dc = rights
+
+# whether to display collection and community strengths
+webui.strengths.show = false
+
+# whether to display the contents of the licence bundle (often just the deposit
+# licence in standard DSpace installation
+webui.licence_bundle.show = false
+
+# Customise the DC metadata fields to show in the default simple item view.
+# 
+# The form is <schema prefix>.<element>[.<qualifier>|.*][(date)|(link)], ...
+#
+# For example:
+#    dc.title               = Dublin Core element 'title' (unqualified)
+#    dc.title.alternative   = DC element 'title', qualifier 'alternative'
+#    dc.title.*             = All fields with Dublin Core element 'title' 
+#                             (any or no qualifier)
+#    dc.identifier.uri(link) = DC identifier.uri, render as a link
+#    dc.date.issued(date)   = DC date.issued, render as a date
+#
+# If an item has no value for a particular field, it won't be displayed.
+# The name of the field for display will be drawn from the current UI
+# dictionary, using the key:
+#
+# "metadata.<field>"
+#
+# e.g.   "metadata.dc.title"
+#        "metadata.dc.contributor.*" 
+#        "metadata.dc.date.issued"
+#
+#webui.itemdisplay.default = dc.title, dc.title.alternative, dc.contributor.*, \
+#                            dc.subject, dc.date.issued(date), dc.publisher, \
+#                            dc.identifier.citation, dc.relation.ispartofseries, \
+#                            dc.description.abstract, dc.description, \
+#                            dc.identifier.govdoc, dc.identifier.uri(link), \
+#                            dc.identifier.isbn, dc.identifier.issn, \
+#                            dc.identifier.ismn, dc.identifier
+
+# Specify which collections use which views by Handle.
+#
+# webui.itemdisplay.<style>.collections = <collection handle>, ...
+#
+# FIXME: This should be more database-driven
+#
+# webui.itemdisplay.thesis.collections = 123456789/24, 123456789/35
+
+# Customise the DC fields to use in the item listing page.  Elements will be
+# displayed left to right in the order that they are specified here.
+#
+# The form is <schema prefix>.<element>[.<qualifier>|.*][(date)], ...
+#
+# Although not a requirement, it would make sense to include among the listed
+# fields at least the date and title fields as specified by the
+# webui.browse.index.* configuration options below.
+#
+# webui.itemlist.columns = dc.date.issued(date), dc.title, dc.contributor.*
+
+# Set the bindings for the DC browse fields.  These determine which metadata
+# elements are used for browse by date, author, title and subject.  In addition, 
+# these settings will be used to determine the behaviour of the fields on the
+# listing page: dates will be formatted as required, and titles will be links
+# to item metadata pages.  At least the date and title fields ought to be
+# specified in the webui.itemlist.columns parameters.
+#
+# The form is <schema prefix>.<element>[.<qualifier>|.*], ...
+#
+# NOTE: if you make changes to this configuration to an existing DSpace
+# installation you must re-index the system using: 
+#
+# % [dspace]/bin/index-all
+#
+# webui.browse.index.date = dc.date.issued
+# webui.browse.index.author = dc.contributor.*
+# webui.browse.index.title = dc.title
+# webui.browse.index.subject = dc.subject.*
+
+
+### i18n -  Locales ####
+# Default Locale
+# A Locale in the form country or country_language or country_language_variant
+# if no default locale is defined the server default locale will be used.
+default.locale = en
+
+# All the Locales, that are supported by this instance of DSpace
+# A comma seperated list of Locales. All types of Locales country, country_language, country_language_variant
+# Note that the appropriate file are present, especially that all the Messages_x.properties are there
+# may be used, e. g: webui.supported.locales = en, de
+
+
+### MyDSpace display of group membership
+#
+# if omitted, the default behaviour is false
+# 
+# webui.mydspace.showgroupmemberships = false
+
+
+
+##### SFX Server #####
+
+# SFX query is appended to this URL.  If this property is commented out or
+# omitted, SFX support is switched off.
+# sfx.server.url = http://sfx.myu.edu:8888/sfx?
+
+
+##### Ingest settings #####
+
+# Default language for metadata values
+default.language = en_US
+
+
+##### Media Filter settings #####
+# maximum width and height of generated thumbnails
+thumbnail.maxwidth  80
+thumbnail.maxheight 80
+
+
+##### Fulltext Indexing settings #####
+# Maximum number of terms indexed for a single field in Lucene.
+# Default is 10,000 words - often not enough for full-text indexing.
+# If you change this, you'll need to re-index for the change
+# to take effect on previously added items.
+# -1 = unlimited (Integer.MAX_VALUE)
+search.maxfieldlength = 10000
+
+
+##### Fields to Index for Search #####
+
+# DC metadata elements.qualifiers to be indexed for search
+# format: - search.index.[number] = [search field]:element.qualifier
+#         - * used as wildcard
+
+###      changing these will change your search results,     ###
+###  but will NOT automatically change your search displays  ###
+
+search.index.1 = author:dc.contributor.*
+search.index.2 = author:dc.creator.*
+search.index.3 = title:dc.title.*
+search.index.4 = keyword:dc.subject.*
+search.index.5 = abstract:dc.description.abstract
+search.index.6 = author:dc.description.statementofresponsibility
+search.index.7 = series:dc.relation.ispartofseries
+search.index.8 = abstract:dc.description.tableofcontents
+search.index.9 = mime:dc.format.mimetype
+search.index.10 = sponsor:dc.description.sponsorship
+search.index.11 = identifier:dc.identifier.*
+search.index.12 = language:dc.language.iso
+
+
+#### Creative Commons settings ######
+# are Creative Commons licenses used in submission?
+webui.submit.enable-cc = false
+
+
+#### OAI-PMH settings #####
+# Max response size for DIDL. This is the maximum size in bytes of the files you
+# wish to enclose Base64 encoded in your responses, remember that the base64
+# encoding process uses a lot of memory. We recommend at most 200000 for answers
+# of 30 records each on a 1 Gigabyte machine. Ultimately this will change to a
+# streaming model and remove this restriction. Also please remember to allocate
+# plenty of memory, at least 512 MB to your Tomcat.
+#
+# Optional: DSpace uses 100 records as the limit for the oai responses. You can
+# alter this by changing $DSPACE_SOURCE_DIR/src/org/dspace/app/oai/DSpaceOAICatalog.java to modify the
+# declaration:
+# private final int MAX_RECORDS = 100 to private final int MAX_RECORDS = 30
+# oai.didl.maxresponse = 0
+
+#### Proxy Settings ######
+# uncomment and specify both properties if proxy server required
+# proxy server for external http requests - use regular hostname without port number
+#http.proxy.host =
+
+# port number of proxy server
+#http.proxy.port = 
+
+
+#### LDAP Authentication Configuration Settings ####
+#
+# If LDAP is enabled, then new users will be able to register
+# by entering their username and  password without being sent the 
+# registration token. If users do not have a username and password,
+# then they  can still register and login with just their email address 
+# the same way they do now. 
+#
+# For providing any special privileges to LDAP users,
+# you will still need to extend the SiteAuthenticator class to
+# automatically put people who have a netid into a special
+# group.  You might also want to give certain email addresses
+# special privileges. Refer to the DSpace documentation for more
+# information about how to do this.
+# 
+# It may be necessary to obtain the values of these settings from the
+# LDAP server administrators as LDAP configuration will vary from server
+# to server.
+
+# This setting will enable or disable LDAP authentication in DSpace.
+# With the setting off, users will be required to register and login with
+# their email address.  With this setting on, users will be able to login
+# and register with their LDAP user ids and passwords.
+ldap.enable = false
+
+# This is the url to the institution's ldap server. The /o=myu.edu
+# may or may not be required depending on the LDAP server setup.
+# A server may also require the ldaps:// protocol.
+#ldap.provider_url = ldap://ldap.myu.edu/o=myu.edu
+
+# This is the unique identifier field in the LDAP directory
+# where the username is stored. 
+#ldap.id_field = uid
+
+# This is the object context used when authenticating the
+# user.  It is appended to the ldap.id_field and username. 
+# For example uid=username,ou=people,o=myu.edu.  This must match 
+# the LDAP server configuration.
+#ldap.object_context = ou=people,o=myu.edu
+
+# This is the search context used when looking up a user's
+# LDAP object to retrieve their data for autoregistering. 
+# With ldap.autoregister turned on, when a user authenticates
+# without an EPerson object, a search on the LDAP directory to
+# get their name and email address is initiated so that DSpace 
+# can create a EPerson object for them.  So after we have authenticated against
+# uid=username,ou=people,o=byu.edu we now search in ou=people
+# for filtering on [uid=username].  Often the
+# ldap.search_context is the same as the ldap.object_context
+# parameter.  But again this depends on each individual LDAP server
+# configuration.
+#ldap.search_context = ou=people
+
+# This is the LDAP object field where the user's email address
+# is stored.  "mail" is the default and the most common for
+# LDAP servers.  If the mail field is not found the username
+# will be used as the email address when creating the eperson
+# object.
+#ldap.email_field = mail
+
+# This is the LDAP object field where the user's last name is
+# stored.  "sn" is the default and is the most common for LDAP
+# servers.  If the field is not found the field will be left
+# blank in the new eperson object.
+#ldap.surname_field = sn
+
+# This is the LDAP object field where the user's given names
+# are stored.  This may not be used or set in all LDAP instances.
+# If the field is not found the field will be left blank in the 
+# new eperson object.
+#ldap.givenname_field = givenName
+
+# This is the field where the user's phone number is stored in
+# the LDAP directory.  If the field is not found the field
+# will be left blank in the new eperson object.
+#ldap.phone_field = telephoneNumber
+
+#### Media Filter plugins (through PluginManager) ####
+
+plugin.sequence.org.dspace.app.mediafilter.MediaFilter = \
+    org.dspace.app.mediafilter.PDFFilter, org.dspace.app.mediafilter.HTMLFilter, \
+    org.dspace.app.mediafilter.WordFilter, org.dspace.app.mediafilter.JPEGFilter
+# to enable branded preview: remove last line above, and uncomment 2 lines below
+#   org.dspace.app.mediafilter.WordFilter, org.dspace.app.mediafilter.JPEGFilter, \
+#   org.dspace.app.mediafilter.BrandedPreviewJPEGFilter
+        
+filter.org.dspace.app.mediafilter.PDFFilter.inputFormats = Adobe PDF
+filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats = HTML, Text
+filter.org.dspace.app.mediafilter.WordFilter.inputFormats = Microsoft Word
+filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats = GIF, JPEG, image/png
+filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats = GIF, JPEG, image/png
+        
+#### Syndication Feed Settings ######
+# enable syndication feeds - links display on community and collection home pages 
+webui.feed.enable = false
+# number of DSpace items per feed (the most recent submissions)
+webui.feed.items = 4
+# maximum number of feeds in memory cache
+# value of 0 will disable caching
+webui.feed.cache.size = 100
+# number of hours to keep cached feeds before checking currency
+# value of 0 will force a check with each request
+webui.feed.cache.age = 48
+# which syndication formats to offer
+# use one or more (comma-separated) values from list:
+# rss_0.90, rss_0.91, rss_0.92, rss_0.93, rss_0.94, rss_1.0, rss_2.0
+webui.feed.formats = rss_1.0,rss_2.0
+# URLs returned by the feed will point at the global handle server (e.g. http://hdl.handle.net/123456789/1)
+# Set to true to use local server URLs (i.e. http://myserver.myorg/handle/123456789/1)
+webui.feed.localresolve = false
+
+# Customize each single-value field displayed in the
+# feed information for each item.  Each of
+# the below fields takes a *single* metadata field
+#
+# The form is <schema prefix>.<element>[.<qualifier>|.*]
+webui.feed.item.title = dc.title
+webui.feed.item.date = dc.date.issued
+
+# Customise the metadata fields to show in the feed for each item's description.
+# Elements will be displayed in the order that they are specified here.
+#
+# The form is <schema prefix>.<element>[.<qualifier>|.*][(date)], ...
+#
+# Similar to the item display UI, the name of the field for display 
+# in the feed will be drawn from the current UI dictionary, 
+# using the key:
+# "metadata.<field>"
+#
+# e.g.   "metadata.dc.title"
+#        "metadata.dc.contributor.author" 
+#        "metadata.dc.date.issued"
+webui.feed.item.description = dc.title, dc.contributor.author, \
+							  dc.contributor.editor, dc.description.abstract, \
+							  dc.description
+
+#### Item Recommendation Settings #####
+# show a link to the item recommendation page from item display page
+webui.suggest.enable = false
+#
+# Enable only, if the user is logged in.
+# If not set the  default value is  false
+# webui.suggest.loggedinusers.only = true
+
+
+#### Author and subject links ####
+# link author names back to browse-by-author (if not set, defaults to true)
+webui.authorlinks.enable = true
+# link subjects back to browse-by-subject (if not set, defaults to false)
+webui.subjectlinks.enable = false
+
+
+#### Controlled Vocabulary Settings #####
+# Enable or disable the controlled vocabulary add-on
+# Warning: this feature is not compatible with WAI (it requires javascript to function)
+#
+# webui.controlledvocabulary.enable = true
+
+#### Multi-file HTML document/site settings #####
+#
+# When serving up composite HTML items, how deep can the request be for us to
+# serve up a file with the same name?
+#
+# e.g. if we receive a request for "foo/bar/index.html"
+# and we have a bitstream called just "index.html"
+# we will serve up that bitstream for the request if webui.html.max-depth-guess
+# is 2 or greater.  If webui.html.max-depth-guess is 1 or less, we would not
+# serve that bitstream, as the depth of the file is greater.
+#
+# If webui.html.max-depth-guess is zero, the request filename and path must
+# always exactly match the bitstream name.  Default value is 3.
+#
+# webui.html.max-depth-guess = 3
+
+
+#### Sitemap settings #####
+#
+# Comma-separated list of search engine URLs to 'ping' when a new Sitemap has
+# been created.  Include everything except the Sitemap URL itself (which will
+# be URL-encoded and appended to form the actual URL 'pinged').
+#
+sitemap.engineurls = http://www.google.com/webmasters/sitemaps/ping?sitemap=
+
+# Add this to the above parameter if you have an application ID with Yahoo
+# (Replace REPLACE_ME with your application ID)
+# http://search.yahooapis.com/SiteExplorerService/V1/updateNotification?appid=REPLACE_ME&url=
+#
+# No known Sitemap 'ping' URL for MSN/Live search
+
+
+#### Checksum Checker Settings ####
+# Default dispatcher in case none specified
+plugin.single.org.dspace.checker.BitstreamDispatcher=org.dspace.checker.SimpleDispatcher
+
+# check history retention
+checker.retention.default=10y
+checker.retention.CHECKSUM_MATCH=8w
+
+#### Crosswalk and Packager Plugin Settings ####
+
+# Configure table-driven MODS dissemination crosswalk
+#  (add lower-case name for OAI-PMH)
+crosswalk.mods.properties.MODS = crosswalks/mods.properties
+crosswalk.mods.properties.mods = crosswalks/mods.properties
+
+# Configure XSLT-driven submission crosswalk for MODS
+crosswalk.submission.MODS.stylesheet= crosswalks/mods-submission.xsl
+
+# Configure the QDCCrosswalk dissemination plugin for Qualified DC
+#  (add lower-case name for OAI-PMH)
+crosswalk.qdc.namespace.QDC.dc = http://purl.org/dc/elements/1.1/
+crosswalk.qdc.namespace.QDC.dcterms = http://purl.org/dc/terms/
+crosswalk.qdc.schemaLocation.QDC  = \
+  http://purl.org/dc/terms/ http://dublincore.org/schemas/xmls/qdc/2006/01/06/dcterms.xsd \
+  http://purl.org/dc/elements/1.1/ http://dublincore.org/schemas/xmls/qdc/2006/01/06/dc.xsd
+crosswalk.qdc.properties.QDC = crosswalks/QDC.properties
+
+crosswalk.qdc.namespace.qdc.dc = http://purl.org/dc/elements/1.1/
+crosswalk.qdc.namespace.qdc.dcterms = http://purl.org/dc/terms/
+crosswalk.qdc.schemaLocation.qdc  = \
+  http://purl.org/dc/terms/ http://dublincore.org/schemas/xmls/qdc/2006/01/06/dcterms.xsd \
+  http://purl.org/dc/elements/1.1/ http://dublincore.org/schemas/xmls/qdc/2006/01/06/dc.xsd
+crosswalk.qdc.properties.qdc = crosswalks/QDC.properties
+
+# METS ingester configuration:
+# map of metadata type declared in mdWrap to a crosswalk plugin name:
+mets.submission.crosswalk.DC = QDC
+
+# Option to save METS manifest in the item: (default is false)
+mets.submission.preserveManifest = false
+
+# Crosswalk Plugins:
+plugin.named.org.dspace.content.crosswalk.IngestionCrosswalk = \
+  org.dspace.content.crosswalk.PREMISCrosswalk = PREMIS \
+  org.dspace.content.crosswalk.NullIngestionCrosswalk = NIL
+
+plugin.selfnamed.org.dspace.content.crosswalk.IngestionCrosswalk = \
+  org.dspace.content.crosswalk.XSLTIngestionCrosswalk
+
+plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk = \
+  org.dspace.content.crosswalk.SimpleDCDisseminationCrosswalk = DC \
+  org.dspace.content.crosswalk.SimpleDCDisseminationCrosswalk = dc \
+  org.dspace.content.crosswalk.PREMISCrosswalk = PREMIS \
+  org.dspace.content.crosswalk.METSDisseminationCrosswalk = METS \
+  org.dspace.content.crosswalk.METSDisseminationCrosswalk = mets
+
+plugin.selfnamed.org.dspace.content.crosswalk.DisseminationCrosswalk = \
+  org.dspace.content.crosswalk.MODSDisseminationCrosswalk , \
+  org.dspace.content.crosswalk.XSLTDisseminationCrosswalk, \
+  org.dspace.content.crosswalk.QDCCrosswalk
+
+# Packager Plugins:
+
+plugin.named.org.dspace.content.packager.PackageDisseminator = \
+  org.dspace.content.packager.DSpaceMETSDisseminator = METS
+
+plugin.named.org.dspace.content.packager.PackageIngester = \
+  org.dspace.content.packager.PDFPackager  = Adobe PDF, PDF, \
+  org.dspace.content.packager.DSpaceMETSIngester = METS
+
+#### Event System Configuration ####
+
+# default synchronous dispatcher (same behavior as traditional DSpace)
+event.dispatcher.default.class = org.dspace.event.BasicDispatcher
+event.dispatcher.default.consumers = search, browse
+
+# consumer to maintain the search index
+event.consumer.search.class = org.dspace.search.SearchConsumer
+event.consumer.search.filters = Item|Collection|Community|Bundle+Create|Modify|Modify_Metadata|Delete:Bundle+Add|Remove
+
+# consumer to maintain the browse index
+event.consumer.browse.class = org.dspace.browse.BrowseConsumer
+event.consumer.browse.filters = Item+Create|Modify|Modify_Metadata:Collection+Add|Remove
+
+# test consumer for debugging and monitoring
+event.consumer.test.class = org.dspace.event.TestConsumer
+event.consumer.test.filters = All+All
+
+# ...set to true to enable testConsumer messages to standard output
+#testConsumer.verbose = true
+
+
+#### Asynchronous Event System  (Optional)
+
+## experimental consumer designed to run asynch, sends subscriber mail
+# event.consumer.jms.class = org.dspace.event.JMSConsumer
+# event.consumer.jms.filters = All+All
+
+# These configurations need to be set if your DSpace has *any* asynchronous
+# consumers.  They can be left out if all events are synchronous.
+
+# ActiveMQ broker URI, runs external broker in a separate JVM
+#jms.broker.uri = tcp://localhost:61616
+
+# ActiveMQ's configuration file in [dspace]/config/activemq.xml
+# NOTE: You may need to configure the database login settings there
+#jms.configuration = xbean:file://${dspace.dir}/config/activemq.xml
+
+## Example of configuring an alternate asynchronous consumer for batch mode
+## and assigning the Packager application to use it:
+
+# ..This would set the dispatcher for org.dspace.app.packager.Packager
+#packager.dispatcher = batch
+
+# .. configuration of dispatcher named "batch", with async clients.
+#event.dispatcher.batch.class = org.dspace.event.BasicDispatcher
+#event.dispatcher.batch.consumers = browse, search
+
+## experimental consumer designed to run asynch, sends subscriber mail
+#event.consumer.mail.class = org.dspace.eperson.AsynchSubscribe
+#event.consumer.mail.filters = Item+Modify|Modify_Metadata:Collection+Add|Remove
+
+## Special dispatcher to be run periodically by AsynchEventManager --
+## DO NOT let applications call this dispatcher, it will lose their events.
+## Named "cron" since it could be run by cron on Unix platforms.
+#event.dispatcher.cron.class = org.dspace.event.AsynchDispatcher
+#event.dispatcher.cron.consumers = search, browse, mail

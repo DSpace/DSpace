@@ -1,3 +1,6 @@
+(Graham Triggs / Brad Teale / Ed Yu)
+- S.F. Patch 1679972 OAIDCCrosswalk NPE and invalid character fix
+
 (Graham Triggs)
 - S.F. Patch 1749196 Oracle SQL in Bitstream Checker
 
