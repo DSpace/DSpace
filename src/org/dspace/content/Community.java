@@ -557,6 +557,55 @@ public class Community extends DSpaceObject
     }
 
     /**
+     * Get the collections not in this community.
+     * 
+     * @return array of Collection objects
+     */
+    public Collection[] getCollectionsUnmapped() throws SQLException
+    {
+        List collections = new ArrayList();
+
+        // Get the table rows
+        TableRowIterator tri = DatabaseManager
+                .query(
+                        ourContext,
+                        "collection",
+                        "SELECT collection.* FROM collection WHERE "
+			+ "collection_id NOT IN "
+                        + "  (SELECT collection.collection_id FROM collection, community2collection WHERE "
+			+ "   community2collection.collection_id=collection.collection_id "
+			+ "   AND community2collection.community_id="
+			+ getID() + ") ORDER BY collection.name");
+
+        // Make Collection objects
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            // First check the cache
+            Collection fromCache = (Collection) ourContext.fromCache(
+                    Collection.class, row.getIntColumn("collection_id"));
+
+            if (fromCache != null)
+            {
+                collections.add(fromCache);
+            }
+            else
+            {
+                collections.add(new Collection(ourContext, row));
+            }
+        }
+        // close the TableRowIterator to free up resources
+        tri.close();
+
+        // Put them in an array
+        Collection[] collectionArray = new Collection[collections.size()];
+        collectionArray = (Collection[]) collections.toArray(collectionArray);
+
+        return collectionArray;
+    }
+
+    /**
      * Get the immediate sub-communities of this community. Throws an
      * SQLException because creating a community object won't load in all
      * collections.
