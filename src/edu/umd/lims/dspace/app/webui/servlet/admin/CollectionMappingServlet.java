@@ -50,10 +50,6 @@ public class CollectionMappingServlet extends DSpaceServlet {
     int commID = UIUtil.getIntParameter(request, "community_id");
     int collID = UIUtil.getIntParameter(request, "collection_id");
 
-    //request.setAttribute("group", group);
-    //request.setAttribute("members", group.getMembers());
-    //JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
-
     // Get the community
     if (commID == -1) {
       throw new ServletException("community_id is a required parameter");
@@ -66,16 +62,68 @@ public class CollectionMappingServlet extends DSpaceServlet {
 
     // Take action
     if (action == null || action.equals("")) {
+      showMainPage(c, request, response, comm);
+    }
 
-      request.setAttribute("mapped", comm.getCollections());
-      request.setAttribute("unmapped", comm.getCollectionsUnmapped());
+    else if (action.equals("map") ||
+	     action.equals("unmap") ||
+	     action.equals("confirm_map") ||
+	     action.equals("confirm_unmap")) {
 
-      JSPManager.showJSP(request, response, "/tools/mapcollections.jsp");
-      
+      // Get the collection
+      if (collID == -1) {
+	// Instead of an error message, just show the page again
+	showMainPage(c, request, response, comm);
+      }
+      Collection coll = Collection.find(c, collID);
+      if (coll == null) {
+	throw new ServletException("invalid collection_id");
+      }
+      request.setAttribute("collection", coll);
+
+      // Get cancellation 
+      String cancel = request.getParameter("submit_cancel");
+      if (cancel != null && cancel.equals("")) {
+	cancel = null;
+      }
+
+      // Take action
+      if (action.equals("map")) {
+	JSPManager.showJSP(request, response, "/tools/confirm-mapcollection.jsp");
+      }
+      else if (action.equals("unmap")) {
+	JSPManager.showJSP(request, response, "/tools/confirm-unmapcollection.jsp");
+      }	
+      else if (action.equals("confirm_map") && cancel == null) {
+	comm.addCollection(coll);
+	c.commit();
+      }	
+      else if (action.equals("confirm_unmap") && cancel == null) {
+	comm.removeCollection(coll);
+	c.commit();
+      }	
+
+      showMainPage(c, request, response, comm);
+
     }
 
     else {
       throw new ServletException("Invalid action: " + action);
     }
   }
+
+  
+  /**
+   *
+   */
+
+  private void showMainPage(Context c, HttpServletRequest request, HttpServletResponse response, Community comm) throws ServletException, IOException, SQLException, AuthorizeException {
+
+    request.setAttribute("mapped", comm.getCollections());
+    request.setAttribute("unmapped", comm.getCollectionsUnmapped());
+
+    JSPManager.showJSP(request, response, "/tools/mapcollections.jsp");
+  }
+
 }
+
