@@ -504,6 +504,13 @@
 			</roles>
 		</developer>
 		<developer>
+			<name>Graham Triggs</name>
+			<email>grahamtriggs at users.sourceforge.net</email>
+			<roles>
+				<role>commiter</role>
+			</roles>
+		</developer>
+		<developer>
 			<name>Scott Yeadon</name>
 			<email>syeadon at users.sourceforge.net</email>
 			<roles>
@@ -644,6 +651,5 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
 
 </project>
