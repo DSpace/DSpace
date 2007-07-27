@@ -271,29 +271,31 @@ public class Context
         // Commit any changes made as part of the transaction
         Dispatcher dispatcher = null;
 
-        try {
-            if (events != null) {
-                
-                if (dispName == null) {
+        try
+        {
+            if (events != null)
+            {
+
+                if (dispName == null)
+                {
                     dispName = EventManager.DEFAULT_DISPATCHER;
                 }
-                
+
                 dispatcher = EventManager.getDispatcher(dispName);
-                
                 connection.commit();
                 dispatcher.dispatch(this);
-            } else {
-                connection.commit();                
             }
-            
-        } finally {
+            else
+            {
+                connection.commit();
+            }
+
+        }
+        finally
+        {
             events = null;
             if(dispatcher != null) 
             {
-            	/* 
-            	 * TODO return dispatcher via internal method dispatcher.close();
-            	 * and remove the returnDispatcher method from EventManager.
-            	 */
                 EventManager.returnDispatcher(dispName, dispatcher);
             }
         }
