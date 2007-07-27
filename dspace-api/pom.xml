@@ -30,7 +30,8 @@
          <activation>
             <activeByDefault>true</activeByDefault>
             <property>
-               <name>postgres</name>
+              <name>db.name</name>
+              <value>postgres</value>
             </property>
          </activation>
          <dependencies>
@@ -45,7 +46,8 @@
          <id>oracle</id>
          <activation>
             <property>
-               <name>oracle</name>
+               <name>db.name</name>
+               <value>oracle</value>
             </property>
          </activation>
          <dependencies>
@@ -185,6 +187,5 @@
          <artifactId>activation</artifactId>
       </dependency>
    </dependencies>
-   
 </project>
 

@@ -523,37 +523,63 @@ public class ConfigurationManager
             }
 
             // Load in default license
-            String licenseFile = getProperty("dspace.dir") + File.separator
-                    + "config" + File.separator + "default.license";
+            File licenseFile = new File(getProperty("dspace.dir") + File.separator
+                    + "config" + File.separator + "default.license");
             
-            FileInputStream fir = new FileInputStream(licenseFile);
-            InputStreamReader ir = new InputStreamReader(fir, "UTF-8");
-            BufferedReader br = new BufferedReader(ir);
-            String lineIn;
-            license = "";
-
-            while ((lineIn = br.readLine()) != null)
+            if (licenseFile != null && licenseFile.exists())
             {
-                license = license + lineIn + '\n';
+	            FileInputStream fir = new FileInputStream(licenseFile);
+	            InputStreamReader ir = new InputStreamReader(fir, "UTF-8");
+	            BufferedReader br = new BufferedReader(ir);
+	            String lineIn;
+	            license = "";
+	
+	            while ((lineIn = br.readLine()) != null)
+	            {
+	                license = license + lineIn + '\n';
+	            }
+	
+	            is.close();
             }
-
-            is.close();
-
+            else
+            {
+            	license = "";
+            }
+            
             // Load in log4j config
             // Load the log4j config, if a log4j.xml version exists use that
             // configuration format over the log4j.properties version
-            String log4jConfProp = ConfigurationManager
-                    .getProperty("dspace.dir")
-                    + File.separator
-                    + "config"
-                    + File.separator
-                    + "log4j.properties";
-            String log4jConfXml = ConfigurationManager
-                    .getProperty("dspace.dir")
-                    + File.separator + "config" + File.separator + "log4j.xml";
+            String log4jSysProp  = System.getProperty("log4j.configuration");
+            String log4jConfProp = "";
+            String log4jConfXml  = "";
+            File   xmlFile       = null;
+            
+            if (log4jSysProp != null)
+            {
+        		log4jConfProp = log4jSysProp;
+//            	File sysFile = new File(log4jSysProp);
+//           	if (sysFile.exists())
+//            	{
+//            	}
+//            	else
+//            	{
+//            	}
+            }
+            else
+            {
+                log4jConfProp = ConfigurationManager.getProperty("dspace.dir")
+        				+ File.separator
+        				+ "config"
+        				+ File.separator
+        				+ "log4j.properties";
 
-            File xmlFile = new File(log4jConfXml);
-            if (xmlFile.exists())
+                log4jConfXml = ConfigurationManager.getProperty("dspace.dir")
+        				+ File.separator + "config" + File.separator + "log4j.xml";
+		
+        		xmlFile = new File(log4jConfXml);
+            }
+
+            if (xmlFile != null && xmlFile.exists())
             {
                 try
                 {
