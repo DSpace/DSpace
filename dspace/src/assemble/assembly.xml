@@ -27,9 +27,18 @@
          </includes>
          <excludes>
             <exclude>src</exclude>
+            <exclude>config/dspace.cfg</exclude>
          </excludes>
       </fileSet>
    </fileSets>
+
+   <files>
+     <file>
+       <source>config/dspace.cfg</source>
+       <outputDirectory>config</outputDirectory>
+       <filtered>true</filtered>
+     </file>
+   </files>
 
    <dependencySets>
       <dependencySet>

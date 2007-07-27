@@ -5,6 +5,7 @@
 - S.F. Patch 1679972 OAIDCCrosswalk NPE and invalid character fix
 
 (Graham Triggs)
+- ConfigurationManager fix to honour log4j.configuration
 - S.F. Patch 1749196 Oracle SQL in Bitstream Checker
 
 (Larry Stone, Richard Rodgers, Sands Fish, Mark Diggory)
