@@ -64,9 +64,6 @@
     <profile>
       <id>jspui</id>
       <activation>
-        <property>
-          <name>!nojspui</name>
-        </property>
         <file>
           <exists>../dspace-jspui/pom.xml</exists>
         </file>
@@ -101,9 +98,6 @@
     <profile>
       <id>lni</id>
       <activation>
-        <property>
-          <name>!no-lni</name>
-        </property>
         <file>
           <exists>../dspace-lni/pom.xml</exists>
         </file>
