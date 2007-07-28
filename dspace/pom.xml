@@ -22,24 +22,29 @@
     <version>1.5-SNAPSHOT</version>
     <relativePath>../dspace-pom</relativePath>
   </parent>
-  <!-- 
-  
-    Profiles activate the inclusion of various modules into
-    the DSpace Build process. These profiles are all 
-    "Active by Default" to assure that all endorsed DSpace
-    AddOns can be compiled against an addition/change in the
-    codebase or in the dependencies.
-    
-    To restrict your build to a specific set of modules, use
-    the '-P' option to build only the set of modules you 
-    require. For example, to build only the JSPUI and OAI 
-    modules:  'mvn -P jspui,oai package'
-    
-  -->
   <profiles>
     <!-- 
-      Builds OAI Gateway WAR + Dependencies for DSpace
-      Use '-P oai'
+      These profiles activate the inclusion of various modules into
+      the DSpace Build process. They activate automatically if the
+      source module is in the local file system, correctly located
+      relative to this file.
+    -->
+    <!-- 
+      Builds central API for DSpace
+    -->
+    <profile>
+      <id>dspace-api</id>
+      <activation>
+        <file>
+          <exists>../dspace-api/pom.xml</exists>
+        </file>
+      </activation>
+      <modules>
+        <module>../dspace-api</module>
+      </modules>
+    </profile>
+    <!-- 
+      Builds OAI Gateway WAR for DSpace
     -->
     <profile>
       <id>oai</id>
@@ -47,19 +52,13 @@
         <file>
           <exists>../dspace-oai/pom.xml</exists>
         </file>
-        <property>
-          <name>oai</name>
-        </property>
       </activation>
       <modules>
-        <module>../language-packs</module>
-        <module>../dspace-api</module>
         <module>../dspace-oai</module>
       </modules>
     </profile>
     <!-- 
-      Builds JSPUI WAR + Dependencies for DSpace
-      Use '-P jspui'
+      Builds JSPUI WAR for DSpace
     -->
     <profile>
       <id>jspui</id>
@@ -69,14 +68,11 @@
         </file>
       </activation>
       <modules>
-        <module>../language-packs</module>
-        <module>../dspace-api</module>
         <module>../dspace-jspui</module>
       </modules>
     </profile>
     <!-- 
-      Builds XMLUI WAR + Dependencies for DSpace
-      Use '-P xmlui'
+      Builds XMLUI WAR for DSpace
     -->
     <profile>
       <id>xmlui</id>
@@ -86,14 +82,11 @@
         </file>
       </activation>
       <modules>
-        <module>../language-packs</module>
-        <module>../dspace-api</module>
         <module>../dspace-xmlui</module>
       </modules>
     </profile>
     <!-- 
-      Builds LNI WAR + Dependencies for DSpace
-      Use '-P lni'
+      Builds LNI WAR for DSpace
     -->
     <profile>
       <id>lni</id>
@@ -103,12 +96,36 @@
         </file>
       </activation>
       <modules>
-        <module>../language-packs</module>
-        <module>../dspace-api</module>
         <module>../dspace-lni</module>
       </modules>
     </profile>
-    <!-- Database profiles must appear before the setup -->
+    <!-- 
+      Builds Language Packs for DSpace
+    -->
+    <profile>
+      <id>language-packs</id>
+      <activation>
+        <file>
+          <exists>../language-packs/pom.xml</exists>
+        </file>
+      </activation>
+      <modules>
+        <module>../language-packs</module>
+      </modules>
+    </profile>
+    <!-- 
+      These profiles setup properties and build configuration
+      appropriate to the database that DSpace will be installed
+      against.
+      
+      They are activated by using the profile id - ie. -Ppostgres,
+      or defining db.name - ie. -Ddb.name=oracle
+    -->
+    <!-- 
+      Profile for Postgres database configuration
+      Use -Ppostgres to activate.
+      NB defining -Ddb.name=postgres will not work!
+    -->
     <profile>
       <id>postgres</id>
       <activation>
@@ -137,6 +154,10 @@
         </plugins>
       </build>
     </profile>
+    <!-- 
+      Profile for Oracle database configuration
+      Use -Poracle or -Ddb.name=oracle to activate.
+    -->
     <profile>
       <id>oracle</id>
       <activation>
@@ -166,6 +187,16 @@
         </plugins>
       </build>
     </profile>
+    <!-- 
+      Profiles to activate special build processes.
+      These are tasks that you would not want to occur
+      for every build, but may be required occassionally
+      - for example setting up the database schema
+    -->
+    <!--
+      Profile to setup the database schema.
+      Use -Psetup-db to activate
+    -->
     <profile>
       <id>setup-db</id>
       <activation>
