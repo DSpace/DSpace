@@ -40,24 +40,19 @@
 
 package org.dspace.content.crosswalk;
 
-import java.io.OutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.sql.SQLException;
-
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
-import org.dspace.content.Item;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.DCValue;
-import org.dspace.core.SelfNamedPlugin;
 import org.dspace.authorize.AuthorizeException;
-
-import org.jdom.*;
-//import org.jdom.output.XMLOutputter;
-//import org.jdom.output.Format;
+import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.core.SelfNamedPlugin;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  * Disseminator for Simple Dublin Core metadata in XML format.

@@ -40,40 +40,30 @@
 
 package org.dspace.content.crosswalk;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.Enumeration;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.OutputStream;
+import java.util.List;
 
-import java.sql.SQLException;
 import org.apache.log4j.Logger;
-
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
-import org.dspace.content.Item;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.packager.PackageParameters;
+import org.dspace.content.Item;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.packager.PackageParameters;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-
-import org.jdom.*;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
-import org.jdom.input.JDOMParseException;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * METS dissemination crosswalk

@@ -42,21 +42,15 @@ package org.dspace.content.crosswalk;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 
-import java.sql.SQLException;
-
 import org.apache.log4j.Logger;
-
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
-import org.dspace.content.DSpaceObject;
 import org.dspace.authorize.AuthorizeException;
-
-import org.jdom.*;
-import org.jdom.output.XMLOutputter;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.jdom.Element;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * "Null" ingestion crosswalk

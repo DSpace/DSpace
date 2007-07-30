@@ -40,37 +40,34 @@
 
 package org.dspace.content.crosswalk;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.Enumeration;
-import java.io.StringReader;
 import java.io.File;
 import java.io.FileInputStream;
-
+import java.io.IOException;
+import java.io.StringReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
-import org.dspace.content.Item;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
-
-import org.jdom.*;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
-import org.jdom.input.JDOMParseException;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * Configurable QDC Crosswalk

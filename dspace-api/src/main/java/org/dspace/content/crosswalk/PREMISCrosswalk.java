@@ -41,30 +41,25 @@
 package org.dspace.content.crosswalk;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.Enumeration;
-import java.net.URLEncoder;
-
-import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
-import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Bundle;
-import org.dspace.content.Item;
 import org.dspace.content.DSpaceObject;
-import org.dspace.authorize.AuthorizeException;
-
-import org.jdom.*;
+import org.dspace.content.FormatIdentifier;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  * PREMIS Crosswalk

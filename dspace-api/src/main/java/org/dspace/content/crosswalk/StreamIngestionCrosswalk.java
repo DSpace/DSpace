@@ -40,15 +40,13 @@
 
 package org.dspace.content.crosswalk;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 
-import org.dspace.core.Constants;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.crosswalk.CrosswalkException;
 
 
 /**

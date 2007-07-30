@@ -40,17 +40,12 @@
 
 package org.dspace.content.crosswalk;
 
-import java.io.OutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
-import java.sql.SQLException;
-
-import org.dspace.core.Context;
-import org.dspace.content.Item;
-import org.dspace.content.DSpaceObject;
 import org.dspace.authorize.AuthorizeException;
-
+import org.dspace.content.DSpaceObject;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
