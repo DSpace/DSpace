@@ -40,8 +40,10 @@
 package org.dspace.core;
 
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -92,6 +94,7 @@ public class Context
     /** Group IDs of special groups user is a member of */
     private List specialGroups;
 
+    
     /**
      * Construct a new context object. A database connection is opened. No user
      * is authenticated.
