@@ -381,7 +381,7 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         return findByUnique(context, ctable, getPrimaryKeyColumn(ctable),
-                Integer.toString(id));
+                new Integer(id));
     }
 
     /**
@@ -403,7 +403,7 @@ public class DatabaseManager
      *                If a database error occurs
      */
     public static TableRow findByUnique(Context context, String table,
-            String column, String value) throws SQLException
+            String column, Object value) throws SQLException
     {
         String ctable = canonicalize(table);
 
@@ -438,7 +438,7 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         return deleteByValue(context, ctable, getPrimaryKeyColumn(ctable),
-                Integer.toString(id));
+                new Integer(id));
     }
 
     /**
@@ -458,7 +458,7 @@ public class DatabaseManager
      *                If a database error occurs
      */
     public static int deleteByValue(Context context, String table,
-            String column, String value) throws SQLException
+            String column, Object value) throws SQLException
     {
         String ctable = canonicalize(table);
 
