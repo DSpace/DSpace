@@ -458,6 +458,7 @@ CREATE TABLE WorkspaceItem
   multiple_files    BOOL,
   -- How for the user has got in the submit process
   stage_reached     INTEGER
+  page_reached      INTEGER;
 );
 
 -------------------------------------------------------
