@@ -151,11 +151,6 @@ public class JSPSelectCollectionStep extends SelectCollectionStep implements JSP
             log
                     .debug("Select Collection page skipped, since a Collection ID was already found.  Collection ID="
                             + collectionID);
-
-            // do processing & post-processing immediately (no need to load JSP)
-            int status = doProcessing(context, request, response, subInfo);
-
-            doPostProcessing(context, request, response, subInfo, status);
         }
         else
         {
