@@ -186,6 +186,10 @@
          <groupId>javax.activation</groupId>
          <artifactId>activation</artifactId>
       </dependency>
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+		</dependency>
    </dependencies>
 
 </project>
