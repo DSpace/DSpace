@@ -287,7 +287,7 @@ Common usage:
 	<target name="setup_database" description="Create database tables">
 
 		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg value="database_schema.sql" />
 		</java>
@@ -305,7 +305,7 @@ Common usage:
 	<target name="clean_database" description="Removes DSpace database tables, destroying data">
 
 		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg value="clean-database.sql" />
 		</java>
@@ -321,14 +321,14 @@ Common usage:
 	<target name="load_registries" description="Load initial contents of registries">
 
 		<java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg value="-bitstream" />
 			<arg value="${dspace.dir}/config/registries/bitstream-formats.xml" />
 		</java>
 
 		<java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg value="-dc" />
 			<arg value="${dspace.dir}/config/registries/dublin-core-types.xml" />
@@ -381,13 +381,13 @@ Common usage:
 		</copy>
 
 		<java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg line="-f" />
 		</java>
 
 		<java classname="org.dspace.search.DSIndexer" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:etc/log4j.build.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
 		</java>
 
