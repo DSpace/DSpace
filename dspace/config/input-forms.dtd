@@ -14,7 +14,8 @@
  <!ATTLIST form name NMTOKEN #REQUIRED>
  <!ELEMENT page (field)+ >
  <!ATTLIST page number NMTOKEN #REQUIRED>
- <!ELEMENT field (dc-element, dc-qualifier?, repeatable?, label, input-type, hint, required?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, input-type, hint, required?, vocabulary?) >
+ <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
  
@@ -45,4 +46,6 @@
  <!ELEMENT displayed-value (#PCDATA)>
  <!ELEMENT stored-value (#PCDATA)>
 
-<!ATTLIST input-type value-pairs-name CDATA  #IMPLIED>
+ <!ATTLIST input-type value-pairs-name CDATA  #IMPLIED>
+
+ <!ELEMENT vocabulary (#PCDATA) >
