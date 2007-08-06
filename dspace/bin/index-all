@@ -48,7 +48,7 @@
 BINDIR=`dirname $0`
 
 echo "Creating browse index"
-$BINDIR/dsrun org.dspace.browse.InitializeBrowse
+$BINDIR/dsrun org.dspace.browse.IndexBrowse -i
 
 echo "Creating search index"
 $BINDIR/dsrun org.dspace.search.DSIndexer

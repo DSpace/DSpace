@@ -184,6 +184,31 @@ public class RequestUtils {
 		return values;
 	}
 	
+    /**
+     * Obtain a parameter from the given request as an int. <code>-1</code> is
+     * returned if the parameter is garbled or does not exist.
+     * 
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     * 
+     * @return the integer value of the parameter, or -1
+     */
+    public static int getIntParameter(Request request, String param)
+    {
+        String val = request.getParameter(param);
+
+        try
+        {
+            return Integer.parseInt(val.trim());
+        }
+        catch (Exception e)
+        {
+            // Problem with parameter
+            return -1;
+        }
+    }
 	
 	
 }

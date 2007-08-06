@@ -52,7 +52,8 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.browse.Browse;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -987,31 +988,41 @@ public class Collection extends DSpaceObject
         // Remove items
         ItemIterator items = getAllItems();
 
-        while (items.hasNext())
+        try
         {
-            Item item = items.next();
-            
-            if (item.isOwningCollection(this))
-            {
-                int itemId = item.getID();
-            // the collection to be deletd is the owning collection, thus remove
-            // the item from all collections it belongs to
-                Collection[] collections = item.getCollections();
-                for (int i=0; i< collections.length; i++)
-                {
-                    //notify Browse of removing item.
-                    Browse.itemRemoved(ourContext, itemId);
-                    collections[i].removeItem(item);
-                }
-                    
-            } 
-            // the item was only mapped to this collection, so just remove it
-            else
-            {
-                //notify Browse of removing item mapping. 
-                Browse.itemChanged(ourContext, item);
-                removeItem(item);
-            }
+        	while (items.hasNext())
+        	{
+        		Item item = items.next();
+        		IndexBrowse ib = new IndexBrowse(ourContext);
+        		
+        		if (item.isOwningCollection(this))
+        		{
+        			// the collection to be deletd is the owning collection, thus remove
+        			// the item from all collections it belongs to
+        			Collection[] collections = item.getCollections();
+        			for (int i=0; i< collections.length; i++)
+        			{
+        				//notify Browse of removing item.
+        				ib.itemRemoved(item);
+        				// Browse.itemRemoved(ourContext, itemId);
+        				collections[i].removeItem(item);
+        			}
+        			
+        		} 
+        		// the item was only mapped to this collection, so just remove it
+        		else
+        		{
+        			//notify Browse of removing item mapping. 
+        			ib.indexItem(item);
+        			// Browse.itemChanged(ourContext, item);
+        			removeItem(item);
+        		}
+        	}
+        }
+        catch (BrowseException e)
+        {
+        	log.error("caught exception: ", e);
+        	throw new IOException(e.getMessage());
         }
 
         // Delete bitstream logo

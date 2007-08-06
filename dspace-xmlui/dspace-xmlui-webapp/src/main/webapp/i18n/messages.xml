@@ -135,48 +135,44 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.not">NOT</message>
 	
 	
-	<!-- org.dspace.app.xmlui.artifactbrowser.BrowseAuthorItems.java -->
-	<message key="xmlui.ArtifactBrowser.BrowseAuthorItems.title">Browse By Author Items</message>
-	<message key="xmlui.ArtifactBrowser.BrowseAuthorItems.trail">Browse By Author Items</message>
-	<message key="xmlui.ArtifactBrowser.BrowseAuthorItems.head">Browse Items for Author "{0}"</message>
-	<message key="xmlui.ArtifactBrowser.BrowseAuthorItems.back">Back to browse by author.</message>
+	<!-- org.dspace.app.xmlui.artifactbrowser.ConfigureableBrowse.java -->
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with">Or enter first few letters:</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help">Browse for items that begin with these letters</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select">Jump to a point in the index:</message>	
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_month">(Choose month)</message>	
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_year">(Choose year)</message>	
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year">Or type in a year: </message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year_help">Browse for items that are from the given year.</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by"> Sort by: </message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.order"> Order: </message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp"> Results: </message><!-- /Page -->
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.etal"> Authors/Item: </message>
+
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.etal.all">All</message>
+
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.title">title</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.date">date</message>
+
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc">ascending</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc">descending</message>
+
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.author.title">Browsing {0} by Author {1}</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.author.trail">Browsing {0} by Author</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.author.column_heading">Authors Name</message>
+
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.subject.title">Browsing {0} by Subject {1}</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.subject.trail">Browsing {0} by Subject</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.subject.column_heading">Subject</message>
 	
-	<!-- org.dspace.app.xmlui.artifactbrowser.BrowseAuthors.java -->
-	<message key="xmlui.ArtifactBrowser.BrowseAuthors.title">Browse By Author</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseAuthors.trail">Browse By Author</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseAuthors.head">Browse By Author</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseAuthors.starts_with">Or enter the first few letters:</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseAuthors.column_heading">Authors Name</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.title">Browsing {0} by Title {1}</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.trail">Browsing {0} by Title</message>
 	
-	<!-- org.dspace.app.xmlui.artifactbrowser.BrowseSubjectItems.java -->
-	<message key="xmlui.ArtifactBrowser.BrowseSubjectItems.title">Browse By Subject Items</message>
-	<message key="xmlui.ArtifactBrowser.BrowseSubjectItems.trail">Browse By Subject Items</message>
-	<message key="xmlui.ArtifactBrowser.BrowseSubjectItems.head">Browse Items for Subject "{0}"</message>
-	<message key="xmlui.ArtifactBrowser.BrowseSubjectItems.back">Back to browse by Subject.</message>
-	
-	<!-- org.dspace.app.xmlui.artifactbrowser.BrowseSubjects.java -->
-	<message key="xmlui.ArtifactBrowser.BrowseSubjects.title">Browse By Subject</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseSubjects.trail">Browse By Subject</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseSubjects.head">Browse By Subject</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseSubjects.starts_with">Or enter the first few letters:</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseSubjects.column_heading">Subjects Name</message>
-	
-	<!-- org.dspace.app.xmlui.artifactbrowser.BrowseDates.java -->
-	<message key="xmlui.ArtifactBrowser.BrowseDates.title">Browse By Dates</message>
-	<message key="xmlui.ArtifactBrowser.BrowseDates.trail">Browse By Dates</message>
-	<message key="xmlui.ArtifactBrowser.BrowseDates.head">Browse By Dates</message>
-	<message key="xmlui.ArtifactBrowser.BrowseDates.jump_select">Jump to a point in the index:</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseDates.choose_month">(Choose month)</message>
-	<message key="xmlui.ArtifactBrowser.BrowseDates.choose_year">(Choose year)</message>
-	<message key="xmlui.ArtifactBrowser.BrowseDates.jump_year">Or type in a year: </message>
-	<message key="xmlui.ArtifactBrowser.BrowseDates.jump_year_help">Browse for items that are from the given year.</message>
-	
-	<!-- org.dspace.app.xmlui.artifactbrowser.BrowseTitles.java -->
-	<message key="xmlui.ArtifactBrowser.BrowseTitles.title">Browse By Title</message>
-	<message key="xmlui.ArtifactBrowser.BrowseTitles.trail">Browse By Title</message>
-	<message key="xmlui.ArtifactBrowser.BrowseTitles.head">Browse By Title</message>
-	<message key="xmlui.ArtifactBrowser.BrowseTitles.starts_with">Or enter the first few letters:</message>	
-	<message key="xmlui.ArtifactBrowser.BrowseTitles.starts_with_help">Browse for items that begin with this title.</message>	
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.dateissued.title">Browsing {0} by Issue Date {1}</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.dateissued.trail">Browsing {0} by Issue Date</message>
+
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.dateaccessioned.title">Browsing {0} by Submit Date {1}</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.dateaccessioned.trail">Browsing {0} by Submit Date</message>
+
 	
 	<!-- org.dspace.app.xmlui.artifactbrowser.CollectionViewer.java -->
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.search_scope">Search Scope</message>
@@ -246,10 +242,11 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.head_browse">Browse</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">All of DSpace</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.communities_and_collections">Communities &amp; Collections</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.browse_titles">Titles</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.browse_authors">Authors</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.browse_subjects">Subjects</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.browse_dates">By Dates</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.browse_title">Titles</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.browse_author">Authors</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.browse_subject">Subjects</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateissued">By Issue Date</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">By Submit Date</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">This Collection</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">This Community</message>
 	

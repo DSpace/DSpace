@@ -154,41 +154,10 @@
     <servlet-class>org.dspace.app.webui.servlet.BitstreamServlet</servlet-class>
   </servlet>
 
-  <servlet>
-    <servlet-name>browse-author</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
-    <init-param>
-      <param-name>browse</param-name>
-      <param-value>authors</param-value>
-    </init-param>
-  </servlet>
-
-  <servlet>
-    <servlet-name>browse-date</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
-    <init-param>
-      <param-name>browse</param-name>
-      <param-value>dates</param-value>
-    </init-param>
-  </servlet>
-
-  <servlet>
-    <servlet-name>browse-subject</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
-    <init-param>
-      <param-name>browse</param-name>
-      <param-value>subjects</param-value>
-    </init-param>
-  </servlet>
-
-  <servlet>
-    <servlet-name>browse-title</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.BrowseServlet</servlet-class>
-    <init-param>
-      <param-name>browse</param-name>
-      <param-value>titles</param-value>
-    </init-param>
-  </servlet>
+	<servlet>
+		<servlet-name>browse</servlet-name>
+		<servlet-class>org.dspace.app.webui.servlet.BrowserServlet</servlet-class>
+	</servlet>
 
   <servlet>
     <servlet-name>collection-wizard</servlet-name>
@@ -286,16 +255,6 @@
   <servlet>
     <servlet-name>internal-error</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.InternalErrorServlet</servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>items-by-author</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.ItemsByAuthorServlet</servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>items-by-subject</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.ItemsBySubjectServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -434,25 +393,10 @@
     <url-pattern>/bitstream/*</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
-    <servlet-name>browse-author</servlet-name>
-    <url-pattern>/browse-author</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>browse-date</servlet-name>
-    <url-pattern>/browse-date</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>browse-subject</servlet-name>
-    <url-pattern>/browse-subject</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>browse-title</servlet-name>
-    <url-pattern>/browse-title</url-pattern>
-  </servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>browse</servlet-name>
+		<url-pattern>/browse</url-pattern>
+	</servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>community-list</servlet-name>
@@ -552,16 +496,6 @@
   <servlet-mapping>
     <servlet-name>internal-error</servlet-name>
     <url-pattern>/internal-error</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>items-by-author</servlet-name>
-    <url-pattern>/items-by-author</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>items-by-subject</servlet-name>
-    <url-pattern>/items-by-subject</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

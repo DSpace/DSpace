@@ -39,36 +39,25 @@
  */
 package org.dspace.browse;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 /**
- * The results of a Browse method call.
+ * The results of a Browse, including all the contextual information about
+ * the query, as well as the results and associated information to create
+ * pagable navigation.
  * 
- * <p>
- * Results are a List of objects returned from the browse; each returned object
- * is either a String (for getAuthors()) or an {@link org.dspace.content.Item}
- * (for all the getItems.... methods). The list is readonly, and is guaranteed
- * to be non-null.
- * </p>
- * 
- * <p>
- * overallPosition is the position of the first element of results within the
- * Browse index. Positions begin with 0.
- * </p>
- * 
- * <p>
- * total is the number of objects in the index. Note that this is a snapshot,
- * which is only guaranteed to be correct at the time the browse method was
- * called.
- * </p>
- * 
- * <p>
- * offset is the position of the requested object within the results. This
- * position is also 0-based.
- * </p>
+ * @author Richard Jones
  */
 public class BrowseInfo
 {
@@ -99,6 +88,54 @@ public class BrowseInfo
      */
     private boolean cached;
 
+    /** the browse index to which this pertains */
+    private BrowseIndex browseIndex;
+    
+    /** the sort option being used */
+    private SortOption sortOption;
+    
+    /** is the browse ascending or descending */
+    private boolean ascending;
+    
+    /** what level of browse are we in?  full and single front pages are 0, single value browse is 1 */
+    private int level = 0;
+    
+    /** the value browsed upon */
+    private String value;
+    
+    /** is this a "starts_with" browse? */
+    private boolean startsWith = false;
+    
+    /** Collection we are constrained to */
+    private Collection collection;
+	
+    /** Community we are constrained to */
+	private Community community;
+	
+	/** database id of the item at the top of the next page */
+	private int nextItem = -1;
+	
+	/** string value of the value at the top of the next page */
+	private String nextValue;
+	
+	/** database id of the item at the top of the previous page */
+	private int prevItem = -1;
+	
+	/** string value of the value at the top of the previous page */
+	private String prevValue;
+	
+	/** the value upon which we are focussing */
+	private String focus;
+    
+	/** number of resutls to display per page */
+	private int resultsPerPage = -1;
+	
+	/** database id of the item upon which we are focussing */
+	private int focusItem = -1;
+	
+	/** number of metadata elements to display before truncating using "et al" */
+	private int etAl = -1;
+	
     /**
      * Constructor
      * 
@@ -125,6 +162,350 @@ public class BrowseInfo
     }
 
     /**
+     * @return	the number of metadata fields at which to truncate with "et al"
+     */
+    public int getEtAl()
+    {
+    	return etAl;
+    }
+    
+    /**
+     * set the number of metadata fields at which to truncate with "et al"
+     * 
+     * @param etAl
+     */
+    public void setEtAl(int etAl)
+    {
+    	this.etAl = etAl;
+    }
+    
+    /**
+	 * @return Returns the focusItem.
+	 */
+	public int getFocusItem()
+	{
+		return focusItem;
+	}
+
+	/**
+	 * @param focusItem The focusItem to set.
+	 */
+	public void setFocusItem(int focusItem)
+	{
+		this.focusItem = focusItem;
+	}
+	
+	/**
+	 * Does this browse have an item focus (as opposed to one of: no focus, 
+	 * a value focus)
+	 * 
+	 * @return	true if item focus, false if not
+	 */
+	public boolean hasItemFocus()
+	{
+		if (focusItem == -1)
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * @return Returns the resultsPerPage.
+	 */
+	public int getResultsPerPage()
+	{
+		return resultsPerPage;
+	}
+	
+	/**
+	 * @param resultsPerPage The resultsPerPage to set.
+	 */
+	public void setResultsPerPage(int resultsPerPage)
+	{
+		this.resultsPerPage = resultsPerPage;
+	}
+
+	/**
+	 * Is there a value associated with this browse
+	 * 
+	 * @return	true if a value, false if not
+	 */
+	public boolean hasValue()
+    {
+    	if (this.value != null)
+    	{
+    		return true;
+    	}
+    	return false;
+    }
+    
+	/**
+	 * Are there results for this browse, or was the result set empty?
+	 * 
+	 * @return	true if results, false if not
+	 */
+    public boolean hasResults()
+    {
+    	if (results.size() > 0)
+    	{
+    		return true;
+    	}
+    	return false;
+    }
+    
+    /**
+     * @param focus		the value to focus the browse around
+     */
+    public void setFocus(String focus)
+    {
+    	this.focus = focus;
+    }
+    
+    /**
+     * @return		the value to focus the browse around
+     */
+    public String getFocus()
+    {
+    	return this.focus;
+    }
+    
+    /**
+     * Set the DSpaceObject that is the container for this browse.  If this
+     * is not of type Collection or Community, this method will throw an
+     * exception
+     * 
+     * @param dso		the container object; a Community or Collection
+     * @throws BrowseException
+     */
+    public void setBrowseContainer(DSpaceObject dso)
+    	throws BrowseException
+    {
+    	if (dso instanceof Collection)
+    	{
+    		this.collection = (Collection) dso;
+    	}
+    	else if (dso instanceof Community)
+    	{
+    		this.community = (Community) dso;
+    	}
+    	else
+    	{
+    		throw new BrowseException("The container must be a community or a collection");
+    	}
+    }
+    
+    /**
+     * Obtain a DSpaceObject that represents the container object.  This will be
+     * a Community or a Collection
+     * 
+     * @return	A DSpaceObject representing a Community or a Collection
+     */
+    public DSpaceObject getBrowseContainer()
+    {
+    	if (this.collection != null)
+    	{
+    		return this.collection;
+    	}
+    	if (this.community != null)
+    	{
+    		return this.community;
+    	}
+    	return null;
+    }
+    
+    /**
+     * @param level		the browse level
+     */
+    public void setBrowseLevel(int level)
+    {
+    	this.level = level;
+    }
+    
+    /**
+     * @return	the browse level
+     */
+    public int getBrowseLevel()
+    {
+    	return this.level;
+    }
+    
+    /**
+     * @param id	the database id of the item at the top of the next page
+     */
+    public void setNextItem(int id)
+    {
+    	this.nextItem = id;
+    }
+    
+    /**
+     * @return		the database id of the item at the top of the next page
+     */
+    public int getNextItem()
+    {
+    	return this.nextItem;
+    }
+    
+    /**
+     * @param value		the string value of the value at the top of the next page
+     */
+    public void setNextValue(String value)
+    {
+    	this.nextValue = value;
+    }
+    
+    /**
+     * @return	the string value of the value at the top of the next page
+     */
+    public String getNextValue()
+    {
+    	return this.nextValue;
+    }
+    
+   /**
+	 * @return Returns the ascending.
+	 */
+	public boolean isAscending()
+	{
+		return ascending;
+	}
+
+	/**
+	 * @param ascending The ascending to set.
+	 */
+	public void setAscending(boolean ascending)
+	{
+		this.ascending = ascending;
+	}
+
+	/**
+	 * @return Returns the browseIndex.
+	 */
+	public BrowseIndex getBrowseIndex()
+	{
+		return browseIndex;
+	}
+
+	/**
+	 * @param browseIndex The browseIndex to set.
+	 */
+	public void setBrowseIndex(BrowseIndex browseIndex)
+	{
+		this.browseIndex = browseIndex;
+	}
+
+	/**
+	 * @return Returns the prevItem.
+	 */
+	public int getPrevItem()
+	{
+		return prevItem;
+	}
+
+	/**
+	 * @param prevItem The prevItem to set.
+	 */
+	public void setPrevItem(int prevItem)
+	{
+		this.prevItem = prevItem;
+	}
+
+	/**
+	 * @return Returns the prevValue.
+	 */
+	public String getPrevValue()
+	{
+		return prevValue;
+	}
+
+	/**
+	 * @param prevValue The prevValue to set.
+	 */
+	public void setPrevValue(String prevValue)
+	{
+		this.prevValue = prevValue;
+	}
+
+	/**
+	 * @return Returns the sortOption.
+	 */
+	public SortOption getSortOption()
+	{
+		return sortOption;
+	}
+
+	/**
+	 * @param sortOption The sortOption to set.
+	 */
+	public void setSortOption(SortOption sortOption)
+	{
+		this.sortOption = sortOption;
+	}
+
+	/**
+	 * @return Returns the startsWith.
+	 */
+	public boolean isStartsWith()
+	{
+		return startsWith;
+	}
+
+	/**
+	 * @param startsWith The startsWith to set.
+	 */
+	public void setStartsWith(boolean startsWith)
+	{
+		this.startsWith = startsWith;
+	}
+
+	/**
+	 * @return Returns the value.
+	 */
+	public String getValue()
+	{
+		return value;
+	}
+
+	/**
+	 * @param value The value to set.
+	 */
+	public void setValue(String value)
+	{
+		this.value = value;
+	}
+
+	/**
+	 * is this a top level (0) browse?  Examples of this are a full item
+	 * browse or a single browse.  Other browse types are considered
+	 * second level (1)
+	 * 
+	 * @return	true if top level, false if not
+	 */
+	public boolean isTopLevel()
+	{
+		if (this.level == 0)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Is this a second level (1) browse?  Examples of this are a single
+	 * value browse (e.g. all items by a given author)
+	 * 
+	 * @return	true if second level, false if not
+	 */
+	public boolean isSecondLevel()
+	{
+		if (this.level == 1)
+		{
+			return true;
+		}
+		return false;
+	}
+    
+    /**
      * The results of the Browse. Each member of the list is either a String
      * (for the authors browse) or an {@link org.dspace.content.Item}(for the
      * other browses).
@@ -147,15 +528,48 @@ public class BrowseInfo
     }
 
     /**
+     * @deprecated
+     * @return
+     */
+    public Item[] getItemResults()
+    {
+    	return new Item[0];
+    }
+    
+    /**
      * Return the results of the Browse as an Item array.
      * 
      * @return The results of the Browse as an Item array.
      */
-    public Item[] getItemResults()
+    public Item[] getItemResults(Context context)
+    	throws BrowseException
     {
-        return (Item[]) results.toArray(new Item[results.size()]);
+    	try
+    	{
+    		BrowseItem[] bis = getBrowseItemResults();
+    		Item[] items = new Item[bis.length];
+    		for (int i = 0; i < bis.length; i++)
+    		{
+    			items[i] = Item.find(context, bis[i].getID());
+    		}
+    		return items;
+    	}
+    	catch (SQLException e)
+    	{
+    		throw new BrowseException(e);
+    	}
     }
 
+    /**
+     * Return the results of the Browse as a BrowseItem array
+     * 
+     * @return		the results of the browse as a BrowseItem array
+     */
+    public BrowseItem[] getBrowseItemResults()
+    {
+        return (BrowseItem[]) results.toArray(new BrowseItem[results.size()]);
+    }
+    
     /**
      * Return the number of results.
      * 
@@ -231,5 +645,353 @@ public class BrowseInfo
     void setCached(boolean cached)
     {
         this.cached = cached;
+    }
+    
+    /**
+     * are we browsing within a Community container?
+     * 
+     * @return	true if in community, false if not
+     */
+    public boolean inCommunity()
+	{
+		if (this.community != null)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+    /**
+     * are we browsing within a Collection container
+     * 
+     * @return	true if in collection, false if not
+     */
+	public boolean inCollection()
+	{
+		if (this.collection != null)
+		{
+			return true;
+		}
+		return false;
+	}
+    
+	/**
+	 * Are there further results for the browse that haven't been returned yet?
+	 * 
+	 * @return	true if next page, false if not
+	 */
+	public boolean hasNextPage()
+	{
+		if (!"".equals(nextValue) && (nextValue != null))
+		{
+			return true;
+		}
+		if (nextItem != -1)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Are there results prior to these that haven't been returned here?
+	 * 
+	 * @return	true if previous page, false if not
+	 */
+	public boolean hasPrevPage()
+	{
+		if (!"".equals(prevValue) && (prevValue != null))
+		{
+			return true;
+		}
+		if (prevItem != -1)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Does this browse have a focus?
+	 * 
+	 * @return	true if focus, false if not
+	 */
+	public boolean hasFocus()
+	{
+		if ("".equals(focus) || focus == null)
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Get an integer representing the number within the total set of results which
+	 * marks the position of the first result in the current sub-set
+	 * 
+	 * @return	the start point of the browse page
+	 */
+	public int getStart()
+	{
+		return overallPosition + 1;
+	}
+	
+	/**
+	 * Get an integer representing the number within the total set of results which
+	 * marks the poisition of the last result in the current sub-set
+	 * 
+	 * @return	the end point of the browse page
+	 */
+	public int getFinish()
+	{
+		return overallPosition + results.size();
+	}
+	
+	/**
+	 * Utility method for obtaining a string representation of the browse.  This is
+	 * useful only for debug
+	 */
+    public String toString()
+    {
+    	try
+    	{
+    		StringBuffer sb = new StringBuffer();
+    		
+    		// calculate the range for display
+    		String from = Integer.toString(overallPosition + 1);
+    		String to = Integer.toString(overallPosition + results.size());
+    		String of = Integer.toString(total);
+    		
+    		// report on the positional information of the browse
+    		sb.append("BrowseInfo String Representation: ");
+    		sb.append("Browsing " + from + " to " + to + " of " + of + " ");
+    		
+    		// insert the information about which index
+    		sb.append("in index: " + browseIndex.getName() + 
+    				" (data type: " + browseIndex.getDataType() + 
+    				", display type: " + browseIndex.getDisplayType() + ") ");
+    		
+    		sb.append("||");
+    		
+    		// report on the browse scope container
+    		String container = "all of DSpace";
+    		DSpaceObject theContainer = null;
+    		if (inCollection())
+    		{
+    			container = "collection";
+    			theContainer = this.collection;
+    		}
+    		else if (inCommunity())
+    		{
+    			container = "community";
+    			theContainer = this.community;
+    		}
+    		
+    		String containerID = "no id available/necessary";
+    		if (theContainer != null)
+    		{
+    			containerID = Integer.toString(theContainer.getID()) + " (" + theContainer.getHandle() + ")";
+    		}
+    		
+    		sb.append("Browsing in " + container + ": " + containerID);
+    		sb.append("||");
+    		
+    		// load the item list display configuration
+    		ItemListConfig config = new ItemListConfig();
+    		
+    		// some information about the columns to be displayed
+    		if (browseIndex.isFull())
+    		{
+    			sb.append("Listing over " + Integer.toString(config.numCols()) + " columns: ");
+    			for (int k = 1; k <= config.numCols(); k++)
+    			{
+    				if (k > 1)
+    				{
+    					sb.append(",");
+    				}
+    				String[] meta = config.getMetadata(k);
+    				sb.append(meta[0] + "." + meta[1] + "." + meta[2]);
+    			}
+    			
+    			if (value != null)
+    			{
+    				sb.append(" on value: " + value);
+    			}
+    			
+    			if (isStartsWith())
+    			{
+    				sb.append(" sort column starting with: " + focus);
+    			}
+    			else if (hasFocus())
+    			{
+    				sb.append(" sort column focus: " + focus);
+    			}
+    		}
+    		else if (browseIndex.isSingle())
+    		{
+    			sb.append("Listing single column: " + browseIndex.getMetadata());
+    			if (isStartsWith())
+    			{
+    				sb.append(" sort column starting with: " + focus);
+    			}
+    			else if (hasFocus())
+    			{
+    				sb.append(" sort column focus: " + focus);
+    			}
+    		}
+    		
+    		sb.append("||");
+    		
+    		// some information about how the data is sorted
+    		String direction = (ascending ? "ASC" : "DESC");
+    		sb.append("Sorting by: " + sortOption.getMetadata() + " " + direction + 
+    				" (option " + Integer.toString(sortOption.getNumber()) + ")");
+    		sb.append("||");
+    		
+    		// output the results
+    		if (browseIndex.isSingle() && !isSecondLevel())
+    		{
+    			sb.append(valueListingString());
+    		}
+    		else if (browseIndex.isFull() || isSecondLevel())
+    		{
+    			sb.append(fullListingString(config));
+    		}
+    		
+    		sb.append("||");
+    		
+    		// tell us what the next and previous values are going to be
+    		sb.append("Top of next page: ");
+    		if (hasNextPage())
+    		{
+    			if (browseIndex.isSingle() && !isSecondLevel())
+    			{
+    				sb.append(this.nextValue);
+    			}
+    			else if (browseIndex.isFull() || isSecondLevel())
+    			{
+    				sb.append("Item ID: " + Integer.toString(this.nextItem));
+    			}
+    		}
+    		else
+    		{
+    			sb.append("n/a");
+    		}
+    		sb.append(";");
+    		
+    		sb.append("Top of previous page: ");
+    		if (hasPrevPage())
+    		{
+    			if (browseIndex.isSingle() && !isSecondLevel())
+    			{
+    				sb.append(this.prevValue);
+    			}
+    			else if (browseIndex.isFull() || isSecondLevel())
+    			{
+    				sb.append("Item ID: " + Integer.toString(this.prevItem));
+    			}
+    		}
+    		else
+    		{
+    			sb.append("n/a");
+    		}
+    		
+    		sb.append("||");
+    		
+    		return sb.toString();
+    	}
+    	catch (SQLException e)
+    	{
+    		return e.getMessage();
+    	}
+    	catch (BrowseException e)
+    	{
+    		return e.getMessage();
+    	}
+    }
+    
+    /**
+     * A utility method for generating a string to represent a single item's
+     * entry in the browse
+     * 
+     * @param config
+     * @return
+     * @throws SQLException
+     */
+    private String fullListingString(ItemListConfig config)
+    	throws SQLException
+    {
+    	// report on all the results contained herein
+    	StringBuffer sb = new StringBuffer();
+    	
+		Iterator itr = results.iterator();
+		while (itr.hasNext())
+		{
+			BrowseItem bi = (BrowseItem) itr.next();
+			if (bi == null)
+			{
+				sb.append("{{ NULL ITEM }}");
+				break;
+			}
+			sb.append("{{Item ID: " + Integer.toString(bi.getID()) + " :: ");
+			
+			for (int j = 1; j <= config.numCols(); j++)
+			{
+				String[] md = config.getMetadata(j);
+				if (md == null)
+    			{
+    				sb.append("{{ NULL METADATA }}");
+    				break;
+    			}
+				DCValue[] values = bi.getMetadata(md[0], md[1], md[2], Item.ANY);
+				StringBuffer value = new StringBuffer();
+				if (values != null)
+				{
+					for (int i = 0; i < values.length; i++)
+					{
+						if (i > 0)
+						{
+							value.append(",");
+						}
+						value.append(values[i].value);
+					}
+				}
+				else
+				{
+					value.append("-");
+				}
+				String metadata = "[" + md[0] + "." + md[1] + "." + md[2] + ":" + value.toString() + "]";
+				sb.append(metadata);
+			}
+			
+			sb.append("}}");
+		}
+		
+		return sb.toString();
+    }
+    
+    /**
+     * A utility method for representing a single value in the browse
+     * 
+     * @return
+     */
+    private String valueListingString()
+    {
+    	// report on all the results contained herein
+    	StringBuffer sb = new StringBuffer();
+    	
+		Iterator itr = results.iterator();
+		while (itr.hasNext())
+		{
+			String theValue = (String) itr.next();
+			if (theValue == null)
+			{
+				sb.append("{{ NULL VALUE }}");
+				break;
+			}
+			sb.append("{{Value: " + theValue + "}}");
+		}
+		
+		return sb.toString();
     }
 }

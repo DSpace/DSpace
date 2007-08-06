@@ -641,3 +641,26 @@ img.controlledvocabulary {
 .controlledVocabularyLink {  
            font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-size: 8pt; }   
+           
+.browse_buttons
+{
+	float: right;
+	padding: 1px;
+	margin: 1px;
+}
+
+#browse_navigation
+{
+	margin-bottom: 10px;
+}
+
+#browse_controls
+{
+	margin-bottom: 10px;
+}
+
+.browse_range
+{
+	margin-top: 5px;
+	margin-bottom: 5px;
+}

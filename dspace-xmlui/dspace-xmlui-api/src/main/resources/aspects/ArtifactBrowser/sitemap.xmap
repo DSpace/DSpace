@@ -56,12 +56,7 @@ and searching the repository.
 			<map:transformer name="CommunityViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityViewer"/>
 			<map:transformer name="CollectionViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.CollectionViewer"/>
 			<map:transformer name="ItemViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemViewer"/>
-			<map:transformer name="BrowseTitles" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseTitles"/>
-			<map:transformer name="BrowseDates" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseDates"/>
-			<map:transformer name="BrowseAuthors" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseAuthors"/>
-			<map:transformer name="BrowseAuthorItems" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseAuthorItems"/>
-		    <map:transformer name="BrowseSubjects" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseSubjects"/>
-			<map:transformer name="BrowseSubjectItems" src="org.dspace.app.xmlui.aspect.artifactbrowser.BrowseSubjectItems"/>
+			<map:transformer name="ConfigurableBrowse" src="org.dspace.app.xmlui.aspect.artifactbrowser.ConfigurableBrowse"/>
 			<map:transformer name="SimpleSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.SimpleSearch"/>
 			<map:transformer name="AdvancedSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.AdvancedSearch"/>
 			<map:transformer name="FeedbackForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.FeedbackForm"/>
@@ -153,33 +148,9 @@ and searching the repository.
 			</map:match>	
 			
 			
-			<!-- Global browse by titles, dates, subjects or authors -->
-			<map:match pattern="browse-title">
-				<map:transform type="BrowseTitles"/>
-				<map:serialize type="xml"/>
-			</map:match>
-			<map:match pattern="browse-date">
-				<map:transform type="BrowseDates"/>
-				<map:serialize type="xml"/>
-			</map:match>
-			<!-- Browse by author -->
-			<map:match pattern="browse-author">
-				<map:transform type="BrowseAuthors"/>
-				<map:serialize type="xml"/>
-			</map:match>
-			<!-- Browse by author's items -->
-			<map:match pattern="browse-author-items">
-				<map:transform type="BrowseAuthorItems"/>
-				<map:serialize type="xml"/>
-			</map:match>
-		    <!-- Browse by subject -->
-			<map:match pattern="browse-subject">
-				<map:transform type="BrowseSubjects"/>
-				<map:serialize type="xml"/>
-			</map:match>
-			<!-- Browse by items pertaining to a subject -->
-			<map:match pattern="browse-subject-items">
-				<map:transform type="BrowseSubjectItems"/>
+			<!-- Browse (by anything) -->
+			<map:match pattern="browse">
+				<map:transform type="ConfigurableBrowse"/>
 				<map:serialize type="xml"/>
 			</map:match>
 			
@@ -190,45 +161,11 @@ and searching the repository.
 				<map:match type="HandleAuthorizedMatcher" pattern="READ">				
 					<map:match type="HandleTypeMatcher" pattern="community,collection">
 					
-						<!-- Browse by title -->
-						<map:match pattern="handle/*/*/browse-title">
-							<map:transform type="BrowseTitles"/>
+						<!-- Browse (by anything) -->
+						<map:match pattern="handle/*/*/browse">
+							<map:transform type="ConfigurableBrowse"/>
 							<map:serialize type="xml"/>
 						</map:match>
-						
-						
-						<!-- Browse by date -->
-						<map:match pattern="handle/*/*/browse-date">
-							<map:transform type="BrowseDates"/>
-							<map:serialize type="xml"/>
-						</map:match>
-						
-						
-						<!-- Browse by author -->
-						<map:match pattern="handle/*/*/browse-author">
-							<map:transform type="BrowseAuthors"/>
-							<map:serialize type="xml"/>
-						</map:match>
-												
-						<!-- Browse by author's items -->
-						<map:match pattern="handle/*/*/browse-author-items">
-							<map:transform type="BrowseAuthorItems"/>
-							<map:serialize type="xml"/>
-						</map:match>
-					    
-					    
-					    <!-- Browse by subject -->
-					    <map:match pattern="handle/*/*/browse-subject">
-					        <map:transform type="BrowseSubjects"/>
-					        <map:serialize type="xml"/>
-					    </map:match>
-					    
-					    <!-- Browse by items pertaining to a subject -->
-					    <map:match pattern="handle/*/*/browse-subject-items">
-					        <map:transform type="BrowseSubjectItems"/>
-					        <map:serialize type="xml"/>
-					    </map:match>
-					    
 					    						
 						<!-- Simple search -->
 						<map:match pattern="handle/*/*/search">

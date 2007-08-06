@@ -3,18 +3,25 @@
 <head>
 <!--
   Author:   Peter Breton
+  Author:	Richard Jones
   Version:  $Revision$
   Date:     $Date$
 -->
 </head>
 <body bgcolor="white">
 <p>
-Provides classes and methods for browsing Items in DSpace by title, author,
-date, or subject. The main class is <a href="Browse.html">Browse</a>.
-Callers of the API use <a href="BrowseScope.html">BrowseScope</a>
-objects to describe the desired browse; the results are returned as
-<a href="BrowseInfo.html">BrowseInfo</a> objects.
+Provides classes and mehtods for browsing Items in DSpace by whatever
+is specified in the configuration.  The standard method by which you 
+would perform a browse is as follows:
 </p>
+
+<ul>
+	<li>Create a <a href="BrowserScope.html">BrowserScope</a> object.  This object holds all of the parameters
+	of your browse request</li>
+	<li>Pass the <a href="BrowserScope.html">BrowserScope</a> object into the <a href="BrowseEngine.html">BrowseEngine</a> object.
+	This object should be invoked through either the browse() method or the browseMini() method</li>
+	<li>The <a href="BrowseEngine.html">BrowseEngine</a> will pass back a <a href="BrowseInfo.html">BrowseInfo</a> object which contains all the relevant details of your request</li>
+</ul>
 
 <p>
 Browses only return archived Items; other Items (eg, those 
@@ -27,21 +34,27 @@ in the workflow system) are ignored.
 An example use of the Browse API is shown below:
 <pre>
     // Create or obtain a context object
-    Context context;
+    Context context = new Context();
 
     // Create a BrowseScope object within the context
-    BrowseScope scope = new BrowseScope(context);
+    BrowserScope scope = new BrowserScope(context);
+    
     // The browse is limited to the test collection
-    Collection test;
-    scope.setScope(test);
+    Collection test = Collection.find(context, someID);
+    scope.setBrowseContainer(test);
+    
     // Set the focus
     scope.setFocus("Test Title");
+    
     // A maximum of 30 items will be returned
-    scope.setTotal(30);
-    // Up to 5 Items with titles before Test Title
-    scope.setNumberBefore(5);
+    scope.setResultsPerPage(30);
+    
+    // set ordering to DESC
+    scope.setOrder("DESC");
 
-    BrowseInfo results = Browse.getItemsByTitle(scope);
+	// now execute the browse
+	BrowseEngine be = new BrowseEngine();
+    BrowseInfo results = be.browse(scope);
 </pre>
 </p>
 
@@ -65,65 +78,29 @@ Thesis and Antithesis
 <h2>Browse Indexes</h2>
 
 <p>
-The Browse API uses database tables to index Items by title, author,
-date of issue,date of accession, or subject keywords. When an Item is added to DSpace,
-modified, or removed from DSpace via the
+The Browse API uses database tables to index Items based on the supplied
+configuration.  When an Item is added to DSpace, modified or removed via the
 <a href="../content/package-summary.html">Content Management API</a>, the
 indexes are automatically updated.
 </p>
 
 <p>
-The mapping between the indexes and Dublin Core values is:
+To rebuild the database tables for the browse (on configuration change), or
+to re-index just the contents of the existing tables, use the following 
+commands from <a href="IndexBrowse.html">IndexBrowse</a>:
 </p>
 
-<table>
+<p>A complete rebuild of the database and the indices:</p>
 
-<tr>
-  <th align="left">Index</th>
-  <th align="left">Element</th>
-  <th align="left">Qualifier</th>
-</tr>
+<pre>
+[dspace]/dsrun org.dspace.browse.IndexBrowse -f -r
+</pre>
 
-<tr>
-  <td>Title</td>
-  <td>title</td>
-  <td>none</td>
-</tr>
+<p>A complete re-index of the archive contents:</p>
 
-<tr>
-  <td>Author</td>
-  <td>contributor</td>
-  <td>(any)</td>
-</tr>
-
-<tr>
-  <td>Date</td>
-  <td>date</td>
-  <td>issued</td>
-</tr>
-
-</table>
-</p>
-
-
-<p>
-You should not attempt to manipulate the tables which contain the
-items, metadata values, or indexes via direct database manipulation
-(eg, with SQL statements), because doing so incorrectly may corrupt
-the indexes. If the indexes somehow become corrupted, however, running
-the InitializeBrowse command-line tool will rebuild them:
-</p>
-
-   <code>java org.dspace.browse.InitializeBrowse</code>
-
-<p>
-<!--
-     FIXME Should reference either the documentation for index-all
-     or for command-line tools
--->
-Note that the <em>index-all</em> command-line tool rebuilds both the
-Browse and Search indexes.
-</p>
+<pre>
+[dspace]/dsrun org.dspace.browse.IndexBrowse -i
+</pre>
 
 </body>
 </html>

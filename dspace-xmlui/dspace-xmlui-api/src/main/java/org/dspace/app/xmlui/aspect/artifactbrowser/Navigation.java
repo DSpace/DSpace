@@ -42,6 +42,8 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -58,6 +60,8 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -162,11 +166,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         List browseContext = browse.addList("context");
 
         browseGlobal.setHead(T_head_all_of_dspace);
+
         browseGlobal.addItemXref(contextPath + "/community-list",T_communities_and_collections);
-        browseGlobal.addItemXref(contextPath + "/browse-title",T_browse_titles);
-        browseGlobal.addItemXref(contextPath + "/browse-author",T_browse_authors);
-        browseGlobal.addItemXref(contextPath + "/browse-subject",T_browse_subjects);
-        browseGlobal.addItemXref(contextPath + "/browse-date",T_browse_dates);
+
+        // Add the configured browse lists for 'top level' browsing
+        addBrowseOptions(browseGlobal, contextPath + "/browse");
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso != null)
@@ -187,11 +191,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                 browseContext.setHead(T_head_this_community);
             }
 
+            // Add the configured browse lists for scoped browsing
             String handle = dso.getHandle();
-            browseContext.addItemXref(contextPath + "/handle/" + handle + "/browse-title",T_browse_titles);
-            browseContext.addItemXref(contextPath + "/handle/" + handle + "/browse-author",T_browse_authors);
-            browseContext.addItemXref(contextPath + "/handle/" + handle + "/browse-subject",T_browse_subjects);
-            browseContext.addItemXref(contextPath + "/handle/" + handle + "/browse-date",T_browse_dates);
+            addBrowseOptions(browseContext, contextPath + "/handle/" + handle + "/browse");
         }
     }
 
@@ -237,6 +239,39 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                 pageMeta.addMetadata("focus","container").addContent("hdl:"+dso.getHandle());
                 this.getObjectManager().manageObject(dso);
             }
+        }
+    }
+
+    /**
+     * Add navigation for the configured browse tables to the supplied list.
+     * 
+     * @param browseList
+     * @param browseURL
+     * @throws WingException
+     */
+    private void addBrowseOptions(List browseList, String browseURL) throws WingException
+    {
+        // FIXME Exception handling
+        try
+        {
+            // Get a Map of all the browse tables
+            Map<Integer, BrowseIndex> bis = BrowseIndex.getBrowseIndicesMap();
+            for (int i = 0; i < bis.size(); i++)
+            {
+                // Create a Map of the query parameters for this link
+                Map<String, String> queryParams = new HashMap<String, String>();
+                BrowseIndex bix = (BrowseIndex) bis.get(new Integer(i + 1));
+
+                queryParams.put("type", bix.getName());
+                
+                // Add a link to this browse
+                browseList.addItemXref(super.generateURL(browseURL, queryParams),
+                        message("xmlui.ArtifactBrowser.Navigation.browse_" + bix.getName()));
+            }
+        }
+        catch (BrowseException bex)
+        {
+            throw new UIException("Unable to get browse indicies", bex);
         }
     }
 }

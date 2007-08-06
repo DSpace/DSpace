@@ -46,7 +46,9 @@ import java.sql.SQLException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -60,8 +62,11 @@ import org.dspace.app.xmlui.wing.element.Reference;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.Browse;
-import org.dspace.browse.BrowseScope;
+import org.dspace.browse.BrowseEngine;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowseItem;
+import org.dspace.browse.BrowserScope;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -72,11 +77,14 @@ import org.xml.sax.SAXException;
 /**
  * Display a single community. This includes a full text search, browse by list,
  * community display and a list of recent submissions.
- * 
+ *     private static final Logger log = Logger.getLogger(DSpaceFeedGenerator.class);
+
  * @author Scott Phillips
  */
 public class CommunityViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    private static final Logger log = Logger.getLogger(DSpaceFeedGenerator.class);
+	
     /** Language Strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
@@ -112,7 +120,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     private static final int RECENT_SUBMISISONS = 5;
 
     /** The cache of recently submitted items */
-    private java.util.List<Item> recentSubmittedItems;
+    private java.util.List<BrowseItem> recentSubmittedItems;
     
     /** Cached validity object */
     private SourceValidity validity;
@@ -176,7 +184,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            }
 	
 	            // Recently submitted items
-	            for (Item item : getRecientlySubmittedIems(community))
+	            for (BrowseItem item : getRecientlySubmittedIems(community))
 	            {
 	                validity.add(item);
 	            }
@@ -321,7 +329,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         // Reciently submitted items
         {
-            java.util.List<Item> items = getRecientlySubmittedIems(community);
+            java.util.List<BrowseItem> items = getRecientlySubmittedIems(community);
 
             Division lastSubmittedDiv = home
                     .addDivision("community-recent-submission","secondary recent-submission");
@@ -329,7 +337,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
                     "collection-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
                     null, "recent-submissions");
-            for (Item item : items)
+            for (BrowseItem item : items)
             {
                 lastSubmitted.addReference(item);
             }
@@ -342,17 +350,29 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
      * @param community The community.
      */
     @SuppressWarnings("unchecked") 
-    private java.util.List<Item> getRecientlySubmittedIems(Community community)
+    private java.util.List<BrowseItem> getRecientlySubmittedIems(Community community)
             throws SQLException
     {
         if (recentSubmittedItems != null)
             return recentSubmittedItems;
 
-        BrowseScope scope = new BrowseScope(context);
-        scope.setScope(community);
-        scope.setTotal(RECENT_SUBMISISONS);
+        BrowserScope scope = new BrowserScope(context);
+        scope.setCommunity(community);
+        scope.setResultsPerPage(RECENT_SUBMISISONS);
+        
+        // FIXME Exception Handling
+        try
+        {
+        	scope.setBrowseIndex(BrowseIndex.getBrowseIndex("dateaccessioned"));
 
-        this.recentSubmittedItems = Browse.getLastSubmitted(scope);
+        	BrowseEngine be = new BrowseEngine(context);
+        	this.recentSubmittedItems = be.browse(scope).getResults();
+        }
+        catch (BrowseException bex)
+        {
+        	log.error("Caught BrowseException", bex);
+        }
+        
         return this.recentSubmittedItems;
     }
 

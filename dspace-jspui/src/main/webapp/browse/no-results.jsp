@@ -52,43 +52,57 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page  import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 
 <%
-    // Retrieve attributes
-    Community community = (Community) request.getAttribute("community");
-    Collection collection = (Collection) request.getAttribute("collection");
+	// get the BrowseInfo object
+	BrowseInfo bi = (BrowseInfo) request.getAttribute("browse.info");
 
+    // Retrieve community and collection if necessary
+    Community community = null;
+    Collection collection = null;
+
+    if (bi.inCommunity())
+    {
+    	community = (Community) bi.getBrowseContainer();
+    }
+    
+    if (bi.inCollection())
+    {
+    	collection = (Collection) bi.getBrowseContainer();
+    }
+    
+    // FIXME: this is not using the i18n
     // Description of what the user is actually browsing, and where link back
     String linkText = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.home");
     String linkBack = "/";
 
-    if(collection != null)
+    if (collection != null)
     {
         linkText = collection.getMetadata("name");
         linkBack = "/handle/" + collection.getHandle();
     }
-    else if(community != null)
+    else if (community != null)
     {
         linkText = community.getMetadata("name");
         linkBack = "/handle/" + community.getHandle();
     }
 %>
 
-<dspace:layout titlekey="jsp.browse.no-results.title">
+<dspace:layout titlekey="browse.no-results.title">
 
-    <h1><fmt:message key="jsp.browse.no-results.title"/></h1>
-
+    <h1><fmt:message key="browse.no-results.title"/></h1>
 
 <p>
     <%
 	    if (collection != null)
 	    {
    %>
-            	<fmt:message key="jsp.browse.no-results.col">
+            	<fmt:message key="browse.no-results.col">
                     <fmt:param><%= collection.getMetadata("name")%></fmt:param>
                 </fmt:message>
    <%
@@ -96,7 +110,7 @@
 	    else if (community != null)
 	    {
    %>
-   		<fmt:message key="jsp.browse.no-results.com">
+   		<fmt:message key="browse.no-results.com">
             <fmt:param><%= community.getMetadata("name")%></fmt:param>
         </fmt:message>
    <%
@@ -104,12 +118,17 @@
  	    else
  	    {
    %>
-   		<fmt:message key="jsp.browse.no-results.genericScope"/>
+   		<fmt:message key="browse.no-results.genericScope"/>
    <%
    	    }
    %>
  </p>
    
     <p><a href="<%= request.getContextPath() %><%= linkBack %>"><%= linkText %></a></p>
+
+    <%-- dump the results for debug (uncomment to enable) --%>
+    <%--
+	<!-- <%= bi.toString() %> -->
+	--%>
 
 </dspace:layout>

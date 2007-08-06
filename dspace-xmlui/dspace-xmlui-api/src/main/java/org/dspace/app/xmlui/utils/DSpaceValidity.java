@@ -45,6 +45,7 @@ import java.sql.SQLException;
 
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.dspace.browse.BrowseItem;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -312,6 +313,22 @@ public class DSpaceValidity implements SourceValidity
             {
                 // Add each of the items bundles & bitstreams.
                 this.add(bundle);
+            }
+        }
+        else if (dso instanceof BrowseItem)
+        {
+        	BrowseItem browseItem = (BrowseItem) dso;
+        	
+        	validityKey.append("BrowseItem:");
+        	validityKey.append(browseItem.getHandle());
+        	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            for (DCValue dcv : dcvs)
+            {
+                validityKey.append(dcv.schema + ".");
+                validityKey.append(dcv.element + ".");
+                validityKey.append(dcv.qualifier + ".");
+                validityKey.append(dcv.language + "=");
+                validityKey.append(dcv.value);
             }
         }
         else if (dso instanceof Bundle)

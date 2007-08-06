@@ -55,7 +55,8 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.browse.Browse;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -1699,8 +1700,19 @@ public class Item extends DSpaceObject
          **/
         if (isArchived())
         {
-            // Remove from Browse indices
-            Browse.itemRemoved(ourContext, getID());
+//        	 FIXME: there is an exception handling problem here
+            try
+            {
+//            	 Remove from indicies
+            	IndexBrowse ib = new IndexBrowse(ourContext);
+            	ib.itemRemoved(this);
+            }
+            catch (BrowseException e)
+            {
+            	log.error("caught exception: ", e);
+            	throw new SQLException(e.getMessage());
+            }
+            
         }
 
         // Delete the Dublin Core

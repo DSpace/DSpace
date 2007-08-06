@@ -251,6 +251,37 @@
     </attribute>
   </tag>
 
+<tag>
+    <name>browselist</name>
+    <tagclass>org.dspace.app.webui.jsptag.BrowseListTag</tagclass>
+    <info>
+      Tag for displaying a list of items.  Specify highlightrow (starting
+      from zero) if a row should be highlit.  Specify an emphcolumn of
+      "date" or "title" to emphasise the contents of a column.
+    </info>
+    <attribute>
+      <name>items</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>browseInfo</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>highlightrow</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>emphcolumn</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+
   <tag>
     <name>communitylist</name>
     <tagclass>org.dspace.app.webui.jsptag.CommunityListTag</tagclass>

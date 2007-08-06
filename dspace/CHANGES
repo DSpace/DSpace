@@ -1,3 +1,9 @@
+(Richard Jones / Graham Triggs)
+- New Browse code that allows customisation of the available indexes via dspace.cfg,
+  and pluggable normalisation of the sort strings.
+  Integration with both JSP-UI and XML-UI included.
+  (S.F. Patches 1702233 and 1672065)
+
 (Flavio Botelho)
 - S.F. Patch 1764069 Replace "String" with "Integer" in PreparedStatement 
   Parameters where appropiate.

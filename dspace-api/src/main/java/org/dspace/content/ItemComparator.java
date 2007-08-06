@@ -45,7 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.dspace.browse.Browse;
+import org.dspace.browse.BrowseOrder;
 
 /**
  * Compare two Items by their DCValues.
@@ -256,6 +256,6 @@ public class ItemComparator implements Comparator
             return value.value;
         }
 
-        return Browse.getNormalizedTitle(value.value, value.language);
+        return BrowseOrder.makeSortString(value.value, value.language, BrowseOrder.TITLE);
     }
 }

@@ -513,6 +513,330 @@ metadata.dc.contributor.* = Authors
 metadata.dc.identifier.uri = Citation
 metadata.dc.description.abstract = Abstract</pre>
 
+
+<h2><a name="browse" id="browse">Browse Configuration</a></h2>
+
+<p>The browse indices for DSpace can be extensively configured.  This section of the configuration
+allows you to take control of the indices you wish to browse on, and how you wish to present
+the results.  This configuration is broken down into several parts: defining the indices, defining
+the fields upon which users can sort results, defining truncation for potentially long fields (e.g. 
+author lists), setting cross-links between different browse contexts (e.g. from an author's name to
+a complete list of their items), how many recent submissions to display, and configuration for item
+mapping browse.</p>
+
+<h3>Defining the Indices</h3>
+
+<p>The form is:</p>
+
+<pre>
+webui.browse.index.&lt;n&gt; = &lt;index name&gt; : \
+                               &lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*] : \
+                               (date | title | text) : \
+                               (full | single) \
+</pre>
+
+<dl>
+	<dt>index name</dt>
+	<dd>
+		The name by which the index will be identified.  This may be used in later configuration
+		or to locate the message key for this index.
+	</dd>
+	<dt>&lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*]</dt>
+	<dd>
+		The metadata field declaration for the field to be indexed.  This will be something
+		like <code>dc.date.issued</code> or <code>dc.contributor.*</code> or <code>dc.title</code>.
+	</dd>
+	<dt>(date | title | text)</dt>
+	<dd>This refers to the datatype of the field:
+		<ul>
+			<li>date: the index type will be treated as a date object</li>
+			<li>title: the index type will be treated like a title, which will include
+					a link to the item page</li>
+			<li>text: the index type will be treated as plain text.  If single mode is
+					specified then this will link to the full mode list</li>
+		</ul>
+	</dd>
+	
+	<dt>(full | single)</dt>
+	<dd>
+		This refers to the way that the index will be displayed in the 
+		browse listing.  "Full" will be the full item list as specified
+		by <code>webui.itemlist.columns</code>; "single" will be a single list of
+		only the indexed term.
+	</dd>
+</dl>
+
+<p>If you are customising this list beyond the default you will need to insert the text
+you wish to appear in the navigation and on link and buttons describing the browse index
+into the <code>Messages.properties</code> file.  The system uses parameters of the form:</p>
+
+<pre>
+browse.type.&lt;index name&gt;
+</pre>
+
+<p>The Index numbers denoted by &lt;n&gt; must start from 1 and increment by 1 continuously
+thereafter.  Deviation from this rule will cause an error during installation or during
+configuration update</p>
+
+<p>This is an example configuration, as it appears by default in <code>dspace.cfg</code>.</p>
+
+<pre>
+webui.browse.index.1 = dateissued:dc.date.issued:date:full
+webui.browse.index.2 = author:dc.contributor.*:text:single
+webui.browse.index.3 = title:dc.title:title:full
+webui.browse.index.4 = subject:dc.subject.*:text:single
+webui.browse.index.5 = dateaccessioned:dc.date.accessioned:date:full
+</pre>
+
+<h3>Defining Sort Options</h3>
+
+<p>
+Sort options will be available when browsing a list of items (i.e. only in
+"full" mode, not "single" mode).  You can define an arbitrary number of fields
+to sort on, irrespective of which fields you display using webui.itemlist.columns</p>
+
+<p>The format is:</p>
+
+<pre>
+webui.browse.sort-option.&lt;n&gt; = &lt;option name&gt; : \
+                               &lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*] : \
+                               (date | text)
+</pre>
+
+<dl>
+	<dt>option name</dt>
+	<dd>
+		The name by which the sort option will be identified.  This may be used in later configuration
+		or to locate the message key for this index.
+	</dd>
+	<dt>&lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*]</dt>
+	<dd>
+		The metadata field declaration for the field to be sorted on.  This will be something
+		like <code>dc.title</code> or <code>dc.date.issued</code>.
+	</dd>
+	<dt>(date | text)</dt>
+	<dd>This refers to the datatype of the field:
+		<ul>
+			<li>date: the sort type will be treated as a date object</li>
+			<li>text: the sort type will be treated as plain text.</li>
+		</ul>
+	</dd>
+</dl>
+
+<p>This is the example configuration as it appears in the default <code>dspace.cfg</code>:
+
+<pre>				
+webui.browse.sort-option.1 = title:dc.title:text
+webui.browse.sort-option.2 = date:dc.date.issued:date
+</pre>
+
+<h3>Author (Multiple metadata value) Display</h3>
+
+<p>(Note: this section actually applies to any field with multiple values, but authors are the defined case)</p>
+
+<p>You can define which field is the author (or editor, or other repeated field) which
+this configuration will deal with thus:</p>
+
+<pre>
+webui.browse.author-field = dc.contributor.*
+</pre>
+
+Replace <code>dc.contributor.*</code> with another field if appropriate.
+
+<p>The field should be listed in the configuration for <code>webui.itemlist.columns</code>, otherwise
+you will not see its effect.  It must also be defined in <code>webui.itemlist.columns</code> as being
+of data type <code>text</code>, otherwise the functionality will be overriden by the specific
+data type features.
+
+<p>Now that we know which field is our author or other multiple metadata value field we can 
+provide the option to truncate the number of values displayed by default.  We replace the
+remaining list of values with "et al" or the language pack specific alternative.  Note that this
+is just for the default, and users will have the option of changing the number displayed when
+they browse the results</p>
+
+<pre>
+webui.browse.author-limit = &lt;n&gt;
+</pre>
+
+<p>Where &lt;n&gt; is an integer number of values to be displayed.  Use <code>-1</code> for unlimited (default).</p>
+
+<h3>Links to other browse contexts</h3>
+
+<p>We can define which fields link to other browse listings.  This is useful, for example,
+to link an author's name to a list of just that author's items.
+The effect this has is to create links to browse views for the item clicked on.
+If it is a "single" type, it will link to a view of all the items which share
+that metadata element in common (i.e. all the papers by a single author).  If 
+it is a "full" type, it will link to a view of the standard full browse page,
+starting with the value of the link clicked on.</p>
+
+<p>The form is:</p>
+
+<pre>
+webui.browse.link.&lt;n&gt; = &lt;index name&gt;:&lt;display column metadata&gt;
+</pre>
+
+<p>
+This should associated
+the name of one of the browse indices (<code>webui.browse.index.n</code>) with a metadata field listed
+in <code>webui.itemlist.columns</code> above.  If this condition is not fulfilled, cross-linking
+will not work.  Note also that cross-linking only works for metadata fields not tagged as <code>title</code> in
+<code>webui.itemlist.columns</code>.
+
+<p>The following example shows the default in <code>dspace.cfg</code> which links author
+names to lists of their publications:</p>
+
+<pre>
+webui.browse.link.1 = author:dc.contributor.*
+</pre>
+
+<h3>Recent Submissions</h3>
+
+<p>This allows us to define which index to base Recent Submission display on,
+and how many we should show at any one time.  This uses the PluginManager to
+automatically load the relevant plugin for the Community and Collection home
+pages.  Values given in examples are the defaults supplied in <code>dspace.cfg</code></p>
+
+<p>First define the index name (from <code>webui.browse.index</code>) to use for
+# displaying recent submissions.  For example:</p>
+
+<pre>
+recent.submissions.index = dateaccessioned
+</pre>
+
+<p>Define how many recent submissions should be displayed at any one time,
+for example:</p>
+
+<pre>
+recent.submissions.count = 5
+</pre>
+
+<p>Now we need to set up the processors that the <a href="business.html#plugin">PluginManager</a> will load to
+actually perform the recent submissions query on the relevant pages.</p>
+
+<p>Tell the community and collection pages that we are using the Recent Submissions code
+
+<pre>
+plugin.sequence.org.dspace.plugin.CommunityHomeProcessor = \
+	org.dspace.app.webui.components.RecentCommunitySubmissions
+
+plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
+	org.dspace.app.webui.components.RecentCollectionSubmissions
+</pre>
+
+<p>This is already configured by default in <code>dspace.cfg</code> so there should be no
+need for you to worry about it</p>
+
+<h3>Item Mapper</h3>
+
+<p>Because the item mapper requires a primitive implementation of the browse
+system to be present, we simply need to tell that system which of our indices
+defines the author browse (or equivalent) so that the mapper can list authors'
+items for mapping</p>
+
+<p>Define the the index name (from <code>webui.browse.index</code>) to use for
+displaying items by author
+
+<pre>
+itemmap.author.index = author
+</pre>
+
+<p>So if you change the name of your author browse field, you will also need to
+update this configuration.</p>
+
+
+<h2><a name="browse-index" id="browse-index">Browse Index Creation</a></h2>
+
+<p>
+To create all the various browse indices that you define in the configuration as described in
+the section <a href="#browse">Browse Configuration</a> there are a variety of options available 
+to you.  You can see these options at any time by running the indexer without any arguments, thus:
+</p>
+
+<pre>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse
+</pre>
+
+<p>This will show you the following options are available to you:</p>
+
+<dl>
+	<dt>-r,--rebuild</dt>
+	<dd>
+	   should we rebuild all the indices, which removes old index
+                tables and creates new ones.  For use with -f. Mutually exclusive with -d
+    </dd>
+    <dt>-s,--start</dt>
+    <dd>     [-s &lt;int&gt;] start from this index number and work upward
+                (mostly only useful for debugging). For use with -t and -f
+                </dd>
+     <dt>-x,--execute</dt>
+     <dd>   execute all the remove and create SQL against the
+                database. For use with -t and -f</dd>
+     <dt>-i,--index</dt>
+     <dd>     actually do the indexing.  Mutually exclusive with -t and
+                -f</dd>
+     <dt>-o,--out</dt>
+     <dd>      [-o &lt;filename&gt;] write the remove and create SQL to the
+                given file. For use with -t and -f</dd>
+     <dt>-p,--print</dt>
+     <dd>     write the remove and create SQL to the stdout. For use
+                with -t and -f</dd>
+     <dt>-t,--tables</dt>
+     <dd>    create the tables only, do not attempt to index.  Mutually
+                exclusive with -f and -i</dd>
+     <dt>-f,--full</dt>
+     <dd>      make the tables, and do the indexing.  This forces -x.
+                Mutually exclusive with -t and -i</dd>
+     <dt>-v,--verbose</dt>
+     <dd>   print extra information to the stdout.  If used in
+                conjunction with -p, you cannot use the stdout to generate your database
+                structure</dd>
+     <dt>-d,--delete</dt>
+     <dd>    delete all the indices, but don't create new ones.  For
+                use with -f. This is mutually exclusive with -r</dd>
+     <dt>-h,--help</dt>
+     <dd>      show this help documentation.  Overrides all other
+                arguments</dd>
+</dl>
+
+<p>The following, then, are examples of what you want to achieve and how this is done with
+the command line options</p>
+
+<p><em>Do a full browse re-index, tearing down all old tables and reconstructing with the new configuration</em></p>
+
+<pre>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -f -r
+</pre>
+
+<p><em>Do a full browse re-index without modifying the table structure</em> (This should be your default approach if indexing, for example,
+via a cron job periodically)</p>
+
+<pre>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -i
+</pre>
+
+<p><em>Destroy and rebuild the database, but do not do the indexing.  Output the SQL to do this to the screen and a file, as well
+as executing it against the database, while being verbose</em></p>
+
+<pre>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -r -t -p -v -x -o myfile.sql
+</pre>
+
+<p>During installation you will have run the ant target:</p>
+
+<pre>
+ant index
+</pre>
+
+<p>This creates the index tables as per the configuration, and will produce your initial indexed state.  From this point on, you should
+not use ant to generate your indices, as it is not a very good execution environment.  Instead, if you feel the need, or your local
+customisations demand regular full indexing you should set up a regular script to execute:</p>
+
+<pre>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -i
+</pre>
+
+
   <h2><a name="mydspacegroupmembership" id="mydspacegroupmembership">MyDSpace Display of Group Memberships</a></h2>
   <p>In the MyDSpace page of a user, all the groups the user is member of can be displayed by setting webui.mydspace.showgroupmemberships = true:
   <pre>

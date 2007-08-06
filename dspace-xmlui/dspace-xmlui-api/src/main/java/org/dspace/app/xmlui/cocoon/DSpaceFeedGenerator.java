@@ -63,10 +63,13 @@ import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.cocoon.xml.dom.DOMStreamer;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.browse.Browse;
-import org.dspace.browse.BrowseScope;
+import org.dspace.browse.BrowseEngine;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowserScope;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -122,6 +125,7 @@ import com.sun.syndication.io.WireFeedOutput;
 public class DSpaceFeedGenerator extends AbstractGenerator 
 		implements Configurable, CacheableProcessingComponent, Recyclable
 {
+    private static final Logger log = Logger.getLogger(DSpaceFeedGenerator.class);
 
 	/** The feed's requested format */
 	private String format = null;
@@ -537,14 +541,24 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     	if (recentSubmissionItems != null)
     		return recentSubmissionItems;
 
-    	BrowseScope scope = new BrowseScope(context);
+    	BrowserScope scope = new BrowserScope(context);
     	if (dso instanceof Collection)
-    		scope.setScope((Collection) dso);
+    		scope.setCollection((Collection) dso);
     	else if (dso instanceof Community)
-    		scope.setScope((Community) dso);
-    	scope.setTotal(itemCount);
+    		scope.setCommunity((Community) dso);
+    	scope.setResultsPerPage(itemCount);
 
-    	this.recentSubmissionItems = Browse.getLastSubmitted(scope);
+    	// FIXME Exception handling
+    	try
+    	{
+    		scope.setBrowseIndex(BrowseIndex.getBrowseIndex("dateaccessioned"));
+    		BrowseEngine be = new BrowseEngine(context);
+    		this.recentSubmissionItems = be.browse(scope).getResults();
+    	}
+    	catch (BrowseException bex)
+    	{
+    		log.error("Caught browse exception", bex);
+    	}
     	return this.recentSubmissionItems;
     }
     

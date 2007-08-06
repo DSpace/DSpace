@@ -45,7 +45,8 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.browse.Browse;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -88,7 +89,16 @@ public class FlowMapperUtils
                 if (!item.isOwningCollection(toCollection))
                 {
                     toCollection.addItem(item);
-                    Browse.itemChanged(context,item);
+                    // FIXME Exception handling
+                    try
+                    {
+                    	IndexBrowse ib = new IndexBrowse(context);
+                    	ib.indexItem(item);
+                    }
+                    catch (BrowseException bex)
+                    {
+                    	throw new UIException("Unable to process browse", bex);
+                    }
                 }
             }
         }
@@ -127,7 +137,16 @@ public class FlowMapperUtils
                 if (!item.isOwningCollection(toCollection))
                 {
                     toCollection.removeItem(item);
-                    Browse.itemChanged(context,item);
+                    // FIXME Exception handling
+                    try
+                    {
+                    	IndexBrowse ib = new IndexBrowse(context);
+                    	ib.indexItem(item);
+                    }
+                    catch (BrowseException bex)
+                    {
+                    	throw new UIException("Unable to process browse", bex);
+                    }
                 }
             }
         }

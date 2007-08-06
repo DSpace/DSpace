@@ -339,6 +339,11 @@
 				<artifactId>axis-saaj</artifactId>
 				<version>1.2</version>
 			</dependency>
+			<dependency>
+      			<groupId>com.ibm.icu</groupId>
+      			<artifactId>icu4j</artifactId>
+      			<version>3.4.4</version>
+		    </dependency>
 
 		</dependencies>
 	</dependencyManagement>
