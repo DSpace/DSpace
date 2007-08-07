@@ -20,6 +20,7 @@
 (Graham Triggs)
 - ConfigurationManager fix to honour log4j.configuration
 - S.F. Patch 1749196 Oracle SQL in Bitstream Checker
+- S.F. Patch 1740579 Patch for bug 1740454 (Concurrency)
 
 (Larry Stone, Richard Rodgers, Sands Fish, Mark Diggory)
 - S.F. Patch 1633596 Event System for DSpace 1.5

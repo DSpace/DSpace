@@ -62,6 +62,14 @@ import java.util.Hashtable;
 import javax.naming.directory.*;
 import javax.naming.*;
 
+// Internal class to pass LDAP details from authentication method
+class LDAPResult
+{
+    String email;
+    String givenName;
+    String surname;
+    String phone;
+}
 
 /**
  * LDAP username and password authentication servlet.  Displays the
@@ -75,14 +83,6 @@ public class LDAPServlet extends DSpaceServlet
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(LDAPServlet.class);
-
-    /** ldap email result */
-    private String ldapEmail;
-
-    /** ldap name result */
-    private String ldapGivenName;
-    private String ldapSurname;
-    private String ldapPhone;
 
     protected void doDSGet(Context context,
         HttpServletRequest request,
@@ -113,10 +113,12 @@ public class LDAPServlet extends DSpaceServlet
         boolean loggedIn = false;
 
         // make sure ldap values are null with every request
-        ldapGivenName = null;
-        ldapSurname = null;
-        ldapEmail = null;
-        ldapPhone = null;
+        LDAPResult ldapResult = new LDAPResult();
+
+        ldapResult.givenName = null;
+        ldapResult.surname = null;
+        ldapResult.email = null;
+        ldapResult.phone = null;
 
         // if they entered a netid that matches an eperson
         if (eperson != null && eperson.canLogIn())
@@ -132,7 +134,7 @@ public class LDAPServlet extends DSpaceServlet
             }
             else 
             {
-                if (ldapAuthenticate(netid, password, context))
+                if (ldapAuthenticate(netid, password, context, ldapResult))
                 {
                     // Logged in OK.
                     Authenticate.loggedIn(context, request, eperson);
@@ -186,7 +188,7 @@ public class LDAPServlet extends DSpaceServlet
         }
         // the user does not already exist so try and authenticate them with ldap and create an eperson for them
         else {
-            if (ldapAuthenticate(netid, password, context))
+            if (ldapAuthenticate(netid, password, context, ldapResult))
             {
                 if (ConfigurationManager.getBooleanProperty("webui.ldap.autoregister"))
                 {
@@ -194,9 +196,9 @@ public class LDAPServlet extends DSpaceServlet
                     log.info(LogManager.getHeader(context,
                                     "autoregister", "netid=" + netid));
 
-                    if ((ldapEmail!=null)&&(!ldapEmail.equals(""))) 
+                    if ((ldapResult.email!=null)&&(!ldapResult.email.equals(""))) 
                     {
-                        eperson = EPerson.findByEmail(context, ldapEmail);
+                        eperson = EPerson.findByEmail(context, ldapResult.email);
                         if (eperson!=null)
                         {
                             log.info(LogManager.getHeader(context,
@@ -209,11 +211,11 @@ public class LDAPServlet extends DSpaceServlet
                     // TEMPORARILY turn off authorisation
                     context.setIgnoreAuthorization(true);
                     eperson = EPerson.create(context);
-                    if ((ldapEmail!=null)&&(!ldapEmail.equals(""))) eperson.setEmail(ldapEmail);
+                    if ((ldapResult.email!=null)&&(!ldapResult.email.equals(""))) eperson.setEmail(ldapResult.email);
                     else eperson.setEmail(netid);
-                    if ((ldapGivenName!=null)&&(!ldapGivenName.equals(""))) eperson.setFirstName(ldapGivenName);
-                    if ((ldapSurname!=null)&&(!ldapSurname.equals(""))) eperson.setLastName(ldapSurname);
-                    if ((ldapPhone!=null)&&(!ldapPhone.equals(""))) eperson.setMetadata("phone", ldapPhone);
+                    if ((ldapResult.givenName!=null)&&(!ldapResult.givenName.equals(""))) eperson.setFirstName(ldapResult.givenName);
+                    if ((ldapResult.surname!=null)&&(!ldapResult.surname.equals(""))) eperson.setLastName(ldapResult.surname);
+                    if ((ldapResult.phone!=null)&&(!ldapResult.phone.equals(""))) eperson.setMetadata("phone", ldapResult.phone);
                     eperson.setNetid(netid);
                     eperson.setCanLogIn(true);
                     AuthenticationManager.initEPerson(context, request, eperson);
@@ -250,7 +252,7 @@ public class LDAPServlet extends DSpaceServlet
     /**
      * contact the ldap server and attempt to authenticate
      */
-    protected boolean ldapAuthenticate(String netid, String password, Context context)
+    protected boolean ldapAuthenticate(String netid, String password, Context context, LDAPResult ldapResult)
     {
         //--------- START LDAP AUTH SECTION -------------
         if (!password.equals("")) 
@@ -297,25 +299,25 @@ public class LDAPServlet extends DSpaceServlet
                         if (attlist[0]!=null)
                         {
                         	att = atts.get(attlist[0]);
-                        	if (att != null) ldapEmail = (String)att.get();
+                        	if (att != null) ldapResult.email = (String)att.get();
                         }
                         
                         if (attlist[1]!=null)
                         {
                     		att = atts.get(attlist[1]);
-                    		if (att != null) ldapGivenName = (String)att.get();
+                    		if (att != null) ldapResult.givenName = (String)att.get();
                         }
                         
                         if (attlist[2]!=null) 
                         {
                		     	att = atts.get(attlist[2]);
-               		     	if (att != null) ldapSurname = (String)att.get();
+               		     	if (att != null) ldapResult.surname = (String)att.get();
                         }
 
                         if (attlist[3]!=null)
                         {
                		     	att = atts.get(attlist[3]);
-               		     	if (att != null) ldapPhone = (String)att.get();
+               		     	if (att != null) ldapResult.phone = (String)att.get();
                         }                        
                     }
                 }
