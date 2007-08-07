@@ -1,3 +1,6 @@
+(Richard Jones)
+- S.F. Patch 1670093 More stable metadata and schema registry import 
+
 (Richard Jones / Graham Triggs)
 - New Browse code that allows customisation of the available indexes via dspace.cfg,
   and pluggable normalisation of the sort strings.

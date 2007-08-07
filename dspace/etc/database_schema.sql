@@ -300,9 +300,6 @@ CREATE TABLE MetadataValue
   place              INTEGER
 );
 
--- Create the DC schema
-INSERT INTO MetadataSchemaRegistry VALUES (getnextid('metadataschemaregistry'),'http://dublincore.org/documents/dcmi-terms/','dc');
-
 -- Create a dcvalue view for backwards compatibilty
 CREATE VIEW dcvalue AS
   SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.item_id,
@@ -457,8 +454,8 @@ CREATE TABLE WorkspaceItem
   published_before  BOOL,
   multiple_files    BOOL,
   -- How for the user has got in the submit process
-  stage_reached     INTEGER
-  page_reached      INTEGER;
+  stage_reached     INTEGER,
+  page_reached      INTEGER
 );
 
 -------------------------------------------------------

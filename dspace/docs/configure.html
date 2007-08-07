@@ -207,8 +207,9 @@ property2.name = ${dspace.dir}/rest/of/path
   <h2><a name="registries" id="registries">The Metadata and Bitstream Format Registries</a></h2>
 
   <p>
-    The <code><i>[dspace]</i>/config/registries</code> directory contains two XML files. 
-    These are used to load the <em>initial</em> contents of the <a href="appendix.html#dublincoreregistry">Dublin Core Metadata registry</a> 
+    The <code><i>[dspace]</i>/config/registries</code> directory contains three XML files. 
+    These are used to load the <em>initial</em> contents of the Metadata Schema Registry, 
+    <a href="appendix.html#dublincoreregistry">Dublin Core Metadata registry</a> 
     and <a href="appendix.html#bitstreamformatregistry">Bitstream Format registry</a>. 
     After the initial loading (performed by <code>ant fresh_install</code> above), 
     the registries reside in the database; the XML files are not updated. 
@@ -216,22 +217,66 @@ property2.name = ${dspace.dir}/rest/of/path
   
   <p>
     In order to change the registries, you may adjust the XML files before the first installation of DSpace. 
-    On an allready running instance it is recommended to change the registries via DSpace admin UI. 
+    On an allready running instance it is recommended to change bitstream registries via DSpace admin UI, but
+    the metadata registries can be loaded again at any time from the XML files without difficult. 
     The changes made via admin UI are not reflected in the XML files.
   </p>
+  
+  <h3>Metadata Schema Registry</h3>
+  
+  <p>The default metadata schema in DSpace is Dublin Core, so it is distributed with a single entry in
+  the source XML file for that namespace.  If you wish to add more schemas you can do this in one of two
+  ways.  Via the DSpace admin UI you may define new Metadata Schemas, edit existing schemas and move 
+  elements between schemas.  But you may also modify the XML file (or provide an additional one), and
+  re-import the data as follows:</p>
+  
+  <pre>
+  [dspace]/bin/dsrun org.dspace.adminster.SchemaImporter -f [xml file]
+  </pre>
+  
+  The XML file should be structured as follows:
+  
+  <pre>
+	&lt;metadata-schemas&gt;
+		&lt;schema&gt;
+			&lt;name&gt;[schema name]&lt;/name&gt;
+			&lt;namespace&gt;http://myu.edu/some/namespace&lt;/namespace&gt;
+		&lt;/schema&gt;
+	&lt;/metadata-schemas&gt;
+  </pre>
   
   <h3>Metadata Format Registries</h3>
  	
   <p>
     The default metadata schema is Dublin Core, so DSpace is distributed with a default Dublin Core Metadata Registry. 
-    Currently, the system requires that every item have a Dublin Core record.<br/>
-    Via the DSpace admin UI you may define new Metadata Schemas, edit existing schemas and move elements between schemas.<br/>
-    There is a set of Dublin Core Elements, which is used by the system and should not be removed or moved to another schema, 
-    see <a href="appendix.html#dublincoreregistry">Appendix: Default Dublin Core Metadata registry</a>.<br/>
-    <strong>Note</strong>: altering a Metadata Registry has no effect on corresponding parts, e.g. item submission interface, item display, 
-    item import and vice versa. Every metadata element used in submission interface or item import must be registered before using it.<br />
-    <strong>Note</strong> also that deleting a metadata element will delete all its corresponding values.
+    Currently, the system requires that every item have a Dublin Core record.</p>
+    <p>There is a set of Dublin Core Elements, which is used by the system and should not be removed or moved to another schema, 
+    see <a href="appendix.html#dublincoreregistry">Appendix: Default Dublin Core Metadata registry</a>.</p>
+    <p><strong>Note</strong>: altering a Metadata Registry has no effect on corresponding parts, e.g. item submission interface, item display, 
+    item import and vice versa. Every metadata element used in submission interface or item import must be registered before using it.</p>
+    <p><strong>Note</strong> also that deleting a metadata element will delete all its corresponding values.
    </p>
+ 
+   <p>If you wish to add more metadata elements, you can do this in one of two ways.  Via the DSpace admin UI you may define
+   new metadata elements in the different available schemas.  But you may also modify the XML file (or provide an additional one),
+   and re-import the data as follows:
+   
+   <pre>
+  [dspace]/bin/dsrun org.dspace.adminster.MetadataImporter -f [xml file]
+  </pre>
+ 
+ 	The XML file should be structured as follows:
+ 	
+ 	<pre>
+	&lt;dspace-dc-types&gt;
+		&lt;dc-type&gt;
+			&lt;schema&gt;dc&lt;/schema&gt;
+			&lt;element&gt;contributor&lt;/element&gt;
+			&lt;qualifier&gt;advisor&lt;/qualifier&gt;
+			&lt;scope_note&gt;Use primarily for thesis advisor.&lt;/scope_note&gt;
+		&lt;/dc-type&gt;
+	&lt;/dspace-dc-types&gt;
+ 	</pre>
  
   <h3>Bitstream Format Registry</h3>
   <p>

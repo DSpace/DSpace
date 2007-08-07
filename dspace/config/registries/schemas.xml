@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<!--
+  - schemas.xml
+  -
+  - Registry of metadata schemas required by the default DSpace instance
+  -
+  -->
+
+<!-- start of XML -->
+
+<metadata-schemas>
+        <schema>
+                <name>dc</name>
+                <namespace>http://dublincore.org/documents/dcmi-terms/</namespace>
+        </schema>
+</metadata-schemas>

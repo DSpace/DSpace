@@ -286,12 +286,19 @@ Common usage:
     -  properties -->
 	<target name="setup_database" description="Create database tables">
 
+		<!-- Load the Schema -->
 		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
 			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg value="database_schema.sql" />
 		</java>
 
+		<!-- Add the browse tables -->
+        <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg line="-t -x" />
+        </java>
 	</target>
 
 
@@ -320,6 +327,7 @@ Common usage:
 	<!-- Loads bitstream format and Dublin Core type registries -->
 	<target name="load_registries" description="Load initial contents of registries">
 
+		<!-- first import the bitstream registry -->
 		<java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
 			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.configuration" value="${config}" />
@@ -327,13 +335,20 @@ Common usage:
 			<arg value="${dspace.dir}/config/registries/bitstream-formats.xml" />
 		</java>
 
-		<java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-			<sysproperty key="dspace.configuration" value="${config}" />
-			<arg value="-dc" />
-			<arg value="${dspace.dir}/config/registries/dublin-core-types.xml" />
+		<!-- next import the metadata schema records -->
+		<java classname="org.dspace.administer.SchemaImporter" classpathref="class.path" fork="yes" failonerror="yes">
+			  <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
+		      <sysproperty key="dspace.configuration" value="${config}"/>
+		      <arg line="-f ${dspace.dir}/config/registries/schemas.xml"/>
 		</java>
-
+		   
+		<!-- finally import the metadata elements -->
+		<java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
+            <sysproperty key="dspace.configuration" value="${config}"/>
+		    <arg line="-f ${dspace.dir}/config/registries/dublin-core-types.xml"/>
+		</java>
+		
 	</target>
 
 
