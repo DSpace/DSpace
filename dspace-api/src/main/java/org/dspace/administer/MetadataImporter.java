@@ -94,12 +94,15 @@ public class MetadataImporter
     public static void main(String[] args)
     	throws ParseException, SQLException, IOException, TransformerException,
     			ParserConfigurationException, AuthorizeException, SAXException,
-    			NonUniqueMetadataException
+    			NonUniqueMetadataException, RegistryImportException
     {
+        boolean forceUpdate = false;
+        
         // create an options object and populate it
         CommandLineParser parser = new PosixParser();
         Options options = new Options();
         options.addOption("f", "file", true, "source xml file for DC fields");
+        options.addOption("u", "update", false, "update an existing schema");
         CommandLine line = parser.parse(options, args);
         
         String file = null;
@@ -112,8 +115,9 @@ public class MetadataImporter
             usage();
             System.exit(0);
         }
-        
-        loadRegistry(file);
+
+        forceUpdate = line.hasOption('u');
+        loadRegistry(file, forceUpdate);
     }
     
     /**
@@ -121,9 +125,9 @@ public class MetadataImporter
      * 
      * @param 	file	the file path containing the source data
      */
-    public static void loadRegistry(String file)
+    public static void loadRegistry(String file, boolean forceUpdate)
     	throws SQLException, IOException, TransformerException, ParserConfigurationException, 
-    		AuthorizeException, SAXException, NonUniqueMetadataException
+    		AuthorizeException, SAXException, NonUniqueMetadataException, RegistryImportException
     {
         // create a context
         Context context = new Context();
@@ -131,6 +135,16 @@ public class MetadataImporter
         
         // read the XML
         Document document = RegistryImporter.loadXML(file);
+
+        // Get the nodes corresponding to types
+        NodeList schemaNodes = XPathAPI.selectNodeList(document, "/dspace-dc-types/dc-schema");
+        
+        // Add each one as a new format to the registry
+        for (int i = 0; i < schemaNodes.getLength(); i++)
+        {
+            Node n = schemaNodes.item(i);
+            loadSchema(context, n, forceUpdate);
+        }
         
         // Get the nodes corresponding to types
         NodeList typeNodes = XPathAPI.selectNodeList(document, "/dspace-dc-types/dc-type");
@@ -146,6 +160,77 @@ public class MetadataImporter
     }
     
     /**
+     * Process a node in the metadata registry XML file.  If the
+     * schema already exists, it will not be recreated
+     * 
+     * @param context
+     *            DSpace context object
+     * @param node
+     *            the node in the DOM tree
+     * @throws NonUniqueMetadataException
+     */
+    private static void loadSchema(Context context, Node node, boolean updateExisting)
+        throws SQLException, IOException, TransformerException,
+            AuthorizeException, NonUniqueMetadataException, RegistryImportException
+    {
+        // Get the values
+        String name = RegistryImporter.getElementData(node, "name");
+        String namespace = RegistryImporter.getElementData(node, "namespace");
+        
+        if (name == null || "".equals(name))
+        {
+            throw new RegistryImportException("Name of schema must be supplied");
+        }
+
+        if (namespace == null || "".equals(namespace))
+        {
+            throw new RegistryImportException("Namespace of schema must be supplied");
+        }
+
+        System.out.print("Registering Schema: " + name + " - " + namespace + " ... ");
+        
+        // check to see if the schema already exists
+        MetadataSchema s = MetadataSchema.find(context, name);
+        
+        if (s == null)
+        {
+            // Schema does not exist - create
+            MetadataSchema schema = new MetadataSchema(namespace, name);
+            schema.create(context);
+            System.out.println("created");
+        }
+        else
+        {
+            // Schema exists - if it's the same namespace, allow the type imports to continue
+            if (s.getNamespace().equals(namespace))
+            {
+                System.out.println("already exists, skipping to type import");
+                return;
+            }
+            
+            // It's a different namespace - have we been told to update?
+            if (updateExisting)
+            {
+                // Update the existing schema namespace and continue to type import
+                s.setNamespace(namespace);
+                s.update(context);
+                System.out.println("namespace updated (" + name + " = " + namespace + ")");
+            }
+            else
+            {
+                // Don't update the existing namespace - abort abort abort
+                System.out.println("schema exists, but with different namespace");
+                System.out.println("was: " + s.getNamespace());
+                System.out.println("xml: " + namespace);
+                System.out.println("aborting - use -u to force the update");
+                
+                throw new RegistryImportException("schema already registerd with different namespace - use -u to update");
+            }
+        }
+        
+    }
+    
+    /**
      * Process a node in the metadata registry XML file. The node must
      * be a "dc-type" node.  If the type already exists, then it
      * will not be reimported
@@ -158,7 +243,7 @@ public class MetadataImporter
      */
     private static void loadType(Context context, Node node)
             throws SQLException, IOException, TransformerException,
-            AuthorizeException, NonUniqueMetadataException
+            AuthorizeException, NonUniqueMetadataException, RegistryImportException
     {
         // Get the values
         String schema = RegistryImporter.getElementData(node, "schema");
@@ -176,6 +261,11 @@ public class MetadataImporter
         
         // Find the matching schema object
         MetadataSchema schemaObj = MetadataSchema.find(context, schema);
+        
+        if (schemaObj == null)
+        {
+            throw new RegistryImportException("Schema '" + schema + "' is not registered");
+        }
         
         MetadataField mf = MetadataField.findByElement(context, schemaObj.getSchemaID(), element, qualifier);
         if (mf != null)

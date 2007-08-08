@@ -83,6 +83,11 @@
     <description.version>$Revision$</description.version>
   </dspace-header>
 
+  <dc-schema>
+          <name>dc</name>
+          <namespace>http://dublincore.org/documents/dcmi-terms/</namespace>
+  </dc-schema>
+
   <dc-type>
 	<schema>dc</schema>
     <element>contributor</element>

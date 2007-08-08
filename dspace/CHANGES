@@ -18,6 +18,7 @@
 - S.F. Patch 1679972 OAIDCCrosswalk NPE and invalid character fix
 
 (Graham Triggs)
+- Metadata Exporter (Implements request: #1444364)
 - ConfigurationManager fix to honour log4j.configuration
 - S.F. Patch 1749196 Oracle SQL in Bitstream Checker
 - S.F. Patch 1740579 Patch for bug 1740454 (Concurrency)
