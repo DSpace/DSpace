@@ -149,7 +149,7 @@
 	int rpp = bi.getResultsPerPage();
 	
 //	 the message key for the type
-	String typeKey = "browse.type." + bix.getName();
+	String typeKey = "browse.type.metadata." + bix.getName();
 %>
 
 <dspace:layout titlekey="browse.page-title">

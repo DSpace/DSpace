@@ -66,6 +66,7 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
+import org.dspace.browse.SortOption;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -305,6 +306,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         if (recentSubmissionItems != null)
             return recentSubmissionItems;
         
+        String source = ConfigurationManager.getProperty("recent.submissions.index");
         BrowserScope scope = new BrowserScope(context);
         scope.setCollection(collection);
         scope.setResultsPerPage(RECENT_SUBMISISONS);
@@ -312,7 +314,12 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         // FIXME Exception Handling
         try
         {
-        	scope.setBrowseIndex(BrowseIndex.getBrowseIndex("dateaccessioned"));
+        	scope.setBrowseIndex(BrowseIndex.getItemBrowseIndex());
+            for (SortOption so : SortOption.getSortOptions())
+            {
+                if (so.getName().equals(source))
+                    scope.setSortBy(so.getNumber());
+            }
 
         	BrowseEngine be = new BrowseEngine(context);
         	this.recentSubmissionItems = be.browse(scope).getResults();

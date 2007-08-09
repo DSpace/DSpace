@@ -81,9 +81,7 @@ public interface BrowseCreateDAO
 	public void deleteByItemID(String table, int itemID) throws BrowseException;
 	
 	/**
-	 * Insert an index record into the given table for the given item id.  The value
-	 * is the human readable value for the field, the sortValue is the normalised version
-	 * (normalised in whatever way the caller sees fit), and the Map should contain
+	 * Insert an index record into the given table for the given item id.  The Map should contain
 	 * key value pairs representing the sort column integer representation and the normalised
 	 * value for that field.
 	 * 
@@ -95,17 +93,42 @@ public interface BrowseCreateDAO
 	 * map.put(new Integer(2), "the subject");
 	 * 
 	 * BrowseCreateDAO dao = BrowseDAOFactory.getCreateInstance();
-	 * dao.insertIndex("index_1", 21, "Human Readable", "human readable", map);
+	 * dao.insertIndex("index_1", 21, map);
 	 * </code>
 	 * 
 	 * @param table		the browse table to insert the index in
 	 * @param itemID	the database id of the item being indexed
-	 * @param value		the human readable value of the index
-	 * @param sortValue	the sortable value of the index
 	 * @param sortCols	an Integer-String map of sort column numbers and values
 	 * @throws BrowseException
 	 */
-	public void insertIndex(String table, int itemID, String value, String sortValue, Map sortCols) throws BrowseException;
+    public void insertIndex(String table, int itemID, Map sortCols) throws BrowseException;
+
+    /**
+     * Insert an index record into the given table for the given item id.  The value
+     * is the human readable value for the field, the sortValue is the normalised version
+     * (normalised in whatever way the caller sees fit), and the Map should contain
+     * key value pairs representing the sort column integer representation and the normalised
+     * value for that field.
+     * 
+     * For example, the caller might do as follows:
+     * 
+     * <code>
+     * Map map = new HashMap();
+     * map.put(new Integer(1), "the title");
+     * map.put(new Integer(2), "the subject");
+     * 
+     * BrowseCreateDAO dao = BrowseDAOFactory.getCreateInstance();
+     * dao.insertIndex("index_1", 21, "Human Readable", "human readable", map);
+     * </code>
+     * 
+     * @param table     the browse table to insert the index in
+     * @param itemID    the database id of the item being indexed
+     * @param value     the human readable value of the index
+     * @param sortValue the sortable value of the index
+     * @param sortCols  an Integer-String map of sort column numbers and values
+     * @throws BrowseException
+     */
+    public void insertIndex(String table, int itemID, String value, String sortValue, Map sortCols) throws BrowseException;
 	
 	/**
 	 * Get the browse index's internal id for the location of the given string
@@ -234,6 +257,8 @@ public interface BrowseCreateDAO
 	 * it should not.  The returned string should contain the SQL (if relevant) that the caller
 	 * can do with what they like (for example, output to the screen)
 	 * 
+	 * This form is used for 'secondary' browses - ie. browse the items for an author
+	 * 
 	 * This should be used, for example, like this:
 	 * 
 	 * <code>
@@ -251,9 +276,36 @@ public interface BrowseCreateDAO
 	 * @return			the instructions (SQL) that effect the creation
 	 * @throws BrowseException
 	 */
-	public String createPrimaryTable(String table, List sortCols, boolean execute) throws BrowseException;
+	public String createSecondaryTable(String table, List sortCols, boolean execute) throws BrowseException;
+
+    /**
+     * Create the main index table.  This is the one which will contain a single row per
+     * item.  If the boolean execute is true this operation should be carried out, and if it is false
+     * it should not.  The returned string should contain the SQL (if relevant) that the caller
+     * can do with what they like (for example, output to the screen)
+     * 
+     * This form is used for the primary item browse tables
+     * 
+     * This should be used, for example, like this:
+     * 
+     * <code>
+     * List list = new ArrayList();
+     * list.add(new Integer(1));
+     * list.add(new Integer(2));
+     * 
+     * BrowseCreateDAO dao = BrowseDAOFactory.getCreateInstance();
+     * dao.createPrimaryTable("index_1", list, true);
+     * </code>
+     * 
+     * @param table     the raw table to create
+     * @param sortCols  a List of Integers numbering the sort columns required
+     * @param execute   whether to action the create or not
+     * @return          the instructions (SQL) that effect the creation
+     * @throws BrowseException
+     */
+    public String createPrimaryTable(String table, List sortCols, boolean execute) throws BrowseException;
 	
-	/**
+    /**
 	 * Create any indices that the implementing DAO sees fit to maximise performance.
 	 * If the boolean execute is true this operation should be carried out, and if it is false
 	 * it should not.  The returned string array should contain the SQL (if relevant) that the caller
@@ -261,11 +313,12 @@ public interface BrowseCreateDAO
 	 * you can return each bit of SQL as an element if you want.
 	 * 
 	 * @param table		the table upon which to create indices
+	 * @param sortCols TODO
 	 * @param execute	whether to action the create or not
 	 * @return			the instructions (SQL) that effect the indices
 	 * @throws BrowseException
 	 */
-	public String[] createDatabaseIndices(String table, boolean execute) throws BrowseException;
+	public String[] createDatabaseIndices(String table, List<Integer> sortCols, boolean value, boolean execute) throws BrowseException;
 	
 	/**
 	 * Create the View of the full item index as seen from a collection.
@@ -330,9 +383,10 @@ public interface BrowseCreateDAO
 	 * 
 	 * @param table		the index table to check
 	 * @param map		the name of the associated distinct mapping table
+	 * @param withdrawn TODO
 	 * @throws BrowseException
 	 */
-	public void pruneExcess(String table, String map) throws BrowseException;
+	public void pruneExcess(String table, String map, boolean withdrawn) throws BrowseException;
 	
 	/**
 	 * So that there are no distinct values indexed which are no longer referenced from the

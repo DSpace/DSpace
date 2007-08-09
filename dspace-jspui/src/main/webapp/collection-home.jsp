@@ -186,7 +186,7 @@
 <%
 	for (int i = 0; i < bis.length; i++)
 	{
-		String key = "browse.menu." + bis[i].getMessageKey();
+		String key = "browse.menu." + bis[i].getName();
 %>
 	<div class="browse_buttons">
 	<form method="get" action="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/browse">

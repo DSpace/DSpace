@@ -42,6 +42,7 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +57,7 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
+import org.dspace.browse.SortOption;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
@@ -130,18 +132,48 @@ public class BrowserServlet extends DSpaceServlet
         	{
     			showError(context, request, response);
         	}
+
         	BrowseIndex bi = BrowseIndex.getBrowseIndex(type);
         	if (bi == null)
         	{
         		throw new BrowseException("There is no browse index of the type: " + type);
         	}
         	
+        	// If we don't have a sort column
+            if (sortBy == -1)
+            {
+                // Get the default one
+                SortOption so = bi.getSortOption();
+                if (so != null)
+                {
+                    sortBy = so.getNumber();
+                }
+            }
+            else if (bi.isItemIndex() && !bi.isInternalIndex())
+            {
+                // If a default sort option is specified by the index, but it isn't
+                // the same as sort option requested, attempt to find an index that
+                // is configured to use that sort by default
+                // This is so that we can then highlight the correct option in the navigation
+                SortOption bso = bi.getSortOption();
+                SortOption so = SortOption.getSortOption(sortBy);
+                if ( bso != null && bso != so)
+                {
+                    BrowseIndex newBi = BrowseIndex.getBrowseIndex(so);
+                    if (newBi != null)
+                    {
+                        bi   = newBi;
+                        type = bi.getName();
+                    }
+                }
+            }
+            
         	// if no resultsperpage set, default to 20
         	if (resultsperpage == -1)
         	{
         		resultsperpage = 20;
         	}
-        	
+
         	// if no order parameter, default to ascending
         	if (order == null || "".equals(order))
         	{
@@ -177,22 +209,6 @@ public class BrowserServlet extends DSpaceServlet
         	if (value != null)
         	{
         		level = 1;
-        	}
-        	
-        	// if a value has been specified but a sort_by parameter has not been, we
-        	// need to set it as a default
-        	if (value != null && sortBy == -1)
-        	{
-        		Map map = bi.getSortOptions();
-        		if (map == null)
-        		{
-        			throw new BrowseException("Value browse cannot complete without a sortable column");
-        		}
-        		if (map.size() == 0)
-        		{
-        			throw new BrowseException("Value browse cannot complete without a sortable column");
-        		}
-        		sortBy = ((Integer) map.keySet().iterator().next()).intValue();
         	}
         	
         	// if sortBy is still not set, set it to 0, which is default to use the primary index value
@@ -242,11 +258,11 @@ public class BrowserServlet extends DSpaceServlet
         	BrowserScope scope = new BrowserScope(context);
         	scope.setBrowseIndex(bi);
         	scope.setOrder(order);
-        	scope.setValue(value);
-            scope.setValueLang(valueLang);
-        	scope.setFocus(focus);
-        	scope.setValueFocus(valueFocus);
-            scope.setValueFocusLang(valueFocusLang);
+        	scope.setFilterValue(value);
+            scope.setFilterValueLang(valueLang);
+        	scope.setJumpToItem(focus);
+        	scope.setJumpToValue(valueFocus);
+            scope.setJumpToValueLang(valueFocusLang);
         	scope.setStartsWith(startsWith);
         	scope.setResultsPerPage(resultsperpage);
         	scope.setSortBy(sortBy);
@@ -273,7 +289,7 @@ public class BrowserServlet extends DSpaceServlet
         	
         	if (binfo.hasResults())
         	{
-        		if (bi.isSingle() && !scope.isSecondLevel())
+        		if (bi.isMetadataIndex() && !scope.isSecondLevel())
         		{
         			showSinglePage(context, request, response);
         		}

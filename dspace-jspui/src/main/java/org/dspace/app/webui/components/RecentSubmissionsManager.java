@@ -46,6 +46,7 @@ import org.dspace.browse.BrowserScope;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowseException;
+import org.dspace.browse.SortOption;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.content.Item;
 
@@ -98,14 +99,18 @@ public class RecentSubmissionsManager
 			// prep our engine and scope
 			BrowseEngine be = new BrowseEngine(context);
 			BrowserScope bs = new BrowserScope(context);
-			BrowseIndex bi = BrowseIndex.getBrowseIndex(source);
+			BrowseIndex bi = BrowseIndex.getItemBrowseIndex();
 			
 			// fill in the scope with the relevant gubbins
 			bs.setBrowseIndex(bi);
 			bs.setOrder("DESC");	// FIXME: eek - plain text flag!  Should be BrowserScope.ASC or something
 			bs.setResultsPerPage(Integer.parseInt(count));
 			bs.setBrowseContainer(dso);
-			bs.setSortBy(0);
+            for (SortOption so : SortOption.getSortOptions())
+            {
+                if (so.getName().equals(source))
+                    bs.setSortBy(so.getNumber());
+            }
 			
 			BrowseInfo results = be.browseMini(bs);
 			

@@ -40,6 +40,7 @@
 package org.dspace.browse;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -151,26 +152,32 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#createDatabaseIndices(java.lang.String, boolean)
      */
-    public String[] createDatabaseIndices(String table, boolean execute) throws BrowseException
+    public String[] createDatabaseIndices(String table, List<Integer> sortCols, boolean value, boolean execute) throws BrowseException
     {
         try
         {
-            String sortIndexName = table + "_value_idx";
-            String itemIndexName = table + "_item_id_idx";
+            ArrayList<String> array = new ArrayList<String>();
             
-            String createSortIndex = "CREATE INDEX " + sortIndexName + " ON " 
-                                    + table + "(sort_value)";
-            String createItemIndex = "CREATE INDEX " + itemIndexName + " ON " 
-                                    + table + "(item_id)";
+            array.add("CREATE INDEX " + table + "_item_id_idx ON " + table + "(item_id)");
+    
+            if (value)
+                array.add("CREATE INDEX " + table + "_value_index ON " + table + "(sort_value)");
+    
+            for (Integer i : sortCols)
+            {
+                array.add("CREATE INDEX " + table + "_s" + i + "_idx ON " + table + "(sort_" + i + ")");
+            }
             
             if (execute)
             {
-                DatabaseManager.updateQuery(context, createSortIndex);
-                DatabaseManager.updateQuery(context, createItemIndex);
+                for (String query : array)
+                {
+                    DatabaseManager.updateQuery(context, query);
+                }
             }
             
-            String[] array = { createSortIndex + ";", createItemIndex + ";" };
-            return array;
+            String[] arr = new String[array.size()];
+            return array.toArray(arr);
         }
         catch (SQLException e)
         {
@@ -234,7 +241,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         try
         {
             String create = "CREATE TABLE " + table + " (" +
-                            "id integer PRIMARY KEY, " + 
+                            "id INTEGER PRIMARY KEY, " + 
                             "value " + getValueColumnDefinition() + ", " +
                             "sort_value " + getSortColumnDefinition() +
                             ")";
@@ -252,10 +259,43 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         }
     }
 
+    public String createPrimaryTable(String table, List sortCols, boolean execute) throws BrowseException
+    {
+        try
+        {
+            StringBuffer sb = new StringBuffer();
+            
+            Iterator itr = sortCols.iterator();
+            while (itr.hasNext())
+            {
+                Integer no = (Integer) itr.next();
+                sb.append(", sort_");
+                sb.append(no.toString());
+                sb.append(getSortColumnDefinition());
+            }
+            
+            String createTable = "CREATE TABLE " + table + " (" +
+                                    "id INTEGER PRIMARY KEY," +
+                                    "item_id INTEGER REFERENCES item(item_id)" +
+                                    sb.toString() + 
+                                    ")";
+            if (execute)
+            {
+                DatabaseManager.updateQuery(context, createTable);
+            }
+            return createTable;
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }       
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#createPrimaryTable(java.lang.String, java.util.List, boolean)
      */
-    public String createPrimaryTable(String table, List sortCols, boolean execute) throws BrowseException
+    public String createSecondaryTable(String table, List sortCols, boolean execute) throws BrowseException
     {
         try
         {
@@ -487,6 +527,35 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         }
     }
 
+    public void insertIndex(String table, int itemID, Map sortCols)
+            throws BrowseException
+    {
+        try
+        {
+            // create us a row in the index
+            TableRow row = DatabaseManager.create(context, table);
+            
+            // set the primary information for the index
+            row.setColumn("item_id", itemID);
+            
+            // now set the columns for the other sort values
+            Iterator itra = sortCols.keySet().iterator();
+            while (itra.hasNext())
+            {
+                Integer key = (Integer) itra.next();
+                String nValue = (String) sortCols.get(key);
+                row.setColumn("sort_" + key.toString(), utils.truncateSortValue(nValue));
+            }
+            
+            DatabaseManager.update(context, row);
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }
+    }
+    
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#insertIndex(java.lang.String, int, java.lang.String, java.lang.String, java.util.Map)
      */
@@ -544,13 +613,14 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#pruneExcess(java.lang.String, java.lang.String)
      */
-    public void pruneExcess(String table, String map) throws BrowseException
+    public void pruneExcess(String table, String map, boolean withdrawn) throws BrowseException
     {
         TableRowIterator tri = null;
         
         try
         {
-            String query = "SELECT item_id FROM " + table + " WHERE item_id NOT IN ( SELECT item_id FROM item WHERE in_archive = true AND withrdawn = false)";
+            String query = "SELECT item_id FROM " + table + " WHERE item_id NOT IN ( SELECT item_id FROM item WHERE in_archive = 1 AND withdrawn = " +
+                            (withdrawn ? "0" : "1") + ")";
             tri = DatabaseManager.query(context, query);
             while (tri.hasNext())
             {

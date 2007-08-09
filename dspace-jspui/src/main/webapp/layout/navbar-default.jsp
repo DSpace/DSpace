@@ -88,12 +88,17 @@
     }
     
     // get the browse indices
-    Map bis = BrowseIndex.getBrowseIndicesMap();
+    
+	BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
     BrowseInfo binfo = (BrowseInfo) request.getAttribute("browse.info");
     String browseCurrent = "";
     if (binfo != null)
     {
-    	browseCurrent = binfo.getBrowseIndex().getName();
+        BrowseIndex bix = binfo.getBrowseIndex();
+        // Only highlight the current browse, only if it is a metadata index,
+        // or the selected sort option is the default for the index
+        if (bix.isMetadataIndex() || bix.getSortOption() == binfo.getSortOption())
+    		browseCurrent = bix.getName();
     }
 %>
 
@@ -172,10 +177,10 @@
 <%-- Insert the dynamic browse indices here --%>
 
 <%
-	for (int i = 0; i < bis.size(); i++)
+	for (int i = 0; i < bis.length; i++)
 	{
-		BrowseIndex bix = (BrowseIndex) bis.get(new Integer(i + 1));
-		String key = "browse.menu." + bix.getMessageKey();
+		BrowseIndex bix = bis[i];
+		String key = "browse.menu." + bix.getName();
 	%>
 		<tr class="navigationBarItem">
     		<td>

@@ -70,6 +70,7 @@ import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowserScope;
+import org.dspace.browse.SortOption;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -536,11 +537,12 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     
     @SuppressWarnings("unchecked")
     private java.util.List<Item> getRecientlySubmittedItems(Context context, DSpaceObject dso) 
-    throws SQLException
+            throws SQLException
     {
     	if (recentSubmissionItems != null)
     		return recentSubmissionItems;
 
+        String source = ConfigurationManager.getProperty("recent.submissions.index");
     	BrowserScope scope = new BrowserScope(context);
     	if (dso instanceof Collection)
     		scope.setCollection((Collection) dso);
@@ -551,8 +553,14 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     	// FIXME Exception handling
     	try
     	{
-    		scope.setBrowseIndex(BrowseIndex.getBrowseIndex("dateaccessioned"));
-    		BrowseEngine be = new BrowseEngine(context);
+            scope.setBrowseIndex(BrowseIndex.getItemBrowseIndex());
+            for (SortOption so : SortOption.getSortOptions())
+            {
+                if (so.getName().equals(source))
+                    scope.setSortBy(so.getNumber());
+            }
+
+            BrowseEngine be = new BrowseEngine(context);
     		this.recentSubmissionItems = be.browse(scope).getResults();
     	}
     	catch (BrowseException bex)

@@ -221,7 +221,7 @@ public class BrowseListTag extends TagSupport
                 if (cl.hasLink(field))
                 {
                 	browseType = cl.getLinkType(field);
-                	viewFull = BrowseIndex.getBrowseIndex(browseType).isFull();
+                	viewFull = BrowseIndex.getBrowseIndex(browseType).isItemIndex();
                 }
                 
                 

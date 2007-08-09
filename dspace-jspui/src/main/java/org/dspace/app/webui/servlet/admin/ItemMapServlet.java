@@ -373,8 +373,8 @@ public class ItemMapServlet extends DSpaceServlet
     			// set up the browse scope
     			bs.setBrowseIndex(bi);
     			bs.setOrder("ASC");
-    			bs.setValue(name);
-    			bs.setValueFocus(null);
+    			bs.setFilterValue(name);
+    			bs.setJumpToValue(null);
     			bs.setResultsPerPage(10000);	// an arbitrary number (large) for the time being
     			bs.setSortBy(0);
     			bs.setBrowseLevel(1);

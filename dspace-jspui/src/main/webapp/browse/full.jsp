@@ -49,6 +49,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.browse.BrowseInfo" %>
+<%@ page import="org.dspace.browse.SortOption" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
@@ -65,7 +66,6 @@
 	BrowseInfo bi = (BrowseInfo) request.getAttribute("browse.info");
 	BrowseIndex bix = bi.getBrowseIndex();
 	SortOption so = bi.getSortOption();
-	Map sos = bix.getSortOptions();
 
 	// values used by the header
 	String scope = "";
@@ -174,11 +174,19 @@
 	int rpp = bi.getResultsPerPage();
 	
 	// the message key for the type
-	String typeKey = "browse.type." + bix.getName();
+	String typeKey;
+
+	if (bix.isMetadataIndex())
+		typeKey = "browse.type.metadata." + bix.getName();
+	else if (bi.getSortOption() != null)
+		typeKey = "browse.type.item." + bi.getSortOption().getName();
+	else
+		typeKey = "browse.type.item." + bix.getSortOption().getName();
 %>
 
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
 
+<%@page import="java.util.Set"%>
 <dspace:layout titlekey="browse.page-title">
 
 	<%-- Build the header (careful use of spacing) --%>
@@ -327,16 +335,15 @@
 		}
 --%>
 <%
-	if (sos.size() > 1 && bi.getBrowseLevel() > 0)
+	Set<SortOption> sortOptions = SortOption.getSortOptions();
+	if (sortOptions.size() > 1) // && bi.getBrowseLevel() > 0
 	{
 %>
 		<fmt:message key="browse.full.sort-by"/>
 		<select name="sort_by">
 <%
-		Iterator itr = sos.keySet().iterator();
-		while (itr.hasNext())
+		for (SortOption sortBy : sortOptions)
 		{
-			SortOption sortBy = (SortOption) sos.get((Integer) itr.next());
 			String selected = (sortBy.getName().equals(sortedBy) ? "selected=\"selected\"" : "");
 			String mKey = "browse.sort-by." + sortBy.getName();
 			%> <option value="<%= sortBy.getNumber() %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
@@ -454,8 +461,20 @@
 	</div>
 	
     <%-- output the results using the browselist tag --%>
+    <%
+    	if (bix.isMetadataIndex())
+    	{
+    %>
 	<dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getMetadata() %>" />
-
+	<%
+    	}
+    	else
+    	{
+	%>
+	<dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getSortOption().getMetadata() %>" />
+	<%
+    	}
+	%>
 	<%-- give us the bottom report on what we are looking at --%>
 	<div align="center" class="browse_range">
 		<fmt:message key="browse.full.range">

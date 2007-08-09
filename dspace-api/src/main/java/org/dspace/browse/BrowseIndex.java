@@ -42,7 +42,6 @@ package org.dspace.browse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -61,10 +60,14 @@ import org.dspace.core.ConfigurationManager;
 public class BrowseIndex
 {
 	/** the configuration number, as specified in the config */
+    /** used for single metadata browse tables for generating the table name */
     private int number;
     
     /** the name of the browse index, as specified in the config */
     private String name;
+
+    /** the SortOption for this index (only valid for item indexes) */
+    private SortOption sortOption;
     
     /** the value of the metadata, as specified in the config */
     private String metadata;
@@ -75,14 +78,44 @@ public class BrowseIndex
     /** the display type of the metadata, as specified in the config */
     private String displayType;
     
-    /** the message key to use to generate the UI component */
-    private String messageKey;
+    /** base name for tables, sequences */
+    private String tableBaseName;
     
     /** a three part array of the metadata bits (e.g. dc.contributor.author) */
     private String[] mdBits;
+
+    /** array of the configured indexes */
+    private static BrowseIndex[] browseIndexes = null;
+
+    /** additional 'internal' tables that are always defined */
+    private static BrowseIndex itemIndex      = new BrowseIndex("bi_item");
+    private static BrowseIndex withdrawnIndex = new BrowseIndex("bi_withdrawn");
+
+    /**
+     * Ensure noone else can create these
+     */
+    private BrowseIndex()
+    {
+    }
     
-    /** the sort options available for this index */
-    private Map sortOptions = new HashMap();
+    /**
+     * Constructor for creating generic / internal index objects
+     * @param baseName
+     */
+    private BrowseIndex(String baseName)
+    {
+        try
+        {
+            number = -1;
+            tableBaseName = baseName;
+            displayType = "item";
+            sortOption = SortOption.getDefaultSortOption();
+        }
+        catch (BrowseException be)
+        {
+            // FIXME Exception handling
+        }
+    }
     
     /**
      * Create a new BrowseIndex object using the definition from the configuration,
@@ -102,28 +135,64 @@ public class BrowseIndex
      * @param number		the configuration number of this index
      * @throws BrowseException
      */
-    public BrowseIndex(String definition, int number)
+    private BrowseIndex(String definition, int number)
     	throws BrowseException
     {
+        boolean valid = true;
         this.number = number;
         
-        String rx = "(\\w+):([\\w\\.\\*]+):(\\w+):(\\w+)";
+        String rx = "(\\w+):(\\w+):([\\w\\.\\*]+):?(\\w*)";
         Pattern pattern = Pattern.compile(rx);
         Matcher matcher = pattern.matcher(definition);
         
-        if (!matcher.matches())
+        if (matcher.matches())
+        {
+            name = matcher.group(1);
+            displayType = matcher.group(2);
+            
+            if (isMetadataIndex())
+            {
+                metadata = matcher.group(3);
+                datatype = matcher.group(4);
+
+                if (metadata == null || metadata.isEmpty())
+                    valid = false;
+                
+                if ((datatype == null || datatype.isEmpty()))
+                    valid = false;
+                
+                tableBaseName = makeTableBaseName(number);
+            }
+            else if (isItemIndex())
+            {
+                String sortName = matcher.group(3);
+
+                for (SortOption so : SortOption.getSortOptions())
+                {
+                    if (so.getName().equals(sortName))
+                        sortOption = so;
+                }
+
+                if (sortOption == null)
+                    valid = false;
+                
+                tableBaseName = getItemBrowseIndex().tableBaseName;
+            }
+            else
+            {
+                valid = false;
+            }
+        }
+        else
+        {
+            valid = false;
+        }
+        
+        if (!valid)
         {
             throw new BrowseException("Browse Index configuration is not valid: webui.browse.index." + 
                     number + " = " + definition);
         }
-        
-        messageKey = name = matcher.group(1);
-        metadata = matcher.group(2);
-        datatype = matcher.group(3);
-        displayType = matcher.group(4);
-        
-        // now load the sort options
-        loadSortOptions();
     }
 
     /**
@@ -131,64 +200,54 @@ public class BrowseIndex
 	 */
 	public String getDataType()
 	{
+        if (sortOption != null)
+            return sortOption.getType();
+
 		return datatype;
 	}
 
 	/**
 	 * @param datatype The datatype to set.
 	 */
-	public void setDataType(String datatype)
-	{
-		this.datatype = datatype;
-	}
+//	public void setDataType(String datatype)
+//	{
+//		this.datatype = datatype;
+//	}
 
 	/**
 	 * @return Returns the displayType.
 	 */
 	public String getDisplayType()
 	{
-		return displayType;
+        return displayType;
 	}
 
 	/**
 	 * @param displayType The displayType to set.
 	 */
-	public void setDisplayType(String displayType)
-	{
-		this.displayType = displayType;
-	}
+//	public void setDisplayType(String displayType)
+//	{
+//		this.displayType = displayType;
+//	}
 
 	/**
 	 * @return Returns the mdBits.
 	 */
 	public String[] getMdBits()
 	{
-		return mdBits;
+	    if (isMetadataIndex())
+	        return mdBits;
+	    
+	    return null;
 	}
 
 	/**
 	 * @param mdBits The mdBits to set.
 	 */
-	public void setMdBits(String[] mdBits)
-	{
-		this.mdBits = mdBits;
-	}
-
-	/**
-	 * @return Returns the messageKey.
-	 */
-	public String getMessageKey()
-	{
-		return messageKey;
-	}
-
-	/**
-	 * @param messageKey The messageKey to set.
-	 */
-	public void setMessageKey(String messageKey)
-	{
-		this.messageKey = messageKey;
-	}
+//	public void setMdBits(String[] mdBits)
+//	{
+//		this.mdBits = mdBits;
+//	}
 
 	/**
 	 * @return Returns the metadata.
@@ -201,10 +260,10 @@ public class BrowseIndex
 	/**
 	 * @param metadata The metadata to set.
 	 */
-	public void setMetadata(String metadata)
-	{
-		this.metadata = metadata;
-	}
+//	public void setMetadata(String metadata)
+//	{
+//		this.metadata = metadata;
+//	}
 
 	/**
 	 * @return Returns the name.
@@ -217,35 +276,19 @@ public class BrowseIndex
 	/**
 	 * @param name The name to set.
 	 */
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
+//	public void setName(String name)
+//	{
+//		this.name = name;
+//	}
+	
 	/**
-	 * @return Returns the number.
+	 * Get the SortOption associated with this index.
 	 */
-	public int getNumber()
+	public SortOption getSortOption()
 	{
-		return number;
+	    return sortOption;
 	}
-
-	/**
-	 * @param number The number to set.
-	 */
-	public void setNumber(int number)
-	{
-		this.number = number;
-	}
-
-	/**
-	 * @param sortOptions The sortOptions to set.
-	 */
-	public void setSortOptions(Map sortOptions)
-	{
-		this.sortOptions = sortOptions;
-	}
-
+	
 	/**
 	 * Populate the internal array containing the bits of metadata, for
 	 * ease of use later
@@ -254,7 +297,8 @@ public class BrowseIndex
     {
     	try
     	{
-    		mdBits = interpretField(metadata, null);
+    	    if (isMetadataIndex())
+    	        mdBits = interpretField(metadata, null);
     	}
     	catch(IOException e)
     	{
@@ -272,7 +316,7 @@ public class BrowseIndex
 	 */
     public String getSequenceName(boolean isDistinct, boolean isMap)
     {
-    	return BrowseIndex.getSequenceName(this.number, isDistinct, isMap);
+        return BrowseIndex.getSequenceName(tableBaseName, isDistinct, isMap);
     }
     
     /**
@@ -285,24 +329,36 @@ public class BrowseIndex
      */
     public static String getSequenceName(int number, boolean isDistinct, boolean isMap)
     {
-    	String baseName = "bi_" + number;
-    	
-    	if (isDistinct)
-    	{
-    		baseName = baseName + "_dis";
-    	}
-    	else if (isMap)
-    	{
-    		baseName = baseName + "_dmap";
-    	}
-    	
-    	baseName = baseName + "_seq";
-    	
-    	return baseName;
+        return BrowseIndex.getSequenceName(makeTableBaseName(number), isDistinct, isMap);
+    }
+    
+    /**
+     * Generate a sequence name from the given base
+     * @param baseName
+     * @param isDistinct
+     * @param isMap
+     * @return
+     */
+    private static String getSequenceName(String baseName, boolean isDistinct, boolean isMap)
+    {
+        if (isDistinct)
+        {
+            baseName = baseName + "_dis";
+        }
+        else if (isMap)
+        {
+            baseName = baseName + "_dmap";
+        }
+        
+        baseName = baseName + "_seq";
+        
+        return baseName;
     }
     
     /**
      * Get the name of the table for the given set of circumstances
+     * This is provided solely for cleaning the database, where you are
+     * trying to create table names that may not be reflected in the current index
      * 
      * @param number		the index configuration number
      * @param isCommunity	whether this is a community constrained index (view)
@@ -313,8 +369,20 @@ public class BrowseIndex
      */
     public static String getTableName(int number, boolean isCommunity, boolean isCollection, boolean isDistinct, boolean isMap)
     {
-    	String baseName = "bi_" + number;
-    	
+        return BrowseIndex.getTableName(makeTableBaseName(number), isCommunity, isCollection, isDistinct, isMap);
+    }
+    
+    /**
+     * Generate a table name from the given base
+     * @param baseName
+     * @param isCommunity
+     * @param isCollection
+     * @param isDistinct
+     * @param isMap
+     * @return
+     */
+    private static String getTableName(String baseName, boolean isCommunity, boolean isCollection, boolean isDistinct, boolean isMap)
+    {
     	// isDistinct is meaningless in relation to isCommunity and isCollection
     	// so we bounce that back first, ignoring other arguments
     	if (isDistinct)
@@ -352,7 +420,10 @@ public class BrowseIndex
      */
     public String getTableName(boolean isCommunity, boolean isCollection, boolean isDistinct, boolean isMap)
     {
-    	return BrowseIndex.getTableName(number, isCommunity, isCollection, isDistinct, isMap);
+        if (this.isMetadataIndex())
+            return BrowseIndex.getTableName(number, isCommunity, isCollection, isDistinct, isMap);
+        
+        return BrowseIndex.getTableName(tableBaseName, isCommunity, isCollection, isDistinct, isMap);
     }
     
     /**
@@ -467,10 +538,10 @@ public class BrowseIndex
      * 
      * @return	true if title type, false if not
      */
-    public boolean isTitle()
-    {
-        return "title".equals(datatype);
-    }
+//    public boolean isTitle()
+//    {
+//        return "title".equals(getDataType());
+//    }
     
     /**
      * Is the browse index type for a date?
@@ -479,7 +550,7 @@ public class BrowseIndex
      */
     public boolean isDate()
     {
-        return "date".equals(datatype);
+        return "date".equals(getDataType());
     }
     
     /**
@@ -487,19 +558,19 @@ public class BrowseIndex
      * 
      * @return	true if plain text type, false if not
      */
-    public boolean isText()
-    {
-        return "text".equals(datatype);
-    }
+//    public boolean isText()
+//    {
+//        return "text".equals(getDataType());
+//    }
     
     /**
      * Is the browse index of display type single?
      * 
      * @return true if singe, false if not
      */
-    public boolean isSingle()
+    public boolean isMetadataIndex()
     {
-        return "single".equals(displayType);
+        return "metadata".equals(displayType);
     }
     
     /**
@@ -507,47 +578,32 @@ public class BrowseIndex
      * 
      * @return	true if full, false if not
      */
-    public boolean isFull()
+    public boolean isItemIndex()
     {
-        return "full".equals(displayType);
+        return "item".equals(displayType);
     }
     
     /**
-     * @return	the SortOptions object for this index
-     */
-    public Map getSortOptions()
-    {
-    	return sortOptions;
-    }
-    
-    /**
-     * For the specific browse index, load the sort options from
-     * configuration
-     * 
+     * Get the field for sorting associated with this index
+     * @return
      * @throws BrowseException
      */
-    public void loadSortOptions()
-    	throws BrowseException
+    public String getSortField() throws BrowseException
     {
-    	Enumeration en = ConfigurationManager.propertyNames();
-        
-        ArrayList browseIndices = new ArrayList();
-        
-        String rx = "webui\\.browse\\.sort-option\\.(\\d+)";
-        Pattern pattern = Pattern.compile(rx);
-        
-        while (en.hasMoreElements())
+        String focusField;
+        if (isMetadataIndex())
         {
-            String property = (String) en.nextElement();
-            Matcher matcher = pattern.matcher(property);
-            if (matcher.matches())
-            {
-                int number = Integer.parseInt(matcher.group(1));
-                String option = ConfigurationManager.getProperty(property);
-                SortOption so = new SortOption(number, option);
-                sortOptions.put(new Integer(number), so);
-            }
+            focusField = "sort_value";
         }
+        else
+        {
+            if (sortOption != null)
+                focusField = "sort_" + sortOption.getNumber();
+            else
+                focusField = "sort_1";  // Use the first sort column
+        }
+        
+        return focusField;
     }
     
     /**
@@ -574,23 +630,6 @@ public class BrowseIndex
         returnTables = (String[]) tables.toArray((String[]) returnTables);
         
         return returnTables;
-    }
-    
-    /**
-     * @deprecated
-     * @return
-     * @throws BrowseException
-     */
-    public static Map getBrowseIndicesMap()
-    	throws BrowseException
-    {
-    	Map map = new HashMap();
-    	BrowseIndex[] bis = getBrowseIndices();
-    	for (int i = 0 ; i < bis.length; i++)
-    	{
-    		map.put(new Integer(bis[i].getNumber()), bis[i]);
-    	}
-    	return map;
     }
     
     /**
@@ -629,8 +668,8 @@ public class BrowseIndex
     }
     
     /**
-     * Get the browse index from configuration with the specified name.  The
-     * name is the first part of the browse configuration
+     * Get the browse index from configuration with the specified name.
+     * The name is the first part of the browse configuration
      * 
      * @param name		the name to retrieve
      * @return			the specified browse index
@@ -639,30 +678,50 @@ public class BrowseIndex
     public static BrowseIndex getBrowseIndex(String name)
     	throws BrowseException
     {
-        Enumeration en = ConfigurationManager.propertyNames();
-        
-        ArrayList browseIndices = new ArrayList();
-        
-        String rx = "webui\\.browse\\.index\\.(\\d+)";
-        Pattern pattern = Pattern.compile(rx);
-        
-        while (en.hasMoreElements())
+        for (BrowseIndex bix : BrowseIndex.getBrowseIndices())
         {
-            String property = (String) en.nextElement();
-            Matcher matcher = pattern.matcher(property);
-            if (matcher.matches())
-            {
-                int number = Integer.parseInt(matcher.group(1));
-                String definition = ConfigurationManager.getProperty(property);
-                BrowseIndex bi = new BrowseIndex(definition, number);
-                if (bi.getName().equals(name))
-                {
-                    return bi;
-                }
-            }
+            if (bix.getName().equals(name))
+                return bix;
         }
          
         return null;
+    }
+    
+    /**
+     * Get the configured browse index that is defined to use this sort option
+     * 
+     * @param so
+     * @return
+     * @throws BrowseException
+     */
+    public static BrowseIndex getBrowseIndex(SortOption so) throws BrowseException
+    {
+        for (BrowseIndex bix : BrowseIndex.getBrowseIndices())
+        {
+            if (bix.getSortOption() == so)
+                return bix;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Get the internally defined browse index for archived items
+     * 
+     * @return
+     */
+    public static BrowseIndex getItemBrowseIndex()
+    {
+        return BrowseIndex.itemIndex;
+    }
+    
+    /**
+     * Get the internally defined browse index for withdrawn items
+     * @return
+     */
+    public static BrowseIndex getWithdrawnBrowseIndex()
+    {
+        return BrowseIndex.withdrawnIndex;
     }
     
     /**
@@ -695,5 +754,37 @@ public class BrowseIndex
     	}
     	
     	return field;
+    }
+    
+    /**
+     * Does the browse index represent one of the internal item indexes
+     * 
+     * @param bi
+     * @return
+     */
+    public static boolean isInternalIndex(BrowseIndex bi)
+    {
+        return (bi == itemIndex || bi == withdrawnIndex);
+    }
+
+    /**
+     * Does this browse index represent one of the internal item indexes
+     * 
+     * @param bi
+     * @return
+     */
+    public boolean isInternalIndex()
+    {
+        return (this == itemIndex || this == withdrawnIndex);
+    }
+
+    /**
+     * Generate a base table name
+     * @param number
+     * @return
+     */
+    private static String makeTableBaseName(int number)
+    {
+        return "bi_" + Integer.toString(number);
     }
 }

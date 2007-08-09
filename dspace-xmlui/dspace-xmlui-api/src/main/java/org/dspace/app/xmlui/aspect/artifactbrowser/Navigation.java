@@ -255,12 +255,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         try
         {
             // Get a Map of all the browse tables
-            Map<Integer, BrowseIndex> bis = BrowseIndex.getBrowseIndicesMap();
-            for (int i = 0; i < bis.size(); i++)
+            BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
+            for (BrowseIndex bix : bis)
             {
                 // Create a Map of the query parameters for this link
                 Map<String, String> queryParams = new HashMap<String, String>();
-                BrowseIndex bix = (BrowseIndex) bis.get(new Integer(i + 1));
 
                 queryParams.put("type", bix.getName());
                 

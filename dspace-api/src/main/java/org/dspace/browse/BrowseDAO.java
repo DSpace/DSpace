@@ -187,7 +187,7 @@ public interface BrowseDAO
 	 * 
 	 * @return	the name of the focus field
 	 */
-	public String getFocusField();
+	public String getJumpToField();
 	
 	/**
 	 * Set the focus field upon which we will match a value from which to start
@@ -196,7 +196,7 @@ public interface BrowseDAO
 	 * 
 	 * param focusField		the name of the focus field
 	 */
-	public void setFocusField(String focusField);
+	public void setJumpToField(String focusField);
 	
 	/**
 	 * Get the value at which the browse will start.  The value supplied here will
@@ -204,7 +204,7 @@ public interface BrowseDAO
 	 * 
 	 * @return		the value to start browsing on
 	 */
-	public String getFocusValue();
+	public String getJumpToValue();
 	
 	/**
 	 * Set the value upon which to start the browse from.  The value supplied here
@@ -212,7 +212,7 @@ public interface BrowseDAO
 	 * 
 	 * @param focusValue	the value in the focus field on which to start browsing
 	 */
-	public void setFocusValue(String focusValue);
+	public void setJumpToValue(String focusValue);
 	
 	/**
 	 * get the integer number which is the limit of the results that will be returned
@@ -334,7 +334,7 @@ public interface BrowseDAO
 	 * 
 	 * @return	the value to which to constrain results
 	 */
-	public String getValue();
+	public String getFilterValue();
 	
 	/**
 	 * Set the value to which all our browse results should be constrained.  For
@@ -343,7 +343,7 @@ public interface BrowseDAO
 	 * 
 	 * @param value	the value to which to constrain results
 	 */
-	public void setValue(String value);
+	public void setFilterValue(String value);
 	
 	/**
 	 * Get the name of the field in which the value to constrain results is
@@ -351,7 +351,7 @@ public interface BrowseDAO
 	 * 
 	 * @return	the name of the field
 	 */
-	public String getValueField();
+	public String getFilterValueField();
 	
 	/**
 	 * Set he name of the field in which the value to constrain results is 
@@ -359,7 +359,7 @@ public interface BrowseDAO
 	 * 
 	 * @param valueField 	the name of the field
 	 */
-	public void setValueField(String valueField);
+	public void setFilterValueField(String valueField);
 	
 	/**
 	 * Set whether this is a distinct value browse or not

@@ -67,6 +67,7 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
+import org.dspace.browse.SortOption;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -356,6 +357,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         if (recentSubmittedItems != null)
             return recentSubmittedItems;
 
+        String source = ConfigurationManager.getProperty("recent.submissions.index");
         BrowserScope scope = new BrowserScope(context);
         scope.setCommunity(community);
         scope.setResultsPerPage(RECENT_SUBMISISONS);
@@ -363,7 +365,12 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         // FIXME Exception Handling
         try
         {
-        	scope.setBrowseIndex(BrowseIndex.getBrowseIndex("dateaccessioned"));
+        	scope.setBrowseIndex(BrowseIndex.getItemBrowseIndex());
+            for (SortOption so : SortOption.getSortOptions())
+            {
+                if (so.getName().equals(source))
+                    scope.setSortBy(so.getNumber());
+            }
 
         	BrowseEngine be = new BrowseEngine(context);
         	this.recentSubmittedItems = be.browse(scope).getResults();

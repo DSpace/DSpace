@@ -65,13 +65,13 @@ public class BrowserScope
 	private int sortBy;
 	
 	/** the value to restrict the browse to */
-	private String value;
+	private String filterValue;
 
     /** the language of the value to restrict the browse to */
-    private String valueLang;
+    private String filterValueLang;
     
 	/** the item id focus of the browse */
-	private int focus;
+	private int jumpItemId;
 	
 	/** the string value to start with */
 	private String startsWith;
@@ -89,10 +89,10 @@ public class BrowserScope
 	private SortOption sortOption;
 	
 	/** the value upon which to focus */
-	private String vFocus;
+	private String jumpValue;
 
     /** the language of the value upon which to focus */
-    private String vFocusLang;
+    private String jumpValueLang;
     
 	/** the browse level */
 	private int level = 0;
@@ -203,8 +203,9 @@ public class BrowserScope
 	 * @param browseIndex The browseIndex to set.
 	 */
 	public void setBrowseIndex(BrowseIndex browseIndex)
+	    throws BrowseException
 	{
-		this.browseIndex = browseIndex;
+        this.browseIndex = browseIndex;
 	}
 
 	/**
@@ -258,49 +259,49 @@ public class BrowserScope
 	/**
 	 * @return Returns the focus.
 	 */
-	public int getFocus()
+	public int getJumpToItem()
 	{
-		return focus;
+		return jumpItemId;
 	}
 
 	/**
-	 * @param focus The focus to set.
+	 * @param itemId The focus to set.
 	 */
-	public void setFocus(int focus)
+	public void setJumpToItem(int itemId)
 	{
-		this.focus = focus;
+		this.jumpItemId = itemId;
 	}
 
 	/**
 	 * @return	the value to focus on
 	 */
-	public String getValueFocus()
+	public String getJumpToValue()
 	{
-		return vFocus;
+		return jumpValue;
 	}
 	
 	/**
 	 * @param value		the value to focus on
 	 */
-	public void setValueFocus(String value)
+	public void setJumpToValue(String value)
 	{
-		this.vFocus = value;
+		this.jumpValue = value;
 	}
 
     /**
      * @return  the language of the value to focus on
      */
-    public String getValueFocusLang()
+    public String setJumpToValueLang()
     {
-        return vFocusLang;
+        return jumpValueLang;
     }
     
     /**
      * @param valueLang     the language of the value to focus on
      */
-    public void setValueFocusLang(String valueLang)
+    public void setJumpToValueLang(String valueLang)
     {
-        this.vFocusLang = valueLang;
+        this.jumpValueLang = valueLang;
     }
 	
 	/**
@@ -349,8 +350,9 @@ public class BrowserScope
 	 * @param sortBy The sortBy to set.
 	 */
 	public void setSortBy(int sortBy)
+	    throws BrowseException
 	{
-		this.sortBy = sortBy;
+        this.sortBy = sortBy;
 	}
 
 	/**
@@ -362,24 +364,51 @@ public class BrowserScope
 	public SortOption getSortOption()
 		throws BrowseException
 	{
+	    // If a sortOption hasn't been set, work out the default
 		if (sortOption == null)
 		{
+		    // We need a browse index first though
 			if (browseIndex != null)
 			{
-				if (sortBy <= 0)
+			    // If a sorting hasn't been specified, and it's a metadata browse
+				if (sortBy <= 0 && browseIndex.isMetadataIndex())
 				{
+				    // Create a dummy sortOption for the metadata sort
 					String dataType = browseIndex.getDataType();
 					String type = ("date".equals(dataType) ? "date" : "text");
 					sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(), type);
 				}
 				else
 				{
-					Map map = browseIndex.getSortOptions();
-					SortOption so = (SortOption) map.get(new Integer(sortBy));
-					sortOption = so;
+				    // If a sorting hasn't been specified
+	                if (sortBy <= 0)
+	                {
+	                    // Get the sort option from the index
+	                    sortOption = browseIndex.getSortOption();
+	                    
+	                    if (sortOption == null)
+	                    {
+	                        // No sort option, so default to the first one defined in the config
+	                        for (SortOption so : SortOption.getSortOptions())
+	                        {
+	                            sortOption = so;
+	                            break;
+	                        }
+	                    }
+	                }
+					else
+					{
+					    // A sorting has been specified, so get it from the configured sort columns
+                        for (SortOption so : SortOption.getSortOptions())
+                        {
+                            if (so.getNumber() == sortBy)
+                                sortOption = so;
+                        }
+					}
 				}
 			}
 		}
+		
 		return sortOption;
 	}
 	
@@ -400,35 +429,39 @@ public class BrowserScope
 	}
 
 	/**
+     * Used for second-level item browses,
+     * to only display items that match the value 
 	 * @return Returns the value.
 	 */
-	public String getValue()
+	public String getFilterValue()
 	{
-		return value;
+		return filterValue;
 	}
 
     /**
+     * Used for second-level item browses,
+     * to only display items that match the value 
      * @param value The value to set.
      */
-    public void setValue(String value)
+    public void setFilterValue(String value)
     {
-        this.value = value;
+        this.filterValue = value;
     }
 
     /**
      * @return Returns the language.
      */
-    public String getValueLang()
+    public String getFilterValueLang()
     {
-        return valueLang;
+        return filterValueLang;
     }
 
     /**
-     * @param valueLang The language to set.
+     * @param lang The language to set.
      */
-    public void setValueLang(String valueLang)
+    public void setFilterValueLang(String lang)
     {
-        this.valueLang = valueLang;
+        this.filterValueLang = lang;
     }
     
 	/**
@@ -470,9 +503,9 @@ public class BrowserScope
 	/**
 	 * @return	true if has value, false if not
 	 */
-	public boolean hasValue()
+	public boolean hasFilterValue()
 	{
-		if (value == null || "".equals(value))
+		if (filterValue == null || "".equals(filterValue))
 		{
 			return false;
 		}
@@ -482,9 +515,9 @@ public class BrowserScope
 	/**
 	 * @return	true if has item focus, false if not
 	 */
-	public boolean hasFocus()
+	public boolean hasJumpToItem()
 	{
-		if (focus == -1)
+		if (jumpItemId == -1)
 		{
 			return false;
 		}
@@ -494,9 +527,9 @@ public class BrowserScope
 	/**
 	 * @return	true if has value focus, false if not
 	 */
-	public boolean hasValueFocus()
+	public boolean hasJumpToValue()
 	{
-		if (this.vFocus != null)
+		if (this.jumpValue != null)
 		{
 			return true;
 		}

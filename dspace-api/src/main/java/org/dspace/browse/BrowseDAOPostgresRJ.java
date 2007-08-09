@@ -946,7 +946,7 @@ public class BrowseDAOPostgresRJ implements BrowseDAO
 	/* (non-Javadoc)
 	 * @see org.dspace.browse.BrowseDAO#getFocusField()
 	 */
-	public String getFocusField()
+	public String getJumpToField()
 	{
 		return focusField;
 	}
@@ -955,7 +955,7 @@ public class BrowseDAOPostgresRJ implements BrowseDAO
 	/* (non-Javadoc)
 	 * @see org.dspace.browse.BrowseDAO#setFocusField(java.lang.String)
 	 */
-	public void setFocusField(String focusField)
+	public void setJumpToField(String focusField)
 	{
 		this.focusField = focusField;
 		setRebuildQuery(true);
@@ -965,7 +965,7 @@ public class BrowseDAOPostgresRJ implements BrowseDAO
 	/* (non-Javadoc)
 	 * @see org.dspace.browse.BrowseDAO#getFocusValue()
 	 */
-	public String getFocusValue()
+	public String getJumpToValue()
 	{
 		return focusValue;
 	}
@@ -974,7 +974,7 @@ public class BrowseDAOPostgresRJ implements BrowseDAO
 	/* (non-Javadoc)
 	 * @see org.dspace.browse.BrowseDAO#setFocusValue(java.lang.String)
 	 */
-	public void setFocusValue(String focusValue)
+	public void setJumpToValue(String focusValue)
 	{
 		this.focusValue = focusValue;
 		setRebuildQuery(true);
@@ -1113,7 +1113,7 @@ public class BrowseDAOPostgresRJ implements BrowseDAO
 	/* (non-Javadoc)
 	 * @see org.dspace.browse.BrowseDAO#getValue()
 	 */
-	public String getValue()
+	public String getFilterValue()
 	{
 		return value;
 	}
@@ -1121,7 +1121,7 @@ public class BrowseDAOPostgresRJ implements BrowseDAO
 	/* (non-Javadoc)
 	 * @see org.dspace.browse.BrowseDAO#setValue(java.lang.String)
 	 */
-	public void setValue(String value)
+	public void setFilterValue(String value)
 	{
 		this.value = value;
 		setRebuildQuery(true);
@@ -1131,7 +1131,7 @@ public class BrowseDAOPostgresRJ implements BrowseDAO
 	/* (non-Javadoc)
 	 * @see org.dspace.browse.BrowseDAO#getValueField()
 	 */
-	public String getValueField()
+	public String getFilterValueField()
 	{
 		return valueField;
 	}
@@ -1140,7 +1140,7 @@ public class BrowseDAOPostgresRJ implements BrowseDAO
 	/* (non-Javadoc)
 	 * @see org.dspace.browse.BrowseDAO#setValueField(java.lang.String)
 	 */
-	public void setValueField(String valueField)
+	public void setFilterValueField(String valueField)
 	{
 		this.valueField = valueField;
 		setRebuildQuery(true);
