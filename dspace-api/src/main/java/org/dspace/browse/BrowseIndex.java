@@ -155,10 +155,10 @@ public class BrowseIndex
                 metadata = matcher.group(3);
                 datatype = matcher.group(4);
 
-                if (metadata == null || metadata.isEmpty())
+                if (metadata == null || metadata.equals(""))
                     valid = false;
                 
-                if ((datatype == null || datatype.isEmpty()))
+                if (datatype == null || datatype.equals(""))
                     valid = false;
                 
                 tableBaseName = makeTableBaseName(number);
