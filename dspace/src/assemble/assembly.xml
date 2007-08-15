@@ -70,7 +70,7 @@
          </includes>
          <binaries>
             <includeDependencies>false</includeDependencies>
-            <outputDirectory>webapps/${artifactId}</outputDirectory>
+            <outputDirectory>webapps</outputDirectory>
             <outputFileNameMapping>
                ${artifactId}
             </outputFileNameMapping>
