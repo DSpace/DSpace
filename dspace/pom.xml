@@ -85,6 +85,46 @@
         <module>../dspace-xmlui</module>
       </modules>
     </profile>
+    
+    <!-- 
+      Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
+     -->
+    <profile>
+      <id>xmlui-api</id>
+      <activation>
+        <file>
+          <exists>../dspace-xmlui-api/pom.xml</exists>
+        </file>
+      </activation>
+      <modules>
+        <module>../dspace-xmlui-api</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>xmlui-wing</id>
+      <activation>
+        <file>
+          <exists>../dspace-xmlui-wing/pom.xml</exists>
+        </file>
+      </activation>
+      <modules>
+        <module>../dspace-xmlui-wing</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>xmlui-webapp</id>
+      <activation>
+        <file>
+          <exists>../dspace-xmlui-webapp/pom.xml</exists>
+        </file>
+      </activation>
+      <modules>
+        <module>../dspace-xmlui-webapp</module>
+      </modules>
+    </profile>
+    
     <!-- 
       Builds LNI WAR for DSpace
     -->
@@ -99,6 +139,46 @@
         <module>../dspace-lni</module>
       </modules>
     </profile>
+    
+    <!-- 
+      Builds each separate LNI module for the LNI war (for development/Eclipse)
+    -->
+    <profile>
+      <id>lni-core</id>
+      <activation>
+        <file>
+          <exists>../dspace-lni-core/pom.xml</exists>
+        </file>
+      </activation>
+      <modules>
+        <module>../dspace-lni-core</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>lni-client</id>
+      <activation>
+        <file>
+          <exists>../dspace-lni-client/pom.xml</exists>
+        </file>
+      </activation>
+      <modules>
+        <module>../dspace-lni-client</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>lni-webapp</id>
+      <activation>
+        <file>
+          <exists>../dspace-lni-webapp/pom.xml</exists>
+        </file>
+      </activation>
+      <modules>
+        <module>../dspace-lni-webapp</module>
+      </modules>
+    </profile>
+    
     <!-- 
       Builds Language Packs for DSpace
     -->
