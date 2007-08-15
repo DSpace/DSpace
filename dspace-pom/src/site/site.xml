@@ -28,15 +28,7 @@
       <item name="DSpace Foundation" href="http://www.dspace.org"/> 
     </links> 
      
-    <menu name="Projects">
-      <item name="DSpace" href="../dspace"/>
-      <item name="DSpace API" href="../dspace-api"/>
-      <item name="DSpace I18N" href="../language=packs"/>
-      <item name="DSpace JSPUI" href="../dspace-jspui"/>
-      <item name="DSpace OAI" href="../dspace-oai"/>
-      <item name="DSpace LNI" href="../dspace-lni"/>
-      <item name="DSpace XMLUI" href="../dspace-xmlui"/>
-    </menu> 
+    <menu ref="modules" inherit="Top" />
 
     <menu name="Quick Links"> 
       <item name="Foundation" href="http://www.dspace.org"/> 
