@@ -15,14 +15,6 @@ Built on Oct 05, 2005 (05:23:37 EDT)-->
   </schema>
  </wsdl:types>
 
-   <wsdl:message name="lookupRequest">
-
-      <wsdl:part name="handle" type="xsd:string"/>
-
-      <wsdl:part name="bitstreamPid" type="xsd:string"/>
-
-   </wsdl:message>
-
    <wsdl:message name="propfindRequest">
 
       <wsdl:part name="uri" type="xsd:string"/>
@@ -32,6 +24,14 @@ Built on Oct 05, 2005 (05:23:37 EDT)-->
       <wsdl:part name="depth" type="xsd:int"/>
 
       <wsdl:part name="types" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="lookupRequest">
+
+      <wsdl:part name="handle" type="xsd:string"/>
+
+      <wsdl:part name="bitstreamPid" type="xsd:string"/>
 
    </wsdl:message>
 
@@ -61,15 +61,15 @@ Built on Oct 05, 2005 (05:23:37 EDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="copyResponse">
-
-      <wsdl:part name="copyReturn" type="xsd:int"/>
-
-   </wsdl:message>
-
    <wsdl:message name="LNIRemoteException">
 
       <wsdl:part name="fault" type="impl:LNIRemoteException"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="copyResponse">
+
+      <wsdl:part name="copyReturn" type="xsd:int"/>
 
    </wsdl:message>
 
@@ -88,26 +88,6 @@ Built on Oct 05, 2005 (05:23:37 EDT)-->
    </wsdl:message>
 
    <wsdl:portType name="LNISoapServlet">
-
-      <wsdl:operation name="propfind" parameterOrder="uri doc depth types">
-
-         <wsdl:input message="impl:propfindRequest" name="propfindRequest"/>
-
-         <wsdl:output message="impl:propfindResponse" name="propfindResponse"/>
-
-         <wsdl:fault message="impl:LNIRemoteException" name="LNIRemoteException"/>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="proppatch" parameterOrder="uri doc">
-
-         <wsdl:input message="impl:proppatchRequest" name="proppatchRequest"/>
-
-         <wsdl:output message="impl:proppatchResponse" name="proppatchResponse"/>
-
-         <wsdl:fault message="impl:LNIRemoteException" name="LNIRemoteException"/>
-
-      </wsdl:operation>
 
       <wsdl:operation name="copy" parameterOrder="source destination depth overwrite keepProperties">
 
@@ -129,59 +109,31 @@ Built on Oct 05, 2005 (05:23:37 EDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="propfind" parameterOrder="uri doc depth types">
+
+         <wsdl:input message="impl:propfindRequest" name="propfindRequest"/>
+
+         <wsdl:output message="impl:propfindResponse" name="propfindResponse"/>
+
+         <wsdl:fault message="impl:LNIRemoteException" name="LNIRemoteException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="proppatch" parameterOrder="uri doc">
+
+         <wsdl:input message="impl:proppatchRequest" name="proppatchRequest"/>
+
+         <wsdl:output message="impl:proppatchResponse" name="proppatchResponse"/>
+
+         <wsdl:fault message="impl:LNIRemoteException" name="LNIRemoteException"/>
+
+      </wsdl:operation>
+
    </wsdl:portType>
 
    <wsdl:binding name="DSpaceLNISoapBinding" type="impl:LNISoapServlet">
 
       <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
-
-      <wsdl:operation name="propfind">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="propfindRequest">
-
-            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="propfindResponse">
-
-            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="LNIRemoteException">
-
-            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="LNIRemoteException" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="proppatch">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="proppatchRequest">
-
-            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="proppatchResponse">
-
-            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="LNIRemoteException">
-
-            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="LNIRemoteException" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
 
       <wsdl:operation name="copy">
 
@@ -218,6 +170,54 @@ Built on Oct 05, 2005 (05:23:37 EDT)-->
          </wsdl:input>
 
          <wsdl:output name="lookupResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="LNIRemoteException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="LNIRemoteException" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="propfind">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="propfindRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="propfindResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="LNIRemoteException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="LNIRemoteException" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="proppatch">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="proppatchRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="proppatchResponse">
 
             <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://dspace.org/xmlns/lni" use="encoded"/>
 
