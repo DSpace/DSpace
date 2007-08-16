@@ -59,10 +59,10 @@
         /xmlui/cocoon/aspects/ directory followed by a slash.
     -->
     <aspects>
-        <aspect name="Artifact Browser" path="ArtifactBrowser/" />
-        <aspect name="E-Person" path="EPerson/" />
-        <aspect name="Submission and Workflow" path="Submission/" />
-        <aspect name="Administration" path="Administrative/" />
+        <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
+        <aspect name="E-Person" path="resource://aspects/EPerson/" />
+        <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
+        <aspect name="Administration" path="resource://aspects/Administrative/" />
 
         <!-- 
             This aspect tests the various possible DRI features, 
