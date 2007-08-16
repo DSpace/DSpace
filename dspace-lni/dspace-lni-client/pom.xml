@@ -18,6 +18,22 @@
       <version>1.5-SNAPSHOT</version>
    </parent>
 
+    <repositories>
+        <repository>
+            <id>maven.dspace.org</id>
+            <name>DSpace Maven Repository</name>
+            <url>http://maven.dspace.org</url>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    
    <scm>
       <connection>
          scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-client
