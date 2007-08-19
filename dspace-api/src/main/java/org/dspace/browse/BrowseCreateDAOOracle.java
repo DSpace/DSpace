@@ -619,8 +619,15 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         
         try
         {
-            String query = "SELECT item_id FROM " + table + " WHERE item_id NOT IN ( SELECT item_id FROM item WHERE in_archive = 1 AND withdrawn = " +
-                            (withdrawn ? "0" : "1") + ")";
+            String query = "SELECT item_id FROM " + table + " WHERE item_id NOT IN ( SELECT item_id FROM item WHERE ";
+
+            if (withdrawn)
+                query += "withdrawn = 1";
+            else
+                query += "in_archive = 1 AND withdrawn = 0";
+
+            query += ")";
+
             tri = DatabaseManager.query(context, query);
             while (tri.hasNext())
             {

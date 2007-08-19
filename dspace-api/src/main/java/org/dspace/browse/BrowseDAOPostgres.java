@@ -138,6 +138,11 @@ public class BrowseDAOPostgres implements BrowseDAO
     
     private String whereClauseOperator = "";
 
+    // FIXME Would be better to join to item table and get the correct values
+    /** flags for what the items represent */
+    private boolean itemsInArchive = true;
+    private boolean itemsWithdrawn = false;
+
     /**
      * Required constructor for use by BrowseDAOFactory 
      * 
@@ -261,7 +266,9 @@ public class BrowseDAOPostgres implements BrowseDAO
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
-                BrowseItem browseItem = new BrowseItem(context, row.getIntColumn("item_id"));
+                BrowseItem browseItem = new BrowseItem(context, row.getIntColumn("item_id"),
+                                                  itemsInArchive,
+                                                  itemsWithdrawn);
                 results.add(browseItem);
             }
             
@@ -583,6 +590,21 @@ public class BrowseDAOPostgres implements BrowseDAO
     public void setTable(String table)
     {
         this.table = table;
+
+        // FIXME Rather than assume from the browse table, join the query to item to get the correct values
+        // Check to see if this is the withdrawn browse index - if it is,
+        // we need to set the flags appropriately for when we create the BrowseItems
+        if (table.equals(BrowseIndex.getWithdrawnBrowseIndex().getTableName()))
+        {
+            itemsInArchive = false;
+            itemsWithdrawn = true;
+        }
+        else
+        {
+            itemsInArchive = true;
+            itemsWithdrawn = false;
+        }
+
         this.rebuildQuery = true;
     }
 
@@ -862,7 +884,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * SELECT [arguments] FROM [table]
      * </code>
      * 
-     * @param args  the string value obtained from distinctClause, countClause or selectValues
+     * @param queryBuf  the string value obtained from distinctClause, countClause or selectValues
      * @return  the SELECT part of the query
      */
     private void buildSelectStatement(StringBuffer queryBuf) throws BrowseException

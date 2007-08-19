@@ -59,6 +59,12 @@
 <%@ page import="org.dspace.content.Collection" %>
 
 <%
+	String layoutNavbar = "default";
+	if (request.getAttribute("browseWithdrawn") != null)
+	{
+	    layoutNavbar = "admin";
+	}
+
 	// get the BrowseInfo object
 	BrowseInfo bi = (BrowseInfo) request.getAttribute("browse.info");
 
@@ -93,7 +99,7 @@
     }
 %>
 
-<dspace:layout titlekey="browse.no-results.title">
+<dspace:layout titlekey="browse.no-results.title" navbar="<%= layoutNavbar %>">
 
     <h1><fmt:message key="browse.no-results.title"/></h1>
 

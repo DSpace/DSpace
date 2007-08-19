@@ -35,8 +35,6 @@
  */
 package org.dspace.browse;
 
-import java.util.Map;
-
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -96,7 +94,9 @@ public class BrowserScope
     
 	/** the browse level */
 	private int level = 0;
-	
+
+	/** the number of authors to display in the results */
+	private int etAl = 0;
 	/**
 	 * Construct a new BrowserScope using the given Context 
 	 * 
@@ -207,6 +207,22 @@ public class BrowserScope
 	{
         this.browseIndex = browseIndex;
 	}
+
+    /**
+     * @return Returns the author limit.
+     */
+    public int getEtAl()
+    {
+        return etAl;
+    }
+
+    /**
+     * @param etAl the author limit
+     */
+    public void setEtAl(int etAl)
+    {
+        this.etAl = etAl;
+    }
 
 	/**
 	 * @return Returns the collection.

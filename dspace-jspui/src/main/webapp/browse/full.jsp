@@ -62,6 +62,14 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%
+    String urlFragment = "browse";
+    String layoutNavbar = "default";
+	if (request.getAttribute("browseWithdrawn") != null)
+	{
+	    layoutNavbar = "admin";
+        urlFragment = "dspace-admin/withdrawn";
+    }
+
 	// First, get the browse info object
 	BrowseInfo bi = (BrowseInfo) request.getAttribute("browse.info");
 	BrowseIndex bix = bi.getBrowseIndex();
@@ -119,12 +127,17 @@
 	{
 		valueString = "&amp;value=" + URLEncoder.encode(bi.getValue());
 	}
-	String sharedLink = linkBase + "browse?type=" + URLEncoder.encode(bix.getName()) + 
-						"&amp;sort_by=" + URLEncoder.encode(Integer.toString(so.getNumber())) + 
-						"&amp;order=" + URLEncoder.encode(direction) + 
-						"&amp;rpp=" + URLEncoder.encode(Integer.toString(bi.getResultsPerPage())) +
-						"&amp;etal=" + URLEncoder.encode(Integer.toString(bi.getEtAl())) + 
-						valueString;
+
+    String sharedLink = linkBase + urlFragment + "?";
+
+    if (bix.getName() != null)
+        sharedLink += "type=" + URLEncoder.encode(bix.getName());
+
+    sharedLink += "&amp;sort_by=" + URLEncoder.encode(Integer.toString(so.getNumber())) +
+				  "&amp;order=" + URLEncoder.encode(direction) +
+				  "&amp;rpp=" + URLEncoder.encode(Integer.toString(bi.getResultsPerPage())) +
+				  "&amp;etal=" + URLEncoder.encode(Integer.toString(bi.getEtAl())) +
+				  valueString;
 	
 	String next = sharedLink;
 	String prev = sharedLink;
@@ -165,7 +178,7 @@
 	{
 		formaction = formaction + "handle/" + community.getHandle() + "/";
 	}
-	formaction = formaction + "browse";
+	formaction = formaction + urlFragment;
 	
 	// prepare the known information about sorting, ordering and results per page
 	String sortedBy = so.getName();
@@ -187,7 +200,7 @@
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
 
 <%@page import="java.util.Set"%>
-<dspace:layout titlekey="browse.page-title">
+<dspace:layout titlekey="browse.page-title" navbar="<%=layoutNavbar %>">
 
 	<%-- Build the header (careful use of spacing) --%>
 	<h2>

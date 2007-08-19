@@ -159,6 +159,11 @@
 		<servlet-class>org.dspace.app.webui.servlet.BrowserServlet</servlet-class>
 	</servlet>
 
+	<servlet>
+		<servlet-name>browsewithdrawn</servlet-name>
+		<servlet-class>org.dspace.app.webui.servlet.admin.WithdrawnBrowserServlet</servlet-class>
+	</servlet>
+
   <servlet>
     <servlet-name>collection-wizard</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.CollectionWizardServlet</servlet-class>
@@ -396,6 +401,11 @@
 	<servlet-mapping>
 		<servlet-name>browse</servlet-name>
 		<url-pattern>/browse</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>browsewithdrawn</servlet-name>
+		<url-pattern>/dspace-admin/withdrawn</url-pattern>
 	</servlet-mapping>
 
   <servlet-mapping>

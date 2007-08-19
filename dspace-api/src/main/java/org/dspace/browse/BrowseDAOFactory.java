@@ -101,8 +101,34 @@ public class BrowseDAOFactory
 			throw new BrowseException("The configuration for db.name is either invalid, or contains an unrecognised database");
 		}
 	}
-	
-	/**
+
+    /**
+     * Get an instance of the relevant Read Only DAO class, which will
+     * conform to the BrowseItemDAO interface
+     *
+     * @param context	the DSpace context
+     * @return			the relevant DAO
+     * @throws BrowseException
+     */
+    public static BrowseItemDAO getItemInstance(Context context)
+        throws BrowseException
+    {
+        String db = ConfigurationManager.getProperty("db.name");
+        if ("postgres".equals(db))
+        {
+            return new BrowseItemDAOPostgres(context);
+        }
+        else if ("oracle".equals(db))
+        {
+            return new BrowseItemDAOOracle(context);
+        }
+        else
+        {
+            throw new BrowseException("The configuration for db.name is either invalid, or contains an unrecognised database");
+        }
+    }
+
+    /**
 	 * Get an instance of the relevant DAO Utilities class, which will
 	 * conform to the BrowseDAOUtils interface
 	 * 

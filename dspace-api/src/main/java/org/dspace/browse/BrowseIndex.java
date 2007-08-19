@@ -42,7 +42,6 @@ package org.dspace.browse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,9 +83,6 @@ public class BrowseIndex
     /** a three part array of the metadata bits (e.g. dc.contributor.author) */
     private String[] mdBits;
 
-    /** array of the configured indexes */
-    private static BrowseIndex[] browseIndexes = null;
-
     /** additional 'internal' tables that are always defined */
     private static BrowseIndex itemIndex      = new BrowseIndex("bi_item");
     private static BrowseIndex withdrawnIndex = new BrowseIndex("bi_withdrawn");
@@ -100,7 +96,7 @@ public class BrowseIndex
     
     /**
      * Constructor for creating generic / internal index objects
-     * @param baseName
+     * @param baseName The base of the table name
      */
     private BrowseIndex(String baseName)
     {
@@ -133,7 +129,7 @@ public class BrowseIndex
      * 
      * @param definition	the configuration definition of this index
      * @param number		the configuration number of this index
-     * @throws BrowseException
+     * @throws BrowseException 
      */
     private BrowseIndex(String definition, int number)
     	throws BrowseException
@@ -770,7 +766,6 @@ public class BrowseIndex
     /**
      * Does this browse index represent one of the internal item indexes
      * 
-     * @param bi
      * @return
      */
     public boolean isInternalIndex()

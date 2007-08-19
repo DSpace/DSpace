@@ -43,7 +43,6 @@ package org.dspace.browse;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
@@ -213,6 +212,8 @@ public class BrowseEngine
 		
 		browseInfo.setResultsPerPage(scope.getResultsPerPage());
 		
+        browseInfo.setEtAl(scope.getEtAl());
+        
 		return browseInfo;
 	}
 	
@@ -367,8 +368,13 @@ public class BrowseEngine
 				}
 				if (prevID != -1)
 				{
-					prev = new BrowseItem(context, prevID);
-				}
+                    // If we are browsing the withdrawn index, create a 'withdrawn' browse item
+                    // Otherwise, assume that the item is in the archive and not withdrawn
+                    if (bs.getBrowseIndex() == BrowseIndex.getWithdrawnBrowseIndex())
+                        prev = new BrowseItem(context, prevID, false, true);
+                    else
+                        prev = new BrowseItem(context, prevID, true, false);
+                }
 			}
 			
 			// now we need to process the position, total and offset for the results
@@ -447,6 +453,8 @@ public class BrowseEngine
 			}
 			
 			browseInfo.setResultsPerPage(scope.getResultsPerPage());
+
+	        browseInfo.setEtAl(scope.getEtAl());
 			
 			return browseInfo;
 		}
@@ -708,7 +716,7 @@ public class BrowseEngine
      * Return a normalized focus value. If there is no normalization that can be performed,
      * return the focus value that is passed in.
      * 
-     * @param String a focus value to normalize
+     * @param value a focus value to normalize
      * @return  the normalized focus value
      * @throws BrowseException
      */

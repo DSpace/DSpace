@@ -619,8 +619,15 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         
         try
         {
-            String query = "SELECT item_id FROM " + table + " WHERE item_id NOT IN ( SELECT item_id FROM item WHERE in_archive = true AND withdrawn = " +
-                        (withdrawn ? "true" : "false") + ")";
+            String query = "SELECT item_id FROM " + table + " WHERE item_id NOT IN ( SELECT item_id FROM item WHERE ";
+
+            if (withdrawn)
+                query += "withdrawn = true";
+            else
+                query += "in_archive = true AND withdrawn = false";
+
+            query += ")";
+
             tri = DatabaseManager.query(context, query);
             while (tri.hasNext())
             {

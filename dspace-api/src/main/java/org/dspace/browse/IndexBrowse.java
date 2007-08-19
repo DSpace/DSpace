@@ -40,10 +40,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.cli.CommandLine;
@@ -360,21 +358,17 @@ public class IndexBrowse
             removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
             removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
 
-            // Index any archived item
-            if (item.isArchived())
+            // Index any archived item that isn't withdrawn
+            if (item.isArchived() && !item.isWithdrawn())
+            {
+                Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
+                dao.insertIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap);
+            }
+            else if (item.isWithdrawn())
             {
                 // If it's withdrawn, add it to the withdrawn items index
-                if (item.isWithdrawn())
-                {
-                    Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
-                    dao.insertIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap);
-                }
-                else
-                {
-                    // Otherwise, add it to the main item index
-                    Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
-                    dao.insertIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap);
-                }
+                Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
+                dao.insertIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap);
             }
 
             // Now update the metadata indexes
@@ -1041,16 +1035,15 @@ public class IndexBrowse
     		}
     		
     		// now get the ids of ALL the items in the database
-    		BrowseItem bi = new BrowseItem(context, -1);
-    		Integer[] ids = bi.findAll();
+            BrowseItemDAO biDao = BrowseDAOFactory.getItemInstance(context);
+            BrowseItem[] items = biDao.findAll();
 
     		// go through every item id, grab the relevant metadata
     		// and write it into the database
     		
-    		for (int j = 0; j < ids.length; j++)
+    		for (int j = 0; j < items.length; j++)
     		{
-    			BrowseItem item = new BrowseItem(context, ids[j].intValue());
-                indexItem(new ItemMetadataProxy(ids[j].intValue(), item));
+                indexItem(new ItemMetadataProxy(items[j].getID(), items[j]));
     			
     			// after each item we commit the context and clear the cache
     			context.commit();
@@ -1074,7 +1067,7 @@ public class IndexBrowse
             // Make sure the deletes are written back
             context.commit();
     		
-    		return ids.length;
+    		return items.length;
     	}
     	catch (SQLException e)
     	{
@@ -1170,7 +1163,6 @@ public class IndexBrowse
 	    
 	    /**
 	     * Is the Item archived?
-	     * If we only have a cut down BrowseItem, assume that it is
 	     * @return
 	     */
 	    public boolean isArchived()
@@ -1180,12 +1172,11 @@ public class IndexBrowse
 	    		return item.isArchived();
 	    	}
 	    	
-	    	return true;
+	    	return browseItem.isArchived();
 	    }
 	    
         /**
          * Is the Item withdrawn?
-         * If we only have a cut down BrowseItem, assume that it is not
          * @return
          */
         public boolean isWithdrawn()
@@ -1195,7 +1186,7 @@ public class IndexBrowse
             	return item.isWithdrawn();
             }
             
-            return false;
+            return browseItem.isWithdrawn();
         }
 	}
 }

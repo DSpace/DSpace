@@ -35,24 +35,18 @@
  */
 package org.dspace.browse;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Entity class to represent an item that is being used to generate Browse
@@ -81,79 +75,35 @@ public class BrowseItem extends DSpaceObject
 	
 	/** database id of the item */
 	private int id = -1;
-	
-	/** item handle */
+
+    /** is the item in the archive */
+    private boolean in_archive = true;
+
+    /** is the item withdrawn */
+    private boolean withdrawn  = false;
+
+    /** item handle */
 	private String handle = null;
-	
-	/** query to obtain all the items from the database */
-	private String findAll = "SELECT * FROM item WHERE in_archive = true AND withdrawn = false";
-	
-	/** query to check the existance of an item id */
-	private String getByID = "SELECT id FROM item WHERE item_id = ?";
-		
-	/** query to get the text value of a metadata element only (qualifier is NULL) */
-    private String getByMetadataElement = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
-                                    "WHERE metadatavalue.item_id = ? " +
-                                    " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
-                                    " AND metadatafieldregistry.element = ? " +
-                                    " AND metadatafieldregistry.qualifier IS NULL " +
-                                    " AND metadatafieldregistry.metadata_schema_id=metadataschemaregistry.metadata_schema_id " +
-                                    " AND metadataschemaregistry.short_id = ?";
-    
-	/** query to get the text value of a metadata element and qualifier */
-    private String getByMetadata = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
-                                    "WHERE metadatavalue.item_id = ? " +
-                                    " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
-                                    " AND metadatafieldregistry.element = ? " +
-                                    " AND metadatafieldregistry.qualifier = ? " +
-                                    " AND metadatafieldregistry.metadata_schema_id=metadataschemaregistry.metadata_schema_id " +
-                                    " AND metadataschemaregistry.short_id = ?";
-    
-	/** query to get the text value of a metadata element with the wildcard qualifier (*) */
-    private String getByMetadataAnyQualifier = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
-                                    "WHERE metadatavalue.item_id = ? " +
-                                    " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
-                                    " AND metadatafieldregistry.element = ? " +
-                                    " AND metadatafieldregistry.metadata_schema_id=metadataschemaregistry.metadata_schema_id " +
-                                    " AND metadataschemaregistry.short_id = ?";
     
 	/** inner item, if we really absolutely have to instantiate it */
 	private Item item;
-	
-	/**
+
+    /**
 	 * Construct a new browse item with the given context and the database id
 	 * 
 	 * @param context	the DSpace context
-	 * @param id		the database id of the item
-	 */
-	public BrowseItem(Context context, int id)
+     * @param id		the database id of the item
+     * @param in_archive
+     * @param withdrawn
+     */
+	public BrowseItem(Context context, int id, boolean in_archive, boolean withdrawn)
 	{
 		this.context = context;
 		this.id = id;
-	}
+        this.in_archive = in_archive;
+        this.withdrawn = withdrawn;
+    }
 
-	/**
-	 * Get an integer array of all the item ids in the database
-	 * 
-	 * @return		integer array of item ids
-	 * @throws SQLException
-	 */
-	public Integer[] findAll()
-		throws SQLException
-	{
-		TableRowIterator tri = DatabaseManager.query(context, findAll);
-		ArrayList ids = new ArrayList();
-		
-		while (tri.hasNext())
-		{
-			TableRow row = tri.next();
-			ids.add(new Integer(row.getIntColumn("item_id")));
-		}
-		
-		Integer[] ints = new Integer[ids.size()];
-		return (Integer[]) ids.toArray((Integer[]) ints);
-	}
-	
 	/**
 	 * Get String array of metadata values matching the given parameters
 	 * 
@@ -167,44 +117,58 @@ public class BrowseItem extends DSpaceObject
 	public DCValue[] getMetadata(String schema, String element, String qualifier, String lang)
 		throws SQLException
 	{
-		// if the qualifier is a wildcard, we have to get it out of the 
-		// database
-		if (Item.ANY.equals(qualifier))
-		{
-			return queryMetadata(schema, element, qualifier, lang);
-		}
-		
-		if (!metadata.isEmpty())
-		{
-			List values = new ArrayList();
-			Iterator i = metadata.iterator();
-			
-			while (i.hasNext())
-			{
-				DCValue dcv = (DCValue) i.next();
-				
-				if (match(schema, element, qualifier, lang, dcv))
-				{
-					values.add(dcv);
-				}
-			}
-			
-			if (values.isEmpty())
-			{
-				return queryMetadata(schema, element, qualifier, lang);
-			}
-			
-			// else, Create an array of matching values
-			DCValue[] valueArray = new DCValue[values.size()];
-			valueArray = (DCValue[]) values.toArray(valueArray);
-			
-			return valueArray;
-		}
-		else
-		{
-			return queryMetadata(schema, element, qualifier, lang);
-		}
-	}
+        try
+        {
+            BrowseItemDAO dao = BrowseDAOFactory.getItemInstance(context);
+
+            // if the qualifier is a wildcard, we have to get it out of the
+            // database
+            if (Item.ANY.equals(qualifier))
+            {
+                return dao.queryMetadata(id, schema, element, qualifier, lang);
+            }
+
+            if (!metadata.isEmpty())
+            {
+                List values = new ArrayList();
+                Iterator i = metadata.iterator();
+
+                while (i.hasNext())
+                {
+                    DCValue dcv = (DCValue) i.next();
+
+                    if (match(schema, element, qualifier, lang, dcv))
+                    {
+                        values.add(dcv);
+                    }
+                }
+
+                if (values.isEmpty())
+                {
+                    DCValue[] dcvs = dao.queryMetadata(id, schema, element, qualifier, lang);
+                    Collections.addAll(metadata, dcvs);
+                    return dcvs;
+                }
+
+                // else, Create an array of matching values
+                DCValue[] valueArray = new DCValue[values.size()];
+                valueArray = (DCValue[]) values.toArray(valueArray);
+
+                return valueArray;
+            }
+            else
+            {
+                DCValue[] dcvs = dao.queryMetadata(id, schema, element, qualifier, lang);
+                Collections.addAll(metadata, dcvs);
+                return dcvs;
+            }
+        }
+        catch (BrowseException be)
+        {
+            log.error("caught exception: ", be);
+            return null;
+        }
+    }
 	
 	/**
 	 * Get the type of object.  This object masquerates as an Item, so this
@@ -332,67 +296,6 @@ public class BrowseItem extends DSpaceObject
         // If we get this far, we have a match
         return true;
     }
-    
-    /**
-     * perform a database query to obtain the string array of values corresponding to
-     * the passed parameters.  In general you should use:
-     * 
-     * <code>
-     * getMetadata(schema, element, qualifier, lang);
-     * </code>
-     * 
-     * As this will obtain the value from cache if available first.
-     * 
-     * @param schema
-     * @param element
-     * @param qualifier
-     * @param lang
-     * @return
-     * @throws SQLException
-     */
-    public DCValue[] queryMetadata(String schema, String element, String qualifier, String lang)
-    	throws SQLException
-    {
-    	ArrayList values = new ArrayList();
-    	TableRowIterator tri;
-    	
-    	if (qualifier == null)
-    	{
-    		Object[] params = { new Integer(id), element, schema };
-    		tri = DatabaseManager.query(context, getByMetadataElement, params);
-    	}
-    	else if (Item.ANY.equals(qualifier))
-    	{
-    		Object[] params = { new Integer(id), element, schema };
-    		tri = DatabaseManager.query(context, getByMetadataAnyQualifier, params);
-    	}
-    	else
-    	{
-    		Object[] params = { new Integer(id), element, qualifier, schema };
-    		tri = DatabaseManager.query(context, getByMetadata, params);
-    	}
-    	
-    	if (!tri.hasNext())
-    	{
-    		return null;
-    	}
-    	
-    	while (tri.hasNext())
-    	{
-    		TableRow tr = tri.next();
-    		DCValue dcv = new DCValue();
-    		dcv.schema = schema;
-    		dcv.element = tr.getStringColumn("element");
-    		dcv.qualifier = tr.getStringColumn("qualifier");
-    		dcv.language = tr.getStringColumn("text_lang");
-    		dcv.value = tr.getStringColumn("text_value");
-    		metadata.add(dcv);
-            values.add(dcv);
-    	}
-    	
-        DCValue[] dcvs = new DCValue[values.size()];
-        return (DCValue[]) values.toArray(dcvs);
-    }
 
 	/* (non-Javadoc)
 	 * @see org.dspace.content.DSpaceObject#getHandle()
@@ -505,5 +408,15 @@ public class BrowseItem extends DSpaceObject
         	log.error("caught exception: ", sqle);
 			return null;
 		}
+    }
+
+    public boolean isArchived()
+    {
+        return in_archive;
+    }
+
+    public boolean isWithdrawn()
+    {
+        return withdrawn;
     }
 }
