@@ -49,8 +49,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cocoon.servlet.CocoonServlet;
 import org.apache.log4j.PropertyConfigurator;
-import org.dspace.app.xmlui.configuration.Aspect;
-import org.dspace.app.xmlui.configuration.Theme;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.core.ConfigurationManager;
@@ -143,21 +141,7 @@ public class DSpaceCocoonServlet extends CocoonServlet
     	{
 	        xmluiConfig = ConfigurationManager.getProperty("dspace.dir")
 	                + File.separator + "config" + File.separator + "xmlui.xconf";
-	        
-	        File file = new File(xmluiConfig);
-	        
-	        if(file.exists())
-	            XMLUIConfiguration.loadConfig(file.toURL());
-	        else
-	        {
-	            // Install reasonable defaults
-	            XMLUIConfiguration.getAspectChain().add(new Aspect("Artifact Browser","resource://aspects/ArtifactBrowser/"));
-	            XMLUIConfiguration.getAspectChain().add(new Aspect("E-Person","resource://aspects/EPerson/"));
-	            XMLUIConfiguration.getAspectChain().add(new Aspect("Submission and Workflow","resource://aspects/Submission/"));
-	            XMLUIConfiguration.getAspectChain().add(new Aspect("Administration","resource://aspects/Administrative/"));
-	            XMLUIConfiguration.getAspectChain().add(new Aspect("XML Tests","resource://aspects/XMLTest/"));
-	            XMLUIConfiguration.getThemeRules().add(new Theme("Classic", ".*", "Classic/",null));
-	        }
+	        XMLUIConfiguration.loadConfig(xmluiConfig);
     	}   
     	catch (Throwable t)
     	{
