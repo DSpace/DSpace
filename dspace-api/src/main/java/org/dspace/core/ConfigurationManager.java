@@ -44,19 +44,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.log4j.helpers.OptionConverter;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
@@ -81,7 +84,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 public class ConfigurationManager
 {
     /** log4j category */
-    private static Logger log = null;
+    private static Logger log = Logger.getLogger(ConfigurationManager.class);
 
     /** The configuration properties */
     private static Properties properties = null;
@@ -93,6 +96,14 @@ public class ConfigurationManager
     // configuration; anything greater than this is very likely to be a loop.
     private final static int RECURSION_LIMIT = 9;
 
+    /**
+     * 
+     */
+    public static Properties getProperties()
+    {
+        return (Properties)properties.clone();
+    }
+    
     /**
      * Get a configuration property
      * 
@@ -449,9 +460,10 @@ public class ConfigurationManager
      * Return the file that configuration was actually loaded from. Only returns
      * a valid File after configuration has been loaded.
      * 
+     * @deprecated Please remove all direct usage of the configuration file.
      * @return File naming configuration data file, or null if not loaded yet.
      */
-    public static File getConfigurationFile()
+    protected static File getConfigurationFile()
     {
         // in case it hasn't been done yet.
         loadConfig(null);
@@ -470,39 +482,49 @@ public class ConfigurationManager
      */
     public static void loadConfig(String configFile)
     {
-        InputStream is;
-
+        
         if (properties != null)
         {
             return;
         }
 
-        String configProperty = System.getProperty("dspace.configuration");
 
+        URL url = null;
+        
         try
         {
+            String configProperty = System.getProperty("dspace.configuration");
+
             if (configFile != null)
             {
-                is = new FileInputStream(configFile);
+                info("Loading provided config file: " + configFile);
+                
                 loadedFile = new File(configFile);
+                url = loadedFile.toURL();
+                
             }
             // Has the default configuration location been overridden?
             else if (configProperty != null)
             {
+                info("Loading system provided config property (-Ddspace.configuration): " + configProperty);
+                
                 // Load the overriding configuration
-                is = new FileInputStream(configProperty);
                 loadedFile = new File(configProperty);
+                url = loadedFile.toURL();
             }
+            // Load configuration from default location
             else
             {
-                // Load configuration from default location
-                is = ConfigurationManager.class
-                        .getResourceAsStream("/dspace.cfg");
-                loadedFile = new File(ConfigurationManager.class.getResource(
-                        "/dspace.cfg").getPath());
+                url = ConfigurationManager.class.getResource("/dspace.cfg");
+                if (url != null)
+                {
+                    info("Loading from classloader: " + url);
+                    
+                    loadedFile = new File(url.getPath());
+                }
             }
-
-            if (is == null)
+            
+            if (url == null)
             {
                 fatal("Cannot find dspace.cfg");
                 throw new RuntimeException("Cannot find dspace.cfg");
@@ -510,7 +532,7 @@ public class ConfigurationManager
             else
             {
                 properties = new Properties();
-                properties.load(is);
+                properties.load(url.openStream());
 
                 // walk values, interpolating any embedded references.
                 for (Enumeration pe = properties.propertyNames(); pe.hasMoreElements(); )
@@ -522,94 +544,109 @@ public class ConfigurationManager
                 }
             }
 
-            // Load in default license
-            File licenseFile = new File(getProperty("dspace.dir") + File.separator
-                    + "config" + File.separator + "default.license");
-            
-            if (licenseFile != null && licenseFile.exists())
-            {
-	            FileInputStream fir = new FileInputStream(licenseFile);
-	            InputStreamReader ir = new InputStreamReader(fir, "UTF-8");
-	            BufferedReader br = new BufferedReader(ir);
-	            String lineIn;
-	            license = "";
-	
-	            while ((lineIn = br.readLine()) != null)
-	            {
-	                license = license + lineIn + '\n';
-	            }
-	
-	            is.close();
-            }
-            else
-            {
-            	license = "";
-            }
-            
-            // Load in log4j config
-            // Load the log4j config, if a log4j.xml version exists use that
-            // configuration format over the log4j.properties version
-            String log4jSysProp  = System.getProperty("log4j.configuration");
-            String log4jConfProp = "";
-            String log4jConfXml  = "";
-            File   xmlFile       = null;
-            
-            if (log4jSysProp != null)
-            {
-        		log4jConfProp = log4jSysProp;
-//            	File sysFile = new File(log4jSysProp);
-//           	if (sysFile.exists())
-//            	{
-//            	}
-//            	else
-//            	{
-//            	}
-            }
-            else
-            {
-                log4jConfProp = ConfigurationManager.getProperty("dspace.dir")
-        				+ File.separator
-        				+ "config"
-        				+ File.separator
-        				+ "log4j.properties";
-
-                log4jConfXml = ConfigurationManager.getProperty("dspace.dir")
-        				+ File.separator + "config" + File.separator + "log4j.xml";
-		
-        		xmlFile = new File(log4jConfXml);
-            }
-
-            if (xmlFile != null && xmlFile.exists())
-            {
-                try
-                {
-                    DOMConfigurator.configure(xmlFile.toURL());
-                    initLog();
-                    info("DSpace logging installed using log4j.xml");
-                }
-                catch (MalformedURLException e)
-                {
-                    PropertyConfigurator.configure(log4jConfProp);
-                    initLog();
-                    error("Logger failed to load log4j.xml, defaulted to "
-                            + "log4j.properties: " + e);
-                }
-            }
-            else
-            {
-                PropertyConfigurator.configure(log4jConfProp);
-                initLog();
-                info("DSpace logging installed using log4j.properties");
-            }
         }
         catch (IOException e)
         {
-            fatal("Can't load configuration", e);
+            fatal("Can't load configuration: " + url, e);
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
-            throw new RuntimeException("Cannot find dspace.cfg",e);
+            throw new RuntimeException("Cannot load configuration: " + url, e);
         }
+        
+        // Load in default license
+        File licenseFile = new File(getProperty("dspace.dir") + File.separator
+                + "config" + File.separator + "default.license");
+        try
+        {
+            
+            FileInputStream fir = new FileInputStream(licenseFile);
+            InputStreamReader ir = new InputStreamReader(fir, "UTF-8");
+            BufferedReader br = new BufferedReader(ir);
+            String lineIn;
+            license = "";
+
+            while ((lineIn = br.readLine()) != null)
+            {
+                license = license + lineIn + '\n';
+            }
+
+            br.close();
+            
+        }
+        catch (IOException e)
+        {
+            fatal("Can't load license: " + licenseFile.toString() , e);
+
+            // FIXME: Maybe something more graceful here, but with the
+            // configuration we can't do anything
+            throw new RuntimeException("Cannot load license: " + licenseFile.toString(),e);
+        }   
+
+        
+        
+        try
+        {
+            /*
+             * Initialize Logging once ConfigurationManager is initialized.
+             * 
+             * This is selection from a property in dspace.cfg, if the property
+             * is absent then nothing will be configured and the application
+             * will use the defaults provided by log4j. 
+             * 
+             * Property format is:
+             * 
+             * log.init.config = ${dspace.dir}/config/log4j.properties
+             * or
+             * log.init.config = ${dspace.dir}/config/log4j.xml
+             * 
+             * See default log4j initialization documentation here:
+             * http://logging.apache.org/log4j/docs/manual.html
+             * 
+             * If there is a problem with the file referred to in
+             * "log.configuration" it needs to be sent to System.err
+             * so do not instantiate another Logging configuration.
+             *
+             */
+            String dsLogConfiguration = ConfigurationManager.getProperty("log.init.config");
+
+            if (dsLogConfiguration == null ||  System.getProperty("dspace.log.init.disable") != null)
+            {
+                /* 
+                 * Do nothing if log config not set in dspace.cfg or "dspace.log.init.disable" 
+                 * system property set.  Leave it upto log4j to properly init its logging 
+                 * via classpath or system properties.
+                 */
+                info("Using default log4j provided log configuration," +
+                        "if uninitended, check your dspace.cfg for (log.init.config)");
+            }
+            else
+            {
+                info("Using dspace provided log configuration (log.init.config)");
+                
+                
+                File logConfigFile = new File(dsLogConfiguration);
+                
+                if(logConfigFile.exists())
+                {
+                    info("Loading: " + dsLogConfiguration);
+                    
+                    OptionConverter.selectAndConfigure(logConfigFile.toURL(), null,
+                            org.apache.log4j.LogManager.getLoggerRepository());
+                }
+                else
+                {
+                    info("File does not exist: " + dsLogConfiguration);
+                }
+            }
+
+        }
+        catch (MalformedURLException e)
+        {
+            fatal("Can't load dspace provided log4j configuration", e);
+            throw new RuntimeException("Cannot load dspace provided log4j configuration",e);
+        }
+        
     }
 
     /**
@@ -701,10 +738,10 @@ public class ConfigurationManager
 
         System.exit(1);
     }
-
+    
     private static void info(String string)
     {
-        if (log == null)
+        if (!isConfigured())
         {
             System.out.println("INFO: " + string);
         }
@@ -716,7 +753,7 @@ public class ConfigurationManager
 
     private static void warn(String string)
     {
-        if (log == null)
+        if (!isConfigured())
         {
             System.out.println("WARN: " + string);
         }
@@ -726,21 +763,9 @@ public class ConfigurationManager
         }
     }
 
-    private static void error(String string)
-    {
-        if (log == null)
-        {
-            System.err.println("ERROR: " + string);
-        }
-        else
-        {
-            log.error(string);
-        }
-    }
-
     private static void fatal(String string, Exception e)
     {
-        if (log == null)
+        if (!isConfigured())
         {
             System.out.println("FATAL: " + string);
             e.printStackTrace();
@@ -753,7 +778,7 @@ public class ConfigurationManager
 
     private static void fatal(String string)
     {
-        if (log == null)
+        if (!isConfigured())
         {
             System.out.println("FATAL: " + string);
         }
@@ -763,11 +788,30 @@ public class ConfigurationManager
         }
     }
 
-    private static void initLog()
+    /*
+     * Only current solution available to detect 
+     * if log4j is truly configured. 
+     */
+    private static boolean isConfigured()
     {
-        log = Logger.getLogger(ConfigurationManager.class);
+        Enumeration en = org.apache.log4j.LogManager.getRootLogger()
+                .getAllAppenders();
+
+        if (!(en instanceof org.apache.log4j.helpers.NullEnumeration))
+        {
+            return true;
+        }
+        else
+        {
+            Enumeration cats = Category.getCurrentCategories();
+            while (cats.hasMoreElements())
+            {
+                Category c = (Category) cats.nextElement();
+                if (!(c.getAllAppenders() instanceof org.apache.log4j.helpers.NullEnumeration))
+                    return true;
+            }
+        }
+        return false;
     }
-    
-    
 
 }

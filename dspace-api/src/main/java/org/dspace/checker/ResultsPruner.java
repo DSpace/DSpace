@@ -80,8 +80,7 @@ public final class ResultsPruner
     {
         try
         {
-            return getPruner(ConfigurationManager.getConfigurationFile()
-                    .getAbsolutePath());
+            return getPruner(ConfigurationManager.getProperties());
         }
         catch (FileNotFoundException e)
         {
@@ -91,6 +90,7 @@ public final class ResultsPruner
 
     }
 
+    
     /**
      * Factory method for ResultsPruners
      * 
@@ -109,36 +109,8 @@ public final class ResultsPruner
         {
             fin = new FileInputStream(propsFile);
             props.load(fin);
-            ResultsPruner rp = new ResultsPruner();
-            Pattern retentionPattern = Pattern
-                    .compile("checker\\.retention\\.(.*)");
-            for (Enumeration en = props.propertyNames(); en.hasMoreElements();)
-            {
-                String name = (String) en.nextElement();
-                Matcher matcher = retentionPattern.matcher(name);
-                if (!matcher.matches())
-                    continue;
-                String resultCode = matcher.group(1);
-                long duration;
-                try
-                {
-                    duration = Utils.parseDuration(props.getProperty(name));
-                }
-                catch (ParseException e)
-                {
-                    throw new RuntimeException("Problem parsing duration: "
-                            + e.getMessage(), e);
-                }
-                if ("default".equals(resultCode))
-                {
-                    rp.setDefaultDuration(duration);
-                }
-                else
-                {
-                    rp.addInterested(resultCode, duration);
-                }
-            }
-            return rp;
+            
+            return getPruner(props);
         }
         catch (IOException e)
         {
@@ -157,6 +129,51 @@ public final class ResultsPruner
                     LOG.warn(e);
                 }
         }
+    }
+    
+    /**
+     * Factory method for ResultsPruners (used to load ConfigurationManager
+     * properties.
+     * 
+     * @param props
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static ResultsPruner getPruner(Properties props)
+    throws FileNotFoundException
+    {
+     
+        ResultsPruner rp = new ResultsPruner();
+        Pattern retentionPattern = Pattern
+                .compile("checker\\.retention\\.(.*)");
+        for (Enumeration en = props.propertyNames(); en.hasMoreElements();)
+        {
+            String name = (String) en.nextElement();
+            Matcher matcher = retentionPattern.matcher(name);
+            if (!matcher.matches())
+                continue;
+            String resultCode = matcher.group(1);
+            long duration;
+            try
+            {
+                duration = Utils.parseDuration(props.getProperty(name));
+            }
+            catch (ParseException e)
+            {
+                throw new RuntimeException("Problem parsing duration: "
+                        + e.getMessage(), e);
+            }
+            if ("default".equals(resultCode))
+            {
+                rp.setDefaultDuration(duration);
+            }
+            else
+            {
+                rp.addInterested(resultCode, duration);
+            }
+        }
+        return rp;
+        
     }
 
     /** Ten years */

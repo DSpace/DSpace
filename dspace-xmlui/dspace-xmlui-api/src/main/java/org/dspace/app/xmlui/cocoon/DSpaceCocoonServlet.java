@@ -49,6 +49,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cocoon.servlet.CocoonServlet;
 import org.apache.log4j.PropertyConfigurator;
+import org.dspace.app.xmlui.configuration.Aspect;
+import org.dspace.app.xmlui.configuration.Theme;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.core.ConfigurationManager;
@@ -113,7 +115,9 @@ public class DSpaceCocoonServlet extends CocoonServlet
     	/**
     	 * Stage 2
     	 * 
-    	 * Load the dspace config
+    	 * Load the dspace config. Also may load log4j configuration.
+    	 * (Please rely on ConfigurationManager or Log4j to configure logging)
+    	 * 
     	 */
     	try 
     	{
@@ -129,34 +133,9 @@ public class DSpaceCocoonServlet extends CocoonServlet
     				"the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
     				"either the local servlet or global context.\n\n",t);
     	}
-            
-
-    	/**
-    	 * Stage 3
-    	 * 
-    	 * Load the log4jconfig
-    	 */
-    	try 
-    	{
-	        log4jConfig = ConfigurationManager.getProperty("dspace.dir")
-	                + File.separator + "config" + File.separator
-	                + "log4j.properties";
-	        PropertyConfigurator.configure(log4jConfig);
-    	}
-    	catch (Throwable t)
-    	{
-    		throw new ServletException(
-    				"\n\nDSpace has failed to initialize, during stage 3. Error while attempting to read the \n" +
-    				"log4j configuration file (Path: "+log4jConfig+"). \n" +
-    				"This has likely occurred because either the file does not exist, or it's permissions are \n" +
-    				"set incorrectly, or the path to the configuration file is incorrect. The log4j \n" +
-    				"configuration file should be named \"log4j.properties\" and located inside the standard \n" +
-    				"DSpace configuration directory.\n\n",t);
-    	}
-
-            
+                	            
         /**
-         * Stage 4
+         * Stage 3
          * 
          * Load the XML UI configuration
          */
@@ -164,12 +143,26 @@ public class DSpaceCocoonServlet extends CocoonServlet
     	{
 	        xmluiConfig = ConfigurationManager.getProperty("dspace.dir")
 	                + File.separator + "config" + File.separator + "xmlui.xconf";
-	        XMLUIConfiguration.loadConfig(xmluiConfig);
+	        
+	        File file = new File(xmluiConfig);
+	        
+	        if(file.exists())
+	            XMLUIConfiguration.loadConfig(file.toURL());
+	        else
+	        {
+	            // Install reasonable defaults
+	            XMLUIConfiguration.getAspectChain().add(new Aspect("Artifact Browser","resource://aspects/ArtifactBrowser/"));
+	            XMLUIConfiguration.getAspectChain().add(new Aspect("E-Person","resource://aspects/EPerson/"));
+	            XMLUIConfiguration.getAspectChain().add(new Aspect("Submission and Workflow","resource://aspects/Submission/"));
+	            XMLUIConfiguration.getAspectChain().add(new Aspect("Administration","resource://aspects/Administrative/"));
+	            XMLUIConfiguration.getAspectChain().add(new Aspect("XML Tests","resource://aspects/XMLTest/"));
+	            XMLUIConfiguration.getThemeRules().add(new Theme("Classic", ".*", "Classic/",null));
+	        }
     	}   
     	catch (Throwable t)
     	{
     		throw new ServletException(
-    				"\n\nDSpace has failed to initialize, during stage 4. Error while attempting to read \n" +
+    				"\n\nDSpace has failed to initialize, during stage 3. Error while attempting to read \n" +
     				"the XML UI configuration file (Path: "+xmluiConfig+").\n" + 
     				"This has likely occurred because either the file does not exist, or it's permissions \n" +
     				"are set incorrectly, or the path to the configuration file is incorrect. The XML UI \n" +
@@ -206,4 +199,7 @@ public class DSpaceCocoonServlet extends CocoonServlet
     	
     	super.service(realRequest, realResponse);
     }
+    
+    
+
 }
