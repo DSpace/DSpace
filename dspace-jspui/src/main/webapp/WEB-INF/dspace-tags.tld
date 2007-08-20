@@ -279,6 +279,16 @@
       <required>false</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>
+    <attribute>
+        <name>linkToEdit</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <name>disableCrossLinks</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
   </tag>
 
 

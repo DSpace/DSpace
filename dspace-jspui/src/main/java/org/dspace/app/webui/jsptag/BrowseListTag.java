@@ -112,6 +112,12 @@ public class BrowseListTag extends TagSupport
 
     /** Config browse/search thumbnail link behaviour */
     private boolean linkToBitstream = false;
+
+    /** Config to include an edit link */
+    private boolean linkToEdit = false;
+
+    /** Config to disable cross links */
+    private boolean disableCrossLinks = false;
     
     /** The default fields to be displayed when listing items */
     private static String listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
@@ -181,6 +187,8 @@ public class BrowseListTag extends TagSupport
         
         // make an array to hold all the frags that we will use
         int columns = st.countTokens();
+        if (linkToEdit)
+            columns++;
         String[] frags = new String[columns * items.length];
         
         try 
@@ -309,11 +317,16 @@ public class BrowseListTag extends TagSupport
                             DCDate dd = new DCDate(metadataArray[0].value);
                             metadata = UIUtil.displayDate(dd, false, false, hrq) + thumbs;
                         }
-                        // format the title field correctly                        
+                        // format the title field correctly for withdrawn items (ie. don't link)                      
+                        else if (field.equals(titleField) && items[i].isWithdrawn())
+                        {
+                            metadata = Utils.addEntities(metadataArray[0].value);
+                        }
+                        // format the title field correctly (as long as the item isn't withdrawn, link to it)
                         else if (field.equals(titleField))
                         {
-                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/" 
-                            + items[i].getHandle() + "\">" 
+                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
+                            + items[i].getHandle() + "\">"
                             + Utils.addEntities(metadataArray[0].value)
                             + "</a>";
                         }
@@ -337,7 +350,7 @@ public class BrowseListTag extends TagSupport
                             {
                             	String startLink = "";
                             	String endLink = "";
-                            	if (!"".equals(browseType))
+                            	if (!"".equals(browseType) && !disableCrossLinks)
                             	{
                             		String argument = "value";
                             		if (viewFull)
@@ -406,6 +419,42 @@ public class BrowseListTag extends TagSupport
                 isDate = false;
                 emph = false;
             }
+
+            // Add column for 'edit item' links
+            if (linkToEdit)
+            {
+                String cOddOrEven = ((columns % 2) == 0 ? "Odd" : "Even");
+                String id = "t" + Integer.toString(colCount);
+                String css = "oddRow" + cOddOrEven + "Col";
+
+                // output the header
+                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                        + (emph ? "<strong>" : "")
+                        + "&nbsp;" //LocaleSupport.getLocalizedMessage(pageContext, message)
+                        + (emph ? "</strong>" : "") + "</th>");
+
+                for (int i = 0; i < items.length; i++)
+                {
+                    // now prepare the XHTML frag for this division
+                    String rOddOrEven;
+                    if (i == highlightRow)
+                    {
+                        rOddOrEven = "highlight";
+                    }
+                    else
+                    {
+                        rOddOrEven = ((i % 2) == 1 ? "odd" : "even");
+                    }
+
+                    int idx = ((i + 1) * columns) - 1;
+                    frags[idx] = "<td headers=\"" + id + "\" class=\""
+                    	+ rOddOrEven + "Row" + cOddOrEven + "Col\" nowrap>"
+                    	+ "<form method=get action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
+                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
+                        + "<input type=\"submit\" value=\"Edit Item\" /></form>"
+                    	+ "</td>";
+                }
+            }
             
             out.println("</tr>");
             
@@ -453,7 +502,27 @@ public class BrowseListTag extends TagSupport
     	setItems(browseInfo.getBrowseItemResults());
     	authorLimit = browseInfo.getEtAl();
     }
-    
+
+    public boolean getLinkToEdit()
+    {
+        return linkToEdit;
+    }
+
+    public void setLinkToEdit(boolean edit)
+    {
+        this.linkToEdit = edit;
+    }
+
+    public boolean getDisableCrossLinks()
+    {
+        return disableCrossLinks;
+    }
+
+    public void setDisableCrossLinks(boolean links)
+    {
+        this.disableCrossLinks = links;
+    }
+
     /**
      * Get the items to list
      * 

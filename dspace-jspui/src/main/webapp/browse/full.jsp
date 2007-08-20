@@ -479,6 +479,12 @@
     	{
     %>
 	<dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getMetadata() %>" />
+    <%
+        }
+        else if (request.getAttribute("browseWithdrawn") != null)
+        {
+    %>
+    <dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getSortOption().getMetadata() %>" linkToEdit="true" disableCrossLinks="true" />
 	<%
     	}
     	else
