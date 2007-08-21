@@ -146,7 +146,11 @@
 				<artifactId>dspace-xmlui-wing</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>1.7.0</version>
+            </dependency>
 			<dependency>
 				<groupId>org.dspace</groupId>
 				<artifactId>jena</artifactId>
@@ -560,12 +564,12 @@
 
 	<scm>
 		<connection>
-			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk
+			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-pom
 		</connection>
 		<developerConnection>
-			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk
+			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-pom
 		</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk</url>
+		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-pom</url>
 	</scm>
 
 	<distributionManagement>
