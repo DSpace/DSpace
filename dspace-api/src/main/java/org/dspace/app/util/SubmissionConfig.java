@@ -48,7 +48,7 @@ import org.apache.log4j.Logger;
 /**
  * Class representing a single Item Submission config definition, organized into
  * steps. This class represents the structure of a single 'submission-process'
- * node in the item-submission.xml configuration file.
+ * node in the item-submission-[UI Name].xml configuration file.
  * 
  * @see org.dspace.app.util.SubmissionConfigReader
  * @see org.dspace.app.util.SubmissionStepConfig
@@ -73,7 +73,7 @@ public class SubmissionConfig
 
     /**
      * Constructs a new Submission Configuration object, based on the XML
-     * configuration file (item-submission.xml)
+     * configuration file (item-submission-[UI Name].xml)
      * 
      * @param submissionName
      *            the submission process name

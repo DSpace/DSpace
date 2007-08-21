@@ -109,7 +109,10 @@ public class SubmissionInfo
     private static SubmissionConfigReader submissionConfigReader;
     
     /**
-     * Default Constructor
+     * Default Constructor - PRIVATE
+     * <p>
+     * Create a SubmissionInfo object
+     * using the load() method!
      * 
      */
     private SubmissionInfo()
@@ -125,6 +128,10 @@ public class SubmissionInfo
      * 
      * @param request
      *            The HTTP Servlet Request object
+     * @param briefUIName
+     *            The brief name of the User Interface to 
+     *            load the Submission Configuration and Information for
+     *            (e.g. "jspui" or "xmlui")           
      * @param subItem
      *            The in-progress submission we are loading information for
      * 
@@ -134,13 +141,19 @@ public class SubmissionInfo
      *             if an error occurs
      */
     public static SubmissionInfo load(HttpServletRequest request,
-            InProgressSubmission subItem) throws ServletException
+    		String briefUIName, InProgressSubmission subItem) throws ServletException
     {
-        SubmissionInfo subInfo = new SubmissionInfo();
+        boolean forceReload = false;
+    	SubmissionInfo subInfo = new SubmissionInfo();
+        
         // load SubmissionConfigReader only the first time
-        if (submissionConfigReader == null)
+        // or if we're using a different UI now.
+        if (submissionConfigReader == null || 
+        		submissionConfigReader.getUIName() == null ||
+        		!submissionConfigReader.getUIName().equals(briefUIName))
         {
-            submissionConfigReader = new SubmissionConfigReader();
+            submissionConfigReader = new SubmissionConfigReader(briefUIName);
+            forceReload=true;
         }
 
         // save the item which is going through the submission process
@@ -159,7 +172,7 @@ public class SubmissionInfo
         // load Submission Process config for this item's collection
         // (Note: this also loads the Progress Bar info, since it is
         // dependent on the Submission config)
-        loadSubmissionConfig(request, subInfo, false);
+        loadSubmissionConfig(request, subInfo, forceReload);
 
         return subInfo;
     }
@@ -210,7 +223,7 @@ public class SubmissionInfo
 
     /**
      * Causes the SubmissionConfig to be completely reloaded from the XML
-     * configuration file (item-submission.xml).
+     * configuration file (item-submission-[UI Name].xml).
      * <P>
      * Note: This also reloads the progress bar info, since the progress bar
      * depends entirely on the submission process (and its steps).
@@ -253,11 +266,6 @@ public class SubmissionInfo
     public SubmissionStepConfig getStepConfig(String stepID)
             throws ServletException
     {
-        if (submissionConfigReader == null)
-        {
-            submissionConfigReader = new SubmissionConfigReader();
-        }
-
         return submissionConfigReader.getStepConfig(stepID);
     }
 

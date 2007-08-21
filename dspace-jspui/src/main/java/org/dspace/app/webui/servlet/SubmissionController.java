@@ -123,6 +123,9 @@ public class SubmissionController extends DSpaceServlet
 
     /** First step after "select collection" */
     public static int FIRST_STEP = 1;
+    
+    /** "Name" of the JSP User Interface - Used to load SubmissionInfo **/
+    public static String UI_NAME = "JSPUI";
 
     /** path to the JSP shown once the submission is completed */
     private static String COMPLETE_JSP = "/submit/complete.jsp";
@@ -167,7 +170,7 @@ public class SubmissionController extends DSpaceServlet
                         .parseInt(workspaceID));
 
                 //load submission information
-                SubmissionInfo si = SubmissionInfo.load(request, wi);
+                SubmissionInfo si = SubmissionInfo.load(request, UI_NAME, wi);
                 
                 //TD: Special case - If a user is resuming a submission
                 //where the submission process now has less steps, then
@@ -211,7 +214,7 @@ public class SubmissionController extends DSpaceServlet
                         .parseInt(workflowID));
 
                 //load submission information
-                SubmissionInfo si = SubmissionInfo.load(request, wi);
+                SubmissionInfo si = SubmissionInfo.load(request, UI_NAME, wi);
                 
                 //For workflows, first step is step #0 
                 //(since Select Collection is already filtered out)
@@ -895,19 +898,19 @@ public class SubmissionController extends DSpaceServlet
             {
                 int workflowID = UIUtil.getIntParameter(request, "workflow_id");
                 
-                info = SubmissionInfo.load(request, WorkflowItem.find(context, workflowID));
+                info = SubmissionInfo.load(request, UI_NAME, WorkflowItem.find(context, workflowID));
             }
             else if(request.getParameter("workspace_item_id") != null)
             {
                 int workspaceID = UIUtil.getIntParameter(request,
                         "workspace_item_id");
                 
-                info = SubmissionInfo.load(request, WorkspaceItem.find(context, workspaceID));
+                info = SubmissionInfo.load(request, UI_NAME, WorkspaceItem.find(context, workspaceID));
             }
             else
             {
                 //by default, initialize Submission Info with no item
-                info = SubmissionInfo.load(request, null);
+                info = SubmissionInfo.load(request, UI_NAME, null);
             }
             
             // We must have a submission object if after the first step,

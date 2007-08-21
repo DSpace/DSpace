@@ -68,7 +68,7 @@ import org.dspace.submit.step.SampleStep;
  * <p>
  * This step can be added to any Submission process (for testing purposes) by
  * adding the following to the appropriate <submission-process> tag in the
- * /config/item-submission.xml:
+ * /config/item-submission-JSPUI.xml:
  * 
  * <step> <heading>Sample</heading>
  * <class-name>org.dspace.app.webui.submit.step.JSPSampleStep</class-name>

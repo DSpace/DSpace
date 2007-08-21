@@ -33,15 +33,14 @@
   <p><em>PLEASE NOTE:  There are separate submission configuration files based on whether
   you plan to use the DSpace JSP User Interface (JSP-UI) or the DSpace XML User Interface (XML-UI, aka. Manakin)</em>
   <ul>
-  	<li><code><i>[dspace]</i>/config/item-submission.xml</code> - This is the JSP-UI configuration file, which is used by <strong>default</strong></li>
-	<li><code><i>[dspace]</i>/config/item-submission-XMLUI.xml</code> - This is the XML-UI configuration file
-		<ul>
-			<li><em>If you plan to use the XML-UI</em>, you need to rename the current <code>item-submission.xml</code> to <code>item-submission-JSPUI.xml</code>, 
-			and then rename the <code>item-submission-XMLUI.xml</code> to <code>item-submission.xml</code>!</li>
-		</ul>
-	</li>
+  	<li><code><i>[dspace]</i>/config/item-submission-JSPUI.xml</code> - This is the JSP-UI configuration file</li>
+	<li><code><i>[dspace]</i>/config/item-submission-XMLUI.xml</code> - This is the XML-UI configuration file</li>
   </ul>
   </p>
+  
+  <p>DSpace will automatically know which <code>item-submission.xml</code> to utilize based on the DSpace user interface being used.
+  <em>However, should you wish to make configuration changes, you must make sure to do so in the correct <code>item-submission.xml</code> 
+  file based on the DSpace user interface you are using!</em></p>
   
   <p>Each of the <code>item-submission.xml</code> configuration files contains detailed documentation within the file itself,
   which should help you better undertand how to best utilize it.</p>

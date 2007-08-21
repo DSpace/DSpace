@@ -89,6 +89,10 @@ public class FlowUtils {
 
     private static Logger log = Logger.getLogger(FlowUtils.class);
     
+    /** "Name" of the XML-based User Interface - Used to load SubmissionInfo **/
+    private static String UI_NAME = "XMLUI";
+
+    
     /** Where the submissionInfo is stored on an HTTP Request object */
     private final static String DSPACE_SUBMISSION_INFO = "dspace.submission.info";
 
@@ -186,7 +190,7 @@ public class FlowUtils {
                     .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
             
                 // load submission info
-                subInfo = SubmissionInfo.load(httpRequest, submission);
+                subInfo = SubmissionInfo.load(httpRequest, UI_NAME, submission);
     
                 // Set the session ID
                 context.setExtraLogInfo("session_id="
@@ -452,7 +456,7 @@ public class FlowUtils {
 			
 			//Load the Submission Process for the collection this WSI is associated with
             Collection c = wsi.getCollection();
-            SubmissionConfigReader subConfigReader = new SubmissionConfigReader();
+            SubmissionConfigReader subConfigReader = new SubmissionConfigReader(UI_NAME);
             SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c.getHandle(), false);
             
             // Set the "stage_reached" column on the workspace item

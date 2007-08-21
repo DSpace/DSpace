@@ -48,7 +48,7 @@ import org.apache.log4j.Logger;
  * Class representing configuration for a single step within an Item Submission
  * Process. In other words, this is a single step in the SubmissionConfig class.
  * This class represents the structure of a single 'step' node in the
- * item-submission.xml configuration file.
+ * item-submission-[UI Name].xml configuration file.
  * 
  * @see org.dspace.app.util.SubmissionConfigReader
  * @see org.dspace.app.util.SubmissionConfig
