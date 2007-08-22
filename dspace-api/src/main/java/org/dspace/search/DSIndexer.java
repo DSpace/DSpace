@@ -89,7 +89,7 @@ import org.dspace.handle.HandleManager;
  * to attain the lock before giving up and logging the failure to log4j and 
  * to the DSpace administrator email account. 
  * 
- * The Administraor can choose to run DSIndexer in a cron that
+ * The Administrator can choose to run DSIndexer in a cron that
  * repeats regularly, a failed attempt to index from the UI will be "caught" up
  * on in that cron.
  * 
@@ -419,102 +419,88 @@ public class DSIndexer
         Context context = new Context();
         context.setIgnoreAuthorization(true);
         
-        // TODO remove this if statement in 1.5
-        if ((args.length == 2) && (args[0].equals("remove")))
+        String usage = "org.dspace.search.DSIndexer [-cbhouf[d <item handle>]] or nothing to update/clean an existing index.";
+        Options options = new Options();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine line = null;
+
+        options.addOption(OptionBuilder
+                        .withArgName("item handle")
+                        .hasArg(true)
+                        .withDescription(
+                                "delete an Item, Collection or Community from index based on its handle")
+                        .create("d"));
+
+        options.addOption(OptionBuilder.isRequired(false).withDescription(
+                "optimize existing index").create("o"));
+
+        options.addOption(OptionBuilder
+                        .isRequired(false)
+                        .withDescription(
+                                "clean existing index removing any documents that no longer exist in the db")
+                        .create("c"));
+
+        options.addOption(OptionBuilder.isRequired(false).withDescription(
+                "(re)build index, wiping out current one if it exists").create(
+                "b"));
+
+        options.addOption(OptionBuilder
+                        .isRequired(false)
+                        .withDescription(
+                                "if updating existing index, force each handle to be reindexed even if uptodate")
+                        .create("f"));
+
+        options.addOption(OptionBuilder.isRequired(false).withDescription(
+                "print this help message").create("h"));
+
+        try
         {
-            unIndexContent(context, args[1]);
+            line = new PosixParser().parse(options, args);
+        }
+        catch (Exception e)
+        {
+            // automatically generate the help statement
+            formatter.printHelp(usage, e.getMessage(), options, "");
+            System.exit(1);
+        }
+
+        if (line.hasOption("h"))
+        {
+            // automatically generate the help statement
+            formatter.printHelp(usage, options);
+            System.exit(1);
+        }
+
+        if (line.hasOption("r"))
+        {
+            log.info("Removing " + line.getOptionValue("r") + " from Index");
+            unIndexContent(context, line.getOptionValue("r"));
+        }
+        else if (line.hasOption("o"))
+        {
+            log.info("Optimizing Index");
+            optimizeIndex(context);
+        }
+        else if (line.hasOption("c"))
+        {
+            log.info("Cleaning Index");
+            cleanIndex(context);
+        }
+        else if (line.hasOption("u"))
+        {
+            log.info("Updating Index");
+            updateIndex(context, line.hasOption("f"));
+        }
+        else if (line.hasOption("b"))
+        {
+            log.info("(Re)building index from scratch.");
+            createIndex(context);
         }
         else
         {
-        	
-        	String usage = "org.dspace.search.DSIndexer [-houf[d <item handle>]] or nothing to update an existing index.";
-            Options options = new Options();
-            HelpFormatter formatter = new HelpFormatter();
-            CommandLine line = null;
-
-            options.addOption(
-            	OptionBuilder
-            		.withArgName("item handle")
-            		.hasArg(true)
-            		.withDescription("delete an Item, Collection or Community from index based on its handle")
-            		.create( "d" ));
-            
-    		options.addOption(
-    			OptionBuilder
-    				.isRequired(false)
-    				.withDescription("optimize existing index")
-    				.create("o"));
-
-    		options.addOption(
-    				OptionBuilder
-    					.isRequired(false)
-    					.withDescription("clean existing index removing any documents that no longer exist in the db")
-    					.create("c"));
-    		
-    		options.addOption(
-    			OptionBuilder
-    				.isRequired(false)
-    				.withDescription("(re)build index, wiping out current one if it exists")
-    				.create("b"));
-    		
-    		options.addOption(
-    				OptionBuilder
-    					.isRequired(false)
-    					.withDescription("if updating existing index, force each handle to be reindexed even if uptodate")
-    					.create("f"));
-    	
-    		options.addOption(
-    			OptionBuilder
-    				.isRequired(false)
-    				.withDescription("print this help message")
-    				.create("h"));
-    	
-            try
-            {
-            	line = new PosixParser().parse(options, args);
-            }
-            catch( Exception e)
-            {
-            	// automatically generate the help statement
-                formatter.printHelp(usage, e.getMessage(), options, "" );
-                System.exit(1);
-            }
-            
-            if(line.hasOption("h"))
-            {
-                // automatically generate the help statement
-                formatter.printHelp(usage, options );
-                System.exit(1);
-            }
-            
-
-            if (line.hasOption("r") )
-            {
-                log.info("Removing " + line.getOptionValue("r") + " from Index");
-                unIndexContent(context, line.getOptionValue("r"));
-            } 
-            else if (line.hasOption("o"))
-            {
-                log.info("Optimizing Index");
-                optimizeIndex(context);
-            }
-            else if (line.hasOption("c"))
-            {
-                log.info("Cleaning Index");
-                cleanIndex(context);
-            }
-            else if (line.hasOption("u"))
-            {
-            	log.info("Updating Index");
-            	updateIndex(context,line.hasOption("f"));
-            }
-            else
-            {
-            	log.info("(Re)building index from scratch.");
-             	createIndex(context);
-            }
-            
-            
+            log.info("Updating and Cleaning Index");
+            cleanIndex(context);
+            updateIndex(context, line.hasOption("f"));
         }
 
         log.info("Done with indexing");
