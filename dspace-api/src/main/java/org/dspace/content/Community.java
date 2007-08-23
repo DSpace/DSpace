@@ -346,7 +346,8 @@ public class Community extends DSpaceObject
      */
     public String getMetadata(String field)
     {
-        return communityRow.getStringColumn(field);
+    	String metadata = communityRow.getStringColumn(field);
+    	return (metadata == null) ? "" : metadata;
     }
 
     /**

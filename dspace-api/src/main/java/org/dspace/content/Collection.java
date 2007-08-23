@@ -389,7 +389,8 @@ public class Collection extends DSpaceObject
      */
     public String getMetadata(String field)
     {
-        return collectionRow.getStringColumn(field);
+    	String metadata = collectionRow.getStringColumn(field);
+    	return (metadata == null) ? "" : metadata; 
     }
 
     /**
