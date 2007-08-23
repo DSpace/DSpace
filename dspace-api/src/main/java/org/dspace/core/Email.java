@@ -256,6 +256,13 @@ public class Email
         Properties props = System.getProperties();
         props.put("mail.smtp.host", server);
 
+        // Set the port number for the mail server
+        String portNo = ConfigurationManager.getProperty("mail.server.port");
+        if (portNo == null) {
+        	portNo = "25";
+        }
+        props.put("mail.smtp.port", portNo.trim());
+        
         // Get session
         Session session;
         
