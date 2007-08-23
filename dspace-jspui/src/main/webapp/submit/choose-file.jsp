@@ -89,22 +89,14 @@
         new window will appear in which you can locate and select the file on your
         local hard drive. <object><dspace:popup page="/help/index.html#upload">(More Help...)</dspace:popup></object></p> --%>
 
-		<div><fmt:message key="jsp.submit.choose-file.info1"/>
-			<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#upload\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+		<p><fmt:message key="jsp.submit.choose-file.info1"/>
+			<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#upload\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></p>
         
-        <%-- <p class="submitFormHelp"><strong>Netscape users please note:</strong> By
-        default, the window brought up by clicking "Browse..." will only display
-        files of type HTML.  If the file you are uploading isn't an HTML file,
-        you will need to select the option to display files of other types.
-        <object><dspace:popup page="/help/index.html#netscapeupload">Instructions for Netscape users</dspace:popup></object> are available.</p> --%>
-		<div class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info3"/>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#netscapeupload\"%>"><fmt:message key="jsp.submit.choose-file.info4"/></dspace:popup></div>
-        
-<%-- FIXME: Collection-specific stuff should go here? --%>
+        <%-- FIXME: Collection-specific stuff should go here? --%>
         <%-- <p class="submitFormHelp">Please also note that the DSpace system is
         able to preserve the content of certain types of files better than other
         types.
-        <object><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.formats\")%>">Information about file types</dspace:popup></object> and levels of
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.formats\")%>">Information about file types</dspace:popup> and levels of
         support for each are available.</p> --%>
         
 		<div class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info6"/>
