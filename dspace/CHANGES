@@ -136,6 +136,8 @@
 (Chris Yates)
 - SF Patch #1711982 Updates to short_description (null) field when editing/creat
 
+(Kyle Brentnell)
+- SF Patch #1720105 Add SMTP port as configurable parameter
 
 1.4.1 final
 ===========
