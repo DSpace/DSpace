@@ -48,6 +48,13 @@
 (Tim Donohue)
 - Added Configurable Submission to JSP-UI and XML-UI (updated version of SF Patch #1691345)
 
+(Stuart Lewis)
+- SF Patch #1737792 Patch for bug 1552760 - Submit interface looks bad in Safari
+- Removal of message for Netscape users in choose-file.jsp + removal of supporting text and images in the help file
+
+(Chris yates)
+- SF Patch #1724330 Removes "null" being displayed in community-home.jsp
+
 1.4.2 beta
 ===========
 
