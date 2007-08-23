@@ -100,31 +100,6 @@
             license = collection.getLicense();
         }
         
-        if (shortDesc == null)
-        {
-            shortDesc = "";
-        }
-        
-        if (copy == null)
-        {
-            copy = "";
-        }
-        
-        if (side == null)
-        {
-            side = "";
-        }
-        
-		if (intro == null)
-		{
-			intro = "";
-		}
-
-        if (provenance == null)
-        {
-            provenance = "";
-        }
-
         wfGroups[0] = collection.getWorkflowGroup(1);
         wfGroups[1] = collection.getWorkflowGroup(2);
         wfGroups[2] = collection.getWorkflowGroup(3);

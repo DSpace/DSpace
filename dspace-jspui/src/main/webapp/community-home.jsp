@@ -94,19 +94,8 @@
     // Put the metadata values into guaranteed non-null variables
     String name = community.getMetadata("name");
     String intro = community.getMetadata("introductory_text");
-    if (intro == null)
-    {
-        intro = "";
-    }
     String copyright = community.getMetadata("copyright_text");
-    if (copyright == null)
-    {
-        copyright = "";
-    }
     String sidebar = community.getMetadata("side_bar_text");
-    if(sidebar == null)
-    sidebar = "";
-
     Bitstream logo = community.getLogo();
     
     boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
