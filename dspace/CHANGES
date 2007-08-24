@@ -1,3 +1,6 @@
+(Graham Triggs)
+- Admin browser for withdrawn items (implements feature request #1221957)
+
 (Richard Jones)
 - S.F. Patch 1670093 More stable metadata and schema registry import 
 

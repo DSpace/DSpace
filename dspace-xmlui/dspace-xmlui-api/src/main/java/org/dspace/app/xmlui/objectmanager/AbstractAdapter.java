@@ -240,7 +240,12 @@ public abstract class AbstractAdapter
      * @return the URL for this item in the interface
      */
     protected abstract String getMETSOBJID() throws WingException;
-    
+
+    /**
+     * @return Return the URL for editing this item
+     */
+    protected abstract String getMETSOBJEDIT();
+
     /**
      * @return the METS ID of the mets document.
      */
@@ -286,8 +291,12 @@ public abstract class AbstractAdapter
     		String objid = getMETSOBJID();
     		if (objid != null)
     			attributes.put("OBJID", objid);
-    		
-    		
+
+            // Include the link for editing the item
+            objid = getMETSOBJEDIT();
+            if (objid != null)
+                attributes.put("OBJEDIT", objid);
+
     		startElement(METS,"METS",attributes);
 
     		// If the user requested no specefic sections then render them all.

@@ -39,13 +39,6 @@
  */
 package org.dspace.app.xmlui.objectmanager;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
@@ -64,6 +57,14 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -141,7 +142,15 @@ public class ItemAdapter extends AbstractAdapter
     		return contextPath+"/handle/" + item.getHandle();
     	return null;
     }
-    
+
+    /**
+     * @return Return the URL for editing this item
+     */
+    protected String getMETSOBJEDIT()
+    {
+        return contextPath+"/admin/item?itemID=" + item.getID();
+    }
+
     /**
      * Return the item's handle as the METS ID
      */
@@ -240,7 +249,9 @@ public class ItemAdapter extends AbstractAdapter
 			// Start the DIM element			
 			attributes = new AttributeMap();
 			attributes.put("dspaceType", Constants.typeText[item.getType()]);
-			startElement(DIM,"dim",attributes);
+            if (item.isWithdrawn())
+                attributes.put("withdrawn", "y");
+            startElement(DIM,"dim",attributes);
 			
 	        DCValue[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 	        for (DCValue dcv : dcvs)

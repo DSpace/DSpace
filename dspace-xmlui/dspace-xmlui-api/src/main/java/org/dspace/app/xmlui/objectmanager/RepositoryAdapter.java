@@ -124,6 +124,14 @@ public class RepositoryAdapter extends AbstractAdapter
 	}
 
     /**
+     * @return  Return the URL for editing this item
+     */
+    protected String getMETSOBJEDIT()
+    {
+        return null;
+    }
+
+    /**
      * Return the profile this METS document conforms too...
      * 
      * FIXME: It dosn't conform to a profile. This needs to be fixed.

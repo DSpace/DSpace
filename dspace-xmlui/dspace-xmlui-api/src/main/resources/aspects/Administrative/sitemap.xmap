@@ -104,6 +104,7 @@ to administer DSpace.
 			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.administrative.Navigation"/>
 			<map:transformer name="SystemwideAlerts" src="org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts"/>
 			<map:transformer name="ControlPanel" src="org.dspace.app.xmlui.aspect.administrative.ControlPanel" />
+            <map:transformer name="WithdrawnItems" src="org.dspace.app.xmlui.aspect.administrative.WithdrawnItems" />
 		</map:transformers>
 		
 		<map:matchers default="wildcard">
@@ -744,7 +745,6 @@ to administer DSpace.
 		        				<map:parameter name="policyIDs" value="{flow-attribute:policyIDs}"/>
 		        			</map:transform>
 		        		</map:match>
-		        		
 		        	</map:match> <!-- if flow -->
             	</map:when>
 		    	<map:otherwise>
@@ -775,7 +775,7 @@ to administer DSpace.
 		    		<map:match pattern="admin/authorize">
 		    			<map:act type="StartAuthentication"/>
 		    		</map:match>
-		    	</map:otherwise>
+                </map:otherwise>
             </map:select>
             
 			<map:match pattern="admin/panel">
@@ -794,6 +794,22 @@ to administer DSpace.
 				</map:select>
 			</map:match>
 		    
+            <map:match pattern="admin/withdrawn">
+                <map:select type="AuthenticatedSelector">
+                    <map:when test="administrator">
+                        <map:act type="ControlPanelAction">
+                            <map:transform type="SystemwideAlerts"/>
+                        </map:act>
+                        <map:transform type="WithdrawnItems" />
+                        <map:serialize type="xml"/>
+                    </map:when>
+
+                    <map:otherwise>
+                        <map:act type="StartAuthentication"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+
 			<map:serialize type="xml"/>
 		</map:pipeline>
 	</map:pipelines>

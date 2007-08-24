@@ -96,6 +96,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_administrative_metadata 			= message("xmlui.administrative.Navigation.administrative_metadata");
     private static final Message T_administrative_format 			= message("xmlui.administrative.Navigation.administrative_format");
     private static final Message T_administrative_items 			= message("xmlui.administrative.Navigation.administrative_items");
+    private static final Message T_administrative_withdrawn  		= message("xmlui.administrative.Navigation.administrative_withdrawn");
     private static final Message T_administrative_control_panel 	= message("xmlui.administrative.Navigation.administrative_control_panel");
 
 
@@ -258,7 +259,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 	        registries.addItemXref(contextPath+"/admin/format-registry",T_administrative_format);	        
 	        
 	        admin.addItemXref(contextPath+"/admin/item", T_administrative_items);	        
-	        admin.addItemXref(contextPath+"/admin/panel", T_administrative_control_panel);	        
+            admin.addItemXref(contextPath+"/admin/withdrawn", T_administrative_withdrawn);	        
+	        admin.addItemXref(contextPath+"/admin/panel", T_administrative_control_panel);
         }
     }
     

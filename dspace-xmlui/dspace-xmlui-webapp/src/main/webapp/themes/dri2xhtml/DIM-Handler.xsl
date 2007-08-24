@@ -117,9 +117,20 @@
     
     <!-- Generate the info about the item from the metadata section -->
     <xsl:template match="dim:dim" mode="itemSummaryList-DIM"> 
+        <xsl:variable name="itemWithdrawn" select="@withdrawn" />
         <div class="artifact-description">
             <div class="artifact-title">
-                <a href="{ancestor::mets:METS/@OBJID}">
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="$itemWithdrawn">
+                                <xsl:value-of select="ancestor::mets:METS/@OBJEDIT" />
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="ancestor::mets:METS/@OBJID" />
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="dim:field[@element='title']">
                             <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
@@ -128,7 +139,7 @@
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
                         </xsl:otherwise>
                     </xsl:choose>
-                </a>
+                </xsl:element>
             </div>
             <div class="artifact-info">
                 <span class="author">

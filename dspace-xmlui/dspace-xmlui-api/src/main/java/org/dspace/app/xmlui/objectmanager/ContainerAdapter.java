@@ -127,6 +127,14 @@ public class ContainerAdapter extends AbstractAdapter
     		return contextPath+"/handle/" + dso.getHandle();
     	return null;
     }
+
+    /**
+     * @return Return the URL for editing this item
+     */
+    protected String getMETSOBJEDIT()
+    {
+        return null;
+    }
     
     /**
      * Use the handle as the id for this METS document

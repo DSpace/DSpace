@@ -390,22 +390,31 @@ public class BrowseEngine
 			// third, position
 			// this is the location in the index of the first part item in the browse
 			int position = -1;
-			if (showLast)
-			{
-				// if we are into showing the last page by default (see above for PREVIOUS page link for
-				// more information), then we need to reduce the position by the number of results per
-				// page
-				position = total - scope.getResultsPerPage();
-			}
-			else
-			{
-				// if this is just a normal every day browse that doesn't satisfy the conditions
-				// above we have to go away and look up the position
-				// position = getPosition(focusValue, value, false);
-				position = getPosition(false);
-			}
-			
-			// construct the BrowseInfo object to pass back
+
+            // Only calculate the position if there are actually results to display
+            if (total > 0)
+            {
+                if (showLast)
+                {
+                    // if we are into showing the last page by default (see above for PREVIOUS page link for
+                    // more information), then we need to reduce the position by the number of results per
+                    // page
+                    position = total - scope.getResultsPerPage();
+
+                    // we can't be at a position before the start of the index!
+                    if (position < 0)
+                        position = 0;
+                }
+                else
+                {
+                    // if this is just a normal every day browse that doesn't satisfy the conditions
+                    // above we have to go away and look up the position
+                    // position = getPosition(focusValue, value, false);
+                    position = getPosition(false);
+                }
+            }
+
+            // construct the BrowseInfo object to pass back
 			BrowseInfo browseInfo = new BrowseInfo(results, position, total, offset);
 			
 			// set the int value of the next item

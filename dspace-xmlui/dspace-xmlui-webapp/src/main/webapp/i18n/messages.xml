@@ -923,6 +923,7 @@
 	<message key="xmlui.administrative.Navigation.administrative_metadata">Metadata</message>
 	<message key="xmlui.administrative.Navigation.administrative_format">Format</message>
 	<message key="xmlui.administrative.Navigation.administrative_items">Items</message>
+    <message key="xmlui.administrative.Navigation.administrative_withdrawn">Withdrawn Items</message>
 	<message key="xmlui.administrative.Navigation.administrative_control_panel">Control Panel</message>
 		
 		
