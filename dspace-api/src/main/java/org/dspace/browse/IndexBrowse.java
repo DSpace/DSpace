@@ -328,6 +328,26 @@ public class IndexBrowse
     }
 
     /**
+     * Prune indexes - called from the public interfaces or at the end of a batch indexing process
+     */
+    private void pruneIndexes() throws BrowseException
+    {
+        // go over the indices and prune
+        for (int i = 0; i < bis.length; i++)
+        {
+            if (bis[i].isMetadataIndex())
+            {
+                log.debug("Pruning metadata index: " + bis[i].getTableName());
+                dao.pruneExcess(bis[i].getTableName(false, false, false, false), bis[i].getTableName(false, false, false, true), false);
+                dao.pruneDistinct(bis[i].getTableName(false, false, true, false), bis[i].getTableName(false, false, false, true));
+            }
+        }
+
+        dao.pruneExcess(BrowseIndex.getItemBrowseIndex().getTableName(false, false, false, false), null, false);
+        dao.pruneExcess(BrowseIndex.getWithdrawnBrowseIndex().getTableName(false, false, false, false), null, true);
+    }
+
+    /**
      * Index the given item
      * 
      * @param item	the item to index
@@ -337,6 +357,9 @@ public class IndexBrowse
     	throws BrowseException
     {
         indexItem(new ItemMetadataProxy(item));
+
+        // Ensure that we remove any invalid entries
+        pruneIndexes();
     }
     
        /**
@@ -518,8 +541,11 @@ public class IndexBrowse
 			log.debug("Removing indexing for removed item " + item.getID() + ", for index: " + bis[i].getTableName());
 			removeIndex(item, bis[i]);
 	    }
-	    
-	    return true;
+
+        // Ensure that we remove any invalid entries
+        pruneIndexes();
+
+        return true;
 	}
 
 	/**
@@ -1052,17 +1078,7 @@ public class IndexBrowse
     		
     		// penultimately we have to delete any items that couldn't be located in the
     		// index list
-    		for (int k = 0; k < bis.length; k++)
-    		{
-                if (bis[k].isMetadataIndex())
-                {
-                    dao.pruneExcess(bis[k].getTableName(false, false, false, false), bis[k].getTableName(false, false, false, true), false);
-    				dao.pruneDistinct(bis[k].getTableName(false, false, true, false), bis[k].getTableName(false, false, false, true));
-    			}
-    		}
-
-            dao.pruneExcess(BrowseIndex.getItemBrowseIndex().getTableName(false, false, false, false), null, false);
-            dao.pruneExcess(BrowseIndex.getWithdrawnBrowseIndex().getTableName(false, false, false, false), null, true);
+            pruneIndexes();
             
             // Make sure the deletes are written back
             context.commit();
