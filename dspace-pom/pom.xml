@@ -14,8 +14,39 @@
 		<url>http://www.dspace.org</url>
 	</organization>
 
+    <profiles>
+        <!-- 
+            This profile is used by all children such that
+            when activated a dspace.config configuration
+            file location passed on the commandline 
+            (-Ddspace.config=...) can be passed through 
+            to be used as a filter source by projects for 
+            tasks such as updating the ${dspace.dir} in
+            web.xml etc.
+            
+            When activated, the child project will inherit
+            the configuration.
+         -->
+       <profile>
+           <activation>
+               <property>
+                   <name>dspace.config</name>
+               </property>
+           </activation>
+           <build>
+               <filters>
+                   <filter>${dspace.config}</filter>
+               </filters>
+           </build>
+       </profile>
+   </profiles>
+   
 	<build>
 		<plugins>
+            <!-- 
+                Java 1.5 is our officially endorsed build target
+                platform.  
+            -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
@@ -32,23 +63,24 @@
 			<name>DSpace Maven Repository</name>
 			<url>http://maven.dspace.org</url>
 			<releases>
-				<updatePolicy>never</updatePolicy>
+				<updatePolicy>daily</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</releases>
 			<snapshots>
-				<updatePolicy>never</updatePolicy>
+				<updatePolicy>daily</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</repository>
 		<repository>
 			<id>central</id>
+            <name>Central Maven Repository</name>
 			<url>http://repo1.maven.org/maven2</url>
 			<releases>
-				<updatePolicy>never</updatePolicy>
+				<updatePolicy>daily</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</releases>
 			<snapshots>
-				<updatePolicy>never</updatePolicy>
+				<updatePolicy>daily</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</repository>
@@ -60,28 +92,28 @@
 			<name>DSpace Maven Repository</name>
 			<url>http://maven.dspace.org</url>
 			<releases>
-				<updatePolicy>never</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</releases>
 			<snapshots>
-				<updatePolicy>never</updatePolicy>
+				<updatePolicy>daily</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
 			<id>m2-snapshot-repository</id>
-			<name>DSpace Maven Repository</name>
+			<name>Apache Maven Repository</name>
 			<url>
 				http://people.apache.org/repo/m2-snapshot-repository
 			</url>
 			<releases>
-				<enabled>false</enabled>
-				<updatePolicy>never</updatePolicy>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</releases>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
+				<updatePolicy>daily</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</pluginRepository>
@@ -562,6 +594,11 @@
 		</contributor>
 	</contributors>
 
+    <!-- 
+        The Subversion repository location is used by Continuum to update against
+        when changes have occured, this spawns a new build cycle and releases snapshots
+        into the snapshot repository below.
+    -->
 	<scm>
 		<connection>
 			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-pom
@@ -572,6 +609,12 @@
 		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-pom</url>
 	</scm>
 
+    <!-- 
+        Distribution Management is currently used by the Continuum server
+        to update snapshots it generates. This will also be used on 
+        release to deploy release versions to the repository by the
+        release manager.
+    -->
 	<distributionManagement>
 		<repository>
 			<id>maven.dspace.org</id>
