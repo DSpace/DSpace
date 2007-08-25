@@ -40,23 +40,16 @@
 
 package org.dspace.browse;
 
-import org.apache.log4j.Logger;
-
-import java.sql.SQLException;
-import java.util.Set;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Set;
 
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
+import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
-import org.dspace.core.LogManager;
-
+import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-import org.dspace.event.EventManager;
 
 /**
  * Class for updating browse system from content events.

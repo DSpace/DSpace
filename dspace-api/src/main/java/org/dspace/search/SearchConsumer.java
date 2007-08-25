@@ -44,7 +44,6 @@ package org.dspace.search;
 
 import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
