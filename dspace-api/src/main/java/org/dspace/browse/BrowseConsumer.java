@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -81,106 +82,95 @@ public class BrowseConsumer implements Consumer
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(BrowseConsumer.class);
-    
-    // items to be added to browse index
-    private Set toAdd = null;
 
     // items to be updated in browse index
     private Set toUpdate = null;
 
-
     public void initialize()
         throws Exception
     {
-        toAdd = new HashSet();
-        toUpdate = new HashSet();
+       
     }
 
     public void consume(Context ctx, Event event)
         throws Exception
     {
-        DSpaceObject subj = event.getSubject(ctx);
-        int et = event.getEventType();
-
-        // If an Item is added or modified..
-        if (subj != null && subj.getType() == Constants.ITEM)
+        if(toUpdate == null)
         {
-            if (et == Event.CREATE)
-                toAdd.add(subj);
-            else
-                toUpdate.add(subj);
-
-        // track ADD and REMOVE from collections, that changes browse index.
-        } else if (subj != null && subj.getType() == Constants.COLLECTION &&
-                   event.getObjectType() == Constants.ITEM &&
-                   (et == Event.ADD || et == Event.REMOVE))
-        {
-            DSpaceObject obj = event.getObject(ctx);
-            if (obj != null)
-                toUpdate.add(obj);
+            toUpdate = new HashSet();
         }
-        else if (subj != null)
-            log.warn("consume() got unrecognized event: "+event.toString());
+        
+        DSpaceObject subj = event.getSubject(ctx);
+        
+        int st = event.getSubjectType();
+        int et = event.getEventType();
+        
+        switch (st)
+        {
+
+        // If an Item is created or modified..
+        case Constants.ITEM:
+            toUpdate.add(subj);
+            break;
+        // track ADD and REMOVE from collections, that changes browse index.
+        case Constants.COLLECTION:
+            if (event.getObjectType() == Constants.ITEM
+                    && (et == Event.ADD || et == Event.REMOVE))
+            {
+                DSpaceObject obj = event.getObject(ctx);
+                if (obj != null)
+                    toUpdate.add(obj);
+            }
+            break;
+        default:
+            log.warn("consume() got unrecognized event: " + event.toString());
+
+        }
+        
     }
 
     public void end(Context ctx)
         throws Exception
     {
-        for (Iterator ai = toAdd.iterator(); ai.hasNext();)
-        {
-            Item i = (Item)ai.next();
-            // FIXME: there is an exception handling problem here
-            try
-            {
-            	// Update browse indices
-            	IndexBrowse ib = new IndexBrowse(ctx);
-            	ib.indexItem(i);
-            }
-            catch (BrowseException e)
-            {
-            	log.error("caught exception: ", e);
-            	throw new SQLException(e.getMessage());
-            }
-
-            toUpdate.remove(i);
-            if (log.isDebugEnabled())
-                log.debug("Added browse indices for Item id="+String.valueOf(i.getID())+", hdl="+i.getHandle());
-        }
-
-        // don't update an item we've just added.
-        for (Iterator ui = toUpdate.iterator(); ui.hasNext();)
-        {
-            Item i = (Item)ui.next();
-            // FIXME: there is an exception handling problem here
-            try
-            {
-            	// Update browse indices
-            	IndexBrowse ib = new IndexBrowse(ctx);
-            	ib.indexItem(i);
-            }
-            catch (BrowseException e)
-            {
-            	log.error("caught exception: ", e);
-            	throw new SQLException(e.getMessage());
-            }
         
-            if (log.isDebugEnabled())
-                log.debug("Updated browse indices for Item id="+String.valueOf(i.getID())+", hdl="+i.getHandle());
+        if (toUpdate != null)
+        {
+
+            // Update/Add items
+            for (Iterator ui = toUpdate.iterator(); ui.hasNext();)
+            {
+                Item i = (Item) ui.next();
+                // FIXME: there is an exception handling problem here
+                try
+                {
+                    // Update browse indices
+                    IndexBrowse ib = new IndexBrowse(ctx);
+                    ib.indexItem(i);
+                }
+                catch (BrowseException e)
+                {
+                    log.error("caught exception: ", e);
+                    //throw new SQLException(e.getMessage());
+                }
+
+                if (log.isDebugEnabled())
+                    log.debug("Updated browse indices for Item id="
+                            + String.valueOf(i.getID()) + ", hdl="
+                            + i.getHandle());
+            }
+
+            // NOTE: Removed items are necessarily handled inline (ugh).
+
+            // browse updates wrote to the DB, so we have to commit.
+            ctx.getDBConnection().commit();
+
         }
-
-        // NOTE: Removed items are necessarily handled inline (ugh).
-
-        // browse updates wrote to the DB, so we have to commit.
-        ctx.getDBConnection().commit();
         
-        // clean out toAdd & toUpdate
-        toAdd.clear();
-        toUpdate.clear();
+        // clean out toUpdate
+        toUpdate = null;
     }
     
     public void finish(Context ctx) {
     	
-    	toAdd = toUpdate = null;
-    	return;
     }
 }

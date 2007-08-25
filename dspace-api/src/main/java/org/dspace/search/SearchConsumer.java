@@ -66,10 +66,7 @@ public class SearchConsumer implements Consumer
     /** log4j logger */
     private static Logger log = Logger.getLogger(SearchConsumer.class);
 
-    // collect Items, Collections, Communities newly created.
-    private Set objectsCreated = null;
-
-    // collect Items, Collections, Communities that need reindexing
+    // collect Items, Collections, Communities that need indexing
     private Set objectsToUpdate = null;
 
     // handles to delete since IDs are not useful by now.
@@ -93,9 +90,8 @@ public class SearchConsumer implements Consumer
     public void consume(Context ctx, Event event) throws Exception
     {
 
-        if (objectsCreated == null)
+        if (objectsToUpdate == null)
         {
-            objectsCreated = new HashSet();
             objectsToUpdate = new HashSet();
             handlesToDelete = new HashSet();
         }
@@ -144,18 +140,10 @@ public class SearchConsumer implements Consumer
         switch (et)
         {
         case Event.CREATE:
-            if (dso == null)
-                log.warn("CREATE event, could not get object for "
-                        + event.getSubjectTypeAsString() + " id="
-                        + String.valueOf(event.getSubjectID())
-                        + ", perhaps it has been deleted.");
-            else
-                objectsCreated.add(dso);
-            break;
         case Event.MODIFY:
         case Event.MODIFY_METADATA:
             if (dso == null)
-                log.warn("MODIFY event, could not get object for "
+                log.warn(event.getEventTypeAsString() + " event, could not get object for "
                         + event.getSubjectTypeAsString() + " id="
                         + String.valueOf(event.getSubjectID())
                         + ", perhaps it has been deleted.");
@@ -186,89 +174,56 @@ public class SearchConsumer implements Consumer
      */
     public void end(Context ctx) throws Exception
     {
-        // add new created items to index, unless they were deleted.
-        for (Iterator ii = objectsCreated.iterator(); ii.hasNext();)
+        
+        if(objectsToUpdate != null && handlesToDelete != null)
         {
-            DSpaceObject ic = (DSpaceObject) ii.next();
-            if (ic.getType() != Constants.ITEM || ((Item) ic).isArchived())
+         
+            // update the changed Items not deleted because they were on create list
+            for (Iterator ii = objectsToUpdate.iterator(); ii.hasNext();)
             {
-                // if handle is NOT in list of deleted objects, index it:
-                String hdl = ic.getHandle();
-                if (hdl != null && !handlesToDelete.contains(hdl))
+                DSpaceObject iu = (DSpaceObject) ii.next();
+                if (iu.getType() != Constants.ITEM || ((Item) iu).isArchived())
                 {
-                    try
+                    // if handle is NOT in list of deleted objects, index it:
+                    String hdl = iu.getHandle();
+                    if (hdl != null && !handlesToDelete.contains(hdl))
                     {
-                        DSIndexer.indexContent(ctx, ic);
-                        if (log.isDebugEnabled())
-                            log.debug("Indexed NEW "
-                                    + Constants.typeText[ic.getType()]
-                                    + ", id=" + String.valueOf(ic.getID())
-                                    + ", handle=" + hdl);
-                    }
-                    catch (Exception e)
-                    {
-                        log.error("Failed while indexing new object: ", e);
-                        objectsCreated = null;
-                        objectsToUpdate = null;
-                        handlesToDelete = null;
+                        try
+                        {
+                            DSIndexer.indexContent(ctx, iu);
+                            if (log.isDebugEnabled())
+                                log.debug("Indexed "
+                                        + Constants.typeText[iu.getType()]
+                                        + ", id=" + String.valueOf(iu.getID())
+                                        + ", handle=" + hdl);
+                        }
+                        catch (Exception e)
+                        {
+                            log.error("Failed while indexing object: ", e);
+                        }
                     }
                 }
             }
-            // remove it from modified list since we just indexed it.
-            objectsToUpdate.remove(ic);
-        }
 
-        // update the changed Items not deleted because they were on create list
-        for (Iterator ii = objectsToUpdate.iterator(); ii.hasNext();)
-        {
-            DSpaceObject iu = (DSpaceObject) ii.next();
-            if (iu.getType() != Constants.ITEM || ((Item) iu).isArchived())
+            for (Iterator ii = handlesToDelete.iterator(); ii.hasNext();)
             {
-                // if handle is NOT in list of deleted objects, index it:
-                String hdl = iu.getHandle();
-                if (hdl != null && !handlesToDelete.contains(hdl))
+                String hdl = (String) ii.next();
+                try
                 {
-                    try
-                    {
-                        DSIndexer.reIndexContent(ctx, iu);
-                        if (log.isDebugEnabled())
-                            log.debug("RE-Indexed "
-                                    + Constants.typeText[iu.getType()]
-                                    + ", id=" + String.valueOf(iu.getID())
-                                    + ", handle=" + hdl);
-                    }
-                    catch (Exception e)
-                    {
-                        log.error("Failed while RE-indexing object: ", e);
-                        objectsCreated = null;
-                        objectsToUpdate = null;
-                        handlesToDelete = null;
-                    }
+                    DSIndexer.unIndexContent(ctx, hdl);
+                    if (log.isDebugEnabled())
+                        log.debug("UN-Indexed Item, handle=" + hdl);
                 }
-            }
-        }
+                catch (Exception e)
+                {
+                    log.error("Failed while UN-indexing object: " + hdl, e);
+                }
 
-        for (Iterator ii = handlesToDelete.iterator(); ii.hasNext();)
-        {
-            String hdl = (String) ii.next();
-            try
-            {
-                DSIndexer.unIndexContent(ctx, hdl);
-                if (log.isDebugEnabled())
-                    log.debug("UN-Indexed Item, handle=" + hdl);
-            }
-            catch (Exception e)
-            {
-                log.error("Failed while UN-indexing object: " + hdl, e);
-                objectsCreated = new HashSet();
-                objectsToUpdate = new HashSet();
-                handlesToDelete = new HashSet();
             }
 
         }
-
+        
         // "free" the resources
-        objectsCreated = null;
         objectsToUpdate = null;
         handlesToDelete = null;
     }
