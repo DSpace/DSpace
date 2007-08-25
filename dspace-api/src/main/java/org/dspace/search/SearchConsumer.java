@@ -67,10 +67,10 @@ public class SearchConsumer implements Consumer
     private static Logger log = Logger.getLogger(SearchConsumer.class);
 
     // collect Items, Collections, Communities that need indexing
-    private Set objectsToUpdate = null;
+    private Set<DSpaceObject> objectsToUpdate = null;
 
     // handles to delete since IDs are not useful by now.
-    private Set handlesToDelete = null;
+    private Set<String> handlesToDelete = null;
 
     public void initialize() throws Exception
     {
@@ -92,8 +92,8 @@ public class SearchConsumer implements Consumer
 
         if (objectsToUpdate == null)
         {
-            objectsToUpdate = new HashSet();
-            handlesToDelete = new HashSet();
+            objectsToUpdate = new HashSet<DSpaceObject>();
+            handlesToDelete = new HashSet<String>();
         }
 
         int st = event.getSubjectType();
@@ -179,9 +179,8 @@ public class SearchConsumer implements Consumer
         {
          
             // update the changed Items not deleted because they were on create list
-            for (Iterator ii = objectsToUpdate.iterator(); ii.hasNext();)
+            for (DSpaceObject iu : objectsToUpdate)
             {
-                DSpaceObject iu = (DSpaceObject) ii.next();
                 if (iu.getType() != Constants.ITEM || ((Item) iu).isArchived())
                 {
                     // if handle is NOT in list of deleted objects, index it:
@@ -205,9 +204,8 @@ public class SearchConsumer implements Consumer
                 }
             }
 
-            for (Iterator ii = handlesToDelete.iterator(); ii.hasNext();)
+            for (String hdl : handlesToDelete)
             {
-                String hdl = (String) ii.next();
                 try
                 {
                     DSIndexer.unIndexContent(ctx, hdl);
