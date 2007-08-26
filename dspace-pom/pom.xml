@@ -63,11 +63,11 @@
 			<name>DSpace Maven Repository</name>
 			<url>http://maven.dspace.org</url>
 			<releases>
-				<updatePolicy>daily</updatePolicy>
+				<updatePolicy>never</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</releases>
 			<snapshots>
-				<updatePolicy>daily</updatePolicy>
+				<updatePolicy>always</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</repository>
@@ -92,28 +92,11 @@
 			<name>DSpace Maven Repository</name>
 			<url>http://maven.dspace.org</url>
 			<releases>
-                <updatePolicy>daily</updatePolicy>
+				<updatePolicy>never</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</releases>
 			<snapshots>
-				<updatePolicy>daily</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>m2-snapshot-repository</id>
-			<name>Apache Maven Repository</name>
-			<url>
-				http://people.apache.org/repo/m2-snapshot-repository
-			</url>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
+				<updatePolicy>never</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</pluginRepository>
