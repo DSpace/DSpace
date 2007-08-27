@@ -55,13 +55,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.eperson.AuthenticationManager;
-import org.dspace.eperson.AuthenticationMethod;
 import org.dspace.eperson.EPerson;
 
 

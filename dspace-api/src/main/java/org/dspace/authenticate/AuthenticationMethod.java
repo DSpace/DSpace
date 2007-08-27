@@ -37,7 +37,7 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.eperson;
+package org.dspace.authenticate;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -183,7 +183,8 @@ public interface AuthenticationMethod {
      * @return array of EPerson-group IDs, possibly 0-length, but
      * never <code>null</code>.
      */
-    public int[] getSpecialGroups(Context context, HttpServletRequest request);
+    public int[] getSpecialGroups(Context context, HttpServletRequest request)
+        throws SQLException;
 
     /**
      * Authenticate the given or implicit credentials.

@@ -52,9 +52,9 @@ import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.eperson.AuthenticationManager;
-import org.dspace.eperson.AuthenticationMethod;
 
 /**
  * When only one login method is defined in the dspace.cfg file this class will

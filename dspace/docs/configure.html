@@ -975,6 +975,8 @@ customisations demand regular full indexing you should set up a regular script t
     </li>
   </ul>
 
+  <h3>IP Authentication</h3>
+  As of version 1.5 IP based authentication is configurable via dspace.cfg. It support full and partial IP's, network/netmasks, and network/CIDR notation.
   <h3>LDAP Authentication</h3>
 
   <p>As of version 1.3, the authentication method <code>org.dspace.eperson.LDAPAuthentication</code> is also supplied to support <A HREF="#ldap">LDAP authentication</A>.</P>
@@ -1056,6 +1058,18 @@ customisations demand regular full indexing you should set up a regular script t
      <code>org.dspace.eperson.X509Authentication</code> for an implicit
      method.</p>
 
+  <h2><a name="ipauthentication" id="ipauthentication">Configuring IP Authentication</a></h2>
+  
+  <p>You can enable IP authentication by adding its method to the stack in the DSpace configuration, e.g.:</p>
+  <pre>plugin.sequence.org.dspace.eperson.AuthenticationMethod = org.dspace.eperson.IPAuthentication</pre>
+  <p>You are than able to map DSpace groups to IP's in dspace.cfg by setting authentication.ip.GROUPNAME = iprange[, iprange ...], e.g:</p>
+  <pre>
+  authentication.ip.MY_UNIVERSITY = 10.1.2.3, \            # Full IP
+                                    13.5, \                # Partial IP
+                                    11.3.4.5/24, \         # with CIDR
+                                    12.7.8.9/255.255.128.0 # with netmask
+  </pre>
+  <p><strong>Note: </strong>if the Groupname contains blanks you must escape the, e.g. Department\ of\ Statistics</p>
 
   <h2><a name="ldap" id="ldap">Configuring LDAP Authentication</a></h2>
 

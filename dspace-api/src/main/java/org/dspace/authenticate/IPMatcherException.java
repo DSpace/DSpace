@@ -1,11 +1,11 @@
 /*
- * AuthenticationCountSelector.java
+ * IPMatcherException.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/25 15:24:23 $
+ * Date: $Date$
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,46 +37,33 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.app.xmlui.aspect.eperson;
-
-import java.util.Iterator;
-import java.util.Map;
-
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.selection.Selector;
-import org.dspace.authenticate.AuthenticationManager;
+package org.dspace.authenticate;
 
 /**
- * Selector will count the number of AuthenticationMethods defined in the 
- * dpace configuration file
- * @author Jay Paz
- * @author Scott Phillips
- *
+ * Thrown when there is a problem parsing an IP matcher specification.
+ * 
+ * @version $Revision$
+ * @author Robert Tansley
  */
-public class AuthenticationCountSelector implements Selector{
-    /**
-     * Returns true if the expression (in this case a number) is equal to the number
-     * of AuthenticationMethods defined in the dspace.cnf file
-     * @return
-     */
-	public boolean select(String expression, Map objectModel, Parameters parameters) {
-		// get an iterator of all the AuthenticationMethods defined
-		final Iterator authMethods = AuthenticationManager
-		.authenticationMethodIterator();
-		
-		int authMethodCount = 0;
-		
-		// iterate to count the methods
-		while(authMethods.hasNext()){
-			authMethods.next();
-			authMethodCount++;
-		}
-		
-		final Integer exp = new Integer(expression);
-		
-		return (authMethodCount == exp);
-	}
+public class IPMatcherException extends Exception
+{
+    public IPMatcherException()
+    {
+        super();
+    }
 
-	
+    public IPMatcherException(String message)
+    {
+        super(message);
+    }
 
+    public IPMatcherException(Throwable cause)
+    {
+        super(cause);
+    }
+
+    public IPMatcherException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

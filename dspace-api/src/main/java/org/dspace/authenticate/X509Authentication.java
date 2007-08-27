@@ -37,7 +37,7 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.eperson;
+package org.dspace.authenticate;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -63,6 +63,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
 
 /**
  * Implicit authentication method that gets credentials from the X.509

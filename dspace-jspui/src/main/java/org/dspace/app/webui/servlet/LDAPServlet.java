@@ -51,12 +51,12 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.AuthenticationManager;
 import java.util.Hashtable;
 
 import javax.naming.directory.*;

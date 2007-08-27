@@ -37,7 +37,7 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.eperson;
+package org.dspace.authenticate;
 
 import java.io.IOException;
 
@@ -58,7 +58,6 @@ import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.AuthenticationMethod;
 
 /**
  * Access point for the stackable authentication methods.
@@ -299,6 +298,7 @@ public class AuthenticationManager
      */
     public static int[] getSpecialGroups(Context context,
                                          HttpServletRequest request)
+        throws SQLException
     {
         ArrayList gll = new ArrayList();
         int totalLen = 0;

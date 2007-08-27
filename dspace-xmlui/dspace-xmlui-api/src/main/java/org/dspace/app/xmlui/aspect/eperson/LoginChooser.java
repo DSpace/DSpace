@@ -62,9 +62,9 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.eperson.AuthenticationManager;
-import org.dspace.eperson.AuthenticationMethod;
 import org.xml.sax.SAXException;
 
 /**

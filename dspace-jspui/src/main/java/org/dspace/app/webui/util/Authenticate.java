@@ -49,12 +49,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.AuthenticationManager;
-import org.dspace.eperson.AuthenticationMethod;
 
 /**
  * Methods for authenticating the user. This is DSpace platform code, as opposed

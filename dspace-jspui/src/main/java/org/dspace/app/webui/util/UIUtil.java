@@ -52,6 +52,7 @@ import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
+import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -61,7 +62,6 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.AuthenticationManager;
 
 /**
  * Miscellaneous UI utility methods

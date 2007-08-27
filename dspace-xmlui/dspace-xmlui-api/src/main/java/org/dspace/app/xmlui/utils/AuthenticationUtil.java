@@ -47,11 +47,11 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.AuthenticationManager;
-import org.dspace.eperson.AuthenticationMethod;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -192,7 +192,7 @@ public class AuthenticationUtil
      *            the eperson logged in
      */
     public static void loggedIn(Context context, HttpServletRequest request,
-            EPerson eperson)
+            EPerson eperson) throws SQLException
     {
         if (eperson == null)
             return;

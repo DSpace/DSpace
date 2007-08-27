@@ -48,8 +48,8 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.AuthenticationManager;
 
 /**
  * Miscellaneous UI utility methods methods for managing DSpace context.

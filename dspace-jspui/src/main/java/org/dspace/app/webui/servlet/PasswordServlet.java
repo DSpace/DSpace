@@ -51,12 +51,12 @@ import javax.servlet.jsp.jstl.core.Config;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.AuthenticationManager;
-import org.dspace.eperson.AuthenticationMethod;
 
 /**
  * Simple username and password authentication servlet. Displays the login form
