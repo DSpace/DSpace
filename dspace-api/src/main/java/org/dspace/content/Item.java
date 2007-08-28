@@ -1978,6 +1978,66 @@ public class Item extends DSpaceObject
 
         replaceAllBitstreamPolicies(policies);
     }
+    
+    /**
+     * Moves the item from one collection to another one
+     * 
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void move (Collection from, Collection to) throws SQLException, AuthorizeException, IOException 
+    {
+    	if (isOwningCollection(from))
+    	{
+    		setOwningCollection(to);
+    		update();
+    	}
+    	
+    	to.addItem(this);
+    	from.removeItem(this);
+    }
+    
+    /**
+     * Get the collections this item is not in.
+     * 
+     * @return the collections this item is not in, if any.
+     * @throws SQLException
+     */
+    public Collection[] getCollectionsNotLinked() throws SQLException
+    {
+    	Collection[] allCollections = Collection.findAll(ourContext);
+       	Collection[] linkedCollections = getCollections();
+       	Collection[] notLinkedCollections = new Collection[allCollections.length - linkedCollections.length];
+
+       	if ((allCollections.length - linkedCollections.length) == 0)
+       	{
+       		return notLinkedCollections;
+       	}
+       	
+       	int i = 0;
+           	 
+       	for (Collection collection : allCollections)
+        {
+           	 boolean alreadyLinked = false;
+           		 
+           	 for (Collection linkedCommunity : linkedCollections)
+           	 {
+           		 if (collection.getID() == linkedCommunity.getID())
+           		 {
+           			 alreadyLinked = true;
+           			 break;
+           		 }
+           	 }
+           		 
+           	 if (!alreadyLinked)
+           	 {
+           		 notLinkedCollections[i++] = collection;
+          	 }
+        }   	 
+       	
+       	return notLinkedCollections;
+    }
 
     /**
      * return TRUE if context's user can edit item, false otherwise

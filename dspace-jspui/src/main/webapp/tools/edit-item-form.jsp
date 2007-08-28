@@ -73,6 +73,7 @@
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.eperson.EPerson" %>
 
 <%
     Item item = (Item) request.getAttribute("item");
@@ -80,6 +81,13 @@
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     MetadataField[] dcTypes = (MetadataField[])  request.getAttribute("dc.types");
     HashMap metadataFields = (HashMap) request.getAttribute("metadataFields");
+    
+    // Is anyone logged in?
+    EPerson user = (EPerson) request.getAttribute("dspace.current.user");
+
+    // Is the logged in user an admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
 %>
 
 
@@ -140,6 +148,17 @@
                         <%-- <input type="submit" name="submit" value="Delete (Expunge)..."> --%>
 						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete-w-confirm.button"/>"/>
                     </form>
+<%
+  if (isAdmin)
+  {
+%>                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                        <input type="hidden" name="action" value="<%= EditItemServlet.START_MOVE_ITEM %>" />
+						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.move-item.button"/>"/>
+                    </form>
+<%
+  }
+%>
                 </td>
             </tr>
             <tr>

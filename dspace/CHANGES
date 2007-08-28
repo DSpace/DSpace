@@ -16,7 +16,8 @@
 
 (Flavio Botelho)
 - S.F. Patch 1764069 Replace "String" with "Integer" in PreparedStatement 
-  Parameters where appropiate.
+  Parameters where appropriate.
+- SF Patch 1743188 Patch for Request #1145499 - Move Items
 
 (Mark Diggory)
 - Guard against output invalid unqualified Dublin Core in OAIDCCrosswalk.
