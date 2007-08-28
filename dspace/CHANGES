@@ -58,9 +58,13 @@
 (Stuart Lewis)
 - SF Patch #1737792 Patch for bug 1552760 - Submit interface looks bad in Safari
 - Removal of message for Netscape users in choose-file.jsp + removal of supporting text and images in the help file
+- SF Patch #1591871 Docs for google and html sitemaps
 
 (Chris yates)
 - SF Patch #1724330 Removes "null" being displayed in community-home.jsp
+
+(Robert Tansley / Stuart Lewis)
+- SF Patch #1587225 Google and html sitemap generator
 
 1.4.2 beta
 ===========
@@ -111,7 +115,6 @@
 (Stuart Lewis)
 - SF Patch #1670110 for SF Bug #1670106 Onebox and textarea fail when visibility set to workflow
 - SF Patch #1628889 Improve file size descriptions in ItemTag
-- SF Patch #1587225 Google and html sitemap generator
 - SF Patch #1641678 [dspace]/bin scripts for import and export
 - SF Patch #1642336 Restrict domains of self-registered users
 

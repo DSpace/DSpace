@@ -528,6 +528,39 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 
 	<p>will change any handles currently assigned prefix 123456789 to prefix 1303, so for example handle 123456789/23 will be updated to 1303/23 in the database.</p>
 
+	<h3><a NAME="sitemaps">Google and HTML sitemaps</a></h3>
+
+    <p>To aid web crawlers index the content within your repository, you can make use of sitemaps. There are currently two forms of sitemaps included in DSpace; Google sitemaps and HTML sitemaps.</p>
+
+    <p>Sitemaps allow DSpace to expose it's content without the crawlers having to index every page. HTML sitemaps provide a list of all items, collections and communities in HTML format, whilst Google sitemaps provide the same information in gzipped XML format.</p>
+
+    <p>To generate the sitemaps, you need to run <code>[dspace]/bin/generate-sitemaps</code> This creates the sitemaps in <code>[dspace]/sitemaps/</code></p>
+
+    <p>The sitemaps can be accessed from the following URLs:
+
+    <ul>
+    	<li>http://dspace.example.com/dspace/sitemap - Index sitemap</li>
+    	<li>http://dspace.example.com/dspace/sitemap?map=0 - First list of items (up to 50,000)</li>
+    	<li>http://dspace.example.com/dspace/sitemap?map=n - Subsequent lists of items (e.g. 50,0001 to 100,000) etc...</li>
+    </ul>
+
+    HTML sitemaps follow the same procedure:
+
+    <ul>
+    	<li>http://dspace.example.com/dspace/htmlmap - Index sitemap</li>
+    	<li>etc...</li>
+    </ul>
+
+    </p>
+
+    <p>When running <code>[dspace]/bin/generate-sitemaps</code> the script informs Google that the sitemaps have been updated. For this update to register correctly, you must first register your Google sitemap index page (<code>/dspace/sitemap</code>) with Google at <a href="http://www.google.com/webmasters/sitemaps/">http://www.google.com/webmasters/sitemaps/</a>. If your DSpace server requires the use of a HTTP proxy to connect to the Internet, ensure that you have set <code>http.proxy.host</code> and <code>http.proxy.port</code> in <code>[dspace]/config/dspace.cfg</code></p>
+	
+	<p>The URL for pinging Google, and in future, other search engines, is configured in <code>[dspace]/config/dspace.cfg</code> using the <code>sitemap.engineurls</code> setting where you can provide a comma-separated list of URLs to 'ping'.
+
+    <p>You can generate the sitemaps automatically every day using an additional cron job:</p>
+
+    <pre># Generate sitemaps<br />0 6 * * * [dspace]/bin/generate-sitemaps
+	</pre>
 
 	<h2><a name="windows">Windows Installation</a></h2>
 

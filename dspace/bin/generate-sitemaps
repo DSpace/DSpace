@@ -47,5 +47,5 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-echo "Generating HTML sitemaps"
+echo "Generating sitemaps"
 $BINDIR/dsrun org.dspace.app.sitemap.GenerateSitemaps $@
