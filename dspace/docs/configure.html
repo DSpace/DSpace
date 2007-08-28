@@ -101,11 +101,11 @@ property2.name = ${dspace.dir}/rest/of/path
       </tr>
 
       <tr>
-        <td><code>plugin.sequence.org.dspace<br>.eperson.AuthenticationMethod</code></td>
+        <td><code>plugin.sequence.org.dspace<br>.authenticate.AuthenticationMethod</code></td>
 
-        <td><code>org.dspace.eperson<br>.X509Authentication, org.dspace.eperson<br>.PasswordAuthentication</code></td>
+        <td><code>org.dspace.eperson<br>.X509Authentication, org.dspace.authenticate<br>.PasswordAuthentication</code></td>
 
-        <td>Comma-separated list of classes implementing the <code>org.dspace.eperson.AuthenticationMethod</code> interface, which make up the <a href="#authenticate">authentication stack</a>.  Authentication methods are called on in the order listed.</td>
+        <td>Comma-separated list of classes implementing the <code>org.dspace.authenticate.AuthenticationMethod</code> interface, which make up the <a href="#authenticate">authentication stack</a>.  Authentication methods are called on in the order listed.</td>
       </tr>
 
       <tr>
@@ -906,14 +906,14 @@ customisations demand regular full indexing you should set up a regular script t
      existing code.  You can also share authentication code with other sites.</p>
 
   <p>The configuration property
-     <code>plugin.sequence.org.dspace.eperson.AuthenticationMethod</code>
+     <code>plugin.sequence.org.dspace.authenticate.AuthenticationMethod</code>
      defines the authentication stack.  It is a comma-separated list of
      class names.  Each of these classes implements a different
      <em>authentication method</em>, or way of determining the identity of
      the user.  They are invoked in the order specified until one succeeds.
 
   <p>An authentication method is a class that implements the
-     interface <code>org.dspace.eperson.AuthenticationMethod</code>.
+     interface <code>org.dspace.authenticate.AuthenticationMethod</code>.
      It <em>authenticates</em> a user by evaluating the <em>credentials</em>
      (e.g. username and password) he or she presents and
      checking that they are valid.</p>
@@ -955,7 +955,7 @@ customisations demand regular full indexing you should set up a regular script t
 
   <h3>Authentication by Password</h3>
 
-  <p>The default method <code>org.dspace.eperson.PasswordAuthentication</code> has the following properties:
+  <p>The default method <code>org.dspace.authenticate.PasswordAuthentication</code> has the following properties:
 
   <ul>
     <li>
@@ -979,7 +979,7 @@ customisations demand regular full indexing you should set up a regular script t
   As of version 1.5 IP based authentication is configurable via dspace.cfg. It support full and partial IP's, network/netmasks, and network/CIDR notation.
   <h3>LDAP Authentication</h3>
 
-  <p>As of version 1.3, the authentication method <code>org.dspace.eperson.LDAPAuthentication</code> is also supplied to support <A HREF="#ldap">LDAP authentication</A>.</P>
+  <p>As of version 1.3, the authentication method <code>org.dspace.authenticate.LDAPAuthentication</code> is also supplied to support <A HREF="#ldap">LDAP authentication</A>.</P>
 
   <h3>X.509 Certificate Authentication</h3>
 
@@ -997,15 +997,15 @@ customisations demand regular full indexing you should set up a regular script t
   so the server requests a personal Web certificate from the client.</p>
   </li>
   <p><li>
-  Add the <code>org.dspace.eperson.X509Authentication</code> plugin
+  Add the <code>org.dspace.authenticate.X509Authentication</code> plugin
   <em>first</em> to the list of stackable authentication methods in the value
-  of the configuration key <code>plugin.sequence.org.dspace.eperson.AuthenticationMethod</code>
+  of the configuration key <code>plugin.sequence.org.dspace.authenticate.AuthenticationMethod</code>
   <i>E.g.:</i>
   </p>
   <pre>
-    plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
-        org.dspace.eperson.X509Authentication, \
-        org.dspace.eperson.PasswordAuthentication
+    plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
+        org.dspace.authenticate.X509Authentication, \
+        org.dspace.authenticate.PasswordAuthentication
   </pre>
 
   </li>
@@ -1053,15 +1053,15 @@ customisations demand regular full indexing you should set up a regular script t
 
   <p>You can create your own custom authentication method and add it to
      the stack.  Use the most similar existing method as a model, e.g.
-     <code>org.dspace.eperson.PasswordAuthentication</code> for an "explicit"
+     <code>org.dspace.authenticate.PasswordAuthentication</code> for an "explicit"
      method (with credentials entered interactively) or
-     <code>org.dspace.eperson.X509Authentication</code> for an implicit
+     <code>org.dspace.authenticate.X509Authentication</code> for an implicit
      method.</p>
 
   <h2><a name="ipauthentication" id="ipauthentication">Configuring IP Authentication</a></h2>
   
   <p>You can enable IP authentication by adding its method to the stack in the DSpace configuration, e.g.:</p>
-  <pre>plugin.sequence.org.dspace.eperson.AuthenticationMethod = org.dspace.eperson.IPAuthentication</pre>
+  <pre>plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.IPAuthentication</pre>
   <p>You are than able to map DSpace groups to IP's in dspace.cfg by setting authentication.ip.GROUPNAME = iprange[, iprange ...], e.g:</p>
   <pre>
   authentication.ip.MY_UNIVERSITY = 10.1.2.3, \            # Full IP
@@ -1075,7 +1075,7 @@ customisations demand regular full indexing you should set up a regular script t
 
   <p>You can enable LDAP authentication by adding its method to the
      stack in the DSpace configuration, e.g.</p>
-     <pre>plugin.sequence.org.dspace.eperson.AuthenticationMethod = org.dspace.eperson.LDAPAuthentication</pre>
+     <pre>plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.LDAPAuthentication</pre>
 
   <p>If LDAP is enabled in the dspace.cfg file, then new users will be able to register by entering their username and password without being sent the registration token. If users do not have a username and password, then they can still register and login with just their email address the same way they do now.</p>
 
@@ -1103,7 +1103,7 @@ customisations demand regular full indexing you should set up a regular script t
     This is the search context used when looking up a user's ldap object to retrieve their data for autoregistering. With ldap.autoregister turned on, when a user authenticates without an EPerson object we search the ldap directory to get their name and email address so that we can create one for them. So after we have authenticated against uid=username,ou=people,o=byu.edu we now search in ou=people for filtering on [uid=username]. Often the ldap.search_context is the same as the ldap.object_context parameter. But again this depends on your ldap server configuration.</li>
 
     <li><b>ldap.email_field = mail</b><br>
-    This is the ldap object field where the user's email address is stored. "mail" is the default and the most common for ldap servers. If the mail field is not found the username will be used as the email address when creating the eperson obejct.</li>
+    This is the ldap object field where the user's email address is stored. "mail" is the default and the most common for ldap servers. If the mail field is not found the username will be used as the email address when creating the eperson object.</li>
 
     <li><b>ldap.surname_field = sn</b><br>
     This is the ldap object field where the user's last name is stored. "sn" is the default and is the most common for ldap servers. If the field is not found the field will be left blank in the new eperson object.</li>
