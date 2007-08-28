@@ -285,7 +285,8 @@ public class EditItemServlet extends DSpaceServlet
 	        	request.setAttribute("notLinkedCollections", notLinkedCollections);
 	            	            
 	        	JSPManager.showJSP(request, response, "/tools/move-item.jsp");
-        	} else {
+        	} else
+        	{
         		throw new ServletException("You must be an administrator to move an item");
         	}
         	
@@ -307,7 +308,8 @@ public class EditItemServlet extends DSpaceServlet
 	            showEditForm(context, request, response, item);
 	
 	            context.complete();
-        	} else {
+        	} else
+        	{
         		throw new ServletException("You must be an administrator to move an item");
         	}
         	
