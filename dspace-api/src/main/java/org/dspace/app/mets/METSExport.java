@@ -410,6 +410,12 @@ public class METSExport
             {
                 Bitstream[] bitstreams = bundles[i].getBitstreams();
 
+                // Unusual condition, but if no bitstreams, skip this bundle
+                if (bitstreams.length == 0)
+                {
+                    continue;
+                }
+                        
                 // First: we skip the license bundle, since it's included
                 // elsewhere
                 if (bitstreams[0].getFormat().getID() == licenseFormat)
@@ -563,10 +569,13 @@ public class METSExport
             // Assume license will be in its own bundle
             Bitstream[] bitstreams = bundles[i].getBitstreams();
 
-            if (bitstreams[0].getFormat().getID() == licenseFormat)
+            if (bitstreams.length > 0)
             {
-                // Read the license into a string
-                return bitstreams[0].retrieve();
+                if (bitstreams[0].getFormat().getID() == licenseFormat)
+                {
+                    // Read the license into a string
+                    return bitstreams[0].retrieve();
+                }
             }
         }
 
@@ -647,9 +656,22 @@ public class METSExport
             }
             else
             {
+                String value = dc[i].value;
+
+                // Replace all $'s with \$ so it doesn't trip up the replaceAll!
+                if (value != null && value.length() > 0)
+                {
+                    // RegExp note: Yes, there really does need to be this many backslashes!
+                    // To have \$ inserted in the replacement, both the backslash and the dollar
+                    // have to be escaped (backslash) - so the replacemenet string has to be
+                    // passed as \\\$. All of those backslashes then have to escaped in the literal
+                    // for them to be in string used!!!
+                    value = dc[i].value.replaceAll("\\$", "\\\\\\$");
+                }
+
                 // Replace '%s' with DC value (with entities encoded)
                 modsXML.append(modsMapping.replaceAll("%s", Utils
-                        .addEntities(dc[i].value)));
+                        .addEntities(value)));
                 modsXML.append("\n"); // For readability
             }
         }
