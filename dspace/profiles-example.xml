@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profilesXml xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/profiles-1.0.0.xsd">
+    <!--  
+    
+        To use these profiles, you will need to copy this file to "profiles.xml" and customize
+        it appropriately.
+        
+        The following profiles show how to customize the build process for either
+        postgres or oracle to include extra details such as db.url, db.username and db.password
+        which will be populated in the resulting dspace.cfg that is filtered into
+        this projects target directory.
+
+        Note: for oracle you may more than likely find you need to retrieve the jar from
+        the Oracle website and install it locally into your repository.
+        
+    -->
+    <profiles>
+        <profile>
+            <id>postgres</id>
+            <activation>
+                <property>
+                    <name>!db.name</name>
+                </property>
+            </activation>
+            <properties>
+                <db.sql.dir>etc</db.sql.dir>
+                <db.name>postgres</db.name>
+                <db.driver>org.postgresql.Driver</db.driver>
+                <db.url>jdbc:postgresql://localhost:5432/dspace</db.url>
+                <db.username>postgres_user</db.username>
+                <db.password>postgres_passwd</db.password>
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <properties>
+                <db.sql.dir>etc/oracle</db.sql.dir>
+                <db.name>oracle</db.name>
+                <db.driver>oracle.jdbc.OracleDriver</db.driver>
+                <db.driver.groupId>com.oracle</db.driver.groupId>
+                <db.driver.artifactId>ojdbc14</db.driver.artifactId>
+                <db.driver.version>10.2.0.2.0</db.driver.version>
+                <!-- 
+                
+                Other Possibilities:
+                
+                <db.driver.version>9.0.2.0.0</db.driver.version>
+                 -->
+                <db.url>jdbc:oracle:thin:@//localhost:1521/xe</db.url>
+                <db.username>oracle_user</db.username>
+                <db.password>oracle_passwd</db.password>
+            </properties>
+        </profile>
+    </profiles>
+</profilesXml>

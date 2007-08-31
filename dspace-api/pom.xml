@@ -21,46 +21,6 @@
    </parent>
    
    <!-- 
-      Profiles cause different dependencies to be included into the DSpace
-      build process
-   -->
-   <profiles>
-      <profile>
-         <id>postgres</id>
-         <activation>
-            <activeByDefault>true</activeByDefault>
-            <property>
-              <name>db.name</name>
-              <value>postgres</value>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>postgresql</groupId>
-               <artifactId>postgresql</artifactId>
-               <version>8.1-404.jdbc3</version>
-            </dependency>
-         </dependencies>
-      </profile>
-      <profile>
-         <id>oracle</id>
-         <activation>
-            <property>
-               <name>db.name</name>
-               <value>oracle</value>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>com.oracle</groupId>
-               <artifactId>ojdbc14</artifactId>
-               <version>10.2.0.2.0</version>
-            </dependency>
-         </dependencies>
-      </profile>
-   </profiles>
-   
-   <!-- 
       Runtime and Compile Time dependencies for DSpace.
    -->
    <dependencies>

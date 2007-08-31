@@ -39,6 +39,42 @@
                </filters>
            </build>
        </profile>
+ 
+      <profile>
+         <id>postgres</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+            <property>
+              <name>db.name</name>
+              <value>postgres</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>postgresql</groupId>
+               <artifactId>postgresql</artifactId>
+               <version>8.1-404.jdbc3</version>
+            </dependency>
+         </dependencies>
+      </profile>
+      
+      <profile>
+         <id>oracle</id>
+         <activation>
+            <property>
+               <name>db.name</name>
+               <value>oracle</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.oracle</groupId>
+               <artifactId>ojdbc14</artifactId>
+               <version>10.2.0.2.0</version>
+            </dependency>
+         </dependencies>
+      </profile>
+      
    </profiles>
    
 	<build>
@@ -363,7 +399,16 @@
       			<artifactId>icu4j</artifactId>
       			<version>3.4.4</version>
 		    </dependency>
-
+            <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>8.1-404.jdbc3</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc14</artifactId>
+                <version>10.2.0.2.0</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
