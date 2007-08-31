@@ -240,9 +240,10 @@
         <profile>
             <id>oracle</id>
             <activation>
-                <file>
-                    <exists>../dspace-storage-oracle/pom.xml</exists>
-                </file>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
             </activation>
             <properties>
                 <db.sql.dir>etc/oracle</db.sql.dir>

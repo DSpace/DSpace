@@ -45,15 +45,6 @@
                 <db.sql.dir>etc/oracle</db.sql.dir>
                 <db.name>oracle</db.name>
                 <db.driver>oracle.jdbc.OracleDriver</db.driver>
-                <db.driver.groupId>com.oracle</db.driver.groupId>
-                <db.driver.artifactId>ojdbc14</db.driver.artifactId>
-                <db.driver.version>10.2.0.2.0</db.driver.version>
-                <!-- 
-                
-                Other Possibilities:
-                
-                <db.driver.version>9.0.2.0.0</db.driver.version>
-                 -->
                 <db.url>jdbc:oracle:thin:@//localhost:1521/xe</db.url>
                 <db.username>oracle_user</db.username>
                 <db.password>oracle_passwd</db.password>
