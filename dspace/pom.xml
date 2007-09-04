@@ -249,6 +249,7 @@
                 <db.sql.dir>etc/oracle</db.sql.dir>
                 <db.name>oracle</db.name>
                 <db.driver>oracle.jdbc.OracleDriver</db.driver>
+                <db.url>jdbc:oracle:thin:@//localhost:1521/xe</db.url>
                 <db.username>dspace</db.username>
                 <db.password>dspace</db.password>
             </properties>
