@@ -1,450 +1,457 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Copyright 1999-2004 The Apache Software Foundation
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
-
-<!--+
-    | This is the Cocoon web-app configurations file
-    +-->
-
 <!DOCTYPE web-app
     PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
     "http://java.sun.com/dtd/web-app_2_3.dtd">
-
 <web-app>
-
-  <!-- Context Configuration ========================================== -->
-
-  <!--+
-      | Set a context property useful to allow you to ProxyPass your
-      | web application mounted to a different URI without loosing the
-      | ability to do cookie-based sessions.
-      | WARNING: this is Jetty specific!
-      +-->
-  <!--context-param>
-    <param-name>org.mortbay.jetty.servlet.SessionPath</param-name>
-    <param-value>/some/path/to/your/webapp</param-value>
-    <description>An override of the session cookie path</description>
-   </context-param-->
-
-  <!-- Servlet Configuration ========================================== -->
-
-	<display-name> Manakin </display-name>
-	<description>
-		An XML based front end to DSpace that allows thematic customizations to DSpace's interface.
-	</description>
-
-  <servlet>
-    <servlet-name>Cocoon</servlet-name>
-    <display-name>Cocoon</display-name>
-    <description>Cocoon</description>
-
     <!--
-      The regular servlet class (trusts the servlet container classloader)
-    --> 
-    <servlet-class>org.dspace.app.xmlui.cocoon.DSpaceCocoonServlet</servlet-class>
-
-    <!--
-      This parameter tells cocoon to set the thread's context classloader to
-      its own classloader. If you experience strange classloader issues,
-      try setting this parameter to "true" or using ParanoidCocoonServlet.
+        Copyright 1999-2004 The Apache Software Foundation
+        
+        Licensed under the Apache License, Version 2.0 (the "License");
+        you may not use this file except in compliance with the License.
+        You may obtain a copy of the License at
+        
+        http://www.apache.org/licenses/LICENSE-2.0
+        
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
     -->
-    <init-param>
-      <param-name>init-classloader</param-name>
-      <param-value>false</param-value>
-    </init-param>
+    <display-name>Manakin</display-name>
+
+    <description>
+        An XML based front end to DSpace that allows thematic
+        customizations to DSpace's interface.
+    </description>
+
+    <!-- Context Configuration ========================================== -->
+
+    <!--+
+        | Set a context property useful to allow you to ProxyPass your
+        | web application mounted to a different URI without loosing the
+        | ability to do cookie-based sessions.
+        | WARNING: this is Jetty specific!
+        +-->
+    <!--context-param>
+        <param-name>org.mortbay.jetty.servlet.SessionPath</param-name>
+        <param-value>/some/path/to/your/webapp</param-value>
+        <description>An override of the session cookie path</description>
+        </context-param-->
+
+
+    <!-- DSpace Configuration Information -->
+    <context-param>
+        <param-name>dspace-config</param-name>
+        <param-value>${dspace.dir}/config/dspace.cfg</param-value>
+        <description>
+            The location of the main DSpace configuration file
+        </description>
+    </context-param>
+
+    <!-- Servlet Configuration ========================================== -->
+
+    <servlet>
+        <servlet-name>Cocoon</servlet-name>
+        <display-name>Cocoon</display-name>
+        <description>Cocoon</description>
+
+        <!--
+            The regular servlet class (trusts the servlet container classloader)
+        -->
+        <servlet-class>
+            org.dspace.app.xmlui.cocoon.DSpaceCocoonServlet
+        </servlet-class>
+
+        <!--
+            This parameter tells cocoon to set the thread's context classloader to
+            its own classloader. If you experience strange classloader issues,
+            try setting this parameter to "true" or using ParanoidCocoonServlet.
+        -->
+        <init-param>
+            <param-name>init-classloader</param-name>
+            <param-value>false</param-value>
+        </init-param>
+
+        <!--
+            This parameter allows to set system properties
+        -->
+        <!--
+            <init-param>
+            <param-name>force-property</param-name>
+            <param-value>
+            org.apache.commons.logging.Log=org.apache.commons.logging.impl.LogKitLogger
+            </param-value>
+            </init-param>
+        -->
+
+        <!--
+            This parameter points to the main configuration file for Cocoon.
+            Note that the path is specified in absolute notation but it will be
+            resolved relative to the servlets webapp context path
+        -->
+        <init-param>
+            <param-name>configurations</param-name>
+            <param-value>/WEB-INF/cocoon.xconf</param-value>
+        </init-param>
+
+        <!--
+            This parameter indicates the configuration file of the LogKit management
+        -->
+        <init-param>
+            <param-name>logkit-config</param-name>
+            <param-value>/WEB-INF/logkit.xconf</param-value>
+        </init-param>
+
+        <!--
+            This parameter indicates the category id of the logger from the LogKit
+            configuration used by the CocoonServlet.
+        -->
+        <init-param>
+            <param-name>servlet-logger</param-name>
+            <param-value>access</param-value>
+        </init-param>
+
+        <!--
+            This parameter indicates the category id of the logger from the LogKit
+            management configuration for the Cocoon engine.
+            This logger is used for all components described in the cocoon.xconf
+            and sitemap.xmap file not having specified a logger with the
+            logger="..." attribute in the component configuration file.
+        -->
+        <init-param>
+            <param-name>cocoon-logger</param-name>
+            <param-value>core</param-value>
+        </init-param>
+
+        <!--
+            This parameter indicates the log level to use throughout startup of the
+            system. As soon as the logkit.xconf the setting of the logkit.xconf
+            configuration is used instead! Only for startup and if the logkit.xconf is
+            not readable/available this log level is of importance.
+            
+            Available levels are:
+            DEBUG:        prints all level of log messages.
+            INFO:         prints all level of log messages except DEBUG ones.
+            WARN:         prints all level of log messages except DEBUG and INFO ones.
+            ERROR:        prints all level of log messages except DEBUG, INFO and WARN ones.
+            FATAL_ERROR:  prints only log messages of this level
+        -->
+        <init-param>
+            <param-name>log-level</param-name>
+            <param-value>WARN</param-value>
+        </init-param>
+
+        <!--
+            The forbidden level for deprectation messages. DEBUG forbids all deprecations (strict mode)
+            and FATAL_ERROR allows all (tolerant mode). Default is ERROR, allowing up to WARN.
+            See org.apache.util.Deprecation for more details.
+        -->
+        <init-param>
+            <param-name>forbidden-deprecation-level</param-name>
+            <param-value>ERROR</param-value>
+        </init-param>
+
+        <!--
+            This parameter switches the logging system from LogKit to Log4J for Cocoon.
+            Log4J has to be configured already.
+            <init-param>
+            <param-name>logger-class</param-name>
+            <param-value>org.apache.avalon.excalibur.logger.Log4JLoggerManager</param-value>
+            </init-param>
+        -->
+
+        <!--
+            If you want to configure log4j using Cocoon, then you can define
+            an XML configuration file here. You can use the usual log4j property
+            substituation mechanism, e.g. ${context-root} is replaced by the
+            context root of this web application etc.
+            You can configure the log4j configuration even if you use LogKit
+            for Cocoon logging. You can use this to configure third party code
+            for example.
+            <init-param>
+            <param-name>log4j-config</param-name>
+            <param-value>/WEB-INF/log4j.xconf</param-value>
+            </init-param>
+        -->
+
+        <!--
+            Allow reinstantiating (reloading) of the cocoon instance. If this is
+            set to "yes" or "true", a new cocoon instance can be created using
+            the request parameter "cocoon-reload". It also enables that Cocoon is
+            reloaded when cocoon.xconf changes. Default is no for security reasons.
+        -->
+        <init-param>
+            <param-name>allow-reload</param-name>
+            <param-value>no</param-value>
+        </init-param>
+
+        <!--
+            This parameter is used to list classes that should be loaded at
+            initialization time of the servlet. For example, JDBC Drivers used need to
+            be named here. Additional entries may be inserted here during build
+            depending on your build properties.
+        -->
+        <init-param>
+            <param-name>load-class</param-name>
+            <param-value>
+                <!-- For parent ComponentManager sample:
+                    org.apache.cocoon.samples.parentcm.Configurator -->
+                <!-- For IBM WebSphere:
+                    com.ibm.servlet.classloader.Handler -->
+            </param-value>
+        </init-param>
+
+        <!--
+            Causes all files in multipart requests to be processed.
+            Default is false for security reasons.
+            Unsupported values will be interpreted as false.
+        -->
+        <init-param>
+            <param-name>enable-uploads</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+        <!--
+            This parameter allows to specify where Cocoon should put uploaded files.
+            The path specified can be either absolute or relative to the context
+            path of the servlet. On windows platform, absolute directory must start
+            with volume: C:\Path\To\Upload\Directory
+            
+            The default directory is "upload-dir" in the work-directory
+        -->
+        <init-param>
+            <param-name>upload-directory</param-name>
+            <param-value>WEB-INF/work/upload-dir</param-value>
+        </init-param>
+
+
+        <!--
+            Causes all files in multipart requests to be saved to upload-dir.
+            Default is true for security reasons.
+            Unsupported values will be interpreted as false.
+        -->
+        <init-param>
+            <param-name>autosave-uploads</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+        <!--
+            Specify handling of name conflicts when saving uploaded files to disk.
+            Acceptable values are deny, allow, rename (default). Files are renamed
+            x_filename where x is an integer value incremented to make the new
+            filename unique.
+        -->
+        <init-param>
+            <param-name>overwrite-uploads</param-name>
+            <param-value>rename</param-value>
+        </init-param>
+
+        <!--
+            Specify maximum allowed size of the upload. Defaults to 10 Mb.
+        -->
+        <init-param>
+            <param-name>upload-max-size</param-name>
+            <param-value>1000000000</param-value>
+        </init-param>
+
+        <!--
+            This parameter allows to specify where Cocoon should create its page
+            and other objects cache. The path specified can be either absolute or
+            relative to the context path of the servlet. On windows platform,
+            absolute directory must start with volume: C:\Path\To\Cache\Directory
+            
+            The default directory is "cache-dir" in the work-directory
+            
+            <init-param>
+            <param-name>cache-directory</param-name>
+            <param-value>WEB-INF/work/cache-dir</param-value>
+            </init-param>
+        -->
+
+        <!--
+            This parameter allows to specify where Cocoon should put it's
+            working files. The path specified is either absolute or relative
+            to the context path of the Cocoon servlet. On windows platform,
+            absolute directory must start with volume: C:\Path\To\Work\Directory
+            
+            The default directory is "cocoon-files" directory in the servlet
+            context's temp directory (context property javax.servlet.context.tempdir).
+            
+            <init-param>
+            <param-name>work-directory</param-name>
+            <param-value>WEB-INF/work</param-value>
+            </init-param>
+        -->
+
+        <!--
+            This parameter allows to specify additional directories or jars
+            which Cocoon should put into it's own classpath.
+            Note that you must separate them using the platforms path.separator
+            (":" for *nix and ";" for Windows systems). Also note that absolute
+            pathes are taken as such but relative pathes are rooted at the context
+            root of the Cocoon servlet.
+            
+            <init-param>
+            <param-name>extra-classpath</param-name>
+            <param-value>WEB-INF/extra-classes1:/[YOU-ABSOLUTE-PATH-TO]/own.jar</param-value>
+            </init-param>
+        -->
+
+        <!--
+            This parameter allows you to select the parent component manager.
+            The class will be instantiated via the constructor that takes a single
+            String as a parameter. That String will be equal to the text after the
+            '/'.
+            
+            Cocoon honors the LogEnabled, Initializable and Disposable interfaces for
+            this class, if it implements them.
+            
+            If you uncomment the following lines the parent CM is set to the Parent CM
+            sample, which will look up a configuration via JNDI at
+            org/apache/cocoon/samples/parentcm/ParentCMConfiguration and use it.
+            <init-param>
+            <param-name>parent-component-manager</param-name>
+            <param-value>org.apache.cocoon.samples.parentcm.ParentComponentManager/org/apache/cocoon/samples/parentcm/ParentCMConfiguration</param-value>
+            </init-param>
+        -->
+
+        <!--
+            If you set this parameter to 'true' or 'yes', Cocoon will add processing
+            time to the end of each response. Value 'hide' adds processing time as an
+            HTML comment. By default, processing time is not added (corresponds to
+            value 'no').
+            NOTE: If you use this feature, Cocoon might generated a wrong content
+            length header in the response. This is due to the internal processing
+            of Readers and the Caching. So, this might be the reason if you get
+            a warning about a wrong content length.
+            See http://issues.apache.org/bugzilla/show_bug.cgi?id=17370.
+            <init-param>
+            <param-name>show-time</param-name>
+            <param-value>hide</param-value>
+            </init-param>
+        -->
+
+        <!--
+            If true or not set, this class will try to catch and handle all Cocoon
+            exceptions. If false, it will rethrow them to the servlet container.
+        -->
+        <init-param>
+            <param-name>manage-exceptions</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+        <!--
+            If true, Avalon Excalibur instrumentation will be enabled on all
+            Instrumentable components with Cocoon and your Cocoon application.
+        -->
+        <init-param>
+            <param-name>enable-instrumentation</param-name>
+            <param-value>false</param-value>
+        </init-param>
+
+        <!--
+            This defines the location of the instrument manager configuration, only
+            used if the init-param enable-instrumentation is enabled.
+        -->
+        <!--<init-param>
+            <param-name>instrumentation-config</param-name>
+            <param-value>/WEB-INF/instrumentation.xconf</param-value>
+            </init-param>-->
+
+        <!--
+            Set encoding used by the container. If not set the ISO-8859-1 encoding
+            will be assumed.
+            Since the servlet specification requires that the ISO-8859-1 encoding
+            is used (by default), you should never change this value unless
+            you have a buggy servlet container.
+        -->
+        <init-param>
+            <param-name>container-encoding</param-name>
+            <param-value>ISO-8859-1</param-value>
+        </init-param>
+
+        <!--
+            Set form encoding. This will be the character set used to decode request
+            parameters. If not set the ISO-8859-1 encoding will be assumed.
+        -->
+        <init-param>
+            <param-name>form-encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+
+        <!--
+            This parameter allows you to startup Cocoon2 immediately after startup
+            of your servlet engine.
+        -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- URL space mappings ============================================= -->
 
     <!--
-      This parameter allows to set system properties
+        Cocoon handles all the URL space assigned to the webapp using its sitemap.
+        It is recommended to leave it unchanged. Under some circumstances though
+        (like integration with proprietary webapps or servlets) you might have
+        to change this parameter.
     -->
-    <!--
-    <init-param>
-      <param-name>force-property</param-name>
-      <param-value>
-        org.apache.commons.logging.Log=org.apache.commons.logging.impl.LogKitLogger
-      </param-value>
-    </init-param>
-    -->
-
-    <!--
-      This parameter points to the main configuration file for Cocoon.
-      Note that the path is specified in absolute notation but it will be
-      resolved relative to the servlets webapp context path
-    -->
-    <init-param>
-      <param-name>configurations</param-name>
-      <param-value>/WEB-INF/cocoon.xconf</param-value>
-    </init-param>
+    <servlet-mapping>
+        <servlet-name>Cocoon</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
 
     <!--
-      This parameter indicates the configuration file of the LogKit management
+        Some servlet engines (Tomcat) have defaults which are not overriden
+        by '/' mapping, but must be overriden explicitly.
     -->
-    <init-param>
-      <param-name>logkit-config</param-name>
-      <param-value>/WEB-INF/logkit.xconf</param-value>
-    </init-param>
-
+    <servlet-mapping>
+        <servlet-name>Cocoon</servlet-name>
+        <url-pattern>*.jsp</url-pattern>
+    </servlet-mapping>
     <!--
-      This parameter indicates the category id of the logger from the LogKit
-      configuration used by the CocoonServlet.
+        Some servlet engines (WebLogic) have defaults which are not overriden
+        by '/' mapping, but must be overriden explicitly.
     -->
-    <init-param>
-      <param-name>servlet-logger</param-name>
-      <param-value>access</param-value>
-    </init-param>
+    <servlet-mapping>
+        <servlet-name>Cocoon</servlet-name>
+        <url-pattern>*.html</url-pattern>
+    </servlet-mapping>
 
-    <!--
-      This parameter indicates the category id of the logger from the LogKit
-      management configuration for the Cocoon engine.
-      This logger is used for all components described in the cocoon.xconf
-      and sitemap.xmap file not having specified a logger with the
-      logger="..." attribute in the component configuration file.
-    -->
-    <init-param>
-      <param-name>cocoon-logger</param-name>
-      <param-value>core</param-value>
-    </init-param>
+    <!-- various MIME type mappings ====================================== -->
 
-    <!--
-      This parameter indicates the log level to use throughout startup of the
-      system. As soon as the logkit.xconf the setting of the logkit.xconf
-      configuration is used instead! Only for startup and if the logkit.xconf is
-      not readable/available this log level is of importance.
+    <mime-mapping>
+        <extension>css</extension>
+        <mime-type>text/css</mime-type>
+    </mime-mapping>
 
-      Available levels are:
-        DEBUG:        prints all level of log messages.
-        INFO:         prints all level of log messages except DEBUG ones.
-        WARN:         prints all level of log messages except DEBUG and INFO ones.
-        ERROR:        prints all level of log messages except DEBUG, INFO and WARN ones.
-        FATAL_ERROR:  prints only log messages of this level
-    -->
-    <init-param>
-      <param-name>log-level</param-name>
-      <param-value>WARN</param-value>
-    </init-param>
+    <mime-mapping>
+        <extension>xml</extension>
+        <mime-type>text/xml</mime-type>
+    </mime-mapping>
 
-    <!--
-      The forbidden level for deprectation messages. DEBUG forbids all deprecations (strict mode)
-      and FATAL_ERROR allows all (tolerant mode). Default is ERROR, allowing up to WARN.
-      See org.apache.util.Deprecation for more details.
-    -->
-    <init-param>
-      <param-name>forbidden-deprecation-level</param-name>
-      <param-value>ERROR</param-value>
-    </init-param>
+    <mime-mapping>
+        <extension>xsl</extension>
+        <mime-type>text/xml</mime-type>
+    </mime-mapping>
 
-    <!--
-      This parameter switches the logging system from LogKit to Log4J for Cocoon.
-      Log4J has to be configured already.
-      <init-param>
-        <param-name>logger-class</param-name>
-        <param-value>org.apache.avalon.excalibur.logger.Log4JLoggerManager</param-value>
-      </init-param>
-    -->
+    <mime-mapping>
+        <extension>xconf</extension>
+        <mime-type>text/xml</mime-type>
+    </mime-mapping>
 
-    <!--
-      If you want to configure log4j using Cocoon, then you can define
-      an XML configuration file here. You can use the usual log4j property
-      substituation mechanism, e.g. ${context-root} is replaced by the
-      context root of this web application etc.
-      You can configure the log4j configuration even if you use LogKit
-      for Cocoon logging. You can use this to configure third party code
-      for example.
-      <init-param>
-        <param-name>log4j-config</param-name>
-        <param-value>/WEB-INF/log4j.xconf</param-value>
-      </init-param>
-    -->
+    <mime-mapping>
+        <extension>xmap</extension>
+        <mime-type>text/xml</mime-type>
+    </mime-mapping>
 
-    <!--
-      Allow reinstantiating (reloading) of the cocoon instance. If this is
-      set to "yes" or "true", a new cocoon instance can be created using
-      the request parameter "cocoon-reload". It also enables that Cocoon is
-      reloaded when cocoon.xconf changes. Default is no for security reasons.
-    -->
-    <init-param>
-      <param-name>allow-reload</param-name>
-      <param-value>no</param-value>
-    </init-param>
+    <mime-mapping>
+        <extension>ent</extension>
+        <mime-type>text/plain</mime-type>
+    </mime-mapping>
 
-    <!--
-      This parameter is used to list classes that should be loaded at
-      initialization time of the servlet. For example, JDBC Drivers used need to
-      be named here. Additional entries may be inserted here during build
-      depending on your build properties.
-    -->
-    <init-param>
-      <param-name>load-class</param-name>
-      <param-value>
-        <!-- For parent ComponentManager sample:
-        org.apache.cocoon.samples.parentcm.Configurator -->
-        <!-- For IBM WebSphere:
-        com.ibm.servlet.classloader.Handler -->
-      </param-value>
-    </init-param>
-
-    <!--
-      Causes all files in multipart requests to be processed.
-      Default is false for security reasons.
-      Unsupported values will be interpreted as false.
-    -->
-    <init-param>
-      <param-name>enable-uploads</param-name>
-      <param-value>true</param-value>
-    </init-param>
-
-    <!--
-      This parameter allows to specify where Cocoon should put uploaded files.
-      The path specified can be either absolute or relative to the context
-      path of the servlet. On windows platform, absolute directory must start
-      with volume: C:\Path\To\Upload\Directory
-
-      The default directory is "upload-dir" in the work-directory
-    -->
-    <init-param>
-      <param-name>upload-directory</param-name>
-      <param-value>WEB-INF/work/upload-dir</param-value>
-    </init-param>
-    
-
-    <!--
-      Causes all files in multipart requests to be saved to upload-dir.
-      Default is true for security reasons.
-      Unsupported values will be interpreted as false.
-    -->
-    <init-param>
-      <param-name>autosave-uploads</param-name>
-      <param-value>true</param-value>
-    </init-param>
-
-    <!--
-      Specify handling of name conflicts when saving uploaded files to disk.
-      Acceptable values are deny, allow, rename (default). Files are renamed
-      x_filename where x is an integer value incremented to make the new
-      filename unique.
-    -->
-    <init-param>
-      <param-name>overwrite-uploads</param-name>
-      <param-value>rename</param-value>
-    </init-param>
-
-    <!--
-      Specify maximum allowed size of the upload. Defaults to 10 Mb.
-    -->
-    <init-param>
-      <param-name>upload-max-size</param-name>
-      <param-value>1000000000</param-value>
-    </init-param>
-
-    <!--
-      This parameter allows to specify where Cocoon should create its page
-      and other objects cache. The path specified can be either absolute or
-      relative to the context path of the servlet. On windows platform,
-      absolute directory must start with volume: C:\Path\To\Cache\Directory
-
-      The default directory is "cache-dir" in the work-directory
-
-    <init-param>
-      <param-name>cache-directory</param-name>
-      <param-value>WEB-INF/work/cache-dir</param-value>
-    </init-param>
-    -->
-
-    <!--
-      This parameter allows to specify where Cocoon should put it's
-      working files. The path specified is either absolute or relative
-      to the context path of the Cocoon servlet. On windows platform,
-      absolute directory must start with volume: C:\Path\To\Work\Directory
-
-      The default directory is "cocoon-files" directory in the servlet
-      context's temp directory (context property javax.servlet.context.tempdir).
-
-    <init-param>
-      <param-name>work-directory</param-name>
-      <param-value>WEB-INF/work</param-value>
-    </init-param>
-    -->
-
-    <!--
-      This parameter allows to specify additional directories or jars
-      which Cocoon should put into it's own classpath.
-      Note that you must separate them using the platforms path.separator
-      (":" for *nix and ";" for Windows systems). Also note that absolute
-      pathes are taken as such but relative pathes are rooted at the context
-      root of the Cocoon servlet.
-
-    <init-param>
-      <param-name>extra-classpath</param-name>
-      <param-value>WEB-INF/extra-classes1:/[YOU-ABSOLUTE-PATH-TO]/own.jar</param-value>
-    </init-param>
-    -->
-
-    <!--
-      This parameter allows you to select the parent component manager.
-      The class will be instantiated via the constructor that takes a single
-      String as a parameter. That String will be equal to the text after the
-      '/'.
-
-      Cocoon honors the LogEnabled, Initializable and Disposable interfaces for
-      this class, if it implements them.
-
-      If you uncomment the following lines the parent CM is set to the Parent CM
-      sample, which will look up a configuration via JNDI at
-      org/apache/cocoon/samples/parentcm/ParentCMConfiguration and use it.
-    <init-param>
-      <param-name>parent-component-manager</param-name>
-      <param-value>org.apache.cocoon.samples.parentcm.ParentComponentManager/org/apache/cocoon/samples/parentcm/ParentCMConfiguration</param-value>
-    </init-param>
-    -->
-
-    <!--
-      If you set this parameter to 'true' or 'yes', Cocoon will add processing
-      time to the end of each response. Value 'hide' adds processing time as an
-      HTML comment. By default, processing time is not added (corresponds to
-      value 'no').
-      NOTE: If you use this feature, Cocoon might generated a wrong content
-      length header in the response. This is due to the internal processing
-      of Readers and the Caching. So, this might be the reason if you get
-      a warning about a wrong content length.
-      See http://issues.apache.org/bugzilla/show_bug.cgi?id=17370.
-    <init-param>
-      <param-name>show-time</param-name>
-      <param-value>hide</param-value>
-    </init-param>
-    -->
-
-    <!--
-       If true or not set, this class will try to catch and handle all Cocoon
-       exceptions. If false, it will rethrow them to the servlet container.
-    -->
-    <init-param>
-      <param-name>manage-exceptions</param-name>
-      <param-value>true</param-value>
-    </init-param>
-
-    <!--
-       If true, Avalon Excalibur instrumentation will be enabled on all
-       Instrumentable components with Cocoon and your Cocoon application.
-    -->
-    <init-param>
-      <param-name>enable-instrumentation</param-name>
-      <param-value>false</param-value>
-    </init-param>
-
-    <!--
-       This defines the location of the instrument manager configuration, only
-       used if the init-param enable-instrumentation is enabled.
-    -->
-    <!--<init-param>
-      <param-name>instrumentation-config</param-name>
-      <param-value>/WEB-INF/instrumentation.xconf</param-value>
-    </init-param>-->
-
-    <!--
-      Set encoding used by the container. If not set the ISO-8859-1 encoding
-      will be assumed.
-      Since the servlet specification requires that the ISO-8859-1 encoding
-      is used (by default), you should never change this value unless
-      you have a buggy servlet container.
-    -->
-    <init-param>
-      <param-name>container-encoding</param-name>
-      <param-value>ISO-8859-1</param-value>
-    </init-param>
-
-    <!--
-      Set form encoding. This will be the character set used to decode request
-      parameters. If not set the ISO-8859-1 encoding will be assumed.
-    -->
-    <init-param>
-      <param-name>form-encoding</param-name>
-      <param-value>UTF-8</param-value>
-    </init-param>
-
-    <!--
-      This parameter allows you to startup Cocoon2 immediately after startup
-      of your servlet engine.
-    -->
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-
-  <!-- URL space mappings ============================================= -->
-
-  <!--
-    Cocoon handles all the URL space assigned to the webapp using its sitemap.
-    It is recommended to leave it unchanged. Under some circumstances though
-    (like integration with proprietary webapps or servlets) you might have
-    to change this parameter.
-  -->
-  <servlet-mapping>
-    <servlet-name>Cocoon</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
-
-  <!--
-    Some servlet engines (Tomcat) have defaults which are not overriden
-    by '/' mapping, but must be overriden explicitly.
-  -->
-  <servlet-mapping>
-    <servlet-name>Cocoon</servlet-name>
-    <url-pattern>*.jsp</url-pattern>
-  </servlet-mapping>
-  <!--
-    Some servlet engines (WebLogic) have defaults which are not overriden
-    by '/' mapping, but must be overriden explicitly.
-  -->
-  <servlet-mapping>
-    <servlet-name>Cocoon</servlet-name>
-    <url-pattern>*.html</url-pattern>
-  </servlet-mapping>
-
-  <!-- various MIME type mappings ====================================== -->
-
-  <mime-mapping>
-    <extension>css</extension>
-    <mime-type>text/css</mime-type>
-  </mime-mapping>
-
-  <mime-mapping>
-    <extension>xml</extension>
-    <mime-type>text/xml</mime-type>
-  </mime-mapping>
-
-  <mime-mapping>
-    <extension>xsl</extension>
-    <mime-type>text/xml</mime-type>
-  </mime-mapping>
-
-  <mime-mapping>
-    <extension>xconf</extension>
-    <mime-type>text/xml</mime-type>
-  </mime-mapping>
-
-  <mime-mapping>
-    <extension>xmap</extension>
-    <mime-type>text/xml</mime-type>
-  </mime-mapping>
-
-  <mime-mapping>
-    <extension>ent</extension>
-    <mime-type>text/plain</mime-type>
-  </mime-mapping>
-
-  <mime-mapping>
-    <extension>grm</extension>
-    <mime-type>text/plain</mime-type>
-  </mime-mapping>
+    <mime-mapping>
+        <extension>grm</extension>
+        <mime-type>text/plain</mime-type>
+    </mime-mapping>
 
 </web-app>
