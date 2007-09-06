@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>dspace-pom</artifactId>
+    <groupId>org.dspace</groupId>
+    <version>1.5-SNAPSHOT</version>
+    <relativePath>../dspace-pom</relativePath>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.dspace</groupId>
+  <artifactId>dspace-storage</artifactId>
+  <packaging>jar</packaging>
+  <name>DSpace Storage :: Postgresql Support</name>
+  <description>Support for Postgresql Database.</description>
+  <url>http://projects.dspace.org/dspace-storage-postgres</url>
+  <dependencies>
+    <dependency>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+    </dependency>
+  </dependencies>
+
+</project>
+
