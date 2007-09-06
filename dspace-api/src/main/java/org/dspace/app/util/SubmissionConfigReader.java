@@ -144,6 +144,7 @@ public class SubmissionConfigReader
      */
     public SubmissionConfigReader(String UIName) throws ServletException
     {
+        this.UIName = UIName;
         buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + "-" + UIName + SUBMIT_DEF_FILE_SUFFIX);
     }
 
