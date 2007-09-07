@@ -3,7 +3,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>language-packs</artifactId>
-   <name>DSpace :: Language Packs</name>
+   <name>DSpace I18N :: Language Packs</name>
    <description>
       DSpace Language Packs to support multiple languages.
    </description>
