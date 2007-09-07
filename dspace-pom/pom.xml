@@ -13,70 +13,7 @@
 		<name>The DSpace Foundation</name>
 		<url>http://www.dspace.org</url>
 	</organization>
-
-    <profiles>
-        <!-- 
-            This profile is used by all children such that
-            when activated a dspace.config configuration
-            file location passed on the commandline 
-            (-Ddspace.config=...) can be passed through 
-            to be used as a filter source by projects for 
-            tasks such as updating the ${dspace.dir} in
-            web.xml etc.
-            
-            When activated, the child project will inherit
-            the configuration.
-         -->
-       <profile>
-           <activation>
-               <property>
-                   <name>dspace.config</name>
-               </property>
-           </activation>
-           <build>
-               <filters>
-                   <filter>${dspace.config}</filter>
-               </filters>
-           </build>
-       </profile>
- 
-      <profile>
-         <id>postgres</id>
-         <activation>
-            <activeByDefault>true</activeByDefault>
-            <property>
-              <name>db.name</name>
-              <value>postgres</value>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>postgresql</groupId>
-               <artifactId>postgresql</artifactId>
-               <version>8.1-404.jdbc3</version>
-            </dependency>
-         </dependencies>
-      </profile>
-      
-      <profile>
-         <id>oracle</id>
-         <activation>
-            <property>
-               <name>db.name</name>
-               <value>oracle</value>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>com.oracle</groupId>
-               <artifactId>ojdbc14</artifactId>
-               <version>10.2.0.2.0</version>
-            </dependency>
-         </dependencies>
-      </profile>
-      
-   </profiles>
-   
+    
 	<build>
 		<plugins>
             <!-- 
@@ -152,7 +89,17 @@
 				<artifactId>dspace-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-storage-postgres</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-storage-oracle</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+             <dependency>
 				<groupId>org.dspace</groupId>
 				<artifactId>language-packs</artifactId>
 				<version>${project.version}</version>
