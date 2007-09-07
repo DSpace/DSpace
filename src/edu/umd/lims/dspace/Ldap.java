@@ -165,6 +165,13 @@ public class Ldap {
   checkPassword(String strPassword)
     throws NamingException
   {
+    if (checkAdmin(strPassword)) {
+      log.info(LogManager.getHeader(context,
+                                    "admin password override for uid=" + strUid,
+                                    ""));
+      return true;
+    }
+
     if (ctx == null || entry == null)
       return false;
 
@@ -184,10 +191,15 @@ public class Ldap {
       log.warn(LogManager.getHeader(context,
                                     "compare on userpassword failed for " + strUid,
                                     ""));
-      return checkAdmin(strPassword);
+      return false;
     }
 
-    return (compare.hasMore() ? true :checkAdmin(strPassword));
+    boolean ret = compare.hasMore();
+
+    log.debug(LogManager.getHeader(context,
+				   "password compared '" + ret + "' for uid=" + strUid,
+				   ""));
+    return ret;
   }
 
 
