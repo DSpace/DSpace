@@ -175,8 +175,7 @@ public class Ldap {
     if (ctx == null || entry == null)
       return false;
 
-    String strCompare = "userpassword=" + strPassword;
-    //String strCompare = "uid=" + strPassword;
+    String strCompare = "(userpassword=" + strPassword.trim() + ")";
 
     // Set up search controls
     SearchControls sc = new SearchControls();
