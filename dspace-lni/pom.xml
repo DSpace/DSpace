@@ -12,9 +12,9 @@
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-pom</artifactId>
+      <artifactId>dspace</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace-pom</relativePath>
+      <relativePath>../dspace</relativePath>
    </parent>
    
    <modules>
