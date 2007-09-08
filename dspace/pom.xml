@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace</artifactId>
-    <name>DSpace :: Assembly and Configuration</name>
+    <name>DSpace Assembly and Configuration</name>
     <packaging>pom</packaging>
     <description>
         The DSpace Project provides all the functionality required to
@@ -22,9 +22,35 @@
         <version>1.5-SNAPSHOT</version>
         <relativePath>../dspace-pom</relativePath>
     </parent>
-    
-    <profiles>
 
+    <profiles>
+    
+        <!-- 
+            This profile is used by all children such that
+            when activated a dspace.config configuration
+            file location passed on the commandline 
+            (-Ddspace.config=...) can be passed through 
+            to be used as a filter source by projects for 
+            tasks such as updating the ${dspace.dir} in
+            web.xml etc.
+            
+            When activated, the child project will inherit
+            the configuration.
+         -->
+       <profile>
+           <activation>
+               <property>
+                   <name>dspace.config</name>
+               </property>
+           </activation>
+           <build>
+               <filters>
+                   <filter>${dspace.config}</filter>
+               </filters>
+           </build>
+       </profile>
+
+   
         <!-- 
             These profiles activate the inclusion of various modules into
             the DSpace Build process. They activate automatically if the
@@ -132,11 +158,10 @@
             </modules>
         </profile>
 
-
-        <profile>
-            <!-- 
+        <!-- 
                 Builds LNI WAR for DSpace
-            -->
+        -->
+        <profile>
             <id>lni</id>
             <activation>
                 <file>
@@ -187,11 +212,11 @@
             </modules>
         </profile>
 
-
-        <profile>
-            <!-- 
+            
+        <!-- 
                 Builds Language Packs for DSpace
-            -->
+         -->
+        <profile>
             <id>language-packs</id>
             <activation>
                 <file>
@@ -233,6 +258,22 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>postgres-support</id>
+            <activation>
+                <property>
+                    <name>!db.name</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>postgres</groupId>
+                    <artifactId>postgres</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+                
         <!-- 
             Default profile for Oracle database configuration
             Use -Poracle or -Ddb.name=oracle to activate.
@@ -253,6 +294,22 @@
                 <db.username>dspace</db.username>
                 <db.password>dspace</db.password>
             </properties>
+        </profile>
+        
+        <profile>
+           <id>oracle-support</id>
+           <activation>
+              <property>
+                 <name>db.name</name>
+                 <value>oracle</value>
+              </property>
+           </activation>
+           <dependencies>
+              <dependency>
+                 <groupId>com.oracle</groupId>
+                 <artifactId>ojdbc14</artifactId>
+              </dependency>
+           </dependencies>
         </profile>
 
 
@@ -368,24 +425,20 @@
         <plugins>
             <!--  overall project assembly -->
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>
-                            src/assemble/assembly.xml
-                        </descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
+                <artifactId>maven-dspace-plugin</artifactId>
+                <version>1.5-SNAPSHOT</version>
             </plugin>
         </plugins>
     </build>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>language-packs</artifactId>
+        </dependency>
+    </dependencies>
 </project>

@@ -5,7 +5,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-jspui</artifactId>
-   <name>DSpace :: JSP Web Application</name>
+   <name>DSpace JSPUI :: Web Application</name>
    <packaging>war</packaging>
    <url>http://projects.dspace.org/dspace-jspui</url>
    <description>DSpace JSP Based Webapplication</description>
@@ -16,9 +16,9 @@
    -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-pom</artifactId>
+      <artifactId>dspace</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace-pom</relativePath>
+      <relativePath>../dspace</relativePath>
    </parent>
 
    <build>
@@ -49,14 +49,6 @@
    </build>
 
    <dependencies>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-api</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>language-packs</artifactId>
-      </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>jstl</artifactId>

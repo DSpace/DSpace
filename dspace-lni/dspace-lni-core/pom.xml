@@ -12,7 +12,7 @@
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-pom</artifactId>
+      <artifactId>dspace</artifactId>
       <version>1.5-SNAPSHOT</version>
    </parent>
 
@@ -45,14 +45,6 @@
    </scm>
    
 	<dependencies>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>language-packs</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>wsdl4j</groupId>
 			<artifactId>wsdl4j</artifactId>

@@ -5,7 +5,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-api</artifactId>
-   <name>DSpace :: API and Implementation</name>
+   <name>DSpace Kernel :: API and Implementation</name>
    <description>DSpace core data model and service APIs.</description>
    <url>http://projects.dspace.org/dspace-api</url>
    
@@ -146,10 +146,10 @@
          <groupId>javax.activation</groupId>
          <artifactId>activation</artifactId>
       </dependency>
-		<dependency>
-			<groupId>com.ibm.icu</groupId>
-			<artifactId>icu4j</artifactId>
-		</dependency>
+      <dependency>
+         <groupId>com.ibm.icu</groupId>
+         <artifactId>icu4j</artifactId>
+      </dependency>
    </dependencies>
 
 </project>
