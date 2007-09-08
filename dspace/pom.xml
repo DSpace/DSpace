@@ -267,8 +267,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>postgres</groupId>
-                    <artifactId>postgres</artifactId>
+                  <groupId>postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
                 </dependency>
             </dependencies>
         </profile>
