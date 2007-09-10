@@ -427,6 +427,25 @@
             <plugin>
                 <artifactId>maven-dspace-plugin</artifactId>
                 <version>1.5-SNAPSHOT</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>
+                            src/assemble/assembly.xml
+                        </descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+
+            <!--  overall project assembly -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>
+                            src/assemble/assembly.xml
+                        </descriptor>
+                    </descriptors>
+                </configuration>
             </plugin>
         </plugins>
     </build>
