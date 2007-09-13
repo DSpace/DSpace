@@ -289,13 +289,8 @@ public class AuthorizeManager
             }
         }
 
-        List policies = getPoliciesActionFilter(c, o, action);
-        Iterator i = policies.iterator();
-
-        while (i.hasNext())
+        for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action))
         {
-            ResourcePolicy rp = (ResourcePolicy) i.next();
-
             // check policies for date validity
             if (rp.isDateValid())
             {
@@ -420,14 +415,14 @@ public class AuthorizeManager
      * 
      * @return List of <code>ResourcePolicy</code> objects
      */
-    public static List getPolicies(Context c, DSpaceObject o)
+    public static List<ResourcePolicy> getPolicies(Context c, DSpaceObject o)
             throws SQLException
     {
     	TableRowIterator tri = DatabaseManager.queryTable(c, "resourcepolicy",
                 "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? ",
                 o.getType(),o.getID());
 
-        List policies = new ArrayList();
+        List<ResourcePolicy> policies = new ArrayList();
 
         while (tri.hasNext())
         {
@@ -452,6 +447,45 @@ public class AuthorizeManager
     }
 
     /**
+     * Return a List of the policies for a group
+     *
+     * @param c  current context
+     * @param g  group to retrieve policies for
+     *
+     * @return List of <code>ResourcePolicy</code> objects
+     */
+    public static List<ResourcePolicy> getPoliciesForGroup(Context c, Group g)
+            throws SQLException
+    {
+    	TableRowIterator tri = DatabaseManager.queryTable(c, "resourcepolicy",
+                "SELECT * FROM resourcepolicy WHERE epersongroup_id= ? ",
+                g.getID());
+
+        List<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            // first check the cache (FIXME: is this right?)
+            ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
+                    ResourcePolicy.class, row.getIntColumn("policy_id"));
+
+            if (cachepolicy != null)
+            {
+                policies.add(cachepolicy);
+            }
+            else
+            {
+                policies.add(new ResourcePolicy(c, row));
+            }
+        }
+        tri.close();
+
+        return policies;
+    }
+    
+    /**
      * Return a list of policies for an object that match the action
      * 
      * @param c
@@ -463,7 +497,7 @@ public class AuthorizeManager
      * @throws SQLException
      *             if there's a database problem
      */
-    public static List getPoliciesActionFilter(Context c, DSpaceObject o,
+    public static List<ResourcePolicy> getPoliciesActionFilter(Context c, DSpaceObject o,
             int actionID) throws SQLException
     {
     	TableRowIterator tri = DatabaseManager.queryTable(c, "resourcepolicy",
@@ -471,7 +505,7 @@ public class AuthorizeManager
                 "AND resource_id= ? AND action_id= ? ", 
                 o.getType(), o.getID(),actionID);
 
-        List policies = new ArrayList();
+        List<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
 
         while (tri.hasNext())
         {
@@ -512,7 +546,7 @@ public class AuthorizeManager
             DSpaceObject dest) throws SQLException, AuthorizeException
     {
         // find all policies for the source object
-        List policies = getPolicies(c, src);
+        List<ResourcePolicy> policies = getPolicies(c, src);
 
         addPolicies(c, policies, dest);
     }
@@ -531,16 +565,12 @@ public class AuthorizeManager
      * @throws AuthorizeException
      *             if the current user is not authorized to add these policies
      */
-    public static void addPolicies(Context c, List policies, DSpaceObject dest)
+    public static void addPolicies(Context c, List<ResourcePolicy> policies, DSpaceObject dest)
             throws SQLException, AuthorizeException
     {
-        Iterator i = policies.iterator();
-
         // now add them to the destination object
-        while (i.hasNext())
+        for (ResourcePolicy srp : policies)
         {
-            ResourcePolicy srp = (ResourcePolicy) i.next();
-
             ResourcePolicy drp = ResourcePolicy.create(c);
 
             // copy over values
@@ -668,7 +698,7 @@ public class AuthorizeManager
                 "SELECT * FROM resourcepolicy WHERE resource_type_id= ? "+
                 "AND resource_id= ? AND action_id= ? ",o.getType(),o.getID(),actionID);
     	
-        List groups = new ArrayList();
+        List<Group> groups = new ArrayList<Group>();
 
         while (tri.hasNext())
         {
@@ -700,7 +730,7 @@ public class AuthorizeManager
         tri.close();
 
         Group[] groupArray = new Group[groups.size()];
-        groupArray = (Group[]) groups.toArray(groupArray);
+        groupArray = groups.toArray(groupArray);
 
         return groupArray;
     }
