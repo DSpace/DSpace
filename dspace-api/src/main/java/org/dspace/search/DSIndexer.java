@@ -243,18 +243,23 @@ public class DSIndexer
             switch (dso.getType())
             {
             case Constants.ITEM :
-                if(requiresIndexing(handle, ((Item)dso).getLastModified()) || force)
+                Item item = (Item)dso;
+                if (item.isArchived() && !item.isWithdrawn())
                 {
-                	Document doc = buildDocument(context, (Item) dso);
-                	
-                	/* open inside stale block, after building doc
-                	 * to limit the total time spent in a lock.
-                	 */
-                	writer = openIndex(context, false); 
-                	writer.updateDocument(t, doc);
-                	
-                    log.info("Wrote Item: " + handle + " to Index");
+                    if(requiresIndexing(handle, ((Item)dso).getLastModified()) || force)
+                    {
+                        Document doc = buildDocument(context, (Item) dso);
+
+                        /* open inside stale block, after building doc
+                         * to limit the total time spent in a lock.
+                         */
+                        writer = openIndex(context, false);
+                        writer.updateDocument(t, doc);
+
+                        log.info("Wrote Item: " + handle + " to Index");
+                    }
                 }
+                
                 break;
                 
             case Constants.COLLECTION :
