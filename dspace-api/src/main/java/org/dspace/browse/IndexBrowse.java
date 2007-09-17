@@ -700,7 +700,7 @@ public class IndexBrowse
 	 * 
 	 * @throws BrowseException
 	 */
-    private void clearDatabase()
+    public void clearDatabase()
 		throws BrowseException
 	{
     	try
@@ -983,7 +983,7 @@ public class IndexBrowse
 	 * @throws SQLException
 	 * @throws BrowseException
 	 */
-    private void initBrowse()
+    public void initBrowse()
 		throws SQLException, BrowseException
 	{
 		Date start = new Date();

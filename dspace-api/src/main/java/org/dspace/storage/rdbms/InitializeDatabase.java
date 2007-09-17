@@ -45,6 +45,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -73,7 +75,43 @@ public class InitializeDatabase
 
         try
         {
-            DatabaseManager.loadSql(getScript(argv[0]));
+            if("clean-database.sql".equals(argv[0]))
+            {
+                try
+                {
+                    IndexBrowse browse = new IndexBrowse();
+                    browse.setDelete(true);
+                    browse.setExecute(true);
+                    browse.clearDatabase();
+                }
+                catch (BrowseException e)
+                {
+                    log.error(e.getMessage(),e);
+                    throw new RuntimeException(e.getMessage(),e);
+                }
+                
+                DatabaseManager.loadSql(getScript(argv[0]));
+                
+            }
+            else if("database_schema.sql".equals(argv[0]))
+            {
+                
+                DatabaseManager.loadSql(getScript(argv[0]));
+                
+                try
+                {
+                    IndexBrowse browse = new IndexBrowse();
+                    browse.setRebuild(true);
+                    browse.setExecute(true);
+                    browse.initBrowse();
+                }
+                catch (BrowseException e)
+                {
+                    log.error(e.getMessage(),e);
+                    throw new RuntimeException(e.getMessage(),e);
+                }
+            }
+            
             System.exit(0);
         }
         catch (Exception e)
