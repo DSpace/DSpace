@@ -152,6 +152,9 @@ public class Email
 
     private List attachments;
 
+    /** The character set this message will be sent in */
+    private String charset;
+    
     /**
      * Create a new email message.
      */
@@ -163,6 +166,7 @@ public class Email
         subject = "";
         content = "";
         replyTo = null;
+        charset = null;
     }
 
     /**
@@ -228,6 +232,11 @@ public class Email
         attachments.add(new FileAttachment(f, name));
     }
 
+    public void setCharset(String cs)
+    {
+        charset = cs;
+    }
+
     /**
      * "Reset" the message. Clears the arguments and recipients, but leaves the
      * subject and content intact.
@@ -238,6 +247,7 @@ public class Email
         recipients = new ArrayList(50);
         attachments = new ArrayList(10);
         replyTo = null;
+        charset = null;
     }
 
     /**
@@ -258,11 +268,18 @@ public class Email
 
         // Set the port number for the mail server
         String portNo = ConfigurationManager.getProperty("mail.server.port");
-        if (portNo == null) {
+        if (portNo == null)
+        {
         	portNo = "25";
         }
         props.put("mail.smtp.port", portNo.trim());
-        
+
+        // If no character set specified, attempt to retrieve a default
+        if (charset == null)
+        {
+            charset = ConfigurationManager.getProperty("mail.charset");    
+        }
+
         // Get session
         Session session;
         
@@ -304,7 +321,15 @@ public class Email
         message.setSubject(subject);
         if (attachments.isEmpty())
         {
-            message.setText(fullMessage);
+            // If a character set has been specified, or a default exists
+            if (charset != null)
+            {
+                message.setText(fullMessage, charset);
+            }
+            else
+            {
+                message.setText(fullMessage);
+            }
         }
         else
         {

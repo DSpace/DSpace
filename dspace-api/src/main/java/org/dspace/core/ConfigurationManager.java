@@ -279,6 +279,7 @@ public class ConfigurationManager
      */
     public static Email getEmail(String emailFile) throws IOException
     {
+        String charset = null;
         String subject = "";
         StringBuffer contentBuffer = new StringBuffer();
 
@@ -304,6 +305,11 @@ public class ConfigurationManager
                     // of the colon, trimmed of whitespace
                     subject = line.substring(8).trim();
                 }
+                else if (line.toLowerCase().startsWith("charset:"))
+                {
+                    // Extract the character set from the email
+                    charset = line.substring(8).trim();
+                }
                 else if (!line.startsWith("#"))
                 {
                     // Add non-comment lines to the content
@@ -323,6 +329,9 @@ public class ConfigurationManager
         Email email = new Email();
         email.setSubject(subject);
         email.setContent(contentBuffer.toString());
+
+        if (charset != null)
+            email.setCharset(charset);
 
         return email;
     }
