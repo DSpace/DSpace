@@ -738,6 +738,11 @@ public class BrowseEngine
             // Normalize it based on the specified language as appropriate for this index
             return BrowseOrder.makeSortString(scope.getJumpToValue(), scope.setJumpToValueLang(), scope.getBrowseIndex().getDataType());
         }
+        else if (scope.hasStartsWith())
+        {
+            // Scope has a starts with, so normalize that instead
+            return BrowseOrder.makeSortString(scope.getStartsWith(), null, scope.getBrowseIndex().getDataType());
+        }
         
         // No focus value on the scope (ie. focus by id), so just return the passed focus value
         // This is useful in cases where we have pulled a focus value from the index
