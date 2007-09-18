@@ -288,7 +288,7 @@ Common usage:
 
 		<!-- Load the Schema -->
 		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="config/log4j-console.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.log.init.disable" value="true"/>
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg value="database_schema.sql" />
@@ -296,7 +296,7 @@ Common usage:
 
 		<!-- Add the browse tables -->
         <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="config/log4j-console.properties" />
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.log.init.disable" value="true"/>
             <sysproperty key="dspace.configuration" value="${config}" />
             <arg line="-t -x" />
@@ -314,7 +314,7 @@ Common usage:
 	<target name="clean_database" description="Removes DSpace database tables, destroying data">
 
 		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="config/log4j-console.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.log.init.disable" value="true"/>
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg value="clean-database.sql" />
@@ -332,7 +332,7 @@ Common usage:
 
 		<!-- first import the bitstream registry -->
 		<java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="config/log4j-console.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.log.init.disable" value="true"/>
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg value="-bitstream" />
@@ -341,7 +341,7 @@ Common usage:
 
 		<!-- finally import the metadata elements -->
 		<java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="config/log4j-console.properties"/>
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
 			<sysproperty key="dspace.log.init.disable" value="true"/>
             <sysproperty key="dspace.configuration" value="${config}"/>
 		    <arg line="-f ${dspace.dir}/config/registries/dublin-core-types.xml"/>
@@ -394,14 +394,14 @@ Common usage:
 		</copy>
 
 		<java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="config/log4j-console.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.log.init.disable" value="true"/>
 			<sysproperty key="dspace.configuration" value="${config}" />
 			<arg line="-f" />
 		</java>
 
 		<java classname="org.dspace.search.DSIndexer" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="config/log4j-console.properties" />
+			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.log.init.disable" value="true"/>
 			<sysproperty key="dspace.configuration" value="${config}" />
 		</java>
