@@ -590,4 +590,68 @@ public class Bitstream extends DSpaceObject
 	}
   }
 
+    /**
+     * Get the value of a metadata field
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * 
+     * @return the value of the metadata field
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public String getMetadata(String field)
+    {
+        return bRow.getStringColumn(field);
+    }
+
+    /**
+     * Get the value of an int  metadata field
+     *
+     * @param  field   the name of the metadata field to get
+     *
+     * @return  the value of the metadata field
+     *
+     * @exception IllegalArgumentException   if the requested metadata
+     *            field doesn't exist
+     */
+    public int getIntMetadata(String field)
+    {
+        return bRow.getIntColumn(field);
+    }
+
+
+    /**
+     * Set a metadata value
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * @param value
+     *            value to set the field to
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public void setMetadata(String field, String value)
+    {
+        bRow.setColumn(field, value);
+    }
+
+    /**
+     * Set a metadata value
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * @param value
+     *            value to set the field to
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public void setMetadata(String field, int value)
+    {
+        bRow.setColumn(field, value);
+    }
+
 }

@@ -75,34 +75,6 @@ import javax.servlet.jsp.tagext.TagSupport;
 public class ItemTag extends TagSupport
 {
 
-/*
- *
- * <pre>
- *   Revision History:
- * 
- *     2007/01/19: Ben
- *       - add rights.license display
- *
- *     2006/12/19: Ben
- *       - live links for all fields
- *
- *     2006/11/06: Ben
- *       - always show the description
- *
- *     2006/09/21: Ben
- *       - add ETD embargo message to bitstream description
- *
- *     2006/03/22: Ben
- *       - add type field
- *
- *     2005/07/13: Ben
- *       - add contributor.department as Department/Program
- *
- *     2004/05/31: Ben
- *       - modify contributor display
- * </pre>
- */
-
     /** Item to display */
     private Item item;
 
@@ -343,6 +315,8 @@ public class ItemTag extends TagSupport
 
         listCollections();
 
+	showViews(out);
+
         out.println("</table></center><br>");
 
         listBitstreams();
@@ -408,6 +382,8 @@ public class ItemTag extends TagSupport
         }
 
         listCollections();
+
+	showViews(out);
 
         out.println("</table></center><br>");
 
@@ -480,6 +456,24 @@ public class ItemTag extends TagSupport
         }
     }
 
+
+    /**
+     * Show the number of times this item has been viewed.
+     */
+    private void showViews(JspWriter out) throws IOException
+    {
+      out.print("<tr>"
+		+ "<td class=\"metadataFieldLabel\">"
+		+ "Number of item views:"
+		+ "</td>"
+		+ "<td class=\"metadataFieldValue\">"
+		+ item.getIntMetadata("views")
+		+ "</td>"
+		+ "</tr>"
+		);
+    }
+
+
     /**
      * List bitstreams in the item
      */
@@ -545,7 +539,7 @@ public class ItemTag extends TagSupport
             }
 
             out
-                    .println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th></tr>");
+                    .println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th><th class=\"standard\">Views</th></tr>");
 
             // if primary bitstream is html, display a link for only that one to
             // HTMLServlet
@@ -616,8 +610,9 @@ public class ItemTag extends TagSupport
                             out.print(bitstreams[k].getSize() / 1024);
                             out.print("Kb</td><td class=\"standard\">");
                             out.print(bitstreams[k].getFormatDescription());
-                            out
-                                    .print("</td><td class=\"standard\" align=\"center\">");
+                            out.print("</td><td class=\"standard\" align=\"center\">");
+                            out.print(bitstreams[k].getIntMetadata("views"));
+                            out.print("</td><td class=\"standard\" align=\"center\">");
 
                             // Work out what the bitstream link should be
                             // (persistent
