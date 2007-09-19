@@ -1,3 +1,6 @@
+(Brian Helm)
+SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
+
 (Robert Tansley / Barhatov Andrew)
 - Authentication code moved to new org.dspace.authenticate package
 - Added IP Authentication (SF patch #1566820)
