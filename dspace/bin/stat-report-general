@@ -86,8 +86,8 @@ $out_directory = "/dspace/reports/";
 $in = $in_directory . $in_prefix . $this_year . "-" . $this_month . "-" . $day . $in_suffix;
 $out = $out_directory . $out_prefix . $this_year . "-" . $this_month . "-" . $day . $out_suffix;
 
-$general = "$dsrun org.dspace.app.statistics.ReportGenerator -format html -in $in -out $out";
+$execute = "$dsrun org.dspace.app.statistics.ReportGenerator -format html -in $in -out $out";
 
-$status = system($general);
+$status = system($execute);
 
 exit($status);

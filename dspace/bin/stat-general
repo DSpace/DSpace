@@ -79,8 +79,8 @@ $out_directory = "/dspace/log/";
 
 ######################################################
 
-$general = "$dsrun org.dspace.app.statistics.LogAnalyser -out $out_directory$out_prefix$this_year-$this_month-$day$out_suffix";
+$execute = "$dsrun org.dspace.app.statistics.LogAnalyser -out $out_directory$out_prefix$this_year-$this_month-$day$out_suffix";
 
-$status = system($general);
+$status = system($execute);
 
 exit($status);

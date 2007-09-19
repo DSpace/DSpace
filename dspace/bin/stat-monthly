@@ -120,6 +120,6 @@ $out = $out_directory . $out_prefix . $this_year . "-" . $this_month . $out_suff
 # The command to generate the report
 $execute = "$dsrun org.dspace.app.statistics.LogAnalyser -start $start -end $end -out $out";
 
-$status = system($general);
+$status = system($execute);
 
 exit($status);
