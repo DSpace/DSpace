@@ -315,8 +315,6 @@ public class ItemTag extends TagSupport
 
         listCollections();
 
-	showViews(out);
-
         out.println("</table></center><br>");
 
         listBitstreams();
@@ -382,8 +380,6 @@ public class ItemTag extends TagSupport
         }
 
         listCollections();
-
-	showViews(out);
 
         out.println("</table></center><br>");
 
@@ -458,23 +454,6 @@ public class ItemTag extends TagSupport
 
 
     /**
-     * Show the number of times this item has been viewed.
-     */
-    private void showViews(JspWriter out) throws IOException
-    {
-      out.print("<tr>"
-		+ "<td class=\"metadataFieldLabel\">"
-		+ "Number of item views:"
-		+ "</td>"
-		+ "<td class=\"metadataFieldValue\">"
-		+ item.getIntMetadata("views")
-		+ "</td>"
-		+ "</tr>"
-		);
-    }
-
-
-    /**
      * List bitstreams in the item
      */
   private void listBitstreams() throws IOException, java.sql.SQLException
@@ -539,7 +518,7 @@ public class ItemTag extends TagSupport
             }
 
             out
-                    .println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th><th class=\"standard\">Views</th></tr>");
+                    .println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th><th class=\"standard\">Hits</th></tr>");
 
             // if primary bitstream is html, display a link for only that one to
             // HTMLServlet
