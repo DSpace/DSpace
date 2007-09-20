@@ -39,34 +39,27 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.sun.mail.smtp.SMTPAddressFailedException;
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.*;
 import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
 
-import com.sun.mail.smtp.SMTPAddressFailedException;
-
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.naming.NamingException;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Hashtable;
-import javax.naming.*;
-import javax.naming.directory.*;
 
 /**
  * Servlet for handling user registration and forgotten passwords.
@@ -534,6 +527,43 @@ public class RegisterServlet extends DSpaceServlet
             eperson.update();
 
             request.setAttribute("eperson", eperson);
+
+
+            // Notify of new user registration
+            String notifyRecipient = ConfigurationManager.getProperty("registration.notify");
+            if (notifyRecipient == null) {
+                notifyRecipient = "";
+            }
+            notifyRecipient = notifyRecipient.trim();
+
+            if(!notifyRecipient.equals(""))
+            {
+            try
+                {
+                    Email adminEmail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "registration_notify"));
+                    adminEmail.addRecipient(notifyRecipient);
+
+                    adminEmail.addArgument(eperson.getFirstName() + " " + eperson.getLastName()); // Name
+                    adminEmail.addArgument(eperson.getEmail()); // Email
+
+                    adminEmail.setReplyTo(eperson.getEmail());
+
+                    adminEmail.send();
+
+                    log.info(LogManager.getHeader(context, "registerion_alert", "user="
+                            + eperson.getEmail()));
+                }
+                catch (MessagingException me)
+                {
+                    log.warn(LogManager.getHeader(context,
+                        "error_emailing_administrator", ""), me);
+
+                    JSPManager.showInternalError(request, response);
+                }
+            }
+
+
+
             JSPManager.showJSP(request, response, "/register/registered.jsp");
             context.complete();
         }

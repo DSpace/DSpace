@@ -66,6 +66,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 
 (Chris yates)
 - SF Patch #1724330 Removes "null" being displayed in community-home.jsp
+- SF Patch #1763535 Alert DSpace administrator of new user registration
 
 (Robert Tansley / Stuart Lewis)
 - SF Patch #1587225 Google and html sitemap generator
