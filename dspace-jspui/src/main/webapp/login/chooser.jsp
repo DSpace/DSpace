@@ -50,8 +50,8 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.core.Context" %>
-<%@ page import="org.dspace.eperson.AuthenticationManager" %>
-<%@ page import="org.dspace.eperson.AuthenticationMethod" %>
+<%@ page import="org.dspace.authenticate.AuthenticationManager" %>
+<%@ page import="org.dspace.authenticate.AuthenticationMethod" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
