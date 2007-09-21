@@ -105,7 +105,7 @@
 
 <%-- <h2 align="center"><a name="top">DSpace Supported Formats</a></h2> --%>
 <h2 align="center"><a name="top"><fmt:message key="jsp.help.formats.title"/></a></h2>
-<p align="right"><a href="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\")%>"><fmt:message key="jsp.help.formats.return"/></a></p>
+<p align="right"><a href="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index")%>"><fmt:message key="jsp.help.formats.return"/></a></p>
 
 <%-- <h5><a href="#policy">Format Support Policy</a></h5> --%>
 <h5><a href="#policy"><fmt:message key="jsp.help.formats.policy"/></a></h5>
