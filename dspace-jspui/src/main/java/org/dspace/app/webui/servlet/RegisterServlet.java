@@ -528,42 +528,6 @@ public class RegisterServlet extends DSpaceServlet
 
             request.setAttribute("eperson", eperson);
 
-
-            // Notify of new user registration
-            String notifyRecipient = ConfigurationManager.getProperty("registration.notify");
-            if (notifyRecipient == null) {
-                notifyRecipient = "";
-            }
-            notifyRecipient = notifyRecipient.trim();
-
-            if(!notifyRecipient.equals(""))
-            {
-            try
-                {
-                    Email adminEmail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "registration_notify"));
-                    adminEmail.addRecipient(notifyRecipient);
-
-                    adminEmail.addArgument(eperson.getFirstName() + " " + eperson.getLastName()); // Name
-                    adminEmail.addArgument(eperson.getEmail()); // Email
-
-                    adminEmail.setReplyTo(eperson.getEmail());
-
-                    adminEmail.send();
-
-                    log.info(LogManager.getHeader(context, "registerion_alert", "user="
-                            + eperson.getEmail()));
-                }
-                catch (MessagingException me)
-                {
-                    log.warn(LogManager.getHeader(context,
-                        "error_emailing_administrator", ""), me);
-
-                    JSPManager.showInternalError(request, response);
-                }
-            }
-
-
-
             JSPManager.showJSP(request, response, "/register/registered.jsp");
             context.complete();
         }

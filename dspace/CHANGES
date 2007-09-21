@@ -5,9 +5,6 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - Authentication code moved to new org.dspace.authenticate package
 - Added IP Authentication (SF patch #1566820)
 
-(Graham Triggs)
-- Admin browser for withdrawn items (implements feature request #1221957)
-
 (Richard Jones)
 - S.F. Patch 1670093 More stable metadata and schema registry import 
 
@@ -33,6 +30,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - ConfigurationManager fix to honour log4j.configuration
 - S.F. Patch 1749196 Oracle SQL in Bitstream Checker
 - S.F. Patch 1740579 Patch for bug 1740454 (Concurrency)
+- Admin browser for withdrawn items (implements feature request #1221957)
 
 (Larry Stone, Richard Rodgers, Sands Fish, Mark Diggory)
 - S.F. Patch 1633596 Event System for DSpace 1.5
@@ -63,6 +61,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - SF Patch #1737792 Patch for bug 1552760 - Submit interface looks bad in Safari
 - Removal of message for Netscape users in choose-file.jsp + removal of supporting text and images in the help file
 - SF Patch #1591871 Docs for google and html sitemaps
+- SF Patch #1799575 New EPersonConsumer event consumer
 
 (Chris yates)
 - SF Patch #1724330 Removes "null" being displayed in community-home.jsp
