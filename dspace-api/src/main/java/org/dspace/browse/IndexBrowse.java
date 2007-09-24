@@ -542,6 +542,10 @@ public class IndexBrowse
 			removeIndex(item, bis[i]);
 	    }
 
+        // Remove from the item indexes (archive and withdrawn)
+        removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
+        removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+
         // Ensure that we remove any invalid entries
         pruneIndexes();
 
