@@ -1674,7 +1674,7 @@
 			<a href="http://dspace.org">http://dspace.org</a>                            
 		</p>
 	</message>
-	<message key="xmlui.dri2xhtml.structural.contact-link">Contant Us</message>
+	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>
 	<message key="xmlui.dri2xhtml.structural.feedback-link">Send Feedback</message>
 	
 	<message key="xmlui.dri2xhtml.structural.head-subtitle">Manakin: DSpace XMLUI Project v2</message>
