@@ -86,7 +86,9 @@
     // calculate the resource type and its relevance ID
     // to check what actions to present
     int resourceType      = policy.getResourceType();
-    int resourceRelevance = 1 << resourceType;     
+    int resourceRelevance = 1 << resourceType;
+    
+    request.setAttribute("LanguageSwitch", "hide");  
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.authorize-policy-edit.title"

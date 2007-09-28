@@ -64,6 +64,7 @@
     // get objects from request
     Group[] groups = (Group[]) request.getAttribute("groups");
     WorkspaceItem[] workspaceItems = (WorkspaceItem[]) request.getAttribute("wsItems");
+    request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.supervise-link.title"

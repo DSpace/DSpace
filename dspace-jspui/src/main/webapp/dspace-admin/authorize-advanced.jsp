@@ -77,6 +77,7 @@
 <%
     Group      [] groups     = (Group      []) request.getAttribute("groups"     );
     Collection [] collections= (Collection []) request.getAttribute("collections");
+    request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.authorize-advanced.advanced"

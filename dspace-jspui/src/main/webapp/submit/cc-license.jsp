@@ -49,6 +49,8 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
+    request.setAttribute("LanguageSwitch", "hide");
+
     String cc_license_url = (String) request.getParameter("license_url");
 %>
 <script type="text/javascript">

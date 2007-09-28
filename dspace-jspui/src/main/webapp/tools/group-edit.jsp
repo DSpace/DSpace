@@ -67,6 +67,7 @@
     EPerson [] epeople = (EPerson []) request.getAttribute("members");
     
 	Group   [] groups  = (Group   []) request.getAttribute("membergroups");
+	request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout titlekey="jsp.tools.group-edit.title"

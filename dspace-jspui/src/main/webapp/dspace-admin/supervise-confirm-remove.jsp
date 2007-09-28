@@ -64,6 +64,7 @@
     // get item and group out of the request
     WorkspaceItem wsItem = (WorkspaceItem) request.getAttribute("wsItem");
     Group group = (Group) request.getAttribute("group");
+    request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.supervise-confirm-remove.title"

@@ -58,6 +58,8 @@
 
 
 <%
+    request.setAttribute("LanguageSwitch", "hide");
+
     // Obtain DSpace context
     Context context = UIUtil.obtainContext(request);
 

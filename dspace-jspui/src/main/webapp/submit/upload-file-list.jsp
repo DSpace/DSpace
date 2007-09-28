@@ -75,6 +75,8 @@
 
     boolean justUploaded = ((Boolean) request.getAttribute("just.uploaded")).booleanValue();
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
+    
+    request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">

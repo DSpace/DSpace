@@ -50,6 +50,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<% request.setAttribute("LanguageSwitch", "hide"); %>
+
 <dspace:layout locbar="off" titlekey="jsp.submit.cancelled-removed.title">
 
     <%-- <h1>Submission Cancelled</h1> --%>

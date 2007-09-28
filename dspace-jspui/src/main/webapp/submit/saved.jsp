@@ -50,6 +50,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<% request.setAttribute("LanguageSwitch", "hide"); %>
+
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.saved.title">
 
     <%-- <h1>Submission Saved</h1> --%>

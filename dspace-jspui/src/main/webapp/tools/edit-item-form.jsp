@@ -81,7 +81,8 @@
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     MetadataField[] dcTypes = (MetadataField[])  request.getAttribute("dc.types");
     HashMap metadataFields = (HashMap) request.getAttribute("metadataFields");
-    
+    request.setAttribute("LanguageSwitch", "hide");
+
     // Is anyone logged in?
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
 

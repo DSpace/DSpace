@@ -85,6 +85,8 @@
 <%!// required by Controlled Vocabulary  add-on
 	String contextPath;
 
+    request.setAttribute("LanguageSwitch", "hide");
+
     // This method is resposible for showing a link next to an input box 
     // that pops up a window that to display a controlled vocabulary. 
     // It should be called from the doOneBox and doTwoBox methods. 

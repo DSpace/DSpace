@@ -68,6 +68,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
+    request.setAttribute("LanguageSwitch", "hide");
+
     /** log4j logger */
     Logger log = Logger.getLogger("progressbar.jsp");
 

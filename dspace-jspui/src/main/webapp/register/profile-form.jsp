@@ -58,6 +58,7 @@
 <%@ page import="java.util.Locale"%>
 
 <%@ page import="org.dspace.core.I18nUtil" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 
 <%
@@ -122,7 +123,7 @@
         	{ selected = "selected=\"selected\"";}
 %>
            <option <%= selected %>
-                value="<%= lang %>"><%= supportedLocales[i].getDisplayName(I18nUtil.getSupportedLocale(request.getLocale())) %></option>
+                value="<%= lang %>"><%= supportedLocales[i].getDisplayName(UIUtil.getSessionLocale(request)) %></option>
 <%
         }
 %>

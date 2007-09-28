@@ -58,6 +58,7 @@
 
 <%
     WorkflowItem workflow = (WorkflowItem) request.getAttribute("workflow");
+    request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.workflow-abort-confirm.title"

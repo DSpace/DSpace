@@ -56,6 +56,7 @@
 
 <%
     Item item = (Item) request.getAttribute("item");
+    request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout titlekey="jsp.tools.upload-bitstream.title"

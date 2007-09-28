@@ -55,6 +55,8 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
+    request.setAttribute("LanguageSwitch", "hide");
+
     // Obtain DSpace context
     Context context = UIUtil.obtainContext(request);    
 

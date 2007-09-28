@@ -59,6 +59,8 @@
 <%@ page import="org.dspace.content.Collection" %>
 
 <%
+    request.setAttribute("LanguageSwitch", "hide");
+
 	String layoutNavbar = "default";
 	if (request.getAttribute("browseWithdrawn") != null)
 	{

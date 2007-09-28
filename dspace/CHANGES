@@ -46,12 +46,11 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 (Claudia Juergen)
 - SF Patch #1722557 for SF Bug #1549290 Suggest Features uses hard coded strings
 - SF Patch #1450491 i18n configurable multilingualism support
+- SF Patch #1638569 for SF Bug #1638565 Database Upgrade 12 to 13 missing content on new colums
 
 (James Rutherford)
 - Fixed SF bug #1727034 Method MetadataField.unique() is incorrect for null values
 - Fixed SF bug #1614546 get rid of unused mets_bitstream_id column
-- SF Patch #1638569 for SF Bug #1638565 Database Upgrade 12 to 13 missing content on new colums
-- SF Patch #1620700 Add Community and Sub-Community to OAI Sets
 - Removed unnecessary and unused edu.mit.dspace.MITSpecialGroup
 
 (Tim Donohue)
@@ -66,9 +65,13 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 (Chris yates)
 - SF Patch #1724330 Removes "null" being displayed in community-home.jsp
 - SF Patch #1763535 Alert DSpace administrator of new user registration
+- SF Patch #1759438 Multilingualism Language Switch - DSpace Header
 
 (Robert Tansley / Stuart Lewis)
 - SF Patch #1587225 Google and html sitemap generator
+
+(Zuki Ebetsu)
+- SF Patch #1620700 Add Community and Sub-Community to OAI Sets
 
 1.4.2 beta
 ===========

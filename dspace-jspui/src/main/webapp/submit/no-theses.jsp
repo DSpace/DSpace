@@ -53,6 +53,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<% request.setAttribute("LanguageSwitch", "hide"); %>
+
 <dspace:layout titlekey="jsp.submit.no-theses.title">
 
     <%-- <h1>Theses Not Accepted in DSpace</h1> --%>

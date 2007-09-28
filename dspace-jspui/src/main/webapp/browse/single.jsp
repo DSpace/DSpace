@@ -58,6 +58,8 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%
+    request.setAttribute("LanguageSwitch", "hide");
+
 	//First, get the browse info object
 	BrowseInfo bi = (BrowseInfo) request.getAttribute("browse.info");
 	BrowseIndex bix = bi.getBrowseIndex();

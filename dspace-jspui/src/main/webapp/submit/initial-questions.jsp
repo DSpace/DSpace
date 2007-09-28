@@ -64,6 +64,8 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
+    request.setAttribute("LanguageSwitch", "hide");
+
         DCInputSet inputSet =
         (DCInputSet) request.getAttribute("submission.inputs");
 

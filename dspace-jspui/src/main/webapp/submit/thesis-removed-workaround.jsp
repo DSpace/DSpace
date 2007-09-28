@@ -58,6 +58,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<% request.setAttribute("LanguageSwitch", "hide"); %>
+
 <dspace:layout titlekey="jsp.submit.thesis-removed-workaround.title">
     <%-- <h1>Submission Stopped: Theses Not Accepted in DSpace</h1> --%>
 	<h1><fmt:message key="jsp.submit.thesis-removed-workaround.heading"/></h1>

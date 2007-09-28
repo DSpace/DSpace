@@ -63,6 +63,8 @@
 <%
     Community [] communities =
         (Community[]) request.getAttribute("communities");
+        
+    request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.community-select.title"

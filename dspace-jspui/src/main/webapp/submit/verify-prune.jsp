@@ -77,6 +77,8 @@
     boolean willRemoveFiles = ((Boolean) request.getAttribute("will.remove.files")).booleanValue();
 
     String buttonPressed = (String) request.getAttribute("button.pressed");
+    
+    request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout locbar="off"

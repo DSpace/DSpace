@@ -60,6 +60,7 @@
 <%
     // get the object array out of the request
     SupervisedItem[] supervisedItems = (SupervisedItem[]) request.getAttribute("supervised");
+    request.setAttribute("LanguageSwitch", "hide");
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.supervise-list.title"

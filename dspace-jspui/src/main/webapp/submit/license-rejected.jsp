@@ -49,6 +49,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<% request.setAttribute("LanguageSwitch", "hide"); %>
+
 <dspace:layout titlekey="jsp.submit.license-rejected.title">
 
     <%-- <h1>Submit: License Rejected</h1> --%>

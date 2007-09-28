@@ -43,6 +43,8 @@
    - a supervisor setting which already exists
    --%>
 
+<% request.setAttribute("LanguageSwitch", "hide"); %>
+
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>

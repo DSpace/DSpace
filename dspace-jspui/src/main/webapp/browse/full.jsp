@@ -62,6 +62,8 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%
+    request.setAttribute("LanguageSwitch", "hide");
+
     String urlFragment = "browse";
     String layoutNavbar = "default";
 	if (request.getAttribute("browseWithdrawn") != null)

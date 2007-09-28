@@ -61,6 +61,8 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
+    request.setAttribute("LanguageSwitch", "hide");
+
     //get collections to choose from
     Collection[] collections =
         (Collection[]) request.getAttribute("collections");

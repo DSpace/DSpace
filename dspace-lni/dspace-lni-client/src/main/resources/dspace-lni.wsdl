@@ -15,35 +15,41 @@ Built on Oct 05, 2005 (05:23:37 EDT)-->
   </schema>
  </wsdl:types>
 
-   <wsdl:message name="propfindRequest">
+   <wsdl:message name="propfindResponse">
+
+      <wsdl:part name="propfindReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="LNIRemoteException">
+
+      <wsdl:part name="fault" type="impl:LNIRemoteException"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="proppatchRequest">
 
       <wsdl:part name="uri" type="xsd:string"/>
 
       <wsdl:part name="doc" type="xsd:string"/>
 
-      <wsdl:part name="depth" type="xsd:int"/>
+   </wsdl:message>
 
-      <wsdl:part name="types" type="xsd:string"/>
+   <wsdl:message name="copyResponse">
+
+      <wsdl:part name="copyReturn" type="xsd:int"/>
 
    </wsdl:message>
 
-   <wsdl:message name="lookupRequest">
+   <wsdl:message name="proppatchResponse">
 
-      <wsdl:part name="handle" type="xsd:string"/>
-
-      <wsdl:part name="bitstreamPid" type="xsd:string"/>
+      <wsdl:part name="proppatchReturn" type="xsd:string"/>
 
    </wsdl:message>
 
    <wsdl:message name="lookupResponse">
 
       <wsdl:part name="lookupReturn" type="xsd:string"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="propfindResponse">
-
-      <wsdl:part name="propfindReturn" type="xsd:string"/>
 
    </wsdl:message>
 
@@ -61,29 +67,23 @@ Built on Oct 05, 2005 (05:23:37 EDT)-->
 
    </wsdl:message>
 
-   <wsdl:message name="LNIRemoteException">
+   <wsdl:message name="lookupRequest">
 
-      <wsdl:part name="fault" type="impl:LNIRemoteException"/>
+      <wsdl:part name="handle" type="xsd:string"/>
 
-   </wsdl:message>
-
-   <wsdl:message name="copyResponse">
-
-      <wsdl:part name="copyReturn" type="xsd:int"/>
+      <wsdl:part name="bitstreamPid" type="xsd:string"/>
 
    </wsdl:message>
 
-   <wsdl:message name="proppatchResponse">
-
-      <wsdl:part name="proppatchReturn" type="xsd:string"/>
-
-   </wsdl:message>
-
-   <wsdl:message name="proppatchRequest">
+   <wsdl:message name="propfindRequest">
 
       <wsdl:part name="uri" type="xsd:string"/>
 
       <wsdl:part name="doc" type="xsd:string"/>
+
+      <wsdl:part name="depth" type="xsd:int"/>
+
+      <wsdl:part name="types" type="xsd:string"/>
 
    </wsdl:message>
 

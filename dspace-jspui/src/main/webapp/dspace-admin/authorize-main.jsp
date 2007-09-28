@@ -61,6 +61,7 @@
 
 <%@ page import="org.dspace.content.Collection" %>
 
+<% request.setAttribute("LanguageSwitch", "hide"); %>
 
 <%
 // this space intentionally left blank
