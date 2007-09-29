@@ -81,11 +81,12 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
-<%!// required by Controlled Vocabulary  add-on
-	String contextPath;
-
+<%
     request.setAttribute("LanguageSwitch", "hide");
+%>
+<%!
+    // required by Controlled Vocabulary  add-on
+	String contextPath;
 
     // This method is resposible for showing a link next to an input box 
     // that pops up a window that to display a controlled vocabulary. 
@@ -108,8 +109,8 @@
 					"</span>" + 
 			"</a>";
 		} 
-		return link;
 
+		return link;
     }
 
 	boolean hasVocabulary(String vocabulary)
