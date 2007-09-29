@@ -250,7 +250,8 @@
 				<groupId>javax.servlet</groupId>
 				<artifactId>servlet-api</artifactId>
 				<version>2.3</version>
-			</dependency>
+                <scope>provided</scope>
+            </dependency>
 			
 			<dependency>
 				<groupId>jaxen</groupId>
