@@ -39,9 +39,11 @@
  */
 package org.dspace.app.webui.servlet;
 
-import javax.servlet.http.HttpServlet;
-
 import org.dspace.core.ConfigurationManager;
+
+import javax.servlet.http.HttpServlet;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Simple servlet to load in DSpace and log4j configurations. Should always be
@@ -54,6 +56,27 @@ public class LoadDSpaceConfig extends HttpServlet
 {	
     public void init()
     {
+        // On Windows, URL caches can cause problems, particularly with undeployment
+        // So, here we attempt to disable them if we detect that we are running on Windows
+        try
+        {
+            String osName = System.getProperty("os.name");
+            if (osName != null)
+                osName = osName.toLowerCase();
+
+            if (osName != null && osName.contains("windows"))
+            {
+                URL url = new URL("http://localhost/");
+                URLConnection urlConn = url.openConnection();
+                urlConn.setDefaultUseCaches(false);
+            }
+        }
+        catch (Throwable t)
+        {
+            // Any errors thrown in disabling the caches aren't significant to
+            // the normal execution of the application, so we ignore them
+        }
+
         // Get config parameter
         String config = getServletContext().getInitParameter("dspace-config");
 

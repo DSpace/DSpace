@@ -42,6 +42,8 @@ package org.dspace.app.xmlui.cocoon;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -80,10 +82,30 @@ public class DSpaceCocoonServlet extends CocoonServlet
      */
     public void init() throws ServletException
     {
+        // On Windows, URL caches can cause problems, particularly with undeployment
+        // So, here we attempt to disable them if we detect that we are running on Windows
+        try
+        {
+            String osName = System.getProperty("os.name");
+            if (osName != null)
+                osName = osName.toLowerCase();
+
+            if (osName != null && osName.contains("windows"))
+            {
+                URL url = new URL("http://localhost/");
+                URLConnection urlConn = url.openConnection();
+                urlConn.setDefaultUseCaches(false);
+            }
+        }
+        catch (Throwable t)
+        {
+            // Any errors thrown in disabling the caches aren't significant to
+            // the normal execution of the application, so we ignore them
+        }
+
     	// Check if cocoon needs to do anything at init time?
     	super.init();
-    	
-    	
+
     	// Paths to the various config files
     	String dspaceConfig = null;
     	String log4jConfig  = null;
