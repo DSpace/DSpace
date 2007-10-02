@@ -25,7 +25,6 @@
                 </property>
             </activation>
             <properties>
-                <db.sql.dir>etc</db.sql.dir>
                 <db.name>postgres</db.name>
                 <db.driver>org.postgresql.Driver</db.driver>
                 <db.url>jdbc:postgresql://localhost:5432/dspace</db.url>
@@ -42,7 +41,6 @@
                 </property>
             </activation>
             <properties>
-                <db.sql.dir>etc/oracle</db.sql.dir>
                 <db.name>oracle</db.name>
                 <db.driver>oracle.jdbc.OracleDriver</db.driver>
                 <db.url>jdbc:oracle:thin:@//localhost:1521/xe</db.url>
