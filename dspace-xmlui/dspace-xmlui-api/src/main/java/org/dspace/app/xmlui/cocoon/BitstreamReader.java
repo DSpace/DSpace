@@ -393,9 +393,14 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         response.setDateHeader("Expires", System.currentTimeMillis()
                 + expires);
 
-        response.setHeader("Accept-Ranges", "bytes");
-
-        String ranges = request.getHeader("Range");
+        // Turn off partial downloads, they cause problems
+        // and are only rarely used. Specifically some windows pdf
+        // viewers are incapable of handling this request. By
+        // uncommenting the following two lines you will turn this feature back on.
+        // response.setHeader("Accept-Ranges", "bytes");
+        // String ranges = request.getHeader("Range");
+        String ranges = null;
+        
 
         ByteRange byteRange = null;
         if (ranges != null)
