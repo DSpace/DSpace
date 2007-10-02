@@ -197,7 +197,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
             else if (itemID > -1)
             {
-            	// Refrenced by internal itemID
+            	// Referenced by internal itemID
             	Item item = Item.find(context, itemID);
             	
             	if (sequence > -1)
@@ -263,17 +263,6 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             throw new ProcessingException("Unable to read bitstream.",ae);
         } 
-        finally 
-        {
-			try 
-			{
-				ContextUtil.closeContext(objectModel);
-			} 
-			catch (SQLException sqle) 
-			{
-				throw new ProcessingException("Unable to close DSpace context after reading bitstream",sqle);
-			}
-		}
     }
 
     

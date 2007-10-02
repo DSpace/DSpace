@@ -53,6 +53,7 @@ import org.apache.cocoon.servlet.CocoonServlet;
 import org.apache.log4j.PropertyConfigurator;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -204,6 +205,9 @@ public class DSpaceCocoonServlet extends CocoonServlet
 		}
     	
     	super.service(realRequest, realResponse);
+    	
+    	// Close out the DSpace context no matter what.
+    	ContextUtil.closeContext(realRequest);
     }
     
     

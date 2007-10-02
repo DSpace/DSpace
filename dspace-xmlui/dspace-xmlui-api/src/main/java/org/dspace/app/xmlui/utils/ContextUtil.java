@@ -42,6 +42,7 @@ package org.dspace.app.xmlui.utils;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -117,19 +118,22 @@ public class ContextUtil
     /**
      * Check if a context exists for this request, if so complete the context.
      * 
-     * @param objectModel
-     *            The cocoon ObjectModel
+     * @param request
+     *            The request object 
      */
-    public static void closeContext(Map objectModel) throws SQLException
+    public static void closeContext(HttpServletRequest request) throws ServletException
     {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
-        if (context == null)
-            return;
+    	if (context != null && context.isValid())
+    	{
+    		try {
+    			context.complete();
+    		} catch (SQLException sqle) {
+    			throw new ServletException("Unable to close DSpace context.",sqle);
+    		}
+    	}
 
-        if (context.isValid())
-            context.complete();
     }
 
 }

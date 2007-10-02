@@ -116,16 +116,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 	 */
 	public void generate() throws IOException, SAXException,
 			ProcessingException {
-		boolean contextOpened = true;
 		try {
-			// This is an effecency work around, check to see if a context option has been
-			// created for the request (i.e. are we inside a normal DSpace request or were
-			// we called externaly). If we are opening the request then remember that 
-			// so we can close it at the end.
-			Request request = ObjectModelHelper.getRequest(objectModel);
-			if (request.getAttribute(ContextUtil.DSPACE_CONTEXT) instanceof Context)
-				contextOpened = false;
-			
 			// Open a new context.
 			Context context = ContextUtil.obtainContext(objectModel);
 			
@@ -141,10 +132,6 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 			contentHandler.startDocument();
 			adapter.renderMETS(contentHandler,lexicalHandler);
 			contentHandler.endDocument();
-			
-			// If we opened the context then everything is good.
-			if (contextOpened)
-				ContextUtil.closeContext(objectModel);
 			
 		} catch (WingException we) {
 			throw new ProcessingException(we);
