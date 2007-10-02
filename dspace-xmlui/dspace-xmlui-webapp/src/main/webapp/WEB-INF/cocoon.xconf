@@ -444,7 +444,8 @@
       |    in the cache will be thrown out.
       +-->
   <transient-store logger="core.store.transient">
-    <parameter name="maxobjects" value="10000"/>
+    <parameter name="maxobjects" value="100"/>
+    <parameter name="use-persistent-cache" value="false"/>
   </transient-store>
 
   <!--+
@@ -459,8 +460,12 @@
       |    in the cache will be thrown out.
       +-->
   <store logger="core.store">
-    <parameter name="maxobjects" value="10000"/>
-    <parameter name="use-cache-directory" value="true"/>
+    <parameter name="maxobjects" value="1000"/>
+    <parameter name="eternal" value="false"/>
+    <parameter name="timeToLiveSeconds" value="86400"/> <!-- 24 hours -->
+    <parameter name="timeToIdleSeconds" value="10800"/> <!-- 3 hours  -->
+    <parameter name="overflow-to-disk" value="true"/>
+    <parameter name="diskpersistent" value="false"/>
   </store>
 
   <!--+
