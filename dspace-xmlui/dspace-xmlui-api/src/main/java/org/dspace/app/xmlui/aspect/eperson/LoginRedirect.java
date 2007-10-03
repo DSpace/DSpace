@@ -95,6 +95,8 @@ public class LoginRedirect extends AbstractAction {
 						httpRequest.getQueryString() == null ? ""
 								: ("?" + httpRequest.getQueryString()));
 				httpResponse.sendRedirect(location.toString());
+			} else {
+				httpResponse.sendRedirect(url);
 			}
 		} else {
 			httpResponse.sendRedirect(url);
