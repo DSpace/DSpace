@@ -282,8 +282,8 @@ select
     '1', 
     CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, 
     CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, 
-    date_trunc('milliseconds', now()),
-    date_trunc('milliseconds', now()),
+    TO_TIMESTAMP(TO_CHAR(current_timestamp, 'DD-MM-RRRR HH24:MI:SS'), 'DD-MM-RRRR HH24:MI:SS'),
+    TO_TIMESTAMP(TO_CHAR(current_timestamp, 'DD-MM-RRRR HH24:MI:SS'), 'DD-MM-RRRR HH24:MI:SS'),
     CASE WHEN bitstream.checksum_algorithm IS NULL THEN 'MD5' ELSE bitstream.checksum_algorithm END,
     '1'
 from bitstream; 
