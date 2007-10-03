@@ -156,7 +156,7 @@ CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_i
 
 CREATE TABLE checksum_results
 (
-    result_code VARCHAR PRIMARY KEY,
+    result_code VARCHAR(64) PRIMARY KEY,
     result_description VARCHAR2(2000)
 );
 
