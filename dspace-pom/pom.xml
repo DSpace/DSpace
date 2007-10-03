@@ -103,16 +103,6 @@
 				<artifactId>dspace-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-storage-postgres</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-storage-oracle</artifactId>
-                <version>${project.version}</version>
-            </dependency>
              <dependency>
 				<groupId>org.dspace</groupId>
 				<artifactId>language-packs</artifactId>
@@ -120,12 +110,12 @@
 			</dependency>
 			<dependency>
 				<groupId>org.dspace</groupId>
-				<artifactId>jspui</artifactId>
+				<artifactId>dspace-jspui</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.dspace</groupId>
-				<artifactId>oai</artifactId>
+				<artifactId>dspace-oai</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -163,7 +153,12 @@
                 <artifactId>ant</artifactId>
                 <version>1.7.0</version>
             </dependency>
-			<dependency>
+            <dependency>
+               <groupId>org.apache.lucene</groupId>
+               <artifactId>lucene-core</artifactId>
+               <version>2.2.0</version>
+            </dependency>
+            <dependency>
 				<groupId>org.dspace</groupId>
 				<artifactId>jena</artifactId>
 				<version>1.4.0</version>
@@ -192,11 +187,6 @@
 				<groupId>org.dspace</groupId>
 				<artifactId>bcmail-jdk15</artifactId>
 				<version>136</version>
-			</dependency>
-			<dependency>
-				<groupId>org.dspace</groupId>
-				<artifactId>lucene</artifactId>
-				<version>2.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.dspace</groupId>

@@ -50,11 +50,11 @@
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>lucene</artifactId>
+         <artifactId>tm-extractors</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>tm-extractors</artifactId>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-core</artifactId>
       </dependency>
       <dependency>
          <groupId>commons-cli</groupId>
