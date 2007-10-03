@@ -41,15 +41,7 @@
          <artifactId>mets</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>bcprov-jdk15</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>bcmail-jdk15</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
+         <groupId>org.textmining</groupId>
          <artifactId>tm-extractors</artifactId>
       </dependency>
       <dependency>

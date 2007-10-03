@@ -179,17 +179,7 @@
 				<version>1.5.2</version>
 			</dependency>
 			<dependency>
-				<groupId>org.dspace</groupId>
-				<artifactId>bcprov-jdk15</artifactId>
-				<version>136</version>
-			</dependency>
-			<dependency>
-				<groupId>org.dspace</groupId>
-				<artifactId>bcmail-jdk15</artifactId>
-				<version>136</version>
-			</dependency>
-			<dependency>
-				<groupId>org.dspace</groupId>
+				<groupId>org.textmining</groupId>
 				<artifactId>tm-extractors</artifactId>
 				<version>0.4</version>
 			</dependency>
