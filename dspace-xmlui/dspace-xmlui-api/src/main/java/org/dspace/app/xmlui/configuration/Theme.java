@@ -53,6 +53,8 @@ public class Theme
     private final String name;
     /** The directory path of the theme */
     private final String path;
+    /** The unique id of the theme */
+    private final String id;
     
     /** The regular exrpession for this theme rule, if supplied */
     private final String regex;
@@ -68,12 +70,14 @@ public class Theme
      * 
      * @param name A unique name of the theme
      * @param path The directory path to the theme
+     * @param id The unique ID of the theme
      * @param regex The regular exrpession for this theme rule
      * @param handle handle expression for this theme rule
      */
-    public Theme(String name, String path, String regex, String handle) {
+    public Theme(String name, String path, String id, String regex, String handle) {
         this.name = name;
         this.path = path;
+        this.id = id;
         this.regex = regex;
         if (regex != null && regex.length() > 0)
             this.pattern = Pattern.compile(regex);
@@ -136,6 +140,13 @@ public class Theme
      */
     public String getHandle() {
         return handle;
+    }
+    
+    /**
+     * @return The theme's unique ID
+     */
+    public String getId(){
+    	return id;
     }
     
 }

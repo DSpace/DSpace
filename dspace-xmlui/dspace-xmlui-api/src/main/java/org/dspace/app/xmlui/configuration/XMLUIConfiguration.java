@@ -114,15 +114,16 @@ public class XMLUIConfiguration
 
         for (Element themeElement : themeElements)
         {
-            String path = themeElement.getAttributeValue("path");
             String name = themeElement.getAttributeValue("name");
+            String path = themeElement.getAttributeValue("path");
+            String id = themeElement.getAttributeValue("id");
             String regex = themeElement.getAttributeValue("regex");
             String handle = themeElement.getAttributeValue("handle");
 
             if (path == null || path.length() == 0)
                 throw new IllegalStateException("All themes muth define a path");
-            themes.add(new Theme(name, path, regex, handle));
-            log.info("Theme Installed: name='"+name+"', path='"+path+"', regex='"+regex+"', handle='"+handle+"'.");
+            themes.add(new Theme(name, path, id, regex, handle));
+            log.info("Theme Installed: name='"+name+"', path='"+path+"', id='"+id+"', regex='"+regex+"', handle='"+handle+"'.");
         }
     }
 

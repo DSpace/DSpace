@@ -58,91 +58,87 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
 
 /**
- *  This class determines the correct Aspect to use. This is determined by the
+ * This class determines the correct Aspect to use. This is determined by the
  * url string, if it is prepended with a number followed by a slash (such as 1/
  * or 3/) then the Aspect identified by the number is used. When the URL does
  * not start with an integer then the first Aspect (aspect zero) is loaded.
  * 
- * Once the Aspect has been identified the following sitemap parameters are 
- * provided: {ID} is the Aspect ID, {aspect} is the path to the aspect, 
- * {aspectName} is a unique name for the aspect, and {prefix} is the aspect 
+ * Once the Aspect has been identified the following sitemap parameters are
+ * provided: {ID} is the Aspect ID, {aspect} is the path to the aspect,
+ * {aspectName} is a unique name for the aspect, and {prefix} is the aspect
  * identifier prepending the URL (if one exists!).
  * 
- * This class determines the correct Theme to apply to the URL. This is determined
- * by the Theme rules defined in the xmlui.xml configuration file. Each rule is 
- * evaluated in order and the first rule to match is the selected Theme.
+ * This class determines the correct Theme to apply to the URL. This is
+ * determined by the Theme rules defined in the xmlui.xml configuration file.
+ * Each rule is evaluated in order and the first rule to match is the selected
+ * Theme.
  * 
- * Once the Theme has been selected the following sitemap parameters are 
+ * Once the Theme has been selected the following sitemap parameters are
  * provided: {themeName} is a unique name for the Theme, and {theme} is the
  * theme's path.
  * 
  * @author Scott Phillips
  */
 
-public class ThemeMatcher extends AbstractLogEnabled implements Matcher
-{
+public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 
-    /**
-     * @param pattern
-     *            name of sitemap parameter to find
-     * @param objectModel
-     *            environment passed through via cocoon
-     * @return null or map containing value of sitemap parameter 'pattern'
-     */
-    public Map match(String src, Map objectModel, Parameters parameters)
-            throws PatternException
-    {
-        try
-        {
-            Request request = ObjectModelHelper.getRequest(objectModel);
-            String uri = request.getSitemapURI();
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+	/**
+	 * @param pattern
+	 *            name of sitemap parameter to find
+	 * @param objectModel
+	 *            environment passed through via cocoon
+	 * @return null or map containing value of sitemap parameter 'pattern'
+	 */
+	public Map match(String src, Map objectModel, Parameters parameters)
+			throws PatternException {
+		try {
+			Request request = ObjectModelHelper.getRequest(objectModel);
+			String uri = request.getSitemapURI();
+			DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-            List<Theme> rules = XMLUIConfiguration.getThemeRules();
-            getLogger().debug("Checking if URL="+uri+" matches any theme rules.");
-            for (Theme rule : rules)
-            {
-                getLogger().debug("rule="+rule.getName());
-                if (!(rule.hasRegex() || rule.hasHandle()))
-                    // Skip any rule with out a pattern or handle 
-                    continue;
+			List<Theme> rules = XMLUIConfiguration.getThemeRules();
+			getLogger().debug("Checking if URL=" + uri + " matches any theme rules.");
+			for (Theme rule : rules) {
+				getLogger().debug("rule=" + rule.getName());
+				if (!(rule.hasRegex() || rule.hasHandle()))
+					// Skip any rule with out a pattern or handle
+					continue;
 
-                getLogger().debug("checking for patterns");
-                if (rule.hasRegex())
-                {
-                    // If the rule has a pattern insure that the URL matches it.
-                    Pattern pattern = rule.getPattern();
-                    if ( ! pattern.matcher(uri).find())
-                        continue;
-                }
+				getLogger().debug("checking for patterns");
+				if (rule.hasRegex()) {
+					// If the rule has a pattern insure that the URL matches it.
+					Pattern pattern = rule.getPattern();
+					if (!pattern.matcher(uri).find())
+						continue;
+				}
 
-                getLogger().debug("checking for handles");
-                if (rule.hasHandle())
-                {
-                    // If the rules has a handle insure that the DSO matches it.
-                    if ( ! HandleUtil.inheritsFrom(dso,rule.getHandle())) 
-                        continue;
+				getLogger().debug("checking for handles");
+				if (rule.hasHandle()) {
+					// If the rules has a handle insure that the DSO matches it.
+					if (!HandleUtil.inheritsFrom(dso, rule.getHandle()))
+						continue;
 
-                }
-                
-                getLogger().debug("rule selected!!");
+				}
 
-                Map<String, String> result = new HashMap<String, String>();
-                result.put("themeName", rule.getName());
-                result.put("theme", rule.getPath());
-                return result;
-            }
+				getLogger().debug("rule selected!!");
+				Map<String, String> result = new HashMap<String, String>();
+				result.put("themeName", rule.getName());
+				result.put("theme", rule.getPath());
+				result.put("themeID", rule.getId());
+				
+				request.getSession().setAttribute("themeName", rule.getName());
+				request.getSession().setAttribute("theme", rule.getPath());
+				request.getSession().setAttribute("themeID", rule.getId());
+				
+				return result;
+			}
 
-        }
-        catch (SQLException sqle)
-        {
-            throw new PatternException(sqle);
-        }
+		} catch (SQLException sqle) {
+			throw new PatternException(sqle);
+		}
 
-        // No themes matched.
-        return null;
-    }
-    
-    
-    
+		// No themes matched.
+		return null;
+	}
+
 }
