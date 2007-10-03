@@ -26,10 +26,6 @@
    <dependencies>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>jena</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
          <artifactId>handle</artifactId>
       </dependency>
       <dependency>
