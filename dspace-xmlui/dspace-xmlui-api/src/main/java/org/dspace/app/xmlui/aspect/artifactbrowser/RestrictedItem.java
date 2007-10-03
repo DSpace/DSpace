@@ -42,15 +42,18 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -79,7 +82,6 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     private static final Message T_para = 
         message("xmlui.ArtifactBrowser.RestrictedItem.para");
     
-    
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException
@@ -99,27 +101,32 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {   
+    	Request  request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         
+        String type = null;
         String identifier = null;
         if (dso == null)
         {
+        	type = "resource";
         	identifier = "unknown";
         } 
         else if (dso instanceof Community)
         {
         	Community community = (Community) dso;
         	identifier = community.getMetadata("name");
+        	type = "community";
         } 
         else if (dso instanceof Collection)
         {
         	Collection collection = (Collection) dso;
         	identifier = collection.getMetadata("name");
+        	type = "collection";
         } 
         else 
         {
         	String handle = dso.getHandle();
-        	
+        	type = "item";
         	if (handle == null || "".equals(handle))
         	{
         		identifier =  "internal ID: " + dso.getID();
@@ -128,11 +135,27 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         	{
         		identifier = "hdl:"+handle;
         	}
+        	
+        	if (request.getParameter("bitstreamId")!=null){
+        		type = "bitstream";
+        		try{
+        			Bitstream bit = Bitstream.find(context, new Integer(request.getParameter("bitstreamId")));
+	        		if(bit!=null){
+	        			identifier = bit.getName();
+	        		}
+	        		else{
+	        			identifier = "unknown";
+	        		}
+        		}
+        		catch(Exception e){
+        			
+        		}
+        	}
         }
         	
         Division unauthorized = body.addDivision("unauthorized-item","primary");
-        unauthorized.setHead(T_head);
+        unauthorized.setHead(T_head.parameterize(type));
         
-        unauthorized.addPara(T_para.parameterize(identifier));
+        unauthorized.addPara(T_para.parameterize(new Object[]{type,identifier}));
     }
 }

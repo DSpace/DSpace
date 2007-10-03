@@ -157,6 +157,12 @@ and searching the repository.
 			<!-- Handle specific features -->
 			<map:match pattern="handle/*/**">
 
+				<!-- Inform the user that the item they are viewing is a restricted resource -->
+				<map:match pattern="handle/*/*/restricted-resource">
+					<map:transform type="RestrictedItem"/>
+					<map:serialize type="xml"/>	
+				</map:match>
+
 				<!-- Scoped browse by features -->
 				<map:match type="HandleAuthorizedMatcher" pattern="READ">				
 					<map:match type="HandleTypeMatcher" pattern="community,collection">

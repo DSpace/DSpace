@@ -189,6 +189,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
             // Reslove the bitstream
             Bitstream bitstream = null;
+            Item item = null;
+            DSpaceObject dso = null;
             
             if (bitstreamID > -1)
             {
@@ -198,7 +200,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             else if (itemID > -1)
             {
             	// Referenced by internal itemID
-            	Item item = Item.find(context, itemID);
+            	item = Item.find(context, itemID);
             	
             	if (sequence > -1)
             	{
@@ -212,7 +214,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             else if (handle != null)
             {
             	// Reference by an item's handle.
-            	DSpaceObject dso = HandleManager.resolveToObject(context,handle);
+            	dso = HandleManager.resolveToObject(context,handle);
             	
             	if (dso instanceof Item && sequence > -1)
             	{
@@ -231,21 +233,42 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             	throw new ResourceNotFoundException("Unable to locate bitstream");
             }
                 
-            // Does the user have access to read it?
+            // Is there a User logged in and does the user have access to read it?
             if (!AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ))
             {
-            	// The user does not have read access to this bitstream. Inturrupt this current request
-            	// and then forward them to the login page so that they can be authenticated. Once that is
-            	// successfull they will request will be resumed.
-            	AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
-            	
-            	// Redirect
-            	String redictURL = request.getContextPath() + "/login";
-            	
-            	HttpServletResponse httpResponse = (HttpServletResponse) 
+            	if(this.request.getSession().getAttribute("dspace.current.user.id")!=null){
+            		// A user is logged in, but they are not authorized to read this bitstream, 
+            		// instead of asking them to login again we'll point them to a friendly error 
+            		// message that tells them the bitstream is restricted.
+            		String redictURL = request.getContextPath() + "/handle/";
+            		if (item!=null){
+            			redictURL += item.getHandle();
+            		}
+            		else if(dso!=null){
+            			redictURL += dso.getHandle();
+            		}
+            		redictURL += "/restricted-resource?bitstreamId=" + bitstream.getID();
+
+            		HttpServletResponse httpResponse = (HttpServletResponse) 
             		objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                httpResponse.sendRedirect(redictURL);
-                return;
+            		httpResponse.sendRedirect(redictURL);
+            		return;
+            	}
+            	else{
+
+            		// The user does not have read access to this bitstream. Inturrupt this current request
+            		// and then forward them to the login page so that they can be authenticated. Once that is
+            		// successfull they will request will be resumed.
+            		AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
+
+            		// Redirect
+            		String redictURL = request.getContextPath() + "/login";
+
+            		HttpServletResponse httpResponse = (HttpServletResponse) 
+            		objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+            		httpResponse.sendRedirect(redictURL);
+            		return;
+            	}
             }
                 
                 

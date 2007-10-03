@@ -264,6 +264,19 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.trail">Restricted</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head">This item is restricted</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para">The item you tried to access, <b>{0}</b>, is a restricted item and requires credentials that you do not have.</message>
+	
+	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">This resource is restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.trail">Restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.head">This {0} is restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para">The {0} you tried to access, <b>{1}</b>, is a restricted {0} and requires credentials that you do not have.</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_collection">collection</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_community">community</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_bitstream">bitstream</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_item">item</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_resource">resource</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.unknown">unknown</message>
+	
 	<!-- Authentication messages used at the top of the login page:  -->
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_header">The item is restricted</message>	
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_message">The item you are attempting to access is a restricted item and requires credentials to view. Please login below to access the item.</message>
