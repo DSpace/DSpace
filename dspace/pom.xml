@@ -249,11 +249,11 @@
                 </property>
             </activation>
             <properties>
-                <db.name>postgres</db.name>
-                <db.driver>org.postgresql.Driver</db.driver>
-                <db.url>jdbc:postgresql://localhost:5432/dspace</db.url>
-                <db.username>dspace</db.username>
-                <db.password>dspace</db.password>
+                <default.db.name>postgres</default.db.name>
+                <default.db.driver>org.postgresql.Driver</default.db.driver>
+                <default.db.url>jdbc:postgresql://localhost:5432/dspace</default.db.url>
+                <default.db.username>dspace</default.db.username>
+                <default.db.password>dspace</default.db.password>
             </properties>
         </profile>
 
@@ -286,11 +286,11 @@
                 </property>
             </activation>
             <properties>
-                <db.name>oracle</db.name>
-                <db.driver>oracle.jdbc.OracleDriver</db.driver>
-                <db.url>jdbc:oracle:thin:@//localhost:1521/xe</db.url>
-                <db.username>dspace</db.username>
-                <db.password>dspace</db.password>
+                <default.db.name>oracle</default.db.name>
+                <default.db.driver>oracle.jdbc.OracleDriver</default.db.driver>
+                <default.db.url>jdbc:oracle:thin:@//localhost:1521/xe</default.db.url>
+                <default.db.username>dspace</default.db.username>
+                <default.db.password>dspace</default.db.password>
             </properties>
         </profile>
         
