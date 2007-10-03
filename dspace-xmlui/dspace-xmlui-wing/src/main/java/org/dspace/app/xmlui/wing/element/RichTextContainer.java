@@ -121,6 +121,26 @@ public abstract class RichTextContainer extends TextContainer
         Xref xref = addXref(target);
         xref.addContent(characters);
     }
+    
+    /**
+     * Add a new reference to the character container. The xref element is a
+     * reference to an external document. The characters will be used as the
+     * visual part of the link's body
+     * 
+     * @param target
+     *            (Required) A target URL for the references a destination for
+     *            the xref.
+     * @param characters
+     *            (May be null) The link's body
+     * @param rend
+     * 			  (May be null) Special rendering instructions.
+     */
+    public void addXref(String target, String characters, String rend) throws WingException
+    {
+    	Xref xref = new Xref(context, target, rend);
+    	xref.addContent(characters);
+    	contents.add(xref);
+    }
 
     /**
      * Add a new reference to the character container. The xref element is a
@@ -137,6 +157,26 @@ public abstract class RichTextContainer extends TextContainer
     {
         Xref xref = addXref(target);
         xref.addContent(key);
+    }
+    
+    /**
+     * Add a new reference to the character container. The xref element is a
+     * reference to an external document. The translated i18n key will be used
+     * as the visual part of the link's body
+     * 
+     * @param target
+     *            (Required) A target URL for the references a destination for
+     *            the xref.
+     * @param key
+     *            (Required) The link's body
+     * @param rend
+     *  		  (May be null) Special rendering instructions
+     */
+    public void addXref(String target, Message key, String rend) throws WingException
+    {
+        Xref xref = new Xref(context, target, rend);
+        xref.addContent(key);
+    	contents.add(xref);
     }
 
     /**
