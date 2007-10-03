@@ -66,6 +66,9 @@ public class Xref extends TextContainer implements StructuralElement
 
     /** The link's target */
     private String target;
+    
+    /** Special rendering instructions for this link */
+    private String rend;
 
     /**
      * Construct a new xref link.
@@ -75,8 +78,10 @@ public class Xref extends TextContainer implements StructuralElement
      * @param target
      *            (Required) A target URL for the references a destination for
      *            the xref.
+     * @param rend
+     *            (May be null) A special rendering instruction for this xref.
      */
-    protected Xref(WingContext context, String target) throws WingException
+    protected Xref(WingContext context, String target, String rend) throws WingException
     {
         super(context);
         
@@ -95,6 +100,21 @@ public class Xref extends TextContainer implements StructuralElement
         	target = "/";
         
         this.target = target;
+        this.rend = rend;
+    }
+    
+    /**
+     * Construct a new xref link.
+     * 
+     * @param context
+     *            (Required) The context this element is contained in
+     * @param target
+     *            (Required) A target URL for the references a destination for
+     *            the xref.
+     */
+    protected Xref(WingContext context, String target) throws WingException
+    {
+    	this(context,target,null);
     }
 
     /**
@@ -117,6 +137,10 @@ public class Xref extends TextContainer implements StructuralElement
     {
         AttributeMap attributes = new AttributeMap();
         attributes.put(A_TARGET, target);
+           
+        if(this.rend!=null){
+        	attributes.put(A_RENDER, this.rend);
+        }
 
         startElement(contentHandler, namespaces, E_XREF, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);
