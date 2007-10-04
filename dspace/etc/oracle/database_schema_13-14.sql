@@ -294,7 +294,7 @@ from bitstream;
 -- deleted from the system
 
 update most_recent_checksum
-set to_be_processed = false
+set to_be_processed = 0
 where most_recent_checksum.bitstream_id in (
 select bitstream_id
 from bitstream where deleted = '1' );
@@ -314,9 +314,10 @@ insert into checksum_history
 )
 select most_recent_checksum.bitstream_id,
      most_recent_checksum.last_process_end_date,
-     date_trunc('milliseconds', now()),
+     TO_TIMESTAMP(TO_CHAR(current_timestamp, 'DD-MM-RRRR HH24:MI:SS'), 'DD-MM-RRRR HH24:MI:SS'),
       most_recent_checksum.expected_checksum,
-      most_recent_checksum.expected_checksum;
+      most_recent_checksum.expected_checksum
+FROM most_recent_checksum;
 
 -- update the history to indicate that this was 
 -- the first time the software was installed
