@@ -136,9 +136,9 @@ CREATE VIEW dcvalue AS
   WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
   AND MetadataFieldRegistry.metadata_schema_id = 1;
 
-SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
-SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
-SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
+@updateseq.sql metadatafieldregistry_seq metadatafieldregistry metadata_field_id;
+@updateseq.sql metadatavalue_seq metadatavalue metadata_value_id;
+@updateseq.sql metadataschemaregistry_seq metadataschemaregistry metadata_schema_id;
 
 DROP TABLE dctyperegistry;
 
