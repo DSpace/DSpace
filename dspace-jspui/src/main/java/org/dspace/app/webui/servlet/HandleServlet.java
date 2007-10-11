@@ -39,37 +39,33 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.core.PluginManager;
+import org.dspace.content.*;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.dspace.handle.HandleManager;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Servlet for handling requests within a community or collection. The Handle is
@@ -89,6 +85,16 @@ public class HandleServlet extends DSpaceServlet
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(DSpaceServlet.class);
+
+    /** For obtaining &lt;meta&gt; elements to put in the &lt;head&gt; */
+    private DisseminationCrosswalk xHTMLHeadCrosswalk;
+
+    public HandleServlet()
+    {
+        super();
+        xHTMLHeadCrosswalk = (DisseminationCrosswalk) PluginManager
+                .getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
+    }   
 
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -306,6 +312,31 @@ public class HandleServlet extends DSpaceServlet
             displayAll = true;
         }
 
+        String headMetadata = "";
+
+        // Produce <meta> elements for header from crosswalk
+        try
+        {
+            List l = xHTMLHeadCrosswalk.disseminateList(item);
+            StringWriter sw = new StringWriter();
+
+            XMLOutputter xmlo = new XMLOutputter();
+            for (int i = 0; i < l.size(); i++)
+            {
+                Element e = (Element) l.get(i);
+                // FIXME: we unset the Namespace so it's not printed.
+                // This is fairly yucky, but means the same crosswalk should
+                // work for Manakin as well as the JSP-based UI.
+                e.setNamespace(null);
+                xmlo.output(e, sw);
+            }
+            headMetadata = sw.toString();
+        }
+        catch (CrosswalkException ce)
+        {
+            throw new ServletException(ce);
+        }
+
         // Enable suggest link or not
         boolean suggestEnable = false;
         if (!ConfigurationManager.getBooleanProperty("webui.suggest.enable"))
@@ -334,6 +365,7 @@ public class HandleServlet extends DSpaceServlet
         request.setAttribute("display.all", new Boolean(displayAll));
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
+        request.setAttribute("dspace.layout.head", headMetadata);
         JSPManager.showJSP(request, response, "/display-item.jsp");
     }
 

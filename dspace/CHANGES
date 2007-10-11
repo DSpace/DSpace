@@ -73,6 +73,9 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 (Zuki Ebetsu)
 - SF Patch #1620700 Add Community and Sub-Community to OAI Sets
 
+(Robert Tansley)
+- SF Patch #1566572 Item metadata in XHTML head <meta> elements
+
 1.4.2 beta
 ===========
 

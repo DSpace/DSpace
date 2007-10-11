@@ -91,6 +91,14 @@ import org.dspace.app.webui.servlet.FeedServlet;
  * elements where <i>n</i> is the number of feeds.</li>
  * </ul>
  * <p>
+ *
+ * * Additionally the following parameter may be set elsewhere in a Servlet.
+ * <p>
+ * <ul>
+ * <li><code>dspace.layout.head</code> - extra data to include verbatim in
+ * the &lt;head&gt; element of the page</li>
+ * </ul>
+ * 
  * Furthermore it sets the content type of the response to text/html using UTF-8
  * to ensure this will be returned in the HTTP header.
  * </p>
