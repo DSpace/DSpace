@@ -112,7 +112,7 @@
         <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim"
             mode="itemSummaryList-DIM"/>
         <!-- Generate the thunbnail, if present, from the file section -->
-        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']"/>
+        <xsl:apply-templates select="./mets:fileSec" mode="artifact-preview"/>
     </xsl:template>
     
     <!-- Generate the info about the item from the metadata section -->
@@ -250,7 +250,7 @@
         mode="itemSummaryList-DIM"/>
         
         <!-- Generate the thunbnail, if present, from the file section -->
-        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']"/>
+        <xsl:apply-templates select="./mets:fileSec" mode="artifact-preview"/>
     </xsl:template>
     
     
