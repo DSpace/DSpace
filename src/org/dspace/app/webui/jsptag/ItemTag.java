@@ -518,7 +518,7 @@ public class ItemTag extends TagSupport
             }
 
             out
-                    .println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th><th class=\"standard\">Hits</th></tr>");
+	      .println("<th class=\"standard\">Size</th class=\"standard\"><th class=\"standard\">Format</th><th class=\"standard\">No. of Downloads</th></tr>");
 
             // if primary bitstream is html, display a link for only that one to
             // HTMLServlet
