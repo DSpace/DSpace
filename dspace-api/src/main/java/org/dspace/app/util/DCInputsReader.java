@@ -211,7 +211,7 @@ public class DCInputsReader
     	Vector pages = (Vector)formDefns.get(formName);
     	if ( pages == null )
     	{
-    		throw new ServletException("Missing the default form");    		
+    		throw new ServletException("Missing the " + formName  + " form");    		
     	}
     	lastInputSet = new DCInputSet(formName, pages, valuePairs);
     	return lastInputSet;
