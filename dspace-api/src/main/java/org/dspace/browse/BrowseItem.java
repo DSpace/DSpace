@@ -146,7 +146,10 @@ public class BrowseItem extends DSpaceObject
                 if (values.isEmpty())
                 {
                     DCValue[] dcvs = dao.queryMetadata(id, schema, element, qualifier, lang);
-                    Collections.addAll(metadata, dcvs);
+                    if (dcvs != null)
+                    {
+                    	Collections.addAll(metadata, dcvs);
+                    }
                     return dcvs;
                 }
 
@@ -159,7 +162,10 @@ public class BrowseItem extends DSpaceObject
             else
             {
                 DCValue[] dcvs = dao.queryMetadata(id, schema, element, qualifier, lang);
-                Collections.addAll(metadata, dcvs);
+                if (dcvs != null)
+                {
+                	Collections.addAll(metadata, dcvs);
+                }
                 return dcvs;
             }
         }
