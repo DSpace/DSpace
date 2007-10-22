@@ -138,7 +138,8 @@ CREATE TABLE EPerson
   last_active         TIMESTAMP,
   sub_frequency       INTEGER,
   phone	              VARCHAR2(32),
-  netid               VARCHAR2(64) UNIQUE
+  netid               VARCHAR2(64) UNIQUE,
+  language            VARCHAR2(64)
 );
 
 
@@ -411,7 +412,8 @@ CREATE TABLE WorkspaceItem
   published_before  NUMBER(1),
   multiple_files    NUMBER(1),
   -- How for the user has got in the submit process
-  stage_reached     INTEGER
+  stage_reached     INTEGER,
+  page_reached      INTEGER
 );
 
 -------------------------------------------------------

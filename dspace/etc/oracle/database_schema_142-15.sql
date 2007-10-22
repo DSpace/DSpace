@@ -48,3 +48,20 @@
 -- Remove NOT NULL restrictions from the checksum columns of most_recent_checksum
 ALTER TABLE most_recent_checksum MODIFY expected_checksum null;
 ALTER TABLE most_recent_checksum MODIFY current_checksum null;
+
+------------------------------------------------------
+-- New Column language language in EPerson
+------------------------------------------------------
+
+alter table eperson add column language VARCHAR2(64);
+update eperson set language = 'en';
+
+alter table bundle drop column mets_bitstream_id; -- totally unused column
+
+
+-------------------------------------------------------------------------------
+-- Necessary for Configurable Submission functionality:
+-- Modification to workspaceitem table to support keeping track
+-- of the last page reached within a step in the Configurable Submission Process
+-------------------------------------------------------------------------------
+ALTER TABLE workspaceitem ADD page_reached INTEGER;
