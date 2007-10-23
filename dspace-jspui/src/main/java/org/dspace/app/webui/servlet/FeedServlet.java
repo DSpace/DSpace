@@ -427,8 +427,13 @@ public class FeedServlet extends DSpaceServlet
     		}
     		
     		channel.setItems(items);
-    		
-    		return channel;
+
+            // If the description is null, replace it with an empty string
+            // to avoid a FeedException
+            if (channel.getDescription() == null)
+                channel.setDescription("");
+
+            return channel;
     	}
     	catch (BrowseException e)
     	{
