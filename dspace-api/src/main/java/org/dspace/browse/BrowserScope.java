@@ -39,6 +39,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.apache.log4j.Logger;
 
 /**
  * A class which represents the initial request to the browse system.
@@ -50,6 +51,9 @@ import org.dspace.core.Context;
  */
 public class BrowserScope
 {
+    /** the logger for this class */
+    private static Logger log = Logger.getLogger(BrowserScope.class);
+
 	/** the DSpace context */
 	private Context context;
 	
@@ -57,7 +61,7 @@ public class BrowserScope
 	private BrowseIndex browseIndex;
 	
 	/** the order in which to display results */
-	private String order = "ASC";
+	private String order;
 	
 	/** the field upon which to sort */
 	private int sortBy;
@@ -325,17 +329,43 @@ public class BrowserScope
 	 */
 	public String getOrder()
 	{
-		return order;
-	}
+        if (order != null)
+            return order;
+
+        try
+        {
+            SortOption so = getSortOption();
+
+            if (so != null)
+                return so.getDefaultOrder();
+        }
+        catch (BrowseException be)
+        {
+            // recoverable problem, just log the error and continue
+            log.debug("Unable to retrieve a sort option for this browse", be);
+        }
+
+        return SortOption.ASCENDING;
+    }
 
 	/**
 	 * @param order The order to set.
 	 */
 	public void setOrder(String order)
 	{
-		if (order != null && !"".equals(order))
-			this.order = order;
-	}
+        if (order == null)
+        {
+            this.order = null;
+        }
+        else if (SortOption.ASCENDING.equalsIgnoreCase(order))
+        {
+            this.order = SortOption.ASCENDING;
+        }
+        else if (SortOption.DESCENDING.equalsIgnoreCase(order))
+        {
+            this.order = SortOption.DESCENDING;
+        }
+    }
 
 	/**
 	 * @return Returns the resultsPerPage.
@@ -392,7 +422,7 @@ public class BrowserScope
 				    // Create a dummy sortOption for the metadata sort
 					String dataType = browseIndex.getDataType();
 					String type = ("date".equals(dataType) ? "date" : "text");
-					sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(), type);
+                    sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(), type, browseIndex.getDefaultOrder());
 				}
 				else
 				{
@@ -505,15 +535,34 @@ public class BrowserScope
 	}
 	
 	/**
-	 * @return	true if ascending, false if not
+	 * @return	true if ascending, false if not - or not set
 	 */
 	public boolean isAscending()
 	{
-		if ("ASC".equals(order))
+		if (SortOption.ASCENDING.equalsIgnoreCase(order))
 		{
 			return true;
 		}
-		return false;
+
+        if (SortOption.DESCENDING.equalsIgnoreCase(order))
+        {
+            return false;
+        }
+
+        try
+        {
+            SortOption so = getSortOption();
+
+            if (so != null && SortOption.DESCENDING.equalsIgnoreCase(so.getDefaultOrder()))
+                return false;
+        }
+        catch (BrowseException be)
+        {
+            // recoverable problem, just log the error and continue
+            log.debug("Unable to retrieve a sort option for this browse", be);
+        }
+
+        return true;
 	}
 	
 	/**

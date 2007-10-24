@@ -145,12 +145,6 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                 resultsperpage = 20;
             }
         
-            // if no order parameter, default to ascending
-            if (order == null || "".equals(order))
-            {
-                order = "ASC";
-            }
-            
             // if year and perhaps month have been selected, we translate these into "startsWith"
             // if startsWith has already been defined then it is overwritten
             if (year != null && !"".equals(year) && !"-1".equals(year))

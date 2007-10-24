@@ -103,7 +103,7 @@ public class RecentSubmissionsManager
 			
 			// fill in the scope with the relevant gubbins
 			bs.setBrowseIndex(bi);
-			bs.setOrder("DESC");	// FIXME: eek - plain text flag!  Should be BrowserScope.ASC or something
+			bs.setOrder(SortOption.DESCENDING);
 			bs.setResultsPerPage(Integer.parseInt(count));
 			bs.setBrowseContainer(dso);
             for (SortOption so : SortOption.getSortOptions())

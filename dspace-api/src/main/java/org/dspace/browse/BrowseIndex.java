@@ -83,6 +83,9 @@ public class BrowseIndex
     /** a three part array of the metadata bits (e.g. dc.contributor.author) */
     private String[] mdBits;
 
+    /** default order (asc / desc) for this index */
+    private String defaultOrder;
+
     /** additional 'internal' tables that are always defined */
     private static BrowseIndex itemIndex      = new BrowseIndex("bi_item");
     private static BrowseIndex withdrawnIndex = new BrowseIndex("bi_withdrawn");
@@ -135,9 +138,10 @@ public class BrowseIndex
     	throws BrowseException
     {
         boolean valid = true;
+        this.defaultOrder = SortOption.ASCENDING;
         this.number = number;
         
-        String rx = "(\\w+):(\\w+):([\\w\\.\\*]+):?(\\w*)";
+        String rx = "(\\w+):(\\w+):([\\w\\.\\*]+):?(\\w*):?(\\w*)";
         Pattern pattern = Pattern.compile(rx);
         Matcher matcher = pattern.matcher(definition);
         
@@ -156,7 +160,16 @@ public class BrowseIndex
                 
                 if (datatype == null || datatype.equals(""))
                     valid = false;
-                
+
+                // If an optional ordering configuration is supplied,
+                // set the defaultOrder appropriately (asc or desc)
+                if (matcher.groupCount() > 4)
+                {
+                    String order = matcher.group(5);
+                    if (SortOption.DESCENDING.equalsIgnoreCase(order))
+                        this.defaultOrder = SortOption.DESCENDING;
+                }
+
                 tableBaseName = makeTableBaseName(number);
             }
             else if (isItemIndex())
@@ -189,6 +202,14 @@ public class BrowseIndex
             throw new BrowseException("Browse Index configuration is not valid: webui.browse.index." + 
                     number + " = " + definition);
         }
+    }
+
+    /**
+     * @return Default order for this index, null if not specified
+     */
+    public String getDefaultOrder()
+    {
+        return defaultOrder;
     }
 
     /**

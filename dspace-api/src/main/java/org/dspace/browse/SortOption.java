@@ -55,7 +55,10 @@ import org.dspace.core.ConfigurationManager;
  */
 public class SortOption
 {
-	/** the sort configuration number */
+    public static final String ASCENDING  = "ASC";
+    public static final String DESCENDING = "DESC";
+
+    /** the sort configuration number */
 	private int number;
 	
 	/** the name of the sort */
@@ -69,6 +72,9 @@ public class SortOption
 	
 	/** the metadata broken down into bits for convenience */
 	private String[] mdBits;
+
+    /** default ordering for this sort, when not supplied by the user */
+    private String defaultOrder;
 
     /** the sort options available for this index */
     private static Set<SortOption> sortOptionsSet = null;
@@ -90,10 +96,25 @@ public class SortOption
 		this.type = type;
 		this.metadata = md;
 		this.number = number;
-		generateMdBits();
+        this.defaultOrder = SortOption.ASCENDING;
+        generateMdBits();
 	}
 
-	/** 
+    public SortOption(int number, String name, String md, String type, String defaultOrder)
+        throws BrowseException
+    {
+        this.name = name;
+        this.type = type;
+        this.metadata = md;
+        this.number = number;
+        if (SortOption.DESCENDING.equalsIgnoreCase(defaultOrder))
+            this.defaultOrder = SortOption.DESCENDING;
+        else
+            this.defaultOrder = SortOption.ASCENDING;
+        generateMdBits();
+    }
+
+	/**
 	 * Construct a new SortOption object using the definition from the configuration
 	 * 
 	 * @param number
@@ -105,7 +126,7 @@ public class SortOption
 	{
 		this.number = number;
 		
-		String rx = "(\\w+):([\\w\\.\\*]+):(\\w+)";
+		String rx = "(\\w+):([\\w\\.\\*]+):(\\w+):?(\\w*)";
         Pattern pattern = Pattern.compile(rx);
         Matcher matcher = pattern.matcher(definition);
         
@@ -118,10 +139,28 @@ public class SortOption
         name = matcher.group(1);
         metadata = matcher.group(2);
         type = matcher.group(3);
+        if (matcher.groupCount() > 3)
+            defaultOrder = matcher.group(4);
+
+        // If the default order is specified as descending, keep it
+        // Otherwise, set the default order to ascending
+        if (SortOption.DESCENDING.equalsIgnoreCase(defaultOrder))
+            defaultOrder = SortOption.DESCENDING;
+        else
+            defaultOrder = SortOption.ASCENDING;
+
         generateMdBits();
 	}
-	
-	/**
+
+    /**
+     * @return Returns the default ordering for this sort option
+     */
+    public String getDefaultOrder()
+    {
+        return defaultOrder;
+    }
+
+    /**
 	 * @return Returns the metadata.
 	 */
 	public String getMetadata()

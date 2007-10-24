@@ -39,33 +39,27 @@
  */
 package org.dspace.app.webui.servlet.admin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.browse.BrowseEngine;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowserScope;
-import org.dspace.browse.IndexBrowse;
+import org.dspace.browse.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Servlet for editing and deleting (expunging) items
@@ -372,7 +366,7 @@ public class ItemMapServlet extends DSpaceServlet
     			
     			// set up the browse scope
     			bs.setBrowseIndex(bi);
-    			bs.setOrder("ASC");
+    			bs.setOrder(SortOption.ASCENDING);
     			bs.setFilterValue(name);
     			bs.setJumpToValue(null);
     			bs.setResultsPerPage(10000);	// an arbitrary number (large) for the time being
