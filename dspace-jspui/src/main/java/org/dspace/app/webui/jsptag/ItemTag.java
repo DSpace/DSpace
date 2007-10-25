@@ -39,29 +39,12 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
-
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Utils;
-
 import java.io.IOException;
 import java.net.URLEncoder;
-
 import java.sql.SQLException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,6 +52,22 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
+
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.StyleSelection;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.browse.BrowseException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.DCDate;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.PluginManager;
+import org.dspace.core.Utils;
 
 /**
  * <P>
@@ -107,6 +106,14 @@ import javax.servlet.jsp.tagext.TagSupport;
  * 
  * <PRE>
  * 
+ * "metadata.&lt;style.&gt;.&lt;field&gt;"
+ * 
+ * e.g. "metadata.thesis.dc.title" "metadata.thesis.dc.contributor.*"
+ * "metadata.thesis.dc.date.issued"
+ * 
+ * 
+ * if this key is not found will be used the more general one
+ * 
  * "metadata.&lt;field&gt;"
  * 
  * e.g. "metadata.dc.title" "metadata.dc.contributor.*"
@@ -115,7 +122,19 @@ import javax.servlet.jsp.tagext.TagSupport;
  * </PRE>
  * 
  * <P>
- * You can also specify which collections use which views.
+ * You need to specify which strategy use for select the style for an item.
+ * </P>
+ * 
+ * <PRE>
+ * 
+ * plugin.single.org.dspace.app.webui.util.StyleSelection = \
+ *                      org.dspace.app.webui.util.CollectionStyleSelection
+ *                      #org.dspace.app.webui.util.MetadataStyleSelection                                            
+ * 
+ * </PRE>
+ * 
+ * <P>
+ * With the Collection strategy you can also specify which collections use which views.
  * </P>
  * 
  * <PRE>
@@ -131,6 +150,18 @@ import javax.servlet.jsp.tagext.TagSupport;
  * <PRE>
  * 
  * webui.itemdisplay.thesis.collections = 123456789/24, 123456789/35
+ * 
+ * </PRE>
+ *
+ * <P>
+ * With the Metadata strategy you MUST specify which metadata use as name of the style.
+ * </P>
+ * 
+ * <PRE>
+ * 
+ * webui.itemdisplay.metadata-style = schema.element[.qualifier|.*]
+ * 
+ * e.g. "dc.type"
  * 
  * </PRE>
  * 
@@ -151,15 +182,14 @@ public class ItemTag extends TagSupport
     /** Whether to show preview thumbs on the item page */
     private boolean showThumbs;
 
-    /** Hashmap of collection Handles to styles to use, from dspace.cfg */
-    private static Map collectionStyles;
-
     /** Default DC fields to display, in absence of configuration */
     private static String defaultFields = "dc.title, dc.title.alternative, dc.contributor.*, dc.subject, dc.date.issued(date), dc.publisher, dc.identifier.citation, dc.relation.ispartofseries, dc.description.abstract, dc.description, dc.identifier.govdoc, dc.identifier.uri(link), dc.identifier.isbn, dc.identifier.issn, dc.identifier.ismn, dc.identifier";
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(ItemTag.class);
 
+    private StyleSelection styleSelection = (StyleSelection) PluginManager.getSinglePlugin(StyleSelection.class);
+    
     /** Hashmap of linked metadata to browse, from dspace.cfg */
     private Map<String,String> linkedMetadata;
     
@@ -167,7 +197,6 @@ public class ItemTag extends TagSupport
     {
         super();
         getThumbSettings();
-        collectionStyles = null;
         linkedMetadata = new HashMap<String, String>();
         String linkMetadata;
         for (int i = 1; null != (linkMetadata = ConfigurationManager.getProperty("webui.browse.link."+i)); i++)
@@ -185,17 +214,7 @@ public class ItemTag extends TagSupport
         {
             if (style == null || style.equals(""))
             {
-                // see if we need to use a particular style for a style
-                // FIXME?: Trust owning collection
-                Collection owner = item.getOwningCollection();
-                if (owner != null)
-                {
-                    getStyleFor(owner);
-                }
-                else
-                {
-                    style = "default";
-                }
+                style = styleSelection.getStyleForItem(item);
             }
 
             if (style.equals("full"))
@@ -297,8 +316,7 @@ public class ItemTag extends TagSupport
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
         
-        String configLine = ConfigurationManager
-                .getProperty("webui.itemdisplay." + style);
+        String configLine = styleSelection.getConfigurationForStyle(style);
 
         if (configLine == null)
             configLine = defaultFields;
@@ -364,9 +382,22 @@ public class ItemTag extends TagSupport
             {
                 out.print("<tr><td class=\"metadataFieldLabel\">");
 
-                out.print(LocaleSupport.getLocalizedMessage(pageContext,
-                        "metadata." + field));
-
+                String label = null;
+                try
+                {
+                    label = I18nUtil.getMessage("metadata."
+                            + (style != null ? style + "." : "") + field,
+                            pageContext.getRequest().getLocale());
+                }
+                catch (MissingResourceException e)
+                {
+                    // if there is not a specific translation for the style we
+                    // use the default one
+                    label = LocaleSupport.getLocalizedMessage(pageContext,
+                            "metadata." + field);
+                }
+                
+                out.print(label);
                 out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
 
                 for (int j = 0; j < values.length; j++)
@@ -846,71 +877,6 @@ public class ItemTag extends TagSupport
         out.println("</td></tr></table>");
     }
 
-    /**
-     * Find the style to use for a particular collection from dspace.cfg
-     */
-    private void getStyleFor(Collection c)
-    {
-        if (collectionStyles == null)
-        {
-            readCollectionStyleConfig();
-        }
-
-        String collStyle = (String) collectionStyles.get(c.getHandle());
-
-        if (collStyle == null)
-        {
-            // No specific style specified for this collection
-            style = "default";
-            return;
-        }
-
-        // Specific style specified. Check style exists
-        if (ConfigurationManager.getProperty("webui.itemdisplay." + collStyle) == null)
-        {
-            log
-                    .warn("dspace.cfg specifies undefined item metadata display style '"
-                            + collStyle
-                            + "' for collection "
-                            + c.getHandle()
-                            + ".  Using default");
-            style = "default";
-            return;
-        }
-
-        // Style specified & exists
-        style = collStyle;
-    }
-
-    private static void readCollectionStyleConfig()
-    {
-        collectionStyles = new HashMap();
-
-        Enumeration e = ConfigurationManager.propertyNames();
-
-        while (e.hasMoreElements())
-        {
-            String key = (String) e.nextElement();
-
-            if (key.startsWith("webui.itemdisplay.")
-                    && key.endsWith(".collections"))
-            {
-                String styleName = key.substring("webui.itemdisplay.".length(),
-                        key.length() - ".collections".length());
-
-                String[] collections = ConfigurationManager.getProperty(key)
-                        .split(",");
-
-                for (int i = 0; i < collections.length; i++)
-                {
-                    collectionStyles.put(collections[i].trim(), styleName
-                            .toLowerCase());
-                }
-
-            }
-        }
-    }
-    
     /**
      * Return the browse index related to the field. <code>null</code> if the field is not a browse field
      * (look for <cod>webui.browse.link.<n></code> in dspace.cfg) 
