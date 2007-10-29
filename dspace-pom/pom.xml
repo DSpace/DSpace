@@ -590,6 +590,7 @@
 			<id>maven.dspace.org</id>
 			<name>DSpace Maven Repository</name>
 			<url>file:/var/maven/snapshot</url>
+			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<site>
 			<id>website</id>
