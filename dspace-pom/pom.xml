@@ -589,7 +589,7 @@
 		<snapshotRepository>
 			<id>maven.dspace.org-snapshot</id>
 			<name>DSpace Maven Repository</name>
-			<url>scp://maven.dspace.org/var/maven</url>
+			<url>scp://maven.dspace.org/var/maven/snapshot</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<site>
