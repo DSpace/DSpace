@@ -5,7 +5,7 @@
 	<groupId>org.dspace</groupId>
 	<artifactId>dspace-pom</artifactId>
 	<packaging>pom</packaging>
-	<version>1.5-SNAPSHOT</version>
+	<version>SNAPSHOT</version>
 	<name>DSpace Parent Project</name>
 	<url>http://projects.dspace.org/dspace-pom</url>
 
@@ -582,14 +582,15 @@
     -->
 	<distributionManagement>
 		<repository>
-			<id>maven.dspace.org</id>
+			<id>maven.dspace.org-release</id>
 			<name>DSpace Maven Repository</name>
-			<url>scp://maven.dspace.org/var/maven</url>
+			<url>file:/var/maven/release</url>
 		</repository>
 		<snapshotRepository>
-			<id>maven.dspace.org</id>
+			<id>maven.dspace.org-snapshot</id>
 			<name>DSpace Maven Repository</name>
-			<url>scp://maven.dspace.org/var/maven</url>
+			<url>file:/var/maven/snapshot</url>
+			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<site>
 			<id>website</id>

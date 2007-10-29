@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>SNAPSHOT</version>
    </parent>
 
     <repositories>

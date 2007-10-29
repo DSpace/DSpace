@@ -11,7 +11,7 @@
   <skin>
     <groupId>org.dspace.maven.skins</groupId>
     <artifactId>dspace-stylus-skin</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>SNAPSHOT</version>
   </skin>
   <publishDate format="dd MMM yyyy" />
   <version position="left" />
