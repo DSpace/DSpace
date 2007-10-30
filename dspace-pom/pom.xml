@@ -580,12 +580,12 @@
     -->
 	<scm>
 		<connection>
-			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-pom
+			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-pom
 		</connection>
 		<developerConnection>
-			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-pom
+			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-pom
 		</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-pom</url>
+		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-pom</url>
 	</scm>
 
     <!-- 
