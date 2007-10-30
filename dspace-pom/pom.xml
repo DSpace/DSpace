@@ -75,11 +75,11 @@
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>maven.dspace.org</id>
+			<id>maven.dspace.org-release</id>
 			<name>DSpace Maven Repository</name>
-			<url>http://maven.dspace.org</url>
+			<url>http://maven.dspace.org/release</url>
 			<releases>
-				<updatePolicy>never</updatePolicy>
+				<updatePolicy>daily</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</releases>
 			<snapshots>
@@ -87,8 +87,21 @@
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</pluginRepository>
+		<pluginRepository>
+			<id>maven.dspace.org-snapshot</id>
+			<name>DSpace Maven Repository</name>
+			<url>http://maven.dspace.org/snapshot</url>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+			<snapshots>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</pluginRepository>
 	</pluginRepositories>
-
+	
 	<!-- 
 	Distribution management provides a means to control which
 	versions of dependency jars are used for compilation
