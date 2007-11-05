@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>language-packs</artifactId>
@@ -53,7 +55,9 @@
             <configuration>
                <encoding>UTF8</encoding>
                <includes>**/*.properties.UTF-8</includes>
-               <excludes>**/*.properties,src,target,pom.xml,.*</excludes>
+               <excludes>
+                  **/*.properties,src,target,pom.xml,.*
+               </excludes>
                <mapFrom>*.properties.UTF-8</mapFrom>
                <mapTo>*.properties</mapTo>
                <flatten>true</flatten>
@@ -71,22 +75,22 @@
       </plugins>
    </build>
 
-	<reporting>
-	
-		<plugins>
-			<plugin>
-				<groupId>org.dspace</groupId>
-				<artifactId>maven-i18n-report-plugin</artifactId>
-				<version>1.0-SNAPSHOT</version>
-			</plugin>
-		</plugins>
-	</reporting>
+   <reporting>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-api</artifactId>
-		</dependency>
-	</dependencies>
-	
+      <plugins>
+         <plugin>
+            <groupId>org.dspace</groupId>
+            <artifactId>maven-i18n-report-plugin</artifactId>
+            <version>1.0-SNAPSHOT</version>
+         </plugin>
+      </plugins>
+   </reporting>
+
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+      </dependency>
+   </dependencies>
+
 </project>

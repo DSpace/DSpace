@@ -1,340 +1,344 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.dspace</groupId>
-    <artifactId>dspace</artifactId>
-    <name>DSpace Assembly and Configuration</name>
-    <packaging>pom</packaging>
-    <description>
-        The DSpace Project provides all the functionality required to
-        build, install and upgrade and dspace instance.
-    </description>
-    <url>http://projects.dspace.org/dspace</url>
-    <!-- 
-        A Parent POM that Maven inherits DSpace Default 
-        POM atrributes from. 
-    -->
-    <parent>
-        <groupId>org.dspace</groupId>
-        <artifactId>dspace-pom</artifactId>
-        <version>1.5-SNAPSHOT</version>
-        <relativePath>../dspace-pom</relativePath>
-    </parent>
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace</artifactId>
+   <name>DSpace Assembly and Configuration</name>
+   <packaging>pom</packaging>
+   <description>
+      The DSpace Project provides all the functionality required to
+      build, install and upgrade and dspace instance.
+   </description>
+   <url>http://projects.dspace.org/dspace</url>
+   <!-- 
+      A Parent POM that Maven inherits DSpace Default 
+      POM atrributes from. 
+   -->
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace-pom</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <relativePath>../dspace-pom</relativePath>
+   </parent>
 
-    <profiles>
-    
-        <!-- 
-            This profile is used by all children such that
-            when activated a dspace.config configuration
-            file location passed on the commandline 
-            (-Ddspace.config=...) can be passed through 
-            to be used as a filter source by projects for 
-            tasks such as updating the ${dspace.dir} in
-            web.xml etc.
-            
-            When activated, the child project will inherit
-            the configuration.
-         -->
-       <profile>
-           <activation>
-               <property>
-                   <name>dspace.config</name>
-               </property>
-           </activation>
-           <build>
-               <filters>
-                   <filter>${dspace.config}</filter>
-               </filters>
-           </build>
-       </profile>
+   <profiles>
 
-   
-        <!-- 
-            These profiles activate the inclusion of various modules into
-            the DSpace Build process. They activate automatically if the
-            source module is in the local file system, correctly located
-            relative to this file.
-        -->
+      <!-- 
+         This profile is used by all children such that
+         when activated a dspace.config configuration
+         file location passed on the commandline 
+         (-Ddspace.config=...) can be passed through 
+         to be used as a filter source by projects for 
+         tasks such as updating the ${dspace.dir} in
+         web.xml etc.
+         
+         When activated, the child project will inherit
+         the configuration.
+      -->
+      <profile>
+         <activation>
+            <property>
+               <name>dspace.config</name>
+            </property>
+         </activation>
+         <build>
+            <filters>
+               <filter>${dspace.config}</filter>
+            </filters>
+         </build>
+      </profile>
 
-        <!-- 
-            Builds central API for DSpace
-        -->
-        <profile>
-            <id>dspace-api</id>
-            <activation>
-                <file>
-                    <exists>../dspace-api/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-api</module>
-            </modules>
-        </profile>
 
-        <!-- 
-            Builds OAI Gateway WAR for DSpace
-        -->
-        <profile>
-            <id>oai</id>
-            <activation>
-                <file>
-                    <exists>../dspace-oai/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-oai</module>
-            </modules>
-        </profile>
+      <!-- 
+         These profiles activate the inclusion of various modules into
+         the DSpace Build process. They activate automatically if the
+         source module is in the local file system, correctly located
+         relative to this file.
+      -->
 
-        <!-- 
-            Builds JSPUI WAR for DSpace
-        -->
-        <profile>
+      <!-- 
+         Builds central API for DSpace
+      -->
+      <profile>
+         <id>dspace-api</id>
+         <activation>
+            <file>
+               <exists>../dspace-api/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-api</module>
+         </modules>
+      </profile>
 
-            <id>jspui</id>
-            <activation>
-                <file>
-                    <exists>../dspace-jspui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-jspui</module>
-            </modules>
-        </profile>
+      <!-- 
+         Builds OAI Gateway WAR for DSpace
+      -->
+      <profile>
+         <id>oai</id>
+         <activation>
+            <file>
+               <exists>../dspace-oai/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-oai</module>
+         </modules>
+      </profile>
 
-        <!-- 
-            Builds XMLUI WAR for DSpace
-        -->
-        <profile>
-            <id>xmlui</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui</module>
-            </modules>
-        </profile>
+      <!-- 
+         Builds JSPUI WAR for DSpace
+      -->
+      <profile>
 
-        <!-- 
-            Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
-        -->
-        <profile>
-            <id>xmlui-api</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui-api/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui-api</module>
-            </modules>
-        </profile>
+         <id>jspui</id>
+         <activation>
+            <file>
+               <exists>../dspace-jspui/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-jspui</module>
+         </modules>
+      </profile>
 
-        <profile>
-            <id>xmlui-wing</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui-wing/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui-wing</module>
-            </modules>
-        </profile>
+      <!-- 
+         Builds XMLUI WAR for DSpace
+      -->
+      <profile>
+         <id>xmlui</id>
+         <activation>
+            <file>
+               <exists>../dspace-xmlui/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-xmlui</module>
+         </modules>
+      </profile>
 
-        <profile>
-            <id>xmlui-webapp</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui-webapp/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui-webapp</module>
-            </modules>
-        </profile>
+      <!-- 
+         Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
+      -->
+      <profile>
+         <id>xmlui-api</id>
+         <activation>
+            <file>
+               <exists>../dspace-xmlui-api/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-xmlui-api</module>
+         </modules>
+      </profile>
 
-        <!-- 
-                Builds LNI WAR for DSpace
-        -->
-        <profile>
-            <id>lni</id>
-            <activation>
-                <file>
-                    <exists>../dspace-lni/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-lni</module>
-            </modules>
-        </profile>
+      <profile>
+         <id>xmlui-wing</id>
+         <activation>
+            <file>
+               <exists>../dspace-xmlui-wing/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-xmlui-wing</module>
+         </modules>
+      </profile>
 
-        <!-- 
-            Builds each separate LNI module for the LNI war (for development/Eclipse)
-        -->
-        <profile>
-            <id>lni-core</id>
-            <activation>
-                <file>
-                    <exists>../dspace-lni-core/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-lni-core</module>
-            </modules>
-        </profile>
+      <profile>
+         <id>xmlui-webapp</id>
+         <activation>
+            <file>
+               <exists>../dspace-xmlui-webapp/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-xmlui-webapp</module>
+         </modules>
+      </profile>
 
-        <profile>
-            <id>lni-client</id>
-            <activation>
-                <file>
-                    <exists>../dspace-lni-client/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-lni-client</module>
-            </modules>
-        </profile>
+      <!-- 
+         Builds LNI WAR for DSpace
+      -->
+      <profile>
+         <id>lni</id>
+         <activation>
+            <file>
+               <exists>../dspace-lni/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-lni</module>
+         </modules>
+      </profile>
 
-        <profile>
-            <id>lni-webapp</id>
-            <activation>
-                <file>
-                    <exists>../dspace-lni-webapp/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-lni-webapp</module>
-            </modules>
-        </profile>
+      <!-- 
+         Builds each separate LNI module for the LNI war (for development/Eclipse)
+      -->
+      <profile>
+         <id>lni-core</id>
+         <activation>
+            <file>
+               <exists>../dspace-lni-core/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-lni-core</module>
+         </modules>
+      </profile>
 
-            
-        <!-- 
-                Builds Language Packs for DSpace
-         -->
-        <profile>
-            <id>language-packs</id>
-            <activation>
-                <file>
-                    <exists>../language-packs/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../language-packs</module>
-            </modules>
-        </profile>
+      <profile>
+         <id>lni-client</id>
+         <activation>
+            <file>
+               <exists>../dspace-lni-client/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-lni-client</module>
+         </modules>
+      </profile>
 
-        <!-- 
-            These profiles setup properties and build configuration
-            appropriate to the database that DSpace will be installed
-            against.
-            
-            They are activated by using the profile id - ie. -Ppostgres,
-            or defining db.name - ie. -Ddb.name=oracle
-        -->
-        <!-- 
-            Default profile for Postgres database configuration
-            Use -Ppostgres to activate.
-        -->
+      <profile>
+         <id>lni-webapp</id>
+         <activation>
+            <file>
+               <exists>../dspace-lni-webapp/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-lni-webapp</module>
+         </modules>
+      </profile>
 
-        <profile>
-            <id>postgres</id>
-            <activation>
-                <property>
-                    <name>!db.name</name>
-                </property>
-            </activation>
-            <properties>
-                <default.db.name>postgres</default.db.name>
-                <default.db.driver>org.postgresql.Driver</default.db.driver>
-                <default.db.url>jdbc:postgresql://localhost:5432/dspace</default.db.url>
-                <default.db.username>dspace</default.db.username>
-                <default.db.password>dspace</default.db.password>
-            </properties>
-        </profile>
 
-        <profile>
-            <id>postgres-support</id>
-            <activation>
-                <property>
-                    <name>!db.name</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                  <groupId>postgresql</groupId>
-                  <artifactId>postgresql</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
+      <!-- 
+         Builds Language Packs for DSpace
+      -->
+      <profile>
+         <id>language-packs</id>
+         <activation>
+            <file>
+               <exists>../language-packs/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../language-packs</module>
+         </modules>
+      </profile>
 
-                
-        <!-- 
-            Default profile for Oracle database configuration
-            Use -Poracle or -Ddb.name=oracle to activate.
-        -->
-        <profile>
-            <id>oracle</id>
-            <activation>
-                <property>
-                    <name>db.name</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <properties>
-                <default.db.name>oracle</default.db.name>
-                <default.db.driver>oracle.jdbc.OracleDriver</default.db.driver>
-                <default.db.url>jdbc:oracle:thin:@//localhost:1521/xe</default.db.url>
-                <default.db.username>dspace</default.db.username>
-                <default.db.password>dspace</default.db.password>
-            </properties>
-        </profile>
-        
-        <profile>
-           <id>oracle-support</id>
-           <activation>
-              <property>
-                 <name>db.name</name>
-                 <value>oracle</value>
-              </property>
-           </activation>
-           <dependencies>
-              <dependency>
-                 <groupId>com.oracle</groupId>
-                 <artifactId>ojdbc14</artifactId>
-              </dependency>
-           </dependencies>
-        </profile>
-    </profiles>
+      <!-- 
+         These profiles setup properties and build configuration
+         appropriate to the database that DSpace will be installed
+         against.
+         
+         They are activated by using the profile id - ie. -Ppostgres,
+         or defining db.name - ie. -Ddb.name=oracle
+      -->
+      <!-- 
+         Default profile for Postgres database configuration
+         Use -Ppostgres to activate.
+      -->
 
-    <build>
-        <plugins>
-            <!--  overall project assembly -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>
-                            src/assemble/assembly.xml
-                        </descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+      <profile>
+         <id>postgres</id>
+         <activation>
+            <property>
+               <name>!db.name</name>
+            </property>
+         </activation>
+         <properties>
+            <default.db.name>postgres</default.db.name>
+            <default.db.driver>org.postgresql.Driver</default.db.driver>
+            <default.db.url>
+               jdbc:postgresql://localhost:5432/dspace
+            </default.db.url>
+            <default.db.username>dspace</default.db.username>
+            <default.db.password>dspace</default.db.password>
+         </properties>
+      </profile>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>language-packs</artifactId>
-        </dependency>
-    </dependencies>
+      <profile>
+         <id>postgres-support</id>
+         <activation>
+            <property>
+               <name>!db.name</name>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>postgresql</groupId>
+               <artifactId>postgresql</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+
+
+      <!-- 
+         Default profile for Oracle database configuration
+         Use -Poracle or -Ddb.name=oracle to activate.
+      -->
+      <profile>
+         <id>oracle</id>
+         <activation>
+            <property>
+               <name>db.name</name>
+               <value>oracle</value>
+            </property>
+         </activation>
+         <properties>
+            <default.db.name>oracle</default.db.name>
+            <default.db.driver>
+               oracle.jdbc.OracleDriver
+            </default.db.driver>
+            <default.db.url>
+               jdbc:oracle:thin:@//localhost:1521/xe
+            </default.db.url>
+            <default.db.username>dspace</default.db.username>
+            <default.db.password>dspace</default.db.password>
+         </properties>
+      </profile>
+
+      <profile>
+         <id>oracle-support</id>
+         <activation>
+            <property>
+               <name>db.name</name>
+               <value>oracle</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.oracle</groupId>
+               <artifactId>ojdbc14</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+   </profiles>
+
+   <build>
+      <plugins>
+         <!--  overall project assembly -->
+         <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+               <descriptors>
+                  <descriptor>src/assemble/assembly.xml</descriptor>
+               </descriptors>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>language-packs</artifactId>
+      </dependency>
+   </dependencies>
 </project>

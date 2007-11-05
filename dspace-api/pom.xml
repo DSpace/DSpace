@@ -8,7 +8,7 @@
    <name>DSpace Kernel :: API and Implementation</name>
    <description>DSpace core data model and service APIs.</description>
    <url>http://projects.dspace.org/dspace-api</url>
-   
+
    <!-- 
       A Parent POM that Maven inherits DSpace Defaults 
       POM atrributes from. 
@@ -19,7 +19,7 @@
       <version>1.5-SNAPSHOT</version>
       <relativePath>../dspace-pom</relativePath>
    </parent>
-   
+
    <!-- 
       Runtime and Compile Time dependencies for DSpace.
    -->

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.dspace</groupId>
-	<artifactId>dspace-lni</artifactId>
-	<packaging>pom</packaging>
-	<name>DSpace LNI</name>
-	<description>DSpace Lightweight Network Interface Build Modules</description>
-	<url>http://www.dspace.org</url>
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-lni</artifactId>
+   <packaging>pom</packaging>
+   <name>DSpace LNI</name>
+   <description>
+      DSpace Lightweight Network Interface Build Modules
+   </description>
+   <url>http://www.dspace.org</url>
 
    <parent>
       <groupId>org.dspace</groupId>
@@ -16,11 +18,11 @@
       <version>1.5-SNAPSHOT</version>
       <relativePath>../dspace</relativePath>
    </parent>
-   
+
    <modules>
       <module>dspace-lni-core</module>
       <module>dspace-lni-webapp</module>
       <module>dspace-lni-client</module>
    </modules>
-	
+
 </project>
