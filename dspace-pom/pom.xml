@@ -597,13 +597,12 @@
 		<repository>
 			<id>dspace.sourceforge.net/repository/release</id>
 			<name>DSpace Maven Repository</name>
-			<url>scp://shell.sourceforge.net/home/groups/d/ds/dspace/htdocs/repository/release</url>
+			<url>file:/var/maven/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>dspace.sourceforge.net/repository/snapshot</id>
 			<name>DSpace Maven Repository</name>
-			<url>scp://shell.sourceforge.net/home/groups/d/ds/dspace/htdocs/repository/snapshot</url>
-			<uniqueVersion>false</uniqueVersion>
+			<url>file:/var/maven/snapshot</url>
 		</snapshotRepository>
 		<site>
 			<id>website</id>
