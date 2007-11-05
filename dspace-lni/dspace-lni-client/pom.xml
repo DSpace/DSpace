@@ -23,7 +23,7 @@
             <!--  remove once we have rsync with maven central -->
             <id>dspace.sourceforge.net/repository/release</id>
             <name>DSpace Maven Release Repository</name>
-            <url>http://dspace.sourceforge.net/repository/release</url>
+            <url>http://maven.dspace.org/release</url>
             <releases>
                 <enabled>true</enabled>
                 <checksumPolicy>fail</checksumPolicy>
@@ -36,7 +36,7 @@
         <repository>
             <id>dspace.sourceforge.net/repository/snapshot</id>
             <name>DSpace Maven Snapshot Repository</name>
-            <url>http://dspace.sourceforge.net/repository/snapshot</url>
+            <url>http://maven.dspace.org/snapshot</url>
             <releases>
                 <enabled>false</enabled>
                 <checksumPolicy>fail</checksumPolicy>
