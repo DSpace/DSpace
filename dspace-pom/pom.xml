@@ -30,38 +30,11 @@
 		</plugins>
 	</build>
 
-    <repositories>
-    	 <repository>
-			<id>central</id>
-            <name>Central Maven Repository</name>
-			<url>http://repo1.maven.org/maven2</url>
-			<releases>
-				<updatePolicy>daily</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<updatePolicy>daily</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		 </repository>
-         <repository>
-            <!--  remove once we have rsync with maven central -->
-            <id>dspace.sourceforge.net/repository/release</id>
-            <name>DSpace Maven Release Repository</name>
-            <url>http://dspace.sourceforge.net/repository/release</url>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
+        <repositories>
         <repository>
-            <id>dspace.sourceforge.net/repository/snapshot</id>
+            <id>maven.dspace.org/snapshot</id>
             <name>DSpace Maven Snapshot Repository</name>
-            <url>http://dspace.sourceforge.net/repository/snapshot</url>
+            <url>http://maven.dspace.org/snapshot</url>
             <releases>
                 <enabled>false</enabled>
                 <checksumPolicy>fail</checksumPolicy>
@@ -75,20 +48,7 @@
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>maven.dspace.org-release</id>
-			<name>DSpace Maven Repository</name>
-			<url>http://maven.dspace.org/release</url>
-			<releases>
-				<updatePolicy>daily</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<updatePolicy>never</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>maven.dspace.org-snapshot</id>
+			<id>maven.dspace.org/snapshot</id>
 			<name>DSpace Maven Repository</name>
 			<url>http://maven.dspace.org/snapshot</url>
 			<releases>
@@ -579,12 +539,12 @@
     -->
 	<scm>
 		<connection>
-			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-pom
+			scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-pom
 		</connection>
 		<developerConnection>
-			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-pom
+			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-pom
 		</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-pom</url>
+		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-pom</url>
 	</scm>
 
     <!-- 
@@ -595,14 +555,15 @@
     -->
 	<distributionManagement>
 		<repository>
-			<id>dspace.sourceforge.net/repository/release</id>
+			<id>maven.dspace.org/release</id>
 			<name>DSpace Maven Repository</name>
-			<url>file:/var/maven/release</url>
+			<url>scp://maven.dspace.org/var/maven/release</url>
 		</repository>
 		<snapshotRepository>
-			<id>dspace.sourceforge.net/repository/snapshot</id>
+			<id>maven.dspace.org/snapshot</id>
 			<name>DSpace Maven Repository</name>
-			<url>file:/var/maven/snapshot</url>
+			<url>scp://maven.dspace.org/var/maven/snapshot</url>
+			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<site>
 			<id>website</id>
