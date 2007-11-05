@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.dspace</groupId>
-	<artifactId>dspace-lni-core</artifactId>
-	<packaging>jar</packaging>
-	<name>DSpace LNI :: Core Implementation</name>
-	<description>DSpace Lightweight Network Interface</description>
-	<url>http://www.dspace.org</url>
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-lni-core</artifactId>
+   <packaging>jar</packaging>
+   <name>DSpace LNI :: Core Implementation</name>
+   <description>DSpace Lightweight Network Interface</description>
+   <url>http://www.dspace.org</url>
 
    <parent>
       <groupId>org.dspace</groupId>
@@ -16,22 +16,22 @@
       <version>SNAPSHOT</version>
    </parent>
 
-    <repositories>
-        <repository>
-            <id>maven.dspace.org/snapshot</id>
-            <name>DSpace Maven Snapshot Repository</name>
-            <url>http://dspace.sourceforge.net/repository/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-    
+   <repositories>
+      <repository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
+
    <scm>
       <connection>
          scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-core

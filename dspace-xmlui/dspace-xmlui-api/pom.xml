@@ -8,7 +8,10 @@
    <packaging>jar</packaging>
    <name>DSpace XMLUI (Manakin) :: API and Core Aspects</name>
    <url>http://www.dspace.org</url>
-   <description>DSpace/Manakin XML UI Based APIs and components using the Cocoon and Wing frameworks.</description>
+   <description>
+      DSpace/Manakin XML UI Based APIs and components using the Cocoon
+      and Wing frameworks.
+   </description>
 
    <parent>
       <groupId>org.dspace</groupId>
@@ -16,22 +19,22 @@
       <version>SNAPSHOT</version>
    </parent>
 
-    <repositories>
-        <repository>
-            <id>maven.dspace.org/snapshot</id>
-            <name>DSpace Maven Snapshot Repository</name>
-            <url>http://dspace.sourceforge.net/repository/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-    
+   <repositories>
+      <repository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
+
    <scm>
       <connection>
          scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-api
@@ -45,14 +48,14 @@
    </scm>
 
    <dependencies>
-            
+
       <!-- Wing framework -->
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui-wing</artifactId>
          <version>${project.version}</version>
       </dependency>
-      
+
    </dependencies>
 
 </project>

@@ -1,91 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.dspace</groupId>
-    <artifactId>dspace-xmlui-webapp</artifactId>
-    <packaging>war</packaging>
-    <name>DSpace XMLUI (Manakin) :: Web Application</name>
-    <url>http://www.dspace.org</url>
-    <description>
-        DSpace/Manakin XML UI Based Webapplication using the Cocoon and
-        Wing frameworks
-    </description>
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-xmlui-webapp</artifactId>
+   <packaging>war</packaging>
+   <name>DSpace XMLUI (Manakin) :: Web Application</name>
+   <url>http://www.dspace.org</url>
+   <description>
+      DSpace/Manakin XML UI Based Webapplication using the Cocoon and
+      Wing frameworks
+   </description>
 
-    <parent>
-        <groupId>org.dspace</groupId>
-        <artifactId>dspace</artifactId>
-        <version>SNAPSHOT</version>
-    </parent>
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace</artifactId>
+      <version>SNAPSHOT</version>
+   </parent>
 
-    <repositories>
-        <repository>
-            <id>maven.dspace.org/snapshot</id>
-            <name>DSpace Maven Snapshot Repository</name>
-            <url>http://dspace.sourceforge.net/repository/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
+   <repositories>
+      <repository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
 
-    <scm>
-        <connection>
-            scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-webapp
-        </connection>
-        <developerConnection>
-            scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-webapp
-        </developerConnection>
-        <url>
-            http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-webapp
-        </url>
-    </scm>
+   <scm>
+      <connection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-webapp
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-webapp
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-webapp
+      </url>
+   </scm>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.0</version>
-                <configuration>
-                    <archiveClasses>true</archiveClasses>
-                    <webResources>
-                        <resource>
-                            <filtering>true</filtering>
-                            <directory>
-                                ${basedir}/src/main/webapp
-                            </directory>
-                            <includes>
-                                <include>WEB-INF/web.xml</include>
-                            </includes>
-                        </resource>
-                    </webResources>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.0</version>
+            <configuration>
+               <archiveClasses>true</archiveClasses>
+               <webResources>
+                  <resource>
+                     <filtering>true</filtering>
+                     <directory>${basedir}/src/main/webapp</directory>
+                     <includes>
+                        <include>WEB-INF/web.xml</include>
+                     </includes>
+                  </resource>
+               </webResources>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>prepare-package</phase>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
 
-    <dependencies>
+   <dependencies>
 
-        <!-- DSpace XMLUI API -->
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+      <!-- DSpace XMLUI API -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-xmlui-api</artifactId>
+         <version>${project.version}</version>
+      </dependency>
 
-    </dependencies>
+   </dependencies>
 
 </project>
 
