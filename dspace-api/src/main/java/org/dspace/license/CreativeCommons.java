@@ -129,6 +129,7 @@ public class CreativeCommons
             String cc_license_url) throws SQLException, IOException,
             AuthorizeException
     {
+        boolean hasCCnamespace = true;
         Bundle bundle = getCcBundle(item);
 
         // get some more information
@@ -137,20 +138,46 @@ public class CreativeCommons
 
         // here we need to transform the license_rdf into a document_rdf
         // first we find the beginning of "<License"
-        int license_start = license_rdf.indexOf("<License");
+        int license_start = license_rdf.indexOf("<cc:License");
+        if (license_start < 0)
+        {
+            hasCCnamespace = false;
+            license_start = license_rdf.indexOf("<License");
+        }
 
-        // the 10 is the length of the license closing tag.
-        int license_end = license_rdf.indexOf("</License>") + 10;
-        String document_rdf = "<rdf:RDF xmlns=\"http://web.resource.org/cc/\"\n"
-                + "   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
-                + "   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
-                + "<Work rdf:about=\"\">\n"
-                + "<license rdf:resource=\""
-                + cc_license_url
-                + "\">\n"
-                + "</Work>\n\n"
-                + license_rdf.substring(license_start, license_end)
-                + "\n\n</rdf:RDF>";
+        int license_end;
+        String document_rdf;
+
+        if (hasCCnamespace)
+        {
+            // the 13 is the length of the license closing tag.
+            license_end = license_rdf.indexOf("</cc:License>") + 13;
+            document_rdf = "<rdf:RDF xmlns:cc=\"http://web.resource.org/cc/\"\n"
+                    + "   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
+                    + "   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
+                    + "<cc:Work rdf:about=\"\">\n"
+                    + "<cc:License rdf:resource=\""
+                    + cc_license_url
+                    + "\"/>\n"
+                    + "</cc:Work>\n\n"
+                    + license_rdf.substring(license_start, license_end)
+                    + "\n\n</rdf:RDF>";
+        }
+        else
+        {
+            // the 10 is the length of the license closing tag.
+            license_end = license_rdf.indexOf("</License>") + 10;
+            document_rdf = "<rdf:RDF xmlns=\"http://web.resource.org/cc/\"\n"
+                    + "   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
+                    + "   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
+                    + "<Work rdf:about=\"\">\n"
+                    + "<License rdf:resource=\""
+                    + cc_license_url
+                    + "\"/>\n"
+                    + "</Work>\n\n"
+                    + license_rdf.substring(license_start, license_end)
+                    + "\n\n</rdf:RDF>";
+        }
 
         // set the format
         BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(
@@ -187,7 +214,7 @@ public class CreativeCommons
                    BSN_LICENSE_RDF : BSN_LICENSE_TEXT);
         bs.setFormat(bs_format);
         bs.update();
-        }
+    }
 
     public static void removeLicense(Context context, Item item)
             throws SQLException, IOException, AuthorizeException
