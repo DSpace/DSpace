@@ -1,3 +1,7 @@
+(Graham Triggs/Mark Diggory
+- S.F. Bug 1824710 Creative Commons RDF has changed. Adjusted CC processing to be XSL driven 
+  and adjusted generated XML/RDF. Created LicenseCleanup CLI to process existing CC license_rdf
+  
 (Brian Helm)
 SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 
