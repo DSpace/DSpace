@@ -207,8 +207,6 @@ public class LicenseCleanup
 
         bundle.update();
 
-        log.info(new String(copy(newBitstream)));
-
     }
 
     static final int BUFF_SIZE = 100000;
