@@ -227,7 +227,7 @@
       <dependency>
          <groupId>org.dspace.xmlui.jakarta</groupId>
          <artifactId>jakarta-bcel</artifactId>
-         <version>20040329</version>
+         <version>5.1.20040329-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>org.dspace.xmlui.jakarta</groupId>
@@ -251,7 +251,7 @@
       <dependency>
          <groupId>org.dspace.xmlui.jcs</groupId>
          <artifactId>jcs</artifactId>
-         <version>1.2.5-dev-20050313</version>
+         <version>1.2.5.20050313-SNAPSHOT</version>
       </dependency>
 
       <!-- jdtcore -->
