@@ -501,7 +501,7 @@
             <xsl:with-param name="position">top</xsl:with-param>
         </xsl:apply-templates>
         <div>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-static-div</xsl:with-param>
             </xsl:call-template>
             <xsl:choose>
@@ -535,7 +535,7 @@
             <xsl:with-param name="position">top</xsl:with-param>
         </xsl:apply-templates>
         <form>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-interactive-div</xsl:with-param>
             </xsl:call-template>
             <xsl:attribute name="action"><xsl:value-of select="@action"/></xsl:attribute>
@@ -557,7 +557,7 @@
     <!-- Special case for divs tagged as "notice" -->
     <xsl:template match="dri:div[@n='general-message']" priority="3">
         <div>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-notice-div</xsl:with-param>
             </xsl:call-template>
        		<xsl:apply-templates />
@@ -578,7 +578,7 @@
     <xsl:template match="dri:table">
         <xsl:apply-templates select="dri:head"/>
         <table>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-table</xsl:with-param>
             </xsl:call-template>
             <!-- rows and cols atributes are not allowed in strict
@@ -601,7 +601,7 @@
     <!-- Header row, most likely filled with header cells -->
     <xsl:template match="dri:row[@role='header']" priority="2">
         <tr>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-table-header-row</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates />
@@ -611,7 +611,7 @@
     <!-- Header cell, assumed to be one since it is contained in a header row -->
     <xsl:template match="dri:row[@role='header']/dri:cell | dri:cell[@role='header']" priority="2">
         <th>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-table-header-cell 
                     <xsl:if test="(position() mod 2 = 0)">even</xsl:if>
                     <xsl:if test="(position() mod 2 = 1)">odd</xsl:if>
@@ -635,7 +635,7 @@
     <!-- Normal row, most likely filled with data cells -->
     <xsl:template match="dri:row" priority="1">
         <tr>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-table-row 
                     <xsl:if test="(position() mod 2 = 0)">even</xsl:if>
                     <xsl:if test="(position() mod 2 = 1)">odd</xsl:if>
@@ -648,7 +648,7 @@
     <!-- Just a plain old table cell -->
     <xsl:template match="dri:cell" priority="1">
         <td>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-table-cell 
                     <xsl:if test="(position() mod 2 = 0)">even</xsl:if>
                     <xsl:if test="(position() mod 2 = 1)">odd</xsl:if>
@@ -679,7 +679,7 @@
     -->
     <xsl:template match="dri:p">
         <p>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-paragraph</xsl:with-param>
             </xsl:call-template>
             <xsl:choose>
@@ -705,7 +705,7 @@
     <xsl:template match="dri:list[@type='bulleted']" priority="2">
         <xsl:apply-templates select="dri:head"/>
         <ul>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-bulleted-list</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates select="*[not(name()='head')]" mode="nested"/>
@@ -740,7 +740,7 @@
     <xsl:template match="dri:list[@type='ordered']" priority="2">
         <xsl:apply-templates select="dri:head"/>
         <ol>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-ordered-list</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates select="*[not(name()='head')]" mode="nested">
@@ -770,7 +770,7 @@
     <xsl:template match="dri:list[@type='progress']" priority="2">
         <xsl:apply-templates select="dri:head"/>
         <ul>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-progress-list</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates select="dri:item"/>
@@ -807,7 +807,7 @@
     <xsl:template match="dri:list[@type='gloss']" priority="2">
         <xsl:apply-templates select="dri:head"/>
         <dl>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-gloss-list</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates select="*[not(name()='head')]" mode="nested"/>
@@ -849,7 +849,7 @@
         <xsl:apply-templates select="dri:head"/>
         <xsl:if test="count(dri:label)>0">
             <table>
-                <xsl:call-template name="standardAttribues">
+                <xsl:call-template name="standardAttributes">
                     <xsl:with-param name="class">ds-gloss-list</xsl:with-param>
                 </xsl:call-template>
                 <xsl:apply-templates select="dri:item" mode="labeled"/>
@@ -857,7 +857,7 @@
         </xsl:if>
         <xsl:if test="count(dri:label)=0">
             <ul>
-                <xsl:call-template name="standardAttribues">
+                <xsl:call-template name="standardAttributes">
                     <xsl:with-param name="class">ds-simple-list</xsl:with-param>
                 </xsl:call-template>
                 <xsl:apply-templates select="dri:item" mode="nested"/>
@@ -920,7 +920,7 @@
                         
             <li>
             <fieldset>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">
                     <!-- Provision for the sub list -->
                     <xsl:text>ds-form-</xsl:text>
@@ -943,7 +943,7 @@
             </xsl:when>
             <xsl:otherwise>
             <fieldset>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">
                     <!-- Provision for the sub list -->
                     <xsl:text>ds-form-</xsl:text>
@@ -969,7 +969,7 @@
     <!-- TODO: Account for the dri:hi/dri:field kind of nesting here and everywhere else... -->
     <xsl:template match="dri:list[@type='form']/dri:item" priority="3">
         <li>
-        	<xsl:call-template name="standardAttribues">
+        	<xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">
                     <xsl:text>ds-form-item </xsl:text>
                 <xsl:choose>
@@ -1015,7 +1015,7 @@
     <!-- An item in a nested "form" list -->
     <xsl:template match="dri:list[@type='form']//dri:list[@type='form']/dri:item" priority="3">
         <li>
-        	<xsl:call-template name="standardAttribues">
+        	<xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">
                     <xsl:text>ds-form-item </xsl:text>
 
@@ -1125,7 +1125,7 @@
     <xsl:template match="dri:options/dri:list[dri:list]" priority="4">
         <xsl:apply-templates select="dri:head"/>
         <div>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-option-set</xsl:with-param>
             </xsl:call-template>
             <ul class="ds-options-list">
@@ -1147,7 +1147,7 @@
     <xsl:template match="dri:options/dri:list" priority="3">
         <xsl:apply-templates select="dri:head"/>
         <div>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-option-set</xsl:with-param>
             </xsl:call-template>
             <ul class="ds-simple-list">
@@ -1165,7 +1165,7 @@
     
     <xsl:template match="dri:options/dri:list/dri:head" priority="3">
         <h3>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-option-set-head</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates />
@@ -1186,7 +1186,7 @@
     <xsl:template match="dri:list" priority="1">
         <xsl:apply-templates select="dri:head"/>
         <ul>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-simple-list</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates select="*[not(name()='head')]" mode="nested"/>
@@ -1224,7 +1224,7 @@
     <xsl:template match="dri:div/dri:head" priority="3">
         <xsl:variable name="head_count" select="count(ancestor::dri:div)"/>
         <xsl:element name="h{$head_count}">
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-div-head</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates />
@@ -1234,7 +1234,7 @@
     <!-- The second case is the header on tables, which always creates an HTML h3 element -->
     <xsl:template match="dri:table/dri:head" priority="2">
         <h3>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-table-head</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates />
@@ -1245,7 +1245,7 @@
         and h4 elements for all sublists. -->
     <xsl:template match="dri:list/dri:head" priority="2" mode="nested">
         <h3>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-list-head</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates />
@@ -1254,7 +1254,7 @@
     
     <xsl:template match="dri:list/dri:list/dri:head" priority="3" mode="nested">
         <h4>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-sublist-head</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates />
@@ -1268,7 +1268,7 @@
         change in the future. -->
     <xsl:template match="dri:referenceSet/dri:head" priority="2">
         <h3>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-list-head</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates />
@@ -1279,7 +1279,7 @@
         covered above. It assumes nothing about the parent element and simply generates an HTML h3 tag -->
     <xsl:template match="dri:head" priority="1">
         <h3>
-            <xsl:call-template name="standardAttribues">
+            <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-head</xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates />
@@ -1822,7 +1822,7 @@
     
     <!-- A set of standard attributes common to all fields -->
     <xsl:template name="fieldAttributes">
-        <xsl:call-template name="standardAttribues">
+        <xsl:call-template name="standardAttributes">
             <xsl:with-param name="class">
                 <xsl:text>ds-</xsl:text><xsl:value-of select="@type"/><xsl:text>-field </xsl:text>
                 <xsl:if test="dri:error">
@@ -2308,7 +2308,7 @@
     
     <!-- The standard attributes template -->
     <!-- TODO: should probably be moved up some, since it is commonly called -->
-    <xsl:template name="standardAttribues">
+    <xsl:template name="standardAttributes">
         <xsl:param name="class"/>
         <xsl:if test="@id">
             <xsl:attribute name="id"><xsl:value-of select="translate(@id,'.','_')"/></xsl:attribute>
