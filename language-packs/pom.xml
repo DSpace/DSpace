@@ -16,9 +16,8 @@
    -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-pom</artifactId>
+      <artifactId>dspace-parent</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace-pom</relativePath>
    </parent>
 
    <build>

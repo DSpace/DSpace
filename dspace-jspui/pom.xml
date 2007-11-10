@@ -16,9 +16,8 @@
    -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace</artifactId>
+      <artifactId>dspace-parent</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace</relativePath>
    </parent>
 
    <build>
@@ -26,9 +25,8 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-            <version>2.0</version>
             <configuration>
-               <archiveClasses>true</archiveClasses>
+               <archiveClasses>false</archiveClasses>
                <webResources>
                   <resource>
                      <filtering>true</filtering>
@@ -48,7 +46,67 @@
       </plugins>
    </build>
 
+   <profiles>
+      <!-- 
+         when activated a dspace.config configuration
+         file location passed on the commandline 
+         (-Ddspace.config=...) can be passed through 
+         to be used as a filter source by projects for 
+         tasks such as updating the ${dspace.dir} in
+         web.xml etc.
+      -->
+      <profile>
+         <activation>
+            <property>
+               <name>dspace.config</name>
+            </property>
+         </activation>
+         <build>
+            <filters>
+               <filter>${dspace.config}</filter>
+            </filters>
+         </build>
+      </profile>
+      <profile>
+         <id>oracle-support</id>
+         <activation>
+            <property>
+               <name>db.name</name>
+               <value>oracle</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.oracle</groupId>
+               <artifactId>ojdbc14</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+      <profile>
+         <id>postgres-support</id>
+         <activation>
+            <property>
+               <name>!db.name</name>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>postgresql</groupId>
+               <artifactId>postgresql</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+   </profiles>
+
    <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>language-packs</artifactId>
+      </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>

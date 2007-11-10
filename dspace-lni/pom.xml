@@ -14,9 +14,8 @@
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace</artifactId>
+      <artifactId>dspace-parent</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../dspace</relativePath>
    </parent>
 
    <modules>
