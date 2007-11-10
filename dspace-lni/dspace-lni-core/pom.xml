@@ -8,7 +8,7 @@
    <packaging>jar</packaging>
    <name>DSpace LNI :: Core Implementation</name>
    <description>DSpace Lightweight Network Interface</description>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-lni/dspace-lni-core</url>
 
    <parent>
       <groupId>org.dspace</groupId>

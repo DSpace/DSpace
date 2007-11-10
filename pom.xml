@@ -7,7 +7,7 @@
    <packaging>pom</packaging>
    <version>1.5-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
-   <url>http://projects.dspace.org/dspace-parent</url>
+   <url>http://projects.dspace.org</url>
 
    <organization>
       <name>The DSpace Foundation</name>

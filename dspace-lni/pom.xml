@@ -10,7 +10,7 @@
    <description>
       DSpace Lightweight Network Interface Build Modules
    </description>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-lni</url>
 
    <parent>
       <groupId>org.dspace</groupId>

@@ -10,7 +10,7 @@
    <description>
       DSpace Lightweight Network Interface Webapplication
    </description>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-lni/dspace-lni-webapp</url>
 
    <parent>
       <groupId>org.dspace</groupId>

@@ -10,7 +10,7 @@
    <description>
       Example Client for working with DSpace LNI Service.
    </description>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-lni/dspace-lni-client</url>
 
    <parent>
       <groupId>org.dspace</groupId>

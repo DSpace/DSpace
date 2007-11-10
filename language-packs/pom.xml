@@ -9,6 +9,7 @@
    <description>
       DSpace Language Packs to support multiple languages.
    </description>
+   <url>http://projects.dspace.org/language-packs</url>
 
    <!-- 
       A Parent POM that Maven inherits DSpace Default 
