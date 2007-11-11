@@ -22,6 +22,7 @@
 
    <build>
       <plugins>
+      
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
@@ -43,6 +44,32 @@
                </execution>
             </executions>
          </plugin>
+         
+         <!-- Secondary Artifact: Skinny war. -->
+         <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+               <descriptorRefs>
+                  <descriptorRef>skinny</descriptorRef>
+               </descriptorRefs>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>attached</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <dependencies>
+               <dependency>
+                  <groupId>org.dspace.maven.plugins</groupId>
+                  <artifactId>dspace-assembly-plugin</artifactId>
+                  <version>1.5-SNAPSHOT</version>
+               </dependency>
+            </dependencies>
+         </plugin>
+         
       </plugins>
    </build>
 
