@@ -64,7 +64,8 @@
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
- 
+<%@ page import="org.dspace.browse.ItemCounter" %>
+
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.DCValue" %>
@@ -104,6 +105,8 @@
     {
         feedData = "comm:" + ConfigurationManager.getProperty("webui.feed.formats");
     }
+    
+    ItemCounter ic = new ItemCounter();
 %>
 
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
@@ -111,7 +114,16 @@
   <table border="0" cellpadding="5" width="100%">
     <tr>
       <td width="100%">
-        <h1><%= name %></h1>
+        <h1><%= name %>
+        <%
+            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            {
+%>
+                : [<%= ic.getCount(community) %>]
+<%
+            }
+%>
+        </h1>
 		<h3><fmt:message key="jsp.community-home.heading1"/></h3>
       </td>
       <td valign="top">
@@ -209,7 +221,7 @@
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
             {
 %>
-                [<%= collections[i].countItems() %>]
+                [<%= ic.getCount(collections[i]) %>]
 <%
             }
 %>
@@ -259,7 +271,7 @@
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
 %>
-                    [<%= subcommunities[j].countItems() %>]
+                    [<%= ic.getCount(subcommunities[j]) %>]
 <%
                 }
 %>

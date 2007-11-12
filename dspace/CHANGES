@@ -7,6 +7,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 
 (Richard Jones)
 - S.F. Patch 1670093 More stable metadata and schema registry import 
+- Option to generate community and collection "strength" as a batch job
 
 (Richard Jones / Graham Triggs)
 - New Browse code that allows customisation of the available indexes via dspace.cfg,

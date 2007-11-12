@@ -67,7 +67,8 @@
 <%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.eperson.Group"     %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
- 
+<%@ page import="org.dspace.browse.ItemCounter" %>
+
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.DCValue" %>
@@ -127,6 +128,8 @@
     {
         feedData = "coll:" + ConfigurationManager.getProperty("webui.feed.formats");
     }
+    
+    ItemCounter ic = new ItemCounter();
 %>
 
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
@@ -139,7 +142,7 @@
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
             {
 %>
-                : [<%= collection.countItems() %>]
+                : [<%= ic.getCount(collection) %>]
 <%
             }
 %>

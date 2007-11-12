@@ -62,7 +62,8 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.dspace.browse.ItemCounter" %>
+<%@ page import="org.dspace.browse.ItemCountException" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -73,6 +74,7 @@
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     boolean showAll = true;
+    ItemCounter ic = new ItemCounter();
 %>
 
 <%!
@@ -87,8 +89,15 @@
 
     void showCommunity(Community c) throws IOException, SQLException
     {
+    	try
+    	{
+    	ItemCounter ic = new ItemCounter();
         out.println( "<li class=\"communityLink\">" );
         out.println( "<strong><a href=\"" + request.getContextPath() + "/handle/" + c.getHandle() + "\">" + c.getMetadata("name") + "</a></strong>");
+        if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+        {
+            out.println(" <span class=\"communityStrength\">[" + ic.getCount(c) + "]</span>");
+        }
 
         // Get the collections in this community
         Collection[] cols = c.getCollections();
@@ -101,7 +110,7 @@
                 out.println("<a href=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</a>");
 				if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
-                    out.println(" [" + cols[j].countItems() + "]");
+                    out.println(" [" + ic.getCount(cols[j]) + "]");
                 }
 
                 out.println("</li>");
@@ -122,6 +131,12 @@
         }
         out.println("<br />");
         out.println("</li>");
+    	}
+    	catch (ItemCountException e)
+    	{
+    		// FIXME: except it's not
+    		throw new SQLException(e);
+    	}
     }
 %>
 
@@ -216,7 +231,7 @@
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
 %>
-                    [<%= cols[j].countItems() %>]
+                    [<%= ic.getCount(cols[j]) %>]
 <%
                 }
 %>
@@ -241,7 +256,7 @@
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
 %>
-                    [<%= comms[k].countItems() %>]
+                    [<%= ic.getCount(comms[k]) %>]
 <%
                 }
 %>
