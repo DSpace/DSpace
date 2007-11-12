@@ -21,6 +21,38 @@
       <version>1.5-SNAPSHOT</version>
    </parent>
 
+   <repositories>
+      <repository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
+
+   <pluginRepositories>
+      <pluginRepository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </pluginRepository>
+   </pluginRepositories>
+
    <build>
       <plugins>
          <plugin>
@@ -76,7 +108,6 @@
    </build>
 
    <reporting>
-
       <plugins>
          <plugin>
             <groupId>org.dspace</groupId>
