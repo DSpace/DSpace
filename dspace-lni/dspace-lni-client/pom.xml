@@ -10,11 +10,11 @@
    <description>
       Example Client for working with DSpace LNI Service.
    </description>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-lni/dspace-lni-client</url>
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace</artifactId>
+      <artifactId>dspace-lni</artifactId>
       <version>SNAPSHOT</version>
    </parent>
 
@@ -33,6 +33,22 @@
          </snapshots>
       </repository>
    </repositories>
+
+   <pluginRepositories>
+      <pluginRepository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </pluginRepository>
+   </pluginRepositories>
 
    <scm>
       <connection>

@@ -7,7 +7,7 @@
    <artifactId>dspace-xmlui-api</artifactId>
    <packaging>jar</packaging>
    <name>DSpace XMLUI (Manakin) :: API and Core Aspects</name>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-xmlui/dspace-xmlui-api</url>
    <description>
       DSpace/Manakin XML UI Based APIs and components using the Cocoon
       and Wing frameworks.
@@ -15,7 +15,7 @@
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace</artifactId>
+      <artifactId>dspace-xmlui</artifactId>
       <version>SNAPSHOT</version>
    </parent>
 
@@ -34,6 +34,22 @@
          </snapshots>
       </repository>
    </repositories>
+
+   <pluginRepositories>
+      <pluginRepository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </pluginRepository>
+   </pluginRepositories>
 
    <scm>
       <connection>
@@ -56,6 +72,16 @@
          <version>${project.version}</version>
       </dependency>
 
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+      </dependency>
+      
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>language-packs</artifactId>
+      </dependency>
+      
    </dependencies>
 
 </project>

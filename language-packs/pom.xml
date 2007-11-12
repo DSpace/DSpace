@@ -9,6 +9,7 @@
    <description>
       DSpace Language Packs to support multiple languages.
    </description>
+   <url>http://projects.dspace.org/language-packs</url>
 
    <!-- 
       A Parent POM that Maven inherits DSpace Default 
@@ -16,10 +17,41 @@
    -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-pom</artifactId>
+      <artifactId>dspace-parent</artifactId>
       <version>SNAPSHOT</version>
-      <relativePath>../dspace-pom</relativePath>
    </parent>
+
+   <repositories>
+      <repository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
+
+   <pluginRepositories>
+      <pluginRepository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </pluginRepository>
+   </pluginRepositories>
 
    <build>
       <plugins>
@@ -76,7 +108,6 @@
    </build>
 
    <reporting>
-
       <plugins>
          <plugin>
             <groupId>org.dspace</groupId>

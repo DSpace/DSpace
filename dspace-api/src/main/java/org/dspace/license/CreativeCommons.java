@@ -43,9 +43,17 @@ import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -74,6 +82,8 @@ public class CreativeCommons
 
     private static final String BSN_LICENSE_RDF = "license_rdf";
 
+    protected static Templates templates = null;
+    
     private static boolean enabled_p;
 
     static
@@ -97,6 +107,19 @@ public class CreativeCommons
                 System.setProperty("http.proxyPort", proxyPort);
             }
         }
+        
+        try
+        {
+            templates = TransformerFactory.newInstance().newTemplates(
+                        new StreamSource(CreativeCommons.class
+                                .getResourceAsStream("CreativeCommons.xsl")));
+        }
+        catch (TransformerConfigurationException e)
+        {
+            throw new RuntimeException(e.getMessage(),e);
+        }
+       
+        
     }
 
     /**
@@ -134,24 +157,7 @@ public class CreativeCommons
         // get some more information
         String license_text = fetchLicenseText(cc_license_url);
         String license_rdf = fetchLicenseRDF(cc_license_url);
-
-        // here we need to transform the license_rdf into a document_rdf
-        // first we find the beginning of "<License"
-        int license_start = license_rdf.indexOf("<License");
-
-        // the 10 is the length of the license closing tag.
-        int license_end = license_rdf.indexOf("</License>") + 10;
-        String document_rdf = "<rdf:RDF xmlns=\"http://web.resource.org/cc/\"\n"
-                + "   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
-                + "   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
-                + "<Work rdf:about=\"\">\n"
-                + "<license rdf:resource=\""
-                + cc_license_url
-                + "\">\n"
-                + "</Work>\n\n"
-                + license_rdf.substring(license_start, license_end)
-                + "\n\n</rdf:RDF>";
-
+        
         // set the format
         BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(
                 context, "License");
@@ -166,7 +172,7 @@ public class CreativeCommons
 
         // set the RDF bitstream
         setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_format,
-                document_rdf.getBytes());
+                license_rdf.getBytes());
     }
 
     public static void setLicense(Context context, Item item,
@@ -187,7 +193,7 @@ public class CreativeCommons
                    BSN_LICENSE_RDF : BSN_LICENSE_TEXT);
         bs.setFormat(bs_format);
         bs.update();
-        }
+    }
 
     public static void removeLicense(Context context, Item item)
             throws SQLException, IOException, AuthorizeException
@@ -282,10 +288,21 @@ public class CreativeCommons
 
     public static String fetchLicenseRDF(String license_url)
     {
-        String rdf_url = license_url + "rdf";
-        byte[] urlBytes = fetchURL(rdf_url);
+        StringWriter result = new StringWriter();
+        
+        try
+        {
+            templates.newTransformer().transform(
+                    new StreamSource(license_url + "rdf"),
+                    new StreamResult(result)
+                    );
+        }
+        catch (TransformerException e)
+        {
+            throw new RuntimeException(e.getMessage(),e);
+        }
 
-        return (urlBytes != null) ? new String(urlBytes) : "";
+        return result.getBuffer().toString();
     }
 
     // The following two helper methods assume that the CC

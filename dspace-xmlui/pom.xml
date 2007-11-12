@@ -7,22 +7,53 @@
    <artifactId>dspace-xmlui</artifactId>
    <packaging>pom</packaging>
    <name>DSpace XMLUI (Manakin)</name>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-xmlui</url>
    <description>
       DSpace web-based user interface based upon Apache Cocoon.
    </description>
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace</artifactId>
+      <artifactId>dspace-parent</artifactId>
       <version>SNAPSHOT</version>
-      <relativePath>../dspace</relativePath>
    </parent>
 
+   <repositories>
+      <repository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
+
+   <pluginRepositories>
+      <pluginRepository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </pluginRepository>
+   </pluginRepositories>
+   
    <modules>
-      <module>dspace-xmlui-wing/</module>
-      <module>dspace-xmlui-api/</module>
-      <module>dspace-xmlui-webapp/</module>
+      <module>dspace-xmlui-wing</module>
+      <module>dspace-xmlui-api</module>
+      <module>dspace-xmlui-webapp</module>
    </modules>
 
 </project>

@@ -73,7 +73,7 @@
 		-->
 	<message key="xmlui.PageNotFound.title">Page not found</message>
 	<message key="xmlui.PageNotFound.head">Page not found</message>
-	<message key="xmlui.PageNotFound.para1">The page you are trying to access has not been found on the server.</message>
+	<message key="xmlui.PageNotFound.para1">We can't find the page you asked for.</message>
 	
 	
 	<!--
@@ -106,9 +106,9 @@
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head1_community">Search Results for Community: {0}</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head1_collection">Search Results for Collection: {0}</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head1_none">Search Results</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.result_query">Your query "{0}" produced {1} results.</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Communities or Collections that matched your query</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Items that matched your query</message>
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.result_query">Your query "{0}" produced {1} result(s).</message>
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Communities or Collections matching your query</message>
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Items matching your query</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">Search produced no results.</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">All of DSpace</message>
 	
@@ -209,7 +209,7 @@
 	<message key="xmlui.ArtifactBrowser.Contact.title">Contact us</message>
 	<message key="xmlui.ArtifactBrowser.Contact.trail">Contact us</message>
 	<message key="xmlui.ArtifactBrowser.Contact.head">Contact us</message>
-	<message key="xmlui.ArtifactBrowser.Contact.para1">{0} administration may be contacted at:</message>
+	<message key="xmlui.ArtifactBrowser.Contact.para1">{0} administrators may be contacted at:</message>
 	<message key="xmlui.ArtifactBrowser.Contact.feedback_label">On-line form</message>
 	<message key="xmlui.ArtifactBrowser.Contact.feedback_link">Feedback</message>
 	<message key="xmlui.ArtifactBrowser.Contact.email">Email</message>
@@ -218,7 +218,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Give feedback</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Thanks for taking the time to share your feedback about the DSpace system. Your comments are appreciated!</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Thanks for sharing your feedback about the DSpace system. Your comments are appreciated!</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Your Email</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">This address will be used to follow up on your feedback.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Comments</message>
@@ -228,7 +228,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.title">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.trail">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.head">Feedback sent</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Your comments have been recieved.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Your comments have been received.</message>
 	
 	<!-- org.dspace.app.xmlui.artifactbrowser.FrontPageSearch.java -->
 	<message key="xmlui.ArtifactBrowser.FrontPageSearch.head">Search DSpace</message>
@@ -322,8 +322,8 @@
 	<message key="xmlui.EPerson.EditProfile.subscriptions_help">You may subscribe to collections to receive daily e-mail alerts of new items added. You can subscribe to as many or as few collections as you wish. Another alternative to daily e-mail alerts is to use the RSS feeds available for all collections.</message>
 	<message key="xmlui.EPerson.EditProfile.email_subscriptions">Email Subscriptions</message>
 	<message key="xmlui.EPerson.EditProfile.select_collection">( Select Collection )</message>
-	<message key="xmlui.EPerson.EditProfile.update_password_instructions">Optionally, you can choose a new password and enter it into the box below, and confirm it by typing it again into the second box for verification. It should be at least six characters long.</message>
-	<message key="xmlui.EPerson.EditProfile.create_password_instructions">Please choose a password and enter it into the box below, and confirm it by typing it again into the second box. It should be at least six characters long.</message>
+	<message key="xmlui.EPerson.EditProfile.update_password_instructions">Optionally, you can enter a new password in the box below, and confirm it by typing it again into the second box. It should be at least six characters long.</message>
+	<message key="xmlui.EPerson.EditProfile.create_password_instructions">Please enter a password in the box below, and confirm it by typing it again into the second box. It should be at least six characters long.</message>
 	<message key="xmlui.EPerson.EditProfile.password">Password</message>
 	<message key="xmlui.EPerson.EditProfile.confirm_password">Retype to confirm</message>
 	<message key="xmlui.EPerson.EditProfile.submit_update">Complete Registration</message>
@@ -331,7 +331,7 @@
 	<message key="xmlui.EPerson.EditProfile.error_required">This field is required</message>
 	<message key="xmlui.EPerson.EditProfile.error_invalid_password">Choose a password at least 6 characters long</message>
 	<message key="xmlui.EPerson.EditProfile.error_unconfirmed_password">Please retype your password to confirm</message>
-	<message key="xmlui.EPerson.EditProfile.head_auth">Authorization groups your are a member of</message>
+	<message key="xmlui.EPerson.EditProfile.head_auth">Authorization groups you belong to</message>
 	
 	<!-- org.dspace.app.xmlui.eperson.EPersonUtils.java -->
 	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Verify Email</message>
@@ -350,8 +350,8 @@
 	<message key="xmlui.EPerson.InvalidToken.title">Invalid token</message>
 	<message key="xmlui.EPerson.InvalidToken.trail">Invalid token</message>
 	<message key="xmlui.EPerson.InvalidToken.head">Invalid token</message>
-	<message key="xmlui.EPerson.InvalidToken.para1">The URL you provided is invalid. It is possible that the URL was broken across multiple lines in your email client, like this:</message>
-	<message key="xmlui.EPerson.InvalidToken.para2">If this is the case, you should copy and paste the entire URL directly into your browser's address bar, rather than simply clicking on the link. The address bar should then contain something like:</message>
+	<message key="xmlui.EPerson.InvalidToken.para1">The URL you provided is invalid. The URL may have been broken across multiple lines in your email client, like this:</message>
+	<message key="xmlui.EPerson.InvalidToken.para2">If so, copy and paste the entire URL directly into your browser's address bar, rather than simply clicking on the link. The address bar should then contain something like:</message>
 	
 	<!-- org.dspace.app.xmlui.eperson.Navigation.java -->
 	<message key="xmlui.EPerson.Navigation.my_account">My Account</message>
@@ -371,7 +371,7 @@
 	<message key="xmlui.EPerson.PasswordLogin.forgot_link"> Forgot your password?</message>
 	<message key="xmlui.EPerson.PasswordLogin.submit">Sign in</message>
 	<message key="xmlui.EPerson.PasswordLogin.head2">Register new user</message>
-	<message key="xmlui.EPerson.PasswordLogin.para1">Register an account to subscribe to collections for email udptase, and submit new items to DSpace.</message>
+	<message key="xmlui.EPerson.PasswordLogin.para1">Register an account to subscribe to collections for email updates, and submit new items to DSpace.</message>
 	<message key="xmlui.EPerson.PasswordLogin.register_link">Click here to register.</message>
 	
 	<!-- org.dspace.app.xmlui.eperson.LDAPLogin.java -->
@@ -388,7 +388,7 @@
 	<message key="xmlui.EPerson.LoginChooser.title">Choose a Login Method</message>
 	<message key="xmlui.EPerson.LoginChooser.trail">Choose Login</message>
 	<message key="xmlui.EPerson.LoginChooser.head1">Choose a Login Method</message>
-	<message key="xmlui.EPerson.LoginChooser.para1">The following represent ways in which you can log in.  Choose the appropriate method by following the link.</message>
+	<message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
 	<message key="au.edu.mq.melcoe.mams.dspace.eperson.ShibAuthentication.title">Shibboleth Authentication</message>
 	<message key="org.dspace.eperson.PasswordAuthentication.title">Password Authentication</message>
 	
@@ -415,7 +415,7 @@
 	<!-- org.dspace.app.xmlui.eperson.RegistrationFinished.java -->
 	<message key="xmlui.EPerson.RegistrationFinished.title">Registration finished</message>
 	<message key="xmlui.EPerson.RegistrationFinished.head">Registration Finished</message>
-	<message key="xmlui.EPerson.RegistrationFinished.para1">You're now registered to use the DSpace system.  You can subscribe to collections to receive e-mail updates about new items.</message>
+	<message key="xmlui.EPerson.RegistrationFinished.para1">You're now registered to use the DSpace system.  You can subscribe to collections to receive email updates about new items.</message>
 	
 	<!-- org.dspace.app.xmlui.eperson.ResetPassword.java -->
 	<message key="xmlui.EPerson.ResetPassword.title">Reset password</message>
@@ -431,7 +431,7 @@
 	<!-- org.dspace.app.xmlui.eperson.StartForgotPassword.java -->
 	<message key="xmlui.EPerson.StartForgotPassword.title">Forgot Password</message>
 	<message key="xmlui.EPerson.StartForgotPassword.head">Forgot Password</message>
-	<message key="xmlui.EPerson.StartForgotPassword.para1">Enter the email address you provided when you registered for DSpace. An email will be sent to that address with further instructions.</message>
+	<message key="xmlui.EPerson.StartForgotPassword.para1">Enter the email address you provided when you registered with DSpace. An email will be sent to that address with further instructions.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.email_address">Email Address</message>
 	<message key="xmlui.EPerson.StartForgotPassword.email_address_help">Enter the same address used when registering.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.error_not_found">Email address not found.</message>
@@ -519,7 +519,7 @@
 	<message key="xmlui.Submission.Submissions.workflow_column3">Item</message>
 	<message key="xmlui.Submission.Submissions.workflow_column4">Collection</message>
 	<message key="xmlui.Submission.Submissions.workflow_column5">Submitter</message>
-	<message key="xmlui.Submission.Submissions.workflow_submit_return">Return selected tosks to the pool</message>
+	<message key="xmlui.Submission.Submissions.workflow_submit_return">Return selected tasks to the pool</message>
 	<message key="xmlui.Submission.Submissions.workflow_info2">No tasks are assigned to you</message>
 	<message key="xmlui.Submission.Submissions.workflow_head3">Tasks in the pool</message>
 	<message key="xmlui.Submission.Submissions.workflow_submit_take">Take selected tasks</message>
@@ -528,9 +528,9 @@
 	<message key="xmlui.Submission.Submissions.submit_head1">Submissions</message>
 	<message key="xmlui.Submission.Submissions.submit_info1a">You may </message>
 	<message key="xmlui.Submission.Submissions.submit_info1b">start a new submission</message>
-	<message key="xmlui.Submission.Submissions.submit_info1c">, this function enables user to add items to DSpace. The processes of submission includes filling out information about the item on a metadata form and uploading the file(s) comprising the digital item. Each community or collection may set it's own submission policy.</message>
+	<message key="xmlui.Submission.Submissions.submit_info1c">The submission process includes describing the item and uploading the file(s) comprising it. Each community or collection may set its own submission policy.</message>
 	<message key="xmlui.Submission.Submissions.submit_head2">Unfinished submissions</message>
-	<message key="xmlui.Submission.Submissions.submit_info2a">These are partial item submissions to the repository which you have not yet completed. You may also </message>
+	<message key="xmlui.Submission.Submissions.submit_info2a">These are incomplete item submissions. You may also </message>
 	<message key="xmlui.Submission.Submissions.submit_info2b">start another submission</message>
 	<message key="xmlui.Submission.Submissions.submit_info2c">.</message>
 	<message key="xmlui.Submission.Submissions.submit_column1"></message>
@@ -543,7 +543,7 @@
 	<message key="xmlui.Submission.Submissions.submit_submit_remove">Remove selected submissions</message>
 	<!-- Same transformer, inprogress section -->
 	<message key="xmlui.Submission.Submissions.progress_head1">Submissions being reviewed</message>
-	<message key="xmlui.Submission.Submissions.progress_info1">These are your completed item submissions which are currently being reviewed by collection curators.</message>
+	<message key="xmlui.Submission.Submissions.progress_info1">These are your completed submissions which are currently being reviewed by collection curators.</message>
 	<message key="xmlui.Submission.Submissions.progress_column1">Title</message>
 	<message key="xmlui.Submission.Submissions.progress_column2">Collection</message>
 	<message key="xmlui.Submission.Submissions.progress_column3">Status</message>
@@ -571,8 +571,8 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SaveOrRemoveStep -->
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.head">Save or cancel your submission?</message>
-	<message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Do you want the half-finished submission removed, or do you want to keep it so you can carry on working on it later?  You can also return to where you where during the submission process if you clicked Cancel by accident.</message>
-	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_back">Opps, continue submission</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Do you want the submission removed, or do you want to carry on working on it later?  You may return to the submission process if you clicked Cancel by accident.</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_back">Oops, continue submission</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_save">Save it, I'll work on it later</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_remove">Remove the submission</message>
 
@@ -596,7 +596,7 @@
 	
 	<!-- org.dspace.app.xmlui.Submission.submit.DescribeStep -->
 	<message key="xmlui.Submission.submit.DescribeStep.head">Describe Item</message>
-	<message key="xmlui.Submission.submit.DescribeStep.unknown_field">Error: Unknow field type</message>
+	<message key="xmlui.Submission.submit.DescribeStep.unknown_field">Error: Unknown field type</message>
 	<message key="xmlui.Submission.submit.DescribeStep.required_field">This field is required</message>
 	<message key="xmlui.Submission.submit.DescribeStep.last_name_help">Last name, <i>e.g. Smith</i></message>
 	<message key="xmlui.Submission.submit.DescribeStep.first_name_help">First name(s) + "Jr", <i>e.g. Donald Jr</i></message>
@@ -609,10 +609,10 @@
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Upload File(s)</message>
 	<message key="xmlui.Submission.submit.UploadStep.file">File</message>
-	<message key="xmlui.Submission.submit.UploadStep.file_help">Please enter the name of the file on your local hard drive corresponding to your item. If you click "Browse...", a new window will appear in which you can locate and select the file on your local hard drive.</message>
+	<message key="xmlui.Submission.submit.UploadStep.file_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer.</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_error">The item must contain at least one file.</message>
 	<message key="xmlui.Submission.submit.UploadStep.description">Description</message>
-	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionaly, provide a brief description of the contents of this file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
+	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
 	<message key="xmlui.Submission.submit.UploadStep.column1"></message>
@@ -634,12 +634,12 @@
 	<message key="xmlui.Submission.submit.EditFileStep.head">Edit File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.file">File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.description">File Description</message>
-	<message key="xmlui.Submission.submit.EditFileStep.description_help">Optionaly, provide a brief description of the contents of this file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
-	<message key="xmlui.Submission.submit.EditFileStep.info1">Select the format of the file from the list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>", <b>OR</b> if the format is not in the list, please describe the format file in the input box below the list.</message>
+	<message key="xmlui.Submission.submit.EditFileStep.description_help">Optionally, provide a brief description of the contents; for example, "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
+	<message key="xmlui.Submission.submit.EditFileStep.info1">Select the format of the file from the list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>." <strong>If the format is not in the list</strong>, please describe it in the input box below the list.</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_detected">Detected Format</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_selected">Selected Format</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_default">Format not in list</message>
-	<message key="xmlui.Submission.submit.EditFileStep.info2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe the file's format in the field below.</message>
+	<message key="xmlui.Submission.submit.EditFileStep.info2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe the file's format in the box below.</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_user">Other Format</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_user_help">The application's name you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
 	<message key="xmlui.Submission.submit.EditFileStep.submit_save">Save</message>
@@ -663,7 +663,7 @@
 	
 	<!-- org.dspace.app.xmlui.Submission.submit.CCLicenseStep -->
 	<message key="xmlui.Submission.submit.CCLicenseStep.head">Creative Commons License</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.info1">You may optionally license your Item under a <a href="http://creativecommons.org/">Creative Commons</a> License. If you wish to select a Creative Commons license click the button below where you will be taken away from this website to the Creative Commons website. Once there you will be presented with several licensing options after selecting a license you will be returned to this page.</message>
+	<message key="xmlui.Submission.submit.CCLicenseStep.info1">If you wish, you may add a <a href="http://creativecommons.org/">Creative Commons</a> License to your item. <strong>Creative Commons licenses govern what people who read your work may then do with it.</strong> If you wish to select a Creative Commons license click the button below. You will be taken to the Creative Commons website, where you will be presented with several licensing options.  After selecting a license, you will be returned to this page.</message>
 	<message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Proceed to Creative Commons website to select a license</message>
 	<message key="xmlui.Submission.submit.CCLicenseStep.license">License</message>
 	<message key="xmlui.Submission.submit.CCLicenseStep.submit_remove">Remove this Creative Commons License</message>
@@ -671,8 +671,8 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.LicenseStep -->
 	<message key="xmlui.Submission.submit.LicenseStep.head">Distribution License</message>
-	<message key="xmlui.Submission.submit.LicenseStep.info1"><strong>There is one last step:</strong> In order for DSpace to reproduce, translate and distribute your submission worldwide, your agreement to the following terms is necessary.</message>
-	<message key="xmlui.Submission.submit.LicenseStep.info2">Grant the standard distribution license by selecting 'I Grant the License' and then click 'Complete Submission'.</message>
+	<message key="xmlui.Submission.submit.LicenseStep.info1"><strong>There is one last step:</strong> In order for DSpace to reproduce, translate and distribute your submission worldwide, you must agree to the following terms.</message>
+	<message key="xmlui.Submission.submit.LicenseStep.info2">Grant the standard distribution license by selecting 'I Grant the License'; and then click 'Complete Submission'.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.info3">If you have questions regarding this license please contact the system administrators.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_label">Distribution license</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">I Grant the License</message>
@@ -685,30 +685,30 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.CompletedStep -->
 	<message key="xmlui.Submission.submit.CompletedStep.head">Submission complete</message>	
-	<message key="xmlui.Submission.submit.CompletedStep.info1">Your submission will now go through the workflow process designated for the collection to which you are submitting. You will receive e-mail notification as soon as your submission has become a part of the collection, or if for some reason there is a problem with your submission. You can also check on the status of your submission by going to the My DSpace page.</message>	
+	<message key="xmlui.Submission.submit.CompletedStep.info1">Your submission will now go through the review process for this collection. You will receive e-mail notification as soon as your submission has joined the collection, or if there is a problem with your submission. You may also check on the status of your submission by visiting your submissions page.</message>	
 	<message key="xmlui.Submission.submit.CompletedStep.go_submission">Go to the Submissions page</message>	
 	<message key="xmlui.Submission.submit.CompletedStep.submit_again">Submit another item</message>		
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.PerformTaskStep -->
 	<message key="xmlui.Submission.workflow.PerformTaskStep.info1">Actions you may perform on this task:</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.take_help">Select this option to assign this task to yourself.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.take_help">Assign this task to yourself.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.take_submit">Take task</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">If you wish to leave this task in the pool for another to take, use this option.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">Leave this task in the pool for another to take.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_submit">Leave task</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_help">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_submit">Approve item</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_help">Once you've edited the item, use this option to commit the item to the archive.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_submit">Commit to archive</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">If you have reviewed the item and found it is <strong>not</strong> suitable for inclusion in the collection, select "Reject".  You will then be asked to enter a message indicating why the item is unsuitable, and whether the submitter should change something and re-submit.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">If you have reviewed the item and found it is <strong>not</strong> suitable for inclusion in the collection, select "Reject".  You will then be asked to enter a message indicating why the item is unsuitable, and whether the submitter should change something and resubmit.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Reject item</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Select this option to correct, amend or otherwise edit the item's metadata.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Select this option to change the item's metadata.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_submit">Edit metadata</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.return_help">To return the task to the pool so that another user can perform the task, use this option.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.return_help">Return the task to the pool so that another user may perform the task.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_submit">Return task to pool</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.cancel_submit">Cancel</message>
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.RejectTaskStep -->
-	<message key="xmlui.Submission.workflow.RejectTaskStep.info1">Please enter the reason you are rejecting the submission into the box below.  Please indicate in your message whether the submitter should fix a problem and resubmit.</message>
+	<message key="xmlui.Submission.workflow.RejectTaskStep.info1">Please enter your reason for rejecting the submission into the box below, indicating whether the submitter may fix a problem and resubmit.</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason">Reason</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason_required">The reason field is required</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_reject">Reject item</message>
@@ -735,7 +735,7 @@
 	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_lastName">Please provide your last name</message>
 	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_suffix">Suffix</message>
 	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_citizenship">Citizenship</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_citizenship">Plesae provide your citizenship information</message>
+	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_citizenship">Please provide your citizenship information</message>
 	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_email">E-mail</message>
 	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_email">Please provide your e-mail address</message>
 	<message key="xmlui.CSS.VerifyPersonalInformationStep.affiliation_head">Affiliation</message>
@@ -889,7 +889,7 @@
 	
 	<message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">The user was added successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">The user was edited successfully.</message>
-	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">An email message has been sent to the user containing a token that may be used to pick a new password.</message>
+	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">An email message has been sent to the user containing a token that may be used to choose a new password.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice">The user(s) were deleted successfully.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.edit_group_success_notice">The group was edited successfully.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.delete_group_success_notice">The selected groups were deleted successfully.</message>
@@ -897,11 +897,11 @@
 	<message key="xmlui.administrative.FlowRegistryUtils.delete_metadata_schema_success_notice">The schema(s) were successfully deleted.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.add_metadata_field_success_notice">Metadata field successfully added.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.edit_metadata_field_success_notice">Metadata field successfully edited.</message>
-	<message key="xmlui.administrative.FlowRegistryUtils.move_metadata_field_success_notice">The fields(s) were successfully moved.</message>
-	<message key="xmlui.administrative.FlowRegistryUtils.delete_metadata_field_success_notice">The fields(s) were successfully deleted.</message>
+	<message key="xmlui.administrative.FlowRegistryUtils.move_metadata_field_success_notice">The field(s) were successfully moved.</message>
+	<message key="xmlui.administrative.FlowRegistryUtils.delete_metadata_field_success_notice">The field(s) were successfully deleted.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.edit_bitstream_format_success_notice">The format was successfully saved.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.delete_bitstream_format_success_notice">The format(s) were successfully deleted.</message>
-	<message key="xmlui.administrative.FlowItemUtils.metadata_updated">The Item's metadata was successfully updated.</message>
+	<message key="xmlui.administrative.FlowItemUtils.metadata_updated">The item's metadata was successfully updated.</message>
 	<message key="xmlui.administrative.FlowItemUtils.metadata_added">New metadata was added.</message>
 	<message key="xmlui.administrative.FlowItemUtils.item_withdrawn">The item has been withdrawn.</message>
 	<message key="xmlui.administrative.FlowItemUtils.item_reinstated">The item has been reinstated.</message>
@@ -944,28 +944,28 @@
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.title">Manage E-people</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.main_head">E-person management</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_head">Actions</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_create">Create a new e-person</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_create">Create a new E-Person</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_create_link">Click here to add a new E-Person.</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_browse">Browse e-people</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_browse">Browse E-People</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_browse_link">Click here to browse all E-People.</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_search">Search for e-people</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_help">E-people are searched by any partial match on email or name</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_para1">Below is the list of e-people that matched your search query. Select the e-people you want to delete and click the delete button to continue or click on an e-person's email or name to edit them.</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_search">Search for E-People</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_help">E-People are searched by any partial match on email or name</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_para1">Below is the list of E-People that matched your search query. Select the E-People you want to delete and click the delete button to continue or click on an E-Person's email or name to edit them.</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_head">Search results</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column1"></message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column2">ID</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column3">Name</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column4">Email</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.submit_delete">Delete epeople</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.submit_delete">Delete E-People</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.no_results">Your search found no results...</message>
 		
 		
 	<!-- org.dspace.app.xmlui.administrative.eperson.AddEPersonForm -->
-	<message key="xmlui.administrative.eperson.AddEPersonForm.title">Add E-person</message>
-	<message key="xmlui.administrative.eperson.AddEPersonForm.trail">Add E-person</message>
+	<message key="xmlui.administrative.eperson.AddEPersonForm.title">Add E-Person</message>
+	<message key="xmlui.administrative.eperson.AddEPersonForm.trail">Add E-Person</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.head1">Create a new user</message>
-	<message key="xmlui.administrative.eperson.AddEPersonForm.email_taken">That email address is in use by another EPerson. Emails must be unique.</message>
-	<message key="xmlui.administrative.eperson.AddEPersonForm.head2">New Eperson's information:</message>
+	<message key="xmlui.administrative.eperson.AddEPersonForm.email_taken">That email address is in use by another E-Person. Emails must be unique.</message>
+	<message key="xmlui.administrative.eperson.AddEPersonForm.head2">New E-Person's information:</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.error_email_unique">Email address must be unique</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.error_email">Email address is required</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.error_fname">First name is required</message>
@@ -975,10 +975,10 @@
 	<message key="xmlui.administrative.eperson.AddEPersonForm.submit_create">Create E-Person</message>
 	
 	<!-- org.dspace.app.xmlui.administrative.eperson.EditEPersonForm -->
-	<message key="xmlui.administrative.eperson.EditEPersonForm.title">Edit E-person</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.trail">Edit E-person</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.title">Edit E-Person</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.trail">Edit E-Person</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.head1">Edit an E-Person</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.email_taken">That email address is in use by another EPerson. Emails must be unique.</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.email_taken">That email address is in use by another E-Person. Emails must be unique.</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.head2">{0}'s information:</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.error_email_unique">Email address must be unique</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.error_email">Email address is required</message>
@@ -987,18 +987,18 @@
 	<message key="xmlui.administrative.eperson.EditEPersonForm.req_certs">Require Certificate</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.can_log_in">Can Log In</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_reset_password">Reset Password</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.special_help">You may also permanently remove this eperson them from the system or reset their password. When reseting a password the user will be sent an email containing a special link they can follow to pick a new password.</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Delete this EPerson</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.member_head">Groups this EPerson is a member of:</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.special_help">You may also permanently remove this E-Person from the system or reset his/her password. When resetting a password the user will be sent an email containing a special link they can follow to choose a new password.</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Delete this E-Person</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.member_head">Groups this E-Person is a member of:</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.indirect_member">(via group: {0})</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.member_none">none</message>
 	
 	
 	<!-- org.dspace.app.xmlui.administrative.eperson.DeleteEPeopleConfirm -->
-	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.title">Confirm E-person Deletion</message>
+	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.title">Confirm E-Person Deletion</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.trail">Confirm Delete</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.confirm_head">Confirm Deletion</message>
-	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.confirm_para">The following EPeople will be deleted: </message>
+	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.confirm_para">The following E-People will be deleted: </message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.submit_confirm">Confirm Deletion</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_id">ID</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_name">Name</message>
@@ -1042,7 +1042,7 @@
 	<message key="xmlui.administrative.group.EditGroupForm.label_name">Change group name: </message>
 	<message key="xmlui.administrative.group.EditGroupForm.label_instructions">This group is associated with a specific collection and the name cannot be modified.</message>
 	<message key="xmlui.administrative.group.EditGroupForm.label_search">Search members to add: </message>
-	<message key="xmlui.administrative.group.EditGroupForm.submit_search_people">E-people...</message>
+	<message key="xmlui.administrative.group.EditGroupForm.submit_search_people">E-People...</message>
 	<message key="xmlui.administrative.group.EditGroupForm.submit_search_groups">Groups...</message>
 	<message key="xmlui.administrative.group.EditGroupForm.no_results">Your search found no results...</message>
 	<message key="xmlui.administrative.group.EditGroupForm.epeople_column1">ID</message>
@@ -1084,7 +1084,7 @@
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.title">Delete Bitstream Formats</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.trail">Delete bitstream formats</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.head">Confirm Deletion</message>
-	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.para1">Are you sure the format null should be deleted? Any existing bitstreams of this format will be reverted to the unknown bitstream format.</message>
+	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.para1">Are you sure the format should be deleted? Any existing bitstreams of this format will be reverted to the unknown bitstream format.</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.column1">ID</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.column2">MIME Type</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.column3">Name</message>
@@ -1092,10 +1092,10 @@
 	<!-- org.dspace.app.xmlui.administrative.registries.DeleteMetadataFieldsConfirm.java -->
 	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.title">Delete Fields</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.trail">Delete fields</message>
-	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.head">Confirm Deletetion</message>
-	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.para1">Are you <b>absolutly</b> sure you want to delete these fields? If any items contain metadata for these fields, an error will occur preventing the field's deletion. You must ensure that no items exist within the system that contain these fields.</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.head">Confirm Deletion</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.para1">Are you <b>absolutely</b> sure you want to delete these fields? If any items contain metadata for these fields, the field(s) cannot be deleted. You must ensure that no items use these fields.</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.warning">WARNING: </message>
-	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.para2">This will result in an error if any item contains metadata for these fields.</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.para2">This will cause an error if any item contains metadata for these fields.</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.column1">ID</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.column2">Name</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.column3">Scope Note</message>
@@ -1104,9 +1104,9 @@
 	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.title">Delete Schema</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.trail">Delete schema</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.head">Confirm Deletion</message>
-	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.para1">Are you <b>absolutly</b> sure you want to delete these schema? If any items contain metadata for fields contained within these schema, an error will occur preventing the schema's deletion. You must ensure that no items exist within the system that contain metadata in this schema.</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.para1">Are you <b>absolutely</b> sure you want to delete this schema? If any items contain metadata for fields contained within this schema, the schema cannot be deleted. You must ensure that no items contain metadata in this schema.</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.warning">WARNING: </message>
-	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.para2">This will result in an error if any item contains metadata within this schema.</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.para2">This will cause an error if any item contains metadata within this schema.</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.column1">ID</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.column2">Namespace</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.column3">Name</message>
@@ -1116,12 +1116,12 @@
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.trail">Bitstream format</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.head1">New bitstream format</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.head2">Bitstream format: {0}</message>
-	<message key="xmlui.administrative.registries.EditBitstreamFormat.para1">Provide descriptive metadata about the bitstream format below. While format names must be unique MIME-Types do not need to be. You might have separate format registry entries for different versions of Microsoft Word, even though the MIME type will be the same for each of them.</message>
+	<message key="xmlui.administrative.registries.EditBitstreamFormat.para1">Provide descriptive metadata about the bitstream format below. While format names must be unique, MIME types do not need to be. You may have separate format registry entries for different versions of Microsoft Word, even though the MIME type will be the same for each of them.</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.name">Name</message>
-	<message key="xmlui.administrative.registries.EditBitstreamFormat.name_help">A unique name for this format, (i.e. Microsoft Word XP or Microsoft Word 2000)</message>
+	<message key="xmlui.administrative.registries.EditBitstreamFormat.name_help">A unique name for this format, (e.g. Microsoft Word XP or Microsoft Word 2000)</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.name_error">The name field is required.</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.mimetype">MIME Type</message>
-	<message key="xmlui.administrative.registries.EditBitstreamFormat.mimetype.help">The MIME-type associated with this format, does not have to be unique.</message>
+	<message key="xmlui.administrative.registries.EditBitstreamFormat.mimetype.help">The MIME type associated with this format, does not have to be unique.</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.description">Description</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.support">Support level</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.support_help">The level of support your institution pledges for this format.</message>
@@ -1137,7 +1137,7 @@
 	<message key="xmlui.administrative.registries.EditMetadataSchema.title">Metadata Schema</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.trail">Metadata schema</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.head1">Metadata Schema: "{0}"</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.para1">This is the metadata schema for "{0}". You may add new or update existing metadata fields to this schema. Fields may also be selected for deletion or to be moved to another schema. </message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.para1">This is the metadata schema for "{0}". You may add new or update existing metadata fields to this schema. Fields may also be selected for deletion or be moved to another schema. </message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.head2">Schema metadata fields</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column1"></message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column2">ID</message>
@@ -1156,17 +1156,17 @@
 	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_update">Update field</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_cancel">Cancel</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.error">Error</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.error_duplicate_field">The field name is allready in use, all element and qualifiers must be unique.</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.error_duplicate_field">The field name is already in use, all element and qualifiers must be unique.</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.error_element_empty">The field's element is required.</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.error_element_badchar">The field's element contains a bad character, the element may NOT contain: dot, underscore, or a space.</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.error_element_badchar">The field's element contains a bad character. The element may NOT contain: periods, underscores, or spaces.</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.error_element_tolong">The field's element is to long, it must be less than 32 characters.</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.error_qualifier_tolong">The field's qualifier is to long, it must be less than 32 characters.</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.error_qualifier_badchar">The field's qualifier contains a bad character, the qualifier may NOT contain: dot, underscore, or a space.</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.error_qualifier_badchar">The field's qualifier contains a bad character. The qualifier may NOT contain: periods, underscores, or spaces.</message>
 
 	<!-- org.dspace.app.xmlui.administrative.registries.FormatRegistryMain.java -->
 	<message key="xmlui.administrative.registries.FormatRegistryMain.title">Format Registry</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.head">Bitstream format registry</message>
-	<message key="xmlui.administrative.registries.FormatRegistryMain.para1">This list of bitstreams provides information about known bitstreams and their support level. You can edit or add new bitstream formats with this tool. Formats marked as 'internal' are hidden from the user, and are used for administrative purposes.</message>
+	<message key="xmlui.administrative.registries.FormatRegistryMain.para1">This list of bitstream formats provides information about known formats and their support level. You can edit or add new bitstream formats with this tool. Formats marked as 'internal' are hidden from the user, and are used for administrative purposes.</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.new_link">Add a new bitstream format</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.column1"></message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.column2">ID</message>
@@ -1182,7 +1182,7 @@
 	<!-- org.dspace.app.xmlui.administrative.registries.MetadatRegistryMain.java -->
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.title">Metadata Registry</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.head1">Metadata registry</message>
-	<message key="xmlui.administrative.registries.MetadataRegistryMain.para1">The metadata registry maintains a list of all metadata fields available in the repository. These fields may be divided amongst multiple schemas, however DSpace requires the qualified Dublin Core schema. You may extend the Dublin Core schema with additional fields or add new schema's to the registry.</message>
+	<message key="xmlui.administrative.registries.MetadataRegistryMain.para1">The metadata registry maintains a list of all metadata fields available in the repository. These fields may be divided amongst multiple schemas.  However, DSpace requires the qualified Dublin Core schema. You may extend the Dublin Core schema with additional fields or add new schemas to the registry.</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.column1"></message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.column2">ID</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.column3">Namespace</message>
@@ -1190,10 +1190,10 @@
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.submit_delete">Delete schema</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.head2">Add a new schema</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace">Namespace</message>
-	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace_help">Namespace should be a established URI location for the new schema.</message>
+	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace_help">Namespace should be an established URI location for the new schema.</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace_error">This field is required.</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.name">Name</message>
-	<message key="xmlui.administrative.registries.MetadataRegistryMain.name_help">Short hand notation for the schema, this will be used to prefix a field's name (i.e. dc.element.qualifier). The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
+	<message key="xmlui.administrative.registries.MetadataRegistryMain.name_help">Shorthand notation for the schema. This will be used to prefix a field's name (e.g. dc.element.qualifier). The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.name_error">This field is required and must be less than 32 characters and cannot contain any spaces, periods, or underscores.</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.submit_add">Add new schema</message>
 
@@ -1201,7 +1201,7 @@
 	<message key="xmlui.administrative.registries.MoveMetadataField.title">Move Fields</message>
 	<message key="xmlui.administrative.registries.MoveMetadataField.trail">Move fields</message>
 	<message key="xmlui.administrative.registries.MoveMetadataField.head1">Move metadata fields</message>
-	<message key="xmlui.administrative.registries.MoveMetadataField.para1">Select a target schema where these fields will be moved too. If the target schema already has fields with identical names the fields will not be moved.</message>
+	<message key="xmlui.administrative.registries.MoveMetadataField.para1">Select a target schema where these fields will be moved. If the target schema already has fields with identical names the fields will not be moved.</message>
 	<message key="xmlui.administrative.registries.MoveMetadataField.column1">ID</message>
 	<message key="xmlui.administrative.registries.MoveMetadataField.column2">Name</message>
 	<message key="xmlui.administrative.registries.MoveMetadataField.column3">Scope Note</message>
@@ -1222,7 +1222,7 @@
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_head">Item authorizations</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.bad_name">The ID you supplied did not resolve to an item</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_item_lookup">Look up an item</message>
-	<message key="xmlui.administrative.authorization.AuthorizationMain.search_help">items are looked up by handle or internal ID</message>
+	<message key="xmlui.administrative.authorization.AuthorizationMain.search_help">Items may be found by handle or internal ID</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.submit_find">Find</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced">Advanced authorizations tool</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced_link">Click here to go to the item wildcard policy admin tool</message>
@@ -1242,7 +1242,7 @@
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.head_action">Action</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.head_group">Group</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.submit_delete">Delete Selected</message>
-	<message key="xmlui.administrative.authorization.EditContainerPolicies.group_edit">edit</message>
+	<message key="xmlui.administrative.authorization.EditContainerPolicies.group_edit">Edit</message>
 	
 
 	
@@ -1250,8 +1250,8 @@
 	<message key="xmlui.administrative.authorization.EditItemPolicies.title">Edit Item's Policies</message>
 	<message key="xmlui.administrative.authorization.EditItemPolicies.trail">Policies List</message>
 	<message key="xmlui.administrative.authorization.EditItemPolicies.main_head">Policies for Item {0} (ID={1})</message>
-	<message key="xmlui.administrative.authorization.EditItemPolicies.main_para1">With this editor you can view and alter the policies of an item, plus alter policies of individual item components: bundles and bitstreams. Briefly, an item is a container of bundles, and bundles, are containers of bitstreams. Containers usually have ADD/REMOVE/READ/WRITE policies, while bitstreams only have READ/WRITE policies.</message>
-	<message key="xmlui.administrative.authorization.EditItemPolicies.main_para2">You will notice an extra bundle and bitstream for each item, and those contain the license text for the item.</message>
+	<message key="xmlui.administrative.authorization.EditItemPolicies.main_para1">With this editor you can view and alter the policies of an item, plus alter policies of individual item components: bundles and bitstreams. Briefly, an item is a container of bundles, and bundles are containers of bitstreams. Containers usually have ADD/REMOVE/READ/WRITE policies, while bitstreams only have READ/WRITE policies.</message>
+	<message key="xmlui.administrative.authorization.EditItemPolicies.main_para2">You will notice an extra bundle and bitstream for each item containing the license text for the item.</message>
 	<message key="xmlui.administrative.authorization.EditItemPolicies.subhead_item">Item Policies</message>
 	<message key="xmlui.administrative.authorization.EditItemPolicies.subhead_bundle">Policies for Bundle {0} ({1})</message>
 	<message key="xmlui.administrative.authorization.EditItemPolicies.subhead_bitstream">Bitstream {0} ({1})</message>
@@ -1287,7 +1287,7 @@
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.title">Advanced Policy Manager</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.trail">Advanced Authorizations</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.main_head">Advanced Policy Manager</message>
-	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.main_para">Allows you to do wildcard additions to and clearing of policies for types of content contained in a collection. Warning, dangerous - removing READ permissions from items will make them not viewable!</message>
+	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.main_para">Allows wildcard additions to and clearing of policies for types of content within specific collection(s). WARNING - removing READ permissions from items will make them not viewable!</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_groupSentence">For all of the selected groups...</message>
     <message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_actionSentence">...grant the ability to perform the following action...</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_resourceSentence">...for all following object types...</message>
@@ -1321,22 +1321,22 @@
 	<message key="xmlui.administrative.item.AddBitstreamForm.trail">Upload bitstream</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.head1">Upload a new bitstream</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_label">Bundle</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_original">Content Files    (default)</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_original">Content Files (default)</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_metadata">Metadata Files</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_thumbnail">Thumbnails</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_license">Licenses</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_cc_license">Creative Commons Licenses</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.file_label">File</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.file_help">Please enter the name of the file on your local hard drive corresponding to your item. If you click "Browse...", a new window will appear in which you can locate and select the file on your local hard drive.</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.file_help">Please enter the name of the file on your computer corresponding to your item. If you click "Browse...", a new window will appear in which you can locate and select the file from your computer.</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.description_label">Description</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Optionaly, provide a brief description of the contents of this file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.submit_upload">Upload</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.no_bundles">You need the ADD &amp; WRITE privelege on at least one bundle to be able to upload new bitstreams.</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.no_bundles">You need the ADD &amp; WRITE privilege on at least one bundle to be able to upload new bitstreams.</message>
 	
 	<!-- org.dspace.app.xmlui.administrative.item.DeleteBitstreamConfirm -->
 	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.title">Confirm Deletion</message>
 	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.trail">Confirm deletion</message>
-	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.head1">Confirm Deletition(s)</message>
+	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.head1">Confirm Deletion(s)</message>
 	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.para1">Are you sure you want to delete these bitstreams:</message>
 	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.column1">Name</message>
 	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.column2">Description</message>
@@ -1348,7 +1348,7 @@
 	<message key="xmlui.administrative.item.ConfirmItemForm.head1">Modify item: {0}</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.para_delete">Are you sure this item should be completely deleted? Caution: At present, no tombstone would be left.</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.para_withdraw">Are you sure this item should be withdrawn from the archive?</message>
-	<message key="xmlui.administrative.item.ConfirmItemForm.para_reinstate">Are you sure this item should be reinstated from the archive?</message>
+	<message key="xmlui.administrative.item.ConfirmItemForm.para_reinstate">Are you sure this item should be reinstated to the archive?</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.column1">Field</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.column2">Value</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.column3">Language</message>
@@ -1365,13 +1365,13 @@
 	<message key="xmlui.administrative.item.EditBitstreamForm.primary_option_yes">yes</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.primary_option_no">no</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.description_label">Description</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Optionaly, provide a brief description of the contents of this file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>"."</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.para1">Select the format of the file from the list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>", <b>OR</b> if the format is not in the list, please describe the format file in the input box below the list.</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>"."</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.para1">Select the format of the file from the list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>", <b>OR</b> if the format is not in the list, please describe it in the box below.</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.format_label">Selected Format</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.format_default">Format not in list</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.para2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe the file's format in the field below.</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.para2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe it in the field below.</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.user_label">Other Format</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.user_help">The application's name you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.user_help">The application you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
 	
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemBitstreamsForm -->
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.title">Item Bitstreams</message>
@@ -1387,8 +1387,8 @@
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.view_link">view</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_add">Upload a new bitstream</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_delete">Delete bitstreams</message>
-	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_upload">You need the ADD &amp; WRITE privelege on the item and bundles to be able to upload new bitstreams.</message>
-	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_remove">You need the REMOVE privelege on the item and bundles to be able to delete bitstreams.</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_upload">You need the ADD &amp; WRITE privilege on the item and bundles to be able to upload new bitstreams.</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_remove">You need the REMOVE privilege on the item and bundles to be able to delete bitstreams.</message>
 	
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemMetadataForm -->
 	<message key="xmlui.administrative.item.EditItemMetadataForm.title">Item Metadata</message>
@@ -1488,11 +1488,11 @@
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.delete">Delete</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.restrict">Restrict...</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_admins">Collection administrators decide who can submit items to the collection, withdraw items, edit item metadata (after submission), and add (map) existing items from other collections to this collection (subject to authorization for that collection).</message>
-	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_wf_step1">The people responsible for this step are able to accept or reject incoming submissions. They are not be able to edit the submission's metadata, however.</message>
+	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_wf_step1">The people responsible for this step are able to accept or reject incoming submissions. However, they are not able to edit the submission's metadata.</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_wf_step2">The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them.</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_wf_step3">The people responsible for this step are able to edit the metadata of incoming submissions, but will not be able to reject them.</message>
-	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_submitters">The EPeople and Groups that have permission to submit new items to this collection.</message>
-	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_default_read">EPeople and Groups that can read new items submitted to this collection. Changes to this role are not retroactive and old items will still be viewable by those who had read access at the time of their addition.</message>
+	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_submitters">The E-People and Groups that have permission to submit new items to this collection.</message>
+	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_default_read">E-People and Groups that can read new items submitted to this collection. Changes to this role are not retroactive.  Existing items in the system will still be viewable by those who had read access at the time of their addition.</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.default_read_custom">This collection uses custom default access settings. </message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.default_read_anonymous">Default read for incoming items and bitsreams is currently set to Anonymous.</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.edit_authorization">Edit authorization policies directly.</message>
@@ -1510,7 +1510,7 @@
 	<!-- org.dspace.app.xmlui.administrative.collection.DeleteCollectionConfirm.java -->
 	<message key="xmlui.administrative.collection.DeleteCollectionConfirm.title">Confirm Deletion</message>
 	<message key="xmlui.administrative.collection.DeleteCollectionConfirm.trail">Confirm</message>
-	<message key="xmlui.administrative.collection.DeleteCollectionConfirm.main_head">Confrim deletetion for collection {0}</message>
+	<message key="xmlui.administrative.collection.DeleteCollectionConfirm.main_head">Confirm deletion for collection {0}</message>
 	<message key="xmlui.administrative.collection.DeleteCollectionConfirm.main_para">Are you sure collection {0} should be deleted? This will delete:</message>
 	<message key="xmlui.administrative.collection.DeleteCollectionConfirm.confirm_item1">Any items and incomplete submissions in this collection that aren't contained in other collections</message>
 	<message key="xmlui.administrative.collection.DeleteCollectionConfirm.confirm_item2">The contents of those items</message>
@@ -1520,8 +1520,8 @@
 	<message key="xmlui.administrative.collection.DeleteCollectionRoleConfirm.title">Confirm role deletion</message>
 	<message key="xmlui.administrative.collection.DeleteCollectionRoleConfirm.trail">Confirm</message>
 	<message key="xmlui.administrative.collection.DeleteCollectionRoleConfirm.main_head">Confirm deletion for role {0}</message>
-	<message key="xmlui.administrative.collection.DeleteCollectionRoleConfirm.main_para_read">Are you sure you want to delete this role? Deleting this group will give READ access to all users for all items submitted to this collection from now on. Please note that this change is not retroactive, so items submitted under the previous policy will still be restrivted to the members defined by the group you are about to delete.</message>
-	<message key="xmlui.administrative.collection.DeleteCollectionRoleConfirm.main_para">Are you sure you want to delete this role? All changes and customizations made to the {0} group will be lost and have to be created anew.</message>
+	<message key="xmlui.administrative.collection.DeleteCollectionRoleConfirm.main_para_read">Are you sure you want to delete this role? Deleting this group will give READ access to all users for all items submitted to this collection from now on. Please note that this change is not retroactive. Existing items in the system will still be restricted to the members defined by the role you are about to delete.</message>
+	<message key="xmlui.administrative.collection.DeleteCollectionRoleConfirm.main_para">Are you sure you want to delete this role? All changes and customizations made to the {0} group will be lost and wouuld have to be created anew.</message>
 	
 	<!-- org.dspace.app.xmlui.administrative.collection.EditCollectionMetadataForm.java -->
 	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.title">Edit Collection Metadata</message>
@@ -1555,7 +1555,7 @@
 	<!-- org.dspace.app.xmlui.administrative.community.DeleteCommunityConfirm.java -->
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.title">Confirm Deletion</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.trail">Confirm</message>
-	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_head">Confrim deletetion for community {0}</message>
+	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_head">Confrim deletion for community {0}</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_para">Are you sure community {0} should be deleted? This will delete:</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item1">Any collections in the community that are not contained in other communities</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item2">Any items and incomplete submissions in this community that aren't contained in other communities</message>
@@ -1652,8 +1652,8 @@
 	<!-- org.dspace.app.xmlui.administrative.NotAuthorized -->
 	<message key="xmlui.administrative.NotAuthorized.title">Not Authorized</message>
 	<message key="xmlui.administrative.NotAuthorized.trail">Not authorized</message>
-	<message key="xmlui.administrative.NotAuthorized.head">Insufficent privleges</message>
-	<message key="xmlui.administrative.NotAuthorized.para1a">Your account has insufficent privleges to preform the requested action. If you feel this is in error or you need to preform the action then please contant the site's </message>
+	<message key="xmlui.administrative.NotAuthorized.head">Insufficent privileges</message>
+	<message key="xmlui.administrative.NotAuthorized.para1a">Your account has insufficent privileges to perform the requested action. If you feel this is an error or have questions about your privileges, please contact the site's </message>
 	<message key="xmlui.administrative.NotAuthorized.para1b">system administrators</message>
 	<message key="xmlui.administrative.NotAuthorized.para1c">.</message>
 	<message key="xmlui.administrative.NotAuthorized.para2">Login as another user</message>

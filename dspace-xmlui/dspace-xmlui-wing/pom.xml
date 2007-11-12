@@ -7,12 +7,12 @@
    <artifactId>dspace-xmlui-wing</artifactId>
    <packaging>jar</packaging>
    <name>DSpace XMLUI (Manakin) :: Wing-Framework</name>
-   <url>http://www.dspace.org</url>
+   <url>http://projects.dspace.org/dspace-xmlui/dspace-xmlui-wing</url>
    <description>The Cocoon-based Wing framework</description>
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace</artifactId>
+      <artifactId>dspace-xmlui</artifactId>
       <version>SNAPSHOT</version>
    </parent>
 
@@ -31,6 +31,22 @@
          </snapshots>
       </repository>
    </repositories>
+
+   <pluginRepositories>
+      <pluginRepository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </pluginRepository>
+   </pluginRepositories>
 
    <scm>
       <connection>
@@ -80,6 +96,12 @@
          <groupId>avalon-logkit</groupId>
          <artifactId>avalon-logkit</artifactId>
          <version>2.1</version>
+         <exclusions>
+            <exclusion>
+               <groupId>geronimo-spec</groupId>
+               <artifactId>geronimo-spec-javamail</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <!-- Commons -->
@@ -221,7 +243,7 @@
       <dependency>
          <groupId>org.dspace.xmlui.jakarta</groupId>
          <artifactId>jakarta-bcel</artifactId>
-         <version>20040329</version>
+         <version>5.1.20040329-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>org.dspace.xmlui.jakarta</groupId>
@@ -245,7 +267,7 @@
       <dependency>
          <groupId>org.dspace.xmlui.jcs</groupId>
          <artifactId>jcs</artifactId>
-         <version>1.2.5-dev-20050313</version>
+         <version>1.2.5.20050313-SNAPSHOT</version>
       </dependency>
 
       <!-- jdtcore -->
