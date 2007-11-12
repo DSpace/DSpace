@@ -61,3 +61,17 @@ alter table bundle drop column mets_bitstream_id; -- totally unused column
 -- of the last page reached within a step in the Configurable Submission Process
 -------------------------------------------------------------------------------
 ALTER TABLE workspaceitem ADD page_reached INTEGER;
+
+-------------------------------------------------------------------------
+-- Tables to manage cache of item counts for communities and collections
+-------------------------------------------------------------------------
+
+CREATE TABLE collection_item_count (
+	collection_id INTEGER REFERENCES collection(collection_id),
+	number INTEGER
+);
+
+CREATE TABLE community_item_count (
+	community_id INTEGER REFERENCES community(community_id),
+	number INTEGER
+);

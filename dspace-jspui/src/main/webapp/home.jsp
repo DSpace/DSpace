@@ -60,6 +60,7 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.browse.ItemCounter" %>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
@@ -77,6 +78,7 @@
         feedData = "ALL:" + ConfigurationManager.getProperty("webui.feed.formats");
     }
     
+    ItemCounter ic = new ItemCounter();
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
@@ -145,7 +147,7 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
 %>
-            [<%= communities[i].countItems() %>]
+            [<%= ic.getCount(communities[i]) %>]
 <%
         }
 

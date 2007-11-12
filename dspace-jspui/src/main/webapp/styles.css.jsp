@@ -253,6 +253,11 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  font-size: 14pt;
                  font-weight: bold }
 
+.communityStrength {
+				font-family: "verdana", "Arial", "Helvetica", sans-serif;
+                 font-size: 12pt;
+                 font-weight: normal }
+
 .communityDescription { margin-left: 20px;
                         margin-right: 10px;
                         font-family: "verdana", "Arial", "Helvetica", sans-serif;

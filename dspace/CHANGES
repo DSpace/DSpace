@@ -1,4 +1,4 @@
-(Graham Triggs/Mark Diggory
+(Graham Triggs/Mark Diggory)
 - S.F. Bug 1824710 Creative Commons RDF has changed. Adjusted CC processing to be XSL driven 
   and adjusted generated XML/RDF. Created LicenseCleanup CLI to process existing CC license_rdf
   
@@ -11,6 +11,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 
 (Richard Jones)
 - S.F. Patch 1670093 More stable metadata and schema registry import 
+- Option to generate community and collection "strength" as a batch job
 
 (Richard Jones / Graham Triggs)
 - New Browse code that allows customisation of the available indexes via dspace.cfg,

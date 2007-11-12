@@ -1053,6 +1053,19 @@ public class Collection extends DSpaceObject
             wsarray[x].deleteAll();
         }
 
+        //  get rid of the content count cache if it exists
+        try
+        {
+        	ItemCounter ic = new ItemCounter(ourContext);
+        	ic.remove(this);
+        }
+        catch (ItemCountException e)
+        {
+        	// FIXME: upside down exception handling due to lack of good
+        	// exception framework
+        	throw new SQLException(e);
+        }
+        
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);
 
