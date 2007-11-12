@@ -918,7 +918,7 @@ public class Community extends DSpaceObject
         {
         	// FIXME: upside down exception handling due to lack of good
         	// exception framework
-        	throw new SQLException(e);
+        	throw new RuntimeException(e.getMessage(),e);
         }
         
         // Delete community row

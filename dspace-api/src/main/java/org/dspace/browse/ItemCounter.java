@@ -178,6 +178,7 @@ public class ItemCounter
 	 * @param dso
 	 * @return
 	 * @throws ItemCountException
+	 * @throws SQLException 
 	 */
 	public int getCount(DSpaceObject dso)
 		throws ItemCountException
@@ -192,12 +193,22 @@ public class ItemCounter
 		// if we make it this far, we need to manually count
 		if (dso instanceof Collection)
 		{
-			return ((Collection) dso).countItems();
+			try {
+				return ((Collection) dso).countItems();
+			} catch (SQLException e) {
+				log.error("caught exception: ", e);
+				throw new ItemCountException(e);
+			}
 		}
 		
 		if (dso instanceof Community)
 		{
-			return ((Collection) dso).countItems();
+			try {
+				return ((Collection) dso).countItems();
+			} catch (SQLException e) {
+				log.error("caught exception: ", e);
+				throw new ItemCountException(e);
+			}
 		}
 		
 		return 0;
