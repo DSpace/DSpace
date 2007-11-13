@@ -51,10 +51,28 @@
          </snapshots>
       </pluginRepository>
    </pluginRepositories>
-   
+
+
+   <!-- 
+      The Subversion repository location is used by Continuum to update against
+      when changes have occured, this spawns a new build cycle and releases snapshots
+      into the snapshot repository below.
+   -->
+   <scm>
+      <connection>
+         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-jspui
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-jspui
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-jspui
+      </url>
+   </scm>
+
    <build>
       <plugins>
-      
+
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
@@ -76,7 +94,7 @@
                </execution>
             </executions>
          </plugin>
-         
+
          <!-- Secondary Artifact: Skinny war. -->
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
@@ -101,7 +119,7 @@
                </dependency>
             </dependencies>
          </plugin>
-         
+
       </plugins>
    </build>
 
