@@ -5,7 +5,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>1.5-SNAPSHOT</version>
+   <version>SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>http://projects.dspace.org</url>
 
@@ -547,13 +547,13 @@
    -->
    <scm>
       <connection>
-         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x
+         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk
       </connection>
       <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk
       </developerConnection>
       <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk
       </url>
    </scm>
 
