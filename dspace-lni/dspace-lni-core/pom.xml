@@ -50,13 +50,13 @@
 
    <scm>
       <connection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-core
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-core
       </connection>
       <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-core
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-core
       </developerConnection>
       <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-core
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-lni/dspace-lni-core
       </url>
    </scm>
 

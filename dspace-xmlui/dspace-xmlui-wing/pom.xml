@@ -50,13 +50,13 @@
 
    <scm>
       <connection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-wing
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
       </connection>
       <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-wing
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
       </developerConnection>
       <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-wing
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
       </url>
    </scm>
 
