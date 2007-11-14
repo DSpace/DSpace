@@ -200,6 +200,8 @@ public class Bitstream extends DSpaceObject
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
 
+	bitstream.bRow.setColumn("views", 0);
+
         return bitstream;
     }
 
