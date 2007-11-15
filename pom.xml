@@ -27,6 +27,18 @@
                <target>1.5</target>
             </configuration>
          </plugin>
+         
+         <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <dependencies>
+               <dependency>
+                  <groupId>org.dspace.maven.plugins</groupId>
+                  <artifactId>dspace-assembly-plugin</artifactId>
+                  <version>1.5-SNAPSHOT</version>
+               </dependency>
+            </dependencies>
+         </plugin>
+         
       </plugins>
    </build>
 
