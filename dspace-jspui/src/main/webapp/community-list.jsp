@@ -58,6 +58,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.sql.SQLException" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
