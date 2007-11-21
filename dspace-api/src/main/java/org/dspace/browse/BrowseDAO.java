@@ -344,6 +344,13 @@ public interface BrowseDAO
 	 * @param value	the value to which to constrain results
 	 */
 	public void setFilterValue(String value);
+
+    /**
+     * Sets whether we will treat the filter value as partial (like match), or exact
+     *
+     * @param part true if partial, false if exact
+     */
+    public void setFilterValuePartial(boolean part);
 	
 	/**
 	 * Get the name of the field in which the value to constrain results is

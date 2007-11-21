@@ -99,6 +99,9 @@ public class BrowseDAOPostgres implements BrowseDAO
     
     /** value to restrict browse to (e.g. author name) */
     private String value = null;
+
+    /** exact or partial matching of the value */
+    private boolean valuePartial = false;
     
     /** the table that defines the mapping for the relevant container */
     private String containerTable = null;
@@ -616,6 +619,15 @@ public class BrowseDAOPostgres implements BrowseDAO
         this.value = value;
         this.rebuildQuery = true;
     }
+
+    /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseDAO#setFilterValuePartial(boolean)
+     */
+    public void setFilterValuePartial(boolean part)
+    {
+        this.valuePartial = part;
+        this.rebuildQuery = true;
+    }
     
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#setValueField(java.lang.String)
@@ -1034,15 +1046,31 @@ public class BrowseDAOPostgres implements BrowseDAO
             buildWhereClauseOpInsert(queryBuf);
             queryBuf.append(" ");
             queryBuf.append(valueField);
-            queryBuf.append("=? ");
-
-            if (valueField.startsWith("sort_"))
+            if (valuePartial)
             {
-                params.add(utils.truncateSortValue(value));
+                queryBuf.append(" LIKE ? ");
+
+                if (valueField.startsWith("sort_"))
+                {
+                    params.add("%" + utils.truncateSortValue(value) + "%");
+                }
+                else
+                {
+                    params.add("%" + utils.truncateValue(value) + "%");
+                }
             }
             else
             {
-                params.add(utils.truncateValue(value));
+                queryBuf.append("=? ");
+
+                if (valueField.startsWith("sort_"))
+                {
+                    params.add(utils.truncateSortValue(value));
+                }
+                else
+                {
+                    params.add(utils.truncateValue(value));
+                }
             }
         }
     }

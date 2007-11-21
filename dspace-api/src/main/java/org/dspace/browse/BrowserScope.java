@@ -69,6 +69,9 @@ public class BrowserScope
 	/** the value to restrict the browse to */
 	private String filterValue;
 
+    /** exact or partial matching of the value */
+    private boolean filterValuePartial = false;
+
     /** the language of the value to restrict the browse to */
     private String filterValueLang;
     
@@ -492,6 +495,24 @@ public class BrowserScope
     public void setFilterValue(String value)
     {
         this.filterValue = value;
+    }
+
+    /**
+     * Should the filter value be treated as partial, or exact
+     * @return true if partial, false if exact
+     */
+    public boolean getFilterValuePartial()
+    {
+        return filterValuePartial;
+    }
+
+    /**
+     * Should the filter value be treated as partial, or exact
+     * @param filterValuePartial true if partial, false if exact
+     */
+    public void setFilterValuePartial(boolean filterValuePartial)
+    {
+        this.filterValuePartial = filterValuePartial;
     }
 
     /**
