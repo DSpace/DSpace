@@ -159,7 +159,7 @@
         }
 
         // Full param to dspace:popup must be single variable
-        String supportLevelLink = "/help/formats.jsp#" + supportLevel;
+        String supportLevelLink = LocaleSupport.getLocalizedMessage(pageContext, "help.formats") +"#" + supportLevel;
 %>
             <tr>
 		<td headers="t1" class="<%= row %>RowEvenCol" align="center">
