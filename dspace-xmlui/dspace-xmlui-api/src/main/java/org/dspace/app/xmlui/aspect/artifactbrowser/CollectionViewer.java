@@ -306,7 +306,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         if (recentSubmissionItems != null)
             return recentSubmissionItems;
         
-        String source = ConfigurationManager.getProperty("recent.submissions.index");
+        String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
         BrowserScope scope = new BrowserScope(context);
         scope.setCollection(collection);
         scope.setResultsPerPage(RECENT_SUBMISISONS);

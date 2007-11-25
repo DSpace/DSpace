@@ -311,10 +311,10 @@ public class FeedServlet extends DSpaceServlet
     		// BrowseScope scope = new BrowseScope(context);
     		
     		// new method of doing the browse:
-    		String idx = ConfigurationManager.getProperty("recent.submissions.index");
+    		String idx = ConfigurationManager.getProperty("recent.submissions.sort-option");
     		if (idx == null)
     		{
-    			throw new IOException("There is no configuration supplied for: recent.submissions.index");
+    			throw new IOException("There is no configuration supplied for: recent.submissions.sort-option");
     		}
     		BrowseIndex bix = BrowseIndex.getItemBrowseIndex();
     		if (bix == null)
