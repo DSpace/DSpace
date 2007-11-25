@@ -47,10 +47,10 @@ public class ChecksumHistoryDAO extends DAOSupport
             + "and most_recent_checksum.bitstream_id = bitstream.bitstream_id";
 
     private static final String INSERT_MISSING_HISTORY_BITSTREAMS_ORACLE = "insert into checksum_history ( "
-        + "bitstream_id, process_start_date, "
+        + "check_id, bitstream_id, process_start_date, "
         + "process_end_date, checksum_expected, "
         + "checksum_calculated, result ) "
-        + "select most_recent_checksum.bitstream_id, "
+        + "select checksum_history_seq.nextval, most_recent_checksum.bitstream_id, "
         + "most_recent_checksum.last_process_start_date, "
         + "most_recent_checksum.last_process_end_date, "
         + "most_recent_checksum.expected_checksum, most_recent_checksum.expected_checksum, "
@@ -64,6 +64,10 @@ public class ChecksumHistoryDAO extends DAOSupport
     private static final String INSERT_HISTORY = "insert into checksum_history (  bitstream_id, process_start_date, "
             + " process_end_date, checksum_expected, checksum_calculated, result ) "
             + " values ( ?, ?, ?, ?, ?, ?)";
+
+    private static final String INSERT_HISTORY_ORACLE = "insert into checksum_history (  check_id, bitstream_id, process_start_date, "
+            + " process_end_date, checksum_expected, checksum_calculated, result ) "
+            + " values ( checksum_history_seq.nextval, ?, ?, ?, ?, ?, ?)";
 
     /**
      * Deletes from the most_recent_checksum where the bitstream id is found
@@ -101,7 +105,10 @@ public class ChecksumHistoryDAO extends DAOSupport
         try
         {
             conn = DatabaseManager.getConnection();
-            stmt = conn.prepareStatement(INSERT_HISTORY);
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+	            stmt = conn.prepareStatement(INSERT_HISTORY_ORACLE);
+            else
+            	stmt = conn.prepareStatement(INSERT_HISTORY);
             stmt.setInt(1, info.getBitstreamId());
             stmt.setTimestamp(2, new java.sql.Timestamp(info
                     .getProcessStartDate().getTime()));
