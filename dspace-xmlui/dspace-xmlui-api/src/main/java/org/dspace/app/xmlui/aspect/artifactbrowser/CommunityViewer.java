@@ -357,7 +357,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         if (recentSubmittedItems != null)
             return recentSubmittedItems;
 
-        String source = ConfigurationManager.getProperty("recent.submissions.index");
+        String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
         BrowserScope scope = new BrowserScope(context);
         scope.setCommunity(community);
         scope.setResultsPerPage(RECENT_SUBMISISONS);

@@ -93,7 +93,7 @@ public class RecentSubmissionsManager
 		try
 		{
 			// get our configuration
-			String source = ConfigurationManager.getProperty("recent.submissions.index");
+			String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
 			String count = ConfigurationManager.getProperty("recent.submissions.count");
 			
 			// prep our engine and scope
