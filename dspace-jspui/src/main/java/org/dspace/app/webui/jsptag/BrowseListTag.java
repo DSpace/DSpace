@@ -40,47 +40,30 @@
 package org.dspace.app.webui.jsptag;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.UIUtil;
-
-import org.dspace.authorize.AuthorizeManager;
-
+import org.dspace.browse.*;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 
-import java.awt.image.BufferedImage;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-
-import java.sql.SQLException;
-import java.util.StringTokenizer;
-
 import javax.imageio.ImageIO;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
-
-import org.dspace.browse.BrowseItem;
-import org.dspace.browse.Thumbnail;
-import org.dspace.browse.CrossLinks;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseInfo;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.StringTokenizer;
 
 /**
  * Tag for display a list of items
@@ -157,10 +140,53 @@ public class BrowseListTag extends TagSupport
         */
         
         // get the elements to display
-        String configLine = ConfigurationManager.getProperty("webui.itemlist.columns");
-        if (configLine != null)
+        String browseListLine = null;
+
+        // As different indexes / sort options may require different columns to be displayed
+        // try to obtain a custom configuration based for the browse that has been performed
+        if (browseInfo != null)
         {
-            listFields = configLine;
+            SortOption so = browseInfo.getSortOption();
+            BrowseIndex bix = browseInfo.getBrowseIndex();
+
+            // We have obtained the index that was used for this browse
+            if (bix != null)
+            {
+                // First, try to get a configuration for this browse and sort option combined
+                if (so != null && browseListLine == null)
+                    browseListLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".sort." + so.getName() + ".columns");
+
+                // We haven't got a sort option defined, so get one for the index
+                // - it may be required later
+                if (so == null)
+                    so = bix.getSortOption();
+            }
+
+            // If no config found, attempt to get one for this sort option
+            if (so != null && browseListLine == null)
+                browseListLine = ConfigurationManager.getProperty("webui.itemlist.sort." + so.getName() + ".columns");
+
+            // If no config found, attempt to get one for this browse index
+            if (bix != null && browseListLine == null)
+                browseListLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".columns");
+
+            // If no config found, attempt to get a general one, using the sort name
+            if (so != null && browseListLine == null)
+                browseListLine = ConfigurationManager.getProperty("webui.itemlist." + so.getName() + ".columns");
+
+            // If no config found, attempt to get a general one, using the index name
+            if (bix != null && browseListLine == null)
+                browseListLine = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".columns");
+        }
+
+        if (browseListLine == null)
+        {
+            browseListLine = ConfigurationManager.getProperty("webui.itemlist.columns");
+        }
+
+        if (browseListLine != null)
+        {
+            listFields = browseListLine;
         }
         
         // get the date and title fields
