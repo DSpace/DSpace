@@ -63,6 +63,7 @@ public class InitializeDatabase
 
     public static void main(String[] argv)
     {
+    	
         // Usage checks
         if (argv.length != 1)
         {
@@ -93,7 +94,7 @@ public class InitializeDatabase
                 DatabaseManager.loadSql(getScript(argv[0]));
                 
             }
-            else if("database_schema.sql".equals(argv[0]))
+            else
             {
                 
                 DatabaseManager.loadSql(getScript(argv[0]));
