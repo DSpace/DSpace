@@ -291,6 +291,7 @@ public class BrowseEngine
 				// set the values in the Browse Query
 				dao.setFilterValueField("sort_value");
 				dao.setFilterValue(value);
+                dao.setFilterValuePartial(scope.getFilterValuePartial());
 			}
 			
 			// define a clause for the WHERE clause which will allow us to constraine
