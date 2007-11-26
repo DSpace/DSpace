@@ -66,10 +66,10 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 	private String collectionSelect = "SELECT * FROM collection_item_count WHERE collection_id = ?";
 	
 	/** SQL to insert a new collection record */
-	private String collectionInsert = "INSERT INTO collection_item_count (collection_id, number) VALUES (?, ?)";
+	private String collectionInsert = "INSERT INTO collection_item_count (collection_id, count) VALUES (?, ?)";
 	
 	/** SQL to update an existing collection record */
-	private String collectionUpdate = "UPDATE collection_item_count SET number = ? WHERE collection_id = ?";
+	private String collectionUpdate = "UPDATE collection_item_count SET count = ? WHERE collection_id = ?";
 	
 	/** SQL to remove a collection record */
 	private String collectionRemove = "DELETE FROM collection_item_count WHERE collection_id = ?";
@@ -78,10 +78,10 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 	private String communitySelect = "SELECT * FROM community_item_count WHERE community_id = ?";
 	
 	/** SQL to insert a new community record */
-	private String communityInsert = "INSERT INTO community_item_count (community_id, number) VALUES (?, ?)";
+	private String communityInsert = "INSERT INTO community_item_count (community_id, count) VALUES (?, ?)";
 	
 	/** SQL to update an existing community record */
-	private String communityUpdate = "UPDATE community_item_count SET number = ? WHERE community_id = ?";
+	private String communityUpdate = "UPDATE community_item_count SET count = ? WHERE community_id = ?";
 	
 	/** SQL to remove a community record */
 	private String communityRemove = "DELETE FROM community_item_count WHERE community_id = ?";
@@ -287,7 +287,7 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 			
 			tri.close();
 			
-			return tr.getIntColumn("number");
+			return tr.getIntColumn("count");
 		}
 		catch (SQLException e)
 		{
@@ -325,7 +325,7 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 			
 			tri.close();
 			
-			return tr.getIntColumn("number");
+			return tr.getIntColumn("count");
 		}
 		catch (SQLException e)
 		{

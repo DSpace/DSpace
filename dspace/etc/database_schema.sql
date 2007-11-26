@@ -742,12 +742,12 @@ WHERE ItemsBySubject.item_id = Communities2Item.item_id
 
 CREATE TABLE collection_item_count (
 	collection_id INTEGER REFERENCES collection(collection_id),
-	number INTEGER
+	count INTEGER
 );
 
 CREATE TABLE community_item_count (
 	community_id INTEGER REFERENCES community(community_id),
-	number INTEGER
+	count INTEGER
 );
 
 -------------------------------------------------------
