@@ -42,7 +42,8 @@
       </plugins>
    </build>
 
-   <modules>
+   <modules>      
+      <module>language-packs</module>
       <module>dspace-api</module>
       <module>dspace-jspui</module>
       <module>dspace-xmlui</module>
