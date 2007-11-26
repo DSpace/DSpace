@@ -307,9 +307,9 @@ function submissionControl(collectionHandle, workspaceID, stepAndPage)
     	//----------------------------------------------------------
     	// #2: Determine which page/step the user should be sent to next
     	//-----------------------------------------------------------
-        // User clicked "Next->" button:
+        // User clicked "Next->" button (or a Non-interactive Step - i.e. no UI)
         // Only step forward to next page if no errors on this page
-        if (cocoon.request.get(AbstractProcessingStep.NEXT_BUTTON) && (response_flag==AbstractProcessingStep.STATUS_COMPLETE))
+        if ((cocoon.request.get(AbstractProcessingStep.NEXT_BUTTON) || !stepHasUI(stepConfig))  && (response_flag==AbstractProcessingStep.STATUS_COMPLETE))
         {
            	progressIterator++;
            	
@@ -338,9 +338,27 @@ function submissionControl(collectionHandle, workspaceID, stepAndPage)
         	}
         }//User clicked "<- Previous" button
         else if (cocoon.request.get(AbstractProcessingStep.PREVIOUS_BUTTON))
-        {
-            progressIterator--;
-            stepAndPage = stepsInSubmission[progressIterator];
+        {  
+            var stepBack = true;
+            
+            //Need to find the previous step which HAS a user interface.
+            while(stepBack)
+            {
+            	progressIterator--;
+            	if(progressIterator<0)
+            	    stepBack = false;
+            	   
+            	stepAndPage = stepsInSubmission[progressIterator];
+            
+            	var prevStep = String(stepAndPage).split(".")[0];
+            	var prevStepConfig = submissionInfo.getSubmissionConfig().getStep(prevStep);
+            
+            	if(!stepHasUI(prevStepConfig))
+            		stepBack = true;
+            	else
+            		stepBack = false;
+     		}
+            
             cocoon.log.debug("Previous Step & Page=" + stepAndPage);
         }
         // User clicked "Save/Cancel" Button
@@ -412,29 +430,21 @@ function doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, resp
   	//-------------------------------------
  	// #1: Check if this step has a UI
  	//-------------------------------------
- 		
- 	//check if this step has an XML-UI Transformer class specified
- 	var xmlUIClassName = stepConfig.getXMLUIClassName();
- 
- 	var stepHasUI = false;
- 
 	//if this step has an XML-UI, then call the generic step transformer
  	//(otherwise, this is just a processing step)
- 	if((xmlUIClassName!=null) && (xmlUIClassName.length()>0))
+ 	if(stepHasUI(stepConfig))
  	{
- 		stepHasUI = true;
- 		
  		//prepend URI with the handle of the collection, and go there!
- 		sendPageAndWait("handle/"+collectionHandle+ "/submit/continue",{"id":workspaceID,"step":String(stepAndPage),"transformer":xmlUIClassName,"error":String(response_flag),"error_fields":getErrorFields()});
-     }
+ 		sendPageAndWait("handle/"+collectionHandle+ "/submit/continue",{"id":workspaceID,"step":String(stepAndPage),"transformer":stepConfig.getXMLUIClassName(),"error":String(response_flag),"error_fields":getErrorFields()});
+    }
         
-     //-------------------------------------
-     // #2: Perform step processing
-     //-------------------------------------
-     //perform step processing (this returns null if no errors, otherwise an error string)
-     response_flag = processPage(workspaceID, stepConfig, page, stepHasUI);
+    //-------------------------------------
+    // #2: Perform step processing
+    //-------------------------------------
+    //perform step processing (this returns null if no errors, otherwise an error string)
+    response_flag = processPage(workspaceID, stepConfig, page);
      
-     return response_flag;
+    return response_flag;
 }
 
 
@@ -451,9 +461,8 @@ function doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, resp
  *     workspaceID - the in progress submission's Workspace ID
  *     stepConfig - the SubmissionStepConfig for the current step
  *     page - the current page number we are on in the step
- *     stepHasUI - whether or not this step has a user interface
  */
-function processPage(workspaceID, stepConfig, page, stepHasUI)
+function processPage(workspaceID, stepConfig, page)
 {
 	//retrieve submission info 
 	//(we cannot pass the submission info to this function, since
@@ -501,7 +510,7 @@ function processPage(workspaceID, stepConfig, page, stepHasUI)
 	
 	//if this is a non-interactive step, 
 	//we cannot do much with errors/responses other than logging them!
-    if((!stepHasUI) && (response_flag!=AbstractProcessingStep.STATUS_COMPLETE))
+    if((!stepHasUI(stepConfig)) && (response_flag!=AbstractProcessingStep.STATUS_COMPLETE))
     {
     	//check to see if there is a description of this response/error in Messages!
     	var error = stepClass.getErrorMessage(response_flag);
@@ -626,6 +635,30 @@ function getErrorFields()
 	return ERROR_FIELDS;
 }
 
+
+/**
+ * Return whether or not the step (specified by the step configuration)
+ * has a User Interface.
+ * 
+ * This method returns true (if step has UI) or false (if no UI / non-interactive step)
+ * Parameters:
+ *     stepConfig - the SubmissionStepConfig representing the current step config
+ */
+function stepHasUI(stepConfig)
+{
+	//check if this step has an XML-UI Transformer class specified
+ 	var xmlUIClassName = stepConfig.getXMLUIClassName();
+ 
+	//if this step specifies an XMLUI class, then it has a User Interface
+ 	if((xmlUIClassName!=null) && (xmlUIClassName.length()>0))
+ 	{
+ 		return true;
+ 	}
+ 	else
+ 	{
+ 		return false;
+ 	}
+}
 
 /**
  * This step is used when ever the user clicks save/cancel during the submission 
