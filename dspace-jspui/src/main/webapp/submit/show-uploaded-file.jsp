@@ -151,15 +151,15 @@
 <%    
     if (format.getSupportLevel() == 0)
     { %>
-      <dspace:popup page="/help/formats.jsp#unsupported">(<fmt:message key="jsp.submit.show-uploaded-file.notSupported"/>)</dspace:popup>
+      <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.formats\") +\"#unsupported\"%>">(<fmt:message key="jsp.submit.show-uploaded-file.notSupported"/>)</dspace:popup>
 <%  }
     else if (format.getSupportLevel() == 1)
     { %>
-      <dspace:popup page="/help/formats.jsp#known">(<fmt:message key="jsp.submit.show-uploaded-file.known"/>)</dspace:popup>
+      <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.formats\") +\"#known\"%>">(<fmt:message key="jsp.submit.show-uploaded-file.known"/>)</dspace:popup>
 <%  }
     else
     { %>
-      <dspace:popup page="/help/formats.jsp#supported">(<fmt:message key="jsp.submit.show-uploaded-file.supported"/>)</dspace:popup>
+      <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.formats\") +\"#supported\"%>">(<fmt:message key="jsp.submit.show-uploaded-file.supported"/>)</dspace:popup>
 <%  } %>
                 </td>
 <%
