@@ -88,10 +88,8 @@
         this.request = request;
     }
 
-    void showCommunity(Community c) throws IOException, SQLException
+    void showCommunity(Community c) throws ItemCountException, IOException, SQLException
     {
-    	try
-    	{
     	ItemCounter ic = new ItemCounter();
         out.println( "<li class=\"communityLink\">" );
         out.println( "<strong><a href=\"" + request.getContextPath() + "/handle/" + c.getHandle() + "\">" + c.getMetadata("name") + "</a></strong>");
@@ -132,12 +130,6 @@
         }
         out.println("<br />");
         out.println("</li>");
-    	}
-    	catch (ItemCountException e)
-    	{
-    		// FIXME: except it's not
-    		throw new SQLException(e);
-    	}
     }
 %>
 
