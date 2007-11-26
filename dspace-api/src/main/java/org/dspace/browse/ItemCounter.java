@@ -204,7 +204,7 @@ public class ItemCounter
 		if (dso instanceof Community)
 		{
 			try {
-				return ((Collection) dso).countItems();
+				return ((Community) dso).countItems();
 			} catch (SQLException e) {
 				log.error("caught exception: ", e);
 				throw new ItemCountException(e);
