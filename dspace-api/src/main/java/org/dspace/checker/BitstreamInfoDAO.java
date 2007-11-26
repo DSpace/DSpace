@@ -141,7 +141,7 @@ public final class BitstreamInfoDAO extends DAOSupport
 
     public static final String GET_OLDEST_BITSTREAM_ORACLE = "SELECT bitstream_id FROM (select bitstream_id  "
         + "from most_recent_checksum " + "where to_be_processed = 1 "
-        + "order by date_trunc('milliseconds', last_process_end_date), "
+        + "order by trunc(last_process_end_date, 'mi'), "
         + "bitstream_id " + "ASC) WHERE rownum=1";
     
     /**
@@ -160,7 +160,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         + "from most_recent_checksum "
         + "where to_be_processed = 1 "
         + "and last_process_start_date < ? "
-        + "order by date_trunc('milliseconds', last_process_end_date), "
+        + "order by trunc(last_process_end_date, 'mi'), "
         + "bitstream_id " + "ASC) WHERE rownum=1";
     
     /** SQL query to retrieve bitstreams for a given item. */
