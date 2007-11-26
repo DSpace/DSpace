@@ -55,16 +55,17 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 	
-<%@ page import="java.util.Map" %>
+<%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.browse.ItemCountException" %>
+<%@ page import="org.dspace.browse.ItemCounter" %>
+<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.sql.SQLException" %>
-<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
-<%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.browse.ItemCounter" %>
-<%@ page import="org.dspace.browse.ItemCountException" %>
+<%@ page import="java.util.Map" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -75,7 +76,7 @@
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     boolean showAll = true;
-    ItemCounter ic = new ItemCounter();
+    ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 %>
 
 <%!
@@ -90,7 +91,7 @@
 
     void showCommunity(Community c) throws ItemCountException, IOException, SQLException
     {
-    	ItemCounter ic = new ItemCounter();
+    	ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
         out.println( "<li class=\"communityLink\">" );
         out.println( "<strong><a href=\"" + request.getContextPath() + "/handle/" + c.getHandle() + "\">" + c.getMetadata("name") + "</a></strong>");
         if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))

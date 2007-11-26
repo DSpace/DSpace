@@ -78,32 +78,12 @@ public class ItemCounter
 	 * @param args
 	 */
 	public static void main(String[] args)
-		throws ItemCountException
+		throws ItemCountException, SQLException
 	{
-		ItemCounter ic = new ItemCounter();
+        Context context = new Context();
+        ItemCounter ic = new ItemCounter(context);
 		ic.buildItemCounts();
-		ic.completeContext();
-	}
-
-	/**
-	 * Construct a new item counter which will create its own
-	 * DSpace Context
-	 * 
-	 * @throws ItemCountException
-	 */
-	public ItemCounter()
-		throws ItemCountException
-	{
-		try
-		{
-			this.context = new Context();
-			this.dao = ItemCountDAOFactory.getInstance(this.context);
-		}
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
-			throw new ItemCountException(e);
-		}
+        context.complete();
 	}
 	
 	/**
@@ -118,30 +98,6 @@ public class ItemCounter
 	{
 		this.context = context;
 		this.dao = ItemCountDAOFactory.getInstance(this.context);
-	}
-	
-	/**
-	 * Complete the context being used by this class.  This exists so that
-	 * instances of this class which created their own instance of the
-	 * DSpace Context can also terminate it.  For Context object which were
-	 * passed in by the constructor, the caller is responsible for 
-	 * either calling this method themselves or completing the context
-	 * when they need to.
-	 * 
-	 * @throws ItemCountException
-	 */
-	public void completeContext()
-		throws ItemCountException
-	{
-		try
-		{
-			this.context.complete();
-		}
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
-			throw new ItemCountException(e);
-		}
 	}
 	
 	/**
