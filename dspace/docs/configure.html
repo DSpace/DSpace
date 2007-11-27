@@ -1141,28 +1141,132 @@ search.index.11 = id:dc.identifier.*
 
   <p><strong>NOTE:</strong> While the indexes are created, this only affects the search results and has no effect on the search components of the user interface. To add new search capability (e.g. to add a new search category to the Advanced Search) requires local customisation to the user interface.</p>
 
-  <h2><a name="mediafilters" id="mediafilters">Media Filters</a></h2>
+  <h2><a name="mediafilters" id="mediafilters">Configuring Media Filters</a></h2>
   
-  <p>Media Filters are classes used to generate derivative or alternative versions of master bitstreams. For example, the PDF Media Filter will extract textual content from PDF bitstreams, the JPEG Media Filter can create thumbnails from image bitstreams.</p>
+  <p>Media or Format Filters are classes used to generate derivative or alternative versions of content or bitstreams within DSpace. For example, the PDF Media Filter will extract textual content from PDF bitstreams, the JPEG Media Filter can create thumbnails from image bitstreams.</p>
 
-  <p>Media Filters are configured as a <a href="business.html#plugin">Sequence Plugin</a>, with each filter also having a separate config item indicating which formats it can process. The default configuration is shown below.</p>
+  <p>Media Filters are configured as <a href="business.html#plugin">Named Plugins</a>, with each filter also having a separate configuration setting (in <code>dspace.cfg</code>) indicating which formats it can process. The default configuration is shown below.</p>
 
-<p><pre>#### Media Filter plugins (through PluginManager) ####
+<p><pre>
+	#### Media Filter / Format Filter plugins (through PluginManager) ####
 
-plugin.sequence.org.dspace.app.mediafilter.MediaFilter = \
-    org.dspace.app.mediafilter.PDFFilter, org.dspace.app.mediafilter.HTMLFilter, \
-    org.dspace.app.mediafilter.WordFilter, org.dspace.app.mediafilter.JPEGFilter
-# to enable branded preview: remove last line above, and uncomment 2 lines below
-#   org.dspace.app.mediafilter.WordFilter, org.dspace.app.mediafilter.JPEGFilter, \
-#   org.dspace.app.mediafilter.BrandedPreviewJPEGFilter
+	#Names of the enabled MediaFilter or FormatFilter plugins
+	filter.plugins = PDF Text Extractor, HTML Text Extractor, \
+						Word Text Extractor, JPEG Thumbnail
+	# to enable branded preview: remove last line above, and uncomment 2 lines below
+	#   					Word Text Extractor, JPEG Thumbnail, \
+	#   					Branded Preview JPEG
 
-filter.org.dspace.app.mediafilter.PDFFilter.inputFormats = Adobe PDF
-filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats = HTML, Text
-filter.org.dspace.app.mediafilter.WordFilter.inputFormats = Microsoft Word
-filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats = GIF, JPEG, image/png
-filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats = GIF, JPEG, image/png</pre></p>
+	#Assign 'human-understandable' names to each filter
+	plugin.named.org.dspace.app.mediafilter.FormatFilter = \
+  		org.dspace.app.mediafilter.PDFFilter = PDF Text Extractor, \
+  		org.dspace.app.mediafilter.HTMLFilter = HTML Text Extractor, \
+  		org.dspace.app.mediafilter.WordFilter = Word Text Extractor, \
+  		org.dspace.app.mediafilter.JPEGFilter = JPEG Thumbnail, \
+  		org.dspace.app.mediafilter.BrandedPreviewJPEGFilter = Branded Preview JPEG
 
-<p>To add a new Media Filter, add the new filter class to the <code>plugin.sequence.org.dspace.app.mediafilter.MediaFilter</code> config item and add a corresponding <code>filter.<i>&lt;class path&gt;</i>.inputFormats</code> config item. Note the input formats must match the <code>short_description</code> field in the <code>bitstreamformatregistry</code> table.</p>
+	#Configure each filter's input format(s)
+	filter.org.dspace.app.mediafilter.PDFFilter.inputFormats = Adobe PDF
+	filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats = HTML, Text
+	filter.org.dspace.app.mediafilter.WordFilter.inputFormats = Microsoft Word
+	filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats = GIF, JPEG, image/png
+	filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats = GIF, JPEG, image/png</pre></p>
+
+<p>The enabled Media/Format Filters are named in the <code>filter.plugins</code> field above.</p>
+<p>Names are assigned to each filter using the <code>plugin.named.org.dspace.app.mediafilter.FormatFilter</code> field
+(e.g. by default the <code>PDFFilter</code> is named "PDF Text Extractor").</p>  
+<p>Finally the appropriate <code>filter.<em>&lt;class path&gt;</em>.inputFormats</code> defines the vaild input formats which each filter can be applied to.  These
+format names <strong>must match</strong> the <code>short description</code> field of the <a href="appendix.html#bitstreamformatregistry">Bitstream Format Registry</a>.</p>
+
+<p>You can also implement more dynamic or configurable Media/Format Filters which extend <a href="business.html#selfnamedplugin"><code>SelfNamedPlugin</code></a>.  
+More information is provide below in <a href="#newfilter">Creating a new Media/Format Filter</a></p>
+
+ <h3><a name="newfilter">Creating a new Media/Format Filter</a></h3>
+
+    <h4>Creating a simple Media Filter</h4>
+    <p>New Media Filters <strong>must implement</strong> the <code>org.dspace.app.mediafilter.FormatFilter</code> interface.  More information on the methods you need to implement is provided in the <code>FormatFilter.java</code> source file.  For example:
+    <code><pre>
+	public class MySimpleMediaFilter implements FormatFilter</pre></code>
+    </p>  
+	
+	<p>Alternatively, you could extend the <code>org.dspace.app.mediafilter.MediaFilter</code> class, which just defaults to performing no pre/post-processing of bitstreams before or after filtering.
+	<code><pre>
+	public class MySimpleMediaFilter extends MediaFilter</pre></code>
+	</p>
+	
+	<p>You must give your new filter a "name", by adding it and its name to the <code>plugin.named.org.dspace.app.mediafilter.FormatFilter</code> field in <code>dspace.cfg</code>.
+	In addition to naming your filter, make sure to specify its input formats in the
+	<code>filter.<i>&lt;class path&gt;</i>.inputFormats</code> config item. Note the input formats must match the <code>short description</code> field in the <a href="appendix.html#bitstreamformatregistry">Bitstream Format Registry</a> (i.e. <code>bitstreamformatregistry</code> table).
+	<code><pre>
+	plugin.named.org.dspace.app.mediafilter.FormatFilter = \
+  		org.dspace.app.mediafilter.MySimpleMediaFilter = My Simple Text Filter, \
+  		...
+  	
+  	filter.org.dspace.app.mediafilter.MySimpleMediaFilter.inputFormats = Text</pre></code>
+	</p>
+	
+	<em>WARNING: If you neglect to define the <code>inputFormats</code> for
+	   a particular filter, the <code>MediaFilterManager</code> will never call that filter, since it will never find a bitstream which has a format
+	   matching that filter's input format(s).</em>
+	
+	<p>If you have a complex Media Filter class, which actually performs different filtering for different formats (e.g. conversion from Word to PDF <strong>and</strong> conversion from Excel to CSV), you should define this as a <a href="selfnamedfilter">Dynamic / Self-Named Format Filter</a>.
+	
+    <h4>Creating a Dynamic or "Self-Named" Format Filter</h4>	
+	<p>If you have a more complex Media/Format Filter, which actually performs <strong>multiple</strong> filtering or conversions for different formats (e.g. conversion from Word to PDF <strong>and</strong> conversion from Excel to CSV), you should have define a class which implements the <code>FormatFilter</code> interface, 
+	while also extending the <a href="business.html#selfnamedplugin"><code>SelfNamedPlugin</code></a> class.  For example:
+	<code><pre>
+	public class MyComplexMediaFilter extends SelfNamedPlugin implements FormatFilter</pre></code>
+	</p>
+
+	<p>Since <code>SelfNamedPlugins</code> are self-named (as stated), they must provide the various names the plugin uses by defining a <a href="business.html#pluginmethods">getPluginNames()</a> method</a>.  
+	Generally speaking, each "name" the plugin uses should correspond to a different type of filter it implements (e.g. "Word2PDF" and "Excel2CSV" are two good names for a complex media filter which performs both Word to PDF and Excel to CSV conversions).
+	</p>
+	
+	<p>Self-Named Media/Format Filters are also configured differently in <code>dspace.cfg</code>.  Below is a general template for a Self Named Filter (defined by an imaginary <code>MyComplexMediaFilter</code> class, which
+	can perform both Word to PDF and Excel to CSV conversions):</p>
+	
+	<p><code><pre>
+	#Add to a list of all Self Named filters
+	plugin.selfnamed.org.dspace.app.mediafilter.FormatFilter = \
+  		org.dspace.app.mediafilter.MyComplexMediaFilter
+  		
+	#Define input formats for each "named" plugin this filter implements
+	filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Word2PDF.inputFormats = Microsoft Word
+	filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.inputFormats = Microsoft Excel</pre>
+	</code></p>
+	
+	<p>As shown above, each Self-Named Filter class must be listed in the <code>plugin.selfnamed.org.dspace.app.mediafilter.FormatFilter</code> item in <code>dspace.cfg</code>.
+	   In addition, each Self-Named Filter <strong>must</strong> define the input formats for <em>each named plugin</em> defined by that filter.  
+	   In the above example the <code>MyComplexMediaFilter</code> class is assumed to have defined two named plugins, <code>Word2PDF</code> and <code>Excel2CSV</code>. 
+	   So, these two valid plugin names ("Word2PDF" and "Excel2CSV") <strong>must</strong> be returned by the <code>getPluginNames()</code> method of the <code>MyComplexMediaFilter</code> class.</p>
+	<p>These named plugins take different input formats as defined above (see the corresponding <code>inputFormats</code> setting).  <em>WARNING: If you neglect to define the <code>inputFormats</code> for
+	   a particular named plugin, the <code>MediaFilterManager</code> will never call that plugin, since it will never find a bitstream which has a format
+	   matching that plugin's input format(s).</em>
+	</p>
+	
+	<p>For a particular Self-Named Filter, you are also welcome to define additional configuration settings in <code>dspace.cfg</code>.
+	To continue with our current example, each of our imaginary plugins actually results in a different output format (Word2PDF creates "Adobe PDF", while Excel2CSV creates "Comma Separated Values").
+	To allow this complex Media Filter to be even more configurable (especially across institutions, with potential different "Bitstream Format Registries"), you may 
+	wish to allow for the output format to be customizable for each named plugin.  For example:</p>
+	
+	<p><code><pre>
+	#Define output formats for each named plugin
+	filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Word2PDF.outputFormat = Adobe PDF
+	filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outputFormat = Comma Separated Values</pre>
+	</code></p>
+	
+	<p>Any custom configuration fields in <code>dspace.cfg</code> defined by your filter are ignored by the <code>MediaFilterManager</code>, so it is up to your custom media filter class to read those configurations and apply them as necessary.  
+	For example, you could use the following sample Java code in your <code>MyComplexMediaFilter</code> class to read these custom <code>outputFormat</code> configurations from <code>dspace.cfg</code> :
+	<code><pre>
+	//get "outputFormat" configuration from dspace.cfg
+	String outputFormat = ConfigurationManager.getProperty(MediaFilterManager.FILTER_PREFIX + "." + 
+		MyComplexMediaFilter.class.getName() + "." + this.getPluginInstanceName() + ".outputFormat");</pre></code>
+	</p>
+	
+  <h3><a name="runningfilter">Running Media/Format Filter</a></h3>	
+  
+  <p>Information on scheduling Media/Format Filters to run is available in the section:
+  <a href="application.html#mediafilters">MediaFilters: Transforming DSpace Content</a></p>
 
   <h2><a name="statistics" id="statistics">Configuring System Statistical Reports</a></h2>
 
@@ -1260,8 +1364,8 @@ stat-report-monthly
   <p>To activate this feature and display a preview image on the item page (all properties mentioned below
      are found in <code>dspace.cfg</code>):</p>
   <ol>
-	<li>Uncomment the lines defining the list of configured mediafilters at
-<code>plugin.sequence.org.dspace.app.mediafilter.MediaFilter</code> to include <code>org.dspace.app.mediafilter.BrandedPreviewJPEGFilter</code>.</li>
+	<li>Uncomment the lines defining the list of enabled mediafilters at
+<code>filter.plugins</code> to include <code>Branded Preview JPEG</code>.</li>
 	<li>Set the maximum pixel dimensions for the preview image by altering the <code>webui.preview.maxwidth</code> and <code>webui.preview.maxheight</code> (default is 600) config items.</li>
 	<li>Set the <code>webui.preview.brand</code> to the text you want to brand the image with. The brand will appear as white text on a black background strip across the base of the image. For example you might set the text to the owning organisation. The handle is also displayed as part of the branding.</li>
 	<li>Set the <code>webui.preview.brand.abbrev</code>. This is an abbreviated form of the  <code>webui.preview.brand</code> text and will be shown where the brand text is longer than the image width (e.g. for narrow images).</li>
@@ -1282,7 +1386,7 @@ stat-report-monthly
 
   <p><code>webui.browse.thumbnail.show = true</code></p>
 
-  <p>If set to <code>false</code> or this configuration item is missing then thumbnails will not be shown.  Additionally, appropriate <A HREF="application.html#mediafilters">media filters</a> must be configured and the media filter configured to run periodically (for example, via a 'cron' job) </p>
+  <p>If set to <code>false</code> or this configuration item is missing then thumbnails will not be shown.  Additionally, the appropriate <A HREF="#mediafilters">"JPEG Thumbnail" media filter</a> must be configured and the <a href="application.html#mediafilters">filter-media</a> script configured to run periodically (for example, via a 'cron' job) </p>
 
   <p>The size of the browse/search thumbnails can also be configured to a smaller size than that generated by the mediafilter. To do this set the following configuration items:</p>
 
@@ -1586,7 +1690,7 @@ bin/checker -L	    # Loops continuously through the repository</pre>
 <li>passing in a properties file containing retention policies when using the -p option. </li>
 </ol>
 
-  <p>Pruning is controlled by a number of properties, each of which describes a checksum result code, and the length of time for which results with that code should be retained. The format is <code>checker.retention.[RESULT CODE]=[duration]. For example: -</p>
+  <p>Pruning is controlled by a number of properties, each of which describes a checksum result code, and the length of time for which results with that code should be retained. The format is <code>checker.retention.[RESULT CODE]=[duration]</code>. For example: -</p>
   
   <pre>checker.retention.CHECKSUM_MATCH=8w</pre>
   

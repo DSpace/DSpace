@@ -425,7 +425,7 @@ packager plugin's implementation.</p>
     <p>See the <a href="#pluginmethods">getNamedPlugin()</a> method and the getPluginNames() methods.</p></li>
     </ol></p>
 
-    <h4>Self-Named Plugins</h4>
+    <h4><a name="selfnamedplugin">Self-Named Plugins</a></h4>
 
     <p>Named plugins can get their names either from the configuration or, for a variant called self-named plugins, from within the plugin itself.</p>
 
@@ -513,7 +513,7 @@ packager plugin's implementation.</p>
 
   <h4>SelfNamedPlugin Class</h4>
 
-  <p>A named plugin implementation must extend this class if it wants to supply its own Plugin Name(s). See Self-Named Plugins for why this is sometimes necessary.</p>
+  <p>A named plugin implementation must extend this class if it wants to supply its own Plugin Name(s). See <a href="#selfnamedplugin">Self-Named Plugins</a> for why this is sometimes necessary.</p>
 
 <pre>abstract class SelfNamedPlugin
 {
@@ -544,11 +544,11 @@ packager plugin's implementation.</p>
 
   <p>This is a <code>RuntimeException</code> so it doesn't have to be declared, and can be passed all the way up to a generalized fatal exception handler.</p>
 
-  <h3>Configuring Plugins</h3>
+  <h3><a name="pluginconfig">Configuring Plugins</a></h3>
 
   <p>All of the Plugin Manager's configuration comes from the DSpace Configuration Manager, which is a Java Properties map. You can configure these characteristics of each plugin:
   <ol>
-  <li><strong>Interface</strong>: Classname of the Java interface which defines the plugin, including package name. e.g. <code>org.dspace.app.mediafilter.MediaFilter</code></li>
+  <li><strong>Interface</strong>: Classname of the Java interface which defines the plugin, including package name. e.g. <code>org.dspace.app.mediafilter.FormatFilter</code></li>
   <li><strong>Implementation Class</strong>: Classname of the implementation class, including package. e.g. <code>org.dspace.app.mediafilter.PDFFilter</code></li>
   <li><strong>Names</strong>: (Named plugins only) There are two ways to bind names to plugins: listing them in the value of a plugin.named.interface key, or configuring a class in <code>plugin.selfnamed.<i>interface</i></code> which extends the <code>SelfNamedPlugin</code> class.</li>
   <li><strong>Reusable option</strong>: (Optional) This is declared in a <code>plugin.reusable</code> configuration line. Plugins are reusable by default, so you only need to configure the non-reusable ones.</li>
