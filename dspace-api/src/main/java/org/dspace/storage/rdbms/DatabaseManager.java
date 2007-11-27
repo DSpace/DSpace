@@ -146,7 +146,16 @@ public class DatabaseManager
     {
         if (log.isDebugEnabled())
         {
-            log.debug("Running query \"" + query + "\"");
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < parameters.length; i++)
+            {
+                if (i > 0)
+               {
+                       sb.append(",");
+               }
+                sb.append(parameters[i].toString());
+            }
+            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
         }
         
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
@@ -179,7 +188,16 @@ public class DatabaseManager
     {
         if (log.isDebugEnabled())
         {
-            log.debug("Running query \"" + query + "\"");
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < parameters.length; i++)
+            {
+                if (i > 0)
+               {
+                       sb.append(",");
+               }
+                sb.append(parameters[i].toString());
+            }
+            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
         }
 
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
@@ -202,10 +220,6 @@ public class DatabaseManager
      *            The prepared statement to execute.
      * @param table
      *            The name of the table which results
-     * @param parameters
-     * 			  A set of SQL parameters to be included in query. The order of 
-     * 			  the parameters must correspond to the order of their reference 
-     * 			  within the query.
      * @return A TableRowIterator with the results of the query
      * @exception SQLException
      *                If a database error occurs
@@ -317,7 +331,16 @@ public class DatabaseManager
 
         if (log.isDebugEnabled())
         {
-            log.debug("Running query \"" + query + "\"");
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < parameters.length; i++)
+            {
+                if (i > 0)
+               {
+                       sb.append(",");
+               }
+                sb.append(parameters[i].toString());
+            }
+            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
         }
 
         try
@@ -744,7 +767,7 @@ public class DatabaseManager
     /**
      * Return the names of all the columns of the ResultSet.
      * 
-     * @param table
+     * @param meta
      *            The ResultSetMetaData
      * @return The names of all the columns of the given table, as a List. Each
      *         element of the list is a String.
