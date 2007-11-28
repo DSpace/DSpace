@@ -150,9 +150,9 @@ public class DatabaseManager
             for (int i = 0; i < parameters.length; i++)
             {
                 if (i > 0)
-            	{
-            		sb.append(",");
-            	}
+               {
+                       sb.append(",");
+               }
                 sb.append(parameters[i].toString());
             }
             log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
@@ -192,9 +192,9 @@ public class DatabaseManager
             for (int i = 0; i < parameters.length; i++)
             {
                 if (i > 0)
-            	{
-            		sb.append(",");
-            	}
+               {
+                       sb.append(",");
+               }
                 sb.append(parameters[i].toString());
             }
             log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
@@ -335,9 +335,9 @@ public class DatabaseManager
             for (int i = 0; i < parameters.length; i++)
             {
                 if (i > 0)
-            	{
-            		sb.append(",");
-            	}
+               {
+                       sb.append(",");
+               }
                 sb.append(parameters[i].toString());
             }
             log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
