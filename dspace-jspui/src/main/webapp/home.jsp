@@ -78,7 +78,7 @@
         feedData = "ALL:" + ConfigurationManager.getProperty("webui.feed.formats");
     }
     
-    ItemCounter ic = new ItemCounter();
+    ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
