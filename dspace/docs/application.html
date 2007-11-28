@@ -807,6 +807,8 @@ archive_directory/
   <pre>
 -r -s n -f filepath
 -r -s n -f filepath\tbundle:bundlename
+-r -s n -f filepath\tbundle:bundlename\tpermissions: -[r|w] 'group name'
+-r -s n -f filepath\tbundle:bundlename\tpermissions: -[r|w] 'group name'\tdescription: some text
 </pre>
 
   <P>where</P>
@@ -817,6 +819,8 @@ archive_directory/
     <li><code>-f filepath</code> indicates the path and name of the content file to be registered (filepath)</li>
     <li><code>\t</code> is a tab character</li>
     <li><code>bundle:bundlename</code> is an optional bundle name</li>
+    <li><code>permissions: -[r|w] 'group name'</code> is an optional read or write permission that can be attached to the bitstream</li>
+    <li><code>description: some text</code> is an optional description field to add to the file</li>
   </ul>
 
   <p>The bundle, that is everything after the filepath, is optional and is normally not used.</p>

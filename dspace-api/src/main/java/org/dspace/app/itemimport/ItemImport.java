@@ -54,6 +54,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -67,6 +68,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -81,6 +84,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowManager;
 import org.w3c.dom.Document;
@@ -639,9 +643,10 @@ public class ItemImport
                 + File.separatorChar);
 
         // and the bitstreams from the contents file
-        // process contents file, add bistreams and bundles
-        processContentsFile(c, myitem, path + File.separatorChar + itemname,
-                "contents");
+        // process contents file, add bistreams and bundles, return any
+        // non-standard permissions
+        Vector options = processContentsFile(c, myitem, path
+                + File.separatorChar + itemname, "contents");
 
         if (useWorkflow)
         {
@@ -670,6 +675,13 @@ public class ItemImport
                 myhandle = HandleManager.findHandle(c, myitem);
 
                 mapOutput = itemname + " " + myhandle;
+            }
+
+            // set permissions if specified in contents file
+            if (options.size() > 0)
+            {
+                System.out.println("Processing options");
+                processOptions(c, myitem, options);
             }
         }
 
@@ -875,7 +887,7 @@ public class ItemImport
         }
         else
         {
-        	// If we're just test the import, let's check that the actual metadata field exists.
+            // If we're just test the import, let's check that the actual metadata field exists.
         	MetadataSchema foundSchema = MetadataSchema.find(c,schema);
         	
         	if (foundSchema == null)
@@ -893,26 +905,6 @@ public class ItemImport
         		return;
             }		
         }
-    }
-
-    /**
-     * Return the String value of a Node
-     */
-    public String getStringValue(Node node)
-    {
-        String value = node.getNodeValue();
-
-        if (node.hasChildNodes())
-        {
-            Node first = node.getFirstChild();
-
-            if (first.getNodeType() == Node.TEXT_NODE)
-            {
-                return first.getNodeValue();
-            }
-        }
-
-        return value;
     }
 
     /**
@@ -964,14 +956,16 @@ public class ItemImport
 
     /**
      * Given a contents file and an item, stuffing it with bitstreams from the
-     * contents file
+     * contents file Returns a Vector of Strings with lines from the contents
+     * file that request non-default bitstream permission
      */
-    private void processContentsFile(Context c, Item i, String path,
+    private Vector processContentsFile(Context c, Item i, String path,
             String filename) throws SQLException, IOException,
             AuthorizeException
     {
         String contentspath = path + File.separatorChar + filename;
         String line = "";
+        Vector options = new Vector();
 
         System.out.println("\tProcessing contents file: " + contentspath);
 
@@ -1051,29 +1045,99 @@ public class ItemImport
                     continue;				// process next line in contents file
             	}
 
-            	// look for a bundle name
-                String bundleMarker = "\tbundle:";
+                int bitstreamEndIndex = line.indexOf("\t");
 
-                int markerIndex = line.indexOf(bundleMarker);
-
-                if (markerIndex == -1)
+                if (bitstreamEndIndex == -1)
                 {
-                    // no bundle found
+                    // no extra info
                     processContentFileEntry(c, i, path, line, null);
                     System.out.println("\tBitstream: " + line);
                 }
                 else
                 {
-                    // found bundle
-                    String bundleName = line.substring(markerIndex
-                            + bundleMarker.length());
-                    String bitstreamName = line.substring(0, markerIndex);
-                    bitstreamName = bitstreamName.trim();
-                    
-                    processContentFileEntry(c, i, path, bitstreamName,
-                            bundleName);
-                    System.out.println("\tBitstream: " + bitstreamName
-                            + "\tBundle: " + bundleName);
+
+                    String bitstreamName = line.substring(0, bitstreamEndIndex);
+
+                    boolean bundleExists = false;
+                    boolean permissionsExist = false;
+                    boolean descriptionExists = false;
+
+                    // look for a bundle name
+                    String bundleMarker = "\tbundle:";
+                    int bMarkerIndex = line.indexOf(bundleMarker);
+                    int bEndIndex = 0;
+                    if (bMarkerIndex > 0)
+                    {
+                        bEndIndex = line.indexOf("\t", bMarkerIndex + 1);
+                        if (bEndIndex == -1)
+                        {
+                            bEndIndex = line.length();
+                        }
+                        bundleExists = true;
+                    }
+
+                    // look for permissions
+                    String permissionsMarker = "\tpermissions:";
+                    int pMarkerIndex = line.indexOf(permissionsMarker);
+                    int pEndIndex = 0;
+                    if (pMarkerIndex > 0)
+                    {
+                        pEndIndex = line.indexOf("\t", pMarkerIndex + 1);
+                        if (pEndIndex == -1)
+                        {
+                            pEndIndex = line.length();
+                        }
+                        permissionsExist = true;
+                    }
+
+                    // look for descriptions
+                    String descriptionMarker = "\tdescription:";
+                    int dMarkerIndex = line.indexOf(descriptionMarker);
+                    int dEndIndex = 0;
+                    if (dMarkerIndex > 0)
+                    {
+                        dEndIndex = line.indexOf("\t", dMarkerIndex + 1);
+                        if (dEndIndex == -1)
+                        {
+                            dEndIndex = line.length();
+                        }
+                        descriptionExists = true;
+                    }
+
+                    if (bundleExists)
+                    {
+                        String bundleName = line.substring(bMarkerIndex
+                                + bundleMarker.length(), bEndIndex);
+
+                        processContentFileEntry(c, i, path, bitstreamName,
+                                bundleName);
+                        System.out.println("\tBitstream: " + bitstreamName
+                                + "\tBundle: " + bundleName);
+                    }
+                    else
+                    {
+                        processContentFileEntry(c, i, path, bitstreamName, null);
+                        System.out.println("\tBitstream: " + bitstreamName);
+                    }
+
+                    if (permissionsExist || descriptionExists)
+                    {
+                        String extraInfo = bitstreamName;
+
+                        if (permissionsExist)
+                        {
+                            extraInfo = extraInfo
+                                    + line.substring(pMarkerIndex, pEndIndex);
+                        }
+
+                        if (descriptionExists)
+                        {
+                            extraInfo = extraInfo
+                                    + line.substring(dMarkerIndex, dEndIndex);
+                        }
+
+                        options.add(extraInfo);
+                    }
                 }
             }
         }
@@ -1084,10 +1148,21 @@ public class ItemImport
                 is.close();
             }
         }
+        return options;
     }
 
-    // each entry represents a bitstream....
-    public void processContentFileEntry(Context c, Item i, String path,
+    /**
+     * each entry represents a bitstream....
+     * @param c
+     * @param i
+     * @param path
+     * @param fileName
+     * @param bundleName
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    private void processContentFileEntry(Context c, Item i, String path,
             String fileName, String bundleName) throws SQLException,
             IOException, AuthorizeException
     {
@@ -1158,7 +1233,7 @@ public class ItemImport
      * @throws IOException
      * @throws AuthorizeException
      */
-    public void registerBitstream(Context c, Item i, int assetstore, 
+    private void registerBitstream(Context c, Item i, int assetstore, 
             String bitstreamPath, String bundleName )
         	throws SQLException, IOException, AuthorizeException
     {
@@ -1215,71 +1290,260 @@ public class ItemImport
         }
     }
 
-    // XML utility methods
-    public String getAttributeValue(Node n, String myattributename)
+    /**
+     * 
+     * Process the Options to apply to the Item. The options are tab delimited
+     * 
+     * Options:
+     *      48217870-MIT.pdf        permissions: -r 'MIT Users'     description: Full printable version (MIT only)
+     *      permissions:[r|w]-['group name']
+     *      description: 'the description of the file'
+     *      
+     *      where:
+     *          [r|w] (meaning: read|write)
+     *          ['MIT Users'] (the group name)
+     *          
+     * @param c
+     * @param myItem
+     * @param options
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    private void processOptions(Context c, Item myItem, Vector options)
+            throws SQLException, AuthorizeException
     {
-        String myvalue = "";
+        for (int i = 0; i < options.size(); i++)
+        {
+            String line = options.elementAt(i).toString();
 
+            System.out.println("\tprocessing " + line);
+
+            boolean permissionsExist = false;
+            boolean descriptionExists = false;
+
+            String permissionsMarker = "\tpermissions:";
+            int pMarkerIndex = line.indexOf(permissionsMarker);
+            int pEndIndex = 0;
+            if (pMarkerIndex > 0)
+            {
+                pEndIndex = line.indexOf("\t", pMarkerIndex + 1);
+                if (pEndIndex == -1)
+                {
+                    pEndIndex = line.length();
+                }
+                permissionsExist = true;
+            }
+
+            String descriptionMarker = "\tdescription:";
+            int dMarkerIndex = line.indexOf(descriptionMarker);
+            int dEndIndex = 0;
+            if (dMarkerIndex > 0)
+            {
+                dEndIndex = line.indexOf("\t", dMarkerIndex + 1);
+                if (dEndIndex == -1)
+                {
+                    dEndIndex = line.length();
+                }
+                descriptionExists = true;
+            }
+
+            int bsEndIndex = line.indexOf("\t");
+            String bitstreamName = line.substring(0, bsEndIndex);
+
+            int actionID = -1;
+            String groupName = "";
+            Group myGroup = null;
+            if (permissionsExist)
+            {
+                String thisPermission = line.substring(pMarkerIndex
+                        + permissionsMarker.length(), pEndIndex);
+
+                // get permission type ("read" or "write")
+                int pTypeIndex = thisPermission.indexOf("-");
+
+                // get permission group (should be in single quotes)
+                int groupIndex = thisPermission.indexOf("'", pTypeIndex);
+                int groupEndIndex = thisPermission.indexOf("'", groupIndex + 1);
+
+                // if not in single quotes, assume everything after type flag is
+                // group name
+                if (groupIndex == -1)
+                {
+                    groupIndex = thisPermission.indexOf(" ", pTypeIndex);
+                    groupEndIndex = thisPermission.length();
+                }
+
+                groupName = thisPermission.substring(groupIndex + 1,
+                        groupEndIndex);
+
+                if (thisPermission.toLowerCase().charAt(pTypeIndex + 1) == 'r')
+                {
+                    actionID = Constants.READ;
+                }
+                else if (thisPermission.toLowerCase().charAt(pTypeIndex + 1) == 'w')
+                {
+                    actionID = Constants.WRITE;
+                }
+
+                try
+                {
+                    myGroup = Group.findByName(c, groupName);
+                }
+                catch (SQLException sqle)
+                {
+                    System.out.println("SQL Exception finding group name: "
+                            + groupName);
+                    // do nothing, will check for null group later
+                }
+            }
+
+            String thisDescription = "";
+            if (descriptionExists)
+            {
+                thisDescription = line.substring(
+                        dMarkerIndex + descriptionMarker.length(), dEndIndex)
+                        .trim();
+            }
+
+            Bitstream bs = null;
+            boolean notfound = true;
+            if (!isTest)
+            {
+                // find bitstream
+                Bitstream[] bitstreams = myItem.getNonInternalBitstreams();
+                for (int j = 0; j < bitstreams.length && notfound; j++)
+                {
+                    if (bitstreams[j].getName().equals(bitstreamName))
+                    {
+                        bs = bitstreams[j];
+                        notfound = false;
+                    }
+                }
+            }
+
+            if (notfound && !isTest)
+            {
+                // this should never happen
+                System.out.println("\tdefault permissions set for "
+                        + bitstreamName);
+            }
+            else if (!isTest)
+            {
+                if (permissionsExist)
+                {
+                    if (myGroup == null)
+                    {
+                        System.out.println("\t" + groupName
+                                + " not found, permissions set to default");
+                    }
+                    else if (actionID == -1)
+                    {
+                        System.out
+                                .println("\tinvalid permissions flag, permissions set to default");
+                    }
+                    else
+                    {
+                        System.out.println("\tSetting special permissions for "
+                                + bitstreamName);
+                        setPermission(c, myGroup, actionID, bs);
+                    }
+                }
+
+                if (descriptionExists)
+                {
+                    System.out.println("\tSetting description for "
+                            + bitstreamName);
+                    bs.setDescription(thisDescription);
+                    bs.update();
+                }
+            }
+        }
+    }
+
+    /**
+     * Set the Permission on a Bitstream.
+     * 
+     * @param c
+     * @param g
+     * @param actionID
+     * @param bs
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    private void setPermission(Context c, Group g, int actionID, Bitstream bs)
+            throws SQLException, AuthorizeException
+    {
+        if (!isTest)
+        {
+            // remove the default policy
+            AuthorizeManager.removeAllPolicies(c, bs);
+
+            // add the policy
+            ResourcePolicy rp = ResourcePolicy.create(c);
+
+            rp.setResource(bs);
+            rp.setAction(actionID);
+            rp.setGroup(g);
+
+            rp.update();
+        }
+        else
+        {
+            if (actionID == Constants.READ)
+            {
+                System.out.println("\t\tpermissions: READ for " + g.getName());
+            }
+            else if (actionID == Constants.WRITE)
+            {
+                System.out.println("\t\tpermissions: WRITE for " + g.getName());
+            }
+        }
+
+    }
+
+    // XML utility methods
+    /**
+     * Lookup an attribute from a DOM node.
+     * @param n
+     * @param name
+     * @return
+     */
+    private String getAttributeValue(Node n, String name)
+    {
         NamedNodeMap nm = n.getAttributes();
 
         for (int i = 0; i < nm.getLength(); i++)
         {
             Node node = nm.item(i);
-            String name = node.getNodeName();
-            String value = node.getNodeValue();
 
-            if (myattributename.equals(name))
+            if (name.equals(node.getNodeName()))
             {
-                return value;
+                return node.getNodeValue();
             }
         }
 
-        return myvalue;
+        return "";
     }
 
-    // XML utility methods stolen from administer.
-
+    
     /**
-     * Get the CDATA of a particular element. For example, if the XML document
-     * contains:
-     * <P>
-     * <code>
-     * &lt;foo&gt;&lt;mimetype&gt;application/pdf&lt;/mimetype&gt;&lt;/foo&gt;
-     * </code>
-     * passing this the <code>foo</code> node and <code>mimetype</code> will
-     * return <code>application/pdf</code>.
-     * </P>
-     * Why this isn't a core part of the XML API I do not know...
-     * 
-     * @param parentElement
-     *            the element, whose child element you want the CDATA from
-     * @param childName
-     *            the name of the element you want the CDATA from
-     * 
-     * @return the CDATA as a <code>String</code>
+     * Return the String value of a Node.
+     * @param node
+     * @return
      */
-    private String getElementData(Node parentElement, String childName)
-            throws TransformerException
+    private String getStringValue(Node node)
     {
-        // Grab the child node
-        Node childNode = XPathAPI.selectSingleNode(parentElement, childName);
+        String value = node.getNodeValue();
 
-        if (childNode == null)
+        if (node.hasChildNodes())
         {
-            // No child node, so no values
-            return null;
+            Node first = node.getFirstChild();
+
+            if (first.getNodeType() == Node.TEXT_NODE)
+            {
+                return first.getNodeValue();
+            }
         }
-
-        // Get the #text
-        Node dataNode = childNode.getFirstChild();
-
-        if (dataNode == null)
-        {
-            return null;
-        }
-
-        // Get the data
-        String value = dataNode.getNodeValue().trim();
 
         return value;
     }
