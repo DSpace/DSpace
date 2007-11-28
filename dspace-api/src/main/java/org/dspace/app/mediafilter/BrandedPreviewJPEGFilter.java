@@ -182,7 +182,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
         Brand brand = new Brand((int) xsize, brandHeight, new Font(brandFont, Font.PLAIN, brandFontPoint), 5);
 		BufferedImage brandImage = brand.create(ConfigurationManager.getProperty("webui.preview.brand"),
 												ConfigurationManager.getProperty("webui.preview.brand.abbrev"),
-												item == null ? "" : "hdl:" + item.getHandle());
+												MediaFilterManager.getCurrentItem() == null ? "" : "hdl:" + MediaFilterManager.getCurrentItem().getHandle());
 		
 		g2d.drawImage(brandImage, (int)0, (int)ysize, (int) xsize, (int) 20, null);
 

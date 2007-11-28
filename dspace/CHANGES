@@ -61,6 +61,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 
 (Tim Donohue)
 - Added Configurable Submission to JSP-UI and XML-UI (updated version of SF Patch #1691345)
+- SF Patch #1589429 "Self-Named" Media Filters (i.e. MediaFilter Plugins) (updated version of this patch)
 
 (Stuart Lewis)
 - SF Patch #1737792 Patch for bug 1552760 - Submit interface looks bad in Safari

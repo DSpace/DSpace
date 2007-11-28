@@ -949,41 +949,64 @@ dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c collectionID -
 
   <h2><a name="mediafilters" id="mediafilters">MediaFilters: Transforming DSpace Content</a></h2>
 
-  <p>DSpace can apply filters to content/bitstreams, creating new content. Filters are included that extract text for <strong>full-text searching</strong>, and create <strong>thumbnails</strong> for items that contain images. The media filters are controlled by the <code>MediaFilterManager</code> which traverses the asset store, invoking the <code>MediaFilter</code> subclasses on bitstreams. The MediaFilter plugin config item <code>plugin.named.org.dspace.app.mediafilter.MediaFilter</code> in <code>dspace.cfg</code> contains a list of bitstream format types and the filters that operate on bitstreams of that type. The media filter system is intended to be run from the command line (or regularly as a cron task):</p>
+  <p>DSpace can apply filters to content/bitstreams, creating new content. Filters are included that extract text for <strong>full-text searching</strong>, and create <strong>thumbnails</strong> for items that contain images. 
+  The media filters are controlled by the <code>MediaFilterManager</code> which traverses the asset store, invoking the <code>MediaFilter</code> or <code>FormatFilter</code> classes on bitstreams. 
+  The media filter plugin configuration <code>filter.plugins</code> in <code>dspace.cfg</code> contains a list of all enabled media/format filter plugins (see <a href="configure.html#mediafilters">Configuring Media Filters</a> for more information).  
+  The media filter system is intended to be run from the command line (or regularly as a cron task):</p>
   <pre>
-dspace/bin/filter-media
+[dspace]/bin/filter-media
 </pre>
 
-  <p>Traverse the asset store, applying media filters to bitstreams, skipping bitstreams that have already been filtered.</p>
-  <pre>
-dspace/bin/filter-media -f
-</pre>
-
-  <p>Apply filters to ALL bitstreams, even if they've already been filtered.</p>
-  <pre>
-dspace/bin/filter-media -v
-</pre>
-
-  <p>Verbose mode - print all extracted text and other filter details to STDOUT.</p>
-  <pre>
-dspace/bin/filter-media -n
-</pre>
-
-  <p>Suppress index creation - by default, a new search index is created for full-text searching. This option suppresses index creation if you intend to run <code>index-all</code> elsewhere.</p>
+  <p>With no options, this traverses the asset store, applying media filters to bitstreams, and skipping bitstreams that have already been filtered.</p>
   
-  <pre>
-dspace/bin/filter-media -i 123456789/2
-</pre>
+  <p><strong>Available Command-Line Options:</strong></p>
 
-  <p>Restrict processing to the community, collection, or item named by the identifier - by default, all bitstreams of all items in the repository are processed. The identifier must be a handle, not a DB key. This option may be combined with any other option.</p>
+<ul>
+<li><code>[dspace]/bin/filter-media -h</code>
+   <ul>
+   <li>Display help message describing all command-line options.</li>
+   </ul>
+</li>
+
+<li><code>[dspace]/bin/filter-media -f</code>
+	<ul>
+	<li>"Force" mode - Apply filters to ALL bitstreams, even if they've already been filtered.  If they've already been filtered, the previously filtered content is overwritten.</li>
+ 	</ul>
+</li>
+ 
+<li><code>[dspace]/bin/filter-media -i 123456789/2</code>
+	<ul>
+	<li>Restrict processing to the community, collection, or item named by the identifier - by default, all bitstreams of all items in the repository are processed. The identifier must be a Handle, not a DB key. This option may be combined with any other option.</li>
+	</ul>
+</li>
+ 
+<li><code>[dspace]/bin/filter-media -m 1000</code>
+	<ul>
+	<li>Suspend operation after the specified maximum number of items have been processed - by default, no limit exists. This option may be combined with any other option.</li>
+	</ul>
+</li>
+ 
+<li><code>[dspace]/bin/filter-media -n</code>
+	<ul>
+	<li>Suppress index creation - by default, a new search index is created for full-text searching. This option suppresses index creation if you intend to run <code>index-all</code> elsewhere.</li>
+  	</ul>
+</li>
+
+<li><code>[dspace]/bin/filter-media -p "PDF Text Extractor","Word Text Extractor"</code>
+	<ul>
+	<li>Apply ONLY the filter plugin(s) listed (separated by commas).  By default all named filters listed in the <code>filter.plugins</code> field of <code>dspace.cfg</code> are applied. This option may be combined with any other option. <em>WARNING:</em> multiple plugin names must be separated by a comma (i.e. ',') and NOT a comma followed by a space (i.e. ', ').</li>
+	</ul>
+</li>
   
-  <pre>
-dspace/bin/filter-media -m 1000
-</pre>
+<li><code>[dspace]/bin/filter-media -v</code>
+	<ul>
+	<li>Verbose mode - print all extracted text and other filter details to STDOUT.</li>
+	</ul>
+</li>
 
-  <p>Suspend operation after the specified maximum number of items have been processed - by default, no limit exists. This option may be combined with any other option.</p>
+</ul>
 
-  <p>Adding your own filters is done by creating a sub-class of the <code>MediaFilter</code> class. See the comments in the source file MediaFilter.java for more information. In theory filters could be implemented in any language (C, Perl, etc.) They only need to be invoked by the Java code in the <code>MediaFilter</code> class that you create.</p>
+  <p>Adding your own filters is done by creating a class which <code>implements</code> the <code>org.dspace.app.mediafilter.FormatFilter</code> interface. See the <a href="configure.html#newfilter">Creating a new Media Filter</a> topic and comments in the source file FormatFilter.java for more information. In theory filters could be implemented in any programming language (C, Perl, etc.) However, they need to be invoked by the Java code in the Media Filter class that you create.</p>
 
   <h2><a name="filiator" id="filiator">Sub-Community Management</a></h2>
 
