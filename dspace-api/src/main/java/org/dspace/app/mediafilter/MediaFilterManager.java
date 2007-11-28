@@ -602,7 +602,7 @@ public class MediaFilterManager
         b.setFormat(bf);
         b.update();
         
-        //UIUC change - inherit policies from the source bitstream
+        //Inherit policies from the source bitstream
         //(first remove any existing policies)
         AuthorizeManager.removeAllPolicies(c, b);
         AuthorizeManager.inheritPolicies(c, source, b);
@@ -637,8 +637,5 @@ public class MediaFilterManager
     {
         return currentItem;
     }
-    
-    
-    /** END UIUC Change **/
     
 }
