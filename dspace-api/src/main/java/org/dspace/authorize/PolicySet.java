@@ -41,6 +41,9 @@ package org.dspace.authorize;
 
 import java.sql.SQLException;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -67,7 +70,7 @@ public class PolicySet
         if (argv.length < 6)
         {
             System.out
-                    .println("Args: containerType containerID contentType actionID groupID command");
+                   .println("Args: containerType containerID contentType actionID groupID command [filter]");
             System.out.println("container=COLLECTION command = ADD|REPLACE");
 
             return;
@@ -81,6 +84,11 @@ public class PolicySet
 
         boolean isReplace = false;
         String command = argv[5];
+        String filter = null;
+        if ( argv.length == 7 )
+        {
+                filter = argv[6];
+        }
 
         if (command.equals("REPLACE"))
         {
@@ -95,13 +103,13 @@ public class PolicySet
         //////////////////////
         // carnage begins here
         //////////////////////
-        setPolicies(c, containertype, containerID, contenttype, actionID,
-                groupID, isReplace, false);
+        setPoliciesFilter(c, containertype, containerID, contenttype, actionID,
+                groupID, isReplace, false, filter);
 
         c.complete();
         System.exit(0);
     }
-
+    
     /**
      * Useful policy wildcard tool. Can set entire collections' contents'
      * policies
@@ -132,6 +140,44 @@ public class PolicySet
     public static void setPolicies(Context c, int containerType,
             int containerID, int contentType, int actionID, int groupID,
             boolean isReplace, boolean clearOnly) throws SQLException,
+            AuthorizeException
+    {
+        setPoliciesFilter(c, containerType, containerID, contentType,
+                           actionID, groupID, isReplace, clearOnly, null);                         
+    }
+
+    /**
+     * Useful policy wildcard tool. Can set entire collections' contents'
+     * policies
+     * 
+     * @param c
+     *            current context
+     * @param containerType
+     *            type, Constants.ITEM or Constants.COLLECTION
+     * @param containerID
+     *            ID of container (DB primary key)
+     * @param contentType
+     *            type (BUNDLE, ITEM, or BITSTREAM)
+     * @param actionID
+     *            action ID
+     * @param groupID
+     *            group ID (database key)
+     * @param isReplace
+     *            if <code>true</code>, existing policies are removed first,
+     *            otherwise add to existing policies
+     * @param clearOnly
+     *            if <code>true</code>, just delete policies for matching
+     *            objects
+     * @param filter
+     *            if non-null, only process bitstreams whose names contain filter
+     * @throws SQLException
+     *             if database problem
+     * @throws AuthorizeException
+     *             if current user is not authorized to change these policies
+     */
+    public static void setPoliciesFilter(Context c, int containerType,
+            int containerID, int contentType, int actionID, int groupID,
+            boolean isReplace, boolean clearOnly, String filter) throws SQLException,
             AuthorizeException
     {
         if (containerType == Constants.COLLECTION)
@@ -222,22 +268,26 @@ public class PolicySet
                         {
                             Bitstream t = bitstreams[k]; // t for target
 
-                            // is this a replace? delete policies first
-                            if (isReplace || clearOnly)
+                            if ( filter == null ||
+                                 t.getName().indexOf( filter ) != -1 )
                             {
-                                AuthorizeManager.removeAllPolicies(c, t);
-                            }
+                                // is this a replace? delete policies first
+                                if (isReplace || clearOnly)
+                                {
+                                        AuthorizeManager.removeAllPolicies(c, t);
+                                }
 
-                            if (!clearOnly)
-                            {
-                                // now add the policy
-                                ResourcePolicy rp = ResourcePolicy.create(c);
+                                if (!clearOnly)
+                                {
+                                        // now add the policy
+                                        ResourcePolicy rp = ResourcePolicy.create(c);
 
-                                rp.setResource(t);
-                                rp.setAction(actionID);
-                                rp.setGroup(group);
+                                        rp.setResource(t);
+                                        rp.setAction(actionID);
+                                        rp.setGroup(group);
 
-                                rp.update();
+                                        rp.update();
+                                }
                             }
                         }
                     }
