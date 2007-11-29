@@ -658,24 +658,15 @@ public class BrowseIndex
     public static BrowseIndex[] getBrowseIndices()
     	throws BrowseException
     {
-        Enumeration en = ConfigurationManager.propertyNames();
-        
+        int idx = 1;
+        String definition;
         ArrayList browseIndices = new ArrayList();
-        
-        String rx = "webui\\.browse\\.index\\.(\\d+)";
-        Pattern pattern = Pattern.compile(rx);
-        
-        while (en.hasMoreElements())
+
+        while ( ((definition = ConfigurationManager.getProperty("webui.browse.index." + idx))) != null)
         {
-            String property = (String) en.nextElement();
-            Matcher matcher = pattern.matcher(property);
-            if (matcher.matches())
-            {
-                int number = Integer.parseInt(matcher.group(1));
-                String definition = ConfigurationManager.getProperty(property);
-                BrowseIndex bi = new BrowseIndex(definition, number);
-                browseIndices.add(bi);
-            }
+            BrowseIndex bi = new BrowseIndex(definition, idx);
+            browseIndices.add(bi);
+            idx++;
         }
         
         BrowseIndex[] bis = new BrowseIndex[browseIndices.size()];
