@@ -359,10 +359,13 @@
 <%
 		for (SortOption sortBy : sortOptions)
 		{
-			String selected = (sortBy.getName().equals(sortedBy) ? "selected=\"selected\"" : "");
-			String mKey = "browse.sort-by." + sortBy.getName();
-			%> <option value="<%= sortBy.getNumber() %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
-		}
+            if (sortBy.isVisible())
+            {
+                String selected = (sortBy.getName().equals(sortedBy) ? "selected=\"selected\"" : "");
+                String mKey = "browse.sort-by." + sortBy.getName();
+                %> <option value="<%= sortBy.getNumber() %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
+            }
+        }
 %>
 		</select>
 <%

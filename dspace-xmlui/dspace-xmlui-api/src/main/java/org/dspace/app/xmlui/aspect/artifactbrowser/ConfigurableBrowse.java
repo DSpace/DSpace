@@ -465,8 +465,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     
                     for (SortOption so : sortOptions)
                     {
-                        sortSelect.addOption(so.equals(info.getSortOption()), so.getNumber(),
-                                message("xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by." + so.getName()));
+                        if (so.isVisible())
+                        {
+                            sortSelect.addOption(so.equals(info.getSortOption()), so.getNumber(),
+                                    message("xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by." + so.getName()));
+                        }
                     }
                 }
             }

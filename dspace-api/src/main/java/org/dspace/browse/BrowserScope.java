@@ -335,18 +335,9 @@ public class BrowserScope
         if (order != null)
             return order;
 
-        try
-        {
-            SortOption so = getSortOption();
-
-            if (so != null)
-                return so.getDefaultOrder();
-        }
-        catch (BrowseException be)
-        {
-            // recoverable problem, just log the error and continue
-            log.debug("Unable to retrieve a sort option for this browse", be);
-        }
+        BrowseIndex bi = getBrowseIndex();
+        if (bi != null)
+            return bi.getDefaultOrder();
 
         return SortOption.ASCENDING;
     }
@@ -425,7 +416,7 @@ public class BrowserScope
 				    // Create a dummy sortOption for the metadata sort
 					String dataType = browseIndex.getDataType();
 					String type = ("date".equals(dataType) ? "date" : "text");
-                    sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(), type, browseIndex.getDefaultOrder());
+                    sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(), type);
 				}
 				else
 				{
@@ -570,18 +561,10 @@ public class BrowserScope
             return false;
         }
 
-        try
-        {
-            SortOption so = getSortOption();
+        BrowseIndex bi = getBrowseIndex();
 
-            if (so != null && SortOption.DESCENDING.equalsIgnoreCase(so.getDefaultOrder()))
-                return false;
-        }
-        catch (BrowseException be)
-        {
-            // recoverable problem, just log the error and continue
-            log.debug("Unable to retrieve a sort option for this browse", be);
-        }
+        if (bi != null && SortOption.DESCENDING.equalsIgnoreCase(bi.getDefaultOrder()))
+            return false;
 
         return true;
 	}
