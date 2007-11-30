@@ -113,6 +113,8 @@ public class MediaFilterManager
     
     private static Map filterFormats = new HashMap();
     
+    private static List skipList = null; //list of identifiers to skip during processing
+    
     //separator in filterFormats Map between a filter class name and a plugin name,
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
     public static String FILTER_PLUGIN_SEPARATOR = "\034";
@@ -151,8 +153,19 @@ public class MediaFilterManager
                        "(e.g. MediaFilterManager -p \n\"Word Text Extractor\",\"PDF Text Extractor\")");                
         Option pluginOption = OptionBuilder.create('p');
         pluginOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
-        options.addOption(pluginOption);                             
-         
+        options.addOption(pluginOption);	
+        
+         //create a "skip" option (to specify communities/collections/items to skip)
+        OptionBuilder.withLongOpt("skip");
+        OptionBuilder.withValueSeparator(',');
+        OptionBuilder.withDescription(
+                "SKIP the bitstreams belonging to identifier\n" + 
+                "Separate multiple identifiers with a comma (,)\n" +
+                "(e.g. MediaFilterManager -s \n 123456789/34,123456789/323)");                
+        Option skipOption = OptionBuilder.create('s');
+        skipOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
+        options.addOption(skipOption);    
+        
         CommandLine line = null;
         try
         {
@@ -308,7 +321,29 @@ public class MediaFilterManager
               
         //store our filter list into an internal array
         filterClasses = (FormatFilter[]) filterList.toArray(new FormatFilter[filterList.size()]);
+        
+        
+        //Retrieve list of identifiers to skip (if any)
+        String skipIds[] = null;
+        if(line.hasOption('s'))
+        {
+            //specified which identifiers to skip when processing
+            skipIds = line.getOptionValues('s');
             
+            if(skipIds==null || skipIds.length==0)
+            {   //display error, since no identifiers specified to skip
+                System.err.println("\nERROR: -s (-skip) option requires at least one identifier to SKIP.\n" +
+                                    "Make sure to separate multiple identifiers with a comma!\n" +
+                                    "(e.g. MediaFilterManager -s 123456789/34,123456789/323)\n");
+                HelpFormatter myhelp = new HelpFormatter();
+                myhelp.printHelp("MediaFilterManager\n", options);
+                System.exit(0);
+            }
+            
+            //save to a global skip list
+            skipList = Arrays.asList(skipIds);
+        }
+        
         Context c = null;
 
         try
@@ -372,46 +407,68 @@ public class MediaFilterManager
 
     public static void applyFiltersAllItems(Context c) throws Exception
     {
-        ItemIterator i = Item.findAll(c);
-        while (i.hasNext() && processed < max2Process)
+        if(skipList!=null)
+        {    
+            //if a skip-list exists, we need to filter community-by-community
+            //so we can respect what is in the skip-list
+            Community[] topLevelCommunities = Community.findAllTop(c);
+          
+            for(int i=0; i<topLevelCommunities.length; i++)
+                applyFiltersCommunity(c, topLevelCommunities[i]);
+        }
+        else 
         {
-        	applyFiltersItem(c, i.next());
+            //otherwise, just find every item and process
+            ItemIterator i = Item.findAll(c);
+            while (i.hasNext() && processed < max2Process)
+            {
+            	applyFiltersItem(c, i.next());
+            }
         }
     }
     
     public static void applyFiltersCommunity(Context c, Community community)
                                              throws Exception
-    {
-       	Community[] subcommunities = community.getSubcommunities();
-       	for (int i = 0; i < subcommunities.length; i++)
-       	{
-       		applyFiltersCommunity(c, subcommunities[i]);
-       	}
-       	
-       	Collection[] collections = community.getCollections();
-       	for (int j = 0; j < collections.length; j++)
-       	{
-       		applyFiltersCollection(c, collections[j]);
-       	}
+    {   //only apply filters if community not in skip-list
+        if(!inSkipList(community.getHandle()))
+        {    
+           	Community[] subcommunities = community.getSubcommunities();
+           	for (int i = 0; i < subcommunities.length; i++)
+           	{
+           		applyFiltersCommunity(c, subcommunities[i]);
+           	}
+           	
+           	Collection[] collections = community.getCollections();
+           	for (int j = 0; j < collections.length; j++)
+           	{
+           		applyFiltersCollection(c, collections[j]);
+           	}
+        }
     }
         
     public static void applyFiltersCollection(Context c, Collection collection)
                                               throws Exception
     {
-        ItemIterator i = collection.getItems();
-        while (i.hasNext() && processed < max2Process)
+        //only apply filters if collection not in skip-list
+        if(!inSkipList(collection.getHandle()))
         {
-        	applyFiltersItem(c, i.next());
+            ItemIterator i = collection.getItems();
+            while (i.hasNext() && processed < max2Process)
+            {
+            	applyFiltersItem(c, i.next());
+            }
         }
     }
        
     public static void applyFiltersItem(Context c, Item item) throws Exception
     {
-        //cache this item in MediaFilterManager
-        //so it can be accessed by MediaFilters as necessary
-        currentItem = item;
-        
-        
+        //only apply filters if item not in skip-list
+        if(!inSkipList(item.getHandle()))
+        {
+    	  //cache this item in MediaFilterManager
+    	  //so it can be accessed by MediaFilters as necessary
+    	  currentItem = item;
+    	
           if (filterItem(c, item))
           {
         	  // commit changes after each filtered item
@@ -422,6 +479,7 @@ public class MediaFilterManager
           // clear item objects from context cache and internal cache
           item.decache();
           currentItem = null;
+        }  
     }
 
     /**
@@ -636,6 +694,26 @@ public class MediaFilterManager
     public static Item getCurrentItem()
     {
         return currentItem;
+    }
+    
+    /**
+     * Check whether or not to skip processing the given identifier
+     * 
+     * @param identifier
+     *            identifier (handle) of a community, collection or item
+     *            
+     * @return true if this community, collection or item should be skipped
+     *          during processing.  Otherwise, return false.
+     */
+    public static boolean inSkipList(String identifier)
+    {
+        if(skipList!=null && skipList.contains(identifier))
+        {
+            System.out.println("SKIP-LIST: skipped bitstreams within identifier " + identifier);
+            return true;
+        }    
+        else
+            return false;
     }
     
 }
