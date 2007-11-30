@@ -138,7 +138,12 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                     }
                 }
             }
-            
+
+            if (order == null && bi != null)
+            {
+                order = bi.getDefaultOrder();
+            }
+
             // if no resultsperpage set, default to 20
             if (resultsperpage == -1)
             {

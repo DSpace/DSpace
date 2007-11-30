@@ -36,7 +36,6 @@
 package org.dspace.browse;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -73,8 +72,8 @@ public class SortOption
 	/** the metadata broken down into bits for convenience */
 	private String[] mdBits;
 
-    /** default ordering for this sort, when not supplied by the user */
-    private String defaultOrder;
+    /** should the sort option be visible for user selection */
+    private boolean visible;
 
     /** the sort options available for this index */
     private static Set<SortOption> sortOptionsSet = null;
@@ -96,23 +95,9 @@ public class SortOption
 		this.type = type;
 		this.metadata = md;
 		this.number = number;
-        this.defaultOrder = SortOption.ASCENDING;
+        this.visible = true;
         generateMdBits();
 	}
-
-    public SortOption(int number, String name, String md, String type, String defaultOrder)
-        throws BrowseException
-    {
-        this.name = name;
-        this.type = type;
-        this.metadata = md;
-        this.number = number;
-        if (SortOption.DESCENDING.equalsIgnoreCase(defaultOrder))
-            this.defaultOrder = SortOption.DESCENDING;
-        else
-            this.defaultOrder = SortOption.ASCENDING;
-        generateMdBits();
-    }
 
 	/**
 	 * Construct a new SortOption object using the definition from the configuration
@@ -139,26 +124,16 @@ public class SortOption
         name = matcher.group(1);
         metadata = matcher.group(2);
         type = matcher.group(3);
-        if (matcher.groupCount() > 3)
-            defaultOrder = matcher.group(4);
 
-        // If the default order is specified as descending, keep it
-        // Otherwise, set the default order to ascending
-        if (SortOption.DESCENDING.equalsIgnoreCase(defaultOrder))
-            defaultOrder = SortOption.DESCENDING;
+        // If the option is configured to be hidden, then set the visible flag to false
+        // otherwise, flag it as visible (true)
+        if (matcher.groupCount() > 3 && "hide".equalsIgnoreCase(matcher.group(4)))
+            visible = false;
         else
-            defaultOrder = SortOption.ASCENDING;
+            visible = true;
 
         generateMdBits();
 	}
-
-    /**
-     * @return Returns the default ordering for this sort option
-     */
-    public String getDefaultOrder()
-    {
-        return defaultOrder;
-    }
 
     /**
 	 * @return Returns the metadata.
@@ -223,8 +198,17 @@ public class SortOption
 	{
 		this.number = number;
 	}
-	
-	/**
+
+    /**
+     * Should this sort option be made visible in the UI
+     * @return true if visible, false otherwise
+     */
+    public boolean isVisible()
+    {
+        return visible;
+    }
+
+    /**
 	 * @return	a 3 element array of the metadata bits
 	 */
 	public String[] getMdBits()
@@ -346,22 +330,14 @@ public class SortOption
         SortOption.sortOptionsSet = new HashSet<SortOption>();
         synchronized (SortOption.sortOptionsSet)
         {
-            Enumeration en = ConfigurationManager.propertyNames();
-            
-            String rx = "webui\\.browse\\.sort-option\\.(\\d+)";
-            Pattern pattern = Pattern.compile(rx);
-            
-            while (en.hasMoreElements())
+            int idx = 1;
+            String option;
+
+            while ( ((option = ConfigurationManager.getProperty("webui.browse.sort-option." + idx))) != null)
             {
-                String property = (String) en.nextElement();
-                Matcher matcher = pattern.matcher(property);
-                if (matcher.matches())
-                {
-                    int number = Integer.parseInt(matcher.group(1));
-                    String option = ConfigurationManager.getProperty(property);
-                    SortOption so = new SortOption(number, option);
-                    SortOption.sortOptionsSet.add(so);
-                }
+                SortOption so = new SortOption(idx, option);
+                SortOption.sortOptionsSet.add(so);
+                idx++;
             }
         }
 

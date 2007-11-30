@@ -83,7 +83,7 @@ public abstract class InitialArticleWord implements TextFilter
             while (initialEnd < 0 && curPos < str.length())
             {
                 // Have we found a significant character
-                if (Character.isLetterOrDigit(str.charAt(curPos)) || str.charAt(curPos) == '\'')
+                if (Character.isLetterOrDigit(str.charAt(curPos)))
                 {
                     // Mark this as the cut point for the initial word
                     initialStart = curPos;

@@ -184,7 +184,16 @@ public class BrowseIndex
 
                 if (sortOption == null)
                     valid = false;
-                
+
+                // If an optional ordering configuration is supplied,
+                // set the defaultOrder appropriately (asc or desc)
+                if (matcher.groupCount() > 3)
+                {
+                    String order = matcher.group(4);
+                    if (SortOption.DESCENDING.equalsIgnoreCase(order))
+                        this.defaultOrder = SortOption.DESCENDING;
+                }
+
                 tableBaseName = getItemBrowseIndex().tableBaseName;
             }
             else
@@ -629,23 +638,19 @@ public class BrowseIndex
      * @throws BrowseException
      */
     public static String[] tables()
-    	throws BrowseException
+            throws BrowseException
     {
         BrowseIndex[] bis = getBrowseIndices();
-        ArrayList tables = new ArrayList();
+        String[] returnTables = new String[bis.length + 1];
         for (int i = 0; i < bis.length; i++)
         {
-            String tableName = bis[i].getTableName();
-            tables.add(tableName);
+            returnTables[i] = bis[i].getTableName();
         }
-        
+
         // FIXME: this complies with the old BrowseTables method, but I'm
         // not really sure why it's here
-        tables.add("Communities2Item");
-        
-        String[] returnTables = new String[tables.size()];
-        returnTables = (String[]) tables.toArray((String[]) returnTables);
-        
+        returnTables[bis.length] = "Communities2Item";
+
         return returnTables;
     }
     
@@ -668,17 +673,17 @@ public class BrowseIndex
             browseIndices.add(bi);
             idx++;
         }
-        
+
         BrowseIndex[] bis = new BrowseIndex[browseIndices.size()];
         bis = (BrowseIndex[]) browseIndices.toArray((BrowseIndex[]) bis);
-        
+
         return bis;
     }
-    
+
     /**
      * Get the browse index from configuration with the specified name.
      * The name is the first part of the browse configuration
-     * 
+     *
      * @param name		the name to retrieve
      * @return			the specified browse index
      * @throws BrowseException

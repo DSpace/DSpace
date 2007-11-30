@@ -1,5 +1,5 @@
 /*
- * BrowseOrderTitleMarc21.java
+ * StripLeadingNonAlphaNum.java
  *
  * Version: $Revision: 1.0 $
  *
@@ -38,21 +38,25 @@
  * DAMAGE.
  */
 
-package org.dspace.browse;
+package org.dspace.text.filter;
 
-import org.dspace.text.filter.*;
-
-/**
- * MARC 21 title ordering delegate implementation
- * 
- * @author Graham Triggs
- */
-public class BrowseOrderTitleMarc21 extends AbstractTextFilterBOD
+public class StripLeadingNonAlphaNum implements TextFilter
 {
-	{
-		filters = new TextFilter[] { new MARC21InitialArticleWord(),
-                                     new DecomposeDiactritics(),
-                                     new StripLeadingNonAlphaNum(),
-									 new LowerCaseAndTrim() };
-	}
+    public String filter(String str)
+    {
+        int i = 0;
+
+        while (i < str.length() && !Character.isLetterOrDigit(str.charAt(i)))
+            i++;
+
+        if (i > 0)
+            return str.substring(i);
+
+        return str;
+    }
+
+    public String filter(String str, String lang)
+    {
+        return filter(str);
+    }
 }

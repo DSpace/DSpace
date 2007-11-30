@@ -133,7 +133,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
             { "die",        Language.AFRIKAANS, Language.GERMAN, Language.YIDDISH },
             { "dos",        Language.YIDDISH },
             { "e",          Language.NORWEGIAN },
-            { "'e",         Language.FRISIAN },
+            { "e",          Language.FRISIAN },         // should be 'e - leading apostrophes are ignored
             { "een",        Language.DUTCH },
             { "eene",       Language.DUTCH },
             { "egy",        Language.HUNGARIAN },
@@ -205,21 +205,21 @@ public class MARC21InitialArticleWord extends InitialArticleWord
             { "mga",        Language.TAGALOG },
             { "m\u0303ga",  Language.TAGALOG },
             { "mia",        Language.GREEK },
-            { "'n",         Language.AFRIKAANS, Language.DUTCH, Language.FRISIAN },
+            { "n",          Language.AFRIKAANS, Language.DUTCH, Language.FRISIAN },              // should be 'n - leading apostrophes are ignored
             { "na",         Language.HAWAIIAN, Language.IRISH, Language.SCOTTISH_GAELIC },
             { "na h-",      Language.IRISH, Language.SCOTTISH_GAELIC },
             { "nje",        Language.ALBANIAN },
             { "ny",         Language.MALAGASY },
-            { "'o",         Language.NEAPOLITAN_ITALIAN },
+            { "o",          Language.NEAPOLITAN_ITALIAN },               // should be 'o - leading apostrophes are ignored
             { "o",          Language.GALICIAN, Language.HAWAIIAN, Language.PORTUGUESE, Language.ROMANIAN },
             { "os",         Language.PORTUGUESE },
-            { "'r",         Language.ICELANDIC },
-            { "'s",         Language.GERMAN },
+            { "r",          Language.ICELANDIC },                // should be 'r - leading apostrophes are ignored
+            { "s",          Language.GERMAN },                   // should be 's - leading apostrophes are ignored
             { "sa",         Language.TAGALOG },
             { "sa mga",     Language.TAGALOG },
             { "si",         Language.TAGALOG },
             { "sin\u00e1",  Language.TAGALOG },
-            { "'t",         Language.DUTCH, Language.FRISIAN },
+            { "t",          Language.DUTCH, Language.FRISIAN },          // should be 't - leading apostrophes are ignored
             { "ta",         Language.CLASSICAL_GREEK, Language.GREEK },
             { "tais",       Language.CLASSICAL_GREEK },
             { "tas",        Language.CLASSICAL_GREEK },
