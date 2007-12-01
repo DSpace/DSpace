@@ -966,43 +966,52 @@ dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c collectionID -
   <p><strong>Available Command-Line Options:</strong></p>
 
 <ul>
-<li><code>[dspace]/bin/filter-media -h</code>
+<li><strong>Help</strong>: <code>[dspace]/bin/filter-media -h</code>
    <ul>
    <li>Display help message describing all command-line options.</li>
    </ul>
 </li>
 
-<li><code>[dspace]/bin/filter-media -f</code>
+<li><strong>Force mode</strong>: <code>[dspace]/bin/filter-media -f</code>
 	<ul>
-	<li>"Force" mode - Apply filters to ALL bitstreams, even if they've already been filtered.  If they've already been filtered, the previously filtered content is overwritten.</li>
+	<li>Apply filters to ALL bitstreams, even if they've already been filtered.  If they've already been filtered, the previously filtered content is overwritten.</li>
  	</ul>
 </li>
  
-<li><code>[dspace]/bin/filter-media -i 123456789/2</code>
+<li><strong>Identifier mode</strong>: <code>[dspace]/bin/filter-media -i 123456789/2</code>
 	<ul>
 	<li>Restrict processing to the community, collection, or item named by the identifier - by default, all bitstreams of all items in the repository are processed. The identifier must be a Handle, not a DB key. This option may be combined with any other option.</li>
 	</ul>
 </li>
  
-<li><code>[dspace]/bin/filter-media -m 1000</code>
+<li><strong>Maximum mode</strong>: <code>[dspace]/bin/filter-media -m 1000</code>
 	<ul>
 	<li>Suspend operation after the specified maximum number of items have been processed - by default, no limit exists. This option may be combined with any other option.</li>
 	</ul>
 </li>
  
-<li><code>[dspace]/bin/filter-media -n</code>
+<li><strong>No-Index mode</strong>: <code>[dspace]/bin/filter-media -n</code>
 	<ul>
 	<li>Suppress index creation - by default, a new search index is created for full-text searching. This option suppresses index creation if you intend to run <code>index-all</code> elsewhere.</li>
   	</ul>
 </li>
 
-<li><code>[dspace]/bin/filter-media -p "PDF Text Extractor","Word Text Extractor"</code>
+<li><strong>Plugin mode</strong>: <code>[dspace]/bin/filter-media -p "PDF Text Extractor","Word Text Extractor"</code>
 	<ul>
 	<li>Apply ONLY the filter plugin(s) listed (separated by commas).  By default all named filters listed in the <code>filter.plugins</code> field of <code>dspace.cfg</code> are applied. This option may be combined with any other option. <em>WARNING:</em> multiple plugin names must be separated by a comma (i.e. ',') and NOT a comma followed by a space (i.e. ', ').</li>
 	</ul>
 </li>
+
+<li><strong>Skip mode</strong>: <code>[dspace]/bin/filter-media -s 123456789/9,123456789/100</code>
+	<ul>
+	<li>SKIP the listed identifiers (separated by commas) during processing.  The identifiers must be Handles (not DB Keys).  They may refer to items, collections or communities which should be skipped.  This option may be combined with any other option. <em>WARNING:</em> multiple identifiers must be separated by a comma (i.e. ',') and NOT a comma followed by a space (i.e. ', ').</li>
+	<li>NOTE: If you have a large number of identifiers to skip, you may maintain this comma-separated list within a separate file (e.g. <code>filter-skiplist.txt</code>), and call it similar to the following:
+		<ul><li><code>[dspace]/bin/filter-media -s `less filter-skiplist.txt`</code></li></ul>
+	</li>
+	</ul>
+</li>
   
-<li><code>[dspace]/bin/filter-media -v</code>
+<li><strong>Verbose mode</strong>: <code>[dspace]/bin/filter-media -v</code>
 	<ul>
 	<li>Verbose mode - print all extracted text and other filter details to STDOUT.</li>
 	</ul>
