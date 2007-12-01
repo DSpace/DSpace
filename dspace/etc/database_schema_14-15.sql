@@ -75,3 +75,19 @@ CREATE TABLE community_item_count (
 	community_id INTEGER REFERENCES community(community_id),
 	count INTEGER
 );
+
+------------------------------------------------------------------
+-- Remove sequences and tables of the old browse system
+------------------------------------------------------------------
+
+DROP SEQUENCE itemsbyauthor_seq;
+DROP SEQUENCE itemsbytitle_seq;
+DROP SEQUENCE itemsbydate_seq;
+DROP SEQUENCE itemsbydateaccessioned_seq;
+DROP SEQUENCE itemsbysubject_seq;
+
+DROP TABLE ItemsByAuthor CASCADE;
+DROP TABLE ItemsByTitle CASCADE;
+DROP TABLE ItemsByDate CASCADE;
+DROP TABLE ItemsByDateAccessioned CASCADE;
+DROP TABLE ItemsBySubject CASCADE;
