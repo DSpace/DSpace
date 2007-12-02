@@ -58,10 +58,39 @@ update eperson set language = 'en';
 
 alter table bundle drop column mets_bitstream_id; -- totally unused column
 
-
 -------------------------------------------------------------------------------
 -- Necessary for Configurable Submission functionality:
 -- Modification to workspaceitem table to support keeping track
 -- of the last page reached within a step in the Configurable Submission Process
 -------------------------------------------------------------------------------
 ALTER TABLE workspaceitem ADD page_reached INTEGER;
+
+-------------------------------------------------------------------------
+-- Tables to manage cache of item counts for communities and collections
+-------------------------------------------------------------------------
+
+CREATE TABLE collection_item_count (
+	collection_id INTEGER REFERENCES collection(collection_id),
+	count INTEGER
+);
+
+CREATE TABLE community_item_count (
+	community_id INTEGER REFERENCES community(community_id),
+	count INTEGER
+);
+
+------------------------------------------------------------------
+-- Remove sequences and tables of the old browse system
+------------------------------------------------------------------
+
+DROP SEQUENCE itemsbyauthor_seq;
+DROP SEQUENCE itemsbytitle_seq;
+DROP SEQUENCE itemsbydate_seq;
+DROP SEQUENCE itemsbydateaccessioned_seq;
+DROP SEQUENCE itemsbysubject_seq;
+
+DROP TABLE ItemsByAuthor CASCADE;
+DROP TABLE ItemsByTitle CASCADE;
+DROP TABLE ItemsByDate CASCADE;
+DROP TABLE ItemsByDateAccessioned CASCADE;
+DROP TABLE ItemsBySubject CASCADE;
