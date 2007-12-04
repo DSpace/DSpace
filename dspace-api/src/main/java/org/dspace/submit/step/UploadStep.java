@@ -394,7 +394,7 @@ public class UploadStep extends AbstractProcessingStep
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-    private int processRemoveFile(Context context, Item item, int bitstreamID)
+    protected int processRemoveFile(Context context, Item item, int bitstreamID)
             throws IOException, SQLException, AuthorizeException
     {
         Bitstream bitstream;
@@ -451,7 +451,7 @@ public class UploadStep extends AbstractProcessingStep
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-    private int processUploadFile(Context context, HttpServletRequest request,
+    protected int processUploadFile(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException
@@ -608,7 +608,7 @@ public class UploadStep extends AbstractProcessingStep
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-    private int processSaveFileFormat(Context context,
+    protected int processSaveFileFormat(Context context,
             HttpServletRequest request, HttpServletResponse response,
             SubmissionInfo subInfo) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -658,7 +658,7 @@ public class UploadStep extends AbstractProcessingStep
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-    private int processSaveFileDescription(Context context,
+    protected int processSaveFileDescription(Context context,
             HttpServletRequest request, HttpServletResponse response,
             SubmissionInfo subInfo) throws ServletException, IOException,
             SQLException, AuthorizeException

@@ -300,7 +300,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
      * @param multipleFiles
      *            if there will be multiple files
      */
-    private void processVerifyPrune(Context context,
+    protected void processVerifyPrune(Context context,
             HttpServletRequest request, HttpServletResponse response,
             SubmissionInfo subInfo, boolean multipleTitles,
             boolean publishedBefore, boolean multipleFiles)

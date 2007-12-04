@@ -404,7 +404,7 @@ public class DescribeStep extends AbstractProcessingStep
      * @param repeated
      *            set to true if the field is repeatable on the form
      */
-    private void readNames(HttpServletRequest request, Item item,
+    protected void readNames(HttpServletRequest request, Item item,
             String schema, String element, String qualifier, boolean repeated)
     {
         String metadataField = MetadataField
@@ -523,7 +523,7 @@ public class DescribeStep extends AbstractProcessingStep
      * @param lang
      *            language to set (ISO code)
      */
-    private void readText(HttpServletRequest request, Item item, String schema,
+    protected void readText(HttpServletRequest request, Item item, String schema,
             String element, String qualifier, boolean repeated, String lang)
     {
         // FIXME: Of course, language should be part of form, or determined
@@ -599,7 +599,7 @@ public class DescribeStep extends AbstractProcessingStep
      *            the metadata qualifier, or null if unqualified
      * @throws SQLException
      */
-    private void readDate(HttpServletRequest request, Item item, String schema,
+    protected void readDate(HttpServletRequest request, Item item, String schema,
             String element, String qualifier) throws SQLException
     {
         String metadataField = MetadataField
@@ -658,7 +658,7 @@ public class DescribeStep extends AbstractProcessingStep
      * @param repeated
      *            set to true if the field is repeatable on the form
      */
-    private void readSeriesNumbers(HttpServletRequest request, Item item,
+    protected void readSeriesNumbers(HttpServletRequest request, Item item,
             String schema, String element, String qualifier, boolean repeated)
     {
         String metadataField = MetadataField
@@ -742,7 +742,7 @@ public class DescribeStep extends AbstractProcessingStep
      * 
      * @return a List of Strings
      */
-    private List getRepeatedParameter(HttpServletRequest request,
+    protected List getRepeatedParameter(HttpServletRequest request,
             String metadataField, String param)
     {
         List vals = new LinkedList();
