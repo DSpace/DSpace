@@ -55,6 +55,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -68,18 +69,22 @@ import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.content.dao.BitstreamDAOFactory;
 import org.dspace.content.dao.BitstreamFormatDAO;
 import org.dspace.content.dao.BitstreamFormatDAOFactory;
+import org.dspace.content.dao.CollectionDAOFactory;
+import org.dspace.content.dao.CommunityDAO;
+import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.content.dao.CollectionDAO;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.search.DSIndexer;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -119,10 +124,8 @@ public class MediaFilterManager
 
     private static Map filterFormats = new HashMap();
 
-    private static ItemDAO itemDAO;
-
     private static List skipList = null; //list of identifiers to skip during processing
-    
+
     //separator in filterFormats Map between a filter class name and a plugin name,
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
     public static String FILTER_PLUGIN_SEPARATOR = "\034";
@@ -162,14 +165,15 @@ public class MediaFilterManager
         Option pluginOption = OptionBuilder.create('p');
         pluginOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
         options.addOption(pluginOption);	
-        
+
          //create a "skip" option (to specify communities/collections/items to skip)
         OptionBuilder.withLongOpt("skip");
         OptionBuilder.withValueSeparator(',');
         OptionBuilder.withDescription(
-                "SKIP the bitstreams belonging to identifier\n" + 
+                "SKIP the bitstreams belonging to identifier\n" +
                 "Separate multiple identifiers with a comma (,)\n" +
-                "(e.g. MediaFilterManager -s \n 123456789/34,123456789/323)");                
+                "(e.g. MediaFilterManager -s \n" +
+                "uuid:6432e1d5-b089-44dd-91cc-504104cf80b0,uuid:65263253-c4ce-416a-83c8-fbb2404156b8)");
         Option skipOption = OptionBuilder.create('s');
         skipOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
         options.addOption(skipOption);    
@@ -427,41 +431,53 @@ public class MediaFilterManager
 
     public static void applyFiltersAllItems(Context c) throws Exception
     {
+        ItemDAO itemDAO = ItemDAOFactory.getInstance(c);
+        CommunityDAO communityDAO = CommunityDAOFactory.getInstance(c);
+
         if(skipList!=null)
         {    
             //if a skip-list exists, we need to filter community-by-community
             //so we can respect what is in the skip-list
-            Community[] topLevelCommunities = Community.findAllTop(c);
+            List<Community> topLevelCommunities =
+                    communityDAO.getTopLevelCommunities();
           
-            for(int i=0; i<topLevelCommunities.length; i++)
-                applyFiltersCommunity(c, topLevelCommunities[i]);
+            for (Community community : topLevelCommunities)
+            {
+                applyFiltersCommunity(c, community);
+            }
         }
         else 
         {
             //otherwise, just find every item and process
-            ItemIterator i = Item.findAll(c);
-            while (i.hasNext() && processed < max2Process)
+            List<Item> items = itemDAO.getItems();
+            for (int i = 0; i < items.size() && processed < max2Process; i++)
             {
-            	applyFiltersItem(c, i.next());
+            	applyFiltersItem(c, items.get(i));
             }
         }
     }
 
     public static void applyFiltersCommunity(Context c, Community community)
         throws Exception
-    {   //only apply filters if community not in skip-list
-        if(!inSkipList(community.getHandle()))
+    {
+        CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(c);
+        CommunityDAO communityDAO = CommunityDAOFactory.getInstance(c);
+
+        // only apply filters if community not in skip-list
+        if(!inSkipList(community.getIdentifier().getCanonicalForm()))
         {    
-           	Community[] subcommunities = community.getSubcommunities();
-           	for (int i = 0; i < subcommunities.length; i++)
+           	List<Community> children =
+                       communityDAO.getChildCommunities(community);
+           	for (Community child : children)
            	{
-           		applyFiltersCommunity(c, subcommunities[i]);
+           		applyFiltersCommunity(c, child);
            	}
            	
-           	Collection[] collections = community.getCollections();
-           	for (int j = 0; j < collections.length; j++)
+           	List<Collection> collections =
+                       collectionDAO.getChildCollections(community);
+           	for (Collection collection : collections)
            	{
-           		applyFiltersCollection(c, collections[j]);
+           		applyFiltersCollection(c, collection);
            	}
         }
     }
@@ -469,21 +485,25 @@ public class MediaFilterManager
     public static void applyFiltersCollection(Context c, Collection collection)
           throws Exception
     {
+        ItemDAO itemDAO = ItemDAOFactory.getInstance(c);
+
         //only apply filters if collection not in skip-list
-        if(!inSkipList(collection.getHandle()))
+        if(!inSkipList(collection.getIdentifier().getCanonicalForm()))
         {
-            ItemIterator i = collection.getItems();
-            while (i.hasNext() && processed < max2Process)
+            List<Item> items = itemDAO.getItemsByCollection(collection);
+            for (int i = 0; i < items.size() && processed < max2Process; i++)
             {
-            	applyFiltersItem(c, i.next());
+                applyFiltersItem(c, items.get(i));
             }
         }
     }
 
     public static void applyFiltersItem(Context c, Item item) throws Exception
     {
+        ItemDAO itemDAO = ItemDAOFactory.getInstance(c);
+
         //only apply filters if item not in skip-list
-        if(!inSkipList(item.getHandle()))
+        if(!inSkipList(item.getIdentifier().getCanonicalForm()))
         {
     	  //cache this item in MediaFilterManager
     	  //so it can be accessed by MediaFilters as necessary
@@ -497,7 +517,7 @@ public class MediaFilterManager
               ++processed;
           }
           // clear item objects from context cache and internal cache
-          item.decache();
+          itemDAO.decache(item);
           currentItem = null;
         }  
     }
@@ -540,6 +560,8 @@ public class MediaFilterManager
     public static boolean filterBitstream(Context c, Item myItem,
             Bitstream myBitstream) throws Exception
     {
+        ItemDAO itemDAO = ItemDAOFactory.getInstance(c);
+
     	boolean filtered = false;
 
     	// iterate through filter classes. A single format may be actioned
