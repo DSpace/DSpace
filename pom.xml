@@ -5,7 +5,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>1.6-SNAPSHOT</version>
+   <version>SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>http://projects.dspace.org</url>
 
